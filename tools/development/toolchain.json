@@ -1,0 +1,15 @@
+{
+  "developmentRoot": "D:\\Development",
+  "dotnetSdk": "10.0.401",
+  "unityEditor": "6000.3.25f1",
+  "unityRevision": "e1dba0a9aba4",
+  "urp": "17.3.0",
+  "unityHub": "3.22.2",
+  "blender": "4.5.14",
+  "dotnet": "D:\\Development\\dotnet\\dotnet.exe",
+  "unity": "D:\\Development\\Unity\\6000.3.25f1\\Editor\\Unity.exe",
+  "hub": "D:\\Development\\Unity\\Hub\\Unity Hub.exe",
+  "blenderExecutable": "D:\\Development\\Blender\\blender-4.5.14-windows-x64\\blender.exe",
+  "code": "D:\\Development\\Microsoft VS Code\\bin\\code.cmd",
+  "codeExtensions": "D:\\Development\\Microsoft VS Code\\Extensions"
+}

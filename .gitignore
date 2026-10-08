@@ -1,0 +1,32 @@
+# Unity generated data
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+[Bb]uild/
+[Bb]uilds/
+
+# .NET and local editor state
+**/bin/
+**/obj/
+TestResults/
+.vs/
+*.user
+*.suo
+
+# Local caches and credentials
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+.local/
+.env
+.env.*
+!.env.example
+
+# Blender recovery files; source .blend files remain tracked
+*.blend1
+*.blend2

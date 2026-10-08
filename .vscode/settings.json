@@ -1,0 +1,16 @@
+{
+  "dotnetAcquisitionExtension.existingDotnetPath": [
+    { "extensionId": "ms-dotnettools.csharp", "path": "D:\\Development\\dotnet\\dotnet.exe" },
+    { "extensionId": "ms-dotnettools.csdevkit", "path": "D:\\Development\\dotnet\\dotnet.exe" },
+    { "extensionId": "visualstudiotoolsforunity.vstuc", "path": "D:\\Development\\dotnet\\dotnet.exe" }
+  ],
+  "files.exclude": { "**/Library": true, "**/Temp": true, "**/obj": true },
+  "files.watcherExclude": { "**/Library/**": true, "**/Temp/**": true, "**/bin/**": true, "**/obj/**": true },
+  "terminal.integrated.profiles.windows": {
+    "Catan PowerShell": {
+      "path": "powershell.exe",
+      "args": ["-NoExit", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ". '${workspaceFolder}\\tools\\development\\Enter-DevEnvironment.ps1'"]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "Catan PowerShell"
+}

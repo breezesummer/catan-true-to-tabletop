@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "referenceSetId": "official-2025-en-v001",
+  "accessedOn": "2026-10-08",
+  "accessDateTimeZone": "Asia/Shanghai",
+  "decision": {
+    "status": "user-confirmed-development-baseline",
+    "confirmedOn": "2026-10-08",
+    "description": "Use official 2025 rules and explicitly estimated dimensions to complete M0; physical references will follow.",
+    "physicalEdition": null,
+    "physicalEditionConfirmed": false
+  },
+  "sourceIndexUrl": "https://www.catan.com/understand-catan/game-rules",
+  "cacheRoot": ".local/reference-cache/official-2025/v001",
+  "cachePolicy": "Preserve downloaded PDF bytes unchanged. Cache is ignored by Git; reproduce by URL and SHA-256. Never replace a mismatched file automatically.",
+  "sources": [
+    {
+      "id": "catan-base-2025-en",
+      "title": "CATAN - The Game Rulebook",
+      "language": "en",
+      "edition": "2025 / 6th Edition",
+      "role": "base-rules-source",
+      "ruleSetId": "catan-base-2025-en-v1",
+      "sliceRuleSetId": "catan-m1-slice-v1",
+      "url": "https://www.catan.com/sites/default/files/2025-03/CN3081%20CATAN%E2%80%93The%20Game%20Rulebook%20secure%20%281%29.pdf",
+      "cachePath": ".local/reference-cache/official-2025/v001/catan-base-2025-en.pdf",
+      "byteLength": 11653913,
+      "sha256": "0d81a40c1d4eb5eb438a62f80d71cdaab5f00404722c3cfa0b106d79b635ebc6",
+      "pdfPageCount": 12,
+      "titlePage": 1,
+      "creditsPage": 12,
+      "versionEvidence": "Credits name the 6th Edition and copyright 2025 CATAN GmbH and CATAN Studio.",
+      "verification": "Parsed all 12 PDF pages; visually checked building costs and setup/credits on PDF pages 8 and 12. M1 source locators: pages 3, 6, 7, 8, 12."
+    },
+    {
+      "id": "catan-seafarers-2025-en",
+      "title": "CATAN - Seafarers Rulebook",
+      "language": "en",
+      "edition": "2025 / 6th Edition",
+      "role": "M3-source-locked-rules-audit-pending",
+      "ruleSetId": null,
+      "url": "https://www.catan.com/sites/default/files/2025-03/CN3083%20CATAN%E2%80%93Seafarers%20Rulebook%202025%20secured%20reduced.pdf",
+      "cachePath": ".local/reference-cache/official-2025/v001/catan-seafarers-2025-en.pdf",
+      "byteLength": 13769276,
+      "sha256": "a499abe2b613afd618dd3c806790400c7e84adebcc9b9ab19a24fb80dd04b099",
+      "pdfPageCount": 20,
+      "titlePage": 1,
+      "creditsPage": 20,
+      "versionEvidence": "Credits name the 6th Edition and copyright 2025 CATAN GmbH and CATAN Studio.",
+      "verification": "Parsed PDF page count; visually checked the title and credits on PDF pages 1 and 20. Expansion rules and scenarios are not yet audited or implemented."
+    },
+    {
+      "id": "catan-cities-knights-2025-en",
+      "title": "CATAN - Cities & Knights Rulebook",
+      "language": "en",
+      "edition": "2025 / 6th Edition",
+      "role": "M4-source-locked-rules-audit-pending",
+      "ruleSetId": null,
+      "url": "https://www.catan.com/sites/default/files/2025-03/CN3087%20CATAN%E2%80%93Cities%26Knights_%20Rulebook.pdf",
+      "cachePath": ".local/reference-cache/official-2025/v001/catan-cities-knights-2025-en.pdf",
+      "byteLength": 12000564,
+      "sha256": "dac9f01afe9006e3b517aa257363c844eb2a9ff4b6578d3127f5d8d861c9a540",
+      "pdfPageCount": 16,
+      "titlePage": 1,
+      "creditsPage": 16,
+      "versionEvidence": "Credits name the 6th Edition and copyright 2025 CATAN GmbH and CATAN Studio.",
+      "verification": "Parsed PDF page count; visually checked the title and credits on PDF pages 1 and 16. Expansion rules and cards are not yet audited or implemented."
+    }
+  ],
+  "excludedFromActiveRules": [
+    "Rules archived as editions before 2025",
+    "5-6 player extensions",
+    "3D Edition and 3D Expansion rule variants",
+    "Unverified physical-edition differences",
+    "Seafarers plus Cities & Knights combination details pending M5"
+  ]
+}

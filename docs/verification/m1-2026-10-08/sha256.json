@@ -1,0 +1,62 @@
+[
+  {
+    "path": "src/Catan.Core/bin/Release/netstandard2.1/Catan.Core.dll",
+    "sha256": "a57f9da17de8f0ea92409674e18ff01c1d6a3e708b17eb3bef3587c654fc5036"
+  },
+  {
+    "path": "Unity/Catan/Assets/Scripts/CatanApp.cs",
+    "sha256": "67eceaa8256e8c100e3079740451c70ccc278f8fb8e9c4e34db82451c9ac3938"
+  },
+  {
+    "path": "Unity/Catan/Assets/Scripts/BoardRenderer.cs",
+    "sha256": "2efbac7193708cda3235336499e00718b3f8399569fad1c147a83192ec819dc4"
+  },
+  {
+    "path": "Unity/Catan/Assets/Scripts/LocalGameHost.cs",
+    "sha256": "3c397e9d72ab07a31a6f2acc23a04daacf7c6c0afd5efdc795d65aee6b4b5d9a"
+  },
+  {
+    "path": "Unity/Catan/Assets/Scripts/M1PlayerVerification.cs",
+    "sha256": "1bda02aef2d8efb6eb2dd9c26b94d183b6d9ef2200972a36200897fd414e0a7a"
+  },
+  {
+    "path": "Unity/Catan/Assets/Editor/M1Build.cs",
+    "sha256": "a3b3091d7c10ff7c0381b09eccfe30010dbf91fb4e2320a34ff69e83a9039881"
+  },
+  {
+    "path": "Unity/Catan/Packages/packages-lock.json",
+    "sha256": "c5a5c9bfe76e4c918384fc1fb6abdbee668aeef448b3ef3d2b4c69c84a5c3221"
+  },
+  {
+    "path": "art/exports/mountain-tile-v001/mountain-tile-v001.fbx",
+    "sha256": "0cb99e86ca0d7b4405b4446f147dc059587e177f3fddb649c03239fa93fd6427"
+  },
+  {
+    "path": ".local/m1/Builds/Windows/CatanM1.exe",
+    "sha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+  },
+  {
+    "path": ".local/m1/Builds/Windows/CatanM1_Data/Managed/Assembly-CSharp.dll",
+    "sha256": "6fb5a8c275050ff9d2f018cf45929b2798f38f3f6891069f6fdc3aa6dadd6236"
+  },
+  {
+    "path": ".local/m1/Builds/Windows/CatanM1_Data/Managed/Catan.Core.dll",
+    "sha256": "a57f9da17de8f0ea92409674e18ff01c1d6a3e708b17eb3bef3587c654fc5036"
+  },
+  {
+    "path": ".local/m1/logs/unity-build.log",
+    "sha256": "e44bd94f6e2b372e97c2c357560ccd938cddefb154a69e71bb79e4263f3e50f9"
+  },
+  {
+    "path": "docs/verification/m1-2026-10-08/m1-rules.trx",
+    "sha256": "e805b05438077fedb71289688848422d81257b77e47ebf315df3a2646863fc46"
+  },
+  {
+    "path": "docs/verification/m1-2026-10-08/m1-default.png",
+    "sha256": "461d4c0a0bbe7e1da4fb1546378cd443d15f77398e99fc6d2628c8bcf1ffb8c9"
+  },
+  {
+    "path": "docs/verification/m1-2026-10-08/m1-top.png",
+    "sha256": "e599522d5903e110080e9354b48aef1ffa4341f82119d00f2e4743e97ee58bad"
+  }
+]
