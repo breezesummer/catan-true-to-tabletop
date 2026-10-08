@@ -1,0 +1,58 @@
+{
+  "assetId": "mountain-tile-v001",
+  "blenderVersion": "4.5.14 LTS",
+  "status": "passed",
+  "fbxRoundTrip": true,
+  "meshObjects": 24,
+  "triangles": 1192,
+  "closedMeshes": true,
+  "uvMeshes": 24,
+  "bottomCentrePivots": true,
+  "blendHashVerified": true,
+  "previewViewsVerified": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "dimensionsBlenderMetres": [
+    0.06928203254938126,
+    0.07999999821186066,
+    0.03350000722095592
+  ],
+  "minEdgeClearanceMm": 8.437069598585367,
+  "minVertexClearanceMm": 15.491445071536793,
+  "materials": [
+    "M1_Base_Obsidian",
+    "M1_Ground_Moss",
+    "M1_Ground_Slate",
+    "M1_Number_Recess",
+    "M1_Ore_Copper",
+    "M1_Ore_GoldFace",
+    "M1_Rim_AntiqueBronze",
+    "M1_Stone_BlueSlate",
+    "M1_Stone_DeepSlate",
+    "M1_Stone_Quartz",
+    "M1_Stone_Weathered"
+  ],
+  "missingTextures": [],
+  "cleanRebuildComparison": {
+    "referenceRoot": "art",
+    "comparedFields": [
+      "geometry",
+      "materials",
+      "export",
+      "tool",
+      "blenderBounds",
+      "expectedUnityBounds",
+      "previews.resolution",
+      "previews.views"
+    ],
+    "identical": true
+  },
+  "notCovered": [
+    "Unity import and material remapping",
+    "Unity pointer picking and camera occlusion",
+    "User visual acceptance"
+  ]
+}

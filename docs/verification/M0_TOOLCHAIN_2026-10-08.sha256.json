@@ -1,0 +1,102 @@
+[
+  {
+    "path": "global.json",
+    "sha256": "4E7D5022B2A5A8D02BB951BB264A4C8613EABC332572A0AF5F9743D23F23D84E",
+    "bytes": 105
+  },
+  {
+    "path": "tools/development/toolchain.json",
+    "sha256": "E88F2115CE27E7E8C0511D1428FC027B8D157B99C8BA2084465DFA44212D3250",
+    "bytes": 603
+  },
+  {
+    "path": "tools/development/unity-packages-lock.json",
+    "sha256": "13461C21DBF05EF21B1A0BAF4BA5079D1CCCA2A857176712BE4136FD09967FE1",
+    "bytes": 4432
+  },
+  {
+    "path": "tools/development/Verify-Environment.ps1",
+    "sha256": "3651E208150CD0A7CD319771088E9D86E52524F79CA2F006504A153F75D96458",
+    "bytes": 7514
+  },
+  {
+    "path": "tools/development/UnitySmoke.cs",
+    "sha256": "76AA6427E791A638E0DB413761F7AFBEAA9079126E6B791529789E2DEE6C43D2",
+    "bytes": 4210
+  },
+  {
+    "path": "tools/development/SmokeRuntime.cs",
+    "sha256": "C9BC75F5338E3C2652CE8AB2AA55AB5D43A6978D89CB1E17BA7DEEFAEC45C103",
+    "bytes": 2894
+  },
+  {
+    "path": "tools/development/blender_smoke.py",
+    "sha256": "9C993124A7F03517E36CEB381B9968D0727A39AA0A330BC6C0CDDA73DFA451FB",
+    "bytes": 1837
+  },
+  {
+    "path": ".local/environment/logs/dotnet-test.log",
+    "sha256": "469E7B6074D5BE088B5F4B31121DF7E494AB7344F3F177AB6DB30EAA5AF04058",
+    "bytes": 1294
+  },
+  {
+    "path": ".local/environment/logs/blender-export.log",
+    "sha256": "25EEAAE47BB9554041A2182DF1E6E3A50FD4AB293438F566058BC373E53E15DD",
+    "bytes": 626
+  },
+  {
+    "path": ".local/environment/logs/unity-build.log",
+    "sha256": "53F126C971B418878D1DAB5711FA360E2122517ACCE5C7619F4C18356761D12C",
+    "bytes": 326160
+  },
+  {
+    "path": ".local/environment/logs/player.log",
+    "sha256": "1F70A4173BCD43A6752580DC169D4A3EC33D9E23055484B4245024FCD0565D2E",
+    "bytes": 4085
+  },
+  {
+    "path": ".local/environment/logs/player-graphics.log",
+    "sha256": "6279A6F832A9B0F545789C1E9295A4AD220F019F63D3E50EBAC992EB4E0C748F",
+    "bytes": 4118
+  },
+  {
+    "path": ".local/environment/TestResults/BreezeSummer_BREEZEPRO_2026-10-08_22_52_38_net10.0.trx",
+    "sha256": "0E19A9116CE885008A1DBD21C099B854D4C2B89EEDC6DC59CD2683C9D4DC7460",
+    "bytes": 4063
+  },
+  {
+    "path": ".local/environment/Previews/windows-20261008-145255-416.png",
+    "sha256": "EC9F741B5E04FE6E71E7820C06D71A0F75186700BD3B2C286A4958F6AB82623D",
+    "bytes": 20374
+  },
+  {
+    "path": ".local/environment/art/v001/environment-cube-v001.fbx",
+    "sha256": "F004770BFAED52F0DBD1064C9C15A8E62AE4DEC261763965E324D68C660D7948",
+    "bytes": 11884
+  },
+  {
+    "path": ".local/environment/art/v001/environment-cube-v001.blend",
+    "sha256": "F1AEDEB10F50FEC8756DD50F5D885DDB6AC5FE3690691FB1BD0220D4EA095A9B",
+    "bytes": 426550
+  },
+  {
+    "path": ".local/environment/art/v001/manifest.json",
+    "sha256": "3E832DC87AA158E35E57F689803328DEB0D6853169816B82C1C0B5A4BA6180B3",
+    "bytes": 523
+  },
+  {
+    "path": ".local/environment/DotNetSmoke/Core/bin/Release/netstandard2.1/Catan.EnvironmentProbe.dll",
+    "sha256": "A359685A12E90D23ADADEB422AD390DF2BB7ADE48448C662CA3AFD1214082351",
+    "bytes": 4096
+  },
+  {
+    "path": ".local/environment/Builds/Windows/EnvironmentSmoke.exe",
+    "sha256": "B9FC30BB05CA93A042831974149A681D656963E3E612ECAFD9AE826759D739AD",
+    "bytes": 667136
+  },
+  {
+    "path": ".local/environment/evidence/m0-20261008-225238-final/windows-build-sha256.csv",
+    "sha256": "558C2E1A70BCBC216D62079086BC2E9BBEE27331B59BB43117E264084444341B",
+    "bytes": 37128
+  }
+]

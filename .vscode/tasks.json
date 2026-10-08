@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "验证 .NET 与 Blender 环境",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\tools\\development\\Verify-Environment.ps1"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "验证完整环境（需要 Unity 许可）",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\tools\\development\\Verify-Environment.ps1", "-Unity"],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

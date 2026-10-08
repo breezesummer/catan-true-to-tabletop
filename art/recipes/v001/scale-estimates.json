@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "parameterSetId": "m1-scale-estimates-v001",
+  "status": "estimated-not-measured",
+  "date": "2026-10-08",
+  "decision": "User authorized official 2025 rules and explicitly estimated dimensions for M0; physical references will follow.",
+  "parameterAuthor": "AI working defaults; individual dimensions are not user measurements",
+  "physicalEdition": null,
+  "referenceIds": [],
+  "measuredDimensionsMm": null,
+  "units": { "parameters": "millimetres", "blender": "metres", "unityUnitsPerMetre": 1 },
+  "axes": { "blenderUp": "+Z", "fbxForward": "-Z", "fbxUp": "+Y", "unityUp": "+Y" },
+  "hexTile": {
+    "edgeLengthMm": 40,
+    "cornerToCornerMm": 80,
+    "flatToFlatMm": 69.2820323027551,
+    "baseThicknessMm": 8,
+    "piecePlacementPlaneMm": 8,
+    "maxLandscapeHeightAboveBaseMm": 28,
+    "pivot": "bottom-centre",
+    "landscapeExclusion": { "distanceFromEdgeMm": 6, "radiusAroundVertexMm": 9 }
+  },
+  "road": { "lengthMm": 26, "widthMm": 5, "heightMm": 5, "pivot": "bottom-centre-at-length-midpoint" },
+  "settlement": { "widthMm": 12, "depthMm": 12, "heightMm": 16, "pivot": "bottom-centre" },
+  "city": { "widthMm": 16, "depthMm": 16, "heightMm": 22, "pivot": "bottom-centre" },
+  "resourceCard": { "widthMm": 54, "heightMm": 80, "thicknessMm": 0.3 },
+  "firstSample": {
+    "id": "mountain-tile-v001",
+    "status": "planned-for-M1-not-generated",
+    "generationSeed": 20251008,
+    "materialVersion": "graybox-v001",
+    "requiredPreviews": ["top", "side", "game-camera", "crowded-vertex"],
+    "mustVerify": ["scale", "bottom-pivot", "adjacent-tiles", "selection-clearance", "camera-occlusion", "rebuild-from-empty-output"]
+  },
+  "expansionDimensions": { "ship": null, "knight": null, "cityWall": null, "cityImprovementBoard": null },
+  "notes": [
+    "Synthetic tooling cube (80 x 80 x 10 mm) is separate from these hex-tile estimates.",
+    "No photos, scans, textures, or usable game mesh are supplied by this parameter file.",
+    "Tile, Vertex and Edge identifiers must not depend on physical size or render coordinates.",
+    "Preserve v001 when physical measurements arrive; produce v002 with source reference IDs."
+  ]
+}

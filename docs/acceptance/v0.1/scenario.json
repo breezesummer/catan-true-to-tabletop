@@ -1,0 +1,1900 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "m1-fixed-four-seats-v001",
+  "scenarioVersion": "1.0.0",
+  "rulesBaselineId": "catan-base-2025-en-v1",
+  "rulesVersion": "catan-m1-slice-v1",
+  "status": "authored-fixture-not-game-test",
+  "resourceOrder": [
+    "wood",
+    "brick",
+    "wool",
+    "wheat",
+    "ore"
+  ],
+  "players": [
+    "P1",
+    "P2",
+    "P3",
+    "P4"
+  ],
+  "initialBank": {
+    "wood": 19,
+    "brick": 19,
+    "wool": 19,
+    "wheat": 19,
+    "ore": 19
+  },
+  "initialPieces": {
+    "roads": 15,
+    "settlements": 5,
+    "cities": 4
+  },
+  "roadCost": {
+    "wood": 1,
+    "brick": 1,
+    "wool": 0,
+    "wheat": 0,
+    "ore": 0
+  },
+  "robberTile": "T10",
+  "ports": [],
+  "topology": {
+    "coordinateScheme": "pointy-axial-integer-corners-v1",
+    "tiles": [
+      {
+        "id": "T01",
+        "q": 0,
+        "r": -2,
+        "resource": "wood",
+        "number": 5,
+        "vertices": [
+          "V01",
+          "V05",
+          "V09",
+          "V13",
+          "V08",
+          "V04"
+        ]
+      },
+      {
+        "id": "T02",
+        "q": 1,
+        "r": -2,
+        "resource": "wood",
+        "number": 5,
+        "vertices": [
+          "V02",
+          "V06",
+          "V10",
+          "V14",
+          "V09",
+          "V05"
+        ]
+      },
+      {
+        "id": "T03",
+        "q": 2,
+        "r": -2,
+        "resource": "wool",
+        "number": 6,
+        "vertices": [
+          "V03",
+          "V07",
+          "V11",
+          "V15",
+          "V10",
+          "V06"
+        ]
+      },
+      {
+        "id": "T04",
+        "q": -1,
+        "r": -1,
+        "resource": "brick",
+        "number": 3,
+        "vertices": [
+          "V08",
+          "V13",
+          "V18",
+          "V23",
+          "V17",
+          "V12"
+        ]
+      },
+      {
+        "id": "T05",
+        "q": 0,
+        "r": -1,
+        "resource": "wood",
+        "number": 9,
+        "vertices": [
+          "V09",
+          "V14",
+          "V19",
+          "V24",
+          "V18",
+          "V13"
+        ]
+      },
+      {
+        "id": "T06",
+        "q": 1,
+        "r": -1,
+        "resource": "ore",
+        "number": 10,
+        "vertices": [
+          "V10",
+          "V15",
+          "V20",
+          "V25",
+          "V19",
+          "V14"
+        ]
+      },
+      {
+        "id": "T07",
+        "q": 2,
+        "r": -1,
+        "resource": "wheat",
+        "number": 2,
+        "vertices": [
+          "V11",
+          "V16",
+          "V21",
+          "V26",
+          "V20",
+          "V15"
+        ]
+      },
+      {
+        "id": "T08",
+        "q": -2,
+        "r": 0,
+        "resource": "wheat",
+        "number": 8,
+        "vertices": [
+          "V17",
+          "V23",
+          "V29",
+          "V34",
+          "V28",
+          "V22"
+        ]
+      },
+      {
+        "id": "T09",
+        "q": -1,
+        "r": 0,
+        "resource": "wool",
+        "number": 4,
+        "vertices": [
+          "V18",
+          "V24",
+          "V30",
+          "V35",
+          "V29",
+          "V23"
+        ]
+      },
+      {
+        "id": "T10",
+        "q": 0,
+        "r": 0,
+        "resource": null,
+        "number": null,
+        "vertices": [
+          "V19",
+          "V25",
+          "V31",
+          "V36",
+          "V30",
+          "V24"
+        ]
+      },
+      {
+        "id": "T11",
+        "q": 1,
+        "r": 0,
+        "resource": "brick",
+        "number": 8,
+        "vertices": [
+          "V20",
+          "V26",
+          "V32",
+          "V37",
+          "V31",
+          "V25"
+        ]
+      },
+      {
+        "id": "T12",
+        "q": 2,
+        "r": 0,
+        "resource": "wool",
+        "number": 9,
+        "vertices": [
+          "V21",
+          "V27",
+          "V33",
+          "V38",
+          "V32",
+          "V26"
+        ]
+      },
+      {
+        "id": "T13",
+        "q": -2,
+        "r": 1,
+        "resource": "ore",
+        "number": 11,
+        "vertices": [
+          "V29",
+          "V35",
+          "V40",
+          "V44",
+          "V39",
+          "V34"
+        ]
+      },
+      {
+        "id": "T14",
+        "q": -1,
+        "r": 1,
+        "resource": "wheat",
+        "number": 10,
+        "vertices": [
+          "V30",
+          "V36",
+          "V41",
+          "V45",
+          "V40",
+          "V35"
+        ]
+      },
+      {
+        "id": "T15",
+        "q": 0,
+        "r": 1,
+        "resource": "wool",
+        "number": 3,
+        "vertices": [
+          "V31",
+          "V37",
+          "V42",
+          "V46",
+          "V41",
+          "V36"
+        ]
+      },
+      {
+        "id": "T16",
+        "q": 1,
+        "r": 1,
+        "resource": "ore",
+        "number": 4,
+        "vertices": [
+          "V32",
+          "V38",
+          "V43",
+          "V47",
+          "V42",
+          "V37"
+        ]
+      },
+      {
+        "id": "T17",
+        "q": -2,
+        "r": 2,
+        "resource": "brick",
+        "number": 6,
+        "vertices": [
+          "V40",
+          "V45",
+          "V49",
+          "V52",
+          "V48",
+          "V44"
+        ]
+      },
+      {
+        "id": "T18",
+        "q": -1,
+        "r": 2,
+        "resource": "wheat",
+        "number": 11,
+        "vertices": [
+          "V41",
+          "V46",
+          "V50",
+          "V53",
+          "V49",
+          "V45"
+        ]
+      },
+      {
+        "id": "T19",
+        "q": 0,
+        "r": 2,
+        "resource": "wood",
+        "number": 12,
+        "vertices": [
+          "V42",
+          "V47",
+          "V51",
+          "V54",
+          "V50",
+          "V46"
+        ]
+      }
+    ],
+    "vertices": [
+      {
+        "id": "V01",
+        "x": -2,
+        "y": -8
+      },
+      {
+        "id": "V02",
+        "x": 0,
+        "y": -8
+      },
+      {
+        "id": "V03",
+        "x": 2,
+        "y": -8
+      },
+      {
+        "id": "V04",
+        "x": -3,
+        "y": -7
+      },
+      {
+        "id": "V05",
+        "x": -1,
+        "y": -7
+      },
+      {
+        "id": "V06",
+        "x": 1,
+        "y": -7
+      },
+      {
+        "id": "V07",
+        "x": 3,
+        "y": -7
+      },
+      {
+        "id": "V08",
+        "x": -3,
+        "y": -5
+      },
+      {
+        "id": "V09",
+        "x": -1,
+        "y": -5
+      },
+      {
+        "id": "V10",
+        "x": 1,
+        "y": -5
+      },
+      {
+        "id": "V11",
+        "x": 3,
+        "y": -5
+      },
+      {
+        "id": "V12",
+        "x": -4,
+        "y": -4
+      },
+      {
+        "id": "V13",
+        "x": -2,
+        "y": -4
+      },
+      {
+        "id": "V14",
+        "x": 0,
+        "y": -4
+      },
+      {
+        "id": "V15",
+        "x": 2,
+        "y": -4
+      },
+      {
+        "id": "V16",
+        "x": 4,
+        "y": -4
+      },
+      {
+        "id": "V17",
+        "x": -4,
+        "y": -2
+      },
+      {
+        "id": "V18",
+        "x": -2,
+        "y": -2
+      },
+      {
+        "id": "V19",
+        "x": 0,
+        "y": -2
+      },
+      {
+        "id": "V20",
+        "x": 2,
+        "y": -2
+      },
+      {
+        "id": "V21",
+        "x": 4,
+        "y": -2
+      },
+      {
+        "id": "V22",
+        "x": -5,
+        "y": -1
+      },
+      {
+        "id": "V23",
+        "x": -3,
+        "y": -1
+      },
+      {
+        "id": "V24",
+        "x": -1,
+        "y": -1
+      },
+      {
+        "id": "V25",
+        "x": 1,
+        "y": -1
+      },
+      {
+        "id": "V26",
+        "x": 3,
+        "y": -1
+      },
+      {
+        "id": "V27",
+        "x": 5,
+        "y": -1
+      },
+      {
+        "id": "V28",
+        "x": -5,
+        "y": 1
+      },
+      {
+        "id": "V29",
+        "x": -3,
+        "y": 1
+      },
+      {
+        "id": "V30",
+        "x": -1,
+        "y": 1
+      },
+      {
+        "id": "V31",
+        "x": 1,
+        "y": 1
+      },
+      {
+        "id": "V32",
+        "x": 3,
+        "y": 1
+      },
+      {
+        "id": "V33",
+        "x": 5,
+        "y": 1
+      },
+      {
+        "id": "V34",
+        "x": -4,
+        "y": 2
+      },
+      {
+        "id": "V35",
+        "x": -2,
+        "y": 2
+      },
+      {
+        "id": "V36",
+        "x": 0,
+        "y": 2
+      },
+      {
+        "id": "V37",
+        "x": 2,
+        "y": 2
+      },
+      {
+        "id": "V38",
+        "x": 4,
+        "y": 2
+      },
+      {
+        "id": "V39",
+        "x": -4,
+        "y": 4
+      },
+      {
+        "id": "V40",
+        "x": -2,
+        "y": 4
+      },
+      {
+        "id": "V41",
+        "x": 0,
+        "y": 4
+      },
+      {
+        "id": "V42",
+        "x": 2,
+        "y": 4
+      },
+      {
+        "id": "V43",
+        "x": 4,
+        "y": 4
+      },
+      {
+        "id": "V44",
+        "x": -3,
+        "y": 5
+      },
+      {
+        "id": "V45",
+        "x": -1,
+        "y": 5
+      },
+      {
+        "id": "V46",
+        "x": 1,
+        "y": 5
+      },
+      {
+        "id": "V47",
+        "x": 3,
+        "y": 5
+      },
+      {
+        "id": "V48",
+        "x": -3,
+        "y": 7
+      },
+      {
+        "id": "V49",
+        "x": -1,
+        "y": 7
+      },
+      {
+        "id": "V50",
+        "x": 1,
+        "y": 7
+      },
+      {
+        "id": "V51",
+        "x": 3,
+        "y": 7
+      },
+      {
+        "id": "V52",
+        "x": -2,
+        "y": 8
+      },
+      {
+        "id": "V53",
+        "x": 0,
+        "y": 8
+      },
+      {
+        "id": "V54",
+        "x": 2,
+        "y": 8
+      }
+    ],
+    "edges": [
+      {
+        "id": "E01",
+        "vertices": [
+          "V01",
+          "V04"
+        ]
+      },
+      {
+        "id": "E02",
+        "vertices": [
+          "V01",
+          "V05"
+        ]
+      },
+      {
+        "id": "E03",
+        "vertices": [
+          "V02",
+          "V05"
+        ]
+      },
+      {
+        "id": "E04",
+        "vertices": [
+          "V02",
+          "V06"
+        ]
+      },
+      {
+        "id": "E05",
+        "vertices": [
+          "V03",
+          "V06"
+        ]
+      },
+      {
+        "id": "E06",
+        "vertices": [
+          "V03",
+          "V07"
+        ]
+      },
+      {
+        "id": "E07",
+        "vertices": [
+          "V04",
+          "V08"
+        ]
+      },
+      {
+        "id": "E08",
+        "vertices": [
+          "V05",
+          "V09"
+        ]
+      },
+      {
+        "id": "E09",
+        "vertices": [
+          "V06",
+          "V10"
+        ]
+      },
+      {
+        "id": "E10",
+        "vertices": [
+          "V07",
+          "V11"
+        ]
+      },
+      {
+        "id": "E11",
+        "vertices": [
+          "V08",
+          "V12"
+        ]
+      },
+      {
+        "id": "E12",
+        "vertices": [
+          "V08",
+          "V13"
+        ]
+      },
+      {
+        "id": "E13",
+        "vertices": [
+          "V09",
+          "V13"
+        ]
+      },
+      {
+        "id": "E14",
+        "vertices": [
+          "V09",
+          "V14"
+        ]
+      },
+      {
+        "id": "E15",
+        "vertices": [
+          "V10",
+          "V14"
+        ]
+      },
+      {
+        "id": "E16",
+        "vertices": [
+          "V10",
+          "V15"
+        ]
+      },
+      {
+        "id": "E17",
+        "vertices": [
+          "V11",
+          "V15"
+        ]
+      },
+      {
+        "id": "E18",
+        "vertices": [
+          "V11",
+          "V16"
+        ]
+      },
+      {
+        "id": "E19",
+        "vertices": [
+          "V12",
+          "V17"
+        ]
+      },
+      {
+        "id": "E20",
+        "vertices": [
+          "V13",
+          "V18"
+        ]
+      },
+      {
+        "id": "E21",
+        "vertices": [
+          "V14",
+          "V19"
+        ]
+      },
+      {
+        "id": "E22",
+        "vertices": [
+          "V15",
+          "V20"
+        ]
+      },
+      {
+        "id": "E23",
+        "vertices": [
+          "V16",
+          "V21"
+        ]
+      },
+      {
+        "id": "E24",
+        "vertices": [
+          "V17",
+          "V22"
+        ]
+      },
+      {
+        "id": "E25",
+        "vertices": [
+          "V17",
+          "V23"
+        ]
+      },
+      {
+        "id": "E26",
+        "vertices": [
+          "V18",
+          "V23"
+        ]
+      },
+      {
+        "id": "E27",
+        "vertices": [
+          "V18",
+          "V24"
+        ]
+      },
+      {
+        "id": "E28",
+        "vertices": [
+          "V19",
+          "V24"
+        ]
+      },
+      {
+        "id": "E29",
+        "vertices": [
+          "V19",
+          "V25"
+        ]
+      },
+      {
+        "id": "E30",
+        "vertices": [
+          "V20",
+          "V25"
+        ]
+      },
+      {
+        "id": "E31",
+        "vertices": [
+          "V20",
+          "V26"
+        ]
+      },
+      {
+        "id": "E32",
+        "vertices": [
+          "V21",
+          "V26"
+        ]
+      },
+      {
+        "id": "E33",
+        "vertices": [
+          "V21",
+          "V27"
+        ]
+      },
+      {
+        "id": "E34",
+        "vertices": [
+          "V22",
+          "V28"
+        ]
+      },
+      {
+        "id": "E35",
+        "vertices": [
+          "V23",
+          "V29"
+        ]
+      },
+      {
+        "id": "E36",
+        "vertices": [
+          "V24",
+          "V30"
+        ]
+      },
+      {
+        "id": "E37",
+        "vertices": [
+          "V25",
+          "V31"
+        ]
+      },
+      {
+        "id": "E38",
+        "vertices": [
+          "V26",
+          "V32"
+        ]
+      },
+      {
+        "id": "E39",
+        "vertices": [
+          "V27",
+          "V33"
+        ]
+      },
+      {
+        "id": "E40",
+        "vertices": [
+          "V28",
+          "V34"
+        ]
+      },
+      {
+        "id": "E41",
+        "vertices": [
+          "V29",
+          "V34"
+        ]
+      },
+      {
+        "id": "E42",
+        "vertices": [
+          "V29",
+          "V35"
+        ]
+      },
+      {
+        "id": "E43",
+        "vertices": [
+          "V30",
+          "V35"
+        ]
+      },
+      {
+        "id": "E44",
+        "vertices": [
+          "V30",
+          "V36"
+        ]
+      },
+      {
+        "id": "E45",
+        "vertices": [
+          "V31",
+          "V36"
+        ]
+      },
+      {
+        "id": "E46",
+        "vertices": [
+          "V31",
+          "V37"
+        ]
+      },
+      {
+        "id": "E47",
+        "vertices": [
+          "V32",
+          "V37"
+        ]
+      },
+      {
+        "id": "E48",
+        "vertices": [
+          "V32",
+          "V38"
+        ]
+      },
+      {
+        "id": "E49",
+        "vertices": [
+          "V33",
+          "V38"
+        ]
+      },
+      {
+        "id": "E50",
+        "vertices": [
+          "V34",
+          "V39"
+        ]
+      },
+      {
+        "id": "E51",
+        "vertices": [
+          "V35",
+          "V40"
+        ]
+      },
+      {
+        "id": "E52",
+        "vertices": [
+          "V36",
+          "V41"
+        ]
+      },
+      {
+        "id": "E53",
+        "vertices": [
+          "V37",
+          "V42"
+        ]
+      },
+      {
+        "id": "E54",
+        "vertices": [
+          "V38",
+          "V43"
+        ]
+      },
+      {
+        "id": "E55",
+        "vertices": [
+          "V39",
+          "V44"
+        ]
+      },
+      {
+        "id": "E56",
+        "vertices": [
+          "V40",
+          "V44"
+        ]
+      },
+      {
+        "id": "E57",
+        "vertices": [
+          "V40",
+          "V45"
+        ]
+      },
+      {
+        "id": "E58",
+        "vertices": [
+          "V41",
+          "V45"
+        ]
+      },
+      {
+        "id": "E59",
+        "vertices": [
+          "V41",
+          "V46"
+        ]
+      },
+      {
+        "id": "E60",
+        "vertices": [
+          "V42",
+          "V46"
+        ]
+      },
+      {
+        "id": "E61",
+        "vertices": [
+          "V42",
+          "V47"
+        ]
+      },
+      {
+        "id": "E62",
+        "vertices": [
+          "V43",
+          "V47"
+        ]
+      },
+      {
+        "id": "E63",
+        "vertices": [
+          "V44",
+          "V48"
+        ]
+      },
+      {
+        "id": "E64",
+        "vertices": [
+          "V45",
+          "V49"
+        ]
+      },
+      {
+        "id": "E65",
+        "vertices": [
+          "V46",
+          "V50"
+        ]
+      },
+      {
+        "id": "E66",
+        "vertices": [
+          "V47",
+          "V51"
+        ]
+      },
+      {
+        "id": "E67",
+        "vertices": [
+          "V48",
+          "V52"
+        ]
+      },
+      {
+        "id": "E68",
+        "vertices": [
+          "V49",
+          "V52"
+        ]
+      },
+      {
+        "id": "E69",
+        "vertices": [
+          "V49",
+          "V53"
+        ]
+      },
+      {
+        "id": "E70",
+        "vertices": [
+          "V50",
+          "V53"
+        ]
+      },
+      {
+        "id": "E71",
+        "vertices": [
+          "V50",
+          "V54"
+        ]
+      },
+      {
+        "id": "E72",
+        "vertices": [
+          "V51",
+          "V54"
+        ]
+      }
+    ]
+  },
+  "setup": [
+    {
+      "player": "P1",
+      "vertex": "V42",
+      "edge": "E60",
+      "settlementCommandId": "C01",
+      "roadCommandId": "C02",
+      "initialResources": {
+        "wood": 0,
+        "brick": 0,
+        "wool": 0,
+        "wheat": 0,
+        "ore": 0
+      }
+    },
+    {
+      "player": "P2",
+      "vertex": "V15",
+      "edge": "E17",
+      "settlementCommandId": "C03",
+      "roadCommandId": "C04",
+      "initialResources": {
+        "wood": 0,
+        "brick": 0,
+        "wool": 0,
+        "wheat": 0,
+        "ore": 0
+      }
+    },
+    {
+      "player": "P3",
+      "vertex": "V29",
+      "edge": "E41",
+      "settlementCommandId": "C05",
+      "roadCommandId": "C06",
+      "initialResources": {
+        "wood": 0,
+        "brick": 0,
+        "wool": 0,
+        "wheat": 0,
+        "ore": 0
+      }
+    },
+    {
+      "player": "P4",
+      "vertex": "V40",
+      "edge": "E56",
+      "settlementCommandId": "C07",
+      "roadCommandId": "C08",
+      "initialResources": {
+        "wood": 0,
+        "brick": 0,
+        "wool": 0,
+        "wheat": 0,
+        "ore": 0
+      }
+    },
+    {
+      "player": "P4",
+      "vertex": "V32",
+      "edge": "E48",
+      "settlementCommandId": "C09",
+      "roadCommandId": "C10",
+      "initialResources": {
+        "wood": 0,
+        "brick": 1,
+        "wool": 1,
+        "wheat": 0,
+        "ore": 1
+      }
+    },
+    {
+      "player": "P3",
+      "vertex": "V18",
+      "edge": "E27",
+      "settlementCommandId": "C11",
+      "roadCommandId": "C12",
+      "initialResources": {
+        "wood": 1,
+        "brick": 1,
+        "wool": 1,
+        "wheat": 0,
+        "ore": 0
+      }
+    },
+    {
+      "player": "P2",
+      "vertex": "V49",
+      "edge": "E69",
+      "settlementCommandId": "C13",
+      "roadCommandId": "C14",
+      "initialResources": {
+        "wood": 0,
+        "brick": 1,
+        "wool": 0,
+        "wheat": 1,
+        "ore": 0
+      }
+    },
+    {
+      "player": "P1",
+      "vertex": "V09",
+      "edge": "E08",
+      "settlementCommandId": "C15",
+      "roadCommandId": "C16",
+      "initialResources": {
+        "wood": 3,
+        "brick": 0,
+        "wool": 0,
+        "wheat": 0,
+        "ore": 0
+      }
+    }
+  ],
+  "controlledRandom": {
+    "algorithmId": "fixture-dice-queue-v1",
+    "dice": [
+      [
+        2,
+        3
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "initialCursor": 0,
+    "authorityOnly": true
+  },
+  "actions": [
+    {
+      "commandId": "C17",
+      "player": "P1",
+      "kind": "RollDice",
+      "expectedDice": [
+        2,
+        3
+      ],
+      "checkpoint": "afterRoll"
+    },
+    {
+      "commandId": "C18",
+      "player": "P1",
+      "kind": "BankTrade",
+      "give": {
+        "wood": 4
+      },
+      "receive": {
+        "brick": 1
+      },
+      "checkpoint": "afterTrade"
+    },
+    {
+      "commandId": "C19",
+      "player": "P1",
+      "kind": "BuildRoad",
+      "edge": "E65",
+      "checkpoint": "afterBuild"
+    },
+    {
+      "commandId": "C20",
+      "player": "P1",
+      "kind": "EndTurn",
+      "checkpoint": "afterEnd"
+    }
+  ],
+  "restoreProbe": {
+    "commandId": "C21",
+    "player": "P2",
+    "kind": "RollDice",
+    "expectedDice": [
+      1,
+      1
+    ],
+    "checkpoint": "afterRestoreProbe"
+  },
+  "expected": {
+    "afterSetup": {
+      "hands": {
+        "P1": {
+          "wood": 3,
+          "brick": 0,
+          "wool": 0,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P2": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 0,
+          "wheat": 1,
+          "ore": 0
+        },
+        "P3": {
+          "wood": 1,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P4": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 1
+        }
+      },
+      "bank": {
+        "wood": 15,
+        "brick": 16,
+        "wool": 17,
+        "wheat": 18,
+        "ore": 18
+      },
+      "remainingPieces": {
+        "P1": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P2": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P3": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P4": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        }
+      },
+      "activePlayer": "P1",
+      "turn": 1,
+      "phase": "ProductionAwaitRoll",
+      "pendingDecision": null,
+      "rngCursor": 0,
+      "publicVictoryPoints": {
+        "P1": 2,
+        "P2": 2,
+        "P3": 2,
+        "P4": 2
+      }
+    },
+    "afterRoll": {
+      "hands": {
+        "P1": {
+          "wood": 5,
+          "brick": 0,
+          "wool": 0,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P2": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 0,
+          "wheat": 1,
+          "ore": 0
+        },
+        "P3": {
+          "wood": 1,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P4": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 1
+        }
+      },
+      "bank": {
+        "wood": 13,
+        "brick": 16,
+        "wool": 17,
+        "wheat": 18,
+        "ore": 18
+      },
+      "remainingPieces": {
+        "P1": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P2": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P3": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P4": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        }
+      },
+      "activePlayer": "P1",
+      "turn": 1,
+      "phase": "Action",
+      "pendingDecision": null,
+      "rngCursor": 1,
+      "publicVictoryPoints": {
+        "P1": 2,
+        "P2": 2,
+        "P3": 2,
+        "P4": 2
+      }
+    },
+    "afterTrade": {
+      "hands": {
+        "P1": {
+          "wood": 1,
+          "brick": 1,
+          "wool": 0,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P2": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 0,
+          "wheat": 1,
+          "ore": 0
+        },
+        "P3": {
+          "wood": 1,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P4": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 1
+        }
+      },
+      "bank": {
+        "wood": 17,
+        "brick": 15,
+        "wool": 17,
+        "wheat": 18,
+        "ore": 18
+      },
+      "remainingPieces": {
+        "P1": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P2": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P3": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P4": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        }
+      },
+      "activePlayer": "P1",
+      "turn": 1,
+      "phase": "Action",
+      "pendingDecision": null,
+      "rngCursor": 1,
+      "publicVictoryPoints": {
+        "P1": 2,
+        "P2": 2,
+        "P3": 2,
+        "P4": 2
+      }
+    },
+    "afterBuild": {
+      "hands": {
+        "P1": {
+          "wood": 0,
+          "brick": 0,
+          "wool": 0,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P2": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 0,
+          "wheat": 1,
+          "ore": 0
+        },
+        "P3": {
+          "wood": 1,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P4": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 1
+        }
+      },
+      "bank": {
+        "wood": 18,
+        "brick": 16,
+        "wool": 17,
+        "wheat": 18,
+        "ore": 18
+      },
+      "remainingPieces": {
+        "P1": {
+          "roads": 12,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P2": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P3": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P4": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        }
+      },
+      "activePlayer": "P1",
+      "turn": 1,
+      "phase": "Action",
+      "pendingDecision": null,
+      "rngCursor": 1,
+      "publicVictoryPoints": {
+        "P1": 2,
+        "P2": 2,
+        "P3": 2,
+        "P4": 2
+      }
+    },
+    "afterEnd": {
+      "hands": {
+        "P1": {
+          "wood": 0,
+          "brick": 0,
+          "wool": 0,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P2": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 0,
+          "wheat": 1,
+          "ore": 0
+        },
+        "P3": {
+          "wood": 1,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P4": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 1
+        }
+      },
+      "bank": {
+        "wood": 18,
+        "brick": 16,
+        "wool": 17,
+        "wheat": 18,
+        "ore": 18
+      },
+      "remainingPieces": {
+        "P1": {
+          "roads": 12,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P2": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P3": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P4": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        }
+      },
+      "activePlayer": "P2",
+      "turn": 2,
+      "phase": "ProductionAwaitRoll",
+      "pendingDecision": null,
+      "rngCursor": 1,
+      "publicVictoryPoints": {
+        "P1": 2,
+        "P2": 2,
+        "P3": 2,
+        "P4": 2
+      }
+    },
+    "afterRestoreProbe": {
+      "hands": {
+        "P1": {
+          "wood": 0,
+          "brick": 0,
+          "wool": 0,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P2": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 0,
+          "wheat": 2,
+          "ore": 0
+        },
+        "P3": {
+          "wood": 1,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 0
+        },
+        "P4": {
+          "wood": 0,
+          "brick": 1,
+          "wool": 1,
+          "wheat": 0,
+          "ore": 1
+        }
+      },
+      "bank": {
+        "wood": 18,
+        "brick": 16,
+        "wool": 17,
+        "wheat": 17,
+        "ore": 18
+      },
+      "remainingPieces": {
+        "P1": {
+          "roads": 12,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P2": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P3": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        },
+        "P4": {
+          "roads": 13,
+          "settlements": 3,
+          "cities": 4
+        }
+      },
+      "activePlayer": "P2",
+      "turn": 2,
+      "phase": "Action",
+      "pendingDecision": null,
+      "rngCursor": 2,
+      "publicVictoryPoints": {
+        "P1": 2,
+        "P2": 2,
+        "P3": 2,
+        "P4": 2
+      }
+    }
+  },
+  "pendingSave": {
+    "afterCommandId": "C07",
+    "activePlayer": "P4",
+    "phase": "SetupRoad",
+    "pendingDecision": {
+      "kind": "SetupRoad",
+      "playerId": "P4",
+      "anchorVertexId": "V40",
+      "placementNumber": 4
+    },
+    "settlements": {
+      "P1": [
+        "V42"
+      ],
+      "P2": [
+        "V15"
+      ],
+      "P3": [
+        "V29"
+      ],
+      "P4": [
+        "V40"
+      ]
+    },
+    "roads": {
+      "P1": [
+        "E60"
+      ],
+      "P2": [
+        "E17"
+      ],
+      "P3": [
+        "E41"
+      ],
+      "P4": []
+    },
+    "remainingPieces": {
+      "P1": {
+        "roads": 14,
+        "settlements": 4,
+        "cities": 4
+      },
+      "P2": {
+        "roads": 14,
+        "settlements": 4,
+        "cities": 4
+      },
+      "P3": {
+        "roads": 14,
+        "settlements": 4,
+        "cities": 4
+      },
+      "P4": {
+        "roads": 15,
+        "settlements": 4,
+        "cities": 4
+      }
+    },
+    "bank": {
+      "wood": 19,
+      "brick": 19,
+      "wool": 19,
+      "wheat": 19,
+      "ore": 19
+    },
+    "hands": {
+      "P1": {
+        "wood": 0,
+        "brick": 0,
+        "wool": 0,
+        "wheat": 0,
+        "ore": 0
+      },
+      "P2": {
+        "wood": 0,
+        "brick": 0,
+        "wool": 0,
+        "wheat": 0,
+        "ore": 0
+      },
+      "P3": {
+        "wood": 0,
+        "brick": 0,
+        "wool": 0,
+        "wheat": 0,
+        "ore": 0
+      },
+      "P4": {
+        "wood": 0,
+        "brick": 0,
+        "wool": 0,
+        "wheat": 0,
+        "ore": 0
+      }
+    },
+    "rngCursor": 0
+  },
+  "negativeCases": [
+    {
+      "id": "N01",
+      "at": "after C02",
+      "kind": "PlaceSettlement",
+      "player": "P2",
+      "vertex": "V46",
+      "reason": "DistanceRule"
+    },
+    {
+      "id": "N02",
+      "at": "after C07",
+      "kind": "PlaceSetupRoad",
+      "player": "P4",
+      "edge": "E01",
+      "reason": "MustTouchPendingSettlement"
+    },
+    {
+      "id": "N03",
+      "at": "afterSetup",
+      "kind": "EndTurn",
+      "player": "P1",
+      "reason": "MustRollFirst"
+    },
+    {
+      "id": "N04",
+      "at": "afterRoll",
+      "kind": "EndTurn",
+      "player": "P2",
+      "reason": "NotActivePlayer"
+    },
+    {
+      "id": "N05",
+      "at": "afterRoll",
+      "kind": "BankTrade",
+      "player": "P1",
+      "give": {
+        "wood": 3
+      },
+      "receive": {
+        "brick": 1
+      },
+      "reason": "InvalidTradeRatio"
+    },
+    {
+      "id": "N06",
+      "at": "afterTrade",
+      "kind": "BuildRoad",
+      "player": "P1",
+      "edge": "E01",
+      "reason": "DisconnectedRoad"
+    },
+    {
+      "id": "N07",
+      "at": "afterTrade",
+      "kind": "BuildRoad",
+      "player": "P1",
+      "edge": "E60",
+      "reason": "OccupiedEdge"
+    },
+    {
+      "id": "N08",
+      "at": "afterBuild",
+      "kind": "BuildRoad",
+      "player": "P1",
+      "edge": "E70",
+      "reason": "InsufficientResources"
+    },
+    {
+      "id": "N09",
+      "at": "afterRoll",
+      "kind": "RollDice",
+      "player": "P1",
+      "reason": "AlreadyRolled"
+    },
+    {
+      "id": "N10",
+      "at": "after C07",
+      "kind": "EndTurn",
+      "player": "P4",
+      "reason": "PendingDecision"
+    }
+  ]
+}

@@ -1,0 +1,274 @@
+{
+  "schemaVersion": 1,
+  "assetId": "mountain-tile-v001",
+  "materialVersion": "metallic-stone-v001",
+  "provenance": "Original faceted slate mountains and copper mineral clusters authored procedurally for the M1 sample. No supplied photograph, scan, model, texture, or AI-generated bitmap was used. Dimensions are working estimates, not measured physical components.",
+  "referenceIds": [],
+  "measuredDimensionsMm": null,
+  "tool": {
+    "blender": "4.5.14 LTS",
+    "script": "tools/art/generate_mountain.py",
+    "scriptSha256": "610b6e0e137a8559704e57db4b832422cceef9962965043cc7d1c668fdf91b55",
+    "recipe": "art\\recipes\\mountain-tile-v001\\recipe.json",
+    "recipeSha256": "6652db8a00fe66904d57eeb9356238730eca3c6ec2dece15566ee41cb2e368ba",
+    "seed": 20251008
+  },
+  "units": "metres",
+  "pivot": "bottom-centre: every exported object origin is (0,0,0)",
+  "blenderBounds": {
+    "min": [
+      -0.03464101627469063,
+      -0.03999999910593033,
+      0.0
+    ],
+    "max": [
+      0.03464101627469063,
+      0.03999999910593033,
+      0.03350000083446503
+    ]
+  },
+  "expectedUnityBounds": {
+    "min": [
+      -0.03464101627469063,
+      0.0,
+      -0.03999999910593033
+    ],
+    "max": [
+      0.03464101627469063,
+      0.03350000083446503,
+      0.03999999910593033
+    ]
+  },
+  "hexCornerAngleDegreesBlender": 30,
+  "piecePlacementYUnityMetres": 0.008,
+  "numberAnchorUnityMetres": [
+    0,
+    0.009,
+    0.016
+  ],
+  "geometry": {
+    "meshObjects": 24,
+    "vertices": 644,
+    "triangles": 1192,
+    "canonicalSha256": "c6ce02d11a15698ebd07f57bd5c58fd3a4ae671ad1a16fa2985685fcd24da5b5",
+    "landscapeMinEdgeDistanceMm": 8.437071147534663,
+    "landscapeMinVertexDistanceMm": 15.491446950240075
+  },
+  "checks": {
+    "bottomPivot": true,
+    "landscapeEdgeClearance": true,
+    "landscapeVertexClearance": true,
+    "heightWithin36mm": true
+  },
+  "export": {
+    "use_selection": true,
+    "global_scale": 1.0,
+    "apply_unit_scale": true,
+    "apply_scale_options": "FBX_SCALE_UNITS",
+    "axis_forward": "-Z",
+    "axis_up": "Y",
+    "bake_anim": false,
+    "add_leaf_bones": false,
+    "path_mode": "AUTO",
+    "use_mesh_modifiers": true,
+    "mesh_smooth_type": "FACE",
+    "use_triangles": true
+  },
+  "materials": [
+    {
+      "name": "M1_Base_Obsidian",
+      "baseColorLinearRgba": [
+        0.03700000047683716,
+        0.04800000041723251,
+        0.052000001072883606,
+        1.0
+      ],
+      "roughness": 0.3700000047683716,
+      "metallic": 0.25
+    },
+    {
+      "name": "M1_Rim_AntiqueBronze",
+      "baseColorLinearRgba": [
+        0.3700000047683716,
+        0.20499999821186066,
+        0.0729999989271164,
+        1.0
+      ],
+      "roughness": 0.3199999928474426,
+      "metallic": 0.7200000286102295
+    },
+    {
+      "name": "M1_Ground_Slate",
+      "baseColorLinearRgba": [
+        0.1899999976158142,
+        0.24500000476837158,
+        0.25,
+        1.0
+      ],
+      "roughness": 0.8199999928474426,
+      "metallic": 0.0
+    },
+    {
+      "name": "M1_Stone_DeepSlate",
+      "baseColorLinearRgba": [
+        0.11999999731779099,
+        0.18000000715255737,
+        0.20499999821186066,
+        1.0
+      ],
+      "roughness": 0.8299999833106995,
+      "metallic": 0.0
+    },
+    {
+      "name": "M1_Stone_BlueSlate",
+      "baseColorLinearRgba": [
+        0.28999999165534973,
+        0.3700000047683716,
+        0.38499999046325684,
+        1.0
+      ],
+      "roughness": 0.75,
+      "metallic": 0.0
+    },
+    {
+      "name": "M1_Stone_Weathered",
+      "baseColorLinearRgba": [
+        0.47999998927116394,
+        0.5400000214576721,
+        0.5249999761581421,
+        1.0
+      ],
+      "roughness": 0.7900000214576721,
+      "metallic": 0.0
+    },
+    {
+      "name": "M1_Stone_Quartz",
+      "baseColorLinearRgba": [
+        0.7200000286102295,
+        0.75,
+        0.6800000071525574,
+        1.0
+      ],
+      "roughness": 0.6399999856948853,
+      "metallic": 0.0
+    },
+    {
+      "name": "M1_Ground_Moss",
+      "baseColorLinearRgba": [
+        0.20000000298023224,
+        0.27000001072883606,
+        0.12999999523162842,
+        1.0
+      ],
+      "roughness": 0.9300000071525574,
+      "metallic": 0.0
+    },
+    {
+      "name": "M1_Ore_Copper",
+      "baseColorLinearRgba": [
+        0.6200000047683716,
+        0.25,
+        0.06499999761581421,
+        1.0
+      ],
+      "roughness": 0.2800000011920929,
+      "metallic": 0.6200000047683716
+    },
+    {
+      "name": "M1_Ore_GoldFace",
+      "baseColorLinearRgba": [
+        0.9100000262260437,
+        0.5299999713897705,
+        0.17000000178813934,
+        1.0
+      ],
+      "roughness": 0.30000001192092896,
+      "metallic": 0.5600000023841858
+    },
+    {
+      "name": "M1_Number_Recess",
+      "baseColorLinearRgba": [
+        0.10000000149011612,
+        0.14499999582767487,
+        0.1599999964237213,
+        1.0
+      ],
+      "roughness": 0.7300000190734863,
+      "metallic": 0.0
+    }
+  ],
+  "textureDependencies": [],
+  "collision": "No collider is supplied. Unity interaction uses stable Tile/Vertex/Edge targets independently of the render mesh.",
+  "previews": {
+    "generated": true,
+    "resolution": [
+      1600,
+      1200
+    ],
+    "views": {
+      "top": {
+        "position": [
+          0,
+          0,
+          0.18
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "ortho": 0.125
+      },
+      "side": {
+        "position": [
+          0.13,
+          -0.12,
+          0.037
+        ],
+        "target": [
+          0,
+          0,
+          0.014
+        ],
+        "ortho": 0.102
+      },
+      "game-camera": {
+        "position": [
+          0.09,
+          -0.13,
+          0.115
+        ],
+        "target": [
+          0,
+          0,
+          0.008
+        ],
+        "ortho": 0.116
+      },
+      "crowded-vertex": {
+        "position": [
+          0.078,
+          -0.125,
+          0.085
+        ],
+        "target": [
+          0,
+          -0.014,
+          0.01
+        ],
+        "ortho": 0.104
+      }
+    },
+    "crowdedViewIsGameState": false
+  },
+  "files": {
+    "fbx": {
+      "path": "exports/mountain-tile-v001/mountain-tile-v001.fbx",
+      "sha256": "0cb99e86ca0d7b4405b4446f147dc059587e177f3fddb649c03239fa93fd6427"
+    },
+    "blend": {
+      "path": "source/mountain-tile-v001/mountain-tile-v001.blend",
+      "sha256": "d866ab842c6d59530f58e6e9c5ae60f4f38ad4a98f65c5aedaa5108881587d0d"
+    }
+  }
+}

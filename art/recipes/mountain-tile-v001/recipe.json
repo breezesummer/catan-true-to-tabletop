@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "assetId": "mountain-tile-v001",
+  "materialVersion": "metallic-stone-v001",
+  "scaleBaseline": "art/recipes/v001/scale-estimates.json",
+  "sourceType": "original-procedural-estimated",
+  "referenceIds": [],
+  "physicalEdition": null,
+  "measuredDimensionsMm": null,
+  "seed": 20251008,
+  "hexCornerAngleDegrees": 30,
+  "dimensionsMm": { "edgeLength": 40, "baseThickness": 8, "maximumTotalHeight": 36 },
+  "landscapeClearanceMm": { "edge": 6, "vertex": 9 },
+  "numberAnchorBlenderMm": [0, -16, 9],
+  "preview": { "width": 1600, "height": 1200, "samples": 48 },
+  "provenance": "Original faceted slate mountains and copper mineral clusters authored procedurally for the M1 sample. No supplied photograph, scan, model, texture, or AI-generated bitmap was used. Dimensions are working estimates, not measured physical components."
+}
