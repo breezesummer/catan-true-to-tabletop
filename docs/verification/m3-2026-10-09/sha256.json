@@ -1,0 +1,142 @@
+﻿[
+    {
+        "path":  "src/Catan.Core/bin/Release/netstandard2.1/Catan.Core.dll",
+        "sha256":  "7b66db4b79e1863175dbb4dcc0c4141d1137320cb551ee5b448e2ed37227f925",
+        "bytes":  249856
+    },
+    {
+        "path":  "Unity/Catan/Assets/Plugins/Catan.Core.dll",
+        "sha256":  "7b66db4b79e1863175dbb4dcc0c4141d1137320cb551ee5b448e2ed37227f925",
+        "bytes":  249856
+    },
+    {
+        "path":  ".local/m3/Builds/Windows/CatanM3.exe",
+        "sha256":  "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+        "bytes":  667136
+    },
+    {
+        "path":  ".local/m3/Builds/Windows/CatanM3_Data/Managed/Assembly-CSharp.dll",
+        "sha256":  "d84a6ee5ae8c21a0062d82517ff5f4a3f6a861884843136d2cb7d5a41bdbd2c5",
+        "bytes":  117760
+    },
+    {
+        "path":  ".local/m3/Builds/Windows/CatanM3_Data/Managed/Catan.Core.dll",
+        "sha256":  "7b66db4b79e1863175dbb4dcc0c4141d1137320cb551ee5b448e2ed37227f925",
+        "bytes":  249856
+    },
+    {
+        "path":  "Unity/Catan/Packages/packages-lock.json",
+        "sha256":  "c5a5c9bfe76e4c918384fc1fb6abdbee668aeef448b3ef3d2b4c69c84a5c3221",
+        "bytes":  4432
+    },
+    {
+        "path":  "src/Catan.Core/M3GameSession.cs",
+        "sha256":  "ab01f4ffcff04f2cb36ad4baee6ff34b05b3d130d3c1a7c87ba4397c7011a96d",
+        "bytes":  44622
+    },
+    {
+        "path":  "src/Catan.Core/M3Models.cs",
+        "sha256":  "147aa5e5645ec7ffdda31a952651764fdffe1bb1a6545cbdda208fa60dc89a1e",
+        "bytes":  20274
+    },
+    {
+        "path":  "src/Catan.Core/M3PiratesAndValidation.cs",
+        "sha256":  "b0d9373cb231edd1e11e96a648b8f1e8089cd37cd02721541a802d871a6e5c08",
+        "bytes":  11421
+    },
+    {
+        "path":  "src/Catan.Core/M3Scenarios.cs",
+        "sha256":  "7efe76989b8b6450c9c2c92e439a30345ec4f6390a39238d1bbef6ef568c8468",
+        "bytes":  23117
+    },
+    {
+        "path":  "src/Catan.Core/M3Seafaring.cs",
+        "sha256":  "8e40b4b7d8645d6206c82ea3707a2bc535ed80f9ee3eb26ef17b4c412f5f41af",
+        "bytes":  29914
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M3App.cs",
+        "sha256":  "b8d67ca2310d9700fae6d96c60a423e05b11614e1b52e9d5ee40e8ed9cf933cc",
+        "bytes":  40269
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M3BoardRenderer.cs",
+        "sha256":  "006049edbf031330403923ae0e185ebf7e65b57894ada1ce739dc1071f4b4f23",
+        "bytes":  12524
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M3LocalGameHost.cs",
+        "sha256":  "8a57a4980b8ac191173990909e79b1e2e628c565bc1a1101fc7f449a76c5a5b5",
+        "bytes":  1779
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M3PlayerVerification.cs",
+        "sha256":  "665e7e1db78bd79f64b9ba6ad1069704cc472af094e013b4009e5a2fd67ee627",
+        "bytes":  19245
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M3FullGameTests.cs",
+        "sha256":  "6d51c467c72084a027bbd868ac326d540a4b0446c2d177b7921b6bf6f3816003",
+        "bytes":  19963
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M3Harness.cs",
+        "sha256":  "bd7d3334541c4fa7a5689af17ca741d1d73b0577e4e5d1b0941c612421bcd7d4",
+        "bytes":  10482
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M3PersistenceTests.cs",
+        "sha256":  "1db203289f9cdf281b5bd54f6986e5ff9e34acc71876505ed9f88a231245f37e",
+        "bytes":  9462
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M3RulesTests.cs",
+        "sha256":  "a736dddd1658bfbf6b899f48d549b3d05c6bea7500037d45d7ba55319107a06d",
+        "bytes":  15612
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M3ScenarioTests.cs",
+        "sha256":  "ce0d269d111d2a1e9f8bbcb6e8dad0f580024fb920d81a1814a2a0b49a50a0e2",
+        "bytes":  9636
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M3SpecialRulesTests.cs",
+        "sha256":  "f11f8e6f044daf9da815a9a98ddbd11277f3aa55a5d1e62b6ea2e106e199a9eb",
+        "bytes":  21382
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/SeafarersPortPersistenceTests.cs",
+        "sha256":  "a2281ec3d01f334e6eaec3335e316a0da61b21643cfda8b4da74f0c52b18beb4",
+        "bytes":  5195
+    },
+    {
+        "path":  "docs/verification/m3-2026-10-09/m3-default.png",
+        "sha256":  "f2001e53a7922f5f5d37af751ca51f48696010673851dbac33766db489a8dbde",
+        "bytes":  108508
+    },
+    {
+        "path":  "docs/verification/m3-2026-10-09/m3-rules.trx",
+        "sha256":  "60a0b985846e82d7f4db9a1596b295766b66d7b35145d122510f8f90f1102934",
+        "bytes":  344714
+    },
+    {
+        "path":  "docs/verification/m3-2026-10-09/m3-top.png",
+        "sha256":  "0b148a84b27498991af0683df58e88f1033f38ccc811776930231c75f330694a",
+        "bytes":  128967
+    },
+    {
+        "path":  "docs/verification/m3-2026-10-09/player-load.log",
+        "sha256":  "b4abd44b0c0bafcaa4ae727840db5a94499d4b4e42d7d794d67e341577b37eed",
+        "bytes":  1862
+    },
+    {
+        "path":  "docs/verification/m3-2026-10-09/player-save.log",
+        "sha256":  "c665c7768601bac238df2de2f589ff06db61c970eb33957ae079045ce9a23663",
+        "bytes":  2146
+    },
+    {
+        "path":  "docs/verification/m3-2026-10-09/unity-build.log",
+        "sha256":  "ae1774773d465559bd49c6e266d603f76afc9d0416b5c33c607088aa55c346e4",
+        "bytes":  314697
+    }
+]

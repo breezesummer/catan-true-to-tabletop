@@ -1,0 +1,192 @@
+﻿[
+    {
+        "path":  "src/Catan.Core/bin/Release/netstandard2.1/Catan.Core.dll",
+        "sha256":  "0010842f5bb77cb0f712688081ada1c8a612a65b4659537acb26b29a4d6380a7",
+        "bytes":  381440
+    },
+    {
+        "path":  "Unity/Catan/Assets/Plugins/Catan.Core.dll",
+        "sha256":  "0010842f5bb77cb0f712688081ada1c8a612a65b4659537acb26b29a4d6380a7",
+        "bytes":  381440
+    },
+    {
+        "path":  ".local/m4/Builds/Windows/CatanM4.exe",
+        "sha256":  "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+        "bytes":  667136
+    },
+    {
+        "path":  ".local/m4/Builds/Windows/CatanM4_Data/Managed/Assembly-CSharp.dll",
+        "sha256":  "12f90d7f27d0c5c4c55b12593a62e3d7681ba61f5da75d0f7a37d67d22b9661f",
+        "bytes":  159232
+    },
+    {
+        "path":  ".local/m4/Builds/Windows/CatanM4_Data/Managed/Catan.Core.dll",
+        "sha256":  "0010842f5bb77cb0f712688081ada1c8a612a65b4659537acb26b29a4d6380a7",
+        "bytes":  381440
+    },
+    {
+        "path":  "Unity/Catan/Packages/packages-lock.json",
+        "sha256":  "c5a5c9bfe76e4c918384fc1fb6abdbee668aeef448b3ef3d2b4c69c84a5c3221",
+        "bytes":  4432
+    },
+    {
+        "path":  "Unity/Catan/Assets/Editor/M4Build.cs",
+        "sha256":  "e0f0e31f40d6226c2009aead468c19603b59f7f6a91b4e16eae1f0b8838d584d",
+        "bytes":  3655
+    },
+    {
+        "path":  "Unity/Catan/Assets/M4.unity",
+        "sha256":  "56a4c89c5030bc197caf3155ffb7a7245fdd0ee2140bd56a1d6efcabc88ebc8e",
+        "bytes":  11426
+    },
+    {
+        "path":  "art/recipes/m4-v001/manifest.json",
+        "sha256":  "e442dbbf135d8e30e1f40af993be6e1036c387059554e8213f67b49c8b56cc73",
+        "bytes":  1916
+    },
+    {
+        "path":  "tools/development/Build-M4.ps1",
+        "sha256":  "7f826489defed7a5f7f1fcab628e5c2068c3f3fb1fa7ed53d877076644fce841",
+        "bytes":  3143
+    },
+    {
+        "path":  "tools/validation/Test-M4Rules.ps1",
+        "sha256":  "a1a36b25b6fefc07531f47062c69b0f2c2b229f43e04178d4b608bd9f554aabb",
+        "bytes":  907
+    },
+    {
+        "path":  "src/Catan.Core/M4CitiesKnights.cs",
+        "sha256":  "38ac576034b27cd7d4466a74bd42191448ab2cfd10fe1a359a5a140bef222f95",
+        "bytes":  20425
+    },
+    {
+        "path":  "src/Catan.Core/M4ExpansionModels.cs",
+        "sha256":  "53b951532f8b7c17cd69e5a0d7fc95c88cf0ed608f48c5c1200c5f2b7b8d2e62",
+        "bytes":  6104
+    },
+    {
+        "path":  "src/Catan.Core/M4GameSession.cs",
+        "sha256":  "536be522998199f2a13048c90c786ab14b56058743daada49bbf35311d273195",
+        "bytes":  45631
+    },
+    {
+        "path":  "src/Catan.Core/M4Models.cs",
+        "sha256":  "8e69f952a24d63f664d3f669f82edeb1bc19834bfcb4b0e3bcb4951a083c75ea",
+        "bytes":  11558
+    },
+    {
+        "path":  "src/Catan.Core/M4ProgressCards.cs",
+        "sha256":  "21f5043084f57233de4c753f95c1e329115cfc2301eb69a5f64a2c369301c0ab",
+        "bytes":  33157
+    },
+    {
+        "path":  "src/Catan.Core/M4ProgressModels.cs",
+        "sha256":  "077f3f3b241d44d68f5f8283ea23e4e46f7d3bd3521c7294d6c8518b76d2e5ea",
+        "bytes":  5094
+    },
+    {
+        "path":  "src/Catan.Core/M4Validation.cs",
+        "sha256":  "70fad12386cedeb9de0f471b96210fede3cca7047acf6ac590d8a66268008c83",
+        "bytes":  3505
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M4App.cs",
+        "sha256":  "f188b8dd50e47f3c6974f64b1393adfac721f6af6cecf19f8b1ae0433c652d91",
+        "bytes":  31852
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M4BoardRenderer.cs",
+        "sha256":  "f024745afa5655da7b0ace39fb9256b75106d1e2c3a481e41edd07acb8a1e0ef",
+        "bytes":  13462
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M4LocalGameHost.cs",
+        "sha256":  "2e8c007ac2876c90109d9ea330018d88101a1a2171a653a69f0dc9de0f02589c",
+        "bytes":  1704
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M4PlayerVerification.cs",
+        "sha256":  "f9e77a2ec511bbb7716944536b520744d59a1b0b3322c4935978f4027fded5c1",
+        "bytes":  11350
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M4CoreHarness.cs",
+        "sha256":  "46decc31ffa741c3fd960d7e25c2ebd4bb6cf1303196ebe98ba07db6d088a5be",
+        "bytes":  6829
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M4CoreRulesTests.cs",
+        "sha256":  "7a358d9beb3abcaf9c7d3f677a4fc316c461674128fefe94cd9123228f3c907e",
+        "bytes":  21029
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M4FullGameTests.cs",
+        "sha256":  "c7ee9786f30c6b08e1164c0541ff73b5643fc1f233103f1dab826c707c37ee90",
+        "bytes":  18359
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M4PersistenceTests.cs",
+        "sha256":  "1189066c82a195a561a099625a653883923a9e25a859dece078d4be3cb6c17ce",
+        "bytes":  4185
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M4ProgressCardTests.cs",
+        "sha256":  "f09cb986c70005a22046bd9a47b066430f3c106250ffb870748ac8a3160211a5",
+        "bytes":  26007
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M4ProgressHarness.cs",
+        "sha256":  "b67e9ef7b6f3cbe5caf751170b8062b3e1a90fb2ef26659a3bfc1d4ee5595863",
+        "bytes":  3770
+    },
+    {
+        "path":  "docs/verification/m4-2026-10-09/m4-components-crowded.png",
+        "sha256":  "467cefb2b20088c026a663f168e9fab3bdfcf83de481182839302e68332fb3b1",
+        "bytes":  109070
+    },
+    {
+        "path":  "docs/verification/m4-2026-10-09/m4-components-default.png",
+        "sha256":  "69fc0353d233ef7397decfaedff958d130cf8b94c9743218d75d45d0f54cc93e",
+        "bytes":  88786
+    },
+    {
+        "path":  "docs/verification/m4-2026-10-09/m4-components-side.png",
+        "sha256":  "350806b6564e99792a6bcf064d376866196427591f83dc039af38d41f60faa1a",
+        "bytes":  59247
+    },
+    {
+        "path":  "docs/verification/m4-2026-10-09/m4-components-top.png",
+        "sha256":  "ba08e4ad1c057e2899d7725e2ad2dcd6473a14f6e0953bb08410040c816a4212",
+        "bytes":  100330
+    },
+    {
+        "path":  "docs/verification/m4-2026-10-09/m4-default.png",
+        "sha256":  "81976ad80a1c4613cdbf79ae0ae66bfa5aca85039a6864b177f20b81f99c2ae5",
+        "bytes":  85322
+    },
+    {
+        "path":  "docs/verification/m4-2026-10-09/m4-rules.trx",
+        "sha256":  "079869fe22dde54dc99684babbad63a0f43abfdff8484c616b765059619fa59f",
+        "bytes":  471439
+    },
+    {
+        "path":  "docs/verification/m4-2026-10-09/m4-top.png",
+        "sha256":  "0e5a212d4a3561a95ad1e35b93c89d3a5a7c8aa5ebb2816f64a1748285b87479",
+        "bytes":  92995
+    },
+    {
+        "path":  "docs/verification/m4-2026-10-09/player-load.log",
+        "sha256":  "44b31628239fdbfaed0ee93bfb39abf58ee089e3608c09cfd07313a20c2e2494",
+        "bytes":  1796
+    },
+    {
+        "path":  "docs/verification/m4-2026-10-09/player-save.log",
+        "sha256":  "afc67c23581a006ad1ddc5da29951063f68d3ffbbf97d791c32214c8584aa006",
+        "bytes":  1873
+    },
+    {
+        "path":  "docs/verification/m4-2026-10-09/unity-build.log",
+        "sha256":  "54f3daba729346fe3359941c6bb6ed9a5ce6b3379dde9f819a0bab69bc6bf8a4",
+        "bytes":  433052
+    }
+]
