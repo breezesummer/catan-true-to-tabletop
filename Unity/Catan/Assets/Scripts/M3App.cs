@@ -12,6 +12,7 @@ using DevelopmentCardKind = Catan.Core.M3.DevelopmentCardKind;
 // Local seats share the core command entrance; this component owns presentation only.
 public sealed class M3App : MonoBehaviour
 {
+    private M6App ai;
     private M3LocalGameHost host;
     private PlayerView view;
     private M3BoardRenderer board;
@@ -35,13 +36,17 @@ public sealed class M3App : MonoBehaviour
     public void Start()
     {
         Application.targetFrameRate=60;
-        host=new M3LocalGameHost();
+        ai=GetComponent<M6App>();
+        host=new M3LocalGameHost(ai==null?4:ai.PlayerCount);
+        if(ai!=null)host.NewGame(ai.ScenarioId,ai.PlayerCount);
+        if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         catalog=Catan.Core.M3.SeafarersScenarios.Ids.Select(id=>Catan.Core.M3.SeafarersScenarios.Create(id,4)).ToArray();
-        var initial=host.View("P1");
+        var initial=host.View(ai==null?"P1":ai.HumanSeat);
         seat=initial.ActivePlayerId;nextSeat=seat;
         RefreshBoard(initial);
         font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Arial"},18);
-        gameObject.AddComponent<M3PlayerVerification>().Initialize(this);
+        if(ai==null)gameObject.AddComponent<M3PlayerVerification>().Initialize(this);
+        else ai.Connect(this,host);
     }
     void Update()
     {
@@ -49,7 +54,7 @@ public sealed class M3App : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){CancelPickup();newGameDialog=false;}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(Input.mousePosition.x<Screen.width*.74f&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
-        if(curtain||newGameDialog||!holding||view==null)return;
+        if(curtain||newGameDialog||!holding||view==null||ai!=null&&!ai.IsHumanTurn)return;
         var mouse=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
         var candidate=ResolveTarget(mouse);
         if(candidate!=hover)
@@ -110,6 +115,7 @@ public sealed class M3App : MonoBehaviour
     }
     public void SwitchSeat(string target)
     {
+        if(ai!=null){status="你控制 "+ai.HumanSeat+"；其他席位为 AI，仅显示公开信息。";return;}
         CancelPickup();nextSeat=target;view=null;curtain=true;
         discard=new ResourceBag();offerGive=new ResourceBag();offerReceive=new ResourceBag();
         gold=new ResourceBag();shipSource="";portSource="";specialSelection=0;
@@ -132,6 +138,7 @@ public sealed class M3App : MonoBehaviour
     }
     public CommandResult Submit(Command command)
     {
+        if(ai!=null&&(!ai.IsHumanTurn||command.PlayerId!=ai.HumanSeat)){status="请等待当前 AI 或待决席位完成操作。";return null;}
         CancelPickup();
         var result=host.Submit(command);
         status=result.Success?"操作完成。":"操作未执行："+Reason(result.ErrorCode,result.Message);
@@ -141,7 +148,7 @@ public sealed class M3App : MonoBehaviour
             if(command.Kind==CommandKind.RollDice)status="掷骰 "+view.LastDice1+" + "+view.LastDice2+" = "+(view.LastDice1+view.LastDice2)+"。";
             if(view.Phase==GamePhase.Finished)status=view.WinnerPlayerId+" 达到胜利条件，本局结束。";
             string actor=NextActor(view);
-            if(actor!=seat&&view.Phase!=GamePhase.Finished)SwitchSeat(actor);
+            if(ai==null&&actor!=seat&&view.Phase!=GamePhase.Finished)SwitchSeat(actor);
         }
         return result;
     }
@@ -169,11 +176,13 @@ public sealed class M3App : MonoBehaviour
     }
     public void SaveGame()
     {
+        if(ai!=null){ai.SaveGame();return;}
         try{host.Save();status="已保存，包括待决选择和随机继续状态。";}
         catch(Exception){status="保存失败，请检查存档目录的写入权限。";}
     }
     public void LoadGame()
     {
+        if(ai!=null){ai.LoadGame();return;}
         try
         {
             host.Load();CancelPickup();var restored=host.View("P1");RefreshBoard(restored);
@@ -238,7 +247,7 @@ public sealed class M3App : MonoBehaviour
         else if(view!=null){DrawBoardLabels();DrawSeatPanel();}
         if(Button(1085,749,160,"保存局面"))SaveGame();
         if(Button(1256,749,160,"载入存档"))LoadGame();
-        if(Button(1085,794,160,"新开一局"))newGameDialog=true;
+        if(Button(1085,794,160,"新开一局")){if(ai!=null)ai.ShowMenu();else newGameDialog=true;}
         if(Button(1256,794,160,help?"隐藏提示":"规则提示"))help=!help;
         Label(1085,846,335,42,"规则按官方 2025 航海家。\nTab 切换视角 · 滚轮缩放 · Esc 取消",small);
         Panel(new Rect(0,808,1065,92),new Color(.045f,.09f,.10f));
@@ -262,7 +271,7 @@ public sealed class M3App : MonoBehaviour
         Label(1085,248,335,24,"余件 "+own.Pieces.Roads+"路 "+own.ShipsRemaining+"船 "+own.Pieces.Settlements+"村 "+own.Pieces.Cities+"城 · 牌库 "+view.DevelopmentDeckCount,small);
         DrawActions();
         if(view==null)return;
-        Label(1085,570,335,23,"公开席位  /  点击换座查看各自手牌",small);
+        Label(1085,570,335,23,ai==null?"公开席位  /  点击换座查看各自手牌":"公开席位  /  你："+ai.HumanSeat+" · 其他为 AI",small);
         for(int i=0;i<view.Players.Length;i++)
         {
             var p=view.Players[i];string award=(p.Id==view.LongestRoadPlayerId?" 路王":"")+(p.Id==view.LargestArmyPlayerId?" 军队":"");
@@ -274,10 +283,11 @@ public sealed class M3App : MonoBehaviour
     }
     void DrawActions()
     {
+        if(ai!=null&&!ai.IsHumanTurn&&view.Phase!=GamePhase.Finished){Label(1085,300,331,115,ai.WaitingText);return;}
         if(view.Phase==GamePhase.Finished)
         {
             Label(1093,304,320,48,view.WinnerPlayerId+" 获胜",title);
-            Label(1093,365,315,126,"本局已结束。\n可以换座查看各自的最终手牌，或保存这局游戏。\n\n选择“新开一局”再来一局。");return;
+            Label(1093,365,315,126,ai==null?"本局已结束。\n可以换座查看各自的最终手牌，或保存这局游戏。\n\n选择“新开一局”再来一局。":"本局已结束。\n可保存这局游戏，或选择“新开一局”更换规则、剧本与席位。");return;
         }
         if(view.TradeOffer!=null){DrawTradeResponse();return;}
         if(view.Phase==GamePhase.GoldChoice){DrawGold();return;}
@@ -296,7 +306,7 @@ public sealed class M3App : MonoBehaviour
             if(Button(1085,367,331,holding?"取消拿起 [Esc]":road?"拿起开局道路":"拿起开局定居点",42))
             {if(holding)CancelPickup();else Pickup(road?CommandKind.SetupRoad:CommandKind.SetupSettlement);}
             if(road&&Button(1085,417,331,"拿起开局船",38))Pickup(CommandKind.SetupShip);
-            Label(1085,472,330,76,"选择绿色标记并单击放下。\n相邻顶点之间不能同时建村。\n完成后自动遮蔽并提示下一席位。",small);return;
+            Label(1085,472,330,76,ai==null?"选择绿色标记并单击放下。\n相邻顶点之间不能同时建村。\n完成后自动遮蔽并提示下一席位。":"选择绿色标记并单击放下。\n相邻顶点之间不能同时建村。\n其他席位由 AI 自动行动；始终只显示你的手牌。",small);return;
         }
         if(view.Phase==GamePhase.Discard){DrawDiscard();return;}
         if(view.Phase==GamePhase.RobberMove)
@@ -526,11 +536,11 @@ public sealed class M3App : MonoBehaviour
         switch(view.Phase)
         {
             case GamePhase.SetupSettlement:guide="开局：按提示席位顺序放村和路 / 船，遵守本剧本的起始区域。\n最后一轮起始村获得邻近资源；村之间至少相隔两条边。";break;
-            case GamePhase.SetupRoad:guide="开局路 / 船：连接刚放下的村。\n完成后自动交给下一席位；确认后才会显示其手牌。";break;
+            case GamePhase.SetupRoad:guide=ai==null?"开局路 / 船：连接刚放下的村。\n完成后自动交给下一席位；确认后才会显示其手牌。":"开局路 / 船：连接刚放下的村。\n始终只显示你的手牌；其他席位由 AI 自动行动。";break;
             case GamePhase.SetupPort:guide="新世界：每位玩家轮流安置当前翻开的港口。\n合法沿海边以绿色标记；放完港口后才开始放村。";break;
-            case GamePhase.Discard:guide="掷出 7：手牌超过 7 张者各弃一半（向下取整）。\n依次换座完成弃牌后，由当前玩家移动强盗。";break;
+            case GamePhase.Discard:guide=ai==null?"掷出 7：手牌超过 7 张者各弃一半（向下取整）。\n依次换座完成弃牌后，由当前玩家移动强盗。":"掷出 7：手牌超过 7 张者各弃一半（向下取整）。\nAI 会自动弃牌；轮到你时在右侧选择要弃的资源。";break;
             case GamePhase.RobberMove:case GamePhase.RobberSteal:guide="强盗所在的地块不产出。移动后，选择一名相邻对手，随机偷取一张资源；若对方空手则不偷取。";break;
-            case GamePhase.GoldChoice:guide="金矿：选择银行现有的任意资源，数量与提示一致。\n需多人领取时依次换座；选择完成后回到原先阶段。";break;
+            case GamePhase.GoldChoice:guide=ai==null?"金矿：选择银行现有的任意资源，数量与提示一致。\n需多人领取时依次换座；选择完成后回到原先阶段。":"金矿：选择银行现有的任意资源，数量与提示一致。\n轮到你时在右侧选择资源；其他席位由 AI 自动处理。";break;
             case GamePhase.PortPlacement:guide="遗忘部落赠送港口：选择有己方沿岸建筑的合法空边安置。";break;
             default:guide="回合：掷骰 → 交易 / 建造 / 航海 / 发展卡 → 结束回合。\n船沿海连接，路船转换须经过己方建筑；金矿产出自选资源。\n"+(view.ScenarioId=="wonders-of-catan"?"奇观建成 4 层即胜，或至少 10 分且层数领先所有对手。":"目标 "+view.TargetVictoryPoints+" 分；海盗岛还须夺回自己的堡垒。");break;
         }
@@ -570,6 +580,17 @@ public sealed class M3App : MonoBehaviour
     }
     // Opt-in runtime verification only; no authoritative state is exposed to the UI.
     internal M3LocalGameHost VerificationHost => host;
+    internal PlayerView M6View=>view;
+    internal void M6Refresh()
+    {
+        CancelPickup();seat=ai.HumanSeat;nextSeat=seat;curtain=false;view=host.View(seat);
+        gold=new ResourceBag();portSource="";specialSelection=0;
+        discard=new ResourceBag();offerGive=new ResourceBag();offerReceive=new ResourceBag();
+        RefreshBoard(view);
+        status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，请完成右侧的行动或待决选择。":ai.WaitingText;
+    }
+    internal void M6Visible(bool value){if(board!=null)board.gameObject.SetActive(value);}
+    internal void M6Close(){enabled=false;if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}Destroy(this);}
     internal M3BoardRenderer VerificationBoard => board;
     internal bool VerificationCurtain => curtain;
     internal bool VerificationHasPrivateView => view!=null;

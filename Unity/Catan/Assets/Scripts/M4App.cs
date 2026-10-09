@@ -12,6 +12,7 @@ using PlayerView = Catan.Core.M4.PlayerView;
 // Presentation receives detached seat views. Every button uses the same authoritative command entrance.
 public sealed class M4App : MonoBehaviour
 {
+    M6App ai;
     M4LocalGameHost host;
     PlayerView view;
     M4BoardRenderer board;
@@ -30,10 +31,13 @@ public sealed class M4App : MonoBehaviour
 
     public void Start()
     {
-        Application.targetFrameRate=60;host=new M4LocalGameHost();
-        var initial=host.View("P1");nextSeat=initial.ActivePlayerId;Refresh(initial);
+        Application.targetFrameRate=60;ai=GetComponent<M6App>();host=new M4LocalGameHost(ai==null?4:ai.PlayerCount);
+
+        if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
+        var initial=host.View(ai==null?"P1":ai.HumanSeat);nextSeat=initial.ActivePlayerId;Refresh(initial);
         font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Arial"},18);
-        gameObject.AddComponent<M4PlayerVerification>().Initialize(this);
+        if(ai==null)gameObject.AddComponent<M4PlayerVerification>().Initialize(this);
+        else ai.Connect(this,host);
     }
     void Styles()
     {
@@ -50,12 +54,14 @@ public sealed class M4App : MonoBehaviour
     }
     public void SwitchSeat(string target)
     {
+        if(ai!=null){status="你控制 "+ai.HumanSeat+"；其他席位为 AI，仅显示公开信息。";return;}
         nextSeat=target;curtain=true;view=null;draft=null;pickField="";scroll=Vector2.zero;tab=0;board.ClearPreview();
         status="手牌与私有选择已遮蔽，请将设备交给 "+target+"。";
     }
     public void ConfirmSeat(){seat=nextSeat;curtain=false;view=host.View(seat);Refresh(view);}
     public CommandResult Submit(Command command)
     {
+        if(ai!=null&&(!ai.IsHumanTurn||command.PlayerId!=ai.HumanSeat)){status="请等待当前 AI 或待决席位完成操作。";return null;}
         command.Id=string.IsNullOrEmpty(command.Id)?Guid.NewGuid().ToString("N"):command.Id;
         var result=host.Submit(command);status=result.Success?"操作完成。":result.Message;
         pickField="";board.ClearPreview();view=host.View(seat);Refresh(view);
@@ -63,7 +69,7 @@ public sealed class M4App : MonoBehaviour
         {
             draft=null;
             if(view.Phase==GamePhase.Finished)status=view.WinnerPlayerId+" 达到 13 分，本局结束。";
-            else if(Actor(view)!=seat)SwitchSeat(Actor(view));
+            else if(ai==null&&Actor(view)!=seat)SwitchSeat(Actor(view));
         }
         return result;
     }
@@ -81,15 +87,15 @@ public sealed class M4App : MonoBehaviour
         }
         board.Refresh(v);board.ShowTerrain(terrain);
     }
-    public void SaveGame(){try{host.Save();status="已保存完整局面和待决选择。";}catch(Exception){status="保存失败，请检查存档目录。";}}
-    public void LoadGame(){try{host.Load();var v=host.View("P1");Refresh(v);SwitchSeat(Actor(v));status="已恢复，请确认席位。";}catch(Exception){status="存档无法读取或版本不兼容，当前局面保留。";}}
+    public void SaveGame(){if(ai!=null){ai.SaveGame();return;}try{host.Save();status="已保存完整局面和待决选择。";}catch(Exception){status="保存失败，请检查存档目录。";}}
+    public void LoadGame(){if(ai!=null){ai.LoadGame();return;}try{host.Load();var v=host.View("P1");Refresh(v);SwitchSeat(Actor(v));status="已恢复，请确认席位。";}catch(Exception){status="存档无法读取或版本不兼容，当前局面保留。";}}
     void Update()
     {
         if(board==null)return;
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){pickField="";board.ClearPreview();newGame=false;}
         if(Input.mousePosition.x<Screen.width*.70f&&Input.mouseScrollDelta.y!=0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
-        if(curtain||newGame||draft==null||pickField=="")return;
+        if(curtain||newGame||draft==null||pickField==""||ai!=null&&!ai.IsHumanTurn)return;
         var mouse=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
         if(mouse.x>Screen.width*.70f||mouse.y<Screen.height*.15f||mouse.y>Screen.height*.90f)return;
         string target=Pick(pickType,mouse);
@@ -148,9 +154,9 @@ public sealed class M4App : MonoBehaviour
             scroll=GUILayout.BeginScrollView(scroll);
             DrawControls();GUILayout.EndScrollView();GUILayout.EndArea();
         }
-        GUILayout.BeginArea(new Rect(1032,749,390,142));GUILayout.BeginHorizontal();if(Btn("保存"))SaveGame();if(Btn("恢复"))LoadGame();if(Btn("新开一局"))newGame=true;GUILayout.EndHorizontal();
+        GUILayout.BeginArea(new Rect(1032,749,390,142));GUILayout.BeginHorizontal();if(Btn("保存"))SaveGame();if(Btn("恢复"))LoadGame();if(Btn("新开一局")){if(ai!=null)ai.ShowMenu();else newGame=true;}GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();foreach(var p in publicView.Players)if(Btn(p.Id+"\n"+p.VictoryPoints+"分 / "+p.ResourceCount+"牌")){SwitchSeat(p.Id);break;}GUILayout.EndHorizontal();
-        Text("点击席位换座 · Tab 视角 · 滚轮缩放 · Esc 取消",true);GUILayout.EndArea();
+        Text(ai==null?"点击席位换座 · Tab 视角 · 滚轮缩放 · Esc 取消":"你："+ai.HumanSeat+" · 其他席位为 AI · Tab 视角 · Esc 取消",true);GUILayout.EndArea();
         Panel(new Rect(0,812,1015,88),new Color(.045f,.09f,.10f));GUI.Label(new Rect(24,826,970,58),pickField==""?status:"请在棋盘选择"+(pickType=="V"?"交点":pickType=="E"?"道路":"地块")+"，然后在右侧确认；Esc 取消。",label);
         GUI.matrix=Matrix4x4.identity;
     }
@@ -180,6 +186,7 @@ public sealed class M4App : MonoBehaviour
     }
     void DrawControls()
     {
+        if(ai!=null&&!ai.IsHumanTurn&&view.Phase!=GamePhase.Finished){Text(ai.WaitingText);return;}
         if(view.Phase==GamePhase.Finished){Text(view.WinnerPlayerId+" 获胜。可保存或新开一局。");return;}
         if(view.TradeOffer!=null)
         {
@@ -355,6 +362,10 @@ public sealed class M4App : MonoBehaviour
         return c.Decline?"放弃可选效果":OptionName(c.TargetId??"")+(c.Kind==CommandKind.DiscardProgressCard?" "+CardName(c.ProgressCard):"");
     }
     public M4LocalGameHost VerificationHost=>host;
+    internal PlayerView M6View=>view;
+    internal void M6Refresh(){seat=ai.HumanSeat;nextSeat=seat;curtain=false;view=host.View(seat);draft=null;pickField="";board.ClearPreview();Refresh(view);status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，请完成右侧的行动或待决选择。":ai.WaitingText;}
+    internal void M6Visible(bool value){if(board!=null)board.gameObject.SetActive(value);}
+    internal void M6Close(){enabled=false;if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}Destroy(this);}
     public M4BoardRenderer VerificationBoard=>board;
     public bool VerificationCurtain=>curtain;
     public bool VerificationHasPrivateView=>view!=null;

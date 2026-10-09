@@ -6,9 +6,10 @@ $m3RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m3Project = Join-Path $m3RepoRoot 'Unity\Catan'
 $m3Logs = Join-Path $m3RepoRoot '.local\m3\logs'
 New-Item -ItemType Directory -Force -Path $m3Logs,(Join-Path $m3Project 'Assets\Plugins'),(Join-Path $m3Project 'Assets\Resources') | Out-Null
-& $toolchain.dotnet build (Join-Path $m3RepoRoot 'src\Catan.Core\Catan.Core.csproj') -c Release --disable-build-servers -m:1
-if ($LASTEXITCODE -ne 0) { throw 'Core build failed.' }
+& $toolchain.dotnet build (Join-Path $m3RepoRoot 'src\Catan.AI\Catan.AI.csproj') -c Release --disable-build-servers -m:1
+if ($LASTEXITCODE -ne 0) { throw 'Core / AI build failed.' }
 Copy-Item -LiteralPath (Join-Path $m3RepoRoot 'src\Catan.Core\bin\Release\netstandard2.1\Catan.Core.dll') -Destination (Join-Path $m3Project 'Assets\Plugins\Catan.Core.dll') -Force
+Copy-Item -LiteralPath (Join-Path $m3RepoRoot 'src\Catan.AI\bin\Release\netstandard2.1\Catan.AI.dll') -Destination (Join-Path $m3Project 'Assets\Plugins\Catan.AI.dll') -Force
 Copy-Item -LiteralPath (Join-Path $m3RepoRoot 'docs\acceptance\v0.1\scenario.json') -Destination (Join-Path $m3Project 'Assets\Resources\m1-scenario.json') -Force
 & $toolchain.unity -batchmode -nographics -quit -projectPath $m3Project -executeMethod M3Build.Build -logFile (Join-Path $m3Logs 'unity-build.log') | Out-Host
 if ($LASTEXITCODE -ne 0) { throw 'Unity build failed; inspect .local/m3/logs/unity-build.log.' }

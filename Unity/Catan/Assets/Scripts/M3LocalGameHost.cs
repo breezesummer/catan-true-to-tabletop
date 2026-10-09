@@ -15,6 +15,8 @@ public sealed class M3LocalGameHost
     public PlayerView View(string seat) => session.GetPlayerView(seat);
     public CommandResult Submit(Command command) => session.Execute(command);
     public CommandResult Preview(Command command) => session.Preview(command);
+    public string ExportSave() => session.Save();
+    public void ImportSave(string json) { session = SeafarersGameSession.Load(json); }
     public string SavePath => Path.Combine(Application.persistentDataPath, "m3-authority-v3.json");
     public void Save() => WriteSave(SavePath);
     public void Load() => ReadSave(SavePath);
