@@ -1,0 +1,217 @@
+﻿[
+    {
+        "path":  "src/Catan.Core/bin/Release/netstandard2.1/Catan.Core.dll",
+        "sha256":  "e35288a4d84488b5dba9897276de92319ee2c8fc06fa03c00adf76bfac2d673d",
+        "bytes":  518144
+    },
+    {
+        "path":  "Unity/Catan/Assets/Plugins/Catan.Core.dll",
+        "sha256":  "e35288a4d84488b5dba9897276de92319ee2c8fc06fa03c00adf76bfac2d673d",
+        "bytes":  518144
+    },
+    {
+        "path":  ".local/m5/Builds/Windows/CatanM5.exe",
+        "sha256":  "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+        "bytes":  667136
+    },
+    {
+        "path":  ".local/m5/Builds/Windows/CatanM5_Data/Managed/Assembly-CSharp.dll",
+        "sha256":  "14c1b33d9ab5366fe9f367969693dd5e14f035d9e651a070c3e12bd94b0c4328",
+        "bytes":  201728
+    },
+    {
+        "path":  ".local/m5/Builds/Windows/CatanM5_Data/Managed/Catan.Core.dll",
+        "sha256":  "e35288a4d84488b5dba9897276de92319ee2c8fc06fa03c00adf76bfac2d673d",
+        "bytes":  518144
+    },
+    {
+        "path":  "Unity/Catan/Packages/packages-lock.json",
+        "sha256":  "c5a5c9bfe76e4c918384fc1fb6abdbee668aeef448b3ef3d2b4c69c84a5c3221",
+        "bytes":  4432
+    },
+    {
+        "path":  "Unity/Catan/Assets/Editor/M5Build.cs",
+        "sha256":  "b50094c32d8705bfb01407d04e4c88176dd45a143859455659f4dbf9d530c4f0",
+        "bytes":  3546
+    },
+    {
+        "path":  "Unity/Catan/Assets/M5.unity",
+        "sha256":  "6e55258ce56f8c29eb8a8f87613e1591a334db168d0fb1c6ac7b9d712a335e4a",
+        "bytes":  11422
+    },
+    {
+        "path":  "art/recipes/m5-v001/manifest.json",
+        "sha256":  "fb9de417d5671ae3cc999b30fb336123ca43c9f3d41d762288f842b986c5ac2e",
+        "bytes":  2115
+    },
+    {
+        "path":  "tools/development/Build-M5.ps1",
+        "sha256":  "daff9cce51f75fbd825e590456ce58a1c5a9a5133e20f8c2c16225a37bcf273b",
+        "bytes":  3143
+    },
+    {
+        "path":  "tools/validation/Test-M5Rules.ps1",
+        "sha256":  "e52ee5e4f27f9b97fa6416ebb9bdaeceb56ce8821420822f12dc229f96c6504e",
+        "bytes":  907
+    },
+    {
+        "path":  "src/Catan.Core/M5CitiesKnights.cs",
+        "sha256":  "1568eee2b79a679e3b56b5b7ad2f8486a4c1f7f37c023dd824debba5112a2c85",
+        "bytes":  21825
+    },
+    {
+        "path":  "src/Catan.Core/M5ExpansionModels.cs",
+        "sha256":  "ad0a463f7d23030f070f3b7c1a4944108a2a52f13e57f0e7240ea3bfb293a33c",
+        "bytes":  6104
+    },
+    {
+        "path":  "src/Catan.Core/M5GameSession.cs",
+        "sha256":  "ba737f3be99b0f77e7dfc2fae3f708474002f329bd2a02418eef5d6afd499ab4",
+        "bytes":  43003
+    },
+    {
+        "path":  "src/Catan.Core/M5Models.cs",
+        "sha256":  "f347734ed57c98a35141ec86217fe67fd53705db0b6e0dcdb66179429a8ba847",
+        "bytes":  11434
+    },
+    {
+        "path":  "src/Catan.Core/M5ProgressCards.cs",
+        "sha256":  "727dd51df847ed320f0020f52e0ae6d2fd722d81718121beca42860685c0a1f7",
+        "bytes":  35067
+    },
+    {
+        "path":  "src/Catan.Core/M5ProgressModels.cs",
+        "sha256":  "8c1f6408ddd0af805499f4328ead01980494dd203359f93adb90b487cfa5794b",
+        "bytes":  5094
+    },
+    {
+        "path":  "src/Catan.Core/M5Seafaring.cs",
+        "sha256":  "781ca66dd7482afb0f0dd2037cb5e5a19033057e596e3134aa6fba76581ccfb3",
+        "bytes":  17144
+    },
+    {
+        "path":  "src/Catan.Core/M5SeafaringModels.cs",
+        "sha256":  "f5e7cd90521c13f41e52e2e37b5b2684014a0f3b5b7dc3a374fcc483026aba4b",
+        "bytes":  3161
+    },
+    {
+        "path":  "src/Catan.Core/M5Transactions.cs",
+        "sha256":  "f75b543e10dc340ce87b0e2d3ed567ebbd0c989bdfaeeb36cec157e0edfb70e4",
+        "bytes":  4564
+    },
+    {
+        "path":  "src/Catan.Core/M5Validation.cs",
+        "sha256":  "17226d263c89df8b7f27d234594cf368096a027e8f55fab40c78446f90a38299",
+        "bytes":  3500
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M5App.cs",
+        "sha256":  "b96603284e75ca4610ad78251383262ab0cdc33846485b451db315a6f94c154a",
+        "bytes":  36063
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M5BoardRenderer.cs",
+        "sha256":  "c7b83b6bd6a60adbb9db1a38b39abbcfc33d2b24fe2cea70b12259fde41be0ce",
+        "bytes":  16296
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M5LocalGameHost.cs",
+        "sha256":  "7b03342e3707157f9366fa82a8eaebe17095144d9cc63ab00952465bc2af0ee9",
+        "bytes":  1643
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M5PlayerVerification.cs",
+        "sha256":  "8cd14d70455383e1059a4b18e6efbf007a2d8e5cf857ad1b011d6731b76a96d1",
+        "bytes":  14680
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M5CombinationTests.cs",
+        "sha256":  "a0c2460744f0a0051f90f8a16b4c8062d27f3803698b8c14a306e7c98647e4d0",
+        "bytes":  20682
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M5FullGameTests.cs",
+        "sha256":  "4166ba7b938e01ec5d0447da1f77cc819fbfa2a103b074e7369912d8bf786f53",
+        "bytes":  21094
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M5Harness.cs",
+        "sha256":  "9f8571835bb81a784389092c0f2c1777eeb454c9d120aa3dcbb2fa06ec90f0af",
+        "bytes":  6947
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M5ReviewRegressionTests.cs",
+        "sha256":  "bbe846f12d6b4ea8719ce920a5057b3a6982e154f58fcd06594145a32ca49962",
+        "bytes":  6984
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M5TransactionTests.cs",
+        "sha256":  "6ee60109bb20e29a8c67574a7b725389523a25ef1616abd406e8cc405d02a09d",
+        "bytes":  8247
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/m5-components-crowded.png",
+        "sha256":  "62183e4302a634543f2919580859c22be47918d16ffe86d0b94399d6f9d16fe4",
+        "bytes":  157626
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/m5-components-default.png",
+        "sha256":  "b3b66d17ac9c9e58f49596b53035bdf247b3e306d2f0159f08ff47b0e4e378c3",
+        "bytes":  117766
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/m5-components-side.png",
+        "sha256":  "8c173cfcacaaf3bfaa70baaa7f371ba1838eff72d21caae1348064e96b316fcc",
+        "bytes":  77153
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/m5-components-top.png",
+        "sha256":  "e774dbffe297227353bf4247760bb485cf1a47cabd75d03d31d5c3f1a5a70499",
+        "bytes":  141181
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/m5-default.png",
+        "sha256":  "d93e29e6938f833282f6f78fa3b0a54b3e754daeaf9f24c8dddb43a39e78d435",
+        "bytes":  139492
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/m5-rules.trx",
+        "sha256":  "4b26bc9d6e1f37fdc3c13ada0689c72747e4f024823de217046f4af7673f7ad8",
+        "bytes":  544377
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/m5-top.png",
+        "sha256":  "cc40999f92f5d54589f2d3b08f6a802b9bdc2dfae89abdad104d577ad7cda2ca",
+        "bytes":  169234
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/m5-ui-desert-three.jpg",
+        "sha256":  "06f33feb14979891f738ad4f22d79149c27af524c8ad77c0186749e1a05c5475",
+        "bytes":  160607
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/m5-ui-restored-curtain.jpg",
+        "sha256":  "da3e8a72355420e900c4611c0d013652ebddd7918ed0cc8509de64678d133d20",
+        "bytes":  166042
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/m5-ui-scenario-menu.jpg",
+        "sha256":  "a26108ac83f44e2b9bd8b273ab5c026c2adeb1aade18f2628b70bef9d5a6c2dc",
+        "bytes":  178847
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/player-load.log",
+        "sha256":  "b7cbad3670949ee25510f915502e17c96065f7bd71a2b9b501f058bc436f80a9",
+        "bytes":  1851
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/player-save.log",
+        "sha256":  "74b78e9d2359ad90f98cd88e7902c198e17dd0289069ccdaf0354b0bc1d62e11",
+        "bytes":  2275
+    },
+    {
+        "path":  "docs/verification/m5-2026-10-09/unity-build.log",
+        "sha256":  "58d0b9c3203a044602021751d815e05aded9fa9ac57c92ebce63890c80ad1002",
+        "bytes":  433227
+    }
+]

@@ -1,0 +1,36 @@
+Mono path[0] = 'D:/Project/the-settlers-of-catan/.local/m4/Builds/Windows/CatanM4_Data/Managed'
+Mono config path = 'D:/Project/the-settlers-of-catan/.local/m4/Builds/Windows/MonoBleedingEdge/etc'
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+Initialize engine version: 6000.3.25f1 (e1dba0a9aba4)
+[Subsystems] Discovering subsystems at path D:/Project/the-settlers-of-catan/.local/m4/Builds/Windows/CatanM4_Data/UnitySubsystems
+Forcing GfxDevice: Direct3D 11
+GfxDevice: creating device client; kGfxThreadingModeClientWorkerJobs
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: AMD Radeon RX 9070 XT (ID=0x7550)
+    Vendor:   ATI
+    VRAM:     16304 MB
+    Driver:   32.0.22042.14002
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  3.095 seconds
+- Finished resetting the current domain, in  0.002 seconds
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+D3D11 device created for Microsoft Media Foundation video decoding.
+<RI> Initializing input.
+<RI> Input initialized.
+UnloadTime: 0.399800 ms
+CATAN_M4_PLAYER_SAVE_OK: normal 3/4-player setup, event/barbarian commands, privacy curtain, rollback, random continuation, picking, authoritative save; knight commands=0
+CATAN_M4_RENDER_OK: URP board-only captures; AMD Radeon RX 9070 XT
+CATAN_M4_COMPONENT_PREVIEWS_OK: four public-only sample renders; no game-authority edits
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input System polling thread exited.
+Input System module state changed to: Shutdown.

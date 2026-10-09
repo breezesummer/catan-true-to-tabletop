@@ -9,8 +9,8 @@
 | 来源 ID | 官方原文 | 页数 | 版本证据位置 | 用途 |
 | --- | --- | --- | --- | --- |
 | `catan-base-2025-en` | [CATAN - The Game](https://www.catan.com/sites/default/files/2025-03/CN3081%20CATAN%E2%80%93The%20Game%20Rulebook%20secure%20%281%29.pdf) | 12 | PDF 第 1 页标题、第 12 页版权/第六版 | M1 子集来源、M2 完整规则来源 |
-| `catan-seafarers-2025-en` | [CATAN - Seafarers](https://www.catan.com/sites/default/files/2025-03/CN3083%20CATAN%E2%80%93Seafarers%20Rulebook%202025%20secured%20reduced.pdf) | 20 | PDF 第 1 页标题、第 20 页版权/第六版 | M3 来源已锁；逐条规则与剧本核验待 M3 |
-| `catan-cities-knights-2025-en` | [CATAN - Cities & Knights](https://www.catan.com/sites/default/files/2025-03/CN3087%20CATAN%E2%80%93Cities%26Knights_%20Rulebook.pdf) | 16 | PDF 第 1 页标题、第 16 页版权/第六版 | M4 来源已锁；逐条规则与卡牌核验待 M4 |
+| `catan-seafarers-2025-en` | [CATAN - Seafarers](https://www.catan.com/sites/default/files/2025-03/CN3083%20CATAN%E2%80%93Seafarers%20Rulebook%202025%20secured%20reduced.pdf) | 20 | PDF 第 1 页标题、第 20 页版权/第六版 | M3 已核验通用规则、八个固定剧本与 New World；见 M3_RULES_CHECKLIST.md |
+| `catan-cities-knights-2025-en` | [CATAN - Cities & Knights](https://www.catan.com/sites/default/files/2025-03/CN3087%20CATAN%E2%80%93Cities%26Knights_%20Rulebook.pdf) | 16 | PDF 第 1 页标题、第 16 页版权/第六版 | M4 已核验单扩展条款及全部 25 种/54 张进步卡；见 M4_RULES_CHECKLIST.md |
 
 访问日期为 **2026-10-08（Asia/Shanghai）**。准确 URL、字节数、SHA-256、页数、已核验范围集中登记于 [sources.json](../assets/references/rules/v001/sources.json)。页码均为从 1 起计的 PDF 页码；此处基础版规则所引用页码与印刷页码一致。
 
@@ -79,3 +79,9 @@ M1 验收采用自编固定地图与固定 4 席位行动序列，**不是**原�
 `Fetch-RuleReferences.ps1` 已在 Windows PowerShell 5.1 下实际运行：已有缓存的常规模式、`-VerifyOnly` 模式、隔离空缓存的三份原文重新下载均通过；向隔离目录放入错误文件后脚本以非零状态退出，输入文件哈希保持不变。测试脚本副本和缓存位于 `.local/development/temp/m0-rule-fetch-smoke-v001/` 和 `.local/development/temp/m0-rule-hash-rejection-v001/`，不改变正式原件。
 
 尚未验证：两个扩展的逐条规则、全部场景/卡牌及组合兼容；实物对应版本和中文印刷名称。此记录不代表完成 M1 实现或游戏试玩。
+
+上述为 M0 历史核验范围。2026-10-09 完成 M3 航海家工程验收后，航海家通用条款、八个官方固定剧本与 New World 已按 [M3 清单](M3_RULES_CHECKLIST.md) 和 [地图基线](M3_SCENARIOS.md) 核验；原始 PDF 字节与版本锁未变。城市与骑士、双扩展组合及实体差异仍待相应阶段核验。
+
+2026-10-09 完成 M4 工程验收：城市与骑士第 3–11、13–16 页条款和全部进步卡已按 [M4 清单](M4_RULES_CHECKLIST.md) 核验，332 项回归及卡牌/顺序/保存案例通过；PDF 第 12 页组合规则留在 M5。原始 PDF、字节数与 SHA-256 保持不变。中文仍为工作译名，实体版本与实测尺寸仍未确认。
+
+2026-10-09 完成 M5 工程验收：城市与骑士第 12 页组合条款、航海家通用条款及官方 FAQ 已按 [M5 组合规则](M5_COMBINATION_RULES.md)核对；新增 `assets/references/rules/m5-v001/` 网页原始快照、日期与校验值。城市与骑士 PDF SHA-256 为 `dac9f01afe9006e3b517aa257363c844eb2a9ff4b6578d3127f5d8d861c9a540`，航海家为 `a499abe2b613afd618dd3c806790400c7e84adebcc9b9ab19a24fb80dd04b099`，原始字节保持不变。支持驶向新海岸、穿越沙漠各 3/4 人，均 16 分；其余七剧本未启用组合。383 项测试、四个正常完整局和 Unity/Windows 验证通过，见 [M5 验收](M5_ACCEPTANCE.md)。组合规则版本为 `catan-seafarers-cities-knights-2025-en-v1`，不将旧 M3/M4 存档自动解释为组合存档；实体差异、中文印刷名称和实测尺寸仍待确认。

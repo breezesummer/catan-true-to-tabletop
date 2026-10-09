@@ -1,0 +1,27 @@
+{
+  "version": "m3-runtime-pieces-v001",
+  "kind": "runtime-mesh-placeholders",
+  "source": "Unity/Catan/Assets/Scripts/M3BoardRenderer.cs",
+  "reference": "assets/references/rules/v001/sources.json#catan-seafarers-2025-en",
+  "physicalReference": null,
+  "measurementStatus": "estimated-not-user-confirmed",
+  "units": "metres",
+  "unityVersion": "6000.3.25f1",
+  "generator": "Unity primitive meshes and deterministic C# transforms",
+  "seed": null,
+  "hexSide": 0.04,
+  "ship": {
+    "hullWidth": 0.009,
+    "hullHeight": 0.005,
+    "hullLength": 0.024,
+    "waterline": 0.008,
+    "placement": "stable Edge midpoint; hull centre 2.5mm above waterline",
+    "forwardAxis": "+Z along Edge endpoint direction",
+    "mastLocalScale": [0.16, 4.0, 0.07],
+    "mastLocalPosition": [0, 2, 0],
+    "sailLocalScale": [0.10, 2.2, 0.48],
+    "sailLocalPosition": [0, 3, 0.22]
+  },
+  "rebuild": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/development/Build-M3.ps1 -VerifyPlayer",
+  "limitations": ["Not final collector artwork", "No independent Blender/FBX export of M3 placeholders", "Original official PDF bytes preserved", "No generated bitmap assets"]
+}

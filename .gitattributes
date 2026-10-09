@@ -1,0 +1,3 @@
+# Preserve original reference bytes and verification evidence checksums.
+assets/references/rules/**/originals/** -text
+docs/verification/** -text
