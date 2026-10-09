@@ -18,6 +18,8 @@ public sealed class M4LocalGameHost
     public PlayerView View(string seat) => session.GetPlayerView(seat);
     public CommandResult Submit(Command command) => session.Execute(command);
     public CommandResult Preview(Command command) => session.Preview(command);
+    public string ExportSave() => session.Save();
+    public void ImportSave(string json) { session = CitiesKnightsGameSession.Load(topology, json); }
     public string SavePath => Path.Combine(Application.persistentDataPath, "m4-authority-v4.json");
     public void Save() => WriteSave(SavePath);
     public void Load() => ReadSave(SavePath);

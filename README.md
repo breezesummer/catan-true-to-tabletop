@@ -4,15 +4,25 @@
 
 用户提供实体组件参考并进行玩法与视觉验收。先逐步完成本地规则，随后交付单人 AI 对战和好友联机。每个规则阶段都应能独立本地试玩。
 
+M6 本地 AI 对手已于 2026 年 10 月 9 日完成工程验收：可选择基础版、航海家九剧本、城市与骑士或已支持的双扩展组合，3–4 人中任选一个人类席位，其余席位自动行动。AI 仅读取自身 PlayerView，经共同规则入口提交；支持交易、多步待决、暂停及保存恢复。**496/496 项测试通过，52 个正常完整局全部结束**，固定 Unity 构建、两个独立 Windows 进程和真实窗口操作均已验证。详见 [M6 验收记录](docs/M6_ACCEPTANCE.md)与[策略质量说明](docs/M6_STRATEGY.md)。
+
+启动当前 M6：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1
+```
+
+当前场景为 `Unity/Catan/Assets/M6.unity`，Windows 程序为 `.local/m6/Builds/Windows/CatanM6.exe`，操作见 [M6 试玩说明](docs/M6_PLAYTEST.md)。策略是本地启发式基线；用户本人整局试玩、对战强度、最终 UI 与美术仍待确认。下一阶段为 M7 好友联机。
+
 M5 双扩展组合已于 2026 年 10 月 9 日完成工程验收：支持“驶向新海岸”“穿越沙漠”各 3–4 人固定地图，均为 16 分获胜。船、海盗、金矿与骑士、蛮族、商品和进步卡共同生效。**383/383 项规则与回归测试通过**，四个正常完整局、固定 Unity 构建、独立 Windows 保存/恢复及真实鼠标开局操作均已验证。详见 [M5 验收记录](docs/M5_ACCEPTANCE.md)与[组合兼容表](docs/M5_SCENARIOS.md)。
 
-启动当前 M5：
+启动保留的 M5：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M5.ps1
 ```
 
-当前场景为 `Unity/Catan/Assets/M5.unity`，Windows 程序为 `.local/m5/Builds/Windows/CatanM5.exe`，操作见 [M5 试玩说明](docs/M5_PLAYTEST.md)。其余七个航海剧本暂未开放组合；用户本人整局试玩、最终 UI 与收藏版美术尚未确认。下一阶段为 M6 本地 AI 对手。
+保留场景为 `Unity/Catan/Assets/M5.unity`，Windows 程序为 `.local/m5/Builds/Windows/CatanM5.exe`，操作见 [M5 试玩说明](docs/M5_PLAYTEST.md)。其余七个航海剧本暂未开放组合；用户本人整局试玩、最终 UI 与收藏版美术尚未确认。AI 模式见当前 M6。
 
 M4 城市与骑士已于 2026 年 10 月 9 日完成工程验收：支持本地 3–4 人，包含商品、城市改良、骑士、蛮族、城墙、大都会，以及官方 2025 版全部 **25 种、54 张进步卡**。**332/332 项规则与回归测试通过**，三人/四人正常完整局、待决保存恢复、固定 Unity 构建和两个独立 Windows 进程均已实际运行。详见 [M4 验收记录](docs/M4_ACCEPTANCE.md)。
 
@@ -42,7 +52,7 @@ M2 基础版已于 2026 年 10 月 9 日完成工程验收，支持本地 3–4 
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M2.ps1
 ```
 
-正式 Unity 工程位于 `Unity/Catan`，M2 场景 `Assets/M2.unity` 和 Windows 程序 `.local/m2/Builds/Windows/CatanM2.exe` 独立保留。操作见 [M2 试玩说明](docs/M2_PLAYTEST.md)。AI、好友联机与最终美术属于后续阶段。用户亲自完成整局试玩、美术确认和长时间性能验收尚未执行。
+正式 Unity 工程位于 `Unity/Catan`，M2 场景 `Assets/M2.unity` 和 Windows 程序 `.local/m2/Builds/Windows/CatanM2.exe` 独立保留。操作见 [M2 试玩说明](docs/M2_PLAYTEST.md)。AI 已在当前 M6 交付，好友联机与最终美术属于后续阶段。用户亲自完成整局试玩、美术确认和长时间性能验收尚未执行。
 
 M0 已于 2026-10-08 完成，环境验证工程保留在 `.local/environment`。M1 固定切片仍可通过 `tools/development/Play-M1.ps1` 启动，原程序与独立存档入口保留；M1 的用户试玩和山地样板确认仍按 [原验收记录](docs/M1_ACCEPTANCE.md) 保留待验，不将 M2 工程验收视为用户已确认。
 
@@ -52,6 +62,10 @@ M0 已于 2026-10-08 完成，环境验证工程保留在 `.local/environment`�
 - [开发路线](docs/ROADMAP.md)：分阶段交付、退出条件和当前任务。
 - [美术生产规范](docs/ART_PIPELINE.md)：实物采集、AI 生产、导入和复现要求。
 - [开发环境](docs/ENVIRONMENT.md)：本机检查结果与工具链配置顺序。
+- [M6 试玩说明](docs/M6_PLAYTEST.md)：单人规则选择、人类席位、AI 暂停与保存恢复。
+- [M6 验收记录](docs/M6_ACCEPTANCE.md)：496 项测试、52 个正常完整局、Unity/Windows 和实际窗口证据。
+- [M6 策略说明](docs/M6_STRATEGY.md)：启发式行为、交易取舍及已知质量缺口。
+- [M6 架构](docs/M6_ARCHITECTURE.md)：独立 PlayerView 策略、共用执行入口、待决调度和固定人类视图。
 - [M5 试玩说明](docs/M5_PLAYTEST.md)：组合剧本、跨海骑士、船、金矿与多席位待决。
 - [M5 验收记录](docs/M5_ACCEPTANCE.md)：383 项测试、四个完整局、Unity/Windows 和真实窗口证据。
 - [M5 组合规则](docs/M5_COMBINATION_RULES.md)：官方 2025 组合来源、快照及跨扩展覆盖顺序。

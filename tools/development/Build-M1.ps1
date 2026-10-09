@@ -4,9 +4,10 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $project = Join-Path $root 'Unity\Catan'
 $logs = Join-Path $root '.local\m1\logs'
 New-Item -ItemType Directory -Force -Path $logs,(Join-Path $project 'Assets\Plugins'),(Join-Path $project 'Assets\Models'),(Join-Path $project 'Assets\Resources'),(Join-Path $project 'Assets\ArtMaterials') | Out-Null
-& $toolchain.dotnet build (Join-Path $root 'src\Catan.Core\Catan.Core.csproj') -c Release
-if ($LASTEXITCODE -ne 0) { throw 'Core build failed' }
+& $toolchain.dotnet build (Join-Path $root 'src\Catan.AI\Catan.AI.csproj') -c Release
+if ($LASTEXITCODE -ne 0) { throw 'Core / AI build failed' }
 Copy-Item -LiteralPath (Join-Path $root 'src\Catan.Core\bin\Release\netstandard2.1\Catan.Core.dll') -Destination (Join-Path $project 'Assets\Plugins\Catan.Core.dll') -Force
+Copy-Item -LiteralPath (Join-Path $root 'src\Catan.AI\bin\Release\netstandard2.1\Catan.AI.dll') -Destination (Join-Path $project 'Assets\Plugins\Catan.AI.dll') -Force
 Copy-Item -LiteralPath (Join-Path $root 'docs\acceptance\v0.1\scenario.json') -Destination (Join-Path $project 'Assets\Resources\m1-scenario.json') -Force
 Copy-Item -LiteralPath (Join-Path $root 'art\exports\mountain-tile-v001\mountain-tile-v001.fbx') -Destination (Join-Path $project 'Assets\Models\mountain-tile-v001.fbx') -Force
 Copy-Item -LiteralPath (Join-Path $root 'art\exports\mountain-tile-v001\manifest.json') -Destination (Join-Path $project 'Assets\Models\mountain-manifest.json') -Force
