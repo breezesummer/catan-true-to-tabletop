@@ -11,7 +11,7 @@ using PlayerView = Catan.Core.M5.PlayerView;
 using PublicPlayer = Catan.Core.M5.PublicPlayer;
 
 // Presentation receives detached seat views. Every button uses the same authoritative command entrance.
-public sealed class M5App : MonoBehaviour
+public sealed partial class M5App : MonoBehaviour
 {
     M6App ai;
     M5LocalGameHost host;
@@ -33,6 +33,8 @@ public sealed class M5App : MonoBehaviour
     Command draft;
     Font font;
     GUIStyle label,small,heading,button;
+    readonly EntityCardAssets.Display cardArt=new EntityCardAssets.Display();
+    bool artOpen;
     static readonly string[] Goods={"木材","砖","羊毛","谷物","矿石","布匹","钱币","纸张"};
     static readonly string[] Tracks={"贸易 · 布匹","政治 · 钱币","科学 · 纸张"};
     static readonly string[] Cards={"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻造","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"};
@@ -65,15 +67,16 @@ public sealed class M5App : MonoBehaviour
     public void SwitchSeat(string target)
     {
         if(ai!=null){status="你控制 "+ai.HumanSeat+"；其他席位为 AI，仅显示公开信息。";return;}
-        nextSeat=target;curtain=true;view=null;draft=null;pickField="";scroll=Vector2.zero;tab=0;board.ClearPreview();
+        dock.Reset();nextSeat=target;curtain=true;view=null;draft=null;pickField="";scroll=Vector2.zero;tab=0;artOpen=false;cardArt.Clear();board.ClearPreview();
         status="手牌与私有选择已遮蔽，请将设备交给 "+target+"。";
     }
-    public void ConfirmSeat(){seat=nextSeat;curtain=false;view=host.View(seat);Refresh(view);}
+    public void ConfirmSeat(){dock.Reset();seat=nextSeat;curtain=false;view=host.View(seat);Refresh(view);}
     public CommandResult Submit(Command command)
     {
-        if(ai!=null&&(!ai.IsHumanTurn||command.PlayerId!=ai.HumanSeat)){status="请等待当前 AI 或待决席位完成操作。";return null;}
+        if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
+        if(ai!=null&&command==draft&&!DockKnightTargetMatches(command.TargetId)){status="请选择低一级的己方骑士晋升。";return null;}
         command.Id=string.IsNullOrEmpty(command.Id)?Guid.NewGuid().ToString("N"):command.Id;
-        var result=host.Submit(command);status=result.Success?"操作完成。":result.Message;
+        dock.Reset();CancelOperationDraft();var result=host.Submit(command);status=result.Success?"操作完成。":result.Message;
         pickField="";board.ClearPreview();view=host.View(seat);Refresh(view);
         if(result.Success)
         {
@@ -96,7 +99,7 @@ public sealed class M5App : MonoBehaviour
             board=new GameObject("M5 board").AddComponent<M5BoardRenderer>();board.Initialize(v.Board.Tiles,v.Board.Vertices,v.Board.Edges);
             board.SetCamera(top);layout=next;
         }
-        board.Refresh(v);board.ShowTerrain(terrain);
+        board.SetOperationLayout(ai!=null);board.Refresh(v);board.ShowTerrain(terrain);
     }
     public void SaveGame(){if(ai!=null){ai.SaveGame();return;}try{host.Save();status="已保存完整局面和待决选择。";}catch(Exception){status="保存失败，请检查存档目录。";}}
     public void LoadGame(){if(ai!=null){ai.LoadGame();return;}try{host.Load();var v=host.View("P1");Refresh(v);SwitchSeat(Actor(v));status="已恢复，请确认席位。";}catch(Exception){status="存档无法读取或版本不兼容，当前局面保留。";}}
@@ -104,19 +107,21 @@ public sealed class M5App : MonoBehaviour
     {
         if(board==null)return;
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
-        if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){pickField="";board.ClearPreview();newGame=false;}
-        if(Input.mousePosition.x<Screen.width*.70f&&Input.mouseScrollDelta.y!=0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
-        if(curtain||newGame||draft==null||pickField==""||ai!=null&&!ai.IsHumanTurn)return;
+        if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();pickField="";board.ClearPreview();newGame=false;cardArt.Clear();}
+        if(!DockBlocksMouse()&&Input.mousePosition.x<Screen.width*.70f&&Input.mouseScrollDelta.y!=0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
+        if(curtain||newGame||artOpen||draft==null||pickField==""||ai!=null&&!ai.IsHumanTurn)return;
         var mouse=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
-        if(mouse.x>Screen.width*.70f||mouse.y<Screen.height*.15f||mouse.y>Screen.height*.90f)return;
+        if(DockBlocksMouse()||cardArt.BlocksBoardInput(new Vector2(mouse.x*1440/Screen.width,mouse.y*900/Screen.height)))return;
+        if(ai==null&&(mouse.x>Screen.width*.70f||mouse.y<Screen.height*.15f||mouse.y>Screen.height*.90f))return;
         string target=Pick(pickType,mouse);
         if(target!="")
         {
             bool valid=true;
-            if(pickField=="target") {string old=draft.TargetId;draft.TargetId=target;valid=host.Preview(draft).Success;draft.TargetId=old;}
+            if(pickField=="target") {string old=draft.TargetId;draft.TargetId=target;valid=host.Preview(draft).Success&&(ai==null||DockKnightTargetMatches(target));draft.TargetId=old;}
             if(pickType=="T")board.PreviewRobber(target,valid);else if(IsShip(draft))board.PreviewShip(target,valid);else board.Preview(target,pickType=="E",valid);
             if(Input.GetMouseButtonDown(0))
             {
+                if(ai!=null&&!DockKnightTargetMatches(target)){status="请选择低一级的己方骑士晋升。";return;}
                 if(pickField=="source")draft.SourceId=target;else draft.TargetId=target;
                 pickField="";board.ClearPreview();status="已选择 "+target+"；检查面板后确认。";
             }
@@ -134,7 +139,7 @@ public sealed class M5App : MonoBehaviour
     void Text(string value,bool minor=false)=>GUILayout.Label(value,minor?small:label);
     void OnGUI()
     {
-        if(host==null)return;Styles();GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));
+        if(host==null)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));
         Panel(new Rect(0,0,1440,125),new Color(.045f,.09f,.10f));
         GUI.Label(new Rect(25,15,700,36),"CATAN  /  航海家 × 城市与骑士",heading);
         var publicView=summary;
@@ -161,20 +166,52 @@ public sealed class M5App : MonoBehaviour
         {
             DrawBoardLabels();GUILayout.BeginArea(new Rect(1032,12,390,724));
             GUILayout.Label(seat+" · "+PhaseName(view.Phase)+" · "+view.OwnVictoryPoints+" 分",heading);
-            Text(string.Join("  ",Enumerable.Range(0,8).Select(i=>Goods[i]+" "+Own(i))),true);
+            cardArt.GoodRow(Enumerable.Range(0,8).Select(Own).ToArray(),Goods,small);
             var own=view.Players.First(p=>p.Id==seat);Text("改良 贸易 "+own.Improvements[0]+" / 政治 "+own.Improvements[1]+" / 科学 "+own.Improvements[2]+"   城墙余 "+own.WallSupply,true);
             Text("路 "+own.Pieces.Roads+" / 船 "+own.ShipsRemaining+" / 村 "+own.Pieces.Settlements+" / 城 "+own.Pieces.Cities+"   骑士余 "+string.Join("/",own.KnightSupply),true);
             Text("防御 "+view.Board.Knights.Where(k=>k.Active).Sum(k=>k.Level)+" / 蛮族力量 "+view.Board.Cities.Length+" · "+(view.FirstBarbarianAttack?"强盗 / 海盗已启用":"强盗 / 海盗尚未启用"),true);
+            if(Btn(artOpen?"返回操作面板":"查看手牌与设施实体卡面")){artOpen=!artOpen;scroll=Vector2.zero;}
             scroll=GUILayout.BeginScrollView(scroll);
-            DrawControls();GUILayout.EndScrollView();GUILayout.EndArea();
+            if(artOpen)DrawEntityCards();else DrawControls();GUILayout.EndScrollView();GUILayout.EndArea();
         }
         GUILayout.BeginArea(new Rect(1032,749,390,142));GUILayout.BeginHorizontal();if(Btn("保存"))SaveGame();if(Btn("恢复"))LoadGame();if(Btn("新开一局")){if(ai!=null)ai.ShowMenu();else newGame=true;}GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();foreach(var p in publicView.Players)if(Btn(p.Id+"\n"+p.VictoryPoints+"分 / "+p.ResourceCount+"牌")){SwitchSeat(p.Id);break;}GUILayout.EndHorizontal();
         Text(ai==null?"点击席位换座 · Tab 视角 · 滚轮缩放 · Esc 取消":"你："+ai.HumanSeat+" · 其他席位为 AI · Tab 视角 · Esc 取消",true);GUILayout.EndArea();
         Panel(new Rect(0,812,1015,88),new Color(.045f,.09f,.10f));GUI.Label(new Rect(24,826,970,58),pickField==""?status:"请在棋盘选择"+(pickType=="V"?"交点":pickType=="E"?"道路":"地块")+"，然后在右侧确认；Esc 取消。",label);
+        if(!curtain&&!newGame&&view!=null)cardArt.DrawPreview(label,small,button);
         GUI.matrix=Matrix4x4.identity;
     }
     int Own(int i)=>i<5?view.OwnResources[(Resource)i]:view.OwnCommodities[(Commodity)(i-5)];
+    void ProgressFace(ProgressCardKind card,string caption)
+    { cardArt.LayoutBadge(EntityCardAssets.Progress((int)card),caption,small); }
+    void DrawEntityCards()
+    {
+        Text("悬停放大 · 点击固定查看与翻面。实体照片中的文字仅作外观，规则以操作提示为准。",true);
+        Text("我的进步卡");
+        foreach(var card in view.OwnProgressCards.Distinct())
+        {
+            GUILayout.BeginHorizontal();ProgressFace(card,CardName(card)+" ×"+view.OwnProgressCards.Count(c=>c==card));Text(CardHelp[(int)card],true);GUILayout.EndHorizontal();
+        }
+        if(view.OwnProgressCards.Length==0)Text("当前没有进步卡。",true);
+        if(view.PrivateTargetProgressCards!=null&&view.PrivateTargetProgressCards.Length>0)
+        {
+            Text("本次待决允许查看的进步卡");
+            foreach(var card in view.PrivateTargetProgressCards.Distinct())ProgressFace(card,"允许查看 · "+CardName(card));
+        }
+        Text("我的城市设施");
+        cardArt.Improvements(view.OwnImprovements,Tracks,small);
+        var own=view.Players.First(p=>p.Id==seat);
+        cardArt.LayoutBadge(EntityCardAssets.Defender,"保卫者 ×"+own.DefenderPoints,small,100,133);
+        Text("公开的奖励牌");
+        foreach(var p in view.Players)
+        {
+            if(p.DefenderPoints==0&&p.ProgressVictoryCards.Length==0)continue;
+            Text(p.Id+" · 公开奖励",true);GUILayout.BeginHorizontal();
+            if(p.DefenderPoints>0)cardArt.LayoutBadge(EntityCardAssets.Defender,p.Id+" 保卫者 ×"+p.DefenderPoints,small,100,133);
+            foreach(var card in p.ProgressVictoryCards.Distinct())ProgressFace(card,p.Id+" "+CardName(card)+" ×"+p.ProgressVictoryCards.Count(c=>c==card));
+            GUILayout.EndHorizontal();
+        }
+    }
     void DrawBoardLabels()
     {
         foreach(var tile in view.Board.Tiles)
@@ -258,7 +295,9 @@ public sealed class M5App : MonoBehaviour
                 Text("进步卡可当回合使用。仅炼金术在掷骰前使用；回合结束最多留 4 张。",true);
                 foreach(var card in view.OwnProgressCards.Distinct())
                 {
+                    GUILayout.BeginHorizontal();ProgressFace(card,CardName(card)+" ×"+view.OwnProgressCards.Count(c=>c==card));
                     if(Btn(CardName(card)+" ×"+view.OwnProgressCards.Count(c=>c==card))){draft=New(CommandKind.PlayProgressCard);draft.ProgressCard=card;}
+                    GUILayout.EndHorizontal();
                 }
                 if(view.OwnProgressCards.Length==0)Text("当前没有进步卡。",true);
                 if(view.CommercialHarborPlayers.Length>0)ActionButton("商业港口 · 提供资源",CommandKind.CommercialHarborOffer);
@@ -277,8 +316,9 @@ public sealed class M5App : MonoBehaviour
         GUILayout.Space(10);Text("当前选择 · "+CommandName(draft.Kind));
         var k=draft.Kind;var pending=view.PendingDecision==null?"":view.PendingDecision.Kind;
         bool card=k==CommandKind.PlayProgressCard;
-        if(card){Text(CardName(draft.ProgressCard)+"："+CardHelp[(int)draft.ProgressCard]);}
-        if(k==CommandKind.ImproveCity||card&&draft.ProgressCard==ProgressCardKind.Crane||pending=="DefenderProgress")draft.Track=(ImprovementTrack)Cycle("轨道",(int)draft.Track,Tracks);
+        if(card){Text(CardName(draft.ProgressCard)+"："+CardHelp[(int)draft.ProgressCard]);if(view.OwnProgressCards.Contains(draft.ProgressCard))ProgressFace(draft.ProgressCard,CardName(draft.ProgressCard));}
+        if(k==CommandKind.ImproveCity&&ai!=null&&operationFacilityLocked)Text("设施轨道："+Tracks[(int)draft.Track]);
+        else if(k==CommandKind.ImproveCity||card&&draft.ProgressCard==ProgressCardKind.Crane||pending=="DefenderProgress")draft.Track=(ImprovementTrack)Cycle("轨道",(int)draft.Track,Tracks);
         bool source=k==CommandKind.MoveKnight||k==CommandKind.DisplaceKnight||k==CommandKind.MoveShip;
         bool vertex=k==CommandKind.SetupSettlement||k==CommandKind.BuildSettlement||k==CommandKind.BuildCity||k==CommandKind.BuildWall||k==CommandKind.RecruitKnight||k==CommandKind.PromoteKnight||k==CommandKind.ActivateKnight||k==CommandKind.ChaseRobber||k==CommandKind.ChasePirate||source&&k!=CommandKind.MoveShip;
         bool edge=k==CommandKind.SetupRoad||k==CommandKind.BuildRoad||k==CommandKind.PlaceFreeRoad||IsShip(draft);
@@ -342,6 +382,7 @@ public sealed class M5App : MonoBehaviour
         if(view.PrivateTargetProgressCards!=null&&view.PrivateTargetProgressCards.Length>0)
         {
             var cards=view.PrivateTargetProgressCards.Distinct().ToArray();draft.SelectedProgressCard=cards[Cycle("允许查看的进步卡",Math.Max(0,Array.IndexOf(cards,draft.SelectedProgressCard)),cards.Select(CardName).ToArray())];
+            ProgressFace(draft.SelectedProgressCard,"允许查看 · "+CardName(draft.SelectedProgressCard));
         }
         if(k==CommandKind.DiscardProgressCard)
         {
@@ -401,7 +442,7 @@ public sealed class M5App : MonoBehaviour
     }
     public M5LocalGameHost VerificationHost=>host;
     internal PlayerView M6View=>view;
-    internal void M6Refresh(){seat=ai.HumanSeat;nextSeat=seat;curtain=false;view=host.View(seat);draft=null;pickField="";board.ClearPreview();Refresh(view);status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，请完成右侧的行动或待决选择。":ai.WaitingText;}
+    internal void M6Refresh(){dock.Reset();seat=ai.HumanSeat;nextSeat=seat;curtain=false;view=host.View(seat);draft=null;pickField="";board.ClearPreview();Refresh(view);status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，请完成右侧的行动或待决选择。":ai.WaitingText;}
     internal void M6Visible(bool value){if(board!=null)board.gameObject.SetActive(value);}
     internal void M6Close(){enabled=false;if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}Destroy(this);}
     public M5BoardRenderer VerificationBoard=>board;

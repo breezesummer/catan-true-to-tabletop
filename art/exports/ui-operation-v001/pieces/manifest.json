@@ -1,0 +1,357 @@
+{
+  "schemaVersion": 1,
+  "assetId": "ui-operation-v001-pieces",
+  "blender": "4.5.14 LTS",
+  "recipe": "art/recipes/ui-operation-v001/render_pieces.py",
+  "recipeSha256": "4643b720b7587ac3a4e185b1dcfc57815c051ec2c6994de7065c5b20c2bf500c",
+  "method": "Retained mesh sources rendered in Cycles CPU; no AI-generated bitmap or mesh conversion",
+  "size": [
+    256,
+    256
+  ],
+  "samples": 24,
+  "transparent": true,
+  "camera": "orthographic (2.6,-4,3) aimed at origin; mesh-normalized; 15 percent fit margin",
+  "assets": [
+    {
+      "id": "road-red",
+      "source": "art/source/photo-samples-v001/road.blend",
+      "sourceSha256": "947d8fbf65e9e052f549df1de8e208ab68faf61c36ceee19b39eac30160ef9ea",
+      "file": "road-red.png",
+      "sha256": "9e8651d7eeafab591a5398051939d764722bfddb8b3fea2ae30220419a68495a",
+      "meshObjects": 51,
+      "polygons": 2726,
+      "materialOverride": [
+        0.85,
+        0.24,
+        0.16,
+        1
+      ]
+    },
+    {
+      "id": "settlement-red",
+      "source": "art/source/photo-samples-v001/village.blend",
+      "sourceSha256": "bdc6b77c1602edc59995e3491dce6991f56533611ceb793a8f16cc3a77463b6a",
+      "file": "settlement-red.png",
+      "sha256": "27da723cc5d618f897150a2d7e39590c3c0b79538a0eef432813effc658f47af",
+      "meshObjects": 60,
+      "polygons": 3093,
+      "materialOverride": null
+    },
+    {
+      "id": "city-red",
+      "source": "art/source/entity-conversion-v001/city/city-red.blend",
+      "sourceSha256": "c03e0c64fd61935522052585286a10cb3f1fe0a89669aef32470f37f4d1045cf",
+      "file": "city-red.png",
+      "sha256": "5e4ed8d32439b579be28b3ea4f57d7820843315479c7c10ccf5c0a570ffc6575",
+      "meshObjects": 1,
+      "polygons": 7569,
+      "materialOverride": null
+    },
+    {
+      "id": "ship-red",
+      "source": "art/source/entity-conversion-v001/ships/ship-red.blend",
+      "sourceSha256": "c98d81e5c8661d7fbc79be5e3ce2fd00e5d559666f3071259fcf9a809d2e6a53",
+      "file": "ship-red.png",
+      "sha256": "98c966f208cfbce88348b20518b8f7385fad8882b2a6a01a46d6916240f3e314",
+      "meshObjects": 2,
+      "polygons": 2982,
+      "materialOverride": null
+    },
+    {
+      "id": "wall-red",
+      "source": "art/source/entity-conversion-v001/city-wall/city-wall-red.blend",
+      "sourceSha256": "7769dbbfb50cde80e51f20cde7273d2d91fa36f59ba33f8aa0672db67dcdca2c",
+      "file": "wall-red.png",
+      "sha256": "abea731fcfffbffd2204caae41721941a8d10d02b915bcde71327383c8a8aa15",
+      "meshObjects": 1,
+      "polygons": 6960,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-1-red",
+      "source": "art/source/entity-conversion-v001/knights/knight-level-1-resting.blend",
+      "sourceSha256": "a57bfce4da298c4c81e7053ee028cf3aafc62cf106814c00721cb9b24ae24ca4",
+      "file": "knight-1-red.png",
+      "sha256": "e60c0644e7338ab2e744d3fc832735b31cad015ba164dc668de3c85907ec5ac6",
+      "meshObjects": 1,
+      "polygons": 4849,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-2-red",
+      "source": "art/source/entity-conversion-v001/knights/knight-level-2-resting.blend",
+      "sourceSha256": "69d7d143962b6a65f948d97eb8eec9670765b5468d16d2e8aca30c442776f367",
+      "file": "knight-2-red.png",
+      "sha256": "b0b818b0c3a5ec399604b353b9c4cc93f5e53e22cf72ba62d7dac67c4e213fa1",
+      "meshObjects": 1,
+      "polygons": 4851,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-3-red",
+      "source": "art/source/entity-conversion-v001/knights/knight-level-3-resting.blend",
+      "sourceSha256": "b94ad280ad14e8348a09adcf103874fa9c8844dc540d925b84827c34e44fc451",
+      "file": "knight-3-red.png",
+      "sha256": "6a93be0dbf0141203d7728317a1bb94e456ababab9fdb474cf7dfa5b3aa2e586",
+      "meshObjects": 1,
+      "polygons": 4853,
+      "materialOverride": null
+    },
+    {
+      "id": "road-blue",
+      "source": "art/source/photo-samples-v001/road.blend",
+      "sourceSha256": "947d8fbf65e9e052f549df1de8e208ab68faf61c36ceee19b39eac30160ef9ea",
+      "file": "road-blue.png",
+      "sha256": "c4ca5ff830e4b927276f46ce3862e9fd552a25b154fd3bebffbbf9131b8c3cf7",
+      "meshObjects": 51,
+      "polygons": 2726,
+      "materialOverride": [
+        0.23,
+        0.56,
+        0.78,
+        1
+      ]
+    },
+    {
+      "id": "settlement-blue",
+      "source": "art/source/entity-conversion-v002/player-buildings/village-blue.blend",
+      "sourceSha256": "ffd5d59689af66a4896534422a9c689044ae56bcba3d5293cba560b4a4a6da5d",
+      "file": "settlement-blue.png",
+      "sha256": "35a368bb716486f072afc87610599f3d3cfd4e3c509b167846ce24a73c34b421",
+      "meshObjects": 1,
+      "polygons": 3369,
+      "materialOverride": null
+    },
+    {
+      "id": "city-blue",
+      "source": "art/source/entity-conversion-v002/player-buildings/city-blue.blend",
+      "sourceSha256": "1fc97bf36ddfdc592f928c6f85404240867c7626a1fe44b872e26005f3fe4385",
+      "file": "city-blue.png",
+      "sha256": "c738a3f749959a89a69fb9db35d27fa3875612a5af724fc979b0da9387a9bd0d",
+      "meshObjects": 1,
+      "polygons": 7569,
+      "materialOverride": null
+    },
+    {
+      "id": "ship-blue",
+      "source": "art/source/entity-conversion-v001/ships/ship-blue.blend",
+      "sourceSha256": "54a6e26a22142ca4e3aee8e6a62095b9ea3cc881dd6423d388bc3bd5e863771b",
+      "file": "ship-blue.png",
+      "sha256": "0afa3e0a9dcda4887517397aad65479d293c9716591e48e6daa1ce08d16cbbc5",
+      "meshObjects": 2,
+      "polygons": 2982,
+      "materialOverride": null
+    },
+    {
+      "id": "wall-blue",
+      "source": "art/source/entity-conversion-v002/player-buildings/city-wall-blue.blend",
+      "sourceSha256": "aea8cb67e5de70ce69d74e38cc9de3d11bfd55b3a82b534dc4b23ab4c8d025ef",
+      "file": "wall-blue.png",
+      "sha256": "848e77fe81bc66e977a48e14f4d5512edbec532cd97f7ee8457688af6f6ae6ed",
+      "meshObjects": 1,
+      "polygons": 6960,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-1-blue",
+      "source": "art/source/entity-conversion-v002/player-knights/knight-blue-level-1-bare.blend",
+      "sourceSha256": "b47e25c8b557d3ea1c1ba7079c70cdbd9cee1d4b9ef9d7f021452bbd70258dea",
+      "file": "knight-1-blue.png",
+      "sha256": "bd47308ad94ebe29dcf47d74a7a4bfe6c3941124e67ff6ac12dc55cc8b9e1779",
+      "meshObjects": 1,
+      "polygons": 4849,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-2-blue",
+      "source": "art/source/entity-conversion-v002/player-knights/knight-blue-level-2-bare.blend",
+      "sourceSha256": "2c643e36182b7b1a2f91b37fde765d64b6fa0123293893f6d5be99f5ebbd4997",
+      "file": "knight-2-blue.png",
+      "sha256": "b234c21cd3614c39cc83e8b8d8ac000148b1d1d00474738ccdcce5017cd16025",
+      "meshObjects": 1,
+      "polygons": 4851,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-3-blue",
+      "source": "art/source/entity-conversion-v002/player-knights/knight-blue-level-3-bare.blend",
+      "sourceSha256": "f6f2e97ee383881dbb24b4f7aea285f574f230e931bccb2650f27638a1a6de39",
+      "file": "knight-3-blue.png",
+      "sha256": "ecd7429e94113ea04f43b576928abe010f81b7de260fe39c8102d4c16e5242fd",
+      "meshObjects": 1,
+      "polygons": 4853,
+      "materialOverride": null
+    },
+    {
+      "id": "road-orange",
+      "source": "art/source/photo-samples-v001/road.blend",
+      "sourceSha256": "947d8fbf65e9e052f549df1de8e208ab68faf61c36ceee19b39eac30160ef9ea",
+      "file": "road-orange.png",
+      "sha256": "76b560187c16bfc37818bdd130828c77423d19715ccec21e72b5e4a0f91d794a",
+      "meshObjects": 51,
+      "polygons": 2726,
+      "materialOverride": [
+        0.94,
+        0.74,
+        0.3,
+        1
+      ]
+    },
+    {
+      "id": "settlement-orange",
+      "source": "art/source/entity-conversion-v002/player-buildings/village-orange.blend",
+      "sourceSha256": "bcff60e3794bf61226d609051ce52eb971c56679343a7d5b151f7d2ab6390cf7",
+      "file": "settlement-orange.png",
+      "sha256": "59175b80e9d6017c02878551f050f3d9c71aba61af5a8aa5bd75b1a2d48f53b3",
+      "meshObjects": 1,
+      "polygons": 3369,
+      "materialOverride": null
+    },
+    {
+      "id": "city-orange",
+      "source": "art/source/entity-conversion-v002/player-buildings/city-orange.blend",
+      "sourceSha256": "bf3512ee8cab45baf88233ae7438da984f409e284aba9342c966db6cd73e251f",
+      "file": "city-orange.png",
+      "sha256": "84cd3228e2d717008845379c3b2c0d047313c5b85b7802d3a7b6772381ff665e",
+      "meshObjects": 1,
+      "polygons": 7569,
+      "materialOverride": null
+    },
+    {
+      "id": "ship-orange",
+      "source": "art/source/entity-conversion-v001/ships/ship-orange.blend",
+      "sourceSha256": "4c2486e5e051ab801d42c09b8b8c3e7c205056df644bfdb6009003e5c6268e8c",
+      "file": "ship-orange.png",
+      "sha256": "d9cb8587b621269c18b7ab47cb66cf80772cd4fface652e596d3f393df5fbe35",
+      "meshObjects": 2,
+      "polygons": 2982,
+      "materialOverride": null
+    },
+    {
+      "id": "wall-orange",
+      "source": "art/source/entity-conversion-v002/player-buildings/city-wall-orange.blend",
+      "sourceSha256": "7780d1e982f21beab7606d784ef9aa225798709cd711521aaff26704df1ababd",
+      "file": "wall-orange.png",
+      "sha256": "10787af21171cf5265f3dc0ad71039d8e45b36e453d5f75dc6fefb31e05edbd5",
+      "meshObjects": 1,
+      "polygons": 6960,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-1-orange",
+      "source": "art/source/entity-conversion-v002/player-knights/knight-orange-level-1-bare.blend",
+      "sourceSha256": "3252e8b7459858b303881103b9cb5646d6e705fbdc3c4bfdbf0236f38ffb4785",
+      "file": "knight-1-orange.png",
+      "sha256": "5e5db60f5ffdd92173df765c01128efa16f942ce5aa50ec14825e62c210d9534",
+      "meshObjects": 1,
+      "polygons": 4849,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-2-orange",
+      "source": "art/source/entity-conversion-v002/player-knights/knight-orange-level-2-bare.blend",
+      "sourceSha256": "44588c2f40785e3ab7de797df28001fabdfcecd4b3935815df32f07e15b16a52",
+      "file": "knight-2-orange.png",
+      "sha256": "b5a9bd1f02339e0684527d1098cf3002a7286ad9261ff5b8a8ca2c69662b5616",
+      "meshObjects": 1,
+      "polygons": 4851,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-3-orange",
+      "source": "art/source/entity-conversion-v002/player-knights/knight-orange-level-3-bare.blend",
+      "sourceSha256": "b61df7cbbcb2bdea02fdaaf94e55f1868ae02c44953d6136ec4c7bb4e997aefc",
+      "file": "knight-3-orange.png",
+      "sha256": "c719abe5ab34bc45ebe53cdffa91a0446c3d6f03f6c82684060a0ea7aa1a5ee8",
+      "meshObjects": 1,
+      "polygons": 4853,
+      "materialOverride": null
+    },
+    {
+      "id": "road-beige",
+      "source": "art/source/photo-samples-v001/road.blend",
+      "sourceSha256": "947d8fbf65e9e052f549df1de8e208ab68faf61c36ceee19b39eac30160ef9ea",
+      "file": "road-beige.png",
+      "sha256": "ba6092f4ee60de23b3c75e967159caeb605d71adffce7d9e959187281f11ac32",
+      "meshObjects": 51,
+      "polygons": 2726,
+      "materialOverride": [
+        0.79,
+        0.79,
+        0.72,
+        1
+      ]
+    },
+    {
+      "id": "settlement-beige",
+      "source": "art/source/entity-conversion-v002/player-buildings/village-beige.blend",
+      "sourceSha256": "805770d8e743210f662f346b796a9db540b1367bf46a04ac038bebab4a8952eb",
+      "file": "settlement-beige.png",
+      "sha256": "f30c94172d4ac9e08141526bf4bee89d59a83f54c9eb67b172ed8c1ccfc4d22a",
+      "meshObjects": 1,
+      "polygons": 3369,
+      "materialOverride": null
+    },
+    {
+      "id": "city-beige",
+      "source": "art/source/entity-conversion-v002/player-buildings/city-beige.blend",
+      "sourceSha256": "92d87dd2aebc3fe11437c5f9f8d799ec142c47860d8924c53ad324dfe42c05ee",
+      "file": "city-beige.png",
+      "sha256": "3fa12717265ecb2f744fb44da82bf99d7feff2335daa4f08ba58cc2b50b4c0d1",
+      "meshObjects": 1,
+      "polygons": 7569,
+      "materialOverride": null
+    },
+    {
+      "id": "ship-beige",
+      "source": "art/source/entity-conversion-v001/ships/ship-ivory.blend",
+      "sourceSha256": "8d2cd4e861603fef159b11383be8476f188c3d7d3f39fbd847c21e0f05dff930",
+      "file": "ship-beige.png",
+      "sha256": "783b3593be7931724b5d511ad49b3688a067642c9a632f6e015836b517c24e19",
+      "meshObjects": 2,
+      "polygons": 2982,
+      "materialOverride": null
+    },
+    {
+      "id": "wall-beige",
+      "source": "art/source/entity-conversion-v002/player-buildings/city-wall-beige.blend",
+      "sourceSha256": "3fd2fe45baf9d74e01cd3485edae8c3bae80797b40c60404a490539fb3ba9956",
+      "file": "wall-beige.png",
+      "sha256": "feb23555510a03cfbb4af2e1405673c2d963f6dc63a7af2f42ad8b71ef300063",
+      "meshObjects": 1,
+      "polygons": 6960,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-1-beige",
+      "source": "art/source/entity-conversion-v002/player-knights/knight-beige-level-1-bare.blend",
+      "sourceSha256": "831108a7a892923d237f4c3fd26647862b98f346c80b0e4c9e7987e5031c835b",
+      "file": "knight-1-beige.png",
+      "sha256": "c90fa716c5d8893d637fc65c33a3652c06a7672f81da188e95e7c037182f85fa",
+      "meshObjects": 1,
+      "polygons": 4849,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-2-beige",
+      "source": "art/source/entity-conversion-v002/player-knights/knight-beige-level-2-bare.blend",
+      "sourceSha256": "7c1a452922f1e12a631f186e98de9091aee9fdd8ed103dcbf09f961174677c9b",
+      "file": "knight-2-beige.png",
+      "sha256": "27ce15e57a2fb90add4405985ff9b90e6a57692d9576377352a65a14748feb2f",
+      "meshObjects": 1,
+      "polygons": 4851,
+      "materialOverride": null
+    },
+    {
+      "id": "knight-3-beige",
+      "source": "art/source/entity-conversion-v002/player-knights/knight-beige-level-3-bare.blend",
+      "sourceSha256": "2b6422a05eb59f8d28935b9591f7a82c07b761ecd28227414e6a134910a55d6c",
+      "file": "knight-3-beige.png",
+      "sha256": "51938431ca605b8abc71a036f1dfbdddb140bc8fdc08e281417ce7856ff90c83",
+      "meshObjects": 1,
+      "polygons": 4853,
+      "materialOverride": null
+    }
+  ]
+}

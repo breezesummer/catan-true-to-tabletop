@@ -1,3 +1,7 @@
 # Preserve original reference bytes and verification evidence checksums.
 assets/references/rules/**/originals/** -text
 docs/verification/** -text
+
+# Preserve hashes of the versioned UI render recipe and export manifest.
+art/recipes/ui-operation-v001/** -text
+art/exports/ui-operation-v001/** -text
