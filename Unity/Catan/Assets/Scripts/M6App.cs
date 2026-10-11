@@ -18,7 +18,7 @@ public sealed partial class M6App : MonoBehaviour
 
     public string RuleSet { get; private set; }="base";
     public string ScenarioId { get; private set; }="heading-for-new-shores";
-    public int PlayerCount { get; private set; }=3;
+    public int PlayerCount { get; private set; }=4;
     public string HumanSeat { get; private set; }="P1";
     public string InitialAuthority { get; private set; }
     public bool Paused { get; private set; }
@@ -31,7 +31,7 @@ public sealed partial class M6App : MonoBehaviour
     public bool Finished=>Ready&&finished();
     public string CurrentActor=>Ready?actor():"";
     public bool IsHumanTurn=>Ready&&!Finished&&CurrentActor==HumanSeat;
-    public string WaitingText=>Fault!=""?"AI 已暂停："+Fault:Paused?"AI 已暂停。点击左上角继续。":Finished?"本局已结束。":"等待 "+CurrentActor+" · AI 正在行动。";
+    public string WaitingText=>Fault!=""?"AI 已暂停："+Fault:Paused?"AI 已暂停。打开右上角桌边菜单继续。":Finished?"本局已结束。":"等待 "+CurrentActor+" · AI 正在行动。";
     public string SavePath=>Path.Combine(Application.persistentDataPath,"m6-local-ai-v1.json");
 
     Func<string> actor,save;
@@ -41,7 +41,17 @@ public sealed partial class M6App : MonoBehaviour
     Action<bool> visible;
     MonoBehaviour presentation;
     float nextAction;
-    int menuRule,menuScenario,menuPlayers=3,menuHuman;
+    int menuRule,menuScenario,menuPlayers=4,menuHuman;
+        bool tableMenu;
+    public bool TableMenuOpen=>tableMenu;
+    public bool BlocksTableInput(Vector2 p)=>MenuVisible||tableMenu||new Rect(1280,20,138,36).Contains(p);
+    void ToggleTableCamera()
+    {
+        var b=FindFirstObjectByType<BoardRenderer>();if(b!=null)b.SetCamera(!b.TopView);
+        var s=FindFirstObjectByType<M3BoardRenderer>();if(s!=null)s.SetCamera(!s.TopView);
+        var c=FindFirstObjectByType<M4BoardRenderer>();if(c!=null)c.SetCamera(!c.TopView);
+        var x=FindFirstObjectByType<M5BoardRenderer>();if(x!=null)x.SetCamera(!x.TopView);
+    }
     Font font;
     GUIStyle label,title,button,small;
     static readonly string[] RuleIds={"base","seafarers","cities-knights","combined"};
@@ -54,10 +64,12 @@ public sealed partial class M6App : MonoBehaviour
         font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Arial"},18);
         gameObject.AddComponent<M6PlayerVerification>().Initialize(this);
         gameObject.AddComponent<OperationUiVerification>();
+        gameObject.AddComponent<TabletopUiVerification>();
     }
     void Update()
     {
-        if(MenuVisible||!Ready||Paused||Time.unscaledTime<nextAction)return;
+        if(Input.GetKeyDown(KeyCode.Escape))tableMenu=false;
+        if(MenuVisible||tableMenu||!Ready||Paused||Time.unscaledTime<nextAction)return;
         nextAction=Time.unscaledTime+.60f;
         StepAi();
     }
@@ -96,7 +108,7 @@ public sealed partial class M6App : MonoBehaviour
         else if(presentation!=null){presentation.enabled=false;Destroy(presentation);}
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
-        Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你的手牌始终只显示 "+human+"。";
+        tableMenu=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你的手牌始终只显示 "+human+"。";
         switch(rules)
         {
             case "base":presentation=gameObject.AddComponent<M2App>();break;
@@ -176,16 +188,21 @@ public sealed partial class M6App : MonoBehaviour
         }
         else
         {
-            Panel(new Rect(0,0,770,87),new Color(.045f,.09f,.10f));
-            GUI.Label(new Rect(25,9,440,36),"M6  /  "+RuleNames[Array.IndexOf(RuleIds,RuleSet)],title);
-            GUI.Label(new Rect(25,53,455,30),"你："+HumanSeat+"  ·  "+(PlayerCount-1)+" 个本地 AI  ·  "+(IsHumanTurn?"等待你的操作":Paused?"AI 已暂停":Finished?"对局结束":"AI："+CurrentActor),small);
-            if(GUI.Button(new Rect(491,23,126,40),Paused?"继续 AI":"暂停 AI",button))SetPaused(!Paused);
-            if(GUI.Button(new Rect(631,23,115,40),"规则菜单",button))ShowMenu();
-            if(Fault!="")
+            var corner=new GUIStyle(small){fontSize=14};corner.normal.textColor=new Color(.98f,.88f,.67f);
+            GUI.Label(new Rect(24,21,300,29),"CATAN  /  "+RuleNames[Array.IndexOf(RuleIds,RuleSet)],corner);
+            if(GUI.Button(new Rect(1280,20,138,36),tableMenu?"收起菜单":"桌边菜单",button))tableMenu=!tableMenu;
+            if(tableMenu)
             {
-                Panel(new Rect(18,92,975,46),new Color(.25f,.075f,.06f,.96f));
-                GUI.Label(new Rect(29,99,950,36),"AI 已暂停："+Fault,small);
+                TabletopUI.Note(new Rect(1110,70,306,290));
+                if(GUI.Button(new Rect(1130,90,266,37),Paused?"继续 AI":"暂停 AI",button))SetPaused(!Paused);
+                if(GUI.Button(new Rect(1130,135,266,37),"保存这桌游戏",button))SaveGame();
+                if(GUI.Button(new Rect(1130,180,127,37),"恢复存档",button)){tableMenu=false;LoadGame();}
+                if(GUI.Button(new Rect(1268,180,128,37),"切换俯视",button))ToggleTableCamera();
+                if(GUI.Button(new Rect(1130,225,266,37),"规则 / 新开一桌",button)){tableMenu=false;ShowMenu();}
+                var note=new GUIStyle(small);note.normal.textColor=new Color(.25f,.13f,.06f);
+                GUI.Label(new Rect(1130,277,266,66),Notice,note);
             }
+            if(Fault!="")GUI.Label(new Rect(330,60,810,35),"AI 已暂停："+Fault,small);
         }
         GUI.matrix=Matrix4x4.identity;
     }

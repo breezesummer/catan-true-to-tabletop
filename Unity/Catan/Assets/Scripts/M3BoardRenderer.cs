@@ -17,6 +17,8 @@ public sealed class M3BoardRenderer : MonoBehaviour
     private readonly Dictionary<string, string> terrainTypes = new Dictionary<string, string>();
     private readonly Dictionary<string, Quaternion> rotations = new Dictionary<string, Quaternion>();
     private Transform pieces;
+    private GameObject feltTable;
+    private TabletopScene tableScene;
     private GameObject ghost;
     private readonly List<GameObject> mountains = new List<GameObject>();
     private readonly Dictionary<Color, Material> pieceMaterials = new Dictionary<Color, Material>();
@@ -60,6 +62,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
             obj.name = tile.Id;
         }
         var table = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        feltTable = table;
         table.name="Felt table"; table.transform.SetParent(transform); table.transform.position=boardCenter+new Vector3(0,-.012f,0);
         float diameter=Mathf.Max(maxX-minX,maxZ-minZ)*1.35f;
         table.transform.localScale=new Vector3(diameter,.01f,diameter); var felt=Material(new Color(.055f,.16f,.18f));terrainMaterials.Add(felt);table.GetComponent<Renderer>().sharedMaterial=felt;
@@ -205,13 +208,28 @@ public sealed class M3BoardRenderer : MonoBehaviour
     }
     public void ClearPreview() { if(ghost!=null)Destroy(ghost); ghost=null; }
     bool operationLayout;
-    public void SetOperationLayout(bool enabled) { if(operationLayout==enabled)return; operationLayout=enabled; SetCamera(TopView); }
+    public void SetOperationLayout(bool enabled)
+    {
+        if(operationLayout==enabled)return;
+        operationLayout=enabled;
+        if(enabled && tableScene==null)
+        {
+            tableScene=TabletopScene.Create(transform,vertices.Values);
+        }
+        if(tableScene!=null)tableScene.SetVisible(enabled);
+        if(feltTable!=null)feltTable.SetActive(!enabled);
+        SetCamera(TopView);
+    }
     public void SetCamera(bool top)
     {
+        if(operationLayout && tableScene!=null)
+        {
+            TopView=top; tableScene.Frame(BoardCamera,top,Zoom/boardRadius); return;
+        }
         TopView=top; BoardCamera.orthographic=true; BoardCamera.orthographicSize=Zoom;
         BoardCamera.transform.position=boardCenter+(top?new Vector3(0,.85f,-.001f):new Vector3(0,.65f,-.55f));
         BoardCamera.transform.LookAt(boardCenter+new Vector3(0,.005f,0));
-        BoardCamera.rect=operationLayout?new Rect(0,342f/900f,1015f/1440f,458f/900f):new Rect(.0f,.10f,.74f,.80f);
+        BoardCamera.rect=new Rect(.0f,.10f,.74f,.80f);
     }
     public void ChangeZoom(float delta) { Zoom=Mathf.Clamp(Zoom+delta,boardRadius*.65f,boardRadius*1.35f); SetCamera(TopView); }
     public void ShowTerrain(bool show) { foreach(var m in mountains) m.SetActive(show); }

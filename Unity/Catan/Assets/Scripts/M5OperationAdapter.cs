@@ -10,17 +10,22 @@ using PlayerView = Catan.Core.M5.PlayerView;
 public sealed partial class M5App
 {
     readonly OperationDock dock=new OperationDock();
+    readonly TabletopUI tabletop=new TabletopUI();
+    bool operationActions;
+    string operationKnightTarget;
     PlayerView operationView;
     OperationSnapshot operationSnapshot;
     int operationKnightLevel;
     bool operationFacilityLocked;
-    bool DockBlocksMouse()
+    bool DockBlocksMouse(Vector2? logicalMouse=null)
     {
         if(ai==null)return false;
-        var p=new Vector2(Input.mousePosition.x*1440f/Screen.width,(Screen.height-Input.mousePosition.y)*900f/Screen.height);
-        return p.x>=1015||p.y<100||p.y>=558||new Rect(24,105,212,29).Contains(p)||dock.BlocksBoardInput(p);
+        var p=logicalMouse??new Vector2(Input.mousePosition.x*1440f/Screen.width,(Screen.height-Input.mousePosition.y)*900f/Screen.height);
+        return ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||OperationContextVisible&&TabletopUI.ContextRect.Contains(p)||dock.BlocksBoardInput(p);
     }
-    void CancelOperationDraft(){draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;if(board!=null)board.ClearPreview();}
+    void CancelOperationDraft(){draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null)board.ClearPreview();}
+    bool DirectTabletopPlacement=>draft!=null&&(draft.Kind==CommandKind.SetupSettlement||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.BuildSettlement||draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.BuildCity||draft.Kind==CommandKind.BuildWall||draft.Kind==CommandKind.RecruitKnight||draft.Kind==CommandKind.PromoteKnight||draft.Kind==CommandKind.ActivateKnight||draft.Kind==CommandKind.ChaseRobber||draft.Kind==CommandKind.MoveRobber||draft.Kind==CommandKind.PlaceFreeRoad||draft.Kind==CommandKind.MoveKnight||draft.Kind==CommandKind.DisplaceKnight||draft.Kind==CommandKind.SetupShip||draft.Kind==CommandKind.BuildShip||draft.Kind==CommandKind.PlaceFreeShip||draft.Kind==CommandKind.MoveShip||draft.Kind==CommandKind.MovePirate||draft.Kind==CommandKind.ChasePirate);
+    bool OperationContextVisible=>view!=null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding||view.Phase==GamePhase.RobberMove);
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
     static int[] DockGoods(ResourceBag r,CommodityBag c)=>Enumerable.Range(0,8).Select(i=>i<5?r[(Resource)i]:c[(Commodity)(i-5)]).ToArray();
     bool DockKnightTargetMatches(string target)=>operationKnightLevel<2||draft==null||draft.Kind!=CommandKind.PromoteKnight||view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==target&&k.Level==operationKnightLevel-1);
@@ -38,7 +43,7 @@ public sealed partial class M5App
             AddDockBuild(s,villageSetup?CommandKind.SetupSettlement:CommandKind.BuildSettlement,"定居点","settlement",own.Pieces.Settlements,villageSetup?DockCost():DockCost(1,1,1,1),!citySetup&&view.LegalVertexIds.Length>0);
             AddDockBuild(s,roadSetup?CommandKind.SetupRoad:freeRoad?CommandKind.PlaceFreeRoad:CommandKind.BuildRoad,"道路","road",own.Pieces.Roads,roadSetup||freeRoad?DockCost():DockCost(1,1),view.LegalEdgeIds.Length>0);
             AddDockBuild(s,citySetup?CommandKind.SetupSettlement:CommandKind.BuildCity,"城市","city",own.Pieces.Cities,citySetup?DockCost():DockCost(wheat:2,ore:3),citySetup?view.LegalVertexIds.Length>0:view.LegalCityVertexIds.Length>0);
-            AddDockBuild(s,roadSetup?CommandKind.SetupShip:CommandKind.BuildShip,"船","ship",own.ShipsRemaining,roadSetup?DockCost():DockCost(wood:1,wool:1),view.LegalShipEdgeIds.Length>0);
+            AddDockBuild(s,roadSetup?CommandKind.SetupShip:freeRoad?CommandKind.PlaceFreeShip:CommandKind.BuildShip,"船","ship",own.ShipsRemaining,roadSetup||freeRoad?DockCost():DockCost(wood:1,wool:1),view.LegalShipEdgeIds.Length>0);
             AddDockBuild(s,CommandKind.BuildWall,"城墙","wall",own.WallSupply,DockCost(brick:2),DockLegal(CommandKind.BuildWall));
             AddDockBuild(s,CommandKind.RecruitKnight,"基础骑士","knight",own.KnightSupply[0],DockCost(wool:1,ore:1),DockLegal(CommandKind.RecruitKnight),1);
             for(int level=2;level<=3;level++)
@@ -64,10 +69,10 @@ public sealed partial class M5App
             s.PrepareBuild=b=>
             {
                 CancelOperationDraft();Select((CommandKind)Enum.Parse(typeof(CommandKind),b.Id.Split(':')[0]));
-                if(b.Track>=0){operationFacilityLocked=true;draft.Track=(ImprovementTrack)b.Track;status="已选 "+b.Name+"，在右侧确认升级。";}
-                else{operationKnightLevel=b.Id.Contains(":")?int.Parse(b.Id.Split(':')[1]):0;pickField="target";pickType=draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.PlaceFreeRoad||IsShip(draft)?"E":"V";status="在棋盘选择 "+b.Name+" 的目标，再确认。";}
+                if(b.Track>=0){operationFacilityLocked=true;draft.Track=(ImprovementTrack)b.Track;Submit(draft);}
+                else{operationKnightLevel=b.Id.Contains(":")?int.Parse(b.Id.Split(':')[1]):0;pickField="target";pickType=draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.PlaceFreeRoad||IsShip(draft)?"E":"V";status="已拿起 "+b.Name+"，点击地图上的合法位置放下；右键或 Esc 放回。";}
             };
-            s.PrepareCard=c=>{CancelOperationDraft();Select(CommandKind.PlayProgressCard);draft.ProgressCard=(ProgressCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，在右侧设置目标并确认。";};
+            s.PrepareCard=c=>{CancelOperationDraft();Select(CommandKind.PlayProgressCard);draft.ProgressCard=(ProgressCardKind)int.Parse(c.Id.Split(':')[0]);status="已打出 "+c.Name+"，按桌上便签选择效果。";};
             s.Cancel=CancelOperationDraft;
             s.Trade=t=>
             {
@@ -90,43 +95,87 @@ public sealed partial class M5App
     OperationBuild AddDockBuild(OperationSnapshot s,CommandKind kind,string name,string icon,int count,int[] cost,bool legal,int suffix=-1)
     {
         bool enough=Enumerable.Range(0,8).All(i=>s.Goods[i]>=cost[i]);
-        var build=new OperationBuild{Id=kind.ToString()+(suffix<0?"":":"+suffix),Name=name,Icon=icon,Count=count,Cost=cost,Available=ai.IsHumanTurn&&(count>0||kind==CommandKind.BuildCity)&&legal&&enough,Detail=cost.Sum()==0?"当前阶段免费放置":kind==CommandKind.PromoteKnight?"选择低一级的己方骑士进行晋升":"点击选择费用，然后选择棋盘目标",UnavailableReason=!ai.IsHumanTurn?"等待当前行动或待决席位":count==0?"库存已用尽":!enough?"缺少所需资源":!legal?"当前阶段或连接条件没有合法目标":null};if(icon=="knight")build.Level=suffix;s.Builds.Add(build);return build;
+        var build=new OperationBuild{Id=kind.ToString()+(suffix<0?"":":"+suffix),Name=name,Icon=icon,Count=count,Cost=cost,Available=ai.IsHumanTurn&&(count>0||kind==CommandKind.BuildCity)&&legal&&enough,Detail=cost.Sum()==0?"当前阶段免费放置":kind==CommandKind.PromoteKnight?"拿起高一级骑士，放到要晋升的己方骑士上":kind==CommandKind.ImproveCity?"点击翻开下一级设施并支付商品":"拿起棋子，再点击地图上的合法位置放下",UnavailableReason=!ai.IsHumanTurn?"等待当前行动或待决席位":count==0?"库存已用尽":!enough?"缺少所需资源":!legal?"当前阶段或连接条件没有合法目标":null};if(icon=="knight")build.Level=suffix;s.Builds.Add(build);return build;
     }
     void DrawOperationLayout()
     {
         Styles();GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));cardArt.Begin(null);
-        Panel(new Rect(1015,95,425,505),new Color(.065f,.12f,.135f));if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool previousEnabled=GUI.enabled;GUI.enabled=previousEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition);
+        if(view==null){GUI.matrix=Matrix4x4.identity;return;}
+        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TableMenuOpen;GUI.enabled=tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition);
         DrawBoardLabels();
-        GUI.Label(new Rect(1035,107,385,33),seat+" · "+PhaseName(view.Phase)+" · "+view.OwnVictoryPoints+" 分",heading);
-        GUI.Label(new Rect(1035,145,385,42),"第 "+view.Turn+" 回合 · 骰子 "+view.LastDice1+" + "+view.LastDice2+" · "+EventName(view.LastEventDie)+"\n蛮族 "+view.BarbarianPosition+" / 7 · 防御 "+view.Board.Knights.Where(k=>k.Active).Sum(k=>k.Level)+" / 力量 "+view.Board.Cities.Length,small);
-        if(GUI.Button(new Rect(24,105,102,29),board.TopView?"斜视 [Tab]":"俯视 [Tab]",button))board.SetCamera(!board.TopView);
-        if(GUI.Button(new Rect(136,105,100,29),"地形显隐",button)){terrain=!terrain;board.ShowTerrain(terrain);}
-        GUILayout.BeginArea(new Rect(1032,193,394,279));scroll=GUILayout.BeginScrollView(scroll);DrawOperationControls();GUILayout.EndScrollView();GUILayout.EndArea();
-        Panel(new Rect(1028,477,398,2),new Color(.2f,.29f,.30f));
-        GUI.Label(new Rect(1035,484,380,23),"公开席位 · 手牌只显示总数",small);
-        for(int i=0;i<view.Players.Length;i++)
-        {
-            var p=view.Players[i];GUI.backgroundColor=BoardRenderer.SeatColor(p.Id);GUI.Button(new Rect(1035+i*97,512,90,38),p.Id+" · "+p.VictoryPoints+"分\n"+p.ResourceCount+"手牌",button);
-        }
-        GUI.backgroundColor=Color.white;
-        if(GUI.Button(new Rect(1035,558,120,30),"保存",button))SaveGame();if(GUI.Button(new Rect(1164,558,120,30),"恢复",button))LoadGame();if(GUI.Button(new Rect(1293,558,120,30),"新开一局",button))ai.ShowMenu();
-        Panel(new Rect(0,558,1015,32),new Color(.045f,.09f,.10f));GUI.Label(new Rect(24,563,970,24),status,small);
-        GUI.enabled=previousEnabled;dock.Draw(Operations(),font);GUI.matrix=Matrix4x4.identity;
+        tabletop.Draw(font,seat,Actor(view),PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,
+            view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Resources=p.ResourceCount,Cards=p.ProgressCardCount,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Ships=p.ShipsRemaining,Improvements=p.Improvements}).ToArray(),
+            ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll,ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.PendingDecision==null&&view.TradeOffer==null,
+            ()=>Submit(New(CommandKind.RollDice)),()=>Submit(New(CommandKind.EndTurn)),target=>{CancelOperationDraft();dock.OpenTrade(target);},
+            ()=>{bool open=!operationActions;dock.Reset();CancelOperationDraft();operationActions=open;},"骑士与特殊行动",
+            EventName(view.LastEventDie)+" · 蛮族 "+view.BarbarianPosition+" / 7 · 防御 "+view.Board.Knights.Where(k=>k.Active).Sum(k=>k.Level)+" / "+view.Board.Cities.Length);
+
+        if(OperationContextVisible)tabletop.DrawContext(operationActions?"棋子行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):"当前选择",DrawOperationControls);
+        tabletop.DrawStatus(view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":!ai.IsHumanTurn?ai.WaitingText:pickField!=""?status:view.Phase==GamePhase.SetupSettlement||view.Phase==GamePhase.SetupRoad?"从面前拿起棋子，点击地图上的合法位置放下。":status);
+        GUI.enabled=tableEnabled;dock.Draw(Operations(),font);GUI.enabled=previousEnabled;GUI.matrix=Matrix4x4.identity;
     }
     void DrawOperationControls()
     {
-        if(view.TradeOffer!=null){Text("交易提案已放在交易桌上。接受、拒绝或撤回后继续回合。");return;}
-        if(!ai.IsHumanTurn&&view.Phase!=GamePhase.Finished){Text(ai.WaitingText);return;}
-        if(view.Phase!=GamePhase.Action&&view.Phase!=GamePhase.ProductionAwaitRoll){DrawControls();return;}
-        GUILayout.BeginHorizontal();if(Btn(view.Phase==GamePhase.ProductionAwaitRoll?"掷骰":"已掷骰")&&view.Phase==GamePhase.ProductionAwaitRoll){Submit(New(CommandKind.RollDice));GUIUtility.ExitGUI();}if(Btn("结束回合")){Submit(New(CommandKind.EndTurn));GUIUtility.ExitGUI();}GUILayout.EndHorizontal();
-        if(draft!=null){DrawDraft();return;}
-        Text("下方组件选择建造；骑士在这里激活与行动。",true);
-        GUILayout.BeginHorizontal();ActionButton("激活骑士 · 谷物 1",CommandKind.ActivateKnight);ActionButton("移动骑士",CommandKind.MoveKnight);GUILayout.EndHorizontal();
-        GUILayout.BeginHorizontal();ActionButton("驱离弱骑士",CommandKind.DisplaceKnight);ActionButton("驱逐强盗",CommandKind.ChaseRobber);GUILayout.EndHorizontal();
-        GUILayout.BeginHorizontal();ActionButton("移动船",CommandKind.MoveShip);ActionButton("驱逐海盗",CommandKind.ChasePirate);GUILayout.EndHorizontal();
-        if(view.CommercialHarborPlayers.Length>0)ActionButton("商业港口 · 提供资源",CommandKind.CommercialHarborOffer);
-        Text(status,true);
+        if(!ai.IsHumanTurn||view.TradeOffer!=null)return;
+        if(operationActions)
+        {
+            Text(operationKnightTarget==null?"点击地图上的己方骑士，也可在此选择动作。":"已拿起这名骑士，请选择动作。",true);
+            TabletopAction("激活骑士 · 谷物 1",CommandKind.ActivateKnight);
+            TabletopAction("移动骑士",CommandKind.MoveKnight);
+            TabletopAction("驱离弱骑士",CommandKind.DisplaceKnight);
+            TabletopAction("驱逐强盗",CommandKind.ChaseRobber);
+            TabletopAction("驱逐海盗",CommandKind.ChasePirate);
+            TabletopAction("移动船",CommandKind.MoveShip);
+            if(view.CommercialHarborPlayers.Length>0)TabletopAction("商业港口 · 提供资源",CommandKind.CommercialHarborOffer);
+            if(Btn("放回棋子"))CancelOperationDraft();
+            return;
+        }
+        if(view.Phase==GamePhase.RobberMove)
+        {
+            Text("拿起强盗或海盗，再在地图放下。",true);
+            if(Btn("拿起强盗")){Select(CommandKind.MoveRobber);pickField="target";pickType="T";status="点击新的地块放下强盗。";}
+            if(Btn("拿起海盗")){Select(CommandKind.MovePirate);pickField="target";pickType="T";status="点击海域放下海盗。";}
+            if(Btn("将海盗放到外框海域")){Submit(New(CommandKind.MovePirate,"frame"));GUIUtility.ExitGUI();}
+            return;
+        }
+        if(view.Phase==GamePhase.RoadBuilding)
+        {
+            Text("从面前拿起道路或船，在地图上放下。",true);
+            if(Btn("完成道路建设")){Submit(New(CommandKind.FinishRoadBuilding));GUIUtility.ExitGUI();}
+            return;
+        }
+        if(view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal){DrawControls();return;}
+        if(draft!=null)DrawDraft();
+    }
+    void TabletopAction(string text,CommandKind kind)
+    {
+        if(!Btn(text))return;
+        string knight=operationKnightTarget;
+        CancelOperationDraft();Select(kind);
+        if(kind==CommandKind.CommercialHarborOffer)return;
+        if(kind==CommandKind.MoveShip){pickField="source";pickType="E";status="点击要移动的船，再点击目的海岸。";return;}
+        bool source=kind==CommandKind.MoveKnight||kind==CommandKind.DisplaceKnight;
+        if(knight!=null)
+        {
+            if(source){draft.SourceId=knight;pickField="target";}
+            else{draft.TargetId=knight;Submit(draft);GUIUtility.ExitGUI();return;}
+        }
+        else pickField=source?"source":"target";
+        pickType="V";status=source?"点击骑士，再点击它要前往的位置；右键放回。":"点击要行动的己方骑士。";
+    }
+    bool PickTabletopObject(Vector2 mouse)
+    {
+        if(draft!=null||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null)return false;
+        string vertex=Pick("V",mouse);
+        if(vertex!=""&&view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==vertex))
+        {operationKnightTarget=vertex;operationActions=true;status="选择这名骑士要执行的动作。";return true;}
+        string edge=Pick("E",mouse);
+        if(edge!=""&&view.Board.Ships.Any(s=>s.PlayerId==seat&&s.LocationId==edge))
+        {
+            CancelOperationDraft();Select(CommandKind.MoveShip);draft.SourceId=edge;pickField="target";pickType="E";
+            status="已拿起船，点击目的海岸放下；右键放回。";return true;
+        }
+        return false;
     }
     internal OperationSnapshot VerificationOperationSnapshot=>Operations();
     internal OperationDock VerificationOperationDock=>dock;
