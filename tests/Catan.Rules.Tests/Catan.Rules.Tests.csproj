@@ -13,6 +13,7 @@
     <ProjectReference Include="../../src/Catan.Core/Catan.Core.csproj" />
     <ProjectReference Include="../../src/Catan.AI/Catan.AI.csproj" />
     <ProjectReference Include="../Catan.SaveProbe/Catan.SaveProbe.csproj" ReferenceOutputAssembly="false" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/OperationDockModel.cs" Link="Presentation/OperationDockModel.cs" />
     <None Include="../../docs/acceptance/v0.1/scenario.json" Link="scenario.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

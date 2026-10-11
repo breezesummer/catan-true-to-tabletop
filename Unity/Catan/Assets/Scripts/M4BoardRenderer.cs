@@ -16,6 +16,10 @@ public sealed class M4BoardRenderer : MonoBehaviour
     private readonly Dictionary<string, string> terrainTypes = new Dictionary<string, string>();
     private readonly Dictionary<string, Quaternion> rotations = new Dictionary<string, Quaternion>();
     private Transform pieces;
+    private Transform publicMarkers;
+    private GameObject barbarianTrack;
+    private GameObject barbarianShip;
+    private Vector3 displayCenter;
     private GameObject ghost;
     private readonly List<GameObject> mountains = new List<GameObject>();
     private readonly Dictionary<Color, Material> pieceMaterials = new Dictionary<Color, Material>();
@@ -37,6 +41,8 @@ public sealed class M4BoardRenderer : MonoBehaviour
     {
         BoardCamera = Camera.main;
         foreach (var v in boardVertices) vertices[v.Id] = new Vector3(v.X * Mathf.Sqrt(3) * .02f, .008f, -v.Y * .02f);
+        float minX=vertices.Values.Min(v=>v.x),maxX=vertices.Values.Max(v=>v.x);
+        displayCenter=new Vector3((minX+maxX)/2,0,0);
         foreach (var e in boardEdges)
         {
             var a = vertices[e.Vertices[0]]; var b = vertices[e.Vertices[1]];
@@ -48,13 +54,8 @@ public sealed class M4BoardRenderer : MonoBehaviour
             center.y = 0;
             tiles[tile.Id] = center;
             terrainTypes[tile.Id] = tile.Resource;
-            GameObject obj;
-            if (tile.Resource == "ore")
-            {
-                obj = Instantiate(Resources.Load<GameObject>("mountain-tile-v001"), center, Quaternion.identity, transform);
-                mountains.Add(obj);
-            }
-            else
+            var obj = EntityBoardAssets.Terrain(tile.Resource, center, transform);
+            if (obj == null)
             {
                 obj = new GameObject(tile.Id); obj.transform.SetParent(transform); obj.transform.position=center;
                 var mesh=HexMesh();terrainMeshes.Add(mesh);obj.AddComponent<MeshFilter>().sharedMesh=mesh;
@@ -67,6 +68,17 @@ public sealed class M4BoardRenderer : MonoBehaviour
         table.name="Felt table"; table.transform.SetParent(transform); table.transform.position=new Vector3(0,-.012f,0);
         table.transform.localScale=new Vector3(.65f,.01f,.65f); var felt=Material(new Color(.055f,.16f,.18f));terrainMaterials.Add(felt);table.GetComponent<Renderer>().sharedMaterial=felt;
         pieces = new GameObject("Committed pieces").transform; pieces.SetParent(transform);
+        publicMarkers = new GameObject("Public expansion display").transform; publicMarkers.SetParent(transform);
+        var trackBottom=new Vector3(minX-.110f,0,0);
+        barbarianTrack=EntityBoardAssets.BarbarianTrack(trackBottom,publicMarkers);
+        if(barbarianTrack!=null)
+        {
+            displayCenter=new Vector3((trackBottom.x-EntityBoardAssets.BarbarianTrackWidth*.5f+maxX)*.5f,0,0);
+            var tableDiameter=Mathf.Max(table.transform.localScale.x,(-trackBottom.x+EntityBoardAssets.BarbarianTrackWidth*.5f)*2.16f);
+            table.transform.localScale=new Vector3(tableDiameter,.01f,tableDiameter);
+            RefreshBarbarians(0);
+        }
+        else displayCenter=Vector3.zero;
         SetCamera(false);
     }
     public static Mesh HexMesh()
@@ -88,13 +100,26 @@ public sealed class M4BoardRenderer : MonoBehaviour
     }
     public void Refresh(PlayerView view)
     {
-        Refresh(view.Board.Settlements, view.Board.Roads, view.Board.Cities, view.Board.RobberTileId);
-        RenderExpansion(view.Board.Walls,view.Board.Knights,view.Board.Metropolises,view.MerchantTileId);
+        RefreshProjectedPieces(view.Board.Settlements,view.Board.Roads,view.Board.Cities,view.Board.RobberTileId,
+            view.Board.Walls,view.Board.Knights,view.Board.Metropolises,view.MerchantTileId,view.BarbarianPosition);
+    }
+    // The live PlayerView and art verification share this public projection-only entrance.
+    public void RefreshProjectedPieces(PiecePlacement[] settlements,PiecePlacement[] roads,PiecePlacement[] cities,string robberTileId,
+        PiecePlacement[] walls,Catan.Core.M4.Knight[] knights,Catan.Core.M4.Metropolis[] metropolises,string merchant,int? barbarianPosition=null)
+    {
+        var expanded=new HashSet<string>(walls.Select(w=>w.LocationId).Concat(metropolises.Select(m=>m.LocationId)));
+        Refresh(settlements,roads,cities.Where(c=>!expanded.Contains(c.LocationId)).ToArray(),robberTileId);
+        RenderExpansion(walls,knights,metropolises,merchant);
+        if(barbarianPosition.HasValue)RefreshBarbarians(barbarianPosition.Value);
     }
     void RenderExpansion(PiecePlacement[] walls,Catan.Core.M4.Knight[] knights,Catan.Core.M4.Metropolis[] metropolises,string merchant)
     {
         foreach(var wall in walls)
         {
+            if(metropolises.Any(m=>m.LocationId==wall.LocationId))continue;
+            if(PlayerComponentAssets.Building("city-with-wall",wall.PlayerId,"City with wall "+wall.LocationId,Position(wall.LocationId),pieces)!=null)continue;
+            // Keep a readable city and wall when the colour-specific model is unavailable.
+            CityFallback(wall.LocationId,SeatColor(wall.PlayerId));
             var root = MarkerRoot("Wall "+wall.LocationId, Position(wall.LocationId));
             for(int i=0;i<4;i++)
             {
@@ -105,17 +130,45 @@ public sealed class M4BoardRenderer : MonoBehaviour
         }
         foreach(var k in knights)
         {
-            var root=MarkerRoot("Knight L"+k.Level+" "+k.LocationId,Position(k.LocationId));
-            Marker(PrimitiveType.Cylinder,root,new Vector3(0,.002f,0),new Vector3(.015f,.002f,.015f),SeatColor(k.PlayerId));
-            for(int i=0;i<k.Level;i++)Marker(PrimitiveType.Cylinder,root,new Vector3(0,.006f+i*.004f,0),new Vector3(.010f,.0015f,.010f),SeatColor(k.PlayerId));
-            Marker(PrimitiveType.Sphere,root,new Vector3(0,.010f+k.Level*.004f,0),new Vector3(.006f,.006f,.006f),k.Active?new Color(.96f,.88f,.48f):new Color(.12f,.14f,.17f));
+            var asset=PlayerComponentAssets.Knight(k.PlayerId,k.Level,k.Active,"Knight L"+k.Level+" "+k.LocationId,Position(k.LocationId),pieces);
+            var root=asset!=null?asset.transform:MarkerRoot("Knight L"+k.Level+" "+k.LocationId,Position(k.LocationId));
+            if(asset==null)
+            {
+                Marker(PrimitiveType.Cylinder,root,new Vector3(0,.002f,0),new Vector3(.015f,.002f,.015f),SeatColor(k.PlayerId));
+                for(int i=0;i<k.Level;i++)Marker(PrimitiveType.Cylinder,root,new Vector3(0,.006f+i*.004f,0),new Vector3(.010f,.0015f,.010f),SeatColor(k.PlayerId));
+            }
+            // Explicit active status remains readable independently of the provisional helmet convention.
+            var status=Marker(PrimitiveType.Sphere,root,new Vector3(.012f,.004f,-.008f),new Vector3(.005f,.005f,.005f),k.Active?new Color(.96f,.88f,.48f):new Color(.12f,.14f,.17f));
+            status.name=k.Active?"Active state: active":"Active state: resting";
+            var rank=new GameObject("Knight level: "+k.Level).transform;
+            rank.SetParent(root,false);rank.localPosition=new Vector3(0,.002f,.012f);
+            for(int i=0;i<k.Level;i++)
+                Marker(PrimitiveType.Sphere,rank,new Vector3((i-(k.Level-1)*.5f)*.0025f,0,0),new Vector3(.0018f,.0018f,.0018f),Color.white);
         }
         foreach(var m in metropolises)
         {
-            var root=MarkerRoot("Metropolis "+m.Track,Position(m.LocationId));
+            var hasWall=walls.Any(w=>w.LocationId==m.LocationId);
+            var asset=PlayerComponentAssets.Building(hasWall?"metropolis-with-wall":"metropolis",m.PlayerId,"Metropolis "+m.Track+" "+m.LocationId,Position(m.LocationId),pieces);
+            var root=asset!=null?asset.transform:MarkerRoot("Metropolis "+m.Track+" "+m.LocationId,Position(m.LocationId));
             var color=new[]{new Color(.93f,.67f,.2f),new Color(.26f,.51f,.92f),new Color(.26f,.75f,.39f)}[(int)m.Track];
-            for(int i=0;i<3;i++)Marker(PrimitiveType.Cube,root,new Vector3((i-1)*.009f,.032f,0),new Vector3(.005f,.014f,.005f),color);
-            Marker(PrimitiveType.Cube,root,new Vector3(0,.027f,0),new Vector3(.027f,.005f,.008f),color);
+            if(asset==null)
+            {
+                CityFallback(m.LocationId,SeatColor(m.PlayerId));
+                for(int i=0;i<3;i++)Marker(PrimitiveType.Cube,root,new Vector3((i-1)*.009f,.032f,0),new Vector3(.005f,.014f,.005f),color);
+                Marker(PrimitiveType.Cube,root,new Vector3(0,.027f,0),new Vector3(.027f,.005f,.008f),color);
+                if(hasWall)
+                    for(int i=0;i<4;i++)
+                    {
+                        float angle=i*90*Mathf.Deg2Rad;
+                        var part=Marker(PrimitiveType.Cube,root,new Vector3(Mathf.Cos(angle)*.012f,.004f,Mathf.Sin(angle)*.012f),new Vector3(.028f,.008f,.003f),SeatColor(m.PlayerId));
+                        part.transform.localRotation=Quaternion.Euler(0,90-i*90,0);
+                    }
+            }
+            var track=Marker(PrimitiveType.Cylinder,root,new Vector3(-.018f,.002f,0),new Vector3(.007f,.002f,.007f),color);
+            track.name="Metropolis track: "+m.Track;
+            // One / two / three pips also distinguish tracks when colour alone is unclear.
+            for(int i=0;i<=(int)m.Track;i++)
+                Marker(PrimitiveType.Sphere,track.transform,new Vector3((i-(int)m.Track*.5f)*.23f,1.3f,0),new Vector3(.18f,.45f,.18f),Color.white);
         }
         RefreshMerchant(merchant);
     }
@@ -124,10 +177,9 @@ public sealed class M4BoardRenderer : MonoBehaviour
     {
         var nearby=vertices.OrderBy(p=>p.Value.sqrMagnitude).Take(8).Select(p=>p.Key).ToArray();
         var cities=Enumerable.Range(0,3).Select(i=>new PiecePlacement{PlayerId="P"+(i+1),LocationId=nearby[i*2]}).ToArray();
-        Refresh(new PiecePlacement[0],new PiecePlacement[0],cities,null);
         var knights=Enumerable.Range(0,3).Select(i=>new Catan.Core.M4.Knight{PlayerId="P"+(i+1),LocationId=nearby[i*2+1],Level=i+1,Active=i!=1}).ToArray();
         var metros=Enumerable.Range(0,3).Select(i=>new Catan.Core.M4.Metropolis{PlayerId=cities[i].PlayerId,LocationId=cities[i].LocationId,Track=(Catan.Core.M4.ImprovementTrack)i}).ToArray();
-        RenderExpansion(cities,knights,metros,tiles.OrderBy(t=>t.Value.sqrMagnitude).First().Key);
+        RefreshProjectedPieces(new PiecePlacement[0],new PiecePlacement[0],cities,null,cities,knights,metros,tiles.OrderBy(t=>t.Value.sqrMagnitude).First().Key,3);
     }
     Transform MarkerRoot(string label,Vector3 position)
     {
@@ -143,26 +195,45 @@ public sealed class M4BoardRenderer : MonoBehaviour
         // Added by the progress-card view projection; no authoritative state enters rendering.
         if(!string.IsNullOrEmpty(merchant))
         {
-            var root=MarkerRoot("Merchant",Position(merchant)+new Vector3(-.013f,0,0));
+            var bottom=Position(merchant)+new Vector3(-.013f,EntityBoardAssets.BoardSurfaceHeight,0);
+            if(EntityBoardAssets.Merchant("Merchant "+merchant,bottom,pieces)!=null)return;
+            var root=MarkerRoot("Merchant",bottom);
             Marker(PrimitiveType.Capsule,root,new Vector3(0,.019f,0),new Vector3(.008f,.016f,.008f),new Color(.8f,.4f,.85f));
         }
+    }
+    public void RefreshBarbarians(int position)
+    {
+        if(barbarianShip!=null){barbarianShip.SetActive(false);Destroy(barbarianShip);}
+        barbarianShip=barbarianTrack==null?null:EntityBoardAssets.BarbarianShip(position,barbarianTrack.transform,publicMarkers);
     }
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId)
     {
         foreach(Transform t in pieces) Destroy(t.gameObject);
-        foreach(var p in settlements) Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
+        foreach(var p in settlements)
+            if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
+                Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
         foreach(var p in roads) Piece(true,p.LocationId,SeatColor(p.PlayerId),pieces);
         foreach(var p in cities)
         {
-            var city=Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
-            city.name="City "+p.LocationId;
-            city.transform.localScale=new Vector3(.02f,.023f,.015f);
-            city.transform.position=Position(p.LocationId)+Vector3.up*.012f;
+            if(PlayerComponentAssets.Building("city",p.PlayerId,"City "+p.LocationId,Position(p.LocationId),pieces)!=null)continue;
+            CityFallback(p.LocationId,SeatColor(p.PlayerId));
         }
         if(!string.IsNullOrEmpty(robberTileId)) Robber(robberTileId,new Color(.08f,.075f,.09f),pieces);
     }
-    GameObject Robber(string tileId, Color color, Transform parent)
+    void CityFallback(string id,Color color)
     {
+        var city=Piece(false,id,color,pieces,false);
+        city.name="City "+id;
+        city.transform.localScale=new Vector3(.02f,.023f,.015f);
+        city.transform.position=Position(id)+Vector3.up*.012f;
+    }
+    GameObject Robber(string tileId, Color color, Transform parent, bool entityModel = true)
+    {
+        if(entityModel)
+        {
+            var asset=EntityBoardAssets.Robber("Robber "+tileId,Position(tileId)+new Vector3(.012f,EntityBoardAssets.BoardSurfaceHeight,0),parent);
+            if(asset!=null)return asset;
+        }
         var marker=GameObject.CreatePrimitive(PrimitiveType.Capsule);
         Destroy(marker.GetComponent<Collider>());marker.name="Robber "+tileId;
         marker.transform.SetParent(parent);marker.transform.position=Position(tileId)+new Vector3(.012f,.035f,0);
@@ -171,8 +242,13 @@ public sealed class M4BoardRenderer : MonoBehaviour
         marker.GetComponent<Renderer>().sharedMaterial=material;
         return marker;
     }
-    GameObject Piece(bool road,string id,Color color,Transform parent)
+    GameObject Piece(bool road,string id,Color color,Transform parent,bool photoSample=true)
     {
+        if(photoSample)
+        {
+            var sample=PhotoSampleAssets.Piece(road,id,Position(id),road?rotations[id]:Quaternion.identity,color,parent);
+            if(sample!=null)return sample;
+        }
         var go = GameObject.CreatePrimitive(PrimitiveType.Cube); Destroy(go.GetComponent<Collider>()); go.transform.SetParent(parent);
         go.name=id; go.transform.position=Position(id)+Vector3.up*(road?.0025f:.006f);
         go.transform.localScale=road?new Vector3(.005f,.005f,.026f):new Vector3(.012f,.012f,.012f);
@@ -202,15 +278,17 @@ public sealed class M4BoardRenderer : MonoBehaviour
     public void PreviewRobber(string id,bool legal)
     {
         ClearPreview();if(string.IsNullOrEmpty(id))return;
-        ghost=Robber(id,legal?new Color(.3f,1f,.75f):new Color(1f,.22f,.2f),transform);
+        ghost=Robber(id,legal?new Color(.3f,1f,.75f):new Color(1f,.22f,.2f),transform,false);
     }
     public void ClearPreview() { if(ghost!=null)Destroy(ghost); ghost=null; }
+    bool operationLayout;
+    public void SetOperationLayout(bool enabled) { if(operationLayout==enabled)return; operationLayout=enabled; SetCamera(TopView); }
     public void SetCamera(bool top)
     {
         TopView=top; BoardCamera.orthographic=true; BoardCamera.orthographicSize=Zoom;
-        BoardCamera.transform.position=top?new Vector3(0,.65f,-.001f):new Vector3(0,.48f,-.4f);
-        BoardCamera.transform.LookAt(new Vector3(0,.005f,0));
-        BoardCamera.rect=new Rect(.0f,.10f,.74f,.80f);
+        BoardCamera.transform.position=displayCenter+(top?new Vector3(0,.65f,-.001f):new Vector3(0,.48f,-.4f));
+        BoardCamera.transform.LookAt(displayCenter+new Vector3(0,.005f,0));
+        BoardCamera.rect=operationLayout?new Rect(0,342f/900f,1015f/1440f,458f/900f):new Rect(.0f,.10f,.74f,.80f);
     }
     public void ChangeZoom(float delta) { Zoom=Mathf.Clamp(Zoom+delta,.19f,.32f); SetCamera(TopView); }
     public void ShowTerrain(bool show) { foreach(var m in mountains) m.SetActive(show); }

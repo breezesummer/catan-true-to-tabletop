@@ -10,7 +10,7 @@ using PlayerView = Catan.Core.M2.PlayerView;
 using DevelopmentCardKind = Catan.Core.M2.DevelopmentCardKind;
 
 // Local seats share the core command entrance; this component owns presentation only.
-public sealed class M2App : MonoBehaviour
+public sealed partial class M2App : MonoBehaviour
 {
     private M6App ai;
     private M2LocalGameHost host;
@@ -25,6 +25,7 @@ public sealed class M2App : MonoBehaviour
     private ResourceBag discard=new ResourceBag(), offerGive=new ResourceBag(), offerReceive=new ResourceBag();
     private Font font;
     private GUIStyle text, small, title, button, badge;
+    private readonly EntityCardAssets.Display cardArt=new EntityCardAssets.Display();
     private static readonly string[] ResourceNames={"木材","砖块","羊毛","谷物","矿石"};
     private readonly Color ink=new Color(.9f,.91f,.84f), panelColor=new Color(.06f,.115f,.125f);
 
@@ -45,11 +46,12 @@ public sealed class M2App : MonoBehaviour
     void Update()
     {
         if(host==null)return;
-        if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){CancelPickup();newGameDialog=false;}
+        if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
-        if(Input.mousePosition.x<Screen.width*.74f&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
+        if(!DockBlocksMouse()&&Input.mousePosition.x<Screen.width*.74f&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGameDialog||!holding||view==null||ai!=null&&!ai.IsHumanTurn)return;
         var mouse=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
+        if(DockBlocksMouse()||cardArt.BlocksBoardInput(new Vector2(mouse.x*1440/Screen.width,mouse.y*900/Screen.height)))return;
         var candidate=ResolveTarget(mouse);
         if(candidate!=hover)
         {
@@ -58,7 +60,7 @@ public sealed class M2App : MonoBehaviour
             if(placement==CommandKind.MoveRobber)board.PreviewRobber(hover,valid);
             else board.Preview(hover,IsRoad(placement),valid);
         }
-        bool guideHit=help&&mouse.x>24f*Screen.width/1440f&&mouse.x<732f*Screen.width/1440f&&mouse.y>104f*Screen.height/900f&&mouse.y<227f*Screen.height/900f;
+        bool guideHit=ai==null&&help&&mouse.x>24f*Screen.width/1440f&&mouse.x<732f*Screen.width/1440f&&mouse.y>104f*Screen.height/900f&&mouse.y<227f*Screen.height/900f;
         if(Input.GetMouseButtonDown(0)&&!guideHit&&mouse.x<Screen.width*.73f&&mouse.y>Screen.height*.10f&&mouse.y<Screen.height*.895f)
         {
             if(hover!="")Drop(hover);
@@ -89,13 +91,13 @@ public sealed class M2App : MonoBehaviour
     Command NewCommand(CommandKind kind,string target=null) => new Command{Id=Guid.NewGuid().ToString("N"),PlayerId=seat,Kind=kind,TargetId=target};
     public void ConfirmSeat()
     {
-        seat=nextSeat;view=host.View(seat);curtain=false;status="已就座 "+seat+"。";
+        dock.Reset();seat=nextSeat;view=host.View(seat);curtain=false;status="已就座 "+seat+"。";
         RefreshBoard(view);
     }
     public void SwitchSeat(string target)
     {
         if(ai!=null){status="你控制 "+ai.HumanSeat+"；其他席位为 AI，仅显示公开信息。";return;}
-        CancelPickup();nextSeat=target;view=null;curtain=true;
+        dock.Reset();CancelOperationDraft();CancelPickup();nextSeat=target;view=null;curtain=true;cardArt.Clear();
         discard=new ResourceBag();offerGive=new ResourceBag();offerReceive=new ResourceBag();
         tab=0;give=0;receive=1;plentyA=0;plentyB=1;monopoly=0;tradeTarget=1;playerTrading=false;
         status="已遮蔽手牌，请将设备交给 "+target+"。";
@@ -110,9 +112,9 @@ public sealed class M2App : MonoBehaviour
     public CommandResult Drop(string target){var command=NewCommand(placement,target);return Submit(command);}
     public CommandResult Submit(Command command)
     {
-        if(ai!=null&&(!ai.IsHumanTurn||command.PlayerId!=ai.HumanSeat)){status="请等待当前 AI 或待决席位完成操作。";return null;}
+        if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
         CancelPickup();
-        var result=host.Submit(command);
+        dock.Reset();CancelOperationDraft();var result=host.Submit(command);
         status=result.Success?"操作完成。":"操作未执行："+Reason(result.ErrorCode,result.Message);
         view=host.View(seat);RefreshBoard(view);
         if(result.Success)
@@ -142,7 +144,7 @@ public sealed class M2App : MonoBehaviour
             board.Initialize(current.Board.Tiles,current.Board.Vertices,current.Board.Edges);
             board.ChangeZoom(zoom-board.Zoom);board.SetCamera(top);board.ShowTerrain(terrain);boardLayout=layout;
         }
-        board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId);
+        board.SetOperationLayout(ai!=null);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId);
     }
     public void SaveGame()
     {
@@ -198,7 +200,7 @@ public sealed class M2App : MonoBehaviour
     void Label(float x,float y,float width,float height,string label,GUIStyle style=null) => GUI.Label(new Rect(x,y,width,height),label,style??text);
     void OnGUI()
     {
-        if(host==null)return;Styles();
+        if(host==null)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGameDialog||view==null?null:seat);
         GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));
         Panel(new Rect(0,0,1440,90),new Color(.045f,.09f,.10f));
         Label(30,15,570,40,"CATAN  /  岛屿工坊",title);
@@ -225,6 +227,7 @@ public sealed class M2App : MonoBehaviour
         Label(28,859,1008,25,holding?"绿色可落点 · 单击放置 · 红色目标将拒绝 · Esc / 右键取消":"建筑需连到自己路网；城市需升级自己的定居点。所有操作均由规则核心验证。",small);
         if(help&&!curtain&&view!=null)DrawGuide();
         if(newGameDialog)DrawNewGame();
+        if(!curtain&&!newGameDialog&&view!=null)cardArt.DrawPreview(text,small,button);
         GUI.matrix=Matrix4x4.identity;
     }
     void DrawSeatPanel()
@@ -234,6 +237,7 @@ public sealed class M2App : MonoBehaviour
         Label(1085,145,335,28,"第 "+view.Turn+" 回合 · 行动 "+view.ActivePlayerId+" · 自己 "+view.OwnVictoryPoints+" 分",small);
         for(int i=0;i<5;i++)
         {
+            if(cardArt.Badge(new Rect(1085+i*67,180,60,62),EntityCardAssets.Good(i),ResourceNames[i]+" "+view.OwnResources[(Resource)i],badge))continue;
             Panel(new Rect(1085+i*67,180,60,62),new Color(.13f,.23f,.24f));
             Label(1085+i*67,182,60,22,ResourceNames[i],badge);
             Label(1085+i*67,208,60,27,view.OwnResources[(Resource)i].ToString(),badge);
@@ -386,7 +390,7 @@ public sealed class M2App : MonoBehaviour
         if(Button(1085,468,151,"垄断："+ResourceNames[monopoly],29))monopoly=(monopoly+1)%5;
         if(Button(1247,468,169,"打出垄断 ×"+CardCount(DevelopmentCardKind.Monopoly),29))
         {var c=NewCommand(CommandKind.PlayMonopoly);c.Resource=(Resource)monopoly;Submit(c);return;}
-        Label(1085,504,331,63,"隐藏胜利点卡："+CardCount(DevelopmentCardKind.VictoryPoint)+" 张；每回合限 1 张行动卡。\n当回合买入不能打出。发明取 2 张；银行不足 2 张时用“不取”取剩余。",small);
+        Label(1085,504,331,63,"发展卡实体照片尚缺，保留文字操作。隐藏胜利点卡："+CardCount(DevelopmentCardKind.VictoryPoint)+" 张。\n每回合限 1 张行动卡；当回合买入不能打出。发明取 2 张，银行不足时用“不取”取剩余。",small);
     }
     void DrawBoardLabels()
     {
@@ -455,7 +459,7 @@ public sealed class M2App : MonoBehaviour
     internal PlayerView M6View=>view;
     internal void M6Refresh()
     {
-        CancelPickup();seat=ai.HumanSeat;nextSeat=seat;curtain=false;view=host.View(seat);
+        dock.Reset();CancelOperationDraft();CancelPickup();seat=ai.HumanSeat;nextSeat=seat;curtain=false;view=host.View(seat);
 
         discard=new ResourceBag();offerGive=new ResourceBag();offerReceive=new ResourceBag();
         RefreshBoard(view);

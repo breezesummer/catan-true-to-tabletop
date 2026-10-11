@@ -53,6 +53,7 @@ public sealed partial class M6App : MonoBehaviour
         Application.targetFrameRate=60;
         font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Arial"},18);
         gameObject.AddComponent<M6PlayerVerification>().Initialize(this);
+        gameObject.AddComponent<OperationUiVerification>();
     }
     void Update()
     {
@@ -180,8 +181,11 @@ public sealed partial class M6App : MonoBehaviour
             GUI.Label(new Rect(25,53,455,30),"你："+HumanSeat+"  ·  "+(PlayerCount-1)+" 个本地 AI  ·  "+(IsHumanTurn?"等待你的操作":Paused?"AI 已暂停":Finished?"对局结束":"AI："+CurrentActor),small);
             if(GUI.Button(new Rect(491,23,126,40),Paused?"继续 AI":"暂停 AI",button))SetPaused(!Paused);
             if(GUI.Button(new Rect(631,23,115,40),"规则菜单",button))ShowMenu();
-            Panel(new Rect(18,747,975,56),new Color(.045f,.09f,.10f,.94f));
-            GUI.Label(new Rect(29,754,950,48),Fault!=""?"AI 已暂停："+Fault:Notice,small);
+            if(Fault!="")
+            {
+                Panel(new Rect(18,92,975,46),new Color(.25f,.075f,.06f,.96f));
+                GUI.Label(new Rect(29,99,950,36),"AI 已暂停："+Fault,small);
+            }
         }
         GUI.matrix=Matrix4x4.identity;
     }

@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "assetId": "ui-operation-v001",
+  "method": "Runtime Unity GUI.DrawTextureWithTexCoords; no bitmap export",
+  "cropCoordinates": "Normalized [x,y,width,height] from top-left; conversion to Unity bottom-left in GoodUv",
+  "implementation": "Unity/Catan/Assets/Scripts/OperationIconAssets.cs",
+  "goods": [
+    {
+      "texture": "Unity/Catan/Assets/Resources/PhotoSamples/v001/wood-front.png",
+      "crop": [
+        0.155,
+        0.31,
+        0.675,
+        0.35
+      ],
+      "originalSha256": "447133145e2d82dc15142e61ff22e26267da1a37e6d543c2c68b1a6617b588be",
+      "provenance": "Existing photo-samples-v001 AI-cleaned candidate; not an untouched photo",
+      "recipe": "art/recipes/photo-samples-v001/recipe.json",
+      "index": 0,
+      "id": "wood",
+      "textureSha256": "36067e8c331ae0d62b0ba7300866799abf92622098aac00598c248b006e87199",
+      "original": "assets/references/inbox/资源牌/木头.jpg"
+    },
+    {
+      "texture": "Unity/Catan/Assets/Resources/EntityAssets/v001/resource-cards/resource-brick-front.png",
+      "crop": [
+        0.195,
+        0.365,
+        0.605,
+        0.25
+      ],
+      "originalSha256": "b70eb1432b2d36665dd5a50582147bcf73d08ee4849f2c41bd682090d6c27ec4",
+      "provenance": "Existing geometrically corrected original-photo card",
+      "recipe": "art/recipes/entity-conversion-v001/resource-cards/recipe.json",
+      "index": 1,
+      "id": "brick",
+      "textureSha256": "89333890fac03a9b1ac28056b790298544e41dd3bee5e6089be52f252d98d473",
+      "original": "assets/references/inbox/资源牌/砖头.jpg"
+    },
+    {
+      "texture": "Unity/Catan/Assets/Resources/EntityAssets/v001/resource-cards/resource-wool-front.png",
+      "crop": [
+        0.22,
+        0.305,
+        0.555,
+        0.34
+      ],
+      "originalSha256": "0dbfd3ba45889231041354cd7c4b410b11ece05ca06ec53091c3ea345fa8bc7b",
+      "provenance": "Existing geometrically corrected original-photo card",
+      "recipe": "art/recipes/entity-conversion-v001/resource-cards/recipe.json",
+      "index": 2,
+      "id": "wool",
+      "textureSha256": "fb7b9a6b4b95a933dcde23d54200689097028dcaea5b57b51e72410da5653eb5",
+      "original": "assets/references/inbox/资源牌/羊毛.jpg"
+    },
+    {
+      "texture": "Unity/Catan/Assets/Resources/EntityAssets/v001/resource-cards/resource-grain-front.png",
+      "crop": [
+        0.225,
+        0.295,
+        0.565,
+        0.44
+      ],
+      "originalSha256": "90597e7807eddf96c8757fd84588e2f24350412355a8cee0ce7580d6203c2429",
+      "provenance": "Existing geometrically corrected original-photo card",
+      "recipe": "art/recipes/entity-conversion-v001/resource-cards/recipe.json",
+      "index": 3,
+      "id": "grain",
+      "textureSha256": "a67fcbb96c7b01b22e1113562d1a773993e22573cf78a942b0d041208f45b262",
+      "original": "assets/references/inbox/资源牌/小麦.jpg"
+    },
+    {
+      "texture": "Unity/Catan/Assets/Resources/EntityAssets/v001/resource-cards/resource-ore-front.png",
+      "crop": [
+        0.19,
+        0.36,
+        0.6,
+        0.27
+      ],
+      "originalSha256": "3cc8d4bbee405952035bc075d8e741124f888d50cd402ae8662244b23aac8a10",
+      "provenance": "Existing geometrically corrected original-photo card",
+      "recipe": "art/recipes/entity-conversion-v001/resource-cards/recipe.json",
+      "index": 4,
+      "id": "ore",
+      "textureSha256": "f01722ea791cfea1b014b8f93796b0f0a204a9ef0e115d4a8e7ceb79985a1fd5",
+      "original": "assets/references/inbox/资源牌/铁矿石.jpg"
+    },
+    {
+      "texture": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-1-front.png",
+      "crop": [
+        0.108,
+        0.59,
+        0.295,
+        0.295
+      ],
+      "originalSha256": "a8450574cd4fa21d43eea6323a2ef97cd440457b9e02a983326ffc8f11f928fd",
+      "provenance": "Single commodity cost symbol from level-one improvement cost face",
+      "recipe": "art/recipes/entity-conversion-v001/city-improvements/recipe.json",
+      "index": 5,
+      "id": "cloth",
+      "textureSha256": "bec729e02882b2e3d9f7617ed574def8e05ad197de8f3ac8dd892260c8a0de0d",
+      "original": "assets/references/inbox/城市设施/黄色1级市场正面.jpg"
+    },
+    {
+      "texture": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-1-front.png",
+      "crop": [
+        0.075,
+        0.625,
+        0.3,
+        0.295
+      ],
+      "originalSha256": "9b50c7580c4259ca9e70d7e7dca3e63bb7278f35b78e72cb55dfc8695e698ce9",
+      "provenance": "Single commodity cost symbol from level-one improvement cost face",
+      "recipe": "art/recipes/entity-conversion-v001/city-improvements/recipe.json",
+      "index": 6,
+      "id": "coin",
+      "textureSha256": "3474bffbb3778d8bfd79d6a4ccfc9a0a9ea517b53cbeec9cde13a93376b715c4",
+      "original": "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg"
+    },
+    {
+      "texture": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-1-front.png",
+      "crop": [
+        0.078,
+        0.625,
+        0.3,
+        0.295
+      ],
+      "originalSha256": "a1cd408ec3836e30484a3af3748c11aea5e1d26c9df79a3f7c0024bc6a422eb1",
+      "provenance": "Single commodity cost symbol from level-one improvement cost face",
+      "recipe": "art/recipes/entity-conversion-v001/city-improvements/recipe.json",
+      "index": 7,
+      "id": "paper",
+      "textureSha256": "4531c9297bc89147462dc16c592238d20631f25d6c40d18d69bdf9831f2a04c3",
+      "original": "assets/references/inbox/城市设施/绿色1级修道院正面.jpg"
+    }
+  ]
+}

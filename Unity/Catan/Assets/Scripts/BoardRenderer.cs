@@ -47,13 +47,8 @@ public sealed class BoardRenderer : MonoBehaviour
             center.y = 0;
             tiles[tile.Id] = center;
             terrainTypes[tile.Id] = tile.Resource;
-            GameObject obj;
-            if (tile.Resource == "ore")
-            {
-                obj = Instantiate(Resources.Load<GameObject>("mountain-tile-v001"), center, Quaternion.identity, transform);
-                mountains.Add(obj);
-            }
-            else
+            var obj = EntityBoardAssets.Terrain(tile.Resource, center, transform);
+            if (obj == null)
             {
                 obj = new GameObject(tile.Id); obj.transform.SetParent(transform); obj.transform.position=center;
                 var mesh=HexMesh();terrainMeshes.Add(mesh);obj.AddComponent<MeshFilter>().sharedMesh=mesh;
@@ -92,19 +87,27 @@ public sealed class BoardRenderer : MonoBehaviour
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId)
     {
         foreach(Transform t in pieces) Destroy(t.gameObject);
-        foreach(var p in settlements) Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
+        foreach(var p in settlements)
+            if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
+                Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
         foreach(var p in roads) Piece(true,p.LocationId,SeatColor(p.PlayerId),pieces);
         foreach(var p in cities)
         {
-            var city=Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
+            if(PlayerComponentAssets.Building("city",p.PlayerId,"City "+p.LocationId,Position(p.LocationId),pieces)!=null)continue;
+            var city=Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces,false);
             city.name="City "+p.LocationId;
             city.transform.localScale=new Vector3(.02f,.023f,.015f);
             city.transform.position=Position(p.LocationId)+Vector3.up*.012f;
         }
         if(!string.IsNullOrEmpty(robberTileId)) Robber(robberTileId,new Color(.08f,.075f,.09f),pieces);
     }
-    GameObject Robber(string tileId, Color color, Transform parent)
+    GameObject Robber(string tileId, Color color, Transform parent, bool entityModel = true)
     {
+        if(entityModel)
+        {
+            var asset=EntityBoardAssets.Robber("Robber "+tileId,Position(tileId)+new Vector3(.012f,EntityBoardAssets.BoardSurfaceHeight,0),parent);
+            if(asset!=null)return asset;
+        }
         var marker=GameObject.CreatePrimitive(PrimitiveType.Capsule);
         Destroy(marker.GetComponent<Collider>());marker.name="Robber "+tileId;
         marker.transform.SetParent(parent);marker.transform.position=Position(tileId)+new Vector3(.012f,.035f,0);
@@ -113,8 +116,13 @@ public sealed class BoardRenderer : MonoBehaviour
         marker.GetComponent<Renderer>().sharedMaterial=material;
         return marker;
     }
-    GameObject Piece(bool road,string id,Color color,Transform parent)
+    GameObject Piece(bool road,string id,Color color,Transform parent,bool photoSample=true)
     {
+        if(photoSample)
+        {
+            var sample=PhotoSampleAssets.Piece(road,id,Position(id),road?rotations[id]:Quaternion.identity,color,parent);
+            if(sample!=null)return sample;
+        }
         var go = GameObject.CreatePrimitive(PrimitiveType.Cube); Destroy(go.GetComponent<Collider>()); go.transform.SetParent(parent);
         go.name=id; go.transform.position=Position(id)+Vector3.up*(road?.0025f:.006f);
         go.transform.localScale=road?new Vector3(.005f,.005f,.026f):new Vector3(.012f,.012f,.012f);
@@ -144,15 +152,17 @@ public sealed class BoardRenderer : MonoBehaviour
     public void PreviewRobber(string id,bool legal)
     {
         ClearPreview();if(string.IsNullOrEmpty(id))return;
-        ghost=Robber(id,legal?new Color(.3f,1f,.75f):new Color(1f,.22f,.2f),transform);
+        ghost=Robber(id,legal?new Color(.3f,1f,.75f):new Color(1f,.22f,.2f),transform,false);
     }
     public void ClearPreview() { if(ghost!=null)Destroy(ghost); ghost=null; }
+    bool operationLayout;
+    public void SetOperationLayout(bool enabled) { if(operationLayout==enabled)return; operationLayout=enabled; SetCamera(TopView); }
     public void SetCamera(bool top)
     {
         TopView=top; BoardCamera.orthographic=true; BoardCamera.orthographicSize=Zoom;
         BoardCamera.transform.position=top?new Vector3(0,.65f,-.001f):new Vector3(0,.48f,-.4f);
         BoardCamera.transform.LookAt(new Vector3(0,.005f,0));
-        BoardCamera.rect=new Rect(.0f,.10f,.74f,.80f);
+        BoardCamera.rect=operationLayout?new Rect(0,342f/900f,1015f/1440f,458f/900f):new Rect(.0f,.10f,.74f,.80f);
     }
     public void ChangeZoom(float delta) { Zoom=Mathf.Clamp(Zoom+delta,.19f,.32f); SetCamera(TopView); }
     public void ShowTerrain(bool show) { foreach(var m in mountains) m.SetActive(show); }

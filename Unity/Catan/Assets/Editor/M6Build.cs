@@ -43,7 +43,10 @@ public static class M6Build
         light.gameObject.AddComponent<UniversalAdditionalLightData>();
         RenderSettings.ambientMode = AmbientMode.Flat;
         RenderSettings.ambientLight = new Color(.55f, .61f, .68f);
-        new GameObject("Catan Local AI").AddComponent<M6App>();
+        var app=new GameObject("Catan Local AI");
+        app.AddComponent<M6App>();
+        app.AddComponent<EntityIntegrationVerification>();
+        app.AddComponent<PlayerComponentVerification>();
         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), "Assets/M6.unity");
         PlayerSettings.companyName = "CatanDevelopment";
         PlayerSettings.productName = "Catan M6";
