@@ -12,19 +12,22 @@ public sealed partial class M3App
     internal OperationSnapshot VerificationOperationSnapshot=>Operations();
     internal OperationDock VerificationOperationDock=>dock;
     readonly OperationDock dock = new OperationDock();
+    readonly TabletopUI tabletop = new TabletopUI();
+    bool tableNotes;
+    string tableVictim;
     Vector2 pendingOperationScroll;
     PlayerView operationView;
     OperationSnapshot operationSnapshot;
     DevelopmentCardKind? preparedDevelopment;
     bool preparedPurchase;
     bool showSeafaring; Vector2 operationScroll;
-    bool DockBlocksMouse()
+    bool DockBlocksMouse(Vector2? logical=null)
     {
         if(ai==null)return false;
-        var p=new Vector2(Input.mousePosition.x*1440f/Screen.width,(Screen.height-Input.mousePosition.y)*900f/Screen.height);
-        return p.x>=1015||p.y<100||p.y>=558||new Rect(24,105,212,29).Contains(p)||dock.BlocksBoardInput(p);
+        var p=logical??new Vector2(Input.mousePosition.x*1440f/Screen.width,(Screen.height-Input.mousePosition.y)*900f/Screen.height);
+        return ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||dock.BlocksBoardInput(p);
     }
-    void CancelOperationDraft(){preparedDevelopment=null;preparedPurchase=false;showSeafaring=false;CancelPickup();}
+    void CancelOperationDraft(){preparedDevelopment=null;preparedPurchase=false;showSeafaring=false;tableNotes=false;tableVictim=null;CancelPickup();}
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
     OperationSnapshot Operations()
     {
@@ -46,14 +49,14 @@ public sealed partial class M3App
             AddDockBuild(s,roadSetup?CommandKind.SetupShip:freeRoad?CommandKind.PlaceFreeShip:CommandKind.BuildShip,"船","ship",own.ShipsRemaining,roadSetup||freeRoad?DockCost():DockCost(wood:1,wool:1),view.LegalShipEdgeIds.Length>0);
             int cardIndex=0;
             foreach(var c in view.OwnDevelopmentCards)
-                s.Cards.Add(new OperationHandCard{Id=((int)c.Kind)+":"+cardIndex++,Name=DockDevelopmentName(c.Kind),Detail=c.Kind==DevelopmentCardKind.VictoryPoint?"隐藏胜利点，达到目标后可宣告胜利":c.BoughtTurn>=view.Turn?"本回合买入，下回合可用":"点击准备出牌，在右侧确认",Playable=c.Kind!=DevelopmentCardKind.VictoryPoint&&c.BoughtTurn<view.Turn&&!view.DevelopmentCardPlayedThisTurn&&(view.Phase==GamePhase.Action||view.Phase==GamePhase.ProductionAwaitRoll)&&view.TradeOffer==null&&view.ActivePlayerId==seat});
+                s.Cards.Add(new OperationHandCard{Id=((int)c.Kind)+":"+cardIndex++,Name=DockDevelopmentName(c.Kind),Detail=c.Kind==DevelopmentCardKind.VictoryPoint?"隐藏胜利点，达到目标后可宣告胜利":c.BoughtTurn>=view.Turn?"本回合买入，下回合可用":"点击准备出牌，在桌面确认",Playable=c.Kind!=DevelopmentCardKind.VictoryPoint&&c.BoughtTurn<view.Turn&&!view.DevelopmentCardPlayedThisTurn&&(view.Phase==GamePhase.Action||view.Phase==GamePhase.ProductionAwaitRoll)&&view.TradeOffer==null&&view.ActivePlayerId==seat});
             if(view.TradeOffer!=null)
             {
                 var t=view.TradeOffer;
                 s.Offer=new OperationOffer{Proposer=t.ProposerId,Recipient=t.OtherPlayerId,Give=DockCost(t.Give.Wood,t.Give.Brick,t.Give.Wool,t.Give.Wheat,t.Give.Ore),Receive=DockCost(t.Receive.Wood,t.Receive.Brick,t.Receive.Wool,t.Receive.Wheat,t.Receive.Ore),CanAccept=seat==t.OtherPlayerId,CanReject=seat==t.OtherPlayerId,CanCancel=seat==t.ProposerId};
             }
-            s.PrepareBuild=b=>{CancelOperationDraft();var k=(CommandKind)Enum.Parse(typeof(CommandKind),b.Id);if(k==CommandKind.BuyDevelopmentCard){preparedPurchase=true;status="已选发展卡，请在右侧确认购买。";}else Pickup(k);};
-            s.PrepareCard=c=>{CancelOperationDraft();preparedDevelopment=(DevelopmentCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在右侧确认出牌。";};
+            s.PrepareBuild=b=>{CancelOperationDraft();var k=(CommandKind)Enum.Parse(typeof(CommandKind),b.Id);if(k==CommandKind.BuyDevelopmentCard){preparedPurchase=true;status="已选发展卡，请在桌面确认购买。";}else Pickup(k);};
+            s.PrepareCard=c=>{CancelOperationDraft();preparedDevelopment=(DevelopmentCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在桌面确认出牌。";};
             s.Cancel=CancelOperationDraft;
             s.Trade=t=>
             {
@@ -79,71 +82,103 @@ public sealed partial class M3App
     static string DockDevelopmentName(DevelopmentCardKind kind)=>new[]{"骑士","道路建设","丰收","垄断","胜利点"}[(int)kind];
     void DrawOperationLayout()
     {
-        Styles();GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));
-        cardArt.Begin(null);
-        Panel(new Rect(1015,95,425,505),panelColor);
+        Styles();GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool previousEnabled=GUI.enabled;GUI.enabled=previousEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition);
+        bool enabled=GUI.enabled;GUI.enabled=enabled&&!dock.HasOverlay&&!ai.TableMenuOpen;
         DrawBoardLabels();
-        Label(1035,108,385,32,seat+" · "+PhaseName(view.Phase)+" · "+view.OwnVictoryPoints+" 分",title);
-        Label(1035,145,385,38,"第 "+view.Turn+" 回合 · 骰子 "+view.LastDice1+" + "+view.LastDice2+"\n当前行动 "+view.ActivePlayerId,small);
-        if(Button(24,105,102,board.TopView?"斜视 [Tab]":"俯视 [Tab]",29))board.SetCamera(!board.TopView);
-        if(Button(136,105,100,"地形显隐",29)){terrain=!terrain;board.ShowTerrain(terrain);}
-        if(view.TradeOffer!=null)Label(1035,204,365,66,"交易提案已放在交易桌上。\n接受、拒绝或撤回后继续回合。");
-        else if(!ai.IsHumanTurn&&view.Phase!=GamePhase.Finished)Label(1035,204,365,180,ai.WaitingText);
-        else if(view.Phase==GamePhase.Action||view.Phase==GamePhase.ProductionAwaitRoll)DrawOperationTurn();
-        else
-        {
-            pendingOperationScroll=GUI.BeginScrollView(new Rect(1035,190,380,279),pendingOperationScroll,new Rect(1085,283,350,289));DrawActions();GUI.EndScrollView();
-        }
-        Panel(new Rect(1028,477,398,2),new Color(.2f,.29f,.30f));
-        Label(1035,485,380,24,"公开席位 · 手牌只显示总数",small);
-        for(int i=0;i<view.Players.Length;i++)
-        {
-            var p=view.Players[i];GUI.backgroundColor=BoardRenderer.SeatColor(p.Id);
-            Button(1035+i*97,512,90,p.Id+" · "+p.VictoryPoints+"分\n"+p.ResourceCount+"资源",38);
-        }
-        GUI.backgroundColor=Color.white;
-        if(Button(1035,558,120,"保存",30))SaveGame();if(Button(1164,558,120,"恢复",30))LoadGame();if(Button(1293,558,120,"新开一局",30))ai.ShowMenu();
-        Panel(new Rect(0,558,1015,32),new Color(.045f,.09f,.10f));
-        Label(24,563,970,24,status,small);
-        GUI.enabled=previousEnabled;dock.Draw(Operations(),font);GUI.matrix=Matrix4x4.identity;
+        tabletop.Draw(font,seat,ai.CurrentActor,PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,
+            view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Resources=p.ResourceCount,Cards=p.DevelopmentCardCount,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Ships=p.ShipsRemaining}).ToArray(),
+            ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll&&view.TradeOffer==null,
+            ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.TradeOffer==null,
+            ()=>Submit(NewCommand(CommandKind.RollDice)),()=>Submit(NewCommand(CommandKind.EndTurn)),TableSeatClick,
+            ()=>{tableNotes=!tableNotes;},"航海日志");
+        tabletop.DrawStatus(ai.IsHumanTurn?TableInstruction():ai.WaitingText);
+        if(ai.IsHumanTurn&&view.TradeOffer==null)DrawTableDecision();
+        GUI.enabled=enabled&&!ai.TableMenuOpen;dock.Draw(Operations(),font);GUI.enabled=enabled;GUI.matrix=Matrix4x4.identity;
     }
-    void DrawOperationTurn()
+    void TableSeatClick(string target)
     {
-        if(Button(1035,192,182,view.Phase==GamePhase.ProductionAwaitRoll?"掷骰 · 开始本回合":"已掷骰",34)&&view.Phase==GamePhase.ProductionAwaitRoll){Submit(NewCommand(CommandKind.RollDice));return;}
-        if(Button(1227,192,182,"结束回合",34)){Submit(NewCommand(CommandKind.EndTurn));return;}
-        if(Button(1035,235,370,showSeafaring?"返回建造与卡牌":"航海行动 · 移船 / 港口 / 剧本" ,30)){showSeafaring=!showSeafaring;preparedDevelopment=null;preparedPurchase=false;}
-        if(showSeafaring){operationScroll=GUI.BeginScrollView(new Rect(1035,278,380,188),operationScroll,new Rect(1085,325,350,370));DrawSeafaring();GUI.EndScrollView();return;}
+        if(ai.IsHumanTurn&&view.Phase==GamePhase.RobberSteal&&view.PendingDecision!=null&&view.PendingDecision.EligibleVictimIds.Contains(target))
+        {if(view.PendingDecision.Token=="pirate"){tableVictim=target;return;}var c=NewCommand(CommandKind.StealResource);c.OtherPlayerId=target;Submit(c);return;}
+        if(Operations().CanTrade)dock.OpenTrade(target);
+        else status="当前阶段不能发起交易；先完成本回合或待决选择。";
+    }
+    string TableInstruction()
+    {
+        if(holding)return "棋子已拿起 · 移向亮点后单击放下 · 右键 / Esc 放回";
+        if(view.Phase==GamePhase.SetupSettlement)return "从面前拿起定居点，放到地图上的合法交点";
+        if(view.Phase==GamePhase.SetupRoad)return "从面前拿起道路或船，连接刚放下的定居点";
+        if(view.Phase==GamePhase.ProductionAwaitRoll)return "轮到你了 · 点击桌上的两颗骰子";
+        if(view.Phase==GamePhase.RobberSteal)return "点击一名相邻对手的牌背，随机抽取资源";
+        if(view.Phase==GamePhase.Discard)return "点选面前需要弃掉的资源牌，再确认弃牌";
+        if(view.Phase==GamePhase.RobberMove)return "拿起地图上的强盗，放到另一块地形";
+        return status;
+    }
+    void TableNote(string caption,Action content)
+    {
+        tabletop.BeginContext(caption);
+        var label=new GUIStyle(text);label.normal.textColor=new Color(.25f,.13f,.06f);
+        tableInk=label;content();tabletop.EndContext();
+    }
+    GUIStyle tableInk;
+    bool TableButton(string caption)=>GUILayout.Button(caption,button,GUILayout.MinHeight(32));
+    void DrawTableDecision()
+    {
+        if(view.Phase==GamePhase.RobberSteal&&tableVictim!=null&&view.PendingDecision.Token=="pirate")
+        {
+            TableNote("从 "+tableVictim+" 取走",()=>{
+                if(TableButton("随机抽取一张资源牌")){var c=NewCommand(CommandKind.StealResource);c.OtherPlayerId=tableVictim;Submit(c);}
+                if(TableButton("取走一份布匹")){var c=NewCommand(CommandKind.StealCloth);c.OtherPlayerId=tableVictim;Submit(c);}
+                if(TableButton("改选其他玩家"))tableVictim=null;
+            });return;
+        }
         if(preparedPurchase)
         {
-            Label(1035,277,370,50,"购买发展卡\n羊毛 1 · 谷物 1 · 矿石 1");
-            if(Button(1035,339,370,"确认购买")){Submit(NewCommand(CommandKind.BuyDevelopmentCard));preparedPurchase=false;return;}
+            TableNote("抽取一张发展卡",()=>{
+                GUILayout.Label("付出羊毛、谷物、矿石各一张。",tableInk);
+                if(TableButton("把资源交回银行 · 抽牌"))Submit(NewCommand(CommandKind.BuyDevelopmentCard));
+                if(TableButton("放回")){CancelOperationDraft();dock.Reset();}
+            });return;
         }
-        else if(preparedDevelopment.HasValue)DrawPreparedDevelopment();
-        else
+        if(preparedDevelopment.HasValue)
         {
-            Label(1035,277,375,81,holding?status:"点击下方组件会选中所需资源。\n也可先抽出资源牌，查看可建项目。\n交易在下方“交易桌”内完成。");
-            if(Button(1035,370,370,"宣告胜利")){Submit(NewCommand(CommandKind.DeclareVictory));return;}
+            var kind=preparedDevelopment.Value;
+            TableNote("打出 · "+DockDevelopmentName(kind),()=>{
+                if(kind==DevelopmentCardKind.YearOfPlenty)
+                {if(TableButton("第一张："+(plentyA<5?ResourceNames[plentyA]:"不取")))plentyA=(plentyA+1)%6;if(TableButton("第二张："+(plentyB<5?ResourceNames[plentyB]:"不取")))plentyB=(plentyB+1)%6;}
+                if(kind==DevelopmentCardKind.Monopoly&&TableButton("收取："+ResourceNames[monopoly]))monopoly=(monopoly+1)%5;
+                if(TableButton("将这张卡放到桌上"))
+                {
+                    var c=NewCommand(kind==DevelopmentCardKind.Knight?CommandKind.PlayKnight:kind==DevelopmentCardKind.RoadBuilding?CommandKind.PlayRoadBuilding:kind==DevelopmentCardKind.Monopoly?CommandKind.PlayMonopoly:CommandKind.PlayYearOfPlenty);
+                    if(kind==DevelopmentCardKind.YearOfPlenty){c.Resources=new ResourceBag();if(plentyA<5)c.Resources[(Resource)plentyA]++;if(plentyB<5)c.Resources[(Resource)plentyB]++;}
+                    if(kind==DevelopmentCardKind.Monopoly)c.Resource=(Resource)monopoly;Submit(c);
+                }
+                if(TableButton("放回手牌")){CancelOperationDraft();dock.Reset();}
+            });return;
         }
-        if((holding||preparedPurchase||preparedDevelopment.HasValue)&&Button(1035,427,370,"取消当前选择 [Esc]")){CancelOperationDraft();dock.Reset();}
-    }
-    void DrawPreparedDevelopment()
-    {
-        var kind=preparedDevelopment.Value;Label(1035,272,370,35,"准备出牌 · "+DockDevelopmentName(kind));
-        if(kind==DevelopmentCardKind.YearOfPlenty)
+        if(view.Phase==GamePhase.Discard)
         {
-            if(Button(1035,309,180,"资源一："+(plentyA<5?ResourceNames[plentyA]:"不取")))plentyA=(plentyA+1)%6;
-            if(Button(1225,309,180,"资源二："+(plentyB<5?ResourceNames[plentyB]:"不取")))plentyB=(plentyB+1)%6;
+            var required=view.Discards.FirstOrDefault(d=>d.PlayerId==seat);if(required==null)return;
+            TableNote("归还资源",()=>{
+                GUILayout.Label("需弃 "+required.Amount+" 张 · 已抽出 "+dock.Selection.Selected.Sum()+" 张",tableInk);
+                bool before=GUI.enabled;GUI.enabled=before&&dock.Selection.Selected.Sum()==required.Amount;
+                if(TableButton("将选中的牌放回银行")){var c=NewCommand(CommandKind.DiscardResources);c.Resources=new ResourceBag();for(int i=0;i<5;i++)c.Resources[(Resource)i]=dock.Selection.Selected[i];Submit(c);}GUI.enabled=before;
+            });return;
         }
-        if(kind==DevelopmentCardKind.Monopoly&&Button(1035,309,370,"资源："+ResourceNames[monopoly]))monopoly=(monopoly+1)%5;
-        Label(1035,348,370,23,"确认后进入此卡的后续选择。",small);
-        if(Button(1035,376,370,"确认打出 "+DockDevelopmentName(kind)))
+        if(view.Phase==GamePhase.RobberMove&&!holding)
         {
-            var c=NewCommand(kind==DevelopmentCardKind.Knight?CommandKind.PlayKnight:kind==DevelopmentCardKind.RoadBuilding?CommandKind.PlayRoadBuilding:kind==DevelopmentCardKind.Monopoly?CommandKind.PlayMonopoly:CommandKind.PlayYearOfPlenty);
-            if(kind==DevelopmentCardKind.YearOfPlenty){c.Resources=new ResourceBag();if(plentyA<5)c.Resources[(Resource)plentyA]++;if(plentyB<5)c.Resources[(Resource)plentyB]++;}
-            if(kind==DevelopmentCardKind.Monopoly)c.Resource=(Resource)monopoly;
-            Submit(c);preparedDevelopment=null;
+            TableNote("拿起强盗或海盗",()=>{if(TableButton("拿起强盗"))Pickup(CommandKind.MoveRobber);if(TableButton("拿起海盗"))Pickup(CommandKind.MovePirate);if(TableButton("把海盗放到外框海域"))Submit(NewCommand(CommandKind.MovePirate,"frame"));});
+        }
+        if(view.Phase==GamePhase.RoadBuilding&&!holding&&view.LegalEdgeIds.Length==0&&view.LegalShipEdgeIds.Length==0)
+            TableNote("道路建设",()=>{if(TableButton("结束免费建设"))Submit(NewCommand(CommandKind.FinishRoadBuilding));});
+                if(!holding&&(view.Phase==GamePhase.GoldChoice||view.Phase==GamePhase.PortPlacement||view.Phase==GamePhase.SetupPort))
+        {
+            tabletop.RegisterContext();TabletopUI.Note(TabletopUI.ContextRect);pendingOperationScroll=GUI.BeginScrollView(new Rect(1025,380,376,240),pendingOperationScroll,new Rect(1080,278,352,290));var previousInk=text.normal.textColor;var previousSmall=small.normal.textColor;text.normal.textColor=small.normal.textColor=new Color(.25f,.13f,.06f);DrawActions();text.normal.textColor=previousInk;small.normal.textColor=previousSmall;GUI.EndScrollView();
+        }
+        if(tableNotes&&!holding&&view.Phase==GamePhase.Action)
+        {
+                        tabletop.RegisterContext();TabletopUI.Note(TabletopUI.ContextRect);pendingOperationScroll=GUI.BeginScrollView(new Rect(1025,380,376,240),pendingOperationScroll,new Rect(1080,320,352,355));var previousInk=text.normal.textColor;var previousSmall=small.normal.textColor;text.normal.textColor=small.normal.textColor=new Color(.25f,.13f,.06f);DrawSeafaring();text.normal.textColor=previousInk;small.normal.textColor=previousSmall;
+            if(Button(1085,640,331,"宣告胜利"))Submit(NewCommand(CommandKind.DeclareVictory));GUI.EndScrollView();
         }
     }
 }

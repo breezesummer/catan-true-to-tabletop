@@ -46,12 +46,13 @@ public sealed partial class M2App : MonoBehaviour
     void Update()
     {
         if(host==null)return;
+        Vector2 releasePoint=Vector2.zero;bool released=ai!=null&&dock.ConsumeBuildRelease(out releasePoint);
         if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
-        if(!DockBlocksMouse()&&Input.mousePosition.x<Screen.width*.74f&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
+        if(!DockBlocksMouse()&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGameDialog||!holding||view==null||ai!=null&&!ai.IsHumanTurn)return;
-        var mouse=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
-        if(DockBlocksMouse()||cardArt.BlocksBoardInput(new Vector2(mouse.x*1440/Screen.width,mouse.y*900/Screen.height)))return;
+        var mouse=released?new Vector2(releasePoint.x*Screen.width/1440f,releasePoint.y*Screen.height/900f):new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
+        if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(new Vector2(mouse.x*1440/Screen.width,mouse.y*900/Screen.height)))return;
         var candidate=ResolveTarget(mouse);
         if(candidate!=hover)
         {
@@ -61,7 +62,7 @@ public sealed partial class M2App : MonoBehaviour
             else board.Preview(hover,IsRoad(placement),valid);
         }
         bool guideHit=ai==null&&help&&mouse.x>24f*Screen.width/1440f&&mouse.x<732f*Screen.width/1440f&&mouse.y>104f*Screen.height/900f&&mouse.y<227f*Screen.height/900f;
-        if(Input.GetMouseButtonDown(0)&&!guideHit&&mouse.x<Screen.width*.73f&&mouse.y>Screen.height*.10f&&mouse.y<Screen.height*.895f)
+        if((Input.GetMouseButtonDown(0)||released)&&!guideHit&&(ai!=null||mouse.x<Screen.width*.73f&&mouse.y>Screen.height*.10f&&mouse.y<Screen.height*.895f))
         {
             if(hover!="")Drop(hover);
             else {CancelPickup();status="没有吸附目标，已取消；局面保持不变。";}
@@ -397,6 +398,7 @@ public sealed partial class M2App : MonoBehaviour
         foreach(var tile in view.Board.Tiles)
         {
             var p=board.ScreenPoint(tile.Id);float x=p.x*1440f/Screen.width,y=p.y*900f/Screen.height;
+            if(ai!=null){TabletopUI.NumberToken(new Vector2(x,y),tile.Number,"沙漠",badge);continue;}
             Panel(new Rect(x-25,y-20,50,40),new Color(.045f,.085f,.09f,.86f));
             Label(x-25,y-21,50,25,tile.Number.HasValue?tile.Number.Value.ToString():"沙漠",badge);
             Label(x-25,y+2,50,20,tile.Id+(tile.Id==view.Board.RobberTileId?" 强盗":""),new GUIStyle(badge){fontSize=10});
@@ -406,6 +408,13 @@ public sealed partial class M2App : MonoBehaviour
             var center=(board.Position(port.Vertices[0])+board.Position(port.Vertices[1]))*.5f;
             center*=1.14f;var p=board.BoardCamera.WorldToScreenPoint(center);
             float x=p.x*1440f/Screen.width,y=(Screen.height-p.y)*900f/Screen.height;
+            if(ai!=null)
+            {
+                var portRect=new Rect(x-29,y-13,58,26);TabletopUI.Note(portRect);
+                var portInk=new GUIStyle(badge){fontSize=11};portInk.normal.textColor=new Color(.25f,.13f,.06f);
+                GUI.Label(portRect,port.Resource.HasValue?ResourceNames[(int)port.Resource.Value]+" 2:1":"3:1",portInk);
+                if(GUI.Button(portRect,GUIContent.none,GUIStyle.none)&&Operations().CanTrade)dock.OpenTrade();continue;
+            }
             Panel(new Rect(x-36,y-12,72,24),new Color(.11f,.21f,.27f,.94f));
             Label(x-36,y-12,72,24,port.Resource.HasValue?ResourceNames[(int)port.Resource.Value]+" 2:1":"港口 3:1",badge);
         }
@@ -463,7 +472,7 @@ public sealed partial class M2App : MonoBehaviour
 
         discard=new ResourceBag();offerGive=new ResourceBag();offerReceive=new ResourceBag();
         RefreshBoard(view);
-        status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，请完成右侧的行动或待决选择。":ai.WaitingText;
+        status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，请从桌上的棋子、卡牌或骰子开始操作。":ai.WaitingText;
     }
     internal void M6Visible(bool value){if(board!=null)board.gameObject.SetActive(value);}
     internal void M6Close(){enabled=false;if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}Destroy(this);}
