@@ -19,6 +19,11 @@ public sealed class TabletopUI
     Vector2 scroll;
     bool contextVisible;
     static Texture2D disc;
+    static Texture2D dieSurface;
+    readonly TabletopDicePresentation dice = new TabletopDicePresentation();
+    public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
+    public void ObserveDice(long sequence,int first,int second,int? eventDie)
+    {dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);}
     static readonly Color Cream = new Color(.96f,.88f,.70f), Ink = new Color(.24f,.12f,.06f);
     public bool BlocksBoardInput(Vector2 p) => hits.Any(r=>r.Contains(p)) || contextVisible && ContextRect.Contains(p);
     internal static string[] OpponentOrder(string ownSeat,System.Collections.Generic.IEnumerable<string> ids)
@@ -85,13 +90,19 @@ public sealed class TabletopUI
         }
         GUI.Label(new Rect(28,579,157,24),"银行 / 港口 · 交换",center);
         if(GUI.Button(bank,GUIContent.none,GUIStyle.none))trade?.Invoke(null);
-        var diceRect=new Rect(1232,537,185,87);hits.Add(diceRect);
-        DrawDie(new Rect(1245,542,59,59),dice1==0?1:dice1,new Color(.68f,.10f,.045f));
-        DrawDie(new Rect(1321,555,59,59),dice2==0?6:dice2,new Color(.95f,.73f,.23f));
-        GUI.Label(new Rect(1219,620,199,24),canRoll?"点击骰子 · 掷出本回合":"骰子  "+dice1+" + "+dice2,center);
-        bool enabled=GUI.enabled;GUI.enabled=enabled&&canRoll;
-        if(GUI.Button(diceRect,GUIContent.none,GUIStyle.none))roll?.Invoke();GUI.enabled=enabled;
-        if(ObjectButton(new Rect(1248,479,153,43),"交出回合  →",canEnd))end?.Invoke();
+        bool expansion=dice.Event.HasValue;
+        var diceRects=expansion?new[]{new Rect(1234,551,50,50),new Rect(1295,560,50,50),new Rect(1355,545,50,50)}
+            :new[]{new Rect(1247,545,59,59),new Rect(1330,558,59,59)};
+        bool enabled=GUI.enabled;
+        for(int i=0;i<diceRects.Length;i++)
+        {
+            hits.Add(diceRects[i]);
+            DrawAnimatedDie(diceRects[i],i,expansion);
+            GUI.enabled=enabled&&canRoll&&!DiceRolling;
+            if(GUI.Button(diceRects[i],GUIContent.none,GUIStyle.none))roll?.Invoke();
+        }
+        GUI.enabled=enabled;
+        if(ObjectButton(new Rect(1248,479,153,43),"交出回合  →",canEnd&&!DiceRolling))end?.Invoke();
         if(special!=null&&ObjectButton(new Rect(28,482,159,36),specialLabel))special();
         GUI.enabled=tableEnabled;
     }
@@ -124,14 +135,66 @@ public sealed class TabletopUI
         var texture=OperationPieceAssets.Texture(kind,seat,1);if(texture==null)return;
         for(int i=0;i<count;i++)GUI.DrawTexture(new Rect(x+(i%row)*Math.Min(size,width/row),y+(i/row)*size*.65f,size+8,size+8),texture,ScaleMode.ScaleToFit);
     }
-    static void DrawDie(Rect r,int value,Color color)
+    void DrawAnimatedDie(Rect r,int index,bool expansion)
     {
-        Note(r);Fill(new Rect(r.x+2,r.y+2,r.width-4,r.height-4),color);
+        double now=Time.unscaledTimeAsDouble;
+        float progress=dice.Progress(now),motion=DiceRolling?1-progress:0;
+        float spin=DiceRolling?(1-Mathf.Pow(1-progress,3))*720:0;
+        r.position+=new Vector2(Mathf.Sin(progress*Mathf.PI*6+index)*motion*10,-Mathf.Abs(Mathf.Sin(progress*Mathf.PI*5))*motion*19);
+        var matrix=GUI.matrix;
+        GUIUtility.RotateAroundPivot((index==0?-9:index==1?12:-5)+spin*(index%2==0?1:-1),r.center);
+        Color color=index==0?new Color(.72f,.12f,.08f):index==1?expansion?new Color(.98f,.96f,.88f):new Color(.97f,.76f,.28f):new Color(.97f,.94f,.83f);
+        DrawDieSurface(r,color);
+        int value=dice.Face(index,now);
+        if(index==2){DrawEventSymbol(r,value);GUI.matrix=matrix;return;}
         var dots=value==1?new[]{4}:value==2?new[]{0,8}:value==3?new[]{0,4,8}:value==4?new[]{0,2,6,8}:value==5?new[]{0,2,4,6,8}:new[]{0,2,3,5,6,8};
-        foreach(int d in dots)Token(new Rect(r.x+10+(d%3)*15,r.y+10+(d/3)*15,8,8),new Color(.16f,.08f,.035f));
+        Color pip=index==0?new Color(.99f,.95f,.85f):new Color(.16f,.11f,.07f);
+        foreach(int d in dots)Token(new Rect(r.x+r.width*(.19f+(d%3)*.25f),r.y+r.height*(.19f+(d/3)*.25f),r.width*.12f,r.height*.12f),pip);
+        GUI.matrix=matrix;
     }
-    public void DrawStatus(string value)
-    {if(text!=null)GUI.Label(new Rect(277,634,890,25),value,new GUIStyle(center){fontSize=13});}
+    static void DrawDieSurface(Rect r,Color color)
+    {
+        if(dieSurface==null)
+        {
+            const int size=128;dieSurface=new Texture2D(size,size,TextureFormat.RGBA32,false){name="圆角骰面 v003"};
+            var pixels=new Color[size*size];
+            for(int y=0;y<size;y++)for(int x=0;x<size;x++)
+            {
+                float dx=Mathf.Max(0,Mathf.Abs(x-63.5f)-48),dy=Mathf.Max(0,Mathf.Abs(y-63.5f)-48);
+                float edge=15-Mathf.Sqrt(dx*dx+dy*dy),alpha=Mathf.Clamp01(edge);
+                float shade=.84f+.12f*y/size+.06f*Mathf.Clamp01(edge/5);
+                pixels[y*size+x]=new Color(shade,shade,shade,alpha);
+            }
+            dieSurface.SetPixels(pixels);dieSurface.Apply();
+        }
+        var old=GUI.color;
+        GUI.color=new Color(0,0,0,.26f);GUI.DrawTexture(new Rect(r.x+3,r.y+6,r.width,r.height),dieSurface);
+        GUI.color=color*.78f;GUI.DrawTexture(new Rect(r.x,r.y+3,r.width,r.height),dieSurface);
+        GUI.color=color;GUI.DrawTexture(r,dieSurface);GUI.color=old;
+    }
+    static void DrawEventSymbol(Rect r,int value)
+    {
+        float unit=r.width/50,x=r.x+10*unit,y=r.y+10*unit;
+        Color ink=value==1?new Color(.79f,.52f,.045f):value==2?new Color(.10f,.28f,.69f):value==3?new Color(.10f,.49f,.22f):new Color(.16f,.13f,.10f);
+        if(value==0)
+        {
+            // 蛮族船：船体、桅杆和两片帆。
+            Fill(new Rect(x+2*unit,y+21*unit,26*unit,4*unit),ink);
+            Fill(new Rect(x+5*unit,y+25*unit,20*unit,3*unit),ink);
+            Fill(new Rect(x+14*unit,y,2*unit,23*unit),ink);
+            for(int row=0;row<16;row++)
+            {Fill(new Rect(x+(14-row*.6f)*unit,y+(row+2)*unit,(row*.6f)*unit,unit),ink);Fill(new Rect(x+17*unit,y+(row+2)*unit,(15-row)*.55f*unit,unit),ink);}
+        }
+        else
+        {
+            // 黄、蓝、绿城堡分别对应贸易、政治、科学。
+            Fill(new Rect(x+3*unit,y+9*unit,24*unit,18*unit),ink);
+            for(int i=0;i<3;i++)Fill(new Rect(x+(3+i*9)*unit,y+3*unit,6*unit,8*unit),ink);
+            Fill(new Rect(x+12*unit,y+18*unit,6*unit,9*unit),new Color(.97f,.94f,.83f));
+            Fill(new Rect(x+7*unit,y+12*unit,3*unit,5*unit),new Color(.97f,.94f,.83f));
+            Fill(new Rect(x+20*unit,y+12*unit,3*unit,5*unit),new Color(.97f,.94f,.83f));
+        }
+    }
     public void BeginContext(string caption)
     {
         contextVisible=true;Note(ContextRect);

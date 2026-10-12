@@ -115,6 +115,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             int steps = 0;
             while (!app.IsHumanTurn && steps++ < 80) { Advance(); if (steps % 4 == 0) yield return null; }
             Require(app.IsHumanTurn, "未能推进至人类开局");
+            CheckPresentation();
             VerifyPlacement();
             steps = 0;
             while (!Snapshot.CanTrade && steps++ < 500) { Advance(); if (steps % 8 == 0) yield return null; }
@@ -131,6 +132,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             Dock.Reset(); Snapshot.Cancel?.Invoke();
             Require(before == Authority, "取消玩家交易改变权威状态");
             configurations++;
+            if(human==players)app.WriteSave(Path.Combine(output,mode+"-"+players+"-review.json"));
             if (captureCamera && human == players)
             {
                 // 只渲染游戏相机到独立 RT，不读取屏幕帧缓冲和用户桌面。
@@ -157,6 +159,33 @@ public sealed class TabletopUiVerification : MonoBehaviour
         int own = Array.IndexOf(ids, app.HumanSeat);
         Require(ordered.Length == players - 1 && !ordered.Contains(app.HumanSeat), "自己的席位没有留在前方");
         for (int i = 0; i < ordered.Length; i++) Require(ordered[i] == ids[(own + i + 1) % players], "对手未按相对顺时针排列");
+    }
+
+    void CheckPresentation()
+    {
+        string before=Authority;var snapshot=Snapshot;
+        foreach(var build in snapshot.Builds.Where(b=>b.Track<0&&b.Count>0))
+        {
+            var texture=OperationPieceAssets.Texture(build.Icon,snapshot.Seat,Math.Max(1,build.Level));
+            if(texture==null)continue;
+            Require(texture.isReadable,"棋子缩略图未保留透明命中数据");
+            var rect=new Rect(0,0,texture.width,texture.height);
+            Require(!OperationPieceAssets.Contains(texture,rect,new Vector2(.1f,.1f)),"棋子透明边角错误接收点击");
+            var pixels=texture.GetPixels32();int opaque=Array.FindIndex(pixels,p=>p.a>220);
+            Require(opaque>=0,"棋子缩略图没有可点击轮廓");
+            var point=new Vector2(opaque%texture.width+.5f,texture.height-(opaque/texture.width+.5f));
+            Require(OperationPieceAssets.Contains(texture,rect,point),"棋子实体轮廓无法命中");
+            Dock.Selection.Choose(build,snapshot.Goods,build.Count-1);
+            Require(Enumerable.Range(0,build.Count).Count(i=>Dock.Selection.IsPieceSelected(build.Id,i))==1,"拿取错误选中一组棋子");
+            Dock.Selection.Clear();
+        }
+        var prompt=new TabletopPromptSequence();prompt.Show(0,"你的回合","请掷骰");
+        Require(prompt.At(0)=="你的回合"&&prompt.At(1.5)=="请掷骰"&&prompt.At(3)=="","Unity 提示时长或顺序错误");
+        var dice=new TabletopDicePresentation();int? eventDie=snapshot.GoodCount==8?(int?)2:null;
+        dice.Observe(0,0,0,eventDie,0);dice.Observe(1,2,5,eventDie,1);
+        Require(dice.IsRolling(1.2)&&!dice.IsRolling(2),"Unity 骰子时间轴无法结束");
+        Require(dice.Face(0,2)==2&&dice.Face(1,2)==5&&dice.Event.HasValue==(snapshot.GoodCount==8),"骰子数量或最终骰面错误");
+        Require(before==Authority,"拿取、提示或动画改变了权威状态");
     }
 
     string FixedAuthority(int players, int human)

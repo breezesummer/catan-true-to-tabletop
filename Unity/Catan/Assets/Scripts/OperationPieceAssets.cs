@@ -8,6 +8,14 @@ public static class OperationPieceAssets
     const string Root = "OperationUI/v001/pieces/";
     static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
 
+    public static bool Contains(Texture2D texture, Rect rect, Vector2 point)
+    {
+        float width=Mathf.Min(rect.width,rect.height*texture.width/texture.height),height=width*texture.height/texture.width;
+        var fitted=new Rect(rect.center.x-width/2,rect.center.y-height/2,width,height);
+        if(!fitted.Contains(point))return false;
+        return texture.isReadable&&texture.GetPixelBilinear((point.x-fitted.x)/width,1-(point.y-fitted.y)/height).a>.12f;
+    }
+
     public static Texture2D Texture(string icon, string seat, int level = 1)
     {
         var colour = PlayerComponentAssets.ColourKey(seat);

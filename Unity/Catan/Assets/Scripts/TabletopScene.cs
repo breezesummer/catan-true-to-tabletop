@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 // 桌面仅使用已公开的顶点坐标；海框、木纹与相机不参与规则和落点裁决。
-// v002：米制、固定程序纹理，无外部图片；原有实体资产和枢轴保持不变。
+// v003：米制、版本化橡木贴图；生成位图只作为桌面材质，原有实体资产和枢轴保持不变。
 public sealed class TabletopScene : MonoBehaviour
 {
     public static readonly Rect BoardArea = new Rect(230, 132, 980, 510);
@@ -13,6 +13,8 @@ public sealed class TabletopScene : MonoBehaviour
     Vector3[] outline;
     Vector3 center;
     Camera tableCamera;
+    Material oakMaterial;
+    float oakSpan = .8f;
     bool topView;
     float zoom = 1;
     int screenWidth, screenHeight;
@@ -21,7 +23,7 @@ public sealed class TabletopScene : MonoBehaviour
 
     public static TabletopScene Create(Transform parent, IEnumerable<Vector3> publicVertices)
     {
-        var root = new GameObject("完整木桌 v002");
+        var root = new GameObject("完整橡木桌 v003");
         root.transform.SetParent(parent, false);
         var scene = root.AddComponent<TabletopScene>();
         scene.Initialize(publicVertices.ToArray());
@@ -41,11 +43,24 @@ public sealed class TabletopScene : MonoBehaviour
             outline[i].y = -.001f;
         }
 
-        var wood = MakeMaterial("胡桃木桌面 v002", Color.white, .2f);
-        var grain = WoodTexture(); textures.Add(grain);
-        wood.SetTexture("_BaseMap", grain); wood.SetTextureScale("_BaseMap", new Vector2(8, 8));
+        var wood = MakeMaterial("烟熏橡木哑光清漆 v003", new Color(.88f,.88f,.86f), .38f);
+        var grain=Resources.Load<Texture2D>("TabletopUI/v003/oak-table-albedo");
+        if(grain!=null)
+        {
+            // 至少覆盖中央 0.8 米；相机确定后扩大至完整可见桌面，避免边缘拉伸。
+            wood.SetTexture("_BaseMap",grain);wood.SetTextureScale("_BaseMap",new Vector2(10,10));
+            wood.SetTextureOffset("_BaseMap",new Vector2(-4.5f,-4.5f));
+            oakMaterial=wood;
+        }
+        else
+        {
+            Texture2D normal;grain=OakTexture(out normal);textures.Add(grain);textures.Add(normal);
+            wood.SetTexture("_BaseMap",grain);wood.SetTextureScale("_BaseMap",new Vector2(10,10));
+            wood.SetTexture("_BumpMap",normal);wood.SetTextureScale("_BumpMap",new Vector2(10,10));
+            wood.SetFloat("_BumpScale",.38f);wood.EnableKeyword("_NORMALMAP");
+        }
         var table = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        table.name = "胡桃木整桌"; table.transform.SetParent(transform, false);
+        table.name = "大幅橡木拼板桌"; table.transform.SetParent(transform, false);
         table.transform.position = center + new Vector3(0, -.025f, 0);
         table.transform.localScale = new Vector3(8, .035f, 8);
         Destroy(table.GetComponent<Collider>());
@@ -114,6 +129,24 @@ public sealed class TabletopScene : MonoBehaviour
         float centerY = .5f - BoardArea.center.y / 900f;
         tableCamera.transform.position = focus - tableCamera.transform.forward * 2
             - right * (centerX * size * 2 * aspect) - up * (centerY * size * 2);
+        if(oakMaterial!=null)
+        {
+            var plane=new Plane(Vector3.up,new Vector3(0,-.0075f,0));
+            float span=oakSpan;
+            for(int corner=0;corner<4;corner++)
+            {
+                var ray=tableCamera.ViewportPointToRay(new Vector3(corner%2,corner/2,0));
+                if(!plane.Raycast(ray,out float distance))continue;
+                var point=ray.GetPoint(distance)-center;
+                span=Mathf.Max(span,2.1f*Mathf.Max(Mathf.Abs(point.x),Mathf.Abs(point.z)));
+            }
+            if(span>oakSpan)
+            {
+                oakSpan=span;float scale=8/span;
+                oakMaterial.SetTextureScale("_BaseMap",new Vector2(scale,scale));
+                oakMaterial.SetTextureOffset("_BaseMap",Vector2.one*(1-scale)/2);
+            }
+        }
         if (expansionTrack != null && expansionMarkers != null)
         {
             // 蛮族行进板放在上方右侧空桌面；投影宽度保持 135 像素，不挤压地图。
@@ -180,29 +213,45 @@ public sealed class TabletopScene : MonoBehaviour
 
     static float Cross(Vector3 a, Vector3 b, Vector3 p) => (b.x - a.x) * (p.z - a.z) - (b.z - a.z) * (p.x - a.x);
 
-    static Texture2D WoodTexture()
+    static Texture2D OakTexture(out Texture2D normal)
     {
         const int size = 1024;
         var texture = new Texture2D(size, size, TextureFormat.RGB24, true) {
-            name = "周期无缝木纹 v002", wrapMode = TextureWrapMode.Repeat,
-            filterMode = FilterMode.Trilinear, anisoLevel = 4
+            name = "烟熏橡木色彩 v003", wrapMode = TextureWrapMode.Repeat,
+            filterMode = FilterMode.Trilinear, anisoLevel = 8
         };
         var pixels = new Color[size * size];
+        var heights = new float[size * size];
         for (int y = 0; y < size; y++) for (int x = 0; x < size; x++)
         {
             float u = x / (float)size, v = y / (float)size;
-            // 所有频率均为整周期：重复铺贴时边界和一阶变化连续，不生成方块接缝。
-            float broad = PeriodicNoise(u, v, 3, 7, 11);
-            float warp = (broad - .5f) * .045f + (PeriodicNoise(u, v, 9, 17, 21) - .5f) * .012f;
-            float coordinate = v + warp + Mathf.Sin(u * Mathf.PI * 4) * .009f;
-            float grain = .5f + .5f * Mathf.Sin(coordinate * Mathf.PI * 160);
-            float fineGrain = .5f + .5f * Mathf.Sin(coordinate * Mathf.PI * 380 + Mathf.Sin(u * Mathf.PI * 6));
-            float fibres = PeriodicNoise(u, v, 32, 256, 63);
-            float pores = PeriodicNoise(u, v, 128, 512, 87);
-            float tone = .63f + (broad - .5f) * .22f - Mathf.Pow(grain, 7) * .15f
-                - Mathf.Pow(fineGrain, 11) * .065f + (fibres - .5f) * .12f + (pores - .5f) * .045f;
-            pixels[y * size + x] = Color.Lerp(new Color(.20f, .085f, .035f), new Color(.58f, .29f, .12f), Mathf.Clamp01(tone));
+            // 宽拼板、缓慢弯曲的年轮、沿纹理的导管与细小木射线；确定性生成。
+            int plank=Mathf.Min(5,Mathf.FloorToInt(v*6));float across=v*6-plank;
+            float broad=PeriodicNoise(u,v,3,19,11),fibre=PeriodicNoise(u,v,16,420,63);
+            float bend=Mathf.Sin(u*Mathf.PI*2+plank*1.7f)*.028f
+                +Mathf.Sin(u*Mathf.PI*4+plank*.7f)*.011f+(broad-.5f)*.048f;
+            float coordinate=v+bend;
+            float ring=.5f+.5f*Mathf.Sin(coordinate*Mathf.PI*112);
+            float fine=.5f+.5f*Mathf.Sin(coordinate*Mathf.PI*380+Mathf.Sin(u*Mathf.PI*8));
+            float pores=PeriodicNoise(u,coordinate-Mathf.Floor(coordinate),44,512,87);
+            float rays=Mathf.Pow(PeriodicNoise(u,v,110,37,193),15)*.12f;
+            float join=1-Mathf.SmoothStep(0,.007f,Mathf.Min(across,1-across));
+            float boardTone=(NoiseValue(plank,0,41)-.5f)*.09f;
+            float tone=.72f+boardTone+(broad-.5f)*.20f-Mathf.Pow(ring,9)*.105f
+                -Mathf.Pow(fine,13)*.05f+(fibre-.5f)*.11f-(pores<.30f?.035f:0)+rays-join*.18f;
+            pixels[y*size+x]=Color.Lerp(new Color(.29f,.195f,.105f),new Color(.68f,.51f,.31f),Mathf.Clamp01(tone));
+            heights[y*size+x]=.5f+(fibre-.5f)*.055f-Mathf.Pow(fine,13)*.015f-join*.06f;
         }
+        normal=new Texture2D(size,size,TextureFormat.RGBA32,true,true){name="橡木细导管法线 v003",wrapMode=TextureWrapMode.Repeat,filterMode=FilterMode.Trilinear,anisoLevel=8};
+        var normals=new Color[size*size];
+        for(int y=0;y<size;y++)for(int x=0;x<size;x++)
+        {
+            float dx=heights[y*size+(x+1)%size]-heights[y*size+(x+size-1)%size];
+            float dy=heights[((y+1)%size)*size+x]-heights[((y+size-1)%size)*size+x];
+            var n=new Vector3(-dx*3,-dy*3,1).normalized;
+            normals[y*size+x]=new Color(n.x*.5f+.5f,n.y*.5f+.5f,n.z*.5f+.5f,1);
+        }
+        normal.SetPixels(normals);normal.Apply(true,true);
         texture.SetPixels(pixels); texture.Apply(true, true); return texture;
     }
 

@@ -58,6 +58,7 @@ public sealed partial class M3App
             s.PrepareBuild=b=>{CancelOperationDraft();var k=(CommandKind)Enum.Parse(typeof(CommandKind),b.Id);if(k==CommandKind.BuyDevelopmentCard){preparedPurchase=true;status="已选发展卡，请在桌面确认购买。";}else Pickup(k);};
             s.PrepareCard=c=>{CancelOperationDraft();preparedDevelopment=(DevelopmentCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在桌面确认出牌。";};
             s.Cancel=CancelOperationDraft;
+            s.Notify=ai.ShowTablePrompt;
             s.Trade=t=>
             {
                 var error=OperationSelection.ValidateTrade(Operations(),t);if(error!=null)return error;
@@ -86,15 +87,17 @@ public sealed partial class M3App
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
         bool enabled=GUI.enabled;GUI.enabled=enabled&&!dock.HasOverlay&&!ai.TableMenuOpen;
         DrawBoardLabels();
+        tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,null);
+        ai.TableDiceRolling=tabletop.DiceRolling;
         tabletop.Draw(font,seat,ai.CurrentActor,PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,
             view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Resources=p.ResourceCount,Cards=p.DevelopmentCardCount,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Ships=p.ShipsRemaining}).ToArray(),
             ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll&&view.TradeOffer==null,
             ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.TradeOffer==null,
             ()=>Submit(NewCommand(CommandKind.RollDice)),()=>Submit(NewCommand(CommandKind.EndTurn)),TableSeatClick,
             ()=>{tableNotes=!tableNotes;},"航海日志");
-        tabletop.DrawStatus(ai.IsHumanTurn?TableInstruction():ai.WaitingText);
         if(ai.IsHumanTurn&&view.TradeOffer==null)DrawTableDecision();
-        GUI.enabled=enabled&&!ai.TableMenuOpen;dock.Draw(Operations(),font);GUI.enabled=enabled;GUI.matrix=Matrix4x4.identity;
+        GUI.enabled=enabled&&!ai.TableMenuOpen;dock.Draw(Operations(),font);GUI.enabled=enabled;
+        ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
     }
     void TableSeatClick(string target)
     {
@@ -105,13 +108,15 @@ public sealed partial class M3App
     }
     string TableInstruction()
     {
-        if(holding)return "棋子已拿起 · 移向亮点后单击放下 · 右键 / Esc 放回";
-        if(view.Phase==GamePhase.SetupSettlement)return "从面前拿起定居点，放到地图上的合法交点";
-        if(view.Phase==GamePhase.SetupRoad)return "从面前拿起道路或船，连接刚放下的定居点";
-        if(view.Phase==GamePhase.ProductionAwaitRoll)return "轮到你了 · 点击桌上的两颗骰子";
-        if(view.Phase==GamePhase.RobberSteal)return "点击一名相邻对手的牌背，随机抽取资源";
-        if(view.Phase==GamePhase.Discard)return "点选面前需要弃掉的资源牌，再确认弃牌";
-        if(view.Phase==GamePhase.RobberMove)return "拿起地图上的强盗，放到另一块地形";
+        if(holding)return "请选择合法位置放下棋子";
+        if(view.Phase==GamePhase.SetupSettlement)return "请放置定居点";
+        if(view.Phase==GamePhase.SetupRoad)return "请放置道路或船";
+        if(view.Phase==GamePhase.ProductionAwaitRoll)return "请掷骰";
+        if(view.Phase==GamePhase.RobberSteal)return "请选择偷取对象";
+        if(view.Phase==GamePhase.Discard)return "请选择要弃掉的牌";
+        if(view.Phase==GamePhase.RobberMove)return "请移动强盗或海盗";
+        if(view.Phase==GamePhase.Finished)return view.WinnerPlayerId+" 获胜";
+        if(view.Phase==GamePhase.Action)return "请选择你的行动";
         return status;
     }
     void TableNote(string caption,Action content)

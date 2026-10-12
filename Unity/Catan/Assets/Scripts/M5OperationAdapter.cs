@@ -74,6 +74,7 @@ public sealed partial class M5App
             };
             s.PrepareCard=c=>{CancelOperationDraft();Select(CommandKind.PlayProgressCard);draft.ProgressCard=(ProgressCardKind)int.Parse(c.Id.Split(':')[0]);status="已打出 "+c.Name+"，按桌上便签选择效果。";};
             s.Cancel=CancelOperationDraft;
+            s.Notify=ai.ShowTablePrompt;
             s.Trade=t=>
             {
                 string error=OperationSelection.ValidateTrade(Operations(),t);if(error!=null)return error;
@@ -103,16 +104,32 @@ public sealed partial class M5App
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
         bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TableMenuOpen;GUI.enabled=tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition);
         DrawBoardLabels();
+        tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,(int)view.LastEventDie);
+        ai.TableDiceRolling=tabletop.DiceRolling;
         tabletop.Draw(font,seat,Actor(view),PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,
             view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Resources=p.ResourceCount,Cards=p.ProgressCardCount,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Ships=p.ShipsRemaining,Improvements=p.Improvements}).ToArray(),
             ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll,ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.PendingDecision==null&&view.TradeOffer==null,
             ()=>Submit(New(CommandKind.RollDice)),()=>Submit(New(CommandKind.EndTurn)),target=>{CancelOperationDraft();dock.OpenTrade(target);},
             ()=>{bool open=!operationActions;dock.Reset();CancelOperationDraft();operationActions=open;},"骑士与特殊行动",
-            EventName(view.LastEventDie)+" · 蛮族 "+view.BarbarianPosition+" / 7 · 防御 "+view.Board.Knights.Where(k=>k.Active).Sum(k=>k.Level)+" / "+view.Board.Cities.Length);
+            "蛮族 "+view.BarbarianPosition+" / 7 · 防御 "+view.Board.Knights.Where(k=>k.Active).Sum(k=>k.Level)+" / "+view.Board.Cities.Length);
 
         if(OperationContextVisible)tabletop.DrawContext(operationActions?"棋子行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):"当前选择",DrawOperationControls);
-        tabletop.DrawStatus(view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":!ai.IsHumanTurn?ai.WaitingText:pickField!=""?status:view.Phase==GamePhase.SetupSettlement||view.Phase==GamePhase.SetupRoad?"从面前拿起棋子，点击地图上的合法位置放下。":status);
-        GUI.enabled=tableEnabled;dock.Draw(Operations(),font);GUI.enabled=previousEnabled;GUI.matrix=Matrix4x4.identity;
+        GUI.enabled=tableEnabled;dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
+        ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
+    }
+    string TableInstruction()
+    {
+        if(view.Phase==GamePhase.Finished)return view.WinnerPlayerId+" 获胜";
+        if(pickField!="")return "请选择合法位置放下棋子";
+        if(view.Phase==GamePhase.ProductionAwaitRoll)return "请掷骰";
+        if(view.Phase==GamePhase.SetupSettlement)return view.Board.Settlements.Any(p=>p.PlayerId==seat)?"请放置城市":"请放置定居点";
+        if(view.Phase==GamePhase.SetupRoad)return "请放置道路或船";
+        if(view.Phase==GamePhase.Discard)return "请选择要弃掉的牌";
+        if(view.Phase==GamePhase.RobberMove)return "请移动强盗或海盗";
+        if(view.Phase==GamePhase.RobberSteal)return "请选择偷取对象";
+        if(view.Phase==GamePhase.PendingChoice)return "请完成当前选择";
+        if(view.Phase==GamePhase.RoadBuilding)return "请放置免费道路或船";
+        return "请选择你的行动";
     }
     void DrawOperationControls()
     {

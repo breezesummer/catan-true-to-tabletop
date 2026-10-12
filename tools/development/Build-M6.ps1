@@ -1,22 +1,23 @@
-param([switch]$VerifyPlayer)
+﻿param([switch]$VerifyPlayer,[string]$OutputRoot='.local/m6-ui-v003')
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Project = Join-Path $m6RepoRoot 'Unity\Catan'
-$m6Logs = Join-Path $m6RepoRoot '.local\m6\logs'
+$m6OutputRoot = [IO.Path]::GetFullPath((Join-Path $m6RepoRoot $OutputRoot))
+$m6Logs = Join-Path $m6OutputRoot 'logs'
 New-Item -ItemType Directory -Force -Path $m6Logs,(Join-Path $m6Project 'Assets\Plugins'),(Join-Path $m6Project 'Assets\Resources') | Out-Null
 & $toolchain.dotnet build (Join-Path $m6RepoRoot 'src\Catan.AI\Catan.AI.csproj') -c Release --disable-build-servers -m:1
-if ($LASTEXITCODE -ne 0) { throw 'Core build failed.' }
+if ($LASTEXITCODE -ne 0) { throw '规则与 AI 程序集构建失败。' }
 Copy-Item -LiteralPath (Join-Path $m6RepoRoot 'src\Catan.Core\bin\Release\netstandard2.1\Catan.Core.dll') -Destination (Join-Path $m6Project 'Assets\Plugins\Catan.Core.dll') -Force
 Copy-Item -LiteralPath (Join-Path $m6RepoRoot 'src\Catan.AI\bin\Release\netstandard2.1\Catan.AI.dll') -Destination (Join-Path $m6Project 'Assets\Plugins\Catan.AI.dll') -Force
 Copy-Item -LiteralPath (Join-Path $m6RepoRoot 'docs\acceptance\v0.1\scenario.json') -Destination (Join-Path $m6Project 'Assets\Resources\m1-scenario.json') -Force
-& $toolchain.unity -batchmode -nographics -quit -projectPath $m6Project -executeMethod M6Build.Build -logFile (Join-Path $m6Logs 'unity-build.log') | Out-Host
-if ($LASTEXITCODE -ne 0) { throw 'Unity build failed; inspect .local/m6/logs/unity-build.log.' }
-if (!(Select-String -LiteralPath (Join-Path $m6Logs 'unity-build.log') -Pattern 'CATAN_M6_UNITY_BUILD_OK' -Quiet)) { throw 'Missing build success marker.' }
-Write-Host ("M6 .NET / Unity build completed in {0:N1} seconds." -f $m6BuildClock.Elapsed.TotalSeconds)
+& $toolchain.unity -batchmode -nographics -quit -projectPath $m6Project -executeMethod M6Build.Build --m6-output-root $m6OutputRoot -logFile (Join-Path $m6Logs 'unity-build.log') | Out-Host
+if ($LASTEXITCODE -ne 0) { throw "Unity 构建失败，请检查 $m6Logs/unity-build.log。" }
+if (!(Select-String -LiteralPath (Join-Path $m6Logs 'unity-build.log') -Pattern 'CATAN_M6_UNITY_BUILD_OK' -Quiet)) { throw '未找到 Unity 构建成功标记。' }
+Write-Host ("M6 .NET / Unity 构建耗时 {0:N1} 秒。" -f $m6BuildClock.Elapsed.TotalSeconds)
 if ($VerifyPlayer) {
-    $m6Player = Join-Path $m6RepoRoot '.local\m6\Builds\Windows\CatanM6.exe'
-    $m6Evidence = Join-Path $m6RepoRoot '.local\m6\verification'
+    $m6Player = Join-Path $m6OutputRoot 'Builds/Windows/CatanM6.exe'
+    $m6Evidence = Join-Path $m6OutputRoot 'verification'
     New-Item -ItemType Directory -Force $m6Evidence | Out-Null
     foreach ($mode in @('save','load')) {
         $m6PlayerClock = [Diagnostics.Stopwatch]::StartNew()
@@ -35,5 +36,5 @@ if ($VerifyPlayer) {
 
     }
 }
-Write-Host 'M6 Windows build ready: .local/m6/Builds/Windows/CatanM6.exe'
+Write-Host "M6 新版 Windows 程序已生成：$m6OutputRoot/Builds/Windows/CatanM6.exe"
 

@@ -15,7 +15,7 @@ public sealed class OperationDock
     static readonly Rect CardRect = new Rect(390,208,650,415), GiveDropRect = new Rect(290,265,410,210);
     GUIStyle text, small, heading, center, tableLabel;
     OperationSnapshot current;
-    string revision, scope, hoveredBuild, previewCard, message = "";
+    string revision, scope, hoveredBuild, previewCard, message = "",lastTradeError;
     bool tradeOpen, playerTrade;
     int giveGood, receiveGood = 1, lots = 1, target;
     readonly int[] give = new int[8], receive = new int[8];
@@ -26,17 +26,27 @@ public sealed class OperationDock
     Vector2 pieceStart, pieceReleasePoint;
     bool pieceDragging, pieceReleased;
     Rect tooltipRect;
+    Vector2 costAnchor;
     readonly List<HitShape> hits = new List<HitShape>();
     readonly List<HandFace> faces = new List<HandFace>();
+    readonly List<PieceFace> pieceFaces = new List<PieceFace>();
     sealed class HitShape
     {
         public Rect Rect;
         public float Angle;
+        public Texture2D Texture;
         public bool Contains(Vector2 point)
         {
             float radians=-Angle*Mathf.Deg2Rad;Vector2 delta=point-Rect.center;
-            return Rect.Contains(Rect.center+new Vector2(delta.x*Mathf.Cos(radians)-delta.y*Mathf.Sin(radians),delta.x*Mathf.Sin(radians)+delta.y*Mathf.Cos(radians)));
+            var local=Rect.center+new Vector2(delta.x*Mathf.Cos(radians)-delta.y*Mathf.Sin(radians),delta.x*Mathf.Sin(radians)+delta.y*Mathf.Cos(radians));
+            return Rect.Contains(local)&&(Texture==null||OperationPieceAssets.Contains(Texture,Rect,local));
         }
+    }
+    sealed class PieceFace
+    {
+        public HitShape Shape;
+        public OperationBuild Build;
+        public int Ordinal;
     }
     sealed class HandFace
     {
@@ -55,23 +65,24 @@ public sealed class OperationDock
     public void OpenTrade(string target=null)
     {
         if(current==null||!current.CanTrade||!current.CanInteract||current.Offer!=null)return;
-        current.Cancel?.Invoke();tradeOpen=true;previewCard=null;Selection.BuildId=null;message="";
+        current.Cancel?.Invoke();tradeOpen=true;previewCard=null;Selection.BuildId=null;Selection.PieceOrdinal=-1;message="";lastTradeError=null;
+        current.Notify?.Invoke("请选择交换的资源");
         playerTrade=target!=null;
         this.target=target==null?0:Math.Max(0,Array.IndexOf(current.OtherPlayers,target));
         Array.Copy(Selection.Selected,give,8);Array.Clear(receive,0,8);
     }
     public void Reset()
     {
-        Selection.Clear(); tradeOpen=false; previewCard=null; hoveredBuild=null; message="";
+        Selection.Clear(); tradeOpen=false; previewCard=null; hoveredBuild=null; message="";lastTradeError=null;
         Array.Clear(give,0,8);Array.Clear(receive,0,8); tooltipRect=Rect.zero;
-        handOffset=cardOffset=0;dragGood=-1;dragging=false;hits.Clear();faces.Clear();
+        handOffset=cardOffset=0;dragGood=-1;dragging=false;hits.Clear();faces.Clear();pieceFaces.Clear();
         heldPiece=null;pieceDragging=false;pieceReleased=false;
         target=0;giveGood=0;receiveGood=1;lots=1;playerTrade=false;
     }
     public bool BlocksBoardInput(Vector2 logicalMouse)
     {
         return dragGood>=0 || (tradeOpen||current!=null&&current.Offer!=null)&&TradeRect.Contains(logicalMouse) ||
-            tooltipRect.Contains(logicalMouse) || previewCard!=null&&CardRect.Contains(logicalMouse) || hits.Any(h=>h.Contains(logicalMouse));
+            previewCard!=null&&CardRect.Contains(logicalMouse) || hits.Any(h=>h.Contains(logicalMouse));
     }
     void Styles(Font font)
     {
@@ -94,7 +105,7 @@ public sealed class OperationDock
         var style=new GUIStyle(center){fontSize=14};style.normal.textColor=enabled?Ink:Muted;
         Label(r,value,style);bool clicked=GUI.Button(r,GUIContent.none,GUIStyle.none);GUI.enabled=old;return clicked;
     }
-    HitShape Register(Rect r,float angle=0){var hit=new HitShape{Rect=r,Angle=angle};hits.Add(hit);return hit;}
+    HitShape Register(Rect r,float angle=0,Texture2D texture=null){var hit=new HitShape{Rect=r,Angle=angle,Texture=texture};hits.Add(hit);return hit;}
     static void Paper(Rect r)
     {Fill(new Rect(r.x+5,r.y+7,r.width,r.height),new Color(.12f,.06f,.02f,.30f));Fill(r,Back);}
     public void Draw(OperationSnapshot snapshot,Font font)
@@ -105,9 +116,10 @@ public sealed class OperationDock
         current=snapshot;Selection.Sync(snapshot);
         if(Event.current.type==EventType.KeyDown&&Event.current.keyCode==KeyCode.Escape||Event.current.type==EventType.MouseDown&&Event.current.button==1)
         {Reset();snapshot.Cancel?.Invoke();Event.current.Use();}
-        hoveredBuild=null;tooltipRect=Rect.zero;hits.Clear();faces.Clear();
+        hoveredBuild=null;tooltipRect=Rect.zero;hits.Clear();faces.Clear();pieceFaces.Clear();
         DrawBuilds(snapshot);
         DrawHand(snapshot);
+        HandleBuildInput(snapshot);
         if(tradeOpen)DrawTrade(snapshot);
         else if(snapshot.Offer!=null)DrawOffer(snapshot);
         else if(previewCard!=null)DrawCardPreview(snapshot);
@@ -137,15 +149,14 @@ public sealed class OperationDock
     }
     void DrawBuild(Rect r,OperationBuild build,OperationSnapshot s)
     {
-        bool selected=Selection.BuildId==build.Id, matched=Selection.Matches(build)&&build.Available;
-        if(selected||matched)r.y-=7;
+        bool selected=Selection.BuildId==build.Id;
         bool clicked=false,hovered=false;
         if(build.Track>=0)
         {
             var face=EntityCardAssets.ImprovementFront(build.Track,Math.Max(1,Math.Min(5,build.Level)));
             var card=new Rect(r.x+8,r.y+2,r.width-16,78);Paper(card);
             if(face!=null)GUI.DrawTexture(card,face,ScaleMode.StretchToFill);
-            if(selected||matched)Border(card,Gold,2);
+            if(selected)Border(card,Gold,2);
             Register(card);hovered=card.Contains(Event.current.mousePosition);
             clicked=GUI.Button(card,GUIContent.none,GUIStyle.none);
             Label(new Rect(r.x,r.y+82,r.width,20),build.Name.Replace("设施","")+" · "+build.Level+" 级",tableLabel);
@@ -160,11 +171,14 @@ public sealed class OperationDock
                 float left=r.center.x-(Math.Min(columns,amount)-1)*step/2-20;
                 for(int n=0;n<amount;n++)
                 {
-                    var icon=new Rect(left+(n%columns)*step,r.y+(n/columns)*30,40,43);
+                    bool picked=Selection.IsPieceSelected(build.Id,n);
+                    var icon=new Rect(left+(n%columns)*step,r.y+(n/columns)*30-(picked?7:0),40,43);
                     var prior=GUI.color;if(build.Count==0)GUI.color=new Color(1,1,1,.23f);
-                    GUI.DrawTexture(icon,piece,ScaleMode.ScaleToFit);GUI.color=prior;
-                    Register(icon);hovered|=icon.Contains(Event.current.mousePosition);
-                    PickupButton(icon,build,s);
+                    if(picked)TabletopUI.Token(new Rect(icon.center.x-17,icon.yMax-12,34,12),Gold);
+                    if(!picked||!pieceDragging)GUI.DrawTexture(icon,piece,ScaleMode.ScaleToFit);GUI.color=prior;
+                    var shape=new HitShape{Rect=icon,Texture=piece};
+                    hovered|=shape.Contains(Event.current.mousePosition);
+                    if(build.Count>0){hits.Add(shape);pieceFaces.Add(new PieceFace{Shape=shape,Build=build,Ordinal=n});}
                 }
             }
             else
@@ -175,27 +189,32 @@ public sealed class OperationDock
                 Label(new Rect(card.x+3,card.y+13,44,45),"发展\n卡",tableLabel);
                 Register(card);hovered=card.Contains(Event.current.mousePosition);clicked=GUI.Button(card,GUIContent.none,GUIStyle.none);
             }
-            var caption=new Rect(r.x,r.y+75,r.width,21);Register(caption);
-            Label(caption,build.Name+"  "+build.Count,tableLabel);hovered|=caption.Contains(Event.current.mousePosition);
-            if(piece!=null)PickupButton(caption,build,s);
-            else if(GUI.Button(caption,GUIContent.none,GUIStyle.none))clicked=true;
+            var caption=new Rect(r.x,r.y+75,r.width,21);
+            var label=new GUIStyle(tableLabel);
+            if(Selection.BuildId==null&&Selection.Matches(build)&&build.Available)label.normal.textColor=Gold;
+            Label(caption,build.Name+"  "+build.Count,label);
         }
-        if(selected||matched)Label(new Rect(r.x,r.y-14,r.width,17),selected?(build.Track>=0?"翻开 · 确认升级":build.Icon=="development"?"翻开 · 确认购买":"拿起 · 点地图落下"):"资源已备齐",tableLabel);
-        if(hovered)hoveredBuild=build.Id;
+        if(hovered){hoveredBuild=build.Id;costAnchor=new Vector2(Event.current.mousePosition.x,r.y);}
         if(clicked)
         {
+            if(!build.Available||!s.CanInteract){s.Notify?.Invoke(build.UnavailableReason??"当前不能使用");return;}
             s.Cancel?.Invoke();Selection.Choose(build,s.Goods);tradeOpen=false;previewCard=null;message="";
-            if(build.Available&&s.CanInteract)s.PrepareBuild?.Invoke(build);
+            s.PrepareBuild?.Invoke(build);
         }
     }
-    void PickupButton(Rect rect,OperationBuild build,OperationSnapshot s)
+    void HandleBuildInput(OperationSnapshot s)
     {
         var e=Event.current;
-        if(!GUI.enabled||e.type!=EventType.MouseDown||e.button!=0||!rect.Contains(e.mousePosition))return;
-        s.Cancel?.Invoke();Selection.Choose(build,s.Goods);tradeOpen=false;previewCard=null;message="";
+        if(!GUI.enabled||HasOverlay||e.type!=EventType.MouseDown||e.button!=0)return;
+        // 后绘制的棋子在上层，透明边缘不接收点击；名称与整组区域没有拿取入口。
+        PieceFace hit=null;
+        for(int i=pieceFaces.Count-1;i>=0;i--)if(pieceFaces[i].Shape.Contains(e.mousePosition)){hit=pieceFaces[i];break;}
+        if(hit==null)return;
+        var build=hit.Build;
+        if(!build.Available||!s.CanInteract){s.Notify?.Invoke(build.UnavailableReason??"当前不能拿起棋子");e.Use();return;}
+        s.Cancel?.Invoke();Selection.Choose(build,s.Goods,hit.Ordinal);tradeOpen=false;previewCard=null;message="";
         pieceReleased=false;pieceDragging=false;heldPiece=null;
-        if(build.Available&&s.CanInteract)
-        {s.PrepareBuild?.Invoke(build);heldPiece=build;pieceStart=e.mousePosition;}
+        s.PrepareBuild?.Invoke(build);heldPiece=build;pieceStart=e.mousePosition;
         e.Use();
     }
     void HandlePieceInput(OperationSnapshot s)
@@ -217,8 +236,9 @@ public sealed class OperationDock
     }
     void DrawHand(OperationSnapshot s)
     {
-        DrawSpecialHand(s,new Rect(152,788,409,112));
-        DrawResourceHand(s,new Rect(610,782,684,118));
+        bool resources=s.Goods.Take(s.GoodCount).Sum()>0;
+        DrawSpecialHand(s,new Rect(TabletopHandLayout.SpecialCenter(resources)-190,768,380,112));
+        DrawResourceHand(s,new Rect(TabletopHandLayout.ResourceCenter(s.Cards.Count>0)-342,768,684,112));
         if((Selection.Selected.Sum()>0||Selection.BuildId!=null)&&Button(new Rect(1309,848,103,29),"放回手中"))
         {Selection.Clear();s.Cancel?.Invoke();message="";}
     }
@@ -226,15 +246,14 @@ public sealed class OperationDock
     {
         if(s.Cards.Count==0)return;
         const int visible=8;cardOffset=Mathf.Clamp(cardOffset,0,Math.Max(0,s.Cards.Count-visible));
-        int count=Math.Min(visible,s.Cards.Count-cardOffset);float step=Math.Min(58,(area.width-78)/Math.Max(1,count-1));
-        float left=area.center.x-(78+(count-1)*step)/2;
+        int count=Math.Min(visible,s.Cards.Count-cardOffset);
         for(int i=0;i<count;i++)
         {
-            var card=s.Cards[i+cardOffset];float fan=count==1?0:(2f*i/(count-1)-1);
-            var r=new Rect(left+i*step,area.y+fan*fan*12,78,108);float angle=fan*11;
+            var card=s.Cards[i+cardOffset];var pose=TabletopHandLayout.Card(i,count,area.center.x,area.width,false);
+            var r=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);float angle=pose.Angle;
             var matrix=GUI.matrix;GUIUtility.RotateAroundPivot(angle,r.center);Paper(r);
             var texture=card.Progress&&card.ArtIndex>=0?EntityCardAssets.ProgressFront(card.ArtIndex):null;
-            if(texture!=null)GUI.DrawTexture(new Rect(r.x+2,r.y+2,74,104),texture,ScaleMode.StretchToFill);
+            if(texture!=null)GUI.DrawTexture(new Rect(r.x+2,r.y+2,r.width-4,r.height-4),texture,ScaleMode.StretchToFill);
             else{Label(new Rect(r.x+7,r.y+18,64,55),card.Name,center);Fill(new Rect(r.x+15,r.y+76,48,2),Gold);}
             if(previewCard==card.Id)Border(r,Gold,2);GUI.matrix=matrix;
             faces.Add(new HandFace{Shape=Register(r,angle),Card=card});
@@ -246,17 +265,16 @@ public sealed class OperationDock
         int total=s.Goods.Take(s.GoodCount).Sum();if(total==0)return;
         const int visible=18;handOffset=Mathf.Clamp(handOffset,0,Math.Max(0,total-visible));
         int count=Math.Min(visible,total-handOffset),index=0,drawn=0;
-        float step=Math.Min(59,(area.width-78)/Math.Max(1,count-1)),left=area.center.x-(78+(count-1)*step)/2;
         for(int good=0;good<s.GoodCount;good++)
         {
             var texture=EntityCardAssets.Texture(EntityCardAssets.Good(good).Front);
             for(int n=0;n<s.Goods[good];n++)
             {
                 int ordinal=index++;if(ordinal<handOffset||ordinal>=handOffset+count)continue;
-                bool chosen=n<Selection.Selected[good];float fan=count==1?0:2f*drawn/(count-1)-1;
-                var r=new Rect(left+drawn*step,area.y+fan*fan*14-(chosen?21:0),78,109);float angle=fan*12;
+                bool chosen=n<Selection.Selected[good];var pose=TabletopHandLayout.Card(drawn,count,area.center.x,area.width,chosen);
+                var r=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);float angle=pose.Angle;
                 var matrix=GUI.matrix;GUIUtility.RotateAroundPivot(angle,r.center);Paper(r);
-                if(texture!=null)GUI.DrawTexture(new Rect(r.x+2,r.y+2,74,105),texture,ScaleMode.StretchToFill);
+                if(texture!=null)GUI.DrawTexture(new Rect(r.x+2,r.y+2,r.width-4,r.height-4),texture,ScaleMode.StretchToFill);
                 if(chosen)Border(r,Gold,2);GUI.matrix=matrix;
                 faces.Add(new HandFace{Shape=Register(r,angle),Good=good,Ordinal=n});drawn++;
             }
@@ -300,7 +318,7 @@ public sealed class OperationDock
         {
             s.Cancel?.Invoke();previewCard=null;
             if(dragging&&tradeOpen&&playerTrade&&GiveDropRect.Contains(e.mousePosition))
-            {give[dragGood]=Math.Min(s.Goods[dragGood],give[dragGood]+1);Selection.Selected[dragGood]=give[dragGood];Selection.BuildId=null;message="";}
+            {give[dragGood]=Math.Min(s.Goods[dragGood],give[dragGood]+1);Selection.Selected[dragGood]=give[dragGood];Selection.BuildId=null;Selection.PieceOrdinal=-1;message="";}
             else if(!dragging)
             {Selection.Toggle(dragGood,dragOrdinal,s.Goods[dragGood]);if(tradeOpen&&playerTrade){Array.Copy(Selection.Selected,give,8);message="";}}
             dragGood=-1;dragging=false;e.Use();
@@ -308,20 +326,19 @@ public sealed class OperationDock
     }
     void DrawCost(OperationSnapshot s)
     {
-        // 光标离开备件与手牌后收起费用纸签，让出地图；已选草稿继续保留。
-        string id=hoveredBuild??(Event.current.mousePosition.y>=650?Selection.BuildId:null);
-        var b=s.Builds.FirstOrDefault(x=>x.Id==id);if(b==null)return;
-        tooltipRect=new Rect(390,510,650,132);Paper(tooltipRect);
-        Label(new Rect(408,520,570,28),b.Name+"  ·  "+(b.Cost.Sum()==0?"无需资源":"建造费用"),heading);
-        int index=0;
-        for(int i=0;i<8;i++)if(b.Cost[i]>0)
+        var b=s.Builds.FirstOrDefault(x=>x.Id==hoveredBuild);if(b==null)return;
+        var tokens=TabletopCostToken.For(b.Cost,s.Goods);
+        var style=new GUIStyle(center){fontSize=14,wordWrap=false};
+        float[] widths=tokens.Select(token=>style.CalcSize(new GUIContent(token.Name)).x+10).ToArray();
+        float width=tokens.Length==0?52:widths.Sum()+12;
+        tooltipRect=new Rect(Mathf.Clamp(costAnchor.x-width/2,12,1428-width),costAnchor.y-39,width,29);
+        Paper(tooltipRect);float x=tooltipRect.x+6;
+        if(tokens.Length==0)Label(tooltipRect,"免费",style);
+        for(int i=0;i<tokens.Length;i++)
         {
-            float x=409+index++*113;bool missing=s.Goods[i]<b.Cost[i];
-            OperationIconAssets.DrawGood(new Rect(x,551,31,31),i,missing);
-            Label(new Rect(x+35,550,76,35),Names[i]+" ×"+b.Cost[i],small);
-            if(missing){var old=GUI.color;GUI.color=Missing;Label(new Rect(x,583,106,22),"缺 "+(b.Cost[i]-s.Goods[i])+" 张",center);GUI.color=old;}
+            style.normal.textColor=tokens[i].Missing?Missing:Ink;
+            Label(new Rect(x,tooltipRect.y,widths[i],29),tokens[i].Name,style);x+=widths[i];
         }
-        Label(new Rect(408,611,611,24),b.Available?(string.IsNullOrEmpty(b.Detail)?"资源已备齐，拿起棋子后点亮起的地图位置。":b.Detail):(b.UnavailableReason??"请先满足回合、资源、库存与落点条件。"),small);
     }
     void DrawCardPreview(OperationSnapshot s)
     {
@@ -372,9 +389,10 @@ public sealed class OperationDock
         }
         var trade=new OperationTrade{Bank=!playerTrade,OtherPlayer=s.OtherPlayers.Length>0?s.OtherPlayers[target]:null,Give=(int[])give.Clone(),Receive=(int[])receive.Clone()};
         string error=OperationSelection.ValidateTrade(s,trade);
-        Label(new Rect(298,486,820,31),message!=""?message:error??(playerTrade?"报价发送后等待对方接受；对方手牌保持隐藏。":"比例已按当前港口与能力自动计算。"),small);
+        if(error!=lastTradeError){if(error!=null)s.Notify?.Invoke(error);lastTradeError=error;}
+        Label(new Rect(298,486,820,31),playerTrade?"报价发送后等待对方接受。":"比例已按当前港口与能力自动计算。",small);
         if(Button(new Rect(299,532,554,39),playerTrade?"向 "+trade.OtherPlayer+" 发送报价":"确认交换",error==null))
-        {message=s.Trade?.Invoke(trade)??"";if(message==""){tradeOpen=false;Selection.Clear();}}
+        {message=s.Trade?.Invoke(trade)??"";if(message==""){tradeOpen=false;Selection.Clear();}else s.Notify?.Invoke(message);}
         if(Button(new Rect(875,532,255,39),"取消")){Reset();s.Cancel?.Invoke();}
     }
     void GoodButton(Rect r,int good,bool selected,string caption,Action click)

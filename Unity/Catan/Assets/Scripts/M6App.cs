@@ -41,6 +41,10 @@ public sealed partial class M6App : MonoBehaviour
     Action<bool> visible;
     MonoBehaviour presentation;
     float nextAction;
+    readonly TabletopPromptSequence tablePrompts=new TabletopPromptSequence();
+    string promptContext,lastPromptStatus,lastPromptInstruction;
+    bool promptWasHuman;
+    internal bool TableDiceRolling;
     int menuRule,menuScenario,menuPlayers=4,menuHuman;
         bool tableMenu;
     public bool TableMenuOpen=>tableMenu;
@@ -69,7 +73,7 @@ public sealed partial class M6App : MonoBehaviour
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.Escape))tableMenu=false;
-        if(MenuVisible||tableMenu||!Ready||Paused||Time.unscaledTime<nextAction)return;
+        if(MenuVisible||tableMenu||!Ready||Paused||TableDiceRolling||Time.unscaledTime<nextAction)return;
         nextAction=Time.unscaledTime+.60f;
         StepAi();
     }
@@ -81,7 +85,7 @@ public sealed partial class M6App : MonoBehaviour
         try
         {
             string result=decideAndSubmit(player);
-            if(result!=null){Fault=player+" 的命令被拒绝（"+result+"）。局面保留，可保存后检查。";Paused=true;return false;}
+            if(result!=null){Fault=player+" 的命令被拒绝（"+result+"）。局面保留，可保存后检查。";Paused=true;ShowTablePrompt("AI 已暂停，请检查桌边菜单");return false;}
             AiCommandsExecuted++;
             refresh();
             Notice=Finished?"本局结束。":IsHumanTurn?"轮到你完成行动或待决选择。":player+" 已完成本次操作，AI 正在继续行动。";
@@ -91,10 +95,31 @@ public sealed partial class M6App : MonoBehaviour
         {
             // Do not log command payloads, cards, saves, or exception messages containing private data.
             Fault=player+" 决策失败（"+ex.GetType().Name+"）。";Paused=true;
+            ShowTablePrompt("AI 已暂停，请检查桌边菜单");
             Debug.LogError("CATAN_M6_AI_PAUSED: "+ex.GetType().Name);return false;
         }
     }
-    public void SetPaused(bool value){Paused=value;if(!value)Fault="";nextAction=Time.unscaledTime+.30f;}
+    public void SetPaused(bool value){Paused=value;if(!value)Fault="";nextAction=Time.unscaledTime+.30f;ShowTablePrompt(value?"AI 已暂停":"AI 已继续");}
+    public void ShowTablePrompt(string value)=>tablePrompts.Show(Time.unscaledTimeAsDouble,value);
+    internal string CurrentTablePrompt=>tablePrompts.At(Time.unscaledTimeAsDouble);
+    internal void UpdateTablePrompt(int turn,string phase,bool awaitingRoll,string instruction,string status)
+    {
+        string context=turn+":"+phase+":"+CurrentActor;
+        if(context!=promptContext)
+        {
+            if(IsHumanTurn)
+            {
+                string next=awaitingRoll?"请掷骰":instruction;
+                if(!promptWasHuman||awaitingRoll)tablePrompts.Show(Time.unscaledTimeAsDouble,"你的回合",next);
+                else tablePrompts.Show(Time.unscaledTimeAsDouble,next);
+            }
+            else if(Finished)ShowTablePrompt(instruction);
+            else tablePrompts.Show(Time.unscaledTimeAsDouble);
+        }
+        else if(IsHumanTurn&&(status!=lastPromptStatus||instruction!=lastPromptInstruction))
+            ShowTablePrompt(status!=lastPromptStatus?status:instruction);
+        promptContext=context;promptWasHuman=IsHumanTurn;lastPromptStatus=status;lastPromptInstruction=instruction;
+    }
     void Bind(MonoBehaviour app,Func<string> acting,Func<bool> done,Func<string,string> step,Func<string> export,Action update,Action dispose,Action<bool> show)
     {
         if(app!=presentation){dispose();return;}
@@ -109,6 +134,7 @@ public sealed partial class M6App : MonoBehaviour
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
         tableMenu=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你的手牌始终只显示 "+human+"。";
+        promptContext=null;promptWasHuman=false;lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.Show(Time.unscaledTimeAsDouble);
         switch(rules)
         {
             case "base":presentation=gameObject.AddComponent<M2App>();break;
@@ -134,8 +160,8 @@ public sealed partial class M6App : MonoBehaviour
         string temporary=path+".tmp";File.WriteAllText(temporary,payload);
         if(File.Exists(path))File.Replace(temporary,path,path+".bak");else File.Move(temporary,path);
     }
-    public void SaveGame(){try{WriteSave(SavePath);Notice="已保存权威局面、待决、随机状态、人类席位和 AI 暂停设置。";}catch(Exception ex){Notice="保存失败（"+ex.GetType().Name+"），请检查存档目录。";}}
-    public void LoadGame(){try{ReadSave(SavePath);}catch(Exception ex){Notice="恢复失败（"+ex.GetType().Name+"）：文件不存在、损坏或版本不兼容。当前局面保留。";}}
+    public void SaveGame(){try{WriteSave(SavePath);Notice="已保存权威局面、待决、随机状态、人类席位和 AI 暂停设置。";ShowTablePrompt("游戏已保存");}catch(Exception ex){Notice="保存失败（"+ex.GetType().Name+"），请检查存档目录。";ShowTablePrompt("保存失败");}}
+    public void LoadGame(){try{ReadSave(SavePath);ShowTablePrompt("游戏已恢复");}catch(Exception ex){Notice="恢复失败（"+ex.GetType().Name+"）：文件不存在、损坏或版本不兼容。当前局面保留。";ShowTablePrompt("存档无法读取");}}
     public void ReadSave(string path)
     {
         var data=JsonUtility.FromJson<SavedGame>(File.ReadAllText(path));
@@ -202,7 +228,18 @@ public sealed partial class M6App : MonoBehaviour
                 var note=new GUIStyle(small);note.normal.textColor=new Color(.25f,.13f,.06f);
                 GUI.Label(new Rect(1130,277,266,66),Notice,note);
             }
-            if(Fault!="")GUI.Label(new Rect(330,60,810,35),"AI 已暂停："+Fault,small);
+            string prompt=CurrentTablePrompt;
+            if(prompt.Length>0)
+            {
+                var promptStyle=new GUIStyle(title){fontSize=46,alignment=TextAnchor.MiddleCenter,wordWrap=true};
+                promptStyle.normal.textColor=new Color(.92f,.07f,.055f);
+                if(promptStyle.CalcSize(new GUIContent(prompt)).x>1050)promptStyle.fontSize=34;
+                var area=new Rect(180,375,1080,150);
+                bool before=GUI.enabled;GUI.enabled=true;
+                var shadow=new GUIStyle(promptStyle);shadow.normal.textColor=new Color(.10f,.025f,.01f,.55f);
+                GUI.Label(new Rect(area.x+1,area.y+2,area.width,area.height),prompt,shadow);
+                GUI.Label(area,prompt,promptStyle);GUI.enabled=before;
+            }
         }
         GUI.matrix=Matrix4x4.identity;
     }
