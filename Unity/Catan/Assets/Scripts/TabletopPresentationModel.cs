@@ -8,13 +8,14 @@ public static class TabletopHandLayout
     public const float CardWidth = 74, CardHeight = 103, Baseline = 768;
     public static TabletopCardPose Card(int index, int count, float center, float width, bool selected)
     {
-        float step = Math.Min(56, (width - CardWidth - 24) / Math.Max(1, count - 1));
-        float fan = count <= 1 ? 0 : 2f * index / (count - 1) - 1;
+        float step = CardWidth + 8;
         return new TabletopCardPose {
             X = center - (CardWidth + (count - 1) * step) / 2 + index * step,
-            Y = Baseline + fan * fan * 10 - (selected ? 20 : 0), Angle = fan * 9
+            Y = Baseline - (selected ? 12 : 0), Angle = 0
         };
     }
+    public static int ResourceCapacity(bool hasSpecialCards) => hasSpecialCards ? 8 : 12;
+    public static int SpecialCapacity(bool hasResources) => hasResources ? 4 : 12;
     public static float ResourceCenter(bool hasSpecialCards) => hasSpecialCards ? 948 : 720;
     public static float SpecialCenter(bool hasResources) => hasResources ? 356 : 720;
 }

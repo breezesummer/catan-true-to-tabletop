@@ -18,6 +18,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
     private Transform pieces;
     private GameObject feltTable;
     private TabletopScene tableScene;
+    public TabletopScene TableScene => tableScene;
     private Transform publicMarkers;
     private GameObject barbarianTrack;
     private GameObject barbarianShip;

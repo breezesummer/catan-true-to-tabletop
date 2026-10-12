@@ -102,8 +102,9 @@ public sealed partial class M5App
     {
         Styles();GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TableMenuOpen;GUI.enabled=tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition);
+        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TableMenuOpen;GUI.enabled=tableEnabled&&(!dock.BlocksBoardInput(Event.current.mousePosition)||TabletopUI.EndTurnRect.Contains(Event.current.mousePosition));
         DrawBoardLabels();
+        tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,(int)view.LastEventDie);
         ai.TableDiceRolling=tabletop.DiceRolling;
         tabletop.Draw(font,seat,Actor(view),PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,

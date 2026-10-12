@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 // 桌面仅使用已公开的顶点坐标；海框、木纹与相机不参与规则和落点裁决。
-// v003：米制、版本化橡木贴图；生成位图只作为桌面材质，原有实体资产和枢轴保持不变。
+// v004：固定桌面坐标、原生 8K 程序木纹，所有实体物件共用地图相机。
 public sealed class TabletopScene : MonoBehaviour
 {
     public static readonly Rect BoardArea = new Rect(230, 132, 980, 510);
@@ -13,8 +13,12 @@ public sealed class TabletopScene : MonoBehaviour
     Vector3[] outline;
     Vector3 center;
     Camera tableCamera;
-    Material oakMaterial;
-    float oakSpan = .8f;
+    Vector3 layoutOrigin;
+    float layoutSize, layoutDepthPixel;
+    public const float SurfaceHeight = -.0075f;
+    public float UnitsPerPixel { get; private set; }
+    public TabletopWorldObjects Objects { get; private set; }
+    public float DisplayScale => layoutSize / tableCamera.orthographicSize;
     bool topView;
     float zoom = 1;
     int screenWidth, screenHeight;
@@ -23,7 +27,7 @@ public sealed class TabletopScene : MonoBehaviour
 
     public static TabletopScene Create(Transform parent, IEnumerable<Vector3> publicVertices)
     {
-        var root = new GameObject("完整橡木桌 v003");
+        var root = new GameObject("完整橡木桌 v004");
         root.transform.SetParent(parent, false);
         var scene = root.AddComponent<TabletopScene>();
         scene.Initialize(publicVertices.ToArray());
@@ -43,14 +47,14 @@ public sealed class TabletopScene : MonoBehaviour
             outline[i].y = -.001f;
         }
 
-        var wood = MakeMaterial("烟熏橡木哑光清漆 v003", new Color(.88f,.88f,.86f), .38f);
-        var grain=Resources.Load<Texture2D>("TabletopUI/v003/oak-table-albedo");
+        var wood = MakeMaterial("原生 8K 橡木哑光清漆 v004", new Color(.88f,.88f,.86f), .24f);
+        var grain=Resources.Load<Texture2D>("TabletopUI/v004/oak-albedo-8k");
         if(grain!=null)
         {
-            // 至少覆盖中央 0.8 米；相机确定后扩大至完整可见桌面，避免边缘拉伸。
-            wood.SetTexture("_BaseMap",grain);wood.SetTextureScale("_BaseMap",new Vector2(10,10));
-            wood.SetTextureOffset("_BaseMap",new Vector2(-4.5f,-4.5f));
-            oakMaterial=wood;
+            grain.filterMode=FilterMode.Trilinear;grain.anisoLevel=16;
+            // 固定世界纹理密度：每 1.6 米使用完整 8K，不随缩放重新拉伸 UV。
+            wood.SetTexture("_BaseMap",grain);wood.SetTextureScale("_BaseMap",new Vector2(5,5));
+            wood.SetTextureOffset("_BaseMap",new Vector2(-2,-2));
         }
         else
         {
@@ -71,6 +75,43 @@ public sealed class TabletopScene : MonoBehaviour
         var sea = MakeMaterial("海面边框 v002", Color.white, .24f);
         var waves = SeaTexture(); textures.Add(waves); sea.SetTexture("_BaseMap", waves);
         CreatePolygon("海面边框", outline, sea, 0);
+        InitializeLayout();
+        Objects=gameObject.AddComponent<TabletopWorldObjects>();Objects.Initialize(this);
+    }
+
+    void InitializeLayout()
+    {
+        var rotation=Quaternion.Euler(40,0,0);var up=rotation*Vector3.up;var forward=rotation*Vector3.forward;
+        float minX=outline.Min(p=>p.x-center.x),maxX=outline.Max(p=>p.x-center.x);
+        float minY=outline.Min(p=>Vector3.Dot(p-center,up)),maxY=outline.Max(p=>Vector3.Dot(p-center,up))+.017f;
+        layoutSize=Mathf.Max((maxY-minY)/(BoardArea.height/900f*2),(maxX-minX)/(BoardArea.width/1440f*1.6f*2));
+        UnitsPerPixel=layoutSize*2*1.6f/1440;
+        layoutDepthPixel=layoutSize*2/(900*Mathf.Sin(40*Mathf.Deg2Rad));
+        var cameraPosition=center+up*((maxY+minY)*.5f)-forward*2-up*((.5f-BoardArea.center.y/900)*layoutSize*2);
+        layoutOrigin=cameraPosition+forward*((SurfaceHeight-cameraPosition.y)/forward.y);
+    }
+    public Vector3 World(Vector2 layoutPoint) => layoutOrigin+new Vector3((layoutPoint.x-720)*UnitsPerPixel,0,(450-layoutPoint.y)*layoutDepthPixel);
+    public Vector2 Project(Vector3 world)
+    {
+        var point=tableCamera.WorldToViewportPoint(world);return new Vector2(point.x*1440,(1-point.y)*900);
+    }
+    public Ray MouseRay(Vector2 logicalMouse) => tableCamera.ViewportPointToRay(new Vector3(logicalMouse.x/1440,1-logicalMouse.y/900,0));
+    public Rect ProjectSurface(Vector3 position,Vector2 size,Quaternion rotation)
+    {
+        var points=new Vector2[4];
+        for(int i=0;i<4;i++)points[i]=Project(position+rotation*new Vector3((i%2==0?-.5f:.5f)*size.x,0,(i/2==0?-.5f:.5f)*size.y));
+        return Rect.MinMaxRect(points.Min(p=>p.x),points.Min(p=>p.y),points.Max(p=>p.x),points.Max(p=>p.y));
+    }
+    public Rect Project(Bounds bounds)
+    {
+        var points=new Vector2[8];
+        for(int i=0;i<8;i++)points[i]=Project(bounds.center+Vector3.Scale(bounds.extents,new Vector3((i&1)==0?-1:1,(i&2)==0?-1:1,(i&4)==0?-1:1)));
+        return Rect.MinMaxRect(points.Min(p=>p.x),points.Min(p=>p.y),points.Max(p=>p.x),points.Max(p=>p.y));
+    }
+    public Rect ProjectLabel(Rect layout)
+    {
+        var point=Project(World(layout.center));
+        return new Rect(point.x-layout.width*DisplayScale/2,point.y-layout.height*DisplayScale/2,layout.width*DisplayScale,layout.height*DisplayScale);
     }
 
     public void BindExpansionDisplay(Transform markers, Transform track)
@@ -108,56 +149,18 @@ public sealed class TabletopScene : MonoBehaviour
         tableCamera.orthographic = true;
         tableCamera.backgroundColor = new Color(.22f, .11f, .045f);
         tableCamera.transform.rotation = Quaternion.Euler(topView ? 90 : 40, 0, 0);
-        var right = tableCamera.transform.right; var up = tableCamera.transform.up;
-        float minX = float.PositiveInfinity, maxX = float.NegativeInfinity;
-        float minY = float.PositiveInfinity, maxY = float.NegativeInfinity;
-        foreach (var p in outline)
-        {
-            float x = Vector3.Dot(p - center, right), y = Vector3.Dot(p - center, up);
-            minX = Mathf.Min(minX, x); maxX = Mathf.Max(maxX, x);
-            minY = Mathf.Min(minY, y); maxY = Mathf.Max(maxY, y);
-        }
-        // 上方留出棋子高度；地图占用比例对应统一 1440 × 900 桌面坐标。
-        maxY += .017f;
         float aspect = Mathf.Max(.1f, (float)screenWidth / Mathf.Max(1, screenHeight));
-        float fitHeight = (maxY - minY) / (BoardArea.height / 900f * 2);
-        float fitWidth = (maxX - minX) / (BoardArea.width / 1440f * aspect * 2);
-        float size = Mathf.Max(fitHeight, fitWidth) * zoom;
+        float fitHeight=layoutDepthPixel*900*Mathf.Sin((topView?90:40)*Mathf.Deg2Rad)/2;
+        float fitWidth=UnitsPerPixel*1440/aspect/2;
+        float size=Mathf.Max(fitHeight,fitWidth)*zoom;
         tableCamera.orthographicSize = size;
-        var focus = center + up * ((maxY + minY) * .5f);
-        float centerX = BoardArea.center.x / 1440f - .5f;
-        float centerY = .5f - BoardArea.center.y / 900f;
-        tableCamera.transform.position = focus - tableCamera.transform.forward * 2
-            - right * (centerX * size * 2 * aspect) - up * (centerY * size * 2);
-        if(oakMaterial!=null)
-        {
-            var plane=new Plane(Vector3.up,new Vector3(0,-.0075f,0));
-            float span=oakSpan;
-            for(int corner=0;corner<4;corner++)
-            {
-                var ray=tableCamera.ViewportPointToRay(new Vector3(corner%2,corner/2,0));
-                if(!plane.Raycast(ray,out float distance))continue;
-                var point=ray.GetPoint(distance)-center;
-                span=Mathf.Max(span,2.1f*Mathf.Max(Mathf.Abs(point.x),Mathf.Abs(point.z)));
-            }
-            if(span>oakSpan)
-            {
-                oakSpan=span;float scale=8/span;
-                oakMaterial.SetTextureScale("_BaseMap",new Vector2(scale,scale));
-                oakMaterial.SetTextureOffset("_BaseMap",Vector2.one*(1-scale)/2);
-            }
-        }
+        tableCamera.transform.position=layoutOrigin-tableCamera.transform.forward*2;
         if (expansionTrack != null && expansionMarkers != null)
         {
-            // 蛮族行进板放在上方右侧空桌面；投影宽度保持 135 像素，不挤压地图。
-            var plane = new Plane(Vector3.up, Vector3.zero);
-            var ray = tableCamera.ViewportPointToRay(new Vector3(1123f / 1440f, 1 - 75f / 900f, 0));
-            if (plane.Raycast(ray, out float distance))
-            {
-                float scale = 135f / 1440f * size * 2 * aspect / EntityBoardAssets.BarbarianTrackWidth;
-                expansionMarkers.localScale = markerOriginalScale * scale;
-                expansionMarkers.position += ray.GetPoint(distance) - expansionTrack.position;
-            }
+            // 固定物理占地与位置；蛮族板和地图一起缩放。
+            float scale=135*UnitsPerPixel/EntityBoardAssets.BarbarianTrackWidth;
+            expansionMarkers.localScale=markerOriginalScale*scale;
+            expansionMarkers.position+=World(new Vector2(1123,75))+Vector3.up*.0002f-expansionTrack.position;
         }
     }
 
