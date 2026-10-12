@@ -1,4 +1,4 @@
-param([string]$ExportDirectory = '')
+﻿param([string]$ExportDirectory = '')
 $ErrorActionPreference = 'Stop'
 $pieceRepo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
 if (!$ExportDirectory) { $ExportDirectory = Join-Path $pieceRepo 'art/exports/ui-operation-v001/pieces' }
@@ -27,6 +27,7 @@ foreach ($piece in $pieceManifest.assets) {
     $pieceMeta = $pieceMeta -replace 'enableMipMap: 1', 'enableMipMap: 0' -replace 'maxTextureSize: 2048', 'maxTextureSize: 256'
     $pieceMeta = $pieceMeta -replace 'filterMode: 2', 'filterMode: 1' -replace 'alphaIsTransparency: 0', 'alphaIsTransparency: 1'
     $pieceMeta = $pieceMeta -replace 'nPOTScale: 1', 'nPOTScale: 0' -replace 'textureCompression: 1', 'textureCompression: 0'
+    $pieceMeta = $pieceMeta -replace 'isReadable: 0', 'isReadable: 1'
     $pieceMeta | Set-Content -LiteralPath ($pieceTarget + '.meta') -Encoding utf8
 }
 Write-Output "OPERATION_PIECES_INSTALLED $($pieceManifest.assets.Count)"

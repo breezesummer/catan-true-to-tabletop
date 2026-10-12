@@ -17,6 +17,7 @@ public sealed class OperationSnapshot
     public Action<OperationBuild> PrepareBuild;
     public Action<OperationHandCard> PrepareCard;
     public Action Cancel;
+    public Action<string> Notify;
     public Func<OperationTrade, string> Trade;
     public Action<string> Respond;
 }
@@ -50,6 +51,7 @@ public sealed class OperationSelection
 {
     public readonly int[] Selected = new int[8];
     public string BuildId;
+    public int PieceOrdinal = -1;
     string scope, revision, seat;
     int[] goods;
     public void Sync(OperationSnapshot snapshot)
@@ -61,16 +63,18 @@ public sealed class OperationSelection
         goods = snapshot == null ? null : (int[])snapshot.Goods.Clone();
         for (int i = 0; i < 8; i++) Selected[i] = Math.Min(Selected[i], snapshot == null ? 0 : snapshot.Goods[i]);
     }
-    public void Clear() { Array.Clear(Selected, 0, 8); BuildId = null; }
-    public void Choose(OperationBuild build, int[] owned)
+    public void Clear() { Array.Clear(Selected, 0, 8); BuildId = null; PieceOrdinal = -1; }
+    public void Choose(OperationBuild build, int[] owned, int pieceOrdinal = -1)
     {
-        Clear(); BuildId = build.Id;
+        if (pieceOrdinal < -1 || pieceOrdinal >= build.Count && pieceOrdinal >= 0) return;
+        Clear(); BuildId = build.Id; PieceOrdinal = pieceOrdinal;
         for (int i = 0; i < 8; i++) Selected[i] = Math.Min(build.Cost[i], owned[i]);
     }
+    public bool IsPieceSelected(string buildId, int ordinal) => BuildId == buildId && PieceOrdinal >= 0 && PieceOrdinal == ordinal;
     public void Toggle(int good, int ordinal, int owned)
     {
         if (good < 0 || good >= 8 || ordinal < 0 || owned < 0 || ordinal >= owned) return;
-        BuildId = null;
+        BuildId = null; PieceOrdinal = -1;
         Selected[good] = ordinal < Selected[good] ? Selected[good] - 1 : Math.Min(Selected[good] + 1, owned);
     }
     public bool Matches(OperationBuild build)
