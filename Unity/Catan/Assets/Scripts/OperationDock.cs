@@ -30,13 +30,17 @@ public sealed class OperationDock
     readonly List<HitShape> hits = new List<HitShape>();
     readonly List<HandFace> faces = new List<HandFace>();
     readonly List<PieceFace> pieceFaces = new List<PieceFace>();
+    TabletopScene table;
+    public void BindTable(TabletopScene scene) { table=scene; }
     sealed class HitShape
     {
         public Rect Rect;
         public float Angle;
         public Texture2D Texture;
+        public TabletopWorldObjects.Hit World;
         public bool Contains(Vector2 point)
         {
+            if(World!=null)return World.Contains(point);
             float radians=-Angle*Mathf.Deg2Rad;Vector2 delta=point-Rect.center;
             var local=Rect.center+new Vector2(delta.x*Mathf.Cos(radians)-delta.y*Mathf.Sin(radians),delta.x*Mathf.Sin(radians)+delta.y*Mathf.Cos(radians));
             return Rect.Contains(local)&&(Texture==null||OperationPieceAssets.Contains(Texture,Rect,local));
@@ -117,8 +121,10 @@ public sealed class OperationDock
         if(Event.current.type==EventType.KeyDown&&Event.current.keyCode==KeyCode.Escape||Event.current.type==EventType.MouseDown&&Event.current.button==1)
         {Reset();snapshot.Cancel?.Invoke();Event.current.Use();}
         hoveredBuild=null;tooltipRect=Rect.zero;hits.Clear();faces.Clear();pieceFaces.Clear();
+        table.Objects.Begin("own");
         DrawBuilds(snapshot);
         DrawHand(snapshot);
+        table.Objects.End();
         HandleBuildInput(snapshot);
         if(tradeOpen)DrawTrade(snapshot);
         else if(snapshot.Offer!=null)DrawOffer(snapshot);
@@ -129,13 +135,15 @@ public sealed class OperationDock
         if(dragging&&dragGood>=0)
         {
             var texture=EntityCardAssets.Texture(EntityCardAssets.Good(dragGood).Front);
-            var r=new Rect(Event.current.mousePosition.x-36,Event.current.mousePosition.y-52,72,103);
+            float scale=table.DisplayScale;
+            var r=new Rect(Event.current.mousePosition.x-36*scale,Event.current.mousePosition.y-52*scale,72*scale,103*scale);
             if(texture!=null)GUI.DrawTexture(r,texture,ScaleMode.StretchToFill);
         }
         if(pieceDragging&&heldPiece!=null)
         {
             var piece=OperationPieceAssets.Texture(heldPiece.Icon??heldPiece.Id,snapshot.Seat??"P1",Math.Max(1,heldPiece.Level));
-            if(piece!=null)GUI.DrawTexture(new Rect(Event.current.mousePosition.x-33,Event.current.mousePosition.y-38,66,66),piece,ScaleMode.ScaleToFit);
+            float size=66*table.DisplayScale;
+            if(piece!=null)GUI.DrawTexture(new Rect(Event.current.mousePosition.x-size/2,Event.current.mousePosition.y-size*.58f,size,size),piece,ScaleMode.ScaleToFit);
         }
     }
     void DrawBuilds(OperationSnapshot s)
@@ -145,21 +153,29 @@ public sealed class OperationDock
         float width=Math.Min(180,(facilities.Length>0?930:1090)/Math.Max(1f,pieces.Length));
         float start=facilities.Length>0?125:Math.Max(210,(1440-pieces.Length*width)/2);
         for(int i=0;i<pieces.Length;i++)DrawBuild(new Rect(start+i*width,651,width-9,97),pieces[i],s);
-        for(int i=0;i<facilities.Length;i++)DrawBuild(new Rect(1080+i*104,651,94,103),facilities[i],s);
+        for(int i=0;i<facilities.Length;i++)DrawBuild(new Rect(1044+i*122,639,114,152),facilities[i],s);
     }
     void DrawBuild(Rect r,OperationBuild build,OperationSnapshot s)
     {
-        bool selected=Selection.BuildId==build.Id;
         bool clicked=false,hovered=false;
         if(build.Track>=0)
         {
-            var face=EntityCardAssets.ImprovementFront(build.Track,Math.Max(1,Math.Min(5,build.Level)));
-            var card=new Rect(r.x+8,r.y+2,r.width-16,78);Paper(card);
-            if(face!=null)GUI.DrawTexture(card,face,ScaleMode.StretchToFill);
-            if(selected)Border(card,Gold,2);
-            Register(card);hovered=card.Contains(Event.current.mousePosition);
-            clicked=GUI.Button(card,GUIContent.none,GUIStyle.none);
-            Label(new Rect(r.x,r.y+82,r.width,20),build.Name.Replace("设施","")+" · "+build.Level+" 级",tableLabel);
+            var card=table.Objects.Facility("facility-"+build.Track,r,build.Track,build.Level);
+            hits.Add(new HitShape{World=card});
+            for(int level=1;level<=5;level++)
+            {
+                var slot=table.Objects.FacilitySlot("facility-"+build.Track+"-slot-"+level,card,build.Track,level,level<=build.Level);
+                bool over=slot.Contains(Event.current.mousePosition);
+                if(level==build.Level+1&&over){hovered=true;costAnchor=new Vector2(Event.current.mousePosition.x,slot.Rect.y);}
+                if(GUI.enabled&&over&&Event.current.type==EventType.MouseDown&&Event.current.button==0&&!HasOverlay)
+                {
+                    Event.current.Use();
+                    if(level<=build.Level)s.Notify?.Invoke("这一级设施已经建成");
+                    else if(level!=build.Level+1)s.Notify?.Invoke("请先升级第 "+(build.Level+1)+" 级设施");
+                    else clicked=true;
+                }
+            }
+            TableLabel(new Rect(r.x,r.y+136,r.width,20),build.Name.Replace("设施","")+" · "+build.Level+" 级",tableLabel);
         }
         else
         {
@@ -172,11 +188,11 @@ public sealed class OperationDock
                 for(int n=0;n<amount;n++)
                 {
                     bool picked=Selection.IsPieceSelected(build.Id,n);
-                    var icon=new Rect(left+(n%columns)*step,r.y+(n/columns)*30-(picked?7:0),40,43);
-                    var prior=GUI.color;if(build.Count==0)GUI.color=new Color(1,1,1,.23f);
-                    if(picked)TabletopUI.Token(new Rect(icon.center.x-17,icon.yMax-12,34,12),Gold);
-                    if(!picked||!pieceDragging)GUI.DrawTexture(icon,piece,ScaleMode.ScaleToFit);GUI.color=prior;
-                    var shape=new HitShape{Rect=icon,Texture=piece};
+                    if(build.Count==0||picked&&pieceDragging)continue;
+                    var position=new Vector2(left+(n%columns)*step+20,r.y+(n/columns)*30+23);
+                    var world=table.Objects.Piece("stock-"+build.Id+"-"+n,build.Icon??build.Id,s.Seat,Math.Max(1,build.Level),position,picked);
+                    if(world==null)continue;
+                    var shape=new HitShape{World=world};
                     hovered|=shape.Contains(Event.current.mousePosition);
                     if(build.Count>0){hits.Add(shape);pieceFaces.Add(new PieceFace{Shape=shape,Build=build,Ordinal=n});}
                 }
@@ -184,23 +200,28 @@ public sealed class OperationDock
             else
             {
                 // 尚无实物照片的发展牌堆使用标明名称的纸牌，不伪造三维棋子。
-                var card=new Rect(r.center.x-25,r.y+1,50,68);Paper(card);
-                Fill(new Rect(card.x+5,card.y+5,40,58),new Color(.28f,.37f,.37f));
-                Label(new Rect(card.x+3,card.y+13,44,45),"发展\n卡",tableLabel);
-                Register(card);hovered=card.Contains(Event.current.mousePosition);clicked=GUI.Button(card,GUIContent.none,GUIStyle.none);
+                var world=table.Objects.Card("development-stack",new Rect(r.center.x-25,r.y+1,50,68),EntityCardAssets.Texture(EntityCardAssets.Good(0).Back));
+                hits.Add(new HitShape{World=world});hovered=world.Contains(Event.current.mousePosition);
+                TableLabel(new Rect(r.x,r.y+30,r.width,25),"发展卡",tableLabel);
+                if(GUI.enabled&&hovered&&Event.current.type==EventType.MouseDown&&Event.current.button==0&&!HasOverlay){clicked=true;Event.current.Use();}
             }
             var caption=new Rect(r.x,r.y+75,r.width,21);
             var label=new GUIStyle(tableLabel);
             if(Selection.BuildId==null&&Selection.Matches(build)&&build.Available)label.normal.textColor=Gold;
-            Label(caption,build.Name+"  "+build.Count,label);
+            TableLabel(caption,build.Name+"  "+build.Count,label);
         }
-        if(hovered){hoveredBuild=build.Id;costAnchor=new Vector2(Event.current.mousePosition.x,r.y);}
+        if(hovered){hoveredBuild=build.Id;if(build.Track<0)costAnchor=new Vector2(Event.current.mousePosition.x,table.ProjectLabel(r).y);}
         if(clicked)
         {
             if(!build.Available||!s.CanInteract){s.Notify?.Invoke(build.UnavailableReason??"当前不能使用");return;}
             s.Cancel?.Invoke();Selection.Choose(build,s.Goods);tradeOpen=false;previewCard=null;message="";
             s.PrepareBuild?.Invoke(build);
         }
+    }
+    void TableLabel(Rect r,string value,GUIStyle style)
+    {
+        var scaled=new GUIStyle(style){fontSize=Mathf.Max(9,Mathf.RoundToInt(style.fontSize*table.DisplayScale))};
+        Label(table.ProjectLabel(r),value,scaled);
     }
     void HandleBuildInput(OperationSnapshot s)
     {
@@ -237,33 +258,32 @@ public sealed class OperationDock
     void DrawHand(OperationSnapshot s)
     {
         bool resources=s.Goods.Take(s.GoodCount).Sum()>0;
-        DrawSpecialHand(s,new Rect(TabletopHandLayout.SpecialCenter(resources)-190,768,380,112));
-        DrawResourceHand(s,new Rect(TabletopHandLayout.ResourceCenter(s.Cards.Count>0)-342,768,684,112));
-        if((Selection.Selected.Sum()>0||Selection.BuildId!=null)&&Button(new Rect(1309,848,103,29),"放回手中"))
+        float specialWidth=resources?380:1050,resourceWidth=s.Cards.Count>0?684:1050;
+        DrawSpecialHand(s,new Rect(TabletopHandLayout.SpecialCenter(resources)-specialWidth/2,768,specialWidth,112));
+        DrawResourceHand(s,new Rect(TabletopHandLayout.ResourceCenter(s.Cards.Count>0)-resourceWidth/2,768,resourceWidth,112));
+        if((Selection.Selected.Sum()>0||Selection.BuildId!=null)&&Button(new Rect(1118,848,103,29),"放回手中"))
         {Selection.Clear();s.Cancel?.Invoke();message="";}
     }
     void DrawSpecialHand(OperationSnapshot s,Rect area)
     {
         if(s.Cards.Count==0)return;
-        const int visible=8;cardOffset=Mathf.Clamp(cardOffset,0,Math.Max(0,s.Cards.Count-visible));
+        int visible=TabletopHandLayout.SpecialCapacity(s.Goods.Take(s.GoodCount).Sum()>0);cardOffset=Mathf.Clamp(cardOffset,0,Math.Max(0,s.Cards.Count-visible));
         int count=Math.Min(visible,s.Cards.Count-cardOffset);
         for(int i=0;i<count;i++)
         {
             var card=s.Cards[i+cardOffset];var pose=TabletopHandLayout.Card(i,count,area.center.x,area.width,false);
-            var r=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);float angle=pose.Angle;
-            var matrix=GUI.matrix;GUIUtility.RotateAroundPivot(angle,r.center);Paper(r);
+            var r=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);
             var texture=card.Progress&&card.ArtIndex>=0?EntityCardAssets.ProgressFront(card.ArtIndex):null;
-            if(texture!=null)GUI.DrawTexture(new Rect(r.x+2,r.y+2,r.width-4,r.height-4),texture,ScaleMode.StretchToFill);
-            else{Label(new Rect(r.x+7,r.y+18,64,55),card.Name,center);Fill(new Rect(r.x+15,r.y+76,48,2),Gold);}
-            if(previewCard==card.Id)Border(r,Gold,2);GUI.matrix=matrix;
-            faces.Add(new HandFace{Shape=Register(r,angle),Card=card});
+            var world=table.Objects.Card("special-hand-"+i,r,texture??EntityCardAssets.Texture(EntityCardAssets.Good(0).Back),previewCard==card.Id);
+            if(texture==null)TableLabel(new Rect(r.x,r.y+45,r.width,28),card.Name,tableLabel);
+            var shape=new HitShape{World=world};hits.Add(shape);faces.Add(new HandFace{Shape=shape,Card=card});
         }
         if(s.Cards.Count>visible)PageCards(area,s.Cards.Count,visible,ref cardOffset);
     }
     void DrawResourceHand(OperationSnapshot s,Rect area)
     {
         int total=s.Goods.Take(s.GoodCount).Sum();if(total==0)return;
-        const int visible=18;handOffset=Mathf.Clamp(handOffset,0,Math.Max(0,total-visible));
+        int visible=TabletopHandLayout.ResourceCapacity(s.Cards.Count>0);handOffset=Mathf.Clamp(handOffset,0,Math.Max(0,total-visible));
         int count=Math.Min(visible,total-handOffset),index=0,drawn=0;
         for(int good=0;good<s.GoodCount;good++)
         {
@@ -272,20 +292,18 @@ public sealed class OperationDock
             {
                 int ordinal=index++;if(ordinal<handOffset||ordinal>=handOffset+count)continue;
                 bool chosen=n<Selection.Selected[good];var pose=TabletopHandLayout.Card(drawn,count,area.center.x,area.width,chosen);
-                var r=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);float angle=pose.Angle;
-                var matrix=GUI.matrix;GUIUtility.RotateAroundPivot(angle,r.center);Paper(r);
-                if(texture!=null)GUI.DrawTexture(new Rect(r.x+2,r.y+2,r.width-4,r.height-4),texture,ScaleMode.StretchToFill);
-                if(chosen)Border(r,Gold,2);GUI.matrix=matrix;
-                faces.Add(new HandFace{Shape=Register(r,angle),Good=good,Ordinal=n});drawn++;
+                var r=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);
+                var world=table.Objects.Card("resource-hand-"+drawn,r,texture,chosen);
+                var shape=new HitShape{World=world};hits.Add(shape);faces.Add(new HandFace{Shape=shape,Good=good,Ordinal=n});drawn++;
             }
         }
         if(total>visible)PageCards(area,total,visible,ref handOffset);
     }
     void PageCards(Rect area,int total,int visible,ref int offset)
     {
-        if(Button(new Rect(area.x-35,area.y+54,26,27),"‹",offset>0))offset=Math.Max(0,offset-visible/2);
-        if(Button(new Rect(area.xMax+8,area.y+54,26,27),"›",offset+visible<total))offset=Math.Min(total-visible,offset+visible/2);
-        Label(new Rect(area.center.x-90,area.y-23,180,20),(offset+1)+"–"+Math.Min(total,offset+visible)+" / "+total+" 张 · 滚轮翻看",tableLabel);
+        if(Button(table.ProjectLabel(new Rect(area.x-35,area.y+54,26,27)),"‹",offset>0))offset=Math.Max(0,offset-visible/2);
+        if(Button(table.ProjectLabel(new Rect(area.xMax+8,area.y+54,26,27)),"›",offset+visible<total))offset=Math.Min(total-visible,offset+visible/2);
+        TableLabel(new Rect(area.center.x-90,area.y-23,180,20),(offset+1)+"–"+Math.Min(total,offset+visible)+" / "+total+" 张 · 滚轮翻看",tableLabel);
     }
     void HandleHandInput(OperationSnapshot s)
     {
@@ -302,8 +320,8 @@ public sealed class OperationDock
         if(e.type==EventType.ScrollWheel&&hit!=null&&!overPaper)
         {
             int direction=e.delta.y>0?3:-3;
-            if(hit.Card!=null)cardOffset=Mathf.Clamp(cardOffset+direction,0,Math.Max(0,s.Cards.Count-8));
-            else handOffset=Mathf.Clamp(handOffset+direction,0,Math.Max(0,s.Goods.Sum()-18));
+            if(hit.Card!=null)cardOffset=Mathf.Clamp(cardOffset+direction,0,Math.Max(0,s.Cards.Count-TabletopHandLayout.SpecialCapacity(s.Goods.Take(s.GoodCount).Sum()>0)));
+            else handOffset=Mathf.Clamp(handOffset+direction,0,Math.Max(0,s.Goods.Take(s.GoodCount).Sum()-TabletopHandLayout.ResourceCapacity(s.Cards.Count>0)));
             e.Use();return;
         }
         if(e.type==EventType.MouseDown&&e.button==0&&hit!=null&&!overPaper)

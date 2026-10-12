@@ -185,7 +185,44 @@ public sealed class TabletopUiVerification : MonoBehaviour
         dice.Observe(0,0,0,eventDie,0);dice.Observe(1,2,5,eventDie,1);
         Require(dice.IsRolling(1.2)&&!dice.IsRolling(2),"Unity 骰子时间轴无法结束");
         Require(dice.Face(0,2)==2&&dice.Face(1,2)==5&&dice.Event.HasValue==(snapshot.GoodCount==8),"骰子数量或最终骰面错误");
+        CheckWorldObjects();
         Require(before==Authority,"拿取、提示或动画改变了权威状态");
+    }
+
+    void CheckWorldObjects()
+    {
+        var table=mode=="base"?GetComponent<M2App>().VerificationBoard.TableScene:
+            mode=="seafarers"?GetComponent<M3App>().VerificationBoard.TableScene:
+            mode=="cities-knights"?GetComponent<M4App>().VerificationBoard.TableScene:GetComponent<M5App>().VerificationBoard.TableScene;
+        table.Objects.Begin("verification");
+        var card=table.Objects.Card("card",new Rect(680,768,74,103),EntityCardAssets.ResourceFront(0));
+        var location=card.Root.position;var initial=card.Rect;
+        var v1=Position(Vertices[0].Id);var v2=Position(Vertices[1].Id);
+        float boardDistance=Vector2.Distance(table.Project(v1),table.Project(v2));
+        Require(card.Contains(initial.center),"正常缩放下实体手牌不能拾取");
+        table.Frame(BoardCamera,false,.8f);var zoomed=card.Rect;
+        Require((card.Root.position-location).sqrMagnitude<.00000001f,"相机缩放移动了桌面卡片");
+        Require(Mathf.Abs(zoomed.width/initial.width-1.25f)<.001f,"卡片没有随地图按相同比例缩放");
+        Require(Mathf.Abs(Vector2.Distance(table.Project(v1),table.Project(v2))/boardDistance-zoomed.width/initial.width)<.001f,"地图与卡牌缩放比例不一致");
+        Require(card.Contains(zoomed.center),"缩放后手牌的命中区域没有更新");
+        table.Frame(BoardCamera,true,1);Require(card.Contains(card.Rect.center),"俯视实体卡牌不能拾取");
+        table.Frame(BoardCamera,false,1);
+        if(Snapshot.GoodCount==8)
+        {
+            for(int track=0;track<3;track++)
+            {
+                var board=table.Objects.Facility("facility-"+track,new Rect(1044+track*122,639,114,152),track,0);
+                for(int level=1;level<=5;level++)
+                {
+                    var slot=table.Objects.FacilitySlot("slot-"+track+"-"+level,board,track,level,false);
+                    Require(slot.Contains(slot.Rect.center),"完整设施卡内部小翻板无法独立拾取");
+                    Require(slot.Rect.width<board.Rect.width&&slot.Rect.height<board.Rect.height,"小翻板尺寸超出完整设施卡");
+                }
+            }
+        }
+        table.Objects.End();table.Objects.Begin("verification");table.Objects.End();
+        var oak=Resources.Load<Texture2D>("TabletopUI/v004/oak-albedo-8k");
+        Require(oak!=null&&oak.width==8192&&oak.height==8192&&oak.anisoLevel==16,"Unity 未保留原生 8K 木纹及各向异性采样");
     }
 
     string FixedAuthority(int players, int human)

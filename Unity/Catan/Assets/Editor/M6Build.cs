@@ -26,14 +26,22 @@ public static class M6Build
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         var pipeline = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>("Assets/M1Pipeline.asset");
         if (pipeline == null) throw new Exception("URP pipeline missing");
+        const string tablePipelinePath="Assets/TabletopPipeline-v004.asset";
+        var tablePipeline=AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(tablePipelinePath);
+        if(tablePipeline==null){tablePipeline=UnityEngine.Object.Instantiate(pipeline);AssetDatabase.CreateAsset(tablePipeline,tablePipelinePath);}
+        tablePipeline.renderScale=1;tablePipeline.msaaSampleCount=4;
+        EditorUtility.SetDirty(tablePipeline);AssetDatabase.SaveAssets();pipeline=tablePipeline;
         GraphicsSettings.defaultRenderPipeline = pipeline;
         QualitySettings.renderPipeline = pipeline;
+        QualitySettings.globalTextureMipmapLimit=0;
+        QualitySettings.anisotropicFiltering=AnisotropicFiltering.ForceEnable;
         var camera = new GameObject("Board Camera").AddComponent<Camera>();
         camera.tag = "MainCamera";
         camera.nearClipPlane = .001f;
         camera.farClipPlane = 10;
         camera.clearFlags = CameraClearFlags.SolidColor;
         camera.backgroundColor = new Color(.025f, .07f, .085f);
+        camera.allowMSAA=true;
         camera.gameObject.AddComponent<UniversalAdditionalCameraData>();
         var light = new GameObject("Warm key").AddComponent<Light>();
         light.type = LightType.Directional;
@@ -60,7 +68,7 @@ public static class M6Build
         PlayerSettings.colorSpace = ColorSpace.Linear;
         var root = Path.GetFullPath(Path.Combine(Application.dataPath, "../../.."));
         var args=Environment.GetCommandLineArgs();int outputFlag=Array.IndexOf(args,"--m6-output-root");
-        var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/m6-ui-v003");
+        var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/m6-ui-v004");
         var output = Path.Combine(buildRoot, "Builds/Windows/CatanM6.exe");
         Directory.CreateDirectory(Path.GetDirectoryName(output));
         var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {

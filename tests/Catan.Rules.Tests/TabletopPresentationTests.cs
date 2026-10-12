@@ -87,15 +87,16 @@ public sealed class TabletopPresentationTests
         Assert.False(dice.IsRolling(500));Assert.Equal(2,dice.Face(0,500));Assert.Equal(6,dice.Face(1,500));Assert.Equal(2,dice.Face(2,500));
     }
     [Theory]
-    [InlineData(380,356,8)]
-    [InlineData(684,948,18)]
-    [InlineData(684,720,18)]
-    [InlineData(380,720,8)]
-    public void EveryRotatedCardAndItsShadowFitsInsideTheScreen(float width,float center,int maximum)
+    [InlineData(380,356,4)]
+    [InlineData(684,948,8)]
+    [InlineData(1050,720,12)]
+    public void FullCardsFormOneStraightRowWithGapsAndStayInsideTheScreen(float width,float center,int maximum)
     {
         for(int count=1;count<=maximum;count++)for(int i=0;i<count;i++)foreach(bool selected in new[]{false,true})
         {
             var pose=TabletopHandLayout.Card(i,count,center,width,selected);
+            Assert.Equal(0,pose.Angle);
+            if(i>0){var previous=TabletopHandLayout.Card(i-1,count,center,width,selected);Assert.Equal(previous.Y,pose.Y);Assert.True(pose.X>previous.X+TabletopHandLayout.CardWidth);}
             float cx=pose.X+TabletopHandLayout.CardWidth/2,cy=pose.Y+TabletopHandLayout.CardHeight/2;
             Assert.InRange(cx-pose.HalfWidth,12,1428);Assert.InRange(cx+pose.HalfWidth+5,12,1428);
             Assert.InRange(cy-pose.HalfHeight,735,895);Assert.InRange(cy+pose.HalfHeight+7,735,895);

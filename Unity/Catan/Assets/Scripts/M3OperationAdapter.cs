@@ -87,6 +87,7 @@ public sealed partial class M3App
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
         bool enabled=GUI.enabled;GUI.enabled=enabled&&!dock.HasOverlay&&!ai.TableMenuOpen;
         DrawBoardLabels();
+        tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,null);
         ai.TableDiceRolling=tabletop.DiceRolling;
         tabletop.Draw(font,seat,ai.CurrentActor,PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,

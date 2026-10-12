@@ -17,6 +17,7 @@ public sealed class BoardRenderer : MonoBehaviour
     private Transform pieces;
     private GameObject feltTable;
     private TabletopScene tableScene;
+    public TabletopScene TableScene => tableScene;
     private GameObject ghost;
     private readonly List<GameObject> mountains = new List<GameObject>();
     private readonly Dictionary<Color, Material> pieceMaterials = new Dictionary<Color, Material>();
