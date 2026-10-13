@@ -78,7 +78,22 @@ public static class EntityCardAssets
     public static Texture2D ResourceOrCommodityFront(int good) => good >= 0 && good < 8 ? Texture(Good(good).Front) : null;
     // 无边框、无裁切、无反光覆盖条；数量与操作提示由调用方放在卡面外。
     public static void DrawCardFace(Rect area,Texture2D texture)
-    { if(texture!=null)GUI.DrawTexture(area,texture,ScaleMode.ScaleToFit,true); }
+    {
+        if(texture==null)return;
+        var rect=FitCardRect(area,(float)texture.width/texture.height,GUI.matrix);
+        GUI.DrawTexture(rect,texture,ScaleMode.StretchToFill,true);
+    }
+    // 在屏幕像素中保持比例；逻辑坐标里的 ScaleToFit 仍会被外层非等比矩阵拉伸。
+    public static Rect FitCardRect(Rect area,float aspect,Matrix4x4 matrix)
+    {
+        float scaleX=matrix.MultiplyVector(Vector3.right).magnitude;
+        float scaleY=matrix.MultiplyVector(Vector3.up).magnitude;
+        if(scaleX<=0||scaleY<=0||aspect<=0)return area;
+        float logicalAspect=aspect*scaleY/scaleX;
+        float width=Mathf.Min(area.width,area.height*logicalAspect);
+        float height=width/logicalAspect;
+        return new Rect(area.center.x-width/2,area.center.y-height/2,width,height);
+    }
     public static Texture2D ProgressFront(int card) => Texture(Progress(card).Front);
     public static Texture2D ProgressBack(int track)
     {

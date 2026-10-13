@@ -1,4 +1,4 @@
-﻿param([string]$BuildRoot='.local/m6-ui-v006-card-ratio-v001')
+﻿param([string]$BuildRoot='.local/m6-ui-v006-card-ratio-v002')
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Player = Join-Path $m6RepoRoot "$BuildRoot/Builds/Windows/CatanM6.exe"
