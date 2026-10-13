@@ -1,0 +1,47 @@
+{
+  "version": "ui-tabletop-v007",
+  "purpose": "恢复照片卡牌圆角并呈现纸芯、弱漫反射、接触阴影和城市设施厚板",
+  "sources": [
+    "assets/references/ui-v007/",
+    "Unity/Catan/Assets/Resources/PhotoSamples/v001/",
+    "Unity/Catan/Assets/Resources/EntityAssets/v001/",
+    "Unity/Catan/Assets/Resources/EntityAssets/v003/"
+  ],
+  "originals": "原始照片及既有校正贴图保持不变。当前版本只在运行时裁去圆角外的拍摄背景，不重绘文字、插画或改变图像比例。",
+  "implementation": [
+    "Unity/Catan/Assets/Scripts/EntityCardAssets.cs",
+    "Unity/Catan/Assets/Scripts/TabletopWorldObjects.cs",
+    "Unity/Catan/Assets/Resources/TabletopUI/v007/PaperContactShadow.shader"
+  ],
+  "tools": {
+    "unity": "6000.3.25f1",
+    "pipeline": "URP 17.3.0",
+    "gui_mask": "Unity GUI.DrawTexture 原生圆角纹理裁切，borderWidth=0",
+    "export": "运行时 C# 参数网格，无新照片导出或不可复现模型"
+  },
+  "screen_cards": {
+    "aspect": "以 GUI.matrix 换算屏幕像素比例，完整保留原照片长宽比",
+    "corner_radius_short_side_ratio": 0.095,
+    "paper_edge_logical_pixels_at_width_108": 1.7,
+    "shadow_layers": 5,
+    "lighting_texture_pixels": [96, 144],
+    "lighting": "低透明度整面漫反射与固定微颗粒，无高亮装饰横线",
+    "seed": "使用像素坐标固定散列，不调用游戏规则随机数"
+  },
+  "world_meshes": {
+    "unit": "米；以下厚度与比例为外观工作估算，并非用户实测尺寸",
+    "pivot": "底面中心；X 为宽度，Z 为高度，Y 为厚度",
+    "corner_segments": 10,
+    "card_thickness": 0.00045,
+    "card_corner_radius_short_side_ratio": 0.095,
+    "facility_board_thickness": 0.0022,
+    "facility_board_corner_radius_short_side_ratio": 0.035,
+    "facility_tile_thickness": 0.00075,
+    "facility_tile_corner_radius_short_side_ratio": 0.045,
+    "bevel": "厚度的 22%，不超过短边的 0.6%",
+    "surface": "原照片 UV，纸芯粗糙度对应 smoothness=0.11，纸面 smoothness=0.24",
+    "contact_shadow": "确定性 96×96 软阴影贴图，透明 URP 材质，仅参与显示",
+    "geometry": "44 点圆角轮廓、四层倒角侧壁、底面及独立印刷顶面；是真实三维网格，非位图模型"
+  },
+  "reproduction": "重新构建 Unity 工程或启动场景即可由上述 C# 参数重新创建网格与程序纹理。数量、碰撞和动画不决定规则结果。"
+}

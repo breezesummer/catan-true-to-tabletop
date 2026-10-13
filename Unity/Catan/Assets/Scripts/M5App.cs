@@ -237,7 +237,11 @@ public sealed partial class M5App : MonoBehaviour
             if(tile.Resource!="sea")
             {
                 if(ai!=null)TabletopUI.NumberToken(p,tile.Number>0?(int?)tile.Number:null,tile.Resource=="fog"?"迷雾":"沙漠",heading);
-                else GUI.Label(new Rect(p.x-30,p.y-16,70,24),(tile.Number>0?tile.Number.ToString():"沙漠")+(tile.Resource=="gold"?" 金":""),heading);
+                else
+                {
+                    var numberStyle=new GUIStyle(heading);if(tile.Number==6||tile.Number==8)numberStyle.normal.textColor=TabletopUI.HotNumberColor;
+                    GUI.Label(new Rect(p.x-30,p.y-16,70,24),(tile.Number>0?tile.Number.ToString():"沙漠")+(tile.Resource=="gold"?" 金":""),numberStyle);
+                }
             }
         }
         if(pickField!=""&&ai==null)

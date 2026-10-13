@@ -1,0 +1,139 @@
+{
+  "version": "tabletop-ui-v007",
+  "date": "2026-10-13",
+  "stage": "M6 界面迭代；M7/M8 状态不变",
+  "rulesChanged": false,
+  "tests": {
+    "failed": 0,
+    "passed": 721,
+    "fullAiGames": 52,
+    "newCollectionCases": 6,
+    "skipped": 0,
+    "localReport": ".local/m6-ui-v007/test-results/m6-rules.trx",
+    "newScoreCases": 17
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "optimizedBuild": "通过",
+    "originalAiBuild": "通过",
+    "aspectGeometryCases": 384,
+    "aspectResolutions": [
+      "1440x900",
+      "1920x1080",
+      "2560x1080",
+      "1024x768"
+    ],
+    "cardTextures": 47
+  },
+  "persistence": {
+    "originalAi": "两个独立无图形 Windows 进程，四类规则保存恢复通过",
+    "optimized": "两个独立图形 Windows 进程，四类规则保存恢复通过"
+  },
+  "integration": {
+    "graphics": {
+      "status": "passed",
+      "unity": "6000.3.25f1",
+      "note": "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。",
+      "configurations": 28,
+      "checks": 15086,
+      "cameraImages": 8,
+      "guiAttempts": 8,
+      "guiImagesWithChanges": 0,
+      "graphics": true,
+      "fullUiPixelsVerified": false
+    },
+    "headless": {
+      "status": "passed",
+      "unity": "6000.3.25f1",
+      "note": "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。",
+      "configurations": 28,
+      "checks": 15078,
+      "cameraImages": 0,
+      "guiAttempts": 0,
+      "guiImagesWithChanges": 0,
+      "graphics": false,
+      "fullUiPixelsVerified": false
+    }
+  },
+  "windowReview": {
+    "checked": [
+      "圆角卡面、纸芯柔影、悬停轻抬与底部留白",
+      "放大厚板设施与亮红6/8点",
+      "本人12分=城市8+保卫者3+印刷术1",
+      "对手6分仅展示定居点4+城市2",
+      "骑士与银行操作面板",
+      "实际三谷物换一砖，飞牌与插入遮挡"
+    ],
+    "mode": "城市与骑士四人独立开发局，AI暂停",
+    "collectionCapture": {
+      "frames": 48,
+      "landingSeconds": 1.0501,
+      "localDirectory": ".local/m6-ui-v007/manual-review/收牌连续帧-v007-002",
+      "beforeLanding": {
+        "visible": 13,
+        "pending": 1
+      },
+      "note": "已检查起飞与末段逐帧遮挡；截图控制造成约0.73秒的早段采样间隔，不将这次记录作为连续帧率或整段丝滑程度的性能验收。",
+      "afterLanding": {
+        "visible": 14,
+        "pending": 0
+      }
+    },
+    "resolution": "1920x1080"
+  },
+  "limitations": [
+    "全部模式、全部分辨率的人工逐项外观检查尚未完成",
+    "批处理IMGUI完整像素合成仍为false；真实窗口指定项目另行检查",
+    "多资源同时收取有独立时序测试，未逐种人工录像",
+    "长期性能、清洁安装与用户本人最终手感尚未验收"
+  ],
+  "failuresAndRecovery": [
+    "初次Unity编译遇到局部变量重名，修复后两次正式构建通过",
+    "原策略构建通过后恢复工作区DLL一度被进程映射占用，随后重试成功并核对优化版两个DLL哈希"
+  ],
+  "builds": [
+    {
+      "files": [
+        {
+          "sha256": "3070E580E019576B9AFCDEB4FEC18D03CEBC119F6AE84D597412905C749AD653",
+          "file": "CatanM6.exe"
+        },
+        {
+          "sha256": "0A862012C36DE30CD8C27BB5D6C6CB660B664412ECC53CBD41786D005EB80082",
+          "file": "CatanM6_Data/Managed/Assembly-CSharp.dll"
+        },
+        {
+          "sha256": "F5C9F3A870BBF05E71A3E384A2E54F378F874162931C8E58E937879DE4C398F3",
+          "file": "CatanM6_Data/Managed/Catan.Core.dll"
+        },
+        {
+          "sha256": "C7E7499F7C2B31E385CE7387A29C7D8240727025E3F089DDEC39FDB65E6F229E",
+          "file": "CatanM6_Data/Managed/Catan.AI.dll"
+        }
+      ],
+      "root": ".local/m6-ui-v007"
+    },
+    {
+      "files": [
+        {
+          "sha256": "3070E580E019576B9AFCDEB4FEC18D03CEBC119F6AE84D597412905C749AD653",
+          "file": "CatanM6.exe"
+        },
+        {
+          "sha256": "9CC6D5E64012861A3997E39D3FD03F62A7DE17DE8D023446C55897F3F0B94BF2",
+          "file": "CatanM6_Data/Managed/Assembly-CSharp.dll"
+        },
+        {
+          "sha256": "A022C655F6B63154D4E6D932FAC9B385D8BB6DBE113E6D1271F07D05625ABCDF",
+          "file": "CatanM6_Data/Managed/Catan.Core.dll"
+        },
+        {
+          "sha256": "989FC1C3877757160B499799CFFCD9D63508804B3B6E1C5F4A4FB9B7DAA3453B",
+          "file": "CatanM6_Data/Managed/Catan.AI.dll"
+        }
+      ],
+      "root": ".local/m6-ui-v007-original-ai"
+    }
+  ],
+  "privacy": "截图、连续帧与权威存档仅保存在.local；公开摘要不含完整手牌、牌库、随机状态或隐藏地图"
+}

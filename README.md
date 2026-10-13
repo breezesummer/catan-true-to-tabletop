@@ -1,5 +1,9 @@
 # 卡坦岛 PC 项目
 
+2026-10-13 新增 [圆角卡纸、收牌插入与分数构成 v007](docs/UI_TABLETOP_V007.md)：卡牌恢复圆角、纸芯与柔影；手牌离底悬浮，悬停轻抬微摆；操作框去除拼接暗缝；银行飞牌到达后才插入手牌；分数悬停查看构成，对手仅显示明分；城市设施放大并使用真实厚板网格；地图 6／8 点改为亮红。**双击根目录 `启动卡坦.cmd` 启动优化 AI 新版**，程序位于 `.local/m6-ui-v007/Builds/Windows/CatanM6.exe`；`Play-M6.ps1` 保留原策略新版，位于 `.local/m6-ui-v007-original-ai/Builds/Windows/CatanM6.exe`。旧窗口需先保存退出再启动新版。
+
+本轮 **721/721 项测试通过，含 52 个完整 AI 局**；两版 Unity 6000.3.25f1 构建、四类规则独立保存恢复及优化版无图形／图形各 28 配置检查通过。已在真实窗口查看圆角、悬停、本人／对手分数组成、操作框、设施和红点，并实际完成银行兑换，检查飞牌末段逐帧插入。连续帧记录早段存在采样间隔，不作为稳定帧率或整段动画性能验收；最终手感、全分辨率人工外观与长期性能仍待验。见 [公开验证摘要](docs/verification/tabletop-ui-v007/summary.json)。
+
 2026-10-13 新增 [手牌屏幕比例修复 v002](docs/UI_CARD_ASPECT_FIX_V002.md)：修正宽屏窗口下的二次拉伸，资源／进步卡保持原图比例，发展卡文字卡面同步修正。87 项相关回归、两版 Unity 构建、四种窗口比例几何检查及两版独立保存恢复通过；实际查看 1920×1080 木头卡抬起和进步卡预览。**双击根目录 `启动卡坦.cmd` 启动优化 AI 修复版**；原策略仍使用 `Play-M6.ps1`。旧窗口请先保存退出后重开，直接打开旧目录 EXE 不会加载修复。本轮按用户要求不发送微信。
 
 2026-10-13 已修复 [手牌比例回归](docs/UI_CARD_ASPECT_FIX_V001.md)：47 张卡牌贴图保留原图宽高比，解决 v006 手牌变细长及木头牌比例不同的问题。87 项界面相关回归、Unity 构建、28 配置集成及两份程序独立保存恢复通过；实际检查手牌、点击抬牌和进步卡预览。两个原启动脚本均已指向修复版，策略选择继续保留；运行中的旧窗口需重启生效。
@@ -48,7 +52,7 @@ M6 本地 AI 对手已于 2026 年 10 月 9 日完成工程验收：可选择基
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1
 ```
 
-当前场景为 `Unity/Catan/Assets/M6.unity`，原策略 Windows 程序为 `.local/m6-ui-v006-card-ratio-v002/Builds/Windows/CatanM6.exe`，操作见 [M6 试玩说明](docs/M6_PLAYTEST.md)、[v006 说明](docs/UI_TABLETOP_V006.md)和 [手牌比例修复](docs/UI_CARD_ASPECT_FIX_V001.md)。v006 原交付曾逐一核对 166 个文件，并于北京时间 12:14 在“卡坦项目督察组”完成自动汇报，历史核对记录见 [开发进度日志](DEVELOPMENT_LOG.md)；本轮修复验证另列。策略是本地启发式基线；用户本人整局试玩、对战强度、最终 UI 与美术仍待确认。下一阶段为 M7 好友联机。
+当前场景为 `Unity/Catan/Assets/M6.unity`，原策略 Windows 程序为 `.local/m6-ui-v007-original-ai/Builds/Windows/CatanM6.exe`，优化 AI 程序为 `.local/m6-ui-v007/Builds/Windows/CatanM6.exe`，操作见 [M6 试玩说明](docs/M6_PLAYTEST.md)和 [v007 说明](docs/UI_TABLETOP_V007.md)。历史核对与汇报记录见 [开发进度日志](DEVELOPMENT_LOG.md)。策略是本地启发式基线；用户本人整局试玩、对战强度、最终 UI 与美术仍待确认。下一阶段为 M7 好友联机。
 
 M5 双扩展组合已于 2026 年 10 月 9 日完成工程验收：支持“驶向新海岸”“穿越沙漠”各 3–4 人固定地图，均为 16 分获胜。船、海盗、金矿与骑士、蛮族、商品和进步卡共同生效。**383/383 项规则与回归测试通过**，四个正常完整局、固定 Unity 构建、独立 Windows 保存/恢复及真实鼠标开局操作均已验证。详见 [M5 验收记录](docs/M5_ACCEPTANCE.md)与[组合兼容表](docs/M5_SCENARIOS.md)。
 

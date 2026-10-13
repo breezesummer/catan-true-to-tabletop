@@ -221,7 +221,11 @@ public sealed partial class M4App : MonoBehaviour
         {
             var p=board.ScreenPoint(tile.Id);p=new Vector2(p.x*1440/Screen.width,p.y*900/Screen.height);
             if(ai!=null)TabletopUI.NumberToken(p,tile.Number>0?(int?)tile.Number:null,"沙漠",heading);
-            else GUI.Label(new Rect(p.x-30,p.y-16,60,24),(tile.Number>0?tile.Number.ToString():"沙漠"),heading);
+            else
+            {
+                var numberStyle=new GUIStyle(heading);if(tile.Number==6||tile.Number==8)numberStyle.normal.textColor=TabletopUI.HotNumberColor;
+                GUI.Label(new Rect(p.x-30,p.y-16,60,24),(tile.Number>0?tile.Number.ToString():"沙漠"),numberStyle);
+            }
         }
         if(pickField!=""&&ai==null)
         {

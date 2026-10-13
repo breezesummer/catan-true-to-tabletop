@@ -8,6 +8,7 @@ public static class EntityCardAssets
 {
     const string Root = "EntityAssets/v001/";
     static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+    static Texture2D paperLight;
     static readonly string[] GoodIds = { "wood", "brick", "wool", "grain", "ore", "cloth", "coin", "paper" };
     static readonly string[] TrackIds = { "trade", "politics", "science" };
     // Ordered to match the stable M4/M5 ProgressCardKind values, not the printed photo text.
@@ -76,12 +77,62 @@ public static class EntityCardAssets
     public static Texture2D ResourceFront(int resource) => resource >= 0 && resource < 5 ? Texture(Good(resource).Front) : null;
     public static Texture2D CommodityFront(int commodity) => commodity >= 0 && commodity < 3 ? Texture(Good(commodity + 5).Front) : null;
     public static Texture2D ResourceOrCommodityFront(int good) => good >= 0 && good < 8 ? Texture(Good(good).Front) : null;
-    // 无边框、无裁切、无反光覆盖条；数量与操作提示由调用方放在卡面外。
-    public static void DrawCardFace(Rect area,Texture2D texture)
+    // v007：原始照片和印刷比例保持不变，只裁去实体圆角以外的拍摄背景。
+    // 纸芯、投影与整面弱受光属于显示层，不重新加工照片或遮挡规则文字。
+    public static void DrawCardFace(Rect area,Texture2D texture,float elevation=0)
     {
         if(texture==null)return;
         var rect=FitCardRect(area,(float)texture.width/texture.height,GUI.matrix);
-        GUI.DrawTexture(rect,texture,ScaleMode.StretchToFill,true);
+        DrawPaperDepth(rect,elevation);
+        float radius=Mathf.Min(rect.width,rect.height)*.095f;
+        GUI.DrawTexture(rect,texture,ScaleMode.StretchToFill,true,0,Color.white,0,radius);
+        DrawPaperLight(rect,radius);
+    }
+    public static void DrawCardPaper(Rect rect,Color color,float elevation=0)
+    {
+        DrawPaperDepth(rect,elevation);
+        float radius=Mathf.Min(rect.width,rect.height)*.095f;
+        GUI.DrawTexture(rect,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,color,0,radius);
+        DrawPaperLight(rect,radius);
+    }
+    static void DrawPaperDepth(Rect rect,float elevation)
+    {
+        if(Event.current.type!=EventType.Repaint||rect.width<=0||rect.height<=0)return;
+        float radius=Mathf.Min(rect.width,rect.height)*.095f;
+        float scale=Mathf.Clamp(rect.width/108f,.36f,2.4f),lift=Mathf.Clamp01(elevation);
+        // 多层低透明度投影提供连续柔边；不添加卡套或高亮装饰横线。
+        for(int layer=5;layer>=1;layer--)
+        {
+            float spread=(.65f+layer*.8f+lift*1.4f)*scale;
+            var shadow=new Rect(rect.x-spread+.8f*scale,rect.y-spread+(3.3f+lift*4)*scale,rect.width+2*spread,rect.height+2*spread);
+            GUI.DrawTexture(shadow,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,new Color(.035f,.023f,.013f,.032f),0,radius+spread);
+        }
+        var core=new Rect(rect.x+.45f*scale,rect.y+1.7f*scale,rect.width,rect.height);
+        GUI.DrawTexture(core,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,new Color(.57f,.50f,.36f),0,radius);
+        core.y-=.65f*scale;
+        GUI.DrawTexture(core,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,new Color(.89f,.84f,.70f),0,radius);
+    }
+    static void DrawPaperLight(Rect rect,float radius)
+    {
+        if(Event.current.type!=EventType.Repaint)return;
+        if(paperLight==null)
+        {
+            const int width=96,height=144;
+            paperLight=new Texture2D(width,height,TextureFormat.RGBA32,false){name="卡纸漫反射薄覆膜 v007",filterMode=FilterMode.Bilinear,wrapMode=TextureWrapMode.Clamp};
+            var pixels=new Color32[width*height];
+            for(int y=0;y<height;y++)for(int x=0;x<width;x++)
+            {
+                float u=(x+.5f)/width,v=(y+.5f)/height;
+                float glow=Mathf.Exp(-((u-.12f)*(u-.12f)*2.1f+(v-.88f)*(v-.88f)*1.8f))*.075f;
+                float shade=Mathf.Pow(1-v,2)*.05f;
+                // 固定微颗粒，不读取或消耗规则随机数。
+                float grain=(((x*17+y*31+x*y*3)%23)/22f-.5f)*.009f;
+                float light=glow-shade+grain;
+                pixels[y*width+x]=light>=0?new Color(1,.97f,.90f,light):new Color(.14f,.10f,.06f,-light);
+            }
+            paperLight.SetPixels32(pixels);paperLight.Apply(false,true);
+        }
+        GUI.DrawTexture(rect,paperLight,ScaleMode.StretchToFill,true,0,Color.white,0,radius);
     }
     // 在屏幕像素中保持比例；逻辑坐标里的 ScaleToFit 仍会被外层非等比矩阵拉伸。
     public static Rect FitCardRect(Rect area,float aspect,Matrix4x4 matrix)
