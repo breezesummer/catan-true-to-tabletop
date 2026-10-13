@@ -12,7 +12,7 @@
 
 实际检查 1920×1080 城市骑士的完整界面、整桌滚轮缩放、俯视、Esc 菜单、银行交易浮窗的 Esc 关闭优先级，以及双扩展新局的横船和三面分开的城墙。完整截图仅保留本地 `.local`，没有发布验收存档、完整手牌或随机状态。批处理完整 IMGUI 像素验收仍为 false；所有分辨率、用户本人整局试玩、完整设施升级流程和长期性能仍待验。
 
-可玩程序：[CatanM6.exe](.local/m6-ui-v009/Builds/Windows/CatanM6.exe)。发行压缩包：[卡坦岛之三国争霸内测版1.1.zip](.local/m6-ui-v009/release/卡坦岛之三国争霸内测版1.1.zip)，434,611,675 字节，166 个文件逐项压缩流校验通过。包内保留完整 Unity 运行文件和中文说明，排除调试目录、开发存档与日志。复现脚本为 `tools/development/Package-Playtest.ps1`。现有用户修改及根启动脚本的删除保持不动；M7/M8 状态不变。详见 [v009 说明](docs/UI_TABLETOP_V009.md)和[公开摘要](docs/verification/tabletop-ui-v009/summary.json)。提交推送及微信群送达状态另据实际结果补录。
+可玩程序：[CatanM6.exe](.local/m6-ui-v009/Builds/Windows/CatanM6.exe)。发行压缩包：[卡坦岛之三国争霸内测版1.1.zip](.local/m6-ui-v009/release/卡坦岛之三国争霸内测版1.1.zip)，434,611,675 字节，166 个文件逐项压缩流校验通过。包内保留完整 Unity 运行文件和中文说明，排除调试目录、开发存档与日志。复现脚本为 `tools/development/Package-Playtest.ps1`。现有用户修改及根启动脚本的删除保持不动；M7/M8 状态不变。详见 [v009 说明](docs/UI_TABLETOP_V009.md)和[公开摘要](docs/verification/tabletop-ui-v009/summary.json)。实现提交 `0b66f61a19eadbf3a8e9e188e68c603790d38afe` 已推送 `origin/dev-1.0` 并核对远端一致。北京时间 00:33 已确认微信“卡坦项目督察组”收到内测版1.1压缩包与开发结果报告：文件显示普通 ZIP 图标、414.5 MB，无上传文字或暂停图标；报告等待标记消失、输入框清空。报告开头注明 GPT-6 自动报告、本轮约30分钟；细分型号与思考强度因当前运行环境未提供可核实值而如实标注未知，没有沿用上一聊天的模型标签。
 
 ## 2026-10-13 固定分区、逐张手牌与胜利分数 v008
 
