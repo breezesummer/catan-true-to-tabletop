@@ -76,6 +76,7 @@ public sealed class OperationDock
     }
 
     public bool TradeOpen => tradeOpen;
+    public bool HasCancelableInteraction => tradeOpen || previewCard!=null || Selection.BuildId!=null || Selection.Selected.Any(n=>n>0) || heldPiece!=null || dragging;
     // 银行牌堆与旧购买流程共用这一入口，仍由适配层校验并提交指令。
     public void PrepareDevelopmentPurchase()
     {
@@ -145,7 +146,7 @@ public sealed class OperationDock
         if(scope!=snapshot.Scope){hoverAmounts.Clear();spreadAmounts.Clear();hoveredHand=null;handHoverAnchor=Rect.zero;handUpdated=Time.unscaledTimeAsDouble;}
         if(scope!=snapshot.Scope||revision!=snapshot.Revision){Reset();scope=snapshot.Scope;revision=snapshot.Revision;}
         current=snapshot;Selection.Sync(snapshot);
-        if(GUI.enabled&&(Event.current.type==EventType.KeyDown&&Event.current.keyCode==KeyCode.Escape||Event.current.type==EventType.MouseDown&&Event.current.button==1))
+        if(GUI.enabled&&Event.current.type==EventType.MouseDown&&Event.current.button==1)
         {Reset();snapshot.Cancel?.Invoke();Event.current.Use();}
         hoveredBuild=null;tooltipRect=Rect.zero;hits.Clear();faces.Clear();pieceFaces.Clear();
         // 在任何世界组件接收 MouseDown 前，先按本帧屏幕布局确定手牌命中。
@@ -185,10 +186,27 @@ public sealed class OperationDock
     {
         var pieces=s.Builds.Where(b=>b.Track<0&&b.Icon!="development").ToArray();
         var facilities=s.Builds.Where(b=>b.Track>=0).OrderBy(b=>b.Track).ToArray();
-        float width=Math.Min(180,(facilities.Length>0?722:1090)/Math.Max(1f,pieces.Length));
-        float start=facilities.Length>0?248:Math.Max(248,(1440-pieces.Length*width)/2);
-        for(int i=0;i<pieces.Length;i++)DrawBuild(new Rect(start+i*width,628,width-9,97),pieces[i],s);
-        for(int i=0;i<facilities.Length;i++)DrawBuild(new Rect(980+i*146,516,142,188),facilities[i],s);
+        for(int i=0;i<pieces.Length;i++)DrawBuild(StockGroupLayout(pieces,i,facilities.Length>0),pieces[i],s);
+        for(int i=0;i<facilities.Length;i++)DrawBuild(FacilityLayout(i),facilities[i],s);
+    }
+    internal static Rect FacilityLayout(int track) => new Rect(1090+track*108,596,104,138);
+    internal static float StockGroupWidth(string kind) => kind=="road"?152:kind=="ship"?164:kind=="wall"?120:kind=="city"?112:kind=="settlement"?80:54;
+    internal static Rect StockGroupLayout(OperationBuild[] pieces,int index,bool hasFacilities)
+    {
+        float width=pieces.Sum(p=>StockGroupWidth(p.Icon??p.Id));
+        float center=hasFacilities?672:720;
+        float x=center-width/2+pieces.Take(index).Sum(p=>StockGroupWidth(p.Icon??p.Id));
+        return new Rect(x,648,StockGroupWidth(pieces[index].Icon??pieces[index].Id),60);
+    }
+    internal static Vector2 StockPieceLayout(Rect group,string kind,int index)
+    {
+        // 各类组件按轮廓预留自己的位置。横船分三排、城墙逐个留缝，不把大模型挤入统一小网格。
+        if(kind=="ship")return new Vector2(group.center.x-64+(index%5)*32,group.y+15+(index/5)*18);
+        if(kind=="road")return new Vector2(group.center.x-63+(index%8)*18,group.y+20+(index/8)*18);
+        if(kind=="settlement")return new Vector2(group.center.x-22+(index%3)*22,group.y+20+(index/3)*22);
+        if(kind=="city")return new Vector2(group.center.x-42+(index%4)*28,group.y+32+(index/4)*24);
+        if(kind=="wall")return new Vector2(group.center.x-38+(index%3)*38,group.y+36+(index/3)*34);
+        return new Vector2(group.center.x-13+(index%2)*26,group.y+36+(index/2)*26);
     }
     void DrawBuild(Rect r,OperationBuild build,OperationSnapshot s)
     {
@@ -216,14 +234,12 @@ public sealed class OperationDock
             var piece=OperationPieceAssets.Texture(build.Icon??build.Id,s.Seat??"P1",Math.Max(1,build.Level));
             if(piece!=null)
             {
-                int amount=Math.Max(1,build.Count),columns=Math.Min(8,Math.Max(3,(amount+1)/2));
-                float step=Math.Min(25,(r.width-35)/Math.Max(1,columns-1));
-                float left=r.center.x-(Math.Min(columns,amount)-1)*step/2-20;
+                int amount=Math.Max(1,build.Count);
                 for(int n=0;n<amount;n++)
                 {
                     bool picked=Selection.IsPieceSelected(build.Id,n);
                     if(build.Count==0||picked&&pieceDragging)continue;
-                    var position=new Vector2(left+(n%columns)*step+20,r.y+(n/columns)*30+23);
+                    var position=StockPieceLayout(r,build.Icon??build.Id,n);
                     var world=table.Objects.Piece("stock-"+build.Id+"-"+n,build.Icon??build.Id,s.Seat,Math.Max(1,build.Level),position,picked);
                     if(world==null)continue;
                     var shape=new HitShape{World=world};

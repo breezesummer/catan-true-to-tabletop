@@ -1,0 +1,37 @@
+{
+  "说明": "本轮实际独立 .NET 全量回归；不代替 Unity 兼容性或实际界面验收。",
+  "命令": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/validation/Test-M6Rules.ps1 -ResultsDirectory .local/m6-ui-v009/tests",
+  "开始": "2026-10-14T00:09:42.7977963+08:00",
+  "结束": "2026-10-14T00:16:35.2464028+08:00",
+  "总数": 761,
+  "通过": 761,
+  "失败": 0,
+  "未执行": 0,
+  "正常AI完整局": 52,
+  "检查对象": [
+    {
+      "路径": "src/Catan.Core/bin/Release/netstandard2.1/Catan.Core.dll",
+      "SHA256": "e9dbf1832c63b5e4beaa4013149ea1e9c68723de68502aa6631a299550038a4c"
+    },
+    {
+      "路径": "src/Catan.AI/bin/Release/netstandard2.1/Catan.AI.dll",
+      "SHA256": "4c877ed5c48cec4e684182dbade1f4498f6fff4da533288773b53c9ceba1edea"
+    },
+    {
+      "路径": "Unity/Catan/Assets/Scripts/OperationDockModel.cs",
+      "SHA256": "785b9c03bb69ab3bd5685db91cfd1a8b5d71da40dcb7390d8947184763f11f13"
+    },
+    {
+      "路径": "Unity/Catan/Assets/Scripts/TabletopPresentationModel.cs",
+      "SHA256": "fa6029ac18ded0fbd6264cb70a97d37f51983176ae8cf18e6192f7642a2318fd"
+    },
+    {
+      "路径": "Unity/Catan/Assets/Scripts/TabletopDiceHistory.cs",
+      "SHA256": "1ae7413d2476f03a197f94728462008abcf12bed3d3dd43e74793a754d35a4e9"
+    },
+    {
+      "路径": "Unity/Catan/Assets/Scripts/TabletopScoreModel.cs",
+      "SHA256": "bdf4139eea9972696fde78064216778f46d94f3abf940b90cb0162bdb10d9fcc"
+    }
+  ]
+}

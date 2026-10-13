@@ -32,7 +32,7 @@ public sealed partial class M6App : MonoBehaviour
     public bool Finished=>Ready&&finished();
     public string CurrentActor=>Ready?actor():"";
     public bool IsHumanTurn=>Ready&&!Finished&&CurrentActor==HumanSeat;
-    public string WaitingText=>Fault!=""?"AI 已暂停："+Fault:Paused?"AI 已暂停。打开右上角桌边菜单继续。":Finished?"本局已结束。":"等待 "+CurrentActor+" · AI 正在行动。";
+    public string WaitingText=>Fault!=""?"AI 已暂停："+Fault:Paused?"AI 已暂停。按 Esc 打开菜单继续。":Finished?"本局已结束。":"等待 "+CurrentActor+" · AI 正在行动。";
     public string SavePath=>Path.Combine(Application.persistentDataPath,"m6-local-ai-v1.json");
 
     Func<string> actor,save;
@@ -48,9 +48,9 @@ public sealed partial class M6App : MonoBehaviour
     internal bool TableDiceRolling;
     int menuRule,menuScenario,menuPlayers=4,menuHuman;
     int? menuVictoryPoints;
-        bool tableMenu;
+    bool tableMenu, escapeDismissedInteraction;
     public bool TableMenuOpen=>tableMenu;
-    public bool BlocksTableInput(Vector2 p)=>MenuVisible||tableMenu||new Rect(1280,20,138,36).Contains(p);
+    public bool BlocksTableInput(Vector2 p)=>MenuVisible||tableMenu;
     void ToggleTableCamera()
     {
         var b=FindFirstObjectByType<BoardRenderer>();if(b!=null)b.SetCamera(!b.TopView);
@@ -75,20 +75,36 @@ public sealed partial class M6App : MonoBehaviour
     }
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))tableMenu=false;
+        if(Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(1))escapeDismissedInteraction=false;
+        if(Input.GetKeyDown(KeyCode.Escape))HandleTableEscape();
         if(MenuVisible||tableMenu||!Ready||Paused||TableDiceRolling||Time.unscaledTime<nextAction)return;
         nextAction=Time.unscaledTime+.60f;
         StepAi();
     }
+    internal void HandleTableEscape()
+    {
+        if(MenuVisible||!Ready)return;
+        if(tableMenu){tableMenu=false;escapeDismissedInteraction=false;nextAction=Time.unscaledTime+.60f;return;}
+        // 第一遍放回本地草稿；规则要求的待决面板即使自动出现，下一遍仍能打开菜单。
+        if(!escapeDismissedInteraction)
+        {
+            bool cancelled=presentation is M2App basic?basic.TryCancelTableInteraction():
+                presentation is M3App sailing?sailing.TryCancelTableInteraction():
+                presentation is M4App cities?cities.TryCancelTableInteraction():
+                presentation is M5App combined&&combined.TryCancelTableInteraction();
+            if(cancelled){escapeDismissedInteraction=true;return;}
+        }
+        escapeDismissedInteraction=false;tableMenu=true;
+    }
     // At most one decision is computed and submitted in each call/frame. No wait loop blocks input.
     public bool StepAi()
     {
-        if(MenuVisible||!Ready||Paused||Finished||IsHumanTurn)return false;
+        if(MenuVisible||tableMenu||!Ready||Paused||Finished||IsHumanTurn)return false;
         string player=CurrentActor;
         try
         {
             string result=decideAndSubmit(player);
-            if(result!=null){Fault=player+" 的命令被拒绝（"+result+"）。局面保留，可保存后检查。";Paused=true;ShowTablePrompt("AI 已暂停，请检查桌边菜单");return false;}
+            if(result!=null){Fault=player+" 的命令被拒绝（"+result+"）。局面保留，可保存后检查。";Paused=true;ShowTablePrompt("AI 已暂停，按 Esc 查看菜单");return false;}
             AiCommandsExecuted++;
             refresh();
             Notice=Finished?"本局结束。":IsHumanTurn?"轮到你完成行动或待决选择。":player+" 已完成本次操作，AI 正在继续行动。";
@@ -98,7 +114,7 @@ public sealed partial class M6App : MonoBehaviour
         {
             // Do not log command payloads, cards, saves, or exception messages containing private data.
             Fault=player+" 决策失败（"+ex.GetType().Name+"）。";Paused=true;
-            ShowTablePrompt("AI 已暂停，请检查桌边菜单");
+            ShowTablePrompt("AI 已暂停，按 Esc 查看菜单");
             Debug.LogError("CATAN_M6_AI_PAUSED: "+ex.GetType().Name);return false;
         }
     }
@@ -138,7 +154,7 @@ public sealed partial class M6App : MonoBehaviour
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
         TargetVictoryPoints=target;
-        tableMenu=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你的手牌始终只显示 "+human+"。";
+        tableMenu=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你的手牌始终只显示 "+human+"。";
         promptContext=null;promptWasHuman=false;lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.Show(Time.unscaledTimeAsDouble);
         switch(rules)
         {
@@ -233,20 +249,23 @@ public sealed partial class M6App : MonoBehaviour
         {
             var corner=new GUIStyle(small){fontSize=14};corner.normal.textColor=new Color(.98f,.88f,.67f);
             GUI.Label(new Rect(24,21,300,29),"CATAN  /  "+RuleNames[Array.IndexOf(RuleIds,RuleSet)],corner);
-            if(GUI.Button(new Rect(1280,20,138,36),tableMenu?"收起菜单":"桌边菜单",button))tableMenu=!tableMenu;
             if(tableMenu)
             {
-                TabletopUI.Note(new Rect(1110,70,306,290));
-                if(GUI.Button(new Rect(1130,90,266,37),Paused?"继续 AI":"暂停 AI",button))SetPaused(!Paused);
-                if(GUI.Button(new Rect(1130,135,266,37),"保存这桌游戏",button))SaveGame();
-                if(GUI.Button(new Rect(1130,180,127,37),"恢复存档",button)){tableMenu=false;LoadGame();}
-                if(GUI.Button(new Rect(1268,180,128,37),"切换俯视",button))ToggleTableCamera();
-                if(GUI.Button(new Rect(1130,225,266,37),"规则 / 新开一桌",button)){tableMenu=false;ShowMenu();}
-                var note=new GUIStyle(small);note.normal.textColor=new Color(.25f,.13f,.06f);
-                GUI.Label(new Rect(1130,277,266,66),Notice,note);
+                ModernOperationUI.Styles(font);
+                Panel(new Rect(0,0,1440,900),new Color(0,0,0,.48f));
+                ModernOperationUI.Panel(new Rect(470,205,500,490));
+                ModernOperationUI.Label(new Rect(504,231,310,44),"游戏菜单",ModernOperationUI.Title);
+                ModernOperationUI.Label(new Rect(800,242,132,25),"Esc 返回游戏",ModernOperationUI.Small);
+                if(ModernOperationUI.Button(new Rect(504,297,432,46),"返回游戏",true,true)){tableMenu=false;nextAction=Time.unscaledTime+.60f;}
+                if(ModernOperationUI.Button(new Rect(504,355,210,44),Paused?"继续 AI":"暂停 AI"))SetPaused(!Paused);
+                if(ModernOperationUI.Button(new Rect(726,355,210,44),"切换俯视"))ToggleTableCamera();
+                if(ModernOperationUI.Button(new Rect(504,411,210,44),"保存这桌游戏"))SaveGame();
+                if(ModernOperationUI.Button(new Rect(726,411,210,44),"恢复存档")){tableMenu=false;LoadGame();}
+                if(ModernOperationUI.Button(new Rect(504,467,432,44),"规则 / 新开一桌")){tableMenu=false;ShowMenu();}
+                ModernOperationUI.Label(new Rect(504,538,432,122),Notice,ModernOperationUI.Small);
             }
             string prompt=CurrentTablePrompt;
-            if(prompt.Length>0)
+            if(prompt.Length>0&&!tableMenu)
             {
                 var promptStyle=new GUIStyle(title){fontSize=46,alignment=TextAnchor.MiddleCenter,wordWrap=true};
                 promptStyle.normal.textColor=new Color(.92f,.07f,.055f);

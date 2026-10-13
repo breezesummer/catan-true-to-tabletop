@@ -7,7 +7,7 @@ using UnityEngine;
 // 银行仅消费玩家视图的公开库存与获准历史，飞牌只呈现已经完成的结算。
 public sealed class TabletopBankUI
 {
-    public static readonly Rect Area = new Rect(18,316,199,282);
+    public static readonly Rect Area = new Rect(18,55,220,210);
     readonly TabletopCollectionTimeline timeline = new TabletopCollectionTimeline();
     public TabletopCollectionTimeline Collections => timeline;
     public Action<TabletopCollectionFlight> OccludeHand;
@@ -18,14 +18,14 @@ public sealed class TabletopBankUI
     OperationSnapshot current;
     static Texture2D developmentBack;
     static readonly string[] Names = {"木材","砖块","羊毛","谷物","矿石","布匹","钱币","纸张"};
-    public static Rect StackLayout(int index) => new Rect(27+(index%3)*62,340+(index/3)*63,42,59);
+    public static Rect StackLayout(int index) => new Rect(27+(index%4)*52,86+(index/4)*55,34,48);
     public void Draw(TabletopScene table,OperationSnapshot snapshot,GameHistoryEntry[] entries,TabletopSeat[] seats,
         Action<string> trade,Action purchase,List<TabletopWorldObjects.Hit> worldHits,List<Rect> hits)
     {
         if(snapshot==null)return;
         current=snapshot;sources.Clear();destinations.Clear();ownDestinations.Clear();ownSlotIndices.Clear();
         timeline.Observe(snapshot.Scope,entries,Time.unscaledTimeAsDouble);
-        var title=table.ProjectLabel(new Rect(24,316,181,25));hits.Add(title);
+        var title=table.ProjectLabel(new Rect(24,55,208,25));hits.Add(title);
         if(ModernOperationUI.Button(title,"银行",snapshot.CanTrade))trade?.Invoke(null);
         for(int good=0;good<snapshot.GoodCount;good++)
         {
@@ -75,13 +75,13 @@ public sealed class TabletopBankUI
         for(int i=0;i<order.Length;i++)
         {
             int place=order.Length==2?(i==0?0:2):i;
-            var end=table.ProjectLabel(place==1?new Rect(889,52,27,39):new Rect(place==0?54:1271,256,27,39));
+            var end=table.ProjectLabel(TabletopUI.OpponentHandCardLayout(place,0,1));
             destinations[order[i]]=end;
         }
     }
     static void DrawCount(TabletopScene table,Rect layout,int count)
     {
-        var area=table.ProjectLabel(new Rect(layout.xMax+1,layout.y+20,18,20));
+        var area=table.ProjectLabel(new Rect(layout.xMax+1,layout.y+14,18,20));
         GUI.Label(area,count.ToString(),new GUIStyle(ModernOperationUI.Center){wordWrap=false,fontSize=Mathf.Max(9,Mathf.RoundToInt(12*table.DisplayScale))});
     }
     static TabletopWorldObjects.Hit Stack(TabletopScene table,string key,Rect layout,Texture2D texture,int count)

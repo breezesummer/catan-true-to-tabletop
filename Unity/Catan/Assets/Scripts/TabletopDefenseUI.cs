@@ -3,7 +3,7 @@ using UnityEngine;
 // 固定屏幕状态区，只消费 PlayerView 的公开兵力与航程，不参与结算。
 public sealed class TabletopDefenseUI
 {
-    public static readonly Rect Area=new Rect(18,730,220,104);
+    public static readonly Rect Area=new Rect(1208,55,220,104);
     int position=-1,strength,threat;
     static Texture2D ship,shield;
     public void Bind(int position,int strength,int threat)

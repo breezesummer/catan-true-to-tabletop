@@ -100,7 +100,7 @@ public sealed partial class M4App : MonoBehaviour
         if(board==null)return;
         if(ai!=null&&ai.TableMenuOpen){board.ClearPreview();return;}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
-        if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();pickField="";board.ClearPreview();newGame=false;cardArt.Clear();}
+        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();pickField="";board.ClearPreview();newGame=false;cardArt.Clear();}
         if(!DockBlocksMouse()&&(ai!=null||Input.mousePosition.x<Screen.width*.70f)&&Input.mouseScrollDelta.y!=0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGame||artOpen||ai!=null&&!ai.IsHumanTurn)return;
         var mouse=buildReleased?new Vector2(releasedMouse.x*Screen.width/1440f,releasedMouse.y*Screen.height/900f):new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
@@ -132,6 +132,13 @@ public sealed partial class M4App : MonoBehaviour
                 pickField="";board.ClearPreview();status=ai!=null?"目标已选中，请在操作面板确认。":"已选择 "+target+"；检查面板后确认。";
             }
         }
+    }
+    internal bool TryCancelTableInteraction()
+    {
+        if(tabletop.TryCloseOverlay())return true;
+        bool active=draft!=null||operationActions||operationKnightTarget!=null||newGame||artOpen||cardArt.HasSelection||dock.HasCancelableInteraction;
+        if(!active)return false;
+        dock.Reset();CancelOperationDraft();pickField="";board.ClearPreview();newGame=false;artOpen=false;cardArt.Clear();return true;
     }
     string Pick(string type,Vector2 mouse)
     {

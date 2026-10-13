@@ -6,12 +6,15 @@ using UnityEngine;
 // 只渲染已按当前观看者权限投影的历史，不能访问权威状态。
 public sealed class TabletopHistoryUI
 {
-    static readonly Rect Feed = new Rect(18,606,220,112), Window = new Rect(210,144,1020,560);
+    internal static readonly Rect Feed = new Rect(18,550,220,334);
+    static readonly Rect Window = new Rect(210,144,1020,560);
     Vector2 feedScroll, historyScroll, diceScroll;
     string filter;
     long lastSequence = -1;
     bool follow = true, showDice;
     public bool IsOpen { get; private set; }
+    public bool TryClose()
+    {if(!IsOpen)return false;IsOpen=false;return true;}
     public bool BlocksInput(Vector2 p) => IsOpen || Feed.Contains(p);
 
     public void Draw(Font font,GameHistoryEntry[] entries,string[] players)
@@ -38,7 +41,6 @@ public sealed class TabletopHistoryUI
         if(!follow&&ModernOperationUI.Button(new Rect(Feed.xMax-88,Feed.y+5,78,25),"最新 ↓")){follow=true;feedScroll.y=float.MaxValue;}
         }
         if(!IsOpen)return;
-        if(Event.current.type==EventType.KeyDown&&Event.current.keyCode==KeyCode.Escape){IsOpen=false;Event.current.Use();return;}
         ModernOperationUI.Fill(new Rect(0,0,1440,900),new Color(0,0,0,.50f));
         ModernOperationUI.Panel(Window);
         ModernOperationUI.Label(new Rect(Window.x+24,Window.y+18,112,35),"历史",ModernOperationUI.Title);

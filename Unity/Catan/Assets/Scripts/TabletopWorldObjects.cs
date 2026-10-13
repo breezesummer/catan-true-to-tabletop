@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-// 周边物件使用固定桌面相机与米制桌面。这里只接收已授权的显示数据，拾取不裁决规则。
+// 周边物件放在共同米制桌面上，缩放只改变相机。这里只接收已授权的显示数据。
 public sealed class TabletopWorldObjects : MonoBehaviour
 {
     public sealed class Hit
@@ -45,6 +45,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         public string Signature;
         public int Generation;
         public Mesh[] OwnedMeshes;
+        public Vector3 OriginalScale;
     }
     readonly Dictionary<string, Item> items = new Dictionary<string, Item>();
     readonly Dictionary<string, Material> faceMaterials = new Dictionary<string, Material>();
@@ -83,12 +84,12 @@ public sealed class TabletopWorldObjects : MonoBehaviour
             var obj = create(); obj.name = key; obj.transform.SetParent(transform, true);
             TabletopScene.SetTableLayer(obj.transform);
             foreach (var collider in obj.GetComponentsInChildren<Collider>()) { collider.enabled = false; Destroy(collider); }
-            item = new Item { Object = obj, Signature = signature, Hit = new Hit { Scene = scene, Root = obj.transform }, OwnedMeshes=meshes.Skip(firstOwnedMesh).ToArray() };
+            item = new Item { Object = obj, OriginalScale=obj.transform.localScale, Signature = signature, Hit = new Hit { Scene = scene, Root = obj.transform }, OwnedMeshes=meshes.Skip(firstOwnedMesh).ToArray() };
             items.Add(key, item);
         }
         item.Generation = generation; item.Object.SetActive(true); return item;
     }
-    public Hit Piece(string key, string kind, string seat, int level, Vector2 position, bool raised = false)
+    public Hit Piece(string key, string kind, string seat, int level, Vector2 position, bool raised = false, float yaw = float.NaN)
     {
         string resource = kind == "ship" ? EntityBoardAssets.ShipResource(seat) : kind == "road" ? "PhotoSamples/v001/road" :
             kind == "knight" ? PlayerComponentAssets.KnightResource(seat, level, false) :
@@ -104,17 +105,27 @@ public sealed class TabletopWorldObjects : MonoBehaviour
             }
             return instance;
         });
-        item.Object.transform.position = scene.World(position) + Vector3.up * (raised ? .003f : .0002f);
-        item.Object.transform.rotation = Quaternion.Euler(0, kind == "road" ? 90 : 180, 0);
+        item.Object.transform.localScale=item.OriginalScale;
+        item.Object.transform.position = scene.World(position);
+        item.Object.transform.rotation = Quaternion.Euler(0, float.IsNaN(yaw)?(kind == "road" || kind == "ship" ? 90 : 180):yaw, 0);
         if(item.Hit.Renderers==null)item.Hit.Renderers=item.Object.GetComponentsInChildren<Renderer>();
-        if(key.StartsWith("stock-",StringComparison.Ordinal))
-        {
-            // 模型高度各不相同，个人区按实际投影轮廓保留地图下方的空隙。
-            // 不能仅用模型底部锚点判断：高城堡会从锚点向屏幕上方伸出。
-            float top=item.Hit.Rect.yMin,minimum=TabletopScene.BoardArea.yMax+10;
-            if(top<minimum)item.Object.transform.position+=scene.World(position+Vector2.up*(minimum-top))-scene.World(position);
-        }
+        var bounds=PieceBounds(item.Hit.Renderers);
+        // 库存按真实网格占地排放：船横向，城墙保留完整间隙。基准比例不依赖当前缩放。
+        float width=kind=="road"?18:kind=="settlement"?20:kind=="city"?28:kind=="ship"?30:kind=="wall"?34:22;
+        float depth=kind=="road"?8:kind=="settlement"?20:kind=="city"?24:kind=="ship"?16:kind=="wall"?30:22;
+        float scale=Mathf.Min(1,width*scene.UnitsPerPixel/Mathf.Max(.00001f,bounds.size.x),
+            depth*scene.UnitsPerPixel/Mathf.Sin(40*Mathf.Deg2Rad)/Mathf.Max(.00001f,bounds.size.z));
+        item.Object.transform.localScale=item.OriginalScale*scale;
+        bounds=PieceBounds(item.Hit.Renderers);
+        item.Object.transform.position+=new Vector3(scene.World(position).x-bounds.center.x,
+            TabletopScene.SurfaceHeight+(raised?.003f:.0002f)-bounds.min.y,scene.World(position).z-bounds.center.z);
         return item.Hit;
+    }
+    static Bounds PieceBounds(Renderer[] renderers)
+    {
+        var bounds=renderers[0].bounds;
+        foreach(var renderer in renderers.Skip(1))bounds.Encapsulate(renderer.bounds);
+        return bounds;
     }
     Material Face(Texture2D texture, Rect uv, Color color, float smoothness = .24f)
     {
@@ -221,14 +232,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     {
         var size = new Vector2(layout.width, layout.height) * scene.UnitsPerPixel;
         var position=scene.World(layout.center)+Vector3.up*((raised?.002f:.0001f)+elevation);
-        size=FitProjectedSize(position,size,layout.size);
         return Surface(key,position,size,texture,uv??new Rect(0,0,1,1));
-    }
-    Vector2 FitProjectedSize(Vector3 position,Vector2 size,Vector2 maximum)
-    {
-        var projected=scene.ProjectSurface(position,size,Quaternion.identity);
-        float scale=Mathf.Min(1,maximum.x/Mathf.Max(.001f,projected.width),maximum.y/Mathf.Max(.001f,projected.height));
-        return size*scale;
     }
     Hit Surface(string key, Vector3 position, Vector2 size, Texture2D texture, Rect uv,float thickness=.00045f,float radiusRatio=.095f)
     {
@@ -243,11 +247,6 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         float[] cuts = { 0, .337f, .668f, 1 };
         var size=new Vector2(layout.width,layout.height)*scene.UnitsPerPixel;
         var position=scene.World(layout.center)+Vector3.up*.0001f;
-        float bottom=Mathf.Min(layout.yMax,678);
-        size=FitProjectedSize(position,size,new Vector2(layout.width,Mathf.Max(1,bottom-layout.yMin)));
-        var projected=scene.ProjectSurface(position,size,Quaternion.identity);
-        if(projected.yMax>bottom)
-            position+=scene.World(layout.center+Vector2.up*(bottom-projected.yMax))-scene.World(layout.center);
         return Surface(key,position,size,texture,new Rect(cuts[track],0,cuts[track+1]-cuts[track],1),.0022f,.035f);
     }
     // 小翻板沿用原照布局；逐片覆盖正面／背面，整张建设卡始终完整。
