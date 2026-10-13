@@ -64,7 +64,7 @@ public sealed partial class M5App
                 s.Cards.Add(new OperationHandCard{Id=((int)card)+":"+cardIndex++,Name=CardName(card),Detail=CardHelp[(int)card],Progress=true,ArtIndex=(int)card,Playable=view.LegalActions.Any(c=>c.Kind==CommandKind.PlayProgressCard&&c.ProgressCard==card)});
             if(view.TradeOffer!=null)
             {
-                var t=view.TradeOffer;s.Offer=new OperationOffer{Proposer=t.ProposerId,Recipient=t.OtherPlayerId,Give=DockGoods(t.Give,t.GiveCommodities),Receive=DockGoods(t.Receive,t.ReceiveCommodities),CanAccept=seat==t.OtherPlayerId,CanReject=seat==t.OtherPlayerId,CanCancel=seat==t.ProposerId};
+                var t=view.TradeOffer;s.Offer=new OperationOffer{Proposer=t.ProposerId,Recipient=t.OtherPlayerId,IsBroadcast=t.IsBroadcast,PendingRecipients=t.PendingRecipientIds,RejectedRecipients=t.RejectedPlayerIds??Array.Empty<string>(),Give=DockGoods(t.Give,t.GiveCommodities),Receive=DockGoods(t.Receive,t.ReceiveCommodities),CanAccept=t.CanRespond(seat),CanReject=t.CanRespond(seat),CanCancel=seat==t.ProposerId};
             }
             s.PrepareBuild=b=>
             {
@@ -89,7 +89,7 @@ public sealed partial class M5App
             };
             s.Respond=choice=>Submit(New(choice=="accept"?CommandKind.AcceptTrade:choice=="reject"?CommandKind.RejectTrade:CommandKind.CancelTrade));operationSnapshot=s;
         }
-        operationSnapshot.Status=status;operationSnapshot.CanInteract=ai.IsHumanTurn;
+        operationSnapshot.Status=status;operationSnapshot.CanInteract=ai.IsHumanTurn||view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat;
         operationSnapshot.CanTrade=ai.IsHumanTurn&&view.ActivePlayerId==seat&&view.Phase==GamePhase.Action&&view.PendingDecision==null&&view.TradeOffer==null;
         return operationSnapshot;
     }
@@ -105,6 +105,7 @@ public sealed partial class M5App
         bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TableMenuOpen&&!tabletop.HistoryOpen;GUI.enabled=tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition);
         DrawBoardLabels();
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);
+        tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,(int)view.LastEventDie);
         ai.TableDiceRolling=tabletop.DiceRolling;
         tabletop.Draw(font,seat,Actor(view),PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,

@@ -24,7 +24,7 @@ public sealed class BaseGameAi
     {
         if (view == null) throw new ArgumentNullException(nameof(view));
         if (view.Phase == GamePhase.Finished) throw new InvalidOperationException("The game has finished.");
-        var actor = view.TradeOffer != null ? view.TradeOffer.OtherPlayerId : view.PendingDecision?.PlayerId ?? view.ActivePlayerId;
+        var actor = view.TradeOffer != null ? view.TradeOffer.NextResponder(view.PlayerId) : view.PendingDecision?.PlayerId ?? view.ActivePlayerId;
         var canDiscard = view.Phase == GamePhase.Discard && view.Discards.Any(d => d.PlayerId == view.PlayerId);
         if (view.Phase == GamePhase.Discard ? !canDiscard : actor != view.PlayerId) throw new InvalidOperationException("This seat has no pending action.");
         return Choose(view);

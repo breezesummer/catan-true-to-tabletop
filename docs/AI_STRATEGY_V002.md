@@ -28,9 +28,11 @@ AI 仍只接收所属席位的 `PlayerView`，不读取权威会话、完整对�
 
 ## 验证与限制
 
-独立启动入口为 `tools/development/Play-AiStrategy.ps1`，程序目录为 `.local/m6-ai-v002`。重建使用 `tools/development/Build-M6.ps1 -OutputRoot .local/m6-ai-v002 -VerifyPlayer`。本轮在独立检出与独立分支验证、提交，保留并行界面工作的修改；不更新 M7／M8 进度。
+独立启动入口为 `tools/development/Play-AiStrategy.ps1`，程序目录为 `.local/m6-ai-v002`。重建使用 `tools/development/Build-M6.ps1 -OutputRoot .local/m6-ai-v002 -VerifyPlayer`。本轮先在独立检出完成策略验收，再顺序合入已交付的 v006 界面与广播交易；四类 AI 的交易回应继续使用 `NextResponder`。`Play-M6.ps1` 保留 v006 原策略程序，新入口使用集成后的策略程序；不更新 M7／M8 进度。
 
 独立固定局面用于检查战略选择，并通过真实执行入口验证关键动作、错误席位拒绝、输入不变和状态不变量。以 `a244e447` 为基线的独立检出已完成 **652/652 项测试**，包含 **59 项策略案例和 52 个正常完整 AI 局**；24,546 条指令合法，44～131 次玩家回合结束。最终测试耗时 6.77 分钟。Unity 6000.3.25f1 构建 31.0 秒、两个独立 Windows 保存／恢复进程 15.1／9.1 秒，均通过。证据见 [独立验收摘要](verification/ai-strategy-v002/isolated/summary.json)。
+
+随后合入界面提交 `06854215502fee10e3b484ba4c3f3e1f8ba0adb7`，最终集成版 **698/698 项测试通过**，仍含 59 项策略案例、52 个正常完整局及 24,546 条合法指令，44～131 次玩家回合结束；耗时 7.45 分钟。固定 Unity 6000.3.25f1 与 `.NET Standard 2.1` 构建通过，用时 31.6 秒；两个独立 Windows 保存／恢复进程通过，用时 14.4／9.4 秒。新程序另完成 **28 配置、15,078 次断言**的无图形界面检查。AI 源构建、测试目录、Unity 插件及 Windows 程序四份程序集哈希一致；最终程序 166 个文件已逐一核对并复制回主工作区。证据见 [集成验收摘要](verification/ai-strategy-v002/summary.json)和 [界面后台结果](verification/ai-strategy-v002/ui-headless.json)。没有把旧版窗口记录算作本轮集成程序的人工验收。
 
 开发检查曾暴露无建筑局面漏报价和海盗群岛规划非法西岸落点导致卡局；均已修复并增加回归。两次中止的开发跑局与失败尝试不计入上述最终通过结果。
 
