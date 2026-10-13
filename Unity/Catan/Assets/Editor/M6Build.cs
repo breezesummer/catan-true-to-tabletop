@@ -12,6 +12,7 @@ public static class M6Build
 {
     public static void Build()
     {
+        EntityCardTextureImporter.VerifyImportedCards();
         var session = CombinedGameSession.Create("heading-for-new-shores", 4, 20261009);
         if (session.GetPlayerView("P1").Board.Tiles.Length <= 19)
             throw new Exception("M6 core did not execute in Unity");
