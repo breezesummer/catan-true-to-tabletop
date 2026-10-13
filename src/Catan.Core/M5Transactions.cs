@@ -69,6 +69,7 @@ namespace Catan.Core.M5
             var copy=(TradeOffer)MemberwiseClone();
             copy.Give=Give.Copy();copy.Receive=Receive.Copy();
             copy.GiveCommodities=GiveCommodities.Copy();copy.ReceiveCommodities=ReceiveCommodities.Copy();
+            copy.RecipientPlayerIds=RecipientPlayerIds?.ToArray();copy.RejectedPlayerIds=RejectedPlayerIds?.ToArray();
             return copy;
         }
     }

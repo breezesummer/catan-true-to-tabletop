@@ -195,7 +195,7 @@ public sealed partial class M6App : MonoBehaviour
         {
             Panel(new Rect(0,0,1440,900),new Color(.025f,.07f,.085f));
             GUILayout.BeginArea(new Rect(280,95,880,730));GUILayout.Label("CATAN  /  本地 AI 对手",title);
-            GUILayout.Space(15);GUILayout.Label("一个本地人类席位 · 其余席位由离线启发式 AI 操作",label);GUILayout.Space(26);
+            GUILayout.Space(26);
             int selection=GUILayout.Toolbar(menuRule,RuleNames,button,GUILayout.Height(48));if(selection!=menuRule){menuRule=selection;menuScenario=0;}
             GUILayout.Space(20);var ids=ScenarioIds();menuScenario=Mathf.Clamp(menuScenario,0,ids.Length-1);
             if(menuRule==1||menuRule==3)
@@ -208,9 +208,8 @@ public sealed partial class M6App : MonoBehaviour
             GUILayout.Space(16);menuPlayers=GUILayout.Toolbar(menuPlayers-3,new[]{"3 人：你 + 2 个 AI","4 人：你 + 3 个 AI"},button,GUILayout.Height(44))+3;
             menuHuman=Mathf.Clamp(menuHuman,0,menuPlayers-1);GUILayout.Space(20);GUILayout.Label("你的席位",label);
             menuHuman=GUILayout.Toolbar(menuHuman,Enumerable.Range(1,menuPlayers).Select(i=>"P"+i).ToArray(),button,GUILayout.Height(42));
-            GUILayout.Space(22);GUILayout.Label("AI 只读取自己的玩家视图。轮到你的弃牌、交易或其他选择时会等待；可随时暂停 AI、保存并恢复。当前策略仍有明显取舍，供试玩迭代。",small);
             GUILayout.Space(22);if(GUILayout.Button(Ready?"开始新局（替换当前未保存局面）":"开始对局",button,GUILayout.Height(50)))StartGame(RuleIds[menuRule],ids[menuScenario],menuPlayers,"P"+(menuHuman+1));
-            GUILayout.BeginHorizontal();if(GUILayout.Button("读取 M6 存档",button,GUILayout.Height(42)))LoadGame();if(Ready&&GUILayout.Button("返回当前局",button,GUILayout.Height(42)))ResumeGame();GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();if(GUILayout.Button("读取存档",button,GUILayout.Height(42)))LoadGame();if(Ready&&GUILayout.Button("返回当前局",button,GUILayout.Height(42)))ResumeGame();GUILayout.EndHorizontal();
             GUILayout.Space(18);GUILayout.Label(Notice,small);GUILayout.EndArea();
         }
         else

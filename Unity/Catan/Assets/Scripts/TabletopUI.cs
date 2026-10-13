@@ -26,10 +26,16 @@ public sealed class TabletopUI
     static Texture2D disc;
     readonly TabletopDicePresentation dice = new TabletopDicePresentation();
     readonly TabletopHistoryUI history = new TabletopHistoryUI();
+    readonly TabletopBankUI bank = new TabletopBankUI();
+    OperationSnapshot operations;
+    Action purchaseDevelopment;
+    Catan.Core.GameHistoryEntry[] bankHistory = Array.Empty<Catan.Core.GameHistoryEntry>();
+    public void BindOperations(OperationSnapshot snapshot,Action purchase,Catan.Core.GameHistoryEntry[] entries)
+    {operations=snapshot;purchaseDevelopment=purchase;bankHistory=entries??Array.Empty<Catan.Core.GameHistoryEntry>();}
     public bool HistoryOpen => history.IsOpen;
     public bool BlocksOverlayInput(Vector2 p) => history.BlocksInput(p)||contextVisible&&ContextRect.Contains(p);
     public void DrawHistory(Font font,Catan.Core.GameHistoryEntry[] entries,string[] players)
-    {history.Draw(font,entries,players);}
+    {if(!history.IsOpen)bank.DrawFlights();history.Draw(font,entries,players);}
     public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
     public void ObserveDice(long sequence,int first,int second,int? eventDie)
     {dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);}
@@ -86,16 +92,10 @@ public sealed class TabletopUI
             int place=others.Length==2?(i==0?0:2):i;
             DrawSeat(others[i],place,others[i].Id==actor,trade);
         }
-        GUI.Label(new Rect(500,121,440,27),"第 "+turn+" 回合  ·  "+actor+"  ·  "+phase,center);
-        GUI.Label(new Rect(18,842,170,38),seat+" · 你   "+ownPoints+" 分",title);
-        if(!string.IsNullOrEmpty(detail))GUI.Label(new Rect(24,662,181,52),detail,small);
-        var bank=table.ProjectLabel(new Rect(28,434,157,68));hits.Add(bank);
-        for(int i=0;i<3;i++)
-        {
-            var card=table.Objects.Card("bank-card-"+i,new Rect(36+i*45,436,40,57),EntityCardAssets.ResourceFront(i));worldHits.Add(card);
-        }
-        TableLabel(new Rect(28,481,157,24),"银行 / 港口 · 交换",center);
-        if(GUI.Button(bank,GUIContent.none,GUIStyle.none))trade?.Invoke(null);
+        GUI.Label(new Rect(500,121,440,27),turn+" 回合  ·  "+actor+"  ·  "+phase,center);
+        GUI.Label(new Rect(18,842,170,38),seat+"   "+ownPoints+" 分",title);
+        if(!string.IsNullOrEmpty(detail))GUI.Label(new Rect(1236,598,178,42),detail,small);
+        bank.Draw(table,operations,bankHistory,seats,trade,purchaseDevelopment,worldHits,hits);
         bool expansion=dice.Event.HasValue;
         var diceRects=expansion?new[]{new Rect(1258,548,48,48),new Rect(1333,548,48,48),new Rect(1295,485,48,48)}
             :new[]{new Rect(1258,548,48,48),new Rect(1333,548,48,48)};
@@ -116,28 +116,28 @@ public sealed class TabletopUI
     }
     void DrawSeat(TabletopSeat p,int place,bool active,Action<string> trade)
     {
-        bool top=place==1;float x=top?456:place==0?22:1239,y=top?12:197;
-        float width=top?529:180;var seatRect=table.ProjectLabel(new Rect(x,y,width,top?105:260));hits.Add(seatRect);
+        bool top=place==1;float x=top?456:place==0?22:1239,y=top?28:136;
+        float width=top?529:180;var seatRect=table.ProjectLabel(new Rect(x,y,width,top?92:177));hits.Add(seatRect);
         Color color=BoardRenderer.SeatColor(p.Id);
         if(active){Token(table.ProjectLabel(new Rect(x-1,y+1,12,12)),new Color(1,.79f,.29f));}
         var label=new GUIStyle(center){fontSize=p.Improvements!=null&&!top?12:14,fontStyle=FontStyle.Bold};
-        string levels=p.Improvements!=null&&p.Improvements.Length>=3?" · 贸"+p.Improvements[0]+" 政"+p.Improvements[1]+" 科"+p.Improvements[2]:"";
+        string levels=p.Improvements!=null&&p.Improvements.Length>=3&&seatRect.Contains(Event.current.mousePosition)?" · 贸"+p.Improvements[0]+" 政"+p.Improvements[1]+" 科"+p.Improvements[2]:"";
         TableLabel(new Rect(x,y-4,width,26),p.Id+"   "+p.Points+" 分"+levels,label);
-        DrawStock("road",p.Roads,p.Id,x,y+27,top?200:174,top?18:25,8);
-        DrawStock("settlement",p.Settlements,p.Id,top?x+203:x,y+(top?26:82),top?115:100,28,5);
-        DrawStock("city",p.Cities,p.Id,top?x+320:x+95,y+(top?26:82),top?100:85,30,4);
-        if(p.Ships>0)DrawStock("ship",p.Ships,p.Id,x,y+(top?65:122),top?200:172,top?22:18,8);
-        float cx=top?x+433:x+32,cy=top?y+29:y+166;
+        DrawStock("road",p.Roads,p.Id,x,y+23,top?200:174,top?18:17,8);
+        DrawStock("settlement",p.Settlements,p.Id,top?x+203:x,y+(top?26:59),top?115:100,23,5);
+        DrawStock("city",p.Cities,p.Id,top?x+320:x+95,y+(top?26:59),top?100:85,25,4);
+        if(p.Ships>0)DrawStock("ship",p.Ships,p.Id,x,y+(top?60:87),top?200:172,top?22:16,8);
+        float cx=top?x+433:x+32,cy=top?y+24:y+120;
         var back=EntityCardAssets.Texture(EntityCardAssets.Good(0).Back);
         int shown=Math.Min(top?3:6,p.Resources+p.Cards);
         for(int i=0;i<shown;i++)
         {
             var card=table.Objects.Card("opponent-"+p.Id+"-card-"+i,new Rect(top?cx+i*30:x+3+i*30,cy,27,39),back);worldHits.Add(card);
         }
-        TableLabel(new Rect(top?cx-8:x,top?y+86:y+236,top?115:180,22),p.Resources+" 资源 · "+p.Cards+" 卡",new GUIStyle(center){fontSize=12});
+        TableLabel(new Rect(top?cx-8:x,top?y+69:y+158,top?115:180,22),p.Resources+" 资源 · "+p.Cards+" 卡",new GUIStyle(center){fontSize=12});
         // 浮层与银行在视觉上盖住席位时，不允许整块席位热区先吞掉点击。
         bool covered=SpecialRect.Contains(Event.current.mousePosition)||history.BlocksInput(Event.current.mousePosition)
-            ||table.ProjectLabel(new Rect(28,434,157,68)).Contains(Event.current.mousePosition);
+            ||table.ProjectLabel(TabletopBankUI.Area).Contains(Event.current.mousePosition);
         if(!covered&&GUI.Button(seatRect,GUIContent.none,GUIStyle.none))trade?.Invoke(p.Id);
     }
     void DrawStock(string kind,int count,string seat,float x,float y,float width,float size,int row)

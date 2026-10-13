@@ -6,11 +6,11 @@ using UnityEngine;
 // 只渲染已按当前观看者权限投影的历史，不能访问权威状态。
 public sealed class TabletopHistoryUI
 {
-    static readonly Rect Feed = new Rect(18,516,336,126), Window = new Rect(210,144,1020,560);
-    Vector2 feedScroll, historyScroll;
+    static readonly Rect Feed = new Rect(18,606,220,112), Window = new Rect(210,144,1020,560);
+    Vector2 feedScroll, historyScroll, diceScroll;
     string filter;
     long lastSequence = -1;
-    bool follow = true;
+    bool follow = true, showDice;
     public bool IsOpen { get; private set; }
     public bool BlocksInput(Vector2 p) => IsOpen || Feed.Contains(p);
 
@@ -21,40 +21,84 @@ public sealed class TabletopHistoryUI
         long sequence=entries.Length==0?0:entries[entries.Length-1].Sequence;
         if(sequence!=lastSequence)
         {
-            if(sequence<lastSequence){filter=null;historyScroll=Vector2.zero;follow=true;}
+            if(sequence<lastSequence){filter=null;historyScroll=diceScroll=Vector2.zero;follow=true;}
             if(follow)feedScroll.y=float.MaxValue;
             lastSequence=sequence;
         }
         if(!IsOpen)
         {
         ModernOperationUI.Panel(Feed);
-        ModernOperationUI.Label(new Rect(Feed.x+12,Feed.y+7,120,23),"对局动态",ModernOperationUI.Small);
-        if(ModernOperationUI.Button(new Rect(Feed.xMax-106,Feed.y+5,94,25),"查看历史"))IsOpen=true;
+        if(ModernOperationUI.Button(new Rect(Feed.x+10,Feed.y+5,76,25),"历史"))IsOpen=true;
         var recent=entries.Skip(Math.Max(0,entries.Length-40)).ToArray();
         var area=new Rect(Feed.x+8,Feed.y+36,Feed.width-16,Feed.height-44);
         if(Event.current.type==EventType.ScrollWheel&&Feed.Contains(Event.current.mousePosition))follow=false;
         feedScroll=DrawRows(area,recent,feedScroll,true);
         float feedHeight=recent.Sum(e=>Height(e,area.width-22,true));
         if(feedScroll.y>=Math.Max(0,feedHeight-area.height)-3)follow=true;
-        if(!follow&&ModernOperationUI.Button(new Rect(Feed.x+130,Feed.y+5,84,25),"最新 ↓")){follow=true;feedScroll.y=float.MaxValue;}
+        if(!follow&&ModernOperationUI.Button(new Rect(Feed.xMax-88,Feed.y+5,78,25),"最新 ↓")){follow=true;feedScroll.y=float.MaxValue;}
         }
         if(!IsOpen)return;
         if(Event.current.type==EventType.KeyDown&&Event.current.keyCode==KeyCode.Escape){IsOpen=false;Event.current.Use();return;}
         ModernOperationUI.Fill(new Rect(0,0,1440,900),new Color(0,0,0,.50f));
         ModernOperationUI.Panel(Window);
-        ModernOperationUI.Label(new Rect(Window.x+24,Window.y+18,500,35),"对局历史",ModernOperationUI.Title);
-        ModernOperationUI.Label(new Rect(Window.x+24,Window.y+54,800,24),"按行动者或受影响的玩家筛选 · 私密变化仅向有权查看的玩家显示",ModernOperationUI.Small);
+        ModernOperationUI.Label(new Rect(Window.x+24,Window.y+18,112,35),"历史",ModernOperationUI.Title);
+        if(ModernOperationUI.Button(new Rect(Window.x+142,Window.y+18,108,34),"操作",true,false,!showDice))showDice=false;
+        if(ModernOperationUI.Button(new Rect(Window.x+258,Window.y+18,108,34),"掷骰",true,false,showDice))showDice=true;
         if(ModernOperationUI.Button(new Rect(Window.xMax-78,Window.y+18,52,32),"关闭")){IsOpen=false;return;}
         float x=Window.x+24;
-        if(ModernOperationUI.Button(new Rect(x,Window.y+89,108,34),"全部玩家",true,false,filter==null)){filter=null;historyScroll=Vector2.zero;}x+=118;
+        if(ModernOperationUI.Button(new Rect(x,Window.y+70,108,34),"全部玩家",true,false,filter==null)){filter=null;historyScroll=diceScroll=Vector2.zero;}x+=118;
         foreach(var player in players)
         {
-            if(ModernOperationUI.Button(new Rect(x,Window.y+89,108,34),player,true,false,filter==player)){filter=player;historyScroll=Vector2.zero;}x+=118;
+            if(ModernOperationUI.Button(new Rect(x,Window.y+70,108,34),player,true,false,filter==player)){filter=player;historyScroll=diceScroll=Vector2.zero;}x+=118;
+        }
+        if(showDice)
+        {
+            var dice=new TabletopDiceHistory(entries,filter);
+            DrawDiceStatistics(new Rect(Window.x+24,Window.y+126,420,Window.height-168),dice);
+            diceScroll=DrawDiceRows(new Rect(Window.x+468,Window.y+126,Window.width-492,Window.height-168),dice.Rolls,diceScroll);
+            ModernOperationUI.Label(new Rect(Window.x+24,Window.yMax-30,650,22),"共 "+dice.Total+" 次掷骰"+(filter==null?"":" · 与 "+filter+" 相关"),ModernOperationUI.Small);
+            if(ModernOperationUI.Button(new Rect(Window.xMax-132,Window.yMax-34,106,25),"最新 ↓"))diceScroll.y=float.MaxValue;
+            return;
         }
         var visible=entries.Where(e=>filter==null||e.Involves(filter)).ToArray();
-        historyScroll=DrawRows(new Rect(Window.x+20,Window.y+140,Window.width-40,Window.height-182),visible,historyScroll,false);
-        ModernOperationUI.Label(new Rect(Window.x+24,Window.yMax-30,650,22),"共 "+visible.Length+" 条记录 · 随对局存档恢复",ModernOperationUI.Small);
-        if(ModernOperationUI.Button(new Rect(Window.xMax-132,Window.yMax-34,106,25),"跳到最新 ↓"))historyScroll.y=float.MaxValue;
+        historyScroll=DrawRows(new Rect(Window.x+20,Window.y+124,Window.width-40,Window.height-166),visible,historyScroll,false);
+        ModernOperationUI.Label(new Rect(Window.x+24,Window.yMax-30,650,22),"共 "+visible.Length+" 条",ModernOperationUI.Small);
+        if(ModernOperationUI.Button(new Rect(Window.xMax-132,Window.yMax-34,106,25),"最新 ↓"))historyScroll.y=float.MaxValue;
+    }
+    static void DrawDiceStatistics(Rect r,TabletopDiceHistory history)
+    {
+        ModernOperationUI.Label(new Rect(r.x,r.y,45,24),"点数",ModernOperationUI.Small);
+        ModernOperationUI.Label(new Rect(r.x+259,r.y,52,24),"次数",ModernOperationUI.Small);
+        ModernOperationUI.Label(new Rect(r.x+318,r.y,102,24),"本局频率",ModernOperationUI.Small);
+        for(int total=2;total<=12;total++)
+        {
+            float y=r.y+34+(total-2)*30;
+            ModernOperationUI.Label(new Rect(r.x,y,40,25),total.ToString(),ModernOperationUI.Center);
+            ModernOperationUI.Round(new Rect(r.x+48,y+8,188,8),ModernOperationUI.Surface);
+            if(history.Count(total)>0)ModernOperationUI.Round(new Rect(r.x+48,y+8,188f*history.Count(total)/Math.Max(1,history.MaximumCount),8),ModernOperationUI.Accent);
+            ModernOperationUI.Label(new Rect(r.x+247,y,64,25),history.Count(total).ToString(),ModernOperationUI.Center);
+            ModernOperationUI.Label(new Rect(r.x+317,y,80,25),history.Total==0?"—":(history.Frequency(total)*100).ToString("0.0")+"%",ModernOperationUI.Center);
+        }
+    }
+    static Vector2 DrawDiceRows(Rect viewport,GameHistoryEntry[] entries,Vector2 position)
+    {
+        float width=viewport.width-22,total=entries.Length*44;
+        position.y=Mathf.Clamp(position.y,0,Math.Max(0,total-viewport.height));
+        position=GUI.BeginScrollView(viewport,position,new Rect(0,0,width,Math.Max(viewport.height,total)),false,false);
+        for(int i=0;i<entries.Length;i++)
+        {
+            float y=i*44;if(y+44<position.y||y>position.y+viewport.height)continue;
+            var entry=entries[i];
+            ModernOperationUI.Fill(new Rect(0,y+8,3,22),BoardRenderer.SeatColor(entry.PlayerId));
+            ModernOperationUI.Label(new Rect(12,y+5,185,30),"第 "+entry.Turn+" 回合 · "+entry.PlayerId);
+            Die(new Rect(211,y+5,28,28),entry.Dice1,new Color(.64f,.11f,.08f),false);
+            Die(new Rect(245,y+5,28,28),entry.Dice2,new Color(.94f,.90f,.80f),false);
+            if(!string.IsNullOrEmpty(entry.EventDie))Die(new Rect(279,y+5,28,28),EventFace(entry.EventDie),new Color(.21f,.25f,.27f),true);
+            ModernOperationUI.Label(new Rect(332,y+5,98,30),(entry.Dice1+entry.Dice2)+" 点",ModernOperationUI.Center);
+            ModernOperationUI.Fill(new Rect(8,y+41,width-16,1),new Color(.24f,.32f,.31f,.45f));
+        }
+        if(entries.Length==0)ModernOperationUI.Label(new Rect(8,12,width-16,36),"尚未掷骰",ModernOperationUI.Small);
+        GUI.EndScrollView();return position;
     }
     static float Height(GameHistoryEntry entry,float width,bool compact)
     {
@@ -88,11 +132,11 @@ public sealed class TabletopHistoryUI
         float y=r.y+titleHeight;
         if(entry.Dice1>0)
         {
-            ModernOperationUI.Label(new Rect(r.x+8,y,70,28),(entry.Dice1+entry.Dice2)+" 点 （",style);
-            Die(new Rect(r.x+76,y,26,26),entry.Dice1,new Color(.64f,.11f,.08f),false);
-            Die(new Rect(r.x+110,y,26,26),entry.Dice2,new Color(.94f,.90f,.80f),false);
-            if(!string.IsNullOrEmpty(entry.EventDie))Die(new Rect(r.x+144,y,26,26),EventFace(entry.EventDie),new Color(.21f,.25f,.27f),true);
-            ModernOperationUI.Label(new Rect(r.x+(!string.IsNullOrEmpty(entry.EventDie)?177:143),y,25,28),"）",style);y+=34;
+            ModernOperationUI.Label(new Rect(r.x+8,y,54,28),(entry.Dice1+entry.Dice2)+" 点",style);
+            Die(new Rect(r.x+64,y,26,26),entry.Dice1,new Color(.64f,.11f,.08f),false);
+            Die(new Rect(r.x+96,y,26,26),entry.Dice2,new Color(.94f,.90f,.80f),false);
+            if(!string.IsNullOrEmpty(entry.EventDie))Die(new Rect(r.x+128,y,26,26),EventFace(entry.EventDie),new Color(.21f,.25f,.27f),true);
+            y+=34;
         }
         var changes=entry.Changes??Array.Empty<GameHistoryChange>();int columns=Math.Max(1,(int)(r.width/(compact?140:210)));float cell=r.width/columns;
         for(int i=0;i<changes.Length;i++)

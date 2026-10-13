@@ -1,4 +1,4 @@
-﻿param([switch]$VerifyPlayer,[string]$OutputRoot='.local/m6-ui-v005')
+﻿param([switch]$VerifyPlayer,[string]$OutputRoot='.local/m6-ui-v006')
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path

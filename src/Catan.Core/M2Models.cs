@@ -65,6 +65,23 @@ namespace Catan.Core.M2
         [DataMember(Order=2)] public string OtherPlayerId { get; set; }
         [DataMember(Order=3)] public ResourceBag Give { get; set; }
         [DataMember(Order=4)] public ResourceBag Receive { get; set; }
+        // 仅广播报价保存这些字段；省略空字段以兼容既有定向报价存档。
+        [DataMember(Order=5, EmitDefaultValue=false)] public string[] RecipientPlayerIds { get; set; }
+        [DataMember(Order=6, EmitDefaultValue=false)] public string[] RejectedPlayerIds { get; set; }
+        public const string AllPlayers = "*";
+        public bool IsBroadcast => OtherPlayerId == AllPlayers;
+        public string[] PendingRecipientIds => IsBroadcast
+            ? (RecipientPlayerIds ?? Array.Empty<string>()).Where(id => !(RejectedPlayerIds ?? Array.Empty<string>()).Contains(id)).ToArray()
+            : new[] { OtherPlayerId };
+        public bool CanRespond(string playerId) => playerId != ProposerId && PendingRecipientIds.Contains(playerId);
+        public string NextResponder(string preferredPlayerId = null) => CanRespond(preferredPlayerId) ? preferredPlayerId : PendingRecipientIds.FirstOrDefault();
+        internal TradeOffer CopyForTransaction()
+        {
+            var copy = (TradeOffer)MemberwiseClone();
+            copy.Give = Give.Copy(); copy.Receive = Receive.Copy();
+            copy.RecipientPlayerIds = RecipientPlayerIds?.ToArray(); copy.RejectedPlayerIds = RejectedPlayerIds?.ToArray();
+            return copy;
+        }
     }
     [DataContract] public sealed class GameEvent
     {
@@ -134,7 +151,7 @@ namespace Catan.Core.M2
             copy.Bank = Bank.Copy();
             copy.Settlements = Settlements.ToArray(); copy.Cities = Cities.ToArray(); copy.Roads = Roads.ToArray();
             copy.PendingDecision = PendingDecision == null ? null : new PendingDecision { Kind = PendingDecision.Kind, PlayerId = PendingDecision.PlayerId, AnchorVertexId = PendingDecision.AnchorVertexId, RemainingRoads = PendingDecision.RemainingRoads, EligibleVictimIds = PendingDecision.EligibleVictimIds.ToArray(), ReturnPhase = PendingDecision.ReturnPhase };
-            copy.Discards = Discards.ToArray(); copy.TradeOffer = TradeOffer;
+            copy.Discards = Discards.ToArray(); copy.TradeOffer = TradeOffer?.CopyForTransaction();
             copy.DevelopmentDeck = DevelopmentDeck.ToArray(); copy.PlayedDevelopmentCards = PlayedDevelopmentCards.ToArray();
             // Existing receipts/placements are immutable within the engine. External reads are detached copies.
             copy.ProcessedCommands = ProcessedCommands; copy.Events = Events;
