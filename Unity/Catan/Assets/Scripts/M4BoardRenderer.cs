@@ -18,6 +18,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
     private Transform pieces;
     private GameObject feltTable;
     private TabletopScene tableScene;
+    private TabletopNumberTokens numberTokens;
     public TabletopScene TableScene => tableScene;
     private Transform publicMarkers;
     private GameObject barbarianTrack;
@@ -67,6 +68,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
             }
             obj.name = tile.Id;
         }
+        numberTokens=TabletopNumberTokens.Create(transform,boardTiles,tiles);
         var table = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         feltTable = table;
         table.name="Felt table"; table.transform.SetParent(transform); table.transform.position=new Vector3(0,-.012f,0);
@@ -104,6 +106,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
     }
     public void Refresh(PlayerView view)
     {
+        if(numberTokens!=null)numberTokens.Refresh(view.Board.Tiles);
         RefreshProjectedPieces(view.Board.Settlements,view.Board.Roads,view.Board.Cities,view.Board.RobberTileId,
             view.Board.Walls,view.Board.Knights,view.Board.Metropolises,view.MerchantTileId,view.BarbarianPosition);
     }
@@ -141,9 +144,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
                 Marker(PrimitiveType.Cylinder,root,new Vector3(0,.002f,0),new Vector3(.015f,.002f,.015f),SeatColor(k.PlayerId));
                 for(int i=0;i<k.Level;i++)Marker(PrimitiveType.Cylinder,root,new Vector3(0,.006f+i*.004f,0),new Vector3(.010f,.0015f,.010f),SeatColor(k.PlayerId));
             }
-            // Explicit active status remains readable independently of the provisional helmet convention.
-            var status=Marker(PrimitiveType.Sphere,root,new Vector3(.012f,.004f,-.008f),new Vector3(.005f,.005f,.005f),k.Active?new Color(.96f,.88f,.48f):new Color(.12f,.14f,.17f));
-            status.name=k.Active?"Active state: active":"Active state: resting";
+            // 激活状态沿用实体骑士头盔造型；不额外在棋子旁放置球形标记。
             var rank=new GameObject("Knight level: "+k.Level).transform;
             rank.SetParent(root,false);rank.localPosition=new Vector3(0,.002f,.012f);
             for(int i=0;i<k.Level;i++)
@@ -290,6 +291,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
     {
         if(operationLayout==enabled)return;
         operationLayout=enabled;
+        if(numberTokens!=null)numberTokens.gameObject.SetActive(enabled);
         if(enabled && tableScene==null)
         {
             tableScene=TabletopScene.Create(transform,vertices.Values);

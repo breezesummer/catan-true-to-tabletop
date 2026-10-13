@@ -53,6 +53,7 @@ public sealed class OperationTrade
 public sealed class OperationSelection
 {
     public readonly int[] Selected = new int[8];
+    readonly HashSet<int>[] selectedOrdinals = Enumerable.Range(0, 8).Select(_ => new HashSet<int>()).ToArray();
     public string BuildId;
     public int PieceOrdinal = -1;
     string scope, revision, seat;
@@ -66,19 +67,48 @@ public sealed class OperationSelection
         goods = snapshot == null ? null : (int[])snapshot.Goods.Clone();
         for (int i = 0; i < 8; i++) Selected[i] = Math.Min(Selected[i], snapshot == null ? 0 : snapshot.Goods[i]);
     }
-    public void Clear() { Array.Clear(Selected, 0, 8); BuildId = null; PieceOrdinal = -1; }
+    public void Clear()
+    {
+        Array.Clear(Selected, 0, 8);
+        foreach (var ordinals in selectedOrdinals) ordinals.Clear();
+        BuildId = null; PieceOrdinal = -1;
+    }
     public void Choose(OperationBuild build, int[] owned, int pieceOrdinal = -1)
     {
         if (pieceOrdinal < -1 || pieceOrdinal >= build.Count && pieceOrdinal >= 0) return;
         Clear(); BuildId = build.Id; PieceOrdinal = pieceOrdinal;
-        for (int i = 0; i < 8; i++) Selected[i] = Math.Min(build.Cost[i], owned[i]);
+        for (int i = 0; i < 8; i++)
+        {
+            Selected[i] = Math.Min(build.Cost[i], owned[i]);
+            for (int ordinal = 0; ordinal < Selected[i]; ordinal++) selectedOrdinals[i].Add(ordinal);
+        }
     }
     public bool IsPieceSelected(string buildId, int ordinal) => BuildId == buildId && PieceOrdinal >= 0 && PieceOrdinal == ordinal;
+    public bool IsCardSelected(int good, int ordinal) => good >= 0 && good < 8 && selectedOrdinals[good].Contains(ordinal);
     public void Toggle(int good, int ordinal, int owned)
     {
         if (good < 0 || good >= 8 || ordinal < 0 || owned < 0 || ordinal >= owned) return;
         BuildId = null; PieceOrdinal = -1;
-        Selected[good] = ordinal < Selected[good] ? Selected[good] - 1 : Math.Min(Selected[good] + 1, owned);
+        if (!selectedOrdinals[good].Remove(ordinal)) selectedOrdinals[good].Add(ordinal);
+        Selected[good] = selectedOrdinals[good].Count;
+    }
+    public void SelectCard(int good, int ordinal, int owned)
+    {
+        if (good < 0 || good >= 8 || ordinal < 0 || ordinal >= owned) return;
+        BuildId = null; PieceOrdinal = -1;
+        selectedOrdinals[good].Add(ordinal);
+        Selected[good] = selectedOrdinals[good].Count;
+    }
+    // 交易的数量按钮保留已点中的实体牌，只在数量增减时补选或放回。
+    public void SetCount(int good, int count, int owned)
+    {
+        if (good < 0 || good >= 8 || owned < 0) return;
+        count = Math.Max(0, Math.Min(count, owned));
+        var ordinals = selectedOrdinals[good];
+        foreach (int ordinal in ordinals.Where(n => n >= owned).ToArray()) ordinals.Remove(ordinal);
+        foreach (int ordinal in ordinals.OrderByDescending(n => n).Take(Math.Max(0, ordinals.Count - count)).ToArray()) ordinals.Remove(ordinal);
+        for (int ordinal = 0; ordinals.Count < count && ordinal < owned; ordinal++) ordinals.Add(ordinal);
+        Selected[good] = ordinals.Count;
     }
     public bool Matches(OperationBuild build)
     {

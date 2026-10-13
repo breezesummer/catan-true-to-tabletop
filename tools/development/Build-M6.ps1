@@ -1,4 +1,4 @@
-﻿param([switch]$VerifyPlayer,[string]$OutputRoot='.local/m6-ui-v007')
+param([switch]$VerifyPlayer,[string]$OutputRoot='.local/m6-ui-v008-final')
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -8,8 +8,14 @@ $m6Logs = Join-Path $m6OutputRoot 'logs'
 New-Item -ItemType Directory -Force -Path $m6Logs,(Join-Path $m6Project 'Assets\Plugins'),(Join-Path $m6Project 'Assets\Resources') | Out-Null
 & $toolchain.dotnet build (Join-Path $m6RepoRoot 'src\Catan.AI\Catan.AI.csproj') -c Release --disable-build-servers -m:1
 if ($LASTEXITCODE -ne 0) { throw '规则与 AI 程序集构建失败。' }
-Copy-Item -LiteralPath (Join-Path $m6RepoRoot 'src\Catan.Core\bin\Release\netstandard2.1\Catan.Core.dll') -Destination (Join-Path $m6Project 'Assets\Plugins\Catan.Core.dll') -Force
-Copy-Item -LiteralPath (Join-Path $m6RepoRoot 'src\Catan.AI\bin\Release\netstandard2.1\Catan.AI.dll') -Destination (Join-Path $m6Project 'Assets\Plugins\Catan.AI.dll') -Force
+foreach ($assemblyName in @('Catan.Core','Catan.AI')) {
+    $assemblySource = Join-Path $m6RepoRoot "src\$assemblyName\bin\Release\netstandard2.1\$assemblyName.dll"
+    $assemblyTarget = Join-Path $m6Project "Assets\Plugins\$assemblyName.dll"
+    # 内容未变时保留已导入程序集，避免无意义重导入及覆盖系统暂时映射的同一文件。
+    if (!(Test-Path -LiteralPath $assemblyTarget) -or (Get-FileHash -LiteralPath $assemblySource).Hash -ne (Get-FileHash -LiteralPath $assemblyTarget).Hash) {
+        Copy-Item -LiteralPath $assemblySource -Destination $assemblyTarget -Force
+    }
+}
 Copy-Item -LiteralPath (Join-Path $m6RepoRoot 'docs\acceptance\v0.1\scenario.json') -Destination (Join-Path $m6Project 'Assets\Resources\m1-scenario.json') -Force
 & $toolchain.unity -batchmode -nographics -quit -projectPath $m6Project -executeMethod M6Build.Build --m6-output-root $m6OutputRoot -logFile (Join-Path $m6Logs 'unity-build.log') | Out-Host
 if ($LASTEXITCODE -ne 0) { throw "Unity 构建失败，请检查 $m6Logs/unity-build.log。" }

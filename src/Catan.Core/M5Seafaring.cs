@@ -168,7 +168,7 @@ namespace Catan.Core.M5
         }
         private void PopulateSeafaringView(PlayerState own,PlayerView view)
         {
-            view.ScenarioId=seafaring.Id;view.ScenarioName=seafaring.Name;view.TargetVictoryPoints=16;
+            view.ScenarioId=seafaring.Id;view.ScenarioName=seafaring.Name;view.TargetVictoryPoints=state.TargetVictoryPoints.Value;
             view.Board.Ships=Json.Copy(state.Ships);view.Board.PirateTileId=state.PirateTileId;view.ShipMovedThisTurn=state.ShipMovedThisTurn;
             foreach(var pub in view.Players) {var p=state.Players.Single(x=>x.Id==pub.Id);pub.ShipsRemaining=p.ShipsRemaining;pub.BonusVictoryPoints=p.BonusVictoryPoints;}
             view.LegalShipEdgeIds=Array.Empty<string>();view.MovableShipEdgeIds=Array.Empty<string>();

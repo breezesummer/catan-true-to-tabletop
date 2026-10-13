@@ -28,6 +28,8 @@ public sealed class TabletopUI
     readonly TabletopDicePresentation dice = new TabletopDicePresentation();
     readonly TabletopHistoryUI history = new TabletopHistoryUI();
     readonly TabletopBankUI bank = new TabletopBankUI();
+    readonly TabletopDefenseUI defense = new TabletopDefenseUI();
+    public void BindDefense(int position,int strength,int threat) { defense.Bind(position,strength,threat); }
     public TabletopCollectionTimeline Collections => bank.Collections;
     public void BindCollectionOcclusion(Action<TabletopCollectionFlight> draw) { bank.OccludeHand=draw; }
     TabletopScoreBreakdown hoveredScore;
@@ -46,13 +48,22 @@ public sealed class TabletopUI
     {dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);}
     static readonly Color Cream = new Color(.96f,.88f,.70f), Ink = new Color(.24f,.12f,.06f);
     public static readonly Color HotNumberColor = new Color(1f,.10f,.075f);
-    public bool BlocksBoardInput(Vector2 p) => history.BlocksInput(p) || hits.Any(r=>r.Contains(p)) || worldHits.Any(h=>h.Contains(p)) || contextVisible && ContextRect.Contains(p);
+    public bool BlocksBoardInput(Vector2 p) => !TabletopScene.BoardArea.Contains(p) || history.BlocksInput(p) || defense.BlocksInput(p) || hits.Any(r=>r.Contains(p)) || worldHits.Any(h=>h.Contains(p)) || contextVisible && ContextRect.Contains(p);
     internal static string[] OpponentOrder(string ownSeat,System.Collections.Generic.IEnumerable<string> ids)
     {
         var ordered=ids.OrderBy(id=>int.Parse(id.Substring(1))).ToArray();int own=Array.IndexOf(ordered,ownSeat);
         return Enumerable.Range(1,Math.Max(0,ordered.Length-1)).Select(i=>ordered[(own+i)%ordered.Length]).ToArray();
     }
     public void RegisterContext(){contextVisible=true;}
+    public static bool ContainsMapScreenPoint(Vector2 point) =>
+        TabletopScene.BoardArea.Contains(new Vector2(point.x*1440/Screen.width,point.y*900/Screen.height));
+    public static void DrawMapLabels(Action draw)
+    {
+        // 使用绝对逻辑坐标绘制，但裁剪在地图视口，放大后港口文字不会越过个人区。
+        var area=TabletopScene.BoardArea;
+        GUI.BeginClip(area,new Vector2(-area.x,-area.y),Vector2.zero,false);
+        try{draw();}finally{GUI.EndClip();}
+    }
     public static void Fill(Rect r,Color c)
     {var old=GUI.color;GUI.color=c;GUI.DrawTexture(r,Texture2D.whiteTexture);GUI.color=old;}
     public static void Note(Rect r)
@@ -89,7 +100,7 @@ public sealed class TabletopUI
         Styles(font);ModernOperationUI.Styles(font);hits.Clear();worldHits.Clear();hoveredScore=null;table.Objects.Begin("public");
         // 临时便签覆盖的桌面物件不能先于上层按钮响应同一次点击。
         bool tableEnabled=GUI.enabled;
-        if(BlocksOverlayInput(Event.current.mousePosition))GUI.enabled=false;
+        if(Event.current.type!=EventType.Repaint&&BlocksOverlayInput(Event.current.mousePosition))GUI.enabled=false;
         contextVisible=false;
         var others=OpponentOrder(seat,seats.Select(p=>p.Id)).Select(id=>seats.First(p=>p.Id==id)).ToArray();
         for(int i=0;i<others.Length;i++)
@@ -103,7 +114,7 @@ public sealed class TabletopUI
         var ownScore=seats.FirstOrDefault(p=>p.Id==seat)?.Score;
         GUI.Label(ownScoreRect,seat+"   "+(ownScore==null?ownPoints:ownScore.Total)+" 分",title);
         hits.Add(ownScoreRect);ScoreHover(ownScoreRect,ownScore);
-        if(!string.IsNullOrEmpty(detail))GUI.Label(new Rect(1236,496,182,19),detail,small);
+        defense.Draw();
         bank.Draw(table,operations,bankHistory,seats,trade,purchaseDevelopment,worldHits,hits);
         bool expansion=dice.Event.HasValue;
         var diceRects=expansion?new[]{new Rect(1258,448,48,48),new Rect(1333,448,48,48),new Rect(1295,385,48,48)}
@@ -170,24 +181,27 @@ public sealed class TabletopUI
     void DrawScoreDetails()
     {
         if(hoveredScore==null||history.IsOpen)return;
-        var score=hoveredScore;float height=108+Mathf.Max(1,score.Rows.Length)*46;
-        float x=Mathf.Clamp(scoreAnchor.center.x-162,12,1440-336);
+        var score=hoveredScore;float height=118+Mathf.Max(1,score.Rows.Length)*60;
+        float x=Mathf.Clamp(scoreAnchor.center.x-182,12,1440-376);
         float y=scoreAnchor.y>450?scoreAnchor.y-height-10:scoreAnchor.yMax+10;
-        var panel=new Rect(x,Mathf.Clamp(y,12,900-height-12),324,height);
+        var panel=new Rect(x,Mathf.Clamp(y,12,900-height-12),364,height);
         ModernOperationUI.Panel(panel);
-        GUI.Label(new Rect(panel.x+18,panel.y+13,288,28),score.PlayerId+" · 分数构成",ModernOperationUI.Title);
+        var titleStyle=new GUIStyle(ModernOperationUI.Title){padding=new RectOffset(),alignment=TextAnchor.MiddleLeft,wordWrap=false};
+        GUI.Label(new Rect(panel.x+18,panel.y+12,328,40),score.PlayerId+" · 分数构成",titleStyle);
         string total=score.IsOwn?"总分 "+score.Total+"  ·  明分 "+score.PublicPoints+"  ·  暗分 "+score.HiddenPoints:"公开得分 "+score.PublicPoints+" 分";
-        GUI.Label(new Rect(panel.x+18,panel.y+45,288,22),total,ModernOperationUI.Text);
-        float rowY=panel.y+77;
-        if(score.Rows.Length==0)GUI.Label(new Rect(panel.x+18,rowY,288,28),"尚未获得胜利点",ModernOperationUI.Small);
+        var bodyStyle=new GUIStyle(ModernOperationUI.Text){padding=new RectOffset(),alignment=TextAnchor.MiddleLeft,wordWrap=false};
+        var detailStyle=new GUIStyle(ModernOperationUI.Small){padding=new RectOffset(),alignment=TextAnchor.MiddleLeft,wordWrap=false};
+        GUI.Label(new Rect(panel.x+18,panel.y+55,328,32),total,bodyStyle);
+        float rowY=panel.y+98;
+        if(score.Rows.Length==0)GUI.Label(new Rect(panel.x+18,rowY,328,32),"尚未获得胜利点",detailStyle);
         foreach(var row in score.Rows)
         {
-            var nameStyle=new GUIStyle(ModernOperationUI.Text);
+            var nameStyle=new GUIStyle(bodyStyle);
             if(row.Hidden)nameStyle.normal.textColor=ModernOperationUI.Accent;
-            GUI.Label(new Rect(panel.x+18,rowY,222,24),row.Name,nameStyle);
-            GUI.Label(new Rect(panel.x+248,rowY,58,24),row.Points+" 分",new GUIStyle(nameStyle){alignment=TextAnchor.UpperRight});
-            GUI.Label(new Rect(panel.x+18,rowY+24,288,19),row.Detail,ModernOperationUI.Small);
-            rowY+=46;
+            GUI.Label(new Rect(panel.x+18,rowY,254,32),row.Name,nameStyle);
+            GUI.Label(new Rect(panel.x+282,rowY,64,32),row.Points+" 分",new GUIStyle(nameStyle){alignment=TextAnchor.MiddleRight});
+            GUI.Label(new Rect(panel.x+18,rowY+31,328,25),row.Detail,detailStyle);
+            rowY+=60;
         }
     }
     public void BeginContext(string caption)
@@ -201,6 +215,8 @@ public sealed class TabletopUI
     public void DrawContext(string caption,Action content){BeginContext(caption);content();EndContext();}
     public static void NumberToken(Vector2 p,int? number,string fallback,GUIStyle style)
     {
+        // 数字已放回棋盘的实体点数牌，服从三维深度；沙漠保留原始地貌。
+        if(number.HasValue||fallback=="沙漠")return;
         if(!number.HasValue&&string.IsNullOrEmpty(fallback))return;
         var r=new Rect(p.x-19,p.y-16,38,32);Token(r,Cream);
         var s=new GUIStyle(style){fontSize=number.HasValue?21:12,fontStyle=FontStyle.Bold,alignment=TextAnchor.MiddleCenter};

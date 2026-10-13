@@ -28,7 +28,7 @@ namespace Catan.Core.M5
         private static readonly Resource[] Resources = (Resource[])Enum.GetValues(typeof(Resource));
         private CombinedGameSession(Scenario scenario, Port[] ports, M3.SeafarersScenario seafaring, GameState state) { this.scenario = scenario; this.ports = ports; this.seafaring = seafaring; this.state = state; }
 
-        public static CombinedGameSession Create(string scenarioId, int playerCount = 4, uint seed = 1)
+        public static CombinedGameSession Create(string scenarioId, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null)
         {
             if (playerCount != 3 && playerCount != 4) throw new ArgumentOutOfRangeException(nameof(playerCount), "双扩展组合支持 3 或 4 人。");
             var seafaring = CombinedScenarios.Create(scenarioId, playerCount);
@@ -47,7 +47,7 @@ namespace Catan.Core.M5
             var state = new GameState
             {
                 SaveFormatVersion = SaveFormatVersion, RulesVersion = RulesVersion, ScenarioId = scenarioId, ScenarioVersion = ScenarioVersion,
-                ScenarioContentHash = Json.Hash(Json.Write(seafaring)), InitialSeed = seed, Random = random,
+                ScenarioContentHash = Json.Hash(Json.Write(seafaring)), InitialSeed = seed, Random = random, TargetVictoryPoints = VictoryPointSettings.Resolve(targetVictoryPoints, 16),
                 Players = Enumerable.Range(1, playerCount).Select(i => new PlayerState { Id = "P" + i, Resources = new ResourceBag(), Pieces = new PieceSupply { Roads = 15, Settlements = 5, Cities = 4 } }).ToArray(),
                 Bank = new ResourceBag { Wood = 19, Brick = 19, Wool = 19, Wheat = 19, Ore = 19 },
                 Phase = GamePhase.SetupSettlement, ActivePlayerId = "P" + (start + 1), StartingPlayerIndex = start,
@@ -126,7 +126,7 @@ namespace Catan.Core.M5
                 {
                     PlayerId = playerId, ActivePlayerId = state.ActivePlayerId, Turn = state.Turn, Phase = state.Phase, PendingDecision = Json.Copy(state.PendingDecision),
                     Discards = Json.Copy(state.Discards), TradeOffer = Json.Copy(state.TradeOffer), OwnResources = own.Resources.Copy(), OwnDevelopmentCards = Json.Copy(own.DevelopmentCards),
-                    OwnVictoryPoints = VictoryPoints(state, playerId, true), DevelopmentCardPlayedThisTurn = state.DevelopmentCardPlayedThisTurn, DevelopmentDeckCount = state.DevelopmentDeck.Length,
+                    OwnVictoryPoints = VictoryPoints(state, playerId, true), TargetVictoryPoints = state.TargetVictoryPoints.Value, DevelopmentCardPlayedThisTurn = state.DevelopmentCardPlayedThisTurn, DevelopmentDeckCount = state.DevelopmentDeck.Length,
                     Bank = state.Bank.Copy(), Players = state.Players.Select(p => new PublicPlayer { Id = p.Id, ResourceCount = HandCount(p), DevelopmentCardCount = p.DevelopmentCards.Length,
                         PlayedKnights = p.PlayedKnights, Pieces = p.Pieces.Copy(), VictoryPoints = VictoryPoints(state, p.Id, state.WinnerPlayerId == p.Id), LongestRoadLength = LongestRoad(state, p.Id) }).ToArray(),
                     Board = new BoardView { Tiles = Json.Copy(state.Tiles), Vertices = Json.Copy(scenario.Topology.Vertices), Edges = Json.Copy(scenario.Topology.Edges), Ports = Json.Copy(ports),
@@ -155,7 +155,9 @@ namespace Catan.Core.M5
             catch (Exception ex) when (ex is System.Runtime.Serialization.SerializationException || ex is ArgumentException || ex is System.Xml.XmlException) { throw new InvalidDataException("Invalid save JSON.", ex); }
             if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != RulesVersion || saved.ScenarioVersion != ScenarioVersion || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
                 throw new InvalidDataException("Unsupported or malformed save.");
-            var session = Create(saved.ScenarioId, saved.Players.Length, saved.InitialSeed);
+            saved.TargetVictoryPoints = saved.TargetVictoryPoints ?? 16;
+            if (!VictoryPointSettings.IsValid(saved.TargetVictoryPoints)) throw new InvalidDataException("存档中的胜利分数无效。");
+            var session = Create(saved.ScenarioId, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints);
             foreach (var record in saved.ProcessedCommands)
             {
                 if (record == null || record.Command == null) throw new InvalidDataException("Malformed command history.");
@@ -229,7 +231,7 @@ namespace Catan.Core.M5
                 case CommandKind.MoveKnight: case CommandKind.DisplaceKnight: ActionPhase(s); MoveKnight(s,p,c); break;
                 case CommandKind.ChaseRobber: ActionPhase(s); ChaseRobber(s,p,c.TargetId); break;
                 case CommandKind.DeclareVictory:
-                    Require(s.Turn > 0 && VictoryPoints(s, p.Id, true) >= 16, "InsufficientPoints", "尚未达到 16 分。"); break;
+                    Require(s.Turn > 0 && VictoryPoints(s, p.Id, true) >= s.TargetVictoryPoints.Value, "InsufficientPoints", "尚未达到 " + s.TargetVictoryPoints.Value + " 分。"); break;
                 default: throw new RuleException("WrongPhase", "当前没有可处理的此类决定。");
             }
         }
@@ -361,11 +363,12 @@ namespace Catan.Core.M5
         }
         private static void CheckVictory(GameState s)
         {
-            if (s.Turn > 0 && VictoryPoints(s, s.ActivePlayerId, true) >= 16) { s.WinnerPlayerId = s.ActivePlayerId; s.Phase = GamePhase.Finished; s.PendingDecision = null; s.DecisionQueue=Array.Empty<PendingDecision>();s.ProductionPending=false;s.Discards = Array.Empty<DiscardRequirement>(); s.TradeOffer = null; }
+            if (s.Turn > 0 && VictoryPoints(s, s.ActivePlayerId, true) >= s.TargetVictoryPoints.Value) { s.WinnerPlayerId = s.ActivePlayerId; s.Phase = GamePhase.Finished; s.PendingDecision = null; s.DecisionQueue=Array.Empty<PendingDecision>();s.ProductionPending=false;s.Discards = Array.Empty<DiscardRequirement>(); s.TradeOffer = null; }
         }
 
         private void AssertInvariants(GameState s)
         {
+            Check(VictoryPointSettings.IsValid(s.TargetVictoryPoints), "胜利分数无效。");
             void Check(bool valid, string message) { if (!valid) throw new InvalidDataException(message); }
             Check(s.SaveFormatVersion == SaveFormatVersion && s.RulesVersion == RulesVersion && s.ScenarioVersion == ScenarioVersion, "Invalid version identity.");
             Check(Enum.IsDefined(typeof(GamePhase), s.Phase) && s.Turn >= 0 && s.SetupPlacementIndex >= 0 && s.SetupPlacementIndex <= s.Players.Length * 2, "Invalid phase/turn.");
@@ -425,7 +428,7 @@ namespace Catan.Core.M5
             Check(ValidAward(s.Players.Select(p => p.Id).ToArray(), roadLengths, 5, s.LongestRoadPlayerId), "Invalid longest road holder.");
             Check(ValidAward(s.Players.Select(p => p.Id).ToArray(), s.Players.Select(p => p.PlayedKnights).ToArray(), 3, s.LargestArmyPlayerId), "Invalid largest army holder.");
             Check((s.Phase == GamePhase.Finished) == (s.WinnerPlayerId != null), "Winner phase mismatch.");
-            if (s.WinnerPlayerId != null) Check(s.WinnerPlayerId == s.ActivePlayerId && VictoryPoints(s, s.WinnerPlayerId, true) >= 16, "Invalid winner.");
+            if (s.WinnerPlayerId != null) Check(s.WinnerPlayerId == s.ActivePlayerId && VictoryPoints(s, s.WinnerPlayerId, true) >= s.TargetVictoryPoints.Value, "Invalid winner.");
             Check(s.Events.Length == s.ProcessedCommands.Length && s.EventSequence == s.Events.Length, "Invalid event ledger length.");
         }
         private static bool ValidAward(string[] ids, int[] scores, int threshold, string holder)

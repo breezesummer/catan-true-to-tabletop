@@ -34,6 +34,7 @@ public sealed partial class M2App : MonoBehaviour
         Application.targetFrameRate=60;
         ai=GetComponent<M6App>();
         host=new M2LocalGameHost(ai==null?4:ai.PlayerCount);
+        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints);
 
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         var initial=host.View(ai==null?"P1":ai.HumanSeat);
@@ -84,7 +85,9 @@ public sealed partial class M2App : MonoBehaviour
         string candidate="";float distance=(placement==CommandKind.MoveRobber?46f:25f)*Screen.width/1440f;
         foreach(var id in TargetIds())
         {
-            float current=Vector2.Distance(mouse,board.ScreenPoint(id));
+            var projected=board.ScreenPoint(id);
+            if(ai!=null&&(!TabletopUI.ContainsMapScreenPoint(mouse)||!TabletopUI.ContainsMapScreenPoint(projected)))continue;
+            float current=Vector2.Distance(mouse,projected);
             if(current<distance){distance=current;candidate=id;}
         }
         return candidate;
@@ -145,7 +148,7 @@ public sealed partial class M2App : MonoBehaviour
             board.Initialize(current.Board.Tiles,current.Board.Vertices,current.Board.Edges);
             board.ChangeZoom(zoom-board.Zoom);board.SetCamera(top);board.ShowTerrain(terrain);boardLayout=layout;
         }
-        board.SetOperationLayout(ai!=null);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId);
+        board.SetOperationLayout(ai!=null);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId,current.Board.Tiles);
     }
     public void SaveGame()
     {

@@ -1,0 +1,54 @@
+{
+  "版本": "ui-tabletop-v008",
+  "来源": "数字来自公开Tile.Number；使用本机Arial粗体程序排字；不修改任何实体参考原图",
+  "位图与网格": "数字PNG是512×512程序排字位图；TabletopNumberTokens.cs生成真实圆形厚牌网格；船盾是运行时二维状态图标",
+  "生成入口": "art/recipes/ui-tabletop-v008/generate-number-tokens.ps1",
+  "网格入口": "Unity/Catan/Assets/Scripts/TabletopNumberTokens.cs",
+  "单位": "米；直径0.021，厚度0.00045为工作估算，非实测",
+  "轴向": "牌面平行XZ，Y向上",
+  "枢轴": "底面中心",
+  "显示": "地块中心，普通深度测试；6和8使用红色；沙漠无标牌",
+  "状态图标": "TabletopDefenseUI.cs确定性64×64程序图形，无规则随机数",
+  "贴图": [
+    {
+      "文件": "number-10.png",
+      "SHA256": "E24D90555E25198845604AC5E628E58C8EFC4BBB6862FC1EF41F14E61ABEF753"
+    },
+    {
+      "文件": "number-11.png",
+      "SHA256": "1F0B99789C4491A45657DCCA9F3FB72CCE8688882B500F54AB327FF27ED53A76"
+    },
+    {
+      "文件": "number-12.png",
+      "SHA256": "69BC6A84706BBC3F6385484D154256B722A38B08F1874C8B9D7BE0423D7FCF69"
+    },
+    {
+      "文件": "number-2.png",
+      "SHA256": "868CAE984E44B668C4E2BFE9F10BBECAB74B98AA385DDCC037029913AC8BF968"
+    },
+    {
+      "文件": "number-3.png",
+      "SHA256": "7889906F69DA2815FB091DF9BDE13E3F56F062F42E058569EF3F94359D8A17BC"
+    },
+    {
+      "文件": "number-4.png",
+      "SHA256": "5267C0A3C05B5DF0640BB5769D83122E4DC1EA9E65025B9947D88E4E71E04C6A"
+    },
+    {
+      "文件": "number-5.png",
+      "SHA256": "FBB0881CE81806F0E1301383D3402FFD4E85EAA6E3E445458912CA9B611D768E"
+    },
+    {
+      "文件": "number-6.png",
+      "SHA256": "DB67A3AA6FD26FF66671F54882740DAF1913F4473F3496BCA144A5E1264CCE37"
+    },
+    {
+      "文件": "number-8.png",
+      "SHA256": "7E0A902CAC3BB03BDB6A952FEFBB829C1590594F03F6E1B461A15C7445D48D89"
+    },
+    {
+      "文件": "number-9.png",
+      "SHA256": "68F88213D215F0C87B2AF7B891D6AABBDECF598273D35CC0420A50BFEF46DB10"
+    }
+  ]
+}

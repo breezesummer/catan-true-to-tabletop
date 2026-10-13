@@ -87,9 +87,9 @@ public sealed class TabletopPresentationTests
         Assert.False(dice.IsRolling(500));Assert.Equal(2,dice.Face(0,500));Assert.Equal(6,dice.Face(1,500));Assert.Equal(2,dice.Face(2,500));
     }
     [Theory]
-    [InlineData(350,380)]
-    [InlineData(704,930)]
-    [InlineData(1060,720)]
+    [InlineData(282,409)]
+    [InlineData(682,919)]
+    [InlineData(992,764)]
     public void GrowingHandsOverlapWithoutShrinkingOrLeavingTheirScreenRegion(float width,float center)
     {
         foreach(int count in new[]{1,3,8,20,60,120})
@@ -114,7 +114,44 @@ public sealed class TabletopPresentationTests
     [Fact]
     public void ASingleHandStaysAtTheFrontCenter()
     {
-        Assert.Equal(720,TabletopHandLayout.ResourceCenter(false));Assert.Equal(720,TabletopHandLayout.SpecialCenter(false));
+        Assert.Equal(764,TabletopHandLayout.ResourceCenter(false));Assert.Equal(764,TabletopHandLayout.SpecialCenter(false));
         Assert.True(TabletopHandLayout.SpecialCenter(true)<TabletopHandLayout.ResourceCenter(true));
+    }
+
+    [Theory]
+    [InlineData(false,false)]
+    [InlineData(false,true)]
+    [InlineData(true,false)]
+    [InlineData(true,true)]
+    public void ExpandedHandsLeaveTheStatusBoxAndEndTurnControlsUncovered(bool special,bool mixed)
+    {
+        float center=special?TabletopHandLayout.SpecialCenter(mixed):TabletopHandLayout.ResourceCenter(mixed);
+        float width=special?TabletopHandLayout.SpecialWidth(mixed):TabletopHandLayout.ResourceWidth(mixed);
+        foreach(int count in new[]{1,8,20,60,120})
+        {
+            var first=TabletopHandLayout.Card(0,count,center,width,false);
+            var last=TabletopHandLayout.Card(count-1,count,center,width,false);
+            // 留出纸影空间；状态框右边为238，取消选择和结束回合从1290开始。
+            Assert.True(first.X-TabletopHandLayout.HoverSpread>=244-.001f);
+            Assert.True(last.X+TabletopHandLayout.CardWidth+TabletopHandLayout.HoverSpread<=1284+.001f);
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void CollectionFlightDestinationsStayInsideTheSameReservedHandRegion(bool mixed)
+    {
+        float center=TabletopHandLayout.ResourceCenter(mixed),width=TabletopHandLayout.ResourceWidth(mixed);
+        foreach(double arrivingWeight in new[]{.001,.25,.5,1})
+        {
+            var slots=Enumerable.Range(0,60).Select(index=>new TabletopResourceSlot{Good=index%5,Ordinal=index/5,Weight=index==30?arrivingWeight:1}).ToArray();
+            for(int index=0;index<slots.Length;index++)
+            {
+                var pose=TabletopHandLayout.Resource(slots,index,center,width,false);
+                Assert.True(pose.X>=268-.001f);
+                Assert.True(pose.X+TabletopHandLayout.CardWidth<=1260+.001f);
+            }
+        }
     }
 }

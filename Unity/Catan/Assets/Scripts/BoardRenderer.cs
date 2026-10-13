@@ -17,6 +17,7 @@ public sealed class BoardRenderer : MonoBehaviour
     private Transform pieces;
     private GameObject feltTable;
     private TabletopScene tableScene;
+    private TabletopNumberTokens numberTokens;
     public TabletopScene TableScene => tableScene;
     private GameObject ghost;
     private readonly List<GameObject> mountains = new List<GameObject>();
@@ -60,6 +61,7 @@ public sealed class BoardRenderer : MonoBehaviour
             }
             obj.name = tile.Id;
         }
+        numberTokens=TabletopNumberTokens.Create(transform,boardTiles,tiles);
         var table = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         feltTable = table;
         table.name="Felt table"; table.transform.SetParent(transform); table.transform.position=new Vector3(0,-.012f,0);
@@ -86,10 +88,11 @@ public sealed class BoardRenderer : MonoBehaviour
     }
     public void Refresh(PlayerView view)
     {
-        Refresh(view.Board.Settlements, view.Board.Roads, new PiecePlacement[0], null);
+        Refresh(view.Board.Settlements, view.Board.Roads, new PiecePlacement[0], null, view.Board.Tiles);
     }
-    public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId)
+    public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)
     {
+        if(numberTokens!=null)numberTokens.Refresh(boardTiles);
         foreach(Transform t in pieces) Destroy(t.gameObject);
         foreach(var p in settlements)
             if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
@@ -164,6 +167,7 @@ public sealed class BoardRenderer : MonoBehaviour
     {
         if(operationLayout==enabled)return;
         operationLayout=enabled;
+        if(numberTokens!=null)numberTokens.gameObject.SetActive(enabled);
         if(enabled && tableScene==null)
         {
             tableScene=TabletopScene.Create(transform,vertices.Values);

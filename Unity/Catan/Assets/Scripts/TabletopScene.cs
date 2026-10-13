@@ -4,22 +4,29 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 // 桌面仅使用已公开的顶点坐标；海框、木纹与相机不参与规则和落点裁决。
-// v005：固定桌面坐标、低对比微表面橡木；桌面与手牌显示分离。
+// v008：地图只在中央视口内缩放；备件、银行、骰子和设施使用固定桌面相机。
 public sealed class TabletopScene : MonoBehaviour
 {
-    public static readonly Rect BoardArea = new Rect(230, 132, 980, 510);
+    public static readonly Rect BoardArea = new Rect(248, 145, 722, 448);
+    public const int TableLayer = 30;
     readonly List<Material> materials = new List<Material>();
     readonly List<Mesh> meshes = new List<Mesh>();
     readonly List<Texture2D> textures = new List<Texture2D>();
     Vector3[] outline;
     Vector3 center;
-    Camera tableCamera;
-    Vector3 layoutOrigin;
-    float layoutSize, layoutDepthPixel;
+    Camera tableCamera, boardCamera, mapCamera;
+    RenderTexture mapTexture;
+    int originalCullingMask;
+    float originalDepth;
+    CameraClearFlags originalClearFlags;
+    Rect originalCameraRect;
+    bool originalAllowMsaa;
+    bool originalCameraEnabled;
     public const float SurfaceHeight = -.0075f;
     public float UnitsPerPixel { get; private set; }
     public TabletopWorldObjects Objects { get; private set; }
-    public float DisplayScale => layoutSize / tableCamera.orthographicSize;
+    public Camera TableCamera => tableCamera;
+    public float DisplayScale => 1;
     bool topView;
     float zoom = 1;
     int screenWidth, screenHeight;
@@ -70,6 +77,7 @@ public sealed class TabletopScene : MonoBehaviour
         table.transform.localScale = new Vector3(8, .035f, 8);
         Destroy(table.GetComponent<Collider>());
         table.GetComponent<Renderer>().sharedMaterial = wood;
+        SetTableLayer(table.transform);
 
         var rim = MakeMaterial("海框纸板侧面", new Color(.025f, .16f, .22f), .16f);
         CreatePolygon("海框厚度", outline.Select(p => new Vector3(p.x, -.0025f, p.z)).ToArray(), rim, .004f);
@@ -102,16 +110,31 @@ public sealed class TabletopScene : MonoBehaviour
 
     void InitializeLayout()
     {
-        var rotation=Quaternion.Euler(40,0,0);var up=rotation*Vector3.up;var forward=rotation*Vector3.forward;
-        float minX=outline.Min(p=>p.x-center.x),maxX=outline.Max(p=>p.x-center.x);
-        float minY=outline.Min(p=>Vector3.Dot(p-center,up)),maxY=outline.Max(p=>Vector3.Dot(p-center,up))+.017f;
-        layoutSize=Mathf.Max((maxY-minY)/(BoardArea.height/900f*2),(maxX-minX)/(BoardArea.width/1440f*1.6f*2));
-        UnitsPerPixel=layoutSize*2*1.6f/1440;
-        layoutDepthPixel=layoutSize*2/(900*Mathf.Sin(40*Mathf.Deg2Rad));
-        var cameraPosition=center+up*((maxY+minY)*.5f)-forward*2-up*((.5f-BoardArea.center.y/900)*layoutSize*2);
-        layoutOrigin=cameraPosition+forward*((SurfaceHeight-cameraPosition.y)/forward.y);
+        // 桌面组件用固定米制比例，不再由地图大小或地图缩放反推个人区占地。
+        UnitsPerPixel=.0005f;
+        var cameraObject=new GameObject("固定个人区与银行相机 v008");
+        cameraObject.transform.SetParent(transform,false);
+        tableCamera=cameraObject.AddComponent<Camera>();
+        tableCamera.orthographic=true;
+        tableCamera.cullingMask=1<<TableLayer;
+        tableCamera.clearFlags=CameraClearFlags.SolidColor;
+        tableCamera.backgroundColor=new Color(.22f,.11f,.045f);
+        tableCamera.nearClipPlane=.01f;tableCamera.farClipPlane=10;
+        tableCamera.transform.rotation=Quaternion.Euler(40,0,0);
+        var mapObject=new GameObject("透明地图纹理相机 v008");mapObject.transform.SetParent(transform,false);
+        mapCamera=mapObject.AddComponent<Camera>();mapCamera.enabled=false;
     }
-    public Vector3 World(Vector2 layoutPoint) => layoutOrigin+new Vector3((layoutPoint.x-720)*UnitsPerPixel,0,(450-layoutPoint.y)*layoutDepthPixel);
+    public static void SetTableLayer(Transform root)
+    {
+        root.gameObject.layer=TableLayer;
+        foreach(Transform child in root)SetTableLayer(child);
+    }
+    public Vector3 World(Vector2 layoutPoint)
+    {
+        var ray=MouseRay(layoutPoint);
+        var plane=new Plane(Vector3.up,new Vector3(0,SurfaceHeight,0));
+        return plane.Raycast(ray,out float distance)?ray.GetPoint(distance):Vector3.zero;
+    }
     public Vector2 Project(Vector3 world)
     {
         var point=tableCamera.WorldToViewportPoint(world);return new Vector2(point.x*1440,(1-point.y)*900);
@@ -140,49 +163,143 @@ public sealed class TabletopScene : MonoBehaviour
         expansionMarkers = markers; expansionTrack = track;
         if (markers == null) return;
         markerOriginalPosition = markers.position; markerOriginalScale = markers.localScale;
+        SetTableLayer(markers);
     }
 
     public void SetVisible(bool visible)
     {
         gameObject.SetActive(visible);
+        if(boardCamera!=null&&!visible)
+        {
+            RestoreBoardCamera();
+        }
         if (!visible && expansionMarkers != null)
         {
             expansionMarkers.position = markerOriginalPosition;
             expansionMarkers.localScale = markerOriginalScale;
+            foreach(var child in expansionMarkers.GetComponentsInChildren<Transform>(true))child.gameObject.layer=0;
         }
     }
 
     public void Frame(Camera camera, bool top, float zoomMultiplier)
     {
-        tableCamera = camera; topView = top; zoom = zoomMultiplier;
+        if(boardCamera==null)
+        {
+            boardCamera=camera;originalCullingMask=camera.cullingMask;originalClearFlags=camera.clearFlags;originalDepth=camera.depth;originalCameraRect=camera.rect;originalAllowMsaa=camera.allowMSAA;originalCameraEnabled=camera.enabled;
+        }
+        topView = top; zoom = zoomMultiplier;
         ApplyCamera();
     }
 
     void LateUpdate()
     {
-        if (tableCamera != null && (screenWidth != Screen.width || screenHeight != Screen.height)) ApplyCamera();
+        if (boardCamera != null && (screenWidth != Screen.width || screenHeight != Screen.height)) ApplyCamera();
+        // 蛮族移动会生成新船，只修正显示层，绝不更改规则状态。
+        if(expansionMarkers!=null)SetTableLayer(expansionMarkers);
     }
 
     void ApplyCamera()
     {
         screenWidth = Screen.width; screenHeight = Screen.height;
-        tableCamera.rect = new Rect(0, 0, 1, 1);
-        tableCamera.orthographic = true;
-        tableCamera.backgroundColor = new Color(.22f, .11f, .045f);
-        tableCamera.transform.rotation = Quaternion.Euler(topView ? 90 : 40, 0, 0);
         float aspect = Mathf.Max(.1f, (float)screenWidth / Mathf.Max(1, screenHeight));
-        float fitHeight=layoutDepthPixel*900*Mathf.Sin((topView?90:40)*Mathf.Deg2Rad)/2;
-        float fitWidth=UnitsPerPixel*1440/aspect/2;
-        float size=Mathf.Max(fitHeight,fitWidth)*zoom;
-        tableCamera.orthographicSize = size;
-        tableCamera.transform.position=layoutOrigin-tableCamera.transform.forward*2;
+        tableCamera.rect=new Rect(0,0,1,1);tableCamera.depth=originalDepth-1;tableCamera.aspect=aspect;
+        tableCamera.orthographicSize=UnitsPerPixel*1440/aspect/2;
+        // 同一桌面的观察俯角保持一致；World 每次按当前相机把周边组件放回各自屏幕分区。
+        tableCamera.transform.rotation=Quaternion.Euler(topView?90:40,0,0);
+        tableCamera.transform.position=new Vector3(center.x,SurfaceHeight,center.z)-tableCamera.transform.forward*2;
+
+        boardCamera.cullingMask=originalCullingMask&~(1<<TableLayer);
+        // 主相机只保留屏幕投影/拾取接口；不绑定 RT，避免 WorldToScreenPoint 变为纹理坐标。
+        boardCamera.enabled=false;
+        boardCamera.depth=originalDepth;
+        boardCamera.rect=new Rect(BoardArea.x/1440,1-BoardArea.yMax/900,BoardArea.width/1440,BoardArea.height/900);
+        boardCamera.orthographic=true;boardCamera.transform.rotation=Quaternion.Euler(topView?90:40,0,0);
+        var up=boardCamera.transform.up;
+        float minX=outline.Min(p=>p.x-center.x),maxX=outline.Max(p=>p.x-center.x);
+        float minY=outline.Min(p=>Vector3.Dot(p-center,up));
+        // 为最上沿城堡及骑士保留高度；镜头放大后仅裁剪地图，不侵入周边操作区。
+        float maxY=outline.Max(p=>Vector3.Dot(p-center+Vector3.up*.048f,up));
+        float boardAspect=aspect*(BoardArea.width/1440)/(BoardArea.height/900);
+        boardCamera.orthographicSize=Mathf.Max((maxY-minY)/2,(maxX-minX)/(2*boardAspect))*zoom;
+        boardCamera.transform.position=center+up*((minY+maxY)/2)-boardCamera.transform.forward*2;
+        ConfigureMapTexture();
         if (expansionTrack != null && expansionMarkers != null)
         {
-            // 固定物理占地与位置；蛮族板和地图一起缩放。
+            SetTableLayer(expansionMarkers);
             float scale=135*UnitsPerPixel/EntityBoardAssets.BarbarianTrackWidth;
             expansionMarkers.localScale=markerOriginalScale*scale;
             expansionMarkers.position+=World(new Vector2(1123,75))+Vector3.up*.0002f-expansionTrack.position;
+            FitExpansionDisplay();
         }
+    }
+
+    void FitExpansionDisplay()
+    {
+        var renderers=expansionMarkers.GetComponentsInChildren<Renderer>();
+        if(renderers.Length==0)return;
+        var bounds=renderers[0].bounds;
+        foreach(var renderer in renderers.Skip(1))bounds.Encapsulate(renderer.bounds);
+        var projected=Project(bounds);
+        if(projected.yMin>=20&&projected.yMax<=137)return;
+        // 俯视会展开纸板深度；只在超出上方区域时同比缩小，保留完整轨道和船。
+        float scale=Mathf.Min(1,117/Mathf.Max(.001f,projected.height));
+        expansionMarkers.localScale*=scale;
+        expansionMarkers.position+=World(new Vector2(1123,75))+Vector3.up*.0002f-expansionTrack.position;
+        bounds=renderers[0].bounds;
+        foreach(var renderer in renderers.Skip(1))bounds.Encapsulate(renderer.bounds);
+        projected=Project(bounds);
+        float shift=projected.yMin<20?20-projected.yMin:projected.yMax>137?137-projected.yMax:0;
+        expansionMarkers.position+=World(new Vector2(1123,75+shift))-World(new Vector2(1123,75));
+    }
+
+    void ConfigureMapTexture()
+    {
+        if(SystemInfo.graphicsDeviceType==GraphicsDeviceType.Null)return;
+        int width=Mathf.Max(1,Mathf.RoundToInt(Screen.width*BoardArea.width/1440));
+        int height=Mathf.Max(1,Mathf.RoundToInt(Screen.height*BoardArea.height/900));
+        if(mapTexture==null||mapTexture.width!=width||mapTexture.height!=height)
+        {
+            if(mapTexture!=null){mapTexture.Release();Destroy(mapTexture);}
+            mapTexture=new RenderTexture(width,height,24,RenderTextureFormat.ARGB32){name="中央地图透明合成 v008",antiAliasing=1,filterMode=FilterMode.Bilinear};
+            mapTexture.Create();
+        }
+        mapCamera.CopyFrom(boardCamera);mapCamera.targetTexture=mapTexture;mapCamera.rect=new Rect(0,0,1,1);
+        mapCamera.aspect=boardCamera.aspect;mapCamera.allowHDR=false;mapCamera.allowMSAA=false;
+        mapCamera.clearFlags=CameraClearFlags.SolidColor;mapCamera.backgroundColor=Color.clear;
+        mapCamera.transform.SetPositionAndRotation(boardCamera.transform.position,boardCamera.transform.rotation);
+        mapCamera.enabled=true;
+    }
+
+    void OnGUI()
+    {
+        GUI.depth=100;
+        if(mapTexture==null||Event.current.type!=EventType.Repaint)return;
+        var priorMatrix=GUI.matrix;var priorColor=GUI.color;bool priorEnabled=GUI.enabled;
+        GUI.matrix=Matrix4x4.identity;GUI.color=Color.white;GUI.enabled=true;
+        GUI.DrawTexture(new Rect(BoardArea.x*Screen.width/1440,BoardArea.y*Screen.height/900,
+            BoardArea.width*Screen.width/1440,BoardArea.height*Screen.height/900),mapTexture,ScaleMode.StretchToFill,true);
+        GUI.matrix=priorMatrix;GUI.color=priorColor;GUI.enabled=priorEnabled;
+    }
+
+    // 验证工具与实际窗口使用相同的透明地图合成，主投影相机始终不改变输出目标。
+    public void RenderComposite(RenderTexture target)
+    {
+        if(mapTexture==null||target==null)return;
+        var priorTarget=tableCamera.targetTexture;var priorActive=RenderTexture.active;
+        try
+        {
+            tableCamera.targetTexture=target;tableCamera.Render();tableCamera.targetTexture=priorTarget;
+            mapCamera.Render();RenderTexture.active=target;
+            GL.PushMatrix();
+            try
+            {
+                GL.LoadPixelMatrix(0,target.width,target.height,0);
+                Graphics.DrawTexture(new Rect(BoardArea.x*target.width/1440,BoardArea.y*target.height/900,
+                    BoardArea.width*target.width/1440,BoardArea.height*target.height/900),mapTexture);
+            }
+            finally{GL.PopMatrix();}
+        }
+        finally{tableCamera.targetTexture=priorTarget;RenderTexture.active=priorActive;}
     }
 
     Material MakeMaterial(string label, Color color, float smoothness)
@@ -284,5 +401,13 @@ public sealed class TabletopScene : MonoBehaviour
         foreach (var material in materials) Destroy(material);
         foreach (var mesh in meshes) Destroy(mesh);
         foreach (var texture in textures) Destroy(texture);
+        if(mapTexture!=null){mapTexture.Release();Destroy(mapTexture);}
+    }
+    void OnEnable(){if(boardCamera!=null)ApplyCamera();}
+    void OnDisable(){if(mapCamera!=null)mapCamera.enabled=false;RestoreBoardCamera();}
+    void RestoreBoardCamera()
+    {
+        if(boardCamera==null)return;
+        boardCamera.cullingMask=originalCullingMask;boardCamera.clearFlags=originalClearFlags;boardCamera.depth=originalDepth;boardCamera.rect=originalCameraRect;boardCamera.allowMSAA=originalAllowMsaa;boardCamera.enabled=originalCameraEnabled;
     }
 }

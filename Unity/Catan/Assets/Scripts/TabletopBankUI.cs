@@ -39,8 +39,6 @@ public sealed class TabletopBankUI
                 {Event.current.Use();trade?.Invoke(null);}
             }
             DrawCount(table,layout,count);
-            if(hit!=null&&hit.Contains(Event.current.mousePosition))
-                GUI.Label(table.ProjectLabel(new Rect(layout.x-8,layout.y-9,layout.width+16,21)),Names[good],ModernOperationUI.Small);
         }
         if(snapshot.GoodCount==5)
         {
@@ -55,8 +53,6 @@ public sealed class TabletopBankUI
                     {Event.current.Use();purchase?.Invoke();}
                 }
                 DrawCount(table,layout,build.Count);
-                if(hit!=null&&hit.Contains(Event.current.mousePosition))
-                    GUI.Label(table.ProjectLabel(new Rect(layout.x-8,layout.y-9,layout.width+16,21)),"发展",ModernOperationUI.Small);
             }
         }
         else for(int track=0;track<3;track++)
@@ -66,7 +62,7 @@ public sealed class TabletopBankUI
             var hit=Stack(table,"bank-progress-"+track,layout,EntityCardAssets.ProgressBack(track),3);
             worldHits.Add(hit);
         }
-        float center=TabletopHandLayout.ResourceCenter(snapshot.Cards.Count>0),width=snapshot.Cards.Count>0?704:1060;
+        float center=TabletopHandLayout.ResourceCenter(snapshot.Cards.Count>0),width=TabletopHandLayout.ResourceWidth(snapshot.Cards.Count>0);
         var slots=timeline.HandSlots(snapshot.Seat,snapshot.Goods,snapshot.GoodCount,Time.unscaledTimeAsDouble);
         for(int index=0;index<slots.Length;index++)
         {

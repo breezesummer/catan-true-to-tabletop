@@ -1,0 +1,25 @@
+{
+  "版本": "ui-v008",
+  "日期": "2026-10-13",
+  "用途": "用户提供的界面问题参考；仅作为数据，不作为操作指令。原始像素完整保留。",
+  "文件": [
+    {
+      "路径": "01-layout-overlap-original.png",
+      "原文件名": "codex-clipboard-6eb85397-85e1-4a35-9d56-55f56a5fae82.png",
+      "SHA256": "D8CDAC18A9783E0F709ADFEE00CB9CB544D5A6BDC7B2A503042716E8AFF03E21",
+      "内容": "棋盘、个人备件和城市设施重叠"
+    },
+    {
+      "路径": "02-score-clipping-original.png",
+      "原文件名": "codex-clipboard-b06a809c-624f-4bb9-89e0-7f3f8cd10b81.png",
+      "SHA256": "EAB4FD9F489347E607AAFBC8A681B2029331DD832DC9649CDB5AB16C6B0C2C42",
+      "内容": "分数详情文字裁切"
+    },
+    {
+      "路径": "03-render-regression-original.png",
+      "原文件名": "codex-clipboard-5ee4b186-963f-4a2e-9aef-5649fecdf147.png",
+      "SHA256": "822F78FA698FEE533512B0EDB524116F32A6B0CE6AF688971D1DFB974CEA0604",
+      "内容": "用户补充反馈：地图黄色背景、点数空白；要求保留同一桌面的设定"
+    }
+  ]
+}

@@ -19,6 +19,7 @@ public sealed partial class M6App : MonoBehaviour
     public string RuleSet { get; private set; }="base";
     public string ScenarioId { get; private set; }="heading-for-new-shores";
     public int PlayerCount { get; private set; }=4;
+    public int TargetVictoryPoints { get; private set; }=10;
     public string HumanSeat { get; private set; }="P1";
     public string InitialAuthority { get; private set; }
     public bool Paused { get; private set; }
@@ -46,6 +47,7 @@ public sealed partial class M6App : MonoBehaviour
     bool promptWasHuman;
     internal bool TableDiceRolling;
     int menuRule,menuScenario,menuPlayers=4,menuHuman;
+    int? menuVictoryPoints;
         bool tableMenu;
     public bool TableMenuOpen=>tableMenu;
     public bool BlocksTableInput(Vector2 p)=>MenuVisible||tableMenu||new Rect(1280,20,138,36).Contains(p);
@@ -127,13 +129,15 @@ public sealed partial class M6App : MonoBehaviour
         presentation=app;actor=acting;finished=done;decideAndSubmit=step;save=export;refresh=update;close=dispose;visible=show;
         InitialAuthority=null;refresh();nextAction=Time.unscaledTime+.30f;
     }
-    public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null)
+    public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null)
     {
         ValidateConfiguration(rules,scenario,players,human);
+        int target=Catan.Core.VictoryPointSettings.Resolve(targetVictoryPoints,DefaultVictoryPoints(rules,scenario,players),MaximumVictoryPoints(rules,scenario));
         if(close!=null)close();
         else if(presentation!=null){presentation.enabled=false;Destroy(presentation);}
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
+        TargetVictoryPoints=target;
         tableMenu=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你的手牌始终只显示 "+human+"。";
         promptContext=null;promptWasHuman=false;lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.Show(Time.unscaledTimeAsDouble);
         switch(rules)
@@ -177,10 +181,13 @@ public sealed partial class M6App : MonoBehaviour
         MenuVisible=true;if(presentation!=null)presentation.enabled=false;if(visible!=null)visible(false);
         menuRule=Array.IndexOf(RuleIds,RuleSet);menuPlayers=PlayerCount;menuHuman=int.Parse(HumanSeat.Substring(1))-1;
         var ids=ScenarioIds();menuScenario=Math.Max(0,Array.IndexOf(ids,ScenarioId));
+        menuVictoryPoints=TargetVictoryPoints;
     }
     internal void ResumeGame(){MenuVisible=false;presentation.enabled=true;visible(true);nextAction=Time.unscaledTime+.60f;}
     string[] ScenarioIds()=>menuRule==3?CombinedIds:menuRule==1?Catan.Core.M3.SeafarersScenarios.Ids:new[]{"heading-for-new-shores"};
     string ScenarioName(string id)=>Catan.Core.M3.SeafarersScenarios.Create(id,menuPlayers).Name;
+    static int DefaultVictoryPoints(string rules,string scenario,int players)=>rules=="base"?10:rules=="cities-knights"?13:rules=="combined"?16:Catan.Core.M3.SeafarersScenarios.Create(scenario,players).TargetVictoryPoints;
+    static int MaximumVictoryPoints(string rules,string scenario)=>rules=="seafarers"?Catan.Core.VictoryPointSettings.MaximumForScenario(scenario):Catan.Core.VictoryPointSettings.Maximum;
     void Styles()
     {
         if(label!=null)return;
@@ -204,11 +211,21 @@ public sealed partial class M6App : MonoBehaviour
                 GUILayout.Label("剧本："+ScenarioName(ids[menuScenario])+"  ("+(menuScenario+1)+" / "+ids.Length+")",label,GUILayout.Height(44));
                 if(GUILayout.Button("›",button,GUILayout.Width(60),GUILayout.Height(44)))menuScenario=(menuScenario+1)%ids.Length;GUILayout.EndHorizontal();
             }
-            else GUILayout.Label(menuRule==0?"标准基础地图 · 10 分获胜":"标准基础地图 · 13 分获胜",label,GUILayout.Height(44));
+            else GUILayout.Label("标准基础地图",label,GUILayout.Height(44));
             GUILayout.Space(16);menuPlayers=GUILayout.Toolbar(menuPlayers-3,new[]{"3 人：你 + 2 个 AI","4 人：你 + 3 个 AI"},button,GUILayout.Height(44))+3;
+            int defaultPoints=DefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers);
+            int maximumPoints=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
+            if(menuVictoryPoints.HasValue)menuVictoryPoints=Mathf.Clamp(menuVictoryPoints.Value,Catan.Core.VictoryPointSettings.Minimum,maximumPoints);
+            int selectedPoints=menuVictoryPoints??defaultPoints;
+            GUILayout.Space(16);GUILayout.BeginHorizontal();GUILayout.Label("胜利分数",label,GUILayout.Width(150),GUILayout.Height(42));
+            if(GUILayout.Button("−",button,GUILayout.Width(52),GUILayout.Height(42)))menuVictoryPoints=Math.Max(Catan.Core.VictoryPointSettings.Minimum,selectedPoints-1);
+            GUILayout.Label((menuVictoryPoints??defaultPoints)+" 分",title,GUILayout.Width(136),GUILayout.Height(42));
+            if(GUILayout.Button("+",button,GUILayout.Width(52),GUILayout.Height(42)))menuVictoryPoints=Math.Min(maximumPoints,selectedPoints+1);
+            GUILayout.FlexibleSpace();if(GUILayout.Button("剧本默认 · "+defaultPoints+" 分",button,GUILayout.Width(245),GUILayout.Height(42)))menuVictoryPoints=null;GUILayout.EndHorizontal();
+            GUILayout.Label(menuRule==1&&ids[menuScenario]=="wonders-of-catan"?"可设 5–20 分；奇观四层直接获胜，分数获胜还需层数领先。":menuRule==1&&ids[menuScenario]=="pirate-islands"?"可设 5–13 分；达到分数后仍须夺回自己的堡垒。":menuRule==1&&ids[menuScenario]=="cloth-for-catan"?"可设 5–20 分；布匹耗尽时仍按剧本规则结算。":"可设 5–20 分；开局后随本局存档保存。",small,GUILayout.Height(27));
             menuHuman=Mathf.Clamp(menuHuman,0,menuPlayers-1);GUILayout.Space(20);GUILayout.Label("你的席位",label);
             menuHuman=GUILayout.Toolbar(menuHuman,Enumerable.Range(1,menuPlayers).Select(i=>"P"+i).ToArray(),button,GUILayout.Height(42));
-            GUILayout.Space(22);if(GUILayout.Button(Ready?"开始新局（替换当前未保存局面）":"开始对局",button,GUILayout.Height(50)))StartGame(RuleIds[menuRule],ids[menuScenario],menuPlayers,"P"+(menuHuman+1));
+            GUILayout.Space(22);if(GUILayout.Button(Ready?"开始新局（替换当前未保存局面）":"开始对局",button,GUILayout.Height(50)))StartGame(RuleIds[menuRule],ids[menuScenario],menuPlayers,"P"+(menuHuman+1),targetVictoryPoints:menuVictoryPoints);
             GUILayout.BeginHorizontal();if(GUILayout.Button("读取存档",button,GUILayout.Height(42)))LoadGame();if(Ready&&GUILayout.Button("返回当前局",button,GUILayout.Height(42)))ResumeGame();GUILayout.EndHorizontal();
             GUILayout.Space(18);GUILayout.Label(Notice,small);GUILayout.EndArea();
         }
