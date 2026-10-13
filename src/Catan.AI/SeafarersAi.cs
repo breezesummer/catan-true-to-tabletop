@@ -38,13 +38,18 @@ public sealed class SeafarersAi
             case GamePhase.SetupPort:
                 return Make(CommandKind.SetupPort, view.LegalPortEdgeIds.First());
             case GamePhase.SetupSettlement:
-                return Make(CommandKind.SetupSettlement, view.LegalVertexIds.OrderByDescending(v => Value(view, v)).ThenBy(v => v).First());
+                return Make(CommandKind.SetupSettlement, view.LegalVertexIds.OrderByDescending(v => SetupValue(view, v)).ThenBy(v => v).First());
             case GamePhase.SetupRoad:
+                var opening = Expansion(view);
+                if (opening.HasValue && opening.Value.ship && opening.Value.path.Length > 0 && view.LegalShipEdgeIds.Contains(opening.Value.path[0]))
+                    return Make(CommandKind.SetupShip, opening.Value.path[0]);
                 return view.LegalEdgeIds.Length > 0 ? Make(CommandKind.SetupRoad, BestRoad(view, view.LegalEdgeIds)) : Make(CommandKind.SetupShip, view.LegalShipEdgeIds.First());
             case GamePhase.GoldChoice:
                 var gold = Make(CommandKind.ChooseGoldResources); gold.Resources = Bag();
+                var goldRoute = Expansion(view);
+                var goldGoal = goldRoute.HasValue ? goldRoute.Value.path.Length == 0 ? Settlement : goldRoute.Value.ship ? Ship : Road : City;
                 for (var i = 0; i < Math.Min(view.GoldClaims.First(g => g.PlayerId == view.PlayerId).Amount, view.Bank.Total); i++)
-                { var r = Resources.Where(r => view.Bank[r] > gold.Resources[r]).OrderBy(r => view.OwnResources[r] + gold.Resources[r]).First(); gold.Resources[r]++; }
+                { var r = Resources.Where(r => view.Bank[r] > gold.Resources[r]).OrderByDescending(r => goldGoal[r] - view.OwnResources[r] - gold.Resources[r]).ThenBy(r => view.OwnResources[r] + gold.Resources[r]).First(); gold.Resources[r]++; }
                 return gold;
             case GamePhase.PortPlacement:
                 var port = Make(CommandKind.PlacePort, view.LegalPortEdgeIds.First()); port.SourceId = view.OwnHeldPorts.First().Id; return port;
@@ -54,13 +59,9 @@ public sealed class SeafarersAi
                 { var r = Resources.OrderByDescending(r => view.OwnResources[r] - cards[r]).First(); cards[r]++; }
                 var discard = Make(CommandKind.DiscardResources); discard.Resources = cards; return discard;
             case GamePhase.RobberMove:
-                var destination = view.Board.Tiles.Where(t => t.Id != view.Board.RobberTileId && t.Resource != "sea" && t.Resource != "fog"
-                    && (view.ScenarioId != "forgotten-tribe" || t.Number.HasValue)
-                    && (view.ScenarioId != "cloth-for-catan" || !view.Board.Villages.Any(v => t.Vertices.Contains(v.VertexId)))).OrderByDescending(t =>
-                    Buildings(view).Where(b => t.Vertices.Contains(b.LocationId)).Sum(b => b.PlayerId == view.PlayerId ? -100 : 10 + view.Players.Single(p => p.Id == b.PlayerId).ResourceCount)).First();
-                return Make(CommandKind.MoveRobber, destination.Id);
+                return MoveThreat(view);
             case GamePhase.RobberSteal:
-                var theft = Make(CommandKind.StealResource); theft.OtherPlayerId = view.PendingDecision.EligibleVictimIds.OrderByDescending(id => view.Players.Single(p => p.Id == id).ResourceCount).First(); return theft;
+                var theft = Make(CommandKind.StealResource); theft.OtherPlayerId = view.PendingDecision.EligibleVictimIds.OrderByDescending(id => TheftValue(view, id)).ThenBy(id => id).First(); return theft;
             case GamePhase.RoadBuilding:
                 var route = Expansion(view);
                 if (route.HasValue && route.Value.path.Length > 0 && route.Value.ship && view.LegalShipEdgeIds.Contains(route.Value.path[0]))
@@ -74,12 +75,15 @@ public sealed class SeafarersAi
         }
         if (view.TradeOffer != null)
         { var offer = view.TradeOffer; return Make(Covers(view.OwnResources, offer.Receive) && TradeValue(view.OwnResources, offer.Give, offer.Receive) >= -0.01 ? CommandKind.AcceptTrade : CommandKind.RejectTrade); }
-        if (view.LegalCityVertexIds.Length > 0)
-            return Make(CommandKind.BuildCity, view.LegalCityVertexIds.OrderByDescending(v => Value(view, v)).First());
-        if (view.LegalVertexIds.Length > 0)
-            return Make(CommandKind.BuildSettlement, view.LegalVertexIds.OrderByDescending(v => Value(view, v)).First());
-        var expansion = Expansion(view);
         var me = view.Players.Single(p => p.Id == view.PlayerId);
+        var win = view.LegalVertexIds.Where(v => view.OwnVictoryPoints + SettlementPoints(view, v) >= view.TargetVictoryPoints)
+            .OrderByDescending(v => SettlementPoints(view, v)).ThenBy(v => v).FirstOrDefault();
+        if (win != null) return Make(CommandKind.BuildSettlement, win);
+        if (view.OwnVictoryPoints + 1 >= view.TargetVictoryPoints && view.LegalCityVertexIds.Length > 0)
+            return Make(CommandKind.BuildCity, view.LegalCityVertexIds.OrderByDescending(v => Value(view, v)).First());
+        var award = CheapLongestRoute(view);
+        if (award != null && view.OwnVictoryPoints + 2 >= view.TargetVictoryPoints) return award;
+        var expansion = Expansion(view);
         if (view.ScenarioId == "pirate-islands" && view.Board.Fortresses.Single(f => f.PlayerId == view.PlayerId).Strength > 0)
         {
             var ownShips = view.Board.Ships.Where(s => s.PlayerId == view.PlayerId && s.IsInvasionRoute).ToArray();
@@ -108,12 +112,17 @@ public sealed class SeafarersAi
         ResourceBag goal;
         CommandKind goalKind;
         string target = null;
-        if (me.Pieces.Cities > 0 && view.Board.Settlements.Any(b => b.PlayerId == view.PlayerId)
-            && (view.OwnResources.Ore >= 2 || me.Pieces.Settlements == 0 || expansion == null))
-        { goal = City; goalKind = CommandKind.BuildCity; target = view.Board.Settlements.Where(b => b.PlayerId == view.PlayerId).OrderByDescending(b => Value(view, b.LocationId)).First().LocationId; }
+        var bestCity = view.Board.Settlements.Where(b => b.PlayerId == view.PlayerId)
+            .OrderByDescending(b => SeafaringPlanning.Production(view.Board.Tiles, b.LocationId)).FirstOrDefault();
+        var cityValue = bestCity == null ? double.NegativeInfinity : 12 + SeafaringPlanning.Production(view.Board.Tiles, bestCity.LocationId) * Horizon(view) - 5;
+        if (me.Pieces.Cities > 0 && bestCity != null
+            && (me.Pieces.Settlements == 0 || expansion == null || cityValue >= SettlementValue(view, expansion.Value.target, expansion.Value.path.Length)))
+        { goal = City; goalKind = CommandKind.BuildCity; target = bestCity.LocationId; }
         else if (me.Pieces.Settlements > 0 && expansion != null)
         { goal = expansion.Value.path.Length == 0 ? Settlement : expansion.Value.ship ? Ship : Road; goalKind = expansion.Value.path.Length == 0 ? CommandKind.BuildSettlement : expansion.Value.ship ? CommandKind.BuildShip : CommandKind.BuildRoad; target = expansion.Value.path.Length == 0 ? expansion.Value.target : expansion.Value.path[0]; }
         else { goal = Development; goalKind = CommandKind.BuyDevelopmentCard; }
+
+        if (award != null && view.OwnVictoryPoints >= view.TargetVictoryPoints - 3) return award;
 
         if (CanPlay(view, DevelopmentCardKind.YearOfPlenty) && view.Bank.Total > 0)
         {
@@ -141,7 +150,7 @@ public sealed class SeafarersAi
         var reposition = RepositionShip(view); if (reposition != null) return reposition;
         var proposal = ProposeTrade(view, goal); if (proposal != null) return proposal;
         var bankTrade = TradeFor(view, goal); if (bankTrade != null) return bankTrade;
-        if (view.DevelopmentDeckCount > 0 && Covers(view.OwnResources, Development)) return Make(CommandKind.BuyDevelopmentCard);
+        if (view.DevelopmentDeckCount > 0 && Resources.All(r => view.OwnResources[r] >= goal[r] + Development[r])) return Make(CommandKind.BuyDevelopmentCard);
         return Make(CommandKind.EndTurn);
     }
 
@@ -206,27 +215,96 @@ public sealed class SeafarersAi
     }
     private static bool Covers(ResourceBag hand, ResourceBag cost) => Resources.All(r => hand[r] >= cost[r]);
     private static PiecePlacement[] Buildings(PlayerView view) => view.Board.Settlements.Concat(view.Board.Cities).ToArray();
-    // Reuse an idle open end only when the destination is visibly more productive.
-    // MovableShipEdgeIds supplies source permissions; connectivity is checked after removal.
+    private static int Horizon(PlayerView view) => RemainingRolls(view.Turn, Math.Max(view.OwnVictoryPoints, view.Players.Max(p => p.VictoryPoints)), view.TargetVictoryPoints);
+    private static int SettlementPoints(PlayerView view, string vertex) => SeafaringPlanning.SettlementPoints(view.ScenarioId, view.Board.Tiles,
+        Buildings(view).Where(b => b.PlayerId == view.PlayerId).ToArray(), vertex);
+    private static double SettlementValue(PlayerView view, string vertex, int length) => SeafaringPlanning.SettlementValue(view.ScenarioId,
+        view.Board.Tiles, view.Board.Edges, Buildings(view), view.PlayerId, vertex, length, Horizon(view), view.OwnVictoryPoints, view.TargetVictoryPoints);
+
+    private static double TheftValue(PlayerView view, string playerId)
+    {
+        var player = view.Players.Single(p => p.Id == playerId);
+        return player.ResourceCount == 0 ? 0 : 3 + player.VictoryPoints * 0.8 + Math.Min(2, player.ResourceCount * 0.2);
+    }
+
+    // 威胁评分只使用公开的产出点数、建筑和航线；优先压制领跑者并避免阻断自己。
+    private static Command MoveThreat(PlayerView view)
+    {
+        var buildings = Buildings(view);
+        double RobberValue(Tile tile) => buildings.Where(b => tile.Vertices.Contains(b.LocationId)).Sum(b =>
+            b.PlayerId == view.PlayerId ? -10 - Pips(tile.Number) * (view.Board.Cities.Contains(b) ? 2 : 1) :
+            Pips(tile.Number) * (view.Board.Cities.Contains(b) ? 2 : 1) * (0.6 + view.Players.Single(p => p.Id == b.PlayerId).VictoryPoints * 0.1))
+            + buildings.Where(b => b.PlayerId != view.PlayerId && tile.Vertices.Contains(b.LocationId)).Select(b => TheftValue(view, b.PlayerId)).DefaultIfEmpty(0).Max();
+        var destination = view.Board.Tiles.Where(t => t.Id != view.Board.RobberTileId && t.Resource != "sea" && t.Resource != "fog"
+            && (view.ScenarioId != "forgotten-tribe" && view.ScenarioId != "cloth-for-catan" || t.Number.HasValue))
+            .OrderByDescending(RobberValue).ThenBy(t => t.Id).First();
+        var command = new Command { PlayerId = view.PlayerId, Kind = CommandKind.MoveRobber, TargetId = destination.Id };
+        if (view.ScenarioId == "wonders-of-catan" || view.ScenarioId == "pirate-islands" ||
+            view.ScenarioId == "cloth-for-catan" && !view.Board.Villages.Any(v => v.TradingPlayerIds.Contains(view.PlayerId))) return command;
+        double PirateValue(Tile tile)
+        {
+            var ships = view.Board.Ships.Where(s => view.Board.Edges.Any(e => e.Id == s.LocationId && e.Vertices.All(tile.Vertices.Contains))).ToArray();
+            return ships.Sum(s => s.PlayerId == view.PlayerId ? -12 : 2 + view.Players.Single(p => p.Id == s.PlayerId).VictoryPoints * 0.5)
+                + ships.Where(s => s.PlayerId != view.PlayerId).Select(s => TheftValue(view, s.PlayerId)).DefaultIfEmpty(0).Max();
+        }
+        var sea = view.Board.Tiles.Where(t => t.Resource == "sea" && t.Id != view.Board.PirateTileId).OrderByDescending(PirateValue).ThenBy(t => t.Id).FirstOrDefault();
+        return sea != null && PirateValue(sea) > RobberValue(destination)
+            ? new Command { PlayerId = view.PlayerId, Kind = CommandKind.MovePirate, TargetId = sea.Id } : command;
+    }
+
+    // 仅考察一条可立即建造的路/船夺奖，避免四人局投入大量资源长期争路。
+    private static Command CheapLongestRoute(PlayerView view)
+    {
+        if (view.ScenarioId == "cloth-for-catan" || view.ScenarioId == "pirate-islands" || view.LongestRoadPlayerId == view.PlayerId || view.OwnVictoryPoints < view.TargetVictoryPoints - 3) return null;
+        var required = Math.Max(5, view.Players.Where(p => p.Id != view.PlayerId).Max(p => p.LongestRoadLength) + 1);
+        var buildings = Buildings(view);
+        var ownVertices = buildings.Where(b => b.PlayerId == view.PlayerId).Select(b => b.LocationId).ToHashSet();
+        var blocked = buildings.Where(b => b.PlayerId != view.PlayerId).Select(b => b.LocationId).ToHashSet();
+        var owned = view.Board.Roads.Where(r => r.PlayerId == view.PlayerId).Select(r => r.LocationId)
+            .Concat(view.Board.Ships.Where(s => s.PlayerId == view.PlayerId).Select(s => s.LocationId)).ToHashSet();
+        // 一条路可以接通两段现有路线，不能用“当前最长长度加一”作上限。
+        if (owned.Count + 1 < required) return null;
+        foreach (var candidate in view.LegalEdgeIds.Select(id => (id, ship: false)).Concat(view.LegalShipEdgeIds.Select(id => (id, ship: true))))
+        {
+            var edges = view.Board.Edges.Where(e => owned.Contains(e.Id) || e.Id == candidate.id).ToArray();
+            var ships = view.Board.Ships.Where(s => s.PlayerId == view.PlayerId).Select(s => s.LocationId).ToHashSet();
+            if (candidate.ship) ships.Add(candidate.id);
+            var used = new HashSet<string>();
+            bool Reaches(string vertex, string previous, int count)
+            {
+                if (count >= required) return true;
+                if (previous != null && blocked.Contains(vertex)) return false;
+                foreach (var edge in edges.Where(e => e.Vertices.Contains(vertex) && !used.Contains(e.Id)))
+                {
+                    if (previous != null && ships.Contains(previous) != ships.Contains(edge.Id) && !ownVertices.Contains(vertex)) continue;
+                    used.Add(edge.Id);
+                    if (Reaches(edge.Vertices.First(v => v != vertex), edge.Id, count + 1)) return true;
+                    used.Remove(edge.Id);
+                }
+                return false;
+            }
+            if (edges.SelectMany(e => e.Vertices).Distinct().Any(v => Reaches(v, null, 0)))
+                return new Command { PlayerId = view.PlayerId, Kind = candidate.ship ? CommandKind.BuildShip : CommandKind.BuildRoad, TargetId = candidate.id };
+        }
+        return null;
+    }
+    // 仅挪动视图授权的开放船尾；先移除源船，再找仍然连通且能降低登岛成本的目标。
     private static Command RepositionShip(PlayerView view)
     {
         if (view.ShipMovedThisTurn || view.ScenarioId == "pirate-islands") return null;
-        foreach (var targetId in view.LegalShipEdgeIds.OrderByDescending(id => view.Board.Edges.Single(e => e.Id == id).Vertices.Max(v => Value(view, v))))
+        var current = Expansion(view);
+        var bestValue = current.HasValue ? SettlementValue(view, current.Value.target, current.Value.path.Length) : double.NegativeInfinity;
+        Command best = null;
+        foreach (var sourceId in view.MovableShipEdgeIds.OrderBy(id => id))
         {
-            var target = view.Board.Edges.Single(e => e.Id == targetId);
-            var targetValue = target.Vertices.Max(v => Value(view, v));
-            foreach (var sourceId in view.MovableShipEdgeIds)
-            {
-                var source = view.Board.Edges.Single(e => e.Id == sourceId);
-                if (targetValue <= source.Vertices.Max(v => Value(view, v)) + 2) continue;
-                bool connected = target.Vertices.Any(vertex =>
-                    Buildings(view).Any(b => b.PlayerId == view.PlayerId && b.LocationId == vertex) ||
-                    !Buildings(view).Any(b => b.PlayerId != view.PlayerId && b.LocationId == vertex) &&
-                    view.Board.Ships.Any(s => s.PlayerId == view.PlayerId && s.LocationId != sourceId && view.Board.Edges.Single(e => e.Id == s.LocationId).Vertices.Contains(vertex)));
-                if (connected) return new Command { PlayerId=view.PlayerId, Kind=CommandKind.MoveShip, SourceId=sourceId, TargetId=targetId };
-            }
+            var next = Expansion(view, sourceId);
+            if (!next.HasValue || !next.Value.ship || next.Value.path.Length == 0 || next.Value.path[0] == sourceId) continue;
+            var value = SettlementValue(view, next.Value.target, next.Value.path.Length - 1);
+            if (value <= bestValue + 0.01) continue;
+            bestValue = value;
+            best = new Command { PlayerId = view.PlayerId, Kind = CommandKind.MoveShip, SourceId = sourceId, TargetId = next.Value.path[0] };
         }
-        return null;
+        return best;
     }
     private static int Rate(PlayerView view, Resource resource)
     {
@@ -249,12 +327,12 @@ public sealed class SeafarersAi
         if (expansion.HasValue && expansion.Value.path.Length > 0 && legal.Contains(expansion.Value.path[0])) return expansion.Value.path[0];
         return legal.OrderByDescending(id => view.Board.Edges.Single(e => e.Id == id).Vertices.Max(v => Value(view, v))).ThenBy(e => e).First();
     }
-    private static (string target, string[] path, bool ship)? Expansion(PlayerView view)
+    private static (string target, string[] path, bool ship)? Expansion(PlayerView view, string removedShipId = null)
     {
         var buildings = Buildings(view);
         var ownRoads = view.Board.Roads.Where(r => r.PlayerId == view.PlayerId).Select(r => r.LocationId).ToHashSet();
-        var ownShips = view.Board.Ships.Where(r => r.PlayerId == view.PlayerId).Select(r => r.LocationId).ToHashSet();
-        var occupiedEdges = view.Board.Roads.Select(r=>r.LocationId).Concat(view.Board.Ships.Select(s=>s.LocationId)).ToHashSet();
+        var ownShips = view.Board.Ships.Where(r => r.PlayerId == view.PlayerId && r.LocationId != removedShipId).Select(r => r.LocationId).ToHashSet();
+        var occupiedEdges = view.Board.Roads.Select(r=>r.LocationId).Concat(view.Board.Ships.Where(s => s.LocationId != removedShipId).Select(s=>s.LocationId)).ToHashSet();
         var enemyVertices = buildings.Where(b => b.PlayerId != view.PlayerId).Select(b => b.LocationId).ToHashSet();
         var ownBuildings=buildings.Where(b=>b.PlayerId==view.PlayerId).Select(b=>b.LocationId).ToHashSet();
         var paths = new Dictionary<(string vertex,bool ship),string[]>();
@@ -288,12 +366,67 @@ public sealed class SeafarersAi
                 }
             }
         }
+        var me = view.Players.Single(p => p.Id == view.PlayerId);
+        // 海盗群岛只能在主岛或自己的指定滩头建村；收复堡垒不开放其他西侧顶点。
+        // 用公开起点所属的陆地连通区域识别主岛，避免把舰队途经的肥地当成建设目标。
+        HashSet<string> pirateMainland = null;
+        string pirateBeachhead = null;
+        if (view.ScenarioId == "pirate-islands")
+        {
+            var fortress = view.Board.Fortresses.Single(f => f.PlayerId == view.PlayerId);
+            pirateBeachhead = fortress.BeachheadVertexId;
+            var mainland = view.Board.Tiles.Where(t => t.Resource != "sea" && t.Resource != "fog" && t.Vertices.Contains(fortress.StartingVertexId)).ToList();
+            pirateMainland = mainland.Select(t => t.Id).ToHashSet();
+            for (var i = 0; i < mainland.Count; i++)
+                foreach (var tile in view.Board.Tiles.Where(t => t.Resource != "sea" && t.Resource != "fog" && !pirateMainland.Contains(t.Id) && t.Vertices.Intersect(mainland[i].Vertices).Count() >= 2))
+                { pirateMainland.Add(tile.Id); mainland.Add(tile); }
+        }
         var targets = view.Board.Vertices.Where(v => !buildings.Any(b => b.LocationId == v.Id)
             && !view.Board.Edges.Where(e => e.Vertices.Contains(v.Id)).Any(e => buildings.Any(b => e.Vertices.Contains(b.LocationId)))
-            && view.Board.Tiles.Any(t=>t.Number.HasValue&&t.Vertices.Contains(v.Id)))
-            .SelectMany(v=>paths.Where(p=>p.Key.vertex==v.Id).Select(p=>(target:v.Id,path:p.Value.Select(x=>x.Substring(2)).ToArray(),ship:p.Value.FirstOrDefault()?.StartsWith("S:")==true))).ToArray();
+            && view.Board.Tiles.Any(t=>t.Number.HasValue&&t.Vertices.Contains(v.Id))
+            && (pirateMainland == null || v.Id == pirateBeachhead || view.Board.Tiles.Any(t => pirateMainland.Contains(t.Id) && t.Vertices.Contains(v.Id)))
+            && !view.Board.Fortresses.Any(f => f.Strength > 0 && f.VertexId == v.Id))
+            .SelectMany(v=>paths.Where(p=>p.Key.vertex==v.Id && p.Value.Count(x => x.StartsWith("S:")) <= me.ShipsRemaining + (removedShipId == null ? 0 : 1) && p.Value.Count(x => x.StartsWith("R:")) <= me.Pieces.Roads)
+                .Select(p=>(target:v.Id,path:p.Value.Select(x=>x.Substring(2)).ToArray(),ship:p.Value.FirstOrDefault()?.StartsWith("S:")==true))).ToArray();
         if (targets.Length == 0) return null;
-        return targets.OrderByDescending(t => Value(view, t.target) - t.path.Length * 12).ThenBy(t => t.target).First();
+        return targets.OrderByDescending(t => SettlementValue(view, t.target, t.path.Length)).ThenBy(t => t.path.Length).ThenBy(t => t.target).First();
+    }
+}
+
+/// <summary>从已授权的公开棋盘计算登岛收益与回本时间，供单扩展和组合 AI 共用。</summary>
+internal static class SeafaringPlanning
+{
+    internal static int SettlementPoints(string scenarioId, Tile[] tiles, PiecePlacement[] ownBuildings, string target)
+    {
+        var bonus = scenarioId == "heading-for-new-shores" || scenarioId == "four-islands" || scenarioId == "through-the-desert" ? 2 :
+            scenarioId == "wonders-of-catan" || scenarioId == "new-world" ? 1 : 0;
+        if (bonus == 0) return 1;
+        var land = tiles.Where(t => t.Resource != "sea" && t.Resource != "fog" && (scenarioId != "through-the-desert" || t.Resource != "desert")).ToArray();
+        var visited = new HashSet<string>();
+        var extra = 0;
+        foreach (var start in land.Where(t => t.Vertices.Contains(target)))
+        {
+            if (!visited.Add(start.Id)) continue;
+            var region = new List<Tile> { start };
+            for (var i = 0; i < region.Count; i++)
+                foreach (var next in land.Where(t => !visited.Contains(t.Id) && t.Vertices.Intersect(region[i].Vertices).Count() >= 2))
+                { visited.Add(next.Id); region.Add(next); }
+            if (!region.Any(t => ownBuildings.Any(b => t.Vertices.Contains(b.LocationId)))) extra += bonus;
+        }
+        return 1 + extra;
+    }
+
+    internal static double Production(Tile[] tiles, string vertex) => tiles.Where(t => t.Vertices.Contains(vertex)).Sum(t => Pips(t.Number) / 36.0);
+
+    internal static double SettlementValue(string scenarioId, Tile[] tiles, Edge[] edges, PiecePlacement[] buildings, string playerId,
+        string target, int pathLength, int remainingRolls, int ownPoints, int targetPoints)
+    {
+        var points = SettlementPoints(scenarioId, tiles, buildings.Where(b => b.PlayerId == playerId).ToArray(), target);
+        if (pathLength == 0 && ownPoints + points >= targetPoints) return 10000 + points;
+        // 每段路或船花两张牌，村庄花四张；按平均每轮一段施工预留四次掷骰的延迟。
+        // 同分落点只有额外产出能偿还绕行费用时，才值得多造船追逐肥地。
+        var payback = Production(tiles, target) * Math.Max(0, remainingRolls - pathLength * 4);
+        return points * 12 + payback - (4 + pathLength * 2);
     }
 }
 }

@@ -1,0 +1,21 @@
+﻿{
+    "version":  "ai-strategy-v002",
+    "timezone":  "Asia/Shanghai",
+    "testStart":  "2026-10-13T11:55:38.7363241+08:00",
+    "testFinish":  "2026-10-13T12:02:25.1015234+08:00",
+    "total":  652,
+    "passed":  652,
+    "failed":  0,
+    "strategyCases":  59,
+    "completeGames":  52,
+    "commands":  24546,
+    "minimumTurn":  44,
+    "maximumTurn":  131,
+    "unityVersion":  "6000.3.25f1",
+    "unityBuild":  true,
+    "separatePlayerSaveLoad":  true,
+    "humanFullGame":  false,
+    "strengthBenchmark":  false,
+    "manualWindowInspection":  false,
+    "note":  "仅登记本轮实际自动验证；不含权威存档、完整私人手牌或隐藏随机状态。"
+}
