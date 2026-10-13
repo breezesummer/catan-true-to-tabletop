@@ -30,3 +30,20 @@ node_modules/
 # Blender recovery files; source .blend files remain tracked
 *.blend1
 *.blend2
+
+# 可由已保存的脚本、配方和源贴图重建的中间文件（本地保留）
+art/source/entity-conversion-v*/**/*.blend
+art/source/photo-samples-v*/*.blend
+art/exports/entity-conversion-v*/**/*.fbx
+art/exports/entity-conversion-v*/**/textures/
+art/exports/photo-samples-v*/*.fbx
+art/exports/photo-samples-v*/textures/
+art/previews/entity-conversion-v*/
+art/previews/photo-samples-v*/
+
+# 操作系统与编辑器临时文件；截图及版本化验证报告仍保存
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak

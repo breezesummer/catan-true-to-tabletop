@@ -1,0 +1,14 @@
+第一人称桌游 UI 概念首稿 v001
+日期：2026-10-11（北京时间）
+用途：与用户讨论视角、地图比例、玩家席位、棋子和卡牌的桌面摆放。
+状态：待用户讨论；不是已确认的最终界面，不代表开发阶段验收。
+工具：内置 imagegen，以既有游戏截图及实体资产预览为参考生成位图。
+输出：art/previews/ui-tabletop-concept-v001/concept.png
+提示词：本目录 prompt.zh-CN.txt，保存本次完整生成指令。
+说明：人物、房间、木桌、骰子造型与物件细节为概念示意；生成位图不等于可用的三维网格或已实现的 Unity 交互。卡面、数字和落点以规则数据及实际资产为准。
+检查：已查看生成图，检查四席位布局、地图为主、前景自有棋子与手牌、对手手牌背面，以及没有常驻操作栏和分隔边框。没有改动游戏代码；本轮未运行规则测试、Unity 构建或真实交互验收。
+保留：原始参考及生成原图均不覆盖、不删除。未改动路线图；概念首稿不属于阶段完成。
+参考一：docs/verification/m6-2026-10-09/m6-ui-restored-human.jpg（较早 M6 界面参考；当前操作区布局另读 docs/UI_OPERATIONS_V001.md）
+参考二：docs/verification/ore-tile-v004/combined/game-camera.png（板块及棋子外观）
+参考三：art/previews/entity-conversion-v001/resource-cards/game-camera.png（实体资源卡面）
+参考四：art/previews/photo-samples-v001/game-camera.png（木材卡、红色村庄与道路样板）

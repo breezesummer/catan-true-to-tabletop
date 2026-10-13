@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 1,
+  "typeId": "progress-trade",
+  "label": "黄色贸易进步卡六种正面与共同背面",
+  "seed": 20261009,
+  "scaleStatus": "estimated; 54 × 80 × 0.3 mm, not physically measured or user-approved",
+  "limitations": [
+    "照片四点透视校正忠实保留印刷插画、文字、曝光、色偏、模糊与保护套反光；没有 AI 重绘、OCR 排版、补字或去反光。",
+    "四角为卡片直边延長线交点，圆角外会保留少量背景；本批网格为封闭薄盒体，圆角仍待细化。",
+    "原照题名大商家仅与当前规则 GuildDues 作视觉角色对照，照片中的说明不是当前2025规则来源；实体版本差异待确认。",
+    "准确卡片尺寸、纸面材质与真实正背面对齐尚待实测和用户确认。"
+  ],
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色贸易船队.jpg",
+      "sha256": "bc098f34a3c24515909249e53eeacf75b0e0906e88bf28107cd20844044b5c8a",
+      "role": "贸易船队; portrait upright original-photo reference",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色商港.jpg",
+      "sha256": "ca5b9c536051d00bcffbf660b82ec0f5422e0fe783c7e921ebfd8e811b0e0a52",
+      "role": "商港; portrait upright original-photo reference",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色商人.jpg",
+      "sha256": "6eee74bc121c8c4553cc73662493a34244702751e28f419133826893f519be05",
+      "role": "商人; portrait upright original-photo reference",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/大商家.jpg",
+      "sha256": "84f20acb4ec5b09ca2f2665ae92bd385e142a3a9b9969d5ba862386e1644870f",
+      "role": "大商家; portrait upright original-photo reference",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/垄断资源.jpg",
+      "sha256": "c294aaecc121a8b3c928800815a9fb9a7c53191ab16f2c3fed3f406068221f6b",
+      "role": "垄断资源; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/垄断商品.jpg",
+      "sha256": "f82c632e708f3b18fbcbbf659e24cdfbe5cd3820c67570797efcbf98bc45aedc",
+      "role": "垄断商品; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg",
+      "sha256": "f788acd3fea19ef3e5538bdcb9ddb7c9e296c4699308c7b7f6bfa706484c8eae",
+      "role": "黄色共同背面; portrait upright original-photo reference",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    }
+  ],
+  "textureJobs": [
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/黄色贸易船队.jpg",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-merchant-fleet-front.png",
+      "quad": [
+        [
+          512,
+          649
+        ],
+        [
+          2308,
+          636
+        ],
+        [
+          2353,
+          3416
+        ],
+        [
+          550,
+          3436
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/黄色商港.jpg",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-commercial-harbor-front.png",
+      "quad": [
+        [
+          743,
+          741
+        ],
+        [
+          2479,
+          734
+        ],
+        [
+          2513,
+          3393
+        ],
+        [
+          786,
+          3427
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/黄色商人.jpg",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-merchant-front.png",
+      "quad": [
+        [
+          716,
+          687
+        ],
+        [
+          2472,
+          687
+        ],
+        [
+          2477,
+          3398
+        ],
+        [
+          739,
+          3395
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/大商家.jpg",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-guild-dues-front.png",
+      "quad": [
+        [
+          734,
+          546
+        ],
+        [
+          2686,
+          523
+        ],
+        [
+          2724,
+          3544
+        ],
+        [
+          781,
+          3582
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/垄断资源.jpg",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-resource-monopoly-front.png",
+      "quad": [
+        [
+          225,
+          251
+        ],
+        [
+          1049,
+          200
+        ],
+        [
+          1122,
+          1484
+        ],
+        [
+          301,
+          1513
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/垄断商品.jpg",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-trade-monopoly-front.png",
+      "quad": [
+        [
+          208,
+          269
+        ],
+        [
+          960,
+          262
+        ],
+        [
+          978,
+          1425
+        ],
+        [
+          229,
+          1437
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-back-original.png",
+      "quad": [
+        [
+          750,
+          687
+        ],
+        [
+          2367,
+          674
+        ],
+        [
+          2394,
+          3182
+        ],
+        [
+          770,
+          3198
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    }
+  ],
+  "assets": [
+    {
+      "id": "progress-trade-merchant-fleet",
+      "label": "贸易船队贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-merchant-fleet-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-back-original.png"
+    },
+    {
+      "id": "progress-trade-commercial-harbor",
+      "label": "商港贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-commercial-harbor-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-back-original.png"
+    },
+    {
+      "id": "progress-trade-merchant",
+      "label": "商人贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-merchant-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-back-original.png"
+    },
+    {
+      "id": "progress-trade-guild-dues",
+      "label": "大商家贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-guild-dues-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-back-original.png"
+    },
+    {
+      "id": "progress-trade-resource-monopoly",
+      "label": "垄断资源贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-resource-monopoly-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-back-original.png"
+    },
+    {
+      "id": "progress-trade-trade-monopoly",
+      "label": "垄断商品贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-trade-monopoly-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-back-original.png"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "typeId": "city-wall",
+  "operations": [],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "a0b10519c3e231ef51b6ed825722135a9470fa66475aa02e5926f4ae26ff2b8b"
+}

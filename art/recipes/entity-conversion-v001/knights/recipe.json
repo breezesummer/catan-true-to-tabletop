@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "typeId": "knights",
+  "label": "骑士（红色三级 × 戴盔/无盔实体参考）",
+  "seed": 20261009,
+  "scaleStatus": "estimate-not-measured",
+  "displayMappingStatus": "provisional: helmet=active, bare=resting; user confirmation pending; no rule changes",
+  "limitations": [
+    "六张原照均为单个斜前方视角；背面、底部、真实比例与实测尺寸未知。",
+    "参数化封闭雕塑根据可见圆形阶底座、双腿、躯干、盾、持旗手、分级旗形与灰绿头盔制作；非摄影测量、扫描或精确复制。",
+    "估算包围盒 X 宽 12、Y 深 12、Z 高 24 mm；未取得用户实测或尺寸确认。",
+    "一级三角旗、二级单燕尾旗、三级双燕尾旗沿用照片轮廓；盾纹、面部、披风、后侧与底座石纹为简化几何近似。",
+    "戴盔映射 active、无盔映射 resting 仅为文件命名/运行时显示工作约定，待用户确认；不作为实体规则解释或修改规则的依据。",
+    "仅提供有参考依据的红色材质；其他玩家颜色需运行时换色，头盔保持独立灰绿材质。",
+    "没有将单张照片直接贴到雕塑上；红塑料和灰绿头盔是可换色程序材质，曝光/白平衡使真实颜色仍待确认。"
+  ],
+  "references": [
+    {"originalPath": "assets/references/inbox/单位/红色一级骑士.jpg", "sha256": "5e68c8065b79625d7f21ca61c1b795df25b02d743e357bb92336c61de98cb5c5", "role": "level-1-triangle-flag-bare-head-sculpt"},
+    {"originalPath": "assets/references/inbox/单位/红色二级骑士.jpg", "sha256": "c6db1380df865040d931fc01a09584f6c5bb189a783e053ea5df05a22fea091e", "role": "level-2-single-swallowtail-flag-bare-head-sculpt"},
+    {"originalPath": "assets/references/inbox/单位/红色三级骑士.jpg", "sha256": "ed77f3260e3e0d75af34fc7ca6e2dc7ddee2e8a10ca27dab25c8639abb29e8a1", "role": "level-3-double-swallowtail-flag-bare-head-sculpt"},
+    {"originalPath": "assets/references/inbox/单位/红色戴头盔一级骑士.jpg", "sha256": "5f54c4acb167f1eb100d995eb94dc7b0132794903ca5a2e95f3f2ec6df54b828", "role": "level-1-grey-green-helmet-cheek-neck-guard"},
+    {"originalPath": "assets/references/inbox/单位/红色戴头盔二级骑士.jpg", "sha256": "f2e0db86254b856501df55acce4e30d00b50a360a262fec02c4678d519f9e275", "role": "level-2-grey-green-helmet-cheek-neck-guard"},
+    {"originalPath": "assets/references/inbox/单位/红色戴头盔三级骑士.jpg", "sha256": "ede3d7340427ca0d08b50362cec54403aa29a8be054939b94cca4da9a337fe43", "role": "level-3-grey-green-helmet-cheek-neck-guard"}
+  ],
+  "assets": [
+    {"id": "knight-level-1-resting", "label": "一级骑士无盔（resting 暂定）", "kind": "custom", "dimensionsMm": [12,12,24], "customBuilder": "art/recipes/entity-conversion-v001/knights/builder.py", "builderArgs": {"level": 1, "helmet": false, "color": [0.57,0.012,0.022]}},
+    {"id": "knight-level-2-resting", "label": "二级骑士无盔（resting 暂定）", "kind": "custom", "dimensionsMm": [12,12,24], "customBuilder": "art/recipes/entity-conversion-v001/knights/builder.py", "builderArgs": {"level": 2, "helmet": false, "color": [0.57,0.012,0.022]}},
+    {"id": "knight-level-3-resting", "label": "三级骑士无盔（resting 暂定）", "kind": "custom", "dimensionsMm": [12,12,24], "customBuilder": "art/recipes/entity-conversion-v001/knights/builder.py", "builderArgs": {"level": 3, "helmet": false, "color": [0.57,0.012,0.022]}},
+    {"id": "knight-level-1-active", "label": "一级骑士戴盔（active 暂定）", "kind": "custom", "dimensionsMm": [12,12,24], "customBuilder": "art/recipes/entity-conversion-v001/knights/builder.py", "builderArgs": {"level": 1, "helmet": true, "color": [0.57,0.012,0.022]}},
+    {"id": "knight-level-2-active", "label": "二级骑士戴盔（active 暂定）", "kind": "custom", "dimensionsMm": [12,12,24], "customBuilder": "art/recipes/entity-conversion-v001/knights/builder.py", "builderArgs": {"level": 2, "helmet": true, "color": [0.57,0.012,0.022]}},
+    {"id": "knight-level-3-active", "label": "三级骑士戴盔（active 暂定）", "kind": "custom", "dimensionsMm": [12,12,24], "customBuilder": "art/recipes/entity-conversion-v001/knights/builder.py", "builderArgs": {"level": 3, "helmet": true, "color": [0.57,0.012,0.022]}}
+  ]
+}

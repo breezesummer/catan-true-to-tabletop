@@ -1,0 +1,145 @@
+{
+  "status": "passed",
+  "typeId": "progress-trade",
+  "assets": [
+    {
+      "id": "progress-trade-merchant-fleet",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-trade-commercial-harbor",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-trade-merchant",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-trade-guild-dues",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-trade-resource-monopoly",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-trade-trade-monopoly",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/progress-trade-back-original.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-trade-commercial-harbor-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-trade-guild-dues-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-trade-merchant-fleet-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-trade-merchant-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-trade-resource-monopoly-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-trade-trade-monopoly-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    }
+  ],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

@@ -1,0 +1,401 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "resource-cards",
+  "label": "四种剩余资源卡与共同背面",
+  "recipePath": "art/recipes/entity-conversion-v001/resource-cards/recipe.json",
+  "recipeSha256": "4a9a80ed41bc9f67ab6b86cbcd1acf637416fa201418a06181d6fabc5dfff138",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimated; 54 × 80 × 0.3 mm, not physically measured or user-approved",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/资源牌/羊毛.jpg",
+      "sha256": "0dbfd3ba45889231041354cd7c4b410b11ece05ca06ec53091c3ea345fa8bc7b",
+      "role": "wool front; horizontal photo, corrected clockwise to upright sheep"
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/砖头.jpg",
+      "sha256": "b70eb1432b2d36665dd5a50582147bcf73d08ee4849f2c41bd682090d6c27ec4",
+      "role": "brick front; horizontal photo, corrected counterclockwise to upright miners"
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/小麦.jpg",
+      "sha256": "90597e7807eddf96c8757fd84588e2f24350412355a8cee0ce7580d6203c2429",
+      "role": "grain front; portrait photo, corrected 180 degrees to wheat heads above binding"
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/铁矿石.jpg",
+      "sha256": "3cc8d4bbee405952035bc075d8e741124f888d50cd402ae8662244b23aac8a10",
+      "role": "ore front; portrait upright"
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/资源牌背面.jpg",
+      "sha256": "3d94957d49632f67bbd04945cb8e9c6a3eac9bc1bd38c06060adba1b036d5ab0",
+      "role": "shared original-photo back; clockwise to moon above village"
+    }
+  ],
+  "assets": [
+    {
+      "id": "resource-wool",
+      "label": "羊毛资源卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "2250029f62d64352d5cb14b2fea22d4962dce37686a28205a03c6fef9e0635d2",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "resource-wool_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "resource-wool_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "resource-back-original.png"
+        },
+        {
+          "name": "resource-wool_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "resource-wool-front.png"
+        }
+      ],
+      "fbxSha256": "9b8e8e1d448fc6aeca8a9d07d13cdabb1d77f23b5e8780761b2ebe66d6bd2145",
+      "blendSha256": "b81fd2852aa41878e8eb188efc8d4ec512d4c4b1374ba5b5ac3feb3dd37e08c8",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "resource-brick",
+      "label": "砖头资源卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "cd2ec7cff7a1e12940b40d05ff6192bbad0d7265a8aa4c8afb4e0adc4f4b0be6",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "resource-brick_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "resource-brick_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "resource-back-original.png"
+        },
+        {
+          "name": "resource-brick_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "resource-brick-front.png"
+        }
+      ],
+      "fbxSha256": "120c38ee5291a19acc433e8baa92d7437f5e0c68498026247286b39077bd196f",
+      "blendSha256": "5c69248416a3249f95620d4b77059126f10bff0c0af0eeaa230447fae6a2a2ca",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "resource-grain",
+      "label": "小麦资源卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "e4ddfe0b3e44dc2071999d51a2712e19d1460c06c7e5cd7e84889e9f37015362",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "resource-grain_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "resource-grain_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "resource-back-original.png"
+        },
+        {
+          "name": "resource-grain_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "resource-grain-front.png"
+        }
+      ],
+      "fbxSha256": "a92eac1a178ff6c6df985a566b82d8fa3258abec0e9f017f6fb1c112d4f487bf",
+      "blendSha256": "9c488ff9090a89012afd7a5522eedb31d71ab7299af0bd7a8d6911375eb3d957",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "resource-ore",
+      "label": "铁矿石资源卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "d5195e4ad2deadc6866b89f5444714382a4bed3abdcf1385a620df6566b8e5cb",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "resource-ore_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "resource-ore_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "resource-back-original.png"
+        },
+        {
+          "name": "resource-ore_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "resource-ore-front.png"
+        }
+      ],
+      "fbxSha256": "bfc43f960a1521dd92691ea6cdda616b2991d4b1c4e1203cae575dde082a4283",
+      "blendSha256": "84a1654a6c6c066b76d92e7b2bea2a37cf5cc4575354629269850ccd6ad56bf4",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/resource-back-original.png",
+      "sha256": "6163cef5c0939a7efce639bc250933437af97705a68d96f437d8cecad480886b"
+    },
+    {
+      "path": "textures/resource-brick-front.png",
+      "sha256": "89333890fac03a9b1ac28056b790298544e41dd3bee5e6089be52f252d98d473"
+    },
+    {
+      "path": "textures/resource-grain-front.png",
+      "sha256": "a67fcbb96c7b01b22e1113562d1a773993e22573cf78a942b0d041208f45b262"
+    },
+    {
+      "path": "textures/resource-ore-front.png",
+      "sha256": "f01722ea791cfea1b014b8f93796b0f0a204a9ef0e115d4a8e7ceb79985a1fd5"
+    },
+    {
+      "path": "textures/resource-wool-front.png",
+      "sha256": "fb7b9a6b4b95a933dcde23d54200689097028dcaea5b57b51e72410da5653eb5"
+    }
+  ],
+  "limitations": [
+    "照片校正贴图忠实保留原插画、印刷、曝光、模糊与保护套反光；没有 AI 重绘、文字重建或颜色替换。",
+    "四角为人工读取卡片直边延长线交点，圆角外会保留极少白色背景；本批工作网格为薄盒体，圆角轮廓待后续细化。",
+    "卡片实测尺寸、纸面材质、完整正反面对齐与实物版本尚待确认。",
+    "该类型不重做此前木头样板；新共同背面从原照片重取，不复用旧 AI 清理背面。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "793693c40371fc3b3633fae795dd39dfea3a343e8bf5ce3b2e21a2b6822c57bf",
+    "game-camera.png": "ae65d8e8822ec15476ef7bae5e3f7622c8c8c5da25df12376fbc19768efedf2d",
+    "side.png": "7b04e920435e2710264ba1bef488b70c7991aaa54c2479c7a4e8397241d23599",
+    "top.png": "6147e808899255e0158f4acd26ae319130f3d5cf7360e2d3f8cda64fdb845a48"
+  }
+}

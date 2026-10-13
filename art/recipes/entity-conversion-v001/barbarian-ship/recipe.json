@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "typeId": "barbarian-ship",
+  "label": "蛮族入侵船（入侵轨道上的黑色船雕塑）",
+  "seed": 20261009,
+  "scaleStatus": "estimate-not-measured",
+  "semanticMapping": {
+    "sourceFilename": "海盗（入侵卡上的单位）.jpg",
+    "sourceFilenamePreserved": true,
+    "projectAssetId": "barbarian-ship",
+    "meaning": "Cities & Knights barbarian invasion ship; separate from the Seafarers sea pirate"
+  },
+  "waterlineMm": 1.8,
+  "limitations": [
+    "原文件名含“海盗”，在官方 2025 城市与骑士规则及工程语义中对应蛮族入侵船；保留原始文件名与 SHA-256。",
+    "一张较暗斜侧照片只约束可见轮廓，背面、底面、帆后面与细微雕刻未知；本模型是参数化近似，不是扫描复原。",
+    "估算尺寸为本地 X 宽 12、Y 长 28、Z 高 26 mm，宽度包含波浪底座；无实测比例。",
+    "船体舷板、卷曲上翘船首、厚弧帆、桅杆与波浪底座按可见特征制作；未见侧舷按对称近似，不添加玩家船后舱。",
+    "黑绿色塑料颜色受原照片低照度与白平衡影响；材质和波浪细节是近似。",
+    "底心枢轴以底座支承面为准；水线估算为底面以上 1.8 mm，尚无实测。",
+    "Unity 实际导入、相邻组件摆放、拾取与用户外观确认由主任务另行验收。"
+  ],
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/单位/海盗（入侵卡上的单位）.jpg",
+      "sha256": "b0260a1c0dd5617747b74ca6642e59ce03d074264e78371780881651f9632efa",
+      "role": "barbarian-invasion-ship-visible-sculpture-silhouette-and-dark-material"
+    }
+  ],
+  "assets": [
+    {
+      "id": "barbarian-ship",
+      "label": "蛮族入侵船",
+      "kind": "custom",
+      "dimensionsMm": [12, 28, 26],
+      "customBuilder": "art/recipes/entity-conversion-v001/barbarian-ship/builder.py",
+      "builderArgs": {
+        "color": [0.013, 0.023, 0.021],
+        "waveColor": [0.025, 0.044, 0.037]
+      }
+    }
+  ]
+}

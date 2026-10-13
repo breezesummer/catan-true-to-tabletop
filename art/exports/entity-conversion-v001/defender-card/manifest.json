@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "defender-card",
+  "label": "卡坦保卫者奖励卡",
+  "recipePath": "art/recipes/entity-conversion-v001/defender-card/recipe.json",
+  "recipeSha256": "04b4d66dc9c40110402e44ac37b3a9bb7aedccd0882b242ddba0590e69f8cfd3",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimated; 54 × 80 × 0.3 mm, not physically measured or user-approved",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/奖励卡/卡坦保卫者.jpg",
+      "sha256": "3c32e1d715f85010436610507e90a69038a1848770b8e386bbbbb4fe535424da",
+      "role": "defender reward card front only; horizontal original photo corrected clockwise 90 degrees so the title is at the top"
+    }
+  ],
+  "assets": [
+    {
+      "id": "defender-card",
+      "label": "卡坦保卫者奖励卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "594ace843e80a95bc75690a2996974bcf4012c707fdc16654a689b75d2c7512c",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "defender-card_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "defender-card_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "defender-card-front.png"
+        },
+        {
+          "name": "defender-card_UnseenBackNeutral",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.6100000143051147,
+            0.49000000953674316,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "64db224bfb991b91d0fe213c9a482757a8ce5d1f440cb7e006715464485ec557",
+      "blendSha256": "713c5b9652aa6e53cff69135eee5dd04e30a1bbe6144ba56559b3133c251cdd1",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/defender-card-front.png",
+      "sha256": "5cc2d5c97138448af7def0f521a91274611339b2d4000af679abf08db17903c8"
+    }
+  ],
+  "limitations": [
+    "正面由原照片四角几何校正，保留原插画、印刷文字、曝光、模糊及保护套反光；不使用 AI 重绘、OCR 补字、锐化或颜色替换。",
+    "未提供奖励卡背面照片，backTexture 为 null，仅使用中性未知背面材质，不借用其他类别背面。",
+    "卡片外边角依据直边延长线人工估读；圆角外少量白底保留，薄盒网格没有还原圆角和纸面微观形状。",
+    "54 × 80 × 0.3 mm 为工作估算，实体版本、实测尺寸、纸面材质和正反面配准仍未知。",
+    "照片中的中文名称与计分印刷只作外观参考，不改变官方规则数据。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "920bef6c8f954e0f43a3cbb74e4962a17a61585daf6d926899141cbe2d854678",
+    "game-camera.png": "1e4b741676cb6c596011229e96ea2426fd91b3f3ae9139fb2a5a722724ae6552",
+    "side.png": "50967e8d856786f951daf697869ca61000afe4ee97fbe067db2f54099e705abc",
+    "top.png": "a49216df98e8ba4b5c795b0de1c745686bfe8bb2cb06ee7d520a964f5aa61b0b"
+  }
+}

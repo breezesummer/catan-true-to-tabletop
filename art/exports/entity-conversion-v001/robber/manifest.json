@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "robber",
+  "label": "黑色强盗三人群像（同一实体双角度照片参考）",
+  "recipePath": "art/recipes/entity-conversion-v001/robber/recipe.json",
+  "recipeSha256": "58f31ada38f95703fe883daa199f7516df295e735ebd3accc271e424b0addba5",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v001/robber/builder.py",
+      "sha256": "1652eb1ab17d08d7cef5dc78bbd3e5f1da5636f6b819edc37e509209681750d9"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimate-not-measured",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/单位/强盗.jpg",
+      "sha256": "9ee71055322b2c147149b5b8dd045ef8d88f466488d2a0eac0913f08014e7bc5",
+      "role": "same-black-three-person-sculpt-high-front-angle"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/强盗 (2).jpg",
+      "sha256": "2c123cd77edb67be24ef30c0ebc54b125fb108dfcef1307efb5f94f54fac94d4",
+      "role": "same-black-three-person-sculpt-lower-front-angle"
+    }
+  ],
+  "assets": [
+    {
+      "id": "robber-black-group",
+      "label": "黑色强盗三人群像",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        12,
+        25
+      ],
+      "meshObjects": 1,
+      "triangles": 15408,
+      "geometrySha256": "bbc3fe605aab10c3a7d3412814b9d1a0f6a5bbe84b23fa2343305a3a08fa936d",
+      "blenderBounds": {
+        "min": [
+          -0.008999999612569809,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.008999999612569809,
+          0.006000000052154064,
+          0.02500000037252903
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.008999999612569809,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.008999999612569809,
+          0.02500000037252903,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "robber-black-group_Black_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.017999999225139618,
+            0.02199999988079071,
+            0.02199999988079071,
+            1.0
+          ],
+          "roughness": 0.30000001192092896,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "e695827d4777a1c343c3ee71f85f486bd337e825e08a795512b8444b2264b458",
+      "blendSha256": "00c370260ad16a9bae4bbd717b238cc7153f7d7717cd93139363c31359ed0f55",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [],
+  "limitations": [
+    "两张照片显示同一件黑色三人抱团雕像，不是两款强盗；原始照片均只读保留。",
+    "可见正面与较高角度，后背、底面和遮挡处未知；头帽、面部、衣褶与手指为参数化雕塑近似，不是扫描或摄影测量复原。",
+    "估算包围盒 X 宽 18、Y 深 12、Z 高 25 mm，依据照片群像宽高比例调整；没有比例尺，实际尺寸不是已确认值。",
+    "保留后方高个戴帽、左前抱臂双钮扣和右前兜帽持斜棍的三人轮廓；黑色塑料的高光受照片曝光影响，材质采用近似炭黑。",
+    "照片没有清楚显示独立圆盘底座，采用脚部与很薄的异形连接支承；不可见底部连接方式为近似。",
+    "闭合部件合并为一个网格，壳间有重叠，未布尔融合；Unity 正式灯光、碰撞、拾取、相邻组件遮挡及用户外观验收待主任务集成。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "abef0e50bdb7eb44f7dfed8156377495217185ecc08c1572afc36a41a43f08e6",
+    "game-camera.png": "41e3d2de0a080f9cc79665a78d702171b7627f9f9f8f6201edc6864a2ae05220",
+    "side.png": "628470c4635c18b4633c54bfbd619cd50381fffb331d82dff3458328701976c1",
+    "top.png": "044e87ee2a152f9a330e7276b3cd2a9e37ff16ca7930076c98d550b79059762e"
+  }
+}

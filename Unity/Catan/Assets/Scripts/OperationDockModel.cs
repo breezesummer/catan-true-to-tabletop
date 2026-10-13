@@ -31,7 +31,7 @@ public sealed class OperationBuild
 }
 public sealed class OperationHandCard
 {
-    public string Id, Name, Detail;
+    public string Id, Name, Detail, UnavailableReason;
     public int ArtIndex = -1;
     public bool Progress, Playable;
 }

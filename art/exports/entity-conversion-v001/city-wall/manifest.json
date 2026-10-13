@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "city-wall",
+  "label": "城墙（红色组合照片参考）",
+  "recipePath": "art/recipes/entity-conversion-v001/city-wall/recipe.json",
+  "recipeSha256": "a0b10519c3e231ef51b6ed825722135a9470fa66475aa02e5926f4ae26ff2b8b",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v001/city-wall/builder.py",
+      "sha256": "dd89253382445824847f94a10b044681ac4a262bd185633eb1f657e5c8f1f3e3"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimate-not-measured",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/建筑/红色城市+城墙.jpg",
+      "sha256": "95f6e7670b469534b0a1e05932c63ef56810bdfde6c7a19e5f161c4500ea7a14",
+      "role": "city-in-wall-visible-ring-towers-crenellations"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色大都会+城墙.jpg",
+      "sha256": "d6c31093b29977114f68f4047bc0dccae4e602e408c605c226898a2c7943c4a9",
+      "role": "metropolis-in-wall-confirm-visible-ring-ledge-and-towers"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色城市.jpg",
+      "sha256": "b40d7dfa1b75ad0adbed6bf463c26d3061bdf726837f0570f045195d3b43c993",
+      "role": "extra-comparison-reference-for-separate-city-base-and-wall-clearance"
+    }
+  ],
+  "assets": [
+    {
+      "id": "city-wall-red",
+      "label": "红色独立城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        5
+      ],
+      "meshObjects": 1,
+      "triangles": 14624,
+      "geometrySha256": "ae39d8b557c48fb479b3080e65a00dbd31ecda09b09c7626148ad34f1bd17d41",
+      "blenderBounds": {
+        "min": [
+          -0.012000000104308128,
+          -0.012000000104308128,
+          0.0
+        ],
+        "max": [
+          0.012000000104308128,
+          0.012000000104308128,
+          0.004999999888241291
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.012000000104308128,
+          0.0,
+          -0.012000000104308128
+        ],
+        "max": [
+          0.012000000104308128,
+          0.004999999888241291,
+          0.012000000104308128
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-wall-red_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.5699999928474426,
+            0.008999999612569809,
+            0.019999999552965164,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "a54937f6174f14560d5fd28f000854a9aee23ba2de1335571bb8eebb85764fad",
+      "blendSha256": "7769dbbfb50cde80e51f20cde7273d2d91fa36f59ba33f8aa0672db67dcdca2c",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [],
+  "limitations": [
+    "两张斜侧组合照片只显示装入城市或大都会后的外围城墙，独立城墙顶视、内壁、底面和实际尺寸未知。",
+    "参数化实际网格按可见环形墙体、台阶、上沿、圆形小塔和墙垛近似；非摄影测量或扫描复原。",
+    "外径24 mm、内径18.6 mm、总高5 mm均为估算，中央通孔用于容纳已有18 mm城市底座，未实测插装间隙。",
+    "八座圆形小塔和32个主墙垛为重复布局推断；照片被建筑遮挡的后部和具体墙垛数量尚未确认。",
+    "本资产只包含独立城墙，不包含城市或大都会插入件；组合照片中的其余几何由对应类型独立制作。",
+    "红色塑料材质为原照照明下的近似，不代表实物色值或用户已确认的最终外观。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "b6ae8d6abe310ea2a94fb075983d9dd2e95d25509ba7064afb357e3c1da008b4",
+    "game-camera.png": "a1520ec720561906bfadcc6d8f9535993032673c66a99f8de24ba4e4f3dd24d3",
+    "side.png": "a94975d1b09a4c52e148eaf93d22788c2ac7b54fee579b4ae97f506e2d619561",
+    "top.png": "707003593d4d0af753f4186a7097e783e881a44bb1e2140a21ba6e22df3c8080"
+  }
+}

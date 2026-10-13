@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "typeId": "city-wall",
+  "assets": [
+    {
+      "id": "city-wall-red",
+      "meshObjects": 1,
+      "triangles": 14624,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.0050000035593061876
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [],
+  "previews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": null,
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

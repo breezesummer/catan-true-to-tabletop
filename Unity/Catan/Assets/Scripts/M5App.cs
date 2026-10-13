@@ -139,7 +139,7 @@ public sealed partial class M5App : MonoBehaviour
                     draft.TargetId=target;Submit(draft);return;
                 }
                 if(pickField=="source")draft.SourceId=target;else draft.TargetId=target;
-                pickField="";board.ClearPreview();status=ai!=null?"目标已选中，请在桌上便签完成当前效果。":"已选择 "+target+"；检查面板后确认。";
+                pickField="";board.ClearPreview();status=ai!=null?"目标已选中，请在操作面板确认。":"已选择 "+target+"；检查面板后确认。";
             }
         }
     }
@@ -151,8 +151,9 @@ public sealed partial class M5App : MonoBehaviour
         return nearest;
     }
     void Panel(Rect r,Color c){var old=GUI.color;GUI.color=c;GUI.DrawTexture(r,Texture2D.whiteTexture);GUI.color=old;}
-    bool Btn(string text)=>GUILayout.Button(text,button,GUILayout.MinHeight(32));
-    void Text(string value,bool minor=false)=>GUILayout.Label(value,ai!=null?(minor?paperSmall:paperLabel):(minor?small:label));
+    bool Btn(string text)=>ai!=null?ModernOperationUI.LayoutButton(text):GUILayout.Button(text,button,GUILayout.MinHeight(32));
+    void Text(string value,bool minor=false)
+    {if(ai!=null){ModernOperationUI.Styles(font);GUILayout.Label(value,minor?ModernOperationUI.Small:ModernOperationUI.Text);}else GUILayout.Label(value,minor?small:label);}
     void OnGUI()
     {
         if(host==null)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));
@@ -336,7 +337,7 @@ public sealed partial class M5App : MonoBehaviour
         GUILayout.Space(10);Text("当前选择 · "+CommandName(draft.Kind));
         var k=draft.Kind;var pending=view.PendingDecision==null?"":view.PendingDecision.Kind;
         bool card=k==CommandKind.PlayProgressCard;
-        if(card){Text(CardName(draft.ProgressCard)+"："+CardHelp[(int)draft.ProgressCard]);if(view.OwnProgressCards.Contains(draft.ProgressCard))ProgressFace(draft.ProgressCard,CardName(draft.ProgressCard));}
+        if(card){Text(CardName(draft.ProgressCard));Text(CardHelp[(int)draft.ProgressCard],true);if(ai==null&&view.OwnProgressCards.Contains(draft.ProgressCard))ProgressFace(draft.ProgressCard,CardName(draft.ProgressCard));}
         if(k==CommandKind.ImproveCity&&ai!=null&&operationFacilityLocked)Text("设施轨道："+Tracks[(int)draft.Track]);
         else if(k==CommandKind.ImproveCity||card&&draft.ProgressCard==ProgressCardKind.Crane||pending=="DefenderProgress")draft.Track=(ImprovementTrack)Cycle("轨道",(int)draft.Track,Tracks);
         bool source=k==CommandKind.MoveKnight||k==CommandKind.DisplaceKnight||k==CommandKind.MoveShip;
@@ -408,7 +409,14 @@ public sealed partial class M5App : MonoBehaviour
         {
             var cards=view.OwnProgressCards.Distinct().ToArray();if(cards.Length>0){var selected=cards[Cycle("进步卡",Math.Max(0,Array.IndexOf(cards,draft.ProgressCard)),cards.Select(CardName).ToArray())];draft.ProgressCard=selected;draft.SelectedProgressCard=selected;}
         }
-        if(Btn("确认执行")){Submit(draft);GUIUtility.ExitGUI();}
+        GUILayout.Space(8);
+        if(ai!=null)
+        {
+            var preview=host.Preview(draft);bool legal=preview.Success;
+            if(!legal)ModernOperationUI.Info(preview.Message??"请完成所需选择，当前尚不能确认。",true);
+            if(ModernOperationUI.LayoutButton(card?"确认使用 · "+CardName(draft.ProgressCard):"确认执行",legal,true)){Submit(draft);GUIUtility.ExitGUI();}
+        }
+        else if(Btn("确认执行")){Submit(draft);GUIUtility.ExitGUI();}
         if(card&&Btn("弃置此进步卡")){var c=New(CommandKind.DiscardProgressCard);c.ProgressCard=draft.ProgressCard;c.SelectedProgressCard=draft.ProgressCard;Submit(c);GUIUtility.ExitGUI();}
         if(Btn("取消选择")){CancelOperationDraft();}
     }
@@ -420,6 +428,11 @@ public sealed partial class M5App : MonoBehaviour
     int Cycle(string title,int value,string[] choices)
     {
         if(choices.Length==0)return 0;value=Mathf.Clamp(value,0,choices.Length-1);
+        if(ai!=null)
+        {
+            int firstGood=title=="商品"?5:title=="资源"||title=="资源 / 商品"||title=="交出类型"||title=="取得类型"?0:-1;
+            return ModernOperationUI.Choices(title,value,choices,firstGood);
+        }
         GUILayout.BeginHorizontal();Text(title+"："+choices[value]);if(GUILayout.Button("‹",button,GUILayout.Width(36),GUILayout.Height(30)))value=(value+choices.Length-1)%choices.Length;if(GUILayout.Button("›",button,GUILayout.Width(36),GUILayout.Height(30)))value=(value+1)%choices.Length;GUILayout.EndHorizontal();return value;
     }
     int Count(string name,int value,int max)

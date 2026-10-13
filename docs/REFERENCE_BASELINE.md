@@ -2,7 +2,7 @@
 
 2026 年 10 月 8 日，用户确认：**先用官方 2025 规则和明确标注的估算尺寸完成 M0，实体参考后补**。这确认了开发依据和参考补充顺序，未确认用户持有的实体版本、中文印刷用词或任何实测尺寸。
 
-规则来源见 [RULES_BASELINE.md](RULES_BASELINE.md)。`assets/references/manifest.json` 的 `assets` 仍为空：目前没有收到用户原始照片、扫描件或模型，不能登记虚构的参考素材。
+规则来源见 [RULES_BASELINE.md](RULES_BASELINE.md)。M0 时 `assets/references/manifest.json` 的 `assets` 为空。2026-10-09 用户已提供实体照片，首批木头卡正反面、森林板块、道路和村庄的五份来源已登记，处理结果见 [PHOTO_SAMPLES_V001.md](PHOTO_SAMPLES_V001.md)。实测尺寸与实体版本仍未知，不能把照片中的比例直接登记为实测数据。
 
 M0-04 按此决定交付规则来源登记、估算参数和后补清单。实体资料不再阻塞 M0，也不作为已完成的实物还原验收。正式批量美术仍受 [ART_PIPELINE.md](ART_PIPELINE.md) 的样板验证条件约束。
 

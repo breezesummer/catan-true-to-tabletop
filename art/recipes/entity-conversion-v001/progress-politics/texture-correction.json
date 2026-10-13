@@ -1,0 +1,289 @@
+{
+  "typeId": "progress-politics",
+  "operations": [
+    {
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/外交官.jpg",
+      "sourceSha256": "99a94fe632101f48fd35d09c1574186c8c74da5bccf35e3a67c3ad0e8af8f960",
+      "output": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-diplomacy-front.png",
+      "sha256": "5f0557639ed00bd259c4ad185d30fbb2c9b933632b51a182f9b55d5ff82cec79",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          344,
+          285
+        ],
+        [
+          1083,
+          292
+        ],
+        [
+          1077,
+          1429
+        ],
+        [
+          344,
+          1421
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/间谍.jpg",
+      "sourceSha256": "1f0e00204c452d42ff8494aab5b403d683f75237f190b552240ce972ea1710ab",
+      "output": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-espionage-front.png",
+      "sha256": "76d61e46f34398d35c02174250c6cfa1234e04848e5431975d7d9d4641c89e16",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          315,
+          165
+        ],
+        [
+          1032,
+          155
+        ],
+        [
+          1050,
+          1262
+        ],
+        [
+          330,
+          1270
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/指挥官.jpg",
+      "sourceSha256": "929bf6b316911507ae7fe482ce31914ac899571339b2b612adf516170b4abe4c",
+      "output": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-encouragement-front.png",
+      "sha256": "ce6a01b418983926361529c0800994be6a6ec98186820ae3510afbebce8e5cb6",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          244,
+          230
+        ],
+        [
+          1030,
+          229
+        ],
+        [
+          1034,
+          1434
+        ],
+        [
+          258,
+          1436
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/权谋.jpg",
+      "sourceSha256": "e45dbea2c62be9da56bb4208b2df6678ca5b77d101ec6c964bafde97716a1159",
+      "output": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-intrigue-front.png",
+      "sha256": "62c8a90faef224e487e5d30382a944353ed5374745f18fb1be40febd556c05c8",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          588,
+          570
+        ],
+        [
+          2448,
+          519
+        ],
+        [
+          2542,
+          3393
+        ],
+        [
+          678,
+          3445
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/主教.jpg",
+      "sourceSha256": "bfb60c325097072da02d860d99408f85b5ed1a7f2ab522a31ae58bf149a61cd3",
+      "output": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-taxation-front.png",
+      "sha256": "c3f1ff7cd7af2dac3b907e291eb2199318637e46b5c951d57d50ea7bd26697e6",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          206,
+          227
+        ],
+        [
+          997,
+          217
+        ],
+        [
+          1014,
+          1434
+        ],
+        [
+          227,
+          1448
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/石碑.jpg",
+      "sourceSha256": "6b1b15e1c252644d40847741214abef3c7625df22a2e2b1fc6ed7c92cf3b7520",
+      "output": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-constitution-front.png",
+      "sha256": "b761686d7f76e9d069cc3d4f3c218e116b5f4fbfd19d47d885783f42fe6d2de7",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          299,
+          235
+        ],
+        [
+          1033,
+          235
+        ],
+        [
+          1037,
+          1371
+        ],
+        [
+          301,
+          1373
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/叛徒.jpg",
+      "sourceSha256": "119668bcf462a92f25912cbc6f014e5cbcece98d44aa5d919606a514911122f9",
+      "output": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-treason-front.png",
+      "sha256": "69370a2c5c6904a9827b3715a514cd46fe89046cda886548c3b2f54fd7801fa4",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          217,
+          180
+        ],
+        [
+          967,
+          150
+        ],
+        [
+          1014,
+          1295
+        ],
+        [
+          267,
+          1327
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/婚礼.jpg",
+      "sourceSha256": "2cbb13cac70476ba44b0a3e1d6eff682ef55e56e754e3e4f6dbb7c480d4f198b",
+      "output": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-wedding-front.png",
+      "sha256": "fff47d7d6312eea11ac6aa13226b540dfd989b5c009585c20f21bb11af67200c",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          271,
+          287
+        ],
+        [
+          1025,
+          272
+        ],
+        [
+          1054,
+          1433
+        ],
+        [
+          302,
+          1454
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/破坏者.jpg",
+      "sourceSha256": "289a21b92cf666a44a71a1387c34cbdaed590e07dc0045d0e4f192b4f74ae72a",
+      "output": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-sabotage-front.png",
+      "sha256": "94b654d0b109eb122cd69f3f97278e07b26a542a5deb247663b20bdee3023b73",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          795,
+          550
+        ],
+        [
+          2551,
+          543
+        ],
+        [
+          2574,
+          3272
+        ],
+        [
+          820,
+          3274
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    }
+  ],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "111ff71bcea65e65550e0f74c1f24e02442aac9ad0bdc8feb86f6570fb28e04e"
+}

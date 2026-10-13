@@ -1,0 +1,1239 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v002",
+  "typeId": "player-knights",
+  "label": "骑士（橙色 / 米色 / 蓝色 × 三级 × 戴盔 / 无盔）",
+  "recipePath": "art/recipes/entity-conversion-v002/player-knights/recipe.json",
+  "recipeSha256": "06ac0e44a97d0829e72894f09af61a83f445cc9f6579ec73b973edd464153069",
+  "scriptPath": "tools/art/entity_pipeline_v002.py",
+  "scriptSha256": "a31c4c43b1d79a4743292b1e5ba4fc74d680f16f3619323d43ec8d4d35f21c87",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v002/player-knights/builder.py",
+      "sha256": "f4d7e72efda0b802a6824b3afc34556ef349696287ed3bb962122d6f73f94b37"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261010,
+  "units": "metres",
+  "scaleStatus": "estimate-not-measured",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/单位/橙色一级骑士.jpg",
+      "sha256": "47f33e8feb3018e336ef0dfac7ce02cc7aea63c3efc94828e3461f2bcb5b7ecb",
+      "role": "player-plastic-color-level-1-bare-visible-silhouette",
+      "assetId": "knight-orange-level-1-bare"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色二级骑士.jpg",
+      "sha256": "31c9a439d2a1e836f18a774c530e5e127e1c657dd02894edca8b8ecaf080db23",
+      "role": "player-plastic-color-level-2-bare-visible-silhouette",
+      "assetId": "knight-orange-level-2-bare"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色三级骑士.jpg",
+      "sha256": "839203d1395b089b26ad8117b6f6c4ebf8a8d5d857f6176262cd94b53098a675",
+      "role": "player-plastic-color-level-3-bare-visible-silhouette",
+      "assetId": "knight-orange-level-3-bare"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色戴头盔一级骑士.jpg",
+      "sha256": "e289d8a7d07d3031a02d59d570963ea4c73ada93984bf2a3ce29c22def8ecfa5",
+      "role": "player-plastic-color-level-1-helmet-visible-silhouette",
+      "assetId": "knight-orange-level-1-helmet"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色戴头盔二级骑士.jpg",
+      "sha256": "c459e5292eb794a5210afc90733cc254c4deb9c4121f4d6fbb9e1fd983690b69",
+      "role": "player-plastic-color-level-2-helmet-visible-silhouette",
+      "assetId": "knight-orange-level-2-helmet"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色戴头盔三级骑士.jpg",
+      "sha256": "934f83ab0ece2ecb0f3e892fc8d987bbf2da3c5fa9cc4e08e2a58e11cd961d7f",
+      "role": "player-plastic-color-level-3-helmet-visible-silhouette",
+      "assetId": "knight-orange-level-3-helmet"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色一级骑士.jpg",
+      "sha256": "140106ee1955ce385c31553de24bc96cc0b5452fc5e02fd9abc4f33d9998e556",
+      "role": "player-plastic-color-level-1-bare-visible-silhouette",
+      "assetId": "knight-beige-level-1-bare"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色二级骑士.jpg",
+      "sha256": "b8466852faa0fcaab17fff5c90acf87229ab21aa18b00759dfcb0f03a7580348",
+      "role": "player-plastic-color-level-2-bare-visible-silhouette",
+      "assetId": "knight-beige-level-2-bare"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色三级骑士.jpg",
+      "sha256": "3d14fc102f565f623e501273ca730e19158a5ce472410cd9d766831682063b43",
+      "role": "player-plastic-color-level-3-bare-visible-silhouette",
+      "assetId": "knight-beige-level-3-bare"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色戴头盔一级骑士.jpg",
+      "sha256": "a4c02a2873fccee5a591459231f6f905ccb0f9fe29a5f32710181cf76829f778",
+      "role": "player-plastic-color-level-1-helmet-visible-silhouette",
+      "assetId": "knight-beige-level-1-helmet"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色戴头盔二级骑士.jpg",
+      "sha256": "2e3da352665a858d4f422659a6380ce35c47481bd098e0ff7bb3aeeff14caa18",
+      "role": "player-plastic-color-level-2-helmet-visible-silhouette",
+      "assetId": "knight-beige-level-2-helmet"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色戴头盔三级骑士.jpg",
+      "sha256": "006897652ceaccd1d9dcdb2e35887043ea22c9a00035bfbe27988cf72360d3f7",
+      "role": "player-plastic-color-level-3-helmet-visible-silhouette",
+      "assetId": "knight-beige-level-3-helmet"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色一级骑士.jpg",
+      "sha256": "eec23d2027380483c72431a112c9c08ea1a2cf5b8956a4d2955579135dd4889c",
+      "role": "player-plastic-color-level-1-bare-visible-silhouette",
+      "assetId": "knight-blue-level-1-bare"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色二级骑士.jpg",
+      "sha256": "a974a67269bf59404ef5e1e4684da6f680e5bbd52d612604e9916a22dc014925",
+      "role": "player-plastic-color-level-2-bare-visible-silhouette",
+      "assetId": "knight-blue-level-2-bare"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色三级骑士.jpg",
+      "sha256": "d21c343d1e19432b041940aa1d2d57f857a1b57b245295c240e4889215fe32d0",
+      "role": "player-plastic-color-level-3-bare-visible-silhouette",
+      "assetId": "knight-blue-level-3-bare"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色戴头盔一级骑士.jpg",
+      "sha256": "251a381f5dcdf3508780fe07b271b95d89f664de9a77ea34fa72658ae9bc01e8",
+      "role": "player-plastic-color-level-1-helmet-visible-silhouette",
+      "assetId": "knight-blue-level-1-helmet"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色戴头盔二级骑士.jpg",
+      "sha256": "d74b3fc282c094ad7632ed883e1e67cd4391609550a10fdb5a1d81b863fd6682",
+      "role": "player-plastic-color-level-2-helmet-visible-silhouette",
+      "assetId": "knight-blue-level-2-helmet"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色戴头盔三级骑士.jpg",
+      "sha256": "ff9d1456aeb81a89d4206bc3aa68d8a3d2c0feafcfa69b9c54e9b5d7ccd9dd2e",
+      "role": "player-plastic-color-level-3-helmet-visible-silhouette",
+      "assetId": "knight-blue-level-3-helmet"
+    }
+  ],
+  "assets": [
+    {
+      "id": "knight-orange-level-1-bare",
+      "label": "橙色一级骑士无盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11160,
+      "geometrySha256": "642fc89291cf7a9304a586a46395021102ebce999f4050d6615a3cae81f71a75",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-orange-level-1-bare_Orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "91c89b0ce07ecb6ed7d626f2c56e6befdbf330dfdddf868dfe40781cfd656305",
+      "blendSha256": "3252e8b7459858b303881103b9cb5646d6e705fbdc3c4bfdbf0236f38ffb4785",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-orange-level-2-bare",
+      "label": "橙色二级骑士无盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11168,
+      "geometrySha256": "3171f988b68a686312ba2b7cf6a9fe64bbbcb4e389dd5548876ff33430433c5a",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-orange-level-2-bare_Orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "330423abffc0e819b8ae76fdd66237985bf14578ac04e599819b9f11fe086038",
+      "blendSha256": "44588c2f40785e3ab7de797df28001fabdfcecd4b3935815df32f07e15b16a52",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-orange-level-3-bare",
+      "label": "橙色三级骑士无盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11176,
+      "geometrySha256": "d32bd2f5bb4bfebd5e1387b39a7cdf3269bb06c42d2c95f1081bb212bfdbb82c",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-orange-level-3-bare_Orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "7fe7502768b10b6ca84f9b48793d0c2900e118e3741ba0deacb42cdb62e1146c",
+      "blendSha256": "b61df7cbbcb2bdea02fdaaf94e55f1868ae02c44953d6136ec4c7bb4e997aefc",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-orange-level-1-helmet",
+      "label": "橙色一级骑士戴头盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11120,
+      "geometrySha256": "dab709da5ca588ceb6193f5c833c95f91c6bb63ce9c70e35165f4887859b2a92",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-orange-level-1-helmet_Grey_Green_Helmet",
+          "baseColorLinearRgba": [
+            0.23000000417232513,
+            0.25999999046325684,
+            0.1899999976158142,
+            1.0
+          ],
+          "roughness": 0.46000000834465027,
+          "texture": null
+        },
+        {
+          "name": "knight-orange-level-1-helmet_Orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "6c9af5780ee89d3bf879ab10707100c78fb86f0d3855ad20de074e612343195f",
+      "blendSha256": "32482905c6a4072c710b84328f1bdf8344ee2ac2ce2d406ba4b52d60b306c944",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-orange-level-2-helmet",
+      "label": "橙色二级骑士戴头盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11128,
+      "geometrySha256": "fe309249cf239f98a9020d4cc15530c981374c391c82e12ed5f6c8aba586f55f",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-orange-level-2-helmet_Grey_Green_Helmet",
+          "baseColorLinearRgba": [
+            0.23000000417232513,
+            0.25999999046325684,
+            0.1899999976158142,
+            1.0
+          ],
+          "roughness": 0.46000000834465027,
+          "texture": null
+        },
+        {
+          "name": "knight-orange-level-2-helmet_Orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "b5a2e978b75a15636f85edac4fd9fe35616be5fefff67872948f4938a04b53a2",
+      "blendSha256": "de37439d504a0f53b4452284de9b66f3e10bbf178bbc49c6fdae02b46bed8062",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-orange-level-3-helmet",
+      "label": "橙色三级骑士戴头盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11136,
+      "geometrySha256": "825fbab9ead86bb082f3f1b45f39be425cda06f0c3f53b15acaf662314d16869",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-orange-level-3-helmet_Grey_Green_Helmet",
+          "baseColorLinearRgba": [
+            0.23000000417232513,
+            0.25999999046325684,
+            0.1899999976158142,
+            1.0
+          ],
+          "roughness": 0.46000000834465027,
+          "texture": null
+        },
+        {
+          "name": "knight-orange-level-3-helmet_Orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "334ca291425bc67fcdb7bd39f168824e342de62ae043a3257afbd4c9c6087073",
+      "blendSha256": "6abff768790b53e514248a5457bf995922ddfe8d5b81b2f820fa70f935e64ae6",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-beige-level-1-bare",
+      "label": "米色一级骑士无盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11160,
+      "geometrySha256": "642fc89291cf7a9304a586a46395021102ebce999f4050d6615a3cae81f71a75",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-beige-level-1-bare_Beige_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "55909bafd97f30bd286c4809e88a08f604ca1b59ff9a96ebd406ed2c7bd13a7b",
+      "blendSha256": "831108a7a892923d237f4c3fd26647862b98f346c80b0e4c9e7987e5031c835b",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-beige-level-2-bare",
+      "label": "米色二级骑士无盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11168,
+      "geometrySha256": "3171f988b68a686312ba2b7cf6a9fe64bbbcb4e389dd5548876ff33430433c5a",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-beige-level-2-bare_Beige_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "eeead49fbf82aa5b5c5c401d09f214e975058c363c7c0a549c61cc9c1412d7ee",
+      "blendSha256": "7c1a452922f1e12a631f186e98de9091aee9fdd8ed103dcbf09f961174677c9b",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-beige-level-3-bare",
+      "label": "米色三级骑士无盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11176,
+      "geometrySha256": "d32bd2f5bb4bfebd5e1387b39a7cdf3269bb06c42d2c95f1081bb212bfdbb82c",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-beige-level-3-bare_Beige_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "6764326bc7e520787bee0599455b994be0ff50b15d931358df5c3e2bb1c99531",
+      "blendSha256": "2b6422a05eb59f8d28935b9591f7a82c07b761ecd28227414e6a134910a55d6c",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-beige-level-1-helmet",
+      "label": "米色一级骑士戴头盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11120,
+      "geometrySha256": "dab709da5ca588ceb6193f5c833c95f91c6bb63ce9c70e35165f4887859b2a92",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-beige-level-1-helmet_Beige_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        },
+        {
+          "name": "knight-beige-level-1-helmet_Grey_Green_Helmet",
+          "baseColorLinearRgba": [
+            0.23000000417232513,
+            0.25999999046325684,
+            0.1899999976158142,
+            1.0
+          ],
+          "roughness": 0.46000000834465027,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "d1ae08e10f3f4f5622bdedaa1515e2d1460dfc7e4a1e1295d34b8f360b73cc01",
+      "blendSha256": "993ed78ef8e529c6f71662f9bd9012378c1c957e38f979ccb98fa124e4752736",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-beige-level-2-helmet",
+      "label": "米色二级骑士戴头盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11128,
+      "geometrySha256": "fe309249cf239f98a9020d4cc15530c981374c391c82e12ed5f6c8aba586f55f",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-beige-level-2-helmet_Beige_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        },
+        {
+          "name": "knight-beige-level-2-helmet_Grey_Green_Helmet",
+          "baseColorLinearRgba": [
+            0.23000000417232513,
+            0.25999999046325684,
+            0.1899999976158142,
+            1.0
+          ],
+          "roughness": 0.46000000834465027,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "a53514bfc68bcf740f306b30128fc33ffa0cadb5e3cde4a01ee4d9393bcdaba2",
+      "blendSha256": "7d6c54ed5534472440a9da46697121bcffb9904ffcf584872ba3d9e7c18732d5",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-beige-level-3-helmet",
+      "label": "米色三级骑士戴头盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11136,
+      "geometrySha256": "825fbab9ead86bb082f3f1b45f39be425cda06f0c3f53b15acaf662314d16869",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-beige-level-3-helmet_Beige_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        },
+        {
+          "name": "knight-beige-level-3-helmet_Grey_Green_Helmet",
+          "baseColorLinearRgba": [
+            0.23000000417232513,
+            0.25999999046325684,
+            0.1899999976158142,
+            1.0
+          ],
+          "roughness": 0.46000000834465027,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "da9428a0ace9c265541a4bcf99d3b70efb684509a27efe21f880be4ddf3dbda4",
+      "blendSha256": "e38ae7c9cff07756f7dac2e3974e9cead93be21e3a9142f082eda9e48642e94e",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-blue-level-1-bare",
+      "label": "蓝色一级骑士无盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11160,
+      "geometrySha256": "642fc89291cf7a9304a586a46395021102ebce999f4050d6615a3cae81f71a75",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-blue-level-1-bare_Blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "fcfd03ed538e24ab4f0e2e2f2eeb773f069be001a7dde6b2624b8e8975b45f55",
+      "blendSha256": "b47e25c8b557d3ea1c1ba7079c70cdbd9cee1d4b9ef9d7f021452bbd70258dea",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-blue-level-2-bare",
+      "label": "蓝色二级骑士无盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11168,
+      "geometrySha256": "3171f988b68a686312ba2b7cf6a9fe64bbbcb4e389dd5548876ff33430433c5a",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-blue-level-2-bare_Blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "2704a9501e50a438ef8b36e840c0d30bc4a68f1f4d72769ea037b3fead439f38",
+      "blendSha256": "2c643e36182b7b1a2f91b37fde765d64b6fa0123293893f6d5be99f5ebbd4997",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-blue-level-3-bare",
+      "label": "蓝色三级骑士无盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11176,
+      "geometrySha256": "d32bd2f5bb4bfebd5e1387b39a7cdf3269bb06c42d2c95f1081bb212bfdbb82c",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-blue-level-3-bare_Blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "48e48ae53deb68195b7d240db9f09a27db3efe099a6abafc33bcb5eaae5217d8",
+      "blendSha256": "f6f2e97ee383881dbb24b4f7aea285f574f230e931bccb2650f27638a1a6de39",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-blue-level-1-helmet",
+      "label": "蓝色一级骑士戴头盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11120,
+      "geometrySha256": "dab709da5ca588ceb6193f5c833c95f91c6bb63ce9c70e35165f4887859b2a92",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-blue-level-1-helmet_Blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        },
+        {
+          "name": "knight-blue-level-1-helmet_Grey_Green_Helmet",
+          "baseColorLinearRgba": [
+            0.23000000417232513,
+            0.25999999046325684,
+            0.1899999976158142,
+            1.0
+          ],
+          "roughness": 0.46000000834465027,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "0105f27c0477057974db602951921fd264df6f053d96c7f27e83b341caf21005",
+      "blendSha256": "52b7969cc6e2a3147189448a3a0a0d122c4d6e0c72df7731f62dbfa408b776ce",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-blue-level-2-helmet",
+      "label": "蓝色二级骑士戴头盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11128,
+      "geometrySha256": "fe309249cf239f98a9020d4cc15530c981374c391c82e12ed5f6c8aba586f55f",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-blue-level-2-helmet_Blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        },
+        {
+          "name": "knight-blue-level-2-helmet_Grey_Green_Helmet",
+          "baseColorLinearRgba": [
+            0.23000000417232513,
+            0.25999999046325684,
+            0.1899999976158142,
+            1.0
+          ],
+          "roughness": 0.46000000834465027,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "318f691a0a79233cea04aa5db8da97c9d1abecbc56e09c57f8c2dc841404a94d",
+      "blendSha256": "b7cb7145fff62a255d27d13bfa479a7acea255b5bf7cc88be13b64a273c7f929",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "knight-blue-level-3-helmet",
+      "label": "蓝色三级骑士戴头盔",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 11136,
+      "geometrySha256": "825fbab9ead86bb082f3f1b45f39be425cda06f0c3f53b15acaf662314d16869",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.024000000208616257,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "knight-blue-level-3-helmet_Blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        },
+        {
+          "name": "knight-blue-level-3-helmet_Grey_Green_Helmet",
+          "baseColorLinearRgba": [
+            0.23000000417232513,
+            0.25999999046325684,
+            0.1899999976158142,
+            1.0
+          ],
+          "roughness": 0.46000000834465027,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "2d97e68b05fc4ce1519e8d2ae1f193ed1717569f567c04b627409b1e29e541e6",
+      "blendSha256": "9eb17d84bf803c848bdb5c77f994766016997f608eca0d6113f65251df09cab0",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [],
+  "limitations": [
+    "18张新归档原照均为单个斜前方视角，背面、底部和实测尺寸未知。",
+    "同一模具的照片可见轮廓沿用 v001 参数化圆形双阶底座、双腿、靴子、腿甲、盾、持旗手、长旗杆和头部；这是可导入的实际网格近似，不是扫描或精确复制。",
+    "包围盒 X 宽12、Y 深12、Z 高24 mm 仍为估算，没有取得新的实测或用户尺寸确认。",
+    "一级三角旗、二级单燕尾旗、三级双燕尾旗按照片可见分级复用；盾纹、面部、披风后侧和底座石纹为简化近似。",
+    "橙色、米色和蓝色各有独立程序塑料材质；灰绿头盔保持独立材质，曝光和白平衡使实物颜色仍待用户确认。",
+    "bare/helmet 仅描述原照外观，不宣称戴盔/无盔与规则激活状态的对应关系。",
+    "模型由相互重叠的封闭壳合并为单个网格，尚未布尔融合或制作打印实体；不依赖照片纹理。",
+    "四张 Blender 总览用于本类资产检查；crowded-vertex 不包含真实地块、道路、建筑与拾取，不替代 Unity 场景验收。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "7045e5b9752eebad2204d15a9d47648664de9b2a1f8b74118e5ce0847236c60d",
+    "game-camera.png": "6f84a9f53f4c2daca31aa2199a02399409b80df291b20ee49698e7feaa9ffdb7",
+    "side.png": "bcd5c9bf5917e24406a9bfe3ca9030e63bd5592e2379fe212f1dcb702abdc375",
+    "top.png": "2e08ab0adbcf99ebeae5c9efe04ef009fb748875e92c20f603963822bc81fb72"
+  }
+}

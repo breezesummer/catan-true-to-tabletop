@@ -1,0 +1,165 @@
+{
+  "typeId": "resource-cards",
+  "operations": [
+    {
+      "source": "assets/references/inbox/资源牌/羊毛.jpg",
+      "sourceSha256": "0dbfd3ba45889231041354cd7c4b410b11ece05ca06ec53091c3ea345fa8bc7b",
+      "output": "art/source/entity-conversion-v001/resource-cards/textures/resource-wool-front.png",
+      "sha256": "fb7b9a6b4b95a933dcde23d54200689097028dcaea5b57b51e72410da5653eb5",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          396,
+          947
+        ],
+        [
+          402,
+          343
+        ],
+        [
+          1338,
+          341
+        ],
+        [
+          1342,
+          960
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/资源牌/砖头.jpg",
+      "sourceSha256": "b70eb1432b2d36665dd5a50582147bcf73d08ee4849f2c41bd682090d6c27ec4",
+      "output": "art/source/entity-conversion-v001/resource-cards/textures/resource-brick-front.png",
+      "sha256": "89333890fac03a9b1ac28056b790298544e41dd3bee5e6089be52f252d98d473",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          1306,
+          381
+        ],
+        [
+          1340,
+          1035
+        ],
+        [
+          348,
+          1038
+        ],
+        [
+          345,
+          408
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/资源牌/小麦.jpg",
+      "sourceSha256": "90597e7807eddf96c8757fd84588e2f24350412355a8cee0ce7580d6203c2429",
+      "output": "art/source/entity-conversion-v001/resource-cards/textures/resource-grain-front.png",
+      "sha256": "a67fcbb96c7b01b22e1113562d1a773993e22573cf78a942b0d041208f45b262",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          946,
+          1197
+        ],
+        [
+          391,
+          1198
+        ],
+        [
+          413,
+          377
+        ],
+        [
+          935,
+          382
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/资源牌/铁矿石.jpg",
+      "sourceSha256": "3cc8d4bbee405952035bc075d8e741124f888d50cd402ae8662244b23aac8a10",
+      "output": "art/source/entity-conversion-v001/resource-cards/textures/resource-ore-front.png",
+      "sha256": "f01722ea791cfea1b014b8f93796b0f0a204a9ef0e115d4a8e7ceb79985a1fd5",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          369,
+          363
+        ],
+        [
+          1001,
+          382
+        ],
+        [
+          999,
+          1365
+        ],
+        [
+          328,
+          1364
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/资源牌/资源牌背面.jpg",
+      "sourceSha256": "3d94957d49632f67bbd04945cb8e9c6a3eac9bc1bd38c06060adba1b036d5ab0",
+      "output": "art/source/entity-conversion-v001/resource-cards/textures/resource-back-original.png",
+      "sha256": "6163cef5c0939a7efce639bc250933437af97705a68d96f437d8cecad480886b",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          376,
+          956
+        ],
+        [
+          379,
+          365
+        ],
+        [
+          1293,
+          368
+        ],
+        [
+          1294,
+          975
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    }
+  ],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "4a9a80ed41bc9f67ab6b86cbcd1acf637416fa201418a06181d6fabc5dfff138"
+}

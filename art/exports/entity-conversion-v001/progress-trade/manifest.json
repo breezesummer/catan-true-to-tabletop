@@ -1,0 +1,599 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "progress-trade",
+  "label": "黄色贸易进步卡六种正面与共同背面",
+  "recipePath": "art/recipes/entity-conversion-v001/progress-trade/recipe.json",
+  "recipeSha256": "c21e3b34ca4d490d090351adde5066a2c1db81e9b036ab1d8f0cdbec246d1329",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimated; 54 × 80 × 0.3 mm, not physically measured or user-approved",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色贸易船队.jpg",
+      "sha256": "bc098f34a3c24515909249e53eeacf75b0e0906e88bf28107cd20844044b5c8a",
+      "role": "贸易船队; portrait upright original-photo reference",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色商港.jpg",
+      "sha256": "ca5b9c536051d00bcffbf660b82ec0f5422e0fe783c7e921ebfd8e811b0e0a52",
+      "role": "商港; portrait upright original-photo reference",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色商人.jpg",
+      "sha256": "6eee74bc121c8c4553cc73662493a34244702751e28f419133826893f519be05",
+      "role": "商人; portrait upright original-photo reference",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/大商家.jpg",
+      "sha256": "84f20acb4ec5b09ca2f2665ae92bd385e142a3a9b9969d5ba862386e1644870f",
+      "role": "大商家; portrait upright original-photo reference",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/垄断资源.jpg",
+      "sha256": "c294aaecc121a8b3c928800815a9fb9a7c53191ab16f2c3fed3f406068221f6b",
+      "role": "垄断资源; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/垄断商品.jpg",
+      "sha256": "f82c632e708f3b18fbcbbf659e24cdfbe5cd3820c67570797efcbf98bc45aedc",
+      "role": "垄断商品; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg",
+      "sha256": "f788acd3fea19ef3e5538bdcb9ddb7c9e296c4699308c7b7f6bfa706484c8eae",
+      "role": "黄色共同背面; portrait upright original-photo reference",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "progress-trade-merchant-fleet",
+      "label": "贸易船队贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "17c464d339ce4efe7e8dd859250e98111ca99e6737674fd1704120b5fc9e1f96",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-trade-merchant-fleet_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-trade-merchant-fleet_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-back-original.png"
+        },
+        {
+          "name": "progress-trade-merchant-fleet_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-merchant-fleet-front.png"
+        }
+      ],
+      "fbxSha256": "cf696522b9c24ae0895ae56e4add229e8a78b49421fecaf03409fb9367e300d3",
+      "blendSha256": "c5843f542ae302bd7bc6292a91803bf03e440772170a38f4dbbbebf55d905ef7",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-trade-commercial-harbor",
+      "label": "商港贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "9a79c0034c6286a4a2e02f90409df43ff2c8f38fffdec2e681e6f7177db050d7",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-trade-commercial-harbor_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-trade-commercial-harbor_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-back-original.png"
+        },
+        {
+          "name": "progress-trade-commercial-harbor_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-commercial-harbor-front.png"
+        }
+      ],
+      "fbxSha256": "3ce6795fc8340ba2ab9cbdbe9bfb9dc958572476bc0049256b8395b4a2e4bd06",
+      "blendSha256": "ec25d397fbb0870c9f9c153468b4787cd128d8bd9e12aa20455c2da3bbc4551e",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-trade-merchant",
+      "label": "商人贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "e9e4ca0c4cc5f432e406d2266d270618d70ddd8a5cc00a708df82b5289fbda5a",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-trade-merchant_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-trade-merchant_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-back-original.png"
+        },
+        {
+          "name": "progress-trade-merchant_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-merchant-front.png"
+        }
+      ],
+      "fbxSha256": "1644989ae557956f40825b57c0dc69e93a86659dbb05d716139efedbd4e30b4d",
+      "blendSha256": "e1df866c4dadffb88ab1c1df157d3e0589e62b3fca6f07b840518294900d9ee7",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-trade-guild-dues",
+      "label": "大商家贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "b86182a803b26c3840f6bfd92606848f78107475c9140c888354852f5daa5cb1",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-trade-guild-dues_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-trade-guild-dues_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-back-original.png"
+        },
+        {
+          "name": "progress-trade-guild-dues_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-guild-dues-front.png"
+        }
+      ],
+      "fbxSha256": "5f4dafa86398ad8d0d190cfab5b8fbcb32a2a4453cf40975e2e3bb6b85046cdf",
+      "blendSha256": "2b65aa97cb4497dbf62c63d11419cb5d30322aa84750a4c14de5fe0fc0debf19",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-trade-resource-monopoly",
+      "label": "垄断资源贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "b5fb2e77cf6a2f8d64871f536e2cb096efee2dab2ce06b6d042ce693a441b51a",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-trade-resource-monopoly_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-trade-resource-monopoly_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-back-original.png"
+        },
+        {
+          "name": "progress-trade-resource-monopoly_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-resource-monopoly-front.png"
+        }
+      ],
+      "fbxSha256": "3298f5dcd5e72cc9e7f038a6ada7418ae717a3ee5fb4e18109022f5d70e78970",
+      "blendSha256": "f8c62ce0dbba314288c26716224b01aeea035829949e973203704256aae5e9c6",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-trade-trade-monopoly",
+      "label": "垄断商品贸易进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "bf62960c64504c93f52fd41d6eae714f208cffd3944052b530773f0ae5a84926",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-trade-trade-monopoly_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-trade-trade-monopoly_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-back-original.png"
+        },
+        {
+          "name": "progress-trade-trade-monopoly_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-trade-trade-monopoly-front.png"
+        }
+      ],
+      "fbxSha256": "97f017794c803aeea640a84f9175425f27d13f80aa129334b8b180a75bcc203d",
+      "blendSha256": "43ee8ef5c94dccc10641d5831b2335caba33c0636097dc2f3d55daa8f921de8c",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/progress-trade-back-original.png",
+      "sha256": "69266d776858bf53855079ab3e1b9e8b2b8a9ba2268716eef9edf9f730aa626e"
+    },
+    {
+      "path": "textures/progress-trade-commercial-harbor-front.png",
+      "sha256": "f0723c40bdc5819e4cc7acb296a96695546683b95152a85ab1cafa67f6fd53ca"
+    },
+    {
+      "path": "textures/progress-trade-guild-dues-front.png",
+      "sha256": "84fa553383c609e8898798b95b065608f29d087659062ec5f9b78fed0d31824e"
+    },
+    {
+      "path": "textures/progress-trade-merchant-fleet-front.png",
+      "sha256": "eebdfc5502d31cbc55361655fcb38e8ea2587406ab47b3e9a18e542f8a12d513"
+    },
+    {
+      "path": "textures/progress-trade-merchant-front.png",
+      "sha256": "84005f9abe8e9a8ede1f570e14af41d7f52922a4339a340d8cc3727fd7883a3d"
+    },
+    {
+      "path": "textures/progress-trade-resource-monopoly-front.png",
+      "sha256": "b3e959fca057a1db8fe8b127db64d9862c37cf979283b6c684a47eab38e7fe56"
+    },
+    {
+      "path": "textures/progress-trade-trade-monopoly-front.png",
+      "sha256": "459f1d5db45b51a7b7d58c26f7c8a667e95c009c3ac2e7e302359f7b2e7ddf84"
+    }
+  ],
+  "limitations": [
+    "照片四点透视校正忠实保留印刷插画、文字、曝光、色偏、模糊与保护套反光；没有 AI 重绘、OCR 排版、补字或去反光。",
+    "四角为卡片直边延長线交点，圆角外会保留少量背景；本批网格为封闭薄盒体，圆角仍待细化。",
+    "原照题名大商家仅与当前规则 GuildDues 作视觉角色对照，照片中的说明不是当前2025规则来源；实体版本差异待确认。",
+    "准确卡片尺寸、纸面材质与真实正背面对齐尚待实测和用户确认。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "066da14cb9f9eacb21716d8e1e28e8744baf520d01249f632bff9bba2ae250d7",
+    "game-camera.png": "d54b5e80a265b63c7c1dc4d862f171cfa09b8b56e286676d3a8f8adaddf328bf",
+    "side.png": "86114a3a32ad5e52e56f29e58ce2f8efd06ed1309db9f3240877bf4549c9e24f",
+    "top.png": "1a358985ee1d34949e06b7e66536964c1981cb7158e57c082783bfb4c168af88"
+  }
+}

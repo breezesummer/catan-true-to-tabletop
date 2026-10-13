@@ -1,0 +1,225 @@
+{
+  "status": "passed",
+  "typeId": "progress-science",
+  "assets": [
+    {
+      "id": "progress-science-alchemy",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-science-crane",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-science-engineering",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-science-invention",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-science-irrigation",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-science-medicine",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-science-mining",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-science-printing",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-science-road-building",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-science-smithing",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/progress-science-alchemy-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-science-back-original.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-science-crane-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-science-engineering-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-science-invention-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-science-irrigation-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-science-medicine-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-science-mining-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-science-printing-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-science-road-building-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-science-smithing-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    }
+  ],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

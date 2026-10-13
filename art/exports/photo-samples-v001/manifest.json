@@ -1,0 +1,324 @@
+{
+  "assetId": "photo-samples-v001",
+  "recipeSha256": "7f5ccfd2605da581986fe66b550a0dec17edbf333519304a55fd399349ea4901",
+  "scriptSha256": "f3c721ba1dd6c90b825e279c901d5385d280bf1d0cb7981dd2e1e8dda475e7c0",
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimated; photos have no ruler; not physically measured",
+  "assets": [
+    {
+      "id": "forest",
+      "meshObjects": 1,
+      "triangles": 20,
+      "geometrySha256": "6f7cca9fc65c7156961f56fb0cf49a85d4e050c47153f3551eb45e3d022f6e49",
+      "blenderBounds": {
+        "min": [
+          -0.03429460525512695,
+          -0.03959999978542328,
+          0.0
+        ],
+        "max": [
+          0.03429460525512695,
+          0.03959999978542328,
+          0.00800000037997961
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.03429460525512695,
+          0.0,
+          -0.03959999978542328
+        ],
+        "max": [
+          0.03429460525512695,
+          0.00800000037997961,
+          0.03959999978542328
+        ]
+      },
+      "materials": [
+        {
+          "name": "Photo_Forest_Edge",
+          "baseColorLinearRgba": [
+            0.550000011920929,
+            0.4000000059604645,
+            0.20000000298023224,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "Photo_Forest_Top",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "forest-top.png"
+        }
+      ],
+      "fbxSha256": "72b4cf4e373e3e8dfbd9a352f016fe4942b8db3f42749ed77f7e41749fcace9b",
+      "blendSha256": "b6bfd538ef4074af342ce93625346225638b5df79ca220b61c9322d11ebc8afd",
+      "pivot": "bottom centre, root at origin; length axis Z in Unity for road"
+    },
+    {
+      "id": "road",
+      "meshObjects": 51,
+      "triangles": 5492,
+      "geometrySha256": "cea53eb7ba14321aaf85c2ecb2aa2d81fd0ab1b14d41e876a6fb8fbeb0e3ebea",
+      "blenderBounds": {
+        "min": [
+          -0.0024999999441206455,
+          -0.013000000268220901,
+          0.0
+        ],
+        "max": [
+          0.0024999999441206455,
+          0.013000000268220901,
+          0.004999999888241291
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.0024999999441206455,
+          0.0,
+          -0.013000000268220901
+        ],
+        "max": [
+          0.0024999999441206455,
+          0.004999999888241291,
+          0.013000000268220901
+        ]
+      },
+      "materials": [
+        {
+          "name": "Photo_Red_Plastic",
+          "baseColorLinearRgba": [
+            0.6200000047683716,
+            0.017999999225139618,
+            0.02500000037252903,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "10ab5263cfe5af550a8afb7049973cc9d4064f0944f8ca30b9b5bc20e8dff207",
+      "blendSha256": "947d8fbf65e9e052f549df1de8e208ab68faf61c36ceee19b39eac30160ef9ea",
+      "pivot": "bottom centre, root at origin; length axis Z in Unity for road"
+    },
+    {
+      "id": "village",
+      "meshObjects": 60,
+      "triangles": 6180,
+      "geometrySha256": "51c9fc2e34c1da39b578fa749be9306f91364976925b0cfd04867670e72b590b",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.01600000075995922
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.01600000075995922,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "Photo_Red_Plastic",
+          "baseColorLinearRgba": [
+            0.6200000047683716,
+            0.017999999225139618,
+            0.02500000037252903,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "0aaf2bce64d303c274a9486b2f2f5099f66946258f1bd5a347f7e9c48319953f",
+      "blendSha256": "bdc6b77c1602edc59995e3491dce6991f56533611ceb793a8f16cc3a77463b6a",
+      "pivot": "bottom centre, root at origin; length axis Z in Unity for road"
+    },
+    {
+      "id": "resource-card",
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "feb2e2700c0db9a39c43098c98828db4fc72e97af1f9e65829fdf03a53d12d55",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "Photo_Card_Edge",
+          "baseColorLinearRgba": [
+            0.8299999833106995,
+            0.7699999809265137,
+            0.6000000238418579,
+            1.0
+          ],
+          "roughness": 0.699999988079071,
+          "texture": null
+        },
+        {
+          "name": "Photo_Resource_Back",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.75,
+          "texture": "resource-back.png"
+        },
+        {
+          "name": "Photo_Wood_Front",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.75,
+          "texture": "wood-front.png"
+        }
+      ],
+      "fbxSha256": "152e9e7d6ec85b7be31a9c737b781d55202e8e498ca0c4a30f73ecc3e7490591",
+      "blendSha256": "fae2c24376a3f5b62d5a4ee671a7fa0f459d90b4698300457f4087fa39895055",
+      "pivot": "bottom centre, root at origin; length axis Z in Unity for road"
+    }
+  ],
+  "references": [
+    {
+      "id": "physical-wood-front-001",
+      "originalPath": "assets/references/inbox/资源牌/木头.jpg",
+      "sha256": "447133145e2d82dc15142e61ff22e26267da1a37e6d543c2c68b1a6617b588be",
+      "measuredDimensionsMm": null,
+      "referenceRole": "wood-front",
+      "unknowns": [
+        "physical dimensions",
+        "village hidden rear elevations",
+        "road underside",
+        "forest underside printing"
+      ]
+    },
+    {
+      "id": "physical-resource-back-001",
+      "originalPath": "assets/references/inbox/资源牌/资源牌背面.jpg",
+      "sha256": "3d94957d49632f67bbd04945cb8e9c6a3eac9bc1bd38c06060adba1b036d5ab0",
+      "measuredDimensionsMm": null,
+      "referenceRole": "resource-back",
+      "unknowns": [
+        "physical dimensions",
+        "village hidden rear elevations",
+        "road underside",
+        "forest underside printing"
+      ]
+    },
+    {
+      "id": "physical-forest-001",
+      "originalPath": "assets/references/inbox/地图板块/森林.jpg",
+      "sha256": "7ba385edccadd7a7d5ec6fc643c79b0e0f28f95494f139dc169a0080a6468f77",
+      "measuredDimensionsMm": null,
+      "referenceRole": "forest",
+      "unknowns": [
+        "physical dimensions",
+        "village hidden rear elevations",
+        "road underside",
+        "forest underside printing"
+      ]
+    },
+    {
+      "id": "physical-road-001",
+      "originalPath": "assets/references/inbox/道路/红色道路.jpg",
+      "sha256": "919b8ab6d97b32facffb6ac90d2f9f0ee1682d7f0085abaf47b34967ab54fd5b",
+      "measuredDimensionsMm": null,
+      "referenceRole": "road",
+      "unknowns": [
+        "physical dimensions",
+        "village hidden rear elevations",
+        "road underside",
+        "forest underside printing"
+      ]
+    },
+    {
+      "id": "physical-village-001",
+      "originalPath": "assets/references/inbox/建筑/红色村庄.jpg",
+      "sha256": "83c8c1c29172087c858f90c4ddef756212926cc3fda38547551359431be17f7e",
+      "measuredDimensionsMm": null,
+      "referenceRole": "village",
+      "unknowns": [
+        "physical dimensions",
+        "village hidden rear elevations",
+        "road underside",
+        "forest underside printing"
+      ]
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/forest-top.png",
+      "sha256": "053d524b7fd0e688ce5029f0c28212306199a1a3ee09ff35e6e4ef2f2a3e751e"
+    },
+    {
+      "path": "textures/resource-back.png",
+      "sha256": "c3f465c4051a4e71695c2ddf92eee00ef1522c91cfe6e70d55416e0e7963ba11"
+    },
+    {
+      "path": "textures/wood-front.png",
+      "sha256": "36067e8c331ae0d62b0ba7300866799abf92622098aac00598c248b006e87199"
+    }
+  ],
+  "limits": [
+    "Frozen AI-cleaned candidates; illustration details are reinterpreted. Exact original photographs remain unchanged.",
+    "Photo-guided parametric reconstruction, not photogrammetry. Flat printed forest retained on a closed 3D tile. Sculpted cobbles and grouped gabled buildings approximate visible photographs.",
+    "physical dimensions",
+    "village hidden rear elevations",
+    "road underside",
+    "forest underside printing"
+  ],
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ]
+}

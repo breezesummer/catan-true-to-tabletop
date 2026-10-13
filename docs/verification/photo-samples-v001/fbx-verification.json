@@ -1,0 +1,90 @@
+{
+  "status": "passed",
+  "assets": [
+    {
+      "id": "forest",
+      "meshObjects": 1,
+      "triangles": 20,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.0685892105102539,
+        0.07919999957084656,
+        0.00800001335089684
+      ]
+    },
+    {
+      "id": "road",
+      "meshObjects": 51,
+      "triangles": 5492,
+      "closedMeshes": true,
+      "uvMeshes": 51,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.004999999888241291,
+        0.026000000536441803,
+        0.005000002006210202
+      ]
+    },
+    {
+      "id": "village",
+      "meshObjects": 60,
+      "triangles": 6180,
+      "closedMeshes": true,
+      "uvMeshes": 60,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.012000000104308128,
+        0.012000000104308128,
+        0.016000001694472243
+      ]
+    },
+    {
+      "id": "resource-card",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ]
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/forest-top.png",
+      "width": 1254,
+      "height": 1254,
+      "verified": true
+    },
+    {
+      "path": "textures/resource-back.png",
+      "width": 1030,
+      "height": 1526,
+      "verified": true
+    },
+    {
+      "path": "textures/wood-front.png",
+      "width": 1030,
+      "height": 1526,
+      "verified": true
+    }
+  ],
+  "previews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": null,
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

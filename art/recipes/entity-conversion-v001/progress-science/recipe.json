@@ -1,0 +1,535 @@
+{
+  "schemaVersion": 1,
+  "typeId": "progress-science",
+  "label": "绿色科学进步卡十种正面与共同背面",
+  "seed": 20261009,
+  "scaleStatus": "estimated; 54 × 80 × 0.3 mm, not physically measured or user-approved",
+  "limitations": [
+    "照片四点透视校正忠实保留印刷插画、文字、曝光、色偏、模糊与保护套反光；没有 AI 重绘、OCR 排版、补字或去反光。",
+    "四角为卡片直边延长线交点，圆角外保留少量背景；本批网格为封闭薄盒体，圆角尚待细化。",
+    "原照题名仅与当前规则 ProgressCardKind 作视觉角色对照，印刷说明不是当前 2025 规则来源；实体版本差异待确认。",
+    "准确卡片尺寸、纸面材质、真实背面毫米尺寸与正背面配准尚待实测和用户确认。"
+  ],
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/炼金术士.jpg",
+      "sha256": "fdd11dc04cdeb1852f2d0dc0989e8ab5107ff4b644efc6ee6c0833b43a7a64b5",
+      "role": "煉金術士; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/起重机.jpg",
+      "sha256": "4b4410aaf7f70757ec42550905979ed7e2d71bb34248aec702b63b17634a8b9d",
+      "role": "起重機; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/工程师.jpg",
+      "sha256": "9fa002ec01cd40d1d1829749299651c221b637160dc9fcf2a8720d99ef66a7de",
+      "role": "工程師; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/发明家.jpg",
+      "sha256": "8e94d08bf0c7c4aae6f996baa69aff9f80007e599d2a7e21090df0b27cd515b4",
+      "role": "發明家; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/灌溉.jpg",
+      "sha256": "cb814cc85bd78f540a77778feb01965bc7f532bfa92ce8a9a2a30ad489df36e3",
+      "role": "灌溉; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/药物.jpg",
+      "sha256": "dea107041e44f6cfe1499be46d48fdb8cfb4aeb209d738f4294bf0d2a44e6136",
+      "role": "藥物; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/采矿.jpg",
+      "sha256": "48a9ed9e7023938e109e296d15a35aa1935535634c35ea8f5aafb123d0b8dc3a",
+      "role": "採礦; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/印刷厂.jpg",
+      "sha256": "193a5d761f6cc257b3cf97ecc64a1e40cf2975dc3774e194cc4d603c40ab261e",
+      "role": "印刷廠; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/新建道路.jpg",
+      "sha256": "aa68f9356c6dcba85dde9fe0c48df16b145f6e840d54b999ebbb48d05d81fd3a",
+      "role": "興建道路; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/锻铁匠.jpg",
+      "sha256": "11f4ea4b5715ed7a5c0bef506989a6e5b41b478cf532094cb19cff464c4449cd",
+      "role": "鍛冶匠; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg",
+      "sha256": "07b84fce82cb038e187e4df65187327862c663e672aa39a135e98a6ac15b686d",
+      "role": "绿色共同背面; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    }
+  ],
+  "textureJobs": [
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/炼金术士.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-alchemy-front.png",
+      "quad": [
+        [
+          155,
+          88
+        ],
+        [
+          1026,
+          86
+        ],
+        [
+          1038,
+          1426
+        ],
+        [
+          169,
+          1436
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/起重机.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-crane-front.png",
+      "quad": [
+        [
+          197,
+          185
+        ],
+        [
+          1035,
+          180
+        ],
+        [
+          1049,
+          1474
+        ],
+        [
+          211,
+          1481
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/工程师.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-engineering-front.png",
+      "quad": [
+        [
+          193,
+          153
+        ],
+        [
+          982,
+          148
+        ],
+        [
+          1000,
+          1366
+        ],
+        [
+          208,
+          1380
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/发明家.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-invention-front.png",
+      "quad": [
+        [
+          187,
+          221
+        ],
+        [
+          1007,
+          205
+        ],
+        [
+          1043,
+          1477
+        ],
+        [
+          222,
+          1495
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/灌溉.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-irrigation-front.png",
+      "quad": [
+        [
+          210,
+          174
+        ],
+        [
+          1041,
+          168
+        ],
+        [
+          1060,
+          1453
+        ],
+        [
+          232,
+          1467
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/药物.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-medicine-front.png",
+      "quad": [
+        [
+          256,
+          177
+        ],
+        [
+          1084,
+          180
+        ],
+        [
+          1078,
+          1454
+        ],
+        [
+          257,
+          1458
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/采矿.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-mining-front.png",
+      "quad": [
+        [
+          276,
+          249
+        ],
+        [
+          1052,
+          258
+        ],
+        [
+          1044,
+          1464
+        ],
+        [
+          265,
+          1453
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/印刷厂.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-printing-front.png",
+      "quad": [
+        [
+          228,
+          249
+        ],
+        [
+          984,
+          237
+        ],
+        [
+          1024,
+          1409
+        ],
+        [
+          261,
+          1434
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/新建道路.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-road-building-front.png",
+      "quad": [
+        [
+          216,
+          269
+        ],
+        [
+          958,
+          258
+        ],
+        [
+          991,
+          1416
+        ],
+        [
+          241,
+          1435
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/锻铁匠.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-smithing-front.png",
+      "quad": [
+        [
+          307,
+          190
+        ],
+        [
+          1115,
+          178
+        ],
+        [
+          1133,
+          1436
+        ],
+        [
+          326,
+          1443
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg",
+      "output": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png",
+      "quad": [
+        [
+          272,
+          164
+        ],
+        [
+          1113,
+          159
+        ],
+        [
+          1124,
+          1466
+        ],
+        [
+          280,
+          1483
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0
+    }
+  ],
+  "assets": [
+    {
+      "id": "progress-science-alchemy",
+      "label": "煉金術士科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-alchemy-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png"
+    },
+    {
+      "id": "progress-science-crane",
+      "label": "起重機科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-crane-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png"
+    },
+    {
+      "id": "progress-science-engineering",
+      "label": "工程師科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-engineering-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png"
+    },
+    {
+      "id": "progress-science-invention",
+      "label": "發明家科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-invention-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png"
+    },
+    {
+      "id": "progress-science-irrigation",
+      "label": "灌溉科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-irrigation-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png"
+    },
+    {
+      "id": "progress-science-medicine",
+      "label": "藥物科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-medicine-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png"
+    },
+    {
+      "id": "progress-science-mining",
+      "label": "採礦科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-mining-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png"
+    },
+    {
+      "id": "progress-science-printing",
+      "label": "印刷廠科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-printing-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png"
+    },
+    {
+      "id": "progress-science-road-building",
+      "label": "興建道路科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-road-building-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png"
+    },
+    {
+      "id": "progress-science-smithing",
+      "label": "鍛冶匠科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-smithing-front.png",
+      "backTexture": "art/source/entity-conversion-v001/progress-science/textures/progress-science-back-original.png"
+    }
+  ]
+}

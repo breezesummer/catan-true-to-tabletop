@@ -1,0 +1,32 @@
+{
+  "status": "passed",
+  "typeId": "pirate",
+  "assets": [
+    {
+      "id": "pirate-black",
+      "meshObjects": 1,
+      "triangles": 13908,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.012000000104308128,
+        0.02800000086426735,
+        0.030000001610337446
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

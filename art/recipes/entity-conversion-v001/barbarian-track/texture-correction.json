@@ -1,0 +1,41 @@
+{
+  "typeId": "barbarian-track",
+  "operations": [
+    {
+      "source": "assets/references/inbox/单位/海盗入侵卡.jpg",
+      "sourceSha256": "c394f472541936a13a2e90c02702ace117903b783f3dba6c10130bbdf49da72a",
+      "output": "art/source/entity-conversion-v001/barbarian-track/textures/barbarian-track-front.png",
+      "sha256": "a0ac9f03d95cc65bffa0b79f4a4cfd12e6e0e93b0367d3078b4502f15c1fbb8a",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          14.11019112,
+          611.64218701
+        ],
+        [
+          2737.305325,
+          702.32619889
+        ],
+        [
+          3213.2937547,
+          3574.94182353
+        ],
+        [
+          108.48396208,
+          3625.52111301
+        ]
+      ],
+      "size": [
+        1946,
+        2048
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    }
+  ],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "e7f4dca4c4a555107733b264072f6edb634564c7145814b60bd68de6ecf8e300"
+}

@@ -1,0 +1,9 @@
+{
+  "typeId": "barbarian-ship",
+  "operations": [],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "ba00872bc52b60bbb1208eeaf0819ece4d722791c6a6180c572fc756d4ca62e9"
+}

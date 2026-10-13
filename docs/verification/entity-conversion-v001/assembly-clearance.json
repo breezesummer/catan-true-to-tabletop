@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "wallSource": "art/source/entity-conversion-v001/city-wall/city-wall-red.blend",
+  "wallSha256": "7769dbbfb50cde80e51f20cde7273d2d91fa36f59ba33f8aa0672db67dcdca2c",
+  "minimumOpeningDiameterMm": 18.594396872413544,
+  "wallHeightMm": 4.999999888241291,
+  "inserts": [
+    {
+      "id": "city-red",
+      "source": "art/source/entity-conversion-v001/city/city-red.blend",
+      "sha256": "c03e0c64fd61935522052585286a10cb3f1fe0a89669aef32470f37f4d1045cf",
+      "lowerDiameterMm": 18.000000987958714,
+      "minimumRadialClearanceMm": 0.2971979422274149
+    },
+    {
+      "id": "metropolis-red",
+      "source": "art/source/entity-conversion-v001/metropolis/metropolis-red.blend",
+      "sha256": "b19ca5360339c846fe3fd1a958b270e1de9cbbcdfe446069bb4075cdecac47f7",
+      "lowerDiameterMm": 18.000000763313437,
+      "minimumRadialClearanceMm": 0.2971980545500522
+    }
+  ],
+  "method": "projected source wall edges and faces; insert vertices below wall height",
+  "scriptSha256": "20eed5341e68f18a05f9216a83719f0985e2353aec6db585c1d8378c454f38bf",
+  "limitation": "estimated centred meshes; physical measurements and interaction not verified"
+}

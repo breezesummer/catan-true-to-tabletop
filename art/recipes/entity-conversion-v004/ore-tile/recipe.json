@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "typeId": "ore-tile",
+  "label": "铁矿资源卡插画衍生六边形厚板",
+  "seed": 20261011,
+  "scaleStatus": "estimated; 68.58921198 x 79.2 x 8 mm, same placement surface as other tiles",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/资源牌/铁矿石.jpg",
+      "sha256": "3cc8d4bbee405952035bc075d8e741124f888d50cd402ae8662244b23aac8a10",
+      "role": "physical ore RESOURCE CARD illustration; not a photographed mountain hex tile"
+    }
+  ],
+  "textureJobs": [],
+  "inheritedTexture": {
+    "source": "art/source/entity-conversion-v001/resource-cards/textures/resource-ore-front.png",
+    "sha256": "f01722ea791cfea1b014b8f93796b0f0a204a9ef0e115d4a8e7ceb79985a1fd5",
+    "recipe": "art/recipes/entity-conversion-v001/resource-cards/recipe.json",
+    "recipeSha256": "4a9a80ed41bc9f67ab6b86cbcd1acf637416fa201418a06181d6fabc5dfff138"
+  },
+  "derivedTexture": {
+    "output": "art/source/entity-conversion-v004/ore-tile/textures/tile-ore-top.png",
+    "sha256": "a52c4b012d6956517b3dfe239356234d54071c30f1a9ee800cec25f68f781c81",
+    "cropPixels": [
+      112,
+      392,
+      912,
+      1192
+    ],
+    "size": [
+      1024,
+      1024
+    ],
+    "method": "crop original-photo corrected artwork and bicubic resample; hex boundary clips UV"
+  },
+  "limitations": [
+    "用户要求棋盘铁矿改用实体卡片风格；当前没有六边形矿山地块原照，明确使用矿石资源卡插画衍生。",
+    "保留原照片像素、曝光、模糊与色偏；不使用 AI 重绘，不把资源卡照片声称为真实矿山地块照片。",
+    "中央矿石和矿山插画裁切为正方形后映射到六边形；完整资源手牌仍使用旧版未裁切卡面。",
+    "厚度、尺寸、未知背面仍为工作估算；实际闭合网格为厚板，不重建三维山体。"
+  ],
+  "assets": [
+    {
+      "id": "tile-ore",
+      "label": "铁矿卡片插画厚板",
+      "kind": "tile",
+      "dimensionsMm": [
+        68.58921198,
+        79.2,
+        8
+      ],
+      "frontTexture": "art/source/entity-conversion-v004/ore-tile/textures/tile-ore-top.png",
+      "backTexture": null,
+      "frontUv": [
+        [
+          0.9330127,
+          0.75
+        ],
+        [
+          0.5,
+          1
+        ],
+        [
+          0.0669873,
+          0.75
+        ],
+        [
+          0.0669873,
+          0.25
+        ],
+        [
+          0.5,
+          0
+        ],
+        [
+          0.9330127,
+          0.25
+        ]
+      ]
+    }
+  ]
+}

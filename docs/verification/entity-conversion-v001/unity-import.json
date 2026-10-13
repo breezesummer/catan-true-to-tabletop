@@ -1,0 +1,893 @@
+{
+    "unityVersion": "6000.3.25f1",
+    "assets": [
+        {
+            "id": "barbarian-ship",
+            "typeId": "barbarian-ship",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.026000002399086953,
+                0.0280000027269125
+            ],
+            "renderers": 2,
+            "triangles": 10974
+        },
+        {
+            "id": "barbarian-track",
+            "typeId": "barbarian-track",
+            "verified": true,
+            "dimensionsMetres": [
+                0.1899999976158142,
+                0.0015000237617641688,
+                0.19999998807907105
+            ],
+            "renderers": 1,
+            "triangles": 300
+        },
+        {
+            "id": "city-red",
+            "typeId": "city",
+            "verified": true,
+            "dimensionsMetres": [
+                0.017999999225139619,
+                0.019999999552965165,
+                0.017999999225139619
+            ],
+            "renderers": 1,
+            "triangles": 15448
+        },
+        {
+            "id": "improvement-science-1",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-science-2",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-science-3",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-science-4",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-science-5",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-politics-1",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-politics-2",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-politics-3",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-politics-4",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-politics-5",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-trade-1",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-trade-2",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-trade-3",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-trade-4",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "improvement-trade-5",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.03999999910593033,
+                0.0010000045876950026,
+                0.03999999538064003
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "guidance-upgrade",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.18000000715255738,
+                0.0010000094771385193,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "guidance-max",
+            "typeId": "city-improvements",
+            "verified": true,
+            "dimensionsMetres": [
+                0.18000000715255738,
+                0.0010000094771385193,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "city-wall-red",
+            "typeId": "city-wall",
+            "verified": true,
+            "dimensionsMetres": [
+                0.024000000208616258,
+                0.005000002216547728,
+                0.023999998345971109
+            ],
+            "renderers": 1,
+            "triangles": 14624
+        },
+        {
+            "id": "commodity-cloth",
+            "typeId": "commodity-cards",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "commodity-paper",
+            "typeId": "commodity-cards",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "commodity-coin",
+            "typeId": "commodity-cards",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "defender-card",
+            "typeId": "defender-card",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "knight-level-1-resting",
+            "typeId": "knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11160
+        },
+        {
+            "id": "knight-level-2-resting",
+            "typeId": "knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11168
+        },
+        {
+            "id": "knight-level-3-resting",
+            "typeId": "knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11176
+        },
+        {
+            "id": "knight-level-1-active",
+            "typeId": "knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11120
+        },
+        {
+            "id": "knight-level-2-active",
+            "typeId": "knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11128
+        },
+        {
+            "id": "knight-level-3-active",
+            "typeId": "knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11136
+        },
+        {
+            "id": "merchant-neutral-cart",
+            "typeId": "merchant",
+            "verified": true,
+            "dimensionsMetres": [
+                0.014000000432133675,
+                0.02499999850988388,
+                0.01900000125169754
+            ],
+            "renderers": 1,
+            "triangles": 12748
+        },
+        {
+            "id": "metropolis-red",
+            "typeId": "metropolis",
+            "verified": true,
+            "dimensionsMetres": [
+                0.017999999225139619,
+                0.024000000208616258,
+                0.018000001087784768
+            ],
+            "renderers": 1,
+            "triangles": 16604
+        },
+        {
+            "id": "pirate-black",
+            "typeId": "pirate",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.030000001192092897,
+                0.0280000027269125
+            ],
+            "renderers": 1,
+            "triangles": 13908
+        },
+        {
+            "id": "progress-politics-diplomacy",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-espionage",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-encouragement",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-intrigue",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-taxation",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-constitution",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-treason",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-wedding",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-sabotage",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-science-alchemy",
+            "typeId": "progress-science",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-science-crane",
+            "typeId": "progress-science",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-science-engineering",
+            "typeId": "progress-science",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-science-invention",
+            "typeId": "progress-science",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-science-irrigation",
+            "typeId": "progress-science",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-science-medicine",
+            "typeId": "progress-science",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-science-mining",
+            "typeId": "progress-science",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-science-printing",
+            "typeId": "progress-science",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-science-road-building",
+            "typeId": "progress-science",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-science-smithing",
+            "typeId": "progress-science",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-trade-merchant-fleet",
+            "typeId": "progress-trade",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-trade-commercial-harbor",
+            "typeId": "progress-trade",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-trade-merchant",
+            "typeId": "progress-trade",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-trade-guild-dues",
+            "typeId": "progress-trade",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-trade-resource-monopoly",
+            "typeId": "progress-trade",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-trade-trade-monopoly",
+            "typeId": "progress-trade",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "resource-wool",
+            "typeId": "resource-cards",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "resource-brick",
+            "typeId": "resource-cards",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "resource-grain",
+            "typeId": "resource-cards",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "resource-ore",
+            "typeId": "resource-cards",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "robber-black-group",
+            "typeId": "robber",
+            "verified": true,
+            "dimensionsMetres": [
+                0.017999999225139619,
+                0.02499999850988388,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 15408
+        },
+        {
+            "id": "ship-red",
+            "typeId": "ships",
+            "verified": true,
+            "dimensionsMetres": [
+                0.008999999612569809,
+                0.0280000027269125,
+                0.026000002399086953
+            ],
+            "renderers": 2,
+            "triangles": 6188
+        },
+        {
+            "id": "ship-blue",
+            "typeId": "ships",
+            "verified": true,
+            "dimensionsMetres": [
+                0.008999999612569809,
+                0.0280000027269125,
+                0.026000002399086953
+            ],
+            "renderers": 2,
+            "triangles": 6188
+        },
+        {
+            "id": "ship-orange",
+            "typeId": "ships",
+            "verified": true,
+            "dimensionsMetres": [
+                0.008999999612569809,
+                0.0280000027269125,
+                0.026000002399086953
+            ],
+            "renderers": 2,
+            "triangles": 6188
+        },
+        {
+            "id": "ship-ivory",
+            "typeId": "ships",
+            "verified": true,
+            "dimensionsMetres": [
+                0.008999999612569809,
+                0.0280000027269125,
+                0.026000002399086953
+            ],
+            "renderers": 2,
+            "triangles": 6188
+        },
+        {
+            "id": "tile-pasture",
+            "typeId": "tiles",
+            "verified": true,
+            "dimensionsMetres": [
+                0.0685892105102539,
+                0.008000008761882782,
+                0.07919999212026596
+            ],
+            "renderers": 1,
+            "triangles": 20
+        },
+        {
+            "id": "tile-sea",
+            "typeId": "tiles",
+            "verified": true,
+            "dimensionsMetres": [
+                0.0685892105102539,
+                0.008000008761882782,
+                0.07919999212026596
+            ],
+            "renderers": 1,
+            "triangles": 20
+        },
+        {
+            "id": "tile-gold",
+            "typeId": "tiles",
+            "verified": true,
+            "dimensionsMetres": [
+                0.0685892105102539,
+                0.008000008761882782,
+                0.07919999212026596
+            ],
+            "renderers": 1,
+            "triangles": 20
+        },
+        {
+            "id": "tile-desert",
+            "typeId": "tiles",
+            "verified": true,
+            "dimensionsMetres": [
+                0.0685892105102539,
+                0.008000008761882782,
+                0.07919999212026596
+            ],
+            "renderers": 1,
+            "triangles": 20
+        },
+        {
+            "id": "tile-fields",
+            "typeId": "tiles",
+            "verified": true,
+            "dimensionsMetres": [
+                0.0685892105102539,
+                0.008000008761882782,
+                0.07919999212026596
+            ],
+            "renderers": 1,
+            "triangles": 20
+        },
+        {
+            "id": "tile-hills",
+            "typeId": "tiles",
+            "verified": true,
+            "dimensionsMetres": [
+                0.0685892105102539,
+                0.008000008761882782,
+                0.07919999212026596
+            ],
+            "renderers": 1,
+            "triangles": 20
+        }
+    ]
+}

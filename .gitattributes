@@ -5,3 +5,9 @@ docs/verification/** -text
 # Preserve hashes of the versioned UI render recipe and export manifest.
 art/recipes/ui-operation-v001/** -text
 art/exports/ui-operation-v001/** -text
+
+# 来源校验和以文件原始字节为准，不转换这些资产记录的换行。
+assets/references/** -text
+art/recipes/** -text
+art/exports/** -text
+art/source/** -text

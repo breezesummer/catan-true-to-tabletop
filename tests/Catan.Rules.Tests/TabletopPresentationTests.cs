@@ -87,22 +87,29 @@ public sealed class TabletopPresentationTests
         Assert.False(dice.IsRolling(500));Assert.Equal(2,dice.Face(0,500));Assert.Equal(6,dice.Face(1,500));Assert.Equal(2,dice.Face(2,500));
     }
     [Theory]
-    [InlineData(380,356,4)]
-    [InlineData(684,948,8)]
-    [InlineData(1050,720,12)]
-    public void FullCardsFormOneStraightRowWithGapsAndStayInsideTheScreen(float width,float center,int maximum)
+    [InlineData(350,380)]
+    [InlineData(704,930)]
+    [InlineData(1060,720)]
+    public void GrowingHandsOverlapWithoutShrinkingOrLeavingTheirScreenRegion(float width,float center)
     {
-        for(int count=1;count<=maximum;count++)for(int i=0;i<count;i++)foreach(bool selected in new[]{false,true})
+        foreach(int count in new[]{1,3,8,20,60,120})
         {
-            var pose=TabletopHandLayout.Card(i,count,center,width,selected);
-            Assert.Equal(0,pose.Angle);
-            if(i>0){var previous=TabletopHandLayout.Card(i-1,count,center,width,selected);Assert.Equal(previous.Y,pose.Y);Assert.True(pose.X>previous.X+TabletopHandLayout.CardWidth);}
-            float cx=pose.X+TabletopHandLayout.CardWidth/2,cy=pose.Y+TabletopHandLayout.CardHeight/2;
-            Assert.InRange(cx-pose.HalfWidth,12,1428);Assert.InRange(cx+pose.HalfWidth+5,12,1428);
-            Assert.InRange(cy-pose.HalfHeight,735,895);Assert.InRange(cy+pose.HalfHeight+7,735,895);
+            var first=TabletopHandLayout.Card(0,count,center,width,false);
+            var last=TabletopHandLayout.Card(count-1,count,center,width,false);
+            Assert.True(first.X>=center-width/2-.001f);
+            Assert.True(last.X+TabletopHandLayout.CardWidth<=center+width/2+.001f);
+            Assert.Equal(center,(first.X+last.X+TabletopHandLayout.CardWidth)/2,3);
+            Assert.Equal(108,TabletopHandLayout.CardWidth);Assert.Equal(151,TabletopHandLayout.CardHeight);
+            for(int i=0;i<count;i++)
+            {
+                var pose=TabletopHandLayout.Card(i,count,center,width,false);
+                Assert.Equal(0,pose.Angle);Assert.Equal(734,pose.Y);
+                if(i>0)Assert.True(pose.X>TabletopHandLayout.Card(i-1,count,center,width,false).X);
+                Assert.Equal(pose.Y-22,TabletopHandLayout.Card(i,count,center,width,true).Y);
+            }
+            if(count>width/TabletopHandLayout.CardWidth)
+                Assert.True(TabletopHandLayout.Card(1,count,center,width,false).X-first.X<TabletopHandLayout.CardWidth);
         }
-        var left=TabletopHandLayout.Card(0,maximum,center,width,false);var right=TabletopHandLayout.Card(maximum-1,maximum,center,width,false);
-        Assert.Equal(center,(left.X+right.X+TabletopHandLayout.CardWidth)/2,3);
     }
     [Fact]
     public void ASingleHandStaysAtTheFrontCenter()

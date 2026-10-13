@@ -1,0 +1,9 @@
+{
+  "typeId": "knights",
+  "operations": [],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "f0e7f18fceda12825d9cc82eec72e04e831532dab0b996b8ed5cb0f706d26112"
+}

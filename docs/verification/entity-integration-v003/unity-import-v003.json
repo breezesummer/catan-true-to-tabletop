@@ -1,0 +1,113 @@
+{
+    "unityVersion": "6000.3.25f1",
+    "assets": [
+        {
+            "id": "progress-politics-diplomacy",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-espionage",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-encouragement",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-intrigue",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-taxation",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-constitution",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-treason",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-wedding",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        },
+        {
+            "id": "progress-politics-sabotage",
+            "typeId": "progress-politics",
+            "verified": true,
+            "dimensionsMetres": [
+                0.05400000140070915,
+                0.00030000953120179474,
+                0.07999999076128006
+            ],
+            "renderers": 1,
+            "triangles": 12
+        }
+    ]
+}

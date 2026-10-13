@@ -8,6 +8,7 @@ public sealed partial class M6App
 {
     public void Connect(M2App app,M2LocalGameHost host)
     {
+        BindHistory(() => host.History(HumanSeat), () => app.M6View.Events.Length);
         var policy=new BaseGameAi();
         Bind(app,()=>Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M2.GamePhase.Finished,player=>
         {
@@ -22,6 +23,7 @@ public sealed partial class M6App
     }
     public void Connect(M3App app,M3LocalGameHost host)
     {
+        BindHistory(() => host.History(HumanSeat), () => app.M6View.Events.Length);
         var policy=new SeafarersAi();
         Bind(app,()=>Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M3.GamePhase.Finished,player=>
         {
@@ -36,6 +38,7 @@ public sealed partial class M6App
     }
     public void Connect(M4App app,M4LocalGameHost host)
     {
+        BindHistory(() => host.History(HumanSeat), () => app.M6View.Events.Length);
         var policy=new CitiesKnightsAi();
         Bind(app,()=>M4App.Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M4.GamePhase.Finished,player=>
         {
@@ -50,6 +53,7 @@ public sealed partial class M6App
     }
     public void Connect(M5App app,M5LocalGameHost host)
     {
+        BindHistory(() => host.History(HumanSeat), () => app.M6View.Events.Length);
         var policy=new CombinedAi();
         Bind(app,()=>M5App.Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M5.GamePhase.Finished,player=>
         {

@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "typeId": "robber",
+  "label": "黑色强盗三人群像（同一实体双角度照片参考）",
+  "seed": 20261009,
+  "scaleStatus": "estimate-not-measured",
+  "limitations": [
+    "两张照片显示同一件黑色三人抱团雕像，不是两款强盗；原始照片均只读保留。",
+    "可见正面与较高角度，后背、底面和遮挡处未知；头帽、面部、衣褶与手指为参数化雕塑近似，不是扫描或摄影测量复原。",
+    "估算包围盒 X 宽 18、Y 深 12、Z 高 25 mm，依据照片群像宽高比例调整；没有比例尺，实际尺寸不是已确认值。",
+    "保留后方高个戴帽、左前抱臂双钮扣和右前兜帽持斜棍的三人轮廓；黑色塑料的高光受照片曝光影响，材质采用近似炭黑。",
+    "照片没有清楚显示独立圆盘底座，采用脚部与很薄的异形连接支承；不可见底部连接方式为近似。",
+    "闭合部件合并为一个网格，壳间有重叠，未布尔融合；Unity 正式灯光、碰撞、拾取、相邻组件遮挡及用户外观验收待主任务集成。"
+  ],
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/单位/强盗.jpg",
+      "sha256": "9ee71055322b2c147149b5b8dd045ef8d88f466488d2a0eac0913f08014e7bc5",
+      "role": "same-black-three-person-sculpt-high-front-angle"
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/强盗 (2).jpg",
+      "sha256": "2c123cd77edb67be24ef30c0ebc54b125fb108dfcef1307efb5f94f54fac94d4",
+      "role": "same-black-three-person-sculpt-lower-front-angle"
+    }
+  ],
+  "assets": [
+    {
+      "id": "robber-black-group",
+      "label": "黑色强盗三人群像",
+      "kind": "custom",
+      "dimensionsMm": [18, 12, 25],
+      "customBuilder": "art/recipes/entity-conversion-v001/robber/builder.py",
+      "builderArgs": {"color": [0.018, 0.022, 0.022], "roughness": 0.3}
+    }
+  ]
+}

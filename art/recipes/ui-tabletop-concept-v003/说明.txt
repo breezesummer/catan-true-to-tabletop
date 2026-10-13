@@ -1,0 +1,10 @@
+第一人称桌游 UI 概念第三版 v003
+日期：2026-10-11（北京时间）
+编辑目标：art/previews/ui-tabletop-concept-v002/concept.png
+设施参考：art/exports/entity-conversion-v001/city-improvements/textures/improvement-trade-1-front.png、improvement-politics-1-front.png、improvement-science-1-front.png。
+输出：art/previews/ui-tabletop-concept-v003/concept.png
+工具：内置 imagegen；完整生成提示词见 prompt.zh-CN.txt。
+用户本次指定：最下方手牌分为左侧发展卡和右侧资源牌，中间留间隔并居中展示；手牌上方、地图下方，左侧整齐摆放本人可放置的建筑、道路、骑士，右侧为本人城市设施；其他玩家仅显示城市设施、建筑备件及暗置牌。
+检查：已查看生成图，本方下方两层布局、地图主视觉、蓝/橙/米白三位对手各自独立设施与背面手牌均可辨识；保持连续木桌，无常驻操作栏和分区面板。底部资源手牌下缘有局部裁切，后续实际界面仍需按窗口尺寸和交互要求确定可见范围。
+状态：布局讨论用位图概念，未实装，不是可用三维模型，也不代表规则局面、棋子数量、费用数字或交互已经验收。
+保留：前两版、设施参考及生成原图均不覆盖、不删除。未改动游戏代码或路线图，本轮未运行规则测试、Unity 构建或真实交互验收。

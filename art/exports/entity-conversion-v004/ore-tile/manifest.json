@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v004",
+  "typeId": "ore-tile",
+  "label": "铁矿资源卡插画衍生六边形厚板",
+  "recipePath": "art/recipes/entity-conversion-v004/ore-tile/recipe.json",
+  "recipeSha256": "d79b99d1c2ade75904a2291b155a06f72c67fae79b3f9bf6fc6bda6ba2d848df",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261011,
+  "units": "metres",
+  "scaleStatus": "estimated; 68.58921198 x 79.2 x 8 mm, same placement surface as other tiles",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/资源牌/铁矿石.jpg",
+      "sha256": "3cc8d4bbee405952035bc075d8e741124f888d50cd402ae8662244b23aac8a10",
+      "role": "physical ore RESOURCE CARD illustration; not a photographed mountain hex tile"
+    }
+  ],
+  "assets": [
+    {
+      "id": "tile-ore",
+      "label": "铁矿卡片插画厚板",
+      "kind": "tile",
+      "dimensionsMm": [
+        68.58921198,
+        79.2,
+        8
+      ],
+      "meshObjects": 1,
+      "triangles": 20,
+      "geometrySha256": "1b0b105e1865244921db661adf30b3fd7c6dd7dc92cbc701d39af2c43b402b08",
+      "blenderBounds": {
+        "min": [
+          -0.03429460525512695,
+          -0.03959999978542328,
+          0.0
+        ],
+        "max": [
+          0.03429460525512695,
+          0.03959999978542328,
+          0.00800000037997961
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.03429460525512695,
+          0.0,
+          -0.03959999978542328
+        ],
+        "max": [
+          0.03429460525512695,
+          0.00800000037997961,
+          0.03959999978542328
+        ]
+      },
+      "materials": [
+        {
+          "name": "tile-ore_PhotoTop",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "tile-ore-top.png"
+        },
+        {
+          "name": "tile-ore_TileEdge",
+          "baseColorLinearRgba": [
+            0.550000011920929,
+            0.4000000059604645,
+            0.20000000298023224,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "33ad15f818bb1c95aafda9ac773ec4365121f258b0061bf307cf23660955af06",
+      "blendSha256": "c0526af7d434988de0452ee857d5a92bd73d1217655c73cd96e653cc4873a2a6",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/tile-ore-top.png",
+      "sha256": "a52c4b012d6956517b3dfe239356234d54071c30f1a9ee800cec25f68f781c81"
+    }
+  ],
+  "limitations": [
+    "用户要求棋盘铁矿改用实体卡片风格；当前没有六边形矿山地块原照，明确使用矿石资源卡插画衍生。",
+    "保留原照片像素、曝光、模糊与色偏；不使用 AI 重绘，不把资源卡照片声称为真实矿山地块照片。",
+    "中央矿石和矿山插画裁切为正方形后映射到六边形；完整资源手牌仍使用旧版未裁切卡面。",
+    "厚度、尺寸、未知背面仍为工作估算；实际闭合网格为厚板，不重建三维山体。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "95db9f0b989399ad87994d706517700f2a2e9bc86752983307db9e54a9ab1a90",
+    "game-camera.png": "b9381ebb9af4884bb68247d9413b77e9de16182114f2d8ad70edb42a1facc41f",
+    "side.png": "a60370f970d3eefe59ea0462e4d03a3190bfebafcf0179dd585037040b36c2ef",
+    "top.png": "3657f3f49d9c3124979d29865dd12875aa03fec55e531ee7c17944cb68617379"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "status": "passed",
+  "typeId": "ore-tile",
+  "assets": [
+    {
+      "id": "tile-ore",
+      "meshObjects": 1,
+      "triangles": 20,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.0685892105102539,
+        0.07919999957084656,
+        0.00800001335089684
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/tile-ore-top.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    }
+  ],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

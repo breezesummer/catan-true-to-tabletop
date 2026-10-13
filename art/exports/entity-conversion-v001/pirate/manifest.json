@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "pirate",
+  "label": "海洋板块上的黑色海盗船",
+  "recipePath": "art/recipes/entity-conversion-v001/pirate/recipe.json",
+  "recipeSha256": "87bf5826e1e5ed0d8888f722ad330e78d69d9c4d57ad614e3d44088ceb660316",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v001/pirate/builder.py",
+      "sha256": "34e46a5c66b91adcc628d9170f3ec4c2e2081c1b9482aa3730e291c55cb03c65"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimate-not-measured",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/单位/海盗（海洋板块上的单位）.jpg",
+      "sha256": "92cbfaaac2eb705c6868519a8801749344ec580692363621df1eca175006a420",
+      "role": "black-sea-pirate-hull-split-bowed-sails-small-masthead-flag-ribbed-water-support"
+    }
+  ],
+  "assets": [
+    {
+      "id": "pirate-black",
+      "label": "黑色海盗船（海洋板块单位）",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        28,
+        30
+      ],
+      "meshObjects": 1,
+      "triangles": 13908,
+      "geometrySha256": "7c9b76b7f5324fa7f9599fe4848ba1dd70f19848ca9db21709d1bb7739bcb71b",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.014000000432133675,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.014000000432133675,
+          0.029999999329447746
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.014000000432133675
+        ],
+        "max": [
+          0.006000000052154064,
+          0.029999999329447746,
+          0.014000000432133675
+        ]
+      },
+      "materials": [
+        {
+          "name": "pirate-black_Black_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.014000000432133675,
+            0.017999999225139618,
+            0.017000000923871994,
+            1.0
+          ],
+          "roughness": 0.3400000035762787,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "d3a84a8f92e7f09047e848ccffddf1e3168d2de15c00cc8c9ace835f8f3c256a",
+      "blendSha256": "855e37f9f3a246c1480e41b82086183021c82f7ee80ccec8a3085841e7944fd4",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [],
+  "limitations": [
+    "一张较暗的斜视照片；背面、底面、内部与实测尺寸未知。",
+    "照片中的宽窄双帆、桅顶小凸旗、船体和条状波纹底座依可见轮廓参数化近似，不是摄影测量或扫描复原。",
+    "照片不足以确认骷髅或其他微小标志，未添加未经确认的白色海盗标志；不可辨细节保留简化的黑色浮雕。",
+    "本资产是海洋板块上的海盗，不是文件名海盗（入侵卡上的单位）的蛮族入侵船。",
+    "估算本地包围盒为 X宽12、Y长28、Z高30 mm，Unity长轴为Z；底心枢轴位于支承底面。",
+    "低波纹底座上沿附近的水线估算为底面以上1.8 mm；未实测，船体与底座形状仍待多视角照片补充。",
+    "Unity导入、运行显示、拾取和用户外观确认由主任务集成验收。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "0416846dc88c093ed36930538e0e605c6b54022051900a4cf2710462a5d74f74",
+    "game-camera.png": "8ef66ca77f62c2fdf3251861e5854ba9c7119df0564cebd5e78e1d67e2f5f393",
+    "side.png": "541b843af47e4c5101b024f1598a592d0dc3002b2d88d97f70ac4a25a4946c2f",
+    "top.png": "c5bc9f57b3dce58d6f63a063cc6ae1cf15caa53f4f9b75b273b159d1882f0981"
+  }
+}

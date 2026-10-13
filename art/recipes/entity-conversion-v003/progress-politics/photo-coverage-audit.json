@@ -1,0 +1,1199 @@
+{
+  "status": "passed",
+  "auditDate": "2026-10-10",
+  "originalInboxPhotographs": 135,
+  "originalBackupPhotographsNotCountedTwice": 36,
+  "categories": {
+    "单位": 30,
+    "发展卡/绿色发展卡": 11,
+    "发展卡/蓝色发展卡": 10,
+    "发展卡/黄色发展卡": 7,
+    "商品牌": 3,
+    "地图板块": 7,
+    "城市设施": 32,
+    "奖励卡": 1,
+    "建筑": 23,
+    "资源牌": 6,
+    "道路": 5
+  },
+  "priorCataloguedPhotographs": 134,
+  "priorOmittedPhotographs": [
+    "assets/references/inbox/发展卡/蓝色发展卡/卡背.jpg"
+  ],
+  "referencedPhotographsAfterV003": 135,
+  "unconvertedPhotographs": [],
+  "referenceHashMismatches": [],
+  "backupHashMismatches": [],
+  "missingArtifactFiles": [],
+  "changedArtifactHashes": [],
+  "retainedExportedFbxVersions": 123,
+  "uniqueAssetIds": 114,
+  "v003ReplacesExistingPoliticalCards": 9,
+  "batches": [
+    {
+      "version": "photo-samples-v001",
+      "typeId": "photo-samples",
+      "assets": 4,
+      "references": 5,
+      "textures": 3,
+      "manifest": "art/exports/photo-samples-v001/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "barbarian-ship",
+      "assets": 1,
+      "references": 1,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v001/barbarian-ship/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "barbarian-track",
+      "assets": 1,
+      "references": 1,
+      "textures": 1,
+      "manifest": "art/exports/entity-conversion-v001/barbarian-track/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "city",
+      "assets": 1,
+      "references": 1,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v001/city/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "city-improvements",
+      "assets": 17,
+      "references": 32,
+      "textures": 32,
+      "manifest": "art/exports/entity-conversion-v001/city-improvements/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "city-wall",
+      "assets": 1,
+      "references": 3,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v001/city-wall/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "commodity-cards",
+      "assets": 3,
+      "references": 3,
+      "textures": 3,
+      "manifest": "art/exports/entity-conversion-v001/commodity-cards/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "defender-card",
+      "assets": 1,
+      "references": 1,
+      "textures": 1,
+      "manifest": "art/exports/entity-conversion-v001/defender-card/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "knights",
+      "assets": 6,
+      "references": 6,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v001/knights/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "merchant",
+      "assets": 1,
+      "references": 1,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v001/merchant/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "metropolis",
+      "assets": 1,
+      "references": 2,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v001/metropolis/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "pirate",
+      "assets": 1,
+      "references": 1,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v001/pirate/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "progress-politics",
+      "assets": 9,
+      "references": 9,
+      "textures": 9,
+      "manifest": "art/exports/entity-conversion-v001/progress-politics/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "progress-science",
+      "assets": 10,
+      "references": 11,
+      "textures": 11,
+      "manifest": "art/exports/entity-conversion-v001/progress-science/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "progress-trade",
+      "assets": 6,
+      "references": 7,
+      "textures": 7,
+      "manifest": "art/exports/entity-conversion-v001/progress-trade/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "resource-cards",
+      "assets": 4,
+      "references": 5,
+      "textures": 5,
+      "manifest": "art/exports/entity-conversion-v001/resource-cards/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "robber",
+      "assets": 1,
+      "references": 2,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v001/robber/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "ships",
+      "assets": 4,
+      "references": 4,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v001/ships/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v001",
+      "typeId": "tiles",
+      "assets": 6,
+      "references": 6,
+      "textures": 6,
+      "manifest": "art/exports/entity-conversion-v001/tiles/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v002",
+      "typeId": "player-buildings",
+      "assets": 18,
+      "references": 18,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v002/player-buildings/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v002",
+      "typeId": "player-knights",
+      "assets": 18,
+      "references": 18,
+      "textures": 0,
+      "manifest": "art/exports/entity-conversion-v002/player-knights/manifest.json",
+      "priorVerification": "passed"
+    },
+    {
+      "version": "entity-conversion-v003",
+      "typeId": "progress-politics",
+      "assets": 9,
+      "references": 10,
+      "textures": 10,
+      "manifest": "art/exports/entity-conversion-v003/progress-politics/manifest.json",
+      "priorVerification": "passed"
+    }
+  ],
+  "photoCoverage": [
+    {
+      "originalPath": "assets/references/inbox/单位/商人.jpg",
+      "sha256": "17fcefec438a51016dcc51a76bc9f69a12c098732ad6cb01d5b4df6c6fddf344",
+      "exportBatches": [
+        "entity-conversion-v001/merchant"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/强盗 (2).jpg",
+      "sha256": "2c123cd77edb67be24ef30c0ebc54b125fb108dfcef1307efb5f94f54fac94d4",
+      "exportBatches": [
+        "entity-conversion-v001/robber"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/强盗.jpg",
+      "sha256": "9ee71055322b2c147149b5b8dd045ef8d88f466488d2a0eac0913f08014e7bc5",
+      "exportBatches": [
+        "entity-conversion-v001/robber"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色一级骑士.jpg",
+      "sha256": "47f33e8feb3018e336ef0dfac7ce02cc7aea63c3efc94828e3461f2bcb5b7ecb",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色三级骑士.jpg",
+      "sha256": "839203d1395b089b26ad8117b6f6c4ebf8a8d5d857f6176262cd94b53098a675",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色二级骑士.jpg",
+      "sha256": "31c9a439d2a1e836f18a774c530e5e127e1c657dd02894edca8b8ecaf080db23",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色戴头盔一级骑士.jpg",
+      "sha256": "e289d8a7d07d3031a02d59d570963ea4c73ada93984bf2a3ce29c22def8ecfa5",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色戴头盔三级骑士.jpg",
+      "sha256": "934f83ab0ece2ecb0f3e892fc8d987bbf2da3c5fa9cc4e08e2a58e11cd961d7f",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/橙色戴头盔二级骑士.jpg",
+      "sha256": "c459e5292eb794a5210afc90733cc254c4deb9c4121f4d6fbb9e1fd983690b69",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/海盗入侵卡.jpg",
+      "sha256": "c394f472541936a13a2e90c02702ace117903b783f3dba6c10130bbdf49da72a",
+      "exportBatches": [
+        "entity-conversion-v001/barbarian-track"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/海盗（入侵卡上的单位）.jpg",
+      "sha256": "b0260a1c0dd5617747b74ca6642e59ce03d074264e78371780881651f9632efa",
+      "exportBatches": [
+        "entity-conversion-v001/barbarian-ship"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/海盗（海洋板块上的单位）.jpg",
+      "sha256": "92cbfaaac2eb705c6868519a8801749344ec580692363621df1eca175006a420",
+      "exportBatches": [
+        "entity-conversion-v001/pirate"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色一级骑士.jpg",
+      "sha256": "140106ee1955ce385c31553de24bc96cc0b5452fc5e02fd9abc4f33d9998e556",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色三级骑士.jpg",
+      "sha256": "3d14fc102f565f623e501273ca730e19158a5ce472410cd9d766831682063b43",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色二级骑士.jpg",
+      "sha256": "b8466852faa0fcaab17fff5c90acf87229ab21aa18b00759dfcb0f03a7580348",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色戴头盔一级骑士.jpg",
+      "sha256": "a4c02a2873fccee5a591459231f6f905ccb0f9fe29a5f32710181cf76829f778",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色戴头盔三级骑士.jpg",
+      "sha256": "006897652ceaccd1d9dcdb2e35887043ea22c9a00035bfbe27988cf72360d3f7",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/米色戴头盔二级骑士.jpg",
+      "sha256": "2e3da352665a858d4f422659a6380ce35c47481bd098e0ff7bb3aeeff14caa18",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色一级骑士.jpg",
+      "sha256": "5e68c8065b79625d7f21ca61c1b795df25b02d743e357bb92336c61de98cb5c5",
+      "exportBatches": [
+        "entity-conversion-v001/knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色三级骑士.jpg",
+      "sha256": "ed77f3260e3e0d75af34fc7ca6e2dc7ddee2e8a10ca27dab25c8639abb29e8a1",
+      "exportBatches": [
+        "entity-conversion-v001/knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色二级骑士.jpg",
+      "sha256": "c6db1380df865040d931fc01a09584f6c5bb189a783e053ea5df05a22fea091e",
+      "exportBatches": [
+        "entity-conversion-v001/knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色戴头盔一级骑士.jpg",
+      "sha256": "5f54c4acb167f1eb100d995eb94dc7b0132794903ca5a2e95f3f2ec6df54b828",
+      "exportBatches": [
+        "entity-conversion-v001/knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色戴头盔三级骑士.jpg",
+      "sha256": "ede3d7340427ca0d08b50362cec54403aa29a8be054939b94cca4da9a337fe43",
+      "exportBatches": [
+        "entity-conversion-v001/knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色戴头盔二级骑士.jpg",
+      "sha256": "f2e0db86254b856501df55acce4e30d00b50a360a262fec02c4678d519f9e275",
+      "exportBatches": [
+        "entity-conversion-v001/knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色一级骑士.jpg",
+      "sha256": "eec23d2027380483c72431a112c9c08ea1a2cf5b8956a4d2955579135dd4889c",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色三级骑士.jpg",
+      "sha256": "d21c343d1e19432b041940aa1d2d57f857a1b57b245295c240e4889215fe32d0",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色二级骑士.jpg",
+      "sha256": "a974a67269bf59404ef5e1e4684da6f680e5bbd52d612604e9916a22dc014925",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色戴头盔一级骑士.jpg",
+      "sha256": "251a381f5dcdf3508780fe07b271b95d89f664de9a77ea34fa72658ae9bc01e8",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色戴头盔三级骑士.jpg",
+      "sha256": "ff9d1456aeb81a89d4206bc3aa68d8a3d2c0feafcfa69b9c54e9b5d7ccd9dd2e",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/蓝色戴头盔二级骑士.jpg",
+      "sha256": "d74b3fc282c094ad7632ed883e1e67cd4391609550a10fdb5a1d81b863fd6682",
+      "exportBatches": [
+        "entity-conversion-v002/player-knights"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/印刷厂.jpg",
+      "sha256": "193a5d761f6cc257b3cf97ecc64a1e40cf2975dc3774e194cc4d603c40ab261e",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg",
+      "sha256": "07b84fce82cb038e187e4df65187327862c663e672aa39a135e98a6ac15b686d",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/发明家.jpg",
+      "sha256": "8e94d08bf0c7c4aae6f996baa69aff9f80007e599d2a7e21090df0b27cd515b4",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/工程师.jpg",
+      "sha256": "9fa002ec01cd40d1d1829749299651c221b637160dc9fcf2a8720d99ef66a7de",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/新建道路.jpg",
+      "sha256": "aa68f9356c6dcba85dde9fe0c48df16b145f6e840d54b999ebbb48d05d81fd3a",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/灌溉.jpg",
+      "sha256": "cb814cc85bd78f540a77778feb01965bc7f532bfa92ce8a9a2a30ad489df36e3",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/炼金术士.jpg",
+      "sha256": "fdd11dc04cdeb1852f2d0dc0989e8ab5107ff4b644efc6ee6c0833b43a7a64b5",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/药物.jpg",
+      "sha256": "dea107041e44f6cfe1499be46d48fdb8cfb4aeb209d738f4294bf0d2a44e6136",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/起重机.jpg",
+      "sha256": "4b4410aaf7f70757ec42550905979ed7e2d71bb34248aec702b63b17634a8b9d",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/采矿.jpg",
+      "sha256": "48a9ed9e7023938e109e296d15a35aa1935535634c35ea8f5aafb123d0b8dc3a",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/锻铁匠.jpg",
+      "sha256": "11f4ea4b5715ed7a5c0bef506989a6e5b41b478cf532094cb19cff464c4449cd",
+      "exportBatches": [
+        "entity-conversion-v001/progress-science"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/主教.jpg",
+      "sha256": "bfb60c325097072da02d860d99408f85b5ed1a7f2ab522a31ae58bf149a61cd3",
+      "exportBatches": [
+        "entity-conversion-v001/progress-politics",
+        "entity-conversion-v003/progress-politics"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/卡背.jpg",
+      "sha256": "f60c11e4a588f9440b4650a4f6ef0ea65d11edbba98accb30f6fc486b29d542f",
+      "exportBatches": [
+        "entity-conversion-v003/progress-politics"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/叛徒.jpg",
+      "sha256": "119668bcf462a92f25912cbc6f014e5cbcece98d44aa5d919606a514911122f9",
+      "exportBatches": [
+        "entity-conversion-v001/progress-politics",
+        "entity-conversion-v003/progress-politics"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/外交官.jpg",
+      "sha256": "99a94fe632101f48fd35d09c1574186c8c74da5bccf35e3a67c3ad0e8af8f960",
+      "exportBatches": [
+        "entity-conversion-v001/progress-politics",
+        "entity-conversion-v003/progress-politics"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/婚礼.jpg",
+      "sha256": "2cbb13cac70476ba44b0a3e1d6eff682ef55e56e754e3e4f6dbb7c480d4f198b",
+      "exportBatches": [
+        "entity-conversion-v001/progress-politics",
+        "entity-conversion-v003/progress-politics"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/指挥官.jpg",
+      "sha256": "929bf6b316911507ae7fe482ce31914ac899571339b2b612adf516170b4abe4c",
+      "exportBatches": [
+        "entity-conversion-v001/progress-politics",
+        "entity-conversion-v003/progress-politics"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/权谋.jpg",
+      "sha256": "e45dbea2c62be9da56bb4208b2df6678ca5b77d101ec6c964bafde97716a1159",
+      "exportBatches": [
+        "entity-conversion-v001/progress-politics",
+        "entity-conversion-v003/progress-politics"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/石碑.jpg",
+      "sha256": "6b1b15e1c252644d40847741214abef3c7625df22a2e2b1fc6ed7c92cf3b7520",
+      "exportBatches": [
+        "entity-conversion-v001/progress-politics",
+        "entity-conversion-v003/progress-politics"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/破坏者.jpg",
+      "sha256": "289a21b92cf666a44a71a1387c34cbdaed590e07dc0045d0e4f192b4f74ae72a",
+      "exportBatches": [
+        "entity-conversion-v001/progress-politics",
+        "entity-conversion-v003/progress-politics"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/间谍.jpg",
+      "sha256": "1f0e00204c452d42ff8494aab5b403d683f75237f190b552240ce972ea1710ab",
+      "exportBatches": [
+        "entity-conversion-v001/progress-politics",
+        "entity-conversion-v003/progress-politics"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/垄断商品.jpg",
+      "sha256": "f82c632e708f3b18fbcbbf659e24cdfbe5cd3820c67570797efcbf98bc45aedc",
+      "exportBatches": [
+        "entity-conversion-v001/progress-trade"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/垄断资源.jpg",
+      "sha256": "c294aaecc121a8b3c928800815a9fb9a7c53191ab16f2c3fed3f406068221f6b",
+      "exportBatches": [
+        "entity-conversion-v001/progress-trade"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/大商家.jpg",
+      "sha256": "84f20acb4ec5b09ca2f2665ae92bd385e142a3a9b9969d5ba862386e1644870f",
+      "exportBatches": [
+        "entity-conversion-v001/progress-trade"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg",
+      "sha256": "f788acd3fea19ef3e5538bdcb9ddb7c9e296c4699308c7b7f6bfa706484c8eae",
+      "exportBatches": [
+        "entity-conversion-v001/progress-trade"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色商人.jpg",
+      "sha256": "6eee74bc121c8c4553cc73662493a34244702751e28f419133826893f519be05",
+      "exportBatches": [
+        "entity-conversion-v001/progress-trade"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色商港.jpg",
+      "sha256": "ca5b9c536051d00bcffbf660b82ec0f5422e0fe783c7e921ebfd8e811b0e0a52",
+      "exportBatches": [
+        "entity-conversion-v001/progress-trade"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色贸易船队.jpg",
+      "sha256": "bc098f34a3c24515909249e53eeacf75b0e0906e88bf28107cd20844044b5c8a",
+      "exportBatches": [
+        "entity-conversion-v001/progress-trade"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/商品牌/布匹.jpg",
+      "sha256": "19a3b7d05fed239a580430dcf8944c7ea35e074ec0884c609819e107c7395e8e",
+      "exportBatches": [
+        "entity-conversion-v001/commodity-cards"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/商品牌/纸张.jpg",
+      "sha256": "ef81a32d3d33f5eb7833ce0ef4c957ecafac945deb8a9f40614e05edb718b95f",
+      "exportBatches": [
+        "entity-conversion-v001/commodity-cards"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/商品牌/银币.jpg",
+      "sha256": "9111063c9b5e664a56b9da7de8e5cfdc2be9e93cf6e41da78df189afaff05a4f",
+      "exportBatches": [
+        "entity-conversion-v001/commodity-cards"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/小麦.jpg",
+      "sha256": "fb70c010424a66bc28e38bfc3ef18104664195de03ab10b6ce5fdf0337a6f5d3",
+      "exportBatches": [
+        "entity-conversion-v001/tiles"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/森林.jpg",
+      "sha256": "7ba385edccadd7a7d5ec6fc643c79b0e0f28f95494f139dc169a0080a6468f77",
+      "exportBatches": [
+        "photo-samples-v001/photo-samples"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/沙漠.jpg",
+      "sha256": "d9d63fa835f74b8962a691bd408f782fc8794616aa3d92519820e3f4aad9123d",
+      "exportBatches": [
+        "entity-conversion-v001/tiles"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/海洋.jpg",
+      "sha256": "310cdeaaa1c1367b0a0e982f91951109bb2b5c818d7676066f3f6d3c8367dd10",
+      "exportBatches": [
+        "entity-conversion-v001/tiles"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/砖块.jpg",
+      "sha256": "ad9244724ceb65a987b240e2e9336dffb931b91f29d2bd8aaa58487d0e7cd2c1",
+      "exportBatches": [
+        "entity-conversion-v001/tiles"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/草地.jpg",
+      "sha256": "1133266b670cc97b46d27bc8f1a7eb7e1ab41e23fb065f35fb4e0aeaacfae2cf",
+      "exportBatches": [
+        "entity-conversion-v001/tiles"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/金矿.jpg",
+      "sha256": "288a67240785b5d5b9372d2173199ed8d8837f5cf70d585a242cb60c8498b44e",
+      "exportBatches": [
+        "entity-conversion-v001/tiles"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/城市设施升级卡.jpg",
+      "sha256": "259f8fea1625d858b8263aeb23be9093dbd9e851a7c6f54fd2d285108d22047b",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/城市设施满级卡.jpg",
+      "sha256": "b8d21623a6f7e50aa94ed5175843be9e27b4293d21f0cc87463e4a713bdacc5b",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色1级修道院反面.jpg",
+      "sha256": "42ff7a13f67186932958144e740e9baabb55852495737c25ed47bf22132543f9",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色1级修道院正面.jpg",
+      "sha256": "a1cd408ec3836e30484a3af3748c11aea5e1d26c9df79a3f7c0024bc6a422eb1",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色2级图书馆反面.jpg",
+      "sha256": "01d0f5995917cccf70c07aac76e48326d89e2e51488821470b2b6ff94ffc74db",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色2级图书馆正面.jpg",
+      "sha256": "c6d8bcf2e273db47d76e5eb8c4aa0994cf7b20df74f6728f8871ce2e602bc0c9",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色3级引水渠反面.jpg",
+      "sha256": "b51b65f5d32dc3b2cbf3fabf8081dd593742a5ec91df0f1e466cb6ec82cf6c60",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色3级引水渠正面.jpg",
+      "sha256": "d98f48c3ff4316861fc65af9f9cdd392309863615e678c673d1c7509c9db7110",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色4级剧院反面.jpg",
+      "sha256": "24bf2d0900e7298534fbf2d3371f01c80c0b8793e2003e6412c8f83262e865ce",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色4级剧院正面.jpg",
+      "sha256": "80240f514813768fa062cbfd4654d5632c13bb727b73a617a294a1a635cecd84",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色5级大学反面.jpg",
+      "sha256": "0f63cbb4d66fe6ebe210ea74de7c5cdb978cb78969131b54f963f0fa2206869e",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色5级大学正面.jpg",
+      "sha256": "9a1da53e73325de91f79e3e62ecc2dd7229794d36062eb2ae41f12a906f62b86",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色1级市政厅反面.jpg",
+      "sha256": "fa16744b0bc7195954b0807061c0b36eca94426492cbe45b9d466c39c0514c6c",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg",
+      "sha256": "9b50c7580c4259ca9e70d7e7dca3e63bb7278f35b78e72cb55dfc8695e698ce9",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色2级教堂反面.jpg",
+      "sha256": "00dd4ede6283b5afa2e1c97a9199dde46aacb6530bc4a98e9e792f1d36d55760",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色2级教堂正面.jpg",
+      "sha256": "028c7fd304662fd71def80ef3716738fe7cdce4d3c2a99042451172f046175e8",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色3级要塞反面.jpg",
+      "sha256": "b5bb7fa20b123e9778617608758e0f9f787e8332e2ecf8516d982200e70d73e8",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色3级要塞正面.jpg",
+      "sha256": "2117621f40a921979231681343a62b5106066465572e4fab43f92dbc4ed2b043",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色4级大教堂反面.jpg",
+      "sha256": "8d7ea0a760c3da54477c604361cd0b45686d6b7134bd37eddbff9aee6f7ae3c8",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色4级大教堂正面.jpg",
+      "sha256": "975723c52b0916b38f4cfca4003551c8084bf0da98b711e216f0e27c4ee4dade",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色5级卡坦议会反面.jpg",
+      "sha256": "0b5ba5c628de7ecbdbc75c672eddc2b482743753e58376f6bca37e9224294450",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色5级卡坦议会正面.jpg",
+      "sha256": "1f7f6b59e9704eb70cb8e717f006afb948154efea53358a0e4dae15327c5c9d6",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色1级市场反面.jpg",
+      "sha256": "27f7f2a556c51d77cdd4868e80293907b311f2e7e3c3f773c141486393a11cbb",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色1级市场正面.jpg",
+      "sha256": "a8450574cd4fa21d43eea6323a2ef97cd440457b9e02a983326ffc8f11f928fd",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色2级行会反面.jpg",
+      "sha256": "79b507a4d1d444aa161e17e3f6441c898caafc3a3773ec0aa464febffcb7ec53",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色2级行会正面.jpg",
+      "sha256": "540960fc3e640a4e9615ee3ff291aa42baa110586501566f58c5fe07d309eedd",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色3级同业公会反面.jpg",
+      "sha256": "5cfca97514cf5fb2257b39a040f072ec9cbcc5255dd8d9978f92c5ab3faff9fd",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色3级同业公会正面.jpg",
+      "sha256": "1c73f7921f1950a7d06d8f14b4bd3a19dcc012093b69d77861bfbd18d16e449b",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色4级银行反面.jpg",
+      "sha256": "ed70a9c8410ec6ee604641ad6d88536169c57ba10fa8ef8a33c7462764453701",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色4级银行正面.jpg",
+      "sha256": "3ab1ed82e1466b12c23aa07223d7feaa1354a0ab2554299f592857502885438a",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色5级商业中心反面.jpg",
+      "sha256": "47a03876ccca518a456d7a2915bb185b3eec83e8df8d7e51ee8834d4f23ee0f4",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色5级商业中心正面.jpg",
+      "sha256": "cd951c3af7ce30f7c48359706fef7c918f73d7d842fd74fc0d3d1f31f15d5c3b",
+      "exportBatches": [
+        "entity-conversion-v001/city-improvements"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/奖励卡/卡坦保卫者.jpg",
+      "sha256": "3c32e1d715f85010436610507e90a69038a1848770b8e386bbbbb4fe535424da",
+      "exportBatches": [
+        "entity-conversion-v001/defender-card"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色城墙.jpg",
+      "sha256": "51af0491994051feea260b8c20eea0b9110bdafc09304170c57dd10a057ad151",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色城市+城墙.jpg",
+      "sha256": "96a5778715b29ff213880279ce7709abc6833dba5c8a3da287f950cf3d5d79eb",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色城市.jpg",
+      "sha256": "ff46719d0ec7019d33901faaef21ff0d7142c27123f05144a512772292906674",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色大都会+城墙.jpg",
+      "sha256": "24754321da6c55a76ef98bb81fcfc0aef8e6f7932315ee35b36b26f1e6e3bebd",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色大都会.jpg",
+      "sha256": "1c338281e5a3f141ae618defb867b539e6d3024eb8c2b3037f621d8e67add635",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色村庄.jpg",
+      "sha256": "58f3a24dac88f3a208592cfc41b8e0fa5fdda80a24618d7dc11a7d8de9f385ed",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色城墙.jpg",
+      "sha256": "e88bc1f01c4a642d277d27e0be28aa57a5c0de379455a598503bf0cb6502fa05",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色城市+城墙.jpg",
+      "sha256": "bfb8ef91f07b8559ee77ff36e8c2766b4b0661d7706ed8d0a0bba49981e562a1",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色城市.jpg",
+      "sha256": "80615304d09907e141324a07e46e0affa9abc1f1ad852babb9741af9605c3234",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色大都会+城墙.jpg",
+      "sha256": "99068ffbafb6ed9fe826a65169db1aec0a0a4c6e68e3148c26503a824dcb3bb9",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色大都会.jpg",
+      "sha256": "bc005ac1203b656a8336d0e352fad02744e284404494b255614c7eeacab88364",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色村庄.jpg",
+      "sha256": "6968deec805868c5b945b5f1ce67de40f2ff06e6d8469d1c3c495156d227e0ab",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色城市+城墙.jpg",
+      "sha256": "95f6e7670b469534b0a1e05932c63ef56810bdfde6c7a19e5f161c4500ea7a14",
+      "exportBatches": [
+        "entity-conversion-v001/city-wall"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色城市.jpg",
+      "sha256": "b40d7dfa1b75ad0adbed6bf463c26d3061bdf726837f0570f045195d3b43c993",
+      "exportBatches": [
+        "entity-conversion-v001/city",
+        "entity-conversion-v001/city-wall"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色大都会+城墙.jpg",
+      "sha256": "d6c31093b29977114f68f4047bc0dccae4e602e408c605c226898a2c7943c4a9",
+      "exportBatches": [
+        "entity-conversion-v001/city-wall",
+        "entity-conversion-v001/metropolis"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色大都会.jpg",
+      "sha256": "04f962a8e389b69ff0255c2dee74ac29e340fa7ed0c549f3aa036d5485467238",
+      "exportBatches": [
+        "entity-conversion-v001/metropolis"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色村庄.jpg",
+      "sha256": "83c8c1c29172087c858f90c4ddef756212926cc3fda38547551359431be17f7e",
+      "exportBatches": [
+        "photo-samples-v001/photo-samples"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色城墙.jpg",
+      "sha256": "5233bb2381c9936984308b705964a0c51e87bfde12e4723e28c81147a7b64267",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色城市+城墙.jpg",
+      "sha256": "8a0399ce0369973994668d25d93d9e515462cae5c98441e4de5234266180e650",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色城市.jpg",
+      "sha256": "bcd660a7d7cc72193f2676d08ba24c9d4c250e4aa56eed1263e6c3200eb060fd",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色大都会+城墙.jpg",
+      "sha256": "48258eaa4bae2fb068d05366a2b2a60cf7f901e318b29e7b5194fe6d33f74e17",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色大都会.jpg",
+      "sha256": "6dedf3400ee3281ced4226bc35dfac40333552111ab8838cda73902456d271a7",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色村庄.jpg",
+      "sha256": "c84076b79e0b843f3c1cf670b7ec01954cb9e5154249865e8231122f21c3964b",
+      "exportBatches": [
+        "entity-conversion-v002/player-buildings"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/小麦.jpg",
+      "sha256": "90597e7807eddf96c8757fd84588e2f24350412355a8cee0ce7580d6203c2429",
+      "exportBatches": [
+        "entity-conversion-v001/resource-cards"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/木头.jpg",
+      "sha256": "447133145e2d82dc15142e61ff22e26267da1a37e6d543c2c68b1a6617b588be",
+      "exportBatches": [
+        "photo-samples-v001/photo-samples"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/砖头.jpg",
+      "sha256": "b70eb1432b2d36665dd5a50582147bcf73d08ee4849f2c41bd682090d6c27ec4",
+      "exportBatches": [
+        "entity-conversion-v001/resource-cards"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/羊毛.jpg",
+      "sha256": "0dbfd3ba45889231041354cd7c4b410b11ece05ca06ec53091c3ea345fa8bc7b",
+      "exportBatches": [
+        "entity-conversion-v001/resource-cards"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/资源牌背面.jpg",
+      "sha256": "3d94957d49632f67bbd04945cb8e9c6a3eac9bc1bd38c06060adba1b036d5ab0",
+      "exportBatches": [
+        "entity-conversion-v001/resource-cards",
+        "photo-samples-v001/photo-samples"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/铁矿石.jpg",
+      "sha256": "3cc8d4bbee405952035bc075d8e741124f888d50cd402ae8662244b23aac8a10",
+      "exportBatches": [
+        "entity-conversion-v001/resource-cards"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/橘色船.jpg",
+      "sha256": "cbc8d96556b54eaaa48e3add32301d9e729261119e44eb0dd15c184c7571fdf1",
+      "exportBatches": [
+        "entity-conversion-v001/ships"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/米色船.jpg",
+      "sha256": "936c676c0d0162ec76b3aed481c0dcf00adb5344e026f35e980a6f1b11f935fa",
+      "exportBatches": [
+        "entity-conversion-v001/ships"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/红色船.jpg",
+      "sha256": "6806502e4359ba5a57708b2592d59a6d50ebdd50960fa60feb008f3c99ef8a41",
+      "exportBatches": [
+        "entity-conversion-v001/ships"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/红色道路.jpg",
+      "sha256": "919b8ab6d97b32facffb6ac90d2f9f0ee1682d7f0085abaf47b34967ab54fd5b",
+      "exportBatches": [
+        "photo-samples-v001/photo-samples"
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/蓝色船.jpg",
+      "sha256": "ecf10735f231a6df85cd1cf0022a56abcaaa480912df8dbecad0cc05417afb00",
+      "exportBatches": [
+        "entity-conversion-v001/ships"
+      ]
+    }
+  ],
+  "interpretation": [
+    "Photograph coverage is not one model per photograph: paired fronts/backs and combined-piece photographs are shared.",
+    "Seven photographed terrain types are printed textures on closed, thick hexagonal meshes; they are not sculpted terrain.",
+    "The red city+wall and metropolis+wall photos are references for independently exported components, not dedicated combined FBX assets.",
+    "Source/export/texture files and hashes were checked now; historic Blender/Unity verification was inspected, not rerun by this inventory.",
+    "Unity import and gallery validation do not establish current in-game use; current display wiring is audited independently.",
+    "Physical measurements, hidden surfaces, final appearance and M8 acceptance remain pending."
+  ]
+}

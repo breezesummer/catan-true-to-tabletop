@@ -15,6 +15,15 @@ namespace Catan.Core.M4
         private readonly Scenario scenario;
         private readonly Port[] ports;
         private GameState state;
+        private readonly GameHistoryJournal history = new GameHistoryJournal();
+        public GameHistoryEntry[] GetHistory(string playerId, long afterSequence = 0)
+        {
+            lock (gate)
+            {
+                if (!state.Players.Any(p => p.Id == playerId)) throw new ArgumentException("未知席位。", nameof(playerId));
+                return history.Project(playerId, afterSequence);
+            }
+        }
         private static readonly Resource[] Resources = (Resource[])Enum.GetValues(typeof(Resource));
         private CitiesKnightsGameSession(Scenario scenario, Port[] ports, GameState state) { this.scenario = scenario; this.ports = ports; this.state = state; }
 
@@ -71,7 +80,14 @@ namespace Catan.Core.M4
                 var receipt = new[] { ev };
                 next.Events = Append(next.Events, ev);
                 next.ProcessedCommands = Append(next.ProcessedCommands, new ProcessedCommand { CommandId = command.Id, Fingerprint = fingerprint, Command = command, Events = receipt });
-                AssertInvariants(next); state = next;
+                AssertInvariants(next);
+                history.RecordAction(GameHistoryCapture.From(state), GameHistoryCapture.From(next), new HistoryAction
+                {
+                    PlayerId = command.PlayerId, OtherPlayerId = string.IsNullOrEmpty(command.OtherPlayerId) ? null : command.OtherPlayerId,
+                    Kind = command.Kind.ToString(), PublicTarget = PublicTarget(command), PendingKind = state.PendingDecision?.Kind,
+                    Card = command.Kind == CommandKind.PlayProgressCard ? command.ProgressCard.ToString() : null
+                });
+                state = next;
                 return new CommandResult { Success = true, Message = state.Phase == GamePhase.Finished ? state.WinnerPlayerId + " 获胜！" : "操作已确认。", Events = Json.Copy(receipt), NewEvents = Json.Copy(receipt) };
             }
         }

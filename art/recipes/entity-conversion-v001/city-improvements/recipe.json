@@ -1,0 +1,1247 @@
+{
+  "schemaVersion": 1,
+  "typeId": "city-improvements",
+  "label": "城市设施十五种双面翻板与两种组合提示板",
+  "seed": 20261009,
+  "scaleStatus": "estimated; level panels 40 x 40 x 1 mm; photo guidance boards 180 x 80 x 1 mm; not physically measured or user-approved",
+  "limitations": [
+    "人工读取原照片四边交点，PIL投影校正原像素；保留原插画、繁体印刷、数字、曝光、模糊和反光，不使用AI重绘、OCR替字、锐化或颜色替换。",
+    "十五等级翻板为近正方形双面薄panel；四角圆角在工作网格中尚未建模，外角可能残留极少桌面像素。",
+    "两张组合提示板贴图只裁取可见组件整体边界；照片内部孔洞、组件间隙和已摆放翻板仍属于原照片像素，不是可操作城市建设控件。",
+    "组合提示板未见底面，使用明确中性材质；其整板拼装厚度、铰链结构、卡槽、真实尺寸与颜色标准均未知。",
+    "照片中的设施题名与旧版规则提示仅作视觉来源；不改变已锁定官方2025规则。",
+    "1024与2304像素导出包含原照片采样放大，不增加真实细节；高分辨率原照片与所有32个源文件保持不变。"
+  ],
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色1级修道院反面.jpg",
+      "sha256": "42ff7a13f67186932958144e740e9baabb55852495737c25ed47bf22132543f9",
+      "role": "science level 1 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色1级修道院正面.jpg",
+      "sha256": "a1cd408ec3836e30484a3af3748c11aea5e1d26c9df79a3f7c0024bc6a422eb1",
+      "role": "science level 1 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色2级图书馆反面.jpg",
+      "sha256": "01d0f5995917cccf70c07aac76e48326d89e2e51488821470b2b6ff94ffc74db",
+      "role": "science level 2 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色2级图书馆正面.jpg",
+      "sha256": "c6d8bcf2e273db47d76e5eb8c4aa0994cf7b20df74f6728f8871ce2e602bc0c9",
+      "role": "science level 2 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色3级引水渠反面.jpg",
+      "sha256": "b51b65f5d32dc3b2cbf3fabf8081dd593742a5ec91df0f1e466cb6ec82cf6c60",
+      "role": "science level 3 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色3级引水渠正面.jpg",
+      "sha256": "d98f48c3ff4316861fc65af9f9cdd392309863615e678c673d1c7509c9db7110",
+      "role": "science level 3 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色4级剧院反面.jpg",
+      "sha256": "24bf2d0900e7298534fbf2d3371f01c80c0b8793e2003e6412c8f83262e865ce",
+      "role": "science level 4 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色4级剧院正面.jpg",
+      "sha256": "80240f514813768fa062cbfd4654d5632c13bb727b73a617a294a1a635cecd84",
+      "role": "science level 4 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色5级大学反面.jpg",
+      "sha256": "0f63cbb4d66fe6ebe210ea74de7c5cdb978cb78969131b54f963f0fa2206869e",
+      "role": "science level 5 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色5级大学正面.jpg",
+      "sha256": "9a1da53e73325de91f79e3e62ecc2dd7229794d36062eb2ae41f12a906f62b86",
+      "role": "science level 5 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色1级市政厅反面.jpg",
+      "sha256": "fa16744b0bc7195954b0807061c0b36eca94426492cbe45b9d466c39c0514c6c",
+      "role": "politics level 1 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg",
+      "sha256": "9b50c7580c4259ca9e70d7e7dca3e63bb7278f35b78e72cb55dfc8695e698ce9",
+      "role": "politics level 1 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色2级教堂反面.jpg",
+      "sha256": "00dd4ede6283b5afa2e1c97a9199dde46aacb6530bc4a98e9e792f1d36d55760",
+      "role": "politics level 2 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色2级教堂正面.jpg",
+      "sha256": "028c7fd304662fd71def80ef3716738fe7cdce4d3c2a99042451172f046175e8",
+      "role": "politics level 2 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色3级要塞反面.jpg",
+      "sha256": "b5bb7fa20b123e9778617608758e0f9f787e8332e2ecf8516d982200e70d73e8",
+      "role": "politics level 3 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色3级要塞正面.jpg",
+      "sha256": "2117621f40a921979231681343a62b5106066465572e4fab43f92dbc4ed2b043",
+      "role": "politics level 3 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色4级大教堂反面.jpg",
+      "sha256": "8d7ea0a760c3da54477c604361cd0b45686d6b7134bd37eddbff9aee6f7ae3c8",
+      "role": "politics level 4 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色4级大教堂正面.jpg",
+      "sha256": "975723c52b0916b38f4cfca4003551c8084bf0da98b711e216f0e27c4ee4dade",
+      "role": "politics level 4 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色5级卡坦议会反面.jpg",
+      "sha256": "0b5ba5c628de7ecbdbc75c672eddc2b482743753e58376f6bca37e9224294450",
+      "role": "politics level 5 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色5级卡坦议会正面.jpg",
+      "sha256": "1f7f6b59e9704eb70cb8e717f006afb948154efea53358a0e4dae15327c5c9d6",
+      "role": "politics level 5 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色1级市场反面.jpg",
+      "sha256": "27f7f2a556c51d77cdd4868e80293907b311f2e7e3c3f773c141486393a11cbb",
+      "role": "trade level 1 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色1级市场正面.jpg",
+      "sha256": "a8450574cd4fa21d43eea6323a2ef97cd440457b9e02a983326ffc8f11f928fd",
+      "role": "trade level 1 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色2级行会反面.jpg",
+      "sha256": "79b507a4d1d444aa161e17e3f6441c898caafc3a3773ec0aa464febffcb7ec53",
+      "role": "trade level 2 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色2级行会正面.jpg",
+      "sha256": "540960fc3e640a4e9615ee3ff291aa42baa110586501566f58c5fe07d309eedd",
+      "role": "trade level 2 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色3级同业公会反面.jpg",
+      "sha256": "5cfca97514cf5fb2257b39a040f072ec9cbcc5255dd8d9978f92c5ab3faff9fd",
+      "role": "trade level 3 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色3级同业公会正面.jpg",
+      "sha256": "1c73f7921f1950a7d06d8f14b4bd3a19dcc012093b69d77861bfbd18d16e449b",
+      "role": "trade level 3 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色4级银行反面.jpg",
+      "sha256": "ed70a9c8410ec6ee604641ad6d88536169c57ba10fa8ef8a33c7462764453701",
+      "role": "trade level 4 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色4级银行正面.jpg",
+      "sha256": "3ab1ed82e1466b12c23aa07223d7feaa1354a0ab2554299f592857502885438a",
+      "role": "trade level 4 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色5级商业中心反面.jpg",
+      "sha256": "47a03876ccca518a456d7a2915bb185b3eec83e8df8d7e51ee8834d4f23ee0f4",
+      "role": "trade level 5 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色5级商业中心正面.jpg",
+      "sha256": "cd951c3af7ce30f7c48359706fef7c918f73d7d842fd74fc0d3d1f31f15d5c3b",
+      "role": "trade level 5 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/城市设施升级卡.jpg",
+      "sha256": "259f8fea1625d858b8263aeb23be9093dbd9e851a7c6f54fd2d285108d22047b",
+      "role": "assembled three-colour photo board; visible side only"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/城市设施满级卡.jpg",
+      "sha256": "b8d21623a6f7e50aa94ed5175843be9e27b4293d21f0cc87463e4a713bdacc5b",
+      "role": "assembled three-colour photo board; visible side only"
+    }
+  ],
+  "textureJobs": [
+    {
+      "source": "assets/references/inbox/城市设施/绿色1级修道院反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-1-back.png",
+      "quad": [
+        [
+          531.0,
+          666.0
+        ],
+        [
+          982.0,
+          657.0
+        ],
+        [
+          996.0,
+          1108.0
+        ],
+        [
+          534.0,
+          1115.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色1级修道院正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-1-front.png",
+      "quad": [
+        [
+          425.0,
+          584.0
+        ],
+        [
+          939.0,
+          566.0
+        ],
+        [
+          968.0,
+          1079.0
+        ],
+        [
+          442.0,
+          1098.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色2级图书馆反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-2-back.png",
+      "quad": [
+        [
+          457.0,
+          564.0
+        ],
+        [
+          936.0,
+          557.0
+        ],
+        [
+          948.0,
+          1037.0
+        ],
+        [
+          457.0,
+          1038.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色2级图书馆正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-2-front.png",
+      "quad": [
+        [
+          393.0,
+          633.0
+        ],
+        [
+          884.0,
+          616.0
+        ],
+        [
+          905.0,
+          1116.0
+        ],
+        [
+          402.0,
+          1130.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色3级引水渠反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-3-back.png",
+      "quad": [
+        [
+          317.0,
+          611.0
+        ],
+        [
+          833.0,
+          596.0
+        ],
+        [
+          852.0,
+          1105.0
+        ],
+        [
+          326.0,
+          1128.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色3级引水渠正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-3-front.png",
+      "quad": [
+        [
+          410.0,
+          606.0
+        ],
+        [
+          892.0,
+          587.0
+        ],
+        [
+          917.0,
+          1071.0
+        ],
+        [
+          416.0,
+          1088.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色4级剧院反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-4-back.png",
+      "quad": [
+        [
+          527.0,
+          632.0
+        ],
+        [
+          1069.0,
+          625.0
+        ],
+        [
+          1076.0,
+          1173.0
+        ],
+        [
+          524.0,
+          1172.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色4级剧院正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-4-front.png",
+      "quad": [
+        [
+          374.0,
+          513.0
+        ],
+        [
+          891.0,
+          475.0
+        ],
+        [
+          938.0,
+          990.0
+        ],
+        [
+          410.0,
+          1033.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色5级大学反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-5-back.png",
+      "quad": [
+        [
+          446.0,
+          559.0
+        ],
+        [
+          961.0,
+          558.0
+        ],
+        [
+          968.0,
+          1080.0
+        ],
+        [
+          439.0,
+          1075.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色5级大学正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-5-front.png",
+      "quad": [
+        [
+          360.0,
+          623.0
+        ],
+        [
+          904.0,
+          597.0
+        ],
+        [
+          941.0,
+          1150.0
+        ],
+        [
+          383.0,
+          1180.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色1级市政厅反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-1-back.png",
+      "quad": [
+        [
+          458.0,
+          679.0
+        ],
+        [
+          917.0,
+          650.0
+        ],
+        [
+          952.0,
+          1108.0
+        ],
+        [
+          481.0,
+          1140.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-1-front.png",
+      "quad": [
+        [
+          424.0,
+          687.0
+        ],
+        [
+          853.0,
+          667.0
+        ],
+        [
+          875.0,
+          1098.0
+        ],
+        [
+          442.0,
+          1115.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色2级教堂反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-2-back.png",
+      "quad": [
+        [
+          424.0,
+          668.0
+        ],
+        [
+          947.0,
+          669.0
+        ],
+        [
+          955.0,
+          1193.0
+        ],
+        [
+          418.0,
+          1197.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色2级教堂正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-2-front.png",
+      "quad": [
+        [
+          321.0,
+          544.0
+        ],
+        [
+          847.0,
+          510.0
+        ],
+        [
+          881.0,
+          1042.0
+        ],
+        [
+          343.0,
+          1075.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色3级要塞反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-3-back.png",
+      "quad": [
+        [
+          330.0,
+          555.0
+        ],
+        [
+          810.0,
+          575.0
+        ],
+        [
+          791.0,
+          1062.0
+        ],
+        [
+          296.0,
+          1043.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色3级要塞正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-3-front.png",
+      "quad": [
+        [
+          410.0,
+          622.0
+        ],
+        [
+          932.0,
+          608.0
+        ],
+        [
+          958.0,
+          1134.0
+        ],
+        [
+          421.0,
+          1156.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色4级大教堂反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-4-back.png",
+      "quad": [
+        [
+          412.0,
+          568.0
+        ],
+        [
+          877.0,
+          565.0
+        ],
+        [
+          883.0,
+          1030.0
+        ],
+        [
+          403.0,
+          1032.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色4级大教堂正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-4-front.png",
+      "quad": [
+        [
+          348.0,
+          578.0
+        ],
+        [
+          835.0,
+          578.0
+        ],
+        [
+          838.0,
+          1068.0
+        ],
+        [
+          335.0,
+          1067.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色5级卡坦议会反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-5-back.png",
+      "quad": [
+        [
+          424.0,
+          599.0
+        ],
+        [
+          915.0,
+          595.0
+        ],
+        [
+          919.0,
+          1085.0
+        ],
+        [
+          418.0,
+          1086.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色5级卡坦议会正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-5-front.png",
+      "quad": [
+        [
+          403.0,
+          673.0
+        ],
+        [
+          921.0,
+          662.0
+        ],
+        [
+          940.0,
+          1186.0
+        ],
+        [
+          407.0,
+          1196.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色1级市场反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-1-back.png",
+      "quad": [
+        [
+          999.181,
+          1510.19
+        ],
+        [
+          2075.221,
+          1510.19
+        ],
+        [
+          2089.633,
+          2590.612
+        ],
+        [
+          987.171,
+          2588.211
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色1级市场正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-1-front.png",
+      "quad": [
+        [
+          910.311,
+          1358.931
+        ],
+        [
+          1959.931,
+          1358.931
+        ],
+        [
+          1962.333,
+          2405.74
+        ],
+        [
+          895.9,
+          2400.938
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色2级行会反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-2-back.png",
+      "quad": [
+        [
+          529.0,
+          657.0
+        ],
+        [
+          985.0,
+          675.0
+        ],
+        [
+          970.0,
+          1137.0
+        ],
+        [
+          507.0,
+          1114.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色2级行会正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-2-front.png",
+      "quad": [
+        [
+          1102.461,
+          1253.29
+        ],
+        [
+          2226.539,
+          1224.478
+        ],
+        [
+          2264.97,
+          2374.528
+        ],
+        [
+          1121.676,
+          2396.136
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色3级同业公会反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-3-back.png",
+      "quad": [
+        [
+          494.0,
+          691.0
+        ],
+        [
+          985.0,
+          681.0
+        ],
+        [
+          1003.0,
+          1176.0
+        ],
+        [
+          495.0,
+          1187.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色3级同业公会正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-3-front.png",
+      "quad": [
+        [
+          484.0,
+          550.0
+        ],
+        [
+          982.0,
+          554.0
+        ],
+        [
+          986.0,
+          1055.0
+        ],
+        [
+          479.0,
+          1052.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色4级银行反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-4-back.png",
+      "quad": [
+        [
+          416.0,
+          657.0
+        ],
+        [
+          900.0,
+          664.0
+        ],
+        [
+          900.0,
+          1149.0
+        ],
+        [
+          405.0,
+          1145.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色4级银行正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-4-front.png",
+      "quad": [
+        [
+          417.0,
+          679.0
+        ],
+        [
+          903.0,
+          663.0
+        ],
+        [
+          923.0,
+          1159.0
+        ],
+        [
+          423.0,
+          1170.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色5级商业中心反面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-5-back.png",
+      "quad": [
+        [
+          428.0,
+          477.0
+        ],
+        [
+          900.0,
+          476.0
+        ],
+        [
+          912.0,
+          941.0
+        ],
+        [
+          436.0,
+          949.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色5级商业中心正面.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-5-front.png",
+      "quad": [
+        [
+          359.0,
+          589.0
+        ],
+        [
+          839.0,
+          571.0
+        ],
+        [
+          858.0,
+          1055.0
+        ],
+        [
+          370.0,
+          1070.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/城市设施升级卡.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/guidance-upgrade-front.png",
+      "quad": [
+        [
+          59,
+          288
+        ],
+        [
+          1608,
+          318
+        ],
+        [
+          1654,
+          1003
+        ],
+        [
+          25,
+          1012
+        ]
+      ],
+      "size": [
+        2304,
+        1024
+      ],
+      "rotation": 0
+    },
+    {
+      "source": "assets/references/inbox/城市设施/城市设施满级卡.jpg",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/guidance-max-front.png",
+      "quad": [
+        [
+          56,
+          299
+        ],
+        [
+          1646,
+          312
+        ],
+        [
+          1694,
+          1027
+        ],
+        [
+          19,
+          1039
+        ]
+      ],
+      "size": [
+        2304,
+        1024
+      ],
+      "rotation": 0
+    }
+  ],
+  "assets": [
+    {
+      "id": "improvement-science-1",
+      "label": "绿色1级修道院",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-1-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-1-back.png"
+    },
+    {
+      "id": "improvement-science-2",
+      "label": "绿色2级圖書館",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-2-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-2-back.png"
+    },
+    {
+      "id": "improvement-science-3",
+      "label": "绿色3级引水渠",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-3-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-3-back.png"
+    },
+    {
+      "id": "improvement-science-4",
+      "label": "绿色4级劇場",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-4-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-4-back.png"
+    },
+    {
+      "id": "improvement-science-5",
+      "label": "绿色5级大學",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-5-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-5-back.png"
+    },
+    {
+      "id": "improvement-politics-1",
+      "label": "蓝色1级市政廳",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-1-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-1-back.png"
+    },
+    {
+      "id": "improvement-politics-2",
+      "label": "蓝色2级教堂",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-2-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-2-back.png"
+    },
+    {
+      "id": "improvement-politics-3",
+      "label": "蓝色3级要塞",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-3-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-3-back.png"
+    },
+    {
+      "id": "improvement-politics-4",
+      "label": "蓝色4级大教堂",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-4-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-4-back.png"
+    },
+    {
+      "id": "improvement-politics-5",
+      "label": "蓝色5级卡坦議會",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-5-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-5-back.png"
+    },
+    {
+      "id": "improvement-trade-1",
+      "label": "黄色1级市場",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-1-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-1-back.png"
+    },
+    {
+      "id": "improvement-trade-2",
+      "label": "黄色2级行會",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-2-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-2-back.png"
+    },
+    {
+      "id": "improvement-trade-3",
+      "label": "黄色3级同業公會",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-3-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-3-back.png"
+    },
+    {
+      "id": "improvement-trade-4",
+      "label": "黄色4级銀行",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-4-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-4-back.png"
+    },
+    {
+      "id": "improvement-trade-5",
+      "label": "黄色5级商業中心",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-5-front.png",
+      "backTexture": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-5-back.png"
+    },
+    {
+      "id": "guidance-upgrade",
+      "label": "城市设施升级组合提示板",
+      "kind": "panel",
+      "dimensionsMm": [
+        180,
+        80,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/guidance-upgrade-front.png"
+    },
+    {
+      "id": "guidance-max",
+      "label": "城市设施满级组合提示板",
+      "kind": "panel",
+      "dimensionsMm": [
+        180,
+        80,
+        1
+      ],
+      "frontTexture": "art/source/entity-conversion-v001/city-improvements/textures/guidance-max-front.png"
+    }
+  ]
+}

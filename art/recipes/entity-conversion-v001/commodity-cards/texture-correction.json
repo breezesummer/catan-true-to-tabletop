@@ -1,0 +1,103 @@
+{
+  "typeId": "commodity-cards",
+  "operations": [
+    {
+      "source": "assets/references/inbox/商品牌/布匹.jpg",
+      "sourceSha256": "19a3b7d05fed239a580430dcf8944c7ea35e074ec0884c609819e107c7395e8e",
+      "output": "art/source/entity-conversion-v001/commodity-cards/textures/commodity-cloth-front.png",
+      "sha256": "ed07cc11cd869005494625dcb7fa7e65d36c0065fb24f04f666f5bf7d77b2d6d",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          351,
+          259
+        ],
+        [
+          1080,
+          283
+        ],
+        [
+          1037,
+          1428
+        ],
+        [
+          273,
+          1397
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/商品牌/纸张.jpg",
+      "sourceSha256": "ef81a32d3d33f5eb7833ce0ef4c957ecafac945deb8a9f40614e05edb718b95f",
+      "output": "art/source/entity-conversion-v001/commodity-cards/textures/commodity-paper-front.png",
+      "sha256": "14f782fc68e7c2736315a08e0ab0a01c64e3272747a682eabbd1222a36870ecc",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          295,
+          250
+        ],
+        [
+          1014,
+          247
+        ],
+        [
+          1025,
+          1380
+        ],
+        [
+          276,
+          1380
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/商品牌/银币.jpg",
+      "sourceSha256": "9111063c9b5e664a56b9da7de8e5cfdc2be9e93cf6e41da78df189afaff05a4f",
+      "output": "art/source/entity-conversion-v001/commodity-cards/textures/commodity-coin-front.png",
+      "sha256": "641becaf72a1a84688dd8a0ecfb32d51252aab93747daf69055bb4929a2bda9f",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          347,
+          279
+        ],
+        [
+          1050,
+          257
+        ],
+        [
+          1090,
+          1372
+        ],
+        [
+          348,
+          1377
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    }
+  ],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "4e12ec83d7a6af80d1ae66cf02c72a5f414fda999f54022b74ad22b200092336"
+}

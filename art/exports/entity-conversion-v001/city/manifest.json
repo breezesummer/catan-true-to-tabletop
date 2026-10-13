@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "city",
+  "label": "城市棋子（红色实体照片参考）",
+  "recipePath": "art/recipes/entity-conversion-v001/city/recipe.json",
+  "recipeSha256": "8fe268c32cc4bad16e859ab7e53aeca4a34d2a5a16b977f90ca585aeb5347523",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v001/city/builder.py",
+      "sha256": "8ac9724331570016838a841d1224173d3831ab504141d1bca7a60e7acd5d0136"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimate-not-measured",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/建筑/红色城市.jpg",
+      "sha256": "b40d7dfa1b75ad0adbed6bf463c26d3061bdf726837f0570f045195d3b43c993",
+      "role": "red-city-clustered-roofs-portico-stepped-round-base"
+    }
+  ],
+  "assets": [
+    {
+      "id": "city-red",
+      "label": "红色城市",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        20
+      ],
+      "meshObjects": 1,
+      "triangles": 15448,
+      "geometrySha256": "7fe5257f60324965b6dce1d3dcecf64873d1443d3184157168b7aeefcd087990",
+      "blenderBounds": {
+        "min": [
+          -0.008999999612569809,
+          -0.008999999612569809,
+          0.0
+        ],
+        "max": [
+          0.008999999612569809,
+          0.008999999612569809,
+          0.019999999552965164
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.008999999612569809,
+          0.0,
+          -0.008999999612569809
+        ],
+        "max": [
+          0.008999999612569809,
+          0.019999999552965164,
+          0.008999999612569809
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-red_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.5699999928474426,
+            0.008999999612569809,
+            0.019999999552965164,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "4945b65108c9b0a56696c1ac8d222671dabc0a43b07650837b035a1a4d247123",
+      "blendSha256": "c03e0c64fd61935522052585286a10cb3f1fe0a89669aef32470f37f4d1045cf",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [],
+  "limitations": [
+    "原始照片只有单个斜侧视角；背面、底部及实际尺寸未知。",
+    "参数化网格依照片可见的圆形阶梯底座、成组坡屋顶、门廊柱、墙面浮雕和台阶制作，非摄影测量或扫描复原。",
+    "估算包围盒为 X 宽 18、Y 深 18、Z 高 20 mm；该尺寸不是实测或用户确认值。",
+    "屋顶背面和墙面细节按对称/简化结构补齐，墙面砖纹为近似浮雕；塑料颜色受照片曝光和白平衡影响。",
+    "只提供有照片依据的红色资产，其他玩家颜色由运行时换色另行处理。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "80acfabdc3efb87f142ac06249f7a0cad3ef9f39f6ffab81d001b79a77c9b03e",
+    "game-camera.png": "a7d765f6edc78c785cc6f9cf21ea9fdd70f8e3fb41068a3df9446aec4342ffeb",
+    "side.png": "1209fdab0205f9e4854f020edaafe63a34c4296def7483c71d77275f467d419f",
+    "top.png": "649adca44f315a4bec8ed0ba5b905f6f1d34aadfc38f1ae638ba2506c16369f6"
+  }
+}

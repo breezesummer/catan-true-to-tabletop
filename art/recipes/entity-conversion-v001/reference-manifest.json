@@ -1,0 +1,789 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "originalPath": "assets/references/inbox/单位/商人.jpg",
+      "sha256": "17fcefec438a51016dcc51a76bc9f69a12c098732ad6cb01d5b4df6c6fddf344",
+      "width": 4096,
+      "height": 3072,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/强盗 (2).jpg",
+      "sha256": "2c123cd77edb67be24ef30c0ebc54b125fb108dfcef1307efb5f94f54fac94d4",
+      "width": 4096,
+      "height": 3072,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/强盗.jpg",
+      "sha256": "9ee71055322b2c147149b5b8dd045ef8d88f466488d2a0eac0913f08014e7bc5",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/海盗入侵卡.jpg",
+      "sha256": "c394f472541936a13a2e90c02702ace117903b783f3dba6c10130bbdf49da72a",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/海盗（入侵卡上的单位）.jpg",
+      "sha256": "b0260a1c0dd5617747b74ca6642e59ce03d074264e78371780881651f9632efa",
+      "width": 4096,
+      "height": 3072,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/海盗（海洋板块上的单位）.jpg",
+      "sha256": "92cbfaaac2eb705c6868519a8801749344ec580692363621df1eca175006a420",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色一级骑士.jpg",
+      "sha256": "5e68c8065b79625d7f21ca61c1b795df25b02d743e357bb92336c61de98cb5c5",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色三级骑士.jpg",
+      "sha256": "ed77f3260e3e0d75af34fc7ca6e2dc7ddee2e8a10ca27dab25c8639abb29e8a1",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色二级骑士.jpg",
+      "sha256": "c6db1380df865040d931fc01a09584f6c5bb189a783e053ea5df05a22fea091e",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色戴头盔一级骑士.jpg",
+      "sha256": "5f54c4acb167f1eb100d995eb94dc7b0132794903ca5a2e95f3f2ec6df54b828",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色戴头盔三级骑士.jpg",
+      "sha256": "ede3d7340427ca0d08b50362cec54403aa29a8be054939b94cca4da9a337fe43",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/单位/红色戴头盔二级骑士.jpg",
+      "sha256": "f2e0db86254b856501df55acce4e30d00b50a360a262fec02c4678d519f9e275",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/印刷厂.jpg",
+      "sha256": "193a5d761f6cc257b3cf97ecc64a1e40cf2975dc3774e194cc4d603c40ab261e",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg",
+      "sha256": "07b84fce82cb038e187e4df65187327862c663e672aa39a135e98a6ac15b686d",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/发明家.jpg",
+      "sha256": "8e94d08bf0c7c4aae6f996baa69aff9f80007e599d2a7e21090df0b27cd515b4",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/工程师.jpg",
+      "sha256": "9fa002ec01cd40d1d1829749299651c221b637160dc9fcf2a8720d99ef66a7de",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/新建道路.jpg",
+      "sha256": "aa68f9356c6dcba85dde9fe0c48df16b145f6e840d54b999ebbb48d05d81fd3a",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/灌溉.jpg",
+      "sha256": "cb814cc85bd78f540a77778feb01965bc7f532bfa92ce8a9a2a30ad489df36e3",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/炼金术士.jpg",
+      "sha256": "fdd11dc04cdeb1852f2d0dc0989e8ab5107ff4b644efc6ee6c0833b43a7a64b5",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/药物.jpg",
+      "sha256": "dea107041e44f6cfe1499be46d48fdb8cfb4aeb209d738f4294bf0d2a44e6136",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/起重机.jpg",
+      "sha256": "4b4410aaf7f70757ec42550905979ed7e2d71bb34248aec702b63b17634a8b9d",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/采矿.jpg",
+      "sha256": "48a9ed9e7023938e109e296d15a35aa1935535634c35ea8f5aafb123d0b8dc3a",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/锻铁匠.jpg",
+      "sha256": "11f4ea4b5715ed7a5c0bef506989a6e5b41b478cf532094cb19cff464c4449cd",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/主教.jpg",
+      "sha256": "bfb60c325097072da02d860d99408f85b5ed1a7f2ab522a31ae58bf149a61cd3",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/叛徒.jpg",
+      "sha256": "119668bcf462a92f25912cbc6f014e5cbcece98d44aa5d919606a514911122f9",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/外交官.jpg",
+      "sha256": "99a94fe632101f48fd35d09c1574186c8c74da5bccf35e3a67c3ad0e8af8f960",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/婚礼.jpg",
+      "sha256": "2cbb13cac70476ba44b0a3e1d6eff682ef55e56e754e3e4f6dbb7c480d4f198b",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/指挥官.jpg",
+      "sha256": "929bf6b316911507ae7fe482ce31914ac899571339b2b612adf516170b4abe4c",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/权谋.jpg",
+      "sha256": "e45dbea2c62be9da56bb4208b2df6678ca5b77d101ec6c964bafde97716a1159",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/石碑.jpg",
+      "sha256": "6b1b15e1c252644d40847741214abef3c7625df22a2e2b1fc6ed7c92cf3b7520",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/破坏者.jpg",
+      "sha256": "289a21b92cf666a44a71a1387c34cbdaed590e07dc0045d0e4f192b4f74ae72a",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/间谍.jpg",
+      "sha256": "1f0e00204c452d42ff8494aab5b403d683f75237f190b552240ce972ea1710ab",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/垄断商品.jpg",
+      "sha256": "f82c632e708f3b18fbcbbf659e24cdfbe5cd3820c67570797efcbf98bc45aedc",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/垄断资源.jpg",
+      "sha256": "c294aaecc121a8b3c928800815a9fb9a7c53191ab16f2c3fed3f406068221f6b",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/大商家.jpg",
+      "sha256": "84f20acb4ec5b09ca2f2665ae92bd385e142a3a9b9969d5ba862386e1644870f",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg",
+      "sha256": "f788acd3fea19ef3e5538bdcb9ddb7c9e296c4699308c7b7f6bfa706484c8eae",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色商人.jpg",
+      "sha256": "6eee74bc121c8c4553cc73662493a34244702751e28f419133826893f519be05",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色商港.jpg",
+      "sha256": "ca5b9c536051d00bcffbf660b82ec0f5422e0fe783c7e921ebfd8e811b0e0a52",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/黄色发展卡/黄色贸易船队.jpg",
+      "sha256": "bc098f34a3c24515909249e53eeacf75b0e0906e88bf28107cd20844044b5c8a",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/商品牌/布匹.jpg",
+      "sha256": "19a3b7d05fed239a580430dcf8944c7ea35e074ec0884c609819e107c7395e8e",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/商品牌/纸张.jpg",
+      "sha256": "ef81a32d3d33f5eb7833ce0ef4c957ecafac945deb8a9f40614e05edb718b95f",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/商品牌/银币.jpg",
+      "sha256": "9111063c9b5e664a56b9da7de8e5cfdc2be9e93cf6e41da78df189afaff05a4f",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/小麦.jpg",
+      "sha256": "fb70c010424a66bc28e38bfc3ef18104664195de03ab10b6ce5fdf0337a6f5d3",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/森林.jpg",
+      "sha256": "7ba385edccadd7a7d5ec6fc643c79b0e0f28f95494f139dc169a0080a6468f77",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/沙漠.jpg",
+      "sha256": "d9d63fa835f74b8962a691bd408f782fc8794616aa3d92519820e3f4aad9123d",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/海洋.jpg",
+      "sha256": "310cdeaaa1c1367b0a0e982f91951109bb2b5c818d7676066f3f6d3c8367dd10",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/砖块.jpg",
+      "sha256": "ad9244724ceb65a987b240e2e9336dffb931b91f29d2bd8aaa58487d0e7cd2c1",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/草地.jpg",
+      "sha256": "1133266b670cc97b46d27bc8f1a7eb7e1ab41e23fb065f35fb4e0aeaacfae2cf",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/金矿.jpg",
+      "sha256": "288a67240785b5d5b9372d2173199ed8d8837f5cf70d585a242cb60c8498b44e",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/城市设施升级卡.jpg",
+      "sha256": "259f8fea1625d858b8263aeb23be9093dbd9e851a7c6f54fd2d285108d22047b",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/城市设施满级卡.jpg",
+      "sha256": "b8d21623a6f7e50aa94ed5175843be9e27b4293d21f0cc87463e4a713bdacc5b",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色1级修道院反面.jpg",
+      "sha256": "42ff7a13f67186932958144e740e9baabb55852495737c25ed47bf22132543f9",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色1级修道院正面.jpg",
+      "sha256": "a1cd408ec3836e30484a3af3748c11aea5e1d26c9df79a3f7c0024bc6a422eb1",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色2级图书馆反面.jpg",
+      "sha256": "01d0f5995917cccf70c07aac76e48326d89e2e51488821470b2b6ff94ffc74db",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色2级图书馆正面.jpg",
+      "sha256": "c6d8bcf2e273db47d76e5eb8c4aa0994cf7b20df74f6728f8871ce2e602bc0c9",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色3级引水渠反面.jpg",
+      "sha256": "b51b65f5d32dc3b2cbf3fabf8081dd593742a5ec91df0f1e466cb6ec82cf6c60",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色3级引水渠正面.jpg",
+      "sha256": "d98f48c3ff4316861fc65af9f9cdd392309863615e678c673d1c7509c9db7110",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色4级剧院反面.jpg",
+      "sha256": "24bf2d0900e7298534fbf2d3371f01c80c0b8793e2003e6412c8f83262e865ce",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色4级剧院正面.jpg",
+      "sha256": "80240f514813768fa062cbfd4654d5632c13bb727b73a617a294a1a635cecd84",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色5级大学反面.jpg",
+      "sha256": "0f63cbb4d66fe6ebe210ea74de7c5cdb978cb78969131b54f963f0fa2206869e",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色5级大学正面.jpg",
+      "sha256": "9a1da53e73325de91f79e3e62ecc2dd7229794d36062eb2ae41f12a906f62b86",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色1级市政厅反面.jpg",
+      "sha256": "fa16744b0bc7195954b0807061c0b36eca94426492cbe45b9d466c39c0514c6c",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg",
+      "sha256": "9b50c7580c4259ca9e70d7e7dca3e63bb7278f35b78e72cb55dfc8695e698ce9",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色2级教堂反面.jpg",
+      "sha256": "00dd4ede6283b5afa2e1c97a9199dde46aacb6530bc4a98e9e792f1d36d55760",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色2级教堂正面.jpg",
+      "sha256": "028c7fd304662fd71def80ef3716738fe7cdce4d3c2a99042451172f046175e8",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色3级要塞反面.jpg",
+      "sha256": "b5bb7fa20b123e9778617608758e0f9f787e8332e2ecf8516d982200e70d73e8",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色3级要塞正面.jpg",
+      "sha256": "2117621f40a921979231681343a62b5106066465572e4fab43f92dbc4ed2b043",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色4级大教堂反面.jpg",
+      "sha256": "8d7ea0a760c3da54477c604361cd0b45686d6b7134bd37eddbff9aee6f7ae3c8",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色4级大教堂正面.jpg",
+      "sha256": "975723c52b0916b38f4cfca4003551c8084bf0da98b711e216f0e27c4ee4dade",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色5级卡坦议会反面.jpg",
+      "sha256": "0b5ba5c628de7ecbdbc75c672eddc2b482743753e58376f6bca37e9224294450",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色5级卡坦议会正面.jpg",
+      "sha256": "1f7f6b59e9704eb70cb8e717f006afb948154efea53358a0e4dae15327c5c9d6",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色1级市场反面.jpg",
+      "sha256": "27f7f2a556c51d77cdd4868e80293907b311f2e7e3c3f773c141486393a11cbb",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色1级市场正面.jpg",
+      "sha256": "a8450574cd4fa21d43eea6323a2ef97cd440457b9e02a983326ffc8f11f928fd",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色2级行会反面.jpg",
+      "sha256": "79b507a4d1d444aa161e17e3f6441c898caafc3a3773ec0aa464febffcb7ec53",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色2级行会正面.jpg",
+      "sha256": "540960fc3e640a4e9615ee3ff291aa42baa110586501566f58c5fe07d309eedd",
+      "width": 3072,
+      "height": 4096,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色3级同业公会反面.jpg",
+      "sha256": "5cfca97514cf5fb2257b39a040f072ec9cbcc5255dd8d9978f92c5ab3faff9fd",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色3级同业公会正面.jpg",
+      "sha256": "1c73f7921f1950a7d06d8f14b4bd3a19dcc012093b69d77861bfbd18d16e449b",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色4级银行反面.jpg",
+      "sha256": "ed70a9c8410ec6ee604641ad6d88536169c57ba10fa8ef8a33c7462764453701",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色4级银行正面.jpg",
+      "sha256": "3ab1ed82e1466b12c23aa07223d7feaa1354a0ab2554299f592857502885438a",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色5级商业中心反面.jpg",
+      "sha256": "47a03876ccca518a456d7a2915bb185b3eec83e8df8d7e51ee8834d4f23ee0f4",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色5级商业中心正面.jpg",
+      "sha256": "cd951c3af7ce30f7c48359706fef7c918f73d7d842fd74fc0d3d1f31f15d5c3b",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/奖励卡/卡坦保卫者.jpg",
+      "sha256": "3c32e1d715f85010436610507e90a69038a1848770b8e386bbbbb4fe535424da",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色城市+城墙.jpg",
+      "sha256": "95f6e7670b469534b0a1e05932c63ef56810bdfde6c7a19e5f161c4500ea7a14",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色城市.jpg",
+      "sha256": "b40d7dfa1b75ad0adbed6bf463c26d3061bdf726837f0570f045195d3b43c993",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色大都会+城墙.jpg",
+      "sha256": "d6c31093b29977114f68f4047bc0dccae4e602e408c605c226898a2c7943c4a9",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色大都会.jpg",
+      "sha256": "04f962a8e389b69ff0255c2dee74ac29e340fa7ed0c549f3aa036d5485467238",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/红色村庄.jpg",
+      "sha256": "83c8c1c29172087c858f90c4ddef756212926cc3fda38547551359431be17f7e",
+      "width": 4096,
+      "height": 3072,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/小麦.jpg",
+      "sha256": "90597e7807eddf96c8757fd84588e2f24350412355a8cee0ce7580d6203c2429",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/木头.jpg",
+      "sha256": "447133145e2d82dc15142e61ff22e26267da1a37e6d543c2c68b1a6617b588be",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/砖头.jpg",
+      "sha256": "b70eb1432b2d36665dd5a50582147bcf73d08ee4849f2c41bd682090d6c27ec4",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/羊毛.jpg",
+      "sha256": "0dbfd3ba45889231041354cd7c4b410b11ece05ca06ec53091c3ea345fa8bc7b",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/资源牌背面.jpg",
+      "sha256": "3d94957d49632f67bbd04945cb8e9c6a3eac9bc1bd38c06060adba1b036d5ab0",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/资源牌/铁矿石.jpg",
+      "sha256": "3cc8d4bbee405952035bc075d8e741124f888d50cd402ae8662244b23aac8a10",
+      "width": 1279,
+      "height": 1706,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/橘色船.jpg",
+      "sha256": "cbc8d96556b54eaaa48e3add32301d9e729261119e44eb0dd15c184c7571fdf1",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/米色船.jpg",
+      "sha256": "936c676c0d0162ec76b3aed481c0dcf00adb5344e026f35e980a6f1b11f935fa",
+      "width": 4096,
+      "height": 3072,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/红色船.jpg",
+      "sha256": "6806502e4359ba5a57708b2592d59a6d50ebdd50960fa60feb008f3c99ef8a41",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/红色道路.jpg",
+      "sha256": "919b8ab6d97b32facffb6ac90d2f9f0ee1682d7f0085abaf47b34967ab54fd5b",
+      "width": 1706,
+      "height": 1279,
+      "measuredDimensionsMm": null,
+      "edition": null
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/蓝色船.jpg",
+      "sha256": "ecf10735f231a6df85cd1cf0022a56abcaaa480912df8dbecad0cc05417afb00",
+      "width": 4096,
+      "height": 3072,
+      "measuredDimensionsMm": null,
+      "edition": null
+    }
+  ]
+}
