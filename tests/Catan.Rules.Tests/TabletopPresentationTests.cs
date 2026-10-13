@@ -103,7 +103,7 @@ public sealed class TabletopPresentationTests
             for(int i=0;i<count;i++)
             {
                 var pose=TabletopHandLayout.Card(i,count,center,width,false);
-                Assert.Equal(0,pose.Angle);Assert.Equal(734,pose.Y);
+                Assert.Equal(0,pose.Angle);Assert.Equal(714,pose.Y);
                 if(i>0)Assert.True(pose.X>TabletopHandLayout.Card(i-1,count,center,width,false).X);
                 Assert.Equal(pose.Y-22,TabletopHandLayout.Card(i,count,center,width,true).Y);
             }

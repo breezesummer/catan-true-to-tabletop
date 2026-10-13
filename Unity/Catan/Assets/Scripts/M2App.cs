@@ -400,7 +400,8 @@ public sealed partial class M2App : MonoBehaviour
             var p=board.ScreenPoint(tile.Id);float x=p.x*1440f/Screen.width,y=p.y*900f/Screen.height;
             if(ai!=null){TabletopUI.NumberToken(new Vector2(x,y),tile.Number,"沙漠",badge);continue;}
             Panel(new Rect(x-25,y-20,50,40),new Color(.045f,.085f,.09f,.86f));
-            Label(x-25,y-21,50,25,tile.Number.HasValue?tile.Number.Value.ToString():"沙漠",badge);
+            var numberStyle=new GUIStyle(badge);if(tile.Number==6||tile.Number==8)numberStyle.normal.textColor=TabletopUI.HotNumberColor;
+            Label(x-25,y-21,50,25,tile.Number.HasValue?tile.Number.Value.ToString():"沙漠",numberStyle);
             Label(x-25,y+2,50,20,tile.Id+(tile.Id==view.Board.RobberTileId?" 强盗":""),new GUIStyle(badge){fontSize=10});
         }
         foreach(var port in view.Board.Ports)

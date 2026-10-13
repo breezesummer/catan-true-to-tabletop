@@ -136,6 +136,104 @@ public sealed class TabletopCollectionTimelineTests
         Assert.Empty(timeline.Active(3.6));
     }
 
+    [Fact]
+    public void AuthoritativeCardsStayInvisibleUntilTheirIndividualFlightsArrive()
+    {
+        var (timeline, game) = ExchangeTwoOre();
+        int[] owned = [0,0,0,0,3,0,0,0];
+        Assert.Equal(3,game.GetPlayerView("P1").OwnResources.Ore);
+        foreach(double now in new[]{10,10.4,11.049})
+        {
+            var slots=timeline.HandSlots("P1",owned,5,now);
+            Assert.Equal(1,slots.Count(slot=>slot.Flight==null));
+            Assert.Equal(2,slots.Count(slot=>slot.Flight!=null));
+        }
+        Assert.Equal(2,timeline.HandSlots("P1",owned,5,11.051).Count(slot=>slot.Flight==null));
+        Assert.Equal(3,timeline.HandSlots("P1",owned,5,11.111).Count(slot=>slot.Flight==null));
+        Assert.Equal(3,game.GetPlayerView("P1").OwnResources.Ore);
+        Assert.Equal(3,owned[4]);
+    }
+
+    [Fact]
+    public void DiceDelayAlsoHidesIncomingCardsBeforeAnyFlightHasStarted()
+    {
+        var tile=M4CoreHarness.New().GetPlayerView("P1").Board.Tiles.First(t=>t.Resource=="wood");
+        var game=M4CoreHarness.Fixture(s=>
+        {
+            s.Phase=M4.GamePhase.ProductionAwaitRoll;
+            s.AlchemyDice1=Math.Min(6,tile.Number!.Value-1);s.AlchemyDice2=tile.Number.Value-s.AlchemyDice1;
+            s.Cities=[M4CoreHarness.Piece(tile.Vertices[0],"P1")];
+        });
+        var timeline=Baseline("P1",game.GetHistory("P1"));
+        M4CoreHarness.Accepted(game,M4CoreHarness.Cmd(M4.CommandKind.RollDice));
+        timeline.Observe("P1",game.GetHistory("P1"),10);
+        int[] owned=[1,0,0,0,0,0,0,1];
+        Assert.Empty(timeline.Active(10.5));
+        Assert.All(timeline.HandSlots("P1",owned,8,10.5),slot=>{Assert.NotNull(slot.Flight);Assert.Equal(0,slot.Weight);});
+        Assert.Equal(2,timeline.HandSlots("P1",owned,8,12.1).Count(slot=>slot.Flight==null));
+    }
+
+    [Fact]
+    public void ExistingCardsMakeRoomOnlyNearArrivalAndFlightDestinationMatchesFinalHand()
+    {
+        var (timeline, _)=ExchangeTwoOre();int[] owned=[0,0,0,0,3,0,0,0];
+        var early=timeline.HandSlots("P1",owned,5,10.5);
+        Assert.Equal(666,TabletopHandLayout.Resource(early,0,720,1060,false).X);
+        var near=timeline.HandSlots("P1",owned,5,11.11-0.00001);
+        var flying=TabletopHandLayout.Resource(near,2,720,1060,false);
+        var landed=timeline.HandSlots("P1",owned,5,11.111);
+        for(int index=0;index<landed.Length;index++)
+        {
+            var actual=TabletopHandLayout.Resource(landed,index,720,1060,false);
+            var expected=TabletopHandLayout.Card(index,3,720,1060,false);
+            Assert.Equal(expected.X,actual.X,3);Assert.Equal(expected.Y,actual.Y,3);
+        }
+        Assert.InRange(Math.Abs(flying.X-TabletopHandLayout.Resource(landed,2,720,1060,false).X),0,0.01);
+    }
+
+    [Fact]
+    public void SpendingIncomingCardsCancelsTheirPresentationWithoutRestoringAnyGoods()
+    {
+        var (timeline, _)=ExchangeTwoOre();int[] owned=new int[8];
+        Assert.Empty(timeline.HandSlots("P1",owned,5,10.2));
+        Assert.Empty(timeline.Active(10.3));
+        Assert.Empty(timeline.HandSlots("P1",owned,5,20));
+        Assert.All(owned,count=>Assert.Equal(0,count));
+    }
+
+    [Fact]
+    public void RepeatedViewRefreshAndOtherPlayersCannotHideTheViewersOwnCards()
+    {
+        var (timeline,game)=ExchangeTwoOre();int[] owned=[0,0,0,0,3,0,0,0];
+        timeline.Observe("P1",game.GetHistory("P1"),10.2);
+        Assert.Equal(2,timeline.HandSlots("P1",owned,5,10.2).Count(slot=>slot.Flight!=null));
+        Assert.All(timeline.HandSlots("P2",owned,5,10.2),slot=>Assert.Null(slot.Flight));
+        Assert.Equal(2,timeline.HandSlots("P1",owned,5,10.2).Count(slot=>slot.Flight!=null));
+    }
+
+    [Fact]
+    public void SeatChangeOrRewoundHistoryImmediatelyShowsTheNewBaselineHand()
+    {
+        var (timeline,game)=ExchangeTwoOre();int[] owned=[0,0,0,0,3,0,0,0];
+        timeline.Observe("P2",game.GetHistory("P2"),10.2);
+        Assert.All(timeline.HandSlots("P2",owned,5,10.2),slot=>Assert.Null(slot.Flight));
+        Assert.Empty(timeline.Active(10.2));
+        var (rewound,_)=ExchangeTwoOre();
+        rewound.Observe("P1",Array.Empty<GameHistoryEntry>(),10.2);
+        Assert.All(rewound.HandSlots("P1",owned,5,10.2),slot=>Assert.Null(slot.Flight));
+        Assert.Empty(rewound.Active(10.2));
+    }
+
+    static (TabletopCollectionTimeline Timeline,M2.BaseGameSession Game) ExchangeTwoOre()
+    {
+        var game=M2Harness.Fixture(s=>{M2Harness.Player(s).Resources.Wood=8;M2Harness.Player(s).Resources.Ore=1;});
+        var timeline=Baseline("P1",game.GetHistory("P1"));
+        var trade=M2Harness.Cmd(M2.CommandKind.BankTrade);
+        trade.GiveResource=Resource.Wood;trade.GiveAmount=8;trade.ReceiveResource=Resource.Ore;trade.ReceiveAmount=2;
+        M2Harness.Accepted(game,trade);timeline.Observe("P1",game.GetHistory("P1"),10);
+        return(timeline,game);
+    }
+
     static TabletopCollectionTimeline Baseline(string player, GameHistoryEntry[] entries)
     {
         var timeline = new TabletopCollectionTimeline();

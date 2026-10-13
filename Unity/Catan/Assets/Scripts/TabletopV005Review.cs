@@ -17,6 +17,9 @@ public sealed class TabletopV005Review : MonoBehaviour
     string output;
     int captureIndex;
     bool ready,capturing;
+    bool sequenceArmed;
+    long sequenceBaseline;
+    int sequenceCapture;
 
     IEnumerator Start()
     {
@@ -101,7 +104,7 @@ public sealed class TabletopV005Review : MonoBehaviour
 
     static string Actor(PlayerView view)
     {
-        if(view.TradeOffer!=null)return view.TradeOffer.OtherPlayerId;
+        if(view.TradeOffer!=null)return view.TradeOffer.NextResponder(view.PlayerId);
         if(view.Discards.Length>0)return view.Discards[0].PlayerId;
         return view.PendingDecision!=null&&!string.IsNullOrEmpty(view.PendingDecision.PlayerId)?view.PendingDecision.PlayerId:view.ActivePlayerId;
     }
@@ -110,6 +113,45 @@ public sealed class TabletopV005Review : MonoBehaviour
     {
         if(!ready||capturing||app==null||!app.Ready||app.RuleSet!="cities-knights"||reviewPresentation==null||GetComponent<M4App>()!=reviewPresentation)return;
         if(Input.GetKeyDown(KeyCode.F8))StartCoroutine(CaptureReview());
+        if(Input.GetKeyDown(KeyCode.F9))
+        {
+            sequenceArmed=true;
+            sequenceBaseline=app.HistoryEntries.LastOrDefault()?.Sequence??0;
+            app.ShowTablePrompt("连续截图已就绪 · 下一次操作后记录收牌过程");
+        }
+        if(sequenceArmed&&(app.HistoryEntries.LastOrDefault()?.Sequence??0)>sequenceBaseline)
+        {sequenceArmed=false;StartCoroutine(CaptureSequence());}
+    }
+
+    IEnumerator CaptureSequence()
+    {
+        capturing=true;
+        string folder;
+        do{folder=Path.Combine(output,"收牌连续帧-v007-"+(++sequenceCapture).ToString("D3"));}while(Directory.Exists(folder));
+        Directory.CreateDirectory(folder);
+        var rows=new System.Text.StringBuilder("帧号,时间秒,可见资源牌,待到手资源牌\n");
+        var frames=new System.Collections.Generic.List<Texture2D>();
+        double started=Time.unscaledTimeAsDouble;
+        for(int frame=0;frame<48;frame++)
+        {
+            yield return new WaitForEndOfFrame();
+            // 动画结束后再压缩写盘，避免 PNG 编码造成验收画面自身卡顿。
+            frames.Add(ScreenCapture.CaptureScreenshotAsTexture());
+            var dock=reviewPresentation.VerificationOperationDock;
+            rows.Append(frame).Append(',').Append((Time.unscaledTimeAsDouble-started).ToString("F4",System.Globalization.CultureInfo.InvariantCulture))
+                .Append(',').Append(dock.VerificationVisibleResourceCount).Append(',').Append(dock.VerificationPendingResourceCount).Append('\n');
+            yield return null;yield return null;
+        }
+        for(int frame=0;frame<frames.Count;frame++)
+        {
+            var texture=frames[frame];
+            File.WriteAllBytes(Path.Combine(folder,"帧-"+frame.ToString("D3")+".png"),texture.EncodeToPNG());
+            Destroy(texture);yield return null;
+        }
+        File.WriteAllText(Path.Combine(folder,"显示计数.csv"),rows.ToString());
+        capturing=false;
+        app.ShowTablePrompt("收牌连续帧已保存");
+        Debug.Log("CATAN_V007_SEQUENCE_CAPTURED: "+Path.GetFileName(folder));
     }
 
     IEnumerator CaptureReview()

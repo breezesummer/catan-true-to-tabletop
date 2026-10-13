@@ -9,8 +9,12 @@ public sealed class TabletopBankUI
 {
     public static readonly Rect Area = new Rect(18,316,199,282);
     readonly TabletopCollectionTimeline timeline = new TabletopCollectionTimeline();
+    public TabletopCollectionTimeline Collections => timeline;
+    public Action<TabletopCollectionFlight> OccludeHand;
     readonly Dictionary<int,Rect> sources = new Dictionary<int,Rect>();
     readonly Dictionary<string,Rect> destinations = new Dictionary<string,Rect>();
+    readonly Dictionary<TabletopCollectionFlight,Rect> ownDestinations = new Dictionary<TabletopCollectionFlight,Rect>();
+    readonly Dictionary<TabletopCollectionFlight,int> ownSlotIndices = new Dictionary<TabletopCollectionFlight,int>();
     OperationSnapshot current;
     static Texture2D developmentBack;
     static readonly string[] Names = {"木材","砖块","羊毛","谷物","矿石","布匹","钱币","纸张"};
@@ -19,7 +23,7 @@ public sealed class TabletopBankUI
         Action<string> trade,Action purchase,List<TabletopWorldObjects.Hit> worldHits,List<Rect> hits)
     {
         if(snapshot==null)return;
-        current=snapshot;sources.Clear();destinations.Clear();
+        current=snapshot;sources.Clear();destinations.Clear();ownDestinations.Clear();ownSlotIndices.Clear();
         timeline.Observe(snapshot.Scope,entries,Time.unscaledTimeAsDouble);
         var title=table.ProjectLabel(new Rect(24,316,181,25));hits.Add(title);
         if(ModernOperationUI.Button(title,"银行",snapshot.CanTrade))trade?.Invoke(null);
@@ -62,14 +66,14 @@ public sealed class TabletopBankUI
             var hit=Stack(table,"bank-progress-"+track,layout,EntityCardAssets.ProgressBack(track),3);
             worldHits.Add(hit);
         }
-        int total=snapshot.Goods.Take(snapshot.GoodCount).Sum(),drawn=0;
         float center=TabletopHandLayout.ResourceCenter(snapshot.Cards.Count>0),width=snapshot.Cards.Count>0?704:1060;
-        for(int good=0;good<snapshot.GoodCount;good++)
+        var slots=timeline.HandSlots(snapshot.Seat,snapshot.Goods,snapshot.GoodCount,Time.unscaledTimeAsDouble);
+        for(int index=0;index<slots.Length;index++)
         {
-            int index=drawn+Math.Max(0,snapshot.Goods[good]-1);
-            var pose=TabletopHandLayout.Card(index,Math.Max(1,total),center,width,false);
-            destinations[snapshot.Seat+":"+good]=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);
-            drawn+=snapshot.Goods[good];
+            if(slots[index].Flight==null)continue;
+            var pose=TabletopHandLayout.Resource(slots,index,center,width,false);
+            ownDestinations[slots[index].Flight]=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);
+            ownSlotIndices[slots[index].Flight]=index;
         }
         var order=TabletopUI.OpponentOrder(snapshot.Seat,seats.Select(s=>s.Id));
         for(int i=0;i<order.Length;i++)
@@ -89,26 +93,44 @@ public sealed class TabletopBankUI
         TabletopWorldObjects.Hit hit=null;
         // 卡片同轴叠放，以真实纸张厚度表现数量，不增加透明牌套或装饰外框。
         for(int i=0;i<Math.Min(5,count);i++)
-            hit=table.Objects.Card(key+"-"+i,layout,texture,false,null,i*.00038f);
+            hit=table.Objects.Card(key+"-"+i,layout,texture,false,null,i*.00050f);
         return hit;
     }
     public void DrawFlights()
     {
         if(current==null||Event.current.type!=EventType.Repaint)return;
         double now=Time.unscaledTimeAsDouble;
-        foreach(var flight in timeline.Active(now))
+        var active=timeline.Active(now);
+        var landing=active.Where(f=>f.Player==current.Seat&&f.Progress(now)>=.60&&ownSlotIndices.ContainsKey(f))
+            .OrderBy(f=>ownSlotIndices[f]).ToArray();
+        // 落位牌按真实手牌插槽从左向右合成，右邻牌逐渐遮挡下沉部分；仍在空中的牌最后绘制。
+        foreach(var flight in landing)
         {
-            if(!sources.TryGetValue(flight.Good,out var start))continue;
-            bool own=flight.Player==current.Seat;
-            if(!destinations.TryGetValue(own?flight.Player+":"+flight.Good:flight.Player,out var end))continue;
-            float t=(float)flight.Progress(now),ease=1-Mathf.Pow(1-t,3);
-            var center=Vector2.Lerp(start.center,end.center,ease)+Vector2.up*(Mathf.Sin(t*Mathf.PI)*62);
-            float width=Mathf.Lerp(start.width,end.width,ease),height=Mathf.Lerp(start.height,end.height,ease);
-            var r=new Rect(center.x-width/2,center.y-height/2,width,height);
-            var face=EntityCardAssets.Texture(EntityCardAssets.Good(flight.Good).Front);
-            if(!own&&t>.66f)face=EntityCardAssets.Texture(EntityCardAssets.Good(0).Back);
-            EntityCardAssets.DrawCardFace(r,face);
+            DrawFlight(flight,now);
+            OccludeHand?.Invoke(flight);
         }
+        foreach(var flight in active.Where(f=>!landing.Contains(f)))DrawFlight(flight,now);
+    }
+    void DrawFlight(TabletopCollectionFlight flight,double now)
+    {
+        if(!sources.TryGetValue(flight.Good,out var start))return;
+        bool own=flight.Player==current.Seat;
+        Rect end;
+        if(own?!ownDestinations.TryGetValue(flight,out end):!destinations.TryGetValue(flight.Player,out end))return;
+        float t=(float)flight.Progress(now),ease=t*t*(3-2*t),remaining=1-ease;
+        // 银行上方起飞，接近手牌时减速落入各自插槽；起止速度为零，不再先生成一张手牌。
+        var control1=start.center+new Vector2(105,-78);
+        var control2=end.center+new Vector2(-95,-92);
+        var center=remaining*remaining*remaining*start.center+3*remaining*remaining*ease*control1+
+            3*remaining*ease*ease*control2+ease*ease*ease*end.center;
+        float width=Mathf.Lerp(start.width,end.width,ease),height=Mathf.Lerp(start.height,end.height,ease);
+        var r=new Rect(center.x-width/2,center.y-height/2,width,height);
+        var face=EntityCardAssets.Texture(EntityCardAssets.Good(flight.Good).Front);
+        if(!own&&t>.66f)face=EntityCardAssets.Texture(EntityCardAssets.Good(0).Back);
+        var matrix=GUI.matrix;
+        GUIUtility.RotateAroundPivot(-5*Mathf.Sin(t*Mathf.PI),r.center);
+        EntityCardAssets.DrawCardFace(r,face,Mathf.Sin(t*Mathf.PI));
+        GUI.matrix=matrix;
     }
     public static Texture2D DevelopmentBack()
     {

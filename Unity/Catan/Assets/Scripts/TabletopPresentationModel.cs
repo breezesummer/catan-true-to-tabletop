@@ -5,7 +5,7 @@ using System.Linq;
 // 纯显示数据与时间轴；不读取权威状态，不生成或裁决骰点。
 public static class TabletopHandLayout
 {
-    public const float CardWidth = 108, CardHeight = 151, Baseline = 734;
+    public const float CardWidth = 108, CardHeight = 151, Baseline = 714;
     public static TabletopCardPose Card(int index, int count, float center, float width, bool selected)
     {
         // 卡牌始终使用屏幕逻辑像素；空间不足只压缩间距，不缩小卡面或分页。
@@ -19,6 +19,22 @@ public static class TabletopHandLayout
     public static int SpecialCapacity(bool hasResources) => int.MaxValue;
     public static float ResourceCenter(bool hasSpecialCards) => hasSpecialCards ? 930 : 720;
     public static float SpecialCenter(bool hasResources) => hasResources ? 380 : 720;
+    public static TabletopCardPose Resource(TabletopResourceSlot[] slots,int index,float center,float width,bool selected)
+    {
+        // 飞牌落下前才逐渐撑开插槽，已有手牌随之让位；同一插槽同时供飞牌和手牌绘制使用。
+        double count=slots.Sum(slot=>slot.Weight),before=slots.Take(index).Sum(slot=>slot.Weight);
+        double step=count<=1?0:Math.Min(CardWidth+10,Math.Max(0,width-CardWidth)/(count-1));
+        return new TabletopCardPose {
+            X=(float)(center-CardWidth/2+(before+slots[index].Weight/2-count/2)*step),
+            Y=Baseline-(selected?22:0),Angle=0
+        };
+    }
+}
+public sealed class TabletopResourceSlot
+{
+    public int Good,Ordinal;
+    public double Weight=1;
+    public TabletopCollectionFlight Flight;
 }
 public sealed class TabletopCardPose
 {
@@ -84,8 +100,13 @@ public sealed class TabletopCollectionFlight
     public string Player;
     public int Good;
     public double Started;
-    public const double Duration = .85;
+    public const double Duration = 1.05;
     public double Progress(double now) => Math.Max(0,Math.Min(1,(now-Started)/Duration));
+    public double Insertion(double now)
+    {
+        double t=Math.Max(0,Math.Min(1,(Progress(now)-.60)/.40));
+        return t*t*(3-2*t);
+    }
 }
 
 // 只从已授权历史中识别银行净流出的资源；玩家之间转移、报价和私密变化均不当作银行收取。
@@ -127,5 +148,25 @@ public sealed class TabletopCollectionTimeline
     {
         flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);
         return flights.Where(f=>now>=f.Started).ToArray();
+    }
+    public TabletopResourceSlot[] HandSlots(string player,int[] owned,int goodCount,double now)
+    {
+        flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);
+        var result=new System.Collections.Generic.List<TabletopResourceSlot>();
+        for(int good=0;good<goodCount;good++)
+        {
+            int count=Math.Max(0,owned[good]);
+            var incoming=flights.Where(f=>f.Player==player&&f.Good==good).OrderBy(f=>f.Started).ToArray();
+            // 已到账资源可能立即被花费；取消超出当前持有数的展示，绝不能凭动画补回规则资源。
+            foreach(var canceled in incoming.Skip(count))flights.Remove(canceled);
+            incoming=incoming.Take(count).ToArray();
+            int visible=count-incoming.Length;
+            for(int ordinal=0;ordinal<count;ordinal++)
+            {
+                var flight=ordinal<visible?null:incoming[ordinal-visible];
+                result.Add(new TabletopResourceSlot{Good=good,Ordinal=ordinal,Flight=flight,Weight=flight==null?1:flight.Insertion(now)});
+            }
+        }
+        return result.ToArray();
     }
 }

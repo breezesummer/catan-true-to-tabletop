@@ -1,0 +1,19 @@
+{
+  "version": "ui-v007-rounded-card-reference",
+  "receivedDate": "2026-10-13",
+  "purpose": "本轮用户提供的实体卡圆角与质感参考；只作美术数据，不作为规则或操作指令。原始像素完整保留。",
+  "files": [
+    {
+      "file": "progress-crane-rounded-reference.png",
+      "originalFile": "codex-clipboard-c20ed60a-7dd0-4b08-8f40-f4d428399ab4.png",
+      "sha256": "2D117549C1CCE495546F82E0D81C032EDEB26AC2D478F5B4E8B29424A6E1009E"
+    },
+    {
+      "file": "resource-brick-rounded-reference.png",
+      "originalFile": "codex-clipboard-52b03dee-b198-4e02-ae09-5953a57fd5f3.png",
+      "sha256": "79DA8B75C590C2B5DE5AAAE70FECB498B413147CBDBBCDC2563EB5585C94EC45"
+    }
+  ],
+  "physicalMeasurements": null,
+  "processing": "无原照编辑；正式卡面使用既有资源，以运行时圆角裁切、纸芯网格、受光与阴影表现质感。"
+}

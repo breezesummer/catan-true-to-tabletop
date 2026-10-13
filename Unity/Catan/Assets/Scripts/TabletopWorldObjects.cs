@@ -11,6 +11,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         internal TabletopScene Scene;
         internal Transform Root;
         internal Vector2 Size;
+        internal float Thickness;
         internal Renderer[] Renderers;
         public Rect Rect
         {
@@ -43,13 +44,15 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         public Hit Hit;
         public string Signature;
         public int Generation;
+        public Mesh[] OwnedMeshes;
     }
     readonly Dictionary<string, Item> items = new Dictionary<string, Item>();
     readonly Dictionary<string, Material> faceMaterials = new Dictionary<string, Material>();
     readonly Dictionary<int, Texture2D> diceTextures = new Dictionary<int, Texture2D>();
     readonly List<Mesh> meshes = new List<Mesh>();
     TabletopScene scene;
-    Material paperEdge;
+    Material paperEdge, paperShadow;
+    Texture2D paperShadowTexture;
     string group;
     int generation;
     public int ActiveCount => items.Values.Count(i => i.Object.activeSelf);
@@ -59,19 +62,27 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     {
         foreach (var key in items.Keys.Where(k => k.StartsWith(group) && items[k].Generation != generation).ToArray())
         {
-            Destroy(items[key].Object); items.Remove(key);
+            Release(items[key]); items.Remove(key);
         }
+    }
+    void Release(Item item)
+    {
+        // 只释放本组件在创建此物件时登记的运行时网格；导入棋子共享网格不在此列表。
+        foreach(var mesh in item.OwnedMeshes)
+        {meshes.Remove(mesh);Destroy(mesh);}
+        Destroy(item.Object);
     }
     Item Get(string key, string signature, Func<GameObject> create)
     {
         key = group + key;
         if (items.TryGetValue(key, out var prior) && prior.Signature != signature)
-        { Destroy(prior.Object); items.Remove(key); }
+        { Release(prior); items.Remove(key); }
         if (!items.TryGetValue(key, out var item))
         {
+            int firstOwnedMesh=meshes.Count;
             var obj = create(); obj.name = key; obj.transform.SetParent(transform, true);
             foreach (var collider in obj.GetComponentsInChildren<Collider>()) { collider.enabled = false; Destroy(collider); }
-            item = new Item { Object = obj, Signature = signature, Hit = new Hit { Scene = scene, Root = obj.transform } };
+            item = new Item { Object = obj, Signature = signature, Hit = new Hit { Scene = scene, Root = obj.transform }, OwnedMeshes=meshes.Skip(firstOwnedMesh).ToArray() };
             items.Add(key, item);
         }
         item.Generation = generation; item.Object.SetActive(true); return item;
@@ -110,39 +121,111 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         }
         faceMaterials.Add(key, material); return material;
     }
-    GameObject Panel(Vector2 dimensions)
+    GameObject Panel(Vector2 dimensions,float thickness,float radiusRatio)
     {
-        var root = new GameObject("薄卡片网格");
-        if (paperEdge == null) { paperEdge = BoardRenderer.Material(new Color(.89f,.83f,.65f)); paperEdge.SetFloat("_Smoothness", .12f); }
-        var edge = GameObject.CreatePrimitive(PrimitiveType.Cube); edge.transform.SetParent(root.transform, false);
-        edge.transform.localPosition = Vector3.up * .00018f;
-        edge.transform.localScale = new Vector3(dimensions.x, .00036f, dimensions.y);
-        edge.GetComponent<Renderer>().sharedMaterial = paperEdge;
-        var mesh = new Mesh { name = "桌面卡片顶面" };
-        mesh.vertices = new[] { new Vector3(-dimensions.x/2,.0004f,-dimensions.y/2), new Vector3(-dimensions.x/2,.0004f,dimensions.y/2),
-            new Vector3(dimensions.x/2,.0004f,dimensions.y/2), new Vector3(dimensions.x/2,.0004f,-dimensions.y/2) };
-        mesh.uv = new[] { Vector2.zero, Vector2.up, Vector2.one, Vector2.right };
-        mesh.triangles = new[] { 0,1,2,0,2,3 }; mesh.RecalculateNormals(); meshes.Add(mesh);
-        var face = new GameObject("卡面"); face.transform.SetParent(root.transform, false);
-        face.AddComponent<MeshFilter>().sharedMesh = mesh; face.AddComponent<MeshRenderer>(); return root;
+        var root = new GameObject("圆角纸板实体 v007");
+        if(paperEdge==null)
+        {
+            paperEdge=BoardRenderer.Material(new Color(.78f,.70f,.53f));paperEdge.name="原色卡纸纸芯 v007";
+            paperEdge.SetFloat("_Smoothness",.11f);paperEdge.SetFloat("_Metallic",0);
+        }
+        float radius=Mathf.Min(dimensions.x,dimensions.y)*radiusRatio;
+        float bevel=Mathf.Min(thickness*.22f,Mathf.Min(dimensions.x,dimensions.y)*.006f);
+        var boundary=RoundedBoundary(dimensions,radius);
+        var inset=RoundedBoundary(dimensions-Vector2.one*(2*bevel),Mathf.Max(radius-bevel,bevel));
+        int count=boundary.Length;
+        var vertices=new List<Vector3>();var indices=new List<int>();
+        // 真实侧壁和上下倒角。纸芯不使用方形 Cube，以免圆角背后再次露出方角。
+        for(int ring=0;ring<4;ring++)
+        {
+            var contour=ring==0||ring==3?inset:boundary;
+            float y=ring==0?0:ring==1?bevel:ring==2?thickness-bevel:thickness;
+            for(int i=0;i<count;i++)vertices.Add(new Vector3(contour[i].x,y,contour[i].y));
+        }
+        for(int ring=0;ring<3;ring++)for(int i=0;i<count;i++)
+        {
+            int next=(i+1)%count,a=ring*count+i,b=ring*count+next,c=(ring+1)*count+i,d=(ring+1)*count+next;
+            indices.AddRange(new[]{a,c,d,a,d,b});
+        }
+        int center=vertices.Count;vertices.Add(new Vector3(0,0,0));
+        for(int i=0;i<count;i++)indices.AddRange(new[]{center,i,(i+1)%count});
+        var edgeMesh=new Mesh{name="圆角卡纸厚边网格 v007"};edgeMesh.SetVertices(vertices);edgeMesh.SetTriangles(indices,0);edgeMesh.RecalculateNormals();edgeMesh.RecalculateBounds();meshes.Add(edgeMesh);
+        AddMesh(root,"倒角纸芯",edgeMesh,paperEdge);
+
+        vertices.Clear();indices.Clear();var uv=new List<Vector2>();
+        vertices.Add(new Vector3(0,thickness+.000006f,0));uv.Add(new Vector2(.5f,.5f));
+        for(int i=0;i<count;i++)
+        {
+            vertices.Add(new Vector3(inset[i].x,thickness+.000006f,inset[i].y));
+            uv.Add(new Vector2(inset[i].x/dimensions.x+.5f,inset[i].y/dimensions.y+.5f));
+        }
+        for(int i=0;i<count;i++)indices.AddRange(new[]{0,(i+1)%count+1,i+1});
+        var faceMesh=new Mesh{name="圆角原照片卡面网格 v007"};faceMesh.SetVertices(vertices);faceMesh.SetUVs(0,uv);faceMesh.SetTriangles(indices,0);faceMesh.RecalculateNormals();faceMesh.RecalculateBounds();meshes.Add(faceMesh);
+        AddContactShadow(root,dimensions);
+        AddMesh(root,"卡面",faceMesh,null);return root;
+    }
+    static Vector2[] RoundedBoundary(Vector2 dimensions,float radius)
+    {
+        const int steps=10;var points=new Vector2[4*(steps+1)];int index=0;
+        for(int corner=0;corner<4;corner++)
+        {
+            float angle=corner*90;
+            var center=new Vector2((corner==0||corner==3?1:-1)*(dimensions.x/2-radius),(corner<2?1:-1)*(dimensions.y/2-radius));
+            for(int step=0;step<=steps;step++)
+            {
+                float radians=(angle+step*90f/steps)*Mathf.Deg2Rad;
+                points[index++]=center+new Vector2(Mathf.Cos(radians),Mathf.Sin(radians))*radius;
+            }
+        }
+        return points;
+    }
+    static void AddMesh(GameObject root,string name,Mesh mesh,Material material)
+    {
+        var child=new GameObject(name);child.transform.SetParent(root.transform,false);
+        child.AddComponent<MeshFilter>().sharedMesh=mesh;child.AddComponent<MeshRenderer>().sharedMaterial=material;
+    }
+    void AddContactShadow(GameObject root,Vector2 dimensions)
+    {
+        if(paperShadow==null)
+        {
+            const int size=96;paperShadowTexture=new Texture2D(size,size,TextureFormat.RGBA32,false){name="纸板接触软阴影 v007",wrapMode=TextureWrapMode.Clamp,filterMode=FilterMode.Bilinear};
+            var pixels=new Color32[size*size];
+            for(int y=0;y<size;y++)for(int x=0;x<size;x++)
+            {
+                var point=new Vector2(Mathf.Abs((x+.5f)/size-.5f),Mathf.Abs((y+.5f)/size-.5f));
+                var outside=new Vector2(Mathf.Max(point.x-.405f,0),Mathf.Max(point.y-.405f,0));
+                float distance=outside.magnitude-.035f;
+                float alpha=Mathf.Clamp01((.045f-distance)/.085f);
+                pixels[y*size+x]=new Color(.015f,.009f,.003f,alpha*alpha*.30f);
+            }
+            paperShadowTexture.SetPixels32(pixels);paperShadowTexture.Apply(false,true);
+            paperShadow=new Material(Resources.Load<Shader>("TabletopUI/v007/PaperContactShadow")){name="卡纸接触阴影材质 v007",renderQueue=2995};
+            paperShadow.SetTexture("_BaseMap",paperShadowTexture);paperShadow.SetColor("_BaseColor",Color.white);
+        }
+        var mesh=new Mesh{name="卡纸接触阴影平面 v007"};float halfWidth=dimensions.x*.56f,halfDepth=dimensions.y*.55f;
+        mesh.vertices=new[]{new Vector3(-halfWidth,.000012f,-halfDepth),new Vector3(-halfWidth,.000012f,halfDepth),new Vector3(halfWidth,.000012f,halfDepth),new Vector3(halfWidth,.000012f,-halfDepth)};
+        mesh.uv=new[]{Vector2.zero,Vector2.up,Vector2.one,Vector2.right};mesh.triangles=new[]{0,1,2,0,2,3};mesh.RecalculateNormals();meshes.Add(mesh);
+        AddMesh(root,"接触软阴影",mesh,paperShadow);
+        var renderer=root.transform.Find("接触软阴影").GetComponent<MeshRenderer>();renderer.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;renderer.receiveShadows=false;
     }
     public Hit Card(string key, Rect layout, Texture2D texture, bool raised = false, Rect? uv = null, float elevation = 0)
     {
         var size = new Vector2(layout.width, layout.height) * scene.UnitsPerPixel;
         return Surface(key, scene.World(layout.center) + Vector3.up * ((raised ? .002f : .0001f)+elevation), size, texture, uv ?? new Rect(0,0,1,1));
     }
-    Hit Surface(string key, Vector3 position, Vector2 size, Texture2D texture, Rect uv)
+    Hit Surface(string key, Vector3 position, Vector2 size, Texture2D texture, Rect uv,float thickness=.00045f,float radiusRatio=.095f)
     {
-        var item = Get(key, size.ToString("F6"), () => Panel(size));
+        var item = Get(key, size.ToString("F6")+":"+thickness+":"+radiusRatio, () => Panel(size,thickness,radiusRatio));
         item.Object.transform.position = position;
         item.Object.GetComponentsInChildren<MeshRenderer>().Last().sharedMaterial = Face(texture, uv, Color.white);
-        item.Hit.Size = size; item.Hit.Renderers = null; return item.Hit;
+        item.Hit.Size = size;item.Hit.Thickness=thickness; item.Hit.Renderers = null; return item.Hit;
     }
     public Hit Facility(string key, Rect layout, int track, int level)
     {
         var texture = EntityCardAssets.Texture(EntityCardAssets.Guidance(false).Front);
         float[] cuts = { 0, .337f, .668f, 1 };
-        return Card(key, layout, texture, false, new Rect(cuts[track], 0, cuts[track+1]-cuts[track], 1));
+        var size=new Vector2(layout.width,layout.height)*scene.UnitsPerPixel;
+        return Surface(key,scene.World(layout.center)+Vector3.up*.0001f,size,texture,new Rect(cuts[track],0,cuts[track+1]-cuts[track],1),.0022f,.035f);
     }
     // 小翻板沿用原照布局；逐片覆盖正面／背面，整张建设卡始终完整。
     public static readonly Rect[] FacilitySlots = {
@@ -152,9 +235,9 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     public Hit FacilitySlot(string key, Hit board, int track, int level, bool built)
     {
         var slot = FacilitySlots[level-1];
-        var location = board.Root.position + new Vector3((slot.center.x-.5f)*board.Size.x,.0006f,(.5f-slot.center.y)*board.Size.y);
+        var location = board.Root.position + new Vector3((slot.center.x-.5f)*board.Size.x,board.Thickness+.00006f,(.5f-slot.center.y)*board.Size.y);
         return Surface(key, location, new Vector2(slot.width*board.Size.x,slot.height*board.Size.y),
-            built ? EntityCardAssets.ImprovementBack(track,level) : EntityCardAssets.ImprovementFront(track,level), new Rect(0,0,1,1));
+            built ? EntityCardAssets.ImprovementBack(track,level) : EntityCardAssets.ImprovementFront(track,level), new Rect(0,0,1,1),.00075f,.045f);
     }
     public Hit Die(string key, Rect layout, int index, int value, float progress, bool rolling)
     {
@@ -239,5 +322,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         foreach(var m in meshes)Destroy(m);
         foreach(var t in diceTextures.Values)Destroy(t);
         if(paperEdge!=null)Destroy(paperEdge);
+        if(paperShadow!=null)Destroy(paperShadow);
+        if(paperShadowTexture!=null)Destroy(paperShadowTexture);
     }
 }
