@@ -35,7 +35,7 @@ public sealed class BaseGameAi
         switch (view.Phase)
         {
             case GamePhase.SetupSettlement:
-                return Make(CommandKind.SetupSettlement, view.LegalVertexIds.OrderByDescending(v => Value(view, v)).ThenBy(v => v).First());
+                return Make(CommandKind.SetupSettlement, view.LegalVertexIds.OrderByDescending(v => SetupValue(view, v)).ThenBy(v => v).First());
             case GamePhase.SetupRoad:
                 return Make(CommandKind.SetupRoad, BestRoad(view, view.LegalEdgeIds));
             case GamePhase.Discard:
