@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "version": "entity-conversion-v002",
+  "originalsUnchanged": 36,
+  "originalBackupHashesVerified": 36,
+  "assets": 36,
+  "types": [
+    {
+      "typeId": "player-buildings",
+      "assets": 18,
+      "references": 18,
+      "triangles": 344916
+    },
+    {
+      "typeId": "player-knights",
+      "assets": 18,
+      "references": 18,
+      "triangles": 200664
+    }
+  ],
+  "unityVersion": "6000.3.25f1",
+  "standaloneViews": 144,
+  "projectedInstances": 104,
+  "rulesRegressionPassed": 496,
+  "m6GameSaveRestoreProcesses": 2
+}

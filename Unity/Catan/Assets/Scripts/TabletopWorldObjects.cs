@@ -96,12 +96,13 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         item.Object.transform.rotation = Quaternion.Euler(0, kind == "road" ? 90 : 180, 0);
         if(item.Hit.Renderers==null)item.Hit.Renderers=item.Object.GetComponentsInChildren<Renderer>();return item.Hit;
     }
-    Material Face(Texture2D texture, Rect uv, Color color)
+    Material Face(Texture2D texture, Rect uv, Color color, float smoothness = .24f)
     {
-        string key = (texture == null ? 0 : texture.GetInstanceID()) + ":" + uv + ":" + color;
+        string key = (texture == null ? 0 : texture.GetInstanceID()) + ":" + uv + ":" + color + ":" + smoothness;
         if (faceMaterials.TryGetValue(key, out var cached)) return cached;
         var material = BoardRenderer.Material(color); material.name = "桌面纸张面";
-        material.SetFloat("_Smoothness", .16f);
+        material.SetFloat("_Smoothness", smoothness);
+        material.SetFloat("_Metallic", 0);
         if (texture != null)
         {
             material.SetTexture("_BaseMap", texture);
@@ -177,7 +178,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
             int right=Enumerable.Range(1,6).First(n=>n!=value&&n!=7-value&&n!=front&&n!=7-front);
             values=new[]{value,7-value,7-front,front,7-right,right};
         }
-        item.Object.GetComponent<MeshRenderer>().sharedMaterials=values.Select(v=>Face(DieTexture(index,v),new Rect(0,0,1,1),Color.white)).ToArray();
+        item.Object.GetComponent<MeshRenderer>().sharedMaterials=values.Select(v=>Face(DieTexture(index,v),new Rect(0,0,1,1),Color.white,.50f)).ToArray();
         item.Hit.Renderers = item.Object.GetComponentsInChildren<Renderer>(); return item.Hit;
     }
     GameObject RoundedDie(float side)

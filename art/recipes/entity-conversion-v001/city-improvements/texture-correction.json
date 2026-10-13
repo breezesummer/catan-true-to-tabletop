@@ -1,0 +1,1002 @@
+{
+  "typeId": "city-improvements",
+  "operations": [
+    {
+      "source": "assets/references/inbox/城市设施/绿色1级修道院反面.jpg",
+      "sourceSha256": "42ff7a13f67186932958144e740e9baabb55852495737c25ed47bf22132543f9",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-1-back.png",
+      "sha256": "c89b0c45ab47e3f96b7fd7f61c8e35d8b09562301bed623d811c4f12fb9f99fa",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          531.0,
+          666.0
+        ],
+        [
+          982.0,
+          657.0
+        ],
+        [
+          996.0,
+          1108.0
+        ],
+        [
+          534.0,
+          1115.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色1级修道院正面.jpg",
+      "sourceSha256": "a1cd408ec3836e30484a3af3748c11aea5e1d26c9df79a3f7c0024bc6a422eb1",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-1-front.png",
+      "sha256": "4531c9297bc89147462dc16c592238d20631f25d6c40d18d69bdf9831f2a04c3",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          425.0,
+          584.0
+        ],
+        [
+          939.0,
+          566.0
+        ],
+        [
+          968.0,
+          1079.0
+        ],
+        [
+          442.0,
+          1098.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色2级图书馆反面.jpg",
+      "sourceSha256": "01d0f5995917cccf70c07aac76e48326d89e2e51488821470b2b6ff94ffc74db",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-2-back.png",
+      "sha256": "bd29a4507200f096fdd4d912748f64033145df8c501155d808ecc45c4f0eecf1",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          457.0,
+          564.0
+        ],
+        [
+          936.0,
+          557.0
+        ],
+        [
+          948.0,
+          1037.0
+        ],
+        [
+          457.0,
+          1038.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色2级图书馆正面.jpg",
+      "sourceSha256": "c6d8bcf2e273db47d76e5eb8c4aa0994cf7b20df74f6728f8871ce2e602bc0c9",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-2-front.png",
+      "sha256": "c7448bfdcfb6794ba0db61ffba566956ffe645c88195f38532b36bf4303c8613",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          393.0,
+          633.0
+        ],
+        [
+          884.0,
+          616.0
+        ],
+        [
+          905.0,
+          1116.0
+        ],
+        [
+          402.0,
+          1130.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色3级引水渠反面.jpg",
+      "sourceSha256": "b51b65f5d32dc3b2cbf3fabf8081dd593742a5ec91df0f1e466cb6ec82cf6c60",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-3-back.png",
+      "sha256": "e6bdc96c28b45e4126377ddd0d682ce06bf84e9822b2fe662a709060a9389a3f",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          317.0,
+          611.0
+        ],
+        [
+          833.0,
+          596.0
+        ],
+        [
+          852.0,
+          1105.0
+        ],
+        [
+          326.0,
+          1128.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色3级引水渠正面.jpg",
+      "sourceSha256": "d98f48c3ff4316861fc65af9f9cdd392309863615e678c673d1c7509c9db7110",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-3-front.png",
+      "sha256": "a04820cb9781aab32db8ace89d15e057eaf68e4d602c8101962665ad3f940a22",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          410.0,
+          606.0
+        ],
+        [
+          892.0,
+          587.0
+        ],
+        [
+          917.0,
+          1071.0
+        ],
+        [
+          416.0,
+          1088.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色4级剧院反面.jpg",
+      "sourceSha256": "24bf2d0900e7298534fbf2d3371f01c80c0b8793e2003e6412c8f83262e865ce",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-4-back.png",
+      "sha256": "347577c79d04947151ceadc3d306142c7466ee55012d719c8a22ef00fadd7095",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          527.0,
+          632.0
+        ],
+        [
+          1069.0,
+          625.0
+        ],
+        [
+          1076.0,
+          1173.0
+        ],
+        [
+          524.0,
+          1172.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色4级剧院正面.jpg",
+      "sourceSha256": "80240f514813768fa062cbfd4654d5632c13bb727b73a617a294a1a635cecd84",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-4-front.png",
+      "sha256": "2487b943a9414800031dfc3392ee52165df94547aee94aab0f091f2181a9fcf7",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          374.0,
+          513.0
+        ],
+        [
+          891.0,
+          475.0
+        ],
+        [
+          938.0,
+          990.0
+        ],
+        [
+          410.0,
+          1033.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色5级大学反面.jpg",
+      "sourceSha256": "0f63cbb4d66fe6ebe210ea74de7c5cdb978cb78969131b54f963f0fa2206869e",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-5-back.png",
+      "sha256": "676b5e824d55b1e4f99673ba6478462be97b2980677b3e3d1df3f7d06391d9b3",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          446.0,
+          559.0
+        ],
+        [
+          961.0,
+          558.0
+        ],
+        [
+          968.0,
+          1080.0
+        ],
+        [
+          439.0,
+          1075.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/绿色5级大学正面.jpg",
+      "sourceSha256": "9a1da53e73325de91f79e3e62ecc2dd7229794d36062eb2ae41f12a906f62b86",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-science-5-front.png",
+      "sha256": "3b73c5dfb2072cffea9e627843d0285eb73e77653cfe13f7ce9383e616b79a69",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          360.0,
+          623.0
+        ],
+        [
+          904.0,
+          597.0
+        ],
+        [
+          941.0,
+          1150.0
+        ],
+        [
+          383.0,
+          1180.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色1级市政厅反面.jpg",
+      "sourceSha256": "fa16744b0bc7195954b0807061c0b36eca94426492cbe45b9d466c39c0514c6c",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-1-back.png",
+      "sha256": "d969d6a9f9f6de70badc8f33314e2a86682321d8f6428202a3e70a549578f2f0",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          458.0,
+          679.0
+        ],
+        [
+          917.0,
+          650.0
+        ],
+        [
+          952.0,
+          1108.0
+        ],
+        [
+          481.0,
+          1140.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg",
+      "sourceSha256": "9b50c7580c4259ca9e70d7e7dca3e63bb7278f35b78e72cb55dfc8695e698ce9",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-1-front.png",
+      "sha256": "3474bffbb3778d8bfd79d6a4ccfc9a0a9ea517b53cbeec9cde13a93376b715c4",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          424.0,
+          687.0
+        ],
+        [
+          853.0,
+          667.0
+        ],
+        [
+          875.0,
+          1098.0
+        ],
+        [
+          442.0,
+          1115.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色2级教堂反面.jpg",
+      "sourceSha256": "00dd4ede6283b5afa2e1c97a9199dde46aacb6530bc4a98e9e792f1d36d55760",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-2-back.png",
+      "sha256": "debddaf1b7e75071f156bc22441a8dc7e10e64d7a75bec268ae94ca34d44f6a8",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          424.0,
+          668.0
+        ],
+        [
+          947.0,
+          669.0
+        ],
+        [
+          955.0,
+          1193.0
+        ],
+        [
+          418.0,
+          1197.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色2级教堂正面.jpg",
+      "sourceSha256": "028c7fd304662fd71def80ef3716738fe7cdce4d3c2a99042451172f046175e8",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-2-front.png",
+      "sha256": "8f24c9e2d911d1fd9ff83e9db0a0330484fd7443ba1704412a71e65704df6ee9",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          321.0,
+          544.0
+        ],
+        [
+          847.0,
+          510.0
+        ],
+        [
+          881.0,
+          1042.0
+        ],
+        [
+          343.0,
+          1075.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色3级要塞反面.jpg",
+      "sourceSha256": "b5bb7fa20b123e9778617608758e0f9f787e8332e2ecf8516d982200e70d73e8",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-3-back.png",
+      "sha256": "0719a3267d0a598d31419fad5cae87829ad503762f1adc0f0d3dc0fff8049896",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          330.0,
+          555.0
+        ],
+        [
+          810.0,
+          575.0
+        ],
+        [
+          791.0,
+          1062.0
+        ],
+        [
+          296.0,
+          1043.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色3级要塞正面.jpg",
+      "sourceSha256": "2117621f40a921979231681343a62b5106066465572e4fab43f92dbc4ed2b043",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-3-front.png",
+      "sha256": "f61f0e5cb905cda2578ebfa84fc4f35d2dcce32b27a446149dd9561b707e6fae",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          410.0,
+          622.0
+        ],
+        [
+          932.0,
+          608.0
+        ],
+        [
+          958.0,
+          1134.0
+        ],
+        [
+          421.0,
+          1156.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色4级大教堂反面.jpg",
+      "sourceSha256": "8d7ea0a760c3da54477c604361cd0b45686d6b7134bd37eddbff9aee6f7ae3c8",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-4-back.png",
+      "sha256": "cf375074e00740e2e81e97a367eb81535235e42194734f173283b629ed0c1634",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          412.0,
+          568.0
+        ],
+        [
+          877.0,
+          565.0
+        ],
+        [
+          883.0,
+          1030.0
+        ],
+        [
+          403.0,
+          1032.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色4级大教堂正面.jpg",
+      "sourceSha256": "975723c52b0916b38f4cfca4003551c8084bf0da98b711e216f0e27c4ee4dade",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-4-front.png",
+      "sha256": "b73e94324b6169c8d9a5d534735bdc16a2643413dd915c157a11e65e43597e73",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          348.0,
+          578.0
+        ],
+        [
+          835.0,
+          578.0
+        ],
+        [
+          838.0,
+          1068.0
+        ],
+        [
+          335.0,
+          1067.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色5级卡坦议会反面.jpg",
+      "sourceSha256": "0b5ba5c628de7ecbdbc75c672eddc2b482743753e58376f6bca37e9224294450",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-5-back.png",
+      "sha256": "c844bb2304d4552e2f26c10cc3ed5f06c38c72a06c0defdec81a88b4f8b49299",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          424.0,
+          599.0
+        ],
+        [
+          915.0,
+          595.0
+        ],
+        [
+          919.0,
+          1085.0
+        ],
+        [
+          418.0,
+          1086.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/蓝色5级卡坦议会正面.jpg",
+      "sourceSha256": "1f7f6b59e9704eb70cb8e717f006afb948154efea53358a0e4dae15327c5c9d6",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-politics-5-front.png",
+      "sha256": "63773ce9700b8729afdc28c5bb8b9a1d5c09445eb9942c4a873a1081026cfc34",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          403.0,
+          673.0
+        ],
+        [
+          921.0,
+          662.0
+        ],
+        [
+          940.0,
+          1186.0
+        ],
+        [
+          407.0,
+          1196.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色1级市场反面.jpg",
+      "sourceSha256": "27f7f2a556c51d77cdd4868e80293907b311f2e7e3c3f773c141486393a11cbb",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-1-back.png",
+      "sha256": "c507e4d8bce731fda7eb764632ea53556d812ff41b5d102f482bf1ff20f78290",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          999.181,
+          1510.19
+        ],
+        [
+          2075.221,
+          1510.19
+        ],
+        [
+          2089.633,
+          2590.612
+        ],
+        [
+          987.171,
+          2588.211
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色1级市场正面.jpg",
+      "sourceSha256": "a8450574cd4fa21d43eea6323a2ef97cd440457b9e02a983326ffc8f11f928fd",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-1-front.png",
+      "sha256": "bec729e02882b2e3d9f7617ed574def8e05ad197de8f3ac8dd892260c8a0de0d",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          910.311,
+          1358.931
+        ],
+        [
+          1959.931,
+          1358.931
+        ],
+        [
+          1962.333,
+          2405.74
+        ],
+        [
+          895.9,
+          2400.938
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色2级行会反面.jpg",
+      "sourceSha256": "79b507a4d1d444aa161e17e3f6441c898caafc3a3773ec0aa464febffcb7ec53",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-2-back.png",
+      "sha256": "19c16f9e6b93b7881508a3fad0f556c508244a37a484df999eba801ea5d398e4",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          529.0,
+          657.0
+        ],
+        [
+          985.0,
+          675.0
+        ],
+        [
+          970.0,
+          1137.0
+        ],
+        [
+          507.0,
+          1114.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色2级行会正面.jpg",
+      "sourceSha256": "540960fc3e640a4e9615ee3ff291aa42baa110586501566f58c5fe07d309eedd",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-2-front.png",
+      "sha256": "b55baf4a5b00236a805fe04de0747e0332601f2c7d69c1bfd22a6ce842566af1",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          1102.461,
+          1253.29
+        ],
+        [
+          2226.539,
+          1224.478
+        ],
+        [
+          2264.97,
+          2374.528
+        ],
+        [
+          1121.676,
+          2396.136
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色3级同业公会反面.jpg",
+      "sourceSha256": "5cfca97514cf5fb2257b39a040f072ec9cbcc5255dd8d9978f92c5ab3faff9fd",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-3-back.png",
+      "sha256": "37c231e937d6766c9d0d1584aed6f6eab58dba365610d30b546edeac74281e01",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          494.0,
+          691.0
+        ],
+        [
+          985.0,
+          681.0
+        ],
+        [
+          1003.0,
+          1176.0
+        ],
+        [
+          495.0,
+          1187.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色3级同业公会正面.jpg",
+      "sourceSha256": "1c73f7921f1950a7d06d8f14b4bd3a19dcc012093b69d77861bfbd18d16e449b",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-3-front.png",
+      "sha256": "a3a01b84666bd3c905b8b58c501f8daa42bf7dbe93d1831b5b6b9f6bc124b756",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          484.0,
+          550.0
+        ],
+        [
+          982.0,
+          554.0
+        ],
+        [
+          986.0,
+          1055.0
+        ],
+        [
+          479.0,
+          1052.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色4级银行反面.jpg",
+      "sourceSha256": "ed70a9c8410ec6ee604641ad6d88536169c57ba10fa8ef8a33c7462764453701",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-4-back.png",
+      "sha256": "7dac2852f5a84ddea036b19d893e82bcc3678e6b4483c95c4d9f4517be9b64ea",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          416.0,
+          657.0
+        ],
+        [
+          900.0,
+          664.0
+        ],
+        [
+          900.0,
+          1149.0
+        ],
+        [
+          405.0,
+          1145.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色4级银行正面.jpg",
+      "sourceSha256": "3ab1ed82e1466b12c23aa07223d7feaa1354a0ab2554299f592857502885438a",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-4-front.png",
+      "sha256": "a30fabbc3b7421e8f0acdae5e2999c30ebf790cd616417a3cc98a0e0e656a005",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          417.0,
+          679.0
+        ],
+        [
+          903.0,
+          663.0
+        ],
+        [
+          923.0,
+          1159.0
+        ],
+        [
+          423.0,
+          1170.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色5级商业中心反面.jpg",
+      "sourceSha256": "47a03876ccca518a456d7a2915bb185b3eec83e8df8d7e51ee8834d4f23ee0f4",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-5-back.png",
+      "sha256": "58e95f2ef238aafb0c0851bd4861913831dc1cc6229adb9eb9c1a68ef5db8b3b",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          428.0,
+          477.0
+        ],
+        [
+          900.0,
+          476.0
+        ],
+        [
+          912.0,
+          941.0
+        ],
+        [
+          436.0,
+          949.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/黄色5级商业中心正面.jpg",
+      "sourceSha256": "cd951c3af7ce30f7c48359706fef7c918f73d7d842fd74fc0d3d1f31f15d5c3b",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/improvement-trade-5-front.png",
+      "sha256": "c2fafbc709e133aca6073526288972871cf5f776068ffd7b92c159695d9c2c4c",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          359.0,
+          589.0
+        ],
+        [
+          839.0,
+          571.0
+        ],
+        [
+          858.0,
+          1055.0
+        ],
+        [
+          370.0,
+          1070.0
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/城市设施升级卡.jpg",
+      "sourceSha256": "259f8fea1625d858b8263aeb23be9093dbd9e851a7c6f54fd2d285108d22047b",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/guidance-upgrade-front.png",
+      "sha256": "505b648a215a520a3a58a6be99eb866413540a3ba09dc515d9908c8fbc2f65e4",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          59,
+          288
+        ],
+        [
+          1608,
+          318
+        ],
+        [
+          1654,
+          1003
+        ],
+        [
+          25,
+          1012
+        ]
+      ],
+      "size": [
+        2304,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/城市设施/城市设施满级卡.jpg",
+      "sourceSha256": "b8d21623a6f7e50aa94ed5175843be9e27b4293d21f0cc87463e4a713bdacc5b",
+      "output": "art/source/entity-conversion-v001/city-improvements/textures/guidance-max-front.png",
+      "sha256": "590faabe9af25e69e4f8505a2fd17ee2162072b7a45cce0af5e2ce268c1bb64e",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          56,
+          299
+        ],
+        [
+          1646,
+          312
+        ],
+        [
+          1694,
+          1027
+        ],
+        [
+          19,
+          1039
+        ]
+      ],
+      "size": [
+        2304,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    }
+  ],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "10312cbe6afdd66c1332ac647dacbfb445ebb829ca312c45f791f98fb311ad24"
+}

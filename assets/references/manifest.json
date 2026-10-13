@@ -1,4 +1,85 @@
 {
   "schemaVersion": 1,
-  "assets": []
+  "assets": [
+    {
+      "id": "physical-wood-front-001",
+      "originalPath": "assets/references/inbox/资源牌/木头.jpg",
+      "sha256": "447133145e2d82dc15142e61ff22e26267da1a37e6d543c2c68b1a6617b588be",
+      "kind": "photograph",
+      "edition": null,
+      "referenceRole": "wood-front",
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": null,
+      "mustPreserve": [
+        "original photograph",
+        "visible component silhouette",
+        "printed illustration reference"
+      ],
+      "notes": "Photo samples v001; sizes remain estimates; hidden surfaces not supplied."
+    },
+    {
+      "id": "physical-resource-back-001",
+      "originalPath": "assets/references/inbox/资源牌/资源牌背面.jpg",
+      "sha256": "3d94957d49632f67bbd04945cb8e9c6a3eac9bc1bd38c06060adba1b036d5ab0",
+      "kind": "photograph",
+      "edition": null,
+      "referenceRole": "resource-back",
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": null,
+      "mustPreserve": [
+        "original photograph",
+        "visible component silhouette",
+        "printed illustration reference"
+      ],
+      "notes": "Photo samples v001; sizes remain estimates; hidden surfaces not supplied."
+    },
+    {
+      "id": "physical-forest-001",
+      "originalPath": "assets/references/inbox/地图板块/森林.jpg",
+      "sha256": "7ba385edccadd7a7d5ec6fc643c79b0e0f28f95494f139dc169a0080a6468f77",
+      "kind": "photograph",
+      "edition": null,
+      "referenceRole": "forest",
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": null,
+      "mustPreserve": [
+        "original photograph",
+        "visible component silhouette",
+        "printed illustration reference"
+      ],
+      "notes": "Photo samples v001; sizes remain estimates; hidden surfaces not supplied."
+    },
+    {
+      "id": "physical-road-001",
+      "originalPath": "assets/references/inbox/道路/红色道路.jpg",
+      "sha256": "919b8ab6d97b32facffb6ac90d2f9f0ee1682d7f0085abaf47b34967ab54fd5b",
+      "kind": "photograph",
+      "edition": null,
+      "referenceRole": "road",
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": null,
+      "mustPreserve": [
+        "original photograph",
+        "visible component silhouette",
+        "printed illustration reference"
+      ],
+      "notes": "Photo samples v001; sizes remain estimates; hidden surfaces not supplied."
+    },
+    {
+      "id": "physical-village-001",
+      "originalPath": "assets/references/inbox/建筑/红色村庄.jpg",
+      "sha256": "83c8c1c29172087c858f90c4ddef756212926cc3fda38547551359431be17f7e",
+      "kind": "photograph",
+      "edition": null,
+      "referenceRole": "village",
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": null,
+      "mustPreserve": [
+        "original photograph",
+        "visible component silhouette",
+        "printed illustration reference"
+      ],
+      "notes": "Photo samples v001; sizes remain estimates; hidden surfaces not supplied."
+    }
+  ]
 }

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "typeId": "commodity-cards",
+  "label": "三种商品牌正面照片转化",
+  "seed": 20261009,
+  "scaleStatus": "estimated; 54 × 80 × 0.3 mm, not physically measured or user-approved",
+  "limitations": [
+    "忠实保留原照片插画、印刷、曝光、失焦、保护套反光与纸面纹理；没有 AI、OCR、补字、重绘、去反光、锐化或颜色替换。",
+    "四角为人工读取卡片外直边延长线交点，圆角外保留少量背景；工作网格为薄盒体，未还原圆角。",
+    "未提供可明确归属的商品牌背面照片；backTexture 为 null，底面仅为标记未知的中性材质，不复用资源牌背面。",
+    "实物版本、实测尺寸、纸面材质与正反面配准仍未知。",
+    "银币照片仅作为已有 Coin 商品的视觉资源映射，不修改规则定义。"
+  ],
+  "references": [
+    {"originalPath": "assets/references/inbox/商品牌/布匹.jpg", "sha256": "19a3b7d05fed239a580430dcf8944c7ea35e074ec0884c609819e107c7395e8e", "role": "cloth commodity front; upright original photo, no back reference"},
+    {"originalPath": "assets/references/inbox/商品牌/纸张.jpg", "sha256": "ef81a32d3d33f5eb7833ce0ef4c957ecafac945deb8a9f40614e05edb718b95f", "role": "paper commodity front; upright original photo, no back reference"},
+    {"originalPath": "assets/references/inbox/商品牌/银币.jpg", "sha256": "9111063c9b5e664a56b9da7de8e5cfdc2be9e93cf6e41da78df189afaff05a4f", "role": "coin commodity front; upright original photo, no back reference"}
+  ],
+  "textureJobs": [
+    {"source": "assets/references/inbox/商品牌/布匹.jpg", "output": "art/source/entity-conversion-v001/commodity-cards/textures/commodity-cloth-front.png", "quad": [[351,259],[1080,283],[1037,1428],[273,1397]], "size": [1024,1536], "rotation": 0},
+    {"source": "assets/references/inbox/商品牌/纸张.jpg", "output": "art/source/entity-conversion-v001/commodity-cards/textures/commodity-paper-front.png", "quad": [[295,250],[1014,247],[1025,1380],[276,1380]], "size": [1024,1536], "rotation": 0},
+    {"source": "assets/references/inbox/商品牌/银币.jpg", "output": "art/source/entity-conversion-v001/commodity-cards/textures/commodity-coin-front.png", "quad": [[347,279],[1050,257],[1090,1372],[348,1377]], "size": [1024,1536], "rotation": 0}
+  ],
+  "assets": [
+    {"id": "commodity-cloth", "label": "布匹商品牌", "kind": "card", "dimensionsMm": [54,80,0.3], "frontTexture": "art/source/entity-conversion-v001/commodity-cards/textures/commodity-cloth-front.png", "backTexture": null},
+    {"id": "commodity-paper", "label": "纸张商品牌", "kind": "card", "dimensionsMm": [54,80,0.3], "frontTexture": "art/source/entity-conversion-v001/commodity-cards/textures/commodity-paper-front.png", "backTexture": null},
+    {"id": "commodity-coin", "label": "银币商品牌", "kind": "card", "dimensionsMm": [54,80,0.3], "frontTexture": "art/source/entity-conversion-v001/commodity-cards/textures/commodity-coin-front.png", "backTexture": null}
+  ]
+}

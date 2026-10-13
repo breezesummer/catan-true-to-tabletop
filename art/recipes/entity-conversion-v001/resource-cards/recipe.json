@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "typeId": "resource-cards",
+  "label": "四种剩余资源卡与共同背面",
+  "seed": 20261009,
+  "scaleStatus": "estimated; 54 × 80 × 0.3 mm, not physically measured or user-approved",
+  "limitations": [
+    "照片校正贴图忠实保留原插画、印刷、曝光、模糊与保护套反光；没有 AI 重绘、文字重建或颜色替换。",
+    "四角为人工读取卡片直边延长线交点，圆角外会保留极少白色背景；本批工作网格为薄盒体，圆角轮廓待后续细化。",
+    "卡片实测尺寸、纸面材质、完整正反面对齐与实物版本尚待确认。",
+    "该类型不重做此前木头样板；新共同背面从原照片重取，不复用旧 AI 清理背面。"
+  ],
+  "references": [
+    {"originalPath": "assets/references/inbox/资源牌/羊毛.jpg", "sha256": "0dbfd3ba45889231041354cd7c4b410b11ece05ca06ec53091c3ea345fa8bc7b", "role": "wool front; horizontal photo, corrected clockwise to upright sheep"},
+    {"originalPath": "assets/references/inbox/资源牌/砖头.jpg", "sha256": "b70eb1432b2d36665dd5a50582147bcf73d08ee4849f2c41bd682090d6c27ec4", "role": "brick front; horizontal photo, corrected counterclockwise to upright miners"},
+    {"originalPath": "assets/references/inbox/资源牌/小麦.jpg", "sha256": "90597e7807eddf96c8757fd84588e2f24350412355a8cee0ce7580d6203c2429", "role": "grain front; portrait photo, corrected 180 degrees to wheat heads above binding"},
+    {"originalPath": "assets/references/inbox/资源牌/铁矿石.jpg", "sha256": "3cc8d4bbee405952035bc075d8e741124f888d50cd402ae8662244b23aac8a10", "role": "ore front; portrait upright"},
+    {"originalPath": "assets/references/inbox/资源牌/资源牌背面.jpg", "sha256": "3d94957d49632f67bbd04945cb8e9c6a3eac9bc1bd38c06060adba1b036d5ab0", "role": "shared original-photo back; clockwise to moon above village"}
+  ],
+  "textureJobs": [
+    {"source": "assets/references/inbox/资源牌/羊毛.jpg", "output": "art/source/entity-conversion-v001/resource-cards/textures/resource-wool-front.png", "quad": [[396,947],[402,343],[1338,341],[1342,960]], "size": [1024,1536], "rotation": 0},
+    {"source": "assets/references/inbox/资源牌/砖头.jpg", "output": "art/source/entity-conversion-v001/resource-cards/textures/resource-brick-front.png", "quad": [[1306,381],[1340,1035],[348,1038],[345,408]], "size": [1024,1536], "rotation": 0},
+    {"source": "assets/references/inbox/资源牌/小麦.jpg", "output": "art/source/entity-conversion-v001/resource-cards/textures/resource-grain-front.png", "quad": [[946,1197],[391,1198],[413,377],[935,382]], "size": [1024,1536], "rotation": 0},
+    {"source": "assets/references/inbox/资源牌/铁矿石.jpg", "output": "art/source/entity-conversion-v001/resource-cards/textures/resource-ore-front.png", "quad": [[369,363],[1001,382],[999,1365],[328,1364]], "size": [1024,1536], "rotation": 0},
+    {"source": "assets/references/inbox/资源牌/资源牌背面.jpg", "output": "art/source/entity-conversion-v001/resource-cards/textures/resource-back-original.png", "quad": [[376,956],[379,365],[1293,368],[1294,975]], "size": [1024,1536], "rotation": 0}
+  ],
+  "assets": [
+    {"id": "resource-wool", "label": "羊毛资源卡", "kind": "card", "dimensionsMm": [54,80,0.3], "frontTexture": "art/source/entity-conversion-v001/resource-cards/textures/resource-wool-front.png", "backTexture": "art/source/entity-conversion-v001/resource-cards/textures/resource-back-original.png"},
+    {"id": "resource-brick", "label": "砖头资源卡", "kind": "card", "dimensionsMm": [54,80,0.3], "frontTexture": "art/source/entity-conversion-v001/resource-cards/textures/resource-brick-front.png", "backTexture": "art/source/entity-conversion-v001/resource-cards/textures/resource-back-original.png"},
+    {"id": "resource-grain", "label": "小麦资源卡", "kind": "card", "dimensionsMm": [54,80,0.3], "frontTexture": "art/source/entity-conversion-v001/resource-cards/textures/resource-grain-front.png", "backTexture": "art/source/entity-conversion-v001/resource-cards/textures/resource-back-original.png"},
+    {"id": "resource-ore", "label": "铁矿石资源卡", "kind": "card", "dimensionsMm": [54,80,0.3], "frontTexture": "art/source/entity-conversion-v001/resource-cards/textures/resource-ore-front.png", "backTexture": "art/source/entity-conversion-v001/resource-cards/textures/resource-back-original.png"}
+  ]
+}

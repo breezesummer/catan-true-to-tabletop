@@ -123,7 +123,8 @@ public sealed class TabletopUiVerification : MonoBehaviour
             BindDockForHeadless(); before = Authority;
             Dock.OpenTrade(); Require(Dock.TradeOpen, "行动阶段未能打开银行交换草稿");
             Require(Dock.BlocksBoardInput(new Vector2(600, 350)), "交换盘未截获自身区域");
-            Require(!Dock.BlocksBoardInput(new Vector2(1220, 500)), "交换盘错误截获外侧桌面");
+            Require(Dock.BlocksBoardInput(new Vector2(1220, 500)), "交易模态窗口未阻挡外侧桌面");
+            Require(Dock.BlocksBoardInput(new Vector2(18, 18))&&Dock.BlocksBoardInput(new Vector2(1418, 882)), "交易模态窗口未完整阻挡背景输入");
             Require(before == Authority, "银行交换草稿改变权威状态");
             Dock.Reset(); Snapshot.Cancel?.Invoke(); Require(!Dock.TradeOpen && Dock.Selection.Selected.Sum() == 0, "放回交换草稿未清空");
             Require(before == Authority, "取消银行交换改变权威状态");
@@ -199,12 +200,12 @@ public sealed class TabletopUiVerification : MonoBehaviour
         var location=card.Root.position;var initial=card.Rect;
         var v1=Position(Vertices[0].Id);var v2=Position(Vertices[1].Id);
         float boardDistance=Vector2.Distance(table.Project(v1),table.Project(v2));
-        Require(card.Contains(initial.center),"正常缩放下实体手牌不能拾取");
+        Require(card.Contains(initial.center),"正常缩放下桌面公共卡不能拾取");
         table.Frame(BoardCamera,false,.8f);var zoomed=card.Rect;
         Require((card.Root.position-location).sqrMagnitude<.00000001f,"相机缩放移动了桌面卡片");
         Require(Mathf.Abs(zoomed.width/initial.width-1.25f)<.001f,"卡片没有随地图按相同比例缩放");
         Require(Mathf.Abs(Vector2.Distance(table.Project(v1),table.Project(v2))/boardDistance-zoomed.width/initial.width)<.001f,"地图与卡牌缩放比例不一致");
-        Require(card.Contains(zoomed.center),"缩放后手牌的命中区域没有更新");
+        Require(card.Contains(zoomed.center),"缩放后桌面公共卡的命中区域没有更新");
         table.Frame(BoardCamera,true,1);Require(card.Contains(card.Rect.center),"俯视实体卡牌不能拾取");
         table.Frame(BoardCamera,false,1);
         if(Snapshot.GoodCount==8)
@@ -221,8 +222,17 @@ public sealed class TabletopUiVerification : MonoBehaviour
             }
         }
         table.Objects.End();table.Objects.Begin("verification");table.Objects.End();
-        var oak=Resources.Load<Texture2D>("TabletopUI/v004/oak-albedo-8k");
-        Require(oak!=null&&oak.width==8192&&oak.height==8192&&oak.anisoLevel==16,"Unity 未保留原生 8K 木纹及各向异性采样");
+        var oak=Resources.Load<Texture2D>("TabletopUI/v005/smoked-oak-albedo");
+        var normal=Resources.Load<Texture2D>("TabletopUI/v005/smoked-oak-normal");
+        Require(oak!=null&&oak.width==2048&&oak.height==2048&&oak.anisoLevel==16&&normal!=null,"新版细纹桌面或微表面法线未正确导入");
+        Require(UnityEngine.Object.FindObjectsByType<TabletopPhysicalTileV005>(FindObjectsSortMode.None)
+            .Any(p=>p.GetComponentsInChildren<MeshFilter>().Any(m=>m.sharedMesh.name=="六边实体厚板倒角 v005"&&m.sharedMesh.triangles.Length==144)),
+            "真实倒角网格未在正式地图中生成");
+        var handBefore=TabletopHandLayout.Card(15,32,720,1060,false);
+        table.Frame(BoardCamera,false,.8f);
+        var handAfter=TabletopHandLayout.Card(15,32,720,1060,false);
+        Require(handBefore.X==handAfter.X&&handBefore.Y==handAfter.Y&&TabletopHandLayout.CardWidth==108,"底部手牌受桌面缩放影响");
+        table.Frame(BoardCamera,false,1);
     }
 
     string FixedAuthority(int players, int human)

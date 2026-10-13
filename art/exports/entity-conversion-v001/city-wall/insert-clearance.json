@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "method": "minimum XY distance to source wall edges; maximum city vertex radius below wall top",
+  "wallSource": "art/source/entity-conversion-v001/city-wall/city-wall-red.blend",
+  "wallSha256": "7769dbbfb50cde80e51f20cde7273d2d91fa36f59ba33f8aa0672db67dcdca2c",
+  "citySource": "art/source/entity-conversion-v001/city/city-red.blend",
+  "citySha256": "c03e0c64fd61935522052585286a10cb3f1fe0a89669aef32470f37f4d1045cf",
+  "auditScriptSha256": "ab8482f5f9165bdeefa3eea3d5af48f221681a819ee16d2a839677bfa043d4b5",
+  "closedShellCount": 99,
+  "wallHeightMm": 4.999999888241291,
+  "minimumHoleDiameterMm": 18.594396872413544,
+  "cityDiameterBelowWallTopMm": 18.000000987958714,
+  "minimumRadialClearanceMm": 0.2971979422274149,
+  "limitations": [
+    "Both pieces use estimated dimensions; this does not validate physical fit.",
+    "Only centred source geometry checked, not runtime picking, animation or Unity transforms.",
+    "Metropolis fit is separate and has not been checked here."
+  ]
+}

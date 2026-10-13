@@ -1,0 +1,108 @@
+{
+  "typeId": "progress-politics",
+  "version": "entity-conversion-v003",
+  "operations": [
+    {
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/卡背.jpg",
+      "sourceSha256": "f60c11e4a588f9440b4650a4f6ef0ea65d11edbba98accb30f6fc486b29d542f",
+      "output": "art/source/entity-conversion-v003/progress-politics/textures/progress-politics-back-original.png",
+      "sha256": "117b61e2492ce672dc1fbd2ebb51b9bfdb1bb4ab6d1c062ba7e0220de7012068",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          700,
+          558
+        ],
+        [
+          2535,
+          548
+        ],
+        [
+          2600,
+          3392
+        ],
+        [
+          738,
+          3440
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and printed artwork retained"
+    }
+  ],
+  "inheritedFronts": [
+    {
+      "source": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-diplomacy-front.png",
+      "sourceSha256": "5f0557639ed00bd259c4ad185d30fbb2c9b933632b51a182f9b55d5ff82cec79",
+      "output": "art/source/entity-conversion-v003/progress-politics/textures/progress-politics-diplomacy-front.png",
+      "sha256": "5f0557639ed00bd259c4ad185d30fbb2c9b933632b51a182f9b55d5ff82cec79",
+      "method": "unchanged byte-for-byte copy of frozen v001 corrected front"
+    },
+    {
+      "source": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-espionage-front.png",
+      "sourceSha256": "76d61e46f34398d35c02174250c6cfa1234e04848e5431975d7d9d4641c89e16",
+      "output": "art/source/entity-conversion-v003/progress-politics/textures/progress-politics-espionage-front.png",
+      "sha256": "76d61e46f34398d35c02174250c6cfa1234e04848e5431975d7d9d4641c89e16",
+      "method": "unchanged byte-for-byte copy of frozen v001 corrected front"
+    },
+    {
+      "source": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-encouragement-front.png",
+      "sourceSha256": "ce6a01b418983926361529c0800994be6a6ec98186820ae3510afbebce8e5cb6",
+      "output": "art/source/entity-conversion-v003/progress-politics/textures/progress-politics-encouragement-front.png",
+      "sha256": "ce6a01b418983926361529c0800994be6a6ec98186820ae3510afbebce8e5cb6",
+      "method": "unchanged byte-for-byte copy of frozen v001 corrected front"
+    },
+    {
+      "source": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-intrigue-front.png",
+      "sourceSha256": "62c8a90faef224e487e5d30382a944353ed5374745f18fb1be40febd556c05c8",
+      "output": "art/source/entity-conversion-v003/progress-politics/textures/progress-politics-intrigue-front.png",
+      "sha256": "62c8a90faef224e487e5d30382a944353ed5374745f18fb1be40febd556c05c8",
+      "method": "unchanged byte-for-byte copy of frozen v001 corrected front"
+    },
+    {
+      "source": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-taxation-front.png",
+      "sourceSha256": "c3f1ff7cd7af2dac3b907e291eb2199318637e46b5c951d57d50ea7bd26697e6",
+      "output": "art/source/entity-conversion-v003/progress-politics/textures/progress-politics-taxation-front.png",
+      "sha256": "c3f1ff7cd7af2dac3b907e291eb2199318637e46b5c951d57d50ea7bd26697e6",
+      "method": "unchanged byte-for-byte copy of frozen v001 corrected front"
+    },
+    {
+      "source": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-constitution-front.png",
+      "sourceSha256": "b761686d7f76e9d069cc3d4f3c218e116b5f4fbfd19d47d885783f42fe6d2de7",
+      "output": "art/source/entity-conversion-v003/progress-politics/textures/progress-politics-constitution-front.png",
+      "sha256": "b761686d7f76e9d069cc3d4f3c218e116b5f4fbfd19d47d885783f42fe6d2de7",
+      "method": "unchanged byte-for-byte copy of frozen v001 corrected front"
+    },
+    {
+      "source": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-treason-front.png",
+      "sourceSha256": "69370a2c5c6904a9827b3715a514cd46fe89046cda886548c3b2f54fd7801fa4",
+      "output": "art/source/entity-conversion-v003/progress-politics/textures/progress-politics-treason-front.png",
+      "sha256": "69370a2c5c6904a9827b3715a514cd46fe89046cda886548c3b2f54fd7801fa4",
+      "method": "unchanged byte-for-byte copy of frozen v001 corrected front"
+    },
+    {
+      "source": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-wedding-front.png",
+      "sourceSha256": "fff47d7d6312eea11ac6aa13226b540dfd989b5c009585c20f21bb11af67200c",
+      "output": "art/source/entity-conversion-v003/progress-politics/textures/progress-politics-wedding-front.png",
+      "sha256": "fff47d7d6312eea11ac6aa13226b540dfd989b5c009585c20f21bb11af67200c",
+      "method": "unchanged byte-for-byte copy of frozen v001 corrected front"
+    },
+    {
+      "source": "art/source/entity-conversion-v001/progress-politics/textures/progress-politics-sabotage-front.png",
+      "sourceSha256": "94b654d0b109eb122cd69f3f97278e07b26a542a5deb247663b20bdee3023b73",
+      "output": "art/source/entity-conversion-v003/progress-politics/textures/progress-politics-sabotage-front.png",
+      "sha256": "94b654d0b109eb122cd69f3f97278e07b26a542a5deb247663b20bdee3023b73",
+      "method": "unchanged byte-for-byte copy of frozen v001 corrected front"
+    }
+  ],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "66efaba3913e076c6933589b8eca35adac63abc18ed90790c50119a15571ed73",
+  "helperScriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "e0681f21ab6ffa6328ad8ee100c3380806a429ae5380d4c43ab84d3c5cf0fa1e"
+}

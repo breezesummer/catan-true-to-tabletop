@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "typeId": "merchant",
+  "label": "中性色商人与双轮货车（实体单照参考）",
+  "seed": 20261009,
+  "scaleStatus": "estimate-not-measured",
+  "limitations": [
+    "仅有一张斜前方照片；没有比例尺，背面、底面、另一侧货物和真实尺寸未知。",
+    "保留圆软帽/头巾、长脸与鼻、长外衣、垂下握把手的双臂、分开双靴、双轮货车和桶袋卷状货物轮廓；小脸部、衣褶和货物细节均为参数化近似。",
+    "估算包围盒为 X 宽 14、Y 深 19、Z 高 25 mm；后方货车需要较长占地，该尺寸不是实测或用户确认值。",
+    "照片呈米灰中性色，曝光与白平衡未知；采用近似米灰塑料，不追加玩家颜色或未知彩绘。",
+    "原照可见轮子、侧栏板与货物，轮辐、底面车轴及背侧货物按闭合可导入结构补齐，不声称扫描、摄影测量或精确还原。",
+    "闭合子壳合并为一个材质网格，壳之间存在重叠而未布尔融合；不作为打印模型。",
+    "这是商人实体棋子，独立于贸易进步卡中的商人卡；Unity 正式灯光、拾取、碰撞、相邻遮挡与用户外观确认由主任务另验。"
+  ],
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/单位/商人.jpg",
+      "sha256": "17fcefec438a51016dcc51a76bc9f69a12c098732ad6cb01d5b4df6c6fddf344",
+      "role": "neutral-merchant-pulling-two-wheel-cargo-cart-oblique-front"
+    }
+  ],
+  "assets": [
+    {
+      "id": "merchant-neutral-cart",
+      "label": "米灰商人与双轮货车",
+      "kind": "custom",
+      "dimensionsMm": [14, 19, 25],
+      "customBuilder": "art/recipes/entity-conversion-v001/merchant/builder.py",
+      "builderArgs": {"color": [0.40, 0.38, 0.28], "roughness": 0.37}
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "typeId": "metropolis",
+  "label": "大都会棋子（红色实体照片参考）",
+  "seed": 20261009,
+  "scaleStatus": "estimate-not-measured",
+  "limitations": [
+    "逐张查看红色大都会及红色大都会+城墙照片；只有相近斜侧视角，背面、底部和实测尺寸未知。",
+    "本体按左侧双尖顶塔、右侧双方形垛口塔、低层坡屋顶建筑、浮雕石墙和圆形底座参数化制作；不是扫描或摄影测量复原，也不是城市放大版。",
+    "估算包围盒 X 宽18、Y 深18、Z 高24 mm，底心枢轴；尺寸并非实测或用户确认。圆底座按共用城墙最窄孔径18.5944mm留出约0.5944mm直径余量。",
+    "组合照片只作圆底座与独立城墙嵌套参考；本类型只输出一件无外圈城墙的大都会，城墙在独立类型制作。",
+    "背面与暗处几何由可见结构作简化补齐，细小砖纹和门窗为近似浮雕；颜色受原照光照影响。",
+    "没有科学、贸易、政治三轨道身份标记的参考，因此不伪造这三种标记或声称已经还原。",
+    "正式Unity灯光、拾取、相邻城墙适配和用户外观确认由主任务单独验收。"
+  ],
+  "references": [
+    {"originalPath": "assets/references/inbox/建筑/红色大都会.jpg", "sha256": "04f962a8e389b69ff0255c2dee74ac29e340fa7ed0c549f3aa036d5485467238", "role": "metropolis-body-twin-spires-square-crenellated-towers-houses-round-base"},
+    {"originalPath": "assets/references/inbox/建筑/红色大都会+城墙.jpg", "sha256": "d6c31093b29977114f68f4047bc0dccae4e602e408c605c226898a2c7943c4a9", "role": "body-and-independent-city-wall-nesting-reference-only"}
+  ],
+  "assets": [
+    {"id": "metropolis-red", "label": "红色大都会（无独立城墙）", "kind": "custom", "dimensionsMm": [18,18,24], "customBuilder": "art/recipes/entity-conversion-v001/metropolis/builder.py", "builderArgs": {"color": [0.57,0.009,0.020]}}
+  ]
+}

@@ -1,0 +1,437 @@
+{
+    "unityVersion": "6000.3.25f1",
+    "assets": [
+        {
+            "id": "village-orange",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.01599999889731407,
+                0.012000001035630703
+            ],
+            "renderers": 1,
+            "triangles": 6996
+        },
+        {
+            "id": "city-orange",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.017999999225139619,
+                0.019999999552965165,
+                0.017999999225139619
+            ],
+            "renderers": 1,
+            "triangles": 15448
+        },
+        {
+            "id": "metropolis-orange",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.017999999225139619,
+                0.024000000208616258,
+                0.018000001087784768
+            ],
+            "renderers": 1,
+            "triangles": 16604
+        },
+        {
+            "id": "city-wall-orange",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.024000000208616258,
+                0.005000002216547728,
+                0.023999998345971109
+            ],
+            "renderers": 1,
+            "triangles": 14624
+        },
+        {
+            "id": "city-with-wall-orange",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.024000000208616258,
+                0.019999999552965165,
+                0.023999998345971109
+            ],
+            "renderers": 2,
+            "triangles": 30072
+        },
+        {
+            "id": "metropolis-with-wall-orange",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.024000000208616258,
+                0.024000002071261407,
+                0.023999998345971109
+            ],
+            "renderers": 2,
+            "triangles": 31228
+        },
+        {
+            "id": "village-beige",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.01599999889731407,
+                0.012000001035630703
+            ],
+            "renderers": 1,
+            "triangles": 6996
+        },
+        {
+            "id": "city-beige",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.017999999225139619,
+                0.019999999552965165,
+                0.017999999225139619
+            ],
+            "renderers": 1,
+            "triangles": 15448
+        },
+        {
+            "id": "metropolis-beige",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.017999999225139619,
+                0.024000000208616258,
+                0.018000001087784768
+            ],
+            "renderers": 1,
+            "triangles": 16604
+        },
+        {
+            "id": "city-wall-beige",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.024000000208616258,
+                0.005000002216547728,
+                0.023999998345971109
+            ],
+            "renderers": 1,
+            "triangles": 14624
+        },
+        {
+            "id": "city-with-wall-beige",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.024000000208616258,
+                0.019999999552965165,
+                0.023999998345971109
+            ],
+            "renderers": 2,
+            "triangles": 30072
+        },
+        {
+            "id": "metropolis-with-wall-beige",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.024000000208616258,
+                0.024000002071261407,
+                0.023999998345971109
+            ],
+            "renderers": 2,
+            "triangles": 31228
+        },
+        {
+            "id": "village-blue",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.01599999889731407,
+                0.012000001035630703
+            ],
+            "renderers": 1,
+            "triangles": 6996
+        },
+        {
+            "id": "city-blue",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.017999999225139619,
+                0.019999999552965165,
+                0.017999999225139619
+            ],
+            "renderers": 1,
+            "triangles": 15448
+        },
+        {
+            "id": "metropolis-blue",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.017999999225139619,
+                0.024000000208616258,
+                0.018000001087784768
+            ],
+            "renderers": 1,
+            "triangles": 16604
+        },
+        {
+            "id": "city-wall-blue",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.024000000208616258,
+                0.005000002216547728,
+                0.023999998345971109
+            ],
+            "renderers": 1,
+            "triangles": 14624
+        },
+        {
+            "id": "city-with-wall-blue",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.024000000208616258,
+                0.019999999552965165,
+                0.023999998345971109
+            ],
+            "renderers": 2,
+            "triangles": 30072
+        },
+        {
+            "id": "metropolis-with-wall-blue",
+            "typeId": "player-buildings",
+            "verified": true,
+            "dimensionsMetres": [
+                0.024000000208616258,
+                0.024000002071261407,
+                0.023999998345971109
+            ],
+            "renderers": 2,
+            "triangles": 31228
+        },
+        {
+            "id": "knight-orange-level-1-bare",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11160
+        },
+        {
+            "id": "knight-orange-level-2-bare",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11168
+        },
+        {
+            "id": "knight-orange-level-3-bare",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11176
+        },
+        {
+            "id": "knight-orange-level-1-helmet",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11120
+        },
+        {
+            "id": "knight-orange-level-2-helmet",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11128
+        },
+        {
+            "id": "knight-orange-level-3-helmet",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11136
+        },
+        {
+            "id": "knight-beige-level-1-bare",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11160
+        },
+        {
+            "id": "knight-beige-level-2-bare",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11168
+        },
+        {
+            "id": "knight-beige-level-3-bare",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11176
+        },
+        {
+            "id": "knight-beige-level-1-helmet",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11120
+        },
+        {
+            "id": "knight-beige-level-2-helmet",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11128
+        },
+        {
+            "id": "knight-beige-level-3-helmet",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11136
+        },
+        {
+            "id": "knight-blue-level-1-bare",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11160
+        },
+        {
+            "id": "knight-blue-level-2-bare",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11168
+        },
+        {
+            "id": "knight-blue-level-3-bare",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11176
+        },
+        {
+            "id": "knight-blue-level-1-helmet",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11120
+        },
+        {
+            "id": "knight-blue-level-2-helmet",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11128
+        },
+        {
+            "id": "knight-blue-level-3-helmet",
+            "typeId": "player-knights",
+            "verified": true,
+            "dimensionsMetres": [
+                0.012000000104308129,
+                0.024000000208616258,
+                0.012000001966953278
+            ],
+            "renderers": 1,
+            "triangles": 11136
+        }
+    ]
+}

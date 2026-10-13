@@ -1,0 +1,79 @@
+{
+  "status": "passed",
+  "typeId": "commodity-cards",
+  "assets": [
+    {
+      "id": "commodity-cloth",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "commodity-paper",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "commodity-coin",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/commodity-cloth-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/commodity-coin-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/commodity-paper-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    }
+  ],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

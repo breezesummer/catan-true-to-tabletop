@@ -13,6 +13,7 @@ public sealed class M3LocalGameHost
     public void NewGame(string scenario, int players) => NewGame(scenario, players, unchecked((uint)Guid.NewGuid().GetHashCode()));
     public void NewGame(string scenario, int players, uint seed) { session = SeafarersGameSession.Create(scenario, players, seed); }
     public PlayerView View(string seat) => session.GetPlayerView(seat);
+    public Catan.Core.GameHistoryEntry[] History(string seat, long afterSequence = 0) => session.GetHistory(seat, afterSequence);
     public CommandResult Submit(Command command) => session.Execute(command);
     public CommandResult Preview(Command command) => session.Preview(command);
     public string ExportSave() => session.Save();

@@ -1,0 +1,39 @@
+{
+  "status": "passed",
+  "typeId": "defender-card",
+  "assets": [
+    {
+      "id": "defender-card",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/defender-card-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    }
+  ],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

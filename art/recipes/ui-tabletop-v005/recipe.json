@@ -1,0 +1,48 @@
+{
+  "版本": "ui-tabletop-v005",
+  "用途": "桌面微表面材质和已有照片厚板的实体边缘显示",
+  "尺寸状态": "继承已有估算米制尺寸，未取得新的实测值或用户最终外观确认",
+  "来源": {
+    "纹理": "tools/art/generate_tabletop_finish_v005.py 的确定性噪声计算",
+    "板块": "沿用 EntityBoardAssets 的现有版本、原始 FBX 和照片 UV；包括已确认的矿石平坦厚板",
+    "原文件": "不覆盖 v001-v004 模型、照片、材质和管线"
+  },
+  "重建": {
+    "生成命令": "python tools/art/generate_tabletop_finish_v005.py --output art/source/ui-tabletop-v005 --size 2048",
+    "导入": "将 smoked-oak-albedo.png 与 smoked-oak-normal.png 复制到 Unity/Catan/Assets/Resources/TabletopUI/v005；TabletopFinishTextureImporterV005 固定导入参数",
+    "管线": "M6Build 调用 TabletopFinishV005.Configure，生成独立的 TabletopPipeline-v005 和 TabletopRenderer-v005",
+    "实例网格": "EntityBoardAssets.Terrain 调用 TabletopPhysicalTileV005.Apply，从原网格读取六边形和 UV，重建带倒角的显示网格"
+  },
+  "桌面": {
+    "纹理分辨率": [2048, 2048],
+    "纹理覆盖米数": 0.75,
+    "光滑度": 0.29,
+    "法线强度": 0.32,
+    "各向异性过滤": 16,
+    "导入": "三线性过滤和 mipmap；色彩 BC7、法线 BC5；原生窗口分辨率渲染"
+  },
+  "六边厚板": {
+    "上表面米": 0.008,
+    "底倒角径向内缩米": 0.00025,
+    "上倒角径向内缩米": 0.00045,
+    "上倒角高度米": 0.00045,
+    "枢轴": "沿用原始底面中心",
+    "每块三角形": 48,
+    "说明": "保留平坦的原照覆膜印刷面；这不是立体森林、山体等新雕塑模型"
+  },
+  "海框": {
+    "颜色": [0.052, 0.246, 0.322],
+    "光滑度": 0.32,
+    "纹理": "TabletopScene.SeaTexture 使用种子 29/79 的低反差噪声，保留厚边网格；移除旧正弦波条纹"
+  },
+  "灯光": {
+    "主光阴影分辨率": 4096,
+    "阴影距离米": 4,
+    "阴影深度偏移": 0.08,
+    "阴影法线偏移": 0.08,
+    "环境遮蔽半径米": 0.007,
+    "环境遮蔽强度": 1.1,
+    "主光强度": 1.22,
+    "主光欧拉角": [48, -38, 0]
+  }
+}

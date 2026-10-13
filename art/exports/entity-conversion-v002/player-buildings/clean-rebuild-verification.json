@@ -1,0 +1,270 @@
+{
+  "status": "passed",
+  "typeId": "player-buildings",
+  "assets": [
+    {
+      "id": "village-orange",
+      "meshObjects": 1,
+      "triangles": 6996,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.012000000104308128,
+        0.012000000569969416,
+        0.01600000168675786
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "city-orange",
+      "meshObjects": 1,
+      "triangles": 15448,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.017999999225139618,
+        0.017999999225139618,
+        0.02000000097852117
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "metropolis-orange",
+      "meshObjects": 1,
+      "triangles": 16604,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.017999999225139618,
+        0.017999999225139618,
+        0.0240000016397115
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "city-wall-orange",
+      "meshObjects": 1,
+      "triangles": 14624,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.0050000035593061876
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "city-with-wall-orange",
+      "meshObjects": 2,
+      "triangles": 30072,
+      "closedMeshes": true,
+      "uvMeshes": 2,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.02000000136138491
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "metropolis-with-wall-orange",
+      "meshObjects": 2,
+      "triangles": 31228,
+      "closedMeshes": true,
+      "uvMeshes": 2,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.024000002017036004
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "village-beige",
+      "meshObjects": 1,
+      "triangles": 6996,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.012000000104308128,
+        0.012000000569969416,
+        0.01600000168675786
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "city-beige",
+      "meshObjects": 1,
+      "triangles": 15448,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.017999999225139618,
+        0.017999999225139618,
+        0.02000000097852117
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "metropolis-beige",
+      "meshObjects": 1,
+      "triangles": 16604,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.017999999225139618,
+        0.017999999225139618,
+        0.0240000016397115
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "city-wall-beige",
+      "meshObjects": 1,
+      "triangles": 14624,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.0050000035593061876
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "city-with-wall-beige",
+      "meshObjects": 2,
+      "triangles": 30072,
+      "closedMeshes": true,
+      "uvMeshes": 2,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.02000000136138491
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "metropolis-with-wall-beige",
+      "meshObjects": 2,
+      "triangles": 31228,
+      "closedMeshes": true,
+      "uvMeshes": 2,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.024000002017036004
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "village-blue",
+      "meshObjects": 1,
+      "triangles": 6996,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.012000000104308128,
+        0.012000000569969416,
+        0.01600000168675786
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "city-blue",
+      "meshObjects": 1,
+      "triangles": 15448,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.017999999225139618,
+        0.017999999225139618,
+        0.02000000097852117
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "metropolis-blue",
+      "meshObjects": 1,
+      "triangles": 16604,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.017999999225139618,
+        0.017999999225139618,
+        0.0240000016397115
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "city-wall-blue",
+      "meshObjects": 1,
+      "triangles": 14624,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.0050000035593061876
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "city-with-wall-blue",
+      "meshObjects": 2,
+      "triangles": 30072,
+      "closedMeshes": true,
+      "uvMeshes": 2,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.02000000136138491
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "metropolis-with-wall-blue",
+      "meshObjects": 2,
+      "triangles": 31228,
+      "closedMeshes": true,
+      "uvMeshes": 2,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.024000000208616257,
+        0.024000000208616257,
+        0.024000002017036004
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

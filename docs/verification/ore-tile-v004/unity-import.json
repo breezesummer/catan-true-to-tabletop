@@ -1,0 +1,17 @@
+{
+    "unityVersion": "6000.3.25f1",
+    "assets": [
+        {
+            "id": "tile-ore",
+            "typeId": "ore-tile",
+            "verified": true,
+            "dimensionsMetres": [
+                0.0685892105102539,
+                0.008000008761882782,
+                0.07919999212026596
+            ],
+            "renderers": 1,
+            "triangles": 20
+        }
+    ]
+}

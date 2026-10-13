@@ -82,7 +82,7 @@ public sealed partial class M2App
     {
         Styles();GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool enabled=GUI.enabled;GUI.enabled=enabled&&!dock.HasOverlay&&!ai.TableMenuOpen;
+        bool enabled=GUI.enabled;GUI.enabled=enabled&&!dock.HasOverlay&&!ai.TableMenuOpen&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition);
         DrawBoardLabels();
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,null);
@@ -93,8 +93,10 @@ public sealed partial class M2App
             ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.TradeOffer==null,
             ()=>Submit(NewCommand(CommandKind.RollDice)),()=>Submit(NewCommand(CommandKind.EndTurn)),TableSeatClick,
             ()=>{tableNotes=!tableNotes;},"回合备忘");
+        GUI.enabled=enabled&&!ai.TableMenuOpen&&!tabletop.HistoryOpen&&!dock.HasOverlay;
         if(ai.IsHumanTurn&&view.TradeOffer==null)DrawTableDecision();
-        GUI.enabled=enabled&&!ai.TableMenuOpen;dock.Draw(Operations(),font);GUI.enabled=enabled;
+        GUI.enabled=enabled&&!ai.TableMenuOpen&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition));dock.Draw(Operations(),font);GUI.enabled=enabled;
+        if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableMenuOpen)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
         ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
     }
     void TableSeatClick(string target)
@@ -120,19 +122,22 @@ public sealed partial class M2App
     void TableNote(string caption,Action content)
     {
         tabletop.BeginContext(caption);
-        var label=new GUIStyle(text);label.normal.textColor=new Color(.25f,.13f,.06f);
+        ModernOperationUI.Styles(font);var label=new GUIStyle(ModernOperationUI.Text);
         tableInk=label;content();tabletop.EndContext();
     }
     GUIStyle tableInk;
-    bool TableButton(string caption)=>GUILayout.Button(caption,button,GUILayout.MinHeight(32));
+    bool TableButton(string caption)=>ModernOperationUI.LayoutButton(caption);
     void DrawTableDecision()
     {
         if(preparedPurchase)
         {
             TableNote("抽取一张发展卡",()=>{
-                GUILayout.Label("付出羊毛、谷物、矿石各一张。",tableInk);
-                if(TableButton("把资源交回银行 · 抽牌"))Submit(NewCommand(CommandKind.BuyDevelopmentCard));
-                if(TableButton("放回")){CancelOperationDraft();dock.Reset();}
+                ModernOperationUI.Info("购买费用");ModernOperationUI.Cost(new[]{0,0,1,1,1});
+                ModernOperationUI.Info("新买入的行动发展卡从之后的回合起可用。");
+                GUILayout.Space(12);var purchase=NewCommand(CommandKind.BuyDevelopmentCard);
+                var preview=host.Preview(purchase);if(!preview.Success)ModernOperationUI.Info(preview.Message,true);
+                if(ModernOperationUI.LayoutButton("确认购买 · 抽取 1 张",preview.Success,true))Submit(purchase);
+                if(TableButton("取消购买")){CancelOperationDraft();dock.Reset();}
             });return;
         }
         if(preparedDevelopment.HasValue)
@@ -140,14 +145,19 @@ public sealed partial class M2App
             var kind=preparedDevelopment.Value;
             TableNote("打出 · "+DockDevelopmentName(kind),()=>{
                 if(kind==DevelopmentCardKind.YearOfPlenty)
-                {if(TableButton("第一张："+(plentyA<5?ResourceNames[plentyA]:"不取")))plentyA=(plentyA+1)%6;if(TableButton("第二张："+(plentyB<5?ResourceNames[plentyB]:"不取")))plentyB=(plentyB+1)%6;}
-                if(kind==DevelopmentCardKind.Monopoly&&TableButton("收取："+ResourceNames[monopoly]))monopoly=(monopoly+1)%5;
-                if(TableButton("将这张卡放到桌上"))
                 {
-                    var c=NewCommand(kind==DevelopmentCardKind.Knight?CommandKind.PlayKnight:kind==DevelopmentCardKind.RoadBuilding?CommandKind.PlayRoadBuilding:kind==DevelopmentCardKind.Monopoly?CommandKind.PlayMonopoly:CommandKind.PlayYearOfPlenty);
-                    if(kind==DevelopmentCardKind.YearOfPlenty){c.Resources=new ResourceBag();if(plentyA<5)c.Resources[(Resource)plentyA]++;if(plentyB<5)c.Resources[(Resource)plentyB]++;}
-                    if(kind==DevelopmentCardKind.Monopoly)c.Resource=(Resource)monopoly;Submit(c);
+                    var names=ResourceNames.Take(5).Concat(new[]{"不取"}).ToArray();
+                    plentyA=ModernOperationUI.Choices("第一张资源",plentyA,names,0);
+                    plentyB=ModernOperationUI.Choices("第二张资源",plentyB,names,0);
                 }
+                if(kind==DevelopmentCardKind.Monopoly)monopoly=ModernOperationUI.Choices("收取所有对手的这一种资源",monopoly,ResourceNames.Take(5).ToArray(),0);
+                if(kind==DevelopmentCardKind.Knight)ModernOperationUI.Info("打出后移动强盗，并选择可偷取的玩家。");
+                if(kind==DevelopmentCardKind.RoadBuilding)ModernOperationUI.Info("免费放置两段建设；每段分别选择合法位置。");
+                var c=NewCommand(kind==DevelopmentCardKind.Knight?CommandKind.PlayKnight:kind==DevelopmentCardKind.RoadBuilding?CommandKind.PlayRoadBuilding:kind==DevelopmentCardKind.Monopoly?CommandKind.PlayMonopoly:CommandKind.PlayYearOfPlenty);
+                if(kind==DevelopmentCardKind.YearOfPlenty){c.Resources=new ResourceBag();if(plentyA<5)c.Resources[(Resource)plentyA]++;if(plentyB<5)c.Resources[(Resource)plentyB]++;}
+                if(kind==DevelopmentCardKind.Monopoly)c.Resource=(Resource)monopoly;
+                var preview=host.Preview(c);if(!preview.Success)ModernOperationUI.Info(preview.Message,true);
+                GUILayout.Space(10);if(ModernOperationUI.LayoutButton("确认打出 · "+DockDevelopmentName(kind),preview.Success,true))Submit(c);
                 if(TableButton("放回手牌")){CancelOperationDraft();dock.Reset();}
             });return;
         }

@@ -5,19 +5,20 @@ using System.Linq;
 // 纯显示数据与时间轴；不读取权威状态，不生成或裁决骰点。
 public static class TabletopHandLayout
 {
-    public const float CardWidth = 74, CardHeight = 103, Baseline = 768;
+    public const float CardWidth = 108, CardHeight = 151, Baseline = 734;
     public static TabletopCardPose Card(int index, int count, float center, float width, bool selected)
     {
-        float step = CardWidth + 8;
+        // 卡牌始终使用屏幕逻辑像素；空间不足只压缩间距，不缩小卡面或分页。
+        float step = count <= 1 ? 0 : Math.Min(CardWidth + 10, Math.Max(0, width - CardWidth) / (count - 1));
         return new TabletopCardPose {
             X = center - (CardWidth + (count - 1) * step) / 2 + index * step,
-            Y = Baseline - (selected ? 12 : 0), Angle = 0
+            Y = Baseline - (selected ? 22 : 0), Angle = 0
         };
     }
-    public static int ResourceCapacity(bool hasSpecialCards) => hasSpecialCards ? 8 : 12;
-    public static int SpecialCapacity(bool hasResources) => hasResources ? 4 : 12;
-    public static float ResourceCenter(bool hasSpecialCards) => hasSpecialCards ? 948 : 720;
-    public static float SpecialCenter(bool hasResources) => hasResources ? 356 : 720;
+    public static int ResourceCapacity(bool hasSpecialCards) => int.MaxValue;
+    public static int SpecialCapacity(bool hasResources) => int.MaxValue;
+    public static float ResourceCenter(bool hasSpecialCards) => hasSpecialCards ? 930 : 720;
+    public static float SpecialCenter(bool hasResources) => hasResources ? 380 : 720;
 }
 public sealed class TabletopCardPose
 {

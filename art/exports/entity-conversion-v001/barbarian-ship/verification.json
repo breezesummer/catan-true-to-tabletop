@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "typeId": "barbarian-ship",
+  "assets": [
+    {
+      "id": "barbarian-ship",
+      "meshObjects": 2,
+      "triangles": 10974,
+      "closedMeshes": true,
+      "uvMeshes": 2,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.012000000104308128,
+        0.0280000027269125,
+        0.02600000459133489
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [],
+  "previews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": null,
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

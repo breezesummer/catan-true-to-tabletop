@@ -1,0 +1,176 @@
+{
+  "status": "passed",
+  "unchangedOriginalPhotos": 98,
+  "convertedTypes": 18,
+  "convertedAssets": 74,
+  "types": [
+    {
+      "typeId": "tiles",
+      "assets": 6,
+      "references": 6,
+      "textures": 6,
+      "cleanRebuild": true,
+      "triangles": 120
+    },
+    {
+      "typeId": "resource-cards",
+      "assets": 4,
+      "references": 5,
+      "textures": 5,
+      "cleanRebuild": true,
+      "triangles": 48
+    },
+    {
+      "typeId": "commodity-cards",
+      "assets": 3,
+      "references": 3,
+      "textures": 3,
+      "cleanRebuild": true,
+      "triangles": 36
+    },
+    {
+      "typeId": "progress-trade",
+      "assets": 6,
+      "references": 7,
+      "textures": 7,
+      "cleanRebuild": true,
+      "triangles": 72
+    },
+    {
+      "typeId": "progress-science",
+      "assets": 10,
+      "references": 11,
+      "textures": 11,
+      "cleanRebuild": true,
+      "triangles": 120
+    },
+    {
+      "typeId": "progress-politics",
+      "assets": 9,
+      "references": 9,
+      "textures": 9,
+      "cleanRebuild": true,
+      "triangles": 108
+    },
+    {
+      "typeId": "city-improvements",
+      "assets": 17,
+      "references": 32,
+      "textures": 32,
+      "cleanRebuild": true,
+      "triangles": 204
+    },
+    {
+      "typeId": "defender-card",
+      "assets": 1,
+      "references": 1,
+      "textures": 1,
+      "cleanRebuild": true,
+      "triangles": 12
+    },
+    {
+      "typeId": "barbarian-track",
+      "assets": 1,
+      "references": 1,
+      "textures": 1,
+      "cleanRebuild": true,
+      "triangles": 300
+    },
+    {
+      "typeId": "ships",
+      "assets": 4,
+      "references": 4,
+      "textures": 0,
+      "cleanRebuild": true,
+      "triangles": 24752
+    },
+    {
+      "typeId": "city",
+      "assets": 1,
+      "references": 1,
+      "textures": 0,
+      "cleanRebuild": true,
+      "triangles": 15448
+    },
+    {
+      "typeId": "city-wall",
+      "assets": 1,
+      "references": 3,
+      "textures": 0,
+      "cleanRebuild": true,
+      "triangles": 14624
+    },
+    {
+      "typeId": "metropolis",
+      "assets": 1,
+      "references": 2,
+      "textures": 0,
+      "cleanRebuild": true,
+      "triangles": 16604
+    },
+    {
+      "typeId": "knights",
+      "assets": 6,
+      "references": 6,
+      "textures": 0,
+      "cleanRebuild": true,
+      "triangles": 66888
+    },
+    {
+      "typeId": "robber",
+      "assets": 1,
+      "references": 2,
+      "textures": 0,
+      "cleanRebuild": true,
+      "triangles": 15408
+    },
+    {
+      "typeId": "pirate",
+      "assets": 1,
+      "references": 1,
+      "textures": 0,
+      "cleanRebuild": true,
+      "triangles": 13908
+    },
+    {
+      "typeId": "barbarian-ship",
+      "assets": 1,
+      "references": 1,
+      "textures": 0,
+      "cleanRebuild": true,
+      "triangles": 10974
+    },
+    {
+      "typeId": "merchant",
+      "assets": 1,
+      "references": 1,
+      "textures": 0,
+      "cleanRebuild": true,
+      "triangles": 12748
+    }
+  ],
+  "unityVersion": "6000.3.25f1",
+  "playerCapturedViews": 156,
+  "rulesChanged": false,
+  "rulesRegression": {
+    "passed": 496,
+    "failed": 0,
+    "trxSha256": "ef635f1c09f0dee995309dbf6b720e4de1b0af2bfe25204db6406a300a8b3626"
+  },
+  "assemblyClearanceMm": 0.2971979422274149,
+  "inspectionPlayerSha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+  "scriptsSha256": {
+    "tools/art/entity_pipeline.py": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+    "tools/art/verify_entity_pipeline.py": "a5f70d993f0fb3716683c64cdb3f9438d7e6fc041b18f98d910f00161d0e539f",
+    "tools/art/rectify_entity_photos.py": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+    "Unity/Catan/Assets/Editor/EntityAssetBuild.cs": "95634ba8d37838e06b3a9d4cb0a4d3f68ff3be1f261d04848355970faf55eec9",
+    "Unity/Catan/Assets/Scripts/EntityAssetGallery.cs": "1aa54bfb9d4455c9cbb906e0dd4e1de3006a4dfa2c94a1f8eabe8e06bff24491",
+    "Unity/Catan/Assets/Scripts/EntityAssetPlayerVerification.cs": "fe18cdc2ce6c5eaa12d48c40710a0dbb4631ee48cba091fc3a000ebd84cc6bc9"
+  },
+  "limits": [
+    "estimated sizes and hidden surfaces",
+    "user visual approval pending",
+    "no full gameplay replacement",
+    "no long-session performance validation"
+  ]
+}

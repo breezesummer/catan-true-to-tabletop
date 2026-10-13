@@ -1,0 +1,9 @@
+{
+  "typeId": "merchant",
+  "operations": [],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "cddcaa76928b7aeaa84e6b9593d4b02eb10da51d90d604da512e1e5b4a178e47"
+}

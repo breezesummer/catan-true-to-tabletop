@@ -72,7 +72,7 @@ public sealed partial class M5App
                 if(b.Track>=0){operationFacilityLocked=true;draft.Track=(ImprovementTrack)b.Track;Submit(draft);}
                 else{operationKnightLevel=b.Id.Contains(":")?int.Parse(b.Id.Split(':')[1]):0;pickField="target";pickType=draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.PlaceFreeRoad||IsShip(draft)?"E":"V";status="已拿起 "+b.Name+"，点击地图上的合法位置放下；右键或 Esc 放回。";}
             };
-            s.PrepareCard=c=>{CancelOperationDraft();Select(CommandKind.PlayProgressCard);draft.ProgressCard=(ProgressCardKind)int.Parse(c.Id.Split(':')[0]);status="已打出 "+c.Name+"，按桌上便签选择效果。";};
+            s.PrepareCard=c=>{CancelOperationDraft();Select(CommandKind.PlayProgressCard);draft.ProgressCard=(ProgressCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在操作面板设置效果并确认。";};
             s.Cancel=CancelOperationDraft;
             s.Notify=ai.ShowTablePrompt;
             s.Trade=t=>
@@ -102,7 +102,7 @@ public sealed partial class M5App
     {
         Styles();GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TableMenuOpen;GUI.enabled=tableEnabled&&(!dock.BlocksBoardInput(Event.current.mousePosition)||TabletopUI.EndTurnRect.Contains(Event.current.mousePosition));
+        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TableMenuOpen&&!tabletop.HistoryOpen;GUI.enabled=tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition);
         DrawBoardLabels();
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,(int)view.LastEventDie);
@@ -114,8 +114,10 @@ public sealed partial class M5App
             ()=>{bool open=!operationActions;dock.Reset();CancelOperationDraft();operationActions=open;},"骑士与特殊行动",
             "蛮族 "+view.BarbarianPosition+" / 7 · 防御 "+view.Board.Knights.Where(k=>k.Active).Sum(k=>k.Level)+" / "+view.Board.Cities.Length);
 
+        GUI.enabled=tableEnabled&&!dock.HasOverlay;
         if(OperationContextVisible)tabletop.DrawContext(operationActions?"棋子行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):"当前选择",DrawOperationControls);
-        GUI.enabled=tableEnabled;dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
+        GUI.enabled=tableEnabled&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition));dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
+        if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableMenuOpen)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
         ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
     }
     string TableInstruction()
@@ -137,7 +139,14 @@ public sealed partial class M5App
         if(!ai.IsHumanTurn||view.TradeOffer!=null)return;
         if(operationActions)
         {
-            Text(operationKnightTarget==null?"点击地图上的己方骑士，也可在此选择动作。":"已拿起这名骑士，请选择动作。",true);
+            var knight=view.Board.Knights.FirstOrDefault(k=>k.PlayerId==seat&&k.LocationId==operationKnightTarget);
+            if(knight!=null)
+            {
+                Text(new[]{"","基础骑士","强力骑士","精锐骑士"}[knight.Level]+"  ·  "+(knight.Active?"已激活":"未激活"));
+                Text(knight.Active&&knight.ActivatedTurn==view.Turn?"本回合刚激活，下一回合可行动。":"选择动作后，在地图上点选目标。",true);
+            }
+            else Text("点击地图选中己方骑士，或先选择下方动作。",true);
+            GUILayout.Space(8);
             TabletopAction("激活骑士 · 谷物 1",CommandKind.ActivateKnight);
             TabletopAction("移动骑士",CommandKind.MoveKnight);
             TabletopAction("驱离弱骑士",CommandKind.DisplaceKnight);
@@ -145,7 +154,7 @@ public sealed partial class M5App
             TabletopAction("驱逐海盗",CommandKind.ChasePirate);
             TabletopAction("移动船",CommandKind.MoveShip);
             if(view.CommercialHarborPlayers.Length>0)TabletopAction("商业港口 · 提供资源",CommandKind.CommercialHarborOffer);
-            if(Btn("放回棋子"))CancelOperationDraft();
+            GUILayout.Space(8);if(Btn("关闭行动面板"))CancelOperationDraft();
             return;
         }
         if(view.Phase==GamePhase.RobberMove)
@@ -167,7 +176,21 @@ public sealed partial class M5App
     }
     void TabletopAction(string text,CommandKind kind)
     {
-        if(!Btn(text))return;
+        bool from=kind==CommandKind.MoveKnight||kind==CommandKind.DisplaceKnight;
+        bool knightAction=kind==CommandKind.ActivateKnight||from||kind==CommandKind.ChaseRobber||kind==CommandKind.ChasePirate;
+        bool legal=view.LegalActions.Any(c=>c.Kind==kind&&(!knightAction||operationKnightTarget==null||(from?c.SourceId:c.TargetId)==operationKnightTarget));
+        if(!ModernOperationUI.LayoutButton(text,legal))
+        {
+            if(!legal)
+            {
+                var selected=view.Board.Knights.FirstOrDefault(k=>k.PlayerId==seat&&k.LocationId==operationKnightTarget);
+                string reason=selected==null?"当前没有符合条件的棋子或合法目标":
+                    kind==CommandKind.ActivateKnight?(selected.Active?"这名骑士已经激活":view.OwnResources.Wheat<1?"需要 1 张谷物":"当前阶段无法激活"):
+                    !selected.Active?"请先激活这名骑士":selected.ActivatedTurn==view.Turn?"本回合刚激活，暂不能行动":"没有可达的合法目标";
+                ModernOperationUI.Info(reason);
+            }
+            return;
+        }
         string knight=operationKnightTarget;
         CancelOperationDraft();Select(kind);
         if(kind==CommandKind.CommercialHarborOffer)return;

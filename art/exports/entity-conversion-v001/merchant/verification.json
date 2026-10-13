@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "typeId": "merchant",
+  "assets": [
+    {
+      "id": "merchant-neutral-cart",
+      "meshObjects": 1,
+      "triangles": 12748,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.014000000432133675,
+        0.01900000125169754,
+        0.0250000030051033
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [],
+  "previews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": null,
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

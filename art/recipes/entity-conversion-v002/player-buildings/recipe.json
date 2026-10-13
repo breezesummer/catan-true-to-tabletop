@@ -1,0 +1,517 @@
+{
+  "schemaVersion": 1,
+  "typeId": "player-buildings",
+  "label": "三色玩家建筑（18张实体照片参考）",
+  "seed": 20261010,
+  "scaleStatus": "estimate-not-measured",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色村庄.jpg",
+      "sha256": "58f3a24dac88f3a208592cfc41b8e0fa5fdda80a24618d7dc11a7d8de9f385ed",
+      "role": "orange-village-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色城市.jpg",
+      "sha256": "ff46719d0ec7019d33901faaef21ff0d7142c27123f05144a512772292906674",
+      "role": "orange-city-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色大都会.jpg",
+      "sha256": "1c338281e5a3f141ae618defb867b539e6d3024eb8c2b3037f621d8e67add635",
+      "role": "orange-metropolis-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色城墙.jpg",
+      "sha256": "51af0491994051feea260b8c20eea0b9110bdafc09304170c57dd10a057ad151",
+      "role": "orange-city-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色城市+城墙.jpg",
+      "sha256": "96a5778715b29ff213880279ce7709abc6833dba5c8a3da287f950cf3d5d79eb",
+      "role": "orange-city-with-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色大都会+城墙.jpg",
+      "sha256": "24754321da6c55a76ef98bb81fcfc0aef8e6f7932315ee35b36b26f1e6e3bebd",
+      "role": "orange-metropolis-with-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色村庄.jpg",
+      "sha256": "6968deec805868c5b945b5f1ce67de40f2ff06e6d8469d1c3c495156d227e0ab",
+      "role": "beige-village-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色城市.jpg",
+      "sha256": "80615304d09907e141324a07e46e0affa9abc1f1ad852babb9741af9605c3234",
+      "role": "beige-city-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色大都会.jpg",
+      "sha256": "bc005ac1203b656a8336d0e352fad02744e284404494b255614c7eeacab88364",
+      "role": "beige-metropolis-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色城墙.jpg",
+      "sha256": "e88bc1f01c4a642d277d27e0be28aa57a5c0de379455a598503bf0cb6502fa05",
+      "role": "beige-city-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色城市+城墙.jpg",
+      "sha256": "bfb8ef91f07b8559ee77ff36e8c2766b4b0661d7706ed8d0a0bba49981e562a1",
+      "role": "beige-city-with-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色大都会+城墙.jpg",
+      "sha256": "99068ffbafb6ed9fe826a65169db1aec0a0a4c6e68e3148c26503a824dcb3bb9",
+      "role": "beige-metropolis-with-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色村庄.jpg",
+      "sha256": "c84076b79e0b843f3c1cf670b7ec01954cb9e5154249865e8231122f21c3964b",
+      "role": "blue-village-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色城市.jpg",
+      "sha256": "bcd660a7d7cc72193f2676d08ba24c9d4c250e4aa56eed1263e6c3200eb060fd",
+      "role": "blue-city-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色大都会.jpg",
+      "sha256": "6dedf3400ee3281ced4226bc35dfac40333552111ab8838cda73902456d271a7",
+      "role": "blue-metropolis-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色城墙.jpg",
+      "sha256": "5233bb2381c9936984308b705964a0c51e87bfde12e4723e28c81147a7b64267",
+      "role": "blue-city-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色城市+城墙.jpg",
+      "sha256": "8a0399ce0369973994668d25d93d9e515462cae5c98441e4de5234266180e650",
+      "role": "blue-city-with-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色大都会+城墙.jpg",
+      "sha256": "48258eaa4bae2fb068d05366a2b2a60cf7f901e318b29e7b5194fe6d33f74e17",
+      "role": "blue-metropolis-with-wall-shape-and-plastic-colour"
+    }
+  ],
+  "assets": [
+    {
+      "id": "village-orange",
+      "label": "橙色村庄",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        16
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/village_builder.py",
+      "builderArgs": {
+        "color": [
+          0.95,
+          0.23,
+          0.018
+        ],
+        "playerColor": "orange"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/橙色村庄.jpg"
+      ]
+    },
+    {
+      "id": "city-orange",
+      "label": "橙色城市",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        20
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/city_builder.py",
+      "builderArgs": {
+        "color": [
+          0.95,
+          0.23,
+          0.018
+        ],
+        "playerColor": "orange"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/橙色城市.jpg"
+      ]
+    },
+    {
+      "id": "metropolis-orange",
+      "label": "橙色大都会",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        24
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/metropolis_builder.py",
+      "builderArgs": {
+        "color": [
+          0.95,
+          0.23,
+          0.018
+        ],
+        "playerColor": "orange"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/橙色大都会.jpg"
+      ]
+    },
+    {
+      "id": "city-wall-orange",
+      "label": "橙色独立城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        5
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/wall_builder.py",
+      "builderArgs": {
+        "color": [
+          0.95,
+          0.23,
+          0.018
+        ],
+        "playerColor": "orange",
+        "innerDiameterMm": 18.6
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/橙色城墙.jpg"
+      ]
+    },
+    {
+      "id": "city-with-wall-orange",
+      "label": "橙色城市+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        20
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/combination_builder.py",
+      "builderArgs": {
+        "color": [
+          0.95,
+          0.23,
+          0.018
+        ],
+        "playerColor": "orange",
+        "bodyKind": "city"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/橙色城市+城墙.jpg"
+      ]
+    },
+    {
+      "id": "metropolis-with-wall-orange",
+      "label": "橙色大都会+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        24
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/combination_builder.py",
+      "builderArgs": {
+        "color": [
+          0.95,
+          0.23,
+          0.018
+        ],
+        "playerColor": "orange",
+        "bodyKind": "metropolis"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/橙色大都会+城墙.jpg"
+      ]
+    },
+    {
+      "id": "village-beige",
+      "label": "米色村庄",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        16
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/village_builder.py",
+      "builderArgs": {
+        "color": [
+          0.82,
+          0.7,
+          0.43
+        ],
+        "playerColor": "beige"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/米色村庄.jpg"
+      ]
+    },
+    {
+      "id": "city-beige",
+      "label": "米色城市",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        20
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/city_builder.py",
+      "builderArgs": {
+        "color": [
+          0.82,
+          0.7,
+          0.43
+        ],
+        "playerColor": "beige"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/米色城市.jpg"
+      ]
+    },
+    {
+      "id": "metropolis-beige",
+      "label": "米色大都会",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        24
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/metropolis_builder.py",
+      "builderArgs": {
+        "color": [
+          0.82,
+          0.7,
+          0.43
+        ],
+        "playerColor": "beige"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/米色大都会.jpg"
+      ]
+    },
+    {
+      "id": "city-wall-beige",
+      "label": "米色独立城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        5
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/wall_builder.py",
+      "builderArgs": {
+        "color": [
+          0.82,
+          0.7,
+          0.43
+        ],
+        "playerColor": "beige",
+        "innerDiameterMm": 18.6
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/米色城墙.jpg"
+      ]
+    },
+    {
+      "id": "city-with-wall-beige",
+      "label": "米色城市+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        20
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/combination_builder.py",
+      "builderArgs": {
+        "color": [
+          0.82,
+          0.7,
+          0.43
+        ],
+        "playerColor": "beige",
+        "bodyKind": "city"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/米色城市+城墙.jpg"
+      ]
+    },
+    {
+      "id": "metropolis-with-wall-beige",
+      "label": "米色大都会+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        24
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/combination_builder.py",
+      "builderArgs": {
+        "color": [
+          0.82,
+          0.7,
+          0.43
+        ],
+        "playerColor": "beige",
+        "bodyKind": "metropolis"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/米色大都会+城墙.jpg"
+      ]
+    },
+    {
+      "id": "village-blue",
+      "label": "蓝色村庄",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        16
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/village_builder.py",
+      "builderArgs": {
+        "color": [
+          0.008,
+          0.024,
+          0.12
+        ],
+        "playerColor": "blue"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/蓝色村庄.jpg"
+      ]
+    },
+    {
+      "id": "city-blue",
+      "label": "蓝色城市",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        20
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/city_builder.py",
+      "builderArgs": {
+        "color": [
+          0.008,
+          0.024,
+          0.12
+        ],
+        "playerColor": "blue"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/蓝色城市.jpg"
+      ]
+    },
+    {
+      "id": "metropolis-blue",
+      "label": "蓝色大都会",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        24
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/metropolis_builder.py",
+      "builderArgs": {
+        "color": [
+          0.008,
+          0.024,
+          0.12
+        ],
+        "playerColor": "blue"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/蓝色大都会.jpg"
+      ]
+    },
+    {
+      "id": "city-wall-blue",
+      "label": "蓝色独立城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        5
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/wall_builder.py",
+      "builderArgs": {
+        "color": [
+          0.008,
+          0.024,
+          0.12
+        ],
+        "playerColor": "blue",
+        "innerDiameterMm": 18.6
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/蓝色城墙.jpg"
+      ]
+    },
+    {
+      "id": "city-with-wall-blue",
+      "label": "蓝色城市+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        20
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/combination_builder.py",
+      "builderArgs": {
+        "color": [
+          0.008,
+          0.024,
+          0.12
+        ],
+        "playerColor": "blue",
+        "bodyKind": "city"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/蓝色城市+城墙.jpg"
+      ]
+    },
+    {
+      "id": "metropolis-with-wall-blue",
+      "label": "蓝色大都会+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        24
+      ],
+      "customBuilder": "art/recipes/entity-conversion-v002/player-buildings/combination_builder.py",
+      "builderArgs": {
+        "color": [
+          0.008,
+          0.024,
+          0.12
+        ],
+        "playerColor": "blue",
+        "bodyKind": "metropolis"
+      },
+      "referencePaths": [
+        "assets/references/inbox/建筑/蓝色大都会+城墙.jpg"
+      ]
+    }
+  ],
+  "limitations": [
+    "18张原照片已通过逐色6图检视表实际查看；没有尺子，真实尺寸、底面和多数背面未知。",
+    "村庄12×12×16、城市18×18×20、大都会18×18×24、城墙24×24×5mm均为沿用开发基线的估算。",
+    "城市、大都会和城墙复用并复制v001参数化几何到新版本；三色照片显示相同实体模具轮廓，不是扫描或摄影测量。",
+    "村庄沿用照片样板的成组屋顶、烟囱、台阶和浮雕布局，新照片可见圆润相邻底座，采用封闭圆底近似。",
+    "独立城墙与两种建筑+城墙组合均为实际3D网格；组合包含两件底心对齐网格，未用整块不透光圆柱填充内孔。",
+    "城墙名义内径18.6mm、八圆塔及32墙垛为估算；背部和内侧被遮挡细节仍按重复布局近似。",
+    "色值为观察原照得到的橙色、暖米色及深蓝色线性RGB候选，受照片曝光/白平衡影响，不是实物测色。",
+    "同材质部件为相交封闭壳，未执行实体布尔并集；可用于游戏渲染，不声明可直接3D打印。",
+    "Unity正式灯光、拥挤节点拾取与用户外观确认由主任务独立验证。"
+  ]
+}

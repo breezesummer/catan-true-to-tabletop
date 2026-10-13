@@ -1,0 +1,944 @@
+{
+  "image_count": 98,
+  "images": [
+    {
+      "path": "assets/references/inbox/单位/商人.jpg",
+      "width": 4096,
+      "height": 3072
+    },
+    {
+      "path": "assets/references/inbox/单位/强盗 (2).jpg",
+      "width": 4096,
+      "height": 3072
+    },
+    {
+      "path": "assets/references/inbox/单位/强盗.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/单位/海盗入侵卡.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/单位/海盗（入侵卡上的单位）.jpg",
+      "width": 4096,
+      "height": 3072
+    },
+    {
+      "path": "assets/references/inbox/单位/海盗（海洋板块上的单位）.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/单位/红色一级骑士.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/单位/红色三级骑士.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/单位/红色二级骑士.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/单位/红色戴头盔一级骑士.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/单位/红色戴头盔三级骑士.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/单位/红色戴头盔二级骑士.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/印刷厂.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/发明家.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/工程师.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/新建道路.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/灌溉.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/炼金术士.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/药物.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/起重机.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/采矿.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/绿色发展卡/锻铁匠.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/蓝色发展卡/主教.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/蓝色发展卡/叛徒.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/蓝色发展卡/外交官.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/蓝色发展卡/婚礼.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/蓝色发展卡/指挥官.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/蓝色发展卡/权谋.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/发展卡/蓝色发展卡/石碑.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/蓝色发展卡/破坏者.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/发展卡/蓝色发展卡/间谍.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/黄色发展卡/垄断商品.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/黄色发展卡/垄断资源.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/发展卡/黄色发展卡/大商家.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/发展卡/黄色发展卡/黄色商人.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/发展卡/黄色发展卡/黄色商港.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/发展卡/黄色发展卡/黄色贸易船队.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/商品牌/布匹.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/商品牌/纸张.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/商品牌/银币.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/地图板块/小麦.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/地图板块/森林.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/地图板块/沙漠.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/地图板块/海洋.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/地图板块/砖块.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/地图板块/草地.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/地图板块/金矿.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/城市设施/城市设施升级卡.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/城市设施/城市设施满级卡.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/城市设施/绿色1级修道院反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/绿色1级修道院正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/绿色2级图书馆反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/绿色2级图书馆正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/绿色3级引水渠反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/绿色3级引水渠正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/绿色4级剧院反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/绿色4级剧院正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/绿色5级大学反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/绿色5级大学正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/蓝色1级市政厅反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/蓝色2级教堂反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/蓝色2级教堂正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/蓝色3级要塞反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/蓝色3级要塞正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/蓝色4级大教堂反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/蓝色4级大教堂正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/蓝色5级卡坦议会反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/蓝色5级卡坦议会正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/黄色1级市场反面.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/城市设施/黄色1级市场正面.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/城市设施/黄色2级行会反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/黄色2级行会正面.jpg",
+      "width": 3072,
+      "height": 4096
+    },
+    {
+      "path": "assets/references/inbox/城市设施/黄色3级同业公会反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/黄色3级同业公会正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/黄色4级银行反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/黄色4级银行正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/黄色5级商业中心反面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/城市设施/黄色5级商业中心正面.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/奖励卡/卡坦保卫者.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/建筑/红色城市+城墙.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/建筑/红色城市.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/建筑/红色大都会+城墙.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/建筑/红色大都会.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/建筑/红色村庄.jpg",
+      "width": 4096,
+      "height": 3072
+    },
+    {
+      "path": "assets/references/inbox/资源牌/小麦.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/资源牌/木头.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/资源牌/砖头.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/资源牌/羊毛.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/资源牌/资源牌背面.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/资源牌/铁矿石.jpg",
+      "width": 1279,
+      "height": 1706
+    },
+    {
+      "path": "assets/references/inbox/道路/橘色船.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/道路/米色船.jpg",
+      "width": 4096,
+      "height": 3072
+    },
+    {
+      "path": "assets/references/inbox/道路/红色船.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/道路/红色道路.jpg",
+      "width": 1706,
+      "height": 1279
+    },
+    {
+      "path": "assets/references/inbox/道路/蓝色船.jpg",
+      "width": 4096,
+      "height": 3072
+    }
+  ],
+  "category_counts": {
+    "单位": 12,
+    "发展卡/绿色发展卡": 11,
+    "发展卡/蓝色发展卡": 9,
+    "发展卡/黄色发展卡": 7,
+    "商品牌": 3,
+    "地图板块": 7,
+    "城市设施": 32,
+    "奖励卡": 1,
+    "建筑": 5,
+    "资源牌": 6,
+    "道路": 5
+  },
+  "review_scope": "Local inventory only; all 98 photos visually inspected via 11 inspection contact sheets. No generation, source edits, rule edits, or production edits.",
+  "route": "original photo pixel correction, confirmed by user on 2026-10-09; no AI redraw",
+  "completed_samples": [
+    {
+      "id": "forest",
+      "category": "tile",
+      "source_files": [
+        "assets/references/inbox/地图板块/森林.jpg"
+      ],
+      "variants": [
+        "single printed top",
+        "estimated thickness"
+      ],
+      "status": "existing-sample",
+      "notes": "photo-samples-v001: printed tile mesh + frozen AI cleanup candidate; user visual acceptance still pending"
+    },
+    {
+      "id": "wood-card",
+      "category": "resource-card",
+      "source_files": [
+        "assets/references/inbox/资源牌/木头.jpg",
+        "assets/references/inbox/资源牌/资源牌背面.jpg"
+      ],
+      "variants": [
+        "front",
+        "common resource back"
+      ],
+      "status": "existing-sample",
+      "notes": "photo-samples-v001: double-sided card mesh; user visual acceptance still pending"
+    },
+    {
+      "id": "village",
+      "category": "building",
+      "source_files": [
+        "assets/references/inbox/建筑/红色村庄.jpg"
+      ],
+      "variants": [
+        "red reference",
+        "runtime color variants"
+      ],
+      "status": "existing-sample",
+      "notes": "Parameterized approximate mesh; hidden surfaces and actual dimensions unknown"
+    },
+    {
+      "id": "road",
+      "category": "route-piece",
+      "source_files": [
+        "assets/references/inbox/道路/红色道路.jpg"
+      ],
+      "variants": [
+        "red reference",
+        "runtime color variants"
+      ],
+      "status": "existing-sample",
+      "notes": "Parameterized approximate mesh; hidden surfaces and actual dimensions unknown"
+    }
+  ],
+  "conversion_types": [
+    {
+      "id": "tiles",
+      "category": "printed-tile",
+      "source_files": [
+        "assets/references/inbox/地图板块/小麦.jpg",
+        "assets/references/inbox/地图板块/沙漠.jpg",
+        "assets/references/inbox/地图板块/海洋.jpg",
+        "assets/references/inbox/地图板块/砖块.jpg",
+        "assets/references/inbox/地图板块/草地.jpg",
+        "assets/references/inbox/地图板块/金矿.jpg"
+      ],
+      "variants": [
+        "pasture",
+        "sea",
+        "gold",
+        "desert",
+        "fields",
+        "hills"
+      ],
+      "status": "ready-reference",
+      "notes": "Forest is existing sample; mountain has procedural M1 model but no photo and must not count as photo conversion"
+    },
+    {
+      "id": "resource-cards",
+      "category": "resource-card",
+      "source_files": [
+        "assets/references/inbox/资源牌/小麦.jpg",
+        "assets/references/inbox/资源牌/砖头.jpg",
+        "assets/references/inbox/资源牌/羊毛.jpg",
+        "assets/references/inbox/资源牌/铁矿石.jpg"
+      ],
+      "variants": [
+        "ore",
+        "grain",
+        "wool",
+        "brick"
+      ],
+      "status": "ready-reference",
+      "notes": "Use photographed resource back; resource faces have mixed physical photo orientations"
+    },
+    {
+      "id": "commodity-cards",
+      "category": "commodity-card",
+      "source_files": [
+        "assets/references/inbox/商品牌/布匹.jpg",
+        "assets/references/inbox/商品牌/纸张.jpg",
+        "assets/references/inbox/商品牌/银币.jpg"
+      ],
+      "variants": [
+        "cloth",
+        "coin",
+        "paper"
+      ],
+      "status": "ready-reference",
+      "notes": "No separately photographed commodity back; neutral unseen-back material, no resource-back reuse"
+    },
+    {
+      "id": "progress-trade",
+      "category": "progress-card",
+      "source_files": [
+        "assets/references/inbox/发展卡/黄色发展卡/垄断商品.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/垄断资源.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/大商家.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/黄色商人.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/黄色商港.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/黄色贸易船队.jpg"
+      ],
+      "variants": [
+        "6 front types",
+        "1 yellow back"
+      ],
+      "status": "ready-reference",
+      "notes": "Names: 大商家, 商人, 贸易船队, 商港, 垄断商品, 垄断资源. Actual assets are C&K progress cards despite directory name"
+    },
+    {
+      "id": "progress-science",
+      "category": "progress-card",
+      "source_files": [
+        "assets/references/inbox/发展卡/绿色发展卡/印刷厂.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发明家.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/工程师.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/新建道路.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/灌溉.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/炼金术士.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/药物.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/起重机.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/采矿.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/锻铁匠.jpg"
+      ],
+      "variants": [
+        "10 front types",
+        "1 green back"
+      ],
+      "status": "ready-reference",
+      "notes": "Names: 采矿, 锻铁匠, 发明家, 工程师, 灌溉, 炼金术士, 起重机, 新建道路, 药物, 印刷厂"
+    },
+    {
+      "id": "progress-politics",
+      "category": "progress-card",
+      "source_files": [
+        "assets/references/inbox/发展卡/蓝色发展卡/主教.jpg",
+        "assets/references/inbox/发展卡/蓝色发展卡/叛徒.jpg",
+        "assets/references/inbox/发展卡/蓝色发展卡/外交官.jpg",
+        "assets/references/inbox/发展卡/蓝色发展卡/婚礼.jpg",
+        "assets/references/inbox/发展卡/蓝色发展卡/指挥官.jpg",
+        "assets/references/inbox/发展卡/蓝色发展卡/权谋.jpg",
+        "assets/references/inbox/发展卡/蓝色发展卡/石碑.jpg",
+        "assets/references/inbox/发展卡/蓝色发展卡/破坏者.jpg",
+        "assets/references/inbox/发展卡/蓝色发展卡/间谍.jpg"
+      ],
+      "variants": [
+        "9 front types",
+        "blue back missing"
+      ],
+      "status": "front-ready-back-missing",
+      "notes": "Names: 婚礼, 间谍, 叛徒, 破坏者, 权谋, 石碑, 外交官, 指挥官, 主教. Do not recolor a green/yellow back and claim photo provenance"
+    },
+    {
+      "id": "city-improvements",
+      "category": "improvement-board-and-flip-card",
+      "source_files": [
+        "assets/references/inbox/城市设施/城市设施升级卡.jpg",
+        "assets/references/inbox/城市设施/城市设施满级卡.jpg",
+        "assets/references/inbox/城市设施/绿色1级修道院反面.jpg",
+        "assets/references/inbox/城市设施/绿色1级修道院正面.jpg",
+        "assets/references/inbox/城市设施/绿色2级图书馆反面.jpg",
+        "assets/references/inbox/城市设施/绿色2级图书馆正面.jpg",
+        "assets/references/inbox/城市设施/绿色3级引水渠反面.jpg",
+        "assets/references/inbox/城市设施/绿色3级引水渠正面.jpg",
+        "assets/references/inbox/城市设施/绿色4级剧院反面.jpg",
+        "assets/references/inbox/城市设施/绿色4级剧院正面.jpg",
+        "assets/references/inbox/城市设施/绿色5级大学反面.jpg",
+        "assets/references/inbox/城市设施/绿色5级大学正面.jpg",
+        "assets/references/inbox/城市设施/蓝色1级市政厅反面.jpg",
+        "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg",
+        "assets/references/inbox/城市设施/蓝色2级教堂反面.jpg",
+        "assets/references/inbox/城市设施/蓝色2级教堂正面.jpg",
+        "assets/references/inbox/城市设施/蓝色3级要塞反面.jpg",
+        "assets/references/inbox/城市设施/蓝色3级要塞正面.jpg",
+        "assets/references/inbox/城市设施/蓝色4级大教堂反面.jpg",
+        "assets/references/inbox/城市设施/蓝色4级大教堂正面.jpg",
+        "assets/references/inbox/城市设施/蓝色5级卡坦议会反面.jpg",
+        "assets/references/inbox/城市设施/蓝色5级卡坦议会正面.jpg",
+        "assets/references/inbox/城市设施/黄色1级市场反面.jpg",
+        "assets/references/inbox/城市设施/黄色1级市场正面.jpg",
+        "assets/references/inbox/城市设施/黄色2级行会反面.jpg",
+        "assets/references/inbox/城市设施/黄色2级行会正面.jpg",
+        "assets/references/inbox/城市设施/黄色3级同业公会反面.jpg",
+        "assets/references/inbox/城市设施/黄色3级同业公会正面.jpg",
+        "assets/references/inbox/城市设施/黄色4级银行反面.jpg",
+        "assets/references/inbox/城市设施/黄色4级银行正面.jpg",
+        "assets/references/inbox/城市设施/黄色5级商业中心反面.jpg",
+        "assets/references/inbox/城市设施/黄色5级商业中心正面.jpg"
+      ],
+      "variants": [
+        "3 colors x 5 levels x 2 sides = 30 faces",
+        "2 composite guidance board photos"
+      ],
+      "status": "ready-reference",
+      "notes": "32 photos: science green 修道院/图书馆/引水渠/剧院/大学; politics blue 市政厅/教堂/要塞/大教堂/卡坦议会; trade yellow 市场/行会/同业公会/银行/商业中心. Keep photographed words separate from 2025 rule authority"
+    },
+    {
+      "id": "defender-card",
+      "category": "reward-card",
+      "source_files": [
+        "assets/references/inbox/奖励卡/卡坦保卫者.jpg"
+      ],
+      "variants": [
+        "卡坦保卫者 front",
+        "back missing"
+      ],
+      "status": "front-ready-back-missing",
+      "notes": "One victory-point defender card photo; no longest-road/largest-army reference"
+    },
+    {
+      "id": "barbarian-track",
+      "category": "printed-track",
+      "source_files": [
+        "assets/references/inbox/单位/海盗入侵卡.jpg"
+      ],
+      "variants": [
+        "front track",
+        "back unknown"
+      ],
+      "status": "ready-reference",
+      "notes": "Directory name labels pirate invasion; rules use barbarian invasion track. Preserve original filename, map explicit semantic asset ID"
+    },
+    {
+      "id": "ships",
+      "category": "route-piece",
+      "source_files": [
+        "assets/references/inbox/道路/橘色船.jpg",
+        "assets/references/inbox/道路/米色船.jpg",
+        "assets/references/inbox/道路/红色船.jpg",
+        "assets/references/inbox/道路/蓝色船.jpg"
+      ],
+      "variants": [
+        "red",
+        "orange",
+        "blue",
+        "beige"
+      ],
+      "status": "ready-reference",
+      "notes": "4 color references, same ship geometry; sailor/pirate states separate and warship marker photo missing"
+    },
+    {
+      "id": "city",
+      "category": "building",
+      "source_files": [
+        "assets/references/inbox/建筑/红色城市.jpg"
+      ],
+      "variants": [
+        "red city"
+      ],
+      "status": "ready-reference",
+      "notes": "Can use existing source combos for wall fitting but no other physical player colors supplied"
+    },
+    {
+      "id": "city-wall",
+      "category": "building-upgrade",
+      "source_files": [
+        "assets/references/inbox/建筑/红色城市+城墙.jpg",
+        "assets/references/inbox/建筑/红色大都会+城墙.jpg"
+      ],
+      "variants": [
+        "wall under city",
+        "wall under metropolis"
+      ],
+      "status": "ready-reference",
+      "notes": "No standalone wall photo; infer circular ring assembly from two combined objects and mark hidden geometry approximate"
+    },
+    {
+      "id": "metropolis",
+      "category": "building-upgrade",
+      "source_files": [
+        "assets/references/inbox/建筑/红色大都会+城墙.jpg",
+        "assets/references/inbox/建筑/红色大都会.jpg"
+      ],
+      "variants": [
+        "red bare",
+        "red with wall"
+      ],
+      "status": "ready-reference",
+      "notes": "Runtime needs 3 track identity indicators; no photographed science/trade/politics identity markings"
+    },
+    {
+      "id": "knights",
+      "category": "unit",
+      "source_files": [
+        "assets/references/inbox/单位/红色一级骑士.jpg",
+        "assets/references/inbox/单位/红色三级骑士.jpg",
+        "assets/references/inbox/单位/红色二级骑士.jpg",
+        "assets/references/inbox/单位/红色戴头盔一级骑士.jpg",
+        "assets/references/inbox/单位/红色戴头盔三级骑士.jpg",
+        "assets/references/inbox/单位/红色戴头盔二级骑士.jpg"
+      ],
+      "variants": [
+        "levels 1,2,3 x helmet/no helmet = 6 meshes/states",
+        "red reference only"
+      ],
+      "status": "ready-reference",
+      "notes": "Helmet/no-helmet corresponds to active/resting display only after explicit mapping; shape has level-specific flag silhouette"
+    },
+    {
+      "id": "robber",
+      "category": "unit",
+      "source_files": [
+        "assets/references/inbox/单位/强盗 (2).jpg",
+        "assets/references/inbox/单位/强盗.jpg"
+      ],
+      "variants": [
+        "2 angles of same black sculpture"
+      ],
+      "status": "ready-reference",
+      "notes": "Two photos are views, not two independent asset types"
+    },
+    {
+      "id": "pirate",
+      "category": "unit",
+      "source_files": [
+        "assets/references/inbox/单位/海盗（海洋板块上的单位）.jpg"
+      ],
+      "variants": [
+        "black sea pirate ship"
+      ],
+      "status": "ready-reference",
+      "notes": "Keep distinct from barbarian invasion ship"
+    },
+    {
+      "id": "barbarian-ship",
+      "category": "unit",
+      "source_files": [
+        "assets/references/inbox/单位/海盗（入侵卡上的单位）.jpg"
+      ],
+      "variants": [
+        "black invasion ship"
+      ],
+      "status": "ready-reference",
+      "notes": "Rules semantic name is barbarian ship; supplied filename calls it pirate. Preserve filename and disclose mapping"
+    },
+    {
+      "id": "merchant",
+      "category": "unit",
+      "source_files": [
+        "assets/references/inbox/单位/商人.jpg"
+      ],
+      "variants": [
+        "neutral beige sculpture"
+      ],
+      "status": "ready-reference",
+      "notes": "Single oblique photo; backside and underside unknown"
+    }
+  ],
+  "missing_references": [
+    {
+      "category": "identity-scale",
+      "items": [
+        "box/rule edition identity",
+        "ruler measurements",
+        "top/side/rear/underside photos for 3D pieces",
+        "whole table/player area layout"
+      ],
+      "impact": "All current dimensions are estimates; do not promote them to measured facts"
+    },
+    {
+      "category": "base-components",
+      "items": [
+        "mountain/ore tile photo",
+        "number tokens 2,3,4,5,6,8,9,10,11,12 and back/letter variants",
+        "sea border/frame",
+        "3:1 harbor plus five resource 2:1 harbors",
+        "two production dice",
+        "base development card fronts and backs: Knight/Road Building/Year of Plenty/Monopoly/Victory Point",
+        "Longest Road reward card",
+        "Largest Army reward card",
+        "building-cost/reference cards"
+      ],
+      "impact": "Existing rule/runtime placeholders do not constitute entity-photo conversion"
+    },
+    {
+      "category": "seafarers-scenarios",
+      "items": [
+        "CATAN chit/overseas victory token",
+        "cloth supply tokens distinct from commodity cloth card",
+        "neutral cloth villages",
+        "pirate fortress 3 strength layers",
+        "warship state marker",
+        "5 wonder cards and 4-level progress markers",
+        "fog tile back/hidden terrain representation"
+      ],
+      "impact": "Required by implemented M3 scenarios; use no fabricated photo provenance"
+    },
+    {
+      "category": "cities-knights",
+      "items": [
+        "blue progress-card back",
+        "commodity-card back if different",
+        "defender-card back",
+        "event die with color symbols/barbarian faces",
+        "three metropolis track identity indicators",
+        "city-wall standalone views"
+      ],
+      "impact": "Photos cover 25 progress faces and 15 improvement cards; missing back/symbol details remain explicit"
+    }
+  ],
+  "counts": {
+    "photos": 98,
+    "completed_sample_types": 4,
+    "completed_sample_source_photos": 5,
+    "new_source_photos": 93,
+    "remaining_conversion_types": 18,
+    "progress_card_front_types": 25,
+    "progress_back_photos": 2,
+    "city_improvement_face_photos": 30,
+    "city_guidance_board_photos": 2
+  }
+}

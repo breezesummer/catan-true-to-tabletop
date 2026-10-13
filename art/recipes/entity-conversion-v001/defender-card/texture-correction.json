@@ -1,0 +1,41 @@
+{
+  "typeId": "defender-card",
+  "operations": [
+    {
+      "source": "assets/references/inbox/奖励卡/卡坦保卫者.jpg",
+      "sourceSha256": "3c32e1d715f85010436610507e90a69038a1848770b8e386bbbbb4fe535424da",
+      "output": "art/source/entity-conversion-v001/defender-card/textures/defender-card-front.png",
+      "sha256": "5cc2d5c97138448af7def0f521a91274611339b2d4000af679abf08db17903c8",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          420,
+          1032
+        ],
+        [
+          425,
+          407
+        ],
+        [
+          1421,
+          376
+        ],
+        [
+          1435,
+          1060
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    }
+  ],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "04b4d66dc9c40110402e44ac37b3a9bb7aedccd0882b242ddba0590e69f8cfd3"
+}

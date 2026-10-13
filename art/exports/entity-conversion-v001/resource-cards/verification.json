@@ -1,0 +1,107 @@
+{
+  "status": "passed",
+  "typeId": "resource-cards",
+  "assets": [
+    {
+      "id": "resource-wool",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "resource-brick",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "resource-grain",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "resource-ore",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/resource-back-original.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/resource-brick-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/resource-grain-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/resource-ore-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/resource-wool-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    }
+  ],
+  "previews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": null,
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

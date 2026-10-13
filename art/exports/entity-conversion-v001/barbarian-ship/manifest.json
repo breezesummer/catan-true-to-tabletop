@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "barbarian-ship",
+  "label": "蛮族入侵船（入侵轨道上的黑色船雕塑）",
+  "recipePath": "art/recipes/entity-conversion-v001/barbarian-ship/recipe.json",
+  "recipeSha256": "ba00872bc52b60bbb1208eeaf0819ece4d722791c6a6180c572fc756d4ca62e9",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v001/barbarian-ship/builder.py",
+      "sha256": "3dd5d6cecc64dd4237ffc52683a8e635fead6d64400e4ed8a58a535709ace858"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimate-not-measured",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/单位/海盗（入侵卡上的单位）.jpg",
+      "sha256": "b0260a1c0dd5617747b74ca6642e59ce03d074264e78371780881651f9632efa",
+      "role": "barbarian-invasion-ship-visible-sculpture-silhouette-and-dark-material"
+    }
+  ],
+  "assets": [
+    {
+      "id": "barbarian-ship",
+      "label": "蛮族入侵船",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        28,
+        26
+      ],
+      "meshObjects": 2,
+      "triangles": 10974,
+      "geometrySha256": "d89ebb8ed273212430e3f866faac5438f11de5d9a7ed23436e92b94f222c90d6",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.014000000432133675,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.014000000432133675,
+          0.026000000536441803
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.014000000432133675
+        ],
+        "max": [
+          0.006000000052154064,
+          0.026000000536441803,
+          0.014000000432133675
+        ]
+      },
+      "materials": [
+        {
+          "name": "Barbarian_Dark_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.013000000268220901,
+            0.023000000044703484,
+            0.020999999716877937,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        },
+        {
+          "name": "Barbarian_Wave_Base_Plastic",
+          "baseColorLinearRgba": [
+            0.02500000037252903,
+            0.04399999976158142,
+            0.03700000047683716,
+            1.0
+          ],
+          "roughness": 0.3700000047683716,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "3b7e427d1cd761d6ed1530e2cfba3bbdaab2aaa776875c96aa3df481e9a9e8ca",
+      "blendSha256": "c88cba1bb48366cdc73e205aaea70da1f0c9dfea9003f57402535a27e54ba853",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [],
+  "limitations": [
+    "原文件名含“海盗”，在官方 2025 城市与骑士规则及工程语义中对应蛮族入侵船；保留原始文件名与 SHA-256。",
+    "一张较暗斜侧照片只约束可见轮廓，背面、底面、帆后面与细微雕刻未知；本模型是参数化近似，不是扫描复原。",
+    "估算尺寸为本地 X 宽 12、Y 长 28、Z 高 26 mm，宽度包含波浪底座；无实测比例。",
+    "船体舷板、卷曲上翘船首、厚弧帆、桅杆与波浪底座按可见特征制作；未见侧舷按对称近似，不添加玩家船后舱。",
+    "黑绿色塑料颜色受原照片低照度与白平衡影响；材质和波浪细节是近似。",
+    "底心枢轴以底座支承面为准；水线估算为底面以上 1.8 mm，尚无实测。",
+    "Unity 实际导入、相邻组件摆放、拾取与用户外观确认由主任务另行验收。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "aa5c31f77cf352e8b2141ae45d0d25c57863466853963b5aad9d3b593ac09696",
+    "game-camera.png": "5c50a712fdbc3b27a191112036f319f1f10fde2f5ffd23bfd9a85f30c6ebc4e4",
+    "side.png": "1ce7a3a1a7ac91ef3f7b2185cb181b62d73aaed4d48d819b11729b84e4b5de34",
+    "top.png": "ed5b668eb5ddf8f10bbffd53710e27e1966e8577eadb8ab58469d8fffdda5952"
+  }
+}

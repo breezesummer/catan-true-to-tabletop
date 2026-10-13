@@ -1,0 +1,13 @@
+﻿{
+    "status":  "passed",
+    "rules":  [
+                  "base",
+                  "seafarers",
+                  "cities-knights",
+                  "combined"
+              ],
+    "independentProcesses":  2,
+    "saveRestore":  true,
+    "continuedAi":  true,
+    "hiddenSaveLocation":  ".local/art-pipeline/m6-smoke-v002"
+}

@@ -1,0 +1,16 @@
+CATAN_PHOTO_UNITY_IMPORT_OK forest Center: (0.00, 0.00, 0.00), Extents: (0.03, 0.00, 0.04)
+CATAN_PHOTO_UNITY_IMPORT_OK road Center: (0.00, 0.00, 0.00), Extents: (0.00, 0.00, 0.01)
+CATAN_PHOTO_UNITY_IMPORT_OK village Center: (0.00, 0.01, 0.00), Extents: (0.01, 0.01, 0.01)
+CATAN_PHOTO_UNITY_IMPORT_OK resource-card Center: (0.00, 0.00, 0.00), Extents: (0.03, 0.00, 0.04)
+CATAN_PHOTO_UNITY_BUILD_OK
+CATAN_PHOTO_PLAYER_OK: four prefabs, card front/back, rotate/flip/tint, four URP camera renders
+CATAN_M6_MIXED_SEATS_OK: base; players=3; human=P2; AI commands=22; public turn=4
+CATAN_M6_MIXED_SEATS_OK: seafarers; players=4; human=P3; AI commands=34; public turn=5
+CATAN_M6_MIXED_SEATS_OK: cities-knights; players=3; human=P1; AI commands=16; public turn=3
+CATAN_M6_MIXED_SEATS_OK: combined; players=4; human=P4; AI commands=28; public turn=5
+CATAN_M6_PLAYER_SAVE_OK: four rule families; mixed human/AI seats; pause; fixed private view; UI ownership boundary; human wait; AI trade response; versioned authority+seat saves
+CATAN_M6_MIXED_SEATS_OK: base; players=3; human=P2; AI commands=5; public turn=6
+CATAN_M6_MIXED_SEATS_OK: seafarers; players=4; human=P3; AI commands=20; public turn=9
+CATAN_M6_MIXED_SEATS_OK: cities-knights; players=3; human=P1; AI commands=4; public turn=4
+CATAN_M6_MIXED_SEATS_OK: combined; players=4; human=P4; AI commands=21; public turn=9
+CATAN_M6_PLAYER_LOAD_OK: independent process; four rule families; exact authority+seat roundtrip; continued product AI; human choice and trade restored

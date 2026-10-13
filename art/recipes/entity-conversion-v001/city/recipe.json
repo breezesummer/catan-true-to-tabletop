@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "typeId": "city",
+  "label": "城市棋子（红色实体照片参考）",
+  "seed": 20261009,
+  "scaleStatus": "estimate-not-measured",
+  "limitations": [
+    "原始照片只有单个斜侧视角；背面、底部及实际尺寸未知。",
+    "参数化网格依照片可见的圆形阶梯底座、成组坡屋顶、门廊柱、墙面浮雕和台阶制作，非摄影测量或扫描复原。",
+    "估算包围盒为 X 宽 18、Y 深 18、Z 高 20 mm；该尺寸不是实测或用户确认值。",
+    "屋顶背面和墙面细节按对称/简化结构补齐，墙面砖纹为近似浮雕；塑料颜色受照片曝光和白平衡影响。",
+    "只提供有照片依据的红色资产，其他玩家颜色由运行时换色另行处理。"
+  ],
+  "references": [
+    {"originalPath": "assets/references/inbox/建筑/红色城市.jpg", "sha256": "b40d7dfa1b75ad0adbed6bf463c26d3061bdf726837f0570f045195d3b43c993", "role": "red-city-clustered-roofs-portico-stepped-round-base"}
+  ],
+  "assets": [
+    {"id": "city-red", "label": "红色城市", "kind": "custom", "dimensionsMm": [18,18,20], "customBuilder": "art/recipes/entity-conversion-v001/city/builder.py", "builderArgs": {"color": [0.57,0.009,0.020]}}
+  ]
+}

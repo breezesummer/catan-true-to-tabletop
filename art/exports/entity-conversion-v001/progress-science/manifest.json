@@ -1,0 +1,955 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "progress-science",
+  "label": "绿色科学进步卡十种正面与共同背面",
+  "recipePath": "art/recipes/entity-conversion-v001/progress-science/recipe.json",
+  "recipeSha256": "37db3824fe52e10ca8f9953fb7837cff5c325ca198a75e668421d124652d918a",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimated; 54 × 80 × 0.3 mm, not physically measured or user-approved",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/炼金术士.jpg",
+      "sha256": "fdd11dc04cdeb1852f2d0dc0989e8ab5107ff4b644efc6ee6c0833b43a7a64b5",
+      "role": "煉金術士; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/起重机.jpg",
+      "sha256": "4b4410aaf7f70757ec42550905979ed7e2d71bb34248aec702b63b17634a8b9d",
+      "role": "起重機; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/工程师.jpg",
+      "sha256": "9fa002ec01cd40d1d1829749299651c221b637160dc9fcf2a8720d99ef66a7de",
+      "role": "工程師; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/发明家.jpg",
+      "sha256": "8e94d08bf0c7c4aae6f996baa69aff9f80007e599d2a7e21090df0b27cd515b4",
+      "role": "發明家; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/灌溉.jpg",
+      "sha256": "cb814cc85bd78f540a77778feb01965bc7f532bfa92ce8a9a2a30ad489df36e3",
+      "role": "灌溉; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/药物.jpg",
+      "sha256": "dea107041e44f6cfe1499be46d48fdb8cfb4aeb209d738f4294bf0d2a44e6136",
+      "role": "藥物; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/采矿.jpg",
+      "sha256": "48a9ed9e7023938e109e296d15a35aa1935535634c35ea8f5aafb123d0b8dc3a",
+      "role": "採礦; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/印刷厂.jpg",
+      "sha256": "193a5d761f6cc257b3cf97ecc64a1e40cf2975dc3774e194cc4d603c40ab261e",
+      "role": "印刷廠; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/新建道路.jpg",
+      "sha256": "aa68f9356c6dcba85dde9fe0c48df16b145f6e840d54b999ebbb48d05d81fd3a",
+      "role": "興建道路; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/锻铁匠.jpg",
+      "sha256": "11f4ea4b5715ed7a5c0bef506989a6e5b41b478cf532094cb19cff464c4449cd",
+      "role": "鍛冶匠; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg",
+      "sha256": "07b84fce82cb038e187e4df65187327862c663e672aa39a135e98a6ac15b686d",
+      "role": "绿色共同背面; portrait upright original-photo reference",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "progress-science-alchemy",
+      "label": "煉金術士科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "b6ccdd71ad678c33c162f1b71b5bdd07ca6755858da931f181e947ee2e073b95",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-science-alchemy_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-science-alchemy_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-back-original.png"
+        },
+        {
+          "name": "progress-science-alchemy_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-alchemy-front.png"
+        }
+      ],
+      "fbxSha256": "780d1d0f4d746d21e063086431b10f28e45a73ca7dd5599b8627115111e12f7c",
+      "blendSha256": "d5df5a7b8bfd5f39ded29785d6749a0dc1404bcb48339799ba0f406009331101",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-science-crane",
+      "label": "起重機科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "70a228fae445bf948fa0c97e2811ad16b515552b894102105bb2f8e0644a25d8",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-science-crane_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-science-crane_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-back-original.png"
+        },
+        {
+          "name": "progress-science-crane_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-crane-front.png"
+        }
+      ],
+      "fbxSha256": "d4496ec350223283cf4bd977edf3b4412826e37a45a76022e50e6c97b9be4999",
+      "blendSha256": "3fbe9220f21d618f5b4c1a6f5fbf6c997e5867ddfe92fa7652c92c3f2e87c560",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-science-engineering",
+      "label": "工程師科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "47b36e36ecb98fa583c599cb8a647ba1a0ec50de7df498536d3be2569240b754",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-science-engineering_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-science-engineering_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-back-original.png"
+        },
+        {
+          "name": "progress-science-engineering_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-engineering-front.png"
+        }
+      ],
+      "fbxSha256": "63a15ebe5ca22f6920c36a5e408126a5b34a5ecd528ccb508e4431961a14e060",
+      "blendSha256": "5028ac9a27b6fe0c645f327f63093b2a9b6a5dd09c95be6e680abcb7181551e0",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-science-invention",
+      "label": "發明家科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "6e8050b9e1079e4b8b79414b47c8f54abb895bebbd1e85002a64fd9617e91a64",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-science-invention_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-science-invention_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-back-original.png"
+        },
+        {
+          "name": "progress-science-invention_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-invention-front.png"
+        }
+      ],
+      "fbxSha256": "9f52f7656c40017802d27a3a6ec908186e47eaa017455b13e61fc71dc6996b0d",
+      "blendSha256": "0a3b6649ddd9d03d15a68b8d2f48e436247511d15aea93254e546d3296f648a8",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-science-irrigation",
+      "label": "灌溉科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "80949c3491bfd22c19dbf1cb7a108f302a8e4a6653a844a6446f52098f237c4e",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-science-irrigation_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-science-irrigation_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-back-original.png"
+        },
+        {
+          "name": "progress-science-irrigation_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-irrigation-front.png"
+        }
+      ],
+      "fbxSha256": "a2ce8918e6ead16057be4b2f3b50b4cc49aaffe972e1bc4079fb0290346a4483",
+      "blendSha256": "806ecb60188d8206dd5b305cd3dc300f7325617910cd15791d9cf1555a65ee44",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-science-medicine",
+      "label": "藥物科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "c0c15cb16cb027a067eec78a3fd02f1515e567665d2f52ead4c2947000a9b99d",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-science-medicine_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-science-medicine_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-back-original.png"
+        },
+        {
+          "name": "progress-science-medicine_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-medicine-front.png"
+        }
+      ],
+      "fbxSha256": "555b61ffa746a7cf594248ede01495fb0bea1a3b023216f4ad1756a67600a19b",
+      "blendSha256": "c765ccaaf6258d9619363ac6de24609a5e17728bd466d06338fb40d28be98821",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-science-mining",
+      "label": "採礦科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "375bdc92e9fe2e6e1d5d6c3fd445fbe7f0ca01aaa9ff4e36c753aaed80a8e537",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-science-mining_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-science-mining_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-back-original.png"
+        },
+        {
+          "name": "progress-science-mining_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-mining-front.png"
+        }
+      ],
+      "fbxSha256": "898acc291b509648c0379a356add9c3c6fb0a60ede08eaaa11c85ce6eaf3c767",
+      "blendSha256": "e28662e37e231597eb12cddaaeddca5621ddd1b799a85d438a350a6f750946bb",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-science-printing",
+      "label": "印刷廠科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "99478b7f7f1194804881882f192310a0c7fd26ee64f0fc4632bc90db2cc8a45c",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-science-printing_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-science-printing_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-back-original.png"
+        },
+        {
+          "name": "progress-science-printing_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-printing-front.png"
+        }
+      ],
+      "fbxSha256": "512a24ad03ff87b48e73e6937eb90f04c3564243d74bb4028872710c027b23ee",
+      "blendSha256": "66669276a34c1d586c2765f250a6acb8e6754f99fd217c5c104ddc641f6cf9f7",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-science-road-building",
+      "label": "興建道路科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "7c365d794fd0eadfe7c91803394292b8b1f2efa5ce967a92ea0c40a2457bf309",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-science-road-building_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-science-road-building_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-back-original.png"
+        },
+        {
+          "name": "progress-science-road-building_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-road-building-front.png"
+        }
+      ],
+      "fbxSha256": "9d334b87d61e0426cd0d85fa3b0c9265ca7699d67955d4cd86b362e973ead4fd",
+      "blendSha256": "ec8cc8a7d78dfbf5b0e29b9306cc91daa0df97778c497244fe92b482b5c0a148",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-science-smithing",
+      "label": "鍛冶匠科学进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "d4cfab217fcdd028f7b158850f14f0dc0ab0afeb739047586e5c9e0b4c739ce9",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-science-smithing_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-science-smithing_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-back-original.png"
+        },
+        {
+          "name": "progress-science-smithing_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-science-smithing-front.png"
+        }
+      ],
+      "fbxSha256": "8f70449773e63b59711b9fc0b8ea2832f5b45507461e77993164ea538a8cadf9",
+      "blendSha256": "8af617f9d34977e9dbc2434dc805f08dd231e44bed4016a4d5f24f5905317534",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/progress-science-alchemy-front.png",
+      "sha256": "d72e83d114f54db5245146e4848697b02d22fe0aa88324edc67e6651a84b5ac6"
+    },
+    {
+      "path": "textures/progress-science-back-original.png",
+      "sha256": "2ff3ec8817599fb6e5581870f2d7505a96e0f7460f5106c49c5df2c9afd3016c"
+    },
+    {
+      "path": "textures/progress-science-crane-front.png",
+      "sha256": "2b3c22e40178a753b13f3a840746e7d5a2a61a98176b8a7ea39be11c83525873"
+    },
+    {
+      "path": "textures/progress-science-engineering-front.png",
+      "sha256": "ff5ccc4e339086bce7a5c328dc026e3136eae6518c17d0d43dc5fa7bddc6dd6f"
+    },
+    {
+      "path": "textures/progress-science-invention-front.png",
+      "sha256": "abdd86e850104975eea80399037ec3a2e87c285c3534981e19e012beebbacb1a"
+    },
+    {
+      "path": "textures/progress-science-irrigation-front.png",
+      "sha256": "36147611c691674472f772ec164fd9f5194485892b161f60a68af00e56fce783"
+    },
+    {
+      "path": "textures/progress-science-medicine-front.png",
+      "sha256": "b61178f5a922ecf2ade217e17878f529a94107067a1f747bd9419ce39236966d"
+    },
+    {
+      "path": "textures/progress-science-mining-front.png",
+      "sha256": "1ab29bf0f976507892984592e594c25a396b5bbc2582ba9d7cc1fef1a34b0288"
+    },
+    {
+      "path": "textures/progress-science-printing-front.png",
+      "sha256": "bc102f626189e50f174f3181960a842a099e9b1a83ed89d7607a09f710d3ce82"
+    },
+    {
+      "path": "textures/progress-science-road-building-front.png",
+      "sha256": "a6c9f561d1e3cc9ff787447806c7dc7963f3b5d1dbb9cd7a79e25d632f93bfd1"
+    },
+    {
+      "path": "textures/progress-science-smithing-front.png",
+      "sha256": "211a2097cbfa5de44ecb8947b8074b656a33f1fa9e0337f8e0eafcf543dcc6a5"
+    }
+  ],
+  "limitations": [
+    "照片四点透视校正忠实保留印刷插画、文字、曝光、色偏、模糊与保护套反光；没有 AI 重绘、OCR 排版、补字或去反光。",
+    "四角为卡片直边延长线交点，圆角外保留少量背景；本批网格为封闭薄盒体，圆角尚待细化。",
+    "原照题名仅与当前规则 ProgressCardKind 作视觉角色对照，印刷说明不是当前 2025 规则来源；实体版本差异待确认。",
+    "准确卡片尺寸、纸面材质、真实背面毫米尺寸与正背面配准尚待实测和用户确认。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "dc24f338aa5dbcc9f3e50cd7e3b2bb45c262aef0cf33cc6e68b9496a51ecfbff",
+    "game-camera.png": "5563f5e4e0c928ae586d4cb37a10a01dbb60d31e38c41a4173a2e3112141033b",
+    "side.png": "e03cf006733dd0bf553ab18d420650401bca40161c3cd5e038e9dae5b1b9c0e0",
+    "top.png": "909a587d22b8ce871f956ea71586521c3fcfe7cd7a0777889e1deb9972a20bc7"
+  }
+}

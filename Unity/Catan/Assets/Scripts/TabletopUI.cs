@@ -13,8 +13,9 @@ public sealed class TabletopSeat
 
 public sealed class TabletopUI
 {
-    public static readonly Rect ContextRect = new Rect(1010, 365, 404, 265);
-    public static readonly Rect EndTurnRect = new Rect(1235,842,177,43);
+    public static readonly Rect ContextRect = new Rect(982, 315, 432, 390);
+    public static readonly Rect EndTurnRect = new Rect(1290,842,122,43);
+    static readonly Rect SpecialRect = new Rect(18,68,190,36);
     readonly List<Rect> hits = new List<Rect>();
     readonly List<TabletopWorldObjects.Hit> worldHits = new List<TabletopWorldObjects.Hit>();
     TabletopScene table;
@@ -24,11 +25,16 @@ public sealed class TabletopUI
     bool contextVisible;
     static Texture2D disc;
     readonly TabletopDicePresentation dice = new TabletopDicePresentation();
+    readonly TabletopHistoryUI history = new TabletopHistoryUI();
+    public bool HistoryOpen => history.IsOpen;
+    public bool BlocksOverlayInput(Vector2 p) => history.BlocksInput(p)||contextVisible&&ContextRect.Contains(p);
+    public void DrawHistory(Font font,Catan.Core.GameHistoryEntry[] entries,string[] players)
+    {history.Draw(font,entries,players);}
     public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
     public void ObserveDice(long sequence,int first,int second,int? eventDie)
     {dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);}
     static readonly Color Cream = new Color(.96f,.88f,.70f), Ink = new Color(.24f,.12f,.06f);
-    public bool BlocksBoardInput(Vector2 p) => hits.Any(r=>r.Contains(p)) || worldHits.Any(h=>h.Contains(p)) || contextVisible && ContextRect.Contains(p);
+    public bool BlocksBoardInput(Vector2 p) => history.BlocksInput(p) || hits.Any(r=>r.Contains(p)) || worldHits.Any(h=>h.Contains(p)) || contextVisible && ContextRect.Contains(p);
     internal static string[] OpponentOrder(string ownSeat,System.Collections.Generic.IEnumerable<string> ids)
     {
         var ordered=ids.OrderBy(id=>int.Parse(id.Substring(1))).ToArray();int own=Array.IndexOf(ordered,ownSeat);
@@ -62,18 +68,16 @@ public sealed class TabletopUI
     }
     bool ObjectButton(Rect r,string label,bool enabled=true)
     {
-        hits.Add(r);Note(r);bool prior=GUI.enabled;GUI.enabled=prior&&enabled;
-        var style=new GUIStyle(center);style.normal.textColor=enabled?Ink:new Color(.52f,.43f,.34f);
-        bool clicked=GUI.Button(r,label,style);GUI.enabled=prior;return clicked;
+        hits.Add(r);return ModernOperationUI.Button(r,label,enabled,r==EndTurnRect);
     }
     public void Draw(Font font,string seat,string actor,string phase,int turn,int ownPoints,int dice1,int dice2,
         TabletopSeat[] seats,bool canRoll,bool canEnd,Action roll,Action end,Action<string> trade,
         Action special=null,string specialLabel="",string detail="")
     {
-        Styles(font);hits.Clear();worldHits.Clear();table.Objects.Begin("public");
+        Styles(font);ModernOperationUI.Styles(font);hits.Clear();worldHits.Clear();table.Objects.Begin("public");
         // 临时便签覆盖的桌面物件不能先于上层按钮响应同一次点击。
         bool tableEnabled=GUI.enabled;
-        if(contextVisible&&ContextRect.Contains(Event.current.mousePosition))GUI.enabled=false;
+        if(BlocksOverlayInput(Event.current.mousePosition))GUI.enabled=false;
         contextVisible=false;
         var others=OpponentOrder(seat,seats.Select(p=>p.Id)).Select(id=>seats.First(p=>p.Id==id)).ToArray();
         for(int i=0;i<others.Length;i++)
@@ -85,12 +89,12 @@ public sealed class TabletopUI
         GUI.Label(new Rect(500,121,440,27),"第 "+turn+" 回合  ·  "+actor+"  ·  "+phase,center);
         GUI.Label(new Rect(18,842,170,38),seat+" · 你   "+ownPoints+" 分",title);
         if(!string.IsNullOrEmpty(detail))GUI.Label(new Rect(24,662,181,52),detail,small);
-        var bank=table.ProjectLabel(new Rect(28,532,157,68));hits.Add(bank);
+        var bank=table.ProjectLabel(new Rect(28,434,157,68));hits.Add(bank);
         for(int i=0;i<3;i++)
         {
-            var card=table.Objects.Card("bank-card-"+i,new Rect(36+i*45,534,40,57),EntityCardAssets.ResourceFront(i));worldHits.Add(card);
+            var card=table.Objects.Card("bank-card-"+i,new Rect(36+i*45,436,40,57),EntityCardAssets.ResourceFront(i));worldHits.Add(card);
         }
-        TableLabel(new Rect(28,579,157,24),"银行 / 港口 · 交换",center);
+        TableLabel(new Rect(28,481,157,24),"银行 / 港口 · 交换",center);
         if(GUI.Button(bank,GUIContent.none,GUIStyle.none))trade?.Invoke(null);
         bool expansion=dice.Event.HasValue;
         var diceRects=expansion?new[]{new Rect(1258,548,48,48),new Rect(1333,548,48,48),new Rect(1295,485,48,48)}
@@ -107,7 +111,7 @@ public sealed class TabletopUI
         GUI.enabled=enabled;
         table.Objects.End();
         if(ObjectButton(EndTurnRect,"结束回合",canEnd&&!DiceRolling))end?.Invoke();
-        if(special!=null&&ObjectButton(new Rect(28,482,159,36),specialLabel))special();
+        if(special!=null&&ObjectButton(SpecialRect,specialLabel))special();
         GUI.enabled=tableEnabled;
     }
     void DrawSeat(TabletopSeat p,int place,bool active,Action<string> trade)
@@ -131,7 +135,10 @@ public sealed class TabletopUI
             var card=table.Objects.Card("opponent-"+p.Id+"-card-"+i,new Rect(top?cx+i*30:x+3+i*30,cy,27,39),back);worldHits.Add(card);
         }
         TableLabel(new Rect(top?cx-8:x,top?y+86:y+236,top?115:180,22),p.Resources+" 资源 · "+p.Cards+" 卡",new GUIStyle(center){fontSize=12});
-        if(GUI.Button(seatRect,GUIContent.none,GUIStyle.none))trade?.Invoke(p.Id);
+        // 浮层与银行在视觉上盖住席位时，不允许整块席位热区先吞掉点击。
+        bool covered=SpecialRect.Contains(Event.current.mousePosition)||history.BlocksInput(Event.current.mousePosition)
+            ||table.ProjectLabel(new Rect(28,434,157,68)).Contains(Event.current.mousePosition);
+        if(!covered&&GUI.Button(seatRect,GUIContent.none,GUIStyle.none))trade?.Invoke(p.Id);
     }
     void DrawStock(string kind,int count,string seat,float x,float y,float width,float size,int row)
     {
@@ -146,9 +153,8 @@ public sealed class TabletopUI
     {GUI.Label(table.ProjectLabel(r),value,new GUIStyle(style){fontSize=Mathf.Max(9,Mathf.RoundToInt(style.fontSize*table.DisplayScale))});}
     public void BeginContext(string caption)
     {
-        contextVisible=true;Note(ContextRect);
-        var inkTitle=new GUIStyle(title);inkTitle.normal.textColor=Ink;
-        GUI.Label(new Rect(ContextRect.x+12,ContextRect.y+7,ContextRect.width-24,30),caption,inkTitle);
+        contextVisible=true;ModernOperationUI.Panel(ContextRect);
+        GUI.Label(new Rect(ContextRect.x+18,ContextRect.y+12,ContextRect.width-36,30),caption,ModernOperationUI.Title);
         GUILayout.BeginArea(new Rect(ContextRect.x+16,ContextRect.y+44,ContextRect.width-32,ContextRect.height-55));
         scroll=GUILayout.BeginScrollView(scroll);
     }

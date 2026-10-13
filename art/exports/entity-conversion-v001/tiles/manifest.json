@@ -1,0 +1,497 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "tiles",
+  "label": "六种剩余原照片地图板块",
+  "recipePath": "art/recipes/entity-conversion-v001/tiles/recipe.json",
+  "recipeSha256": "f5ace065c33d4256ce1c366f7516f575ba52a96e7fb224d1a23f5590187e40d2",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimated; 68.58921198 × 79.2 × 8 mm, radius 39.6 mm; not physically measured or user-approved",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/地图板块/草地.jpg",
+      "sha256": "1133266b670cc97b46d27bc8f1a7eb7e1ab41e23fb065f35fb4e0aeaacfae2cf",
+      "role": "pasture printed top; flat-top photo; unknown back"
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/海洋.jpg",
+      "sha256": "310cdeaaa1c1367b0a0e982f91951109bb2b5c818d7676066f3f6d3c8367dd10",
+      "role": "sea printed top; flat-top photo; unknown back"
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/金矿.jpg",
+      "sha256": "288a67240785b5d5b9372d2173199ed8d8837f5cf70d585a242cb60c8498b44e",
+      "role": "gold printed top; flat-top photo; unknown back"
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/沙漠.jpg",
+      "sha256": "d9d63fa835f74b8962a691bd408f782fc8794616aa3d92519820e3f4aad9123d",
+      "role": "desert printed top; flat-top photo; unknown back"
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/小麦.jpg",
+      "sha256": "fb70c010424a66bc28e38bfc3ef18104664195de03ab10b6ce5fdf0337a6f5d3",
+      "role": "fields printed top; flat-top photo; unknown back"
+    },
+    {
+      "originalPath": "assets/references/inbox/地图板块/砖块.jpg",
+      "sha256": "ad9244724ceb65a987b240e2e9336dffb931b91f29d2bd8aaa58487d0e7cd2c1",
+      "role": "hills printed top; flat-top photo; unknown back"
+    }
+  ],
+  "assets": [
+    {
+      "id": "tile-pasture",
+      "label": "草地印刷板块",
+      "kind": "tile",
+      "dimensionsMm": [
+        68.58921198,
+        79.2,
+        8
+      ],
+      "meshObjects": 1,
+      "triangles": 20,
+      "geometrySha256": "5a106dda6e06e73c5cf3e923e79c2b1c4c19c8a812c8725e96f53349c9bec102",
+      "blenderBounds": {
+        "min": [
+          -0.03429460525512695,
+          -0.03959999978542328,
+          0.0
+        ],
+        "max": [
+          0.03429460525512695,
+          0.03959999978542328,
+          0.00800000037997961
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.03429460525512695,
+          0.0,
+          -0.03959999978542328
+        ],
+        "max": [
+          0.03429460525512695,
+          0.00800000037997961,
+          0.03959999978542328
+        ]
+      },
+      "materials": [
+        {
+          "name": "tile-pasture_PhotoTop",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "tile-pasture-top.png"
+        },
+        {
+          "name": "tile-pasture_TileEdge",
+          "baseColorLinearRgba": [
+            0.550000011920929,
+            0.4000000059604645,
+            0.20000000298023224,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "4ef5926110eaeadd78ff2cc9a490de62657073a0a9e642c5435be07fea0fd4a8",
+      "blendSha256": "53e72618963cade1c8a0ab65471bd342f5c075e74fa74d08a7562da234da32ca",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "tile-sea",
+      "label": "海洋印刷板块",
+      "kind": "tile",
+      "dimensionsMm": [
+        68.58921198,
+        79.2,
+        8
+      ],
+      "meshObjects": 1,
+      "triangles": 20,
+      "geometrySha256": "8bf8835e5475e2365caeb53a216c309c4b6194935f8fae62e46f1bdf1a53f5bd",
+      "blenderBounds": {
+        "min": [
+          -0.03429460525512695,
+          -0.03959999978542328,
+          0.0
+        ],
+        "max": [
+          0.03429460525512695,
+          0.03959999978542328,
+          0.00800000037997961
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.03429460525512695,
+          0.0,
+          -0.03959999978542328
+        ],
+        "max": [
+          0.03429460525512695,
+          0.00800000037997961,
+          0.03959999978542328
+        ]
+      },
+      "materials": [
+        {
+          "name": "tile-sea_PhotoTop",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "tile-sea-top.png"
+        },
+        {
+          "name": "tile-sea_TileEdge",
+          "baseColorLinearRgba": [
+            0.550000011920929,
+            0.4000000059604645,
+            0.20000000298023224,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "cc42a0c791fb212b076d2938aeadb916a0c83decfcfdbda861b2268459e2fe2f",
+      "blendSha256": "9698186822d37ed95cab8899390eba271cd90af1eea17f7bffc0e96716940cbf",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "tile-gold",
+      "label": "金矿印刷板块",
+      "kind": "tile",
+      "dimensionsMm": [
+        68.58921198,
+        79.2,
+        8
+      ],
+      "meshObjects": 1,
+      "triangles": 20,
+      "geometrySha256": "0044dec2e00ced0d43088053ee57ebf1a5bdfa55f97f827307c1121c51740cb0",
+      "blenderBounds": {
+        "min": [
+          -0.03429460525512695,
+          -0.03959999978542328,
+          0.0
+        ],
+        "max": [
+          0.03429460525512695,
+          0.03959999978542328,
+          0.00800000037997961
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.03429460525512695,
+          0.0,
+          -0.03959999978542328
+        ],
+        "max": [
+          0.03429460525512695,
+          0.00800000037997961,
+          0.03959999978542328
+        ]
+      },
+      "materials": [
+        {
+          "name": "tile-gold_PhotoTop",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "tile-gold-top.png"
+        },
+        {
+          "name": "tile-gold_TileEdge",
+          "baseColorLinearRgba": [
+            0.550000011920929,
+            0.4000000059604645,
+            0.20000000298023224,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "55bafabb5a48801fc7d6f82fb481d89e789cdfaf29da6c7be356fd3c57cff92d",
+      "blendSha256": "9d6eea357929ccd6262350357a2bbb7968c704d83ef31d15ff6e83be3bd06e28",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "tile-desert",
+      "label": "沙漠印刷板块",
+      "kind": "tile",
+      "dimensionsMm": [
+        68.58921198,
+        79.2,
+        8
+      ],
+      "meshObjects": 1,
+      "triangles": 20,
+      "geometrySha256": "438a124d38dd307c299a1b61b0481bf7f0c300df5f9e8c1a94b5df4ab05d4665",
+      "blenderBounds": {
+        "min": [
+          -0.03429460525512695,
+          -0.03959999978542328,
+          0.0
+        ],
+        "max": [
+          0.03429460525512695,
+          0.03959999978542328,
+          0.00800000037997961
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.03429460525512695,
+          0.0,
+          -0.03959999978542328
+        ],
+        "max": [
+          0.03429460525512695,
+          0.00800000037997961,
+          0.03959999978542328
+        ]
+      },
+      "materials": [
+        {
+          "name": "tile-desert_PhotoTop",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "tile-desert-top.png"
+        },
+        {
+          "name": "tile-desert_TileEdge",
+          "baseColorLinearRgba": [
+            0.550000011920929,
+            0.4000000059604645,
+            0.20000000298023224,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "1200f42715c3f8c8ef7d51c6291f09f16ea93cea71a1120a541fb9e2e15f8f5b",
+      "blendSha256": "6347fed3a7e3e3122e50ec7f6366a970cac812067beca64ca8058cc8a8b7d222",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "tile-fields",
+      "label": "小麦印刷板块",
+      "kind": "tile",
+      "dimensionsMm": [
+        68.58921198,
+        79.2,
+        8
+      ],
+      "meshObjects": 1,
+      "triangles": 20,
+      "geometrySha256": "c6333b3615c9fdfe62545de76ba3a09fbd3b75353c7d06e6ce6c23cfbf9367ac",
+      "blenderBounds": {
+        "min": [
+          -0.03429460525512695,
+          -0.03959999978542328,
+          0.0
+        ],
+        "max": [
+          0.03429460525512695,
+          0.03959999978542328,
+          0.00800000037997961
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.03429460525512695,
+          0.0,
+          -0.03959999978542328
+        ],
+        "max": [
+          0.03429460525512695,
+          0.00800000037997961,
+          0.03959999978542328
+        ]
+      },
+      "materials": [
+        {
+          "name": "tile-fields_PhotoTop",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "tile-fields-top.png"
+        },
+        {
+          "name": "tile-fields_TileEdge",
+          "baseColorLinearRgba": [
+            0.550000011920929,
+            0.4000000059604645,
+            0.20000000298023224,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "f3287a3a817b0418b3ed9974f12cc95790b60212a60264f1b0bf777e511bfc74",
+      "blendSha256": "df6c35c0742297b72bf0d81428c0e28edc2220700376ab7ee1647319d773ba04",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "tile-hills",
+      "label": "砖块印刷板块",
+      "kind": "tile",
+      "dimensionsMm": [
+        68.58921198,
+        79.2,
+        8
+      ],
+      "meshObjects": 1,
+      "triangles": 20,
+      "geometrySha256": "163f210f256160a5e4183025267be063f4b4445cc74ddf79f55a183cc1d2f315",
+      "blenderBounds": {
+        "min": [
+          -0.03429460525512695,
+          -0.03959999978542328,
+          0.0
+        ],
+        "max": [
+          0.03429460525512695,
+          0.03959999978542328,
+          0.00800000037997961
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.03429460525512695,
+          0.0,
+          -0.03959999978542328
+        ],
+        "max": [
+          0.03429460525512695,
+          0.00800000037997961,
+          0.03959999978542328
+        ]
+      },
+      "materials": [
+        {
+          "name": "tile-hills_PhotoTop",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "tile-hills-top.png"
+        },
+        {
+          "name": "tile-hills_TileEdge",
+          "baseColorLinearRgba": [
+            0.550000011920929,
+            0.4000000059604645,
+            0.20000000298023224,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "ff762707742e6fd158045633f754805e95b73a44c7319f8278cf062577467586",
+      "blendSha256": "59caa1b60e2fa90068a34b266b3d42add347471e0deedff259977eaed59deaee",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/tile-desert-top.png",
+      "sha256": "195fb3f8bbed38426a31bf1a17bda9caf1cce9b52718d1fd304a9ec9fb8acf30"
+    },
+    {
+      "path": "textures/tile-fields-top.png",
+      "sha256": "2cff594892e813c1e5c1008c74a8367c9e56c6da49ba08e43ab06787147be9d4"
+    },
+    {
+      "path": "textures/tile-gold-top.png",
+      "sha256": "f40f2f67bb85c39b19b0c1e6a29cd3bba1b04be51b6e4f423fbaf41950f4377f"
+    },
+    {
+      "path": "textures/tile-hills-top.png",
+      "sha256": "5e7a320c6749b5e84393491301819f47a708ec6f7bb82fb3062f7074287c48f2"
+    },
+    {
+      "path": "textures/tile-pasture-top.png",
+      "sha256": "8832b7d356ced40dd5fc7352671337c7af3dd00185b1154303a0c6d89a63fed2"
+    },
+    {
+      "path": "textures/tile-sea-top.png",
+      "sha256": "cfb0372e64752935ad21b9c54e0a61da712d3fabe9fae58f999853cf9c0d787c"
+    }
+  ],
+  "limitations": [
+    "仅用原照片像素进行六三角 affine 六角校正；插画、印刷标识、失焦、曝光与表面噪点保留，没有 AI 重绘或颜色替换。",
+    "原照片平顶六边形按对应顶点映射到30度起点尖顶六角；整体相位约逆时针30度，校正后的纹理与米制网格显式UV一一对应。",
+    "六三角 affine 是按人工读取顶点分片映射，并非精确镜头标定；径向三角交界的局部插值变化、圆角裁切与极少边界背景仍可能可见。",
+    "输出为有估算厚度的印刷板块实际封闭网格，并非立体草地、山体、沙丘或海面景观。",
+    "背面、实际厚度和毫米尺寸未知；背面仅中性材质，不能称原版还原。森林旧样板保留，本类型不重做。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "c477efd74c38a9ea9a8eea2674b23afb57aaae01ac13f8099b6a7f26d2b38040",
+    "game-camera.png": "e8859862893fc6850a17a5492de8a5e17b5e3a62672f3aba9e5420f5786d550a",
+    "side.png": "1c3df17b4e3a3eb8ebeeb5fd7398ff736fc6a11b36519cd03542bcccb726c42c",
+    "top.png": "968a98b5760505b48c43902e9d315c080719e5b375642d22318f4e354a21308c"
+  }
+}

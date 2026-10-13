@@ -69,6 +69,7 @@ public sealed partial class M6App : MonoBehaviour
         gameObject.AddComponent<M6PlayerVerification>().Initialize(this);
         gameObject.AddComponent<OperationUiVerification>();
         gameObject.AddComponent<TabletopUiVerification>();
+        gameObject.AddComponent<TabletopV005Review>();
     }
     void Update()
     {
