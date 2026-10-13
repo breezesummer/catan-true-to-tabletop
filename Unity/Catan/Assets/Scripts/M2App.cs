@@ -48,7 +48,8 @@ public sealed partial class M2App : MonoBehaviour
     {
         if(host==null)return;
         Vector2 releasePoint=Vector2.zero;bool released=ai!=null&&dock.ConsumeBuildRelease(out releasePoint);
-        if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();}
+        if(ai!=null&&ai.TableMenuOpen){board.ClearPreview();return;}
+        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(!DockBlocksMouse()&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGameDialog||!holding||view==null||ai!=null&&!ai.IsHumanTurn)return;
@@ -68,6 +69,13 @@ public sealed partial class M2App : MonoBehaviour
             if(hover!="")Drop(hover);
             else {CancelPickup();status="没有吸附目标，已取消；局面保持不变。";}
         }
+    }
+    internal bool TryCancelTableInteraction()
+    {
+        if(tabletop.TryCloseOverlay())return true;
+        bool active=holding||preparedDevelopment.HasValue||preparedPurchase||tableNotes||newGameDialog||cardArt.HasSelection||dock.HasCancelableInteraction;
+        if(!active)return false;
+        dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();return true;
     }
     static bool IsRoad(CommandKind kind) => kind==CommandKind.SetupRoad||kind==CommandKind.BuildRoad||kind==CommandKind.PlaceFreeRoad;
     string[] TargetIds()
