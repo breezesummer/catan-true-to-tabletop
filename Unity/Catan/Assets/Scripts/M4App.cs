@@ -34,6 +34,7 @@ public sealed partial class M4App : MonoBehaviour
     public void Start()
     {
         Application.targetFrameRate=60;ai=GetComponent<M6App>();host=new M4LocalGameHost(ai==null?4:ai.PlayerCount);
+        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints);
 
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         var initial=host.View(ai==null?"P1":ai.HumanSeat);nextSeat=initial.ActivePlayerId;Refresh(initial);
@@ -72,7 +73,7 @@ public sealed partial class M4App : MonoBehaviour
         if(result.Success)
         {
             draft=null;
-            if(view.Phase==GamePhase.Finished)status=view.WinnerPlayerId+" 达到 13 分，本局结束。";
+            if(view.Phase==GamePhase.Finished)status=view.WinnerPlayerId+" 达到 "+view.TargetVictoryPoints+" 分，本局结束。";
             else if(ai==null&&Actor(view)!=seat)SwitchSeat(Actor(view));
         }
         return result;
@@ -136,7 +137,7 @@ public sealed partial class M4App : MonoBehaviour
     {
         string[] ids=type=="E"?view.Board.Edges.Select(x=>x.Id).ToArray():type=="T"?view.Board.Tiles.Select(x=>x.Id).ToArray():view.Board.Vertices.Select(x=>x.Id).ToArray();
         string nearest="";float distance=(type=="T"?42:25)*Screen.width/1440f;
-        foreach(var id in ids){float d=Vector2.Distance(mouse,board.ScreenPoint(id));if(d<distance){distance=d;nearest=id;}}
+        foreach(var id in ids){var projected=board.ScreenPoint(id);if(ai!=null&&(!TabletopUI.ContainsMapScreenPoint(mouse)||!TabletopUI.ContainsMapScreenPoint(projected)))continue;float d=Vector2.Distance(mouse,projected);if(d<distance){distance=d;nearest=id;}}
         return nearest;
     }
     void Panel(Rect r,Color c){var old=GUI.color;GUI.color=c;GUI.DrawTexture(r,Texture2D.whiteTexture);GUI.color=old;}
@@ -240,7 +241,7 @@ public sealed partial class M4App : MonoBehaviour
         foreach(var k in view.Board.Knights)
         {
             var p=board.ScreenPoint(k.LocationId);p=new Vector2(p.x*1440/Screen.width,p.y*900/Screen.height);
-            if(ai==null || new Rect(p.x-25,p.y-40,60,75).Contains(Event.current.mousePosition))
+            if(ai==null)
                 GUI.Label(new Rect(p.x-26,p.y-36,86,21),k.PlayerId+" 骑"+k.Level+(k.Active?" ●":" ○"),small);
         }
     }

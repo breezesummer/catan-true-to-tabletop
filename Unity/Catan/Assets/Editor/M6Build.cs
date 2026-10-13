@@ -65,7 +65,7 @@ public static class M6Build
         PlayerSettings.colorSpace = ColorSpace.Linear;
         var root = Path.GetFullPath(Path.Combine(Application.dataPath, "../../.."));
         var args=Environment.GetCommandLineArgs();int outputFlag=Array.IndexOf(args,"--m6-output-root");
-        var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/m6-ui-v006");
+        var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/m6-ui-v008-final");
         var output = Path.Combine(buildRoot, "Builds/Windows/CatanM6.exe");
         Directory.CreateDirectory(Path.GetDirectoryName(output));
         var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {

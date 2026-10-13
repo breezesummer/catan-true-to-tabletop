@@ -24,6 +24,7 @@ public sealed class M6PlayerVerification : MonoBehaviour
     M5App Combined=>GetComponent<M5App>();
     int Turn=>app.RuleSet=="base"?Base.M6View.Turn:app.RuleSet=="seafarers"?Sea.M6View.Turn:app.RuleSet=="cities-knights"?City.M6View.Turn:Combined.M6View.Turn;
     string Phase=>app.RuleSet=="base"?Base.M6View.Phase.ToString():app.RuleSet=="seafarers"?Sea.M6View.Phase.ToString():app.RuleSet=="cities-knights"?City.M6View.Phase.ToString():Combined.M6View.Phase.ToString();
+    int TargetVictoryPoints=>app.RuleSet=="base"?Base.M6View.TargetVictoryPoints:app.RuleSet=="seafarers"?Sea.M6View.TargetVictoryPoints:app.RuleSet=="cities-knights"?City.M6View.TargetVictoryPoints:Combined.M6View.TargetVictoryPoints;
     string Authority()=>app.RuleSet=="base"?Base.VerificationHost.ExportSave():app.RuleSet=="seafarers"?Sea.VerificationHost.ExportSave():app.RuleSet=="cities-knights"?City.VerificationHost.ExportSave():Combined.VerificationHost.ExportSave();
     void CheckPrivacy()
     {
@@ -96,13 +97,15 @@ public sealed class M6PlayerVerification : MonoBehaviour
         var rules=new[]{"base","seafarers","cities-knights","combined"};
         var scenarios=new[]{"heading-for-new-shores","new-world","heading-for-new-shores","through-the-desert"};
         var humans=new[]{"P2","P3","P1","P4"};
+        var targets=new[]{11,15,14,17};
         for(int i=0;i<rules.Length;i++)
         {
             stage=rules[i]+"-initialize";string path=Path.Combine(directory,rules[i]+".json");
-            if(saving)app.StartGame(rules[i],scenarios[i],i%2==0?3:4,humans[i],true);else app.ReadSave(path);
+            if(saving)app.StartGame(rules[i],scenarios[i],i%2==0?3:4,humans[i],true,targetVictoryPoints:targets[i]);else app.ReadSave(path);
             // New and previous components are settled by Unity before the adapter is inspected.
             yield return null;yield return null;
             Require(app.Ready&&app.RuleSet==rules[i]&&app.HumanSeat==humans[i]&&app.Paused,"Configuration lost");
+            Require(app.TargetVictoryPoints==targets[i]&&TargetVictoryPoints==targets[i],"自定义胜利分数未传入规则或恢复后发生变化");
             if(!saving)Require(app.ExportEnvelope()==File.ReadAllText(path),"Process roundtrip differs");
             CheckPrivacy();CheckHumanBoundary();
             string beforeMenu=app.ExportEnvelope();app.ShowMenu();Require(!app.StepAi(),"Menu advanced AI");app.ResumeGame();Require(beforeMenu==app.ExportEnvelope(),"Menu altered configuration");
@@ -119,7 +122,7 @@ public sealed class M6PlayerVerification : MonoBehaviour
             }
             Require(steps<240&&app.AiCommandsExecuted>0&&humanSteps>0,"Mixed seats did not progress");
             if(saving)app.WriteSave(path);
-            Debug.Log("CATAN_M6_MIXED_SEATS_OK: "+rules[i]+"; players="+app.PlayerCount+"; human="+app.HumanSeat+"; AI commands="+app.AiCommandsExecuted+"; public turn="+Turn);
+            Debug.Log("CATAN_M6_MIXED_SEATS_OK: "+rules[i]+"; players="+app.PlayerCount+"; human="+app.HumanSeat+"; AI commands="+app.AiCommandsExecuted+"; public turn="+Turn+"; target points="+TargetVictoryPoints);
             if(saving&&i==0)
             {
                 stage="base-trade";

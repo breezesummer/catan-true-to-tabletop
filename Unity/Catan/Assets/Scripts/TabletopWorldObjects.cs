@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-// 所有物件共用地图相机与米制桌面。这里只接收已授权的显示数据，拾取不裁决规则。
+// 周边物件使用固定桌面相机与米制桌面。这里只接收已授权的显示数据，拾取不裁决规则。
 public sealed class TabletopWorldObjects : MonoBehaviour
 {
     public sealed class Hit
@@ -81,6 +81,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         {
             int firstOwnedMesh=meshes.Count;
             var obj = create(); obj.name = key; obj.transform.SetParent(transform, true);
+            TabletopScene.SetTableLayer(obj.transform);
             foreach (var collider in obj.GetComponentsInChildren<Collider>()) { collider.enabled = false; Destroy(collider); }
             item = new Item { Object = obj, Signature = signature, Hit = new Hit { Scene = scene, Root = obj.transform }, OwnedMeshes=meshes.Skip(firstOwnedMesh).ToArray() };
             items.Add(key, item);
@@ -105,7 +106,15 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         });
         item.Object.transform.position = scene.World(position) + Vector3.up * (raised ? .003f : .0002f);
         item.Object.transform.rotation = Quaternion.Euler(0, kind == "road" ? 90 : 180, 0);
-        if(item.Hit.Renderers==null)item.Hit.Renderers=item.Object.GetComponentsInChildren<Renderer>();return item.Hit;
+        if(item.Hit.Renderers==null)item.Hit.Renderers=item.Object.GetComponentsInChildren<Renderer>();
+        if(key.StartsWith("stock-",StringComparison.Ordinal))
+        {
+            // 模型高度各不相同，个人区按实际投影轮廓保留地图下方的空隙。
+            // 不能仅用模型底部锚点判断：高城堡会从锚点向屏幕上方伸出。
+            float top=item.Hit.Rect.yMin,minimum=TabletopScene.BoardArea.yMax+10;
+            if(top<minimum)item.Object.transform.position+=scene.World(position+Vector2.up*(minimum-top))-scene.World(position);
+        }
+        return item.Hit;
     }
     Material Face(Texture2D texture, Rect uv, Color color, float smoothness = .24f)
     {
@@ -211,7 +220,15 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     public Hit Card(string key, Rect layout, Texture2D texture, bool raised = false, Rect? uv = null, float elevation = 0)
     {
         var size = new Vector2(layout.width, layout.height) * scene.UnitsPerPixel;
-        return Surface(key, scene.World(layout.center) + Vector3.up * ((raised ? .002f : .0001f)+elevation), size, texture, uv ?? new Rect(0,0,1,1));
+        var position=scene.World(layout.center)+Vector3.up*((raised?.002f:.0001f)+elevation);
+        size=FitProjectedSize(position,size,layout.size);
+        return Surface(key,position,size,texture,uv??new Rect(0,0,1,1));
+    }
+    Vector2 FitProjectedSize(Vector3 position,Vector2 size,Vector2 maximum)
+    {
+        var projected=scene.ProjectSurface(position,size,Quaternion.identity);
+        float scale=Mathf.Min(1,maximum.x/Mathf.Max(.001f,projected.width),maximum.y/Mathf.Max(.001f,projected.height));
+        return size*scale;
     }
     Hit Surface(string key, Vector3 position, Vector2 size, Texture2D texture, Rect uv,float thickness=.00045f,float radiusRatio=.095f)
     {
@@ -225,7 +242,13 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         var texture = EntityCardAssets.Texture(EntityCardAssets.Guidance(false).Front);
         float[] cuts = { 0, .337f, .668f, 1 };
         var size=new Vector2(layout.width,layout.height)*scene.UnitsPerPixel;
-        return Surface(key,scene.World(layout.center)+Vector3.up*.0001f,size,texture,new Rect(cuts[track],0,cuts[track+1]-cuts[track],1),.0022f,.035f);
+        var position=scene.World(layout.center)+Vector3.up*.0001f;
+        float bottom=Mathf.Min(layout.yMax,678);
+        size=FitProjectedSize(position,size,new Vector2(layout.width,Mathf.Max(1,bottom-layout.yMin)));
+        var projected=scene.ProjectSurface(position,size,Quaternion.identity);
+        if(projected.yMax>bottom)
+            position+=scene.World(layout.center+Vector2.up*(bottom-projected.yMax))-scene.World(layout.center);
+        return Surface(key,position,size,texture,new Rect(cuts[track],0,cuts[track+1]-cuts[track],1),.0022f,.035f);
     }
     // 小翻板沿用原照布局；逐片覆盖正面／背面，整张建设卡始终完整。
     public static readonly Rect[] FacilitySlots = {

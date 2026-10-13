@@ -143,6 +143,8 @@ namespace Catan.Core.M2
         [DataMember(Order=30)] public ProcessedCommand[] ProcessedCommands { get; set; } = Array.Empty<ProcessedCommand>();
         [DataMember(Order=31)] public GameEvent[] Events { get; set; } = Array.Empty<GameEvent>();
         [DataMember(Order=32)] public long EventSequence { get; set; }
+        // 可空字段用于识别未保存胜利分数的旧存档。
+        [DataMember(Order=200, EmitDefaultValue=false)] public int? TargetVictoryPoints { get; set; }
         internal GameState CopyForTransaction()
         {
             var copy = (GameState)MemberwiseClone();
@@ -200,6 +202,7 @@ namespace Catan.Core.M2
         public ResourceBag OwnResources { get; internal set; }
         public DevelopmentCard[] OwnDevelopmentCards { get; internal set; }
         public int OwnVictoryPoints { get; internal set; }
+        public int TargetVictoryPoints { get; internal set; }
         public bool DevelopmentCardPlayedThisTurn { get; internal set; }
         public int DevelopmentDeckCount { get; internal set; }
         public ResourceBag Bank { get; internal set; }

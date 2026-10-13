@@ -154,6 +154,8 @@ namespace Catan.Core.M3
         [DataMember(Order=30)] public ProcessedCommand[] ProcessedCommands { get; set; } = Array.Empty<ProcessedCommand>();
         [DataMember(Order=31)] public GameEvent[] Events { get; set; } = Array.Empty<GameEvent>();
         [DataMember(Order=32)] public long EventSequence { get; set; }
+        // 可空字段用于识别未保存胜利分数的旧存档。
+        [DataMember(Order=200, EmitDefaultValue=false)] public int? TargetVictoryPoints { get; set; }
         [DataMember(Order=33)] public Tile[] Tiles { get; set; }
         [DataMember(Order=34)] public Port[] Ports { get; set; }
         [DataMember(Order=35)] public ShipPlacement[] Ships { get; set; } = Array.Empty<ShipPlacement>();

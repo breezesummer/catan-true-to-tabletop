@@ -39,7 +39,7 @@ public sealed partial class M3App : MonoBehaviour
         Application.targetFrameRate=60;
         ai=GetComponent<M6App>();
         host=new M3LocalGameHost(ai==null?4:ai.PlayerCount);
-        if(ai!=null)host.NewGame(ai.ScenarioId,ai.PlayerCount);
+        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.ScenarioId,ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints);
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         catalog=Catan.Core.M3.SeafarersScenarios.Ids.Select(id=>Catan.Core.M3.SeafarersScenarios.Create(id,4)).ToArray();
         var initial=host.View(ai==null?"P1":ai.HumanSeat);
@@ -105,7 +105,9 @@ public sealed partial class M3App : MonoBehaviour
         string candidate="";float distance=(IsToken(placement)?46f:25f)*Screen.width/1440f;
         foreach(var id in TargetIds())
         {
-            float current=Vector2.Distance(mouse,board.ScreenPoint(id));
+            var projected=board.ScreenPoint(id);
+            if(ai!=null&&(!TabletopUI.ContainsMapScreenPoint(mouse)||!TabletopUI.ContainsMapScreenPoint(projected)))continue;
+            float current=Vector2.Distance(mouse,projected);
             if(current<distance){distance=current;candidate=id;}
         }
         return candidate;
@@ -174,7 +176,7 @@ public sealed partial class M3App : MonoBehaviour
             board.Initialize(current.Board.Tiles,current.Board.Vertices,current.Board.Edges);
             if(existing)board.ChangeZoom(zoom-board.Zoom);board.SetCamera(top);board.ShowTerrain(terrain);boardLayout=layout;
         }
-        board.SetOperationLayout(ai!=null);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId);
+        board.SetOperationLayout(ai!=null);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId,current.Board.Tiles);
         board.RefreshSeafarers(current.Board.Ships,current.Board.PirateTileId);
     }
     public void SaveGame()
@@ -556,7 +558,7 @@ public sealed partial class M3App : MonoBehaviour
             case GamePhase.RobberMove:case GamePhase.RobberSteal:guide="强盗所在的地块不产出。移动后，选择一名相邻对手，随机偷取一张资源；若对方空手则不偷取。";break;
             case GamePhase.GoldChoice:guide=ai==null?"金矿：选择银行现有的任意资源，数量与提示一致。\n需多人领取时依次换座；选择完成后回到原先阶段。":"金矿：选择银行现有的任意资源，数量与提示一致。\n轮到你时在右侧选择资源；其他席位由 AI 自动处理。";break;
             case GamePhase.PortPlacement:guide="遗忘部落赠送港口：选择有己方沿岸建筑的合法空边安置。";break;
-            default:guide="回合：掷骰 → 交易 / 建造 / 航海 / 发展卡 → 结束回合。\n船沿海连接，路船转换须经过己方建筑；金矿产出自选资源。\n"+(view.ScenarioId=="wonders-of-catan"?"奇观建成 4 层即胜，或至少 10 分且层数领先所有对手。":"目标 "+view.TargetVictoryPoints+" 分；海盗岛还须夺回自己的堡垒。");break;
+            default:guide="回合：掷骰 → 交易 / 建造 / 航海 / 发展卡 → 结束回合。\n船沿海连接，路船转换须经过己方建筑；金矿产出自选资源。\n"+(view.ScenarioId=="wonders-of-catan"?"奇观建成 4 层即胜，或至少 "+view.TargetVictoryPoints+" 分且层数领先所有对手。":"目标 "+view.TargetVictoryPoints+" 分；海盗岛还须夺回自己的堡垒。");break;
         }
         Panel(new Rect(24,104,708,123),new Color(.045f,.09f,.1f,.92f));
         Label(39,115,678,103,guide,small);

@@ -95,16 +95,78 @@ public sealed class OperationDockTests
     }
 
     [Fact]
-    public void ClickingFifthCardSelectsOnlyOneCardAndRemovingOneDoesNotDropTheWholeGroup()
+    public void ClickingFifthCardSelectsThatExactCardAndClickingAgainPutsItBack()
     {
         var selection = new OperationSelection();
         selection.Toggle(Wood, 4, 5);
         Assert.Equal(Bag((Wood, 1)), selection.Selected);
+        Assert.True(selection.IsCardSelected(Wood, 4));
+        Assert.False(selection.IsCardSelected(Wood, 0));
+        Assert.False(selection.IsCardSelected(Wood, 1));
 
         selection.Toggle(Wood, 4, 5);
-        Assert.Equal(Bag((Wood, 2)), selection.Selected);
+        Assert.Equal(Bag(), selection.Selected);
+        Assert.False(selection.IsCardSelected(Wood, 4));
+    }
+
+    [Fact]
+    public void NonAdjacentCardsOfTheSameGoodRemainIndependentlySelected()
+    {
+        var selection = new OperationSelection();
+        selection.Toggle(Wood, 4, 5);
+        selection.Toggle(Wood, 1, 5);
         selection.Toggle(Wood, 0, 5);
+        selection.Toggle(Wood, 1, 5);
+
+        Assert.Equal(Bag((Wood, 2)), selection.Selected);
+        Assert.True(selection.IsCardSelected(Wood, 0));
+        Assert.True(selection.IsCardSelected(Wood, 4));
+        Assert.False(selection.IsCardSelected(Wood, 1));
+        Assert.False(selection.IsCardSelected(Wood, 2));
+    }
+
+    [Fact]
+    public void DroppingTheSameSelectedCardIntoTradeCannotDuplicateItsPayment()
+    {
+        var selection = new OperationSelection();
+        selection.SelectCard(Wood, 4, 5);
+        selection.SelectCard(Wood, 4, 5);
+
         Assert.Equal(Bag((Wood, 1)), selection.Selected);
+        Assert.True(selection.IsCardSelected(Wood, 4));
+        Assert.False(selection.IsCardSelected(Wood, 0));
+    }
+
+    [Fact]
+    public void IncreasingTradeQuantityKeepsTheCardPickedByTheMouse()
+    {
+        var selection = new OperationSelection();
+        selection.Toggle(Wood, 4, 5);
+        selection.SetCount(Wood, 2, 5);
+
+        Assert.True(selection.IsCardSelected(Wood, 4));
+        Assert.True(selection.IsCardSelected(Wood, 0));
+        Assert.Equal(2, selection.Selected[Wood]);
+        selection.SetCount(Wood, 9, 5);
+        Assert.Equal(5, selection.Selected[Wood]);
+        Assert.All(Enumerable.Range(0, 5), ordinal => Assert.True(selection.IsCardSelected(Wood, ordinal)));
+    }
+
+    [Fact]
+    public void RepaintingKeepsNonAdjacentIdentitiesAndChangingSeatClearsThem()
+    {
+        var snapshot = Snapshot();
+        var selection = new OperationSelection();
+        selection.Sync(snapshot);
+        selection.Toggle(Wood, 4, 12);
+        selection.Sync(snapshot);
+        Assert.True(selection.IsCardSelected(Wood, 4));
+        Assert.False(selection.IsCardSelected(Wood, 0));
+
+        snapshot.Seat = "P2";
+        selection.Sync(snapshot);
+        Assert.False(selection.IsCardSelected(Wood, 4));
+        Assert.All(selection.Selected, count => Assert.Equal(0, count));
     }
 
     [Theory]

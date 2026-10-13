@@ -6,6 +6,9 @@ using System.Linq;
 public static class TabletopHandLayout
 {
     public const float CardWidth = 108, CardHeight = 151, Baseline = 714;
+    public const float HoverSpread = 24;
+    // 左侧状态区止于 238，右侧操作区始于 1290；包含展开后的手牌也必须留在两者之间。
+    const float RestLeft = 268, RestRight = 1260, SpecialRight = 550, MixedResourceLeft = 578;
     public static TabletopCardPose Card(int index, int count, float center, float width, bool selected)
     {
         // 卡牌始终使用屏幕逻辑像素；空间不足只压缩间距，不缩小卡面或分页。
@@ -17,8 +20,10 @@ public static class TabletopHandLayout
     }
     public static int ResourceCapacity(bool hasSpecialCards) => int.MaxValue;
     public static int SpecialCapacity(bool hasResources) => int.MaxValue;
-    public static float ResourceCenter(bool hasSpecialCards) => hasSpecialCards ? 930 : 720;
-    public static float SpecialCenter(bool hasResources) => hasResources ? 380 : 720;
+    public static float ResourceCenter(bool hasSpecialCards) => ((hasSpecialCards ? MixedResourceLeft : RestLeft) + RestRight) / 2;
+    public static float ResourceWidth(bool hasSpecialCards) => RestRight - (hasSpecialCards ? MixedResourceLeft : RestLeft);
+    public static float SpecialCenter(bool hasResources) => (RestLeft + (hasResources ? SpecialRight : RestRight)) / 2;
+    public static float SpecialWidth(bool hasResources) => (hasResources ? SpecialRight : RestRight) - RestLeft;
     public static TabletopCardPose Resource(TabletopResourceSlot[] slots,int index,float center,float width,bool selected)
     {
         // 飞牌落下前才逐渐撑开插槽，已有手牌随之让位；同一插槽同时供飞牌和手牌绘制使用。

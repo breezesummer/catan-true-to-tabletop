@@ -1,5 +1,9 @@
 # 卡坦岛 PC 项目
 
+2026-10-13 当前版本为 [固定分区、逐张手牌与胜利分数 v008](docs/UI_TABLETOP_V008.md)。棋盘、银行、备件与设施保留连续木桌及一致观察角度，地图缩放不侵入周边分区；分数详情留足中文行高；手牌仅轻抬、点击额外上推，同资源逐张选择并让邻牌散开；去除悬停导致的文字置灰；建造费用改为名称和资源图标；历史下方固定显示蛮族／防御状态；开局可设置胜利分数；骑士取消状态球，点数牌参与三维遮挡且沙漠不再加标牌。
+
+已实际通过 **753/753 项全量测试、133/133 项收口专项测试，去重覆盖 764 项**；固定 Unity 构建、四模式独立保存恢复、无图形／图形各 28 配置检查通过。黄色背景与空白点数已修复，并实际检查斜视／俯视同桌布局、同类单张手牌、费用图标、分数文字和开局分数设置。全分辨率人工外观、完整用户对局及长期性能仍待验，详见[公开验证摘要](docs/verification/tabletop-ui-v008/summary.json)。全部当前入口统一使用优化 AI，不再维护原策略新版；默认启动目标为 [CatanM6.exe](.local/m6-ui-v008-final/Builds/Windows/CatanM6.exe)，也可双击根目录 `启动卡坦.cmd`。M7/M8 阶段不变。以下为历史记录，旧路径不代表当前入口。
+
 2026-10-13 新增 [圆角卡纸、收牌插入与分数构成 v007](docs/UI_TABLETOP_V007.md)：卡牌恢复圆角、纸芯与柔影；手牌离底悬浮，悬停轻抬微摆；操作框去除拼接暗缝；银行飞牌到达后才插入手牌；分数悬停查看构成，对手仅显示明分；城市设施放大并使用真实厚板网格；地图 6／8 点改为亮红。**双击根目录 `启动卡坦.cmd` 启动优化 AI 新版**，程序位于 `.local/m6-ui-v007/Builds/Windows/CatanM6.exe`；`Play-M6.ps1` 保留原策略新版，位于 `.local/m6-ui-v007-original-ai/Builds/Windows/CatanM6.exe`。旧窗口需先保存退出再启动新版。
 
 本轮 **721/721 项测试通过，含 52 个完整 AI 局**；两版 Unity 6000.3.25f1 构建、四类规则独立保存恢复及优化版无图形／图形各 28 配置检查通过。已在真实窗口查看圆角、悬停、本人／对手分数组成、操作框、设施和红点，并实际完成银行兑换，检查飞牌末段逐帧插入。连续帧记录早段存在采样间隔，不作为稳定帧率或整段动画性能验收；最终手感、全分辨率人工外观与长期性能仍待验。见 [公开验证摘要](docs/verification/tabletop-ui-v007/summary.json)。
@@ -52,7 +56,7 @@ M6 本地 AI 对手已于 2026 年 10 月 9 日完成工程验收：可选择基
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1
 ```
 
-当前场景为 `Unity/Catan/Assets/M6.unity`，原策略 Windows 程序为 `.local/m6-ui-v007-original-ai/Builds/Windows/CatanM6.exe`，优化 AI 程序为 `.local/m6-ui-v007/Builds/Windows/CatanM6.exe`，操作见 [M6 试玩说明](docs/M6_PLAYTEST.md)和 [v007 说明](docs/UI_TABLETOP_V007.md)。历史核对与汇报记录见 [开发进度日志](DEVELOPMENT_LOG.md)。策略是本地启发式基线；用户本人整局试玩、对战强度、最终 UI 与美术仍待确认。下一阶段为 M7 好友联机。
+当前场景为 `Unity/Catan/Assets/M6.unity`，所有当前启动入口的优化 AI 程序目标统一为 `.local/m6-ui-v008-final/Builds/Windows/CatanM6.exe`，本版最终集成复验状态见本文开头。操作见 [M6 试玩说明](docs/M6_PLAYTEST.md)和 [v008 说明](docs/UI_TABLETOP_V008.md)。历史核对与汇报记录见 [开发进度日志](DEVELOPMENT_LOG.md)。策略是本地启发式基线；用户本人整局试玩、对战强度、最终 UI 与美术仍待确认。下一阶段为 M7 好友联机。
 
 M5 双扩展组合已于 2026 年 10 月 9 日完成工程验收：支持“驶向新海岸”“穿越沙漠”各 3–4 人固定地图，均为 16 分获胜。船、海盗、金矿与骑士、蛮族、商品和进步卡共同生效。**383/383 项规则与回归测试通过**，四个正常完整局、固定 Unity 构建、独立 Windows 保存/恢复及真实鼠标开局操作均已验证。详见 [M5 验收记录](docs/M5_ACCEPTANCE.md)与[组合兼容表](docs/M5_SCENARIOS.md)。
 

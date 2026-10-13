@@ -15,8 +15,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
     string mode, output;
     int checks, configurations, cameraImages, guiAttempts, guiImagesWithChanges;
     bool captureCamera;
-    RenderTexture guiTarget, guiPreviousTarget, guiPreviousActive;
-    Camera guiCamera;
+    RenderTexture guiTarget, guiPreviousActive;
     string guiFilename;
     bool guiBegan;
     Color32[] cameraPixels;
@@ -40,6 +39,9 @@ public sealed class TabletopUiVerification : MonoBehaviour
     Camera BoardCamera => mode == "base" ? GetComponent<M2App>().VerificationBoard.BoardCamera :
         mode == "seafarers" ? GetComponent<M3App>().VerificationBoard.BoardCamera :
         mode == "cities-knights" ? GetComponent<M4App>().VerificationBoard.BoardCamera : GetComponent<M5App>().VerificationBoard.BoardCamera;
+    TabletopScene Table => mode == "base" ? GetComponent<M2App>().VerificationBoard.TableScene :
+        mode == "seafarers" ? GetComponent<M3App>().VerificationBoard.TableScene :
+        mode == "cities-knights" ? GetComponent<M4App>().VerificationBoard.TableScene : GetComponent<M5App>().VerificationBoard.TableScene;
     MonoBehaviour Presentation => mode == "base" ? (MonoBehaviour)GetComponent<M2App>() :
         mode == "seafarers" ? GetComponent<M3App>() : mode == "cities-knights" ? (MonoBehaviour)GetComponent<M4App>() : GetComponent<M5App>();
     Vertex[] Vertices => mode == "base" ? GetComponent<M2App>().M6View.Board.Vertices :
@@ -215,17 +217,34 @@ public sealed class TabletopUiVerification : MonoBehaviour
             mode=="cities-knights"?GetComponent<M4App>().VerificationBoard.TableScene:GetComponent<M5App>().VerificationBoard.TableScene;
         table.Objects.Begin("verification");
         var card=table.Objects.Card("card",new Rect(680,768,74,103),EntityCardAssets.ResourceFront(0));
+        var stock=table.Objects.Piece("stock-check","city",Snapshot.Seat,1,new Vector2(680,651));
+        Require(stock!=null&&stock.Rect.yMin>=TabletopScene.BoardArea.yMax+9.9f,"高建筑备件越过个人区顶部");
         var location=card.Root.position;var initial=card.Rect;
         var v1=Position(Vertices[0].Id);var v2=Position(Vertices[1].Id);
-        float boardDistance=Vector2.Distance(table.Project(v1),table.Project(v2));
+        float boardDistance=Vector2.Distance(BoardCamera.WorldToScreenPoint(v1),BoardCamera.WorldToScreenPoint(v2));
         Require(card.Contains(initial.center),"正常缩放下桌面公共卡不能拾取");
         table.Frame(BoardCamera,false,.8f);var zoomed=card.Rect;
         Require((card.Root.position-location).sqrMagnitude<.00000001f,"相机缩放移动了桌面卡片");
-        Require(Mathf.Abs(zoomed.width/initial.width-1.25f)<.001f,"卡片没有随地图按相同比例缩放");
-        Require(Mathf.Abs(Vector2.Distance(table.Project(v1),table.Project(v2))/boardDistance-zoomed.width/initial.width)<.001f,"地图与卡牌缩放比例不一致");
+        Require(Mathf.Abs(zoomed.width-initial.width)<.001f&&(zoomed.center-initial.center).sqrMagnitude<.001f,"地图缩放影响了固定桌面卡牌");
+        Require(Mathf.Abs(Vector2.Distance(BoardCamera.WorldToScreenPoint(v1),BoardCamera.WorldToScreenPoint(v2))/boardDistance-1.25f)<.001f,"中央地图未独立缩放");
+        Require(!TabletopScene.BoardArea.Overlaps(TabletopDefenseUI.Area)&&!TabletopScene.BoardArea.Overlaps(new Rect(248,628,722,97))&&
+            !TabletopScene.BoardArea.Overlaps(new Rect(980,516,434,188)),"地图视口侵入状态、备件或城市设施分区");
         Require(card.Contains(zoomed.center),"缩放后桌面公共卡的命中区域没有更新");
         table.Frame(BoardCamera,true,1);Require(card.Contains(card.Rect.center),"俯视实体卡牌不能拾取");
+        Require(Quaternion.Angle(table.TableCamera.transform.rotation,BoardCamera.transform.rotation)<.01f,"俯视时棋盘与周边物件不在同一观察角度");
+        var bankLayout=TabletopBankUI.StackLayout(0);
+        var bankCard=table.Objects.Card("bank-top",bankLayout,EntityCardAssets.ResourceFront(0));
+        Require(bankCard.Rect.height<=bankLayout.height+.01f&&bankCard.Rect.width<=bankLayout.width+.01f,"俯视银行纸牌超出自身分区");
+        if(Snapshot.GoodCount==8)
+        {
+            var facilityTop=table.Objects.Facility("facility-top",new Rect(980,516,142,188),0,0);
+            Require(facilityTop.Rect.yMax<=678.01f,"俯视设施进入手牌抬起区域");
+        }
         table.Frame(BoardCamera,false,1);
+        Require(Quaternion.Angle(table.TableCamera.transform.rotation,BoardCamera.transform.rotation)<.01f,"斜视时棋盘与周边物件不在同一观察角度");
+        var boardRect=BoardCamera.rect;var mask=BoardCamera.cullingMask;
+        table.gameObject.SetActive(false);table.gameObject.SetActive(true);
+        Require(BoardCamera.rect==boardRect&&BoardCamera.cullingMask==mask,"返回当前局后地图相机未恢复中央分区");
         if(Snapshot.GoodCount==8)
         {
             for(int track=0;track<3;track++)
@@ -251,6 +270,37 @@ public sealed class TabletopUiVerification : MonoBehaviour
         var handAfter=TabletopHandLayout.Card(15,32,720,1060,false);
         Require(handBefore.X==handAfter.X&&handBefore.Y==handAfter.Y&&TabletopHandLayout.CardWidth==108,"底部手牌受桌面缩放影响");
         table.Frame(BoardCamera,false,1);
+        if(configurations==0)CheckNumberTokenUpdates();
+    }
+
+    void CheckNumberTokenUpdates()
+    {
+        var root=new GameObject("点数同步验证");
+        try
+        {
+            var positions=new System.Collections.Generic.Dictionary<string,Vector3>{{"a",Vector3.zero},{"b",Vector3.right},{"fog",Vector3.left},{"desert",Vector3.forward}};
+            var tiles=new[]{new Tile{Id="a",Resource="wood",Number=3},new Tile{Id="b",Resource="wheat",Number=5},
+                new Tile{Id="fog",Resource="fog",Number=6},new Tile{Id="desert",Resource="desert"}};
+            var tokens=TabletopNumberTokens.Create(root.transform,tiles,positions);
+            Require(tokens.transform.Cast<Transform>().Count(t=>t.gameObject.activeSelf)==2,"沙漠或未揭示地块错误生成点数牌");
+            tiles[0].Number=5;tiles[1].Number=3;tiles[2].Resource="wool";
+            tokens.Refresh(tiles);
+            var active=tokens.transform.Cast<Transform>().Where(t=>t.gameObject.activeSelf).ToArray();
+            Require(active.Length==3&&active.Any(t=>t.name=="点数 5 · a")&&active.Any(t=>t.name=="点数 3 · b")&&active.Any(t=>t.name=="点数 6 · fog"),"换点数或探索后实体牌面未同步");
+            // 资源打包与图形材质分开验证。Null 图形设备不提供完整 Shader 材质属性，
+            // 但仍必须成功加载每张二维贴图；实际设备另外验证牌面材质绑定。
+            foreach(int number in new[]{2,3,4,5,6,8,9,10,11,12})
+            {
+                var texture=Resources.Load<Texture2D>("TabletopUI/v008/NumberTokens/number-"+number);
+                Require(texture!=null&&texture.width==512&&texture.height==512,"实体数字 "+number+" 缺少有效二维贴图");
+            }
+            if(SystemInfo.graphicsDeviceType!=GraphicsDeviceType.Null)
+                Require(active.All(t=>t.GetComponent<MeshRenderer>().sharedMaterials[0].HasProperty("_BaseMap")&&
+                    t.GetComponent<MeshRenderer>().sharedMaterials[0].GetTexture("_BaseMap")!=null),"图形模式实体数字材质未绑定贴图");
+            var identifiers=active.Select(t=>t.GetInstanceID()).ToArray();tokens.Refresh(tiles);
+            Require(identifiers.SequenceEqual(tokens.transform.Cast<Transform>().Where(t=>t.gameObject.activeSelf).Select(t=>t.GetInstanceID())),"不变的公开点数被反复重建");
+        }
+        finally{root.SetActive(false);Destroy(root);}
     }
 
     string FixedAuthority(int players, int human)
@@ -288,13 +338,14 @@ public sealed class TabletopUiVerification : MonoBehaviour
     void CheckProjection(bool top)
     {
         SetTop(top); var camera = BoardCamera;
-        Require(camera.rect == new Rect(0, 0, 1, 1), "相机仍受侧栏视口裁切");
+        var boardArea=TabletopScene.BoardArea;
+        Require(camera.rect == new Rect(boardArea.x/1440,1-boardArea.yMax/900,boardArea.width/1440,boardArea.height/900), "地图相机未限定在中央分区");
         var expected = TabletopScene.BoardArea; expected.xMin -= 4; expected.xMax += 4; expected.yMin -= 4; expected.yMax += 4;
         var ids = Vertices.Select(v => v.Id).Concat(Edges.Select(e => e.Id)).Concat(Tiles.Select(t => t.Id));
         foreach (string id in ids)
         {
-            var point = camera.WorldToViewportPoint(Position(id) + Vector3.up * .005f);
-            Require(point.z > 0 && expected.Contains(new Vector2(point.x * 1440, (1 - point.y) * 900)), "公开地图节点超出中央操作范围");
+            var point = camera.WorldToScreenPoint(Position(id) + Vector3.up * .005f);
+            Require(point.z > 0 && expected.Contains(new Vector2(point.x * 1440/Screen.width, (1 - point.y/Screen.height) * 900)), "公开地图节点超出中央操作范围");
         }
         string rightmost = Vertices.OrderByDescending(v => Position(v.Id).x).First().Id;
         var edgePoint = camera.WorldToScreenPoint(Position(rightmost) + Vector3.up * .005f);
@@ -368,12 +419,13 @@ public sealed class TabletopUiVerification : MonoBehaviour
 
     void CaptureCamera(string filename)
     {
-        var camera = BoardCamera; var previousTarget = camera.targetTexture; var previousActive = RenderTexture.active;
+        var previousActive = RenderTexture.active;
         var target = new RenderTexture(1440, 900, 24, RenderTextureFormat.ARGB32);
         Texture2D image = null;
         try
         {
-            target.Create(); camera.targetTexture = target; camera.Render(); RenderTexture.active = target;
+            target.Create();
+            Table.RenderComposite(target); RenderTexture.active = target;
             image = new Texture2D(1440, 900, TextureFormat.RGB24, false);
             image.ReadPixels(new Rect(0, 0, 1440, 900), 0, 0); image.Apply();
             var pixels = image.GetPixels32();
@@ -384,17 +436,16 @@ public sealed class TabletopUiVerification : MonoBehaviour
         }
         finally
         {
-            camera.targetTexture = previousTarget; RenderTexture.active = previousActive;
+            RenderTexture.active = previousActive;
             target.Release(); Destroy(target); if (image != null) Destroy(image);
         }
     }
 
     void BeginGuiAttempt(string filename)
     {
-        guiAttempts++;guiFilename=filename;guiCamera=BoardCamera;
+        guiAttempts++;guiFilename=filename;
         guiTarget=new RenderTexture(1440,900,24,RenderTextureFormat.ARGB32);guiTarget.Create();
-        guiPreviousTarget=guiCamera.targetTexture;guiCamera.targetTexture=guiTarget;
-        guiCamera.Render();guiBegan=false;
+        Table.RenderComposite(guiTarget);guiBegan=false;
     }
 
     internal void BeginGuiRepaint()
@@ -427,10 +478,9 @@ public sealed class TabletopUiVerification : MonoBehaviour
 
     void EndGuiAttempt()
     {
-        if(guiCamera!=null)guiCamera.targetTexture=guiPreviousTarget;
         if(guiBegan)RenderTexture.active=guiPreviousActive;
         if(guiTarget!=null){guiTarget.Release();Destroy(guiTarget);}
-        guiTarget=null;guiCamera=null;guiBegan=false;
+        guiTarget=null;guiBegan=false;
     }
 }
 

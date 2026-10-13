@@ -85,8 +85,8 @@ public sealed partial class M3App
     {
         Styles();GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool enabled=GUI.enabled;GUI.enabled=enabled&&!dock.HasOverlay&&!ai.TableMenuOpen&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition);
-        DrawBoardLabels();
+        bool enabled=GUI.enabled;GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!dock.HasOverlay&&!ai.TableMenuOpen&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
+        TabletopUI.DrawMapLabels(DrawBoardLabels);
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TableMenuOpen);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,null);
@@ -99,7 +99,7 @@ public sealed partial class M3App
             ()=>{tableNotes=!tableNotes;},"航海日志");
         GUI.enabled=enabled&&!ai.TableMenuOpen&&!tabletop.HistoryOpen&&!dock.HasOverlay;
         if(ai.IsHumanTurn&&view.TradeOffer==null)DrawTableDecision();
-        GUI.enabled=enabled&&!ai.TableMenuOpen&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition));dock.Draw(Operations(),font);GUI.enabled=enabled;
+        GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!ai.TableMenuOpen&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=enabled;
         if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableMenuOpen)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
         ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
     }

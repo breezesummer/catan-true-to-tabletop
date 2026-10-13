@@ -82,8 +82,8 @@ public sealed class CitiesKnightsAi
         legal.AddRange(view.LegalEdgeIds.Select(v => Make(CommandKind.BuildRoad, v)));
 
         // 先结算能立即结束比赛的公开确定性得分，包括两阶段的大都会归属选择。
-        if (view.OwnVictoryPoints >= 13) return Make(CommandKind.DeclareVictory);
-        var winning = legal.Where(c => view.OwnVictoryPoints + PointGain(view, c) >= 13)
+        if (view.OwnVictoryPoints >= view.TargetVictoryPoints) return Make(CommandKind.DeclareVictory);
+        var winning = legal.Where(c => view.OwnVictoryPoints + PointGain(view, c) >= view.TargetVictoryPoints)
             .OrderByDescending(c => PointGain(view, c)).ThenBy(c => c.Kind).FirstOrDefault();
         if (winning != null) return winning;
         var defense = DefenseAction(view, legal, DefenseTarget(view));
@@ -205,7 +205,7 @@ public sealed class CitiesKnightsAi
             if (holder != null && view.Players.Single(p => p.Id == holder.PlayerId).Improvements[(int)track] == 5) return -1;
             return 32; // 对方四级大都会可在下一次五级升级时争取。
         }
-        int rolls = RemainingRolls(view.Turn, view.Players.Max(p => p.VictoryPoints), 13);
+        int rolls = RemainingRolls(view.Turn, view.Players.Max(p => p.VictoryPoints), view.TargetVictoryPoints);
         bool early = rolls >= 30;
         if (track == ImprovementTrack.Science) return early ? 60 + level * 4 : 24 + level * 5;
         if (track == ImprovementTrack.Trade) return early ? 28 + level * 3 : 40 + level * 4;
@@ -221,7 +221,7 @@ public sealed class CitiesKnightsAi
             return GainsMetropolis(view, c.Track) ? 2 : 0;
         if (c.Kind == CommandKind.PlayProgressCard && c.ProgressCard == ProgressCardKind.Medicine) return 1;
         if (c.Kind == CommandKind.PlayProgressCard && c.ProgressCard == ProgressCardKind.Merchant) return view.MerchantPlayerId == view.PlayerId ? 0 : 1;
-        if (view.OwnVictoryPoints >= 10 && (c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight || c.Kind == CommandKind.MoveKnight || c.Kind == CommandKind.DisplaceKnight))
+        if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 3 && (c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight || c.Kind == CommandKind.MoveKnight || c.Kind == CommandKind.DisplaceKnight))
         {
             var lengths = view.Players.ToDictionary(p => p.Id, p => RoadLength(view, p.Id, c));
             int maximum = lengths.Values.Max();
@@ -289,7 +289,7 @@ public sealed class CitiesKnightsAi
     private static double Threat(PlayerView view, string player)
     {
         var other = view.Players.Single(p => p.Id == player);
-        return other.VictoryPoints * 4 + (other.VictoryPoints >= 10 ? 16 : 0) + Math.Min(4, other.ResourceCount + other.CommodityCount);
+        return other.VictoryPoints * 4 + (other.VictoryPoints >= view.TargetVictoryPoints - 3 ? 16 : 0) + Math.Min(4, other.ResourceCount + other.CommodityCount);
     }
 
     private static double RobberValue(PlayerView view, Tile tile)
@@ -380,7 +380,7 @@ public sealed class CitiesKnightsAi
         // 不交出将要完成建设或激活骑士的最后一张关键牌。
         benefit += Resources.Sum(r => (Math.Min(goal[r], view.OwnResources[r] + offer.Give[r] - offer.Receive[r]) - Math.Min(goal[r], view.OwnResources[r])) * 3.0);
         benefit += Commodities.Sum(c => (Math.Min(commodityGoal[c], view.OwnCommodities[c] + gives[c] - costs[c]) - Math.Min(commodityGoal[c], view.OwnCommodities[c])) * 2.0);
-        if (view.Players.Single(p => p.Id == offer.ProposerId).VictoryPoints >= 11) benefit -= 8;
+        if (view.Players.Single(p => p.Id == offer.ProposerId).VictoryPoints >= view.TargetVictoryPoints - 2) benefit -= 8;
         return new Command { PlayerId = view.PlayerId, Kind = affordable && benefit >= -0.01 ? CommandKind.AcceptTrade : CommandKind.RejectTrade };
     }
     private static int Rate(PlayerView view, Resource? resource, Commodity? commodity)
@@ -400,7 +400,7 @@ public sealed class CitiesKnightsAi
         var needs = Resources.Where(r => view.OwnResources[r] < goal[r]).OrderBy(r => view.OwnResources[r] - goal[r]).ToArray();
         var surplus = Resources.Where(r => view.OwnResources[r] > goal[r]).OrderByDescending(r => view.OwnResources[r] - goal[r]).ToArray();
         if (needs.Length == 0 || surplus.Length == 0) return null;
-        var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0 && p.VictoryPoints < 11)
+        var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0 && p.VictoryPoints < view.TargetVictoryPoints - 2)
             .OrderBy(p => p.VictoryPoints).ThenByDescending(p => p.ResourceCount).ThenBy(p => p.Id, StringComparer.Ordinal).FirstOrDefault();
         if (partner == null) return null;
         var give = Bag(); give[surplus[0]] = 1;
@@ -447,7 +447,7 @@ public sealed class CitiesKnightsAi
             && !view.Board.Edges.Where(e => e.Vertices.Contains(v.Id)).Any(e => buildings.Any(b => e.Vertices.Contains(b.LocationId)))
             && paths.ContainsKey(v.Id)).Select(v => (target: v.Id, path: paths[v.Id])).ToArray();
         if (targets.Length == 0) return null;
-        int remaining = RemainingRolls(view.Turn, view.Players.Max(p => p.VictoryPoints), 13);
+        int remaining = RemainingRolls(view.Turn, view.Players.Max(p => p.VictoryPoints), view.TargetVictoryPoints);
         return targets.OrderByDescending(t => 16.0 / (4 + 2 * t.path.Length) + Value(view, t.target) * remaining / 180.0 - t.path.Length * 2).ThenBy(t => t.target).First();
     }
 }

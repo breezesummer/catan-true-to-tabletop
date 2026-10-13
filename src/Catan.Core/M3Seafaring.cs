@@ -358,8 +358,8 @@ namespace Catan.Core.M3
         private bool HasVictory(GameState s, string player)
         {
             var p = s.Players.Single(x => x.Id == player);
-            if (scenario.Id == "wonders-of-catan") return p.WonderLevel == 4 || VictoryPoints(s, player, true) >= 10 && p.WonderLevel > s.Players.Where(x => x.Id != player).Max(x => x.WonderLevel);
-            return VictoryPoints(s, player, true) >= scenario.TargetVictoryPoints && (scenario.Id != "pirate-islands" || s.Fortresses.Single(f => f.PlayerId == player).Strength == 0);
+            if (scenario.Id == "wonders-of-catan") return p.WonderLevel == 4 || VictoryPoints(s, player, true) >= s.TargetVictoryPoints.Value && p.WonderLevel > s.Players.Where(x => x.Id != player).Max(x => x.WonderLevel);
+            return VictoryPoints(s, player, true) >= s.TargetVictoryPoints.Value && (scenario.Id != "pirate-islands" || s.Fortresses.Single(f => f.PlayerId == player).Strength == 0);
         }
         private static void FinishGame(GameState s, string[] winners)
         {

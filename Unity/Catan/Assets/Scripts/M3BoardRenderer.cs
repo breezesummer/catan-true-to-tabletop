@@ -19,6 +19,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
     private Transform pieces;
     private GameObject feltTable;
     private TabletopScene tableScene;
+    private TabletopNumberTokens numberTokens;
     public TabletopScene TableScene => tableScene;
     private GameObject ghost;
     private readonly List<GameObject> mountains = new List<GameObject>();
@@ -62,6 +63,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
             }
             obj.name = tile.Id;
         }
+        numberTokens=TabletopNumberTokens.Create(transform,boardTiles,tiles);
         var table = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         feltTable = table;
         table.name="Felt table"; table.transform.SetParent(transform); table.transform.position=boardCenter+new Vector3(0,-.012f,0);
@@ -87,8 +89,9 @@ public sealed class M3BoardRenderer : MonoBehaviour
     {
         switch(r) { case "wood":return new Color(.16f,.36f,.25f); case "brick":return new Color(.62f,.28f,.18f); case "wool":return new Color(.49f,.62f,.3f); case "wheat":return new Color(.78f,.59f,.25f); case "sea":case "water":return new Color(.07f,.34f,.52f); case "gold":return new Color(.92f,.71f,.15f); case "fog":case "hidden":return new Color(.30f,.34f,.40f); default:return new Color(.68f,.58f,.41f); }
     }
-    public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId)
+    public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)
     {
+        if(numberTokens!=null)numberTokens.Refresh(boardTiles);
         foreach(Transform t in pieces) Destroy(t.gameObject);
         foreach(var p in settlements)
             if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
@@ -213,6 +216,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
     {
         if(operationLayout==enabled)return;
         operationLayout=enabled;
+        if(numberTokens!=null)numberTokens.gameObject.SetActive(enabled);
         if(enabled && tableScene==null)
         {
             tableScene=TabletopScene.Create(transform,vertices.Values);
