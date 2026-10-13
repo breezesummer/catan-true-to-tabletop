@@ -132,6 +132,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             Require(Dock.TradeOpen && before == Authority, "玩家交易草稿未保持权威状态");
             Dock.Reset(); Snapshot.Cancel?.Invoke();
             Require(before == Authority, "取消玩家交易改变权威状态");
+            VerifyBroadcast();
             configurations++;
             if(human==players)app.WriteSave(Path.Combine(output,mode+"-"+players+"-review.json"));
             if (captureCamera && human == players)
@@ -148,6 +149,23 @@ public sealed class TabletopUiVerification : MonoBehaviour
             }
             Debug.Log("CATAN_TABLETOP_CONFIGURATION_OK: " + mode + " / " + players + " / P" + human);
         }
+    }
+
+    void VerifyBroadcast()
+    {
+        var snapshot=Snapshot;int good=Array.FindIndex(snapshot.Goods,n=>n>0);
+        if(good<0)return;
+        var give=new int[8];give[good]=1;var receive=new int[8];receive[(good+1)%snapshot.GoodCount]=1;
+        var owned=(int[])snapshot.Goods.Clone();
+        string error=snapshot.Trade(new OperationTrade{OtherPlayer=OperationTrade.AllPlayers,Give=give,Receive=receive});
+        Require(string.IsNullOrEmpty(error),"正式操作适配器拒绝合法全体报价");
+        var offer=Snapshot.Offer;
+        Require(offer!=null&&offer.IsBroadcast&&offer.PendingRecipients.Length==app.PlayerCount-1,"全体报价没有覆盖其他席位");
+        Require(offer.CanCancel&&!offer.CanAccept&&!offer.CanReject,"报价者回复权限不正确");
+        Require(Snapshot.CanInteract,"报价者等待 AI 回复时不能撤回");
+        Require(owned.SequenceEqual(Snapshot.Goods),"报价阶段已提前扣费");
+        Snapshot.Respond("cancel");
+        Require(Snapshot.Offer==null&&owned.SequenceEqual(Snapshot.Goods),"全体报价撤回未保持原手牌");
     }
 
     void CheckSeatOrder(int players)

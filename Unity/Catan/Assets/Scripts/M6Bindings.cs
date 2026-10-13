@@ -68,13 +68,13 @@ public sealed partial class M6App
     }
     static string Actor(Catan.Core.M2.PlayerView view)
     {
-        if(view.TradeOffer!=null)return view.TradeOffer.OtherPlayerId;
+        if(view.TradeOffer!=null)return view.TradeOffer.NextResponder(view.PlayerId);
         if(view.Discards.Length>0)return view.Discards[0].PlayerId;
         return view.PendingDecision!=null&&!string.IsNullOrEmpty(view.PendingDecision.PlayerId)?view.PendingDecision.PlayerId:view.ActivePlayerId;
     }
     static string Actor(Catan.Core.M3.PlayerView view)
     {
-        if(view.TradeOffer!=null)return view.TradeOffer.OtherPlayerId;
+        if(view.TradeOffer!=null)return view.TradeOffer.NextResponder(view.PlayerId);
         if(view.Discards.Length>0)return view.Discards[0].PlayerId;
         if(view.Phase==Catan.Core.M3.GamePhase.GoldChoice&&view.GoldClaims.Length>0)return view.GoldClaims[0].PlayerId;
         return view.PendingDecision!=null&&!string.IsNullOrEmpty(view.PendingDecision.PlayerId)?view.PendingDecision.PlayerId:view.ActivePlayerId;

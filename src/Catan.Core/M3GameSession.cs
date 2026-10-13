@@ -303,17 +303,28 @@ namespace Catan.Core.M3
         }
         private static void ProposeTrade(GameState s, PlayerState p, Command c)
         {
-            ActionPhase(s); Require(s.Players.Any(x => x.Id == c.OtherPlayerId) && c.OtherPlayerId != p.Id && (s.ActivePlayerId == p.Id || s.ActivePlayerId == c.OtherPlayerId), "InvalidTradePartner", "交易必须包含当前回合玩家及另一席位。");
+            ActionPhase(s);
+            bool broadcast = c.OtherPlayerId == TradeOffer.AllPlayers;
+            Require(broadcast ? s.ActivePlayerId == p.Id : s.Players.Any(x => x.Id == c.OtherPlayerId) && c.OtherPlayerId != p.Id && (s.ActivePlayerId == p.Id || s.ActivePlayerId == c.OtherPlayerId), "InvalidTradePartner", "仅当前回合玩家能向所有人报价；定向交易必须包含当前回合玩家。");
             Require(ValidBag(c.Give) && ValidBag(c.Receive) && c.Give.Total > 0 && c.Receive.Total > 0 && !Resources.Any(r => c.Give[r] > 0 && c.Receive[r] > 0), "InvalidTrade", "双方均须交换资源且不能交换同种资源。");
             Require(Covers(p.Resources, c.Give), "InsufficientResources", "没有足够资源提出此报价。");
-            s.TradeOffer = new TradeOffer { ProposerId = p.Id, OtherPlayerId = c.OtherPlayerId, Give = c.Give.Copy(), Receive = c.Receive.Copy() };
+            s.TradeOffer = new TradeOffer { ProposerId = p.Id, OtherPlayerId = c.OtherPlayerId, Give = c.Give.Copy(), Receive = c.Receive.Copy(), RecipientPlayerIds = broadcast ? s.Players.Where(x => x.Id != p.Id).Select(x => x.Id).ToArray() : null };
         }
         private static void ResolveTrade(GameState s, PlayerState p, Command c)
         {
             var offer = s.TradeOffer;
             if (c.Kind == CommandKind.CancelTrade) { Require(p.Id == offer.ProposerId, "NotProposer", "仅报价者能取消报价。"); s.TradeOffer = null; return; }
-            Require(p.Id == offer.OtherPlayerId, "NotTradeRecipient", "请由报价对象接受或拒绝。");
-            if (c.Kind == CommandKind.RejectTrade) { s.TradeOffer = null; return; }
+            Require(offer.CanRespond(p.Id), "NotTradeRecipient", "仅尚未拒绝的报价对象能接受或拒绝。");
+            if (c.Kind == CommandKind.RejectTrade)
+            {
+                if (offer.IsBroadcast)
+                {
+                    offer.RejectedPlayerIds = (offer.RejectedPlayerIds ?? Array.Empty<string>()).Concat(new[] { p.Id }).ToArray();
+                    if (offer.PendingRecipientIds.Length == 0) s.TradeOffer = null;
+                }
+                else s.TradeOffer = null;
+                return;
+            }
             var proposer = s.Players.Single(x => x.Id == offer.ProposerId);
             Require(Covers(proposer.Resources, offer.Give) && Covers(p.Resources, offer.Receive), "InsufficientResources", "双方资源不足以完成这笔交易。");
             TransferBag(proposer.Resources, p.Resources, offer.Give); TransferBag(p.Resources, proposer.Resources, offer.Receive); s.TradeOffer = null;
@@ -412,7 +423,15 @@ namespace Catan.Core.M3
             if (s.TradeOffer != null)
             {
                 var offer = s.TradeOffer;
-                Check(offer.ProposerId != offer.OtherPlayerId && s.Players.Any(p => p.Id == offer.ProposerId) && s.Players.Any(p => p.Id == offer.OtherPlayerId) && (offer.ProposerId == s.ActivePlayerId || offer.OtherPlayerId == s.ActivePlayerId), "Invalid trade participants.");
+                Check(s.Players.Any(p => p.Id == offer.ProposerId), "报价者不是有效席位。");
+                if (offer.IsBroadcast)
+                {
+                    var recipients = s.Players.Where(p => p.Id != offer.ProposerId).Select(p => p.Id).ToArray();
+                    var rejected = offer.RejectedPlayerIds ?? Array.Empty<string>();
+                    Check(offer.ProposerId == s.ActivePlayerId && offer.RecipientPlayerIds != null && recipients.SequenceEqual(offer.RecipientPlayerIds), "广播报价必须包含所有其他席位。");
+                    Check(rejected.Distinct().Count() == rejected.Length && rejected.All(recipients.Contains) && offer.PendingRecipientIds.Length > 0, "广播报价拒绝记录无效。");
+                }
+                else Check(offer.ProposerId != offer.OtherPlayerId && s.Players.Any(p => p.Id == offer.OtherPlayerId) && (offer.ProposerId == s.ActivePlayerId || offer.OtherPlayerId == s.ActivePlayerId) && (offer.RecipientPlayerIds == null || offer.RecipientPlayerIds.Length == 0) && (offer.RejectedPlayerIds == null || offer.RejectedPlayerIds.Length == 0), "定向报价参与者无效。");
                 Check(ValidBag(offer.Give) && ValidBag(offer.Receive) && offer.Give.Total > 0 && offer.Receive.Total > 0 && !Resources.Any(r => offer.Give[r] > 0 && offer.Receive[r] > 0), "Invalid trade bags.");
             }
             var roadLengths = s.Players.Select(p => LongestRoad(s, p.Id)).ToArray();
