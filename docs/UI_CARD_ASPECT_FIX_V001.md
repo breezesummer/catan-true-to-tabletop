@@ -33,3 +33,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/development/Play-AiStr
 ```
 
 程序分别位于 `.local/m6-ui-v006-card-ratio-v001/Builds/Windows` 和 `.local/m6-ai-v002-card-ratio-v001/Builds/Windows`。已优化策略的源码构建可使用 `Build-M6.ps1 -VerifyPlayer -OutputRoot .local/m6-ai-v002-card-ratio-v001`；原策略程序使用保留 v006 程序的两个规则／AI 程序集构建，新显示资源与界面相同。已经运行的旧窗口需重新启动，才能加载修正后的贴图。
+
+实现提交 `67c889f` 已推送 `origin/dev-1.0` 并核对远端一致。北京时间 18:10 已在“卡坦项目督察组”自动汇报，开头注明实际模型 `gpt-6.1-sol`、思考强度 `max` 与约 33 分钟耗时；已确认发送完成。细节见 [开发进度日志](../DEVELOPMENT_LOG.md)。
