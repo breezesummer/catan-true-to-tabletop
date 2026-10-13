@@ -315,6 +315,7 @@ public sealed class OperationDock
         if(face.Texture!=null)EntityCardAssets.DrawCardFace(r,face.Texture);
         else
         {
+            r=EntityCardAssets.FitCardRect(r,TabletopHandLayout.CardWidth/TabletopHandLayout.CardHeight,GUI.matrix);
             ModernOperationUI.Round(r,new Color(.13f,.22f,.23f));
             Label(new Rect(r.x+10,r.y+9,r.width-20,20),face.Card.Progress?"进步卡":"发展卡",small);
             Label(new Rect(r.x+11,r.y+36,r.width-22,64),face.Card.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=21});
@@ -375,7 +376,7 @@ public sealed class OperationDock
         var texture=c.Progress&&c.ArtIndex>=0?EntityCardAssets.ProgressFront(c.ArtIndex):null;
         var face=new Rect(387,178,294,435);
         if(texture!=null)EntityCardAssets.DrawCardFace(face,texture);
-        else{ModernOperationUI.Round(face,Surface);Label(new Rect(413,304,242,147),c.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=28});}
+        else{face=EntityCardAssets.FitCardRect(face,TabletopHandLayout.CardWidth/TabletopHandLayout.CardHeight,GUI.matrix);ModernOperationUI.Round(face,Surface);Label(face,c.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=28});}
         Label(new Rect(725,253,317,129),c.Detail??"选择使用后指定目标。",text);
         string reason=c.UnavailableReason??(!s.CanInteract?"等待你的行动或待决选择":c.Name=="胜利点"?"胜利点保留在手中，无需主动打出":c.Progress?"当前阶段或目标条件不满足此卡的使用要求":"本回合买入的卡不能使用；每回合最多打出一张行动发展卡");
         if(!c.Playable||!s.CanInteract)Label(new Rect(725,408,317,99),reason,small);
