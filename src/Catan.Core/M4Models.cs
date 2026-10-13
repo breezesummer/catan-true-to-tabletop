@@ -65,6 +65,16 @@ namespace Catan.Core.M4
         [DataMember(Order=2)] public string OtherPlayerId { get; set; }
         [DataMember(Order=3)] public ResourceBag Give { get; set; }
         [DataMember(Order=4)] public ResourceBag Receive { get; set; }
+        // 仅广播报价保存这些字段；省略空字段以兼容既有定向报价存档。
+        [DataMember(Order=5, EmitDefaultValue=false)] public string[] RecipientPlayerIds { get; set; }
+        [DataMember(Order=6, EmitDefaultValue=false)] public string[] RejectedPlayerIds { get; set; }
+        public const string AllPlayers = "*";
+        public bool IsBroadcast => OtherPlayerId == AllPlayers;
+        public string[] PendingRecipientIds => IsBroadcast
+            ? (RecipientPlayerIds ?? Array.Empty<string>()).Where(id => !(RejectedPlayerIds ?? Array.Empty<string>()).Contains(id)).ToArray()
+            : new[] { OtherPlayerId };
+        public bool CanRespond(string playerId) => playerId != ProposerId && PendingRecipientIds.Contains(playerId);
+        public string NextResponder(string preferredPlayerId = null) => CanRespond(preferredPlayerId) ? preferredPlayerId : PendingRecipientIds.FirstOrDefault();
     }
     [DataContract] public sealed partial class GameEvent
     {

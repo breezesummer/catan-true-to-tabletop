@@ -1,0 +1,15 @@
+{
+  "版本": "ui-tabletop-v006",
+  "日期": "2026-10-13",
+  "说明": "沿用现有照片卡面与薄卡网格；完整显示、不叠加牌套边框，不处理或覆盖原照。",
+  "照片来源": ["../ui-operation-v001/sources.json", "../ui-tabletop-v005/recipe.json"],
+  "代码": ["Unity/Catan/Assets/Scripts/EntityCardAssets.cs", "Unity/Catan/Assets/Scripts/TabletopBankUI.cs", "Unity/Catan/Assets/Scripts/TabletopWorldObjects.cs"],
+  "银行逻辑区域": [18, 316, 199, 282],
+  "牌堆布局": {"列数": 3, "起点": [27, 340], "列距": 62, "行距": 63, "卡面尺寸": [42, 59], "数量位置": "卡面右侧留白", "纸厚米": 0.00036, "叠放间隔米": 0.00038, "显示层数上限": 5},
+  "尺度状态": "工作估算，尚无实测确认。卡面尺寸换算为世界长度，纵向布局按桌面透视换算。",
+  "牌面映射": "资源与商品：EntityCardAssets.Good 的完整正面；进步牌：ProgressBack 原照；发展牌背：TabletopBankUI.DevelopmentBack 的程序图案占位。",
+  "发展牌背复现": {"宽": 160, "高": 240, "背景RGB": [0.075, 0.17, 0.23], "图案RGB": [0.83, 0.66, 0.35], "随机性": "无", "来源": "代码绘制菱形，未使用实体背面照片或图像生成模型"},
+  "原件保留": true,
+  "新增三维模型": false,
+  "导出": "没有新增FBX；运行时沿用薄卡网格并加载完整已有卡面，固定Unity构建自动复现。"
+}

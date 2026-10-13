@@ -78,3 +78,54 @@ public sealed class TabletopDicePresentation
         return die < 2 ? step % 6 + 1 : step % 6 < 3 ? 0 : step % 6 - 2;
     }
 }
+
+public sealed class TabletopCollectionFlight
+{
+    public string Player;
+    public int Good;
+    public double Started;
+    public const double Duration = .85;
+    public double Progress(double now) => Math.Max(0,Math.Min(1,(now-Started)/Duration));
+}
+
+// 只从已授权历史中识别银行净流出的资源；玩家之间转移、报价和私密变化均不当作银行收取。
+public sealed class TabletopCollectionTimeline
+{
+    readonly System.Collections.Generic.List<TabletopCollectionFlight> flights = new System.Collections.Generic.List<TabletopCollectionFlight>();
+    string scope;
+    long sequence;
+    bool initialized;
+    public void Observe(string playerScope,Catan.Core.GameHistoryEntry[] entries,double now)
+    {
+        entries=entries??Array.Empty<Catan.Core.GameHistoryEntry>();
+        long latest=entries.Length==0?0:entries.Max(e=>e.Sequence);
+        if(!initialized||scope!=playerScope||latest<sequence)
+        {
+            // 首次绑定、换局和读档均只接收当前历史基线，不能重播旧的收牌。
+            flights.Clear();initialized=true;scope=playerScope;sequence=latest;return;
+        }
+        foreach(var entry in entries.Where(e=>e.Sequence>sequence).OrderBy(e=>e.Sequence))
+        {
+            var changes=(entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>()).Where(c=>c.Category=="goods"&&!c.IsPrivate&&c.GoodIndex>=0&&c.GoodIndex<8).ToArray();
+            int ordinal=0;
+            foreach(var group in changes.GroupBy(c=>c.GoodIndex))
+            {
+                int fromBank=group.Sum(c=>c.Amount);
+                if(fromBank<=0)continue;
+                foreach(var gain in group.Where(c=>c.Amount>0))
+                {
+                    int amount=Math.Min(fromBank,gain.Amount);fromBank-=amount;
+                    for(int i=0;i<amount;i++)flights.Add(new TabletopCollectionFlight {
+                        Player=gain.PlayerId,Good=gain.GoodIndex,Started=now+(entry.Dice1>0?TabletopDicePresentation.Duration:0)+Math.Min(.55,ordinal++*.06)
+                    });
+                }
+            }
+        }
+        sequence=latest;flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);
+    }
+    public TabletopCollectionFlight[] Active(double now)
+    {
+        flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);
+        return flights.Where(f=>now>=f.Started).ToArray();
+    }
+}

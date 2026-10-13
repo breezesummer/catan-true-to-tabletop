@@ -51,7 +51,7 @@ public sealed partial class M4App : MonoBehaviour
     }
     public static string Actor(PlayerView v)
     {
-        if(v.TradeOffer!=null)return v.TradeOffer.OtherPlayerId;
+        if(v.TradeOffer!=null)return v.TradeOffer.NextResponder(v.PlayerId);
         if(v.Discards.Length>0)return v.Discards[0].PlayerId;
         return v.PendingDecision!=null&&!string.IsNullOrEmpty(v.PendingDecision.PlayerId)?v.PendingDecision.PlayerId:v.ActivePlayerId;
     }
@@ -236,7 +236,8 @@ public sealed partial class M4App : MonoBehaviour
         foreach(var k in view.Board.Knights)
         {
             var p=board.ScreenPoint(k.LocationId);p=new Vector2(p.x*1440/Screen.width,p.y*900/Screen.height);
-            GUI.Label(new Rect(p.x-26,p.y-36,86,21),k.PlayerId+" 骑"+k.Level+(k.Active?" ●":" ○"),small);
+            if(ai==null || new Rect(p.x-25,p.y-40,60,75).Contains(Event.current.mousePosition))
+                GUI.Label(new Rect(p.x-26,p.y-36,86,21),k.PlayerId+" 骑"+k.Level+(k.Active?" ●":" ○"),small);
         }
     }
     void DrawControls()

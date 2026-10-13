@@ -126,10 +126,10 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         var face = new GameObject("卡面"); face.transform.SetParent(root.transform, false);
         face.AddComponent<MeshFilter>().sharedMesh = mesh; face.AddComponent<MeshRenderer>(); return root;
     }
-    public Hit Card(string key, Rect layout, Texture2D texture, bool raised = false, Rect? uv = null)
+    public Hit Card(string key, Rect layout, Texture2D texture, bool raised = false, Rect? uv = null, float elevation = 0)
     {
         var size = new Vector2(layout.width, layout.height) * scene.UnitsPerPixel;
-        return Surface(key, scene.World(layout.center) + Vector3.up * (raised ? .002f : .0001f), size, texture, uv ?? new Rect(0,0,1,1));
+        return Surface(key, scene.World(layout.center) + Vector3.up * ((raised ? .002f : .0001f)+elevation), size, texture, uv ?? new Rect(0,0,1,1));
     }
     Hit Surface(string key, Vector3 position, Vector2 size, Texture2D texture, Rect uv)
     {

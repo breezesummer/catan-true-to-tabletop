@@ -38,11 +38,14 @@ public sealed class OperationHandCard
 public sealed class OperationOffer
 {
     public string Proposer, Recipient;
+    public bool IsBroadcast;
+    public string[] PendingRecipients = Array.Empty<string>(), RejectedRecipients = Array.Empty<string>();
     public int[] Give = new int[8], Receive = new int[8];
     public bool CanAccept, CanReject, CanCancel;
 }
 public sealed class OperationTrade
 {
+    public const string AllPlayers = "*";
     public bool Bank;
     public string OtherPlayer;
     public int[] Give = new int[8], Receive = new int[8];
@@ -94,7 +97,7 @@ public sealed class OperationSelection
             if (trade.Give[i] > snapshot.Goods[i]) return "付出的资源超过手牌";
             if (trade.Give[i] > 0 && trade.Receive[i] > 0) return "同一种资源不能同时付出和获得";
         }
-        if (!trade.Bank) return snapshot.OtherPlayers.Contains(trade.OtherPlayer) ? null : "请选择交易玩家";
+        if (!trade.Bank) return trade.OtherPlayer == OperationTrade.AllPlayers && snapshot.OtherPlayers.Length > 0 || snapshot.OtherPlayers.Contains(trade.OtherPlayer) ? null : "请选择交易玩家";
         if (trade.Give.Count(n => n > 0) != 1 || trade.Receive.Count(n => n > 0) != 1) return "银行每次交换一种资源";
         int give = Array.FindIndex(trade.Give, n => n > 0), receive = Array.FindIndex(trade.Receive, n => n > 0);
         if (snapshot.Rates[give] < 2 || trade.Give[give] != snapshot.Rates[give] * trade.Receive[receive]) return "数量不符合当前港口比例";

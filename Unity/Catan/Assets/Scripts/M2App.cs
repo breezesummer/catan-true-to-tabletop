@@ -129,7 +129,7 @@ public sealed partial class M2App : MonoBehaviour
     }
     static string NextActor(PlayerView current)
     {
-        if(current.TradeOffer!=null)return current.TradeOffer.OtherPlayerId;
+        if(current.TradeOffer!=null)return current.TradeOffer.NextResponder(current.PlayerId);
         if(current.Discards.Length>0)return current.Discards[0].PlayerId;
         if(current.PendingDecision!=null&&!string.IsNullOrEmpty(current.PendingDecision.PlayerId))return current.PendingDecision.PlayerId;
         return current.ActivePlayerId;

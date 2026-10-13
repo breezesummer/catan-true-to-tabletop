@@ -53,7 +53,7 @@ public sealed partial class M3App
             if(view.TradeOffer!=null)
             {
                 var t=view.TradeOffer;
-                s.Offer=new OperationOffer{Proposer=t.ProposerId,Recipient=t.OtherPlayerId,Give=DockCost(t.Give.Wood,t.Give.Brick,t.Give.Wool,t.Give.Wheat,t.Give.Ore),Receive=DockCost(t.Receive.Wood,t.Receive.Brick,t.Receive.Wool,t.Receive.Wheat,t.Receive.Ore),CanAccept=seat==t.OtherPlayerId,CanReject=seat==t.OtherPlayerId,CanCancel=seat==t.ProposerId};
+                s.Offer=new OperationOffer{Proposer=t.ProposerId,Recipient=t.OtherPlayerId,IsBroadcast=t.IsBroadcast,PendingRecipients=t.PendingRecipientIds,RejectedRecipients=t.RejectedPlayerIds??Array.Empty<string>(),Give=DockCost(t.Give.Wood,t.Give.Brick,t.Give.Wool,t.Give.Wheat,t.Give.Ore),Receive=DockCost(t.Receive.Wood,t.Receive.Brick,t.Receive.Wool,t.Receive.Wheat,t.Receive.Ore),CanAccept=t.CanRespond(seat),CanReject=t.CanRespond(seat),CanCancel=seat==t.ProposerId};
             }
             s.PrepareBuild=b=>{CancelOperationDraft();var k=(CommandKind)Enum.Parse(typeof(CommandKind),b.Id);if(k==CommandKind.BuyDevelopmentCard){preparedPurchase=true;status="已选发展卡，请在桌面确认购买。";}else Pickup(k);};
             s.PrepareCard=c=>{CancelOperationDraft();preparedDevelopment=(DevelopmentCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在桌面确认出牌。";};
@@ -70,7 +70,7 @@ public sealed partial class M3App
             s.Respond=choice=>Submit(NewCommand(choice=="accept"?CommandKind.AcceptTrade:choice=="reject"?CommandKind.RejectTrade:CommandKind.CancelTrade));
             operationSnapshot=s;
         }
-        operationSnapshot.Status=status;operationSnapshot.CanInteract=ai.IsHumanTurn;
+        operationSnapshot.Status=status;operationSnapshot.CanInteract=ai.IsHumanTurn||view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat;
         operationSnapshot.CanTrade=ai.IsHumanTurn&&view.ActivePlayerId==seat&&view.Phase==GamePhase.Action&&view.PendingDecision==null&&view.TradeOffer==null;
         return operationSnapshot;
     }
@@ -88,6 +88,7 @@ public sealed partial class M3App
         bool enabled=GUI.enabled;GUI.enabled=enabled&&!dock.HasOverlay&&!ai.TableMenuOpen&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition);
         DrawBoardLabels();
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);
+        tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,null);
         ai.TableDiceRolling=tabletop.DiceRolling;
         tabletop.Draw(font,seat,ai.CurrentActor,PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,

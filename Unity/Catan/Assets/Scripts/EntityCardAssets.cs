@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Photo faces are presentation assets, never a source of card effects or player permissions.
-// Callers register only their current PlayerView's own hand and explicitly public/authorized faces.
+// 照片卡面只负责显示，不决定卡牌效果或查看权限。
+// 调用方只能登记当前 PlayerView 的手牌及明确获准查看的卡面。
 public static class EntityCardAssets
 {
     const string Root = "EntityAssets/v001/";
@@ -75,6 +75,10 @@ public static class EntityCardAssets
     }
     public static Texture2D ResourceFront(int resource) => resource >= 0 && resource < 5 ? Texture(Good(resource).Front) : null;
     public static Texture2D CommodityFront(int commodity) => commodity >= 0 && commodity < 3 ? Texture(Good(commodity + 5).Front) : null;
+    public static Texture2D ResourceOrCommodityFront(int good) => good >= 0 && good < 8 ? Texture(Good(good).Front) : null;
+    // 无边框、无裁切、无反光覆盖条；数量与操作提示由调用方放在卡面外。
+    public static void DrawCardFace(Rect area,Texture2D texture)
+    { if(texture!=null)GUI.DrawTexture(area,texture,ScaleMode.ScaleToFit,true); }
     public static Texture2D ProgressFront(int card) => Texture(Progress(card).Front);
     public static Texture2D ProgressBack(int track)
     {
@@ -91,15 +95,15 @@ public static class EntityCardAssets
         sealed class VisibleCard { public Card Card; public string Caption; }
         readonly Dictionary<string, VisibleCard> visible = new Dictionary<string, VisibleCard>();
         static readonly Rect PreviewRect = new Rect(716, 167, 282, 563);
-        string scope, selected, hovered;
+        string scope, selected;
         bool flipped;
         public bool HasSelection => selected != null;
         public bool SelectionIsAuthorized => selected != null && visible.ContainsKey(selected);
-        public void Clear() { visible.Clear(); selected = null; hovered = null; scope = null; flipped = false; }
+        public void Clear() { visible.Clear(); selected = null; scope = null; flipped = false; }
         public void Begin(string playerScope)
         {
             if (playerScope == null || playerScope != scope) Clear();
-            scope = playerScope; visible.Clear(); hovered = null;
+            scope = playerScope; visible.Clear();
         }
         public bool BlocksBoardInput(Vector2 logicalMouse) => selected != null && PreviewRect.Contains(logicalMouse);
         public void Register(Card card, string caption)
@@ -119,13 +123,9 @@ public static class EntityCardAssets
             if (face == null) return false; // Keep the original textual UI when a face is unavailable.
             string key = card.Id + "|" + caption;
             Register(card, caption);
-            var previous = GUI.color; GUI.color = new Color(.035f, .085f, .095f, .97f);
-            GUI.DrawTexture(rect, Texture2D.whiteTexture); GUI.color = previous;
-            GUI.DrawTexture(new Rect(rect.x + 2, rect.y + 2, rect.width - 4, rect.height - 4), face, ScaleMode.ScaleToFit);
+            DrawCardFace(new Rect(rect.x,rect.y,rect.width,Mathf.Max(1,rect.height-23)),face);
             var strip = new Rect(rect.x, rect.yMax - 21, rect.width, 21);
-            GUI.color = new Color(.025f, .06f, .07f, .96f); GUI.DrawTexture(strip, Texture2D.whiteTexture); GUI.color = previous;
             GUI.Label(strip, caption, style);
-            if (rect.Contains(Event.current.mousePosition)) hovered = key;
             if (GUI.Button(rect, GUIContent.none, GUIStyle.none))
             { if (selected == key) selected = null; else SelectVisible(card, caption); }
             return true;
@@ -165,17 +165,14 @@ public static class EntityCardAssets
         {
             if (scope == null) { Clear(); return; }
             ValidateVisibility();
-            string key = selected ?? hovered;
+            string key = selected;
             if (key == null || !visible.TryGetValue(key, out var item)) return;
-            var previous = GUI.color; GUI.color = new Color(.035f, .08f, .09f, .98f);
-            GUI.DrawTexture(PreviewRect, Texture2D.whiteTexture); GUI.color = previous;
-            GUI.Label(new Rect(731, 180, 250, 48), item.Caption, label);
-            bool back = selected == null ? item.Card.ShowBack : flipped;
+            bool back = flipped;
             var face = Texture(back ? item.Card.Back : item.Card.Front);
             if (face == null) face = Texture(item.Card.Front);
             bool hasBack = Texture(item.Card.Back) != null;
-            GUI.DrawTexture(new Rect(731, 233, 250, 379), face, ScaleMode.ScaleToFit);
-            GUI.Label(new Rect(731, 618, 250, 58), "实体照片仅作外观，规则以操作提示为准。\n" + (selected == null ? "点击缩略图可固定查看。" : "已固定查看。") + (!hasBack ? "背面照片尚缺。" : ""), small);
+            DrawCardFace(new Rect(716,167,282,451),face);
+            GUI.Label(new Rect(731,623,250,43),item.Caption,label);
             if (selected != null)
             {
                 if (hasBack && GUI.Button(new Rect(731, 681, 118, 33), back ? "查看正面" : "查看背面", button)) flipped = !flipped;
