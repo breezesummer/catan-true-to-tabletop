@@ -107,8 +107,7 @@
   "publication": {
     "implementationCommit": "6ccd9dd284d0ff78b63383908fcd3a52e93abb1d",
     "branch": "dev-1.0",
-    "status": "committed-not-pushed",
-    "pushLimit": "命令行 GitHub 凭据无效；连接 GitHub 的 create_tree 返回 403 无写权限；SSH 连接关闭。需要恢复本机 GitHub 登录或仓库写权限。",
+    "status": "pushed",
     "wechat": {
       "recipient": "卡坦项目督察组",
       "sentVerifiedAt": "2026-10-14 18:54 Asia/Shanghai",
@@ -122,6 +121,14 @@
       "reportedMinutes": 32,
       "model": "Codex（GPT-6；具体变体未提供）",
       "thinking": "会话未提供具体档位"
-    }
+    },
+    "previousPushLimit": "命令行 GitHub 凭据无效；连接 GitHub 的 create_tree 返回 403 无写权限；SSH 连接关闭。需要恢复本机 GitHub 登录或仓库写权限。",
+    "pushResolution": "2026-10-14 用户确认凭据恢复后，HTTPS 推送成功；远端与本地核对一致。",
+    "initialPushVerifiedHead": "2d678b2b1ce6c7aca1b73bf19e5b63903234b8a8",
+    "pushVerifiedAt": "2026-10-14 20:03 Asia/Shanghai",
+    "pushedCommits": [
+      "6ccd9dd284d0ff78b63383908fcd3a52e93abb1d",
+      "2d678b2b1ce6c7aca1b73bf19e5b63903234b8a8"
+    ]
   }
 }
