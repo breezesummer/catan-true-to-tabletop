@@ -103,5 +103,25 @@
     "presentation": "db775bf189a08afe7bd23896f4c5b90df5f0c71dbbced2b0f1d3e033165d3368",
     "core": "cb7cea2909cf8bc6ef2425d9a447c2d0f41138a7011be7ca2b7a4cca28f23199",
     "ai": "7478f6ba51e355232dd3ca384af5020c129bd3dbfdb67e24f0336037db9f51a7"
+  },
+  "publication": {
+    "implementationCommit": "6ccd9dd284d0ff78b63383908fcd3a52e93abb1d",
+    "branch": "dev-1.0",
+    "status": "committed-not-pushed",
+    "pushLimit": "命令行 GitHub 凭据无效；连接 GitHub 的 create_tree 返回 403 无写权限；SSH 连接关闭。需要恢复本机 GitHub 登录或仓库写权限。",
+    "wechat": {
+      "recipient": "卡坦项目督察组",
+      "sentVerifiedAt": "2026-10-14 18:54 Asia/Shanghai",
+      "verified": true,
+      "checks": [
+        "群名核对",
+        "绿色消息气泡，无等待或失败标记",
+        "会话时间更新",
+        "输入框清空"
+      ],
+      "reportedMinutes": 32,
+      "model": "Codex（GPT-6；具体变体未提供）",
+      "thinking": "会话未提供具体档位"
+    }
   }
 }
