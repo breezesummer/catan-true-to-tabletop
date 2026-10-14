@@ -29,6 +29,7 @@ public sealed class M5BoardRenderer : MonoBehaviour
     private GameObject barbarianShip;
     private Vector3 displayCenter;
     private GameObject ghost;
+    private TabletopShipSelection selectedShip;
     private readonly List<GameObject> mountains = new List<GameObject>();
     private readonly Dictionary<Color, Material> pieceMaterials = new Dictionary<Color, Material>();
     private readonly List<Material> terrainMaterials = new List<Material>();
@@ -365,7 +366,14 @@ public sealed class M5BoardRenderer : MonoBehaviour
         BoardCamera.transform.LookAt(displayCenter+new Vector3(0,.005f,0));
         BoardCamera.rect=new Rect(.0f,.10f,.74f,.80f);
     }
-    public void ChangeZoom(float delta) { Zoom=Mathf.Clamp(Zoom+delta,boardRadius*.65f,boardRadius*1.35f); SetCamera(TopView); }
+    public void ChangeZoom(float delta) { Zoom=Mathf.Clamp(Zoom+delta,boardRadius*.45f,boardRadius*1.65f); SetCamera(TopView); }
+    public void SetSelectedShip(string edgeId)
+    {
+        if(string.IsNullOrEmpty(edgeId)){if(selectedShip!=null)selectedShip.gameObject.SetActive(false);return;}
+        if(!edges.ContainsKey(edgeId))return;
+        if(selectedShip==null)selectedShip=TabletopShipSelection.Create(transform);
+        selectedShip.Show(Position(edgeId),rotations[edgeId]);
+    }
     public void ShowTerrain(bool show) { foreach(var m in mountains) m.SetActive(show); }
     void OnDestroy() {foreach(var m in pieceMaterials.Values)Destroy(m);foreach(var m in terrainMaterials)Destroy(m);foreach(var m in terrainMeshes)Destroy(m);}
 }

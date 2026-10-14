@@ -19,6 +19,23 @@ public sealed class TabletopBankUI
     static Texture2D developmentBack;
     static readonly string[] Names = {"木材","砖块","羊毛","谷物","矿石","布匹","钱币","纸张"};
     public static Rect StackLayout(int index) => new Rect(27+(index%4)*52,86+(index/4)*55,34,48);
+    public void ObserveHud(OperationSnapshot snapshot,GameHistoryEntry[] entries,TabletopSeat[] seats)
+    {
+        if(snapshot==null)return;
+        current=snapshot;sources.Clear();destinations.Clear();ownDestinations.Clear();ownSlotIndices.Clear();
+        timeline.Observe(snapshot.Scope,entries,Time.unscaledTimeAsDouble);
+        for(int good=0;good<snapshot.GoodCount;good++)sources[good]=new Rect(42,32,34,48);
+        var slots=timeline.HandSlots(snapshot.Seat,snapshot.Goods,snapshot.GoodCount,Time.unscaledTimeAsDouble);
+        for(int index=0;index<slots.Length;index++)
+        {
+            if(slots[index].Flight==null)continue;
+            var pose=TabletopHandLayout.Resource(slots,index,TabletopHandLayout.ResourceCenter(false),TabletopHandLayout.ResourceWidth(false),false);
+            ownDestinations[slots[index].Flight]=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);ownSlotIndices[slots[index].Flight]=index;
+        }
+        // 对手收牌只飞向公开头像，不恢复对手实体手牌或卡面。
+        var ordered=seats.OrderBy(s=>s.Id).ToArray();
+        for(int i=0;i<ordered.Length;i++)destinations[ordered[i].Id]=new Rect(1430-ordered.Length*81+i*81+13,20,50,50);
+    }
     public void Draw(TabletopScene table,OperationSnapshot snapshot,GameHistoryEntry[] entries,TabletopSeat[] seats,
         Action<string> trade,Action purchase,List<TabletopWorldObjects.Hit> worldHits,List<Rect> hits)
     {
@@ -92,11 +109,11 @@ public sealed class TabletopBankUI
             hit=table.Objects.Card(key+"-"+i,layout,texture,false,null,i*.00050f);
         return hit;
     }
-    public void DrawFlights()
+    public void DrawFlights(bool ownHandVisible=true)
     {
         if(current==null||Event.current.type!=EventType.Repaint)return;
         double now=Time.unscaledTimeAsDouble;
-        var active=timeline.Active(now);
+        var active=timeline.Active(now).Where(f=>ownHandVisible||f.Player!=current.Seat).ToArray();
         var landing=active.Where(f=>f.Player==current.Seat&&f.Progress(now)>=.60&&ownSlotIndices.ContainsKey(f))
             .OrderBy(f=>ownSlotIndices[f]).ToArray();
         // 落位牌按真实手牌插槽从左向右合成，右邻牌逐渐遮挡下沉部分；仍在空中的牌最后绘制。

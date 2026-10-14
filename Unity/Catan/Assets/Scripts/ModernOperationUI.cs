@@ -4,14 +4,20 @@ using UnityEngine;
 // 仅绘制操作界面；所有确认操作仍由各适配器提交到共同规则入口。
 public static class ModernOperationUI
 {
-    public static readonly Color Background=new Color(.055f,.095f,.10f,.98f), Surface=new Color(.105f,.155f,.16f),
-        TextColor=new Color(.94f,.93f,.86f), Muted=new Color(.60f,.69f,.68f), Accent=new Color(.84f,.69f,.40f),
-        Line=new Color(.24f,.32f,.31f), Error=new Color(.98f,.53f,.40f);
+    public static Color Background => StrategyHudTheme.Background;
+    public static Color Surface => StrategyHudTheme.Surface;
+    public static Color TextColor => StrategyHudTheme.Text;
+    public static Color Muted => StrategyHudTheme.Muted;
+    public static Color Accent => StrategyHudTheme.Accent;
+    public static Color Line => StrategyHudTheme.Line;
+    public static readonly Color Error=new Color(.98f,.53f,.40f);
     static Font currentFont;
+    static int themeVersion=-1;
     public static GUIStyle Text, Small, Title, Center;
     public static void Styles(Font font=null)
     {
-        if(Text!=null&&(font==null||font==currentFont))return;
+        if(Text!=null&&(font==null||font==currentFont)&&themeVersion==StrategyHudTheme.Version)return;
+        themeVersion=StrategyHudTheme.Version;
         if(font!=null)currentFont=font;
         Text=new GUIStyle(GUI.skin.label){font=currentFont,fontSize=16,wordWrap=true};Text.normal.textColor=TextColor;
         Small=new GUIStyle(Text){fontSize=12};Small.normal.textColor=Muted;
@@ -37,7 +43,7 @@ public static class ModernOperationUI
     {
         Styles();bool old=GUI.enabled;GUI.enabled=old&&enabled;
         bool hover=GUI.enabled&&r.Contains(Event.current.mousePosition);
-        Color bg=primary?Accent:selected?new Color(.22f,.31f,.28f):Surface;
+        Color bg=primary?Accent:selected?Color.Lerp(Surface,Accent,.24f):Surface;
         if(hover)bg=Color.Lerp(bg,TextColor,.09f);
         Round(r,GUI.enabled?bg:Color.Lerp(Background,Surface,.6f));
         if(selected)Fill(new Rect(r.x+9,r.yMax-3,r.width-18,2),Accent);
@@ -59,7 +65,7 @@ public static class ModernOperationUI
             float width=area.width/columns;var r=new Rect(area.x+(i%columns)*width,area.y+(i/columns)*(firstGood>=0?65:40),width-5,firstGood>=0?60:35);
             if(firstGood>=0&&firstGood+i<8&&labels[i]!="不取")
             {
-                Round(r,i==value?new Color(.22f,.31f,.28f):Surface);
+                Round(r,i==value?Color.Lerp(Surface,Accent,.24f):Surface);
                 OperationIconAssets.DrawGood(new Rect(r.center.x-13,r.y+5,26,26),firstGood+i);
                 Label(new Rect(r.x,r.y+31,r.width,25),labels[i],Center);
                 if(i==value)Fill(new Rect(r.x+7,r.yMax-3,r.width-14,2),Accent);

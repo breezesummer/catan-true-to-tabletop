@@ -249,7 +249,7 @@ public sealed partial class M6App : MonoBehaviour
         else
         {
             var corner=new GUIStyle(small){fontSize=14};corner.normal.textColor=new Color(.98f,.88f,.67f);
-            GUI.Label(new Rect(24,21,300,29),"CATAN  /  "+RuleNames[Array.IndexOf(RuleIds,RuleSet)],corner);
+            GUI.Label(new Rect(752,24,310,29),"CATAN  /  "+RuleNames[Array.IndexOf(RuleIds,RuleSet)],corner);
             if(tableMenu)
             {
                 ModernOperationUI.Styles(font);
@@ -263,7 +263,9 @@ public sealed partial class M6App : MonoBehaviour
                 if(ModernOperationUI.Button(new Rect(504,411,210,44),"保存这桌游戏"))SaveGame();
                 if(ModernOperationUI.Button(new Rect(726,411,210,44),"恢复存档")){tableMenu=false;LoadGame();}
                 if(ModernOperationUI.Button(new Rect(504,467,432,44),"规则 / 新开一桌")){tableMenu=false;ShowMenu();}
-                ModernOperationUI.Label(new Rect(504,538,432,122),Notice,ModernOperationUI.Small);
+                if(RuleSet=="seafarers"&&ModernOperationUI.Button(new Rect(504,522,432,36),"航海场景行动"))
+                {tableMenu=false;var sailing=GetComponent<M3App>();if(sailing!=null)sailing.ShowScenarioActions();}
+                ModernOperationUI.Label(new Rect(504,573,432,90),Notice,ModernOperationUI.Small);
             }
             string prompt=CurrentTablePrompt;
             if(prompt.Length>0&&!tableMenu)

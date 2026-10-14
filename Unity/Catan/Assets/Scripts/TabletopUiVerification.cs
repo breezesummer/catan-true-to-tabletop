@@ -125,6 +125,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             steps = 0;
             while (!Snapshot.CanTrade && steps++ < 500) { Advance(); if (steps % 8 == 0) yield return null; }
             Require(Snapshot.CanTrade, "未能正常推进至可交易阶段");
+            CheckContextEntrances();
             BindDockForHeadless(); before = Authority;
             Dock.OpenTrade(); Require(Dock.TradeOpen, "行动阶段未能打开银行交换草稿");
             Require(Dock.BlocksBoardInput(new Vector2(600, 350)), "交换盘未截获自身区域");
@@ -211,6 +212,29 @@ public sealed class TabletopUiVerification : MonoBehaviour
         Require(ordered.Length == players - 1 && !ordered.Contains(app.HumanSeat), "自己的席位没有留在前方");
         for (int i = 0; i < ordered.Length; i++) Require(ordered[i] == ids[(own + i + 1) % players], "对手未按相对顺时针排列");
     }
+    void CheckContextEntrances()
+    {
+        BindDockForHeadless();string before=Authority;
+        Require(Snapshot.Rates.Take(Math.Min(5,Snapshot.GoodCount)).All(r=>r==2||r==4),"银行入口错误混入通用港3:1");
+        var open=Presentation.GetType().GetMethod("VerificationOpenPort",BindingFlags.NonPublic|BindingFlags.Instance);
+        Require(open!=null&&!(bool)open.Invoke(Presentation,new object[]{"unknown-port"}),"不存在的港口错误开放兑换");
+        Require(before==Authority&&!Dock.TradeOpen,"非法港口入口改变权威状态或打开窗口");
+        if(mode=="base"||mode=="seafarers")
+        {
+            var development=Snapshot.Builds.FirstOrDefault(b=>b.Icon=="development");
+            Require(development!=null,"资源模式丢失购买发展卡入口数据");
+        }
+        else
+        {
+            string vertex=mode=="cities-knights"?GetComponent<M4App>().M6View.Board.Knights.FirstOrDefault(k=>k.PlayerId==app.HumanSeat)?.LocationId:GetComponent<M5App>().M6View.Board.Knights.FirstOrDefault(k=>k.PlayerId==app.HumanSeat)?.LocationId;
+            if(vertex!=null)
+            {
+                bool selected=mode=="cities-knights"?GetComponent<M4App>().VerificationSelectKnight(vertex):GetComponent<M5App>().VerificationSelectKnight(vertex);
+                Require(selected&&before==Authority,"骑士菜单选择失败或改变权威状态");
+                Snapshot.Cancel?.Invoke();Dock.Reset();
+            }
+        }
+    }
 
     void CheckPresentation()
     {
@@ -246,7 +270,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             mode=="seafarers"?GetComponent<M3App>().VerificationBoard.TableScene:
             mode=="cities-knights"?GetComponent<M4App>().VerificationBoard.TableScene:GetComponent<M5App>().VerificationBoard.TableScene;
         table.Frame(BoardCamera,false,1);
-        Require(table.TableCamera==BoardCamera&&BoardCamera.rect==new Rect(0,0,1,1),"桌面与棋盘没有共用全屏相机");
+        Require(table.TableCamera==BoardCamera&&BoardCamera.rect==new Rect(0,0,1,1)&&table.HudCamera!=BoardCamera,"地图和固定HUD相机未分离");
         table.Objects.Begin("verification");
         var layout=new Rect(680,740,74,103);var stockPoint=new Vector2(680,668);
         var card=table.Objects.Card("card",layout,EntityCardAssets.ResourceFront(0));
@@ -272,13 +296,13 @@ public sealed class TabletopUiVerification : MonoBehaviour
         stock=table.Objects.Piece("stock-check","city",Snapshot.Seat,1,stockPoint);var zoomed=card.Rect;
         Require((card.Root.position-location).sqrMagnitude<.00000001f&&card.Root.localScale==cardScale&&card.Size==cardSize,"相机缩放改变了桌面卡片的世界位置或尺寸");
         Require((stock.Root.position-stockLocation).sqrMagnitude<.00000001f&&stock.Root.localScale==stockScale,"相机缩放改变了库存模型的世界位置或尺寸");
-        Require(Mathf.Abs(zoomed.width/initial.width-1.25f)<.001f&&Mathf.Abs(stock.Rect.width/initialStock.width-1.25f)<.001f,"纸牌或备件未随整桌相机同比缩放");
-        Require(Mathf.Abs(Vector2.Distance(BoardCamera.WorldToScreenPoint(v1),BoardCamera.WorldToScreenPoint(v2))/boardDistance-1.25f)<.001f,"地图与桌面物件的缩放比例不一致");
+        Require(Mathf.Abs(zoomed.width/initial.width-1)<.001f&&Mathf.Abs(stock.Rect.width/initialStock.width-1)<.001f,"地图缩放改变了固定HUD大小");
+        Require(Mathf.Abs(Vector2.Distance(BoardCamera.WorldToScreenPoint(v1),BoardCamera.WorldToScreenPoint(v2))/boardDistance-1.25f)<.001f,"地图相机缩放比例不正确");
         if(facility!=null)
         {
             facility=table.Objects.Facility("facility-check",OperationDock.FacilityLayout(0),0,0);
             Require((facility.Root.position-facilityLocation).sqrMagnitude<.00000001f&&facility.Root.localScale==facilityScale&&facility.Size==facilitySize,"相机缩放改变了设施的世界位置或尺寸");
-            Require(Mathf.Abs(facility.Rect.width/initialFacility.width-1.25f)<.001f,"设施没有随整桌相机同比缩放");
+            Require(Mathf.Abs(facility.Rect.width/initialFacility.width-1)<.001f,"地图缩放改变了设施HUD大小");
         }
         Require(card.Contains(zoomed.center),"缩放后桌面公共卡的命中区域没有更新");
         table.Frame(BoardCamera,true,1);Require(card.Contains(card.Rect.center),"俯视实体卡牌不能拾取");
@@ -295,6 +319,10 @@ public sealed class TabletopUiVerification : MonoBehaviour
             Require(facilityTop.Contains(facilityTop.Rect.center),"俯视设施没有按实体位置响应拾取");
         }
         table.Frame(BoardCamera,false,1);
+        var hudBefore=stock.Rect;var panBefore=table.PanOffset;
+        table.PanFromScreen(new Vector2(720,450),new Vector2(780,480));table.EndPan();
+        Require(table.PanOffset!=panBefore&&stock.Rect==hudBefore,"地图拖动没有移动地图或错误移动HUD");
+        table.ResetPan();
         Require(table.TableCamera==BoardCamera,"斜视时棋盘与周边物件不使用同一相机");
         var boardRect=BoardCamera.rect;var mask=BoardCamera.cullingMask;
         table.gameObject.SetActive(false);table.gameObject.SetActive(true);
@@ -313,6 +341,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             }
         }
         CheckTableLayout(table);
+        checks+=TabletopMapVerificationV010.Check(table);
         table.Objects.End();table.Objects.Begin("verification");table.Objects.End();
         var oak=Resources.Load<Texture2D>("TabletopUI/v005/smoked-oak-albedo");
         var normal=Resources.Load<Texture2D>("TabletopUI/v005/smoked-oak-normal");
@@ -337,52 +366,35 @@ public sealed class TabletopUiVerification : MonoBehaviour
 
     void CheckTableLayout(TabletopScene table)
     {
-        Require(TabletopBankUI.Area.xMin>=0&&TabletopBankUI.Area.xMax<360&&TabletopBankUI.Area.yMax<300,"银行没有留在左上角");
-        Require(TabletopDefenseUI.Area.xMin>1080&&TabletopDefenseUI.Area.yMax<220,"蛮族航程没有移到右上角");
-        Require(TabletopHistoryUI.Feed.xMax<300&&TabletopHistoryUI.Feed.yMin>=450&&TabletopHistoryUI.Feed.yMax>=880&&TabletopHistoryUI.Feed.height>=300,"历史记录没有扩展到左下角");
-        Require(TabletopUI.SpecialRect.yMax<TabletopUI.EndTurnRect.yMin&&Mathf.Abs(TabletopUI.SpecialRect.center.x-TabletopUI.EndTurnRect.center.x)<24,"特殊行动没有移到结束回合上方");
-        var leftSeat=TabletopUI.OpponentSeatLayout(0);var rightSeat=TabletopUI.OpponentSeatLayout(2);
-        Require(Mathf.Abs(leftSeat.center.x+rightSeat.center.x-1440)<.001f&&leftSeat.y==rightSeat.y&&leftSeat.size==rightSeat.size,"左右玩家席位未按屏幕中轴镜像");
-        for(int count=1;count<=6;count++)
-        for(int index=0;index<count;index++)
-        {
-            var left=TabletopUI.OpponentHandCardLayout(0,index,count);var right=TabletopUI.OpponentHandCardLayout(2,index,count);
-            Require(Mathf.Abs(left.center.x+right.center.x-1440)<.001f&&left.y==right.y&&left.size==right.size,"左右玩家手牌未镜像排列");
-        }
-        var topFirst=TabletopUI.OpponentHandCardLayout(1,0,3);var topLast=TabletopUI.OpponentHandCardLayout(1,2,3);
-        Require(Mathf.Abs(topFirst.center.x+topLast.center.x-1440)<.001f,"顶部玩家手牌没有居中");
-        foreach(string kind in new[]{"road","settlement","city","ship"})
-        {
-            int count=kind=="road"||kind=="ship"?15:kind=="settlement"?5:4;
-            for(int index=0;index<count;index++)
-            {
-                var left=TabletopUI.OpponentStockPosition(0,kind,index);var right=TabletopUI.OpponentStockPosition(2,kind,index);
-                Require(Mathf.Abs(left.x+right.x-1440)<.001f&&left.y==right.y,"左右玩家库存棋子未镜像排列");
-            }
-            Require(TabletopUI.OpponentStockPosition(1,kind,0).y>topFirst.yMax,"顶部玩家备件没有位于手牌与棋盘之间");
-        }
+        Require(TabletopDefenseUI.Area.xMin>1080&&TabletopDefenseUI.Area.yMin>=195,"公开防御区没有留在玩家统计下方");
+        Require(TabletopHistoryUI.Feed.xMin>1100&&TabletopHistoryUI.Feed.height>=300,"历史记录没有移到右侧");
+        Require(TabletopUI.EndTurnRect.xMin>1250&&TabletopUI.EndTurnRect.height>=120,"回合按钮没有使用右下圆形布局");
         var pieces=Snapshot.Builds.Where(b=>b.Track<0&&b.Icon!="development").ToArray();
-        bool hasFacilities=Snapshot.GoodCount==8;
         for(int index=0;index<pieces.Length;index++)
         {
-            var build=pieces[index];string kind=build.Icon??build.Id;
-            if(kind!="ship"&&kind!="wall")continue;
-            var group=OperationDock.StockGroupLayout(pieces,index,hasFacilities);
-            var bounds=new System.Collections.Generic.List<Bounds>();
-            for(int n=0;n<build.Count;n++)
-            {
-                var piece=table.Objects.Piece("layout-"+kind+"-"+n,kind,Snapshot.Seat,1,OperationDock.StockPieceLayout(group,kind,n));
-                Require(piece!=null,"缺少需要验证排布的真实库存网格");
-                var actual=ObjectBounds(piece);bounds.Add(actual);
-                if(kind=="ship")Require(actual.size.x>actual.size.z,"自己的船没有横向摆放");
-                Require(Mathf.Abs(actual.min.y-TabletopScene.SurfaceHeight-.0002f)<.00001f,"库存船或城墙没有贴在桌面上");
-            }
-            for(int a=0;a<bounds.Count;a++)for(int b=a+1;b<bounds.Count;b++)
-                Require(bounds[a].max.x<bounds[b].min.x||bounds[b].max.x<bounds[a].min.x||bounds[a].max.z<bounds[b].min.z||bounds[b].max.z<bounds[a].min.z,
-                    kind=="wall"?"库存城墙的真实网格互相重叠":"横向库存船的真实网格互相重叠");
+            var group=OperationDock.StockGroupLayout(pieces,index,Snapshot.GoodCount==8);
+            Require(group.xMax<150&&group.yMin>=280&&group.yMax<=890,"单建筑模型没有排在左下");
+            if(index>0)Require(group.yMin>=OperationDock.StockGroupLayout(pieces,index-1,Snapshot.GoodCount==8).yMax,"建筑token区域重叠");
+        }
+        int prior=StrategyHudTheme.Selected;
+        for(int theme=0;theme<3;theme++)
+        {
+            StrategyHudTheme.Select(theme);Require(StrategyHudTheme.Selected==theme,"主题无法即时切换");
+            Require(ModernOperationUI.Background==StrategyHudTheme.Background&&ModernOperationUI.Accent==StrategyHudTheme.Accent,"操作弹窗没有采用当前主题");
+        }
+        StrategyHudTheme.Select(prior);
+        foreach(string icon in new[]{"cloth","coin","paper"})
+        {
+            var texture=Resources.Load<Texture2D>("TabletopUI/v010/"+icon+"-cutout");
+            Require(texture!=null&&texture.width>=512&&texture.height>=512,"缺少独立商品透明图标");
+        }
+        if(Snapshot.GoodCount==8)
+        {
+            string before=Authority;Dock.OpenFacility(2);
+            Require(Dock.HasOverlay&&Dock.BlocksBoardInput(Vector2.zero),"设施弹窗没有阻挡背景");
+            Require(before==Authority,"打开设施界面改变权威状态");Dock.Reset();
         }
     }
-
     void CheckNumberTokenUpdates()
     {
         var root=new GameObject("点数同步验证");

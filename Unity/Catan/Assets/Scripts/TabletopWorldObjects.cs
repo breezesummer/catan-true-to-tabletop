@@ -21,15 +21,15 @@ public sealed class TabletopWorldObjects : MonoBehaviour
                 {
                     var bounds = Renderers[0].bounds;
                     foreach (var r in Renderers.Skip(1)) bounds.Encapsulate(r.bounds);
-                    return Scene.Project(bounds);
+                    return Scene.ProjectHudBounds(bounds);
                 }
-                return Scene.ProjectSurface(Root.position, Size, Root.rotation);
+                return Scene.ProjectHudSurface(Root.position, Size, Root.rotation);
             }
         }
         public bool Contains(Vector2 logicalMouse)
         {
             if (Root == null || !Root.gameObject.activeInHierarchy) return false;
-            var ray = Scene.MouseRay(logicalMouse);
+            var ray = Scene.MouseHudRay(logicalMouse);
             if (Renderers != null)
                 return Renderers.Any(r => r.bounds.IntersectRay(ray));
             var plane = new Plane(Root.up, Root.position);
@@ -82,14 +82,14 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         {
             int firstOwnedMesh=meshes.Count;
             var obj = create(); obj.name = key; obj.transform.SetParent(transform, true);
-            TabletopScene.SetTableLayer(obj.transform);
+            TabletopScene.SetHudLayer(obj.transform);
             foreach (var collider in obj.GetComponentsInChildren<Collider>()) { collider.enabled = false; Destroy(collider); }
             item = new Item { Object = obj, OriginalScale=obj.transform.localScale, Signature = signature, Hit = new Hit { Scene = scene, Root = obj.transform }, OwnedMeshes=meshes.Skip(firstOwnedMesh).ToArray() };
             items.Add(key, item);
         }
         item.Generation = generation; item.Object.SetActive(true); return item;
     }
-    public Hit Piece(string key, string kind, string seat, int level, Vector2 position, bool raised = false, float yaw = float.NaN)
+    public Hit Piece(string key, string kind, string seat, int level, Vector2 position, bool raised = false, float yaw = float.NaN,float displayMultiplier=1)
     {
         string resource = kind == "ship" ? EntityBoardAssets.ShipResource(seat) : kind == "road" ? "PhotoSamples/v001/road" :
             kind == "knight" ? PlayerComponentAssets.KnightResource(seat, level, false) :
@@ -115,6 +115,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         float depth=kind=="road"?8:kind=="settlement"?20:kind=="city"?24:kind=="ship"?16:kind=="wall"?30:22;
         float scale=Mathf.Min(1,width*scene.UnitsPerPixel/Mathf.Max(.00001f,bounds.size.x),
             depth*scene.UnitsPerPixel/Mathf.Sin(40*Mathf.Deg2Rad)/Mathf.Max(.00001f,bounds.size.z));
+        scale*=displayMultiplier;
         item.Object.transform.localScale=item.OriginalScale*scale;
         bounds=PieceBounds(item.Hit.Renderers);
         item.Object.transform.position+=new Vector3(scene.World(position).x-bounds.center.x,
@@ -269,7 +270,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         var position = scene.World(layout.center) + Vector3.up * (side/2+.0002f + Mathf.Abs(Mathf.Sin(progress*Mathf.PI*5))*motion*side*.6f);
         position.x += Mathf.Sin(progress*Mathf.PI*6+index)*motion*side*.15f;
         item.Object.transform.position = position;
-        item.Object.transform.rotation = Quaternion.Euler(0, rolling ? (1-Mathf.Pow(1-progress,3))*720*(index%2==0?1:-1) : 0, 0);
+        item.Object.transform.rotation = Quaternion.Euler(0,28+(rolling ? (1-Mathf.Pow(1-progress,3))*720*(index%2==0?1:-1) : 0),0);
         int[] values;
         if(index==2)
         {
@@ -285,6 +286,29 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         }
         item.Object.GetComponent<MeshRenderer>().sharedMaterials=values.Select(v=>Face(DieTexture(index,v),new Rect(0,0,1,1),Color.white,.50f)).ToArray();
         item.Hit.Renderers = item.Object.GetComponentsInChildren<Renderer>(); return item.Hit;
+    }
+    public Hit Tray(string key,Rect layout,Color felt,Color rim)
+    {
+        var left=scene.World(new Vector2(layout.xMin,layout.center.y));var right=scene.World(new Vector2(layout.xMax,layout.center.y));
+        var top=scene.World(new Vector2(layout.center.x,layout.yMin));var bottom=scene.World(new Vector2(layout.center.x,layout.yMax));
+        var size=new Vector2(Vector3.Distance(left,right),Vector3.Distance(top,bottom));
+        string signature=layout+":"+size.ToString("F6")+":"+felt+":"+rim;
+        var item=Get(key,signature,()=>{
+            var root=new GameObject("三骰绒面镶金骰盘 v010");
+            var floor=GameObject.CreatePrimitive(PrimitiveType.Cube);floor.name="绒面底盘";floor.transform.SetParent(root.transform,false);
+            floor.transform.localScale=new Vector3(size.x,.0012f,size.y);
+            floor.GetComponent<Renderer>().sharedMaterial=Face(null,new Rect(0,0,1,1),felt,.12f);
+            for(int i=0;i<4;i++)
+            {
+                bool vertical=i<2;var rail=GameObject.CreatePrimitive(PrimitiveType.Cube);rail.name="镶金木框";rail.transform.SetParent(root.transform,false);
+                rail.transform.localPosition=new Vector3(vertical?(i==0?-1:1)*size.x*.49f:0,.002f,vertical?0:(i==2?-1:1)*size.y*.49f);
+                rail.transform.localScale=new Vector3(vertical?size.x*.035f:size.x,.004f,vertical?size.y:size.y*.035f);
+                rail.GetComponent<Renderer>().sharedMaterial=Face(null,new Rect(0,0,1,1),rim,.45f);
+            }
+            return root;
+        });
+        item.Object.transform.position=scene.World(layout.center)+Vector3.down*.001f;
+        item.Hit.Renderers=item.Object.GetComponentsInChildren<Renderer>();return item.Hit;
     }
     GameObject RoundedDie(float side)
     {

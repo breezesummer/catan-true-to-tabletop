@@ -115,7 +115,8 @@ public sealed class TabletopPresentationTests
     public void ASingleHandStaysAtTheFrontCenter()
     {
         Assert.Equal(764,TabletopHandLayout.ResourceCenter(false));Assert.Equal(764,TabletopHandLayout.SpecialCenter(false));
-        Assert.True(TabletopHandLayout.SpecialCenter(true)<TabletopHandLayout.ResourceCenter(true));
+        Assert.Equal(TabletopHandLayout.SpecialCenter(true),TabletopHandLayout.ResourceCenter(true));
+        Assert.Equal(TabletopHandLayout.SpecialWidth(true),TabletopHandLayout.ResourceWidth(true));
     }
 
     [Theory]

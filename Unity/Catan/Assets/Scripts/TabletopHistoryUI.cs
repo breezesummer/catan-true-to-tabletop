@@ -6,16 +6,18 @@ using UnityEngine;
 // 只渲染已按当前观看者权限投影的历史，不能访问权威状态。
 public sealed class TabletopHistoryUI
 {
-    internal static readonly Rect Feed = new Rect(18,550,220,334);
+    internal static readonly Rect Feed = new Rect(1182,327,246,355);
+    static readonly Rect Collapsed=new Rect(1326,327,102,30);
     static readonly Rect Window = new Rect(210,144,1020,560);
     Vector2 feedScroll, historyScroll, diceScroll;
     string filter;
     long lastSequence = -1;
     bool follow = true, showDice;
+    bool collapsed;
     public bool IsOpen { get; private set; }
     public bool TryClose()
     {if(!IsOpen)return false;IsOpen=false;return true;}
-    public bool BlocksInput(Vector2 p) => IsOpen || Feed.Contains(p);
+    public bool BlocksInput(Vector2 p) => IsOpen || (collapsed?Collapsed:Feed).Contains(p);
 
     public void Draw(Font font,GameHistoryEntry[] entries,string[] players)
     {
@@ -30,15 +32,18 @@ public sealed class TabletopHistoryUI
         }
         if(!IsOpen)
         {
-        ModernOperationUI.Panel(Feed);
+        if(collapsed)
+        {if(ModernOperationUI.Button(Collapsed,"历史 ‹"))collapsed=false;return;}
+        ModernOperationUI.Round(Feed,new Color(ModernOperationUI.Background.r,ModernOperationUI.Background.g,ModernOperationUI.Background.b,.42f));
         if(ModernOperationUI.Button(new Rect(Feed.x+10,Feed.y+5,76,25),"历史"))IsOpen=true;
+        if(ModernOperationUI.Button(new Rect(Feed.xMax-39,Feed.y+5,29,25),"›")){collapsed=true;return;}
         var recent=entries.Skip(Math.Max(0,entries.Length-40)).ToArray();
         var area=new Rect(Feed.x+8,Feed.y+36,Feed.width-16,Feed.height-44);
         if(Event.current.type==EventType.ScrollWheel&&Feed.Contains(Event.current.mousePosition))follow=false;
         feedScroll=DrawRows(area,recent,feedScroll,true);
         float feedHeight=recent.Sum(e=>Height(e,area.width-22,true));
         if(feedScroll.y>=Math.Max(0,feedHeight-area.height)-3)follow=true;
-        if(!follow&&ModernOperationUI.Button(new Rect(Feed.xMax-88,Feed.y+5,78,25),"最新 ↓")){follow=true;feedScroll.y=float.MaxValue;}
+        if(!follow&&ModernOperationUI.Button(new Rect(Feed.xMax-128,Feed.y+5,78,25),"最新 ↓")){follow=true;feedScroll.y=float.MaxValue;}
         }
         if(!IsOpen)return;
         ModernOperationUI.Fill(new Rect(0,0,1440,900),new Color(0,0,0,.50f));

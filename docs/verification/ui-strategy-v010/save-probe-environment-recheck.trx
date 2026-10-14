@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="9b3f83ed-669a-4fd6-bafd-6be83771d234" name="BreezeSummer@BREEZEPRO 2026-10-14 23:06:23" runUser="BreezePro\BreezeSummer" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-14T23:06:23.6325155+08:00" queuing="2026-10-14T23:06:23.6325157+08:00" start="2026-10-14T23:06:22.3992389+08:00" finish="2026-10-14T23:06:23.6357135+08:00" />
+  <TestSettings name="default" id="07375c87-52d2-436b-a8f2-5524d76bb314">
+    <Deployment runDeploymentRoot="BreezeSummer_BREEZEPRO_2026-10-14_23_06_23" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="f643a937-a96f-42f8-9ed9-8c3331afd68d" testId="cb1a5747-bf17-a3b5-27fa-f32d5b6411f4" testName="Catan.Rules.Tests.PersistenceTests.C20SaveSurvivesProcessExitAndNewProcessC21PreservesNextDice" computerName="BREEZEPRO" duration="00:00:00.6869649" startTime="2026-10-14T23:06:22.8639324+08:00" endTime="2026-10-14T23:06:23.5551634+08:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f643a937-a96f-42f8-9ed9-8c3331afd68d" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Catan.Rules.Tests.PersistenceTests.C20SaveSurvivesProcessExitAndNewProcessC21PreservesNextDice" storage="d:\project\catan-true-to-tabletop\tests\catan.rules.tests\bin\release\net10.0\catan.rules.tests.dll" id="cb1a5747-bf17-a3b5-27fa-f32d5b6411f4">
+      <Execution id="f643a937-a96f-42f8-9ed9-8c3331afd68d" />
+      <TestMethod codeBase="D:\Project\catan-true-to-tabletop\tests\Catan.Rules.Tests\bin\Release\net10.0\Catan.Rules.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Catan.Rules.Tests.PersistenceTests" name="C20SaveSurvivesProcessExitAndNewProcessC21PreservesNextDice" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="cb1a5747-bf17-a3b5-27fa-f32d5b6411f4" executionId="f643a937-a96f-42f8-9ed9-8c3331afd68d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="列表中未列出的结果" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="所有已加载的结果" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.5+1b188a7b0a (64-bit .NET 10.0.12)&#xD;
+[xUnit.net 00:00:00.06]   Discovering: Catan.Rules.Tests&#xD;
+[xUnit.net 00:00:00.14]   Discovered:  Catan.Rules.Tests&#xD;
+[xUnit.net 00:00:00.16]   Starting:    Catan.Rules.Tests&#xD;
+[xUnit.net 00:00:00.87]   Finished:    Catan.Rules.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

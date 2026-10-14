@@ -15,7 +15,7 @@ public sealed class TabletopSeat
 public sealed class TabletopUI
 {
     public static readonly Rect ContextRect = new Rect(982, 315, 432, 390);
-    public static readonly Rect EndTurnRect = new Rect(1290,842,122,43);
+    public static readonly Rect EndTurnRect = new Rect(1284,760,130,130);
     internal static readonly Rect SpecialRect = new Rect(1278,744,144,43);
     readonly List<Rect> hits = new List<Rect>();
     readonly List<TabletopWorldObjects.Hit> worldHits = new List<TabletopWorldObjects.Hit>();
@@ -24,6 +24,9 @@ public sealed class TabletopUI
     GUIStyle text, small, center, title, button;
     Vector2 scroll;
     bool contextVisible;
+    Vector2? contextAnchor;
+    public Rect CurrentContextRect => contextAnchor.HasValue?new Rect(Mathf.Clamp(contextAnchor.Value.x+14,16,1440-ContextRect.width-16),Mathf.Clamp(contextAnchor.Value.y+10,16,900-ContextRect.height-16),ContextRect.width,ContextRect.height):ContextRect;
+    public void SetContextAnchor(Vector2? anchor){contextAnchor=anchor;}
     static Texture2D disc;
     readonly TabletopDicePresentation dice = new TabletopDicePresentation();
     readonly TabletopHistoryUI history = new TabletopHistoryUI();
@@ -40,16 +43,17 @@ public sealed class TabletopUI
     public void BindOperations(OperationSnapshot snapshot,Action purchase,Catan.Core.GameHistoryEntry[] entries)
     {operations=snapshot;purchaseDevelopment=purchase;bankHistory=entries??Array.Empty<Catan.Core.GameHistoryEntry>();}
     public bool HistoryOpen => history.IsOpen;
+    public bool HandFlightsVisible { get; set; }=true;
     public bool TryCloseOverlay() => history.TryClose();
-    public bool BlocksOverlayInput(Vector2 p) => history.BlocksInput(p)||contextVisible&&ContextRect.Contains(p);
+    public bool BlocksOverlayInput(Vector2 p) => history.BlocksInput(p)||contextVisible&&CurrentContextRect.Contains(p);
     public void DrawHistory(Font font,Catan.Core.GameHistoryEntry[] entries,string[] players)
-    {if(!history.IsOpen)bank.DrawFlights();history.Draw(font,entries,players);if(!history.IsOpen)DrawScoreDetails();}
+    {if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);history.Draw(font,entries,players);if(!history.IsOpen)DrawScoreDetails();}
     public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
     public void ObserveDice(long sequence,int first,int second,int? eventDie)
     {dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);}
     static readonly Color Cream = new Color(.96f,.88f,.70f), Ink = new Color(.24f,.12f,.06f);
     public static readonly Color HotNumberColor = new Color(1f,.10f,.075f);
-    public bool BlocksBoardInput(Vector2 p) => !TabletopScene.BoardArea.Contains(p) || history.BlocksInput(p) || defense.BlocksInput(p) || hits.Any(r=>r.Contains(p)) || worldHits.Any(h=>h.Contains(p)) || contextVisible && ContextRect.Contains(p);
+    public bool BlocksBoardInput(Vector2 p) => !TabletopScene.BoardArea.Contains(p) || history.BlocksInput(p) || defense.BlocksInput(p) || hits.Any(r=>r.Contains(p)) || worldHits.Any(h=>h.Contains(p)) || contextVisible && CurrentContextRect.Contains(p);
     internal static string[] OpponentOrder(string ownSeat,System.Collections.Generic.IEnumerable<string> ids)
     {
         var ordered=ids.OrderBy(id=>int.Parse(id.Substring(1))).ToArray();int own=Array.IndexOf(ordered,ownSeat);
@@ -83,7 +87,7 @@ public sealed class TabletopUI
     }
     void Styles(Font font)
     {
-        if(text!=null)return;
+        if(text!=null){text.normal.textColor=small.normal.textColor=center.normal.textColor=title.normal.textColor=ModernOperationUI.TextColor;return;}
         text=new GUIStyle(GUI.skin.label){font=font,fontSize=16,wordWrap=true};text.normal.textColor=Cream;
         small=new GUIStyle(text){fontSize=12};center=new GUIStyle(text){alignment=TextAnchor.MiddleCenter};
         title=new GUIStyle(center){fontSize=20,fontStyle=FontStyle.Bold};
@@ -96,30 +100,33 @@ public sealed class TabletopUI
     }
     public void Draw(Font font,string seat,string actor,string phase,int turn,int ownPoints,int dice1,int dice2,
         TabletopSeat[] seats,bool canRoll,bool canEnd,Action roll,Action end,Action<string> trade,
-        Action special=null,string specialLabel="",string detail="")
+        Action special=null,string specialLabel="",string detail="",Action<int> facility=null)
     {
         Styles(font);ModernOperationUI.Styles(font);hits.Clear();worldHits.Clear();hoveredScore=null;table.Objects.Begin("public");
         // 临时便签覆盖的桌面物件不能先于上层按钮响应同一次点击。
         bool tableEnabled=GUI.enabled;
         if(Event.current.type!=EventType.Repaint&&BlocksOverlayInput(Event.current.mousePosition))GUI.enabled=false;
         contextVisible=false;
-        var others=OpponentOrder(seat,seats.Select(p=>p.Id)).Select(id=>seats.First(p=>p.Id==id)).ToArray();
-        for(int i=0;i<others.Length;i++)
+        DrawTopButtons(seats.FirstOrDefault(p=>p.Id==seat),trade,facility);
+        DrawPlayers(seats,seat,actor,trade);
+        for(int i=0;i<3;i++)
         {
-            // 顺时针相对座位：自己的席位始终在画面前方。
-            int place=others.Length==2?(i==0?0:2):i;
-            DrawSeat(others[i],place,others[i].Id==actor,trade);
+            var r=new Rect(472+i*64,17,60,25);hits.Add(r);
+            if(ModernOperationUI.Button(r,StrategyHudTheme.Names[i],true,false,StrategyHudTheme.Selected==i))StrategyHudTheme.Select(i);
         }
-        GUI.Label(new Rect(302,21,288,29),turn+" 回合  ·  "+actor+"  ·  "+phase,new GUIStyle(center){fontSize=14});
+        GUI.Label(new Rect(455,51,290,28),turn+" 回合  ·  "+actor+"  ·  "+phase,new GUIStyle(center){fontSize=13});
+        GUI.Label(new Rect(220,122,180,24),"拖拽地图 · 滚轮缩放",new GUIStyle(small){fontSize=11});
         var ownScoreRect=new Rect(600,866,240,30);
         var ownScore=seats.FirstOrDefault(p=>p.Id==seat)?.Score;
         GUI.Label(ownScoreRect,seat+"   "+(ownScore==null?ownPoints:ownScore.Total)+" 分",title);
         hits.Add(ownScoreRect);ScoreHover(ownScoreRect,ownScore);
         defense.Draw();
-        bank.Draw(table,operations,bankHistory,seats,trade,purchaseDevelopment,worldHits,hits);
+        bank.ObserveHud(operations,bankHistory,seats);
         bool expansion=dice.Event.HasValue;
-        var diceRects=expansion?new[]{new Rect(1260,246,42,42),new Rect(1342,246,42,42),new Rect(1301,196,42,42)}
-            :new[]{new Rect(1260,246,42,42),new Rect(1342,246,42,42)};
+        var trayRect=new Rect(15,149,178,128);hits.Add(trayRect);
+        table.Objects.Tray("dice-tray",trayRect,ModernOperationUI.Surface,StrategyHudArt.Gold);
+        var diceRects=expansion?new[]{new Rect(43,204,39,39),new Rect(113,205,39,39),new Rect(79,164,39,39)}
+            :new[]{new Rect(43,192,43,43),new Rect(112,192,43,43)};
         bool enabled=GUI.enabled;
         for(int i=0;i<diceRects.Length;i++)
         {
@@ -130,10 +137,69 @@ public sealed class TabletopUI
             {Event.current.Use();roll?.Invoke();}
         }
         GUI.enabled=enabled;
+        if(canRoll&&!DiceRolling&&GUI.Button(trayRect,GUIContent.none,GUIStyle.none))roll?.Invoke();
         table.Objects.End();
-        if(ObjectButton(EndTurnRect,"结束回合",canEnd&&!DiceRolling))end?.Invoke();
-        if(special!=null&&ObjectButton(SpecialRect,specialLabel))special();
+        string turnCaption=canRoll?"掷骰":phase.Contains("弃牌")||phase.IndexOf("Discard",StringComparison.OrdinalIgnoreCase)>=0?"等待弃牌":canEnd?"结束回合":actor!=seat?"等待玩家":"等待操作";
+        hits.Add(EndTurnRect);bool turnEnabled=(canRoll||canEnd)&&!DiceRolling;
+        StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
+        var turnStyle=new GUIStyle(title){fontSize=21,wordWrap=true};turnStyle.normal.textColor=turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
+        GUI.Label(new Rect(EndTurnRect.x+20,EndTurnRect.y+35,EndTurnRect.width-40,60),turnCaption,turnStyle);
+        bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
+        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
         GUI.enabled=tableEnabled;
+    }
+    void DrawTopButtons(TabletopSeat own,Action<string> trade,Action<int> facility)
+    {
+        string[] names={"银行","玩家交易","贸易设施","政治设施","科学设施"};
+        for(int i=0;i<5;i++)
+        {
+            var r=new Rect(24+i*82,16,70,70);hits.Add(new Rect(r.x,r.y,r.width,105));
+            bool available=i<2||own?.Improvements!=null;
+            bool over=r.Contains(Event.current.mousePosition);
+            var face=i==2?new Color(.38f,.26f,.045f):i==3?new Color(.045f,.17f,.31f):i==4?new Color(.10f,.25f,.09f):ModernOperationUI.Surface;
+            StrategyHudArt.Disc(r,available?face:ModernOperationUI.Background,available&&over);
+            StrategyHudArt.Icon(new Rect(r.x+14,r.y+13,42,43),i);
+            int level=i<2?0:own?.Improvements!=null&&own.Improvements.Length>i-2?own.Improvements[i-2]:0;
+            var marker=new Rect(r.center.x-11,r.yMax-7,22,22);TabletopUI.Token(marker,new Color(.045f,.055f,.05f));
+            var levelStyle=new GUIStyle(center){fontSize=12,fontStyle=FontStyle.Bold};levelStyle.normal.textColor=StrategyHudArt.Gold;
+            GUI.Label(marker,i<2?"•":level.ToString(),levelStyle);
+            GUI.Label(new Rect(r.x-5,r.yMax+17,r.width+10,21),names[i],new GUIStyle(center){fontSize=11});
+            bool prior=GUI.enabled;GUI.enabled=prior&&available;
+            if(GUI.Button(r,GUIContent.none,GUIStyle.none)){if(i<2)trade?.Invoke(i==0?null:"");else facility?.Invoke(i-2);}GUI.enabled=prior;
+            if(over)
+            {
+                string tip=names[i];
+                if(i>=2)tip+=" · "+level+" 级"+(level>=3?"\n"+(i==2?"商会：商品可按 2:1 兑换":i==3?"要塞：可以晋升精锐骑士":"水渠：掷骰非 7 且无产出时，选取一张资源"):"\n达到 3 级解锁能力");
+                var tooltip=new Rect(r.x,125,246,i>=2?61:30);ModernOperationUI.Panel(tooltip);GUI.Label(new Rect(tooltip.x+10,tooltip.y+4,tooltip.width-20,tooltip.height-8),tip,ModernOperationUI.Small);
+            }
+        }
+    }
+    void DrawPlayers(TabletopSeat[] seats,string own,string actor,Action<string> trade)
+    {
+        int count=Math.Max(1,seats.Length);float width=76,x=1430-count*(width+5);
+        foreach(var player in seats.OrderBy(p=>p.Id))
+        {
+            var panel=new Rect(x,13,width,180);hits.Add(panel);
+            ModernOperationUI.Round(panel,new Color(ModernOperationUI.Background.r,ModernOperationUI.Background.g,ModernOperationUI.Background.b,.68f));
+            var avatar=new Rect(x+13,20,50,50);bool active=player.Id==actor;
+            StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
+            StrategyHudArt.Avatar(new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
+            GUI.Label(new Rect(avatar.x+27,avatar.y+36,27,18),player.Id,new GUIStyle(center){fontSize=10,fontStyle=FontStyle.Bold});
+            int points=player.Score==null?player.Points:player.Id==own?player.Score.Total:player.Score.PublicPoints;
+            string[] labels={"分数","贸易","政治","科学","资源","发展"};
+            int[] values={points,player.Improvements==null?0:player.Improvements[0],player.Improvements==null?0:player.Improvements[1],player.Improvements==null?0:player.Improvements[2],player.Resources,player.Cards};
+            for(int row=0;row<6;row++)
+            {
+                var r=new Rect(x+7,75+row*18,width-14,18);
+                GUI.Label(new Rect(r.x,r.y,38,18),labels[row],new GUIStyle(small){fontSize=11,alignment=TextAnchor.MiddleLeft});
+                var valueStyle=new GUIStyle(center){fontSize=12,fontStyle=FontStyle.Bold,alignment=TextAnchor.MiddleRight};
+                valueStyle.normal.textColor=row==0?StrategyHudArt.Gold:row==1?new Color(1,.8f,.3f):row==2?new Color(.48f,.77f,1):row==3?new Color(.55f,.9f,.52f):ModernOperationUI.TextColor;
+                GUI.Label(new Rect(r.xMax-22,r.y,22,18),values[row].ToString(),valueStyle);
+                if(row==0)ScoreHover(r,player.Score);
+            }
+            if(player.Id!=own&&GUI.Button(avatar,GUIContent.none,GUIStyle.none))trade?.Invoke(player.Id);
+            x+=width+5;
+        }
     }
     void DrawSeat(TabletopSeat p,int place,bool active,Action<string> trade)
     {
@@ -235,9 +301,9 @@ public sealed class TabletopUI
     }
     public void BeginContext(string caption)
     {
-        contextVisible=true;ModernOperationUI.Panel(ContextRect);
-        GUI.Label(new Rect(ContextRect.x+18,ContextRect.y+12,ContextRect.width-36,30),caption,ModernOperationUI.Title);
-        GUILayout.BeginArea(new Rect(ContextRect.x+16,ContextRect.y+44,ContextRect.width-32,ContextRect.height-55));
+        var rect=CurrentContextRect;contextVisible=true;ModernOperationUI.Panel(rect);
+        GUI.Label(new Rect(rect.x+18,rect.y+12,rect.width-36,30),caption,ModernOperationUI.Title);
+        GUILayout.BeginArea(new Rect(rect.x+16,rect.y+44,rect.width-32,rect.height-55));
         scroll=GUILayout.BeginScrollView(scroll);
     }
     public void EndContext(){GUILayout.EndScrollView();GUILayout.EndArea();}
