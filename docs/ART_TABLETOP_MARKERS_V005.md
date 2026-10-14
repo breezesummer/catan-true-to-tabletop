@@ -13,8 +13,8 @@
 复现与试玩：
 
 ```powershell
-# 新批次资产从分类原照重新生成、回读并检查干净重建。
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/art/Build-TabletopMarkers.ps1
+# 从分类原照重建到一个尚不存在的输出目录；已归档版本拒绝覆盖。
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/art/Build-TabletopMarkers.ps1 -OutputRoot .local/art-tabletop-markers/rebuild-v001
 
 # 导入新资产并导出当前优化 AI 的可玩版本。
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/development/Build-TabletopMarkers.ps1 -VerifyPlayer
@@ -27,6 +27,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/development/Play-M6.ps
 ```
 
 当前可玩程序为 [CatanM6.exe](../.local/m6-entity-v005/Builds/Windows/CatanM6.exe)。实际验证结果与未验边界见 [公开摘要](verification/tabletop-markers-v005/summary.json)，历史资产、原照和开工时已有工作区修改保留。只维护当前优化 AI，M7／M8 阶段状态不变。
+
+干净 Git 克隆中已有冻结 `manifest.json`，默认生成目录因此会拒绝覆盖；请使用新的 `-OutputRoot`，生成器会把 `.blend`、FBX、依赖与回读报告输出到该目录。仅在原正式 `.blend`／FBX 仍存在时使用配方说明中的 `-CompareRoot art` 做完整几何比较；克隆后直接构建游戏使用已纳入 Git 的 Unity FBX／预制体，不需要先覆盖冻结导出目录。
 
 本轮实际通过 **151／151 项相关 .NET 检查**；Blender 4.5.14 LTS 正式生成和空目录重建均通过八件回读，几何、UV、材质、贴图和来源一致；Unity 6000.3.25f1 导入 **8／8** 真实网格，共 4,204 个三角形；Windows 构建与两个独立图形进程的四模式保存恢复、继续 AI 行动通过。
 

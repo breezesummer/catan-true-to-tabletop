@@ -49,6 +49,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/art/Build-TabletopMark
 
 `prepare.py` 可从分类归档原件生成；干净克隆中不存在未分类原位副本时仍可复现。已有源贴图逐字节校验，不覆盖不同内容。大量可复现 FBX、blend、导出依赖与预览按项目现有忽略策略本地保存；分类原件、源 PNG、配方和验证记录纳入版本保存。
 
+干净 Git 克隆中已有冻结导出清单，不能直接用默认输出覆盖该版本。请选择一个尚未创建的输出根目录，例如 `-OutputRoot .local/art-tabletop-markers/rebuild-v001`；这会生成新的 `.blend`、FBX、贴图、预览和回读报告。`-CompareRoot art` 仅用于本地仍有完整原正式模型的情况，不能把缺少被忽略模型的 Git 克隆作为几何比较基线。
+
 2026-10-14 实际使用 Blender 4.5.14 LTS，显式 FBX 参数沿用固定流水线：`axis_forward=-Z`、`axis_up=Y`、单位缩放 1、`FBX_SCALE_UNITS`、三角化、无动画。正式生成和独立重建均完成 .blend/.fbx 回读；8/8 网格闭合、无退化三角形、UV 完整、全部材质槽有面、底心轴心正确；原照与归档 SHA-256 保持一致。`verification.json` 和 `clean-rebuild-verification.json` 均为 `status=passed`，干净重建几何、UV、材质、依赖纹理、来源及导出参数一致。
 
 已人工查看原照联系表、六港口轮廓标注、八张校正贴图和四张 1600×1000 Blender 预览。俯视港口字样与图标完整，两圆片无镜像；两斜视见实际厚边；侧视将后排分层陈列以避免互遮。`crowded-vertex` 是类型陈列，并非实际棋盘节点拾取证据。目检范围见 `art/exports/entity-conversion-v005/tabletop-markers/visual-review.json`；尺寸与来源审计见同目录 `source-provenance-audit.json`。
