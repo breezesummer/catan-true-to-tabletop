@@ -1,0 +1,35 @@
+{
+  "version": "ui-strategy-v010",
+  "date": "2026-10-14",
+  "note": "原始卡面保留；本批透明主体为AI辅助提取/补绘候选，仅作为2D HUD图标，非3D网格。",
+  "assets": [
+    {
+      "id": "cloth-cutout-v010",
+      "source": "Unity/Catan/Assets/Resources/EntityAssets/v001/commodity-cards/commodity-cloth-front.png",
+      "output": "Unity/Catan/Assets/Resources/TabletopUI/v010/cloth-cutout.png",
+      "tool": "内置 image_gen 透明图像编辑",
+      "prompt": "Use case: background-extraction. Asset type: transparent game HUD commodity icon. Edit target: the attached cloth Catan commodity card photo. Extract only the central folded yellow cloth bolt with its hanging yellow fabric sheet. Preserve the original illustrated object's shape, engraved details, viewing angle, folds and warm tabletop illustration style. Remove every background, frame, landscape, lettering and ornament. Center the isolated object, enlarge it to fill about 78% of a square canvas. Actual transparent alpha background. For paper keep parchment pale but with a subtle green edge lighting for the science button; for silver coins a subtle blue edge lighting for politics; cloth stays golden yellow. No new objects, no card, no text, no circular badge; this is an object cutout used inside a separately drawn badge."
+    },
+    {
+      "id": "coin-cutout-v010",
+      "source": "Unity/Catan/Assets/Resources/EntityAssets/v001/commodity-cards/commodity-coin-front.png",
+      "output": "Unity/Catan/Assets/Resources/TabletopUI/v010/coin-cutout.png",
+      "tool": "内置 image_gen 透明图像编辑",
+      "prompt": "Use case: background-extraction. Asset type: transparent game HUD commodity icon. Edit target: the attached coin Catan commodity card photo. Extract only the two overlapping engraved silver coins in the center. Preserve the original illustrated object's shape, engraved details, viewing angle, folds and warm tabletop illustration style. Remove every background, frame, landscape, lettering and ornament. Center the isolated object, enlarge it to fill about 78% of a square canvas. Actual transparent alpha background. For paper keep parchment pale but with a subtle green edge lighting for the science button; for silver coins a subtle blue edge lighting for politics; cloth stays golden yellow. No new objects, no card, no text, no circular badge; this is an object cutout used inside a separately drawn badge."
+    },
+    {
+      "id": "paper-cutout-v010",
+      "source": "Unity/Catan/Assets/Resources/EntityAssets/v001/commodity-cards/commodity-paper-front.png",
+      "output": "Unity/Catan/Assets/Resources/TabletopUI/v010/paper-cutout.png",
+      "tool": "内置 image_gen 透明图像编辑",
+      "prompt": "Use case: background-extraction. Asset type: transparent game HUD commodity icon. Edit target: the attached paper Catan commodity card photo. Extract only the central stack of pale parchment paper sheets. Preserve the original illustrated object's shape, engraved details, viewing angle, folds and warm tabletop illustration style. Remove every background, frame, landscape, lettering and ornament. Center the isolated object, enlarge it to fill about 78% of a square canvas. Actual transparent alpha background. For paper keep parchment pale but with a subtle green edge lighting for the science button; for silver coins a subtle blue edge lighting for politics; cloth stays golden yellow. No new objects, no card, no text, no circular badge; this is an object cutout used inside a separately drawn badge."
+    },
+    {
+      "id": "leaders-atlas-v010",
+      "source": "原创虚构角色，无真实人物或游戏角色",
+      "output": "Unity/Catan/Assets/Resources/TabletopUI/v010/leaders-atlas.png",
+      "tool": "内置 image_gen 透明图集生成",
+      "prompt": "Asset type: one 2 by 2 game HUD avatar atlas containing four distinct original fictional island civilization leaders, for a premium Catan strategy tabletop game. Composition: square 1024x1024 canvas, exactly four equal cells in a strict 2x2 grid. In each cell place a centered painted head and upper shoulders portrait fully inside a circular silhouette with generous transparent margin: top-left a confident young dark-haired male navigator wearing warm rust red coat; top-right a dignified older female trader in orange and tan clothes; bottom-left a calm bearded male scholar in pale cream and blue; bottom-right a sharp-eyed female knight with blue mantle and silver armor. Tasteful painterly 3D strategy-game illustration, clear distinctive face silhouettes visible at 48px, warm gold studio light, consistent view straight ahead slightly turned. No real people, no existing game characters, no logos, no words, no ornate frame (frame drawn separately by UI). Actual transparent background in every cell outside portrait. Keep cell boundaries clean so the runtime can select each quadrant with UV cropping; portrait circles must not touch cell edges."
+    }
+  ]
+}

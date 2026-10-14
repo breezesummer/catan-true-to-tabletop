@@ -15,6 +15,7 @@ public sealed partial class M2App
     readonly TabletopUI tabletop = new TabletopUI();
     bool tableNotes;
     Vector2 pendingOperationScroll;
+    string operationPortId;
     PlayerView operationView;
     OperationSnapshot operationSnapshot;
     DevelopmentCardKind? preparedDevelopment;
@@ -25,8 +26,49 @@ public sealed partial class M2App
         var p=logical??new Vector2(Input.mousePosition.x*1440f/Screen.width,(Screen.height-Input.mousePosition.y)*900f/Screen.height);
         return ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||dock.BlocksBoardInput(p);
     }
-    void CancelOperationDraft(){preparedDevelopment=null;preparedPurchase=false;tableNotes=false;CancelPickup();}
+    void CancelOperationDraft(){if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);preparedDevelopment=null;preparedPurchase=false;tableNotes=false;CancelPickup();}
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
+    // 银行和港口分别展示各自权限；最终指令仍由同一规则入口裁决。
+    OperationSnapshot TradeValidationSnapshot()
+    {
+        var source=Operations();
+        if(!dock.IsPortTrade||operationPortId==null)return source;
+        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
+        var port=view.Board.Ports.FirstOrDefault(p=>p.Id==operationPortId&&p.Vertices.Any(locations.Contains));
+        if(port==null)return source;
+        var result=new OperationSnapshot{CanTrade=source.CanTrade,CanInteract=source.CanInteract,GoodCount=source.GoodCount,Goods=source.Goods,Bank=source.Bank,OtherPlayers=source.OtherPlayers,Offer=source.Offer};
+        for(int i=0;i<source.GoodCount;i++)result.Rates[i]=port.Resource.HasValue?((int)port.Resource.Value==i?2:0):3;
+        return result;
+    }
+    bool PickTabletopPort(Vector2 mouse)
+    {
+        if(!Operations().CanTrade)return false;
+        string id=board.ReferenceMarkers.PickPort(mouse,board.BoardCamera);
+        if(string.IsNullOrEmpty(id))return false;
+        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
+        var port=view.Board.Ports.FirstOrDefault(p=>p.Id==id);
+        if(port==null)return false;
+        if(!port.Vertices.Any(locations.Contains)){status="此港口未连接你的定居点或城市。";ai.ShowTablePrompt(status);return true;}
+        CancelOperationDraft();
+        int? good=port.Resource.HasValue?(int?)((int)port.Resource.Value):null;
+        dock.OpenPortTrade(good,good.HasValue?ResourceNames[good.Value]+"港口 · 2:1":"通用港口 · 3:1");
+        operationPortId=id;return true;
+    }
+    bool PickTabletopObject(Vector2 mouse)
+    {
+        if(view==null||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null)return false;
+        if(PickTabletopPort(mouse))return true;
+
+        return false;
+    }
+    internal bool VerificationOpenPort(string id)
+    {
+        if(view==null||!Operations().CanTrade)return false;
+        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
+        var port=view.Board.Ports.FirstOrDefault(p=>p.Id==id&&p.Vertices.Any(locations.Contains));
+        if(port==null)return false;
+        CancelOperationDraft();dock.OpenPortTrade(port.Resource.HasValue?(int?)((int)port.Resource.Value):null,"港口兑换");operationPortId=id;return true;
+    }
     OperationSnapshot Operations()
     {
         if(view==null)return null;
@@ -37,16 +79,16 @@ public sealed partial class M2App
             var s=new OperationSnapshot{Scope="M2:"+seat,Seat=seat,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),GoodCount=5};
             s.Goods=DockCost(view.OwnResources.Wood,view.OwnResources.Brick,view.OwnResources.Wool,view.OwnResources.Wheat,view.OwnResources.Ore);
             s.Bank=DockCost(view.Bank.Wood,view.Bank.Brick,view.Bank.Wool,view.Bank.Wheat,view.Bank.Ore);
-            for(int i=0;i<5;i++)s.Rates[i]=TradeRatio((Resource)i);
+            for(int i=0;i<5;i++)s.Rates[i]=4;
             s.OtherPlayers=view.Players.Where(p=>p.Id!=seat).Select(p=>p.Id).ToArray();
             bool setup=view.Phase==GamePhase.SetupSettlement,roadSetup=view.Phase==GamePhase.SetupRoad,freeRoad=view.Phase==GamePhase.RoadBuilding;
             AddDockBuild(s,setup?CommandKind.SetupSettlement:CommandKind.BuildSettlement,"定居点","settlement",own.Pieces.Settlements,setup?DockCost():DockCost(1,1,1,1),view.LegalVertexIds.Length>0);
             AddDockBuild(s,roadSetup?CommandKind.SetupRoad:freeRoad?CommandKind.PlaceFreeRoad:CommandKind.BuildRoad,"道路","road",own.Pieces.Roads,roadSetup||freeRoad?DockCost():DockCost(1,1),view.LegalEdgeIds.Length>0);
             AddDockBuild(s,CommandKind.BuildCity,"城市","city",own.Pieces.Cities,DockCost(wheat:2,ore:3),view.LegalCityVertexIds.Length>0);
             AddDockBuild(s,CommandKind.BuyDevelopmentCard,"发展卡","development",view.DevelopmentDeckCount,DockCost(wool:1,wheat:1,ore:1),view.Phase==GamePhase.Action&&host.Preview(NewCommand(CommandKind.BuyDevelopmentCard)).Success);
-            int cardIndex=0;
+
             foreach(var c in view.OwnDevelopmentCards)
-                s.Cards.Add(new OperationHandCard{Id=((int)c.Kind)+":"+cardIndex++,Name=DockDevelopmentName(c.Kind),Detail=c.Kind==DevelopmentCardKind.VictoryPoint?"隐藏胜利点，达到目标后可宣告胜利":c.BoughtTurn>=view.Turn?"本回合买入，下回合可用":"点击准备出牌，在桌面确认",Playable=c.Kind!=DevelopmentCardKind.VictoryPoint&&c.BoughtTurn<view.Turn&&!view.DevelopmentCardPlayedThisTurn&&(view.Phase==GamePhase.Action||view.Phase==GamePhase.ProductionAwaitRoll)&&view.TradeOffer==null&&view.ActivePlayerId==seat});
+                s.Cards.Add(new OperationHandCard{Id=((int)c.Kind)+":"+s.Cards.Count(entry=>entry.Id.StartsWith(((int)c.Kind)+":",StringComparison.Ordinal)),Name=DockDevelopmentName(c.Kind),Detail=c.Kind==DevelopmentCardKind.VictoryPoint?"隐藏胜利点，达到目标后可宣告胜利":c.BoughtTurn>=view.Turn?"本回合买入，下回合可用":"点击准备出牌，在桌面确认",Playable=c.Kind!=DevelopmentCardKind.VictoryPoint&&c.BoughtTurn<view.Turn&&!view.DevelopmentCardPlayedThisTurn&&(view.Phase==GamePhase.Action||view.Phase==GamePhase.ProductionAwaitRoll)&&view.TradeOffer==null&&view.ActivePlayerId==seat});
             if(view.TradeOffer!=null)
             {
                 var t=view.TradeOffer;
@@ -58,7 +100,7 @@ public sealed partial class M2App
             s.Notify=ai.ShowTablePrompt;
             s.Trade=t=>
             {
-                var error=OperationSelection.ValidateTrade(Operations(),t);if(error!=null)return error;
+                var error=OperationSelection.ValidateTrade(TradeValidationSnapshot(),t);if(error!=null)return error;
                 var c=NewCommand(t.Bank?CommandKind.BankTrade:CommandKind.ProposeTrade);
                 if(t.Bank){int g=Array.FindIndex(t.Give,n=>n>0),r=Array.FindIndex(t.Receive,n=>n>0);c.GiveResource=(Resource)g;c.ReceiveResource=(Resource)r;c.GiveAmount=t.Give[g];c.ReceiveAmount=t.Receive[r];}
                 else{c.Give=new ResourceBag();c.Receive=new ResourceBag();c.OtherPlayerId=t.OtherPlayer;for(int i=0;i<5;i++){c.Give[(Resource)i]=t.Give[i];c.Receive[(Resource)i]=t.Receive[i];}}
@@ -84,7 +126,7 @@ public sealed partial class M2App
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
         bool enabled=GUI.enabled;GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!dock.HasOverlay&&!ai.TableMenuOpen&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
         TabletopUI.DrawMapLabels(DrawBoardLabels);
-        tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TableMenuOpen);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);
+        tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TableMenuOpen);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,null);
         ai.TableDiceRolling=tabletop.DiceRolling;
@@ -93,11 +135,11 @@ public sealed partial class M2App
             ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll&&view.TradeOffer==null,
             ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.TradeOffer==null,
             ()=>Submit(NewCommand(CommandKind.RollDice)),()=>Submit(NewCommand(CommandKind.EndTurn)),TableSeatClick,
-            ()=>{tableNotes=!tableNotes;},"回合备忘");
+            ()=>{tableNotes=!tableNotes;},"回合备忘",facility:dock.OpenFacility);
         GUI.enabled=enabled&&!ai.TableMenuOpen&&!tabletop.HistoryOpen&&!dock.HasOverlay;
         if(ai.IsHumanTurn&&view.TradeOffer==null)DrawTableDecision();
         GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!ai.TableMenuOpen&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=enabled;
-        if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableMenuOpen)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
+        tabletop.HandFlightsVisible=dock.ResourceHandVisible;if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableMenuOpen)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
         ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
     }
     void TableSeatClick(string target)

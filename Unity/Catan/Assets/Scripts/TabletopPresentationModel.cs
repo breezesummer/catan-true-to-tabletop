@@ -20,10 +20,12 @@ public static class TabletopHandLayout
     }
     public static int ResourceCapacity(bool hasSpecialCards) => int.MaxValue;
     public static int SpecialCapacity(bool hasResources) => int.MaxValue;
-    public static float ResourceCenter(bool hasSpecialCards) => ((hasSpecialCards ? MixedResourceLeft : RestLeft) + RestRight) / 2;
-    public static float ResourceWidth(bool hasSpecialCards) => RestRight - (hasSpecialCards ? MixedResourceLeft : RestLeft);
-    public static float SpecialCenter(bool hasResources) => (RestLeft + (hasResources ? SpecialRight : RestRight)) / 2;
-    public static float SpecialWidth(bool hasResources) => (hasResources ? SpecialRight : RestRight) - RestLeft;
+    // 资源和发展/进步牌共用完整区域；页签选择决定当前显示哪副手牌。
+    public static float ResourceCenter(bool hasSpecialCards) => (RestLeft + RestRight) / 2;
+    public static float ResourceWidth(bool hasSpecialCards) => RestRight - RestLeft;
+    public static float SpecialCenter(bool hasResources) => (RestLeft + RestRight) / 2;
+    public static float SpecialWidth(bool hasResources) => RestRight - RestLeft;
+    public static bool IsObscured(float nextX,float x,float width) => nextX < x+width-.5f;
     public static TabletopCardPose Resource(TabletopResourceSlot[] slots,int index,float center,float width,bool selected)
     {
         // 飞牌落下前才逐渐撑开插槽，已有手牌随之让位；同一插槽同时供飞牌和手牌绘制使用。
@@ -121,6 +123,8 @@ public sealed class TabletopCollectionTimeline
     string scope;
     long sequence;
     bool initialized;
+    readonly System.Collections.Generic.Dictionary<string,TabletopHandOrder> orders = new System.Collections.Generic.Dictionary<string,TabletopHandOrder>();
+    readonly System.Collections.Generic.Dictionary<string,System.Collections.Generic.List<TabletopHandChange>> handChanges = new System.Collections.Generic.Dictionary<string,System.Collections.Generic.List<TabletopHandChange>>();
     public void Observe(string playerScope,Catan.Core.GameHistoryEntry[] entries,double now)
     {
         entries=entries??Array.Empty<Catan.Core.GameHistoryEntry>();
@@ -128,10 +132,16 @@ public sealed class TabletopCollectionTimeline
         if(!initialized||scope!=playerScope||latest<sequence)
         {
             // 首次绑定、换局和读档均只接收当前历史基线，不能重播旧的收牌。
-            flights.Clear();initialized=true;scope=playerScope;sequence=latest;return;
+            flights.Clear();orders.Clear();handChanges.Clear();initialized=true;scope=playerScope;sequence=latest;return;
         }
         foreach(var entry in entries.Where(e=>e.Sequence>sequence).OrderBy(e=>e.Sequence))
         {
+            // GetHistory 已按观看者权限投影；仅有具体资源索引的变化能改变该手牌显示队列。
+            foreach(var change in (entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>()).Where(c=>c.Category=="goods"&&c.GoodIndex>=0&&c.GoodIndex<8&&c.PlayerId!=null))
+            {
+                if(!handChanges.TryGetValue(change.PlayerId,out var pending))handChanges[change.PlayerId]=pending=new System.Collections.Generic.List<TabletopHandChange>();
+                pending.Add(new TabletopHandChange{Good=change.GoodIndex,Amount=change.Amount});
+            }
             var changes=(entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>()).Where(c=>c.Category=="goods"&&!c.IsPrivate&&c.GoodIndex>=0&&c.GoodIndex<8).ToArray();
             int ordinal=0;
             foreach(var group in changes.GroupBy(c=>c.GoodIndex))
@@ -158,6 +168,13 @@ public sealed class TabletopCollectionTimeline
     {
         flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);
         var result=new System.Collections.Generic.List<TabletopResourceSlot>();
+        player=player??"";
+        if(!orders.TryGetValue(player,out var order))orders[player]=order=new TabletopHandOrder();
+        handChanges.TryGetValue(player,out var pendingChanges);
+        order.Sync(owned,goodCount,pendingChanges);
+        if(pendingChanges!=null)pendingChanges.Clear();
+        var incomingByGood=new System.Collections.Generic.Dictionary<int,TabletopCollectionFlight[]>();
+        var visibleByGood=new System.Collections.Generic.Dictionary<int,int>();
         for(int good=0;good<goodCount;good++)
         {
             int count=Math.Max(0,owned[good]);
@@ -165,13 +182,16 @@ public sealed class TabletopCollectionTimeline
             // 已到账资源可能立即被花费；取消超出当前持有数的展示，绝不能凭动画补回规则资源。
             foreach(var canceled in incoming.Skip(count))flights.Remove(canceled);
             incoming=incoming.Take(count).ToArray();
-            int visible=count-incoming.Length;
-            for(int ordinal=0;ordinal<count;ordinal++)
-            {
-                var flight=ordinal<visible?null:incoming[ordinal-visible];
-                result.Add(new TabletopResourceSlot{Good=good,Ordinal=ordinal,Flight=flight,Weight=flight==null?1:flight.Insertion(now)});
-            }
+            incomingByGood[good]=incoming;visibleByGood[good]=count-incoming.Length;
+        }
+        var ordinals=new int[8];
+        foreach(int good in order.Goods)
+        {
+            int ordinal=ordinals[good]++;
+            var flight=ordinal<visibleByGood[good]?null:incomingByGood[good][ordinal-visibleByGood[good]];
+            result.Add(new TabletopResourceSlot{Good=good,Ordinal=ordinal,Flight=flight,Weight=flight==null?1:flight.Insertion(now)});
         }
         return result.ToArray();
     }
+    public void SortHand(string player){if(player!=null&&orders.TryGetValue(player,out var order))order.Sort();}
 }

@@ -44,34 +44,47 @@ public sealed partial class M2App : MonoBehaviour
         if(ai==null)gameObject.AddComponent<M2PlayerVerification>().Initialize(this);
         else ai.Connect(this,host);
     }
+    readonly MapPanInput mapPan=new MapPanInput();
     void Update()
     {
-        if(host==null)return;
+        if(host==null||board==null)return;
         Vector2 releasePoint=Vector2.zero;bool released=ai!=null&&dock.ConsumeBuildRelease(out releasePoint);
-        if(ai!=null&&ai.TableMenuOpen){board.ClearPreview();return;}
-        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();}
+        if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
+        var pointer=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
+        bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(new Vector2(pointer.x*1440f/Screen.width,pointer.y*900f/Screen.height));
+        bool canMap=ai!=null&&!curtain&&!newGameDialog&&!ai.TableMenuOpen&&!blocked&&TabletopUI.ContainsMapScreenPoint(pointer);
+        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,!holding);
+        if(mapPan.IsDragging){board.ClearPreview();return;}
+        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();mapPan.Cancel(board.TableScene);}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
-        if(!DockBlocksMouse()&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
-        if(curtain||newGameDialog||!holding||view==null||ai!=null&&!ai.IsHumanTurn)return;
-        var mouse=released?new Vector2(releasePoint.x*Screen.width/1440f,releasePoint.y*Screen.height/900f):new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
+        if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
+        if(curtain||newGameDialog||view==null||ai!=null&&!ai.IsHumanTurn)return;
+        var mouse=released?new Vector2(releasePoint.x*Screen.width/1440f,releasePoint.y*Screen.height/900f):pointer;
         if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(new Vector2(mouse.x*1440/Screen.width,mouse.y*900/Screen.height)))return;
+        if(ai!=null&&!holding&&boardClick){PickTabletopObject(mouse);return;}
+        if(!holding)return;
         var candidate=ResolveTarget(mouse);
         if(candidate!=hover)
         {
             hover=candidate;
             bool valid=hover!=""&&host.Preview(NewCommand(placement,hover)).Success;
-            if(placement==CommandKind.MoveRobber)board.PreviewRobber(hover,valid);
-            else board.Preview(hover,IsRoad(placement),valid);
+            if(placement==CommandKind.MoveRobber)board.PreviewRobber(hover,valid);else board.Preview(hover,IsRoad(placement),valid);
         }
         bool guideHit=ai==null&&help&&mouse.x>24f*Screen.width/1440f&&mouse.x<732f*Screen.width/1440f&&mouse.y>104f*Screen.height/900f&&mouse.y<227f*Screen.height/900f;
-        if((Input.GetMouseButtonDown(0)||released)&&!guideHit&&(ai!=null||mouse.x<Screen.width*.73f&&mouse.y>Screen.height*.10f&&mouse.y<Screen.height*.895f))
+        if((ai!=null?boardClick||released:Input.GetMouseButtonDown(0))&&!guideHit&&(ai!=null||mouse.x<Screen.width*.73f&&mouse.y>Screen.height*.10f&&mouse.y<Screen.height*.895f))
         {
-            if(hover!="")Drop(hover);
-            else {CancelPickup();status="没有吸附目标，已取消；局面保持不变。";}
+            if(hover!="")
+            {
+                if(ai!=null&&!host.Preview(NewCommand(placement,hover)).Success&&!(false))
+                {status="此处不能放下当前棋子，请选择高亮的合法位置；右键放回。";return;}
+                Drop(hover);
+            }
+            else if(ai==null){CancelPickup();status="没有吸附目标，已取消；局面保持不变。";}
         }
     }
     internal bool TryCancelTableInteraction()
     {
+        if(mapPan.IsDragging){mapPan.Cancel(board.TableScene);return true;}
         if(tabletop.TryCloseOverlay())return true;
         bool active=holding||preparedDevelopment.HasValue||preparedPurchase||tableNotes||newGameDialog||cardArt.HasSelection||dock.HasCancelableInteraction;
         if(!active)return false;
@@ -420,7 +433,7 @@ public sealed partial class M2App : MonoBehaviour
         {
             if(board.ReferenceMarkers.HasPort(port.Id))
             {
-                if(ai!=null&&GUI.Button(board.ReferenceMarkers.PortScreenRect(port.Id,board.BoardCamera),GUIContent.none,GUIStyle.none)&&Operations().CanTrade)dock.OpenTrade();
+                // 点击与地图拖动统一在 Update 的松键入口处理。
                 continue;
             }
             var center=(board.Position(port.Vertices[0])+board.Position(port.Vertices[1]))*.5f;
@@ -431,7 +444,7 @@ public sealed partial class M2App : MonoBehaviour
                 var portRect=new Rect(x-29,y-13,58,26);TabletopUI.Note(portRect);
                 var portInk=new GUIStyle(badge){fontSize=11};portInk.normal.textColor=new Color(.25f,.13f,.06f);
                 GUI.Label(portRect,port.Resource.HasValue?ResourceNames[(int)port.Resource.Value]+" 2:1":"3:1",portInk);
-                if(GUI.Button(portRect,GUIContent.none,GUIStyle.none)&&Operations().CanTrade)dock.OpenTrade();continue;
+                continue;
             }
             Panel(new Rect(x-36,y-12,72,24),new Color(.11f,.21f,.27f,.94f));
             Label(x-36,y-12,72,24,port.Resource.HasValue?ResourceNames[(int)port.Resource.Value]+" 2:1":"港口 3:1",badge);

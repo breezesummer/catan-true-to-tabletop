@@ -23,15 +23,17 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         public GameObject Object;
         public string Resource, PlayerId;
         public int Ordinal;
+        public float InlandReach;
     }
     readonly Dictionary<string, Marker> ports = new Dictionary<string, Marker>();
     readonly Dictionary<string, Marker> gifts = new Dictionary<string, Marker>();
     readonly Dictionary<string, Marker> bonuses = new Dictionary<string, Marker>();
     readonly Dictionary<string, Marker> awards = new Dictionary<string, Marker>();
+    readonly Dictionary<string, GameObject> oceanTiles = new Dictionary<string, GameObject>();
     Dictionary<string, Vector3> vertices;
     Dictionary<string, Edge> edges;
     Tile[] tiles;
-    Transform portRoot, giftRoot, bonusRoot, awardRoot;
+    Transform portRoot, giftRoot, bonusRoot, awardRoot, oceanRoot;
     TabletopScene table;
     string observerSeat;
     string[] playerIds = Array.Empty<string>();
@@ -42,6 +44,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
     public int GiftPortCount => gifts.Count;
     public int UnclaimedVictoryMarkerCount => bonuses.Count;
     public int AwardedVictoryMarkerCount => awards.Count;
+    public int SupplementalOceanTileCount => oceanTiles.Count;
 
     public static TabletopReferenceMarkers Create(Transform parent, Tile[] publicTiles,
         Dictionary<string, Vector3> publicVertexPositions, Edge[] publicEdges)
@@ -59,6 +62,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         display.giftRoot = display.Group("赠送港口");
         display.bonusRoot = display.Group("航路奖励");
         display.awardRoot = display.Group("公开奖励");
+        display.oceanRoot = display.Group("港口外侧公开装饰海格 v010");
         return display;
     }
     Transform Group(string name)
@@ -74,6 +78,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         if (publicTiles != null) tiles = publicTiles;
         this.table = table;
         this.observerSeat = observerSeat;
+        RefreshOceanTiles((publicPorts??Array.Empty<PortDisplay>()).Concat(publicGiftPorts??Array.Empty<PortDisplay>()));
         RefreshPorts(ports, portRoot, publicPorts, "港口 ");
         RefreshPorts(gifts, giftRoot, publicGiftPorts, "港礼 ");
         var wantedBonuses = new HashSet<string>(StringComparer.Ordinal);
@@ -115,18 +120,61 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
             var item = Put(existing, port.Id, EntityBoardAssets.PortResource(port.Resource), name + port.Id, parent);
             if (item == null) continue;
             Vector3 midpoint = (a + b) / 2, normal = CoastNormal(endpoints, midpoint, b - a);
-            // 真实纸板中心置于海岸外侧，两个建筑交点与中间的路船仍保持可选取。
-            var bottom = midpoint + normal * .030f;
-            bool seaSurface = (tiles ?? Array.Empty<Tile>()).Any(t => t.Vertices != null && endpoints.All(t.Vertices.Contains) &&
-                (t.Resource == "sea" || t.Resource == "water"));
-            // 有海格时贴 8 mm 板面；外海框顶面为 -1 mm，纸板不能悬在半空。
-            bottom.y = (seaSurface ? EntityBoardAssets.BoardSurfaceHeight : -.001f) + .0001f;
+            // 将原照片纸板的沙岸实际轮廓贴到海岸边，留下 0.35 mm 的实体板缝。
+            // 不凭纸板中心猜测距离，避免不同港口照片的外形产生可见空隙。
+            var bottom = midpoint + normal * (item.InlandReach+.00035f);
+            bottom.y = EntityBoardAssets.BoardSurfaceHeight+.0001f;
             item.Object.transform.position = bottom;
             // 导入纸板的沙岸在 local +Z，向海的凸柄在 local -Z。
             item.Object.transform.rotation = Quaternion.LookRotation(-normal, Vector3.up);
             wanted.Add(port.Id);
         }
         Prune(existing, wanted);
+    }
+    void RefreshOceanTiles(IEnumerable<PortDisplay> publicPorts)
+    {
+        var wanted=new HashSet<string>(StringComparer.Ordinal);
+        var displayOutline=new List<Vector3>();
+        foreach(var port in publicPorts)
+        {
+            var endpoints=port.Vertices;
+            if((endpoints==null||endpoints.Length!=2)&&!string.IsNullOrEmpty(port.EdgeId)&&edges.TryGetValue(port.EdgeId,out var edge))endpoints=edge.Vertices;
+            if(!TryEndpoints(endpoints,out var a,out var b))continue;
+            var midpoint=(a+b)/2;var normal=CoastNormal(endpoints,midpoint,b-a);
+            // 完整相邻六边形中心距海岸半个格宽，边长来自已公开的海岸几何。
+            float side=Vector3.Distance(a,b);
+            var seaCenter=midpoint+normal*(side*Mathf.Sqrt(3)/2);seaCenter.y=0;
+            bool occupied=(tiles??Array.Empty<Tile>()).Any(t=>t.Vertices!=null&&t.Vertices.All(vertices.ContainsKey)&&
+                (TileCenter(t)-seaCenter).sqrMagnitude<.000001f);
+            // 已有海格、陆格或未揭示占位时均不叠加，也不猜测隐藏地形。
+            if(occupied)continue;
+            string key=Mathf.RoundToInt(seaCenter.x*100000)+":"+Mathf.RoundToInt(seaCenter.z*100000);
+            wanted.Add(key);
+            if(!oceanTiles.ContainsKey(key))
+            {
+                var obj=EntityBoardAssets.Terrain("sea",seaCenter,oceanRoot);
+                if(obj==null)continue;
+                obj.name="港口公开装饰海格 "+key;
+                // 原实体海板按边长 40 mm 制作，保持公开拓扑尺度；没有 collider 或规则 ID。
+                obj.transform.localScale=Vector3.one*(side/.04f);
+                oceanTiles.Add(key,obj);
+            }
+            for(int i=0;i<6;i++)
+            {
+                float angle=(30+i*60)*Mathf.Deg2Rad;
+                displayOutline.Add(seaCenter+new Vector3(Mathf.Cos(angle)*side,EntityBoardAssets.BoardSurfaceHeight,Mathf.Sin(angle)*side));
+            }
+        }
+        foreach(var key in oceanTiles.Keys.Where(key=>!wanted.Contains(key)).ToArray())
+        {
+            var obj=oceanTiles[key];obj.SetActive(false);Destroy(obj);oceanTiles.Remove(key);
+        }
+        if(table!=null)table.SetPresentationOutline(displayOutline);
+    }
+    Vector3 TileCenter(Tile tile)
+    {
+        var point=tile.Vertices.Select(id=>vertices[id]).Aggregate(Vector3.zero,(sum,v)=>sum+v)/tile.Vertices.Length;
+        point.y=0;return point;
     }
     bool TryEndpoints(string[] ids, out Vector3 a, out Vector3 b)
     {
@@ -164,7 +212,18 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         }
         var instance = EntityBoardAssets.ReferenceMarker(resource, name, Vector3.zero, Quaternion.identity, parent);
         if (instance == null) return null;
-        var item = new Marker { Object = instance, Resource = resource };
+        float inlandReach=0;
+        foreach(var filter in instance.GetComponentsInChildren<MeshFilter>())
+        {
+            if(filter.sharedMesh==null)continue;
+            var bounds=filter.sharedMesh.bounds;
+            for(int i=0;i<8;i++)
+            {
+                var local=bounds.center+Vector3.Scale(bounds.extents,new Vector3((i&1)==0?-1:1,(i&2)==0?-1:1,(i&4)==0?-1:1));
+                inlandReach=Mathf.Max(inlandReach,instance.transform.InverseTransformPoint(filter.transform.TransformPoint(local)).z);
+            }
+        }
+        var item = new Marker { Object = instance, Resource = resource, InlandReach=inlandReach };
         collection.Add(key, item);
         return item;
     }
@@ -185,16 +244,15 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
     void LateUpdate() => PositionAwards();
     void PositionAwards()
     {
-        var opponents = TabletopUI.OpponentOrder(observerSeat, playerIds);
         foreach (var item in awards.Values)
         {
+            // 对手桌边筹码由右上角公开计分 HUD 代替；地图上的公开奖励标记仍然保留。
+            item.Object.SetActive(table==null||item.PlayerId==observerSeat);
             Vector3 position;
             if (table != null && table.isActiveAndEnabled)
             {
-                int index = Array.IndexOf(opponents, item.PlayerId);
-                int place = opponents.Length == 2 ? (index == 0 ? 0 : 2) : index;
-                var anchor = item.PlayerId == observerSeat ? new Vector2(306, 656) :
-                    place == 1 ? new Vector2(994, 105) : place == 2 ? new Vector2(1221, 432) : new Vector2(219, 432);
+                TabletopScene.SetHudLayer(item.Object.transform);
+                var anchor = new Vector2(128,700);
                 position = table.World(anchor) + Vector3.up * .00015f;
             }
             else
@@ -209,6 +267,52 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         }
     }
     public bool HasPort(string id) => ports.ContainsKey(id);
+    // 输入为左上原点的实际屏幕像素，仅命中已摆放的公开港口；赠送中的港口不能提前交易。
+    public string PickPort(Vector2 screenMouse,Camera camera)
+    {
+        if(camera==null)return null;
+        var logical=new Vector2(screenMouse.x*1440/Screen.width,screenMouse.y*900/Screen.height);
+        var ray=camera.ScreenPointToRay(new Vector3(screenMouse.x,Screen.height-screenMouse.y,0));
+        string nearest=null;float distance=float.PositiveInfinity;
+        foreach(var pair in ports)
+        {
+            if(pair.Value.Object==null||!pair.Value.Object.activeInHierarchy)continue;
+            var rect=PortScreenRect(pair.Key,camera);
+            if(!rect.Contains(logical))continue;
+            // 投影包围盒只用于粗筛。斜向海岸的包围盒会包含岸边道路/船，必须命中真实纸板轮廓。
+            foreach(var filter in pair.Value.Object.GetComponentsInChildren<MeshFilter>())
+            {
+                if(TryHitMesh(ray,filter,out float candidate)&&candidate<distance)
+                {distance=candidate;nearest=pair.Key;}
+            }
+        }
+        return nearest;
+    }
+    static bool TryHitMesh(Ray worldRay,MeshFilter filter,out float distance)
+    {
+        distance=float.PositiveInfinity;
+        var mesh=filter.sharedMesh;
+        if(mesh==null||!mesh.isReadable)return false;
+        var origin=filter.transform.InverseTransformPoint(worldRay.origin);
+        var direction=filter.transform.InverseTransformVector(worldRay.direction);
+        var positions=mesh.vertices;var triangles=mesh.triangles;
+        for(int i=0;i+2<triangles.Length;i+=3)
+        {
+            var a=positions[triangles[i]];var edge1=positions[triangles[i+1]]-a;var edge2=positions[triangles[i+2]]-a;
+            var cross=Vector3.Cross(direction,edge2);float determinant=Vector3.Dot(edge1,cross);
+            if(Mathf.Abs(determinant)<.00000000001f)continue;
+            float inverse=1/determinant;var fromVertex=origin-a;
+            float u=Vector3.Dot(fromVertex,cross)*inverse;
+            if(u<-.00001f||u>1.00001f)continue;
+            var secondCross=Vector3.Cross(fromVertex,edge1);
+            float v=Vector3.Dot(direction,secondCross)*inverse;
+            if(v<-.00001f||u+v>1.00001f)continue;
+            // 方向不归一化，保留世界射线参数；缩放后的模型也能按同一世界距离比较前后。
+            float candidate=Vector3.Dot(edge2,secondCross)*inverse;
+            if(candidate>=0&&candidate<distance)distance=candidate;
+        }
+        return !float.IsPositiveInfinity(distance);
+    }
     public bool HasGiftPort(string id) => gifts.ContainsKey(id);
     public bool HasBonusMarker(string edgeId) => bonuses.ContainsKey(edgeId);
     public GameObject PortObject(string id)

@@ -1,0 +1,68 @@
+{
+  "version": "ui-strategy-v010",
+  "date": "2026-10-14",
+  "status": "passed_with_manual_boundaries",
+  "rulesChanged": false,
+  "aiChanged": false,
+  "dotnet": {
+    "uniqueCases": 792,
+    "initialPassed": 791,
+    "initialFailed": 1,
+    "recheckPassed": 1,
+    "skipped": 0,
+    "completeAiGames": 52,
+    "note": "独立保存探针未加载项目环境而寻找系统.NET6；Enter-DevEnvironment后该项单独复验通过；不把专项次数相加"
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "build": "passed",
+    "saveLoadProcesses": 2,
+    "saveLoadModes": [
+      "base",
+      "seafarers",
+      "cities-knights",
+      "combined"
+    ]
+  },
+  "ui": [
+    {
+      "configurations": 28,
+      "checks": 16971,
+      "graphics": false
+    },
+    {
+      "cameraImages": 8,
+      "fullUiPixelsVerified": false,
+      "configurations": 28,
+      "checks": 16980,
+      "graphics": true
+    }
+  ],
+  "manual": [
+    "1440×900与1920×1080城市骑士布局",
+    "三张设施卡弹窗",
+    "三面真实骰盘与固定建筑模型",
+    "公开玩家统计与资源手牌",
+    "海洋主题即时切换",
+    "滚轮仅缩放地图"
+  ],
+  "unverified": [
+    "完整鼠标拖拽/建筑/移船/骑士/港口兑换全链路",
+    "全部分辨率与三主题人工覆盖",
+    "用户本人完整对局",
+    "长期性能",
+    "最终字形与美术确认"
+  ],
+  "art": {
+    "originalsRetained": true,
+    "transparentPng": 4,
+    "alphaSampled": true,
+    "tool": "内置image_gen，透明商品辅助提取与原创虚构头像"
+  },
+  "executable": {
+    "path": ".local/m6-ui-v010/Builds/Windows/CatanM6.exe",
+    "bytes": 667136,
+    "sha256": "3070E580E019576B9AFCDEB4FEC18D03CEBC119F6AE84D597412905C749AD653"
+  },
+  "roadmap": "M7/M8不推进"
+}

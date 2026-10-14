@@ -1,0 +1,34 @@
+[
+  {
+    "file": "cloth-cutout.png",
+    "width": 1254,
+    "height": 1254,
+    "transparentSamples": 3744,
+    "opaqueSamples": 2426,
+    "sha256": "0506AECA76ED9322939C31C5BF512DA7A47050759764D1FE6F801DD9A7FFCA48"
+  },
+  {
+    "file": "coin-cutout.png",
+    "width": 1254,
+    "height": 1254,
+    "transparentSamples": 3273,
+    "opaqueSamples": 2905,
+    "sha256": "69A75946D41362D18E028364100C62356C2CA86DB927AEBCA7D98FB00EC24890"
+  },
+  {
+    "file": "leaders-atlas.png",
+    "width": 1254,
+    "height": 1254,
+    "transparentSamples": 3237,
+    "opaqueSamples": 2722,
+    "sha256": "6C0D11103EC6D379A125B71258FBD86B1F2CF8128AEB82A3C6D44FAD1036B28E"
+  },
+  {
+    "file": "paper-cutout.png",
+    "width": 1254,
+    "height": 1254,
+    "transparentSamples": 3102,
+    "opaqueSamples": 3028,
+    "sha256": "2D38D0C7B4B36286F598592C746F486CCB107D6797BAD251528E0BD347771F48"
+  }
+]

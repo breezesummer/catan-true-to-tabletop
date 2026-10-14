@@ -94,20 +94,31 @@ public sealed partial class M4App : MonoBehaviour
     }
     public void SaveGame(){if(ai!=null){ai.SaveGame();return;}try{host.Save();status="已保存完整局面和待决选择。";}catch(Exception){status="保存失败，请检查存档目录。";}}
     public void LoadGame(){if(ai!=null){ai.LoadGame();return;}try{host.Load();var v=host.View("P1");Refresh(v);SwitchSeat(Actor(v));status="已恢复，请确认席位。";}catch(Exception){status="存档无法读取或版本不兼容，当前局面保留。";}}
+    readonly MapPanInput mapPan=new MapPanInput();
     void Update()
     {
         Vector2 releasedMouse;bool buildReleased=dock.ConsumeBuildRelease(out releasedMouse);
         if(board==null)return;
-        if(ai!=null&&ai.TableMenuOpen){board.ClearPreview();return;}
+        if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
+        var pointer=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
+        bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(new Vector2(pointer.x*1440f/Screen.width,pointer.y*900f/Screen.height));
+        bool canMap=ai!=null&&!curtain&&!newGame&&!artOpen&&!ai.TableMenuOpen&&!blocked&&TabletopUI.ContainsMapScreenPoint(pointer);
+        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,draft==null&&!operationActions);
+        if(mapPan.IsDragging){board.ClearPreview();return;}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
-        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();pickField="";board.ClearPreview();newGame=false;cardArt.Clear();}
+        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1))
+        {
+            bool knightMenu=ai!=null&&Input.GetMouseButtonDown(1)&&!blocked&&PickTabletopKnight(pointer);
+            if(!knightMenu){dock.Reset();CancelOperationDraft();pickField="";board.ClearPreview();newGame=false;cardArt.Clear();}
+            mapPan.Cancel(board.TableScene);
+        }
         if(!DockBlocksMouse()&&(ai!=null||Input.mousePosition.x<Screen.width*.70f)&&Input.mouseScrollDelta.y!=0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGame||artOpen||ai!=null&&!ai.IsHumanTurn)return;
         var mouse=buildReleased?new Vector2(releasedMouse.x*Screen.width/1440f,releasedMouse.y*Screen.height/900f):new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
         var logicalMouse=new Vector2(mouse.x*1440/Screen.width,mouse.y*900/Screen.height);
         if(DockBlocksMouse(logicalMouse)||cardArt.BlocksBoardInput(logicalMouse)){board.ClearPreview();return;}
         if(ai==null&&(mouse.x>Screen.width*.70f||mouse.y<Screen.height*.15f||mouse.y>Screen.height*.90f))return;
-        if(ai!=null&&draft==null&&Input.GetMouseButtonDown(0)){PickTabletopObject(mouse);return;}
+        if(ai!=null&&draft==null&&boardClick){PickTabletopObject(mouse);return;}
         if(draft==null||pickField=="")return;
         string target=Pick(pickType,mouse);
         if(target!="")
@@ -115,7 +126,7 @@ public sealed partial class M4App : MonoBehaviour
             bool valid=ai==null||!DirectTabletopPlacement||pickField!="source"||view.LegalActions.Any(c=>c.Kind==draft.Kind&&c.SourceId==target);
             if(pickField=="target") {string old=draft.TargetId;draft.TargetId=target;valid=host.Preview(draft).Success&&(ai==null||DockKnightTargetMatches(target));draft.TargetId=old;}
             if(pickType=="T")board.PreviewRobber(target,valid);else board.Preview(target,pickType=="E",valid);
-            if(Input.GetMouseButtonDown(0)||buildReleased)
+            if((ai!=null?boardClick:Input.GetMouseButtonDown(0))||buildReleased)
             {
                 if(ai!=null&&!DockKnightTargetMatches(target)){status="请选择低一级的己方骑士晋升。";return;}
                 if(ai!=null&&DirectTabletopPlacement)
@@ -135,6 +146,7 @@ public sealed partial class M4App : MonoBehaviour
     }
     internal bool TryCancelTableInteraction()
     {
+        if(mapPan.IsDragging){mapPan.Cancel(board.TableScene);return true;}
         if(tabletop.TryCloseOverlay())return true;
         bool active=draft!=null||operationActions||operationKnightTarget!=null||newGame||artOpen||cardArt.HasSelection||dock.HasCancelableInteraction;
         if(!active)return false;
@@ -244,7 +256,7 @@ public sealed partial class M4App : MonoBehaviour
         {
             if(board.ReferenceMarkers.HasPort(port.Id))
             {
-                if(ai!=null&&GUI.Button(board.ReferenceMarkers.PortScreenRect(port.Id,board.BoardCamera),GUIContent.none,GUIStyle.none)&&Operations().CanTrade)dock.OpenTrade();
+                // 点击与地图拖动统一在 Update 的松键入口处理。
                 continue;
             }
             var a=board.ScreenPoint(port.Vertices[0]);var b=board.ScreenPoint(port.Vertices[1]);var p=(a+b)*.5f;p=new Vector2(p.x*1440/Screen.width,p.y*900/Screen.height);

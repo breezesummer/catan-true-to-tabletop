@@ -320,7 +320,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
         BoardCamera.transform.LookAt(displayCenter+new Vector3(0,.005f,0));
         BoardCamera.rect=new Rect(.0f,.10f,.74f,.80f);
     }
-    public void ChangeZoom(float delta) { Zoom=Mathf.Clamp(Zoom+delta,.19f,.32f); SetCamera(TopView); }
+    public void ChangeZoom(float delta) { Zoom=Mathf.Clamp(Zoom+delta,.255f*.45f,.255f*1.65f); SetCamera(TopView); }
     public void ShowTerrain(bool show) { foreach(var m in mountains) m.SetActive(show); }
     void OnDestroy() {foreach(var m in pieceMaterials.Values)Destroy(m);foreach(var m in terrainMaterials)Destroy(m);foreach(var m in terrainMeshes)Destroy(m);}
 }

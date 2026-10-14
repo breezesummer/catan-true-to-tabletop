@@ -1,4 +1,4 @@
-﻿param([string]$BuildRoot='.local/m6-ui-v009',[string]$ReleaseName='卡坦岛之三国争霸内测版1.1')
+param([string]$BuildRoot='.local/m6-ui-v010',[string]$ReleaseName='卡坦岛之三国争霸UI升级版v010')
 $ErrorActionPreference='Stop'
 $packageRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $packageBuild=Join-Path $packageRepo "$BuildRoot/Builds/Windows"
@@ -13,13 +13,13 @@ foreach($packageItem in Get-ChildItem -LiteralPath $packageBuild){
     Copy-Item -LiteralPath $packageItem.FullName -Destination $packageFolder -Recurse
 }
 $packageReadme=@'
-卡坦岛之三国争霸内测版1.1
+卡坦岛之三国争霸UI升级版v010
 
 使用方法：先完整解压此文件夹，再双击 CatanM6.exe。请保留同目录的所有数据文件和运行库。
 运行平台：Windows 64 位；本地单人及 AI 对局。包含基础版、航海家、城市与骑士和已支持的双扩展组合。
 
-本次调整：棋盘居中并恢复全桌统一缩放；银行左上、蛮族轨道和航程右上、扩大历史左下；左右玩家镜像摆放；本人船横放、城墙分开；缩小城市设施。
-操作：鼠标滚轮缩放；Esc 打开游戏菜单；已有浮窗或拿起棋子时，Esc 先关闭/取消，再按一次打开菜单。菜单内可保存、恢复、切换俯视和新开对局。骑士与特殊行动位于右下结束回合上方。
+本次调整：58°地图、完整港口海格；独立地图缩放/拖拽；三主题；五圆片与三面骰盘；四玩家统计；单建筑模型；手牌页签与整理；右侧可收起历史。
+操作：拖拽地图/滚轮缩放，建筑拖到合法位置；右击骑士操作；点船选中再点空海岸改道；所属港口兑换（专属2:1/通用3:1）。左上银行、玩家交易、三设施入口；底部资源/发展页签、整理手牌（新牌追加末尾，读档恢复分类基线）。右下掷骰/等待弃牌/结束回合。Esc优先取消，再开菜单；航海特殊行动从菜单进入。
 
 本版沿用原优化 AI 和存档路径。请先保存并退出旧窗口，再启动新版。内测反馈请附画面、规则模式和复现步骤。
 本包不含开发验收局、用户存档、私人日志或调试符号；好友联机和成品发行验收仍未完成。
