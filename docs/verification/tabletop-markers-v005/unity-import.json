@@ -1,0 +1,101 @@
+{
+    "unityVersion": "6000.3.25f1",
+    "assets": [
+        {
+            "id": "port-generic",
+            "typeId": "tabletop-markers",
+            "verified": true,
+            "dimensionsMetres": [
+                0.04399999976158142,
+                0.0015000039711594582,
+                0.03399999812245369
+            ],
+            "renderers": 1,
+            "triangles": 616
+        },
+        {
+            "id": "port-wood",
+            "typeId": "tabletop-markers",
+            "verified": true,
+            "dimensionsMetres": [
+                0.04399999976158142,
+                0.0015000039711594582,
+                0.03399999812245369
+            ],
+            "renderers": 1,
+            "triangles": 536
+        },
+        {
+            "id": "port-brick",
+            "typeId": "tabletop-markers",
+            "verified": true,
+            "dimensionsMetres": [
+                0.04399999976158142,
+                0.0015000039711594582,
+                0.03399999812245369
+            ],
+            "renderers": 1,
+            "triangles": 664
+        },
+        {
+            "id": "port-wool",
+            "typeId": "tabletop-markers",
+            "verified": true,
+            "dimensionsMetres": [
+                0.04399999976158142,
+                0.0015000039711594582,
+                0.03399999812245369
+            ],
+            "renderers": 1,
+            "triangles": 624
+        },
+        {
+            "id": "port-wheat",
+            "typeId": "tabletop-markers",
+            "verified": true,
+            "dimensionsMetres": [
+                0.04399999976158142,
+                0.0015000039711594582,
+                0.03399999812245369
+            ],
+            "renderers": 1,
+            "triangles": 604
+        },
+        {
+            "id": "port-ore",
+            "typeId": "tabletop-markers",
+            "verified": true,
+            "dimensionsMetres": [
+                0.04399999976158142,
+                0.0015000039711594582,
+                0.03399999812245369
+            ],
+            "renderers": 1,
+            "triangles": 656
+        },
+        {
+            "id": "number-token-back",
+            "typeId": "tabletop-markers",
+            "verified": true,
+            "dimensionsMetres": [
+                0.020999999716877939,
+                0.00045000246609561145,
+                0.020999997854232789
+            ],
+            "renderers": 1,
+            "triangles": 252
+        },
+        {
+            "id": "catan-victory-marker",
+            "typeId": "tabletop-markers",
+            "verified": true,
+            "dimensionsMetres": [
+                0.017999999225139619,
+                0.001500001992098987,
+                0.01799999736249447
+            ],
+            "renderers": 1,
+            "triangles": 252
+        }
+    ]
+}

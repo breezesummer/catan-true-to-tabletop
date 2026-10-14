@@ -21,6 +21,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
     private TabletopScene tableScene;
     private TabletopNumberTokens numberTokens;
     public TabletopScene TableScene => tableScene;
+    public TabletopReferenceMarkers ReferenceMarkers { get; private set; }
     private GameObject ghost;
     private readonly List<GameObject> mountains = new List<GameObject>();
     private readonly Dictionary<Color, Material> pieceMaterials = new Dictionary<Color, Material>();
@@ -64,6 +65,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
             obj.name = tile.Id;
         }
         numberTokens=TabletopNumberTokens.Create(transform,boardTiles,tiles);
+        ReferenceMarkers=TabletopReferenceMarkers.Create(transform,boardTiles,vertices,boardEdges);
         var table = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         feltTable = table;
         table.name="Felt table"; table.transform.SetParent(transform); table.transform.position=boardCenter+new Vector3(0,-.012f,0);
@@ -128,6 +130,15 @@ public sealed class M3BoardRenderer : MonoBehaviour
             var marker=Robber(pirateTileId,new Color(.20f,.05f,.25f),pieces,true);
             marker.name="Pirate "+pirateTileId;
         }
+    }
+    public void RefreshReferenceMarkers(Catan.Core.M3.PlayerView view)
+    {
+        ReferenceMarkers.Refresh(view.Board.Tiles,view.Board.Ports.Select(p=>new TabletopReferenceMarkers.PortDisplay
+            {Id=p.Id,Vertices=p.Vertices,EdgeId=p.EdgeId,Resource=p.Resource}).ToArray(),
+            view.Board.GiftPorts.Select(p=>new TabletopReferenceMarkers.PortDisplay
+            {Id=p.Id,Vertices=p.Vertices,EdgeId=p.EdgeId,Resource=p.Resource}).ToArray(),view.Board.BonusEdgeIds,
+            view.Players.Select(p=>new TabletopReferenceMarkers.ScoreDisplay{PlayerId=p.Id,Points=p.BonusVictoryPoints}).ToArray(),
+            view.PlayerId,tableScene);
     }
     GameObject Ship(string id,Color color,Transform parent)
     {

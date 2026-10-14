@@ -1,0 +1,179 @@
+{
+  "status": "passed",
+  "typeId": "tabletop-markers",
+  "assets": [
+    {
+      "id": "port-generic",
+      "meshObjects": 1,
+      "triangles": 616,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.04399999976158142,
+        0.03400000184774399,
+        0.001500005576658081
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "port-wood",
+      "meshObjects": 1,
+      "triangles": 536,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.04399999976158142,
+        0.03400000184774399,
+        0.001500005576658081
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "port-brick",
+      "meshObjects": 1,
+      "triangles": 664,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.04399999976158142,
+        0.03400000184774399,
+        0.001500005576658081
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "port-wool",
+      "meshObjects": 1,
+      "triangles": 624,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.04399999976158142,
+        0.03400000184774399,
+        0.001500005576658081
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "port-wheat",
+      "meshObjects": 1,
+      "triangles": 604,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.04399999976158142,
+        0.03400000184774399,
+        0.001500005576658081
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "port-ore",
+      "meshObjects": 1,
+      "triangles": 656,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.04399999976158142,
+        0.03400000184774399,
+        0.001500005576658081
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "number-token-back",
+      "meshObjects": 1,
+      "triangles": 252,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.020999999716877937,
+        0.020999999716877937,
+        0.00045000342006318306
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "catan-victory-marker",
+      "meshObjects": 1,
+      "triangles": 252,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.017999999225139618,
+        0.017999999225139618,
+        0.0015000029927237923
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/catan-victory-marker.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/number-token-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/port-brick-front.png",
+      "width": 1024,
+      "height": 792,
+      "verified": true
+    },
+    {
+      "path": "textures/port-generic-front.png",
+      "width": 1024,
+      "height": 792,
+      "verified": true
+    },
+    {
+      "path": "textures/port-ore-front.png",
+      "width": 1024,
+      "height": 792,
+      "verified": true
+    },
+    {
+      "path": "textures/port-wheat-front.png",
+      "width": 1024,
+      "height": 792,
+      "verified": true
+    },
+    {
+      "path": "textures/port-wood-front.png",
+      "width": 1024,
+      "height": 792,
+      "verified": true
+    },
+    {
+      "path": "textures/port-wool-front.png",
+      "width": 1024,
+      "height": 792,
+      "verified": true
+    }
+  ],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

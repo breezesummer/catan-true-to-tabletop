@@ -1,6 +1,10 @@
 # 卡坦岛 PC 项目
 
-2026-10-14 当前版本为 [双扩展地图刷新修复 v001](docs/BUG_COMBINED_MAP_REFRESH_V001.md)：修复“双扩展组合”每次新局地图相同。“驶向新海岸”“穿越沙漠”各 3／4 人现在随机地形、点数与港口，保留岛屿轮廓、沙漠屏障和剧本区域；旧存档按原地图恢复。当前优化 AI 延续。
+2026-10-14 当前版本为 [实体港口与标记接入 v005](docs/ART_TABLETOP_MARKERS_V005.md)：未分类目录的八张照片已分类归档、原像素校正并制成真实厚纸板资产。六类实体港口接入四种模式，航海家礼港／航路奖励与公开奖励筹码随局面更新；点数牌新增船图案照片底面，正面数字保持规则数据。当前入口为 [CatanM6.exe](.local/m6-entity-v005/Builds/Windows/CatanM6.exe)，两个启动脚本统一使用本版和当前优化 AI。
+
+151 项相关 .NET 检查、八件 Blender 回读／干净重建与 Unity 导入、固定 Windows 构建、四模式独立保存恢复，以及 1,903 项新资产图形检查通过。照片总数为 143，唯一资产 ID 为 123，保留版本 FBX 为 132。尺寸仍是估算；完整鼠标点击、全分辨率、用户整局及最终外观待验，M7／M8 状态保留。详细范围见 [验证摘要](docs/verification/tabletop-markers-v005/summary.json)。以下入口与统计均为历史记录。
+
+2026-10-14 历史版本为 [双扩展地图刷新修复 v001](docs/BUG_COMBINED_MAP_REFRESH_V001.md)：修复“双扩展组合”每次新局地图相同。“驶向新海岸”“穿越沙漠”各 3／4 人现在随机地形、点数与港口，保留岛屿轮廓、沙漠屏障和剧本区域；旧存档按原地图恢复。当前优化 AI 延续。
 
 全量与收口复验去重覆盖 **781 项通过（含 52 个完整 AI 局）**；1,032 张地图种子扫描、固定 Unity 构建、四模式独立保存恢复、实际入口两组连续新局／旧档恢复及实际窗口检查通过。当前入口为 [CatanM6.exe](.local/m6-map-refresh-v001/Builds/Windows/CatanM6.exe)，或运行 `tools/development/Play-M6.ps1`。详细次数及未验边界见 [验证摘要](docs/verification/combined-map-refresh-v001/summary.json)。M7／M8 状态保留。以下为历史版本记录，旧程序／压缩包不含本次修复。
 
@@ -65,7 +69,7 @@ M6 本地 AI 对手已于 2026 年 10 月 9 日完成工程验收：可选择基
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1
 ```
 
-当前场景为 `Unity/Catan/Assets/M6.unity`，所有当前启动入口统一使用优化 AI，目标为 `.local/m6-map-refresh-v001/Builds/Windows/CatanM6.exe`。本轮地图修复、存档兼容及复验见 [修复说明](docs/BUG_COMBINED_MAP_REFRESH_V001.md)。操作见 [M6 试玩说明](docs/M6_PLAYTEST.md)，当前仍需用户确认对战强度、最终 UI 与美术；下一阶段为 M7 好友联机。
+当前场景为 `Unity/Catan/Assets/M6.unity`，所有当前启动入口统一使用优化 AI，目标为 `.local/m6-entity-v005/Builds/Windows/CatanM6.exe`。本轮新增实体港口与标记见 [接入说明](docs/ART_TABLETOP_MARKERS_V005.md)，并延续此前地图刷新修复和存档兼容。操作见 [M6 试玩说明](docs/M6_PLAYTEST.md)，当前仍需用户确认对战强度、最终 UI 与美术；下一阶段为 M7 好友联机。
 
 M5 双扩展组合已于 2026 年 10 月 9 日完成工程验收：支持“驶向新海岸”“穿越沙漠”各 3–4 人固定地图，均为 16 分获胜。船、海盗、金矿与骑士、蛮族、商品和进步卡共同生效。**383/383 项规则与回归测试通过**，四个正常完整局、固定 Unity 构建、独立 Windows 保存/恢复及真实鼠标开局操作均已验证。详见 [M5 验收记录](docs/M5_ACCEPTANCE.md)与[组合兼容表](docs/M5_SCENARIOS.md)。
 

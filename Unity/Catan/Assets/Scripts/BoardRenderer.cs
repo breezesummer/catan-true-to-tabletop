@@ -19,6 +19,7 @@ public sealed class BoardRenderer : MonoBehaviour
     private TabletopScene tableScene;
     private TabletopNumberTokens numberTokens;
     public TabletopScene TableScene => tableScene;
+    public TabletopReferenceMarkers ReferenceMarkers { get; private set; }
     private GameObject ghost;
     private readonly List<GameObject> mountains = new List<GameObject>();
     private readonly Dictionary<Color, Material> pieceMaterials = new Dictionary<Color, Material>();
@@ -62,6 +63,7 @@ public sealed class BoardRenderer : MonoBehaviour
             obj.name = tile.Id;
         }
         numberTokens=TabletopNumberTokens.Create(transform,boardTiles,tiles);
+        ReferenceMarkers=TabletopReferenceMarkers.Create(transform,boardTiles,vertices,boardEdges);
         var table = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         feltTable = table;
         table.name="Felt table"; table.transform.SetParent(transform); table.transform.position=new Vector3(0,-.012f,0);
@@ -89,6 +91,11 @@ public sealed class BoardRenderer : MonoBehaviour
     public void Refresh(PlayerView view)
     {
         Refresh(view.Board.Settlements, view.Board.Roads, new PiecePlacement[0], null, view.Board.Tiles);
+    }
+    public void RefreshReferenceMarkers(Catan.Core.M2.PlayerView view)
+    {
+        ReferenceMarkers.Refresh(view.Board.Tiles,view.Board.Ports.Select(p=>new TabletopReferenceMarkers.PortDisplay
+            {Id=p.Id,Vertices=p.Vertices,Resource=p.Resource}).ToArray(),observerSeat:view.PlayerId,table:tableScene);
     }
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)
     {

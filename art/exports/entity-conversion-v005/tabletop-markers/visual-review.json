@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "scope": "原照与校正像素、Blender 四视图人工目检",
+  "reviewed": [
+    "八张原照联系表",
+    "六港口轮廓分割标注联系表",
+    "八张校正图联系表",
+    "top.png",
+    "side.png",
+    "game-camera.png",
+    "crowded-vertex.png"
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "a4d0c1aa18b6ad7f4d139f648f123dbf0b156dce14397a89eeba49085eecd624",
+    "game-camera.png": "37608e31e374f6dda6103372aa5284f09ad0557935688f24302740ca67459d40",
+    "side.png": "cd08f6b1bce8671d247188da76c90ce219f2c7c69929e391009c2df7703770e8",
+    "top.png": "d0e16ff1161e23283275d5433f989b243a85af5b9ab14234fc6e803eff0e65cd"
+  },
+  "findings": [
+    "六港口保留中央柄、两侧圆耳与沙岸异形轮廓，文字和资源图标完整",
+    "船背图案已扶正，两圆片无镜像或明显裁断",
+    "斜视可见实际厚边，侧视分层显示全部八件",
+    "照片色偏、模糊、照明和纸边损伤保留；不视为原版色值已还原"
+  ],
+  "limitations": [
+    "crowded-vertex 为类型陈列，未验实际节点拾取",
+    "未知另一面使用中性材质",
+    "所有尺寸仍为估算",
+    "最终用户外观与 Unity 游戏画面另验"
+  ]
+}

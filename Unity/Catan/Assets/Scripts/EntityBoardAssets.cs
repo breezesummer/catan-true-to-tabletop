@@ -8,6 +8,27 @@ public static class EntityBoardAssets
     public const float BarbarianTrackWidth = .190f;
     public const float BarbarianTrackDepth = .200f;
     public const float BarbarianTrackHeight = .0015f;
+    public const string VictoryMarkerResource = "EntityAssets/v005/tabletop-markers/catan-victory-marker";
+
+    public static string PortResource(Catan.Core.Resource? resource)
+    {
+        string name;
+        switch (resource)
+        {
+            case Catan.Core.Resource.Wood: name = "wood"; break;
+            case Catan.Core.Resource.Brick: name = "brick"; break;
+            case Catan.Core.Resource.Wool: name = "wool"; break;
+            case Catan.Core.Resource.Wheat: name = "wheat"; break;
+            case Catan.Core.Resource.Ore: name = "ore"; break;
+            case null: name = "generic"; break;
+            default: return null;
+        }
+        return "EntityAssets/v005/tabletop-markers/port-" + name;
+    }
+    public static GameObject ReferenceMarker(string resource, string label, Vector3 bottom, Quaternion rotation, Transform parent)
+    {
+        return string.IsNullOrEmpty(resource) ? null : Instantiate(resource, label, bottom, rotation, parent);
+    }
 
     public static string TerrainResource(string resource)
     {

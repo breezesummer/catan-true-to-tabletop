@@ -3,7 +3,7 @@ using System.Linq;
 using Catan.Core;
 using UnityEngine;
 
-// 点数来自公开地图。牌面使用程序排字贴图，厚度与圆边为真实网格，并参与普通深度测试。
+// 点数来自公开地图。正面保留规则排字，背面使用实体照片；闭合厚板参与普通深度测试。
 public sealed class TabletopNumberTokens : MonoBehaviour
 {
     readonly List<Material> materials=new List<Material>();
@@ -34,6 +34,9 @@ public sealed class TabletopNumberTokens : MonoBehaviour
         materials.Clear();
         // 所有点数共用一张圆形厚板网格，数字变化无需重复分配网格；组件销毁时统一释放。
         var edge=BoardRenderer.Material(new Color(.69f,.55f,.31f));edge.name="点数牌纸芯 v008";materials.Add(edge);
+        var back=BoardRenderer.Material(Color.white);back.name="点数牌原照背面 v005";
+        back.SetTexture("_BaseMap",Resources.Load<Texture2D>("EntityAssets/v005/tabletop-markers/number-token-back"));
+        back.SetFloat("_Smoothness",.16f);back.SetFloat("_Metallic",0);materials.Add(back);
         var faces=new Dictionary<int,Material>();
         foreach(var tile in visible)
         {
@@ -47,7 +50,7 @@ public sealed class TabletopNumberTokens : MonoBehaviour
             var obj=new GameObject("点数 "+number+" · "+tile.Id);obj.transform.SetParent(transform,false);
             obj.transform.position=positions[tile.Id]+Vector3.up*(EntityBoardAssets.BoardSurfaceHeight+.00008f);
             obj.AddComponent<MeshFilter>().sharedMesh=tokenMesh;
-            var renderer=obj.AddComponent<MeshRenderer>();renderer.sharedMaterials=new[]{face,edge};
+            var renderer=obj.AddComponent<MeshRenderer>();renderer.sharedMaterials=new[]{face,edge,back};
             renderer.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
         }
     }
@@ -56,7 +59,7 @@ public sealed class TabletopNumberTokens : MonoBehaviour
         // 21 mm 直径置于板块中心，远离边与顶点建筑；薄纸牌不会遮住建筑轮廓。
         const int segments=64;const float radius=.0105f,thickness=.00045f;
         var vertices=new List<Vector3>{new Vector3(0,thickness,0)};var uv=new List<Vector2>{new Vector2(.5f,.5f)};
-        var face=new List<int>();var edge=new List<int>();
+        var face=new List<int>();var edge=new List<int>();var back=new List<int>();
         for(int i=0;i<segments;i++)
         {
             float radians=i*2*Mathf.PI/segments;float x=Mathf.Cos(radians),z=Mathf.Sin(radians);
@@ -71,8 +74,15 @@ public sealed class TabletopNumberTokens : MonoBehaviour
             uv.AddRange(new[]{Vector2.zero,Vector2.right,Vector2.up,Vector2.one});
             edge.AddRange(new[]{start,start+2,start+3,start,start+3,start+1});
         }
-        var mesh=new Mesh{name="点数牌圆形厚纸板 v008"};mesh.SetVertices(vertices);mesh.SetUVs(0,uv);mesh.subMeshCount=2;
-        mesh.SetTriangles(face,0);mesh.SetTriangles(edge,1);mesh.RecalculateNormals();mesh.RecalculateBounds();return mesh;
+        int bottom=vertices.Count;vertices.Add(Vector3.zero);uv.Add(new Vector2(.5f,.5f));
+        for(int i=0;i<segments;i++)
+        {
+            float radians=i*2*Mathf.PI/segments;float x=Mathf.Cos(radians),z=Mathf.Sin(radians);
+            vertices.Add(new Vector3(x*radius,0,z*radius));uv.Add(new Vector2((1-x)/2,(z+1)/2));
+            back.AddRange(new[]{bottom,bottom+i+1,bottom+(i+1)%segments+1});
+        }
+        var mesh=new Mesh{name="点数牌双面闭合厚纸板 v005"};mesh.SetVertices(vertices);mesh.SetUVs(0,uv);mesh.subMeshCount=3;
+        mesh.SetTriangles(face,0);mesh.SetTriangles(edge,1);mesh.SetTriangles(back,2);mesh.RecalculateNormals();mesh.RecalculateBounds();return mesh;
     }
     void OnDestroy(){foreach(var material in materials)Destroy(material);if(tokenMesh!=null)Destroy(tokenMesh);}
 }

@@ -7,6 +7,13 @@ using UnityEngine;
 // Import new frozen versions without replacing the earlier photo conversion outputs.
 public static class EntityIntegrationBuild
 {
+    public static void BuildTabletopMarkers()
+    {
+        Import("v005","tabletop-markers","tabletop-markers-v005","unity-import.json");
+        M6Build.Build();
+        Debug.Log("CATAN_TABLETOP_MARKERS_BUILD_OK");
+    }
+
     public static void Build()
     {
         Import("v003","progress-politics","entity-integration-v003","unity-import-v003.json");
@@ -31,8 +38,9 @@ public static class EntityIntegrationBuild
         foreach(var texture in Directory.GetFiles(runtime,"*.png"))
         {
             var importer=(TextureImporter)AssetImporter.GetAtPath(texture.Replace('\\','/'));
+            importer.textureType=TextureImporterType.Default;importer.textureShape=TextureImporterShape.Texture2D;
             importer.sRGBTexture=true;importer.mipmapEnabled=true;importer.wrapMode=TextureWrapMode.Clamp;
-            importer.filterMode=FilterMode.Trilinear;importer.maxTextureSize=2048;
+            importer.filterMode=FilterMode.Trilinear;importer.anisoLevel=8;importer.maxTextureSize=2048;
             importer.textureCompression=TextureImporterCompression.Uncompressed;importer.SaveAndReimport();
         }
         var evidence=new System.Collections.Generic.List<EntityAssetBuild.ImportRecord>();

@@ -20,6 +20,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
     private TabletopScene tableScene;
     private TabletopNumberTokens numberTokens;
     public TabletopScene TableScene => tableScene;
+    public TabletopReferenceMarkers ReferenceMarkers { get; private set; }
     private Transform publicMarkers;
     private GameObject barbarianTrack;
     private GameObject barbarianShip;
@@ -69,6 +70,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
             obj.name = tile.Id;
         }
         numberTokens=TabletopNumberTokens.Create(transform,boardTiles,tiles);
+        ReferenceMarkers=TabletopReferenceMarkers.Create(transform,boardTiles,vertices,boardEdges);
         var table = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         feltTable = table;
         table.name="Felt table"; table.transform.SetParent(transform); table.transform.position=new Vector3(0,-.012f,0);
@@ -106,9 +108,15 @@ public sealed class M4BoardRenderer : MonoBehaviour
     }
     public void Refresh(PlayerView view)
     {
+        RefreshReferenceMarkers(view);
         if(numberTokens!=null)numberTokens.Refresh(view.Board.Tiles);
         RefreshProjectedPieces(view.Board.Settlements,view.Board.Roads,view.Board.Cities,view.Board.RobberTileId,
             view.Board.Walls,view.Board.Knights,view.Board.Metropolises,view.MerchantTileId,view.BarbarianPosition);
+    }
+    public void RefreshReferenceMarkers(PlayerView view)
+    {
+        ReferenceMarkers.Refresh(view.Board.Tiles,view.Board.Ports.Select(p=>new TabletopReferenceMarkers.PortDisplay
+            {Id=p.Id,Vertices=p.Vertices,Resource=p.Resource}).ToArray(),observerSeat:view.PlayerId,table:tableScene);
     }
     // The live PlayerView and art verification share this public projection-only entrance.
     public void RefreshProjectedPieces(PiecePlacement[] settlements,PiecePlacement[] roads,PiecePlacement[] cities,string robberTileId,
