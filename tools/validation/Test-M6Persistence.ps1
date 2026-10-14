@@ -1,4 +1,4 @@
-﻿param([string]$BuildRoot='.local/m6-ui-v009',[int]$TimeoutSeconds=300)
+﻿param([string]$BuildRoot='.local/m6-map-refresh-v001',[int]$TimeoutSeconds=300)
 $ErrorActionPreference='Stop'
 $persistRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $persistPlayer=Join-Path $persistRepo "$BuildRoot/Builds/Windows/CatanM6.exe"

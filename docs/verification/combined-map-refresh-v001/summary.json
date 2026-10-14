@@ -1,0 +1,107 @@
+{
+  "version": "combined-map-refresh-v001",
+  "date": "2026-10-14",
+  "scope": "用户确认的双扩展新局地图刷新；当前AI沿用；M7/M8状态保留",
+  "rootCause": "新局种子已变化，但双扩展工厂始终读取固定地形与数字模板",
+  "scenarioVersion": "m5-combined-variable-2025-v002",
+  "legacyScenarioVersion": "m5-combined-official-2025-v001",
+  "behaviour": [
+    "主岛与海外组件池分别随机地形及点数，港口类型随机",
+    "海陆轮廓、稳定ID、开局区域、奖励区域和沙漠屏障保留",
+    "6/8不相邻；穿越沙漠金矿不放6/8",
+    "旧存档精确恢复原地图；新局使用随机布局"
+  ],
+  "tests": {
+    "runs": [
+      {
+        "name": "all-rules",
+        "total": 781,
+        "passed": 778,
+        "failed": 3
+      },
+      {
+        "name": "final-targeted",
+        "total": 75,
+        "passed": 75,
+        "failed": 0
+      }
+    ],
+    "distinctCovered": 781,
+    "distinctPassed": 781,
+    "finalUnresolvedFailures": 0,
+    "fullProductionAiGames": 52,
+    "note": "全量与收口专项去重覆盖；未另跑一轮全量。"
+  },
+  "generatedMapSweep": {
+    "configurations": 4,
+    "seedsPerConfiguration": 258,
+    "maps": 1032
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "buildPassed": true,
+    "buildTotalSeconds": 72.1,
+    "coreAndAiRoundtripPassed": true
+  },
+  "persistence": {
+    "independentGraphicsProcesses": 2,
+    "ruleSets": 4,
+    "savePassed": true,
+    "loadPassed": true
+  },
+  "mapHeadless": {
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "configurations": 4,
+    "newGames": 12,
+    "saveRoundtrips": 4,
+    "legacyLoads": 4
+  },
+  "mapGraphics": {
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "configurations": 4,
+    "newGames": 12,
+    "saveRoundtrips": 4,
+    "legacyLoads": 4
+  },
+  "headless": {
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。",
+    "configurations": 28,
+    "checks": 20051,
+    "cameraImages": 0,
+    "guiAttempts": 0,
+    "guiImagesWithChanges": 0,
+    "graphics": false,
+    "fullUiPixelsVerified": false
+  },
+  "graphics": {
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。",
+    "configurations": 28,
+    "checks": 20060,
+    "cameraImages": 8,
+    "guiAttempts": 8,
+    "guiImagesWithChanges": 0,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+  },
+  "windowChecks": [
+    "实际菜单连续两次驶向新海岸新局，地形、数字、港口变化",
+    "实际进入穿越沙漠，随机地形及三块固定沙漠屏障可见"
+  ],
+  "limits": [
+    "完整IMGUI像素自动验收仍为false",
+    "用户本人完整对局、全分辨率、长期性能、随机地图对战平衡未作全面验收"
+  ],
+  "executable": ".local/m6-map-refresh-v001/Builds/Windows/CatanM6.exe",
+  "sha256": {
+    "exe": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+    "presentation": "db775bf189a08afe7bd23896f4c5b90df5f0c71dbbced2b0f1d3e033165d3368",
+    "core": "cb7cea2909cf8bc6ef2425d9a447c2d0f41138a7011be7ca2b7a4cca28f23199",
+    "ai": "7478f6ba51e355232dd3ca384af5020c129bd3dbfdb67e24f0336037db9f51a7"
+  }
+}

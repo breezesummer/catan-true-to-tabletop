@@ -22,7 +22,7 @@ public sealed class M5FullGameTests
     public void ViewOnlyLocalSeatsFinishNormalGameAndPendingSavesResumeDeterministically(string scenario, int seats, uint seed)
     {
         var game = CombinedGameSession.Create(scenario, seats, seed);
-        var driver = new M5ViewOnlyDriver();
+        var driver = new M5ViewOnlyDriver(ensureCoastalOpening: true);
         var checkedDecisions = new HashSet<string>();
         var commands = 0;
         var last = game.GetPlayerView("P1");
@@ -125,6 +125,8 @@ public sealed class M5FullGameTests
 /// <summary>Local acceptance policy. No session, authority, RNG, save, or unauthorized hand access.</summary>
 internal sealed class M5ViewOnlyDriver
 {
+    private readonly bool ensureCoastalOpening;
+    internal M5ViewOnlyDriver(bool ensureCoastalOpening = false) => this.ensureCoastalOpening = ensureCoastalOpening;
     private static readonly Resource[] Resources = Enum.GetValues<Resource>();
     private static readonly Commodity[] Commodities = Enum.GetValues<Commodity>();
     private static ResourceBag Bag(int wood = 0, int brick = 0, int wool = 0, int wheat = 0, int ore = 0) => new() { Wood = wood, Brick = brick, Wool = wool, Wheat = wheat, Ore = ore };
@@ -134,7 +136,13 @@ internal sealed class M5ViewOnlyDriver
         Command Make(CommandKind kind, string? target = null) => new() { PlayerId = view.PlayerId, Kind = kind, TargetId = target! };
         var legal = (view.LegalActions ?? Array.Empty<Command>()).ToList();
         if (view.Phase == GamePhase.SetupSettlement)
-            return Make(CommandKind.SetupSettlement, view.LegalVertexIds.OrderByDescending(v => Value(view, v)).ThenBy(v => v).First());
+        {
+            // 随机地图的最高产点可能全部在内陆；验收首村主动选合法海岸，继续保证完整局覆盖船。
+            var vertices = view.LegalVertexIds.AsEnumerable();
+            if (ensureCoastalOpening && view.Board.Settlements.Length == 0)
+                vertices = vertices.Where(v => view.Board.Tiles.Any(t => t.Resource == "sea" && t.Vertices.Contains(v)));
+            return Make(CommandKind.SetupSettlement, vertices.OrderByDescending(v => Value(view, v)).ThenBy(v => v).First());
+        }
         if (view.Phase == GamePhase.SetupRoad && view.LegalShipEdgeIds.Length > 0)
             return Make(CommandKind.SetupShip, view.LegalShipEdgeIds.First());
         if (view.Phase == GamePhase.SetupRoad)

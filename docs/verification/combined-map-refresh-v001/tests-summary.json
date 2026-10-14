@@ -1,0 +1,21 @@
+{
+  "runs": [
+    {
+      "name": "all-rules",
+      "total": 781,
+      "passed": 778,
+      "failed": 3
+    },
+    {
+      "name": "final-targeted",
+      "total": 75,
+      "passed": 75,
+      "failed": 0
+    }
+  ],
+  "distinctCovered": 781,
+  "distinctPassed": 781,
+  "finalUnresolvedFailures": 0,
+  "fullProductionAiGames": 52,
+  "note": "全量与收口专项去重覆盖；未另跑一轮全量。"
+}

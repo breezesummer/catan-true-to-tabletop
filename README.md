@@ -1,5 +1,10 @@
 # 卡坦岛 PC 项目
 
+2026-10-14 当前版本为 [双扩展地图刷新修复 v001](docs/BUG_COMBINED_MAP_REFRESH_V001.md)：修复“双扩展组合”每次新局地图相同。“驶向新海岸”“穿越沙漠”各 3／4 人现在随机地形、点数与港口，保留岛屿轮廓、沙漠屏障和剧本区域；旧存档按原地图恢复。当前优化 AI 延续。
+
+全量与收口复验去重覆盖 **781 项通过（含 52 个完整 AI 局）**；1,032 张地图种子扫描、固定 Unity 构建、四模式独立保存恢复、实际入口两组连续新局／旧档恢复及实际窗口检查通过。当前入口为 [CatanM6.exe](.local/m6-map-refresh-v001/Builds/Windows/CatanM6.exe)，或运行 `tools/development/Play-M6.ps1`。详细次数及未验边界见 [验证摘要](docs/verification/combined-map-refresh-v001/summary.json)。M7／M8 状态保留。以下为历史版本记录，旧程序／压缩包不含本次修复。
+
+
 2026-10-14 当前版本为 [中央棋盘与整桌缩放 v009](docs/UI_TABLETOP_V009.md)，发行名称 **卡坦岛之三国争霸内测版1.1**。恢复同一相机下的中央大棋盘、备件和设施同步缩放；银行左上，蛮族轨道与航程右上，扩大历史左下；四方玩家与镜像排列，自己的船横放、城墙分开，设施缩小，特殊行动位于结束回合上方。删除桌边按钮，按 Esc 打开菜单。
 
 本轮 **761/761 项测试通过（含 52 个完整 AI 局）**，固定 Unity 构建、四模式独立保存恢复、无图形/图形各 28 配置均通过，并完成实际窗口检查。当前入口为 [CatanM6.exe](.local/m6-ui-v009/Builds/Windows/CatanM6.exe)，或运行 `tools/development/Play-M6.ps1`。分享用 [内测版1.1压缩包](.local/m6-ui-v009/release/卡坦岛之三国争霸内测版1.1.zip)，请完整解压后运行；包内 166 文件已逐一校验。完整用户对局、所有分辨率和长期性能仍待验。M7/M8 不变，见 [验证摘要](docs/verification/tabletop-ui-v009/summary.json)。以下为历史记录，旧入口不代表当前版本。
@@ -60,7 +65,7 @@ M6 本地 AI 对手已于 2026 年 10 月 9 日完成工程验收：可选择基
 powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1
 ```
 
-当前场景为 `Unity/Catan/Assets/M6.unity`，所有当前启动入口的优化 AI 程序目标统一为 `.local/m6-ui-v008-final/Builds/Windows/CatanM6.exe`，本版最终集成复验状态见本文开头。操作见 [M6 试玩说明](docs/M6_PLAYTEST.md)和 [v008 说明](docs/UI_TABLETOP_V008.md)。历史核对与汇报记录见 [开发进度日志](DEVELOPMENT_LOG.md)。策略是本地启发式基线；用户本人整局试玩、对战强度、最终 UI 与美术仍待确认。下一阶段为 M7 好友联机。
+当前场景为 `Unity/Catan/Assets/M6.unity`，所有当前启动入口统一使用优化 AI，目标为 `.local/m6-map-refresh-v001/Builds/Windows/CatanM6.exe`。本轮地图修复、存档兼容及复验见 [修复说明](docs/BUG_COMBINED_MAP_REFRESH_V001.md)。操作见 [M6 试玩说明](docs/M6_PLAYTEST.md)，当前仍需用户确认对战强度、最终 UI 与美术；下一阶段为 M7 好友联机。
 
 M5 双扩展组合已于 2026 年 10 月 9 日完成工程验收：支持“驶向新海岸”“穿越沙漠”各 3–4 人固定地图，均为 16 分获胜。船、海盗、金矿与骑士、蛮族、商品和进步卡共同生效。**383/383 项规则与回归测试通过**，四个正常完整局、固定 Unity 构建、独立 Windows 保存/恢复及真实鼠标开局操作均已验证。详见 [M5 验收记录](docs/M5_ACCEPTANCE.md)与[组合兼容表](docs/M5_SCENARIOS.md)。
 
