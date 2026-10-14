@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace Catan.Core.M5
 {
     /// <summary>The two recommended 2025 Cities & Knights combinations. Other M3 scenarios are deliberately not implied supported.</summary>
-    public static class CombinedScenarios
+    public static partial class CombinedScenarios
     {
         public static string[] Ids => new[] { "heading-for-new-shores", "through-the-desert" };
         public static M3.SeafarersScenario Create(string id, int playerCount)
@@ -13,7 +13,7 @@ namespace Catan.Core.M5
             if (!Ids.Contains(id)) throw new ArgumentException("Unsupported Cities & Knights / Seafarers combination.", nameof(id));
             var scenario = M3.SeafarersScenarios.Create(id, playerCount);
             scenario.TargetVictoryPoints = 16;
-            scenario.Version = CombinedGameSession.ScenarioVersion;
+            scenario.Version = CombinedGameSession.LegacyScenarioVersion;
             scenario.Description = "2025 城市与骑士推荐组合；16 分获胜，保留每个异乡地区首次定居的 2 分奖励。";
             scenario.Name += " · 城市与骑士";
             return scenario;

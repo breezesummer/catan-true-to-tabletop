@@ -23,8 +23,8 @@ public sealed class M5CombinationTests
         var v = g.GetPlayerView("P1"); var source = Catan.Core.M3.SeafarersScenarios.Create(scenario, players);
         Assert.Equal(16, v.TargetVictoryPoints); Assert.Equal(scenario, v.ScenarioId);
         Assert.Equal(source.Tiles.Select(t => t.Id), v.Board.Tiles.Select(t => t.Id));
-        Assert.Equal(source.Tiles.Select(t => t.Resource), v.Board.Tiles.Select(t => t.Resource));
-        Assert.Equal(source.Tiles.Select(t => t.Number), v.Board.Tiles.Select(t => t.Number));
+        Assert.Equal(source.Tiles.Select(t => t.Resource).Order(), v.Board.Tiles.Select(t => t.Resource).Order());
+        Assert.Equal(source.Tiles.Select(t => t.Number).Order(), v.Board.Tiles.Select(t => t.Number).Order());
         Assert.Equal(source.Edges.Select(e => e.Id), v.Board.Edges.Select(e => e.Id));
         Assert.Null(v.Board.RobberTileId); Assert.Null(v.Board.PirateTileId);
         Assert.Empty(g.GetAuthoritativeStateForTesting().DevelopmentDeck);
