@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "tabletop-markers-v005",
+  "classifiedDate": "2026-10-14",
+  "originalsPreserved": true,
+  "originalsRemainAtInboxPaths": true,
+  "uniquePhotographCount": 8,
+  "archiveIsByteIdentical": true,
+  "assets": [
+    {
+      "id": "physical-port-generic-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/3：1港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/3：1港口.jpg",
+      "sha256": "f21928fc7253b2f190e09baf520fdec6ec890c406353d4477c1b9d690f84cee5",
+      "role": "3:1 通用港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ],
+      "classifiedPath": "assets/references/archives/tabletop-markers-v005/ports/3：1港口.jpg",
+      "kind": "photograph",
+      "edition": null,
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "processedAssetIds": [
+        "port-generic"
+      ],
+      "mustPreserve": [
+        "原件字节",
+        "印刷插画与文字",
+        "原照照明/失焦/色偏"
+      ],
+      "unseenSurfaces": [
+        "另一面",
+        "纸芯与侧边实测细节"
+      ],
+      "status": "已归档；原件原位保留"
+    },
+    {
+      "id": "physical-port-wood-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/木头港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/木头港口.jpg",
+      "sha256": "0026a73c325b42ff5e8ecde4d8869cd4214bb4f4ac0651e82a89469e0a1eabdb",
+      "role": "2:1 木头港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ],
+      "classifiedPath": "assets/references/archives/tabletop-markers-v005/ports/木头港口.jpg",
+      "kind": "photograph",
+      "edition": null,
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "processedAssetIds": [
+        "port-wood"
+      ],
+      "mustPreserve": [
+        "原件字节",
+        "印刷插画与文字",
+        "原照照明/失焦/色偏"
+      ],
+      "unseenSurfaces": [
+        "另一面",
+        "纸芯与侧边实测细节"
+      ],
+      "status": "已归档；原件原位保留"
+    },
+    {
+      "id": "physical-port-brick-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/砖港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/砖港口.jpg",
+      "sha256": "2664f4f3f010413d5c831d42c4c13d5a9e9c0f8814187b58024a86e190d36ba1",
+      "role": "2:1 砖港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ],
+      "classifiedPath": "assets/references/archives/tabletop-markers-v005/ports/砖港口.jpg",
+      "kind": "photograph",
+      "edition": null,
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "processedAssetIds": [
+        "port-brick"
+      ],
+      "mustPreserve": [
+        "原件字节",
+        "印刷插画与文字",
+        "原照照明/失焦/色偏"
+      ],
+      "unseenSurfaces": [
+        "另一面",
+        "纸芯与侧边实测细节"
+      ],
+      "status": "已归档；原件原位保留"
+    },
+    {
+      "id": "physical-port-wool-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/羊毛港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/羊毛港口.jpg",
+      "sha256": "3236659d17e0ac7eb660168d432cfacc1491a2fb95c7e620a29fb454b9ba6f30",
+      "role": "2:1 羊毛港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ],
+      "classifiedPath": "assets/references/archives/tabletop-markers-v005/ports/羊毛港口.jpg",
+      "kind": "photograph",
+      "edition": null,
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "processedAssetIds": [
+        "port-wool"
+      ],
+      "mustPreserve": [
+        "原件字节",
+        "印刷插画与文字",
+        "原照照明/失焦/色偏"
+      ],
+      "unseenSurfaces": [
+        "另一面",
+        "纸芯与侧边实测细节"
+      ],
+      "status": "已归档；原件原位保留"
+    },
+    {
+      "id": "physical-port-wheat-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/小麦港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/小麦港口.jpg",
+      "sha256": "009dbd9f9c64015fa447020f00ef552529eec5e967b426c55b20fdface36601b",
+      "role": "2:1 小麦港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ],
+      "classifiedPath": "assets/references/archives/tabletop-markers-v005/ports/小麦港口.jpg",
+      "kind": "photograph",
+      "edition": null,
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "processedAssetIds": [
+        "port-wheat"
+      ],
+      "mustPreserve": [
+        "原件字节",
+        "印刷插画与文字",
+        "原照照明/失焦/色偏"
+      ],
+      "unseenSurfaces": [
+        "另一面",
+        "纸芯与侧边实测细节"
+      ],
+      "status": "已归档；原件原位保留"
+    },
+    {
+      "id": "physical-port-ore-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/矿石港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/矿石港口.jpg",
+      "sha256": "899399de2f9b89eba93de4759d5df484e9e8bd8b3bf7dde7f7e05f4dacc23e64",
+      "role": "2:1 矿石港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ],
+      "classifiedPath": "assets/references/archives/tabletop-markers-v005/ports/矿石港口.jpg",
+      "kind": "photograph",
+      "edition": null,
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "processedAssetIds": [
+        "port-ore"
+      ],
+      "mustPreserve": [
+        "原件字节",
+        "印刷插画与文字",
+        "原照照明/失焦/色偏"
+      ],
+      "unseenSurfaces": [
+        "另一面",
+        "纸芯与侧边实测细节"
+      ],
+      "status": "已归档；原件原位保留"
+    },
+    {
+      "id": "physical-number-token-back-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/tokens/点数背面.jpg",
+      "inboxPath": "assets/references/inbox/未分类/点数背面.jpg",
+      "sha256": "5c2b450eb5ddc06a1e2ce8ec0d68df34cb17010d5259701e22f562aff3d9955c",
+      "role": "点数牌共同船图案背面原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ],
+      "classifiedPath": "assets/references/archives/tabletop-markers-v005/tokens/点数背面.jpg",
+      "kind": "photograph",
+      "edition": null,
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": [
+        21,
+        21,
+        0.45
+      ],
+      "processedAssetIds": [
+        "number-token-back"
+      ],
+      "mustPreserve": [
+        "原件字节",
+        "印刷插画与文字",
+        "原照照明/失焦/色偏"
+      ],
+      "unseenSurfaces": [
+        "另一面",
+        "纸芯与侧边实测细节"
+      ],
+      "status": "已归档；原件原位保留"
+    },
+    {
+      "id": "physical-catan-victory-marker-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/tokens/卡坦分标记.jpg",
+      "inboxPath": "assets/references/inbox/未分类/卡坦分标记.jpg",
+      "sha256": "359a8fb83d3c0a8d8f21555e0e1704b65a58dad575eb7ed12fec0071efbfa954",
+      "role": "卡坦胜利分标记原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ],
+      "classifiedPath": "assets/references/archives/tabletop-markers-v005/tokens/卡坦分标记.jpg",
+      "kind": "photograph",
+      "edition": null,
+      "measuredDimensionsMm": null,
+      "estimatedDimensionsMm": [
+        18,
+        18,
+        1.5
+      ],
+      "processedAssetIds": [
+        "catan-victory-marker"
+      ],
+      "mustPreserve": [
+        "原件字节",
+        "印刷插画与文字",
+        "原照照明/失焦/色偏"
+      ],
+      "unseenSurfaces": [
+        "另一面",
+        "纸芯与侧边实测细节"
+      ],
+      "status": "已归档；原件原位保留"
+    }
+  ]
+}

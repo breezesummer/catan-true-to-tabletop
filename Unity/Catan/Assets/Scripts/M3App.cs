@@ -186,6 +186,7 @@ public sealed partial class M3App : MonoBehaviour
         }
         board.SetOperationLayout(ai!=null);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId,current.Board.Tiles);
         board.RefreshSeafarers(current.Board.Ships,current.Board.PirateTileId);
+        board.RefreshReferenceMarkers(current);
     }
     public void SaveGame()
     {
@@ -519,14 +520,21 @@ public sealed partial class M3App : MonoBehaviour
         foreach(var fortress in view.Board.Fortresses.Where(f=>f.Strength>0))DrawMarker(fortress.VertexId,fortress.PlayerId+" 堡 "+fortress.Strength,new Color(.35f,.08f,.11f));
         foreach(var fortress in view.Board.Fortresses.Where(f=>!string.IsNullOrEmpty(f.BeachheadVertexId)))DrawMarker(fortress.BeachheadVertexId,fortress.PlayerId+" 滩头",new Color(.12f,.26f,.38f));
         foreach(var fortress in view.Board.Fortresses.Where(f=>!string.IsNullOrEmpty(f.InvasionStartingVertexId)))DrawMarker(fortress.InvasionStartingVertexId,fortress.PlayerId+" 西行起点",new Color(.12f,.26f,.38f));
-        foreach(var edge in view.Board.BonusEdgeIds)DrawMarker(edge,"★",new Color(.55f,.4f,.05f));
+        foreach(var edge in view.Board.BonusEdgeIds)
+            if(!board.ReferenceMarkers.HasBonusMarker(edge))DrawMarker(edge,"★",new Color(.55f,.4f,.05f));
         foreach(var edge in view.Board.GiftCardEdgeIds)DrawMarker(edge,"礼",new Color(.10f,.4f,.35f));
-        foreach(var port in view.Board.GiftPorts)DrawMarker(port.EdgeId,port.Resource.HasValue?ResourceNames[(int)port.Resource.Value]+"港礼":"港礼",new Color(.10f,.4f,.35f));
+        foreach(var port in view.Board.GiftPorts)
+            if(!board.ReferenceMarkers.HasGiftPort(port.Id))DrawMarker(port.EdgeId,port.Resource.HasValue?ResourceNames[(int)port.Resource.Value]+"港礼":"港礼",new Color(.10f,.4f,.35f));
         foreach(var wonder in view.Wonders)foreach(var vertex in wonder.VertexIds)DrawMarker(vertex,WonderName(wonder.Id),new Color(.4f,.3f,.08f));
         if(!string.IsNullOrEmpty(view.Board.PirateTileId))DrawMarker(view.Board.PirateTileId,"海盗",new Color(.25f,.05f,.3f));
         if(view.Board.RobberTileId=="frame")DrawMarker("frame","强盗",new Color(.08f,.075f,.09f),true);
         foreach(var port in view.Board.Ports)
         {
+            if(board.ReferenceMarkers.HasPort(port.Id))
+            {
+                if(ai!=null&&GUI.Button(board.ReferenceMarkers.PortScreenRect(port.Id,board.BoardCamera),GUIContent.none,GUIStyle.none)&&Operations().CanTrade)dock.OpenTrade();
+                continue;
+            }
             var center=(board.Position(port.Vertices[0])+board.Position(port.Vertices[1]))*.5f;
             center*=1.14f;var p=board.BoardCamera.WorldToScreenPoint(center);
             float x=p.x*1440f/Screen.width,y=(Screen.height-p.y)*900f/Screen.height;

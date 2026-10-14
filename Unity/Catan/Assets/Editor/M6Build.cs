@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using Catan.Core.M5;
 using UnityEditor;
@@ -52,6 +52,7 @@ public static class M6Build
         app.AddComponent<M6App>();
         app.AddComponent<EntityIntegrationVerification>();
         app.AddComponent<PlayerComponentVerification>();
+        app.AddComponent<TabletopMarkerVerification>();
         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), "Assets/M6.unity");
         PlayerSettings.companyName = "CatanDevelopment";
         PlayerSettings.productName = "Catan M6";
@@ -65,7 +66,7 @@ public static class M6Build
         PlayerSettings.colorSpace = ColorSpace.Linear;
         var root = Path.GetFullPath(Path.Combine(Application.dataPath, "../../.."));
         var args=Environment.GetCommandLineArgs();int outputFlag=Array.IndexOf(args,"--m6-output-root");
-        var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/m6-map-refresh-v001");
+        var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/m6-entity-v005");
         var output = Path.Combine(buildRoot, "Builds/Windows/CatanM6.exe");
         Directory.CreateDirectory(Path.GetDirectoryName(output));
         var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {

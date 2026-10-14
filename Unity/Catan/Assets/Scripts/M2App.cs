@@ -157,6 +157,7 @@ public sealed partial class M2App : MonoBehaviour
             board.ChangeZoom(zoom-board.Zoom);board.SetCamera(top);board.ShowTerrain(terrain);boardLayout=layout;
         }
         board.SetOperationLayout(ai!=null);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId,current.Board.Tiles);
+        board.RefreshReferenceMarkers(current);
     }
     public void SaveGame()
     {
@@ -417,6 +418,11 @@ public sealed partial class M2App : MonoBehaviour
         }
         foreach(var port in view.Board.Ports)
         {
+            if(board.ReferenceMarkers.HasPort(port.Id))
+            {
+                if(ai!=null&&GUI.Button(board.ReferenceMarkers.PortScreenRect(port.Id,board.BoardCamera),GUIContent.none,GUIStyle.none)&&Operations().CanTrade)dock.OpenTrade();
+                continue;
+            }
             var center=(board.Position(port.Vertices[0])+board.Position(port.Vertices[1]))*.5f;
             center*=1.14f;var p=board.BoardCamera.WorldToScreenPoint(center);
             float x=p.x*1440f/Screen.width,y=(Screen.height-p.y)*900f/Screen.height;

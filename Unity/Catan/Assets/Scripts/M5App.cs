@@ -258,6 +258,11 @@ public sealed partial class M5App : MonoBehaviour
         }
         foreach(var port in view.Board.Ports)
         {
+            if(board.ReferenceMarkers.HasPort(port.Id))
+            {
+                if(ai!=null&&GUI.Button(board.ReferenceMarkers.PortScreenRect(port.Id,board.BoardCamera),GUIContent.none,GUIStyle.none)&&Operations().CanTrade)dock.OpenTrade();
+                continue;
+            }
             var a=board.ScreenPoint(port.Vertices[0]);var b=board.ScreenPoint(port.Vertices[1]);var p=(a+b)*.5f;p=new Vector2(p.x*1440/Screen.width,p.y*900/Screen.height);
             GUI.Label(new Rect(p.x-40,p.y+15,100,22),port.Resource.HasValue?Goods[(int)port.Resource.Value]+" 2:1":"港口 3:1",small);
         }

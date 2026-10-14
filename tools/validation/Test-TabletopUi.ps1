@@ -1,4 +1,4 @@
-﻿param([switch]$Graphics,[string]$BuildRoot='.local/m6-map-refresh-v001', [int]$TimeoutSeconds = 900)
+﻿param([switch]$Graphics,[string]$BuildRoot='.local/m6-entity-v005', [int]$TimeoutSeconds = 900)
 $ErrorActionPreference = 'Stop'
 $tabletopRepo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $tabletopPlayer = Join-Path $tabletopRepo "$BuildRoot/Builds/Windows/CatanM6.exe"

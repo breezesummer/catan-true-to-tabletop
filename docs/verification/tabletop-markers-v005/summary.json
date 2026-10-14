@@ -1,0 +1,163 @@
+{
+  "status": "passed",
+  "date": "2026-10-14",
+  "timezone": "Asia/Shanghai",
+  "scope": "未分类八张实体原照分类归档、原像素校正、闭合厚纸板资产及当前M6游戏接入",
+  "sources": {
+    "priorUniquePhotographs": 135,
+    "addedUniquePhotographs": 8,
+    "totalUniquePhotographs": 143,
+    "overlapWithPrevious": 0,
+    "archiveCopiesByteIdentical": true,
+    "catalog": "assets/references/catalogs/tabletop-markers-v005.json",
+    "inboxOriginalsPreserved": true
+  },
+  "assets": {
+    "added": 8,
+    "uniqueIds": 123,
+    "retainedFbxVersions": 132,
+    "blenderVersion": "4.5.14",
+    "meshReadback": "passed",
+    "cleanRebuild": "passed",
+    "triangles": 4204,
+    "dimensions": "全部工作估算，未实测"
+  },
+  "relatedDotnetTests": {
+    "total": 151,
+    "passed": 151,
+    "failed": 0,
+    "skipped": 0,
+    "fullRulesRerun": false,
+    "fullAiGamesRerun": false
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "importedAssets": 8,
+    "buildPassed": true,
+    "finalBuildSeconds": 17.9,
+    "coreAiExecutionAndSaveRoundtrip": true,
+    "coreAiSourceModified": false
+  },
+  "persistence": {
+    "status": "passed",
+    "independentGraphicsProcesses": 2,
+    "ruleSets": [
+      "base",
+      "seafarers",
+      "cities-knights",
+      "combined"
+    ],
+    "saveRestore": true,
+    "continuedAi": true,
+    "privateSaves": ".local/m6-entity-v005/verification"
+  },
+  "runtime": {
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "四种真实 App 正常开局后检查公开地图；补查被遗忘的部落的公开港礼/航路奖励和迷雾岛屿的隐藏数字。独立公开夹具检查迁移、增删及奖励计数。相机图不含 IMGUI；8 张细节图各含顶视、侧视、游戏角度及翻面。未把程序截图计为用户外观确认。",
+    "checks": 1903,
+    "checkedSourceInstances": 72,
+    "cameraImages": 8,
+    "detailImages": 8,
+    "specialGiftPorts": 6,
+    "specialBonusMarkers": 8,
+    "publicDataOnly": true,
+    "visualsHaveNoColliders": true,
+    "stableIds": true,
+    "outsideCoast": true,
+    "hiddenNumbersSuppressed": true,
+    "rulesSupplyNumberFaces": true,
+    "photographedNumberBack": true,
+    "fullUiPixelsVerified": false,
+    "publicSpecialScenario": true,
+    "publicFogScenario": true,
+    "assets": [
+      "port-generic",
+      "port-wood",
+      "port-brick",
+      "port-wool",
+      "port-wheat",
+      "port-ore",
+      "catan-victory-marker",
+      "number-token-back"
+    ],
+    "modes": [
+      {
+        "mode": "base",
+        "ports": 9,
+        "gifts": 0,
+        "unclaimedVictoryMarkers": 0,
+        "awardedVictoryMarkers": 0,
+        "numberTokens": 18
+      },
+      {
+        "mode": "seafarers",
+        "ports": 9,
+        "gifts": 0,
+        "unclaimedVictoryMarkers": 0,
+        "awardedVictoryMarkers": 0,
+        "numberTokens": 27
+      },
+      {
+        "mode": "cities-knights",
+        "ports": 9,
+        "gifts": 0,
+        "unclaimedVictoryMarkers": 0,
+        "awardedVictoryMarkers": 0,
+        "numberTokens": 18
+      },
+      {
+        "mode": "combined",
+        "ports": 9,
+        "gifts": 0,
+        "unclaimedVictoryMarkers": 0,
+        "awardedVictoryMarkers": 0,
+        "numberTokens": 27
+      }
+    ]
+  },
+  "tabletopGraphics": {
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。",
+    "configurations": 28,
+    "checks": 20060,
+    "cameraImages": 8,
+    "guiAttempts": 8,
+    "guiImagesWithChanges": 0,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+  },
+  "visualReview": {
+    "originalContactViewed": true,
+    "correctedContactViewed": true,
+    "sourceOutlinesViewed": true,
+    "blenderOverviewViewsReviewedByAssetAgent": 4,
+    "unityBoardImagesViewed": 8,
+    "unityDetailSheetsViewed": 8,
+    "manualMouseClicks": false,
+    "fullUiPixelsVerified": false
+  },
+  "resolvedIssues": [
+    "Windows PowerShell 5.1 新脚本需UTF-8 BOM以正确解析中文",
+    "验证器六港口贴图映射修正为port-*-front",
+    "构建收口跳过未改变的映射设置文件，场景与渲染配置保留"
+  ],
+  "limits": [
+    "实测尺寸、未知面、照片色彩及最终用户外观待确认",
+    "相机截图不含完整IMGUI，未验证真实鼠标点击港口",
+    "未进行用户完整对局、全分辨率、长期性能与清洁安装验收",
+    "M7/M8状态不变，当前优化AI延续"
+  ],
+  "executable": ".local/m6-entity-v005/Builds/Windows/CatanM6.exe",
+  "sha256": {
+    "exe": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+    "presentation": "7d848726f4e142aa4a340f90e60705a5176ad7517881eb15de3cf8fc0f68f75b",
+    "core": "fc317633e20e1666e836de97264c1f18b94b67be9a34798aa0a3f7957ba72939",
+    "ai": "2c601e3e01d1f99dcbfb3eb22333b94f49e4839d0dbd5f202816f5c7781602fb"
+  },
+  "publication": {
+    "branch": "dev-1.0",
+    "status": "pending"
+  }
+}

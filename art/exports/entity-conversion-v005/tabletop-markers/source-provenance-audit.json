@@ -1,0 +1,110 @@
+{
+  "status": "passed",
+  "scope": "八张原照/分类副本/原像素贴图来源、工作估算尺寸及已回读闭合厚板",
+  "uniquePhotographs": 8,
+  "assets": [
+    {
+      "id": "port-generic",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "dimensionStatus": "估算，未实测",
+      "maximumDimensionErrorMm": 5.5766580810967525e-06,
+      "closedMeshReadback": true,
+      "sourceTextureSha256": "9199f746a3c35863f51cc3b29e9b8cccb6153f7215450cd64832f0bd9ec1dbcc"
+    },
+    {
+      "id": "port-wood",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "dimensionStatus": "估算，未实测",
+      "maximumDimensionErrorMm": 5.5766580810967525e-06,
+      "closedMeshReadback": true,
+      "sourceTextureSha256": "488ddebc7c400a74dd276141f274e9e503d42a7a71d04ab93ae77372bf925828"
+    },
+    {
+      "id": "port-brick",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "dimensionStatus": "估算，未实测",
+      "maximumDimensionErrorMm": 5.5766580810967525e-06,
+      "closedMeshReadback": true,
+      "sourceTextureSha256": "a519401fb16cf3c02c6ae5fbf0e098ed0fc048fc1abd618792457e878064aeb1"
+    },
+    {
+      "id": "port-wool",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "dimensionStatus": "估算，未实测",
+      "maximumDimensionErrorMm": 5.5766580810967525e-06,
+      "closedMeshReadback": true,
+      "sourceTextureSha256": "dac9c6355b3bf9e071d8d79f8bcaf29bb25d90aba4e0351fc25ce018d95b8e07"
+    },
+    {
+      "id": "port-wheat",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "dimensionStatus": "估算，未实测",
+      "maximumDimensionErrorMm": 5.5766580810967525e-06,
+      "closedMeshReadback": true,
+      "sourceTextureSha256": "4a5cf6430c7ba89648e2f7a577864a9e9689d67b4d567901de3c8f14dab6fb2e"
+    },
+    {
+      "id": "port-ore",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "dimensionStatus": "估算，未实测",
+      "maximumDimensionErrorMm": 5.5766580810967525e-06,
+      "closedMeshReadback": true,
+      "sourceTextureSha256": "87c757b126664d8a3209e8d5841b3edf46f397c102637d3a453cdca784539f2d"
+    },
+    {
+      "id": "number-token-back",
+      "dimensionsMm": [
+        21,
+        21,
+        0.45
+      ],
+      "dimensionStatus": "估算，未实测",
+      "maximumDimensionErrorMm": 3.420063183046107e-06,
+      "closedMeshReadback": true,
+      "sourceTextureSha256": "a7c2c785daee6f22c93d887bea80d979545f62f4f4c17e99b345b3999f028cb5"
+    },
+    {
+      "id": "catan-victory-marker",
+      "dimensionsMm": [
+        18,
+        18,
+        1.5
+      ],
+      "dimensionStatus": "估算，未实测",
+      "maximumDimensionErrorMm": 2.992723792338836e-06,
+      "closedMeshReadback": true,
+      "sourceTextureSha256": "86bab122c814ebdb21f6a07b8abb1c4a92f4b39e7125b2bcd0dbcde3df09200d"
+    }
+  ],
+  "inboxOriginalsPresent": true,
+  "originalsAndArchivedCopiesByteIdentical": true,
+  "notCovered": [
+    "Unity 游戏画面与拾取",
+    "最终用户外观确认",
+    "实物尺寸及未知面"
+  ]
+}
