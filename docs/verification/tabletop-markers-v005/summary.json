@@ -158,6 +158,8 @@
   },
   "publication": {
     "branch": "dev-1.0",
-    "status": "pending"
+    "status": "pushed",
+    "implementationCommit": "2e13c6b93f046a0f103bd74e89f6522213b69b78",
+    "verifiedAt": "2026-10-14 20:44 Asia/Shanghai"
   }
 }
