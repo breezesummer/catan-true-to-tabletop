@@ -23,7 +23,7 @@ public sealed partial class M2App
     bool DockBlocksMouse(Vector2? logical=null)
     {
         if(ai==null)return false;
-        var p=logical??new Vector2(Input.mousePosition.x*1440f/Screen.width,(Screen.height-Input.mousePosition.y)*900f/Screen.height);
+        var p=logical??MobileTabletop.Logical(MobileTabletop.Pointer);
         return ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||dock.BlocksBoardInput(p);
     }
     void CancelOperationDraft(){if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);preparedDevelopment=null;preparedPurchase=false;tableNotes=false;CancelPickup();}
@@ -122,7 +122,7 @@ public sealed partial class M2App
     static string DockDevelopmentName(DevelopmentCardKind kind)=>new[]{"骑士","道路建设","丰收","垄断","胜利点"}[(int)kind];
     void DrawOperationLayout()
     {
-        Styles();GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));cardArt.Begin(null);
+        Styles();GUI.matrix=MobileTabletop.GuiMatrix;cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
         bool enabled=GUI.enabled;GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!dock.HasOverlay&&!ai.TableMenuOpen&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
         TabletopUI.DrawMapLabels(DrawBoardLabels);
@@ -216,6 +216,7 @@ public sealed partial class M2App
         }
         if(view.Phase==GamePhase.RobberMove&&!holding)
         {
+            if(MobileTabletop.Enabled){TableNote("移动强盗",()=>{if(TableButton("拿起强盗，选择新的地块"))Pickup(CommandKind.MoveRobber);});return;}
             var pos=board.ScreenPoint(view.Board.RobberTileId);var r=new Rect(pos.x*1440f/Screen.width-24,pos.y*900f/Screen.height-50,48,70);if(GUI.Button(r,GUIContent.none,GUIStyle.none))Pickup(CommandKind.MoveRobber);
         }
         if(view.Phase==GamePhase.RoadBuilding&&!holding&&view.LegalEdgeIds.Length==0)

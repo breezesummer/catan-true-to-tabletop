@@ -40,7 +40,7 @@ public sealed partial class M2App : MonoBehaviour
         var initial=host.View(ai==null?"P1":ai.HumanSeat);
         seat=initial.ActivePlayerId;nextSeat=seat;
         RefreshBoard(initial);
-        font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Arial"},18);
+        font=MobileTabletop.LoadFont();
         if(ai==null)gameObject.AddComponent<M2PlayerVerification>().Initialize(this);
         else ai.Connect(this,host);
     }
@@ -50,17 +50,18 @@ public sealed partial class M2App : MonoBehaviour
         if(host==null||board==null)return;
         Vector2 releasePoint=Vector2.zero;bool released=ai!=null&&dock.ConsumeBuildRelease(out releasePoint);
         if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
-        var pointer=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
-        bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(new Vector2(pointer.x*1440f/Screen.width,pointer.y*900f/Screen.height));
+        var pointer=MobileTabletop.Pointer;
+        bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(MobileTabletop.Logical(pointer));
         bool canMap=ai!=null&&!curtain&&!newGameDialog&&!ai.TableMenuOpen&&!blocked&&TabletopUI.ContainsMapScreenPoint(pointer);
         bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,!holding);
-        if(mapPan.IsDragging){board.ClearPreview();return;}
+        if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
+        if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
         if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();mapPan.Cancel(board.TableScene);}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGameDialog||view==null||ai!=null&&!ai.IsHumanTurn)return;
-        var mouse=released?new Vector2(releasePoint.x*Screen.width/1440f,releasePoint.y*Screen.height/900f):pointer;
-        if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(new Vector2(mouse.x*1440/Screen.width,mouse.y*900/Screen.height)))return;
+        var mouse=released?MobileTabletop.ScreenPoint(releasePoint):pointer;
+        if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(MobileTabletop.Logical(mouse)))return;
         if(ai!=null&&!holding&&boardClick){PickTabletopObject(mouse);return;}
         if(!holding)return;
         var candidate=ResolveTarget(mouse);
@@ -103,7 +104,7 @@ public sealed partial class M2App : MonoBehaviour
     }
     string ResolveTarget(Vector2 mouse)
     {
-        string candidate="";float distance=(placement==CommandKind.MoveRobber?46f:25f)*Screen.width/1440f;
+        string candidate="";float distance=MobileTabletop.PickRadius(placement==CommandKind.MoveRobber?46f:25f);
         foreach(var id in TargetIds())
         {
             var projected=board.ScreenPoint(id);
@@ -227,7 +228,7 @@ public sealed partial class M2App : MonoBehaviour
     void OnGUI()
     {
         if(host==null)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGameDialog||view==null?null:seat);
-        GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));
+        GUI.matrix=MobileTabletop.GuiMatrix;
         Panel(new Rect(0,0,1440,90),new Color(.045f,.09f,.10f));
         Label(30,15,570,40,"CATAN  /  岛屿工坊",title);
         Label(32,57,680,23,"M2 · 基础版完整规则     /     本地 3–4 人 · 隐私换座",small);
@@ -422,7 +423,7 @@ public sealed partial class M2App : MonoBehaviour
     {
         foreach(var tile in view.Board.Tiles)
         {
-            var p=board.ScreenPoint(tile.Id);float x=p.x*1440f/Screen.width,y=p.y*900f/Screen.height;
+            var p=board.ScreenPoint(tile.Id);var logical=MobileTabletop.Logical(p);float x=logical.x,y=logical.y;
             if(ai!=null){TabletopUI.NumberToken(new Vector2(x,y),tile.Number,"沙漠",badge);continue;}
             Panel(new Rect(x-25,y-20,50,40),new Color(.045f,.085f,.09f,.86f));
             var numberStyle=new GUIStyle(badge);if(tile.Number==6||tile.Number==8)numberStyle.normal.textColor=TabletopUI.HotNumberColor;
@@ -438,7 +439,7 @@ public sealed partial class M2App : MonoBehaviour
             }
             var center=(board.Position(port.Vertices[0])+board.Position(port.Vertices[1]))*.5f;
             center*=1.14f;var p=board.BoardCamera.WorldToScreenPoint(center);
-            float x=p.x*1440f/Screen.width,y=(Screen.height-p.y)*900f/Screen.height;
+            var logical=MobileTabletop.Logical(new Vector2(p.x,Screen.height-p.y));float x=logical.x,y=logical.y;
             if(ai!=null)
             {
                 var portRect=new Rect(x-29,y-13,58,26);TabletopUI.Note(portRect);
@@ -453,7 +454,7 @@ public sealed partial class M2App : MonoBehaviour
         var legal=LegalTargets();
         foreach(var id in TargetIds())
         {
-            var p=board.ScreenPoint(id);p.x*=1440f/Screen.width;p.y*=900f/Screen.height;
+            var p=board.ScreenPoint(id);p=MobileTabletop.Logical(p);
             Panel(new Rect(p.x-4,p.y-4,8,8),legal.Contains(id)?new Color(.4f,.95f,.7f):new Color(.6f,.58f,.51f));
             if(id==hover){Panel(new Rect(p.x-28,p.y-31,56,24),new Color(.04f,.1f,.1f));Label(p.x-28,p.y-32,56,25,id,badge);}
         }

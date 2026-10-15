@@ -1,0 +1,12 @@
+[
+  {
+    "assembly": "Catan.Core",
+    "sha256": "5638C0EE99A0FA6CBC67E0E630C12BB45FAE1D186EBF7425C3C0977E33FDAE8A",
+    "netstandard21SourceMatchesUnityPluginAndWindowsPlayer": true
+  },
+  {
+    "assembly": "Catan.AI",
+    "sha256": "C40C4F21D3310B4A0FC6A4E8585952A2C8F7C5901631B8B6979826345A08780A",
+    "netstandard21SourceMatchesUnityPluginAndWindowsPlayer": true
+  }
+]

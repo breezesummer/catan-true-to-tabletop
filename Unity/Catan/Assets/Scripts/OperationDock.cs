@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 // 桌面上的个人组件与手牌。拿取、费用与交换草稿均不直接修改规则状态。
-public sealed class OperationDock
+public sealed partial class OperationDock
 {
     public readonly OperationSelection Selection = new OperationSelection();
     static readonly string[] Names = { "木材", "砖块", "羊毛", "谷物", "矿石", "布匹", "钱币", "纸张" };
@@ -92,7 +92,7 @@ public sealed class OperationDock
     internal int VerificationFacilityTrack => facilityTrack;
     internal int[] VerificationTradeGiveGoods => tradeOpen?OperationPanelOptions.PaymentGoods(current,portTrade?portGood:null):Array.Empty<int>();
     public bool ResourceHandVisible => !specialHand;
-    public bool HasCancelableInteraction => tradeOpen || facilityTrack>=0 || previewCard!=null || Selection.BuildId!=null || Selection.Selected.Any(n=>n>0) || heldPiece!=null || dragging;
+    public bool HasCancelableInteraction => mobileDrawer || tradeOpen || facilityTrack>=0 || previewCard!=null || Selection.BuildId!=null || Selection.Selected.Any(n=>n>0) || heldPiece!=null || dragging;
     // 银行牌堆与旧购买流程共用这一入口，仍由适配层校验并提交指令。
     public void PrepareDevelopmentPurchase()
     {
@@ -105,7 +105,7 @@ public sealed class OperationDock
     internal bool VerificationHandsAreScreenSpace => faces.All(face=>face.Shape.World==null);
     internal int VerificationVisibleResourceCount => faces.Count(face=>face.Good>=0);
     internal int VerificationPendingResourceCount => current==null?0:Math.Max(0,current.Goods.Take(current.GoodCount).Sum()-VerificationVisibleResourceCount);
-    public bool HasOverlay => tradeOpen || facilityTrack>=0 || previewCard!=null || current!=null&&current.Offer!=null;
+    public bool HasOverlay => mobileDrawer || tradeOpen || facilityTrack>=0 || previewCard!=null || current!=null&&current.Offer!=null;
     public bool IsDraggingPiece => pieceDragging;
     public bool ConsumeBuildRelease(out Vector2 releasedLogicalMouse)
     {releasedLogicalMouse=pieceReleasePoint;bool released=pieceReleased;pieceReleased=false;return released;}
@@ -137,7 +137,7 @@ public sealed class OperationDock
     public int FacilityLevel(int track) => current?.Builds.FirstOrDefault(b=>b.Track==track)?.Level??0;
     public void Reset()
     {
-        Selection.Clear(); tradeOpen=false;facilityTrack=-1;portTrade=false;portGood=null; previewCard=null; hoveredBuild=null; message="";
+        mobileDrawer=false;Selection.Clear(); tradeOpen=false;facilityTrack=-1;portTrade=false;portGood=null; previewCard=null; hoveredBuild=null; message="";
         Array.Clear(give,0,8);Array.Clear(receive,0,8); tooltipRect=Rect.zero;
         dragGood=-1;dragging=false;hits.Clear();faces.Clear();pieceFaces.Clear();
         hoveredHand=null;handHoverAnchor=Rect.zero;
@@ -147,6 +147,7 @@ public sealed class OperationDock
     public bool BlocksBoardInput(Vector2 logicalMouse)
     {
         if(HasOverlay)return true;
+        if(MobileTabletop.Enabled&&MobileHandArea.Contains(logicalMouse))return true;
         return dragGood>=0 || hoveredHand!=null&&handHoverAnchor.Contains(logicalMouse) || (tradeOpen||current!=null&&current.Offer!=null)&&TradeRect.Contains(logicalMouse) ||
             previewCard!=null&&CardRect.Contains(logicalMouse) || hits.Any(h=>h.Contains(logicalMouse));
     }
@@ -159,7 +160,7 @@ public sealed class OperationDock
             small=new GUIStyle(text){fontSize=12};heading=new GUIStyle(text){fontSize=21,fontStyle=FontStyle.Bold};
             center=new GUIStyle(text){alignment=TextAnchor.MiddleCenter,fontSize=13};
             tableLabel=new GUIStyle(small){alignment=TextAnchor.MiddleCenter};
-            quantityFont=Font.CreateDynamicFontFromOSFont(new[]{"KaiTi","楷体","STKaiti","SimSun"},36);
+            quantityFont=MobileTabletop.Enabled?font:Font.CreateDynamicFontFromOSFont(new[]{"KaiTi","楷体","STKaiti","SimSun"},36);
             quantity=new GUIStyle(center){font=quantityFont??font,fontSize=34,fontStyle=FontStyle.BoldAndItalic,wordWrap=false,alignment=TextAnchor.LowerRight};
         }
         text.normal.textColor=Ink;heading.normal.textColor=Ink;center.normal.textColor=Ink;
@@ -183,6 +184,7 @@ public sealed class OperationDock
         if(scope!=snapshot.Scope){hoverAmounts.Clear();spreadAmounts.Clear();hoveredHand=null;handHoverAnchor=Rect.zero;handUpdated=Time.unscaledTimeAsDouble;fallbackOrder=new TabletopHandOrder();specialOrder=new TabletopSpecialHandOrder();specialHand=false;}
         if(scope!=snapshot.Scope||revision!=snapshot.Revision){Reset();scope=snapshot.Scope;revision=snapshot.Revision;}
         current=snapshot;Selection.Sync(snapshot);
+        if(MobileTabletop.Enabled){DrawMobile(snapshot);return;}
         hoveredBuild=null;tooltipRect=Rect.zero;hits.Clear();faces.Clear();pieceFaces.Clear();
         // 在任何世界组件接收 MouseDown 前，先按本帧屏幕布局确定手牌命中。
         // 悬停只向上轻推，并让相邻手牌让出一小段空间；点击再向上推高。
@@ -312,9 +314,10 @@ public sealed class OperationDock
     void HandlePieceInput(OperationSnapshot s)
     {
         if(heldPiece==null)return;
+        if(MobileTabletop.Enabled&&Input.touchCount>1){heldPiece=null;pieceDragging=false;pieceReleased=false;return;}
         var e=Event.current;
         if(e.type==EventType.MouseDrag&&e.button==0)
-        {if((e.mousePosition-pieceStart).sqrMagnitude>49)pieceDragging=true;e.Use();}
+        {if((e.mousePosition-pieceStart).sqrMagnitude>(MobileTabletop.Enabled?18*18:49))pieceDragging=true;e.Use();}
         if(e.type==EventType.MouseUp&&e.button==0)
         {
             if(pieceDragging)

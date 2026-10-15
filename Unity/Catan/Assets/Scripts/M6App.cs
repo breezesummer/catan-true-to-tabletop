@@ -7,6 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
+    public const string ReleaseVersion="内测版1.4";
     [Serializable]
     public sealed class SavedGame
     {
@@ -50,6 +51,7 @@ public sealed partial class M6App : MonoBehaviour
     int? menuVictoryPoints;
     bool tableMenu, escapeDismissedInteraction;
     public bool TableMenuOpen=>tableMenu;
+    public void OpenTableMenu(){if(!Ready)return;tableMenu=true;escapeDismissedInteraction=false;}
     public bool BlocksTableInput(Vector2 p)=>MenuVisible||tableMenu;
     void ToggleTableCamera()
     {
@@ -67,15 +69,18 @@ public sealed partial class M6App : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate=60;
-        font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Arial"},18);
+        font=MobileTabletop.LoadFont();
+        if(MobileTabletop.Enabled){Input.simulateMouseWithTouches=true;Screen.sleepTimeout=SleepTimeout.NeverSleep;}
         gameObject.AddComponent<M6PlayerVerification>().Initialize(this);
         gameObject.AddComponent<OperationUiVerification>();
         gameObject.AddComponent<TabletopUiVerification>();
         gameObject.AddComponent<CombinedMapVerification>();
         gameObject.AddComponent<TabletopV005Review>();
+        gameObject.AddComponent<MobileVerification>().Initialize(this);
     }
     void Update()
     {
+        if(MobileTabletop.Enabled)_=MobileTabletop.TouchDragged;
         if(Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(1))escapeDismissedInteraction=false;
         if(Input.GetKeyDown(KeyCode.Escape))HandleTableEscape();
         if(MenuVisible||tableMenu||!Ready||Paused||TableDiceRolling||Time.unscaledTime<nextAction)return;
@@ -180,10 +185,34 @@ public sealed partial class M6App : MonoBehaviour
     {
         string payload=ExportEnvelope();Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
         string temporary=path+".tmp";File.WriteAllText(temporary,payload);
-        if(File.Exists(path))File.Replace(temporary,path,path+".bak");else File.Move(temporary,path);
+        if(File.Exists(path))
+        {
+            if(Application.platform!=RuntimePlatform.Android)File.Replace(temporary,path,path+".bak");
+            else
+            {
+                // Android 的 .NET 文件实现不保证 Replace；保留可恢复的上一份完整权威存档。
+                File.Copy(path,path+".bak",true);
+                try{File.Delete(path);File.Move(temporary,path);}
+                catch{if(!File.Exists(path))File.Copy(path+".bak",path);throw;}
+            }
+        }
+        else File.Move(temporary,path);
     }
+    bool CanAutoSave => Application.platform==RuntimePlatform.Android&&Ready&&!GetComponent<MobileVerification>().VerificationActive&&!Environment.GetCommandLineArgs().Any(arg=>arg.IndexOf("verify",StringComparison.OrdinalIgnoreCase)>=0);
+    void OnApplicationPause(bool paused){if(paused&&CanAutoSave)SaveGame();}
+    void OnApplicationQuit(){if(CanAutoSave)SaveGame();}
     public void SaveGame(){try{WriteSave(SavePath);Notice="已保存权威局面、待决、随机状态、人类席位和 AI 暂停设置。";ShowTablePrompt("游戏已保存");}catch(Exception ex){Notice="保存失败（"+ex.GetType().Name+"），请检查存档目录。";ShowTablePrompt("保存失败");}}
-    public void LoadGame(){try{ReadSave(SavePath);ShowTablePrompt("游戏已恢复");}catch(Exception ex){Notice="恢复失败（"+ex.GetType().Name+"）：文件不存在、损坏或版本不兼容。当前局面保留。";ShowTablePrompt("存档无法读取");}}
+    public void LoadGame()
+    {
+        try
+        {
+            try{ReadSave(SavePath);}
+            catch when(Application.platform==RuntimePlatform.Android&&File.Exists(SavePath+".bak"))
+            {ReadSave(SavePath+".bak");Notice="已从上一次完整备份恢复游戏。";}
+            ShowTablePrompt("游戏已恢复");
+        }
+        catch(Exception ex){Notice="恢复失败（"+ex.GetType().Name+"）：文件不存在、损坏或版本不兼容。当前局面保留。";ShowTablePrompt("存档无法读取");}
+    }
     public void ReadSave(string path)
     {
         var data=JsonUtility.FromJson<SavedGame>(File.ReadAllText(path));
@@ -214,11 +243,12 @@ public sealed partial class M6App : MonoBehaviour
     static void Panel(Rect rect,Color color){var old=GUI.color;GUI.color=color;GUI.DrawTexture(rect,Texture2D.whiteTexture);GUI.color=old;}
     void OnGUI()
     {
-        Styles();GUI.depth=-100;GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));
+        Styles();GUI.depth=-100;GUI.matrix=MobileTabletop.GuiMatrix;
+        if(MobileTabletop.Enabled){DrawMobileMenus();GUI.matrix=Matrix4x4.identity;return;}
         if(MenuVisible)
         {
             Panel(new Rect(0,0,1440,900),new Color(.025f,.07f,.085f));
-            GUILayout.BeginArea(new Rect(280,95,880,730));GUILayout.Label("卡坦岛之三国争霸  /  内测版1.2",title);
+            GUILayout.BeginArea(new Rect(280,95,880,730));GUILayout.Label("卡坦岛之三国争霸  /  内测版1.4",title);
             GUILayout.Space(26);
             int selection=GUILayout.Toolbar(menuRule,RuleNames,button,GUILayout.Height(48));if(selection!=menuRule){menuRule=selection;menuScenario=0;}
             GUILayout.Space(20);var ids=ScenarioIds();menuScenario=Mathf.Clamp(menuScenario,0,ids.Length-1);
@@ -255,7 +285,7 @@ public sealed partial class M6App : MonoBehaviour
                 ModernOperationUI.Panel(new Rect(460,112,520,676));
                 ModernOperationUI.Label(new Rect(494,137,310,44),"游戏菜单",ModernOperationUI.Title);
                 ModernOperationUI.Label(new Rect(814,149,132,25),"Esc 返回游戏",ModernOperationUI.Small);
-                ModernOperationUI.Label(new Rect(494,187,452,24),"卡坦岛之三国争霸 · 内测版1.2",ModernOperationUI.Small);
+                ModernOperationUI.Label(new Rect(494,187,452,24),"卡坦岛之三国争霸 · 内测版1.4",ModernOperationUI.Small);
                 string configuration="当前扩展 · "+RuleNames[Array.IndexOf(RuleIds,RuleSet)];
                 if(RuleSet=="seafarers"||RuleSet=="combined")configuration+=" · "+Catan.Core.M3.SeafarersScenarios.Create(ScenarioId,PlayerCount).Name;
                 ModernOperationUI.Label(new Rect(494,221,452,44),configuration,ModernOperationUI.Text);

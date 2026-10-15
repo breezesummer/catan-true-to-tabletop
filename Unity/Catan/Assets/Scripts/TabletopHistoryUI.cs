@@ -4,7 +4,7 @@ using Catan.Core;
 using UnityEngine;
 
 // 只渲染已按当前观看者权限投影的历史，不能访问权威状态。
-public sealed class TabletopHistoryUI
+public sealed partial class TabletopHistoryUI
 {
     internal static readonly Rect Feed = new Rect(1182,327,246,355);
     static readonly Rect Collapsed=new Rect(1326,327,102,30);
@@ -15,14 +15,16 @@ public sealed class TabletopHistoryUI
     bool follow = true, showDice;
     bool collapsed;
     public bool IsOpen { get; private set; }
+    public void Open(){IsOpen=true;}
     public bool TryClose()
     {if(!IsOpen)return false;IsOpen=false;return true;}
-    public bool BlocksInput(Vector2 p) => IsOpen || (collapsed?Collapsed:Feed).Contains(p);
+    public bool BlocksInput(Vector2 p) => IsOpen || !MobileTabletop.Enabled&&(collapsed?Collapsed:Feed).Contains(p);
 
     public void Draw(Font font,GameHistoryEntry[] entries,string[] players)
     {
         ModernOperationUI.Styles(font);
         entries=entries??Array.Empty<GameHistoryEntry>();players=players??Array.Empty<string>();
+        if(MobileTabletop.Enabled){DrawMobile(entries,players);return;}
         long sequence=entries.Length==0?0:entries[entries.Length-1].Sequence;
         if(sequence!=lastSequence)
         {

@@ -38,7 +38,7 @@ public sealed partial class M4App : MonoBehaviour
 
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         var initial=host.View(ai==null?"P1":ai.HumanSeat);nextSeat=initial.ActivePlayerId;Refresh(initial);
-        font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Arial"},18);
+        font=MobileTabletop.LoadFont();
         if(ai==null)gameObject.AddComponent<M4PlayerVerification>().Initialize(this);
         else ai.Connect(this,host);
     }
@@ -100,11 +100,12 @@ public sealed partial class M4App : MonoBehaviour
         Vector2 releasedMouse;bool buildReleased=dock.ConsumeBuildRelease(out releasedMouse);
         if(board==null)return;
         if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
-        var pointer=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
-        bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(new Vector2(pointer.x*1440f/Screen.width,pointer.y*900f/Screen.height));
+        var pointer=MobileTabletop.Pointer;
+        bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(MobileTabletop.Logical(pointer));
         bool canMap=ai!=null&&!curtain&&!newGame&&!artOpen&&!ai.TableMenuOpen&&!blocked&&TabletopUI.ContainsMapScreenPoint(pointer);
         bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,draft==null&&!operationActions);
-        if(mapPan.IsDragging){board.ClearPreview();return;}
+        if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
+        if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1))
         {
@@ -114,8 +115,8 @@ public sealed partial class M4App : MonoBehaviour
         }
         if(!DockBlocksMouse()&&(ai!=null||Input.mousePosition.x<Screen.width*.70f)&&Input.mouseScrollDelta.y!=0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGame||artOpen||ai!=null&&!ai.IsHumanTurn)return;
-        var mouse=buildReleased?new Vector2(releasedMouse.x*Screen.width/1440f,releasedMouse.y*Screen.height/900f):new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
-        var logicalMouse=new Vector2(mouse.x*1440/Screen.width,mouse.y*900/Screen.height);
+        var mouse=buildReleased?MobileTabletop.ScreenPoint(releasedMouse):MobileTabletop.Pointer;
+        var logicalMouse=MobileTabletop.Logical(mouse);
         if(DockBlocksMouse(logicalMouse)||cardArt.BlocksBoardInput(logicalMouse)){board.ClearPreview();return;}
         if(ai==null&&(mouse.x>Screen.width*.70f||mouse.y<Screen.height*.15f||mouse.y>Screen.height*.90f))return;
         if(ai!=null&&draft==null&&boardClick){PickTabletopObject(mouse);return;}
@@ -155,7 +156,7 @@ public sealed partial class M4App : MonoBehaviour
     string Pick(string type,Vector2 mouse)
     {
         string[] ids=type=="E"?view.Board.Edges.Select(x=>x.Id).ToArray():type=="T"?view.Board.Tiles.Select(x=>x.Id).ToArray():view.Board.Vertices.Select(x=>x.Id).ToArray();
-        string nearest="";float distance=(type=="T"?42:25)*Screen.width/1440f;
+        string nearest="";float distance=MobileTabletop.PickRadius(type=="T"?42:25);
         foreach(var id in ids){var projected=board.ScreenPoint(id);if(ai!=null&&(!TabletopUI.ContainsMapScreenPoint(mouse)||!TabletopUI.ContainsMapScreenPoint(projected)))continue;float d=Vector2.Distance(mouse,projected);if(d<distance){distance=d;nearest=id;}}
         return nearest;
     }
@@ -165,7 +166,7 @@ public sealed partial class M4App : MonoBehaviour
     {if(ai!=null){ModernOperationUI.Styles(font);GUILayout.Label(value,minor?ModernOperationUI.Small:ModernOperationUI.Text);}else GUILayout.Label(value,minor?small:label);}
     void OnGUI()
     {
-        if(host==null)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));
+        if(host==null)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=MobileTabletop.GuiMatrix;
         Panel(new Rect(0,0,1440,125),new Color(.045f,.09f,.10f));
         GUI.Label(new Rect(25,15,640,36),"CATAN  /  城市与骑士",heading);
         GUI.Label(new Rect(25,54,760,25),"M4 · 官方 2025 规则 · 本地 3–4 人 · 13 分获胜",small);
@@ -239,7 +240,7 @@ public sealed partial class M4App : MonoBehaviour
     {
         foreach(var tile in view.Board.Tiles)
         {
-            var p=board.ScreenPoint(tile.Id);p=new Vector2(p.x*1440/Screen.width,p.y*900/Screen.height);
+            var p=board.ScreenPoint(tile.Id);p=MobileTabletop.Logical(p);
             if(ai!=null)TabletopUI.NumberToken(p,tile.Number>0?(int?)tile.Number:null,"沙漠",heading);
             else
             {
@@ -250,7 +251,7 @@ public sealed partial class M4App : MonoBehaviour
         if(pickField!=""&&ai==null)
         {
             var ids=pickType=="V"?view.Board.Vertices.Select(v=>v.Id):pickType=="E"?view.Board.Edges.Select(e=>e.Id):view.Board.Tiles.Select(t=>t.Id);
-            foreach(var id in ids){var p=board.ScreenPoint(id);p=new Vector2(p.x*1440/Screen.width,p.y*900/Screen.height);GUI.Label(new Rect(p.x-25,p.y+8,65,20),id,small);}
+            foreach(var id in ids){var p=board.ScreenPoint(id);p=MobileTabletop.Logical(p);GUI.Label(new Rect(p.x-25,p.y+8,65,20),id,small);}
         }
         foreach(var port in view.Board.Ports)
         {
@@ -259,12 +260,12 @@ public sealed partial class M4App : MonoBehaviour
                 // 点击与地图拖动统一在 Update 的松键入口处理。
                 continue;
             }
-            var a=board.ScreenPoint(port.Vertices[0]);var b=board.ScreenPoint(port.Vertices[1]);var p=(a+b)*.5f;p=new Vector2(p.x*1440/Screen.width,p.y*900/Screen.height);
+            var a=board.ScreenPoint(port.Vertices[0]);var b=board.ScreenPoint(port.Vertices[1]);var p=(a+b)*.5f;p=MobileTabletop.Logical(p);
             GUI.Label(new Rect(p.x-40,p.y+15,100,22),port.Resource.HasValue?Goods[(int)port.Resource.Value]+" 2:1":"港口 3:1",small);
         }
         foreach(var k in view.Board.Knights)
         {
-            var p=board.ScreenPoint(k.LocationId);p=new Vector2(p.x*1440/Screen.width,p.y*900/Screen.height);
+            var p=board.ScreenPoint(k.LocationId);p=MobileTabletop.Logical(p);
             if(ai==null)
                 GUI.Label(new Rect(p.x-26,p.y-36,86,21),k.PlayerId+" 骑"+k.Level+(k.Active?" ●":" ○"),small);
         }
@@ -429,6 +430,13 @@ public sealed partial class M4App : MonoBehaviour
     }
     int Count(string name,int value,int max)
     {
+        if(MobileTabletop.Enabled)
+        {
+            GUILayout.BeginHorizontal();GUILayout.Label(name+"  "+value,ModernOperationUI.Text,GUILayout.Width(360),GUILayout.Height(86));
+            if(ModernOperationUI.LayoutButton("−",value>0))value=Math.Max(0,value-1);
+            if(ModernOperationUI.LayoutButton("+",value<max))value=Math.Min(max,value+1);
+            GUILayout.EndHorizontal();return value;
+        }
         GUILayout.BeginHorizontal();Text(name+"  "+value);if(GUILayout.Button("−",button,GUILayout.Width(36),GUILayout.Height(28)))value=Math.Max(0,value-1);if(GUILayout.Button("+",button,GUILayout.Width(36),GUILayout.Height(28)))value=Math.Min(max,value+1);GUILayout.EndHorizontal();return value;
     }
     void Bag(string title,ResourceBag resources,CommodityBag commodities)

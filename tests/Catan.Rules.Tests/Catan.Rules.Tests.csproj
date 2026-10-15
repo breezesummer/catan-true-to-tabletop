@@ -19,6 +19,7 @@
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopDiceHistory.cs" Link="Presentation/TabletopDiceHistory.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopScoreModel.cs" Link="Presentation/TabletopScoreModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopCameraModel.cs" Link="Presentation/TabletopCameraModel.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/MobileTabletopLayout.cs" Link="Presentation/MobileTabletopLayout.cs" />
     <None Include="../../docs/acceptance/v0.1/scenario.json" Link="scenario.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

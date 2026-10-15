@@ -7,10 +7,18 @@ public sealed class MapPanInput
     bool captured, dragging;
     int button;
     public bool IsDragging => dragging;
+    bool touchCaptured,multiTouch;
+    int touchId;
+    float pinchDistance;
+    Vector2 pinchCenter;
+    public float ZoomDelta { get; private set; }
+    public bool MultiTouchActive => multiTouch;
 
     public bool Update(TabletopScene scene, Vector2 screenMouse, bool canStart, bool allowPan)
     {
+        ZoomDelta=0;
         if(scene==null)return false;
+        if(MobileTabletop.Enabled&&(Input.touchCount>0||touchCaptured||multiTouch))return UpdateTouch(scene,canStart,allowPan);
         if(!captured&&canStart&&(Input.GetMouseButtonDown(0)||allowPan&&Input.GetMouseButtonDown(2)))
         {
             captured=true;dragging=false;button=Input.GetMouseButtonDown(2)?2:0;
@@ -37,6 +45,36 @@ public sealed class MapPanInput
         captured=false;dragging=false;scene.EndPan();return click;
     }
 
+    bool UpdateTouch(TabletopScene scene,bool canStart,bool allowPan)
+    {
+        if(Input.touchCount==0){touchCaptured=false;multiTouch=false;pinchDistance=0;dragging=false;scene.EndPan();return false;}
+        if(Input.touchCount>=2)
+        {
+            if(!multiTouch&&!canStart&&!touchCaptured)return false;
+            var a=Input.GetTouch(0);var b=Input.GetTouch(1);
+            var middle=(a.position+b.position)*.5f;float distance=Vector2.Distance(a.position,b.position);
+            if(multiTouch&&pinchDistance>0)
+            {
+                ZoomDelta=MobileGestureMath.PinchZoomDelta(pinchDistance,distance);
+                scene.PanFromScreen(pinchCenter,middle);
+            }
+            multiTouch=true;touchCaptured=false;dragging=false;pinchDistance=distance;pinchCenter=middle;return false;
+        }
+        // 双指手势剩余的一指必须抬起后，下一次触摸才可放置棋子。
+        if(multiTouch)return false;
+        var touch=Input.GetTouch(0);var point=new Vector2(touch.position.x,Screen.height-touch.position.y);
+        if(!touchCaptured&&touch.phase==TouchPhase.Began&&canStart)
+        {touchCaptured=true;touchId=touch.fingerId;start=previous=point;dragging=false;}
+        if(!touchCaptured||touch.fingerId!=touchId)return false;
+        var delta=MobileTabletop.Logical(point)-MobileTabletop.Logical(start);
+        if(allowPan&&!MobileGestureMath.IsTap(delta.x,delta.y))dragging=true;
+        if(dragging)scene.PanFromScreen(new Vector2(previous.x,Screen.height-previous.y),touch.position);
+        previous=point;
+        if(touch.phase!=TouchPhase.Ended&&touch.phase!=TouchPhase.Canceled)return false;
+        bool click=touch.phase==TouchPhase.Ended&&!dragging&&canStart;
+        touchCaptured=false;dragging=false;scene.EndPan();return click;
+    }
+
     public void Cancel(TabletopScene scene)
-    {captured=false;dragging=false;if(scene!=null)scene.EndPan();}
+    {captured=false;dragging=false;touchCaptured=false;multiTouch=false;pinchDistance=0;ZoomDelta=0;if(scene!=null)scene.EndPan();}
 }

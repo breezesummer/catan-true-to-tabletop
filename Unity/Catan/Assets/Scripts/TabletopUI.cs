@@ -12,7 +12,7 @@ public sealed class TabletopSeat
     public TabletopScoreBreakdown Score;
 }
 
-public sealed class TabletopUI
+public sealed partial class TabletopUI
 {
     public static readonly Rect ContextRect = new Rect(982, 315, 432, 390);
     public static readonly Rect EndTurnRect = new Rect(1284,760,130,130);
@@ -25,7 +25,7 @@ public sealed class TabletopUI
     Vector2 scroll;
     bool contextVisible;
     Vector2? contextAnchor;
-    public Rect CurrentContextRect => contextAnchor.HasValue?new Rect(Mathf.Clamp(contextAnchor.Value.x+14,16,1440-ContextRect.width-16),Mathf.Clamp(contextAnchor.Value.y+10,16,900-ContextRect.height-16),ContextRect.width,ContextRect.height):ContextRect;
+    public Rect CurrentContextRect => MobileTabletop.Enabled?new Rect(550,174,870,548):contextAnchor.HasValue?new Rect(Mathf.Clamp(contextAnchor.Value.x+14,16,1440-ContextRect.width-16),Mathf.Clamp(contextAnchor.Value.y+10,16,900-ContextRect.height-16),ContextRect.width,ContextRect.height):ContextRect;
     public void SetContextAnchor(Vector2? anchor){contextAnchor=anchor;}
     static Texture2D disc;
     readonly TabletopDicePresentation dice = new TabletopDicePresentation();
@@ -46,16 +46,16 @@ public sealed class TabletopUI
     {operations=snapshot;purchaseDevelopment=purchase;bankHistory=entries??Array.Empty<Catan.Core.GameHistoryEntry>();}
     public bool HistoryOpen => history.IsOpen;
     public bool HandFlightsVisible { get; set; }=true;
-    public bool TryCloseOverlay() => history.TryClose();
+    public bool TryCloseOverlay(){if(mobileFacilities){mobileFacilities=false;return true;}return history.TryClose();}
     public bool BlocksOverlayInput(Vector2 p) => history.BlocksInput(p)||contextVisible&&CurrentContextRect.Contains(p);
     public void DrawHistory(Font font,Catan.Core.GameHistoryEntry[] entries,string[] players)
-    {if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);history.Draw(font,entries,players);if(!history.IsOpen)DrawScoreDetails();}
+    {if(!MobileTabletop.Enabled&&!history.IsOpen)bank.DrawFlights(HandFlightsVisible);history.Draw(font,entries,players);if(!MobileTabletop.Enabled&&!history.IsOpen)DrawScoreDetails();}
     public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
     public void ObserveDice(long sequence,int first,int second,int? eventDie)
     {dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);}
     static readonly Color Cream = new Color(.96f,.88f,.70f), Ink = new Color(.24f,.12f,.06f);
     public static readonly Color HotNumberColor = new Color(1f,.10f,.075f);
-    public bool BlocksBoardInput(Vector2 p) => !TabletopScene.BoardArea.Contains(p) || history.BlocksInput(p) || defense.BlocksInput(p) || hits.Any(r=>r.Contains(p)) || worldHits.Any(h=>h.Contains(p)) || contextVisible && CurrentContextRect.Contains(p);
+    public bool BlocksBoardInput(Vector2 p) => !TabletopScene.BoardArea.Contains(p) || history.BlocksInput(p) || !MobileTabletop.Enabled&&defense.BlocksInput(p) || hits.Any(r=>r.Contains(p)) || worldHits.Any(h=>h.Contains(p)) || contextVisible && CurrentContextRect.Contains(p);
     internal static string[] OpponentOrder(string ownSeat,System.Collections.Generic.IEnumerable<string> ids)
     {
         var ordered=ids.OrderBy(id=>int.Parse(id.Substring(1))).ToArray();int own=Array.IndexOf(ordered,ownSeat);
@@ -63,7 +63,7 @@ public sealed class TabletopUI
     }
     public void RegisterContext(){contextVisible=true;}
     public static bool ContainsMapScreenPoint(Vector2 point) =>
-        TabletopScene.BoardArea.Contains(new Vector2(point.x*1440/Screen.width,point.y*900/Screen.height));
+        TabletopScene.BoardArea.Contains(MobileTabletop.Logical(point));
     public static void DrawMapLabels(Action draw)
     {
         // 地图与桌面物件共用完整画面，文字只裁剪在屏幕边界。
@@ -105,6 +105,7 @@ public sealed class TabletopUI
         Action special=null,string specialLabel="",string detail="",Action<int> facility=null)
     {
         Styles(font);ModernOperationUI.Styles(font);hits.Clear();worldHits.Clear();hoveredScore=null;table.Objects.Begin("public");
+        if(MobileTabletop.Enabled){table.Objects.End();DrawMobile(seat,actor,phase,turn,dice1,dice2,seats,canRoll,canEnd,roll,end,trade,special,specialLabel,facility);return;}
         // 临时便签覆盖的桌面物件不能先于上层按钮响应同一次点击。
         bool tableEnabled=GUI.enabled;
         if(Event.current.type!=EventType.Repaint&&BlocksOverlayInput(Event.current.mousePosition))GUI.enabled=false;
@@ -316,8 +317,10 @@ public sealed class TabletopUI
     public void BeginContext(string caption)
     {
         var rect=CurrentContextRect;contextVisible=true;ModernOperationUI.Panel(rect);
-        GUI.Label(new Rect(rect.x+18,rect.y+12,rect.width-36,30),caption,ModernOperationUI.Title);
-        GUILayout.BeginArea(new Rect(rect.x+16,rect.y+44,rect.width-32,rect.height-55));
+        float header=MobileTabletop.Enabled?68:44;
+        GUI.Label(new Rect(rect.x+18,rect.y+12,rect.width-36,header-12),caption,ModernOperationUI.Title);
+        MobileTabletop.ScrollTouch(new Rect(rect.x+16,rect.y+header,rect.width-32,rect.height-header-12),ref scroll);
+        GUILayout.BeginArea(new Rect(rect.x+16,rect.y+header,rect.width-32,rect.height-header-12));
         scroll=GUILayout.BeginScrollView(scroll);
     }
     public void EndContext(){GUILayout.EndScrollView();GUILayout.EndArea();}

@@ -1,0 +1,117 @@
+{
+  "releaseName": "卡坦岛之三国争霸内测版1.4",
+  "date": "2026-10-15",
+  "status": "apk_ready_wechat_runtime_stopped",
+  "previousRelease": "内测版1.3",
+  "scope": {
+    "sameUnityProject": "Unity/Catan",
+    "rulesChanged": false,
+    "aiChanged": false,
+    "authorityFormatChanged": false,
+    "pcRemainsPlayable": true,
+    "pcArchiveRequested": false,
+    "pcArchiveCreated": false,
+    "publishApkOnly": true,
+    "minimumAndroid": "8.0 / API 26 / ARM64"
+  },
+  "dotnet": {
+    "baselinePassed": 815,
+    "mobileMathPassed": 30,
+    "uniquePassed": 845,
+    "failed": 0,
+    "netstandard21": "passed",
+    "completeAiGames": 52
+  },
+  "windows": {
+    "build": "passed",
+    "independentFourModeSaveLoad": "passed",
+    "normalSaveUnchangedAfterFix": true,
+    "graphicsConfigurations": 28,
+    "graphicsChecks": 19374,
+    "fullDesktopUiPixelsVerified": false,
+    "mobilePreviewRunChecks": 394,
+    "mobilePreviewLoadChecks": 272,
+    "mobilePreviewScreenshots": 48,
+    "mobilePreviewResolutions": [
+      "1920x1080",
+      "1600x720"
+    ],
+    "platformSwitchBackToWin64": "passed",
+    "finalBuildSeconds": 71.2,
+    "finalSaveSeconds": 19.7,
+    "finalLoadSeconds": 13.2
+  },
+  "android": {
+    "build": "passed",
+    "toolchain": "Unity 6000.3.25f1 / NDK 27.2.12479018 / JDK 17.0.18+8 / SDK36 / Gradle9.3.1",
+    "packageId": "com.catandevelopment.threekingdoms",
+    "versionCode": 10400,
+    "architectures": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "minApi": 26,
+    "targetApi": 36,
+    "emulator": "API35 / WHPX / SwiftShader",
+    "nativeRun": {
+      "screenshots": 24,
+      "status": "passed",
+      "checks": 353
+    },
+    "nativeLoad": {
+      "screenshots": 24,
+      "status": "passed",
+      "checks": 139,
+      "independentProcess": true
+    },
+    "realTouch": {
+      "realPhoneTested": false,
+      "device": "API35 emulator",
+      "assertions": 22,
+      "status": "passed",
+      "motionEvents": "single and multi touch",
+      "screenshots": 9
+    },
+    "apk": {
+      "path": ".local/m6-release-1.4/release/卡坦岛之三国争霸内测版1.4-安卓/卡坦岛之三国争霸内测版1.4-安卓.apk",
+      "bytes": 302425389,
+      "sha256": "c6a694ff087da714a9cd04107846a79b52ee5b190ff0af75ac34ac655094a1e9",
+      "releaseCopyHashMatches": true,
+      "staticCheck": "passed",
+      "signatureV2": true
+    },
+    "runtimeErrors": 0,
+    "safeArea": {
+      "screen": "2400x1080",
+      "height": 1080,
+      "left": 128,
+      "width": 2272
+    },
+    "visualReview": "passed_without_blocking_issues"
+  },
+  "wechat": {
+    "group": "卡坦项目督察组",
+    "status": "computer_use_runtime_still_stopped_after_user_resume",
+    "apkSent": false,
+    "resumeExplicitlyApproved": true,
+    "descriptionSent": false
+  },
+  "saveIncident": {
+    "initialWindowsVerificationWroteDefaultSaveDirectory": true,
+    "priorUserSaveBackupConfirmed": false,
+    "priorUserSaveRestored": false,
+    "fixedAndroidOnlyNormalGameAutosave": true,
+    "finalWindowsVerificationPreservedDefaultFiles": true,
+    "note": "首轮新增退出自动保存误使PC验收局写入默认存档目录，已告知用户；无法确认测试前原档及其备份，不能声称恢复。"
+  },
+  "unverified": [
+    "真实ARM64手机、API26设备、完整对局与长期性能",
+    "完整骑士／港口／移船及所有扩展待决触控链",
+    "非空发展／进步卡抽屉的实际触控与全分辨率用户最终外观"
+  ],
+  "roadmap": "M7/M8不推进",
+  "sourceCommit": null,
+  "knownMinorIssues": [
+    "组合模式抽屉内不可用船的较长原因文字轻微裁切；禁用状态和操作入口完整。"
+  ]
+}
