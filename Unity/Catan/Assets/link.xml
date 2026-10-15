@@ -1,0 +1,23 @@
+<linker>
+  <!-- 权威保存与 PlayerView 深拷贝使用 DataContractJsonSerializer；保留反射访问的 DTO、构造器和访问器。 -->
+  <assembly fullname="Catan.Core" preserve="all" />
+  <assembly fullname="System.Runtime.Serialization" preserve="all" ignoreIfMissing="1" />
+  <assembly fullname="System.Runtime.Serialization.Json" preserve="all" ignoreIfMissing="1" />
+  <!-- CreatePrimitive 的原生组件通过 PrimitiveType 动态创建，IL2CPP 无法从泛型 Collider 引用推导具体类型。
+       当前四模式使用 Cube、Sphere、Capsule、Cylinder；圆柱也依赖 CapsuleCollider。
+       来源：Unity 6000.3 GameObject.CreatePrimitive 文档要求显式保留网格及相应碰撞体组件。 -->
+  <assembly fullname="UnityEngine.CoreModule">
+    <type fullname="UnityEngine.MeshFilter" preserve="all" />
+    <type fullname="UnityEngine.MeshRenderer" preserve="all" />
+  </assembly>
+  <assembly fullname="UnityEngine.PhysicsModule">
+    <type fullname="UnityEngine.BoxCollider" preserve="all" />
+    <type fullname="UnityEngine.SphereCollider" preserve="all" />
+    <type fullname="UnityEngine.CapsuleCollider" preserve="all" />
+  </assembly>
+  <assembly fullname="Assembly-CSharp">
+    <type fullname="M6App/SavedGame" preserve="all" />
+    <type fullname="MobileVerification/Report" preserve="all" />
+    <type fullname="MobileVerification/TouchState" preserve="all" />
+  </assembly>
+</linker>

@@ -12,6 +12,20 @@ public static class M6Build
 {
     public static void Build()
     {
+        BuildForTarget(false);
+    }
+
+    public static void BuildAndroid()
+    {
+        try { BuildForTarget(true); }
+        finally { AndroidBuildConfiguration.ClearSigningSecrets(); }
+    }
+
+    static void BuildForTarget(bool android)
+    {
+        if (android && !BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Android, BuildTarget.Android))
+            throw new Exception("请安装当前 Unity 版本的 Android Build Support。");
+        if (android) AndroidTexturePolicy.ApplyExistingTextures();
         EntityCardTextureImporter.VerifyImportedCards();
         var session = CombinedGameSession.Create("heading-for-new-shores", 4, 20261009);
         if (session.GetPlayerView("P1").Board.Tiles.Length <= 19)
@@ -27,11 +41,11 @@ public static class M6Build
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         var pipeline = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>("Assets/M1Pipeline.asset");
         if (pipeline == null) throw new Exception("URP pipeline missing");
-        pipeline=TabletopFinishV005.Configure(pipeline);
+        pipeline=android ? AndroidBuildConfiguration.ConfigurePipeline(pipeline) : TabletopFinishV005.Configure(pipeline);
         GraphicsSettings.defaultRenderPipeline = pipeline;
         QualitySettings.renderPipeline = pipeline;
         QualitySettings.globalTextureMipmapLimit=0;
-        QualitySettings.anisotropicFiltering=AnisotropicFiltering.ForceEnable;
+        QualitySettings.anisotropicFiltering=android ? AnisotropicFiltering.Enable : AnisotropicFiltering.ForceEnable;
         var camera = new GameObject("Board Camera").AddComponent<Camera>();
         camera.tag = "MainCamera";
         camera.nearClipPlane = .001f;
@@ -44,7 +58,7 @@ public static class M6Build
         light.type = LightType.Directional;
         light.intensity = 1.5f;
         light.transform.rotation = Quaternion.Euler(50, -35, 0);
-        light.shadows = LightShadows.Soft;
+        light.shadows = android ? LightShadows.Hard : LightShadows.Soft;
         light.gameObject.AddComponent<UniversalAdditionalLightData>();
         RenderSettings.ambientMode = AmbientMode.Flat;
         RenderSettings.ambientLight = new Color(.55f, .61f, .68f);
@@ -56,7 +70,7 @@ public static class M6Build
         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), "Assets/M6.unity");
         PlayerSettings.companyName = "CatanDevelopment";
         PlayerSettings.productName = "Catan M6";
-        PlayerSettings.bundleVersion = "1.2";
+        PlayerSettings.bundleVersion = "1.4";
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
         PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Standalone, ApiCompatibilityLevel.NET_Standard);
         PlayerSettings.defaultScreenWidth = 1440;
@@ -65,17 +79,20 @@ public static class M6Build
         PlayerSettings.resizableWindow = true;
         PlayerSettings.runInBackground = true;
         PlayerSettings.colorSpace = ColorSpace.Linear;
+        if (android) AndroidBuildConfiguration.ConfigurePlayer();
         var root = Path.GetFullPath(Path.Combine(Application.dataPath, "../../.."));
         var args=Environment.GetCommandLineArgs();int outputFlag=Array.IndexOf(args,"--m6-output-root");
-        var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/m6-entity-v005");
-        var output = Path.Combine(buildRoot, "Builds/Windows/CatanM6.exe");
+        var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/m6-release-1.4");
+        var output = Path.Combine(buildRoot, android ? "Builds/Android/Catan.apk" : "Builds/Windows/CatanM6.exe");
         Directory.CreateDirectory(Path.GetDirectoryName(output));
         var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
             scenes = new[] { "Assets/M6.unity" }, locationPathName = output,
-            target = BuildTarget.StandaloneWindows64, options = BuildOptions.None
+            target = android ? BuildTarget.Android : BuildTarget.StandaloneWindows64,
+            options = BuildOptions.None
         });
         if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
-            throw new Exception("M6 Windows build failed");
-        Debug.Log("CATAN_M6_UNITY_BUILD_OK");
+            throw new Exception(android ? "M6 Android build failed" : "M6 Windows build failed");
+        if (android) AndroidBuildConfiguration.WriteBuildInfo(Path.GetDirectoryName(output));
+        Debug.Log(android ? "CATAN_M6_ANDROID_BUILD_OK" : "CATAN_M6_UNITY_BUILD_OK");
     }
 }

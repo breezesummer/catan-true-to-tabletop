@@ -8,6 +8,7 @@ public sealed class TabletopDefenseUI
     string roadPlayer;
     int roadLength;
     bool roadBound;
+    public string MobileSummary => (position>=0?"蛮族 "+position+"/7 · 防御 "+strength+"/"+threat+"\n":"")+(roadBound?"最长路线 · "+(string.IsNullOrEmpty(roadPlayer)?"暂无":roadPlayer+" "+roadLength+" 段"):"");
     static Texture2D ship,shield;
     public void Bind(int position,int strength,int threat)
     {this.position=position;this.strength=strength;this.threat=threat;}

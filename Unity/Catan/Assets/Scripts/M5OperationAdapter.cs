@@ -21,7 +21,7 @@ public sealed partial class M5App
     bool DockBlocksMouse(Vector2? logicalMouse=null)
     {
         if(ai==null)return false;
-        var p=logicalMouse??new Vector2(Input.mousePosition.x*1440f/Screen.width,(Screen.height-Input.mousePosition.y)*900f/Screen.height);
+        var p=logicalMouse??MobileTabletop.Logical(MobileTabletop.Pointer);
         return ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||OperationContextVisible&&tabletop.CurrentContextRect.Contains(p)||dock.BlocksBoardInput(p);
     }
     void CancelOperationDraft(){if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null){board.SetSelectedShip(null);board.ClearPreview();}}
@@ -140,7 +140,7 @@ public sealed partial class M5App
     }
     void DrawOperationLayout()
     {
-        Styles();GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));cardArt.Begin(null);
+        Styles();GUI.matrix=MobileTabletop.GuiMatrix;cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
         bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TableMenuOpen&&!tabletop.HistoryOpen;GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
         TabletopUI.DrawMapLabels(DrawBoardLabels);
@@ -156,7 +156,7 @@ public sealed partial class M5App
             ()=>Submit(New(CommandKind.RollDice)),()=>Submit(New(CommandKind.EndTurn)),target=>{CancelOperationDraft();dock.OpenTrade(target);},
             ()=>{bool open=!operationActions;dock.Reset();CancelOperationDraft();operationActions=open;},"骑士操作",facility:dock.OpenFacility);
 
-        tabletop.SetContextAnchor(operationActions&&operationKnightTarget!=null?(Vector2?)new Vector2(board.ScreenPoint(operationKnightTarget).x*1440f/Screen.width,board.ScreenPoint(operationKnightTarget).y*900f/Screen.height):null);
+        tabletop.SetContextAnchor(operationActions&&operationKnightTarget!=null?(Vector2?)MobileTabletop.Logical(board.ScreenPoint(operationKnightTarget)):null);
         GUI.enabled=tableEnabled&&!dock.HasOverlay;
         if(OperationContextVisible)tabletop.DrawContext(operationActions?"棋子行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):"当前选择",DrawOperationControls);
         GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
@@ -254,7 +254,7 @@ public sealed partial class M5App
         string vertex=Pick("V",mouse);
         if(vertex==""||!view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==vertex))return false;
         dock.Reset();CancelOperationDraft();operationKnightTarget=vertex;operationActions=true;
-        var projected=board.ScreenPoint(vertex);tabletop.SetContextAnchor(new Vector2(projected.x*1440f/Screen.width,projected.y*900f/Screen.height));
+        var projected=board.ScreenPoint(vertex);tabletop.SetContextAnchor(MobileTabletop.Logical(projected));
         status="选择这名骑士的动作；右键空白处或 Esc 收起。";return true;
     }
     internal bool VerificationSelectKnight(string vertex)
@@ -267,6 +267,7 @@ public sealed partial class M5App
     {
         if(draft!=null||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null)return false;
         if(PickTabletopPort(mouse))return true;
+        if(MobileTabletop.Enabled&&PickTabletopKnight(mouse))return true;
         string edge=Pick("E",mouse);
         if(edge!=""&&view.Board.Ships.Any(s=>s.PlayerId==seat&&s.LocationId==edge))
         {
