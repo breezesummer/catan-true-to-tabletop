@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "rules": "combined",
+  "scenario": "through-the-desert",
+  "seats": 4,
+  "independentClientProcesses": 4,
+  "seconds": 56.3280405,
+  "revision": 459
+}

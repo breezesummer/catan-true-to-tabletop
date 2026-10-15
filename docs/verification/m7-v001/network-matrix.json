@@ -1,0 +1,546 @@
+{
+  "passed": true,
+  "completed": 26,
+  "requested": 26,
+  "games": [
+    {
+      "rules": "base",
+      "scenario": "base",
+      "seats": 3,
+      "commands": 319,
+      "retries": 4,
+      "seconds": 16.8585254,
+      "p95CommandMs": 38.1152,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RoadBuilding/RoadBuilding",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "cities-knights",
+      "scenario": "base",
+      "seats": 3,
+      "commands": 385,
+      "retries": 5,
+      "seconds": 46.0366136,
+      "p95CommandMs": 170.7915,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "PendingChoice/PillageCity",
+        "PendingChoice/ProgressEspionage",
+        "PendingChoice/ProgressHarbor",
+        "PendingChoice/ProgressRoads",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "heading-for-new-shores",
+      "seats": 3,
+      "commands": 340,
+      "retries": 4,
+      "seconds": 25.0987308,
+      "p95CommandMs": 48.3858,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "GoldChoice/Gold",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "four-islands",
+      "seats": 3,
+      "commands": 432,
+      "retries": 5,
+      "seconds": 32.1714719,
+      "p95CommandMs": 45.6379,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "fog-islands",
+      "seats": 3,
+      "commands": 567,
+      "retries": 7,
+      "seconds": 46.7775505,
+      "p95CommandMs": 56.315,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "through-the-desert",
+      "seats": 3,
+      "commands": 344,
+      "retries": 4,
+      "seconds": 27.4973647,
+      "p95CommandMs": 48.5906,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "GoldChoice/Gold",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "forgotten-tribe",
+      "seats": 3,
+      "commands": 533,
+      "retries": 7,
+      "seconds": 57.7073135,
+      "p95CommandMs": 84.6486,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "cloth-for-catan",
+      "seats": 3,
+      "commands": 483,
+      "retries": 6,
+      "seconds": 40.7341882,
+      "p95CommandMs": 51.3457,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "pirate-islands",
+      "seats": 3,
+      "commands": 537,
+      "retries": 7,
+      "seconds": 54.5953511,
+      "p95CommandMs": 67.3014,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "GoldChoice/Gold",
+        "ProductionAwaitRoll/",
+        "RoadBuilding/RoadBuilding",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "wonders-of-catan",
+      "seats": 3,
+      "commands": 505,
+      "retries": 6,
+      "seconds": 51.1117845,
+      "p95CommandMs": 61.5458,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "GoldChoice/Gold",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "new-world",
+      "seats": 3,
+      "commands": 620,
+      "retries": 8,
+      "seconds": 65.0607666,
+      "p95CommandMs": 70.7683,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupPort/SetupPort",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "combined",
+      "scenario": "heading-for-new-shores",
+      "seats": 3,
+      "commands": 377,
+      "retries": 5,
+      "seconds": 36.9052515,
+      "p95CommandMs": 70.4446,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "PendingChoice/Aqueduct",
+        "PendingChoice/Metropolis",
+        "PendingChoice/ProgressRoads",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "combined",
+      "scenario": "through-the-desert",
+      "seats": 3,
+      "commands": 574,
+      "retries": 7,
+      "seconds": 57.044554,
+      "p95CommandMs": 75.9027,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "PendingChoice/Aqueduct",
+        "PendingChoice/Gold",
+        "PendingChoice/PillageCity",
+        "PendingChoice/ProgressHarbor",
+        "PendingChoice/ProgressRoads",
+        "PendingChoice/ProgressTreasonPlace",
+        "PendingChoice/ProgressTreasonRemove",
+        "PendingChoice/ProgressWedding",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "base",
+      "scenario": "base",
+      "seats": 4,
+      "commands": 463,
+      "retries": 6,
+      "seconds": 25.326733,
+      "p95CommandMs": 41.0961,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RoadBuilding/RoadBuilding",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "cities-knights",
+      "scenario": "base",
+      "seats": 4,
+      "commands": 389,
+      "retries": 5,
+      "seconds": 52.7039478,
+      "p95CommandMs": 131.6303,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "PendingChoice/Aqueduct",
+        "PendingChoice/Metropolis",
+        "PendingChoice/ProgressHarbor",
+        "PendingChoice/ProgressRoads",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "heading-for-new-shores",
+      "seats": 4,
+      "commands": 456,
+      "retries": 6,
+      "seconds": 44.3320141,
+      "p95CommandMs": 70.9694,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "GoldChoice/Gold",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "four-islands",
+      "seats": 4,
+      "commands": 431,
+      "retries": 5,
+      "seconds": 31.7201052,
+      "p95CommandMs": 52.9257,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "fog-islands",
+      "seats": 4,
+      "commands": 634,
+      "retries": 8,
+      "seconds": 56.4656691,
+      "p95CommandMs": 60.448,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "through-the-desert",
+      "seats": 4,
+      "commands": 502,
+      "retries": 6,
+      "seconds": 46.4430426,
+      "p95CommandMs": 59.3175,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "GoldChoice/Gold",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "forgotten-tribe",
+      "seats": 4,
+      "commands": 481,
+      "retries": 6,
+      "seconds": 46.6993566,
+      "p95CommandMs": 61.9101,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "cloth-for-catan",
+      "seats": 4,
+      "commands": 411,
+      "retries": 5,
+      "seconds": 36.7000506,
+      "p95CommandMs": 60.0987,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "pirate-islands",
+      "seats": 4,
+      "commands": 631,
+      "retries": 8,
+      "seconds": 66.8038981,
+      "p95CommandMs": 73.0311,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "GoldChoice/Gold",
+        "ProductionAwaitRoll/",
+        "RoadBuilding/RoadBuilding",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "wonders-of-catan",
+      "seats": 4,
+      "commands": 588,
+      "retries": 8,
+      "seconds": 57.9921138,
+      "p95CommandMs": 59.9531,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "GoldChoice/Gold",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "new-world",
+      "seats": 4,
+      "commands": 520,
+      "retries": 7,
+      "seconds": 42.3257577,
+      "p95CommandMs": 49.3067,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupPort/SetupPort",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "combined",
+      "scenario": "heading-for-new-shores",
+      "seats": 4,
+      "commands": 666,
+      "retries": 9,
+      "seconds": 61.4682687,
+      "p95CommandMs": 63.6708,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "PendingChoice/Aqueduct",
+        "PendingChoice/Gold",
+        "PendingChoice/Metropolis",
+        "PendingChoice/PillageCity",
+        "PendingChoice/ProgressHarbor",
+        "PendingChoice/ProgressSabotage",
+        "PendingChoice/ProgressTreasonPlace",
+        "PendingChoice/ProgressTreasonRemove",
+        "PendingChoice/ProgressWedding",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "combined",
+      "scenario": "through-the-desert",
+      "seats": 4,
+      "commands": 487,
+      "retries": 6,
+      "seconds": 45.2595587,
+      "p95CommandMs": 60.8505,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "PendingChoice/Aqueduct",
+        "PendingChoice/Gold",
+        "PendingChoice/Metropolis",
+        "PendingChoice/PillageCity",
+        "PendingChoice/ProgressRoads",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "rules": "base",
+  "scenario": "base",
+  "seats": 3,
+  "independentClientProcesses": 3,
+  "seconds": 18.6894389,
+  "revision": 360
+}
