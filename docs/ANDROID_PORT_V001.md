@@ -32,3 +32,5 @@
 本轮已执行的结果、APK 校验信息和微信实际状态以 [发布摘要](verification/android-port-v001/summary.json) 为准。`MobileVerification` 仅在显式命令行参数或 Android 本地 intent 验收请求下运行，截图和权威验收局只留本地，不将隐藏手牌、牌库顺序或随机状态加入公开证据。
 
 Windows 手机布局预览不能替代 Android IL2CPP 运行或真实触控验收；模拟器检查不能替代目标手机的长期对局、功耗与性能。M7 联机与 M8 成品验收仍未完成，本轮不更新阶段状态。
+
+`Test-AndroidTouch.ps1` 默认 `-Mode Probe` 只读探测，限定本机 `emulator-5554`。`-Mode Exercise` 会向该模拟器注入真实单／双指 MotionEvent；测试前需 `adb -s emulator-5554 root` 使其可写模拟器输入设备，结束后执行 `adb -s emulator-5554 unroot` 恢复 shell。无需修改 Windows 权限或 SELinux，也不适用于真实手机。普通试玩与 APK 安装不需要此步骤。

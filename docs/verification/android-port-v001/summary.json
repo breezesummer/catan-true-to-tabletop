@@ -110,8 +110,9 @@
     "非空发展／进步卡抽屉的实际触控与全分辨率用户最终外观"
   ],
   "roadmap": "M7/M8不推进",
-  "sourceCommit": null,
+  "sourceCommit": "70aca57842f5d52b0ea225e4606f2b0e9d6d07f2",
   "knownMinorIssues": [
     "组合模式抽屉内不可用船的较长原因文字轻微裁切；禁用状态和操作入口完整。"
-  ]
+  ],
+  "sourceScope": "实现提交；随后只补文档追溯字段，不改变APK。"
 }
