@@ -2,6 +2,8 @@
 
 2026-10-16 已完成**手牌、弃牌与 AI 动画 v012**，沿用内测版1.4：牌背图标、手牌数／限额及超限红字，地块资源与发展／进步收牌动画，图标化玩家列表，三档单人 AI 速度、头像飞出建造与本回合金色高亮，手牌点选并在右下角确认弃牌。当前可玩入口：[CatanM6.exe](.local/ui-feedback-v012-final/Builds/Windows/CatanM6.exe)。.NET 去重890项、Unity构建、四规则保存恢复和实际窗口检查通过。源码已隔离于 `codex/ui-feedback-v012`，保留主工作区并行菜单／音频修改。详见[迭代说明](docs/UI_FEEDBACK_V012.md)与[验证摘要](docs/verification/ui-feedback-v012/summary.json)。
 
+2026-10-16 已完成**手牌、弃牌与 AI 动画 v012**，沿用内测版1.4：牌背图标、手牌数／限额及超限红字，地块资源与发展／进步收牌动画，图标化玩家列表，三档单人 AI 速度、头像飞出建造与本回合金色高亮，手牌点选并在右下角确认弃牌。当前可玩入口：[CatanM6.exe](.local/ui-feedback-v012-final/Builds/Windows/CatanM6.exe)。.NET 去重890项、Unity构建、四规则保存恢复和实际窗口检查通过。源码已隔离于 `codex/ui-feedback-v012`，保留主工作区并行菜单／音频修改。详见[迭代说明](docs/UI_FEEDBACK_V012.md)与[验证摘要](docs/verification/ui-feedback-v012/summary.json)。
+
 2026-10-15 已实现 **M7 本机联机版**：Windows 客户端与随包权威服务、局域网发现／地址连接、可直接加入或设密码的房间、准备与 AI 席位、断线原席位恢复、幂等命令及服务器保存。沿用内测版1.4；当前可玩入口：[CatanM6.exe](.local/m7-v001/Builds/Windows/CatanM6.exe)，启动脚本默认使用本版。26 种配置网络完局、四规则独立多进程完局及四规则实际 Windows 客户端检查通过，既有单人保存恢复保持。用户尚无云服务器，本轮按确认仅交付本机可验证范围；真实多机、外网、清洁环境和长期容量未验，完整 M7 阶段未退出。Unity 当前以严格证书校验的 HTTPS 每秒同步，原生 WSS 兼容性尚待解决。见 [使用说明](docs/M7_IMPLEMENTATION.md)、[验收记录](docs/M7_ACCEPTANCE.md)；以下为历史构建入口。
 
 2026-10-15 已按最新反馈将**安卓 UI 统一为 PC 完整桌面界面**：共用开局、建造、逐张手牌、骰盘、席位、银行、设施、历史和弹窗，保留触控与安全区适配；点击顶部回合铭牌打开游戏菜单。内测版仍为1.4，安卓构建号为10401。新 [PC 同版界面 APK](.local/m6-android-pc-ui-v001/release/卡坦岛之三国争霸内测版1.4-安卓-PC同版界面/卡坦岛之三国争霸内测版1.4-安卓-PC同版界面.apk)；[本轮 PC 可玩程序](.local/m6-android-pc-ui-v001/Builds/Windows/CatanM6.exe)。变更与验证见 [统一记录](docs/ANDROID_PC_UI_V001.md)。下方手机抽屉版 APK 属于历史构建。
