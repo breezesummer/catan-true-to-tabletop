@@ -34,3 +34,5 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/development/Play-MenuA
 首轮暴露的缺少 Audio 模块、隐藏窗口黑图、WAV 导出量化为零、跨组件 GUI 点击漏声均已修复并复验；黑图未当作外观通过。专项仅检查软件混音数据，未完成人工主观听感、系统扬声器录音、安卓真机或长期性能。详见 [公开摘要](verification/menu-audio-v001/summary.json)、[实际鼠标记录](verification/menu-audio-v001/manual-review.json) 与 [音频资产检查](verification/menu-audio-v001/audio-assets.json)。
 
 当前 EXE：[CatanM6.exe](../.local/menu-audio-v001/Builds/Windows/CatanM6.exe)。完整 M7 和 M8 阶段退出条件未在本轮满足，路线图状态保持。
+
+实现提交 `4f44161` 已推送到 `dev-1.0` 与 `codex/pastoral-menu-audio-v001`，基于同期界面提交收口，未覆盖其功能。2026-10-16 00:41 已在微信“卡坦内测开发组”发送四点文字公告，逐点留空行，并核对完整消息、输入框清空与等待标记消失；本轮未发压缩包，版本保持1.4。默认构建与启动脚本已指向菜单/音效合并版。

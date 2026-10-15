@@ -1,0 +1,30 @@
+{
+  "日期": "2026-10-16",
+  "源码提交": "4f441615bd2bde315f6c2af1c36c31b09b652835",
+  "相对构建根目录": ".local/menu-audio-v001/Builds/Windows",
+  "版本": "内测版1.4",
+  "文件数": 514,
+  "关键文件": [
+    {
+      "file": "CatanM6.exe",
+      "bytes": 667136,
+      "sha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "file": "CatanM6_Data/Managed/Assembly-CSharp.dll",
+      "bytes": 834560,
+      "sha256": "51417f07b96230b03d488bf32a6660e3a6a6c3e3ac55940e50eb0fcd258f1832"
+    },
+    {
+      "file": "CatanM6_Data/Managed/Catan.Core.dll",
+      "bytes": 553984,
+      "sha256": "4806d52080173a112ce0e16ac5f2bd8c3002a3718c64f9a98bcbd29961be5887"
+    },
+    {
+      "file": "CatanM6_Data/Managed/Catan.AI.dll",
+      "bytes": 148480,
+      "sha256": "650d1f310b4dd85ae2cc4297ddb4fc8d06465272f3281dad810529e2254b5461"
+    }
+  ],
+  "说明": "EXE与Data、Mono、Server须保留在同一完整构建目录，用户本轮未要求压缩包。"
+}
