@@ -1,0 +1,167 @@
+{
+  "日期": "2026-10-15",
+  "游戏": "卡坦岛之三国争霸",
+  "版本": "内测版1.4",
+  "范围": "本机可验证的M7实现；不宣布完整阶段退出",
+  "用户确认": [
+    "尚未准备服务器，先本机验证",
+    "房间可直接加入，设置密码时验证口令",
+    "持久访客身份",
+    "掉线等待",
+    "存档不自动删除"
+  ],
+  "NET测试": {
+    "网络与房间": 94,
+    "规则与当前AI": 845,
+    "跳过": 0,
+    "服务": 13,
+    "失败": 0
+  },
+  "网络完整矩阵": {
+    "成功": 26,
+    "边界": "早于最终身份登记和Unity传输修复；规则及AI未改，最终服务另有四代表局复验",
+    "命令": 12675,
+    "配置": 26,
+    "证据": "network-matrix.json",
+    "重复请求": 160
+  },
+  "独立客户端进程完整局": {
+    "每局进程数": [
+      3,
+      4,
+      4,
+      4
+    ],
+    "局数": 4,
+    "边界": "同一开发机，测试人类席位只读自身网络视图"
+  },
+  "最终服务复验": {
+    "原进程停止后恢复": "通过",
+    "证据": [
+      "final-smoke.json",
+      "final-restart.json",
+      "final-matrix.json"
+    ],
+    "HTTPS与WSS": "通过",
+    "四规则代表完整局": "4/4"
+  },
+  "Unity": {
+    "实际传输": "严格固定证书的HTTPS每秒同步",
+    "原生WSS": "Unity Mono自签证书握手未通过",
+    "版本": "6000.3.25f1",
+    "截图": "隐藏窗口截图为黑色，不计外观验收",
+    "鼠标窗口检查": "等待用户手动关闭Windows安全中心权限提示，暂未完成",
+    "最终四模式实际EXE": [
+      {
+        "RuleSet": "base",
+        "ScenarioId": "base",
+        "Result": "passed",
+        "Stage": "only own seat is presented",
+        "Transport": "HTTPS 安全同步（每秒）",
+        "PlayerCount": 3,
+        "Turn": 3,
+        "HumanCommands": 8,
+        "ClientAiCommands": 0,
+        "Revision": 23,
+        "LocalAuthorityAbsent": true,
+        "LocalSaveRejected": true,
+        "ReconnectConfirmed": true,
+        "OwnSeatOnly": true
+      },
+      {
+        "RuleSet": "seafarers",
+        "ScenarioId": "new-world",
+        "Result": "passed",
+        "Stage": "only own seat is presented",
+        "Transport": "HTTPS 安全同步（每秒）",
+        "PlayerCount": 4,
+        "Turn": 3,
+        "HumanCommands": 10,
+        "ClientAiCommands": 0,
+        "Revision": 39,
+        "LocalAuthorityAbsent": true,
+        "LocalSaveRejected": true,
+        "ReconnectConfirmed": true,
+        "OwnSeatOnly": true
+      },
+      {
+        "RuleSet": "cities-knights",
+        "ScenarioId": "base",
+        "Result": "passed",
+        "Stage": "only own seat is presented",
+        "Transport": "HTTPS 安全同步（每秒）",
+        "PlayerCount": 3,
+        "Turn": 3,
+        "HumanCommands": 7,
+        "ClientAiCommands": 0,
+        "Revision": 32,
+        "LocalAuthorityAbsent": true,
+        "LocalSaveRejected": true,
+        "ReconnectConfirmed": true,
+        "OwnSeatOnly": true
+      },
+      {
+        "RuleSet": "combined",
+        "ScenarioId": "through-the-desert",
+        "Result": "passed",
+        "Stage": "only own seat is presented",
+        "Transport": "HTTPS 安全同步（每秒）",
+        "PlayerCount": 4,
+        "Turn": 3,
+        "HumanCommands": 8,
+        "ClientAiCommands": 0,
+        "Revision": 28,
+        "LocalAuthorityAbsent": true,
+        "LocalSaveRejected": true,
+        "ReconnectConfirmed": true,
+        "OwnSeatOnly": true
+      }
+    ],
+    "本地保存恢复": "两个独立Windows进程，四规则混合席位和待决通过",
+    "Windows构建": "通过"
+  },
+  "构建文件": [
+    {
+      "sha256": "3070E580E019576B9AFCDEB4FEC18D03CEBC119F6AE84D597412905C749AD653",
+      "path": ".local/m7-v001/Builds/Windows/CatanM6.exe"
+    },
+    {
+      "sha256": "D11D063DDEE2CD15215EC6BEF12C8B25A36C3A43E83BBBDC3D51C2906CD8A715",
+      "path": ".local/m7-v001/Builds/Windows/CatanM6_Data/Managed/Assembly-CSharp.dll"
+    },
+    {
+      "sha256": "887D27755ADAE168EC987E70C676D7B73689A66DCAAA377EF2CED1D0C9FB4BD7",
+      "path": ".local/m7-v001/Builds/Windows/CatanM6_Data/Managed/Catan.Network.Contracts.dll"
+    },
+    {
+      "sha256": "72FF6C0768C8852F5A78D77D96CAFFE8EDF65E0676F8C2DA793CCB305762529E",
+      "path": ".local/m7-v001/Builds/Windows/Server/Catan.Server.exe"
+    },
+    {
+      "sha256": "94708B767B9351F4611F12980A09A98CD600FC336973FA31A13B1C9FC43032E2",
+      "path": ".local/m7-v001/Builds/Windows/Server/Catan.Server.dll"
+    },
+    {
+      "sha256": "01C8DAF7D97D8A75363E11DA318C4DB77D043470087612B5A315398D2167AEB9",
+      "path": ".local/m7-v001/Builds/Windows/Server/Catan.Rooms.dll"
+    }
+  ],
+  "未验证": [
+    "真实多机LAN和防火墙广播",
+    "云端部署和真实广域网",
+    "清洁Windows无开发环境",
+    "长时间和多并发房间容量",
+    "断电与磁盘损坏恢复",
+    "完整用户鼠标操作与整局",
+    "Android联机",
+    "Unity原生WSS"
+  ],
+  "证据文件": [
+    "tests/rules/m6-rules.trx",
+    "tests/final/network-final.trx",
+    "tests/final/server-final.trx",
+    "logs/unity-build.log",
+    "player-network-console.log",
+    "persistence-console.log"
+  ]
+}

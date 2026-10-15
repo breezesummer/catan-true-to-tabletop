@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "rules": "cities-knights",
+  "scenario": "base",
+  "seats": 4,
+  "independentClientProcesses": 4,
+  "seconds": 112.9558235,
+  "revision": 743
+}

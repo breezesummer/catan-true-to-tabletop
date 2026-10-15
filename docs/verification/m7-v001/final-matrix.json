@@ -1,0 +1,95 @@
+{
+  "passed": true,
+  "completed": 4,
+  "requested": 4,
+  "games": [
+    {
+      "rules": "base",
+      "scenario": "base",
+      "seats": 3,
+      "commands": 391,
+      "retries": 5,
+      "seconds": 24.3026029,
+      "p95CommandMs": 52.7031,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "ProductionAwaitRoll/",
+        "RoadBuilding/RoadBuilding",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "cities-knights",
+      "scenario": "base",
+      "seats": 3,
+      "commands": 520,
+      "retries": 7,
+      "seconds": 58.4531078,
+      "p95CommandMs": 131.1823,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "PendingChoice/Aqueduct",
+        "PendingChoice/Metropolis",
+        "PendingChoice/PillageCity",
+        "PendingChoice/ProgressDiscard",
+        "PendingChoice/ProgressEspionage",
+        "PendingChoice/ProgressGuildDues",
+        "PendingChoice/ProgressHarbor",
+        "PendingChoice/ProgressRoads",
+        "PendingChoice/ProgressWedding",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "heading-for-new-shores",
+      "seats": 3,
+      "commands": 433,
+      "retries": 5,
+      "seconds": 31.2127888,
+      "p95CommandMs": 47.331,
+      "pending": [
+        "Action/",
+        "Discard/Robber",
+        "GoldChoice/Gold",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    },
+    {
+      "rules": "combined",
+      "scenario": "through-the-desert",
+      "seats": 3,
+      "commands": 305,
+      "retries": 4,
+      "seconds": 24.5407741,
+      "p95CommandMs": 52.2046,
+      "pending": [
+        "Action/",
+        "PendingChoice/Aqueduct",
+        "PendingChoice/Metropolis",
+        "ProductionAwaitRoll/",
+        "RobberMove/Robber",
+        "RobberSteal/Steal",
+        "SetupRoad/SetupRoad",
+        "SetupSettlement/"
+      ],
+      "passed": true
+    }
+  ]
+}

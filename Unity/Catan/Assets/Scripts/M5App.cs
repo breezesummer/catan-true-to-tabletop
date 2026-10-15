@@ -43,7 +43,9 @@ public sealed partial class M5App : MonoBehaviour
 
     public void Start()
     {
-        Application.targetFrameRate=60;ai=GetComponent<M6App>();host=new M5LocalGameHost(ai==null?4:ai.PlayerCount);
+        Application.targetFrameRate=60;ai=GetComponent<M6App>();
+        if(ai!=null&&ai.NetworkGame){font=MobileTabletop.LoadFont();ai.ConnectNetwork(this);return;}
+        host=new M5LocalGameHost(ai==null?4:ai.PlayerCount);
         if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.ScenarioId,ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints);
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         var initial=host.View(ai==null?"P1":ai.HumanSeat);nextSeat=initial.ActivePlayerId;Refresh(initial);
@@ -71,14 +73,15 @@ public sealed partial class M5App : MonoBehaviour
         dock.Reset();nextSeat=target;curtain=true;view=null;draft=null;pickField="";scroll=Vector2.zero;tab=0;artOpen=false;cardArt.Clear();board.ClearPreview();
         status="手牌与私有选择已遮蔽，请将设备交给 "+target+"。";
     }
-    public void ConfirmSeat(){dock.Reset();seat=nextSeat;curtain=false;view=host.View(seat);Refresh(view);}
+    public void ConfirmSeat(){dock.Reset();seat=nextSeat;curtain=false;view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);Refresh(view);}
     public CommandResult Submit(Command command)
     {
+        if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status=ai.Network.Status;return null;}
         if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
         if(ai!=null&&command==draft&&!DockKnightTargetMatches(command.TargetId)){status="请选择低一级的己方骑士晋升。";return null;}
         command.Id=string.IsNullOrEmpty(command.Id)?Guid.NewGuid().ToString("N"):command.Id;
         dock.Reset();CancelOperationDraft();var result=host.Submit(command);status=result.Success?"操作完成。":result.Message;
-        pickField="";board.ClearPreview();view=host.View(seat);Refresh(view);
+        pickField="";board.ClearPreview();view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);Refresh(view);
         if(result.Success)
         {
             draft=null;
@@ -135,7 +138,7 @@ public sealed partial class M5App : MonoBehaviour
         if(target!="")
         {
             bool valid=ai==null||!DirectTabletopPlacement||pickField!="source"||(draft.Kind==CommandKind.MoveShip?view.MovableShipEdgeIds.Contains(target):view.LegalActions.Any(c=>c.Kind==draft.Kind&&c.SourceId==target));
-            if(pickField=="target") {string old=draft.TargetId;draft.TargetId=target;valid=host.Preview(draft).Success&&(ai==null||DockKnightTargetMatches(target));draft.TargetId=old;}
+            if(pickField=="target") {string old=draft.TargetId;draft.TargetId=target;valid=Preview(draft).Success&&(ai==null||DockKnightTargetMatches(target));draft.TargetId=old;}
             if(pickType=="T")board.PreviewRobber(target,valid);else if(IsShip(draft))board.PreviewShip(target,valid);else board.Preview(target,pickType=="E",valid);
             if((ai!=null?boardClick:Input.GetMouseButtonDown(0))||buildReleased)
             {
@@ -176,7 +179,7 @@ public sealed partial class M5App : MonoBehaviour
     {if(ai!=null){ModernOperationUI.Styles(font);GUILayout.Label(value,minor?ModernOperationUI.Small:ModernOperationUI.Text);}else GUILayout.Label(value,minor?small:label);}
     void OnGUI()
     {
-        if(host==null)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=MobileTabletop.GuiMatrix;
+        if(host==null&&!NetworkGame)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=MobileTabletop.GuiMatrix;
         Panel(new Rect(0,0,1440,125),new Color(.045f,.09f,.10f));
         GUI.Label(new Rect(25,15,700,36),"CATAN  /  航海家 × 城市与骑士",heading);
         var publicView=summary;
@@ -442,7 +445,7 @@ public sealed partial class M5App : MonoBehaviour
         GUILayout.Space(8);
         if(ai!=null)
         {
-            var preview=host.Preview(draft);bool legal=preview.Success;
+            var preview=Preview(draft);bool legal=preview.Success;
             if(!legal)ModernOperationUI.Info(preview.Message??"请完成所需选择，当前尚不能确认。",true);
             if(ModernOperationUI.LayoutButton(card?"确认使用 · "+CardName(draft.ProgressCard):"确认执行",legal,true)){Submit(draft);GUIUtility.ExitGUI();}
         }
@@ -505,7 +508,7 @@ public sealed partial class M5App : MonoBehaviour
     }
     public M5LocalGameHost VerificationHost=>host;
     internal PlayerView M6View=>view;
-    internal void M6Refresh(){dock.Reset();seat=ai.HumanSeat;nextSeat=seat;curtain=false;view=host.View(seat);CancelOperationDraft();Refresh(view);status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，从面前拿起棋子与卡牌，或点击地图上的己方棋子。":ai.WaitingText;}
+    internal void M6Refresh(){dock.Reset();seat=ai.HumanSeat;nextSeat=seat;curtain=false;if(NetworkGame)cardArt.Clear();view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);CancelOperationDraft();Refresh(view);status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，从面前拿起棋子与卡牌，或点击地图上的己方棋子。":ai.WaitingText;}
     internal void M6Visible(bool value){if(board!=null)board.gameObject.SetActive(value);}
     internal void M6Close(){enabled=false;if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}Destroy(this);}
     public M5BoardRenderer VerificationBoard=>board;
@@ -515,4 +518,11 @@ public sealed partial class M5App : MonoBehaviour
     public string VerificationSeat=>seat;
     public void VerificationPreparePrivateSelections(){draft=New(CommandKind.ProposeTrade);draft.Give.Wood=1;pickField="target";}
     public string VerificationPick(string type,Vector2 position)=>Pick(type,position);
+    internal void M7PreviewRefresh(){operationView=null;}
+    bool NetworkGame=>ai!=null&&ai.NetworkGame;
+    M7Preview Preview(Command command)
+    {
+        if(NetworkGame)return ai.Network.Preview(command);
+        var result=host.Preview(command);return new M7Preview(result.Success,result.Message);
+    }
 }

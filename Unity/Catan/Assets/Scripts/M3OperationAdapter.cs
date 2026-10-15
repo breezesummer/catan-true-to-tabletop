@@ -95,7 +95,7 @@ public sealed partial class M3App
             AddDockBuild(s,setup?CommandKind.SetupSettlement:CommandKind.BuildSettlement,"定居点","settlement",own.Pieces.Settlements,setup?DockCost():DockCost(1,1,1,1),view.LegalVertexIds.Length>0);
             AddDockBuild(s,roadSetup?CommandKind.SetupRoad:freeRoad?CommandKind.PlaceFreeRoad:CommandKind.BuildRoad,"道路","road",own.Pieces.Roads,roadSetup||freeRoad?DockCost():DockCost(1,1),view.LegalEdgeIds.Length>0);
             AddDockBuild(s,CommandKind.BuildCity,"城市","city",own.Pieces.Cities,DockCost(wheat:2,ore:3),view.LegalCityVertexIds.Length>0);
-            AddDockBuild(s,CommandKind.BuyDevelopmentCard,"发展卡","development",view.DevelopmentDeckCount,DockCost(wool:1,wheat:1,ore:1),view.Phase==GamePhase.Action&&host.Preview(NewCommand(CommandKind.BuyDevelopmentCard)).Success);
+            AddDockBuild(s,CommandKind.BuyDevelopmentCard,"发展卡","development",view.DevelopmentDeckCount,DockCost(wool:1,wheat:1,ore:1),view.Phase==GamePhase.Action&&Preview(NewCommand(CommandKind.BuyDevelopmentCard)).Success);
             AddDockBuild(s,roadSetup?CommandKind.SetupShip:freeRoad?CommandKind.PlaceFreeShip:CommandKind.BuildShip,"船","ship",own.ShipsRemaining,roadSetup||freeRoad?DockCost():DockCost(wood:1,wool:1),view.LegalShipEdgeIds.Length>0);
 
             foreach(var c in view.OwnDevelopmentCards)
@@ -200,7 +200,7 @@ public sealed partial class M3App
                 ModernOperationUI.Info("购买费用");ModernOperationUI.Cost(new[]{0,0,1,1,1});
                 ModernOperationUI.Info("新买入的行动发展卡从之后的回合起可用。");
                 GUILayout.Space(12);var purchase=NewCommand(CommandKind.BuyDevelopmentCard);
-                var preview=host.Preview(purchase);if(!preview.Success)ModernOperationUI.Info(preview.Message,true);
+                var preview=Preview(purchase);if(!preview.Success)ModernOperationUI.Info(preview.Message,true);
                 if(ModernOperationUI.LayoutButton("确认购买 · 抽取 1 张",preview.Success,true))Submit(purchase);
                 if(TableButton("取消购买")){CancelOperationDraft();dock.Reset();}
             });return;
@@ -221,7 +221,7 @@ public sealed partial class M3App
                 var c=NewCommand(kind==DevelopmentCardKind.Knight?CommandKind.PlayKnight:kind==DevelopmentCardKind.RoadBuilding?CommandKind.PlayRoadBuilding:kind==DevelopmentCardKind.Monopoly?CommandKind.PlayMonopoly:CommandKind.PlayYearOfPlenty);
                 if(kind==DevelopmentCardKind.YearOfPlenty){c.Resources=new ResourceBag();if(plentyA<5)c.Resources[(Resource)plentyA]++;if(plentyB<5)c.Resources[(Resource)plentyB]++;}
                 if(kind==DevelopmentCardKind.Monopoly)c.Resource=(Resource)monopoly;
-                var preview=host.Preview(c);if(!preview.Success)ModernOperationUI.Info(preview.Message,true);
+                var preview=Preview(c);if(!preview.Success)ModernOperationUI.Info(preview.Message,true);
                 GUILayout.Space(10);if(ModernOperationUI.LayoutButton("确认打出 · "+DockDevelopmentName(kind),preview.Success,true))Submit(c);
                 if(TableButton("放回手牌")){CancelOperationDraft();dock.Reset();}
             });return;

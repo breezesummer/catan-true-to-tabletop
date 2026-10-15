@@ -38,6 +38,8 @@ public sealed partial class M3App : MonoBehaviour
     {
         Application.targetFrameRate=60;
         ai=GetComponent<M6App>();
+        if(ai!=null&&ai.NetworkGame){font=MobileTabletop.LoadFont();ai.ConnectNetwork(this);return;}
+
         host=new M3LocalGameHost(ai==null?4:ai.PlayerCount);
         if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.ScenarioId,ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints);
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
@@ -52,7 +54,7 @@ public sealed partial class M3App : MonoBehaviour
     readonly MapPanInput mapPan=new MapPanInput();
     void Update()
     {
-        if(host==null||board==null)return;
+        if((host==null&&!NetworkGame)||board==null)return;
         Vector2 releasePoint=Vector2.zero;bool released=ai!=null&&dock.ConsumeBuildRelease(out releasePoint);
         if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         var pointer=MobileTabletop.Pointer;
@@ -81,7 +83,7 @@ public sealed partial class M3App : MonoBehaviour
         {
             if(hover!="")
             {
-                if(ai!=null&&!host.Preview(NewCommand(placement,hover)).Success&&!(placement==CommandKind.MoveShip&&string.IsNullOrEmpty(shipSource)&&view.MovableShipEdgeIds.Contains(hover)))
+                if(ai!=null&&!Preview(NewCommand(placement,hover)).Success&&!(placement==CommandKind.MoveShip&&string.IsNullOrEmpty(shipSource)&&view.MovableShipEdgeIds.Contains(hover)))
                 {status="此处不能放下当前棋子，请选择高亮的合法位置；右键放回。";return;}
                 Drop(hover);
             }
@@ -113,9 +115,9 @@ public sealed partial class M3App : MonoBehaviour
             var ownBuildings=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId);
             var remainingShips=view.Board.Ships.Where(s=>s.PlayerId==seat&&s.LocationId!=shipSource).Select(s=>s.LocationId).ToArray();
             var joins=ownBuildings.Concat(view.Board.Edges.Where(e=>remainingShips.Contains(e.Id)).SelectMany(e=>e.Vertices)).ToArray();
-            return view.Board.Edges.Where(e=>e.Vertices.Any(joins.Contains)).Select(e=>e.Id).Where(id=>host.Preview(NewCommand(placement,id)).Success).ToArray();
+            return view.Board.Edges.Where(e=>e.Vertices.Any(joins.Contains)).Select(e=>e.Id).Where(id=>Preview(NewCommand(placement,id)).Success).ToArray();
         }
-        if(IsToken(placement))return view.Board.Tiles.Where(t=>placement==CommandKind.MovePirate?t.Resource=="sea":t.Resource!="sea"&&t.Resource!="fog").Select(t=>t.Id).Where(id=>host.Preview(NewCommand(placement,id)).Success).ToArray();
+        if(IsToken(placement))return view.Board.Tiles.Where(t=>placement==CommandKind.MovePirate?t.Resource=="sea":t.Resource!="sea"&&t.Resource!="fog").Select(t=>t.Id).Where(id=>Preview(NewCommand(placement,id)).Success).ToArray();
         if(placement==CommandKind.PlacePort||placement==CommandKind.SetupPort)return view.LegalPortEdgeIds;
         if(placement==CommandKind.ChooseInvasionRoute)return view.LegalInvasionRootVertexIds;
         if(IsShip(placement))return view.LegalShipEdgeIds;
@@ -136,7 +138,7 @@ public sealed partial class M3App : MonoBehaviour
     Command NewCommand(CommandKind kind,string target=null) => new Command{Id=Guid.NewGuid().ToString("N"),PlayerId=seat,Kind=kind,TargetId=target,SourceId=kind==CommandKind.MoveShip?shipSource:kind==CommandKind.PlacePort?portSource:null};
     public void ConfirmSeat()
     {
-        dock.Reset();seat=nextSeat;view=host.View(seat);curtain=false;status="已就座 "+seat+"。";
+        dock.Reset();seat=nextSeat;view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);curtain=false;status="已就座 "+seat+"。";
         RefreshBoard(view);
     }
     public void SwitchSeat(string target)
@@ -164,11 +166,12 @@ public sealed partial class M3App : MonoBehaviour
     }
     public CommandResult Submit(Command command)
     {
+        if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status=ai.Network.Status;return null;}
         if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
         CancelPickup();
         dock.Reset();CancelOperationDraft();var result=host.Submit(command);
         status=result.Success?"操作完成。":"操作未执行："+Reason(result.ErrorCode,result.Message);
-        view=host.View(seat);RefreshBoard(view);
+        view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);RefreshBoard(view);
         if(result.Success)
         {
             if(command.Kind==CommandKind.RollDice)status="掷骰 "+view.LastDice1+" + "+view.LastDice2+" = "+(view.LastDice1+view.LastDice2)+"。";
@@ -219,6 +222,7 @@ public sealed partial class M3App : MonoBehaviour
     }
     public void NewGame(int players)
     {
+        if(NetworkGame){status="联机房间由服务端管理，请返回大厅创建房间。";return;}
         host.NewGame(selectedScenario,players);var initial=host.View("P1");RefreshBoard(initial);SwitchSeat(initial.ActivePlayerId);newGameDialog=false;
     }
     static string Reason(string code,string fallback)
@@ -255,7 +259,7 @@ public sealed partial class M3App : MonoBehaviour
     void Label(float x,float y,float width,float height,string label,GUIStyle style=null) => GUI.Label(new Rect(x,y,width,height),label,style??text);
     void OnGUI()
     {
-        if(host==null)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGameDialog||view==null?null:seat);
+        if(host==null&&!NetworkGame)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGameDialog||view==null?null:seat);
         GUI.matrix=MobileTabletop.GuiMatrix;
         Panel(new Rect(0,0,1440,90),new Color(.045f,.09f,.10f));
         Label(30,15,570,40,"CATAN  /  岛屿工坊",title);
@@ -631,7 +635,7 @@ public sealed partial class M3App : MonoBehaviour
     internal PlayerView M6View=>view;
     internal void M6Refresh()
     {
-        dock.Reset();CancelOperationDraft();CancelPickup();seat=ai.HumanSeat;nextSeat=seat;curtain=false;view=host.View(seat);
+        dock.Reset();CancelOperationDraft();CancelPickup();seat=ai.HumanSeat;nextSeat=seat;curtain=false;if(NetworkGame)cardArt.Clear();view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);
         gold=new ResourceBag();portSource="";specialSelection=0;
         discard=new ResourceBag();offerGive=new ResourceBag();offerReceive=new ResourceBag();
         RefreshBoard(view);
@@ -646,5 +650,12 @@ public sealed partial class M3App : MonoBehaviour
     internal bool VerificationSelectionsCleared => discard.Total==0&&offerGive.Total==0&&offerReceive.Total==0&&gold.Total==0&&shipSource=="";
     internal void VerificationPreparePrivateSelections(){discard.Wood=1;offerGive.Brick=2;offerReceive.Wool=3;}
     internal string VerificationPick(CommandKind kind,Vector2 mouse){placement=kind;return ResolveTarget(mouse);}
+    internal void M7PreviewRefresh(){operationView=null;hover="";if(holding)placementLegalIds=ComputeLegalTargets();}
+    bool NetworkGame=>ai!=null&&ai.NetworkGame;
+    M7Preview Preview(Command command)
+    {
+        if(NetworkGame)return ai.Network.Preview(command);
+        var result=host.Preview(command);return new M7Preview(result.Success,result.Message);
+    }
 }
 

@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "rules": "seafarers",
+  "scenario": "heading-for-new-shores",
+  "seats": 4,
+  "independentClientProcesses": 4,
+  "seconds": 44.026016,
+  "revision": 394
+}
