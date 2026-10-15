@@ -15,6 +15,8 @@ public sealed partial class M6App : MonoBehaviour
         public string RuleSet,ScenarioId,HumanSeat,Authority;
         public int PlayerCount;
         public bool Paused;
+        public int AiSpeedLevel=1;
+        public bool HasAiSpeed;
     }
 
     public string RuleSet { get; private set; }="base";
@@ -26,6 +28,7 @@ public sealed partial class M6App : MonoBehaviour
     public bool Paused { get; private set; }
     public string Fault { get; private set; }="";
     public string Notice { get; private set; }="选择一种规则和你的席位，其他席位由本地 AI 执行。";
+    public int AiSpeedLevel { get; private set; }=1;
     public int AiCommandsExecuted { get; private set; }
     public string LastCommandKind { get; private set; }="";
     public bool MenuVisible { get; private set; }=true;
@@ -47,7 +50,7 @@ public sealed partial class M6App : MonoBehaviour
     string promptContext,lastPromptStatus,lastPromptInstruction;
     bool promptWasHuman;
     internal bool TableDiceRolling;
-    int menuRule,menuScenario,menuPlayers=4,menuHuman;
+    int menuRule,menuScenario,menuPlayers=4,menuHuman,menuAiSpeed=1;
     int? menuVictoryPoints;
     bool tableMenu, escapeDismissedInteraction;
     public bool TableMenuOpen=>tableMenu;
@@ -78,6 +81,7 @@ public sealed partial class M6App : MonoBehaviour
         gameObject.AddComponent<TabletopUiVerification>();
         gameObject.AddComponent<CombinedMapVerification>();
         gameObject.AddComponent<TabletopV005Review>();
+        gameObject.AddComponent<TabletopAiAnimationVerification>();
         gameObject.AddComponent<MobileVerification>().Initialize(this);
     }
     void Update()
@@ -86,13 +90,13 @@ public sealed partial class M6App : MonoBehaviour
         if(Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(1))escapeDismissedInteraction=false;
         if(Input.GetKeyDown(KeyCode.Escape))HandleTableEscape();
         if(NetworkGame||MenuVisible||tableMenu||!Ready||Paused||TableDiceRolling||Time.unscaledTime<nextAction)return;
-        nextAction=Time.unscaledTime+.60f;
+        nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);
         StepAi();
     }
     internal void HandleTableEscape()
     {
         if(MenuVisible||!Ready)return;
-        if(tableMenu){tableMenu=false;escapeDismissedInteraction=false;nextAction=Time.unscaledTime+.60f;return;}
+        if(tableMenu){tableMenu=false;escapeDismissedInteraction=false;nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);return;}
         // 第一遍放回本地草稿；规则要求的待决面板即使自动出现，下一遍仍能打开菜单。
         if(!escapeDismissedInteraction)
         {
@@ -126,7 +130,7 @@ public sealed partial class M6App : MonoBehaviour
             Debug.LogError("CATAN_M6_AI_PAUSED: "+ex.GetType().Name);return false;
         }
     }
-    public void SetPaused(bool value){if(NetworkGame){Notice="联机 AI 由服务器调度；其他玩家断线时等待。";return;}Paused=value;if(!value)Fault="";nextAction=Time.unscaledTime+.30f;ShowTablePrompt(value?"AI 已暂停":"AI 已继续");}
+    public void SetPaused(bool value){if(NetworkGame){Notice="联机 AI 由服务器调度；其他玩家断线时等待。";return;}Paused=value;if(!value)Fault="";nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);ShowTablePrompt(value?"AI 已暂停":"AI 已继续");}
     public void ShowTablePrompt(string value)=>tablePrompts.Show(Time.unscaledTimeAsDouble,value);
     internal string CurrentTablePrompt=>tablePrompts.At(Time.unscaledTimeAsDouble);
     internal void UpdateTablePrompt(int turn,string phase,bool awaitingRoll,string instruction,string status)
@@ -151,9 +155,9 @@ public sealed partial class M6App : MonoBehaviour
     {
         if(app!=presentation){dispose();return;}
         presentation=app;actor=acting;finished=done;decideAndSubmit=step;save=export;refresh=update;close=dispose;visible=show;
-        InitialAuthority=null;refresh();nextAction=Time.unscaledTime+.30f;
+        InitialAuthority=null;refresh();nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);
     }
-    public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null)
+    public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null,int? aiSpeedLevel=null)
     {
         ValidateConfiguration(rules,scenario,players,human);
         if(!networkEntering&&NetworkGame)Network.EndSession();
@@ -162,7 +166,7 @@ public sealed partial class M6App : MonoBehaviour
         else if(presentation!=null){presentation.enabled=false;Destroy(presentation);}
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
-        TargetVictoryPoints=target;
+        TargetVictoryPoints=target;AiSpeedLevel=TabletopAiSpeed.Clamp(aiSpeedLevel??AiSpeedLevel);ResetBuildPresentation();
         tableMenu=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你的手牌始终只显示 "+human+"。";
         promptContext=null;promptWasHuman=false;lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.Show(Time.unscaledTimeAsDouble);
         switch(rules)
@@ -183,7 +187,7 @@ public sealed partial class M6App : MonoBehaviour
     {
         if(NetworkGame)throw new InvalidOperationException("联机存档保存在服务器，客户端不能导出权威存档。");
         if(!Ready)throw new InvalidOperationException("No game to save");
-        return JsonUtility.ToJson(new SavedGame{RuleSet=RuleSet,ScenarioId=ScenarioId,PlayerCount=PlayerCount,HumanSeat=HumanSeat,Paused=Paused,Authority=save()},true);
+        return JsonUtility.ToJson(new SavedGame{RuleSet=RuleSet,ScenarioId=ScenarioId,PlayerCount=PlayerCount,HumanSeat=HumanSeat,Paused=Paused,AiSpeedLevel=AiSpeedLevel,HasAiSpeed=true,Authority=save()},true);
     }
     public void WriteSave(string path)
     {
@@ -225,7 +229,7 @@ public sealed partial class M6App : MonoBehaviour
         if(data==null||data.Version!=1||string.IsNullOrEmpty(data.Authority))throw new InvalidDataException("Unsupported M6 save");
         ValidateConfiguration(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat);
         ValidateAuthority(data); // Finish parsing before closing the current game.
-        StartGame(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat,data.Paused,data.Authority);
+        StartGame(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat,data.Paused,data.Authority,aiSpeedLevel:data.HasAiSpeed?data.AiSpeedLevel:1);
         Notice="已恢复局面和席位配置。";
     }
     public void ShowMenu()
@@ -234,9 +238,9 @@ public sealed partial class M6App : MonoBehaviour
         MenuVisible=true;if(presentation!=null)presentation.enabled=false;if(visible!=null)visible(false);
         menuRule=Array.IndexOf(RuleIds,RuleSet);menuPlayers=PlayerCount;menuHuman=int.Parse(HumanSeat.Substring(1))-1;
         var ids=ScenarioIds();menuScenario=Math.Max(0,Array.IndexOf(ids,ScenarioId));
-        menuVictoryPoints=TargetVictoryPoints;
+        menuVictoryPoints=TargetVictoryPoints;menuAiSpeed=AiSpeedLevel;
     }
-    internal void ResumeGame(){MenuVisible=false;presentation.enabled=true;visible(true);nextAction=Time.unscaledTime+.60f;}
+    internal void ResumeGame(){MenuVisible=false;presentation.enabled=true;visible(true);nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);}
     string[] ScenarioIds()=>menuRule==3?CombinedIds:menuRule==1?Catan.Core.M3.SeafarersScenarios.Ids:new[]{"heading-for-new-shores"};
     string ScenarioName(string id)=>Catan.Core.M3.SeafarersScenarios.Create(id,menuPlayers).Name;
     static int DefaultVictoryPoints(string rules,string scenario,int players)=>rules=="base"?10:rules=="cities-knights"?13:rules=="combined"?16:Catan.Core.M3.SeafarersScenarios.Create(scenario,players).TargetVictoryPoints;
@@ -267,6 +271,7 @@ public sealed partial class M6App : MonoBehaviour
             }
             else GUILayout.Label("标准基础地图",label,GUILayout.Height(44));
             GUILayout.Space(16);menuPlayers=GUILayout.Toolbar(menuPlayers-3,new[]{"3 人：你 + 2 个 AI","4 人：你 + 3 个 AI"},button,GUILayout.Height(44))+3;
+            GUILayout.Space(12);GUILayout.BeginHorizontal();GUILayout.Label("AI 操作速度",label,GUILayout.Width(150),GUILayout.Height(38));menuAiSpeed=GUILayout.Toolbar(menuAiSpeed,TabletopAiSpeed.Names,button,GUILayout.Height(38));GUILayout.EndHorizontal();
             int defaultPoints=DefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers);
             int maximumPoints=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
             if(menuVictoryPoints.HasValue)menuVictoryPoints=Mathf.Clamp(menuVictoryPoints.Value,Catan.Core.VictoryPointSettings.Minimum,maximumPoints);
@@ -279,7 +284,7 @@ public sealed partial class M6App : MonoBehaviour
             GUILayout.Label(menuRule==1&&ids[menuScenario]=="wonders-of-catan"?"可设 5–20 分；奇观四层直接获胜，分数获胜还需层数领先。":menuRule==1&&ids[menuScenario]=="pirate-islands"?"可设 5–13 分；达到分数后仍须夺回自己的堡垒。":menuRule==1&&ids[menuScenario]=="cloth-for-catan"?"可设 5–20 分；布匹耗尽时仍按剧本规则结算。":"可设 5–20 分；开局后随本局存档保存。",small,GUILayout.Height(27));
             menuHuman=Mathf.Clamp(menuHuman,0,menuPlayers-1);GUILayout.Space(20);GUILayout.Label("你的席位",label);
             menuHuman=GUILayout.Toolbar(menuHuman,Enumerable.Range(1,menuPlayers).Select(i=>"P"+i).ToArray(),button,GUILayout.Height(42));
-            GUILayout.Space(22);if(GUILayout.Button(Ready?"开始新局（替换当前未保存局面）":"开始对局",button,GUILayout.Height(50)))StartGame(RuleIds[menuRule],ids[menuScenario],menuPlayers,"P"+(menuHuman+1),targetVictoryPoints:menuVictoryPoints);
+            GUILayout.Space(22);if(GUILayout.Button(Ready?"开始新局（替换当前未保存局面）":"开始对局",button,GUILayout.Height(50)))StartGame(RuleIds[menuRule],ids[menuScenario],menuPlayers,"P"+(menuHuman+1),targetVictoryPoints:menuVictoryPoints,aiSpeedLevel:menuAiSpeed);
             GUILayout.BeginHorizontal();if(GUILayout.Button("读取存档",button,GUILayout.Height(42)))LoadGame();if(Ready&&GUILayout.Button("返回当前局",button,GUILayout.Height(42)))ResumeGame();GUILayout.EndHorizontal();
             if(GUILayout.Button("局域网 / 在线大厅",button,GUILayout.Height(42)))OpenNetworkMenu();
             GUILayout.Space(8);GUILayout.Label(Notice,small);GUILayout.EndArea();
@@ -300,7 +305,7 @@ public sealed partial class M6App : MonoBehaviour
                 ModernOperationUI.Label(new Rect(494,273,452,23),"界面主题",ModernOperationUI.Small);
                 for(int i=0;i<StrategyHudTheme.Names.Length;i++)
                     if(ModernOperationUI.Button(new Rect(494+i*154,303,144,40),StrategyHudTheme.Names[i],true,false,StrategyHudTheme.Selected==i))StrategyHudTheme.Select(i);
-                if(ModernOperationUI.Button(new Rect(494,365,452,46),"返回游戏",true,true)){tableMenu=false;nextAction=Time.unscaledTime+.60f;}
+                if(ModernOperationUI.Button(new Rect(494,365,452,46),"返回游戏",true,true)){tableMenu=false;nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);}
                 if(ModernOperationUI.Button(new Rect(494,424,220,44),NetworkGame?"联机房间":Paused?"继续 AI":"暂停 AI")){if(NetworkGame)OpenNetworkMenu();else SetPaused(!Paused);}
                 if(ModernOperationUI.Button(new Rect(726,424,220,44),"切换俯视"))ToggleTableCamera();
                 if(ModernOperationUI.Button(new Rect(494,480,220,44),"保存这桌游戏"))SaveGame();

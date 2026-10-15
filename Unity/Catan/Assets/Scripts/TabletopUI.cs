@@ -8,6 +8,7 @@ public sealed class TabletopSeat
 {
     public string Id;
     public int Points, Resources, Cards, Roads, Settlements, Cities, Ships;
+    public int ResourceHandLimit = 7, SpecialHandLimit;
     public int[] Improvements;
     public TabletopScoreBreakdown Score;
 }
@@ -40,6 +41,8 @@ public sealed partial class TabletopUI
     public void BindCollectionOcclusion(Action<TabletopCollectionFlight> draw) { bank.OccludeHand=draw; }
     TabletopScoreBreakdown hoveredScore;
     Rect scoreAnchor;
+    string hoveredPlayerHint;
+    Rect playerHintAnchor;
     OperationSnapshot operations;
     Action purchaseDevelopment;
     Catan.Core.GameHistoryEntry[] bankHistory = Array.Empty<Catan.Core.GameHistoryEntry>();
@@ -52,7 +55,7 @@ public sealed partial class TabletopUI
     bool HistoryBlocksInput(Vector2 p) => (history.IsOpen||!contextVisible)&&history.BlocksInput(p);
     public bool BlocksOverlayInput(Vector2 p) => HistoryBlocksInput(p)||contextVisible&&CurrentContextRect.Contains(p);
     public void DrawHistory(Font font,Catan.Core.GameHistoryEntry[] entries,string[] players)
-    {if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);if(history.IsOpen||!contextVisible)history.Draw(font,entries,players);if(!history.IsOpen)DrawScoreDetails();}
+    {if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);if(history.IsOpen||!contextVisible)history.Draw(font,entries,players);if(!history.IsOpen){DrawScoreDetails();DrawPlayerHint();}}
     public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
     public void ObserveDice(long sequence,int first,int second,int? eventDie)
     {dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);}
@@ -115,11 +118,6 @@ public sealed partial class TabletopUI
         DrawTopButtons(seats.FirstOrDefault(p=>p.Id==seat),trade,facility);
         DrawPlayers(seats,seat,actor,trade);
         DrawTurnBanner(seat,actor,phase,turn);
-        GUI.Label(new Rect(220,122,280,24),MobileTabletop.Enabled?"单指拖地图 · 双指缩放 · 点回合铭牌打开菜单":"拖拽地图 · 滚轮缩放",new GUIStyle(small){fontSize=11});
-        var ownScoreRect=new Rect(600,866,240,30);
-        var ownScore=seats.FirstOrDefault(p=>p.Id==seat)?.Score;
-        GUI.Label(ownScoreRect,seat+"   "+(ownScore==null?ownPoints:ownScore.Total)+" 分",title);
-        hits.Add(ownScoreRect);ScoreHover(ownScoreRect,ownScore);
         defense.Draw();
         bank.ObserveHud(operations,bankHistory,seats);
         bool expansion=dice.Event.HasValue;
@@ -141,11 +139,13 @@ public sealed partial class TabletopUI
         table.Objects.End();
         string turnCaption=canRoll?"掷骰":phase.Contains("弃牌")||phase.IndexOf("Discard",StringComparison.OrdinalIgnoreCase)>=0?"等待弃牌":canEnd?"结束回合":actor!=seat?"等待玩家":"等待操作";
         hits.Add(EndTurnRect);bool turnEnabled=(canRoll||canEnd)&&!DiceRolling;
+        if(DiscardActive){turnCaption=DiscardCaption;turnEnabled=DiscardReady;}
         StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
         var turnStyle=new GUIStyle(title){fontSize=21,wordWrap=true};turnStyle.normal.textColor=turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
         GUI.Label(new Rect(EndTurnRect.x+20,EndTurnRect.y+35,EndTurnRect.width-40,60),turnCaption,turnStyle);
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
-        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
+        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(DiscardActive)ConfirmDiscard();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
+        DrawDiscardCount();
         GUI.enabled=tableEnabled;
     }
     void DrawTurnBanner(string seat,string actor,string phase,int turn)
@@ -196,31 +196,54 @@ public sealed partial class TabletopUI
     }
     void DrawPlayers(TabletopSeat[] seats,string own,string actor,Action<string> trade)
     {
-        int count=Math.Max(1,seats.Length);float width=76,x=1430-count*(width+5);
+        int count=Math.Max(1,seats.Length);float width=94,x=1430-count*(width+5);
+        hoveredPlayerHint=null;playerHintAnchor=Rect.zero;
         foreach(var player in seats.OrderBy(p=>p.Id))
         {
-            var panel=new Rect(x,13,width,180);hits.Add(panel);
+            var panel=new Rect(x,13,width,184);hits.Add(panel);
             ModernOperationUI.Round(panel,new Color(ModernOperationUI.Background.r,ModernOperationUI.Background.g,ModernOperationUI.Background.b,.68f));
-            var avatar=new Rect(x+13,20,50,50);bool active=player.Id==actor;
+            var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
             StrategyHudArt.Avatar(new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
             GUI.Label(new Rect(avatar.x+27,avatar.y+36,27,18),player.Id,new GUIStyle(center){fontSize=10,fontStyle=FontStyle.Bold});
             int points=player.Score==null?player.Points:player.Id==own?player.Score.Total:player.Score.PublicPoints;
-            string[] labels={"分数","贸易","政治","科学","资源","发展"};
             int[] values={points,player.Improvements==null?0:player.Improvements[0],player.Improvements==null?0:player.Improvements[1],player.Improvements==null?0:player.Improvements[2],player.Resources,player.Cards};
+            string[] hints={"胜利点 · 悬停查看分数构成","贸易设施等级","政治设施等级","科学设施等级",
+                "资源与商品 · 当前 / 七点保护线\n超出保护线后掷出 7，须弃去一半手牌",
+                player.SpecialHandLimit>0?"进步卡 · 当前 / 回合结束上限\n公开胜利点卡不占手牌上限":"发展卡 · 当前张数 / 无持有上限"};
             for(int row=0;row<6;row++)
             {
                 var r=new Rect(x+7,75+row*18,width-14,18);
-                GUI.Label(new Rect(r.x,r.y,38,18),labels[row],new GUIStyle(small){fontSize=11,alignment=TextAnchor.MiddleLeft});
+                var icon=new Rect(r.x+1,r.y,23,18);
+                if(row==0)StrategyHudArt.VictoryIcon(icon);
+                else if(row<4)StrategyHudArt.Icon(icon,row+1);
+                else StrategyHudArt.HandCardIcon(icon,row==5);
                 var valueStyle=new GUIStyle(center){fontSize=12,fontStyle=FontStyle.Bold,alignment=TextAnchor.MiddleRight};
                 valueStyle.normal.textColor=row==0?StrategyHudArt.Gold:row==1?new Color(1,.8f,.3f):row==2?new Color(.48f,.77f,1):row==3?new Color(.55f,.9f,.52f):ModernOperationUI.TextColor;
-                GUI.Label(new Rect(r.xMax-22,r.y,22,18),values[row].ToString(),valueStyle);
+                string value=values[row].ToString();
+                if(row>=4)
+                {
+                    var counter=new TabletopHandCounter(values[row],row==4?player.ResourceHandLimit:player.SpecialHandLimit);
+                    value=counter.Caption;if(counter.OverLimit)valueStyle.normal.textColor=ModernOperationUI.Error;
+                }
+                GUI.Label(new Rect(r.x+28,r.y,r.width-28,18),value,valueStyle);
                 if(row==0)ScoreHover(r,player.Score);
+                else if(r.Contains(Event.current.mousePosition)){hoveredPlayerHint=hints[row];playerHintAnchor=r;}
             }
             if(player.Id!=own&&GUI.Button(avatar,GUIContent.none,GUIStyle.none))trade?.Invoke(player.Id);
             x+=width+5;
         }
     }
+    void DrawPlayerHint()
+    {
+        if(hoveredPlayerHint==null||contextVisible||!GUI.enabled)return;
+        var tooltip=new Rect(Mathf.Clamp(playerHintAnchor.center.x-142,16,1140),203,284,hoveredPlayerHint.Contains("\n")?58:32);
+        ModernOperationUI.Panel(tooltip);hits.Add(tooltip);
+        var tip=new GUIStyle(small){fontSize=12,alignment=TextAnchor.MiddleLeft};
+        GUI.Label(new Rect(tooltip.x+10,tooltip.y+5,tooltip.width-20,tooltip.height-10),hoveredPlayerHint,tip);
+    }
+    internal static Rect PlayerAvatarRect(int index,int count)
+    {return new Rect(1430-Math.Max(1,count)*99+index*99+22,20,50,50);}
     void DrawSeat(TabletopSeat p,int place,bool active,Action<string> trade)
     {
         bool top=place==1;

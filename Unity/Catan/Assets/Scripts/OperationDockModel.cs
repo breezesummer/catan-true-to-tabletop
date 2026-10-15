@@ -10,6 +10,10 @@ public sealed class OperationSnapshot
     public bool CanTrade, CanInteract;
     public int[] Goods = new int[8], Bank = new int[8], Rates = new int[8];
     public int GoodCount = 5;
+    public TabletopCollectionTile[] CollectionTiles = Array.Empty<TabletopCollectionTile>();
+    public Func<string,TabletopCardPose> CollectionPosition;
+    public int ResourceHandLimit = 7, SpecialHandLimit;
+    public OperationDiscard Discard;
     public string[] OtherPlayers = Array.Empty<string>();
     public readonly List<OperationBuild> Builds = new List<OperationBuild>();
     public readonly List<OperationHandCard> Cards = new List<OperationHandCard>();
@@ -20,6 +24,23 @@ public sealed class OperationSnapshot
     public Action<string> Notify;
     public Func<OperationTrade, string> Trade;
     public Action<string> Respond;
+}
+// 只描述当前观看者自己的强制交牌；最终合法性仍由规则入口验证。
+public sealed class OperationDiscard
+{
+    public int Amount;
+    public bool Special;
+    public string Prompt = "弃牌";
+    public Action<int[], OperationHandCard> Confirm;
+    public bool Ready(int[] selected, int[] owned, OperationHandCard card)
+    {
+        if (Amount <= 0) return false;
+        if (Special) return card != null && Amount == 1;
+        return selected != null && owned != null && selected.Length == owned.Length &&
+            selected.All(n => n >= 0) && selected.Sum() == Amount &&
+            Enumerable.Range(0, selected.Length).All(i => selected[i] <= owned[i]);
+    }
+    public string Caption(bool ready) => ready ? "确认" : "选择弃牌";
 }
 public sealed class OperationBuild
 {

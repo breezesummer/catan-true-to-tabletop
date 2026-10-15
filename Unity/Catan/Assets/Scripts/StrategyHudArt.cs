@@ -4,7 +4,7 @@ using UnityEngine;
 // 圆片、金属装饰和简洁符号由代码绘制；商品主体使用单独透明抠图。
 public static class StrategyHudArt
 {
-    static Texture2D ornament,bank,handshake,portraits,brushed;
+    static Texture2D ornament,bank,handshake,portraits,brushed,victory;
     static readonly Dictionary<int,Texture2D> commodities=new Dictionary<int,Texture2D>();
     public static readonly Color Gold=new Color(.84f,.67f,.35f);
     // 屏幕空间雕边金属控件；与卡牌、三维棋子资产分开，不参与规则或存档。
@@ -28,7 +28,7 @@ public static class StrategyHudArt
             ModernOperationUI.Fill(new Rect(x-2,rect.center.y-1,4,2),trim);
         }
     }
-    public static bool HandControl(Rect rect,string caption,int kind,bool selected=false)
+    public static bool HandControl(Rect rect,string caption,int kind,bool selected=false,TabletopHandCounter? counter=null)
     {
         ModernOperationUI.Styles();
         bool hover=GUI.enabled&&rect.Contains(Event.current.mousePosition);
@@ -36,13 +36,19 @@ public static class StrategyHudArt
         Color face=selected?Color.Lerp(ModernOperationUI.Surface,ModernOperationUI.Accent,.20f):ModernOperationUI.Surface;
         if(!GUI.enabled){face=Color.Lerp(ModernOperationUI.Background,face,.4f);trim=ModernOperationUI.Line;}
         Plaque(rect,face,trim,hover);
-        var icon=new Rect(rect.x+11,rect.center.y-10,19,20);
+        var icon=counter.HasValue?new Rect(rect.x+8,rect.center.y-16,30,32):new Rect(rect.x+11,rect.center.y-10,19,20);
         Color ink=GUI.enabled?(selected?new Color(1,.94f,.75f):ModernOperationUI.TextColor):ModernOperationUI.Muted;
         HandSymbol(icon,kind,ink);
         var label=new GUIStyle(ModernOperationUI.Center){fontSize=kind==2?11:12,fontStyle=FontStyle.Bold,wordWrap=false,padding=new RectOffset(),alignment=TextAnchor.MiddleCenter};
         label.normal.textColor=ink;
-        GUI.Label(new Rect(rect.x+32,rect.y+2,rect.width-39,rect.height-4),caption,label);
-        if(selected)ModernOperationUI.Fill(new Rect(rect.x+37,rect.yMax-7,rect.width-51,1),new Color(trim.r,trim.g,trim.b,.85f));
+        if(counter.HasValue)
+        {
+            label.fontSize=10;label.normal.textColor=GUI.enabled?ModernOperationUI.Muted:ModernOperationUI.Line;
+            GUI.Label(new Rect(rect.x+39,rect.y+3,rect.width-43,16),caption,label);
+            label.fontSize=14;label.normal.textColor=counter.Value.OverLimit?ModernOperationUI.Error:ink;
+            GUI.Label(new Rect(rect.x+38,rect.y+19,rect.width-42,20),counter.Value.Caption,label);
+        }
+        else GUI.Label(new Rect(rect.x+32,rect.y+2,rect.width-39,rect.height-4),caption,label);
         return GUI.Button(rect,GUIContent.none,GUIStyle.none);
     }
     static void HandSymbol(Rect rect,int kind,Color ink)
@@ -61,22 +67,57 @@ public static class StrategyHudArt
             Line(new Vector2(rect.x+10,rect.yMax-5),new Vector2(rect.x+12,rect.yMax-7),ink,1.5f);
             return;
         }
-        ModernOperationUI.Round(new Rect(rect.x,rect.y+1,13,16),new Color(ink.r,ink.g,ink.b,.45f));
-        var front=new Rect(rect.x+5,rect.y+4,13,16);ModernOperationUI.Round(front,ink);
-        ModernOperationUI.Fill(new Rect(front.x+2,front.y+2,9,12),ModernOperationUI.Surface);
-        if(kind==0)
+        HandCardIcon(rect,kind==1);
+    }
+    public static void HandCardIcon(Rect rect,bool special)
+    {
+        if(!special)
         {
-            Line(new Vector2(front.center.x,front.y+5),new Vector2(front.x+3,front.center.y+1),ink,2);
-            Line(new Vector2(front.x+3,front.center.y+1),new Vector2(front.center.x,front.yMax-3),ink,2);
-            Line(new Vector2(front.center.x,front.yMax-3),new Vector2(front.xMax-3,front.center.y+1),ink,2);
-            Line(new Vector2(front.xMax-3,front.center.y+1),new Vector2(front.center.x,front.y+5),ink,2);
+            EntityCardAssets.DrawCardFace(rect,EntityCardAssets.Texture(EntityCardAssets.Good(0).Back));
+            return;
         }
-        else
+        // 三色牌背保持完整实物比例，围绕同一底部枢轴展开；不暗示对手各颜色的手牌数量。
+        var matrix=GUI.matrix;float height=rect.height*.88f,width=height*.66f;
+        var pivot=new Vector2(rect.center.x,rect.yMax-1);
+        for(int i=0;i<3;i++)
         {
-            ModernOperationUI.Fill(new Rect(front.x+3,front.y+5,7,2),ink);
-            ModernOperationUI.Fill(new Rect(front.x+3,front.y+9,7,1),ink);
-            ModernOperationUI.Fill(new Rect(front.x+3,front.y+12,4,1),ink);
+            GUI.matrix=matrix;GUIUtility.RotateAroundPivot((i-1)*23,pivot);
+            var card=new Rect(pivot.x-width/2,pivot.y-height,width,height);
+            EntityCardAssets.DrawCardFace(card,EntityCardAssets.ProgressBack(i));
         }
+        GUI.matrix=matrix;
+    }
+    public static void VictoryIcon(Rect rect)
+    {
+        if(victory==null)victory=VictoryTexture();
+        GUI.DrawTexture(rect,victory,ScaleMode.ScaleToFit);
+    }
+    static Texture2D VictoryTexture()
+    {
+        // 无对应透明素材的分数徽章：超采样绘制金质奖杯、耳环与底座，保留小尺寸清晰轮廓。
+        const int size=128,samples=2;var pixels=new Color[size*size];
+        for(int y=0;y<size;y++)for(int x=0;x<size;x++)
+        {
+            float coverage=0;
+            for(int sy=0;sy<samples;sy++)for(int sx=0;sx<samples;sx++)
+            {
+                float u=(x+(sx+.5f)/samples)/size,v=(y+(sy+.5f)/samples)/size;
+                float cupHalf=.07f+.23f*Mathf.Clamp01((v-.38f)/.43f);
+                bool cup=v>.38f&&v<.81f&&Mathf.Abs(u-.5f)<cupHalf;
+                bool rim=v>.79f&&v<.87f&&u>.17f&&u<.83f;
+                bool stem=v>.19f&&v<.42f&&Mathf.Abs(u-.5f)<.055f;
+                bool basePlate=v>.085f&&v<.18f&&u>.23f&&u<.77f;
+                float left=Mathf.Sqrt(Mathf.Pow((u-.24f)/.16f,2)+Mathf.Pow((v-.66f)/.17f,2));
+                float right=Mathf.Sqrt(Mathf.Pow((u-.76f)/.16f,2)+Mathf.Pow((v-.66f)/.17f,2));
+                bool handles=v>.48f&&v<.84f&&(left>.67f&&left<1||right>.67f&&right<1);
+                if(cup||rim||stem||basePlate||handles)coverage+=1f/(samples*samples);
+            }
+            float light=Mathf.Clamp01(.5f+(y/(float)size)*.42f+Mathf.Sin(x/(float)size*10)*.18f);
+            var gold=Color.Lerp(new Color(.42f,.24f,.07f),new Color(1f,.90f,.57f),light);gold.a=coverage;
+            pixels[y*size+x]=gold;
+        }
+        var result=new Texture2D(size,size,TextureFormat.RGBA32,true){name="金质分数奖杯 v012",filterMode=FilterMode.Trilinear};
+        result.SetPixels(pixels);result.Apply(true,true);return result;
     }
     public static void Line(Vector2 from,Vector2 to,Color color,float width=1)
     {

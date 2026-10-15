@@ -15,6 +15,8 @@ public sealed class BoardRenderer : MonoBehaviour
     private readonly Dictionary<string, string> terrainTypes = new Dictionary<string, string>();
     private readonly Dictionary<string, Quaternion> rotations = new Dictionary<string, Quaternion>();
     private Transform pieces;
+    public Transform CommittedPieces => pieces;
+    public Quaternion PieceRotation(string locationId) => rotations.TryGetValue(locationId,out var rotation)?rotation:Quaternion.Euler(0,180,0);
     private GameObject feltTable;
     private TabletopScene tableScene;
     private TabletopNumberTokens numberTokens;
@@ -100,7 +102,7 @@ public sealed class BoardRenderer : MonoBehaviour
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)
     {
         if(numberTokens!=null)numberTokens.Refresh(boardTiles);
-        foreach(Transform t in pieces) Destroy(t.gameObject);
+        foreach(Transform t in pieces){t.gameObject.SetActive(false);Destroy(t.gameObject);}
         foreach(var p in settlements)
             if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
                 Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);

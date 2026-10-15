@@ -12,6 +12,7 @@ public sealed partial class M4App
     readonly OperationDock dock=new OperationDock();
     readonly TabletopUI tabletop=new TabletopUI();
     bool operationActions;
+    bool handOverflowDiscard;
     string operationKnightTarget;
     string operationPortId;
     PlayerView operationView;
@@ -26,7 +27,7 @@ public sealed partial class M4App
     }
     void CancelOperationDraft(){if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null)board.ClearPreview();}
     bool DirectTabletopPlacement=>draft!=null&&(draft.Kind==CommandKind.SetupSettlement||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.BuildSettlement||draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.BuildCity||draft.Kind==CommandKind.BuildWall||draft.Kind==CommandKind.RecruitKnight||draft.Kind==CommandKind.PromoteKnight||draft.Kind==CommandKind.ActivateKnight||draft.Kind==CommandKind.ChaseRobber||draft.Kind==CommandKind.MoveRobber||draft.Kind==CommandKind.PlaceFreeRoad||draft.Kind==CommandKind.MoveKnight||draft.Kind==CommandKind.DisplaceKnight);
-    bool OperationContextVisible=>view!=null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding);
+    bool OperationContextVisible=>view!=null&&Operations().Discard==null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding);
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
     static int[] DockGoods(ResourceBag r,CommodityBag c)=>Enumerable.Range(0,8).Select(i=>i<5?r[(Resource)i]:c[(Commodity)(i-5)]).ToArray();
     bool DockKnightTargetMatches(string target)=>operationKnightLevel<2||draft==null||draft.Kind!=CommandKind.PromoteKnight||view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==target&&k.Level==operationKnightLevel-1);
@@ -77,6 +78,7 @@ public sealed partial class M4App
         {
             operationView=view;var own=view.Players.First(p=>p.Id==seat);
             var s=new OperationSnapshot{Scope="M4:"+seat,Seat=seat,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),GoodCount=8,Goods=DockGoods(view.OwnResources,view.OwnCommodities),Bank=DockGoods(view.Bank,view.CommodityBank),OtherPlayers=view.Players.Where(p=>p.Id!=seat).Select(p=>p.Id).ToArray()};
+            s.CollectionTiles=TabletopCollectionSources.Project(view.Board.Tiles,view.Board.Settlements,view.Board.Cities,view.Board.RobberTileId,s.GoodCount==8);s.CollectionPosition=id=>{var point=MobileTabletop.Logical(board.ScreenPoint(id));return new TabletopCardPose{X=point.x,Y=point.y};};
             for(int i=0;i<8;i++)s.Rates[i]=BankTradeRate(i);
             bool setup=view.Phase==GamePhase.SetupSettlement,citySetup=setup&&view.Board.Settlements.Any(p=>p.PlayerId==seat),villageSetup=setup&&!citySetup;
             bool roadSetup=view.Phase==GamePhase.SetupRoad,freeRoad=view.Phase==GamePhase.RoadBuilding;
@@ -112,6 +114,20 @@ public sealed partial class M4App
                 else{operationKnightLevel=b.Id.Contains(":")?int.Parse(b.Id.Split(':')[1]):0;pickField="target";pickType=draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.PlaceFreeRoad?"E":"V";status="已拿起 "+b.Name+"，点击地图上的合法位置放下；右键或 Esc 放回。";}
             };
             s.PrepareCard=c=>{CancelOperationDraft();Select(CommandKind.PlayProgressCard);draft.ProgressCard=(ProgressCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在操作面板设置效果并确认。";};
+            if(view.OwnProgressCards.Length<=4||view.Phase!=GamePhase.Action||view.ActivePlayerId!=seat)handOverflowDiscard=false;
+            s.ResourceHandLimit=7+2*view.Board.Walls.Count(w=>w.PlayerId==seat);s.SpecialHandLimit=4;
+            var handDiscard=view.Phase==GamePhase.Discard?view.Discards.FirstOrDefault(d=>d.PlayerId==seat):null;
+            var handDecision=view.PendingDecision;
+            bool specialDiscard=handOverflowDiscard||handDecision!=null&&handDecision.PlayerId==seat&&handDecision.Kind=="ProgressDiscard";
+            bool effectDiscard=handDecision!=null&&handDecision.PlayerId==seat&&(handDecision.Kind=="ProgressSabotage"||handDecision.Kind=="ProgressWedding");
+            if(handDiscard!=null||specialDiscard||effectDiscard)s.Discard=new OperationDiscard{
+                Amount=handDiscard!=null?handDiscard.Amount:specialDiscard?1:handDecision.Amount,Special=specialDiscard,
+                Prompt=effectDiscard&&handDecision.Kind=="ProgressWedding"?"赠礼":"弃牌",Confirm=(selected,card)=>{
+                    var c=New(specialDiscard?CommandKind.DiscardProgressCard:effectDiscard?CommandKind.ResolveProgressChoice:CommandKind.DiscardResources);
+                    if(specialDiscard){c.ProgressCard=(ProgressCardKind)int.Parse(card.Id.Split(':')[0]);c.SelectedProgressCard=c.ProgressCard;}
+                    else for(int i=0;i<8;i++){if(i<5)c.Resources[(Resource)i]=selected[i];else c.Commodities[(Commodity)(i-5)]=selected[i];}
+                    Submit(c);
+                }};
             s.Cancel=CancelOperationDraft;
             s.Notify=ai.ShowTablePrompt;
             s.Trade=t=>
@@ -145,14 +161,15 @@ public sealed partial class M4App
         TabletopUI.DrawMapLabels(DrawBoardLabels);
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TableMenuOpen);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
+        tabletop.BindDiscard(Operations(),dock);
         tabletop.BindLongestRoad(view.LongestRoadPlayerId,view.Players.FirstOrDefault(p=>p.Id==view.LongestRoadPlayerId)?.LongestRoadLength??0);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,(int)view.LastEventDie);
         tabletop.BindDefense(view.BarbarianPosition,view.Board.Knights.Where(k=>k.Active).Sum(k=>k.Level),view.Board.Cities.Length);
         ai.TableDiceRolling=tabletop.DiceRolling;
         tabletop.Draw(font,seat,Actor(view),PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,
-            view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Score=TabletopScoreModel.For(view,p.Id),Resources=p.ResourceCount,Cards=p.ProgressCardCount,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Improvements=p.Improvements}).ToArray(),
+            view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Score=TabletopScoreModel.For(view,p.Id),Resources=p.ResourceCount,Cards=p.ProgressCardCount,ResourceHandLimit=7+2*view.Board.Walls.Count(w=>w.PlayerId==p.Id),SpecialHandLimit=4,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Improvements=p.Improvements}).ToArray(),
             ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll,ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.PendingDecision==null&&view.TradeOffer==null,
-            ()=>Submit(New(CommandKind.RollDice)),()=>Submit(New(CommandKind.EndTurn)),target=>{CancelOperationDraft();dock.OpenTrade(target);},
+            ()=>Submit(New(CommandKind.RollDice)),EndTableTurn,target=>{CancelOperationDraft();dock.OpenTrade(target);},
             ()=>{bool open=!operationActions;dock.Reset();CancelOperationDraft();operationActions=open;},"骑士操作",facility:dock.OpenFacility);
         if(ai.IsHumanTurn&&draft==null&&view.Phase==GamePhase.RobberMove){Select(CommandKind.MoveRobber);pickField="target";pickType="T";status="拿起强盗，点击新的地块放下。";}
         tabletop.SetContextAnchor(operationActions&&operationKnightTarget!=null?(Vector2?)MobileTabletop.Logical(board.ScreenPoint(operationKnightTarget)):null);
@@ -161,6 +178,16 @@ public sealed partial class M4App
         GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
         tabletop.HandFlightsVisible=dock.ResourceHandVisible;if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableMenuOpen)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
         ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
+    }
+    void EndTableTurn()
+    {
+        if(view.OwnProgressCards.Length>4)
+        {
+            handOverflowDiscard=true;operationView=null;dock.Reset();CancelOperationDraft();
+            ai.ShowTablePrompt("进步卡超过 4 张，请点选要弃掉的牌，再在右下角确认");
+            return;
+        }
+        Submit(New(CommandKind.EndTurn));
     }
     string TableInstruction()
     {
