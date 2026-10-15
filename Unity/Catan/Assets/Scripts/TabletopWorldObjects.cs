@@ -13,12 +13,14 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         internal Vector2 Size;
         internal float Thickness;
         internal Renderer[] Renderers;
+        internal bool LocalBoundsProjection;
         public Rect Rect
         {
             get
             {
                 if (Renderers != null && Renderers.Length > 0)
                 {
+                    if(LocalBoundsProjection)return Scene.ProjectHudPoints(RendererCorners(Renderers));
                     var bounds = Renderers[0].bounds;
                     foreach (var r in Renderers.Skip(1)) bounds.Encapsulate(r.bounds);
                     return Scene.ProjectHudBounds(bounds);
@@ -29,6 +31,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         public bool Contains(Vector2 logicalMouse)
         {
             if (Root == null || !Root.gameObject.activeInHierarchy) return false;
+            if(LocalBoundsProjection&&!Rect.Contains(logicalMouse))return false;
             var ray = Scene.MouseHudRay(logicalMouse);
             if (Renderers != null)
                 return Renderers.Any(r => r.bounds.IntersectRay(ray));
@@ -105,6 +108,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
             }
             return instance;
         });
+        if(key.StartsWith("stock-",StringComparison.Ordinal))return StockPiece(item,kind,position,raised);
         item.Object.transform.localScale=item.OriginalScale;
         item.Object.transform.position = scene.World(position);
         item.Object.transform.rotation = Quaternion.Euler(0, float.IsNaN(yaw)?(kind == "road" || kind == "ship" ? 90 : 180):yaw, 0);
@@ -121,6 +125,42 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         item.Object.transform.position+=new Vector3(scene.World(position).x-bounds.center.x,
             TabletopScene.SurfaceHeight+(raised?.003f:.0002f)-bounds.min.y,scene.World(position).z-bounds.center.z);
         return item.Hit;
+    }
+    Hit StockPiece(Item item,string kind,Vector2 position,bool raised)
+    {
+        var root=item.Object.transform;
+        root.localScale=item.OriginalScale;
+        root.position=scene.World(position);
+        float yaw=kind=="road"||kind=="ship"?90:180;
+        // 正交正面图保持建筑的横向轮廓；城墙以完整顶视显示中间空位。
+        float viewAngle=kind=="wall"?90:0;
+        root.rotation=Quaternion.AngleAxis(TabletopScene.StrategyCameraAngle-viewAngle,Vector3.right)*Quaternion.Euler(0,yaw,0);
+        if(item.Hit.Renderers==null)item.Hit.Renderers=root.GetComponentsInChildren<Renderer>();
+        item.Hit.LocalBoundsProjection=true;
+        var projected=item.Hit.Rect;
+        float width=kind=="ship"?46:kind=="road"?44:kind=="wall"?44:kind=="settlement"?35:40;
+        float height=kind=="road"?12:kind=="ship"?30:kind=="wall"?36:38;
+        float scale=Mathf.Min(width/Mathf.Max(.001f,projected.width),height/Mathf.Max(.001f,projected.height));
+        root.localScale=item.OriginalScale*scale;
+        var center=item.Hit.Rect.center;
+        // 在相机平面内按可见包围盒居中，模型高度不会把数字或相邻框遮住。
+        float unitsPerLogicalY=scene.HudCamera.orthographicSize*2/900;
+        var target=position+Vector2.up*(raised?-2:0);
+        root.position+=scene.HudCamera.transform.right*((target.x-center.x)*scene.UnitsPerPixel)
+            +scene.HudCamera.transform.up*((center.y-target.y)*unitsPerLogicalY);
+        return item.Hit;
+    }
+    static IEnumerable<Vector3> RendererCorners(IEnumerable<Renderer> renderers)
+    {
+        foreach(var renderer in renderers)
+        {
+            var bounds=renderer.localBounds;
+            for(int i=0;i<8;i++)
+            {
+                var local=bounds.center+Vector3.Scale(bounds.extents,new Vector3((i&1)==0?-1:1,(i&2)==0?-1:1,(i&4)==0?-1:1));
+                yield return renderer.transform.TransformPoint(local);
+            }
+        }
     }
     static Bounds PieceBounds(Renderer[] renderers)
     {

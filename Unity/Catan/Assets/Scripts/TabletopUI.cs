@@ -33,6 +33,8 @@ public sealed class TabletopUI
     readonly TabletopBankUI bank = new TabletopBankUI();
     readonly TabletopDefenseUI defense = new TabletopDefenseUI();
     public void BindDefense(int position,int strength,int threat) { defense.Bind(position,strength,threat); }
+    public void BindLongestRoad(string playerId,int length) { defense.BindLongestRoad(playerId,length); }
+    internal static readonly Rect TurnBannerRect = new Rect(524,9,392,82);
     public TabletopCollectionTimeline Collections => bank.Collections;
     public void BindCollectionOcclusion(Action<TabletopCollectionFlight> draw) { bank.OccludeHand=draw; }
     TabletopScoreBreakdown hoveredScore;
@@ -109,12 +111,7 @@ public sealed class TabletopUI
         contextVisible=false;
         DrawTopButtons(seats.FirstOrDefault(p=>p.Id==seat),trade,facility);
         DrawPlayers(seats,seat,actor,trade);
-        for(int i=0;i<3;i++)
-        {
-            var r=new Rect(472+i*64,17,60,25);hits.Add(r);
-            if(ModernOperationUI.Button(r,StrategyHudTheme.Names[i],true,false,StrategyHudTheme.Selected==i))StrategyHudTheme.Select(i);
-        }
-        GUI.Label(new Rect(455,51,290,28),turn+" 回合  ·  "+actor+"  ·  "+phase,new GUIStyle(center){fontSize=13});
+        DrawTurnBanner(seat,actor,phase,turn);
         GUI.Label(new Rect(220,122,180,24),"拖拽地图 · 滚轮缩放",new GUIStyle(small){fontSize=11});
         var ownScoreRect=new Rect(600,866,240,30);
         var ownScore=seats.FirstOrDefault(p=>p.Id==seat)?.Score;
@@ -147,6 +144,23 @@ public sealed class TabletopUI
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
         if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
         GUI.enabled=tableEnabled;
+    }
+    void DrawTurnBanner(string seat,string actor,string phase,int turn)
+    {
+        var r=TurnBannerRect;hits.Add(r);
+        StrategyHudArt.Plaque(r,ModernOperationUI.Background,StrategyHudArt.Gold);
+        var turnStyle=new GUIStyle(center){fontSize=27,fontStyle=FontStyle.Bold};turnStyle.normal.textColor=StrategyHudArt.Gold;
+        GUI.Label(new Rect(r.x+16,r.y+10,64,35),turn.ToString("D2"),turnStyle);
+        var caption=new GUIStyle(center){fontSize=10,fontStyle=FontStyle.Bold};caption.normal.textColor=ModernOperationUI.Muted;
+        GUI.Label(new Rect(r.x+16,r.y+46,64,20),"回  合",caption);
+        Fill(new Rect(r.x+91,r.y+17,1,r.height-34),new Color(StrategyHudArt.Gold.r,StrategyHudArt.Gold.g,StrategyHudArt.Gold.b,.40f));
+        var portrait=new Rect(r.x+109,r.y+12,56,56);
+        StrategyHudArt.Disc(portrait,BoardRenderer.SeatColor(actor)*.62f,true);
+        StrategyHudArt.Avatar(new Rect(portrait.x+6,portrait.y+6,portrait.width-12,portrait.height-12),actor);
+        var actorStyle=new GUIStyle(title){fontSize=19,alignment=TextAnchor.MiddleLeft,wordWrap=false};
+        GUI.Label(new Rect(r.x+181,r.y+15,193,27),actor+(actor==seat?" · 你的行动":" · 正在行动"),actorStyle);
+        var phaseStyle=new GUIStyle(small){fontSize=12,alignment=TextAnchor.MiddleLeft,wordWrap=false};phaseStyle.normal.textColor=ModernOperationUI.Muted;
+        GUI.Label(new Rect(r.x+181,r.y+45,193,21),phase,phaseStyle);
     }
     void DrawTopButtons(TabletopSeat own,Action<string> trade,Action<int> facility)
     {

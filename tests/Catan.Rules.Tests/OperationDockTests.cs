@@ -230,6 +230,127 @@ public sealed class OperationDockTests
     }
 
     [Theory]
+    [InlineData(0, "trade")]
+    [InlineData(1, "politics")]
+    [InlineData(2, "science")]
+    public void OpeningAFacilityReturnsOnlyTheClickedConstructionBoard(int track, string expectedId)
+    {
+        var snapshot = Snapshot();
+        snapshot.Builds.AddRange(new[]
+        {
+            new OperationBuild { Id = "trade", Track = 0, Level = 2 },
+            new OperationBuild { Id = "politics", Track = 1, Level = 1 },
+            new OperationBuild { Id = "science", Track = 2, Level = 4 }
+        });
+
+        var selected = OperationPanelOptions.Facility(snapshot, track);
+
+        Assert.Equal(expectedId, selected.Id);
+        Assert.Equal(track, selected.Track);
+        Assert.Equal(3, snapshot.Builds.Count);
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(0)]
+    [InlineData(2)]
+    [InlineData(3)]
+    public void MissingOrInvalidFacilityCannotOpenAnUnrelatedConstructionBoard(int track)
+    {
+        var snapshot = Snapshot();
+        snapshot.Builds.Add(new OperationBuild { Id = "road", Track = -1 });
+        snapshot.Builds.Add(new OperationBuild { Id = "politics", Track = 1 });
+
+        Assert.Null(OperationPanelOptions.Facility(snapshot, track));
+        Assert.Null(OperationPanelOptions.Facility(null!, 1));
+    }
+
+    [Fact]
+    public void BankAndPlayerPaymentChoicesContainOnlyGoodsActuallyInTheHand()
+    {
+        var snapshot = Snapshot();
+        snapshot.Goods = Bag((Brick, 1), (Wheat, 3));
+        snapshot.Bank[Wood] = 0;
+
+        Assert.Equal(new[] { Brick, Wheat }, OperationPanelOptions.PaymentGoods(snapshot));
+        Assert.Equal(Bag((Brick, 1), (Wheat, 3)), snapshot.Goods);
+        Assert.Equal(19, snapshot.Bank[Ore]);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void FilteringPaymentsStillAllowsRequestingAResourceMissingFromOwnHand(bool bank)
+    {
+        var snapshot = Snapshot();
+        snapshot.Goods = Bag((Wood, 4));
+        var trade = BankTrade(Wood, bank ? 4 : 1, Ore, 1);
+        trade.Bank = bank;
+        trade.OtherPlayer = "P2";
+
+        Assert.Equal(new[] { Wood }, OperationPanelOptions.PaymentGoods(snapshot));
+        Assert.Null(OperationSelection.ValidateTrade(snapshot, trade));
+        Assert.Equal(0, snapshot.Goods[Ore]);
+    }
+
+    [Theory]
+    [InlineData(5, new[] { Wood, Ore })]
+    [InlineData(8, new[] { Wood, Ore, Coin, Paper })]
+    public void PaymentChoicesRespectTheCurrentRulesCommodityVisibility(int count, int[] expected)
+    {
+        var snapshot = Snapshot();
+        snapshot.GoodCount = count;
+        snapshot.Goods = Bag((Wood, 2), (Ore, 1), (Coin, 2), (Paper, 1));
+
+        Assert.Equal(expected, OperationPanelOptions.PaymentGoods(snapshot));
+    }
+
+    [Fact]
+    public void ResourcePortPaymentChoicesContainOnlyItsMatchingOwnedResource()
+    {
+        var snapshot = Snapshot();
+        snapshot.GoodCount = 8;
+        snapshot.Goods = Bag((Wood, 3), (Wool, 1), (Ore, 4), (Cloth, 2));
+
+        Assert.Equal(new[] { Wool }, OperationPanelOptions.PaymentGoods(snapshot, Wool));
+        Assert.Equal(new[] { Wood, Wool, Ore, Cloth }, OperationPanelOptions.PaymentGoods(snapshot));
+        Assert.Empty(OperationPanelOptions.PaymentGoods(snapshot, Wheat));
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(Cloth)]
+    [InlineData(Paper)]
+    [InlineData(8)]
+    public void InvalidResourcePortCannotExposeOtherPaymentGoods(int portGood)
+    {
+        var snapshot = Snapshot();
+        snapshot.GoodCount = 8;
+        Assert.Empty(OperationPanelOptions.PaymentGoods(snapshot, portGood));
+    }
+
+    [Fact]
+    public void EmptyOrHiddenHandHasNoPaymentChoiceAndCannotKeepAPreviousResourceSelected()
+    {
+        var snapshot = Snapshot();
+        snapshot.Goods = Bag();
+        Assert.Empty(OperationPanelOptions.PaymentGoods(snapshot));
+        Assert.Empty(OperationPanelOptions.PaymentGoods(null!));
+        Assert.Equal(-1, OperationPanelOptions.PaymentChoice(OperationPanelOptions.PaymentGoods(snapshot), Wood));
+        Assert.Equal(-1, OperationPanelOptions.PaymentChoice(null!, Wood));
+    }
+
+    [Fact]
+    public void OpeningTradeSelectsAnOwnedResourceAndPreservesAStillVisibleChoice()
+    {
+        var choices = new[] { Wool, Ore };
+
+        Assert.Equal(Wool, OperationPanelOptions.PaymentChoice(choices, Wood));
+        Assert.Equal(Ore, OperationPanelOptions.PaymentChoice(choices, Ore));
+        Assert.Equal(Wool, OperationPanelOptions.PaymentChoice(choices, -1));
+    }
+
+    [Theory]
     [InlineData(2)]
     [InlineData(3)]
     [InlineData(4)]

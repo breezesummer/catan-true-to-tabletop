@@ -5,15 +5,15 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 // 桌面仅使用已公开的顶点坐标；海框、木纹与相机不参与规则和落点裁决。
-// v010：地图使用高角度正交相机；操作模型使用固定 HUD 相机，地图拖拽与缩放不影响它们。
+// 地图缩近时连续放低观察角度；操作模型使用固定 HUD 相机，不受地图移动影响。
 public sealed class TabletopScene : MonoBehaviour
 {
     public static readonly Rect BoardArea = new Rect(0, 0, 1440, 900);
     public static readonly Rect BoardFitArea = new Rect(184, 146, 1050, 556);
     public const int TableLayer = 30;
     public const int HudLayer = 29;
-    public const float StrategyCameraAngle = 58;
-    public const float OverheadCameraAngle = 68;
+    public const float StrategyCameraAngle = TabletopCameraModel.DefaultAngle;
+    public const float OverheadCameraAngle = StrategyCameraAngle + TabletopCameraModel.OverheadOffset;
     readonly List<Material> materials = new List<Material>();
     readonly List<Mesh> meshes = new List<Mesh>();
     readonly List<Texture2D> textures = new List<Texture2D>();
@@ -43,6 +43,7 @@ public sealed class TabletopScene : MonoBehaviour
     public float DisplayScale => baseSize / Mathf.Max(.001f, boardCamera.orthographicSize);
     public bool IsPanning { get; private set; }
     public Vector3 PanOffset => panOffset;
+    public bool TopView => topView;
     bool topView;
     float zoom = 1;
     int screenWidth, screenHeight;
@@ -176,6 +177,11 @@ public sealed class TabletopScene : MonoBehaviour
         for(int i=0;i<8;i++)points[i]=ProjectHud(bounds.center+Vector3.Scale(bounds.extents,new Vector3((i&1)==0?-1:1,(i&2)==0?-1:1,(i&4)==0?-1:1)));
         return Rect.MinMaxRect(points.Min(p=>p.x),points.Min(p=>p.y),points.Max(p=>p.x),points.Max(p=>p.y));
     }
+    public Rect ProjectHudPoints(IEnumerable<Vector3> worldPoints)
+    {
+        var points=worldPoints.Select(ProjectHud).ToArray();
+        return Rect.MinMaxRect(points.Min(p=>p.x),points.Min(p=>p.y),points.Max(p=>p.x),points.Max(p=>p.y));
+    }
     // 输入为实际屏幕像素；沿同一桌面平面移动，手指/鼠标下的地图点保持稳定。
     public void PanFromScreen(Vector2 previousScreenMouse,Vector2 currentScreenMouse)
     {
@@ -295,11 +301,15 @@ public sealed class TabletopScene : MonoBehaviour
         boardCamera.clearFlags=CameraClearFlags.SolidColor;
         boardCamera.backgroundColor=new Color(.22f,.11f,.045f);
         boardCamera.orthographic=true;boardCamera.nearClipPlane=.01f;boardCamera.farClipPlane=10;
-        boardCamera.transform.rotation=Quaternion.Euler(topView?OverheadCameraAngle:StrategyCameraAngle,0,0);
+        boardCamera.transform.rotation=Quaternion.Euler(TabletopCameraModel.Angle(zoom,topView),0,0);
         var up=boardCamera.transform.up;
         float minY=publicOutline.Min(p=>Vector3.Dot(p-center,up));
         float maxY=publicOutline.Max(p=>Vector3.Dot(p-center+Vector3.up*.035f,up));
-        baseSize=Mathf.Max((maxY-minY)/2/(BoardFitArea.height/900),
+        // 拟合尺度固定在该观察模式的默认倾角，倾角随缩放变化时不会二次改写放大倍率。
+        var referenceUp=Quaternion.Euler(topView?OverheadCameraAngle:StrategyCameraAngle,0,0)*Vector3.up;
+        float fitMinY=publicOutline.Min(p=>Vector3.Dot(p-center,referenceUp));
+        float fitMaxY=publicOutline.Max(p=>Vector3.Dot(p-center+Vector3.up*.035f,referenceUp));
+        baseSize=Mathf.Max((fitMaxY-fitMinY)/2/(BoardFitArea.height/900),
             (maxX-minX)/(2*aspect)/(BoardFitArea.width/1440));
         boardCamera.orthographicSize=baseSize*zoom;
         var focus=center+panOffset;
