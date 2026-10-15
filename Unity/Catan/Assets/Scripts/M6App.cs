@@ -73,6 +73,8 @@ public sealed partial class M6App : MonoBehaviour
     {
         Application.targetFrameRate=60;
         font=MobileTabletop.LoadFont();
+        InitializeTabletopAudio();
+        gameObject.AddComponent<MenuAudioVerification>().Initialize(this);
         InitializeNetwork();
         gameObject.AddComponent<M7PlayerVerification>().Initialize(this);
         if(MobileTabletop.Enabled){Input.simulateMouseWithTouches=true;Screen.sleepTimeout=SleepTimeout.NeverSleep;}
@@ -258,36 +260,7 @@ public sealed partial class M6App : MonoBehaviour
         if(networkMenu){DrawNetworkMenu();GUI.matrix=Matrix4x4.identity;return;}
         if(MenuVisible)
         {
-            Panel(new Rect(0,0,1440,900),new Color(.025f,.07f,.085f));
-            GUILayout.BeginArea(new Rect(280,95,880,730));GUILayout.Label("卡坦岛之三国争霸  /  内测版1.4",title);
-            GUILayout.Space(26);
-            int selection=GUILayout.Toolbar(menuRule,RuleNames,button,GUILayout.Height(48));if(selection!=menuRule){menuRule=selection;menuScenario=0;}
-            GUILayout.Space(20);var ids=ScenarioIds();menuScenario=Mathf.Clamp(menuScenario,0,ids.Length-1);
-            if(menuRule==1||menuRule==3)
-            {
-                GUILayout.BeginHorizontal();if(GUILayout.Button("‹",button,GUILayout.Width(60),GUILayout.Height(44)))menuScenario=(menuScenario+ids.Length-1)%ids.Length;
-                GUILayout.Label("剧本："+ScenarioName(ids[menuScenario])+"  ("+(menuScenario+1)+" / "+ids.Length+")",label,GUILayout.Height(44));
-                if(GUILayout.Button("›",button,GUILayout.Width(60),GUILayout.Height(44)))menuScenario=(menuScenario+1)%ids.Length;GUILayout.EndHorizontal();
-            }
-            else GUILayout.Label("标准基础地图",label,GUILayout.Height(44));
-            GUILayout.Space(16);menuPlayers=GUILayout.Toolbar(menuPlayers-3,new[]{"3 人：你 + 2 个 AI","4 人：你 + 3 个 AI"},button,GUILayout.Height(44))+3;
-            GUILayout.Space(12);GUILayout.BeginHorizontal();GUILayout.Label("AI 操作速度",label,GUILayout.Width(150),GUILayout.Height(38));menuAiSpeed=GUILayout.Toolbar(menuAiSpeed,TabletopAiSpeed.Names,button,GUILayout.Height(38));GUILayout.EndHorizontal();
-            int defaultPoints=DefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers);
-            int maximumPoints=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
-            if(menuVictoryPoints.HasValue)menuVictoryPoints=Mathf.Clamp(menuVictoryPoints.Value,Catan.Core.VictoryPointSettings.Minimum,maximumPoints);
-            int selectedPoints=menuVictoryPoints??defaultPoints;
-            GUILayout.Space(16);GUILayout.BeginHorizontal();GUILayout.Label("胜利分数",label,GUILayout.Width(150),GUILayout.Height(42));
-            if(GUILayout.Button("−",button,GUILayout.Width(52),GUILayout.Height(42)))menuVictoryPoints=Math.Max(Catan.Core.VictoryPointSettings.Minimum,selectedPoints-1);
-            GUILayout.Label((menuVictoryPoints??defaultPoints)+" 分",title,GUILayout.Width(136),GUILayout.Height(42));
-            if(GUILayout.Button("+",button,GUILayout.Width(52),GUILayout.Height(42)))menuVictoryPoints=Math.Min(maximumPoints,selectedPoints+1);
-            GUILayout.FlexibleSpace();if(GUILayout.Button("剧本默认 · "+defaultPoints+" 分",button,GUILayout.Width(245),GUILayout.Height(42)))menuVictoryPoints=null;GUILayout.EndHorizontal();
-            GUILayout.Label(menuRule==1&&ids[menuScenario]=="wonders-of-catan"?"可设 5–20 分；奇观四层直接获胜，分数获胜还需层数领先。":menuRule==1&&ids[menuScenario]=="pirate-islands"?"可设 5–13 分；达到分数后仍须夺回自己的堡垒。":menuRule==1&&ids[menuScenario]=="cloth-for-catan"?"可设 5–20 分；布匹耗尽时仍按剧本规则结算。":"可设 5–20 分；开局后随本局存档保存。",small,GUILayout.Height(27));
-            menuHuman=Mathf.Clamp(menuHuman,0,menuPlayers-1);GUILayout.Space(20);GUILayout.Label("你的席位",label);
-            menuHuman=GUILayout.Toolbar(menuHuman,Enumerable.Range(1,menuPlayers).Select(i=>"P"+i).ToArray(),button,GUILayout.Height(42));
-            GUILayout.Space(22);if(GUILayout.Button(Ready?"开始新局（替换当前未保存局面）":"开始对局",button,GUILayout.Height(50)))StartGame(RuleIds[menuRule],ids[menuScenario],menuPlayers,"P"+(menuHuman+1),targetVictoryPoints:menuVictoryPoints,aiSpeedLevel:menuAiSpeed);
-            GUILayout.BeginHorizontal();if(GUILayout.Button("读取存档",button,GUILayout.Height(42)))LoadGame();if(Ready&&GUILayout.Button("返回当前局",button,GUILayout.Height(42)))ResumeGame();GUILayout.EndHorizontal();
-            if(GUILayout.Button("局域网 / 在线大厅",button,GUILayout.Height(42)))OpenNetworkMenu();
-            GUILayout.Space(8);GUILayout.Label(Notice,small);GUILayout.EndArea();
+            DrawPastoralMainMenu();
         }
         else
         {
@@ -313,7 +286,8 @@ public sealed partial class M6App : MonoBehaviour
                 if(ModernOperationUI.Button(new Rect(494,536,452,44),"规则 / 新开一桌")){tableMenu=false;ShowMenu();}
                 if(RuleSet=="seafarers"&&ModernOperationUI.Button(new Rect(494,592,452,36),"航海场景行动"))
                 {tableMenu=false;var sailing=GetComponent<M3App>();if(sailing!=null)sailing.ShowScenarioActions();}
-                ModernOperationUI.Label(new Rect(494,651,452,100),Notice,ModernOperationUI.Small);
+                if(TabletopAudio.Instance!=null)TabletopAudio.Instance.DrawSettings(new Rect(494,640,452,92),font);
+                ModernOperationUI.Label(new Rect(494,740,452,34),Notice,ModernOperationUI.Small);
             }
             if(NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),Network.Status,small);
             string prompt=CurrentTablePrompt;

@@ -1,0 +1,96 @@
+{
+  "status": "passed",
+  "unity": "6000.3.25f1",
+  "generatedUtc": "2026-10-15T16:28:31.6556169Z",
+  "stage": "音频运行检查",
+  "errorType": "",
+  "checks": 236,
+  "animatedPixelChanges": 15350,
+  "userSaveTouched": false,
+  "fullUiPixelsCaptured": true,
+  "humanVisualReview": false,
+  "humanAudioListening": false,
+  "captures": [
+    {
+      "file": "01-menu-1440x900.png",
+      "scene": "首次启动菜单",
+      "width": 1440,
+      "height": 900,
+      "elapsed": 3.413797902494331
+    },
+    {
+      "file": "02-menu-1440x900-animated.png",
+      "scene": "同景 1 秒后",
+      "width": 1440,
+      "height": 900,
+      "elapsed": 4.547034006519274
+    },
+    {
+      "file": "03-menu-1280x720.png",
+      "scene": "16:9 较小窗口",
+      "width": 1280,
+      "height": 720,
+      "elapsed": 4.657209403344671
+    },
+    {
+      "file": "04-menu-1920x1080.png",
+      "scene": "16:9 高清窗口",
+      "width": 1920,
+      "height": 1080,
+      "elapsed": 4.781088704648526
+    },
+    {
+      "file": "05-menu-base.png",
+      "scene": "base 返回配置菜单",
+      "width": 1440,
+      "height": 900,
+      "elapsed": 5.880241801303854
+    },
+    {
+      "file": "06-menu-seafarers.png",
+      "scene": "seafarers 返回配置菜单",
+      "width": 1440,
+      "height": 900,
+      "elapsed": 6.546923802437641
+    },
+    {
+      "file": "07-menu-cities-knights.png",
+      "scene": "cities-knights 返回配置菜单",
+      "width": 1440,
+      "height": 900,
+      "elapsed": 7.2468887046485255
+    },
+    {
+      "file": "08-menu-combined.png",
+      "scene": "combined 返回配置菜单",
+      "width": 1440,
+      "height": 900,
+      "elapsed": 7.963478599773242
+    },
+    {
+      "file": "09-menu-lobby.png",
+      "scene": "未连接服务的联机大厅",
+      "width": 1440,
+      "height": 900,
+      "elapsed": 8.230185303287982
+    },
+    {
+      "file": "10-menu-after-lobby.png",
+      "scene": "联机大厅返回单人菜单",
+      "width": 1440,
+      "height": 900,
+      "elapsed": 8.313467502834467
+    }
+  ],
+  "audioChecks": [
+    "已检查 35 个已生成音效片段：非空、采样率、可读非静音样本及数值范围。",
+    "未改变用户音量偏好；片段检查不能代表扬声器输出或人工听感。"
+  ],
+  "unverified": [
+    "截图的最终外观需要人工逐张查看。",
+    "未执行真实鼠标、触屏的全部菜单链路。",
+    "手机仅验证宽屏安全区逻辑坐标，未完成 Android 真机运行。",
+    "未验证系统音量、扬声器输出、主观听感及长期性能。",
+    "独立验收局面包含完整权威数据，仅保留在 .local；公开证据只复制汇总与合成截图。"
+  ]
+}

@@ -48,7 +48,9 @@ public static class ModernOperationUI
         Round(r,GUI.enabled?bg:Color.Lerp(Background,Surface,.6f));
         if(selected)Fill(new Rect(r.x+9,r.yMax-3,r.width-18,2),Accent);
         var label=new GUIStyle(Center);label.normal.textColor=!GUI.enabled?Muted:primary?Background:TextColor;
-        GUI.Label(r,caption,label);bool result=GUI.Button(r,GUIContent.none,GUIStyle.none);GUI.enabled=old;return result&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
+        GUI.Label(r,caption,label);bool result=GUI.Button(r,GUIContent.none,GUIStyle.none);GUI.enabled=old;
+        result=result&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
+        if(result)TabletopAudio.Instance?.Click();return result;
     }
     public static bool LayoutButton(string caption,bool enabled=true,bool primary=false,float height=36)
     {return Button(GUILayoutUtility.GetRect(GUIContent.none,GUIStyle.none,GUILayout.Height(height),GUILayout.ExpandWidth(true)),caption,enabled,primary);}

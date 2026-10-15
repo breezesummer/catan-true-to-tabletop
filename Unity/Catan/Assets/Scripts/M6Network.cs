@@ -83,9 +83,12 @@ public sealed partial class M6App
     void DrawNetworkMenu()
     {
         SyncNetworkEditor();
-        Panel(new Rect(0,0,1440,900),new Color(.025f,.07f,.085f));
-        GUILayout.BeginArea(new Rect(220,28,1000,850));
-        GUILayout.Label("卡坦岛之三国争霸 · M7 本机联机验证版",title);
+        PastoralMenuScene.DrawBackground(new Rect(0,0,1440,900),Time.unscaledTime);
+        PastoralMenuUI.Styles(font);PastoralMenuUI.Panel(new Rect(190,24,1060,852));
+        var savedLabel=label;var savedTitle=title;var savedSmall=small;var savedButton=button;
+        label=PastoralMenuUI.Text;title=PastoralMenuUI.Title;small=PastoralMenuUI.Small;button=PastoralMenuUI.Control;
+        GUILayout.BeginArea(new Rect(220,45,1000,810));
+        GUILayout.Label("与好友相聚 · 局域网 / 在线大厅",title);
         GUILayout.Label("基础版、航海家、城市与骑士及组合共用权威房间；掉线等待，服务器保留存档。",small);
         networkScroll=GUILayout.BeginScrollView(networkScroll);
         if(Network.Room==null)
@@ -141,6 +144,7 @@ public sealed partial class M6App
         if(Network.ControlLost&&GUILayout.Button("忘记本设备的恢复身份",button,GUILayout.Height(36)))Network.ForgetIdentity();
         if(GUILayout.Button(NetworkGame?"返回联机对局":"返回单人菜单",button,GUILayout.Height(40))){if(NetworkGame&&Ready){networkMenu=false;ResumeGame();}else networkMenu=false;}
         GUILayout.EndArea();
+        label=savedLabel;title=savedTitle;small=savedSmall;button=savedButton;
     }
     void DrawNetworkSettings()
     {
