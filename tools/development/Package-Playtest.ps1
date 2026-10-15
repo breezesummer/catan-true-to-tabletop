@@ -1,4 +1,4 @@
-param([string]$BuildRoot='.local/m6-ui-v011',[string]$ReleaseName='卡坦岛之三国争霸内测版1.2')
+param([string]$BuildRoot='.local/m6-mountain-v006',[string]$ReleaseName='卡坦岛之三国争霸内测版1.2')
 $ErrorActionPreference='Stop'
 $packageRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $packageBuild=Join-Path $packageRepo "$BuildRoot/Builds/Windows"
@@ -18,7 +18,7 @@ $packageReadme=@'
 使用方法：先完整解压此文件夹，再双击 CatanM6.exe。请保留同目录的所有数据文件和运行库。
 运行平台：Windows 64 位；本地单人及 AI 对局。包含基础版、航海家、城市与骑士和已支持的双扩展组合。
 
-本次调整：放大时相机逐渐降低俯视角；紧凑建筑栏、正面建筑与俯视城墙、独立数量和镶边；金属质感手牌控件；设施独立展示；交易付出筛选已有资源；蛮族航程增加最长道路持有者与长度；顶部中央回合徽章。
+本次调整：矿石地形采用实体高山板块照片，替换矿石资源牌裁切插画；矿石手牌继续显示完整资源卡。沿用此前相机缩放、建筑栏、手牌、设施、交易筛选与回合徽章调整。
 操作：拖拽地图/滚轮缩放，建筑拖到合法位置；右击骑士操作；点船选中再点空海岸改道；所属港口兑换（专属2:1/通用3:1）。左上银行、玩家交易、三设施入口；底部资源/发展页签、整理手牌（新牌追加末尾，读档恢复分类基线）。右下掷骰/等待弃牌/结束回合。Esc优先取消，再开菜单；主题切换、当前扩展与航海特殊行动从菜单查看。
 
 本版沿用原优化 AI 和存档路径。请先保存并退出旧窗口，再启动新版。内测反馈请附画面、规则模式和复现步骤。

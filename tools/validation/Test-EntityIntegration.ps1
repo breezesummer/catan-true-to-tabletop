@@ -1,10 +1,10 @@
-param([string]$EvidenceVersion='entity-integration-v003',[switch]$ArtOnly)
+param([string]$EvidenceVersion='mountain-tile-v006',[switch]$ArtOnly,[string]$BuildRoot='.local/m6-mountain-v006')
 $ErrorActionPreference='Stop'
 $integrationRepo=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
-$integrationPlayer=Join-Path $integrationRepo '.local/m6/Builds/Windows/CatanM6.exe'
+$integrationPlayer=Join-Path $integrationRepo "$BuildRoot/Builds/Windows/CatanM6.exe"
 $integrationOutput=Join-Path $integrationRepo "docs/verification/$EvidenceVersion"
-$integrationLogs=Join-Path $integrationRepo '.local/art-integration-v003/logs'
-$integrationSmoke=Join-Path $integrationRepo '.local/art-integration-v003/m6-smoke'
+$integrationLogs=Join-Path $integrationRepo "$BuildRoot/logs/entity-integration"
+$integrationSmoke=Join-Path $integrationRepo "$BuildRoot/verification/entity-integration-smoke"
 New-Item -ItemType Directory -Force $integrationOutput,$integrationLogs,$integrationSmoke | Out-Null
 $integrationModes=if($ArtOnly){@('entity-integration')}else{@('entity-integration','player-components','m6-save','m6-load')}
 foreach($integrationMode in $integrationModes){
@@ -21,5 +21,5 @@ foreach($integrationMode in $integrationModes){
     if(Select-String -LiteralPath $integrationLog -Pattern 'Exception:|_FAILED:' -Quiet){throw "Runtime error: $integrationLog"}
     Write-Host "$integrationMode verified"
 }
-if(!$ArtOnly){[ordered]@{status='passed';ruleSets=@('base','seafarers','cities-knights','combined');independentProcesses=2;saveRestore=$true;continuedAi=$true;privateSaves='.local/art-integration-v003/m6-smoke'} | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $integrationOutput 'm6-smoke.json') -Encoding utf8}
+if(!$ArtOnly){[ordered]@{status='passed';ruleSets=@('base','seafarers','cities-knights','combined');independentProcesses=2;saveRestore=$true;continuedAi=$true;privateSaves="$BuildRoot/verification/entity-integration-smoke"} | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $integrationOutput 'm6-smoke.json') -Encoding utf8}
 Write-Host 'CATAN_ENTITY_INTEGRATION_VERIFIED'

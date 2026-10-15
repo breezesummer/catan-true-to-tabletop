@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v006",
+  "typeId": "ore-tile",
+  "label": "高山原照片六边形板块（产矿石）",
+  "recipePath": "art/recipes/entity-conversion-v006/ore-tile/recipe.json",
+  "recipeSha256": "6f12d665a8480496c7cb4a5c96c67e2c5cdd57c11cb345844760094ae5c1fe9d",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261015,
+  "units": "metres",
+  "scaleStatus": "estimated; 68.58921198 x 79.2 x 8 mm; same board placement surface; not physically measured",
+  "references": [
+    {
+      "originalPath": "assets/references/archives/mountain-tile-v006/高山.jpg",
+      "sha256": "3fb55da76875624c901e791892a44e122bde8ee35b343e73f9ac455bf27b084d",
+      "role": "用户提供的实体高山地图板块正面；产矿石；与资源牌照片分别登记"
+    }
+  ],
+  "assets": [
+    {
+      "id": "tile-ore",
+      "label": "高山地图板块（产矿石）",
+      "kind": "tile",
+      "dimensionsMm": [
+        68.58921198,
+        79.2,
+        8
+      ],
+      "meshObjects": 1,
+      "triangles": 20,
+      "geometrySha256": "1b0b105e1865244921db661adf30b3fd7c6dd7dc92cbc701d39af2c43b402b08",
+      "blenderBounds": {
+        "min": [
+          -0.03429460525512695,
+          -0.03959999978542328,
+          0.0
+        ],
+        "max": [
+          0.03429460525512695,
+          0.03959999978542328,
+          0.00800000037997961
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.03429460525512695,
+          0.0,
+          -0.03959999978542328
+        ],
+        "max": [
+          0.03429460525512695,
+          0.00800000037997961,
+          0.03959999978542328
+        ]
+      },
+      "materials": [
+        {
+          "name": "tile-ore_PhotoTop",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "tile-ore-top.png"
+        },
+        {
+          "name": "tile-ore_TileEdge",
+          "baseColorLinearRgba": [
+            0.550000011920929,
+            0.4000000059604645,
+            0.20000000298023224,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "30b3e98eeb8526c5d0b485e9608dcb24805e58b4160844a819336228ec2920ad",
+      "blendSha256": "7259bb57801bb2d671ee52a610dcd690e44c9e67a5ab2657d4cfa4da1e8351c2",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/tile-ore-top.png",
+      "sha256": "47dc0f3b1c53c71f0d06c7c1b62086be9d7e8d64b9d186bae4920dfe17003499"
+    }
+  ],
+  "limitations": [
+    "仅校正原照片像素，保留插画、黄色边框、失焦与光照；没有 AI 重绘、锐化或颜色替换。",
+    "六个顶面内沿角点分片 affine 校正，未做镜头标定；少量边缘裁切和分片插值属于近似。",
+    "输出为闭合六边形厚板网格，不把照片中的山峰伪称为三维山体。",
+    "实物尺寸、厚度及背面未知，沿用棋盘估算尺寸和中性底面；外观仍待用户确认。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "1f9da884e368ce2f3183fbd3f5172451bbdd32222921a2534d22398ad2259bd8",
+    "game-camera.png": "b2797b991fe2d012fe7f4bfeb08138708c9da219ca4fbc2e214b22744d455ad1",
+    "side.png": "81992377d2269b62c6f28c0796706c8b4fdbe5f5baf2a0ccbbe411a7ae9fc839",
+    "top.png": "8914a53d02257f3f1ffc9832561f512a074636f0c6693f0c155ed61356de90e5"
+  }
+}

@@ -35,7 +35,7 @@ public static class EntityBoardAssets
         switch (resource)
         {
             case "wood": return "PhotoSamples/v001/forest";
-            case "ore": return "EntityAssets/v004/ore-tile/tile-ore";
+            case "ore": return "EntityAssets/v006/ore-tile/tile-ore";
             case "brick": return Root + "tiles/tile-hills";
             case "wool": return Root + "tiles/tile-pasture";
             case "wheat": return Root + "tiles/tile-fields";

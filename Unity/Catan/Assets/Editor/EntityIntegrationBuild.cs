@@ -7,6 +7,13 @@ using UnityEngine;
 // Import new frozen versions without replacing the earlier photo conversion outputs.
 public static class EntityIntegrationBuild
 {
+    public static void BuildMountainTile()
+    {
+        Import("v006","ore-tile","mountain-tile-v006","unity-import.json");
+        M6Build.Build();
+        Debug.Log("CATAN_MOUNTAIN_TILE_BUILD_OK");
+    }
+
     public static void BuildTabletopMarkers()
     {
         Import("v005","tabletop-markers","tabletop-markers-v005","unity-import.json");

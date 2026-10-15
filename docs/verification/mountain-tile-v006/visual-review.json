@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "method": "直接查看原照、校正贴图、Blender 四视图、两张完整 Unity 渲染及四模式八视图合成核对图",
+  "inspected": [
+    "assets/references/inbox/地图板块/高山.jpg",
+    "art/source/entity-conversion-v006/ore-tile/textures/tile-ore-top.png",
+    "docs/verification/mountain-tile-v006/blender/top.png",
+    "docs/verification/mountain-tile-v006/blender/side.png",
+    "docs/verification/mountain-tile-v006/blender/game-camera.png",
+    "docs/verification/mountain-tile-v006/blender/crowded-vertex.png",
+    "docs/verification/mountain-tile-v006/base/game-camera.png",
+    "docs/verification/mountain-tile-v006/combined/top.png",
+    "docs/verification/mountain-tile-v006/four-modes-review.png"
+  ],
+  "findings": [
+    "校正图保留用户照片中的群山、峡谷和黄色边框，没有沿用原先的资源牌矿石堆插画。",
+    "基础版、航海家、城市与骑士、组合的两种相机均显示新的高山图案，厚板与其他地块的摆放面一致。",
+    "侧视为真实闭合厚板，没有将照片印刷山峰当成三维山体。",
+    "Blender 拥挤节点预览是通用配方的单件陈列视角；不将其作为真实鼠标节点拾取验收。"
+  ],
+  "notCovered": [
+    "用户最终美术确认",
+    "实物尺寸与未知背面",
+    "完整真实鼠标链路、用户整局与长期性能"
+  ]
+}

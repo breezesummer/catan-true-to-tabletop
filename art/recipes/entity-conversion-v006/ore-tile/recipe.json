@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "typeId": "ore-tile",
+  "label": "高山原照片六边形板块（产矿石）",
+  "seed": 20261015,
+  "scaleStatus": "estimated; 68.58921198 x 79.2 x 8 mm; same board placement surface; not physically measured",
+  "references": [
+    {
+      "originalPath": "assets/references/archives/mountain-tile-v006/高山.jpg",
+      "sha256": "3fb55da76875624c901e791892a44e122bde8ee35b343e73f9ac455bf27b084d",
+      "role": "用户提供的实体高山地图板块正面；产矿石；与资源牌照片分别登记"
+    }
+  ],
+  "textureJobs": [
+    {
+      "source": "assets/references/archives/mountain-tile-v006/高山.jpg",
+      "output": "art/source/entity-conversion-v006/ore-tile/textures/tile-ore-top.png",
+      "hex": [
+        [
+          1454,
+          668
+        ],
+        [
+          1152,
+          209
+        ],
+        [
+          637,
+          209
+        ],
+        [
+          364,
+          674
+        ],
+        [
+          684,
+          1182
+        ],
+        [
+          1267,
+          1132
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "orientation": "右/右上/左上/左/左下/右下映射为棋盘右上/上/左上/左下/下/右下；与既有板块一致"
+    }
+  ],
+  "limitations": [
+    "仅校正原照片像素，保留插画、黄色边框、失焦与光照；没有 AI 重绘、锐化或颜色替换。",
+    "六个顶面内沿角点分片 affine 校正，未做镜头标定；少量边缘裁切和分片插值属于近似。",
+    "输出为闭合六边形厚板网格，不把照片中的山峰伪称为三维山体。",
+    "实物尺寸、厚度及背面未知，沿用棋盘估算尺寸和中性底面；外观仍待用户确认。"
+  ],
+  "assets": [
+    {
+      "id": "tile-ore",
+      "label": "高山地图板块（产矿石）",
+      "kind": "tile",
+      "dimensionsMm": [
+        68.58921198,
+        79.2,
+        8
+      ],
+      "frontTexture": "art/source/entity-conversion-v006/ore-tile/textures/tile-ore-top.png",
+      "backTexture": null,
+      "frontUv": [
+        [
+          0.9330127,
+          0.75
+        ],
+        [
+          0.5,
+          1
+        ],
+        [
+          0.0669873,
+          0.75
+        ],
+        [
+          0.0669873,
+          0.25
+        ],
+        [
+          0.5,
+          0
+        ],
+        [
+          0.9330127,
+          0.25
+        ]
+      ]
+    }
+  ]
+}
