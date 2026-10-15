@@ -1,8 +1,8 @@
-﻿param(
+param(
     [ValidateSet('Probe','Exercise')][string]$Mode = 'Probe',
     [ValidateSet('emulator-5554')][string]$Serial = 'emulator-5554',
     [string]$AdbPath = 'D:/Development/Android/Sdk/platform-tools/adb.exe',
-    [string]$OutputDirectory = '.local/m6-release-1.4/android-touch'
+    [string]$OutputDirectory = '.local/m6-android-pc-ui-v001/android-touch'
 )
 $ErrorActionPreference = 'Stop'
 $touchPackage = 'com.catandevelopment.threekingdoms'
@@ -18,6 +18,8 @@ $touchReport = [ordered]@{
     androidApi=$null; cpuAbis=$null; physicalSize=$null; density=$null; inputDevice=$null
     multiTouchSlots=$null; rawXMaximum=$null; rawYMaximum=$null
     actualInputExecuted=$false; manualScreenshotReviewRequired=$true; systemFullscreenHintsDismissed=0
+    ui='与 PC 共用的 HUD、常驻建造、底部手牌、交易及菜单'
+    fixturePolicy='开局及交易验收局经同权限命令建立；菜单、建造、手牌页签、交易开关及保存恢复由真实触控执行。'
     assertions=@(); screenshots=@(); failure=$null
 }
 
@@ -70,12 +72,13 @@ function Save-TouchScreenshot([string]$Name) {
     Assert-Touch ((Get-Item -LiteralPath $touchLocalPng).Length -gt 8192) '实际模拟器截图已落盘且不是空文件。'
     $script:touchScreenshots.Add([ordered]@{file=$Name;bytes=(Get-Item -LiteralPath $touchLocalPng).Length;sha256=(Get-FileHash -LiteralPath $touchLocalPng -Algorithm SHA256).Hash})
 }
-function Open-TouchSession {
+function Open-TouchSession([ValidateSet('Setup','Action')][string]$Fixture='Setup') {
     Invoke-TouchAdb -TouchArguments @('shell','am','force-stop',$touchPackage) | Out-Null
     # 只清理本验收会话的公开观察文件，保留存档、run/load 证据和所有其他应用数据。
     Invoke-TouchAdb -TouchArguments @('shell','rm','-f',$touchDeviceState) | Out-Null
-    Invoke-TouchAdb -TouchArguments @('shell','am','start','-W','-n',$touchActivity,'--es','catan_mobile_verify','open:base') | Out-Null
-    $touchOpened=Wait-TouchState {param($s) $s.status -eq 'observing-real-input' -and $s.mode -eq 'base'} '未收到 APK 的独立触控观察记录。' 40
+    $touchRequest=if($Fixture -eq 'Action'){'open:base:action'}else{'open:base'}
+    Invoke-TouchAdb -TouchArguments @('shell','am','start','-W','-n',$touchActivity,'--es','catan_mobile_verify',$touchRequest) | Out-Null
+    $touchOpened=Wait-TouchState {param($s) $s.status -eq 'observing-real-input' -and $s.mode -eq 'base'} '未收到 APK 的独立触控观察记录。' 60
     # Android 首次进入沉浸式界面会延迟弹出系统教学，只在识别到该明确系统节点后关闭。
     Start-Sleep -Milliseconds 1500
     Invoke-TouchAdb -TouchArguments @('shell','uiautomator','dump','/data/local/tmp/catan-touch-ui.xml') -AllowFailure | Out-Null
@@ -93,6 +96,11 @@ function Open-TouchSession {
     }
     Invoke-TouchAdb -TouchArguments @('shell','rm','-f','/data/local/tmp/catan-touch-ui.xml') -AllowFailure | Out-Null
     return $touchOpened
+}
+function Invoke-TouchSetupBuild {
+    # 使用真实渲染棋子的可命中点，避免不同库存数量和模型透明边缘影响点击。
+    $touchBuildState=Wait-TouchState {param($s) $s.buildAvailable} 'PC 常驻建造区没有可点击的初设定居点。'
+    Invoke-TouchAdb -TouchArguments @('shell','input','tap',"$([int]$touchBuildState.buildScreenX)","$([int]$touchBuildState.buildScreenY)") | Out-Null
 }
 function Invoke-TouchPinch([switch]$Inward) {
     # 只写已探测的模拟器 MT 设备；B 协议使用不同 tracking ID，真实产生两指 MotionEvent。
@@ -169,38 +177,36 @@ try {
     if ($Mode -eq 'Probe') {
         $touchReport.status='probe-passed'
     } else {
+        Assert-Touch ((Invoke-TouchAdb -TouchArguments @('shell','id','-u')).Trim() -eq '0') '双指注入需要模拟器 adbd root；请先对 emulator-5554 执行 adb root，再重试。'
         Assert-Touch ((Invoke-TouchAdb -TouchArguments @('shell','pm','path',$touchPackage)) -match '^package:') '目标 APK 已安装在指定模拟器。'
         $touchState=Open-TouchSession
         $touchReport.actualInputExecuted=$true
         if ($touchState.actor -ne $touchState.humanSeat) {
             # 先手由正常规则随机决定。只让产品 AI 执行其席位，轮到人类时再经真实菜单暂停。
-            Invoke-TouchTap 97 48
+            Invoke-TouchTap 720 32
             $null=Wait-TouchState {param($s) $s.tableMenuOpen} '随机先手准备阶段菜单可打开。'
-            Invoke-TouchTap 382 440
+            Invoke-TouchTap 604 446
             $null=Wait-TouchState {param($s) !$s.paused} '随机先手准备阶段可继续产品 AI。'
-            Invoke-TouchTap 380 190
+            Invoke-TouchTap 720 388
             $touchState=Wait-TouchState {param($s) !$s.tableMenuOpen -and $s.actor -eq $s.humanSeat -and $s.phase -eq 'SetupSettlement'} '普通产品 AI 未推进到人类首次摆放。'
-            Invoke-TouchTap 97 48
+            Invoke-TouchTap 720 32
             $null=Wait-TouchState {param($s) $s.tableMenuOpen} '人类回合暂停前菜单可打开。'
-            Invoke-TouchTap 382 440
+            Invoke-TouchTap 604 446
             $null=Wait-TouchState {param($s) $s.paused} '普通产品 AI 可在到达人类回合后暂停。'
-            Invoke-TouchTap 380 190
+            Invoke-TouchTap 720 388
             $touchState=Wait-TouchState {param($s) !$s.tableMenuOpen -and $s.paused} '随机先手准备后返回正常人类回合。'
         }
         Assert-Touch ($touchState.paused -and $touchState.phase -eq 'SetupSettlement' -and $touchState.actor -eq $touchState.humanSeat) '初始验收基线为真实暂停的人类首次摆放。'
         $touchInitialRevision=$touchState.revisionChanges
         $touchInitialSettlements=$touchState.settlements
         Save-TouchScreenshot '01-initial.png'
-        Invoke-TouchTap 97 48
-        $touchState=Wait-TouchState {param($s) $s.tableMenuOpen} '菜单按钮没有打开游戏菜单。'
+        Invoke-TouchTap 720 32
+        $touchState=Wait-TouchState {param($s) $s.tableMenuOpen} 'PC 顶部回合铭牌没有打开游戏菜单。'
         Save-TouchScreenshot '02-menu.png'
-        Invoke-TouchTap 380 190
+        Invoke-TouchTap 720 388
         $touchState=Wait-TouchState {param($s) !$s.tableMenuOpen} '返回游戏按钮没有响应。'
-        Invoke-TouchTap 117 777
-        $touchState=Wait-TouchState {param($s) $s.dockOverlay} '建造按钮没有打开抽屉。'
-        Save-TouchScreenshot '03-build-drawer.png'
-        Invoke-TouchTap 1310 66
-        $touchState=Wait-TouchState {param($s) !$s.dockOverlay} '关闭建造抽屉没有响应。'
+        $touchState=Wait-TouchState {param($s) $s.buildAvailable -and !$s.dockOverlay} 'PC 左侧常驻建造区没有直接提供库存棋子。'
+        Save-TouchScreenshot '03-pc-build-stock.png'
         $touchBeforePan=$touchState
         $touchPanX1=[int]($touchState.viewportLeft+600*$touchState.viewportWidth/1440)
         $touchPanX2=[int]($touchState.viewportLeft+800*$touchState.viewportWidth/1440)
@@ -215,43 +221,58 @@ try {
         $touchState=Wait-TouchState {param($s) $s.maxTouchCount -ge 2 -and [Math]::Abs($s.cameraSize-$touchBeforePinch.cameraSize) -gt .0001} '没有观察到真实双指输入及地图缩放。'
         Assert-Touch ($touchState.revisionChanges -eq $touchInitialRevision -and $touchState.settlements -eq $touchInitialSettlements) '双指缩放及单指残留没有误放置。'
         Save-TouchScreenshot '05-after-pinch.png'
-        Invoke-TouchTap 117 777
-        $null=Wait-TouchState {param($s) $s.dockOverlay} '建造抽屉未重新打开。'
-        Invoke-TouchTap 252 288
+        Invoke-TouchSetupBuild
         $touchState=Wait-TouchState {param($s) $s.selectedBuild -match '^SetupSettlement' -and !$s.dockOverlay} '点击选取定居点没有进入放置状态。'
         Invoke-TouchPinch -Inward
         $touchState=Wait-TouchState {param($s) $s.selectedBuild -match '^SetupSettlement'} '双指结束丢失了已选择的棋子。'
         Assert-Touch ($touchState.revisionChanges -eq $touchInitialRevision -and $touchState.settlements -eq $touchInitialSettlements) '拿起棋子后双指缩放没有误放置。'
-        Invoke-TouchTap 117 672
+        Invoke-TouchTap 203 698
         $touchState=Wait-TouchState {param($s) $s.selectedBuild -eq ''} '放回棋子按钮未清除选择。'
         Assert-Touch ($touchState.revisionChanges -eq $touchInitialRevision) '取消建造未改变规则。'
         Save-TouchScreenshot '06-cancelled-build.png'
-        Invoke-TouchTap 117 777
-        $null=Wait-TouchState {param($s) $s.dockOverlay} '建造抽屉未再次打开。'
-        Invoke-TouchTap 252 288
+        Invoke-TouchSetupBuild
         $touchState=Wait-TouchState {param($s) $s.selectedBuild -match '^SetupSettlement' -and $s.legalPlacementAvailable} '未取得人类公开视图中的可触达合法落点。'
         Invoke-TouchAdb -TouchArguments @('shell','input','tap',"$([int]$touchState.legalPlacementScreenX)","$([int]$touchState.legalPlacementScreenY)") | Out-Null
         $touchState=Wait-TouchState {param($s) $s.settlements -eq $touchInitialSettlements+1 -and $s.phase -eq 'SetupRoad'} '真实点击合法点没有建村并进入修路阶段。'
         Assert-Touch ($touchState.revisionChanges -eq $touchInitialRevision+1) '一次真实点击仅造成一次合法规则变更。'
         Save-TouchScreenshot '07-settlement-placed.png'
-        Invoke-TouchTap 97 48
+        Invoke-TouchTap 720 32
         $null=Wait-TouchState {param($s) $s.tableMenuOpen} '建村后菜单未打开。'
-        Invoke-TouchTap 382 318
+        Invoke-TouchTap 604 502
         $touchState=Wait-TouchState {param($s) $s.saveExists -and $s.saveMatchesCurrent} '保存按钮没有持久保存当前权威局面。'
-        Invoke-TouchTap 382 440
+        Invoke-TouchTap 604 446
         $null=Wait-TouchState {param($s) !$s.paused} '继续 AI 按钮没有响应。'
-        Invoke-TouchTap 382 440
+        Invoke-TouchTap 604 446
         $touchState=Wait-TouchState {param($s) $s.paused} '暂停 AI 按钮没有响应。'
         Invoke-TouchAdb -TouchArguments @('shell','input','keyevent','4') | Out-Null
         $touchState=Wait-TouchState {param($s) !$s.tableMenuOpen} 'Android 返回操作没有返回游戏。'
         Save-TouchScreenshot '08-returned-and-saved.png'
         $touchState=Open-TouchSession
         Assert-Touch ($touchState.settlements -eq 0 -and $touchState.saveExists) '独立重启保留存档且不自动替换验收新局。'
-        Invoke-TouchTap 97 48
+        Invoke-TouchTap 720 32
         $null=Wait-TouchState {param($s) $s.tableMenuOpen} '独立重启后菜单未打开。'
-        Invoke-TouchTap 1057 318
+        Invoke-TouchTap 836 502
         $touchState=Wait-TouchState {param($s) $s.settlements -eq $touchInitialSettlements+1 -and $s.phase -eq 'SetupRoad' -and $s.saveMatchesCurrent} '独立重启后读取存档未恢复建村及修路待决。'
         Save-TouchScreenshot '09-restored-in-new-process.png'
+        $touchState=Open-TouchSession -Fixture Action
+        Assert-Touch ($touchState.tradeAvailable -and $touchState.resourceHandVisible -and $touchState.visibleCards -ge 2 -and !$touchState.dockOverlay) '正常人类回合直接展示 PC 底部完整资源手牌。'
+        $touchActionRevision=$touchState.revisionChanges
+        Save-TouchScreenshot '10-pc-resource-hand.png'
+        Invoke-TouchTap 203 790
+        $touchState=Wait-TouchState {param($s) !$s.resourceHandVisible -and !$s.dockOverlay} 'PC 发展卡页签没有切换底部手牌。'
+        Invoke-TouchTap 203 746
+        $touchState=Wait-TouchState {param($s) $s.resourceHandVisible -and $s.visibleCards -ge 2 -and !$s.dockOverlay} 'PC 资源卡页签没有恢复底部完整手牌。'
+        Invoke-TouchTap 59 51
+        $touchState=Wait-TouchState {param($s) $s.tradeOpen -and $s.dockOverlay} 'PC 顶部银行入口没有打开共用交易面板。'
+        Save-TouchScreenshot '11-pc-bank-trade.png'
+        Invoke-TouchTap 1134 174
+        $touchState=Wait-TouchState {param($s) !$s.tradeOpen -and !$s.dockOverlay} 'PC 交易面板关闭按钮没有响应。'
+        Invoke-TouchTap 141 51
+        $touchState=Wait-TouchState {param($s) $s.tradeOpen -and $s.dockOverlay} 'PC 玩家交易入口没有打开共用交易面板。'
+        Save-TouchScreenshot '12-pc-player-trade.png'
+        Invoke-TouchTap 363 610
+        $touchState=Wait-TouchState {param($s) !$s.tradeOpen -and !$s.dockOverlay} 'PC 玩家交易取消按钮没有响应。'
+        Assert-Touch ($touchState.revisionChanges -eq $touchActionRevision) '切换 PC 手牌页签与查看、取消两类交易未改变规则状态。'
         $touchReport.status='passed'
     }
 } catch {

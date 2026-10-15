@@ -19,10 +19,10 @@ public static class ModernOperationUI
         if(Text!=null&&(font==null||font==currentFont)&&themeVersion==StrategyHudTheme.Version)return;
         themeVersion=StrategyHudTheme.Version;
         if(font!=null)currentFont=font;
-        Text=new GUIStyle(GUI.skin.label){font=currentFont,fontSize=MobileTabletop.Enabled?32:16,wordWrap=true};Text.normal.textColor=TextColor;
-        Small=new GUIStyle(Text){fontSize=MobileTabletop.Enabled?27:12};Small.normal.textColor=Muted;
-        Title=new GUIStyle(Text){fontSize=MobileTabletop.Enabled?38:22,fontStyle=FontStyle.Bold};
-        Center=new GUIStyle(Text){fontSize=MobileTabletop.Enabled?30:14,alignment=TextAnchor.MiddleCenter};
+        Text=new GUIStyle(GUI.skin.label){font=currentFont,fontSize=16,wordWrap=true};Text.normal.textColor=TextColor;
+        Small=new GUIStyle(Text){fontSize=12};Small.normal.textColor=Muted;
+        Title=new GUIStyle(Text){fontSize=22,fontStyle=FontStyle.Bold};
+        Center=new GUIStyle(Text){fontSize=14,alignment=TextAnchor.MiddleCenter};
     }
     public static void Fill(Rect r,Color color)
     {var old=GUI.color;GUI.color=color;GUI.DrawTexture(r,Texture2D.whiteTexture);GUI.color=old;}
@@ -51,20 +51,12 @@ public static class ModernOperationUI
         GUI.Label(r,caption,label);bool result=GUI.Button(r,GUIContent.none,GUIStyle.none);GUI.enabled=old;return result&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
     }
     public static bool LayoutButton(string caption,bool enabled=true,bool primary=false,float height=36)
-    {return Button(GUILayoutUtility.GetRect(GUIContent.none,GUIStyle.none,GUILayout.Height(MobileTabletop.Enabled?Mathf.Max(86,height):height),GUILayout.ExpandWidth(true)),caption,enabled,primary);}
+    {return Button(GUILayoutUtility.GetRect(GUIContent.none,GUIStyle.none,GUILayout.Height(height),GUILayout.ExpandWidth(true)),caption,enabled,primary);}
     public static void Info(string value,bool error=false)
     {Styles();var style=new GUIStyle(Small);if(error)style.normal.textColor=Error;GUILayout.Label(value,style);}
     public static int Choices(string caption,int value,string[] labels,int firstGood=-1)
     {
         Styles();if(labels.Length==0)return 0;value=Mathf.Clamp(value,0,labels.Length-1);
-        if(MobileTabletop.Enabled)
-        {
-            GUILayout.Label(caption,Small);
-            int mobileColumns=Mathf.Min(3,labels.Length),mobileRows=(labels.Length+mobileColumns-1)/mobileColumns;
-            var mobileArea=GUILayoutUtility.GetRect(GUIContent.none,GUIStyle.none,GUILayout.Height(mobileRows*92),GUILayout.ExpandWidth(true));
-            for(int i=0;i<labels.Length;i++)if(Button(new Rect(mobileArea.x+(i%mobileColumns)*mobileArea.width/mobileColumns,mobileArea.y+(i/mobileColumns)*92,mobileArea.width/mobileColumns-8,84),labels[i],true,false,i==value))value=i;
-            return value;
-        }
         GUILayout.Space(5);GUILayout.Label(caption,Small);
         int columns=Math.Min(firstGood>=0?4:3,labels.Length),rows=(labels.Length+columns-1)/columns;
         var area=GUILayoutUtility.GetRect(GUIContent.none,GUIStyle.none,GUILayout.Height(rows*(firstGood>=0?65:40)),GUILayout.ExpandWidth(true));
@@ -77,7 +69,7 @@ public static class ModernOperationUI
                 OperationIconAssets.DrawGood(new Rect(r.center.x-13,r.y+5,26,26),firstGood+i);
                 Label(new Rect(r.x,r.y+31,r.width,25),labels[i],Center);
                 if(i==value)Fill(new Rect(r.x+7,r.yMax-3,r.width-14,2),Accent);
-                if(GUI.Button(r,GUIContent.none,GUIStyle.none))value=i;
+                if(GUI.Button(r,GUIContent.none,GUIStyle.none)&&!MobileTabletop.TouchDragged)value=i;
             }
             else if(Button(r,labels[i],true,false,i==value))value=i;
         }

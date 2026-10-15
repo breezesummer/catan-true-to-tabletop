@@ -11,7 +11,7 @@ using UnityEngine.Rendering.Universal;
 public static class AndroidBuildConfiguration
 {
     public const string PackageId = "com.catandevelopment.threekingdoms";
-    public const int VersionCode = 10400;
+    public const int VersionCode = 10401;
 
     public static UniversalRenderPipelineAsset ConfigurePipeline(UniversalRenderPipelineAsset source)
     {
@@ -112,6 +112,7 @@ public static class AndroidBuildConfiguration
                 ? new[] { "arm64-v8a", "x86_64" } : new[] { "arm64-v8a" },
             graphicsApi = "OpenGLES3",
             scriptingBackend = "IL2CPP",
+            ui = "shared-pc-tabletop",
             coreAssemblySha256 = AssemblyHash("Catan.Core.dll"),
             aiAssemblySha256 = AssemblyHash("Catan.AI.dll")
         };
@@ -136,6 +137,7 @@ public static class AndroidBuildConfiguration
         public string[] architectures;
         public string graphicsApi;
         public string scriptingBackend;
+        public string ui;
         public string coreAssemblySha256;
         public string aiAssemblySha256;
     }

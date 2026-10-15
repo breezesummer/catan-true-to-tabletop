@@ -243,12 +243,12 @@ public sealed partial class M3App
             TableNote("道路建设",()=>{if(TableButton("结束免费建设"))Submit(NewCommand(CommandKind.FinishRoadBuilding));});
                 if(!holding&&(view.Phase==GamePhase.GoldChoice||view.Phase==GamePhase.PortPlacement||view.Phase==GamePhase.SetupPort))
         {
-            if(MobileTabletop.Enabled){DrawMobileSailingDecision();return;}
+            MobileTabletop.ScrollTouch(new Rect(1025,380,376,240),ref pendingOperationScroll);
             tabletop.RegisterContext();TabletopUI.Note(TabletopUI.ContextRect);pendingOperationScroll=GUI.BeginScrollView(new Rect(1025,380,376,240),pendingOperationScroll,new Rect(1080,278,352,290));var previousInk=text.normal.textColor;var previousSmall=small.normal.textColor;text.normal.textColor=small.normal.textColor=new Color(.25f,.13f,.06f);DrawActions();text.normal.textColor=previousInk;small.normal.textColor=previousSmall;GUI.EndScrollView();
         }
         if(tableNotes&&!holding&&view.Phase==GamePhase.Action)
         {
-            if(MobileTabletop.Enabled){DrawMobileSailingActions();return;}
+            MobileTabletop.ScrollTouch(new Rect(1025,380,376,240),ref pendingOperationScroll);
                         tabletop.RegisterContext();TabletopUI.Note(TabletopUI.ContextRect);pendingOperationScroll=GUI.BeginScrollView(new Rect(1025,380,376,240),pendingOperationScroll,new Rect(1080,320,352,355));var previousInk=text.normal.textColor;var previousSmall=small.normal.textColor;text.normal.textColor=small.normal.textColor=new Color(.25f,.13f,.06f);DrawSeafaring();text.normal.textColor=previousInk;small.normal.textColor=previousSmall;
             if(Button(1085,640,331,"宣告胜利"))Submit(NewCommand(CommandKind.DeclareVictory));GUI.EndScrollView();
         }

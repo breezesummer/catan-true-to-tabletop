@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// 仅属于输入与展示层；所有动作继续由既有规则适配器提交。
+// 只适配触控、安全区与字体；手机和 PC 共用完整桌面 UI，不按平台切换布局。
 public static class MobileTabletop
 {
     static readonly bool desktopPreview=System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"-catan-mobile-ui")>=0;

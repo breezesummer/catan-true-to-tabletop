@@ -1,5 +1,7 @@
 # 卡坦岛之三国争霸（PC／安卓同工程）
 
+2026-10-15 已按最新反馈将**安卓 UI 统一为 PC 完整桌面界面**：共用开局、建造、逐张手牌、骰盘、席位、银行、设施、历史和弹窗，保留触控与安全区适配；点击顶部回合铭牌打开游戏菜单。内测版仍为1.4，安卓构建号为10401。新 [PC 同版界面 APK](.local/m6-android-pc-ui-v001/release/卡坦岛之三国争霸内测版1.4-安卓-PC同版界面/卡坦岛之三国争霸内测版1.4-安卓-PC同版界面.apk)；[本轮 PC 可玩程序](.local/m6-android-pc-ui-v001/Builds/Windows/CatanM6.exe)。变更与验证见 [统一记录](docs/ANDROID_PC_UI_V001.md)。下方手机抽屉版 APK 属于历史构建。
+
 2026-10-15 新增**卡坦岛之三国争霸内测版1.4横屏安卓 APK**：同一 Unity 工程共用规则、当前 AI 和资产，手机安全区界面、建造／卡牌抽屉、单指移动与双指缩放；兼容目标为 Android 8.0+、64 位 ARM64、OpenGL ES 3。[安卓 APK](.local/m6-release-1.4/release/卡坦岛之三国争霸内测版1.4-安卓/卡坦岛之三国争霸内测版1.4-安卓.apk)；[本机 PC 可玩入口](.local/m6-release-1.4/Builds/Windows/CatanM6.exe)。按用户要求只发布 APK，不制作 PC 分享压缩包。845 项 .NET 检查通过，具体安卓运行、触控与微信实际状态见 [1.4 发布记录](docs/RELEASE_BETA_1_4.md) 和 [公开验证摘要](docs/verification/android-port-v001/summary.json)。真机完整对局与长期性能待验；首轮 PC 验收误写默认存档目录的事故及修复亦在发布记录中说明。下方均为历史入口与旧发布状态。
 
 2026-10-15 已修正**矿石地形美术 v006**：用用户提供的实体高山六边形板块照片，替换原先从矿石资源牌裁切的地块顶图；基础版、航海家、城市与骑士和组合共用新资产。当前可玩入口：[CatanM6.exe](.local/m6-mountain-v006/Builds/Windows/CatanM6.exe)，两个启动脚本和默认构建／打包目录已统一。沿用当前内测版1.3。112 项相关 .NET 检查、Blender 回读与干净重建、Unity 导入及 Windows 构建、四模式八张渲染视图和独立保存恢复通过；完整矿石手牌仍使用资源牌图。最终用户外观、实物尺寸和长期性能待验。见 [替换说明](docs/ART_MOUNTAIN_TILE_V006.md) 与 [验证摘要](docs/verification/mountain-tile-v006/summary.json)。以下旧程序与已发送压缩包属于历史交付，不包含本次高山替换。

@@ -18,13 +18,12 @@ public sealed partial class TabletopHistoryUI
     public void Open(){IsOpen=true;}
     public bool TryClose()
     {if(!IsOpen)return false;IsOpen=false;return true;}
-    public bool BlocksInput(Vector2 p) => IsOpen || !MobileTabletop.Enabled&&(collapsed?Collapsed:Feed).Contains(p);
+    public bool BlocksInput(Vector2 p) => IsOpen || (collapsed?Collapsed:Feed).Contains(p);
 
     public void Draw(Font font,GameHistoryEntry[] entries,string[] players)
     {
         ModernOperationUI.Styles(font);
         entries=entries??Array.Empty<GameHistoryEntry>();players=players??Array.Empty<string>();
-        if(MobileTabletop.Enabled){DrawMobile(entries,players);return;}
         long sequence=entries.Length==0?0:entries[entries.Length-1].Sequence;
         if(sequence!=lastSequence)
         {
@@ -41,7 +40,7 @@ public sealed partial class TabletopHistoryUI
         if(ModernOperationUI.Button(new Rect(Feed.xMax-39,Feed.y+5,29,25),"›")){collapsed=true;return;}
         var recent=entries.Skip(Math.Max(0,entries.Length-40)).ToArray();
         var area=new Rect(Feed.x+8,Feed.y+36,Feed.width-16,Feed.height-44);
-        if(Event.current.type==EventType.ScrollWheel&&Feed.Contains(Event.current.mousePosition))follow=false;
+        if((Event.current.type==EventType.ScrollWheel||MobileTabletop.TouchDragged)&&Feed.Contains(Event.current.mousePosition))follow=false;
         feedScroll=DrawRows(area,recent,feedScroll,true);
         float feedHeight=recent.Sum(e=>Height(e,area.width-22,true));
         if(feedScroll.y>=Math.Max(0,feedHeight-area.height)-3)follow=true;
@@ -91,6 +90,7 @@ public sealed partial class TabletopHistoryUI
     }
     static Vector2 DrawDiceRows(Rect viewport,GameHistoryEntry[] entries,Vector2 position)
     {
+        MobileTabletop.ScrollTouch(viewport,ref position);
         float width=viewport.width-22,total=entries.Length*44;
         position.y=Mathf.Clamp(position.y,0,Math.Max(0,total-viewport.height));
         position=GUI.BeginScrollView(viewport,position,new Rect(0,0,width,Math.Max(viewport.height,total)),false,false);
@@ -119,6 +119,7 @@ public sealed partial class TabletopHistoryUI
     static string Caption(GameHistoryEntry entry)=>"第 "+entry.Turn+" 回合 · "+entry.PlayerId+"  "+entry.Action;
     Vector2 DrawRows(Rect viewport,GameHistoryEntry[] entries,Vector2 position,bool compact)
     {
+        MobileTabletop.ScrollTouch(viewport,ref position);
         float width=viewport.width-22,total=entries.Sum(e=>Height(e,width,compact));
         position.y=Mathf.Clamp(position.y,0,Math.Max(0,total-viewport.height));
         position=GUI.BeginScrollView(viewport,position,new Rect(0,0,width,Math.Max(viewport.height,total)),false,false);

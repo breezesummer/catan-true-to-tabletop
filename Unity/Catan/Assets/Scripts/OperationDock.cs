@@ -92,7 +92,7 @@ public sealed partial class OperationDock
     internal int VerificationFacilityTrack => facilityTrack;
     internal int[] VerificationTradeGiveGoods => tradeOpen?OperationPanelOptions.PaymentGoods(current,portTrade?portGood:null):Array.Empty<int>();
     public bool ResourceHandVisible => !specialHand;
-    public bool HasCancelableInteraction => mobileDrawer || tradeOpen || facilityTrack>=0 || previewCard!=null || Selection.BuildId!=null || Selection.Selected.Any(n=>n>0) || heldPiece!=null || dragging;
+    public bool HasCancelableInteraction => tradeOpen || facilityTrack>=0 || previewCard!=null || Selection.BuildId!=null || Selection.Selected.Any(n=>n>0) || heldPiece!=null || dragging;
     // 银行牌堆与旧购买流程共用这一入口，仍由适配层校验并提交指令。
     public void PrepareDevelopmentPurchase()
     {
@@ -102,10 +102,25 @@ public sealed partial class OperationDock
         PrepareBuild(build,current);
     }
     internal Rect[] VerificationHandRects => faces.Select(face=>face.Shape.Rect).ToArray();
+    internal Rect[] VerificationBuildRects => pieceFaces.Select(face=>face.Shape.World?.Rect??face.Shape.Rect).ToArray();
+    internal bool VerificationTryBuildPoint(string buildId,out Vector2 logicalPoint)
+    {
+        foreach(var face in pieceFaces.Where(face=>face.Build.Id==buildId&&face.Build.Available))
+        {
+            var rect=face.Shape.World?.Rect??face.Shape.Rect;
+            for(int y=1;y<10;y++)for(int x=1;x<10;x++)
+            {
+                var point=new Vector2(rect.x+rect.width*x/10,rect.y+rect.height*y/10);
+                if(!face.Shape.Contains(point))continue;
+                logicalPoint=point;return true;
+            }
+        }
+        logicalPoint=Vector2.zero;return false;
+    }
     internal bool VerificationHandsAreScreenSpace => faces.All(face=>face.Shape.World==null);
     internal int VerificationVisibleResourceCount => faces.Count(face=>face.Good>=0);
     internal int VerificationPendingResourceCount => current==null?0:Math.Max(0,current.Goods.Take(current.GoodCount).Sum()-VerificationVisibleResourceCount);
-    public bool HasOverlay => mobileDrawer || tradeOpen || facilityTrack>=0 || previewCard!=null || current!=null&&current.Offer!=null;
+    public bool HasOverlay => tradeOpen || facilityTrack>=0 || previewCard!=null || current!=null&&current.Offer!=null;
     public bool IsDraggingPiece => pieceDragging;
     public bool ConsumeBuildRelease(out Vector2 releasedLogicalMouse)
     {releasedLogicalMouse=pieceReleasePoint;bool released=pieceReleased;pieceReleased=false;return released;}
@@ -137,7 +152,7 @@ public sealed partial class OperationDock
     public int FacilityLevel(int track) => current?.Builds.FirstOrDefault(b=>b.Track==track)?.Level??0;
     public void Reset()
     {
-        mobileDrawer=false;Selection.Clear(); tradeOpen=false;facilityTrack=-1;portTrade=false;portGood=null; previewCard=null; hoveredBuild=null; message="";
+        Selection.Clear(); tradeOpen=false;facilityTrack=-1;portTrade=false;portGood=null; previewCard=null; hoveredBuild=null; message="";
         Array.Clear(give,0,8);Array.Clear(receive,0,8); tooltipRect=Rect.zero;
         dragGood=-1;dragging=false;hits.Clear();faces.Clear();pieceFaces.Clear();
         hoveredHand=null;handHoverAnchor=Rect.zero;
@@ -147,7 +162,6 @@ public sealed partial class OperationDock
     public bool BlocksBoardInput(Vector2 logicalMouse)
     {
         if(HasOverlay)return true;
-        if(MobileTabletop.Enabled&&MobileHandArea.Contains(logicalMouse))return true;
         return dragGood>=0 || hoveredHand!=null&&handHoverAnchor.Contains(logicalMouse) || (tradeOpen||current!=null&&current.Offer!=null)&&TradeRect.Contains(logicalMouse) ||
             previewCard!=null&&CardRect.Contains(logicalMouse) || hits.Any(h=>h.Contains(logicalMouse));
     }
@@ -184,7 +198,6 @@ public sealed partial class OperationDock
         if(scope!=snapshot.Scope){hoverAmounts.Clear();spreadAmounts.Clear();hoveredHand=null;handHoverAnchor=Rect.zero;handUpdated=Time.unscaledTimeAsDouble;fallbackOrder=new TabletopHandOrder();specialOrder=new TabletopSpecialHandOrder();specialHand=false;}
         if(scope!=snapshot.Scope||revision!=snapshot.Revision){Reset();scope=snapshot.Scope;revision=snapshot.Revision;}
         current=snapshot;Selection.Sync(snapshot);
-        if(MobileTabletop.Enabled){DrawMobile(snapshot);return;}
         hoveredBuild=null;tooltipRect=Rect.zero;hits.Clear();faces.Clear();pieceFaces.Clear();
         // 在任何世界组件接收 MouseDown 前，先按本帧屏幕布局确定手牌命中。
         // 悬停只向上轻推，并让相邻手牌让出一小段空间；点击再向上推高。
@@ -496,6 +509,7 @@ public sealed partial class OperationDock
     void HandleHandInput(OperationSnapshot s)
     {
         if(!GUI.enabled)return;
+        if(MobileTabletop.Enabled&&Input.touchCount>1){dragGood=-1;dragging=false;return;}
         var e=Event.current;HandFace hit=null;
         if(hoveredHand!=null&&handHoverAnchor.Contains(e.mousePosition))hit=faces.FirstOrDefault(face=>face.Key==hoveredHand);
         if(hit==null)for(int i=faces.Count-1;i>=0;i--)if(faces[i].Shape.Contains(e.mousePosition)){hit=faces[i];break;}
@@ -512,7 +526,7 @@ public sealed partial class OperationDock
             e.Use();return;
         }
         if(dragGood<0)return;
-        if(e.type==EventType.MouseDrag&&e.button==0){if((e.mousePosition-dragStart).sqrMagnitude>49)dragging=true;e.Use();}
+        if(e.type==EventType.MouseDrag&&e.button==0){if((e.mousePosition-dragStart).sqrMagnitude>(MobileTabletop.Enabled?18*18:49))dragging=true;e.Use();}
         if(e.type==EventType.MouseUp&&e.button==0)
         {
             s.Cancel?.Invoke();previewCard=null;
@@ -637,8 +651,8 @@ public sealed partial class OperationDock
         }
         else
         {
-            Label(new Rect(287,282,395,27),"我给予",heading);
-            Label(new Rect(744,282,395,27),"我获得",heading);
+            Label(new Rect(287,282,395,35),"我给予",heading);
+            Label(new Rect(744,282,395,35),"我获得",heading);
             if(giveGood>=0)Label(new Rect(409,287,273,23),"当前比例  "+validation.Rates[giveGood]+" : 1",small);
             for(int index=0;index<paymentGoods.Length;index++)
             {
@@ -697,7 +711,7 @@ public sealed partial class OperationDock
     }
     void DrawTradeBag(OperationSnapshot s,Rect area,int[] bag,bool paying)
     {
-        Label(new Rect(area.x,area.y,area.width,27),paying?"我给予":"我获得",heading);
+        Label(new Rect(area.x,area.y,area.width,35),paying?"我给予":"我获得",heading);
         Label(new Rect(area.x+115,area.y+5,area.width-115,23),bag.Sum()+" 张",small);
         var goods=paying?OperationPanelOptions.PaymentGoods(s):Enumerable.Range(0,s.GoodCount).ToArray();
         if(paying&&goods.Length==0)Label(new Rect(area.x+10,area.y+63,area.width-20,78),"你当前没有可付出的资源。",text);

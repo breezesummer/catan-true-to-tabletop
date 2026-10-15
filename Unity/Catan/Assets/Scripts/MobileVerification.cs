@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
@@ -18,7 +19,7 @@ public sealed class MobileVerification : MonoBehaviour
         public int checks, modes, screenshots, screenWidth, screenHeight, humanCommands, aiCommands;
         public int sampledDarkest, sampledBrightest, sampledChromatic, captureAttempts;
         public float safeLeft, safeBottom, safeWidth, safeHeight, viewportLeft, viewportTop, viewportWidth, viewportHeight;
-        public bool mobileUi, landscape, bundledChineseFont, independentProcessLoad;
+        public bool sharedPcUi, touchInputEnabled, landscape, bundledChineseFont, independentProcessLoad;
         public string[] images;
     }
     [Serializable] sealed class TouchState
@@ -26,6 +27,9 @@ public sealed class MobileVerification : MonoBehaviour
         public string status, mode, phase, actor, humanSeat, selectedBuild, legalPlacementId, legalPlacementKind;
         public int sequence, revisionChanges, maxTouchCount, touchFrames, turn, settlements, cities, roads, ships, knights;
         public bool menuVisible, tableMenuOpen, dockOverlay, paused, saveExists, saveMatchesCurrent;
+        public bool tradeAvailable, tradeOpen, resourceHandVisible, buildAvailable;
+        public float buildScreenX, buildScreenY;
+        public int visibleCards;
         public float viewportLeft, viewportTop, viewportWidth, viewportHeight, cameraSize, panX, panZ;
         public bool legalPlacementAvailable;
         public float legalPlacementScreenX, legalPlacementScreenY;
@@ -37,6 +41,7 @@ public sealed class MobileVerification : MonoBehaviour
     int sampledDarkest, sampledBrightest, sampledChromatic, captureAttempts;
     readonly List<string> images = new List<string>();
     bool running;
+    bool sharedPcUiVerified;
     int touchSequence, touchRevisionChanges, maxTouchCount, touchFrames;
     float nextTouchState;
     string authorityFingerprint;
@@ -62,6 +67,15 @@ public sealed class MobileVerification : MonoBehaviour
     string Phase => mode == "base" ? GetComponent<M2App>().M6View.Phase.ToString() :
         mode == "seafarers" ? GetComponent<M3App>().M6View.Phase.ToString() :
         mode == "cities-knights" ? GetComponent<M4App>().M6View.Phase.ToString() : GetComponent<M5App>().M6View.Phase.ToString();
+    TabletopUI Hud
+    {
+        get
+        {
+            MonoBehaviour adapter = mode == "base" ? (MonoBehaviour)GetComponent<M2App>() : mode == "seafarers" ? GetComponent<M3App>() :
+                mode == "cities-knights" ? (MonoBehaviour)GetComponent<M4App>() : GetComponent<M5App>();
+            return (TabletopUI)adapter.GetType().GetField("tabletop", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(adapter);
+        }
+    }
 
     void LateUpdate()
     {
@@ -85,6 +99,16 @@ public sealed class MobileVerification : MonoBehaviour
                 cameraSize = Table.TableCamera.orthographicSize, panX = Table.PanOffset.x, panZ = Table.PanOffset.z,
                 saveExists = File.Exists(app.SavePath)
             };
+            state.tradeAvailable = Snapshot.CanTrade && Snapshot.CanInteract;
+            state.tradeOpen = Dock.TradeOpen; state.resourceHandVisible = Dock.ResourceHandVisible;
+            state.visibleCards = Dock.VerificationHandRects.Length;
+            var setupBuild = Snapshot.Builds.FirstOrDefault(build => build.Available && build.Id.StartsWith("SetupSettlement", StringComparison.Ordinal));
+            Vector2 buildPoint;
+            if (setupBuild != null && Dock.VerificationTryBuildPoint(setupBuild.Id, out buildPoint))
+            {
+                var screenPoint = MobileTabletop.ScreenPoint(buildPoint);
+                state.buildAvailable = true; state.buildScreenX = screenPoint.x; state.buildScreenY = screenPoint.y;
+            }
             state.saveMatchesCurrent = state.saveExists && File.ReadAllText(app.SavePath) == app.ExportEnvelope();
             string[] legal;
             Func<string, Vector2> point;
@@ -167,7 +191,7 @@ public sealed class MobileVerification : MonoBehaviour
             SaveReport("ready-for-touch", "仅创建本地验收局，后续屏幕触控由外部输入执行。该记录不等同于触控通过。");
             Debug.Log("CATAN_MOBILE_TOUCH_READY: mode=" + mode); yield break;
         }
-        SaveReport("passed", "四模式同权限命令、存档与实际屏幕截图通过；屏幕截图需人工检查，触控手感和长期性能单独验收。");
+        SaveReport("passed", "四模式共用 PC HUD、常驻建造与手牌、设施、交易、菜单、同权限命令及存档检查通过。截图仍需人工检查；触控操作与长期性能单独验收。");
         Debug.Log("CATAN_MOBILE_VERIFY_OK: modes=" + modes + "; checks=" + checks + "; screenshots=" + images.Count);
         Application.Quit(0);
     }
@@ -176,7 +200,7 @@ public sealed class MobileVerification : MonoBehaviour
     {
         stage = "横屏安全区与中文字体";
         Require(request == "run" || request == "load" || request.StartsWith("open:", StringComparison.Ordinal), "未知验收请求");
-        Require(MobileTabletop.Enabled, "未启用手机界面");
+        Require(MobileTabletop.Enabled, "未启用触控与安全区适配");
         Require(Screen.width > Screen.height, "屏幕尚未横屏");
         Require(SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null, "需要真实图形设备");
         var viewport = MobileTabletop.Viewport;
@@ -189,14 +213,25 @@ public sealed class MobileVerification : MonoBehaviour
         foreach (char character in "卡坦岛船骑贸粮") Require(font.HasCharacter(character), "中文字体缺少验收字形");
         if (request.StartsWith("open:", StringComparison.Ordinal))
         {
-            mode = request.Substring(5);
+            bool actionFixture = request.EndsWith(":action", StringComparison.Ordinal);
+            mode = request.Substring(5); if (actionFixture) mode = mode.Substring(0, mode.Length - ":action".Length);
             Require(new[] { "base", "seafarers", "cities-knights", "combined" }.Contains(mode), "未知验收模式");
             app.StartGame(mode, "heading-for-new-shores", 3, "P1", true);
             yield return null; yield return null;
             Require(app.Ready && ViewSeat == "P1", "未建立固定人类视图");
+            if (actionFixture)
+            {
+                int steps = 0;
+                while (steps < 900 && !(app.IsHumanTurn && Snapshot.CanTrade && Snapshot.Goods.Sum() >= 2))
+                { Advance(); steps++; if (steps % 4 == 0) yield return null; }
+                Require(steps < 900, "触控验收未推进到正常人类交易回合");
+                yield return new WaitForSecondsRealtime(3.1f);
+            }
+            yield return new WaitForEndOfFrame();
+            CheckSharedPcHud();
             yield break;
         }
-        foreach (var frame in CaptureReady("00-mobile-menu.png")) yield return frame;
+        foreach (var frame in CaptureReady("00-pc-menu.png")) yield return frame;
         foreach (string rules in new[] { "base", "seafarers", "cities-knights", "combined" })
         {
             mode = rules; stage = mode + "-开局";
@@ -210,6 +245,7 @@ public sealed class MobileVerification : MonoBehaviour
             string initial = Authority;
             Require(!app.StepAi() && initial == Authority, "暂停状态推进了规则");
             foreach (var frame in CaptureReady(mode + "-setup.png")) yield return frame;
+            CheckSharedPcHud();
             int steps = 0, previousAi = app.AiCommandsExecuted;
             stage = mode + "-同权限行动";
             while (steps < 900 && !(app.IsHumanTurn && Snapshot.CanTrade && Snapshot.Goods.Sum() >= 2 && Turn >= 3 && app.AiCommandsExecuted > previousAi))
@@ -221,16 +257,17 @@ public sealed class MobileVerification : MonoBehaviour
             Require(ViewSeat == app.HumanSeat && app.Fault == "", "AI 续跑改变了人类视图");
             yield return new WaitForSecondsRealtime(3.1f);
             foreach (var frame in CaptureReady(mode + "-action.png")) yield return frame;
-            stage = mode + "-手机建造与手牌抽屉";
-            string beforeDrawers = Authority;
-            Dock.VerificationOpenMobileDrawer(false);
-            Require(Dock.HasOverlay, "建造抽屉未打开");
-            foreach (var frame in CaptureReady(mode + "-build-drawer.png")) yield return frame;
-            Dock.Reset(); Dock.VerificationOpenMobileDrawer(true);
-            Require(Dock.HasOverlay, "手牌抽屉未打开");
-            foreach (var frame in CaptureReady(mode + "-cards-drawer.png")) yield return frame;
-            Dock.Reset(); Require(Authority == beforeDrawers, "抽屉显示改变了权威局面");
-            if (mode == "cities-knights")
+            stage = mode + "-PC常驻建造与完整手牌";
+            string beforePanels = Authority;
+            CheckSharedPcHud();
+            Require(Dock.ResourceHandVisible && Dock.VerificationHandsAreScreenSpace, "未使用 PC 屏幕底部资源手牌");
+            Require(Dock.VerificationVisibleResourceCount == Snapshot.Goods.Take(Snapshot.GoodCount).Sum(), "常驻手牌没有逐张展示当前玩家全部资源");
+            Require(Dock.VerificationPendingResourceCount == 0, "收牌完成后仍缺少可见手牌");
+            foreach (var rect in Dock.VerificationHandRects)
+                Require(rect.width > 0 && rect.height > 0 && rect.x >= 0 && rect.xMax <= 1440 && rect.y >= 0 && rect.yMax <= 900, "PC 手牌超出可见逻辑画布");
+            Require(!Dock.HasOverlay && Authority == beforePanels, "常驻建造与手牌被独立移动弹层替代或改变了权威局面");
+            foreach (var frame in CaptureReady(mode + "-pc-build-and-hand.png")) yield return frame;
+            if (mode == "cities-knights" || mode == "combined")
             {
                 stage = mode + "-三类城市设施";
                 for (int track = 0; track < 3; track++)
@@ -238,14 +275,15 @@ public sealed class MobileVerification : MonoBehaviour
                     Dock.OpenFacility(track);
                     Require(Dock.VerificationFacilityTrack == track, "城市设施面板未打开");
                     foreach (var frame in CaptureReady(mode + "-facility-" + track + ".png")) yield return frame;
-                    Dock.Reset(); Require(Authority == beforeDrawers, "设施查看改变了权威局面");
+                    Dock.Reset(); Require(Authority == beforePanels, "设施查看改变了权威局面");
                 }
             }
-            stage = mode + "-手机交易面板";
+            stage = mode + "-PC交易面板";
             string beforeDraft = Authority; Dock.OpenTrade();
             Require(Dock.TradeOpen && beforeDraft == Authority, "打开交易改变规则或面板未打开");
             yield return null;
             foreach (var frame in CaptureReady(mode + "-trade.png")) yield return frame;
+            Require(Dock.VerificationTradeGiveGoods.SequenceEqual(OperationPanelOptions.PaymentGoods(Snapshot)), "PC 交易付出资源筛选与当前授权手牌不一致");
             Dock.Reset();
             stage = mode + "-存档覆盖与恢复";
             string path = request == "load" ? Path.Combine(output, mode + "-reload-authority-private.json") : originalPath;
@@ -254,11 +292,44 @@ public sealed class MobileVerification : MonoBehaviour
             Require(File.ReadAllText(path) == before, "存档内容不一致");
             app.ReadSave(path); yield return null; yield return null;
             Require(app.ExportEnvelope() == before && ViewSeat == app.HumanSeat, "恢复改变权威局面或人类席位");
-            stage = mode + "-菜单暂停";
+            stage = mode + "-PC菜单暂停";
+            app.OpenTableMenu();
+            Require(app.TableMenuOpen && app.BlocksTableInput(Vector2.zero) && app.BlocksTableInput(new Vector2(1439,899)), "PC 游戏菜单未完整阻挡背景");
+            bool paused = app.Paused; app.SetPaused(false);
+            Require(!app.StepAi() && Authority == beforePanels, "PC 游戏菜单中 AI 仍然执行命令"); app.SetPaused(paused);
+            foreach (var frame in CaptureReady(mode + "-pc-table-menu.png")) yield return frame;
+            app.HandleTableEscape(); Require(!app.TableMenuOpen, "返回操作未关闭 PC 游戏菜单");
             app.ShowMenu(); Require(!app.StepAi(), "菜单推进了 AI");
             app.ResumeGame(); Require(app.ExportEnvelope() == before, "菜单改变存档配置");
             Advance(); Require(app.Fault == "", "恢复后无法继续同权限行动"); modes++;
         }
+    }
+
+    void CheckSharedPcHud()
+    {
+        var viewport = MobileTabletop.Viewport;
+        var expected = new Rect(viewport.Left, Screen.height - viewport.Top - viewport.Height, viewport.Width, viewport.Height);
+        foreach (var camera in new[] { Table.TableCamera, Table.HudCamera })
+        {
+            var actual = camera.pixelRect;
+            Require(Mathf.Abs(actual.x - expected.x) < 1 && Mathf.Abs(actual.y - expected.y) < 1 &&
+                Mathf.Abs(actual.width - expected.width) < 1 && Mathf.Abs(actual.height - expected.height) < 1,
+                "三维桌面与 PC HUD 相机未使用同一安全区");
+        }
+        foreach (var logical in new[] { new Vector2(24,16), new Vector2(720,450), new Vector2(1330,825) })
+        {
+            var screen = Table.HudCamera.WorldToScreenPoint(Table.World(logical));
+            var projected = MobileTabletop.Logical(new Vector2(screen.x, Screen.height - screen.y));
+            Require((projected - logical).sqrMagnitude < .01f, "实际 HUD 相机投影与触控位置不一致");
+        }
+        var hudRects = Hud.VerificationHudRects;
+        foreach (var logical in new[] { new Vector2(59,51), new Vector2(141,51), new Vector2(223,51),
+            new Vector2(305,51), new Vector2(387,51), new Vector2(720,50), new Vector2(1349,825) })
+            Require(hudRects.Any(rect => rect.Contains(logical)), "未绘制完整 PC HUD 常驻入口");
+        // 组合模式含八类库存，最上方定居点从 y=430 开始；全部应在骰盘下方的左列。
+        Require(Dock.VerificationBuildRects.Length > 0 && Dock.VerificationBuildRects.All(rect => rect.x >= 0 && rect.xMax < 155 && rect.y > 400 && rect.yMax <= 900),
+            "未在 PC 左侧常驻建造区绘制库存棋子");
+        sharedPcUiVerified = true;
     }
 
     void Advance()
@@ -338,7 +409,7 @@ public sealed class MobileVerification : MonoBehaviour
             sampledDarkest = sampledDarkest, sampledBrightest = sampledBrightest, sampledChromatic = sampledChromatic, captureAttempts = captureAttempts,
             screenWidth = Screen.width, screenHeight = Screen.height, safeLeft = safe.x, safeBottom = safe.y, safeWidth = safe.width, safeHeight = safe.height,
             viewportLeft = viewport.Left, viewportTop = viewport.Top, viewportWidth = viewport.Width, viewportHeight = viewport.Height,
-            mobileUi = MobileTabletop.Enabled, landscape = Screen.width > Screen.height, bundledChineseFont = Resources.Load<Font>("Fonts/NotoSansCJKsc-Regular") != null, independentProcessLoad = request == "load", images = images.ToArray()
+            sharedPcUi = sharedPcUiVerified, touchInputEnabled = MobileTabletop.Enabled, landscape = Screen.width > Screen.height, bundledChineseFont = Resources.Load<Font>("Fonts/NotoSansCJKsc-Regular") != null, independentProcessLoad = request == "load", images = images.ToArray()
         }, true));
     }
 }
