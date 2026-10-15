@@ -99,8 +99,5 @@ namespace Catan.AI
             for (var i = 0; i < count; i++) value += 1.0 + 2.0 / (1 + held + i);
             return value;
         }
-
-        internal static bool LandEdge(Catan.Core.M3.BoardView board, Edge edge) =>
-            board.Tiles.Any(t => t.Resource != "sea" && t.Resource != "fog" && edge.Vertices.All(t.Vertices.Contains));
     }
 }

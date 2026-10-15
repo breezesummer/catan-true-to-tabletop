@@ -1,0 +1,112 @@
+[
+  {
+    "path": ".local/m6/Builds",
+    "files": 166,
+    "bytes": 772431925.0
+  },
+  {
+    "path": ".local/m6-ui-v003/Builds",
+    "files": 166,
+    "bytes": 776637997.0
+  },
+  {
+    "path": ".local/m6-ui-v004/Builds",
+    "files": 166,
+    "bytes": 866130221.0
+  },
+  {
+    "path": ".local/m6-ui-v005/Builds",
+    "files": 166,
+    "bytes": 877881773.0
+  },
+  {
+    "path": ".local/m6-ui-v006/Builds",
+    "files": 166,
+    "bytes": 877897218.0
+  },
+  {
+    "path": ".local/m6-ui-v006-card-ratio-v001/Builds",
+    "files": 166,
+    "bytes": 787704429.0
+  },
+  {
+    "path": ".local/m6-ui-v006-card-ratio-v002/Builds",
+    "files": 166,
+    "bytes": 787704429.0
+  },
+  {
+    "path": ".local/m6-ui-v007-original-ai/Builds",
+    "files": 166,
+    "bytes": 787728161.0
+  },
+  {
+    "path": ".local/distribution/m6-v004-20261012-v001/build/Builds",
+    "files": 166,
+    "bytes": 866130213.0
+  },
+  {
+    "path": ".local/distribution/m6-v004-20261012-v001/Catan-M6-v004-Windows-x64-20261012-v001",
+    "files": 168,
+    "bytes": 865959103.0
+  },
+  {
+    "path": ".local/distribution/m6-v004-20261012-v001/独立解压验证 含空格/Catan-M6-v004-Windows-x64-20261012-v001",
+    "files": 168,
+    "bytes": 865959103.0
+  },
+  {
+    "path": ".local/distribution/卡坦岛之三国争霸内测1.0.zip",
+    "files": 1,
+    "bytes": 466926948.0
+  },
+  {
+    "path": ".local/distribution/m6-v004-20261012-v001/Package.ps1",
+    "files": 1,
+    "bytes": 4785.0
+  },
+  {
+    "path": ".local/distribution/m6-v004-20261012-v001/VerifyDistribution.ps1",
+    "files": 1,
+    "bytes": 4608.0
+  },
+  {
+    "path": ".local/m6-ui-v007/build-original-ai.ps1",
+    "files": 1,
+    "bytes": 1717.0
+  },
+  {
+    "path": ".local/m6-ui-v006-card-ratio-v001/plugin-backup",
+    "files": 2,
+    "bytes": 696320.0
+  },
+  {
+    "path": ".local/ui-v004-baseline/Catan.AI.dll",
+    "files": 1,
+    "bytes": 97792.0
+  },
+  {
+    "path": ".local/ui-v004-baseline/Catan.Core.dll",
+    "files": 1,
+    "bytes": 518144.0
+  },
+  {
+    "path": ".local/operation-ui-compile/bin",
+    "files": 302,
+    "bytes": 49180600.0
+  },
+  {
+    "path": ".local/operation-ui-compile/obj",
+    "files": 17,
+    "bytes": 699356.0
+  },
+  {
+    "path": ".local/v005-review-builder/bin",
+    "files": 9,
+    "bytes": 1033999.0
+  },
+  {
+    "path": ".local/v005-review-builder/obj",
+    "files": 21,
+    "bytes": 249025.0
+  }
+]

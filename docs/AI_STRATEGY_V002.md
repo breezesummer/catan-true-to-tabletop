@@ -28,7 +28,7 @@ AI 仍只接收所属席位的 `PlayerView`，不读取权威会话、完整对�
 
 ## 验证与限制
 
-独立启动入口为 `tools/development/Play-AiStrategy.ps1`，程序目录为 `.local/m6-ai-v002`。重建使用 `tools/development/Build-M6.ps1 -OutputRoot .local/m6-ai-v002 -VerifyPlayer`。本轮先在独立检出完成策略验收，再顺序合入已交付的 v006 界面与广播交易；四类 AI 的交易回应继续使用 `NextResponder`。`Play-M6.ps1` 保留 v006 原策略程序，新入口使用集成后的策略程序；不更新 M7／M8 进度。
+当前仅维护这一套策略，`tools/development/Play-M6.ps1` 与 `tools/development/Play-AiStrategy.ps1` 均启动 `.local/m6-ui-v010/Builds/Windows/CatanM6.exe`；重建使用 `tools/development/Build-M6.ps1 -VerifyPlayer`。2026-10-15 已清理原策略程序、程序集备份和替换插件的旧构建脚本，见 [清理记录](AI_LEGACY_CLEANUP_V001.md)。下述独立检出和 v006 集成结果为当时的验收记录；四类当前 AI 的交易回应继续使用 `NextResponder`，M7／M8 阶段不变。
 
 独立固定局面用于检查战略选择，并通过真实执行入口验证关键动作、错误席位拒绝、输入不变和状态不变量。以 `a244e447` 为基线的独立检出已完成 **652/652 项测试**，包含 **59 项策略案例和 52 个正常完整 AI 局**；24,546 条指令合法，44～131 次玩家回合结束。最终测试耗时 6.77 分钟。Unity 6000.3.25f1 构建 31.0 秒、两个独立 Windows 保存／恢复进程 15.1／9.1 秒，均通过。证据见 [独立验收摘要](verification/ai-strategy-v002/isolated/summary.json)。
 
