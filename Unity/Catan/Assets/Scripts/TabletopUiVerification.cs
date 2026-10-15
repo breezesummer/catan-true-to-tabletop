@@ -219,6 +219,23 @@ public sealed class TabletopUiVerification : MonoBehaviour
         var open=Presentation.GetType().GetMethod("VerificationOpenPort",BindingFlags.NonPublic|BindingFlags.Instance);
         Require(open!=null&&!(bool)open.Invoke(Presentation,new object[]{"unknown-port"}),"不存在的港口错误开放兑换");
         Require(before==Authority&&!Dock.TradeOpen,"非法港口入口改变权威状态或打开窗口");
+        foreach(string target in new[]{(string)null,Snapshot.OtherPlayers[0]})
+        {
+            Dock.OpenTrade(target);
+            Require(Dock.TradeOpen&&Dock.VerificationTradeGiveGoods.SequenceEqual(OperationPanelOptions.PaymentGoods(Snapshot)),"银行或玩家交易没有按本人的已有手牌筛选付出资源");
+            Require(Dock.VerificationTradeGiveGoods.All(g=>Snapshot.Goods[g]>0),"交易付出列表包含未持有资源");
+            Dock.Reset();
+        }
+        if(Snapshot.GoodCount==8)
+        {
+            for(int track=0;track<3;track++)
+            {
+                Dock.OpenFacility(track);
+                Require(Dock.VerificationFacilityTrack==track&&Dock.HasOverlay&&!Dock.TradeOpen,"设施入口没有只选择对应设施");
+                Require(before==Authority,"打开设施改变了权威局面");
+                Dock.Reset();
+            }
+        }
         if(mode=="base"||mode=="seafarers")
         {
             var development=Snapshot.Builds.FirstOrDefault(b=>b.Icon=="development");
@@ -278,7 +295,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
         Require(stock!=null,"未生成库存城市实体");
         var location=card.Root.position;var cardScale=card.Root.localScale;var cardSize=card.Size;var initial=card.Rect;
         var stockLocation=stock.Root.position;var stockScale=stock.Root.localScale;var initialStock=stock.Rect;
-        Require(Mathf.Abs(ObjectBounds(stock).min.y-TabletopScene.SurfaceHeight-.0002f)<.00001f,"城市库存没有贴在桌面上");
+        Require(Vector2.Distance(stock.Rect.center,stockPoint)<.02f&&stock.Rect.width<=48.02f&&stock.Rect.height<=40.02f,"正面库存模型没有居中放入固定小框");
         TabletopWorldObjects.Hit facility=null;
         Vector3 facilityLocation=Vector3.zero,facilityScale=Vector3.zero;Vector2 facilitySize=Vector2.zero;Rect initialFacility=Rect.zero;
         if(Snapshot.GoodCount==8)
@@ -288,7 +305,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             Require(Mathf.Abs(facility.Root.position.y-TabletopScene.SurfaceHeight)<.002f,"城市设施没有置于桌面上");
         }
         var v1=Position(Vertices[0].Id);var v2=Position(Vertices[1].Id);
-        float boardDistance=Vector2.Distance(BoardCamera.WorldToScreenPoint(v1),BoardCamera.WorldToScreenPoint(v2));
+        float boardCameraSize=BoardCamera.orthographicSize;
         Require(card.Contains(initial.center),"正常缩放下桌面公共卡不能拾取");
         table.Frame(BoardCamera,false,.8f);
         // 模拟缩放后实际 Draw 再次提交同一布局，防止每帧重摆让物件锁回屏幕。
@@ -297,7 +314,8 @@ public sealed class TabletopUiVerification : MonoBehaviour
         Require((card.Root.position-location).sqrMagnitude<.00000001f&&card.Root.localScale==cardScale&&card.Size==cardSize,"相机缩放改变了桌面卡片的世界位置或尺寸");
         Require((stock.Root.position-stockLocation).sqrMagnitude<.00000001f&&stock.Root.localScale==stockScale,"相机缩放改变了库存模型的世界位置或尺寸");
         Require(Mathf.Abs(zoomed.width/initial.width-1)<.001f&&Mathf.Abs(stock.Rect.width/initialStock.width-1)<.001f,"地图缩放改变了固定HUD大小");
-        Require(Mathf.Abs(Vector2.Distance(BoardCamera.WorldToScreenPoint(v1),BoardCamera.WorldToScreenPoint(v2))/boardDistance-1.25f)<.001f,"地图相机缩放比例不正确");
+        Require(Mathf.Abs(boardCameraSize/BoardCamera.orthographicSize-1.25f)<.001f,"地图相机缩放比例不正确");
+        Require(BoardCamera.transform.eulerAngles.x<TabletopScene.StrategyCameraAngle,"放大地图没有逐渐放低观察角度");
         if(facility!=null)
         {
             facility=table.Objects.Facility("facility-check",OperationDock.FacilityLayout(0),0,0);
@@ -374,6 +392,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
         {
             var group=OperationDock.StockGroupLayout(pieces,index,Snapshot.GoodCount==8);
             Require(group.xMax<150&&group.yMin>=280&&group.yMax<=890,"单建筑模型没有排在左下");
+            Require(group.height<=52&&TabletopPieceDock.ModelArea(group).xMax<TabletopPieceDock.CountArea(group).xMin,"库存框过大或模型和数字的预留区域发生重叠");
             if(index>0)Require(group.yMin>=OperationDock.StockGroupLayout(pieces,index-1,Snapshot.GoodCount==8).yMax,"建筑token区域重叠");
         }
         int prior=StrategyHudTheme.Selected;

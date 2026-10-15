@@ -4,9 +4,100 @@ using UnityEngine;
 // 圆片、金属装饰和简洁符号由代码绘制；商品主体使用单独透明抠图。
 public static class StrategyHudArt
 {
-    static Texture2D ornament,bank,handshake,portraits;
+    static Texture2D ornament,bank,handshake,portraits,brushed;
     static readonly Dictionary<int,Texture2D> commodities=new Dictionary<int,Texture2D>();
     public static readonly Color Gold=new Color(.84f,.67f,.35f);
+    // 屏幕空间雕边金属控件；与卡牌、三维棋子资产分开，不参与规则或存档。
+    public static void Plaque(Rect rect,Color face,Color trim,bool hover=false)
+    {
+        ModernOperationUI.Round(new Rect(rect.x+1,rect.y+4,rect.width,rect.height),new Color(0,0,0,.32f));
+        ModernOperationUI.Round(rect,Color.Lerp(trim,Color.black,.42f));
+        var bevel=new Rect(rect.x+1,rect.y+1,rect.width-2,rect.height-2);
+        ModernOperationUI.Round(bevel,Color.Lerp(trim,Color.white,hover?.30f:.10f));
+        var inset=new Rect(rect.x+3,rect.y+3,rect.width-6,rect.height-6);
+        ModernOperationUI.Round(inset,Color.Lerp(face,Color.black,.38f));
+        var body=new Rect(rect.x+4,rect.y+4,rect.width-8,rect.height-8);
+        ModernOperationUI.Round(body,hover?Color.Lerp(face,trim,.15f):face);
+        if(brushed==null)brushed=BrushedTexture();
+        var old=GUI.color;GUI.color=new Color(1,1,1,.13f);GUI.DrawTexture(body,brushed);GUI.color=old;
+        ModernOperationUI.Fill(new Rect(rect.x+11,rect.y+5,rect.width-22,1),new Color(1,1,.85f,.16f));
+        ModernOperationUI.Fill(new Rect(rect.x+11,rect.yMax-5,rect.width-22,1),new Color(0,0,0,.34f));
+        foreach(float x in new[]{rect.x+7,rect.xMax-7})
+        {
+            ModernOperationUI.Fill(new Rect(x-1,rect.center.y-2,2,4),Color.Lerp(trim,Color.white,.16f));
+            ModernOperationUI.Fill(new Rect(x-2,rect.center.y-1,4,2),trim);
+        }
+    }
+    public static bool HandControl(Rect rect,string caption,int kind,bool selected=false)
+    {
+        ModernOperationUI.Styles();
+        bool hover=GUI.enabled&&rect.Contains(Event.current.mousePosition);
+        Color trim=selected?ModernOperationUI.Accent:Color.Lerp(Gold,ModernOperationUI.Line,.56f);
+        Color face=selected?Color.Lerp(ModernOperationUI.Surface,ModernOperationUI.Accent,.20f):ModernOperationUI.Surface;
+        if(!GUI.enabled){face=Color.Lerp(ModernOperationUI.Background,face,.4f);trim=ModernOperationUI.Line;}
+        Plaque(rect,face,trim,hover);
+        var icon=new Rect(rect.x+11,rect.center.y-10,19,20);
+        Color ink=GUI.enabled?(selected?new Color(1,.94f,.75f):ModernOperationUI.TextColor):ModernOperationUI.Muted;
+        HandSymbol(icon,kind,ink);
+        var label=new GUIStyle(ModernOperationUI.Center){fontSize=kind==2?11:12,fontStyle=FontStyle.Bold,wordWrap=false,padding=new RectOffset(),alignment=TextAnchor.MiddleCenter};
+        label.normal.textColor=ink;
+        GUI.Label(new Rect(rect.x+32,rect.y+2,rect.width-39,rect.height-4),caption,label);
+        if(selected)ModernOperationUI.Fill(new Rect(rect.x+37,rect.yMax-7,rect.width-51,1),new Color(trim.r,trim.g,trim.b,.85f));
+        return GUI.Button(rect,GUIContent.none,GUIStyle.none);
+    }
+    static void HandSymbol(Rect rect,int kind,Color ink)
+    {
+        // 卡页采用两张交叠卡纸，整理采用三张齐列卡纸和向下归拢箭头。
+        if(kind==2)
+        {
+            for(int i=0;i<3;i++)
+            {
+                var card=new Rect(rect.x+i*6,rect.y+(i==1?0:3),5,11);
+                ModernOperationUI.Round(card,ink);
+                ModernOperationUI.Fill(new Rect(card.x+1,card.y+2,card.width-2,6),ModernOperationUI.Surface);
+            }
+            ModernOperationUI.Fill(new Rect(rect.x+3,rect.yMax-4,14,1),ink);
+            Line(new Vector2(rect.x+8,rect.yMax-7),new Vector2(rect.x+10,rect.yMax-5),ink,1.5f);
+            Line(new Vector2(rect.x+10,rect.yMax-5),new Vector2(rect.x+12,rect.yMax-7),ink,1.5f);
+            return;
+        }
+        ModernOperationUI.Round(new Rect(rect.x,rect.y+1,13,16),new Color(ink.r,ink.g,ink.b,.45f));
+        var front=new Rect(rect.x+5,rect.y+4,13,16);ModernOperationUI.Round(front,ink);
+        ModernOperationUI.Fill(new Rect(front.x+2,front.y+2,9,12),ModernOperationUI.Surface);
+        if(kind==0)
+        {
+            Line(new Vector2(front.center.x,front.y+5),new Vector2(front.x+3,front.center.y+1),ink,2);
+            Line(new Vector2(front.x+3,front.center.y+1),new Vector2(front.center.x,front.yMax-3),ink,2);
+            Line(new Vector2(front.center.x,front.yMax-3),new Vector2(front.xMax-3,front.center.y+1),ink,2);
+            Line(new Vector2(front.xMax-3,front.center.y+1),new Vector2(front.center.x,front.y+5),ink,2);
+        }
+        else
+        {
+            ModernOperationUI.Fill(new Rect(front.x+3,front.y+5,7,2),ink);
+            ModernOperationUI.Fill(new Rect(front.x+3,front.y+9,7,1),ink);
+            ModernOperationUI.Fill(new Rect(front.x+3,front.y+12,4,1),ink);
+        }
+    }
+    public static void Line(Vector2 from,Vector2 to,Color color,float width=1)
+    {
+        var matrix=GUI.matrix;var delta=to-from;
+        // 先在逻辑坐标中定位/旋转，再应用屏幕缩放；非等比宽屏下也保持端点准确。
+        GUI.matrix=matrix*Matrix4x4.TRS(new Vector3(from.x,from.y,0),Quaternion.Euler(0,0,Mathf.Atan2(delta.y,delta.x)*Mathf.Rad2Deg),Vector3.one);
+        try{ModernOperationUI.Fill(new Rect(0,-width/2,delta.magnitude,width),color);}
+        finally{GUI.matrix=matrix;}
+    }
+    static Texture2D BrushedTexture()
+    {
+        const int width=128,height=64;var pixels=new Color[width*height];
+        for(int y=0;y<height;y++)for(int x=0;x<width;x++)
+        {
+            float grain=((x*19+y*43+x*y*7)%31)/30f;
+            float shade=.3f+.35f*y/height+.18f*grain;
+            pixels[y*width+x]=new Color(shade,shade,shade,1);
+        }
+        var texture=new Texture2D(width,height,TextureFormat.RGBA32,false){name="细磨金属控件纹理 v011",filterMode=FilterMode.Bilinear};
+        texture.SetPixels(pixels);texture.Apply(false,true);return texture;
+    }
     public static void Avatar(Rect rect,string seat)
     {
         if(portraits==null)portraits=Resources.Load<Texture2D>("TabletopUI/v010/leaders-atlas");

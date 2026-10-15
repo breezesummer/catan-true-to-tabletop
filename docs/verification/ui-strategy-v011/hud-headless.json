@@ -1,0 +1,12 @@
+{
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。",
+    "configurations": 28,
+    "checks": 19365,
+    "cameraImages": 0,
+    "guiAttempts": 0,
+    "guiImagesWithChanges": 0,
+    "graphics": false,
+    "fullUiPixelsVerified": false
+}

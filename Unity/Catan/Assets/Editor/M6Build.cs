@@ -56,6 +56,7 @@ public static class M6Build
         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), "Assets/M6.unity");
         PlayerSettings.companyName = "CatanDevelopment";
         PlayerSettings.productName = "Catan M6";
+        PlayerSettings.bundleVersion = "1.2";
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
         PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Standalone, ApiCompatibilityLevel.NET_Standard);
         PlayerSettings.defaultScreenWidth = 1440;

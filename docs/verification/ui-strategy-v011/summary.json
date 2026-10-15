@@ -1,0 +1,75 @@
+{
+  "version": "ui-strategy-v011",
+  "releaseName": "卡坦岛之三国争霸内测版1.2",
+  "date": "2026-10-15",
+  "status": "passed_with_manual_boundaries",
+  "rulesChanged": false,
+  "aiChanged": false,
+  "authorityFormatChanged": false,
+  "dotnet": {
+    "fullPassed": 813,
+    "fullFailed": 0,
+    "finalPresentationPassed": 88,
+    "uniqueCases": 815,
+    "completeAiGames": 52,
+    "note": "全量运行后新增两项缺料可换入案例，收口专项88项通过；不累加重复案例。"
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "build": "passed",
+    "netstandard21": "passed",
+    "saveLoadProcesses": 2,
+    "saveLoadModes": [
+      "base",
+      "seafarers",
+      "cities-knights",
+      "combined"
+    ],
+    "note": "使用最终透明框版本通过四模式独立保存恢复；随后装饰线的宽屏坐标修正重建，并做最终图形回归和实际1920×1080复验。"
+  },
+  "ui": [
+    {
+      "configurations": 28,
+      "checks": 19365,
+      "graphics": false
+    },
+    {
+      "configurations": 28,
+      "checks": 19374,
+      "graphics": true,
+      "cameraImages": 8,
+      "fullUiPixelsVerified": false
+    }
+  ],
+  "manual": [
+    "1440×900城市骑士布局、正面库存/俯视城墙/数量无遮挡",
+    "贸易、政治、科学分别独立展示，等级与建设区",
+    "银行/玩家仅列已有付出资源，获得保留合法种类；实际完成银行4:1兑换",
+    "资源/发展页签、整理按钮及三套主题",
+    "地图放大逐渐降低俯视角，固定HUD不变",
+    "Esc主题和扩展信息、顶部居中回合玩家铭牌",
+    "1920×1080布局及装饰线坐标修复后的最终程序"
+  ],
+  "unverified": [
+    "完整港口/骑士/移船的鼠标操作全链路",
+    "所有分辨率和用户最终外观确认",
+    "用户本人完整对局",
+    "长期性能"
+  ],
+  "screenshots": [
+    ".local/m6-ui-v011/verification/manual/interactive-1.png",
+    ".local/m6-ui-v011/verification/manual/interactive-2.png",
+    ".local/m6-ui-v011/verification/manual/interactive-5.png",
+    ".local/m6-ui-v011/verification/manual/interactive-7.png",
+    ".local/m6-ui-v011/verification/manual/interactive-8.png",
+    ".local/m6-ui-v011/verification/manual-1080-final/interactive-1.png"
+  ],
+  "executable": {
+    "path": ".local/m6-ui-v011/Builds/Windows/CatanM6.exe",
+    "bytes": 667136,
+    "sha256": "3070E580E019576B9AFCDEB4FEC18D03CEBC119F6AE84D597412905C749AD653",
+    "presentationAssemblySha256": "DE1608A4449355878EF18D9FF5A82129ECF49DC4C1399198F08937544DF47D77"
+  },
+  "roadmap": "M7/M8不推进",
+  "art": "保留原有参考与真实网格；控件纹理/描边由显示代码生成。"
+}

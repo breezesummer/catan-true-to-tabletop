@@ -218,7 +218,7 @@ public sealed partial class M6App : MonoBehaviour
         if(MenuVisible)
         {
             Panel(new Rect(0,0,1440,900),new Color(.025f,.07f,.085f));
-            GUILayout.BeginArea(new Rect(280,95,880,730));GUILayout.Label("CATAN  /  本地 AI 对手",title);
+            GUILayout.BeginArea(new Rect(280,95,880,730));GUILayout.Label("卡坦岛之三国争霸  /  内测版1.2",title);
             GUILayout.Space(26);
             int selection=GUILayout.Toolbar(menuRule,RuleNames,button,GUILayout.Height(48));if(selection!=menuRule){menuRule=selection;menuScenario=0;}
             GUILayout.Space(20);var ids=ScenarioIds();menuScenario=Mathf.Clamp(menuScenario,0,ids.Length-1);
@@ -248,24 +248,29 @@ public sealed partial class M6App : MonoBehaviour
         }
         else
         {
-            var corner=new GUIStyle(small){fontSize=14};corner.normal.textColor=new Color(.98f,.88f,.67f);
-            GUI.Label(new Rect(752,24,310,29),"CATAN  /  "+RuleNames[Array.IndexOf(RuleIds,RuleSet)],corner);
             if(tableMenu)
             {
                 ModernOperationUI.Styles(font);
                 Panel(new Rect(0,0,1440,900),new Color(0,0,0,.48f));
-                ModernOperationUI.Panel(new Rect(470,205,500,490));
-                ModernOperationUI.Label(new Rect(504,231,310,44),"游戏菜单",ModernOperationUI.Title);
-                ModernOperationUI.Label(new Rect(800,242,132,25),"Esc 返回游戏",ModernOperationUI.Small);
-                if(ModernOperationUI.Button(new Rect(504,297,432,46),"返回游戏",true,true)){tableMenu=false;nextAction=Time.unscaledTime+.60f;}
-                if(ModernOperationUI.Button(new Rect(504,355,210,44),Paused?"继续 AI":"暂停 AI"))SetPaused(!Paused);
-                if(ModernOperationUI.Button(new Rect(726,355,210,44),"切换俯视"))ToggleTableCamera();
-                if(ModernOperationUI.Button(new Rect(504,411,210,44),"保存这桌游戏"))SaveGame();
-                if(ModernOperationUI.Button(new Rect(726,411,210,44),"恢复存档")){tableMenu=false;LoadGame();}
-                if(ModernOperationUI.Button(new Rect(504,467,432,44),"规则 / 新开一桌")){tableMenu=false;ShowMenu();}
-                if(RuleSet=="seafarers"&&ModernOperationUI.Button(new Rect(504,522,432,36),"航海场景行动"))
+                ModernOperationUI.Panel(new Rect(460,112,520,676));
+                ModernOperationUI.Label(new Rect(494,137,310,44),"游戏菜单",ModernOperationUI.Title);
+                ModernOperationUI.Label(new Rect(814,149,132,25),"Esc 返回游戏",ModernOperationUI.Small);
+                ModernOperationUI.Label(new Rect(494,187,452,24),"卡坦岛之三国争霸 · 内测版1.2",ModernOperationUI.Small);
+                string configuration="当前扩展 · "+RuleNames[Array.IndexOf(RuleIds,RuleSet)];
+                if(RuleSet=="seafarers"||RuleSet=="combined")configuration+=" · "+Catan.Core.M3.SeafarersScenarios.Create(ScenarioId,PlayerCount).Name;
+                ModernOperationUI.Label(new Rect(494,221,452,44),configuration,ModernOperationUI.Text);
+                ModernOperationUI.Label(new Rect(494,273,452,23),"界面主题",ModernOperationUI.Small);
+                for(int i=0;i<StrategyHudTheme.Names.Length;i++)
+                    if(ModernOperationUI.Button(new Rect(494+i*154,303,144,40),StrategyHudTheme.Names[i],true,false,StrategyHudTheme.Selected==i))StrategyHudTheme.Select(i);
+                if(ModernOperationUI.Button(new Rect(494,365,452,46),"返回游戏",true,true)){tableMenu=false;nextAction=Time.unscaledTime+.60f;}
+                if(ModernOperationUI.Button(new Rect(494,424,220,44),Paused?"继续 AI":"暂停 AI"))SetPaused(!Paused);
+                if(ModernOperationUI.Button(new Rect(726,424,220,44),"切换俯视"))ToggleTableCamera();
+                if(ModernOperationUI.Button(new Rect(494,480,220,44),"保存这桌游戏"))SaveGame();
+                if(ModernOperationUI.Button(new Rect(726,480,220,44),"恢复存档")){tableMenu=false;LoadGame();}
+                if(ModernOperationUI.Button(new Rect(494,536,452,44),"规则 / 新开一桌")){tableMenu=false;ShowMenu();}
+                if(RuleSet=="seafarers"&&ModernOperationUI.Button(new Rect(494,592,452,36),"航海场景行动"))
                 {tableMenu=false;var sailing=GetComponent<M3App>();if(sailing!=null)sailing.ShowScenarioActions();}
-                ModernOperationUI.Label(new Rect(504,573,432,90),Notice,ModernOperationUI.Small);
+                ModernOperationUI.Label(new Rect(494,651,452,100),Notice,ModernOperationUI.Small);
             }
             string prompt=CurrentTablePrompt;
             if(prompt.Length>0&&!tableMenu)

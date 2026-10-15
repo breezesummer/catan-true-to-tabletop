@@ -50,6 +50,25 @@ public sealed class OperationTrade
     public string OtherPlayer;
     public int[] Give = new int[8], Receive = new int[8];
 }
+// 只从所属玩家的公开授权视图中挑选面板内容，不读取其他玩家手牌。
+public static class OperationPanelOptions
+{
+    public static OperationBuild Facility(OperationSnapshot snapshot, int track)
+    {
+        return snapshot == null || track < 0 || track > 2 ? null : snapshot.Builds.FirstOrDefault(build => build.Track == track);
+    }
+    public static int[] PaymentGoods(OperationSnapshot snapshot, int? portGood = null)
+    {
+        if (snapshot == null || snapshot.Goods == null) return Array.Empty<int>();
+        int count = Math.Max(0, Math.Min(8, Math.Min(snapshot.GoodCount, snapshot.Goods.Length)));
+        if (portGood.HasValue && (portGood.Value < 0 || portGood.Value >= 5)) return Array.Empty<int>();
+        return Enumerable.Range(0, count).Where(good => snapshot.Goods[good] > 0 && (!portGood.HasValue || good == portGood.Value)).ToArray();
+    }
+    public static int PaymentChoice(int[] visibleGoods, int previous)
+    {
+        return visibleGoods == null || visibleGoods.Length == 0 ? -1 : visibleGoods.Contains(previous) ? previous : visibleGoods[0];
+    }
+}
 public sealed class OperationSelection
 {
     public readonly int[] Selected = new int[8];
