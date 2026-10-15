@@ -8,9 +8,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 VERSION = 'entity-conversion-v001'
 POLITICS_VERSION = 'entity-conversion-v003'
-ORE_VERSION = 'entity-conversion-v004'
+ORE_VERSION = 'entity-conversion-v006'
 INTEGRATION_EVIDENCE = REPO / 'docs/verification/entity-integration-v003'
-ORE_EVIDENCE = REPO / 'docs/verification/ore-tile-v004'
+ORE_EVIDENCE = REPO / 'docs/verification/mountain-tile-v006'
 LABELS = {
     'tiles': '地图板块（其余六类）', 'resource-cards': '资源卡（其余四类）',
     'commodity-cards': '商品卡', 'progress-trade': '贸易进步卡（黄色）',
@@ -95,7 +95,8 @@ def ore_evidence():
     runtime = read(ORE_EVIDENCE / 'runtime-integration.json')
     required_views = {mode + '/' + view for mode in ('base', 'seafarers', 'cities-knights', 'combined')
                       for view in ('top', 'game-camera')}
-    runtime_passed = (runtime.get('status') == 'passed' and runtime.get('oreUsesFlatCardArt') is True
+    runtime_passed = (runtime.get('status') == 'passed' and runtime.get('oreUsesMountainTileArt') is True
+                      and runtime.get('oreCardUnchanged') is True
                       and required_views.issubset(runtime.get('views', []))
                       and all((ORE_EVIDENCE / (view + '.png')).exists() for view in required_views))
     imported_passed = ids == {'tile-ore'} and ids.issubset(imported)
@@ -105,22 +106,22 @@ def ore_evidence():
 
 def ore_section():
     evidence = ore_evidence()
-    return ['', '## 铁矿卡片插画派生板块 v004（2026-10-11）', '',
-            '铁矿棋盘显示改为矿石资源卡插画派生的平坦厚板。来源是现有 `资源牌/铁矿石.jpg`，'
-            '经已校正的完整资源卡面裁切 `[112,392,912,1192]`，再缩放为 1024×1024 顶图，映射到 8 mm 六边形网格。'
-            '没有收到真实山地六边形照片；原照与完整手牌卡面保持不变，不把派生插画声称为山地实物复刻。', '',
+    return ['', '## 高山地图板块 v006（2026-10-15，当前矿石地形）', '',
+            '用户已提供真实高山六边形板块照片，替换 v004 矿石资源卡插画派生地形。'
+            '原照经六角几何校正为 1024×1024 顶图，映射到估算 8 mm 厚板；'
+            '保留山峰插画和黄色边框，完整矿石手牌仍使用原资源牌照片。', '',
             '| 转化与干净重建 | Unity 导入 | 四类正式显示入口 |', '| --- | --- | --- |',
             f"| {'已验证' if evidence['converted'] else '待验证'} | {'已验证' if evidence['imported'] else '待验证'} | "
             f"{'已验证' if evidence['passed'] else '待验证'} |", '',
-            '[配方与复现](../art/recipes/entity-conversion-v004/ore-tile/README.md)；'
-            '[回读](../art/exports/entity-conversion-v004/ore-tile/verification.json)；'
-            '[干净重建](../art/exports/entity-conversion-v004/ore-tile/clean-rebuild-verification.json)；'
-            '[Unity 导入](verification/ore-tile-v004/unity-import.json)；'
-            '[正式显示](verification/ore-tile-v004/runtime-integration.json)；'
-            '[人工目检](verification/ore-tile-v004/visual-review.json)。', '',
-            '运行通过要求 `oreUsesFlatCardArt=true`，且基础、航海家、城市骑士、组合四类各含俯视与游戏相机证据。'
-            '本轮仅改外观，不重复宣称规则测试或完整 M6 保存恢复验收；最终外观与 M8 退出条件仍待确认。'
-            '[本轮说明](ART_ORE_TILE_V004.md)。', '']
+            '[配方与复现](../art/recipes/entity-conversion-v006/ore-tile/README.md)；'
+            '[回读](../art/exports/entity-conversion-v006/ore-tile/verification.json)；'
+            '[干净重建](../art/exports/entity-conversion-v006/ore-tile/clean-rebuild-verification.json)；'
+            '[Unity 导入](verification/mountain-tile-v006/unity-import.json)；'
+            '[正式显示](verification/mountain-tile-v006/runtime-integration.json)；'
+            '[画面核对](verification/mountain-tile-v006/visual-review.json)。', '',
+            '运行通过要求 `oreUsesMountainTileArt=true`、`oreCardUnchanged=true`，且四类各含俯视与游戏相机证据。'
+            '本轮验证范围以独立摘要为准；最终外观与 M8 退出条件仍待确认。'
+            '[本轮说明](ART_MOUNTAIN_TILE_V006.md)。', '']
 
 
 def integration_section(coverage):
@@ -137,10 +138,10 @@ def integration_section(coverage):
              '| Unity 导入与图库 | v001、v002 既有记录分批保留；v003 新政治卡导入独立列证，不将导入或图库视为整局验收 |',
              '| 正式游戏运行 | ' + status + '；范围为当前 M6 中基础版、航海家、城市与骑士和已支持组合 |',
              '| 最终用户外观 / M8 | 待确认；尺寸、隐藏面、色彩、节点操作、长期性能和发布条件仍未全部验收 |', '',
-             '棋盘已接入七种有地块照片的板块；铁矿另采用 v004 资源卡插画派生厚板，转化和正式运行证据见下方。'
-             '真实山地六边形照片仍缺。资源卡显示于本人手牌面板；城市与骑士及组合增加商品、进步卡、城市设施和公开奖励卡面。'
+             '棋盘已接入八种有地块照片的板块；高山原照 v006 替换原 v004 资源卡插画派生矿石地形，证据见下方。'
+             '资源卡显示于本人手牌面板；城市与骑士及组合增加商品、进步卡、城市设施和公开奖励卡面。'
              '悬停放大、点击固定查看、已有背面翻面；私有卡面限定当前 PlayerView，换座或隐私幕清空。'
-             '船、强盗、海盗、商人和蛮族轨道/船使用实体参考模型。七种照片板块是有厚度的印刷板块网格，不代表立体景观。', '',
+             '船、强盗、海盗、商人和蛮族轨道/船使用实体参考模型。八种照片板块是有厚度的印刷板块网格，不代表立体景观。', '',
              '查看与重建：`tools/development/Play-M6.ps1`；'
              '`tools/development/Build-EntityIntegration.ps1`；`tools/validation/Test-EntityIntegration.ps1`。'
              '当前 M6 是本轮正式入口，旧独立阶段程序和图库记录按原批次保留。'
@@ -266,7 +267,7 @@ def update():
               '| 范围 | 待补项目 | 当前处理 |', '| --- | --- | --- |',
               '| 共通 | 实体版本、全桌布局、带尺尺寸、棋子顶侧背底面 | 尺寸标估算；单照隐藏形状标近似 |',
               '| 玩家变体与实例 | 道路完整配色、多视角与实测颜色；整局实例数量和摆放 | 三色村庄、城市、城墙、大都会与骑士追加批次见下方 v002；照片白平衡与最终外观仍待确认 |',
-              '| 基础版 | 真实山地六边形板块照片；数字盘及背面/字母；海框；3:1及五种2:1港口；两枚产出骰；基础发展卡五类型及背面；最长道路/最大军队卡；建造费用参考卡 | 铁矿使用 v004 资源卡插画派生厚板，不能算山地实物照片还原；其余维持规则显示 |',
+              '| 基础版 | 数字盘正面/字母；海框；两枚产出骰；基础发展卡五类型及背面；最长道路/最大军队卡；建造费用参考卡 | 高山实物照片已补转 v006；港口及数字背面见 v005；其余维持规则显示 |',
               '| 航海家 | 卡坦标记/海外胜利筹码；布匹筹码；中立村庄；海盗要塞；战船标记；五张奇迹卡与等级标记；迷雾背面 | 未提供照片，不伪造来源 |',
               '| 城市与骑士 | 商品/保卫者卡背面；事件骰；三种大都会身份标记；独立城墙多视图 | 蓝色进步卡背面已提供并补转 v003；其余缺背面使用明确中性底色 |', '',
               '## 路径与运行', '',

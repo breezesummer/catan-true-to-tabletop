@@ -16,14 +16,15 @@ public sealed class EntityIntegrationVerification : MonoBehaviour
         public string status,unityVersion;
         public int checkedSourceInstances,checkedPoliticalCards;
         public string[] views;
-        public bool fogHasNoPhotoTexture,visualsHaveNoColliders,metreScale,previewColours,oreUsesFlatCardArt;
+        public bool fogHasNoPhotoTexture,visualsHaveNoColliders,metreScale,previewColours,oreUsesMountainTileArt,oreCardUnchanged;
+        public string oreResource,oreTexture;
     }
     int checkedInstances;
     readonly List<string> views=new List<string>();
     readonly string[] resources={"wood","wool","wheat","brick","desert","sea","gold","ore","fog"};
     readonly string[] expected={"PhotoSamples/v001/forest","EntityAssets/v001/tiles/tile-pasture",
         "EntityAssets/v001/tiles/tile-fields","EntityAssets/v001/tiles/tile-hills","EntityAssets/v001/tiles/tile-desert",
-        "EntityAssets/v001/tiles/tile-sea","EntityAssets/v001/tiles/tile-gold","EntityAssets/v004/ore-tile/tile-ore",null};
+        "EntityAssets/v001/tiles/tile-sea","EntityAssets/v001/tiles/tile-gold","EntityAssets/v006/ore-tile/tile-ore",null};
     Tile[] tiles;Vertex[] vertices;Edge[] edges;
 
     IEnumerator Start()
@@ -105,7 +106,10 @@ public sealed class EntityIntegrationVerification : MonoBehaviour
             var oreBounds=ore.GetComponentsInChildren<Renderer>()[0].bounds;
             foreach(var renderer in ore.GetComponentsInChildren<Renderer>())oreBounds.Encapsulate(renderer.bounds);
             Require(Mathf.Abs(oreBounds.size.y-.008f)<.000015f,"Ore still has a raised mountain silhouette");
-            Require(ore.GetComponentsInChildren<Renderer>().Any(r=>r.sharedMaterials.Any(m=>m.mainTexture!=null)),"Ore has no card artwork");
+            var mountainPhoto=Resources.Load<Texture2D>("EntityAssets/v006/ore-tile/tile-ore-top");
+            Require(mountainPhoto!=null&&ore.GetComponentsInChildren<Renderer>().Any(r=>r.sharedMaterials.Any(m=>m.mainTexture==mountainPhoto)),"Ore does not use the photographed mountain hex");
+            var oreCard=EntityCardAssets.Texture(EntityCardAssets.Good(4).Front);
+            Require(oreCard==Resources.Load<Texture2D>("EntityAssets/v001/resource-cards/resource-ore-front")&&oreCard!=mountainPhoto,"Ore resource card was replaced by terrain art");
             if(mode=="base")root.GetComponent<BoardRenderer>().ShowTerrain(false);
             else if(mode=="seafarers")root.GetComponent<M3BoardRenderer>().ShowTerrain(false);
             else if(mode=="cities-knights")root.GetComponent<M4BoardRenderer>().ShowTerrain(false);
@@ -197,7 +201,8 @@ public sealed class EntityIntegrationVerification : MonoBehaviour
         CheckCardFaces();
         File.WriteAllText(Path.Combine(output,"runtime-integration.json"),JsonUtility.ToJson(new Report{
             status="passed",unityVersion=Application.unityVersion,checkedSourceInstances=checkedInstances,checkedPoliticalCards=names.Length,
-            fogHasNoPhotoTexture=true,visualsHaveNoColliders=true,metreScale=true,previewColours=true,oreUsesFlatCardArt=true,views=views.ToArray()},true));
+            fogHasNoPhotoTexture=true,visualsHaveNoColliders=true,metreScale=true,previewColours=true,oreUsesMountainTileArt=true,oreCardUnchanged=true,
+            oreResource=EntityBoardAssets.TerrainResource("ore"),oreTexture="EntityAssets/v006/ore-tile/tile-ore-top",views=views.ToArray()},true));
     }
     static void CheckCardFaces()
     {
@@ -231,8 +236,19 @@ public sealed class EntityIntegrationVerification : MonoBehaviour
     {
         Require(instance!=null,"No instance for "+resource);var source=Resources.Load<GameObject>(resource);Require(source!=null,"Missing expected resource "+resource);
         var meshes=instance.GetComponentsInChildren<MeshFilter>().Select(m=>m.sharedMesh).ToArray();
-        Require(source.GetComponentsInChildren<MeshFilter>().All(m=>meshes.Contains(m.sharedMesh)),"Wrong mesh source "+resource);
-        Require(source.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials).All(m=>instance.GetComponentsInChildren<Renderer>().Any(r=>r.sharedMaterials.Contains(m))),"Wrong materials "+resource);
+        if(instance.GetComponent<TabletopPhysicalTileV005>()!=null)
+        {
+            // 当前厚板会重建倒角网格并复制材质；原照片纹理仍须来自指定资源。
+            var photos=source.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials).Where(m=>m.mainTexture!=null).Select(m=>m.mainTexture).Distinct().ToArray();
+            var actual=instance.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials).Where(m=>m.mainTexture!=null).Select(m=>m.mainTexture).Distinct().ToArray();
+            Require(photos.Length>0&&photos.Length==actual.Length&&photos.All(actual.Contains),"Wrong terrain photo source "+resource);
+            Require(meshes.Length>0&&meshes.All(m=>m!=null&&m.triangles.Length>0),"Missing physical tile mesh "+resource);
+        }
+        else
+        {
+            Require(source.GetComponentsInChildren<MeshFilter>().All(m=>meshes.Contains(m.sharedMesh)),"Wrong mesh source "+resource);
+            Require(source.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials).All(m=>instance.GetComponentsInChildren<Renderer>().Any(r=>r.sharedMaterials.Contains(m))),"Wrong materials "+resource);
+        }
         Require(instance.localScale==Vector3.one,"Scale must remain metres "+resource);
         Require(instance.GetComponentsInChildren<Collider>().Length==0,"Artwork blocks picking "+resource);checkedInstances++;
     }

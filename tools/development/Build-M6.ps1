@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='.local/m6-ui-v011',[switch]$ImportTabletopMarkers)
+param([switch]$VerifyPlayer,[string]$OutputRoot='.local/m6-mountain-v006',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -17,7 +17,7 @@ foreach ($assemblyName in @('Catan.Core','Catan.AI')) {
     }
 }
 Copy-Item -LiteralPath (Join-Path $m6RepoRoot 'docs\acceptance\v0.1\scenario.json') -Destination (Join-Path $m6Project 'Assets\Resources\m1-scenario.json') -Force
-$m6BuildMethod=if($ImportTabletopMarkers){'EntityIntegrationBuild.BuildTabletopMarkers'}else{'M6Build.Build'}
+$m6BuildMethod=if($ImportMountainTile){'EntityIntegrationBuild.BuildMountainTile'}elseif($ImportTabletopMarkers){'EntityIntegrationBuild.BuildTabletopMarkers'}else{'M6Build.Build'}
 & $toolchain.unity -batchmode -nographics -quit -projectPath $m6Project -executeMethod $m6BuildMethod --m6-output-root $m6OutputRoot -logFile (Join-Path $m6Logs 'unity-build.log') | Out-Host
 if ($LASTEXITCODE -ne 0) { throw "Unity 构建失败，请检查 $m6Logs/unity-build.log。" }
 if (!(Select-String -LiteralPath (Join-Path $m6Logs 'unity-build.log') -Pattern 'CATAN_M6_UNITY_BUILD_OK' -Quiet)) { throw '未找到 Unity 构建成功标记。' }

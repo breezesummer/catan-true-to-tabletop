@@ -1,0 +1,50 @@
+{
+  "version": "entity-conversion-v006",
+  "typeId": "ore-tile",
+  "sourceSha256": "3fb55da76875624c901e791892a44e122bde8ee35b343e73f9ac455bf27b084d",
+  "source": "assets/references/archives/mountain-tile-v006/高山.jpg",
+  "sourceSize": [
+    1706,
+    1279
+  ],
+  "operation": {
+    "source": "assets/references/archives/mountain-tile-v006/高山.jpg",
+    "output": "art/source/entity-conversion-v006/ore-tile/textures/tile-ore-top.png",
+    "hex": [
+      [
+        1454,
+        668
+      ],
+      [
+        1152,
+        209
+      ],
+      [
+        637,
+        209
+      ],
+      [
+        364,
+        674
+      ],
+      [
+        684,
+        1182
+      ],
+      [
+        1267,
+        1132
+      ]
+    ],
+    "size": [
+      1024,
+      1024
+    ],
+    "orientation": "右/右上/左上/左/左下/右下映射为棋盘右上/上/左上/左下/下/右下；与既有板块一致"
+  },
+  "outputSha256": "47dc0f3b1c53c71f0d06c7c1b62086be9d7e8d64b9d186bae4920dfe17003499",
+  "method": "原像素六三角 affine 校正及 bicubic 重采样",
+  "scriptSha256": "9a270dbac540a5319066bd96d73f0a71841ef9c9b1d6bfd6b374416269d8d8bb",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5"
+}
