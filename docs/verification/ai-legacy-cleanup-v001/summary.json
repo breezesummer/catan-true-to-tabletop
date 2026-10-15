@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-15",
+  "timezone": "Asia/Shanghai",
+  "scope": "原策略M6程序、旧分发副本、旧插件构建脚本、临时程序集与无调用辅助函数",
+  "cleanup": {
+    "paths": 22,
+    "files": 2187,
+    "bytes": 9651577866,
+    "allListedPathsAbsent": true
+  },
+  "tests": {
+    "filter": "FullyQualifiedName~M6&FullyQualifiedName!~M6FullGameTests",
+    "passed": 120,
+    "failed": 0,
+    "skipped": 0
+  },
+  "build": {
+    "dotnetTarget": "netstandard2.1",
+    "warnings": 0,
+    "errors": 0,
+    "unity": "6000.3.25f1",
+    "seconds": 60.8,
+    "unityCoreAndSaveRoundtrip": true,
+    "playerSaveSeconds": 19.6,
+    "playerLoadSeconds": 10.0,
+    "families": [
+      "base",
+      "seafarers",
+      "cities-knights",
+      "combined"
+    ],
+    "aiDllSha256": "43a43a14b2cb51df8f22de8765d01bdfed834575f8473d97e5f108dd4c3ca59d"
+  },
+  "checks": {
+    "sameLauncherTarget": true,
+    "priorTrackedChangesPreserved": true,
+    "legacyProductSourceAndScriptReferences": 0,
+    "legacyHelperCalls": 0
+  },
+  "playableExe": ".local/m6-ui-v010/Builds/Windows/CatanM6.exe",
+  "notRun": [
+    "全量规则测试",
+    "52个完整AI局",
+    "人工鼠标与外观检查",
+    "全分辨率和长期性能"
+  ],
+  "preserved": [
+    "用户正常存档",
+    "原始照片及美术版本",
+    "旧验收记录及Git历史",
+    "M1–M5规则阶段样板",
+    "独立美术图库",
+    "当前策略的历史构建"
+  ]
+}
