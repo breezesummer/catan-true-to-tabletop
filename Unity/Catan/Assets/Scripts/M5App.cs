@@ -467,14 +467,7 @@ public sealed partial class M5App : MonoBehaviour
     }
     int Count(string name,int value,int max)
     {
-        if(MobileTabletop.Enabled)
-        {
-            GUILayout.BeginHorizontal();GUILayout.Label(name+"  "+value,ModernOperationUI.Text,GUILayout.Width(360),GUILayout.Height(86));
-            if(ModernOperationUI.LayoutButton("−",value>0))value=Math.Max(0,value-1);
-            if(ModernOperationUI.LayoutButton("+",value<max))value=Math.Min(max,value+1);
-            GUILayout.EndHorizontal();return value;
-        }
-        GUILayout.BeginHorizontal();Text(name+"  "+value);if(GUILayout.Button("−",button,GUILayout.Width(36),GUILayout.Height(28)))value=Math.Max(0,value-1);if(GUILayout.Button("+",button,GUILayout.Width(36),GUILayout.Height(28)))value=Math.Min(max,value+1);GUILayout.EndHorizontal();return value;
+        GUILayout.BeginHorizontal();Text(name+"  "+value);if(GUILayout.Button("−",button,GUILayout.Width(36),GUILayout.Height(28))&&!MobileTabletop.TouchDragged)value=Math.Max(0,value-1);if(GUILayout.Button("+",button,GUILayout.Width(36),GUILayout.Height(28))&&!MobileTabletop.TouchDragged)value=Math.Min(max,value+1);GUILayout.EndHorizontal();return value;
     }
     void Bag(string title,ResourceBag resources,CommodityBag commodities)
     {

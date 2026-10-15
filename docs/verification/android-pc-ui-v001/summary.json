@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-15",
+  "title": "安卓直接复用PC完整桌面UI",
+  "release": "卡坦岛之三国争霸内测版1.4",
+  "versionCode": 10401,
+  "status": "passed",
+  "apk": {
+    "status": "passed",
+    "checkedAtUtc": "2026-10-15T09:37:34.1535711Z",
+    "apk": "Catan.apk",
+    "bytes": 302390513,
+    "sha256": "1C08F234E7E827D5BDE5B57478BD3CCA12CF094C3AFDDF579F4E1028E381B5A4",
+    "packageId": "com.catandevelopment.threekingdoms",
+    "versionName": "1.4",
+    "versionCode": 10401,
+    "minSdk": 26,
+    "targetSdk": 36,
+    "activity": "com.unity3d.player.UnityPlayerActivity",
+    "orientation": "sensorLandscape",
+    "landscape": true,
+    "glEsVersion": "0x30000",
+    "nativeArchitectures": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "signatureV2Verified": true,
+    "signatureV3Verified": false,
+    "signaturePolicy": "minSdk 26 要求有效 v2；v3 仅记录，不强制。",
+    "signaturePolicySource": "https://source.android.com/docs/security/features/apksigning/v2",
+    "signerCertificateSha256": [
+      "411D31A2D63EB39C60595C96FF2283556CEC04033F6C605484BD940D5F37D6B9"
+    ],
+    "debuggable": false,
+    "zipFiles": 814,
+    "forbiddenEntries": 0,
+    "developmentDataAbsent": true,
+    "failure": null
+  },
+  "dotnet": {
+    "passed": 203,
+    "failed": 0,
+    "filter": "AndroidTouchLayoutTests、Operation与Tabletop相关测试；30项安卓坐标/手势测试包含在203项内，不重复累计"
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "androidBuild": "passed",
+    "windowsBuild": "passed",
+    "pcIndependentSaveLoad": "passed",
+    "pcDefaultSaveUnchanged": true
+  },
+  "androidRuntime": {
+    "device": "Android 15 API 35 x86_64模拟器",
+    "screen": "2400x1080",
+    "run": {
+      "status": "passed",
+      "checks": 547,
+      "modes": 4,
+      "screenshots": 27,
+      "sharedPcUi": true
+    },
+    "independentLoad": {
+      "status": "passed",
+      "checks": 323,
+      "modes": 4,
+      "screenshots": 27,
+      "sharedPcUi": true
+    },
+    "unityErrors": 0
+  },
+  "limitations": [
+    "尚未完成真机完整对局、全部设备分辨率与长期性能验证",
+    "所有港口、骑士、移船和扩展待决触控链未逐项真机验收",
+    "安卓渲染质量与打包中文字体沿用移动配置，UI布局及逻辑与PC共用",
+    "M7/M8阶段状态不变"
+  ],
+  "developmentNotes": [
+    "首次组合库存检查将八类库存起点误判为必须大于450，核对实际布局后修正为大于400，最终重新构建并通过四模式检查。",
+    "构建工具重启ADB后首次安装遇到设备离线，重连后覆盖安装成功。",
+    "首次双指触控注入因shell无sendevent权限失败；仅为开发模拟器临时启用adbd root后重跑通过，结束后恢复非root；普通手机安装运行不需要root。"
+  ],
+  "androidTouch": {
+    "status": "passed",
+    "assertions": 28,
+    "screenshots": 12,
+    "actualInputExecuted": true,
+    "coverage": "菜单、单指平移、双指缩放及防误触、建造取消和合法落子、独立重启恢复、手牌页签、银行与玩家交易",
+    "visualReview": "抽查代表性截图，最终玩家交易标题完整；未逐张人工验收全部截图"
+  },
+  "saveProtection": {
+    "androidOriginalAndBackupRestored": true,
+    "pcDefaultSaveUnchanged": true,
+    "pcFiles": 2,
+    "emulatorAdbReturnedToNonRoot": true
+  },
+  "artifacts": {
+    "apk": ".local/m6-android-pc-ui-v001/release/卡坦岛之三国争霸内测版1.4-安卓-PC同版界面/卡坦岛之三国争霸内测版1.4-安卓-PC同版界面.apk",
+    "windowsExecutable": ".local/m6-android-pc-ui-v001/Builds/Windows/CatanM6.exe",
+    "releaseCopyMatchesVerifiedApk": true
+  }
+}

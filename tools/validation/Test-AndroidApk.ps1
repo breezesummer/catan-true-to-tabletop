@@ -1,6 +1,8 @@
 ﻿param(
     [Parameter(Mandatory=$true)][string]$ApkPath,
-    [string]$UnityAndroidRoot = ''
+    [string]$UnityAndroidRoot = '',
+    [ValidateRange(1,2147483647)][int]$ExpectedVersionCode = 10401,
+    [string]$ExpectedVersionName = '1.4'
 )
 $ErrorActionPreference = 'Stop'
 $apkCheckFailure = $null
@@ -111,8 +113,8 @@ try {
     $apkPublicReport.versionName = Read-ApkAttribute $apkPackageLine 'versionName'
     $apkPublicReport.versionCode = [int](Read-ApkAttribute $apkPackageLine 'versionCode')
     Assert-ApkCheck ($apkPublicReport.packageId -ceq 'com.catandevelopment.threekingdoms') 'APK 包名不符合当前内测发布配置。'
-    Assert-ApkCheck ($apkPublicReport.versionName -ceq '1.4') 'APK versionName 应为 1.4。'
-    Assert-ApkCheck ($apkPublicReport.versionCode -eq 10400) 'APK versionCode 应为 10400。'
+    Assert-ApkCheck ($apkPublicReport.versionName -ceq $ExpectedVersionName) ('APK versionName 应为 ' + $ExpectedVersionName + '。')
+    Assert-ApkCheck ($apkPublicReport.versionCode -eq $ExpectedVersionCode) ('APK versionCode 应为 ' + $ExpectedVersionCode + '。')
     $apkMinMatch = [regex]::Match($apkBadging, "(?m)^sdkVersion:'(\d+)'\s*$")
     $apkTargetMatch = [regex]::Match($apkBadging, "(?m)^targetSdkVersion:'(\d+)'\s*$")
     Assert-ApkCheck ($apkMinMatch.Success -and $apkTargetMatch.Success) 'APK 缺少最低或目标 Android API。'

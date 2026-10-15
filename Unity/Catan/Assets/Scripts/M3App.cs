@@ -251,7 +251,7 @@ public sealed partial class M3App : MonoBehaviour
         badge=new GUIStyle(text){fontSize=14,alignment=TextAnchor.MiddleCenter};
     }
     static void Panel(Rect rect,Color color){var previous=GUI.color;GUI.color=color;GUI.DrawTexture(rect,Texture2D.whiteTexture);GUI.color=previous;}
-    bool Button(float x,float y,float width,string label,float height=34) => GUI.Button(new Rect(x,y,width,height),label,button);
+    bool Button(float x,float y,float width,string label,float height=34) => GUI.Button(new Rect(x,y,width,height),label,button)&&!MobileTabletop.TouchDragged;
     void Label(float x,float y,float width,float height,string label,GUIStyle style=null) => GUI.Label(new Rect(x,y,width,height),label,style??text);
     void OnGUI()
     {
@@ -573,14 +573,10 @@ public sealed partial class M3App : MonoBehaviour
     void DrawMarker(string location,string label,Color color,bool frameRobber=false)
     {
         var p=frameRobber?board.FrameRobberScreenPoint():board.ScreenPoint(location);var logical=MobileTabletop.Logical(p);float x=logical.x,y=logical.y;
-        if(MobileTabletop.Enabled)
-        {
-            var markerStyle=new GUIStyle(small){fontSize=18,wordWrap=false,padding=new RectOffset(),alignment=TextAnchor.MiddleCenter};
-            var size=markerStyle.CalcSize(new GUIContent(label));
-            var area=new Rect(x-size.x/2-6,y-size.y/2-4,size.x+12,size.y+8);
-            Panel(area,color);GUI.Label(area,label,markerStyle);return;
-        }
-        float width=Math.Max(25,label.Length*12);Panel(new Rect(x-width/2,y-10,width,21),color);Label(x-width/2,y-11,width,22,label,small);
+        var markerStyle=new GUIStyle(small){wordWrap=false,padding=new RectOffset(),alignment=TextAnchor.MiddleCenter};
+        var size=markerStyle.CalcSize(new GUIContent(label));
+        var area=new Rect(x-Mathf.Max(25,size.x+8)/2,y-Mathf.Max(21,size.y+4)/2,Mathf.Max(25,size.x+8),Mathf.Max(21,size.y+4));
+        Panel(area,color);GUI.Label(area,label,markerStyle);
     }
     void DrawGuide()
     {

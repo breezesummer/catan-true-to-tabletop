@@ -1,3 +1,3 @@
-param([string]$BuildRoot='.local/m6-release-1.4')
+﻿param([string]$BuildRoot='.local/m6-android-pc-ui-v001')
 $ErrorActionPreference = 'Stop'
 & (Join-Path $PSScriptRoot 'Play-M6.ps1') -BuildRoot $BuildRoot

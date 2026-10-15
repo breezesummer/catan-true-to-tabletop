@@ -216,8 +216,7 @@ public sealed partial class M2App
         }
         if(view.Phase==GamePhase.RobberMove&&!holding)
         {
-            if(MobileTabletop.Enabled){TableNote("移动强盗",()=>{if(TableButton("拿起强盗，选择新的地块"))Pickup(CommandKind.MoveRobber);});return;}
-            var pos=board.ScreenPoint(view.Board.RobberTileId);var r=new Rect(pos.x*1440f/Screen.width-24,pos.y*900f/Screen.height-50,48,70);if(GUI.Button(r,GUIContent.none,GUIStyle.none))Pickup(CommandKind.MoveRobber);
+            var pos=MobileTabletop.Logical(board.ScreenPoint(view.Board.RobberTileId));var r=new Rect(pos.x-24,pos.y-50,48,70);if(GUI.Button(r,GUIContent.none,GUIStyle.none)&&!MobileTabletop.TouchDragged)Pickup(CommandKind.MoveRobber);
         }
         if(view.Phase==GamePhase.RoadBuilding&&!holding&&view.LegalEdgeIds.Length==0)
             TableNote("道路建设",()=>{if(TableButton("结束免费建设"))Submit(NewCommand(CommandKind.FinishRoadBuilding));});

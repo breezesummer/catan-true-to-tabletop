@@ -244,7 +244,6 @@ public sealed partial class M6App : MonoBehaviour
     void OnGUI()
     {
         Styles();GUI.depth=-100;GUI.matrix=MobileTabletop.GuiMatrix;
-        if(MobileTabletop.Enabled){DrawMobileMenus();GUI.matrix=Matrix4x4.identity;return;}
         if(MenuVisible)
         {
             Panel(new Rect(0,0,1440,900),new Color(.025f,.07f,.085f));

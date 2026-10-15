@@ -47,6 +47,7 @@ public sealed class TabletopScene : MonoBehaviour
     bool topView;
     float zoom = 1;
     int screenWidth, screenHeight;
+    Rect screenViewport;
     Transform expansionMarkers, expansionTrack;
     Vector3 markerOriginalPosition, markerOriginalScale;
     bool markerOriginalActive;
@@ -270,16 +271,27 @@ public sealed class TabletopScene : MonoBehaviour
 
     void LateUpdate()
     {
-        if (boardCamera != null && (screenWidth != Screen.width || screenHeight != Screen.height)) ApplyCamera();
+        if (boardCamera != null && (screenWidth != Screen.width || screenHeight != Screen.height || screenViewport != CurrentScreenViewport())) ApplyCamera();
         // 蛮族移动会生成新船，只修正显示层，绝不更改规则状态。
         if(expansionMarkers!=null)SetHudLayer(expansionMarkers);
+    }
+
+    static Rect CurrentScreenViewport()
+    {
+        var viewport=MobileTabletop.Viewport;
+        return new Rect(viewport.Left,Screen.height-viewport.Top-viewport.Height,viewport.Width,viewport.Height);
     }
 
     void ApplyCamera()
     {
         screenWidth = Screen.width; screenHeight = Screen.height;
-        float aspect = Mathf.Max(.1f, (float)screenWidth / Mathf.Max(1, screenHeight));
-        layoutCamera.aspect=aspect;layoutCamera.rect=new Rect(0,0,1,1);
+        screenViewport=CurrentScreenViewport();
+        // 地图、3D 骰子/棋子和 IMGUI 使用同一安全区；逻辑坐标始终为 1440 × 900。
+        // 只偏移二维按钮会让实体 HUD 的显示位置与点击射线发生偏差。
+        var cameraRect=new Rect(screenViewport.x/Mathf.Max(1,screenWidth),screenViewport.y/Mathf.Max(1,screenHeight),
+            screenViewport.width/Mathf.Max(1,screenWidth),screenViewport.height/Mathf.Max(1,screenHeight));
+        float aspect = Mathf.Max(.1f,screenViewport.width/Mathf.Max(1,screenViewport.height));
+        layoutCamera.aspect=aspect;layoutCamera.rect=cameraRect;
         var publicOutline=outline.Concat(presentationOutline??new Vector3[0]).ToArray();
         var hudUp=layoutCamera.transform.up;
         float minX=publicOutline.Min(p=>p.x-center.x),maxX=publicOutline.Max(p=>p.x-center.x);
@@ -297,7 +309,7 @@ public sealed class TabletopScene : MonoBehaviour
 
         boardCamera.cullingMask=(originalCullingMask|(1<<TableLayer))&~(1<<HudLayer);
         boardCamera.enabled=true;boardCamera.targetTexture=null;
-        boardCamera.rect=new Rect(0,0,1,1);boardCamera.aspect=aspect;
+        boardCamera.rect=cameraRect;boardCamera.aspect=aspect;
         boardCamera.clearFlags=CameraClearFlags.SolidColor;
         boardCamera.backgroundColor=new Color(.22f,.11f,.045f);
         boardCamera.orthographic=true;boardCamera.nearClipPlane=.01f;boardCamera.farClipPlane=10;
