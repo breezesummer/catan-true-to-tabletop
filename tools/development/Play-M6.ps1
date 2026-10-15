@@ -1,4 +1,4 @@
-﻿param([string]$BuildRoot='.local/m7-v001')
+param([string]$BuildRoot='.local/ui-feedback-v012-final')
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Player = Join-Path $m6RepoRoot "$BuildRoot/Builds/Windows/CatanM6.exe"

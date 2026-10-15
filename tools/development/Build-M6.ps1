@@ -1,4 +1,4 @@
-﻿param([switch]$VerifyPlayer,[string]$OutputRoot='.local/m6-android-pc-ui-v001',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
+param([switch]$VerifyPlayer,[string]$OutputRoot='.local/ui-feedback-v012-final',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path

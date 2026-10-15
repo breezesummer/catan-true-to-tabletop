@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='.local/m7-v001')
+param([switch]$VerifyPlayer,[string]$OutputRoot='.local/ui-feedback-v012-final')
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m7RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path

@@ -77,6 +77,7 @@ public sealed partial class M2App
             operationView=view;
             var own=view.Players.First(p=>p.Id==seat);
             var s=new OperationSnapshot{Scope="M2:"+seat,Seat=seat,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),GoodCount=5};
+            s.CollectionTiles=TabletopCollectionSources.Project(view.Board.Tiles,view.Board.Settlements,view.Board.Cities,view.Board.RobberTileId,s.GoodCount==8);s.CollectionPosition=id=>{var point=MobileTabletop.Logical(board.ScreenPoint(id));return new TabletopCardPose{X=point.x,Y=point.y};};
             s.Goods=DockCost(view.OwnResources.Wood,view.OwnResources.Brick,view.OwnResources.Wool,view.OwnResources.Wheat,view.OwnResources.Ore);
             s.Bank=DockCost(view.Bank.Wood,view.Bank.Brick,view.Bank.Wool,view.Bank.Wheat,view.Bank.Ore);
             for(int i=0;i<5;i++)s.Rates[i]=4;
@@ -96,6 +97,11 @@ public sealed partial class M2App
             }
             s.PrepareBuild=b=>{CancelOperationDraft();var k=(CommandKind)Enum.Parse(typeof(CommandKind),b.Id);if(k==CommandKind.BuyDevelopmentCard){preparedPurchase=true;status="已选发展卡，请在桌面确认购买。";}else Pickup(k);};
             s.PrepareCard=c=>{CancelOperationDraft();preparedDevelopment=(DevelopmentCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在桌面确认出牌。";};
+            var handDiscard=view.Phase==GamePhase.Discard?view.Discards.FirstOrDefault(d=>d.PlayerId==seat):null;
+            if(handDiscard!=null)s.Discard=new OperationDiscard{Amount=handDiscard.Amount,Confirm=(selected,card)=>{
+                var c=NewCommand(CommandKind.DiscardResources);c.Resources=new ResourceBag();
+                for(int i=0;i<5;i++)c.Resources[(Resource)i]=selected[i];Submit(c);
+            }};
             s.Cancel=CancelOperationDraft;
             s.Notify=ai.ShowTablePrompt;
             s.Trade=t=>
@@ -128,6 +134,7 @@ public sealed partial class M2App
         TabletopUI.DrawMapLabels(DrawBoardLabels);
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TableMenuOpen);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
+        tabletop.BindDiscard(Operations(),dock);
         tabletop.BindLongestRoad(view.LongestRoadPlayerId,view.Players.FirstOrDefault(p=>p.Id==view.LongestRoadPlayerId)?.LongestRoadLength??0);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,null);
         ai.TableDiceRolling=tabletop.DiceRolling;
@@ -205,15 +212,8 @@ public sealed partial class M2App
                 if(TableButton("放回手牌")){CancelOperationDraft();dock.Reset();}
             });return;
         }
-        if(view.Phase==GamePhase.Discard)
-        {
-            var required=view.Discards.FirstOrDefault(d=>d.PlayerId==seat);if(required==null)return;
-            TableNote("归还资源",()=>{
-                GUILayout.Label("需弃 "+required.Amount+" 张 · 已抽出 "+dock.Selection.Selected.Sum()+" 张",tableInk);
-                bool before=GUI.enabled;GUI.enabled=before&&dock.Selection.Selected.Sum()==required.Amount;
-                if(TableButton("将选中的牌放回银行")){var c=NewCommand(CommandKind.DiscardResources);c.Resources=new ResourceBag();for(int i=0;i<5;i++)c.Resources[(Resource)i]=dock.Selection.Selected[i];Submit(c);}GUI.enabled=before;
-            });return;
-        }
+        if(view.Phase==GamePhase.Discard)return;
+
         if(view.Phase==GamePhase.RobberMove&&!holding)
         {
             var pos=MobileTabletop.Logical(board.ScreenPoint(view.Board.RobberTileId));var r=new Rect(pos.x-24,pos.y-50,48,70);if(GUI.Button(r,GUIContent.none,GUIStyle.none)&&!MobileTabletop.TouchDragged)Pickup(CommandKind.MoveRobber);
