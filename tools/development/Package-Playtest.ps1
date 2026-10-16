@@ -1,4 +1,4 @@
-param([string]$BuildRoot='.local/m6-mountain-v006',[string]$ReleaseName='卡坦岛之三国争霸内测版1.3')
+param([string]$BuildRoot='.local/release-1.5',[string]$ReleaseName='卡坦岛之三国争霸内测版1.5-PC')
 $ErrorActionPreference='Stop'
 $packageRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $packageBuild=Join-Path $packageRepo "$BuildRoot/Builds/Windows"
@@ -8,23 +8,27 @@ $packageZip=Join-Path $packageRoot "$ReleaseName.zip"
 if(!(Test-Path -LiteralPath (Join-Path $packageBuild 'CatanM6.exe'))){throw '缺少已构建的可玩程序。'}
 if((Test-Path -LiteralPath $packageFolder) -or (Test-Path -LiteralPath $packageZip)){throw '发行路径已存在；请使用新的发行目录，避免覆盖已发出的版本。'}
 New-Item -ItemType Directory -Path $packageFolder -Force | Out-Null
-foreach($packageItem in Get-ChildItem -LiteralPath $packageBuild){
-    if($packageItem.Name -like '*DoNotShip*'){continue}
-    Copy-Item -LiteralPath $packageItem.FullName -Destination $packageFolder -Recurse
+foreach($packageItem in Get-ChildItem -LiteralPath $packageBuild -Recurse -File){
+    $packageRelative=$packageItem.FullName.Substring($packageBuild.Length+1)
+    if($packageRelative -match '(?i)DoNotShip|\.pdb$'){continue}
+    $packageTarget=Join-Path $packageFolder $packageRelative
+    New-Item -ItemType Directory -Path (Split-Path $packageTarget) -Force | Out-Null
+    Copy-Item -LiteralPath $packageItem.FullName -Destination $packageTarget
 }
+Copy-Item -LiteralPath (Join-Path $packageRepo 'Unity/Catan/Assets/Resources/Fonts/OFL.txt') -Destination (Join-Path $packageFolder '中文字体许可-OFL.txt')
 $packageReadme=@'
-卡坦岛之三国争霸内测版1.3
+卡坦岛之三国争霸内测版1.5-PC
 
 使用方法：先完整解压此文件夹，再双击 CatanM6.exe。请保留同目录的所有数据文件和运行库。
-运行平台：Windows 64 位；本地单人及 AI 对局。包含基础版、航海家、城市与骑士和已支持的双扩展组合。
+运行平台：Windows 64 位；本地单人及 AI 对局，另带局域网房间服务。包含基础版、航海家、城市与骑士和已支持的双扩展组合。
 
-本次调整：矿石地形采用实体高山板块照片，替换矿石资源牌裁切插画；矿石手牌继续显示完整资源卡。沿用此前相机缩放、建筑栏、手牌、设施、交易筛选与回合徽章调整。
+本版汇总：中世纪海港主页、五项主菜单和分层开局／加载／联机／设置；交互音效与环境声、手牌计数和弃牌确认、三档 AI 速度及建造动画。PC 与 Android 共用规则、当前 AI、实体资产和完整桌面界面。
 操作：拖拽地图/滚轮缩放，建筑拖到合法位置；右击骑士操作；点船选中再点空海岸改道；所属港口兑换（专属2:1/通用3:1）。左上银行、玩家交易、三设施入口；底部资源/发展页签、整理手牌（新牌追加末尾，读档恢复分类基线）。右下掷骰/等待弃牌/结束回合。Esc优先取消，再开菜单；主题切换、当前扩展与航海特殊行动从菜单查看。
 
 本版沿用原优化 AI 和存档路径。请先保存并退出旧窗口，再启动新版。内测反馈请附画面、规则模式和复现步骤。
-本包不含开发验收局、用户存档、私人日志或调试符号；好友联机和成品发行验收仍未完成。
+本包不含开发验收局、用户存档、私人日志或调试符号；局域网与在线房间已实现本机验证范围，使用方法见 Server/服务启动说明.md；当前没有公共在线服务器。真实多机、公网、清洁环境与长期性能待验。
 '@
-$packageReadme=$packageReadme.Replace('卡坦岛之三国争霸内测版1.3',$ReleaseName)
+$packageReadme=$packageReadme.Replace('卡坦岛之三国争霸内测版1.5-PC',$ReleaseName)
 [IO.File]::WriteAllText((Join-Path $packageFolder '试玩说明.txt'),$packageReadme,[Text.UTF8Encoding]::new($true))
 $packageRows=foreach($packageFile in Get-ChildItem -LiteralPath $packageFolder -Recurse -File){
     [ordered]@{file=$packageFile.FullName.Substring($packageFolder.Length+1);bytes=$packageFile.Length;sha256=(Get-FileHash -LiteralPath $packageFile.FullName -Algorithm SHA256).Hash}

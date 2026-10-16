@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string ReleaseVersion="内测版1.4";
+    public const string ReleaseVersion="内测版1.5";
     [Serializable]
     public sealed class SavedGame
     {
@@ -272,7 +272,7 @@ public sealed partial class M6App : MonoBehaviour
                 ModernOperationUI.Panel(new Rect(460,112,520,676));
                 ModernOperationUI.Label(new Rect(494,137,310,44),"游戏菜单",ModernOperationUI.Title);
                 ModernOperationUI.Label(new Rect(814,149,132,25),"Esc 返回游戏",ModernOperationUI.Small);
-                ModernOperationUI.Label(new Rect(494,187,452,24),"卡坦岛之三国争霸 · 内测版1.4",ModernOperationUI.Small);
+                ModernOperationUI.Label(new Rect(494,187,452,24),"卡坦岛之三国争霸 · "+ReleaseVersion,ModernOperationUI.Small);
                 string configuration="当前扩展 · "+RuleNames[Array.IndexOf(RuleIds,RuleSet)];
                 if(RuleSet=="seafarers"||RuleSet=="combined")configuration+=" · "+Catan.Core.M3.SeafarersScenarios.Create(ScenarioId,PlayerCount).Name;
                 ModernOperationUI.Label(new Rect(494,221,452,44),configuration,ModernOperationUI.Text);
