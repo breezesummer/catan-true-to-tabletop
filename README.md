@@ -1,5 +1,7 @@
 # 卡坦岛之三国争霸（PC／安卓同工程）
 
+2026-10-16 已完成 **中世纪写实二次元主页与分层菜单 v002**：暖光海港、城堡与麦田插画；左侧五项主菜单；三步开局；独立存档预览、局域网／在线页面、房间分组及声音／外观设置。沿用内测版1.4。当前可玩入口：[CatanM6.exe](.local/menu-medieval-v002/Builds/Windows/CatanM6.exe)，标准启动脚本已统一本版。1,186 项 .NET 回归、Unity Windows 构建及四规则独立保存恢复通过；多分辨率与真实鼠标检查见 [实现与验收](docs/MENU_MEDIEVAL_V002.md)。安卓真机、真实多机／公网及长期性能待验，M7／M8 状态保持。以下为先前构建入口。
+
 2026-10-16 已完成**手牌、弃牌与 AI 动画 v012**，沿用内测版1.4：牌背图标、手牌数／限额及超限红字，地块资源与发展／进步收牌动画，图标化玩家列表，三档单人 AI 速度、头像飞出建造与本回合金色高亮，手牌点选并在右下角确认弃牌。当前可玩入口：[CatanM6.exe](.local/ui-feedback-v012-final/Builds/Windows/CatanM6.exe)。.NET 去重890项、Unity构建、四规则保存恢复和实际窗口检查通过。源码已隔离于 `codex/ui-feedback-v012`，保留主工作区并行菜单／音频修改。详见[迭代说明](docs/UI_FEEDBACK_V012.md)与[验证摘要](docs/verification/ui-feedback-v012/summary.json)。
 
 2026-10-16 已完成**手牌、弃牌与 AI 动画 v012**，沿用内测版1.4：牌背图标、手牌数／限额及超限红字，地块资源与发展／进步收牌动画，图标化玩家列表，三档单人 AI 速度、头像飞出建造与本回合金色高亮，手牌点选并在右下角确认弃牌。当前可玩入口：[CatanM6.exe](.local/ui-feedback-v012-final/Builds/Windows/CatanM6.exe)。.NET 去重890项、Unity构建、四规则保存恢复和实际窗口检查通过。源码已隔离于 `codex/ui-feedback-v012`，保留主工作区并行菜单／音频修改。详见[迭代说明](docs/UI_FEEDBACK_V012.md)与[验证摘要](docs/verification/ui-feedback-v012/summary.json)。

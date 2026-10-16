@@ -1,0 +1,16 @@
+{
+  "assetId": "menu-medieval-v002",
+  "kind": "二维主菜单背景插画",
+  "tool": "内置 image_gen",
+  "source": "art/source/menu-medieval-v002/medieval-harbor-original.png",
+  "runtime": "Unity/Catan/Assets/Resources/PastoralMenu/v002/medieval-harbor.png",
+  "prompt": "Use case: historical-scene. Asset type: finished background key art for a premium cozy medieval strategy game main menu, wide 16:10 composition, ideally 2560x1600. Primary request: realistic anime art (写实二次元), an idyllic medieval coastal settlement in warm late-afternoon sunlight. Physically convincing timber-frame houses, warm weathered limestone, terracotta slate roofs, a small walled castle on a hill, a curving blue-green harbor with wooden medieval sailboats, rolling wheat fields, a few grazing sheep, lush trees and layered distant mountain silhouettes. Art direction: exquisite hand-painted anime environment, realistic proportions and material detail, subtle painterly brushwork, calm breathable atmosphere, romantic pastoral world, rich but restrained natural colors, warm ivory highlights, sage green countryside and blue sea, cinematic atmospheric perspective. Composition: the leftmost 34% is calm shaded foliage and softly lit open land with low contrast, reserved for separately rendered readable left-aligned title and vertical menu. The detailed medieval village and castle lie at center-right, the harbor opens into the distance at upper right, wheat and wildflowers frame the lower right. Preserve a large connected landscape across the image. No large foreground characters. No flat vector art, no low-poly geometry, no chibi, no plastic toy rendering, no modern buildings, no modern objects, no futuristic elements. Text: none. Constraints: only the scene, no lettering, no logos, no watermarks, no border, no buttons, no menu UI. Output is a 2D game backdrop, not a 3D mesh.",
+  "notes": [
+    "原图保留，不覆盖 v001 参考。",
+    "未当作三维网格交付。",
+    "显示动画只使用展示时钟，与权威随机状态独立。"
+  ],
+  "sourceSha256": "0cee5894f839ad5999a3e921f077663a3657754f3d438d2bca6b0a2304c23531",
+  "width": 1586,
+  "height": 992
+}

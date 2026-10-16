@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='.local/menu-audio-v001')
+param([switch]$VerifyPlayer,[string]$OutputRoot='.local/menu-medieval-v002')
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m7RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path

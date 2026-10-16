@@ -1,4 +1,4 @@
-param([string]$BuildRoot='.local/menu-audio-v001')
+param([string]$BuildRoot='.local/menu-medieval-v002')
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Player = Join-Path $m6RepoRoot "$BuildRoot/Builds/Windows/CatanM6.exe"
