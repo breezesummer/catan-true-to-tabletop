@@ -1,0 +1,59 @@
+{
+  "releaseName": "卡坦岛之三国争霸内测版1.3",
+  "date": "2026-10-15",
+  "previousRelease": "内测版1.2",
+  "uiBatch": "v011",
+  "rulesChanged": false,
+  "aiChanged": false,
+  "authorityFormatChanged": false,
+  "dotnet": {
+    "passed": 88,
+    "failed": 0,
+    "filter": "OperationDockTests|TabletopCameraTests",
+    "netstandard21": "passed",
+    "fullSuiteRerun": false,
+    "inheritedBaselineUnique": 815,
+    "inheritedCompleteAiGames": 52
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "build": "passed",
+    "buildSeconds": 33.4,
+    "saveSeconds": 18.7,
+    "loadSeconds": 11.1,
+    "saveLoadModes": [
+      "base",
+      "seafarers",
+      "cities-knights",
+      "combined"
+    ]
+  },
+  "package": {
+    "path": ".local/m6-release-1.3/release/卡坦岛之三国争霸内测版1.3.zip",
+    "bytes": 456935238,
+    "sha256": "B202B3B6A9FC4242F64D592C470C6374D9F965A9ED68D42DE11763DE201D815A",
+    "filesVerified": 166,
+    "archiveStreams": "all_lengths_and_sha256_passed",
+    "sourceBuildMatch": true,
+    "forbiddenDevelopmentData": "absent",
+    "unpackedIndependentSaveLoad": "passed",
+    "manualVersionDisplay": "startup_1.3_verified"
+  },
+  "executable": {
+    "path": ".local/m6-release-1.3/Builds/Windows/CatanM6.exe",
+    "sha256": "3070E580E019576B9AFCDEB4FEC18D03CEBC119F6AE84D597412905C749AD653",
+    "presentationAssemblySha256": "CC232EEF53061918079F70ACE7A55A52D36E0C059C9CD7F54DCBBC2239A3665E"
+  },
+  "wechat": {
+    "group": "卡坦项目督察组",
+    "status": "pending"
+  },
+  "unverified": [
+    "用户本人完整对局",
+    "完整港口／骑士／移船鼠标链",
+    "全部分辨率与用户最终外观",
+    "长期性能"
+  ],
+  "roadmap": "M7/M8不推进",
+  "preExistingTrackedChanges": "byte_for_byte_preserved"
+}

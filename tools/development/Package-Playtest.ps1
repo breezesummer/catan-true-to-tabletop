@@ -1,4 +1,4 @@
-param([string]$BuildRoot='.local/m6-mountain-v006',[string]$ReleaseName='卡坦岛之三国争霸内测版1.2')
+param([string]$BuildRoot='.local/m6-mountain-v006',[string]$ReleaseName='卡坦岛之三国争霸内测版1.3')
 $ErrorActionPreference='Stop'
 $packageRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $packageBuild=Join-Path $packageRepo "$BuildRoot/Builds/Windows"
@@ -13,7 +13,7 @@ foreach($packageItem in Get-ChildItem -LiteralPath $packageBuild){
     Copy-Item -LiteralPath $packageItem.FullName -Destination $packageFolder -Recurse
 }
 $packageReadme=@'
-卡坦岛之三国争霸内测版1.2
+卡坦岛之三国争霸内测版1.3
 
 使用方法：先完整解压此文件夹，再双击 CatanM6.exe。请保留同目录的所有数据文件和运行库。
 运行平台：Windows 64 位；本地单人及 AI 对局。包含基础版、航海家、城市与骑士和已支持的双扩展组合。
@@ -24,7 +24,7 @@ $packageReadme=@'
 本版沿用原优化 AI 和存档路径。请先保存并退出旧窗口，再启动新版。内测反馈请附画面、规则模式和复现步骤。
 本包不含开发验收局、用户存档、私人日志或调试符号；好友联机和成品发行验收仍未完成。
 '@
-$packageReadme=$packageReadme.Replace('卡坦岛之三国争霸内测版1.2',$ReleaseName)
+$packageReadme=$packageReadme.Replace('卡坦岛之三国争霸内测版1.3',$ReleaseName)
 [IO.File]::WriteAllText((Join-Path $packageFolder '试玩说明.txt'),$packageReadme,[Text.UTF8Encoding]::new($true))
 $packageRows=foreach($packageFile in Get-ChildItem -LiteralPath $packageFolder -Recurse -File){
     [ordered]@{file=$packageFile.FullName.Substring($packageFolder.Length+1);bytes=$packageFile.Length;sha256=(Get-FileHash -LiteralPath $packageFile.FullName -Algorithm SHA256).Hash}
