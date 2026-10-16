@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$OutputRoot = '.local/m6-android-pc-ui-v001',
+    [string]$OutputRoot = '.local/release-1.5',
     [switch]$Arm64Only
 )
 $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()
