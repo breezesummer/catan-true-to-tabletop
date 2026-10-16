@@ -97,7 +97,8 @@ public sealed partial class M6App : MonoBehaviour
     }
     internal void HandleTableEscape()
     {
-        if(MenuVisible||!Ready)return;
+        if(MenuVisible){HandleMainMenuEscape();return;}
+        if(!Ready)return;
         if(tableMenu){tableMenu=false;escapeDismissedInteraction=false;nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);return;}
         // 第一遍放回本地草稿；规则要求的待决面板即使自动出现，下一遍仍能打开菜单。
         if(!escapeDismissedInteraction)
@@ -169,7 +170,7 @@ public sealed partial class M6App : MonoBehaviour
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
         TargetVictoryPoints=target;AiSpeedLevel=TabletopAiSpeed.Clamp(aiSpeedLevel??AiSpeedLevel);ResetBuildPresentation();
-        tableMenu=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你的手牌始终只显示 "+human+"。";
+        networkMenu=false;menuPendingAction=null;tableMenu=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你的手牌始终只显示 "+human+"。";
         promptContext=null;promptWasHuman=false;lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.Show(Time.unscaledTimeAsDouble);
         switch(rules)
         {
@@ -237,7 +238,7 @@ public sealed partial class M6App : MonoBehaviour
     public void ShowMenu()
     {
         if(NetworkGame){OpenNetworkMenu();return;}
-        MenuVisible=true;if(presentation!=null)presentation.enabled=false;if(visible!=null)visible(false);
+        MenuVisible=true;NavigateMainMenu(-1);if(presentation!=null)presentation.enabled=false;if(visible!=null)visible(false);
         menuRule=Array.IndexOf(RuleIds,RuleSet);menuPlayers=PlayerCount;menuHuman=int.Parse(HumanSeat.Substring(1))-1;
         var ids=ScenarioIds();menuScenario=Math.Max(0,Array.IndexOf(ids,ScenarioId));
         menuVictoryPoints=TargetVictoryPoints;menuAiSpeed=AiSpeedLevel;

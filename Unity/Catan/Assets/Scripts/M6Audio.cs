@@ -10,7 +10,6 @@ public sealed partial class M6App
         tabletopAudio.Initialize(this);
     }
     void ResetTabletopAudioHistory() { if (tabletopAudio != null) tabletopAudio.ResetHistory(); }
-    partial void DrawPastoralAudioSettings(Rect rect) { if (tabletopAudio != null) tabletopAudio.DrawSettings(rect, font); }
     internal string AudioScope => (presentation == null ? "menu" : presentation.GetInstanceID().ToString()) + ":" + HumanSeat;
     internal int AudioBarbarianPosition => presentation is M4App cities && cities.M6View != null ? cities.M6View.BarbarianPosition :
         presentation is M5App combined && combined.M6View != null ? combined.M6View.BarbarianPosition : -1;
