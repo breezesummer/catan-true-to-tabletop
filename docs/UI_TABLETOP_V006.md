@@ -68,4 +68,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/development/Play-M6.ps
 
 启动脚本已默认使用 v006；最终已测 `Builds/Windows` 已复制到主工作区 `.local/m6-ui-v006/Builds/Windows`，166 个文件逐一 SHA-256 核对一致。主目录另同步 42 个本轮 UI／规则源文件及启动入口；并行 AI 未提交修改保留，五个 AI 源文件集成前后哈希一致。原本未改动的两个 `Assets/Plugins` DLL 已同步为 v006 兼容程序集。
 
-实现提交 `06854215502fee10e3b484ba4c3f3e1f8ba0adb7` 已推送至 `origin/dev-1.0` 和 `origin/codex/tabletop-ui-v006`，远端核对一致。北京时间 12:14 已在“卡坦项目督察组”发送自动报告，开头注明实际请求元数据中的 `gpt-6-astra`、`ultra`、11:25 开始及当时约 48 分钟耗时；已核对目标群、完整绿色气泡、等待标记消失、会话时间更新与输入框清空。报告保留完整动画和广播接受／拒绝人工链路未验的边界。窗口验收与收尾文档另行提交，详见 [开发进度日志](../DEVELOPMENT_LOG.md)。
+实现提交 `06854215502fee10e3b484ba4c3f3e1f8ba0adb7` 已推送至 `origin/dev-1.0` 和 `origin/codex/tabletop-ui-v006`，远端核对一致。北京时间 12:14 已在“卡坦项目督察组”发送自动报告，开头注明实际请求元数据中的 `gpt-6-astra`、`ultra`、11:25 开始及当时约 48 分钟耗时；已核对目标群、完整绿色气泡、等待标记消失、会话时间更新与输入框清空。报告保留完整动画和广播接受／拒绝人工链路未验的边界。窗口验收与收尾文档另行提交，详见 [开发进度日志](../The%20Farmer%27s%20Log.md)。

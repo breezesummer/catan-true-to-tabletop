@@ -72,4 +72,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/validation/Test-Tablet
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/validation/Test-M6Persistence.ps1 -BuildRoot .local/m6-ui-v005
 ```
 
-启动、构建、桌面验证和独立保存／恢复入口已默认使用 v005，上述命令仍明确传入版本目录便于复现。测试权威存档仅留在 `.local`，公开摘要不收录隐藏手牌或随机状态。后续提交、推送及群内汇报结果见 [开发进度日志](../DEVELOPMENT_LOG.md)，当前记录不预记这些操作成功。
+启动、构建、桌面验证和独立保存／恢复入口已默认使用 v005，上述命令仍明确传入版本目录便于复现。测试权威存档仅留在 `.local`，公开摘要不收录隐藏手牌或随机状态。后续提交、推送及群内汇报结果见 [开发进度日志](../The%20Farmer%27s%20Log.md)，当前记录不预记这些操作成功。

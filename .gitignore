@@ -48,3 +48,11 @@ Thumbs.db
 Desktop.ini
 *.tmp
 *.bak
+
+# Office 编辑锁文件与 Unity 自动生成的 IDE 工程
+~$*.docx
+~$*.xlsx
+~$*.pptx
+/Unity/Catan/*.csproj
+/Unity/Catan/*.sln
+/Unity/Catan/*.slnx
