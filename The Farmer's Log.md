@@ -11,7 +11,7 @@
 - **1254/1254项.NET测试通过**：规则与展示943、音效202、联机96、服务边界13。Windows四规则独立保存恢复、菜单及贴图86项检查／20张截图、发行包510文件逐项校验及独立解压运行通过；自包含房间服务与本机四规则联机完整局通过。
 - Android双架构APK签名、包体、横屏和覆盖安装通过，原生运行547项、独立读档288项、真实模拟器触控29项检查通过；两端规则与AI哈希一致。模拟器原有两份存档已恢复并核对。已检查主页和棋盘贴图；真机、用户整局、真实多机／公网、清洁环境和长期性能待验，旧港口几何占地专项未计为通过，不推进路线阶段。
 
-下载入口：[内测版1.6 Release](https://github.com/breezesummer/catan-true-to-tabletop/releases/tag/v1.6.0-beta)。本机程序：[CatanM7.exe](.local/release-1.6/Builds/Windows/CatanM7.exe)，安装与内容见[发布记录](docs/RELEASE_BETA_1_6.md)，结果与发布回执见[验证摘要](docs/verification/release-beta-1.6/summary.json)。PC与Android附件统一经GitHub预发布分发，未上传微信或应用商店。
+下载入口：[内测版1.6 Release](https://github.com/breezesummer/catan-true-to-tabletop/releases/tag/v1.6.0-beta)。本机程序：[CatanM7.exe](.local/release-1.6/Builds/Windows/CatanM7.exe)，安装与内容见[发布记录](docs/RELEASE_BETA_1_6.md)，结果与发布回执见[验证摘要](docs/verification/release-beta-1.6/summary.json)。已于 2026-10-17 20:49:06 +08:00 公开为GitHub预发布，五个附件的服务端长度与SHA-256均与本地最终产物一致，源码标签对应`adec765b0fc3e7b4f53418dd514ddd9878e7fa1e`。未上传微信或应用商店。
 
 ## 2026-10-17 — 主菜单、数字牌、港口与棋子图标贴图恢复 v001
 

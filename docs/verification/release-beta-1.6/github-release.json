@@ -1,0 +1,47 @@
+{
+  "日期": "2026-10-17",
+  "名称": "卡坦岛之三国争霸内测版1.6",
+  "链接": "https://github.com/breezesummer/catan-true-to-tabletop/releases/tag/v1.6.0-beta",
+  "标签": "v1.6.0-beta",
+  "源码提交": "adec765b0fc3e7b4f53418dd514ddd9878e7fa1e",
+  "状态": "已公开发布",
+  "预发布": true,
+  "发布时间": "2026-10-17 20:49:06 +08:00",
+  "附件": [
+    {
+      "名称": "Android-Installation-and-Touch-Guide.txt",
+      "字节数": 2010,
+      "SHA256": "fe27a216453f0b0ccc2ef1c181cbd10fc04eaed8548e2b213739b526249cc211",
+      "下载地址": "https://github.com/breezesummer/catan-true-to-tabletop/releases/download/v1.6.0-beta/Android-Installation-and-Touch-Guide.txt",
+      "状态": "已上传且长度与哈希一致"
+    },
+    {
+      "名称": "CatanM7-Beta-1.6-Android.apk",
+      "字节数": 304186711,
+      "SHA256": "76221fff385fb0ff22f498bbf89d9462c8c26914e9d2c98e0421d0433c14a219",
+      "下载地址": "https://github.com/breezesummer/catan-true-to-tabletop/releases/download/v1.6.0-beta/CatanM7-Beta-1.6-Android.apk",
+      "状态": "已上传且长度与哈希一致"
+    },
+    {
+      "名称": "CatanM7-Beta-1.6-Windows-x64.zip",
+      "字节数": 527256309,
+      "SHA256": "0f5d5efa68902e359b59359de62eaf2d8d4c29baadf96f4e870aaf955ee4eb4b",
+      "下载地址": "https://github.com/breezesummer/catan-true-to-tabletop/releases/download/v1.6.0-beta/CatanM7-Beta-1.6-Windows-x64.zip",
+      "状态": "已上传且长度与哈希一致"
+    },
+    {
+      "名称": "Font-License-OFL.txt",
+      "字节数": 4301,
+      "SHA256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "下载地址": "https://github.com/breezesummer/catan-true-to-tabletop/releases/download/v1.6.0-beta/Font-License-OFL.txt",
+      "状态": "已上传且长度与哈希一致"
+    },
+    {
+      "名称": "SHA256SUMS.txt",
+      "字节数": 392,
+      "SHA256": "d7e6987b19e788fef9ca363e4d31bc8d48c4bce1c2e8b415f46b392320659af2",
+      "下载地址": "https://github.com/breezesummer/catan-true-to-tabletop/releases/download/v1.6.0-beta/SHA256SUMS.txt",
+      "状态": "已上传且长度与哈希一致"
+    }
+  ]
+}
