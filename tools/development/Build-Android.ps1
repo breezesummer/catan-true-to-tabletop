@@ -6,6 +6,7 @@ $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $androidRepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $androidProject = Join-Path $androidRepoRoot 'Unity\Catan'
+& (Join-Path $PSScriptRoot '../validation/Test-UnitySourceIntegrity.ps1') -ProjectPath $androidProject
 $androidOutputRoot = [IO.Path]::GetFullPath((Join-Path $androidRepoRoot $OutputRoot))
 $androidLogs = Join-Path $androidOutputRoot 'logs'
 $androidPlayerRoot = Join-Path (Split-Path $toolchain.unity) 'Data\PlaybackEngines\AndroidPlayer'

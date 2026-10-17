@@ -21,12 +21,33 @@ public static class M6Build
         finally { AndroidBuildConfiguration.ClearSigningSecrets(); }
     }
 
+    static void VerifyPresentationTextures()
+    {
+        var paths = new System.Collections.Generic.List<string> {
+            "Assets/Resources/PastoralMenu/v002/medieval-harbor.png",
+            "Assets/Resources/TabletopUI/v003/oak-table-albedo.png"
+        };
+        foreach (string directory in new[] {
+            "Assets/Resources/TabletopUI/v008/NumberTokens",
+            "Assets/Resources/EntityAssets/v005/tabletop-markers",
+            "Assets/Resources/OperationUI/v001/pieces" })
+            paths.AddRange(Directory.GetFiles(directory, "*.png"));
+        foreach (string path in paths)
+        {
+            var texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            if (texture == null || texture.width < 32 || texture.height < 32)
+                throw new InvalidOperationException("关键界面贴图未正确导入，停止构建：" + path);
+        }
+        Debug.Log("CATAN_PRESENTATION_TEXTURES_OK: " + paths.Count + " 张主页、数字、港口及棋子贴图已导入。");
+    }
+
     static void BuildForTarget(bool android)
     {
         if (android && !BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Android, BuildTarget.Android))
             throw new Exception("请安装当前 Unity 版本的 Android Build Support。");
         if (android) AndroidTexturePolicy.ApplyExistingTextures();
         EntityCardTextureImporter.VerifyImportedCards();
+        VerifyPresentationTextures();
         var session = CombinedGameSession.Create("heading-for-new-shores", 4, 20261009);
         if (session.GetPlayerView("P1").Board.Tiles.Length <= 19)
             throw new Exception("M6 core did not execute in Unity");

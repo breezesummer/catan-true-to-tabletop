@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Linq;
 using UnityEngine;
 
 // 显式开发参数；截图读取最终帧，四规则继续使用各自的真实运行组件。
@@ -50,6 +51,16 @@ public sealed class MedievalMenuVerification : MonoBehaviour
         while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
         yield return null;yield return null;
         Require(PastoralMenuScene.ArtworkReady,"背景未打入构建");
+        foreach(int number in new[]{2,3,4,5,6,8,9,10,11,12})
+            Require(Resources.Load<Texture2D>("TabletopUI/v008/NumberTokens/number-"+number)!=null,"数字贴图未打入构建");
+        foreach(string id in new[]{"port-generic","port-wood","port-brick","port-wool","port-wheat","port-ore","catan-victory-marker","number-token-back"})
+        {
+            string key="EntityAssets/v005/tabletop-markers/"+id;
+            var texture=Resources.Load<Texture2D>(key+(id.StartsWith("port-")?"-front":""));
+            var prefab=Resources.Load<GameObject>(key);
+            Require(texture!=null&&prefab!=null&&prefab.GetComponentsInChildren<Renderer>(true)
+                .SelectMany(r=>r.sharedMaterials).Any(m=>m!=null&&m.mainTexture==texture),"实体标记贴图引用丢失");
+        }
         foreach(var size in new[]{new Vector2Int(1440,900),new Vector2Int(1280,720),new Vector2Int(1920,1080)})
         {
             Screen.SetResolution(size.x,size.y,false);yield return new WaitForSecondsRealtime(.5f);
@@ -78,6 +89,11 @@ public sealed class MedievalMenuVerification : MonoBehaviour
             app.StartGame(modes[i],i==3?"through-the-desert":"heading-for-new-shores",i%2==0?3:4,"P1",true);
             for(int wait=0;!app.Ready&&wait<240;wait++)yield return null;
             Require(app.Ready,"开局未就绪");string authority=app.ExportEnvelope();
+            var tokens=FindObjectsByType<TabletopNumberTokens>(FindObjectsInactive.Include,FindObjectsSortMode.None);
+            Require(tokens.Length==1,"真实棋盘缺少数字组件");
+            var numbers=tokens[0].GetComponentsInChildren<MeshRenderer>(true);
+            Require(numbers.Length>0&&numbers.All(r=>r.sharedMaterials[0].mainTexture!=null&&r.sharedMaterials[2].mainTexture!=null),"真实棋盘数字正反面贴图缺失");
+            yield return Capture("board-"+modes[i]);
             app.ShowMenu();
             foreach(int page in new[]{0,1,2,3,4,-1})
             {Go(page);yield return null;Require(app.ExportEnvelope()==authority&&!app.StepAi(),"导航改变权威局面");}
