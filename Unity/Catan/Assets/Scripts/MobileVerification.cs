@@ -223,7 +223,7 @@ public sealed class MobileVerification : MonoBehaviour
             {
                 int steps = 0;
                 while (steps < 900 && !(app.IsHumanTurn && Snapshot.CanTrade && Snapshot.Goods.Sum() >= 2))
-                { Advance(); steps++; if (steps % 4 == 0) yield return null; }
+                { while(app.TablePresentationBlocked)yield return null; Advance(); steps++; if (steps % 4 == 0) yield return null; }
                 Require(steps < 900, "触控验收未推进到正常人类交易回合");
                 yield return new WaitForSecondsRealtime(3.1f);
             }
@@ -250,6 +250,7 @@ public sealed class MobileVerification : MonoBehaviour
             stage = mode + "-同权限行动";
             while (steps < 900 && !(app.IsHumanTurn && Snapshot.CanTrade && Snapshot.Goods.Sum() >= 2 && Turn >= 3 && app.AiCommandsExecuted > previousAi))
             {
+                while(app.TablePresentationBlocked)yield return null;
                 Advance(); steps++;
                 if (steps % 4 == 0) yield return null;
             }
@@ -301,6 +302,7 @@ public sealed class MobileVerification : MonoBehaviour
             app.HandleTableEscape(); Require(!app.TableMenuOpen, "返回操作未关闭 PC 游戏菜单");
             app.ShowMenu(); Require(!app.StepAi(), "菜单推进了 AI");
             app.ResumeGame(); Require(app.ExportEnvelope() == before, "菜单改变存档配置");
+            while(app.TablePresentationBlocked)yield return null;
             Advance(); Require(app.Fault == "", "恢复后无法继续同权限行动"); modes++;
         }
     }

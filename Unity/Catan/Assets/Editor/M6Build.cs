@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Catan.Core.M5;
 using UnityEditor;
@@ -91,7 +91,7 @@ public static class M6Build
         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), "Assets/M6.unity");
         PlayerSettings.companyName = "CatanDevelopment";
         PlayerSettings.productName = "Catan M6";
-        PlayerSettings.bundleVersion = "1.4";
+        PlayerSettings.bundleVersion = "1.6";
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
         PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Standalone, ApiCompatibilityLevel.NET_Standard);
         PlayerSettings.defaultScreenWidth = 1440;
@@ -103,8 +103,8 @@ public static class M6Build
         if (android) AndroidBuildConfiguration.ConfigurePlayer();
         var root = Path.GetFullPath(Path.Combine(Application.dataPath, "../../.."));
         var args=Environment.GetCommandLineArgs();int outputFlag=Array.IndexOf(args,"--m6-output-root");
-        var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/m6-release-1.4");
-        var output = Path.Combine(buildRoot, android ? "Builds/Android/Catan.apk" : "Builds/Windows/CatanM6.exe");
+        var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/release-1.6");
+        var output = Path.Combine(buildRoot, android ? "Builds/Android/CatanM7.apk" : "Builds/Windows/CatanM7.exe");
         Directory.CreateDirectory(Path.GetDirectoryName(output));
         var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
             scenes = new[] { "Assets/M6.unity" }, locationPathName = output,

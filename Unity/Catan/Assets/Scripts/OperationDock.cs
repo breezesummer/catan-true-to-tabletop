@@ -30,10 +30,11 @@ public sealed partial class OperationDock
     string tradeTitle;
     TabletopHandOrder fallbackOrder = new TabletopHandOrder();
     TabletopSpecialHandOrder specialOrder = new TabletopSpecialHandOrder();
-    int giveGood, receiveGood = 1, lots = 1, target;
+    int target;
     readonly int[] give = new int[8], receive = new int[8];
     int dragGood=-1, dragOrdinal;
     Vector2 dragStart;
+    double handPressedAt;
     bool dragging;
     OperationBuild heldPiece;
     Vector2 pieceStart, pieceReleasePoint;
@@ -139,16 +140,13 @@ public sealed partial class OperationDock
         portTrade=false;portGood=null;tradeTitle=target==null?"银行兑换":"玩家交易";
         playerTrade=target!=null;
         this.target=target==null?0:Math.Max(0,Array.IndexOf(current.OtherPlayers,target));
-        giveGood=OperationPanelOptions.PaymentChoice(OperationPanelOptions.PaymentGoods(current),giveGood);lots=1;
-        Array.Copy(Selection.Selected,give,8);Array.Clear(receive,0,8);
+        if(playerTrade)Array.Copy(Selection.Selected,give,8);else Array.Clear(give,0,8);Array.Clear(receive,0,8);
     }
     public void OpenPortTrade(int? resource,string title)
     {
         if(resource.HasValue&&(resource.Value<0||resource.Value>=5))return;
         OpenTrade();if(!tradeOpen)return;
         portTrade=true;portGood=resource;tradeTitle=string.IsNullOrWhiteSpace(title)?resource.HasValue?Names[resource.Value]+"港口":"通用港口":title;
-        giveGood=OperationPanelOptions.PaymentChoice(OperationPanelOptions.PaymentGoods(current,resource),giveGood);
-        if(giveGood>=0&&receiveGood==giveGood)receiveGood=(giveGood+1)%Math.Max(1,current.GoodCount);
     }
     public void OpenFacility(int track)
     {
@@ -163,7 +161,7 @@ public sealed partial class OperationDock
         dragGood=-1;dragging=false;hits.Clear();faces.Clear();pieceFaces.Clear();
         hoveredHand=null;handHoverAnchor=Rect.zero;
         heldPiece=null;pieceDragging=false;pieceReleased=false;
-        target=0;giveGood=0;receiveGood=1;lots=1;playerTrade=false;
+        target=0;playerTrade=false;
     }
     public bool BlocksBoardInput(Vector2 logicalMouse)
     {
@@ -535,10 +533,14 @@ public sealed partial class OperationDock
             // 全部手牌始终在场；手牌上滚动不再改变桌面相机距离。
             e.Use();return;
         }
+        if(e.type==EventType.MouseDown&&e.button==1&&hit!=null&&hit.Good>=0&&!overPaper)
+        {
+            ChangeHandQuantity(s,hit.Good,-1);e.Use();return;
+        }
         if(e.type==EventType.MouseDown&&e.button==0&&hit!=null&&!overPaper)
         {
             if(hit.Card!=null){previewCard=previewCard==hit.Card.Id?null:hit.Card.Id;tradeOpen=false;if(s.Discard==null)s.Cancel?.Invoke();}
-            else{dragGood=hit.Good;dragOrdinal=hit.Ordinal;dragStart=e.mousePosition;dragging=false;}
+            else{dragGood=hit.Good;dragOrdinal=hit.Ordinal;dragStart=e.mousePosition;handPressedAt=Time.unscaledTimeAsDouble;dragging=false;}
             e.Use();return;
         }
         if(dragGood<0)return;
@@ -549,9 +551,18 @@ public sealed partial class OperationDock
             if(dragging&&tradeOpen&&playerTrade&&GiveDropRect.Contains(e.mousePosition))
             {Selection.SelectCard(dragGood,dragOrdinal,s.Goods[dragGood]);Array.Copy(Selection.Selected,give,8);message="";}
             else if(!dragging)
-            {Selection.Toggle(dragGood,dragOrdinal,s.Goods[dragGood]);if(tradeOpen&&playerTrade){Array.Copy(Selection.Selected,give,8);message="";}}
+            {ChangeHandQuantity(s,dragGood,MobileTabletop.Enabled&&Time.unscaledTimeAsDouble-handPressedAt>=.5?-1:1);}
             dragGood=-1;dragging=false;e.Use();
         }
+    }
+    void ChangeHandQuantity(OperationSnapshot s,int good,int delta)
+    {
+        var selected=(int[])Selection.Selected.Clone();
+        string error=OperationCardQuantity.Change(selected,good,delta,s.Goods[good],s.Discard!=null&&!s.Discard.Special?s.Discard.Amount:int.MaxValue);
+        if(error!=null){s.Notify?.Invoke(error);return;}
+        s.Cancel?.Invoke();previewCard=null;Selection.BuildId=null;Selection.PieceOrdinal=-1;
+        Selection.SetCount(good,selected[good],s.Goods[good]);
+        if(tradeOpen&&playerTrade){Array.Copy(Selection.Selected,give,8);message="";}
     }
     void DrawCost(OperationSnapshot s)
     {
@@ -648,15 +659,11 @@ public sealed partial class OperationDock
     void DrawTrade(OperationSnapshot s)
     {
         target=Mathf.Clamp(target,0,Math.Max(0,s.OtherPlayers.Length-1));
-        var paymentGoods=OperationPanelOptions.PaymentGoods(s,portTrade?portGood:null);
-        giveGood=OperationPanelOptions.PaymentChoice(paymentGoods,giveGood);
-        receiveGood=Mathf.Clamp(receiveGood,0,s.GoodCount-1);
-        if(giveGood>=0&&receiveGood==giveGood)receiveGood=(giveGood+1)%s.GoodCount;
         Paper(TradeRect);
         var validation=TradeValidationSnapshot(s);
         Label(new Rect(287,156,600,34),tradeTitle??"资源交易",heading);
         if(Button(new Rect(1115,158,38,32),"×")){Reset();s.Cancel?.Invoke();return;}
-        Label(new Rect(287,202,760,36),playerTrade?"选择交易玩家，左侧为自己，右侧为对方。":portTrade?"使用当前港口兑换；付出种类和比例由此港口决定。":"从银行兑换资源；港口请点击地图上你拥有的港口。",small);
+        Label(new Rect(287,202,760,36),playerTrade?"选择交易玩家 · "+TabletopCardInput.Hint:portTrade?TabletopCardInput.Hint+" · 按港口比例选择数量":TabletopCardInput.Hint+" · 按银行比例选择数量",small);
         if(playerTrade)
         {
             target=Mathf.Clamp(target,0,Math.Max(0,s.OtherPlayers.Length-1));
@@ -669,36 +676,10 @@ public sealed partial class OperationDock
         }
         else
         {
-            Label(new Rect(287,282,395,35),"我给予",heading);
-            Label(new Rect(744,282,395,35),"我获得",heading);
-            if(giveGood>=0)Label(new Rect(409,287,273,23),"当前比例  "+validation.Rates[giveGood]+" : 1",small);
-            for(int index=0;index<paymentGoods.Length;index++)
-            {
-                float x=286+(index%4)*103,y=324+(index/4)*77;
-                int good=paymentGoods[index];
-                GoodButton(new Rect(x,y,97,70),good,giveGood==good,"× "+s.Goods[good]+"\n"+validation.Rates[good]+" : 1",()=>{giveGood=good;lots=1;message="";});
-            }
-            if(paymentGoods.Length==0)Label(new Rect(296,342,379,78),portGood.HasValue?"你当前没有此港口对应的"+Names[portGood.Value]+"资源。":"你当前没有可付出的资源。",text);
-            for(int good=0;good<s.GoodCount;good++)
-            {
-                int selectedGood=good;
-                float x=744+(good%4)*103,y=324+(good/4)*77;
-                GoodButton(new Rect(x,y,97,70),good,receiveGood==good,"× "+s.Bank[good],()=>{receiveGood=selectedGood;lots=1;message="";});
-            }
-            lots=Math.Max(1,lots);
-            int maximum=giveGood<0?0:Math.Max(0,Math.Min(s.Goods[giveGood]/Math.Max(1,validation.Rates[giveGood]),s.Bank[receiveGood]));
-            if(Button(new Rect(286,489,38,34),"−",lots>1))lots--;
-            Label(new Rect(331,489,296,34),"交换 "+lots+" 份  ·  最多 "+maximum+" 份",center);
-            if(Button(new Rect(634,489,38,34),"+",lots<maximum))lots++;
-            Array.Clear(give,0,8);Array.Clear(receive,0,8);
-            if(giveGood>=0)
-            {
-                EntityCardAssets.DrawCardFace(new Rect(767,483,28,41),EntityCardAssets.ResourceOrCommodityFront(giveGood));
-                Label(new Rect(805,489,112,32),"× "+validation.Rates[giveGood]*lots+"   →",center);
-                EntityCardAssets.DrawCardFace(new Rect(943,483,28,41),EntityCardAssets.ResourceOrCommodityFront(receiveGood));
-                Label(new Rect(984,489,93,32),"× "+lots,center);
-                give[giveGood]=validation.Rates[giveGood]*lots;receive[receiveGood]=lots;
-            }
+            Label(new Rect(287,282,395,35),"付出",heading);
+            Label(new Rect(744,282,395,35),"换取",heading);
+            DrawTradeBag(s,new Rect(286,326,406,218),give,true,true);
+            DrawTradeBag(s,new Rect(744,326,406,218),receive,false,true);
         }
         var trade=new OperationTrade{Bank=!playerTrade,OtherPlayer=s.OtherPlayers.Length>0?s.OtherPlayers[target]:null,Give=(int[])give.Clone(),Receive=(int[])receive.Clone()};
         string error=OperationSelection.ValidateTrade(validation,trade);
@@ -713,19 +694,12 @@ public sealed partial class OperationDock
         }
         else if(Primary(new Rect(744,593,407,35),"确认交换",error==null))SendTrade(s,trade);
         if(Button(new Rect(286,593,154,35),"取消")){Reset();s.Cancel?.Invoke();}
-        if(Button(new Rect(454,593,154,35),"清空选择")){Array.Clear(give,0,8);Array.Clear(receive,0,8);Selection.Clear();lots=1;message="";}
+        if(Button(new Rect(454,593,154,35),"清空选择")){Array.Clear(give,0,8);Array.Clear(receive,0,8);Selection.Clear();message="";}
     }
     void SendTrade(OperationSnapshot s,OperationTrade trade)
     {
         message=s.Trade?.Invoke(trade)??"";
         if(message==""){tradeOpen=false;Selection.Clear();}else s.Notify?.Invoke(message);
-    }
-    void GoodButton(Rect r,int good,bool selected,string caption,Action click)
-    {
-        var face=new Rect(r.x+7,r.y+(selected?0:5),36,54);
-        EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(good));
-        Label(new Rect(r.x+47,r.y+8,r.width-48,48),caption,new GUIStyle(center){fontSize=12});
-        if(GUI.Button(r,GUIContent.none,GUIStyle.none))click();
     }
     void DrawTradePlayer(Rect area,string seat)
     {
@@ -745,20 +719,25 @@ public sealed partial class OperationDock
         EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(good),0,missing?new Color(1,.23f,.23f,1):Color.white);
         if(missing)Fill(new Rect(face.x,face.yMax-7,face.width,7),Missing);
     }
-    void DrawTradeBag(OperationSnapshot s,Rect area,int[] bag,bool paying)
+    void DrawTradeBag(OperationSnapshot s,Rect area,int[] bag,bool paying,bool bank=false)
     {
-        for(int i=0;i<s.GoodCount;i++)
+        var goods=bank&&paying?OperationPanelOptions.PaymentGoods(s,portTrade?portGood:null):Enumerable.Range(0,s.GoodCount).ToArray();
+        if(goods.Length==0)Label(new Rect(area.x,area.y+32,area.width,60),"当前没有可以付出的资源。",small);
+        for(int index=0;index<goods.Length;index++)
         {
-            float x=area.x+(i%4)*103,y=area.y+(i/4)*105;
-            bool missing=paying&&bag[i]>s.Goods[i];
-            TradeCard(new Rect(x+5,y+3,39,58),i,missing);
-            var caption=new GUIStyle(small);if(missing)caption.normal.textColor=Missing;
-            Label(new Rect(x+49,y+6,48,25),Names[i],caption);
-            if(paying)Label(new Rect(x+49,y+32,48,23),"× "+s.Goods[i],caption);
-            if(Button(new Rect(x+4,y+65,26,27),"−",bag[i]>0))bag[i]--;
-            Label(new Rect(x+32,y+65,32,27),bag[i].ToString(),center);
-            if(Button(new Rect(x+66,y+65,26,27),"+",bag[i]<(i<5?19:12)))bag[i]++;
-            if(paying)Selection.SetCount(i,bag[i],s.Goods[i]);
+            int i=goods[index];float x=area.x+(index%4)*103,y=area.y+(index/4)*105;
+            bool missing=paying&&bag[i]>s.Goods[i];var face=new Rect(x+12,y+1,54,77);
+            TradeCard(face,i,missing);
+            var caption=new GUIStyle(center);if(missing)caption.normal.textColor=Missing;
+            Label(new Rect(x,y+79,100,25),Names[i]+" × "+bag[i],caption);
+            if(paying||bank)Label(new Rect(x+69,y+6,32,26),(paying?"有 ":"余 ")+(paying?s.Goods[i]:s.Bank[i]),small);
+            if(bank&&paying)Label(new Rect(x+69,y+37,32,26),TradeValidationSnapshot(s).Rates[i]+":1",small);
+            int delta=TabletopCardInput.Delta(face);
+            if(delta!=0)
+            {
+                message=OperationCardQuantity.Change(bag,i,delta,bank&&!paying?s.Bank[i]:i<5?19:12,int.MaxValue,bank)??"";
+                if(paying)for(int good=0;good<8;good++)Selection.SetCount(good,bag[good],s.Goods[good]);
+            }
         }
     }
     void DrawOffer(OperationSnapshot s)

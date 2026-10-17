@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='.local/menu-medieval-v002',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
+param([switch]$VerifyPlayer,[string]$OutputRoot='.local/release-1.6',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
@@ -24,7 +24,7 @@ if ($LASTEXITCODE -ne 0) { throw "Unity 构建失败，请检查 $m6Logs/unity-b
 if (!(Select-String -LiteralPath (Join-Path $m6Logs 'unity-build.log') -Pattern 'CATAN_M6_UNITY_BUILD_OK' -Quiet)) { throw '未找到 Unity 构建成功标记。' }
 Write-Host ("M6 .NET / Unity 构建耗时 {0:N1} 秒。" -f $m6BuildClock.Elapsed.TotalSeconds)
 if ($VerifyPlayer) {
-    $m6Player = Join-Path $m6OutputRoot 'Builds/Windows/CatanM6.exe'
+    $m6Player = Join-Path $m6OutputRoot 'Builds/Windows/CatanM7.exe'
     $m6Evidence = Join-Path $m6OutputRoot 'verification'
     New-Item -ItemType Directory -Force $m6Evidence | Out-Null
     foreach ($mode in @('save','load')) {
@@ -44,5 +44,5 @@ if ($VerifyPlayer) {
 
     }
 }
-Write-Host "M6 新版 Windows 程序已生成：$m6OutputRoot/Builds/Windows/CatanM6.exe"
+Write-Host "M6 新版 Windows 程序已生成：$m6OutputRoot/Builds/Windows/CatanM7.exe"
 

@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='.local/menu-medieval-v002')
+param([switch]$VerifyPlayer,[string]$OutputRoot='.local/release-1.6')
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m7RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
@@ -13,4 +13,4 @@ Copy-Item -LiteralPath $m7Contract -Destination (Join-Path $m7Plugins 'Catan.Net
 if($LASTEXITCODE -ne 0){throw 'M7 Unity 客户端构建失败。'}
 & (Join-Path $PSScriptRoot 'Build-M7Server.ps1') -OutputRoot $OutputRoot
 if($LASTEXITCODE -ne 0){throw 'M7 自包含 Windows 房间服务发布失败。'}
-Write-Host "M7 Windows 客户端与随包服务：$m7Output/Builds/Windows/CatanM6.exe"
+Write-Host "M7 Windows 客户端与随包服务：$m7Output/Builds/Windows/CatanM7.exe"

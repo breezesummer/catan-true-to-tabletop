@@ -238,14 +238,26 @@ try {
         Save-TouchScreenshot '07-settlement-placed.png'
         Invoke-TouchTap 720 32
         $null=Wait-TouchState {param($s) $s.tableMenuOpen} '建村后菜单未打开。'
-        Invoke-TouchTap 604 502
-        $touchState=Wait-TouchState {param($s) $s.saveExists -and $s.saveMatchesCurrent} '保存按钮没有持久保存当前权威局面。'
         Invoke-TouchTap 604 446
         $null=Wait-TouchState {param($s) !$s.paused} '继续 AI 按钮没有响应。'
         Invoke-TouchTap 604 446
         $touchState=Wait-TouchState {param($s) $s.paused} '暂停 AI 按钮没有响应。'
-        Invoke-TouchAdb -TouchArguments @('shell','input','keyevent','4') | Out-Null
-        $touchState=Wait-TouchState {param($s) !$s.tableMenuOpen} 'Android 返回操作没有返回游戏。'
+        # 保存后正式产品会释放对局并返回主页；此时旧对局观察文件不再更新。
+        # 核对实际存档已替换，再由下方独立进程读档核对建筑及待决，避免依赖已释放的视图。
+        $touchSavePath='/sdcard/Android/data/'+$touchPackage+'/files/m6-local-ai-v1.json'
+        $touchBeforeSave=Invoke-TouchAdb -TouchArguments @('shell','cat',$touchSavePath) -AllowFailure
+        Invoke-TouchTap 604 502
+        $touchSaveTimer=[Diagnostics.Stopwatch]::StartNew()
+        $touchSaved=$null
+        do {
+            $touchSaveText=Invoke-TouchAdb -TouchArguments @('shell','cat',$touchSavePath) -AllowFailure
+            if($touchSaveText -and $touchSaveText -ne $touchBeforeSave){
+                try{$touchSaved=$touchSaveText | ConvertFrom-Json}catch{$touchSaved=$null}
+                if($touchSaved -and $touchSaved.Version -eq 1 -and $touchSaved.RuleSet -eq 'base' -and $touchSaved.Authority){break}
+            }
+            Start-Sleep -Milliseconds 200
+        }while($touchSaveTimer.Elapsed.TotalSeconds -lt 20)
+        Assert-Touch ($null -ne $touchSaved -and $touchSaved.Paused -and $touchSaved.HumanSeat -eq $touchState.humanSeat) '保存并返回主页后生成了可恢复的独立存档。'
         Save-TouchScreenshot '08-returned-and-saved.png'
         $touchState=Open-TouchSession
         Assert-Touch ($touchState.settlements -eq 0 -and $touchState.saveExists) '独立重启保留存档且不自动替换验收新局。'

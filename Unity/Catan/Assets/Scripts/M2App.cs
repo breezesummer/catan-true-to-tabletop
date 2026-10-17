@@ -58,7 +58,7 @@ public sealed partial class M2App : MonoBehaviour
         bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,!holding);
         if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
         if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
-        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();mapPan.Cancel(board.TableScene);}
+        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)&&!blocked&&(ai!=null||pointer.x<Screen.width*.70f)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();mapPan.Cancel(board.TableScene);}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGameDialog||view==null||ai!=null&&!ai.IsHumanTurn)return;

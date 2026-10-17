@@ -121,7 +121,7 @@ public sealed partial class M5App : MonoBehaviour
         if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
         if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
-        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1))
+        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)&&!blocked&&(ai!=null||pointer.x<Screen.width*.70f))
         {
             bool knightMenu=ai!=null&&Input.GetMouseButtonDown(1)&&!blocked&&PickTabletopKnight(pointer);
             if(!knightMenu){dock.Reset();CancelOperationDraft();pickField="";board.ClearPreview();newGame=false;cardArt.Clear();}
@@ -370,7 +370,7 @@ public sealed partial class M5App : MonoBehaviour
     {
         GUILayout.Space(10);Text("当前选择 · "+CommandName(draft.Kind));
         var k=draft.Kind;var pending=view.PendingDecision==null?"":view.PendingDecision.Kind;
-        bool card=k==CommandKind.PlayProgressCard;
+        bool card=k==CommandKind.PlayProgressCard;bool resourceReady=true;
         if(card){Text(CardName(draft.ProgressCard));Text(CardHelp[(int)draft.ProgressCard],true);if(ai==null&&view.OwnProgressCards.Contains(draft.ProgressCard))ProgressFace(draft.ProgressCard,CardName(draft.ProgressCard));}
         if(k==CommandKind.ImproveCity&&ai!=null&&operationFacilityLocked)Text("设施轨道："+Tracks[(int)draft.Track]);
         else if(k==CommandKind.ImproveCity||card&&draft.ProgressCard==ProgressCardKind.Crane||pending=="DefenderProgress")draft.Track=(ImprovementTrack)Cycle("轨道",(int)draft.Track,Tracks);
@@ -410,10 +410,13 @@ public sealed partial class M5App : MonoBehaviour
         }
         if(k==CommandKind.BankTrade)
         {
-            int give=draft.GiveIsCommodity?5+(int)draft.GiveCommodity:(int)draft.GiveResource;give=Cycle("交出类型",give,Goods);draft.GiveIsCommodity=give>=5;if(give<5)draft.GiveResource=(Resource)give;else draft.GiveCommodity=(Commodity)(give-5);
+            Bag("付出",draft.Give,draft.GiveCommodities,true);Bag("换取",draft.Receive,draft.ReceiveCommodities,true);
+            int give=Enumerable.Range(0,8).FirstOrDefault(i=>(i<5?draft.Give[(Resource)i]:draft.GiveCommodities[(Commodity)(i-5)])>0);
+            int receive=Enumerable.Range(0,8).FirstOrDefault(i=>(i<5?draft.Receive[(Resource)i]:draft.ReceiveCommodities[(Commodity)(i-5)])>0);
+            draft.GiveIsCommodity=give>=5;if(give<5)draft.GiveResource=(Resource)give;else draft.GiveCommodity=(Commodity)(give-5);
+            draft.ReceiveIsCommodity=receive>=5;if(receive<5)draft.ReceiveResource=(Resource)receive;else draft.ReceiveCommodity=(Commodity)(receive-5);
+            draft.GiveAmount=draft.Give.Total+draft.GiveCommodities.Total;draft.ReceiveAmount=draft.Receive.Total+draft.ReceiveCommodities.Total;
             Text("当前最优比例 "+TradeRate(give)+" : 1",true);
-            int receive=draft.ReceiveIsCommodity?5+(int)draft.ReceiveCommodity:(int)draft.ReceiveResource;receive=Cycle("取得类型",receive,Goods);draft.ReceiveIsCommodity=receive>=5;if(receive<5)draft.ReceiveResource=(Resource)receive;else draft.ReceiveCommodity=(Commodity)(receive-5);
-            draft.GiveAmount=Count("交出张数",draft.GiveAmount,19);draft.ReceiveAmount=Count("取得张数",draft.ReceiveAmount,19);
         }
         if(k==CommandKind.ProposeTrade){Bag("付出",draft.Give,draft.GiveCommodities);Bag("换取",draft.Receive,draft.ReceiveCommodities);}
         if(k==CommandKind.DiscardResources||pending=="ProgressGuildDues"||pending=="ProgressWedding"||pending=="ProgressSabotage")
@@ -424,16 +427,18 @@ public sealed partial class M5App : MonoBehaviour
         if(pending=="Gold")
         {
             Text("金矿仅选资源，不取商品。需取 "+Math.Min(view.PendingDecision.Amount,view.Bank.Total)+" 张，已选 "+draft.Resources.Total+" 张。",true);
-            for(int i=0;i<5;i++)draft.Resources[(Resource)i]=Count(Goods[i]+" / 银行 "+view.Bank[(Resource)i],draft.Resources[(Resource)i],view.Bank[(Resource)i]);
+            var selected=Enumerable.Range(0,8).Select(i=>i<5?draft.Resources[(Resource)i]:0).ToArray();
+            ModernOperationUI.ResourceCards("选择金矿资源",selected,Enumerable.Range(0,8).Select(i=>i<5?view.Bank[(Resource)i]:0).ToArray(),Math.Min(view.PendingDecision.Amount,view.Bank.Total),5);
+            for(int i=0;i<5;i++)draft.Resources[(Resource)i]=selected[i];
         }
         if(card&&draft.ProgressCard==ProgressCardKind.MerchantFleet)
         {
-            int good=draft.ChooseCommodity?5+(int)draft.Commodity:(int)draft.Resource;good=Cycle("资源 / 商品",good,Goods);draft.ChooseCommodity=good>=5;if(good<5)draft.Resource=(Resource)good;else draft.Commodity=(Commodity)(good-5);
+            int good=draft.ChooseCommodity?5+(int)draft.Commodity:(int)draft.Resource;good=Cycle("资源 / 商品",good,Goods);draft.ChooseCommodity=good>=5;if(good<5)draft.Resource=(Resource)good;else draft.Commodity=(Commodity)(good-5);resourceReady&=good>=0;
         }
         if(k==CommandKind.CommercialHarborOffer||pending=="Aqueduct"||card&&draft.ProgressCard==ProgressCardKind.ResourceMonopoly)
-            draft.Resource=(Resource)Cycle("资源",(int)draft.Resource,Goods.Take(5).ToArray());
+        {draft.Resource=(Resource)Cycle("资源",(int)draft.Resource,Goods.Take(5).ToArray());resourceReady&=(int)draft.Resource>=0;}
         if(pending=="ProgressHarbor"||card&&draft.ProgressCard==ProgressCardKind.TradeMonopoly)
-            draft.Commodity=(Commodity)Cycle("商品",(int)draft.Commodity,Goods.Skip(5).ToArray());
+        {draft.Commodity=(Commodity)Cycle("商品",(int)draft.Commodity,Goods.Skip(5).ToArray());resourceReady&=(int)draft.Commodity>=0;}
         if(view.PrivateTargetProgressCards!=null&&view.PrivateTargetProgressCards.Length>0)
         {
             var cards=view.PrivateTargetProgressCards.Distinct().ToArray();draft.SelectedProgressCard=cards[Cycle("允许查看的进步卡",Math.Max(0,Array.IndexOf(cards,draft.SelectedProgressCard)),cards.Select(CardName).ToArray())];
@@ -443,6 +448,8 @@ public sealed partial class M5App : MonoBehaviour
         {
             var cards=view.OwnProgressCards.Distinct().ToArray();if(cards.Length>0){var selected=cards[Cycle("进步卡",Math.Max(0,Array.IndexOf(cards,draft.ProgressCard)),cards.Select(CardName).ToArray())];draft.ProgressCard=selected;draft.SelectedProgressCard=selected;}
         }
+        if(TabletopCardInput.Changed)GUIUtility.ExitGUI();
+        if(!resourceReady){ModernOperationUI.Info("请点选一种资源或商品。",true);if(Btn("取消当前操作"))CancelOperationDraft();return;}
         GUILayout.Space(8);
         if(ai!=null)
         {
@@ -461,7 +468,10 @@ public sealed partial class M5App : MonoBehaviour
     }
     int Cycle(string title,int value,string[] choices)
     {
-        if(choices.Length==0)return 0;value=Mathf.Clamp(value,0,choices.Length-1);
+        if(choices.Length==0)return 0;
+        int resourceStart=title=="商品"?5:title=="资源"||title=="资源 / 商品"||title=="交出类型"||title=="取得类型"?0:-1;
+        if(resourceStart>=0)return ModernOperationUI.ResourceKind(title,value,resourceStart,choices.Length);
+        value=Mathf.Clamp(value,0,choices.Length-1);
         if(ai!=null)
         {
             int firstGood=title=="商品"?5:title=="资源"||title=="资源 / 商品"||title=="交出类型"||title=="取得类型"?0:-1;
@@ -469,14 +479,11 @@ public sealed partial class M5App : MonoBehaviour
         }
         GUILayout.BeginHorizontal();Text(title+"："+choices[value]);if(GUILayout.Button("‹",button,GUILayout.Width(36),GUILayout.Height(30)))value=(value+choices.Length-1)%choices.Length;if(GUILayout.Button("›",button,GUILayout.Width(36),GUILayout.Height(30)))value=(value+1)%choices.Length;GUILayout.EndHorizontal();return value;
     }
-    int Count(string name,int value,int max)
+    void Bag(string title,ResourceBag resources,CommodityBag commodities,bool singleKind=false)
     {
-        GUILayout.BeginHorizontal();Text(name+"  "+value);if(GUILayout.Button("−",button,GUILayout.Width(36),GUILayout.Height(28))&&!MobileTabletop.TouchDragged)value=Math.Max(0,value-1);if(GUILayout.Button("+",button,GUILayout.Width(36),GUILayout.Height(28))&&!MobileTabletop.TouchDragged)value=Math.Min(max,value+1);GUILayout.EndHorizontal();return value;
-    }
-    void Bag(string title,ResourceBag resources,CommodityBag commodities)
-    {
-        Text(title+" · 共 "+(resources.Total+commodities.Total)+" 张",true);
-        for(int i=0;i<8;i++){int n=i<5?resources[(Resource)i]:commodities[(Commodity)(i-5)];n=Count(Goods[i],n,i<5?19:12);if(i<5)resources[(Resource)i]=n;else commodities[(Commodity)(i-5)]=n;}
+        var selected=Enumerable.Range(0,8).Select(i=>i<5?resources[(Resource)i]:commodities[(Commodity)(i-5)]).ToArray();
+        var error=ModernOperationUI.ResourceCards(title,selected,Enumerable.Range(0,8).Select(i=>i<5?19:12).ToArray(),singleKind:singleKind);if(error!=null)status=error;
+        for(int i=0;i<8;i++){if(i<5)resources[(Resource)i]=selected[i];else commodities[(Commodity)(i-5)]=selected[i];}
     }
     int TradeRate(int good)
     {

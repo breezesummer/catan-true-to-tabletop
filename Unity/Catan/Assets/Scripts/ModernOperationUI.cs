@@ -83,4 +83,35 @@ public static class ModernOperationUI
         for(int i=0;i<goods.Length&&i<8;i++)if(goods[i]>0)
         {OperationIconAssets.DrawGood(new Rect(x,r.y+4,30,30),i);Label(new Rect(x+33,r.y+4,32,30),"×"+goods[i],Center);x+=72;}
     }
+    static readonly string[] GoodNames={"木头","砖块","羊毛","小麦","矿石","布匹","钱币","纸张"};
+    public static string ResourceCards(string caption,int[] selected,int[] limits,int totalLimit=int.MaxValue,int count=8,bool singleKind=false)
+    {
+        Styles();Info(caption+" · 已选 "+System.Linq.Enumerable.Sum(selected)+" 张");Info(TabletopCardInput.Hint);
+        int columns=Math.Min(4,count);const float cardWidth=58,height=86,row=115;
+        var area=GUILayoutUtility.GetRect(GUIContent.none,GUIStyle.none,GUILayout.Height(((count+columns-1)/columns)*row),GUILayout.ExpandWidth(true));
+        string error=null;
+        for(int i=0;i<count;i++)
+        {
+            float cell=area.width/columns;var face=new Rect(area.x+(i%columns)*cell+(cell-cardWidth)/2,area.y+(i/columns)*row,cardWidth,height);
+            EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(i));
+            Label(new Rect(area.x+(i%columns)*cell,face.yMax,cell,27),GoodNames[i]+" × "+selected[i],Center);
+            int delta=TabletopCardInput.Delta(face);
+            if(delta!=0)error=OperationCardQuantity.Change(selected,i,delta,limits[i],totalLimit,singleKind);
+        }
+        return error;
+    }
+    public static int ResourceKind(string caption,int value,int firstGood,int count)
+    {
+        Styles();Info(caption+" · "+TabletopCardInput.Hint);
+        int columns=Math.Min(4,count);const float height=90,row=118,width=60;
+        var area=GUILayoutUtility.GetRect(GUIContent.none,GUIStyle.none,GUILayout.Height(((count+columns-1)/columns)*row),GUILayout.ExpandWidth(true));
+        for(int i=0;i<count;i++)
+        {
+            float cell=area.width/columns;var face=new Rect(area.x+(i%columns)*cell+(cell-width)/2,area.y+(i/columns)*row,width,height);
+            EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(firstGood+i));
+            Label(new Rect(area.x+(i%columns)*cell,face.yMax,cell,27),GoodNames[firstGood+i]+" × "+(value==i?1:0),Center);
+            int delta=TabletopCardInput.Delta(face);if(delta>0)value=i;else if(delta<0&&value==i)value=-1;
+        }
+        return value;
+    }
 }

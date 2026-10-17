@@ -53,7 +53,7 @@ public static class StrategyHudArt
     }
     static void HandSymbol(Rect rect,int kind,Color ink)
     {
-        // 卡页采用两张交叠卡纸，整理采用三张齐列卡纸和向下归拢箭头。
+        // 卡页采用三张扇形牌背，整理采用三张齐列卡纸和向下归拢箭头。
         if(kind==2)
         {
             for(int i=0;i<3;i++)
@@ -71,21 +71,37 @@ public static class StrategyHudArt
     }
     public static void HandCardIcon(Rect rect,bool special)
     {
-        if(!special)
-        {
-            EntityCardAssets.DrawCardFace(rect,EntityCardAssets.Texture(EntityCardAssets.Good(0).Back));
-            return;
-        }
-        // 三色牌背保持完整实物比例，围绕同一底部枢轴展开；不暗示对手各颜色的手牌数量。
-        var matrix=GUI.matrix;float height=rect.height*.88f,width=height*.66f;
-        var pivot=new Vector2(rect.center.x,rect.yMax-1);
+        // 先在图标内建立等比像素坐标，再围绕共同底部旋转，避免外层缩放把枢轴移到桌面。
+        // 三色发展/进步牌背或三张相同资源牌背只表示类别，不表示隐藏手牌构成。
+        var matrix=GUI.matrix;
+        float scaleX=matrix.MultiplyVector(Vector3.right).magnitude,scaleY=matrix.MultiplyVector(Vector3.up).magnitude;
+        if(rect.width<=0||rect.height<=0||scaleX<=0||scaleY<=0)return;
+        const float angle=24;
+        float sin=Mathf.Sin(angle*Mathf.Deg2Rad),cos=Mathf.Cos(angle*Mathf.Deg2Rad),aspect=0;
+        var resource=special?null:EntityCardAssets.Texture(EntityCardAssets.Good(0).Back);
         for(int i=0;i<3;i++)
         {
-            GUI.matrix=matrix;GUIUtility.RotateAroundPivot((i-1)*23,pivot);
-            var card=new Rect(pivot.x-width/2,pivot.y-height,width,height);
-            EntityCardAssets.DrawCardFace(card,EntityCardAssets.ProgressBack(i));
+            var texture=special?EntityCardAssets.ProgressBack(i):resource;
+            if(texture!=null)aspect=Mathf.Max(aspect,(float)texture.width/texture.height);
         }
-        GUI.matrix=matrix;
+        if(aspect<=0)return;
+        float top=Mathf.Max(1,cos+aspect*.5f*sin),bottom=aspect*.5f*sin;
+        // 旋转后所有角点及纸边投影都留在原图标范围内。
+        float height=Mathf.Min(Mathf.Max(0,rect.width*scaleX-4)/(aspect*cos+2*sin),Mathf.Max(0,rect.height*scaleY-4)/(top+bottom));
+        var local=matrix*Matrix4x4.Translate(rect.center)*Matrix4x4.Scale(new Vector3(1/scaleX,1/scaleY,1))
+            *Matrix4x4.Translate(new Vector3(0,(top-bottom)*height/2,0));
+        try
+        {
+            for(int i=0;i<3;i++)
+            {
+                var texture=special?EntityCardAssets.ProgressBack(i):resource;
+                if(texture==null)continue;
+                float width=height*texture.width/texture.height;
+                GUI.matrix=local*Matrix4x4.Rotate(Quaternion.Euler(0,0,(i-1)*angle));
+                EntityCardAssets.DrawCardFace(new Rect(-width/2,-height,width,height),texture);
+            }
+        }
+        finally{GUI.matrix=matrix;}
     }
     public static void VictoryIcon(Rect rect)
     {

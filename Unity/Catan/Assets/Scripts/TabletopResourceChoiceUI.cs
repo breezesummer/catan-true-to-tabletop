@@ -15,7 +15,7 @@ public static class TabletopResourceChoiceUI
         if(!ReferenceEquals(activeSelection,selection)){activeSelection=selection;errorHint="";}
         int required=Math.Min(amount,bank.Total);
         ModernOperationUI.Label(new Rect(368,159,704,42),"金矿 · 选择资源",ModernOperationUI.Title);
-        ModernOperationUI.Label(new Rect(368,205,704,32),"点击资源牌增加数量 · 已选 "+selection.Total+" / "+required+" 张",ModernOperationUI.Center);
+        ModernOperationUI.Label(new Rect(368,205,704,32),TabletopCardInput.Hint+" · 已选 "+selection.Total+" / "+required+" 张",ModernOperationUI.Center);
         for(int i=0;i<8;i++)
         {
             float x=381+(i%4)*176,y=252+(i/4)*205;
@@ -26,13 +26,13 @@ public static class TabletopResourceChoiceUI
             ModernOperationUI.Label(new Rect(x,y+131,144,27),Names[i]+" × "+count,ModernOperationUI.Center);
             ModernOperationUI.Label(new Rect(x,y+158,144,24),resource?"银行 "+bank[(Resource)i]:"金矿不可选商品",ModernOperationUI.Small);
             // 保留点击回馈，超额时明确提示，而不是静默忽略或让计数越界。
-            if(GUI.Button(face,GUIContent.none,GUIStyle.none))
+            int delta=TabletopCardInput.Delta(face);
+            if(delta!=0)
             {
-                string error=OperationResourceChoice.Add(i,amount,selection,bank);
+                string error=OperationResourceChoice.Change(i,delta,amount,selection,bank);
                 errorHint=error??"";
                 if(error!=null)notify?.Invoke(error);
             }
-            if(resource&&ModernOperationUI.Button(new Rect(x+117,y+95,28,31),"−",count>0)){selection[(Resource)i]--;errorHint="";}
         }
         var hint=new GUIStyle(ModernOperationUI.Center);hint.normal.textColor=ModernOperationUI.Error;
         ModernOperationUI.Label(new Rect(368,658,704,30),errorHint,hint);

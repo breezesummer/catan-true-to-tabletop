@@ -1,8 +1,8 @@
-﻿param(
+param(
     [Parameter(Mandatory=$true)][string]$ApkPath,
     [string]$UnityAndroidRoot = '',
-    [ValidateRange(1,2147483647)][int]$ExpectedVersionCode = 10401,
-    [string]$ExpectedVersionName = '1.4'
+    [ValidateRange(1,2147483647)][int]$ExpectedVersionCode = 10600,
+    [string]$ExpectedVersionName = '1.6'
 )
 $ErrorActionPreference = 'Stop'
 $apkCheckFailure = $null

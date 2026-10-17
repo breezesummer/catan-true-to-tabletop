@@ -19,6 +19,7 @@ public sealed partial class M2App
     PlayerView operationView;
     OperationSnapshot operationSnapshot;
     DevelopmentCardKind? preparedDevelopment;
+    int[] preparedResourceCards=new int[8];
     bool preparedPurchase;
     bool DockBlocksMouse(Vector2? logical=null)
     {
@@ -96,7 +97,7 @@ public sealed partial class M2App
                 s.Offer=new OperationOffer{Proposer=t.ProposerId,Recipient=t.OtherPlayerId,IsBroadcast=t.IsBroadcast,PendingRecipients=t.PendingRecipientIds,RejectedRecipients=t.RejectedPlayerIds??Array.Empty<string>(),Give=DockCost(t.Give.Wood,t.Give.Brick,t.Give.Wool,t.Give.Wheat,t.Give.Ore),Receive=DockCost(t.Receive.Wood,t.Receive.Brick,t.Receive.Wool,t.Receive.Wheat,t.Receive.Ore),CanAccept=t.CanRespond(seat),CanReject=t.CanRespond(seat),CanCancel=seat==t.ProposerId};
             }
             s.PrepareBuild=b=>{CancelOperationDraft();var k=(CommandKind)Enum.Parse(typeof(CommandKind),b.Id);if(k==CommandKind.BuyDevelopmentCard){preparedPurchase=true;status="已选发展卡，请在桌面确认购买。";}else Pickup(k);};
-            s.PrepareCard=c=>{CancelOperationDraft();preparedDevelopment=(DevelopmentCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在桌面确认出牌。";};
+            s.PrepareCard=c=>{CancelOperationDraft();preparedResourceCards=new int[8];preparedDevelopment=(DevelopmentCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在桌面确认出牌。";};
             var handDiscard=view.Phase==GamePhase.Discard?view.Discards.FirstOrDefault(d=>d.PlayerId==seat):null;
             if(handDiscard!=null)s.Discard=new OperationDiscard{Amount=handDiscard.Amount,Confirm=(selected,card)=>{
                 var c=NewCommand(CommandKind.DiscardResources);c.Resources=new ResourceBag();
@@ -198,16 +199,21 @@ public sealed partial class M2App
             TableNote("打出 · "+DockDevelopmentName(kind),()=>{
                 if(kind==DevelopmentCardKind.YearOfPlenty)
                 {
-                    var names=ResourceNames.Take(5).Concat(new[]{"不取"}).ToArray();
-                    plentyA=ModernOperationUI.Choices("第一张资源",plentyA,names,0);
-                    plentyB=ModernOperationUI.Choices("第二张资源",plentyB,names,0);
+                    var limits=Enumerable.Range(0,8).Select(i=>i<5?view.Bank[(Resource)i]:0).ToArray();
+                    ModernOperationUI.ResourceCards("选择最多两张资源",preparedResourceCards,limits,2,5);
                 }
-                if(kind==DevelopmentCardKind.Monopoly)monopoly=ModernOperationUI.Choices("收取所有对手的这一种资源",monopoly,ResourceNames.Take(5).ToArray(),0);
+                if(kind==DevelopmentCardKind.Monopoly)
+                {
+                    int selected=Array.FindIndex(preparedResourceCards,n=>n>0);
+                    selected=ModernOperationUI.ResourceKind("收取所有对手的这一种资源",selected,0,5);
+                    Array.Clear(preparedResourceCards,0,8);if(selected>=0)preparedResourceCards[selected]=1;
+                }
+                if(TabletopCardInput.Changed)GUIUtility.ExitGUI();
                 if(kind==DevelopmentCardKind.Knight)ModernOperationUI.Info("打出后移动强盗，并选择可偷取的玩家。");
                 if(kind==DevelopmentCardKind.RoadBuilding)ModernOperationUI.Info("免费放置两段建设；每段分别选择合法位置。");
                 var c=NewCommand(kind==DevelopmentCardKind.Knight?CommandKind.PlayKnight:kind==DevelopmentCardKind.RoadBuilding?CommandKind.PlayRoadBuilding:kind==DevelopmentCardKind.Monopoly?CommandKind.PlayMonopoly:CommandKind.PlayYearOfPlenty);
-                if(kind==DevelopmentCardKind.YearOfPlenty){c.Resources=new ResourceBag();if(plentyA<5)c.Resources[(Resource)plentyA]++;if(plentyB<5)c.Resources[(Resource)plentyB]++;}
-                if(kind==DevelopmentCardKind.Monopoly)c.Resource=(Resource)monopoly;
+                if(kind==DevelopmentCardKind.YearOfPlenty){c.Resources=new ResourceBag();for(int i=0;i<5;i++)c.Resources[(Resource)i]=preparedResourceCards[i];}
+                if(kind==DevelopmentCardKind.Monopoly){int selected=Array.FindIndex(preparedResourceCards,n=>n>0);if(selected<0){ModernOperationUI.Info("请点选一种资源。",true);if(TableButton("放回手牌")){CancelOperationDraft();dock.Reset();}return;}c.Resource=(Resource)selected;}
                 var preview=Preview(c);if(!preview.Success)ModernOperationUI.Info(preview.Message,true);
                 GUILayout.Space(10);if(ModernOperationUI.LayoutButton("确认打出 · "+DockDevelopmentName(kind),preview.Success,true))Submit(c);
                 if(TableButton("放回手牌")){CancelOperationDraft();dock.Reset();}
