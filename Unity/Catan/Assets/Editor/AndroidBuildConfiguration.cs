@@ -11,7 +11,7 @@ using UnityEngine.Rendering.Universal;
 public static class AndroidBuildConfiguration
 {
     public const string PackageId = "com.catandevelopment.threekingdoms";
-    public const int VersionCode = 10600;
+    public const int VersionCode = 10601;
 
     public static UniversalRenderPipelineAsset ConfigurePipeline(UniversalRenderPipelineAsset source)
     {
@@ -61,7 +61,7 @@ public static class AndroidBuildConfiguration
         PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, PackageId);
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
         PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Android, ApiCompatibilityLevel.NET_Standard);
-        PlayerSettings.productName = "卡坦岛之三国争霸";
+        PlayerSettings.productName = M6App.ProductFileName;
         // 跨程序集规则、AI 与存档入口使用保守的最小裁剪级别。
         PlayerSettings.SetManagedStrippingLevel(NamedBuildTarget.Android, ManagedStrippingLevel.Minimal);
         PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;

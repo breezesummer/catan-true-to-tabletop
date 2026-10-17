@@ -1,8 +1,8 @@
 param(
     [Parameter(Mandatory=$true)][string]$ApkPath,
     [string]$UnityAndroidRoot = '',
-    [ValidateRange(1,2147483647)][int]$ExpectedVersionCode = 10600,
-    [string]$ExpectedVersionName = '1.6'
+    [ValidateRange(1,2147483647)][int]$ExpectedVersionCode = 10601,
+    [string]$ExpectedVersionName = '1.6.1'
 )
 $ErrorActionPreference = 'Stop'
 $apkCheckFailure = $null
@@ -98,11 +98,13 @@ try {
         Where-Object { $_.Name -match '^\d+\.\d+\.\d+$' } |
         Sort-Object { [version]$_.Name } -Descending)
     $apkSelectedBuildTools = $apkBuildToolsCandidates | Where-Object {
-        (Test-Path -LiteralPath (Join-Path $_.FullName 'aapt.exe')) -and
+        ((Test-Path -LiteralPath (Join-Path $_.FullName 'aapt2.exe')) -or (Test-Path -LiteralPath (Join-Path $_.FullName 'aapt.exe'))) -and
         (Test-Path -LiteralPath (Join-Path $_.FullName 'apksigner.bat'))
     } | Select-Object -First 1
     Assert-ApkCheck ($null -ne $apkSelectedBuildTools) 'Android SDK 缺少 aapt 或 apksigner。'
-    $apkAapt = Join-Path $apkSelectedBuildTools.FullName 'aapt.exe'
+    # aapt2 支持现行中文版本目录；旧 aapt 在 Windows 会将路径按错误编码传入 ZIP 读取器。
+    $apkUsesAapt2=Test-Path -LiteralPath (Join-Path $apkSelectedBuildTools.FullName 'aapt2.exe')
+    $apkAapt = Join-Path $apkSelectedBuildTools.FullName $(if($apkUsesAapt2){'aapt2.exe'}else{'aapt.exe'})
     $apkSigner = Join-Path $apkSelectedBuildTools.FullName 'apksigner.bat'
     $apkJavaRoot = Join-Path $UnityAndroidRoot 'OpenJDK'
     Assert-ApkCheck (Test-Path -LiteralPath (Join-Path $apkJavaRoot 'bin\java.exe')) 'Unity Android OpenJDK 不完整。'
@@ -115,7 +117,7 @@ try {
     Assert-ApkCheck ($apkPublicReport.packageId -ceq 'com.catandevelopment.threekingdoms') 'APK 包名不符合当前内测发布配置。'
     Assert-ApkCheck ($apkPublicReport.versionName -ceq $ExpectedVersionName) ('APK versionName 应为 ' + $ExpectedVersionName + '。')
     Assert-ApkCheck ($apkPublicReport.versionCode -eq $ExpectedVersionCode) ('APK versionCode 应为 ' + $ExpectedVersionCode + '。')
-    $apkMinMatch = [regex]::Match($apkBadging, "(?m)^sdkVersion:'(\d+)'\s*$")
+    $apkMinMatch = [regex]::Match($apkBadging, "(?m)^(?:sdkVersion|minSdkVersion):'(\d+)'\s*$")
     $apkTargetMatch = [regex]::Match($apkBadging, "(?m)^targetSdkVersion:'(\d+)'\s*$")
     Assert-ApkCheck ($apkMinMatch.Success -and $apkTargetMatch.Success) 'APK 缺少最低或目标 Android API。'
     $apkPublicReport.minSdk = [int]$apkMinMatch.Groups[1].Value
@@ -133,11 +135,13 @@ try {
     $apkPublicReport.debuggable = $apkBadging -match '(?m)^application-debuggable(?:\s|$)'
     $apkLaunchLine = [regex]::Match($apkBadging, '(?m)^launchable-activity:.*$').Value
     $apkPublicReport.activity = Read-ApkAttribute $apkLaunchLine 'name'
-    $apkManifest = Invoke-ApkInspectionTool $apkAapt @('dump','xmltree',$apkResolvedPath,'AndroidManifest.xml')
+    $apkManifestArguments=if($apkUsesAapt2){@('dump','xmltree','--file','AndroidManifest.xml',$apkResolvedPath)}else{@('dump','xmltree',$apkResolvedPath,'AndroidManifest.xml')}
+    $apkManifest = (Invoke-ApkInspectionTool $apkAapt $apkManifestArguments).Replace('http://schemas.android.com/apk/res/android:','android:')
     $apkActivity = Read-ApkActivityBlock $apkManifest $apkPublicReport.activity
-    $apkOrientationMatch = [regex]::Match($apkActivity, 'android:screenOrientation\([^)]*\)=\(type 0x10\)(0x[0-9a-fA-F]+)')
+    $apkOrientationMatch = [regex]::Match($apkActivity, 'android:screenOrientation\([^)]*\)=(?:\(type 0x10\))?(0x[0-9a-fA-F]+|\d+)')
     Assert-ApkCheck $apkOrientationMatch.Success 'APK 启动 Activity 没有明确的横屏方向配置。'
-    $apkOrientation = [Convert]::ToInt32($apkOrientationMatch.Groups[1].Value.Substring(2), 16)
+    $apkOrientationValue=$apkOrientationMatch.Groups[1].Value
+    $apkOrientation = if($apkOrientationValue.StartsWith('0x')){[Convert]::ToInt32($apkOrientationValue.Substring(2),16)}else{[int]$apkOrientationValue}
     $apkOrientationNames = @{0='landscape';6='sensorLandscape';8='reverseLandscape';11='userLandscape'}
     $apkPublicReport.orientation = if ($apkOrientationNames.ContainsKey($apkOrientation)) { $apkOrientationNames[$apkOrientation] } else { 'android-enum-' + $apkOrientation }
     $apkPublicReport.landscape = $apkOrientationNames.ContainsKey($apkOrientation)

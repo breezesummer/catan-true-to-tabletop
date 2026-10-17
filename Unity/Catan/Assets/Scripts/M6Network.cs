@@ -62,10 +62,10 @@ public sealed partial class M6App
         // 重新入桌直接展示当前本人快照；旧历史稍后分页到达，不应阻塞初始棋盘或重播整局出牌。
         switch(Network.Room.RuleSet)
         {
-            case "base":presentedSequence=Network.View<Catan.Core.M2.PlayerView>().Events.LastOrDefault()?.Sequence??0;break;
-            case "seafarers":presentedSequence=Network.View<Catan.Core.M3.PlayerView>().Events.LastOrDefault()?.Sequence??0;break;
-            case "cities":case "cities-knights":presentedSequence=Network.View<Catan.Core.M4.PlayerView>().Events.LastOrDefault()?.Sequence??0;break;
-            default:presentedSequence=Network.View<Catan.Core.M5.PlayerView>().Events.LastOrDefault()?.Sequence??0;break;
+            case "base":cardReveals.Reset(Network.View<Catan.Core.M2.PlayerView>().Events.LastOrDefault()?.Sequence??0);break;
+            case "seafarers":cardReveals.Reset(Network.View<Catan.Core.M3.PlayerView>().Events.LastOrDefault()?.Sequence??0);break;
+            case "cities":case "cities-knights":cardReveals.Reset(Network.View<Catan.Core.M4.PlayerView>().Events.LastOrDefault()?.Sequence??0);break;
+            default:cardReveals.Reset(Network.View<Catan.Core.M5.PlayerView>().Events.LastOrDefault()?.Sequence??0);break;
         }
         Bind(app,acting,done,_=>"联机模式由服务端调度 AI。",()=>throw new InvalidOperationException("联机权威存档由服务端保管。"),update,dispose,show);
     }
@@ -223,7 +223,7 @@ public sealed partial class M6App
     void DrawNetworkStatus()
     {
         GUILayout.BeginArea(new Rect(498,703,815,67));networkStatusScroll=GUILayout.BeginScrollView(networkStatusScroll);
-        GUILayout.Label(NetworkMenuStatus,new GUIStyle(PastoralMenuUI.Small){wordWrap=true});GUILayout.EndScrollView();GUILayout.EndArea();
+        GUILayout.Label(DisplayPlayerText(NetworkMenuStatus),new GUIStyle(PastoralMenuUI.Small){wordWrap=true});GUILayout.EndScrollView();GUILayout.EndArea();
     }
     bool JoinedRoom(RoomSummary room,M7LanService.Advertisement server=null)=>M7RoomEntry.IsJoined(room.RoomId,server?.Address??Network.Endpoint,server?.certificateFingerprint??"",Network.Room?.RoomId,Network.Endpoint,Network.Fingerprint,!string.IsNullOrEmpty(Network.SeatId));
     void CancelJoinPassword(){pendingJoinRoom=null;pendingJoinServer=null;joinPassword="";}
@@ -405,7 +405,7 @@ public sealed partial class M6App
         {
             var r=GUILayoutUtility.GetRect(790,66);
             PastoralMenuUI.Round(new Rect(r.x,r.y+1,r.width-5,59),new Color(.91f,.93f,.86f),9);
-            PastoralMenuUI.Label(new Rect(r.x+17,r.y+16,410,30),ColorLabel(seat.SeatId)+"   "+(seat.Occupied||seat.IsAi?seat.DisplayName:"等待同伴入座")+(room.ManagerSeatId==seat.SeatId?" · 房主":""),18,null,true);
+            PastoralMenuUI.Label(new Rect(r.x+17,r.y+16,410,30),ColorLabel(seat.SeatId)+"   "+(seat.Occupied||seat.IsAi?seat.DisplayName:"等待同伴入座")+(room.ManagerSeatId==seat.SeatId?" · 房主":""),18,BoardRenderer.SeatColor(seat.SeatId),true);
             PastoralMenuUI.Label(new Rect(r.x+420,r.y+21,190,25),seat.RejoinPending?"AI 托管 · 下回合接回":seat.ControlledByAi?"AI 操作中":seat.Ready?"已准备":seat.Connected?"在线 · 未准备":"等待连接",13,PastoralMenuUI.Muted);
             if(!room.Started&&!seat.Occupied&&!seat.IsAi&&PastoralMenuUI.Button(new Rect(r.xMax-129,r.y+12,110,36),"坐这里",!Network.Busy))Network.SelectSeat(seat.SeatId);
             if(room.ManagerSeatId==Network.SeatId&&seat.Occupied&&!seat.IsAi&&seat.SeatId!=Network.SeatId&&PastoralMenuUI.Button(new Rect(r.xMax-129,r.y+12,110,36),"转交房主",!Network.Busy))Network.Transfer(seat.SeatId);

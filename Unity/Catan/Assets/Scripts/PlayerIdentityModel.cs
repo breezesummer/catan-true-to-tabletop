@@ -38,5 +38,6 @@ public static class PlayerIdentityModel
         return names;
     }
     public static string ReplaceIds(string text,Func<string,string> display)
-        =>Regex.Replace(text??"",@"(?<![A-Za-z0-9])P[1-4](?![A-Za-z0-9])",match=>display(match.Value));
+        =>Regex.Replace(text??"",@"(?<![A-Za-z0-9])P[1-4](?![A-Za-z0-9])",match=>display(match.Value.ToUpperInvariant()),RegexOptions.IgnoreCase);
+    public static bool IsPlayerId(string value)=>value!=null&&value.Length==2&&(value[0]=='P'||value[0]=='p')&&value[1]>='1'&&value[1]<='4';
 }

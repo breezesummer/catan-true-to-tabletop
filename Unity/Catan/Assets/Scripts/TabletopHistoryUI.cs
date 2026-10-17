@@ -57,7 +57,7 @@ public sealed partial class TabletopHistoryUI
         if(ModernOperationUI.Button(new Rect(x,Window.y+70,108,34),"全部玩家",true,false,filter==null)){filter=null;historyScroll=diceScroll=Vector2.zero;}x+=118;
         foreach(var player in players)
         {
-            if(ModernOperationUI.Button(new Rect(x,Window.y+70,108,34),M6App.PlayerLabel(player),true,false,filter==player)){filter=player;historyScroll=diceScroll=Vector2.zero;}x+=118;
+            if(ModernOperationUI.Button(new Rect(x,Window.y+70,108,34),M6App.PlayerLabel(player),true,false,filter==player,player)){filter=player;historyScroll=diceScroll=Vector2.zero;}x+=118;
         }
         if(showDice)
         {
@@ -99,7 +99,7 @@ public sealed partial class TabletopHistoryUI
             float y=i*44;if(y+44<position.y||y>position.y+viewport.height)continue;
             var entry=entries[i];
             ModernOperationUI.Fill(new Rect(0,y+8,3,22),BoardRenderer.SeatColor(entry.PlayerId));
-            ModernOperationUI.Label(new Rect(12,y+5,185,30),"第 "+entry.Turn+" 回合 · "+M6App.PlayerLabel(entry.PlayerId));
+            ModernOperationUI.Label(new Rect(12,y+5,185,30),"第 "+entry.Turn+" 回合 · "+M6App.PlayerLabel(entry.PlayerId),M6App.PlayerNameStyle(ModernOperationUI.Text,entry.PlayerId));
             Die(new Rect(211,y+5,28,28),entry.Dice1,new Color(.64f,.11f,.08f),false);
             Die(new Rect(245,y+5,28,28),entry.Dice2,new Color(.94f,.90f,.80f),false);
             if(!string.IsNullOrEmpty(entry.EventDie))Die(new Rect(279,y+5,28,28),EventFace(entry.EventDie),new Color(.21f,.25f,.27f),true);
@@ -135,7 +135,7 @@ public sealed partial class TabletopHistoryUI
     }
     static void DrawRow(Rect r,GameHistoryEntry entry,bool compact)
     {
-        var style=new GUIStyle(ModernOperationUI.Text){fontSize=compact?12:15};
+        var style=M6App.PlayerNameStyle(new GUIStyle(ModernOperationUI.Text){fontSize=compact?12:15},entry.PlayerId);
         float titleHeight=Math.Max(compact?22:28,ModernOperationUI.Text.CalcHeight(new GUIContent(Caption(entry)),r.width-14));
         ModernOperationUI.Fill(new Rect(r.x,r.y+3,3,Math.Max(14,titleHeight-5)),BoardRenderer.SeatColor(entry.PlayerId));
         ModernOperationUI.Label(new Rect(r.x+9,r.y,r.width-12,titleHeight),Caption(entry),style);
@@ -155,7 +155,7 @@ public sealed partial class TabletopHistoryUI
             var label=new GUIStyle(ModernOperationUI.Small);label.normal.textColor=change.Amount<0?new Color(.95f,.64f,.51f):new Color(.60f,.83f,.68f);
             string amount=(change.Amount>0?"+":"")+change.Amount;
             float nameWidth=Math.Min(105,cell*.46f);
-            ModernOperationUI.Label(new Rect(x,cy,nameWidth,27),M6App.PlayerLabel(change.PlayerId),new GUIStyle(label){fontSize=10,wordWrap=true});
+            ModernOperationUI.Label(new Rect(x,cy,nameWidth,27),M6App.PlayerLabel(change.PlayerId),M6App.PlayerNameStyle(new GUIStyle(label){fontSize=10,wordWrap=true},change.PlayerId));
             if(change.GoodIndex>=0&&change.GoodIndex<8)
             {
                 OperationIconAssets.DrawGood(new Rect(x+nameWidth+3,cy+1,25,25),change.GoodIndex);

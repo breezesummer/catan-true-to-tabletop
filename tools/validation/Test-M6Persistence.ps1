@@ -1,7 +1,7 @@
 ﻿param([string]$BuildRoot='.local/m6-entity-v005',[int]$TimeoutSeconds=300)
 $ErrorActionPreference='Stop'
 $persistRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
-$persistPlayer=Join-Path $persistRepo "$BuildRoot/Builds/Windows/CatanM6.exe"
+$persistPlayer=& (Join-Path $PSScriptRoot '../development/Find-GamePlayer.ps1') -BuildRoot $BuildRoot
 $persistDirectory=Join-Path $persistRepo "$BuildRoot/persistence"
 New-Item -ItemType Directory -Force -Path $persistDirectory | Out-Null
 foreach($persistMode in @('save','load')){

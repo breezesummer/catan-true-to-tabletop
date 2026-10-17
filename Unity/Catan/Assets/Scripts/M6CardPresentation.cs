@@ -6,14 +6,16 @@ using UnityEngine;
 
 public sealed partial class M6App
 {
-    readonly Queue<GameHistoryEntry> playedCards=new Queue<GameHistoryEntry>();
-    long presentedSequence;
+    readonly Queue<TabletopCardReveal> playedCards=new Queue<TabletopCardReveal>();
+    readonly TabletopCardRevealTimeline cardReveals=new TabletopCardRevealTimeline();
     double cardStarted;
     Action afterPlayedCards;
     Action pendingNetworkPresentation;
     long pendingNetworkSequence;
     const double CardRevealDuration=2.15;
+    internal GameHistoryEntry CardPresentationRoll { get; private set; }
     internal bool CardPresentationBusy=>playedCards.Count>0;
+    internal TabletopCardReveal PresentedCard=>playedCards.Count>0?playedCards.Peek():null;
     public bool TablePresentationBlocked=>tableMenu||CardPresentationBusy||pendingNetworkPresentation!=null||buildFlights.Any(f=>f.Piece.Previous!=null);
     public string PlayerDisplayName(string seat)
     {
@@ -26,26 +28,23 @@ public sealed partial class M6App
     }
     void ResetCardPresentation(GameHistoryEntry[] history=null)
     {
-        playedCards.Clear();afterPlayedCards=null;pendingNetworkPresentation=null;presentedSequence=history?.LastOrDefault()?.Sequence??0;
+        playedCards.Clear();afterPlayedCards=null;pendingNetworkPresentation=null;CardPresentationRoll=null;cardReveals.Reset(history);
     }
     // 指令已在规则层完成；显示旧快照至卡牌退场，再统一刷新并衔接现有飞牌／棋盘效果。
     internal bool PresentPlayedCard(GameHistoryEntry[] history,Action applyView)
     {
-        foreach(var entry in (history??Array.Empty<GameHistoryEntry>()).Where(e=>e.Sequence>presentedSequence).OrderBy(e=>e.Sequence))
+        foreach(var reveal in cardReveals.Observe(history))
         {
-            presentedSequence=entry.Sequence;
-            if(entry.Kind=="PlayKnight"||entry.Kind=="PlayRoadBuilding"||entry.Kind=="PlayYearOfPlenty"||entry.Kind=="PlayMonopoly"||entry.Kind=="PlayProgressCard")
-            {
-                if(playedCards.Count==0)cardStarted=Time.unscaledTimeAsDouble;
-                playedCards.Enqueue(entry);
-            }
+            if(playedCards.Count==0)cardStarted=Time.unscaledTimeAsDouble+(reveal.Roll!=null?TabletopDicePresentation.Duration:0);
+            if(reveal.Roll!=null)CardPresentationRoll=reveal.Roll;
+            playedCards.Enqueue(reveal);
         }
         if(!CardPresentationBusy)return false;
         afterPlayedCards=applyView;return true;
     }
     internal bool WaitForPresentationHistory(long sequence,Action applyView)
     {
-        if(sequence<=presentedSequence||(Network.History.LastOrDefault()?.Sequence??0)>=sequence)return false;
+        if(sequence<=cardReveals.Sequence||(Network.History.LastOrDefault()?.Sequence??0)>=sequence)return false;
         pendingNetworkSequence=sequence;pendingNetworkPresentation=applyView;return true;
     }
     void UpdateCardPresentation()
@@ -57,25 +56,28 @@ public sealed partial class M6App
         if(Time.unscaledTimeAsDouble-cardStarted<CardRevealDuration)return;
         playedCards.Dequeue();cardStarted=Time.unscaledTimeAsDouble;
         if(CardPresentationBusy)return;
-        var apply=afterPlayedCards;afterPlayedCards=null;apply?.Invoke();
+        var apply=afterPlayedCards;afterPlayedCards=null;apply?.Invoke();CardPresentationRoll=null;
         nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);
     }
     void DrawPlayedCard()
     {
         if(!CardPresentationBusy)return;
         var entry=playedCards.Peek();
-        string card=entry.Action.Replace("打出「","").TrimEnd('」');
+        string card=entry.CardName;
         float elapsed=(float)(Time.unscaledTimeAsDouble-cardStarted);
+        if(elapsed<0)return;
         float enter=Mathf.SmoothStep(0,1,elapsed/.48f),leave=Mathf.SmoothStep(0,1,(elapsed-1.63f)/.52f);
         float x=Mathf.Lerp(-260,610,enter)+leave*1100;
         var face=new Rect(x,260,220,326);
+        if(entry.ImmediateVictory)
+        {
+            int place=Array.IndexOf(HistoryPlayers,entry.PlayerId);
+            var destination=TabletopUI.PlayerAvatarRect(Math.Max(0,place),PlayerCount);
+            face=new Rect(Mathf.Lerp(Mathf.Lerp(-260,610,enter),destination.center.x-22,leave),Mathf.Lerp(260,destination.yMax+3,leave),Mathf.Lerp(220,44,leave),Mathf.Lerp(326,65,leave));
+        }
         Panel(new Rect(0,0,1440,900),new Color(0,0,0,.30f));
         Texture2D texture=null;
-        if(entry.Kind=="PlayProgressCard")
-        {
-            string[] names={"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻造","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"};
-            int index=Array.IndexOf(names,card);if(index>=0)texture=EntityCardAssets.ProgressFront(index);
-        }
+        if(entry.Progress&&entry.ProgressIndex>=0)texture=EntityCardAssets.ProgressFront(entry.ProgressIndex);
         if(texture!=null)EntityCardAssets.DrawCardFace(face,texture);
         else
         {
@@ -84,7 +86,9 @@ public sealed partial class M6App
             GUI.Label(new Rect(x+16,290,188,40),"发展卡",new GUIStyle(label){alignment=TextAnchor.MiddleCenter});
         }
         StrategyHudArt.Avatar(new Rect(x+75,175,70,70),entry.PlayerId);
-        GUI.Label(new Rect(x-240,600,700,70),PlayerDisplayName(entry.PlayerId)+" 使用了「"+card+"」",new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=29});
+        var nameStyle=PlayerNameStyle(new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=29},entry.PlayerId);
+        GUI.Label(new Rect(370,600,700,42),PlayerDisplayName(entry.PlayerId),nameStyle);
+        if(!entry.ImmediateVictory)GUI.Label(new Rect(370,646,700,70),"使用了「"+card+"」",new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=27});
         if(Event.current.isMouse)Event.current.Use();
     }
 }

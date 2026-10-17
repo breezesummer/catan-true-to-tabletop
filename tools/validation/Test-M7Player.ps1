@@ -8,7 +8,7 @@ param(
 $ErrorActionPreference='Stop'
 $m7Repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $m7Root=[IO.Path]::GetFullPath((Join-Path $m7Repo $BuildRoot))
-$m7Player=Join-Path $m7Root 'Builds/Windows/CatanM7.exe'
+$m7Player=& (Join-Path $PSScriptRoot '../development/Find-GamePlayer.ps1') -BuildRoot $BuildRoot
 $m7Fingerprint=(Get-Content -Raw -LiteralPath $FingerprintFile).Trim()
 $m7Modes=@(
     @{Rule='base';Scenario='base';Players=3},

@@ -239,7 +239,7 @@ public sealed partial class M6App
             }
             else
             {
-                var avatar=TabletopUI.PlayerAvatarRect(int.Parse(flight.Piece.PlayerId.Substring(1))-1,PlayerCount);
+                var avatar=TabletopUI.PlayerAvatarRect(Math.Max(0,Array.IndexOf(HistoryPlayers,flight.Piece.PlayerId)),PlayerCount);
                 var ray=buildCamera.ViewportPointToRay(new Vector3(avatar.center.x/1440,1-avatar.center.y/900,0));
                 var plane=new Plane(Vector3.up,new Vector3(0,.035f,0));
                 var start=plane.Raycast(ray,out float distance)?ray.GetPoint(distance):flight.Destination+Vector3.up*.15f;

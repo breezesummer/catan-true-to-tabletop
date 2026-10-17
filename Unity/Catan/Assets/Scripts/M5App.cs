@@ -188,7 +188,7 @@ public sealed partial class M5App : MonoBehaviour
         GUI.Label(new Rect(25,54,760,25),"M5 · "+publicView.ScenarioName+" · 官方 2025 组合 · "+publicView.TargetVictoryPoints+" 分获胜",small);
         if(GUI.Button(new Rect(800,18,180,34),board.TopView?"斜视 [Tab]":"俯视 [Tab]",button))board.SetCamera(!board.TopView);
         if(GUI.Button(new Rect(800,60,180,32),"地形显隐",button)){terrain=!terrain;board.ShowTerrain(terrain);}
-        GUI.Label(new Rect(25,90,960,28),"第 "+publicView.Turn+" 回合 · 行动 "+publicView.ActivePlayerId+"     蛮族 "+publicView.BarbarianPosition+" / 7     红骰 "+publicView.LastDice1+" + 白骰 "+publicView.LastDice2+"     事件 "+EventName(publicView.LastEventDie),label);
+        GUI.Label(new Rect(25,90,960,28),"第 "+publicView.Turn+" 回合 · 行动 "+M6App.PlayerLabel(publicView.ActivePlayerId)+"     蛮族 "+publicView.BarbarianPosition+" / 7     红骰 "+publicView.LastDice1+" + 白骰 "+publicView.LastDice2+"     事件 "+EventName(publicView.LastEventDie),label);
         Panel(new Rect(1015,0,425,900),new Color(.065f,.12f,.135f));
         if(newGame)
         {
@@ -219,7 +219,7 @@ public sealed partial class M5App : MonoBehaviour
         GUILayout.BeginArea(new Rect(1032,749,390,142));GUILayout.BeginHorizontal();if(Btn("保存"))SaveGame();if(Btn("恢复"))LoadGame();if(Btn("新开一局")){if(ai!=null)ai.ShowMenu();else newGame=true;}GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();foreach(var p in publicView.Players)if(Btn(p.Id+"\n"+p.VictoryPoints+"分 / "+p.ResourceCount+"牌")){SwitchSeat(p.Id);break;}GUILayout.EndHorizontal();
         Text(ai==null?"点击席位换座 · Tab 视角 · 滚轮缩放 · Esc 取消":"你："+ai.HumanSeat+" · 其他席位为 AI · Tab 视角 · Esc 取消",true);GUILayout.EndArea();
-        Panel(new Rect(0,812,1015,88),new Color(.045f,.09f,.10f));GUI.Label(new Rect(24,826,970,58),pickField==""?status:"请在棋盘选择"+(pickType=="V"?"交点":pickType=="E"?"道路":"地块")+"，然后在右侧确认；Esc 取消。",label);
+        Panel(new Rect(0,812,1015,88),new Color(.045f,.09f,.10f));GUI.Label(new Rect(24,826,970,58),pickField==""?M6App.DisplayPlayerText(status):"请在棋盘选择"+(pickType=="V"?"交点":pickType=="E"?"道路":"地块")+"，然后在右侧确认；Esc 取消。",label);
         if(!curtain&&!newGame&&view!=null)cardArt.DrawPreview(label,small,button);
         GUI.matrix=Matrix4x4.identity;
     }
@@ -288,7 +288,7 @@ public sealed partial class M5App : MonoBehaviour
         {
             var p=board.ScreenPoint(k.LocationId);p=MobileTabletop.Logical(p);
             if(ai==null)
-                GUI.Label(new Rect(p.x-26,p.y-36,86,21),M6App.PlayerLabel(k.PlayerId)+" 骑"+k.Level+(k.Active?" ●":" ○"),small);
+                GUI.Label(new Rect(p.x-26,p.y-36,86,21),M6App.PlayerLabel(k.PlayerId)+" 骑"+k.Level+(k.Active?" ●":" ○"),M6App.PlayerNameStyle(small,k.PlayerId));
         }
     }
     void DrawControls()

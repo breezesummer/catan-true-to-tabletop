@@ -32,6 +32,7 @@ public sealed class PlayerIdentityTests
     {
         var names=new Dictionary<string,string>{{"P1","P2 的伙伴"},{"P2","糖包"}};
         Assert.Equal("P2 的伙伴 向 糖包 报价；VP1 和 P12 保持原样",PlayerIdentityModel.ReplaceIds("P1 向 P2 报价；VP1 和 P12 保持原样",id=>names[id]));
+        Assert.Equal("糖包 获胜，等待P2 的伙伴；XP2 / P20",PlayerIdentityModel.ReplaceIds("p2 获胜，等待p1；XP2 / P20",id=>names[id]));
         Assert.Equal("玩家",PlayerIdentityModel.NormalizeName(" \n\t "));
         Assert.Equal("海风",PlayerIdentityModel.NormalizeName("\n海风\t"));
         Assert.Equal(20,PlayerIdentityModel.NormalizeName(new string('岛',30)).Length);

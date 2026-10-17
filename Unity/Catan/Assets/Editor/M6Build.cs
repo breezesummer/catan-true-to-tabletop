@@ -91,7 +91,7 @@ public static class M6Build
         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), "Assets/M6.unity");
         PlayerSettings.companyName = "CatanDevelopment";
         PlayerSettings.productName = "Catan M6";
-        PlayerSettings.bundleVersion = "1.6";
+        PlayerSettings.bundleVersion = M6App.BuildVersion;
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
         PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Standalone, ApiCompatibilityLevel.NET_Standard);
         PlayerSettings.defaultScreenWidth = 1440;
@@ -104,7 +104,7 @@ public static class M6Build
         var root = Path.GetFullPath(Path.Combine(Application.dataPath, "../../.."));
         var args=Environment.GetCommandLineArgs();int outputFlag=Array.IndexOf(args,"--m6-output-root");
         var buildRoot=outputFlag>=0&&outputFlag+1<args.Length?Path.GetFullPath(args[outputFlag+1]):Path.Combine(root,".local/release-1.6");
-        var output = Path.Combine(buildRoot, android ? "Builds/Android/CatanM7.apk" : "Builds/Windows/CatanM7.exe");
+        var output = Path.Combine(buildRoot, "Builds", android ? "Android" : "Windows", M6App.ProductFileName + (android ? ".apk" : ".exe"));
         Directory.CreateDirectory(Path.GetDirectoryName(output));
         var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
             scenes = new[] { "Assets/M6.unity" }, locationPathName = output,

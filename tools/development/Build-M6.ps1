@@ -1,6 +1,7 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='.local/release-1.6',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
+param([switch]$VerifyPlayer,[string]$OutputRoot='.local/Catan1.6.1-自动亮牌与玩家显示',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
+$m6FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Project = Join-Path $m6RepoRoot 'Unity\Catan'
 & (Join-Path $PSScriptRoot '../validation/Test-UnitySourceIntegrity.ps1') -ProjectPath $m6Project
@@ -24,7 +25,7 @@ if ($LASTEXITCODE -ne 0) { throw "Unity 构建失败，请检查 $m6Logs/unity-b
 if (!(Select-String -LiteralPath (Join-Path $m6Logs 'unity-build.log') -Pattern 'CATAN_M6_UNITY_BUILD_OK' -Quiet)) { throw '未找到 Unity 构建成功标记。' }
 Write-Host ("M6 .NET / Unity 构建耗时 {0:N1} 秒。" -f $m6BuildClock.Elapsed.TotalSeconds)
 if ($VerifyPlayer) {
-    $m6Player = Join-Path $m6OutputRoot 'Builds/Windows/CatanM7.exe'
+    $m6Player = Join-Path $m6OutputRoot "Builds/Windows/$m6FileStem.exe"
     $m6Evidence = Join-Path $m6OutputRoot 'verification'
     New-Item -ItemType Directory -Force $m6Evidence | Out-Null
     foreach ($mode in @('save','load')) {
@@ -44,5 +45,5 @@ if ($VerifyPlayer) {
 
     }
 }
-Write-Host "M6 新版 Windows 程序已生成：$m6OutputRoot/Builds/Windows/CatanM7.exe"
+Write-Host "Windows 程序已生成：$m6OutputRoot/Builds/Windows/$m6FileStem.exe"
 
