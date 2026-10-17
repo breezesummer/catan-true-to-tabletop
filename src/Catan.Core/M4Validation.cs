@@ -22,6 +22,9 @@ namespace Catan.Core.M4
             Check(s.DowngradedCities.All(c=>s.Settlements.Any(v=>v.PlayerId==c.PlayerId&&v.LocationId==c.LocationId)),"Invalid pillaged city.");
             Check(s.BarbarianPosition>=0&&s.BarbarianPosition<=7&&Enum.IsDefined(typeof(EventDie),s.LastEventDie),"Invalid barbarian track/event die.");
             Check(s.BarbarianPosition!=7||s.FirstBarbarianAttack&&(s.Phase==GamePhase.Finished||s.DecisionQueue.Any(d=>d.Kind=="BarbarianReturnHome")),"Attack must finish before barbarians return home.");
+            Check(s.BarbarianAttackStrength.HasValue==s.BarbarianDefenseStrength.HasValue,"蛮族战斗快照必须同时包含攻守力量。");
+            if(s.BarbarianAttackStrength.HasValue)
+                Check(s.BarbarianPosition==7&&s.BarbarianAttackStrength>=s.Cities.Length&&s.BarbarianAttackStrength<=s.Cities.Length+s.Players.Length&&s.BarbarianDefenseStrength==s.Knights.Where(k=>k.Active).Sum(k=>k.Level),"蛮族战斗快照与结算状态不符。");
             Check(s.DecisionQueue.All(d=>d!=null&&s.Players.Any(p=>p.Id==d.PlayerId)),"Invalid decision queue.");
             Check(s.Tiles.Length==scenario.Topology.Tiles.Length&&s.Tiles.Select(t=>t.Id).Distinct().Count()==s.Tiles.Length,"Invalid board tiles.");
             foreach(var tile in s.Tiles) {var original=scenario.Topology.Tiles.Single(t=>t.Id==tile.Id);Check(tile.Resource==original.Resource&&tile.Q==original.Q&&tile.R==original.R&&tile.Vertices.SequenceEqual(original.Vertices),"Immutable topology changed.");}

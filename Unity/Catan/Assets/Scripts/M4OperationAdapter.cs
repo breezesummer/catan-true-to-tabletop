@@ -164,7 +164,7 @@ public sealed partial class M4App
         tabletop.BindDiscard(Operations(),dock);
         tabletop.BindLongestRoad(view.LongestRoadPlayerId,view.Players.FirstOrDefault(p=>p.Id==view.LongestRoadPlayerId)?.LongestRoadLength??0);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,(int)view.LastEventDie);
-        tabletop.BindDefense(view.BarbarianPosition,view.Board.Knights.Where(k=>k.Active).Sum(k=>k.Level),view.Board.Cities.Length);
+        tabletop.BindDefense(view.BarbarianPosition,view.DefenderStrength,view.BarbarianStrength);
         ai.TableDiceRolling=tabletop.DiceRolling;
         tabletop.Draw(font,seat,Actor(view),PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,
             view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Score=TabletopScoreModel.For(view,p.Id),Resources=p.ResourceCount,Cards=p.ProgressCardCount,ResourceHandLimit=7+2*view.Board.Walls.Count(w=>w.PlayerId==p.Id),SpecialHandLimit=4,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Improvements=p.Improvements}).ToArray(),

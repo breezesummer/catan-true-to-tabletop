@@ -79,6 +79,9 @@ namespace Catan.Core.M5
         [DataMember(Order=49)] public bool ProductionPending { get; set; }
         [DataMember(Order=50)] public GamePhase DecisionReturnPhase { get; set; } = GamePhase.Action;
         [DataMember(Order=51)] public Tile[] Tiles { get; set; } = Array.Empty<Tile>();
+        // 同一次攻击的力量在所有劫掠／奖励选择完成前保持不变。
+        [DataMember(Order=52,EmitDefaultValue=false)] public int? BarbarianAttackStrength { get; set; }
+        [DataMember(Order=53,EmitDefaultValue=false)] public int? BarbarianDefenseStrength { get; set; }
     }
     public sealed partial class PublicPlayer
     {
@@ -100,6 +103,8 @@ namespace Catan.Core.M5
         public int[] OwnImprovements { get; internal set; }
         public CommodityBag CommodityBank { get; internal set; }
         public int BarbarianPosition { get; internal set; }
+        public int DefenderStrength { get; internal set; }
+        public int BarbarianStrength { get; internal set; }
         public bool FirstBarbarianAttack { get; internal set; }
         public EventDie LastEventDie { get; internal set; }
         public Command[] LegalActions { get; internal set; }
