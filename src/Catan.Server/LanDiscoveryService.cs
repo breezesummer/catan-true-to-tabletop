@@ -15,7 +15,13 @@ public sealed class LanDiscoveryService(ServerOptions options, Func<int, object>
         using var listener = new UdpClient(AddressFamily.InterNetwork);
         listener.Client.ExclusiveAddressUse = true;
         try { listener.Client.Bind(new IPEndPoint(IPAddress.Any, options.DiscoveryPort)); }
-        catch (SocketException) { Console.Error.WriteLine("局域网发现端口被占用，可使用 IP 手动加入。发现服务未启动。"); return; }
+        catch (SocketException error)
+        {
+            Console.Error.WriteLine(error.SocketErrorCode==SocketError.AddressAlreadyInUse
+                ?$"CATAN_SERVER_WARNING UDP_PORT_IN_USE：UDP {options.DiscoveryPort} 已被占用，好友可能无法发现本机房间，请关闭重复服务或旧版游戏后重新进入局域网。"
+                :$"CATAN_SERVER_WARNING UDP_{error.NativeErrorCode}：系统拒绝监听发现端口 UDP {options.DiscoveryPort}，请检查网络权限与端口保留设置。");
+            return;
+        }
         while (!stoppingToken.IsCancellationRequested)
         {
             try

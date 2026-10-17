@@ -20,7 +20,9 @@ public sealed class PrivateServerFiles : IDisposable
     public PrivateServerFiles(ServerOptions options)
     {
         MakePrivateDirectory(options.DataDirectory);
-        instanceLock = new FileStream(Path.Combine(options.DataDirectory, "server.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+        try { instanceLock = new FileStream(Path.Combine(options.DataDirectory, "server.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
+        catch (IOException error) when ((error.HResult & 0xffff) is 32 or 33)
+        { throw new ServerStartupException("DATA_IN_USE", "服务存档目录正由另一个进程使用，请关闭旧版游戏或重复服务。"); }
         try
         {
             Certificate = LoadCertificate(options);

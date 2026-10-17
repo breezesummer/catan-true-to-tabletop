@@ -4,12 +4,16 @@ using Catan.Server;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 Console.OutputEncoding = new System.Text.UTF8Encoding(false);
+string startupStage="OPTIONS";int startupPort=47771;
 try
 {
     var options = ServerOptions.Parse(args);
+    startupPort=options.Port;startupStage="PRIVATE_FILES";
     using var privateFiles = new PrivateServerFiles(options);
+    startupStage="ROOMS";
     var scenarioFile = Path.Combine(AppContext.BaseDirectory, "base-scenario.json");
     using var rooms = new RoomDirectory(Path.Combine(options.DataDirectory, "rooms"), File.ReadAllText(scenarioFile));
+    startupStage="LISTEN";
     var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = Array.Empty<string>(), ContentRootPath = AppContext.BaseDirectory });
     // 默认关闭框架请求日志，禁止请求、令牌、口令和异常中的权威内容进入公开日志。
     builder.Logging.ClearProviders();
@@ -54,8 +58,8 @@ try
     });
     await app.RunAsync();
 }
-catch
+catch(Exception error)
 {
-    Console.Error.WriteLine("房间服务无法启动。请检查端口占用、证书、私有目录权限及存档完整性；未输出任何凭据或存档内容。");
+    Console.Error.WriteLine("CATAN_SERVER_ERROR "+StartupDiagnostics.Describe(error,startupStage,startupPort));
     Environment.ExitCode = 1;
 }

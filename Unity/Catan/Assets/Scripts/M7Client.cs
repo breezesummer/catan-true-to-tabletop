@@ -21,6 +21,8 @@ public sealed class M7Client : MonoBehaviour
     public string Endpoint { get; private set; }
     public string Fingerprint { get; private set; }
     public string Status { get; private set; }="填写服务地址，或启动本机局域网服务。";
+    public string LastError { get; private set; }="";
+    public void ClearError(){LastError="";}
     public string SeatId { get; private set; }
     public string RoomId { get; private set; }
     public RoomSummary Room { get; private set; }
@@ -104,9 +106,9 @@ public sealed class M7Client : MonoBehaviour
     public void ConfigureEndpoint(string address,string pin,bool restoreIdentity=true)
     {
         var uri=new Uri(address.Trim().TrimEnd('/'));
-        if(uri.Scheme!="https"||!string.IsNullOrEmpty(uri.UserInfo)||uri.AbsolutePath!="/"||!string.IsNullOrEmpty(uri.Query))throw new InvalidOperationException("请填写 https://主机:端口，不得附带路径或凭据。");
+        if(uri.Scheme!="https"||!string.IsNullOrEmpty(uri.UserInfo)||uri.AbsolutePath!="/"||!string.IsNullOrEmpty(uri.Query))throw new M7NetworkFailure("ADDRESS","请填写 https://主机:端口，不得附带路径或凭据。");
         string normalized=NormalizeFingerprint(pin);
-        if(normalized.Length!=0&&normalized.Length!=64)throw new InvalidOperationException("证书指纹必须是 64 位 SHA-256 十六进制值。");
+        if(normalized.Length!=0&&normalized.Length!=64)throw new M7NetworkFailure("PIN_FORMAT","主机证书标识无效，请重新搜索。");
         EndSession();Endpoint=uri.GetLeftPart(UriPartial.Authority);Fingerprint=normalized;
         lifetime=new CancellationTokenSource();
         var handler=new HttpClientHandler{AllowAutoRedirect=false,UseProxy=false};
@@ -118,7 +120,7 @@ public sealed class M7Client : MonoBehaviour
             return actual.Scheme=="https"&&actual.Authority==uri.Authority&&certificate!=null&&CertificateMatches(certificate.GetRawCertData(),normalized);
         };
         http=new HttpClient(handler){Timeout=TimeSpan.FromSeconds(15)};
-        Status=normalized.Length>0?"已连接发现的局域网主机。":"在线连接使用系统证书校验。";
+        LastError="";Status=normalized.Length>0?"已配置局域网主机，将在请求时建立加密连接。":"已配置在线地址，将使用系统证书校验。";
         if(restoreIdentity)LoadIdentity();
     }
     internal static bool CertificateMatches(byte[] certificate,string expected)
@@ -126,6 +128,18 @@ public sealed class M7Client : MonoBehaviour
         using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(certificate)).Replace("-","").ToLowerInvariant()==expected;
     }
     public void ListRooms()=>Request("List");
+    public async void DescribeRoom(string id,Action<RoomSummary> found)
+    {
+        id=(id??"").Trim();if(id.Length==0){LastError="请输入房间号。";return;}
+        if(Busy||http==null){LastError="请先连接服务，并等待当前请求完成。";return;}
+        Busy=true;LastError="";int current=generation;
+        try
+        {
+            var response=await Send(new NetworkRequest{Operation="Describe",RoomId=id,RequestId=Guid.NewGuid().ToString("N")},lifetime.Token);
+            main.Enqueue(()=>{if(current!=generation)return;Busy=false;if(!response.Success||response.Room==null){LastError="读取房间信息失败 ["+response.Code+"]："+(response.Message??"没有找到该房间。");return;}found(response.Room);});
+        }
+        catch(Exception ex){main.Enqueue(()=>{if(current==generation){Busy=false;LastError=M7NetworkErrors.Describe("读取房间信息",ex);}});}
+    }
     public void Create(RoomSettings settings,string name,string password){SetDisplayName(name);ChangeRoom(null,()=>{rememberedRuleSet=settings.RuleSet;Request("Create",new CreateRoomPayload{Settings=settings,DisplayName=name,Password=password});});}
     // 离开旧桌的回执或网络故障不能阻止玩家加入另一桌；各桌恢复身份单独保留。
     async void ChangeRoom(string target,Action next)
@@ -172,7 +186,7 @@ public sealed class M7Client : MonoBehaviour
                 else Request("Join",payload);
             });
         }
-        catch(Exception){main.Enqueue(()=>{if(current==generation){Busy=false;Status="无法读取房间信息，请检查连接。";}});}
+        catch(Exception ex){main.Enqueue(()=>{if(current==generation){Busy=false;LastError=Status=M7NetworkErrors.Describe("读取房间信息",ex);}});}
     }
     public void SelectSeat(string seat)=>Request("Seat",new SeatPayload{SeatId=seat});
     public void RetryEnrollment(){if(pendingEnrollment==null){Status="没有待确认的创建或加入请求。";return;}Request(pendingEnrollment.Operation);}
@@ -223,7 +237,7 @@ public sealed class M7Client : MonoBehaviour
                 CommandFeedback?.Invoke(Status);
             });
         }
-        catch(Exception ex){main.Enqueue(()=>{if(current==generation&&epoch==connectionEpoch){commandSending=false;Diagnose("Command",ex);Disconnected("操作回执未收到，重连后使用同一命令编号核对，不重复执行。");}});}
+        catch(Exception ex){main.Enqueue(()=>{if(current==generation&&epoch==connectionEpoch){commandSending=false;Diagnose("Command",ex);LastError=M7NetworkErrors.Describe("确认操作",ex);Disconnected(LastError+" 操作结果待确认，重连后核对原命令。");}});}
     }
     public M7Preview Preview(object command)
     {
@@ -251,7 +265,7 @@ public sealed class M7Client : MonoBehaviour
     async void Request(string operation,object payload=null)
     {
         if(Busy||http==null){Status=http==null?"请先连接服务地址。":"上一个请求仍在处理。";return;}
-        Busy=true;int current=generation,epoch=connectionEpoch;var request=Envelope(operation,payload==null?null:WireJson.SerializeObject(payload));
+        Busy=true;LastError="";int current=generation,epoch=connectionEpoch;var request=Envelope(operation,payload==null?null:WireJson.SerializeObject(payload));
         try
         {
             bool enrollment=operation=="Create"||operation=="Join";
@@ -291,7 +305,11 @@ public sealed class M7Client : MonoBehaviour
                 if(!response.Success&&operation=="Join"&&string.IsNullOrEmpty(credential))RoomId=null;
             });
         }
-        catch(Exception ex){main.Enqueue(()=>{if(current==generation&&epoch==connectionEpoch){Diagnose(operation,ex);Busy=false;Disconnected("连接失败：请检查地址、证书指纹、端口与防火墙。正在等待重连。");}});}
+        catch(Exception ex){main.Enqueue(()=>{if(current==generation&&epoch==connectionEpoch){Diagnose(operation,ex);Busy=false;LastError=M7NetworkErrors.Describe(OperationLabel(operation),ex);Disconnected(LastError+(RoomId!=null||EnrollmentPending?" 正在等待重连。":" 请重新搜索或重试。"));}});}
+    }
+    static string OperationLabel(string operation)
+    {
+        switch(operation){case "Join":return "加入房间";case "Create":return "创建房间";case "Reconnect":return "恢复连接";case "List":return "读取房间列表";default:return "房间请求";}
     }
     async Task<NetworkResponse> Send(NetworkRequest request,CancellationToken cancel)
     {
@@ -300,13 +318,18 @@ public sealed class M7Client : MonoBehaviour
         using(var content=new StringContent(body,Encoding.UTF8,"application/json"))
         using(var response=await http.PostAsync(Endpoint+"/api/request",content,cancel))
         {
-            response.EnsureSuccessStatusCode();
-            if(response.Content.Headers.ContentLength>NetworkProtocol.MaximumResponseBytes)throw new InvalidOperationException("响应过大。");
+            M7NetworkErrors.RequireHttp(response.StatusCode);
+            if(response.Content.Headers.ContentLength>NetworkProtocol.MaximumResponseBytes)throw new M7NetworkFailure("RESPONSE_SIZE","服务响应超过大小限制。");
             using(var stream=await response.Content.ReadAsStreamAsync())using(var bytes=new MemoryStream())
             {
                 var buffer=new byte[8192];int count;
-                while((count=await stream.ReadAsync(buffer,0,buffer.Length,cancel))>0){if(bytes.Length+count>NetworkProtocol.MaximumResponseBytes)throw new InvalidOperationException("响应过大。");bytes.Write(buffer,0,count);}
-                return WireJson.Deserialize<NetworkResponse>(Encoding.UTF8.GetString(bytes.ToArray()));
+                while((count=await stream.ReadAsync(buffer,0,buffer.Length,cancel))>0){if(bytes.Length+count>NetworkProtocol.MaximumResponseBytes)throw new M7NetworkFailure("RESPONSE_SIZE","服务响应超过大小限制。");bytes.Write(buffer,0,count);}
+                NetworkResponse result;
+                try{result=WireJson.Deserialize<NetworkResponse>(Encoding.UTF8.GetString(bytes.ToArray()));}
+                catch(Exception){throw new M7NetworkFailure("RESPONSE_FORMAT","服务响应格式无效，请确认双方游戏版本一致。");}
+                if(result==null)throw new M7NetworkFailure("RESPONSE_FORMAT","服务返回空响应。");
+                if(result.ProtocolVersion!=NetworkProtocol.Version)throw new M7NetworkFailure("PROTOCOL","联机协议不兼容，请所有玩家更新至同一版本。");
+                return result;
             }
         }
     }
@@ -314,6 +337,8 @@ public sealed class M7Client : MonoBehaviour
     {
         if(response.ProtocolVersion!=NetworkProtocol.Version){Disconnected("联机协议不兼容，请更新客户端。");return;}
         Status=response.Message??(response.Success?"已连接。":"请求被拒绝。");
+        if(!response.Success)LastError="房间请求失败 ["+response.Code+"]："+Status;
+        else if(handshake)LastError="";
         bool stale=response.Room!=null&&response.Revision<Revision;
         if(handshake)
         {
@@ -374,7 +399,7 @@ public sealed class M7Client : MonoBehaviour
             var response=await Send(Envelope("Get"),lifetime.Token);
             main.Enqueue(()=>{if(current!=generation)return;syncBusy=false;if(epoch!=connectionEpoch)return;TransportMode="HTTPS 安全同步（每秒）";Apply(response);});
         }
-        catch(Exception ex){main.Enqueue(()=>{if(current!=generation)return;syncBusy=false;if(epoch==connectionEpoch){Diagnose("HttpsSync",ex);Disconnected("同步连接中断，原席位与待决保留，正在重连。");}});}
+        catch(Exception ex){main.Enqueue(()=>{if(current!=generation)return;syncBusy=false;if(epoch==connectionEpoch){Diagnose("HttpsSync",ex);LastError=M7NetworkErrors.Describe("同步对局",ex);Disconnected(LastError+" 原席位与待决保留，正在重连。");}});}
     }
     async void StartSocket()
     {
@@ -455,6 +480,20 @@ public sealed class M7Client : MonoBehaviour
         }
         catch(Exception){return false;}
     }
+    internal bool HasRoomIdentity(string room)
+    {
+        try
+        {
+            foreach(string path in new[]{RoomIdentityPath(room),CredentialPath((Endpoint??"")+"|"+room),IdentityPath})
+            {
+                if(!File.Exists(path))continue;
+                var lines=M7CredentialStore.Read(path).Split('\n');
+                if(lines.Length==4&&lines[0]==room&&lines[2]==Fingerprint&&!string.IsNullOrEmpty(lines[1]))return true;
+            }
+        }
+        catch(Exception){/* 无法读取身份时仍可通过密码正常申请加入。 */}
+        return false;
+    }
     void LoadIdentity()
     {
         try{if(File.Exists(IdentityPath)){var lines=M7CredentialStore.Read(IdentityPath).Split('\n');if(lines.Length==4&&lines[2]==Fingerprint){RoomId=lines[0];credential=lines[1];rememberedRuleSet=lines[3];Status+=" 已找到原席位凭据，可重连或退出原房间。";}}}catch(Exception){Status+=" 原恢复凭据不可读取。";}
@@ -470,7 +509,7 @@ public sealed class M7Client : MonoBehaviour
     }
     public void EndSession()
     {
-        bool hadGame=Playing;
+        bool hadGame=Playing;LastError="";
         generation++;connectionEpoch++;lifetime?.Cancel();socket?.Abort();socket?.Dispose();socket=null;http?.Dispose();http=null;lifetime?.Dispose();lifetime=null;
         Playing=false;Connected=false;Busy=false;HumanControlAvailable=false;automaticReconnect=true;socketConnected=syncBusy=commandSending=false;TransportMode="未连接";Room=null;Rooms=Array.Empty<RoomSummary>();RoomId=SeatId=credential=connectionId=viewJson=rememberedRuleSet=null;decodedView=null;Revision=-1;History=Array.Empty<GameHistoryEntry>();historyCursor=0;pendingCommand=pendingEnrollment=null;reconnectJoinFallback=null;historyBusy=historyDirty=previewBusy=false;nextHistoryAt=0;historyRetryDelay=2;previews.Clear();previewPending.Clear();previewQueue.Clear();
         if(hadGame)SessionEnded?.Invoke();

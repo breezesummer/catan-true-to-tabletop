@@ -34,6 +34,7 @@ public sealed partial class M6App
     }
     void HandleMainMenuEscape()
     {
+        if(pendingJoinRoom!=null){CancelJoinPassword();return;}
         if(menuPendingAction!=null){menuPendingAction=null;return;}
         if(networkMenu){if(NetworkGame&&Ready){networkMenu=false;ResumeGame();}else{networkMenu=false;menuPage=-1;}return;}
         if(menuPage==0&&menuSetupStep>0){menuSetupStep--;return;}
