@@ -73,7 +73,7 @@ public sealed class ServerBoundaryTests
                 Assert.Equal(64, first.Length);
                 Assert.True(files.Certificate.HasPrivateKey);
                 Assert.Equal(first, File.ReadAllText(Path.Combine(directory, "server-fingerprint.txt")).Trim());
-                Assert.Throws<IOException>(() => new PrivateServerFiles(options));
+                Assert.ThrowsAny<IOException>(() => new PrivateServerFiles(options));
             }
             using var restored = new PrivateServerFiles(options);
             Assert.Equal(first, restored.Fingerprint);

@@ -8,7 +8,7 @@ public sealed partial class M6App
 {
     public M7Client Network { get; private set; }
     public bool NetworkGame=>Network!=null&&Network.Playing;
-    readonly M7LanService lanService=new M7LanService();
+    M7LanService lanService=new M7LanService();
     bool networkMenu,networkEntering,networkLan=true,networkWorking;
     string networkAddress="https://127.0.0.1:47771",networkPin="",networkRoomId="",networkPassword="",networkRoomName="卡坦好友房间",networkMessage="";
     bool networkListed=true;
@@ -16,6 +16,20 @@ public sealed partial class M6App
     M7LanService.Advertisement[] networkFound=Array.Empty<M7LanService.Advertisement>();
     Vector2 networkScroll;
     string networkEditorConfiguration;
+    internal string LanReviewDataDirectory;
+    internal void ConfigureLanReview(string directory,int port,int discoveryPort)
+    {lanService.Dispose();lanService=new M7LanService(port,discoveryPort);LanReviewDataDirectory=directory;}
+    string LanDataDirectory=>LanReviewDataDirectory??Path.Combine(Application.persistentDataPath,"m7-server");
+    bool lanPreparing;
+    string lanPreparationIssue="";
+    async void PrepareLanService()
+    {
+        if(!lanService.CanHost||lanPreparing)return;
+        lanPreparing=true;lanPreparationIssue="";
+        try{await lanService.Start(LanDataDirectory);lanPreparationIssue=lanService.HostWarning;}
+        catch(Exception ex){lanPreparationIssue=M7NetworkErrors.Describe("本机托管服务",ex)+" 仍可加入朋友的房间。";}
+        finally{lanPreparing=false;}
+    }
     void InitializeNetwork()
     {
         Network=gameObject.AddComponent<M7Client>();Network.ViewChanged+=ApplyNetworkView;
@@ -68,16 +82,26 @@ public sealed partial class M6App
     async void StartLan()
     {
         if(networkWorking)return;networkWorking=true;networkMessage="正在启动随包局域网服务…";
-        try{networkPin=await lanService.Start(Path.Combine(Application.persistentDataPath,"m7-server"));networkAddress="https://127.0.0.1:47771";networkLan=true;networkMessage="本机房间服务已启动，可直接创建房间。";}
-        catch(Exception ex){networkMessage=ex.Message;}
+        try{networkPin=await lanService.Start(LanDataDirectory);networkAddress=lanService.Address;networkLan=true;networkMessage="本机房间服务已启动，可直接创建房间。";}
+        catch(Exception ex){networkMessage=M7NetworkErrors.Describe("本机托管服务",ex);}
         finally{networkWorking=false;}
     }
     async void DiscoverLan()
     {
-        if(networkWorking)return;networkWorking=true;networkMessage="正在搜索同网段服务…";
-        try{networkFound=await lanService.Discover(47772,Network.RememberedRoomIds);int count=networkFound.SelectMany(s=>s.Rooms).Select(r=>r.RoomId).Distinct().Count();networkMessage=count==0?"没有发现正在开放的房间。可重新搜索，或创建房间。":"已发现 "+count+" 个房间，选择后即可加入。";}
-        catch(Exception){networkMessage="局域网搜索失败，请检查网络与防火墙后重新搜索。";}
-        finally{networkWorking=false;}
+        if(networkWorking)return;networkWorking=true;Network.ClearError();int navigation=networkNavigation;
+        PrepareLanService();
+        networkMessage=lanService.CanHost?"正在自动准备局域网服务并搜索房间…":"正在搜索同一网络的房间…";
+        try
+        {
+            var found=await lanService.Discover(lanService.DiscoveryPort,Network.RememberedRoomIds);
+            if(navigation!=networkNavigation||!networkMenu||!networkLan)return;
+            networkFound=found;
+            int count=networkFound.SelectMany(s=>s.Rooms.Select(r=>s.certificateFingerprint+"|"+r.RoomId)).Distinct().Count();
+            networkMessage=count==0?"搜索完成，没有发现开放房间。请确认朋友已创建房间，且双方在同一局域网；访客 Wi-Fi、设备隔离或 VPN 可能阻断发现。":"已发现 "+count+" 个房间，选择后即可加入。";
+            if(!string.IsNullOrEmpty(lanService.DiscoveryIssues))networkMessage+="\n"+lanService.DiscoveryIssues;
+        }
+        catch(Exception ex){if(navigation==networkNavigation)networkMessage=M7NetworkErrors.Describe("局域网搜索",ex);}
+        finally{networkWorking=false;if(navigation!=networkNavigation&&networkMenu&&networkLan&&networkTab==0)DiscoverLan();}
     }
     void ConnectNetworkEndpoint()
     {
@@ -94,7 +118,7 @@ public sealed partial class M6App
         (networkLan?M7Client.NormalizeFingerprint(networkPin)==Network.Fingerprint:string.IsNullOrEmpty(Network.Fingerprint));
     void OpenSeparatedNetworkMenu(bool local)
     {
-        networkNavigation++;
+        networkNavigation++;CancelJoinPassword();
         if(networkLan){menuLanAddress=networkAddress;menuLanPin=networkPin;}else menuOnlineAddress=networkAddress;
         networkLan=local;networkAddress=local?menuLanAddress:menuOnlineAddress;networkPin=local?menuLanPin:"";
         networkTab=0;networkScroll=Vector2.zero;
@@ -123,8 +147,8 @@ public sealed partial class M6App
             if(Network.Room!=null){networkTab=2;lanRoomPage=0;}else if(networkTab==2)networkTab=0;
             networkScroll=Vector2.zero;
         }
-        DrawLanShell();if(!networkMenu)return;
-        bool before=GUI.enabled;GUI.enabled=before&&menuPendingAction==null;
+        bool shellEnabled=GUI.enabled;GUI.enabled=shellEnabled&&pendingJoinRoom==null;DrawLanShell();GUI.enabled=shellEnabled;if(!networkMenu)return;
+        bool before=GUI.enabled;GUI.enabled=before&&menuPendingAction==null&&pendingJoinRoom==null;
         PastoralMenuUI.Panel(new Rect(454,56,920,788));
         MenuPageHeader("近 处 的 同 伴",networkTab==0?"房间列表":networkTab==1?"创建房间":"当前房间",
             networkTab==0?"自动搜索同一网络的房间，选中后即可加入。":networkTab==1?"配置这一桌的玩法与同伴。":"选择建筑颜色、准备或恢复原来的对局。");
@@ -139,7 +163,7 @@ public sealed partial class M6App
         }
         var savedLabel=label;var savedTitle=title;var savedSmall=small;var savedButton=button;
         label=PastoralMenuUI.Text;title=PastoralMenuUI.Title;small=PastoralMenuUI.Small;button=PastoralMenuUI.Control;
-        GUILayout.BeginArea(new Rect(495,282,838,400));networkScroll=GUILayout.BeginScrollView(networkScroll);
+        GUILayout.BeginArea(new Rect(495,282,838,370));networkScroll=GUILayout.BeginScrollView(networkScroll);
         if(networkTab==0)DrawLanRooms();
         else if(networkTab==1)DrawNetworkSettings();
         else if(Network.Room!=null)
@@ -154,7 +178,7 @@ public sealed partial class M6App
         GUILayout.EndScrollView();GUILayout.EndArea();
         label=savedLabel;title=savedTitle;small=savedSmall;button=savedButton;
         PastoralMenuUI.Fill(new Rect(495,701,838,1),new Color(.48f,.54f,.42f,.20f));
-        PastoralMenuUI.Label(new Rect(498,717,815,43),string.IsNullOrEmpty(networkMessage)?Network.Status:networkMessage,12,PastoralMenuUI.Muted);
+        DrawNetworkStatus();
         if(networkTab==1)
         {
             if(networkSettingsPage>0&&PastoralMenuUI.Button(new Rect(956,779,124,40),"上一步"))networkSettingsPage--;
@@ -173,7 +197,7 @@ public sealed partial class M6App
             if(lanRoomPage==1&&room.ManagerSeatId==Network.SeatId&&!room.Started&&PastoralMenuUI.Button(new Rect(1093,779,240,40),"应用房间配置",!Network.Busy,true))Network.ConfigureRoom(NetworkSettings());
             if(room.Started&&NetworkGame&&Ready&&PastoralMenuUI.Button(new Rect(1093,779,240,40),"返回联机对局  →",true,true)){networkMenu=false;ResumeGame();}
         }
-        GUI.enabled=before;DrawMenuConfirmation();
+        GUI.enabled=before;DrawMenuConfirmation();DrawJoinPassword();
     }
     void DrawLanRooms()
     {
@@ -185,35 +209,78 @@ public sealed partial class M6App
             PastoralMenuUI.Round(new Rect(r.x,r.y+2,r.width-6,79),new Color(.91f,.93f,.86f),10);
             PastoralMenuUI.Label(new Rect(r.x+18,r.y+10,r.width-157,28),room.Name+"  ·  "+room.OccupiedSeats+"/"+room.PlayerCount+" 人",18,null,true);
             bool remembered=item.server.RememberedRooms.Contains(room.RoomId);
-            PastoralMenuUI.Label(new Rect(r.x+18,r.y+43,r.width-155,26),(remembered&&room.Started?"我的进行中对局 · 可恢复原玩家":room.Started?"对局中 · 可恢复原席位":"等待开局")+(room.HasPassword&&!remembered?"  ·  需要密码":"  ·  直接加入"),13,PastoralMenuUI.Muted);
-            if(PastoralMenuUI.Button(new Rect(r.xMax-122,r.y+23,104,37),remembered&&room.Started?"重连":"加入",!networkWorking))JoinLanRoom(item.server,room.RoomId);
+            bool joined=JoinedRoom(room,item.server);
+            PastoralMenuUI.Label(new Rect(r.x+18,r.y+43,r.width-155,26),joined?"我的房间 · "+(room.Started?"对局中":"等待开局"):(remembered&&room.Started?"我的进行中对局 · 可恢复原玩家":room.Started?"对局中 · 原玩家可恢复":"等待开局")+(M7RoomEntry.NeedsPassword(room.HasPassword,remembered,room.Started)?"  ·  需要密码":"  ·  直接加入"),13,PastoralMenuUI.Muted);
+            if(joined)PastoralMenuUI.Label(new Rect(r.xMax-122,r.y+23,104,37),"已加入",16,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+            else if(PastoralMenuUI.Button(new Rect(r.xMax-122,r.y+23,104,37),remembered&&room.Started?"重连":"加入",!networkWorking&&!Network.Busy))RequestJoinRoom(room,item.server,remembered);
         }
-        GUILayout.Space(18);NetworkField("房间密码 · 无密码时留空",ref networkPassword,true);
     }
-    void JoinLanRoom(M7LanService.Advertisement server,string roomId)
+    RoomSummary pendingJoinRoom;
+    M7LanService.Advertisement pendingJoinServer;
+    string joinPassword="";
+    Vector2 networkStatusScroll;
+    string NetworkMenuStatus=>(!string.IsNullOrEmpty(Network.LastError)?Network.LastError:!string.IsNullOrEmpty(networkMessage)?networkMessage:Network.Status)+(networkLan?(lanPreparing?"\n本机托管服务准备中，可继续搜索和加入好友房间。":string.IsNullOrEmpty(lanPreparationIssue)?"":"\n"+lanPreparationIssue):"");
+    void DrawNetworkStatus()
+    {
+        GUILayout.BeginArea(new Rect(498,703,815,67));networkStatusScroll=GUILayout.BeginScrollView(networkStatusScroll);
+        GUILayout.Label(NetworkMenuStatus,new GUIStyle(PastoralMenuUI.Small){wordWrap=true});GUILayout.EndScrollView();GUILayout.EndArea();
+    }
+    bool JoinedRoom(RoomSummary room,M7LanService.Advertisement server=null)=>M7RoomEntry.IsJoined(room.RoomId,server?.Address??Network.Endpoint,server?.certificateFingerprint??"",Network.Room?.RoomId,Network.Endpoint,Network.Fingerprint,!string.IsNullOrEmpty(Network.SeatId));
+    void CancelJoinPassword(){pendingJoinRoom=null;pendingJoinServer=null;joinPassword="";}
+    void RequestJoinRoom(RoomSummary room,M7LanService.Advertisement server=null,bool remembered=false)
+    {
+        if(JoinedRoom(room,server))return;
+        if(M7RoomEntry.NeedsPassword(room.HasPassword,remembered,room.Started))
+        {pendingJoinRoom=room;pendingJoinServer=server;joinPassword="";return;}
+        JoinSelectedRoom(server,room.RoomId,"");
+    }
+    void DrawJoinPassword()
+    {
+        if(pendingJoinRoom==null)return;
+        PastoralMenuUI.Fill(new Rect(0,0,1440,900),new Color(.08f,.15f,.1f,.60f));
+        PastoralMenuUI.Panel(new Rect(420,285,600,322));
+        PastoralMenuUI.Label(new Rect(458,318,520,38),"输入房间密码",26,null,true);
+        PastoralMenuUI.Label(new Rect(458,367,520,32),pendingJoinRoom.Name,16,PastoralMenuUI.Muted);
+        GUI.SetNextControlName("lan-join-password");
+        joinPassword=GUI.PasswordField(new Rect(458,414,520,44),joinPassword,'●',128,PastoralMenuUI.Field);
+        if(PastoralMenuUI.Button(new Rect(654,519,150,43),"取消"))CancelJoinPassword();
+        if(pendingJoinRoom!=null&&PastoralMenuUI.Button(new Rect(822,519,156,43),"确认加入",!Network.Busy&&joinPassword.Length>0,true))
+            ConfirmJoinPassword();
+        if(Event.current.type==EventType.KeyDown&&Event.current.keyCode==KeyCode.Escape){CancelJoinPassword();Event.current.Use();}
+        else if(Event.current.type==EventType.KeyDown&&(Event.current.keyCode==KeyCode.Return||Event.current.keyCode==KeyCode.KeypadEnter)){ConfirmJoinPassword();Event.current.Use();}
+    }
+    void ConfirmJoinPassword()
+    {
+        if(pendingJoinRoom==null||Network.Busy||joinPassword.Length==0)return;
+        var room=pendingJoinRoom;var server=pendingJoinServer;string password=joinPassword;
+        CancelJoinPassword();JoinSelectedRoom(server,room.RoomId,password);
+    }
+    void JoinSelectedRoom(M7LanService.Advertisement server,string roomId,string password)
     {
         try
         {
-            networkAddress=server.Address;networkPin=server.certificateFingerprint;networkMessage="";
+            if(server!=null){networkAddress=server.Address;networkPin=server.certificateFingerprint;}
+            networkMessage="";
             if(!CanUseMenuEndpoint)Network.ConfigureEndpoint(networkAddress,networkPin,false);
-            Network.Join(roomId,LocalPlayerName,networkPassword);
+            Network.Join(roomId,LocalPlayerName,password);
         }
-        catch(Exception ex){networkMessage=ex.Message;}
+        catch(Exception ex){networkMessage=M7NetworkErrors.Describe("加入房间",ex);}
     }
     async void CreateLanRoom()
     {
         if(networkWorking)return;
         var settings=NetworkSettings();string name=LocalPlayerName,password=networkPassword;int navigation=networkNavigation;
-        networkWorking=true;networkMessage="正在准备本机房间服务…";
+        networkWorking=true;Network.ClearError();networkMessage="正在准备本机房间服务…";
         try
         {
-            string pin=await lanService.Start(Path.Combine(Application.persistentDataPath,"m7-server"));
+            string pin=await lanService.Start(LanDataDirectory);
+            lanPreparationIssue=lanService.HostWarning;
             if(navigation!=networkNavigation||!networkMenu||!networkLan||networkTab!=1)return;
-            networkPin=pin;networkAddress="https://127.0.0.1:47771";
+            networkPin=pin;networkAddress=lanService.Address;
             if(!CanUseMenuEndpoint)Network.ConfigureEndpoint(networkAddress,networkPin,false);
             Network.Create(settings,name,password);networkMessage="";
         }
-        catch(Exception ex){networkMessage=ex.Message;}
+        catch(Exception ex){networkMessage=M7NetworkErrors.Describe("创建房间",ex);}
         finally{networkWorking=false;}
     }
     void DrawNetworkMenu()
@@ -222,7 +289,7 @@ public sealed partial class M6App
         if(Network.Room?.RoomId!=networkPresentedRoom){networkPresentedRoom=Network.Room?.RoomId;networkTab=0;networkScroll=Vector2.zero;}
         SyncNetworkEditor();DrawPastoralShell(networkLan?2:3);
         if(!networkMenu)return;
-        bool before=GUI.enabled;GUI.enabled=before&&menuPendingAction==null;
+        bool before=GUI.enabled;GUI.enabled=before&&menuPendingAction==null&&pendingJoinRoom==null;
         PastoralMenuUI.Panel(new Rect(454,56,920,788));
         MenuPageHeader(networkLan?"近 处 的 同 伴":"远 方 的 旅 伴",networkLan?"局域网联机":"在线游戏",
             networkLan?"在同一个网络中，与好友共建一座岛屿。":"连接已部署的在线服务，与远方好友相聚。");
@@ -250,8 +317,7 @@ public sealed partial class M6App
         GUILayout.EndScrollView();GUILayout.EndArea();
         label=savedLabel;title=savedTitle;small=savedSmall;button=savedButton;
         PastoralMenuUI.Fill(new Rect(495,701,838,1),new Color(.48f,.54f,.42f,.20f));
-        string status=string.IsNullOrEmpty(networkMessage)?Network.Status:networkMessage;
-        PastoralMenuUI.Label(new Rect(498,720,815,32),status,12,PastoralMenuUI.Muted);
+        DrawNetworkStatus();
         if(Network.Room==null)
         {
             if(networkTab==0&&PastoralMenuUI.Button(new Rect(1093,779,240,40),networkWorking||Network.Busy?"正在连接…":"连接并进入大厅  →",!networkWorking&&!Network.Busy,true))
@@ -277,7 +343,7 @@ public sealed partial class M6App
             if(room.Started&&NetworkGame&&Ready&&PastoralMenuUI.Button(new Rect(1093,779,240,40),"返回联机对局  →",true,true)){networkMenu=false;ResumeGame();}
         }
         PastoralMenuUI.Label(new Rect(498,788,320,25),CanUseMenuEndpoint?Network.TransportMode:"请先连接当前服务",12,PastoralMenuUI.Muted);
-        GUI.enabled=before;DrawMenuConfirmation();
+        GUI.enabled=before;DrawMenuConfirmation();DrawJoinPassword();
     }
     void NetworkField(string caption,ref string value,bool password=false)
     {
@@ -309,14 +375,12 @@ public sealed partial class M6App
     }
     void DrawNetworkJoin()
     {
-        GUILayout.BeginHorizontal();
-        GUILayout.BeginVertical();GUILayout.Label("玩家："+LocalPlayerName+"（在设置中修改）",small);GUILayout.EndVertical();
-        GUILayout.Space(20);GUILayout.BeginVertical();NetworkField("房间密码  ·  无密码时留空",ref networkPassword,true);GUILayout.EndVertical();
-        GUILayout.EndHorizontal();GUILayout.Space(4);
+        GUILayout.Label("玩家："+LocalPlayerName+"（在设置中修改）",small);GUILayout.Space(14);
         GUILayout.Label("通过房间号赴约",label);GUILayout.Space(10);
         GUILayout.BeginHorizontal();networkRoomId=GUILayout.TextField(networkRoomId,PastoralMenuUI.Field,GUILayout.Height(39));
         bool enabled=GUI.enabled;GUI.enabled=enabled&&CanUseMenuEndpoint&&!Network.Busy;
-        if(GUILayout.Button("加入房间",button,GUILayout.Width(171),GUILayout.Height(39)))Network.Join(networkRoomId,LocalPlayerName,networkPassword);
+        if(GUILayout.Button("加入房间",button,GUILayout.Width(171),GUILayout.Height(39)))
+        {int navigation=networkNavigation;Network.DescribeRoom(networkRoomId,room=>{if(navigation==networkNavigation&&networkMenu)RequestJoinRoom(room,null,Network.HasRoomIdentity(room.RoomId));});}
         GUI.enabled=enabled;GUILayout.EndHorizontal();GUILayout.Space(24);
         GUILayout.Label("当前服务的房间",label);GUILayout.Space(10);
         if(!CanUseMenuEndpoint)GUILayout.Label("先在「连接服务」中建立连接，再查看这里的房间。",small);
@@ -327,7 +391,8 @@ public sealed partial class M6App
             PastoralMenuUI.Round(new Rect(r.x,r.y+2,r.width-6,73),new Color(.91f,.93f,.86f),10);
             PastoralMenuUI.Label(new Rect(r.x+18,r.y+10,r.width-156,29),room.Name+"  ·  "+room.OccupiedSeats+"/"+room.PlayerCount+" 人",18,null,true);
             PastoralMenuUI.Label(new Rect(r.x+18,r.y+43,r.width-155,25),"房间号 "+room.RoomId+(room.HasPassword?"  ·  需密码":"  ·  可直接加入")+(room.Started?"  ·  对局中":""),12,PastoralMenuUI.Muted);
-            if(PastoralMenuUI.Button(new Rect(r.xMax-122,r.y+20,104,37),"加入",!Network.Busy))Network.Join(room.RoomId,LocalPlayerName,networkPassword);
+            if(JoinedRoom(room))PastoralMenuUI.Label(new Rect(r.xMax-122,r.y+20,104,37),"已加入",16,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+            else if(PastoralMenuUI.Button(new Rect(r.xMax-122,r.y+20,104,37),"加入",!Network.Busy))RequestJoinRoom(room,null,Network.HasRoomIdentity(room.RoomId));
         }
     }
     void DrawNetworkSeats()
