@@ -5,7 +5,7 @@ using UnityEngine;
 // Runtime never creates a camera, changes layers, or reads hidden game state.
 public static class OperationPieceAssets
 {
-    const string Root = "OperationUI/v001/pieces/";
+    const string Root = "OperationUI/v002/pieces/";
     static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
 
     public static bool Contains(Texture2D texture, Rect rect, Vector2 point)

@@ -27,6 +27,13 @@ public static class PhotoSampleAssets
         if (model == null) return null;
         var instance = Object.Instantiate(model, bottom, rotation, parent);
         instance.name = label;
+        var seat=PlayerComponentAssets.ColourKey(color);
+        if(seat!=null)
+        {
+            int index=System.Array.IndexOf(BoardRenderer.SeatColors,color);
+            PlayerComponentAssets.MatchBuildingPlastic(instance,"P"+(index+1));
+            return instance;
+        }
         var block = new MaterialPropertyBlock();
         block.SetColor("_BaseColor", color);
         block.SetColor("_Color", color);

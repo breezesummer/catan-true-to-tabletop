@@ -101,11 +101,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         if (model == null) return null;
         var item = Get(key, resource+seat, () => {
             var instance=Instantiate(model);
-            if(kind=="road")
-            {
-                var block=new MaterialPropertyBlock();block.SetColor("_BaseColor",BoardRenderer.SeatColor(seat));
-                foreach(var renderer in instance.GetComponentsInChildren<Renderer>())renderer.SetPropertyBlock(block);
-            }
+            PlayerComponentAssets.MatchBuildingPlastic(instance,seat);
             return instance;
         });
         if(key.StartsWith("stock-",StringComparison.Ordinal))return StockPiece(item,kind,position,raised);

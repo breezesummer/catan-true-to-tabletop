@@ -40,7 +40,7 @@ public sealed class TabletopScoreTests
         Set(view,"LongestRoadPlayerId","P1");Set(view,"LargestArmyPlayerId","P1");
         Set(view,"OwnDevelopmentCards",new[]{new M2.DevelopmentCard{Kind=M2.DevelopmentCardKind.VictoryPoint},new M2.DevelopmentCard{Kind=M2.DevelopmentCardKind.Knight},new M2.DevelopmentCard{Kind=M2.DevelopmentCardKind.VictoryPoint}});
         var score=TabletopScoreModel.For(view,"P1");
-        Assert.Equal(new[]{"定居点","城市","最长道路","最大骑士军队","胜利点卡"},score.Rows.Select(r=>r.Name));
+        Assert.Equal(new[]{"村庄","城市","最长道路","最大骑士军队","胜利点卡"},score.Rows.Select(r=>r.Name));
         Assert.Equal(new[]{2,4,2,2,2},score.Rows.Select(r=>r.Points));
         Assert.Equal(10,score.PublicPoints);Assert.Equal(2,score.HiddenPoints);Assert.Equal(12,score.Total);
         Assert.Single(score.Rows,r=>r.Hidden);
@@ -75,7 +75,7 @@ public sealed class TabletopScoreTests
         Set(view,"LongestRoadPlayerId","P2");Set(view,"MerchantPlayerId","P2");Set(player,"DefenderPoints",3);
         Set(player,"ProgressVictoryCards",new[]{M4.ProgressCardKind.Printing,M4.ProgressCardKind.Constitution});
         var score=TabletopScoreModel.For(view,"P2");
-        Assert.Equal(new[]{"定居点","城市","最长道路","大都会加分","卡坦保卫者","商人","印刷术","宪法"},score.Rows.Select(r=>r.Name));
+        Assert.Equal(new[]{"村庄","城市","最长道路","大都会加分","卡坦保卫者","商人","印刷术","宪法"},score.Rows.Select(r=>r.Name));
         Assert.Equal(new[]{1,2,2,2,3,1,1,1},score.Rows.Select(r=>r.Points));
         Assert.Equal(13,score.PublicPoints);Assert.Equal(13,score.Total);Assert.All(score.Rows,r=>Assert.False(r.Hidden));
     }

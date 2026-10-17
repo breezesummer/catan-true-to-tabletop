@@ -116,7 +116,7 @@ public sealed partial class TabletopHistoryUI
         int columns=Math.Max(1,(int)(width/(compact?140:210)));
         return Math.Max(compact?22:28,header)+(entry.Dice1>0?34:0)+((changes+columns-1)/columns)*32+14;
     }
-    static string Caption(GameHistoryEntry entry)=>"第 "+entry.Turn+" 回合 · "+M6App.PlayerLabel(entry.PlayerId)+"  "+entry.Action;
+    static string Caption(GameHistoryEntry entry)=>"第 "+entry.Turn+" 回合 · "+M6App.PlayerLabel(entry.PlayerId)+"  "+M6App.DisplayPlayerText(entry.Action);
     Vector2 DrawRows(Rect viewport,GameHistoryEntry[] entries,Vector2 position,bool compact)
     {
         MobileTabletop.ScrollTouch(viewport,ref position);

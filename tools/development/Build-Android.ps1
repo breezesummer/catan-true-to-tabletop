@@ -1,5 +1,5 @@
 param(
-    [string]$OutputRoot = '.local/Catan1.6.1-自动亮牌与玩家显示',
+    [string]$OutputRoot = '.local/Catan1.6.2-地图修路与界面优化',
     [switch]$Arm64Only
 )
 $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()

@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='.local/Catan1.6.1-自动亮牌与玩家显示',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
+param([switch]$VerifyPlayer,[string]$OutputRoot='.local/Catan1.6.2-地图修路与界面优化',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))

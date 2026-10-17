@@ -23,11 +23,11 @@ public sealed partial class M5App
     {
         if(ai==null)return false;
         var p=logicalMouse??MobileTabletop.Logical(MobileTabletop.Pointer);
-        return view?.PendingDecision?.Kind=="Gold"||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||OperationContextVisible&&tabletop.CurrentContextRect.Contains(p)||dock.BlocksBoardInput(p);
+        return ResourceChoiceVisible||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||OperationContextVisible&&tabletop.CurrentContextRect.Contains(p)||dock.BlocksBoardInput(p);
     }
-    void CancelOperationDraft(){if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null){board.SetSelectedShip(null);board.ClearPreview();}}
+    void CancelOperationDraft(){resourceChoiceSelection=new ResourceBag();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null){board.SetSelectedShip(null);board.ClearPreview();}}
     bool DirectTabletopPlacement=>draft!=null&&(draft.Kind==CommandKind.SetupSettlement||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.BuildSettlement||draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.BuildCity||draft.Kind==CommandKind.BuildWall||draft.Kind==CommandKind.RecruitKnight||draft.Kind==CommandKind.PromoteKnight||draft.Kind==CommandKind.ActivateKnight||draft.Kind==CommandKind.ChaseRobber||draft.Kind==CommandKind.MoveRobber||draft.Kind==CommandKind.PlaceFreeRoad||draft.Kind==CommandKind.MoveKnight||draft.Kind==CommandKind.DisplaceKnight||draft.Kind==CommandKind.SetupShip||draft.Kind==CommandKind.BuildShip||draft.Kind==CommandKind.PlaceFreeShip||draft.Kind==CommandKind.MoveShip||draft.Kind==CommandKind.MovePirate||draft.Kind==CommandKind.ChasePirate);
-    bool OperationContextVisible=>view!=null&&Operations().Discard==null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding||view.Phase==GamePhase.RobberMove);
+    bool OperationContextVisible=>view!=null&&(!FreeRoadPlacementActive||FreeRoadIds.Length==0&&FreeShipIds.Length==0)&&Operations().Discard==null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding&&view.LegalEdgeIds.Length==0&&view.LegalShipEdgeIds.Length==0||view.Phase==GamePhase.RobberMove);
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
     static int[] DockGoods(ResourceBag r,CommodityBag c)=>Enumerable.Range(0,8).Select(i=>i<5?r[(Resource)i]:c[(Commodity)(i-5)]).ToArray();
     bool DockKnightTargetMatches(string target)=>operationKnightLevel<2||draft==null||draft.Kind!=CommandKind.PromoteKnight||view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==target&&k.Level==operationKnightLevel-1);
@@ -57,7 +57,7 @@ public sealed partial class M5App
         var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
         var port=view.Board.Ports.FirstOrDefault(p=>p.Id==id);
         if(port==null)return false;
-        if(!port.Vertices.Any(locations.Contains)){status="此港口未连接你的定居点或城市。";ai.ShowTablePrompt(status);return true;}
+        if(!port.Vertices.Any(locations.Contains)){status="此港口未连接你的村庄或城市。";ai.ShowTablePrompt(status);return true;}
         CancelOperationDraft();
         int? good=port.Resource.HasValue?(int?)((int)port.Resource.Value):null;
         dock.OpenPortTrade(good,good.HasValue?Goods[good.Value]+"港口 · 2:1":"通用港口 · 3:1");
@@ -82,7 +82,7 @@ public sealed partial class M5App
             for(int i=0;i<8;i++)s.Rates[i]=BankTradeRate(i);
             bool setup=view.Phase==GamePhase.SetupSettlement,citySetup=setup&&view.Board.Settlements.Any(p=>p.PlayerId==seat),villageSetup=setup&&!citySetup;
             bool roadSetup=view.Phase==GamePhase.SetupRoad,freeRoad=view.Phase==GamePhase.RoadBuilding;
-            AddDockBuild(s,villageSetup?CommandKind.SetupSettlement:CommandKind.BuildSettlement,"定居点","settlement",own.Pieces.Settlements,villageSetup?DockCost():DockCost(1,1,1,1),!citySetup&&view.LegalVertexIds.Length>0);
+            AddDockBuild(s,villageSetup?CommandKind.SetupSettlement:CommandKind.BuildSettlement,"村庄","settlement",own.Pieces.Settlements,villageSetup?DockCost():DockCost(1,1,1,1),!citySetup&&view.LegalVertexIds.Length>0);
             AddDockBuild(s,roadSetup?CommandKind.SetupRoad:freeRoad?CommandKind.PlaceFreeRoad:CommandKind.BuildRoad,"道路","road",own.Pieces.Roads,roadSetup||freeRoad?DockCost():DockCost(1,1),view.LegalEdgeIds.Length>0);
             AddDockBuild(s,citySetup?CommandKind.SetupSettlement:CommandKind.BuildCity,"城市","city",own.Pieces.Cities,citySetup?DockCost():DockCost(wheat:2,ore:3),citySetup?view.LegalVertexIds.Length>0:view.LegalCityVertexIds.Length>0);
             AddDockBuild(s,roadSetup?CommandKind.SetupShip:freeRoad?CommandKind.PlaceFreeShip:CommandKind.BuildShip,"船","ship",own.ShipsRemaining,roadSetup||freeRoad?DockCost():DockCost(wood:1,wool:1),view.LegalShipEdgeIds.Length>0);
@@ -157,7 +157,7 @@ public sealed partial class M5App
     {
         Styles();GUI.matrix=MobileTabletop.GuiMatrix;cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&view.PendingDecision?.Kind!="Gold";GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
+        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!ResourceChoiceVisible;GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
         TabletopUI.DrawMapLabels(DrawBoardLabels);
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.PlayerName=ai.PlayerDisplayName;dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TablePresentationBlocked);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
@@ -174,15 +174,14 @@ public sealed partial class M5App
 
         tabletop.SetContextAnchor(operationActions&&operationKnightTarget!=null?(Vector2?)MobileTabletop.Logical(board.ScreenPoint(operationKnightTarget)):null);
         GUI.enabled=tableEnabled&&!dock.HasOverlay;
-        if(OperationContextVisible&&view.PendingDecision?.Kind!="Gold")tabletop.DrawContext(operationActions?"棋子行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):"当前选择",DrawOperationControls);
-        GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&view.PendingDecision?.Kind!="Gold"&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
-        if(view.PendingDecision?.Kind=="Gold"&&ai.IsHumanTurn&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen)
+        if(OperationContextVisible&&!ResourceChoiceVisible)tabletop.DrawContext(operationActions?"棋子行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):"当前选择",DrawOperationControls);
+        GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!ResourceChoiceVisible&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
+        if(ResourceChoiceVisible&&ai.IsHumanTurn&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen)
         {
-            if(draft==null)draft=New(CommandKind.ResolveChoice);
-            TabletopResourceChoiceUI.Draw(view.PendingDecision.Amount,draft.Resources,view.Bank,()=>Submit(draft),ai.ShowTablePrompt);
+            DrawPendingResources();
         }
-        tabletop.HandFlightsVisible=dock.ResourceHandVisible;if(view.PendingDecision?.Kind!="Gold"&&(tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TablePresentationBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
-        ai.TableOverlayOpen=dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen||view.PendingDecision?.Kind=="Gold";
+        tabletop.HandFlightsVisible=dock.ResourceHandVisible;if(!ResourceChoiceVisible&&(tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TablePresentationBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
+        ai.TableOverlayOpen=dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen||ResourceChoiceVisible;
         ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
     }
     void EndTableTurn()
@@ -197,16 +196,16 @@ public sealed partial class M5App
     }
     string TableInstruction()
     {
+        if(FreeRoadPlacementActive)return TabletopRoadPlacement.Instruction(view.PendingDecision?.Kind=="ProgressRoads"?view.PendingDecision.Amount:view.PendingDecision?.RemainingRoads??2,ai.HistoryEntries);
         if(view.Phase==GamePhase.Finished)return view.WinnerPlayerId+" 获胜";
         if(pickField!="")return "请选择合法位置放下棋子";
         if(view.Phase==GamePhase.ProductionAwaitRoll)return "请掷骰";
-        if(view.Phase==GamePhase.SetupSettlement)return view.Board.Settlements.Any(p=>p.PlayerId==seat)?"请放置城市":"请放置定居点";
+        if(view.Phase==GamePhase.SetupSettlement)return view.Board.Settlements.Any(p=>p.PlayerId==seat)?"请放置城市":"请放置村庄";
         if(view.Phase==GamePhase.SetupRoad)return "请放置道路或船";
         if(view.Phase==GamePhase.Discard)return "请选择要弃掉的牌";
         if(view.Phase==GamePhase.RobberMove)return "请移动强盗或海盗";
         if(view.Phase==GamePhase.RobberSteal)return "请选择偷取对象";
         if(view.Phase==GamePhase.PendingChoice)return "请完成当前选择";
-        if(view.Phase==GamePhase.RoadBuilding)return "请放置免费道路或船";
         return "请选择你的行动";
     }
     void DrawOperationControls()
@@ -239,10 +238,10 @@ public sealed partial class M5App
             if(Btn("将海盗放到外框海域")){Submit(New(CommandKind.MovePirate,"frame"));GUIUtility.ExitGUI();}
             return;
         }
-        if(view.Phase==GamePhase.RoadBuilding)
+        if(FreeRoadPlacementActive)
         {
-            Text("从面前拿起道路或船，在地图上放下。",true);
-            if(Btn("完成道路建设")){Submit(New(CommandKind.FinishRoadBuilding));GUIUtility.ExitGUI();}
+            Text("当前没有可建位置，可以结束道路建设。",true);
+            if(Btn("完成道路建设")){var command=New(view.PendingDecision?.Kind=="ProgressRoads"?CommandKind.ResolveProgressChoice:CommandKind.FinishRoadBuilding);command.Decline=true;Submit(command);GUIUtility.ExitGUI();}
             return;
         }
         if(view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal){DrawControls();return;}

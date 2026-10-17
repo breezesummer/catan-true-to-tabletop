@@ -9,7 +9,7 @@ public sealed class CatanApp : MonoBehaviour
     private LocalGameHost host;
     private PlayerView view;
     private BoardRenderer board;
-    private string seat="P1", nextSeat="P1", hover="", status="确认席位后，拿起定居点开始。";
+    private string seat="P1", nextSeat="P1", hover="", status="确认席位后，拿起村庄开始。";
     private bool curtain=true, holding, road, help=true, terrain=true;
     private int give, receive=1;
     private Font font;
@@ -25,7 +25,7 @@ public sealed class CatanApp : MonoBehaviour
         Application.targetFrameRate=60;
         host=new LocalGameHost(); view=host.View(seat);
         board=new GameObject("Board").AddComponent<BoardRenderer>(); board.Initialize(view);
-        font=Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Arial"},18);
+        font=MobileTabletop.LoadFont();
         gameObject.AddComponent<M1PlayerVerification>().Initialize(this);
     }
     void Update()
@@ -86,11 +86,11 @@ public sealed class CatanApp : MonoBehaviour
     static string Reason(string code)
     {
         switch(code) {
-            case "DistanceRule":return "与已有定居点过近，至少间隔两条边。";
-            case "MustTouchPendingSettlement":return "道路必须连接刚放下的定居点。";
+            case "DistanceRule":return "与已有村庄过近，至少间隔两条边。";
+            case "MustTouchPendingSettlement":return "道路必须连接刚放下的村庄。";
             case "OccupiedEdge":return "这条边已有道路。";
-            case "OccupiedVertex":return "这个点已有定居点。";
-            case "DisconnectedRoad":return "道路必须连接自己的路网或定居点。";
+            case "OccupiedVertex":return "这个点已有村庄。";
+            case "DisconnectedRoad":return "道路必须连接自己的路网或村庄。";
             case "InsufficientResources":return "资源不足。道路需要 1 木材 + 1 砖块。";
             case "NotActivePlayer":return "请切换到当前行动席位。";
             case "MustRollFirst":return "请先掷骰。";
@@ -149,7 +149,7 @@ public sealed class CatanApp : MonoBehaviour
     {
         Label(1090,112,315,35,seat+"  /  "+PhaseName(view.Phase),title);
         var own=view.Players.First(p=>p.PlayerId==seat);
-        Label(1090,157,315,40,"第 "+view.Turn+" 回合 · 当前行动 "+view.ActivePlayerId+"\n库存："+own.Pieces.Roads+" 路 / "+own.Pieces.Settlements+" 定居点",small);
+        Label(1090,157,315,40,"第 "+view.Turn+" 回合 · 当前行动 "+view.ActivePlayerId+"\n库存："+own.Pieces.Roads+" 路 / "+own.Pieces.Settlements+" 村庄",small);
         var hand=view.OwnResources;
         for(int i=0;i<5;i++)
         {
@@ -160,7 +160,7 @@ public sealed class CatanApp : MonoBehaviour
         if(view.Phase==GamePhase.SetupSettlement||view.Phase==GamePhase.SetupRoad)
         {
             bool r=view.Phase==GamePhase.SetupRoad;
-            if(Button(1090,296,316,holding?"取消拿起 [Esc]":r?"拿起道路":"拿起定居点")){if(holding)CancelPickup();else Pickup(r);}
+            if(Button(1090,296,316,holding?"取消拿起 [Esc]":r?"拿起道路":"拿起村庄")){if(holding)CancelPickup();else Pickup(r);}
         }
         else
         {
@@ -186,7 +186,7 @@ public sealed class CatanApp : MonoBehaviour
     }
     string PhaseName(GamePhase phase)
     {
-        switch(phase){case GamePhase.SetupSettlement:return "开局定居点";case GamePhase.SetupRoad:return "开局道路";case GamePhase.ProductionAwaitRoll:return "等待掷骰";default:return "行动阶段";}
+        switch(phase){case GamePhase.SetupSettlement:return "开局村庄";case GamePhase.SetupRoad:return "开局道路";case GamePhase.ProductionAwaitRoll:return "等待掷骰";default:return "行动阶段";}
     }
     void DrawBoardLabels()
     {
@@ -217,7 +217,7 @@ public sealed class CatanApp : MonoBehaviour
         int count=view.Board.Settlements.Length, roads=view.Board.Roads.Length;
         if(view.Phase==GamePhase.SetupSettlement||view.Phase==GamePhase.SetupRoad)
         {
-            int index=Math.Min(roads,7);guide="固定验收向导  "+(index+1)+" / 8\n"+SetupSeats[index]+"：定居点 "+SetupVertices[index]+" → 道路 "+SetupEdges[index];
+            int index=Math.Min(roads,7);guide="固定验收向导  "+(index+1)+" / 8\n"+SetupSeats[index]+"：村庄 "+SetupVertices[index]+" → 道路 "+SetupEdges[index];
         }
         else guide="固定验收向导\nP1：掷骰 → 4 木换 1 砖 → 道路 E65 → 结束回合\n然后保存、退出、重启载入，由 P2 掷骰。";
         Panel(new Rect(26,105,640,87),new Color(.045f,.09f,.1f,.92f));Label(41,115,610,73,guide,small);

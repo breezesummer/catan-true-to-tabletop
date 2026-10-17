@@ -178,13 +178,13 @@ namespace Catan.Core.M2
             switch (c.Kind)
             {
                 case CommandKind.SetupSettlement:
-                    Require(s.Phase == GamePhase.SetupSettlement, "WrongPhase", "当前不能摆放开局定居点。");
+                    Require(s.Phase == GamePhase.SetupSettlement, "WrongPhase", "当前不能摆放开局村庄。");
                     ValidateSettlement(s, p, c.TargetId, true); PlaceSettlement(s, p, c.TargetId);
                     if (s.SetupPlacementIndex >= s.Players.Length)
                         foreach (var tile in scenario.Topology.Tiles.Where(t => t.Vertices.Contains(c.TargetId) && t.Resource != "desert")) Transfer(s.Bank, p.Resources, ParseResource(tile.Resource), 1);
                     s.PendingDecision = new PendingDecision { Kind = "SetupRoad", PlayerId = p.Id, AnchorVertexId = c.TargetId }; s.Phase = GamePhase.SetupRoad; break;
                 case CommandKind.SetupRoad:
-                    Require(s.Phase == GamePhase.SetupRoad && s.PendingDecision != null, "WrongPhase", "请先摆放开局定居点。");
+                    Require(s.Phase == GamePhase.SetupRoad && s.PendingDecision != null, "WrongPhase", "请先摆放开局村庄。");
                     ValidateRoad(s, p, c.TargetId, s.PendingDecision.AnchorVertexId); PlaceRoad(s, p, c.TargetId); s.PendingDecision = null; s.SetupPlacementIndex++;
                     if (s.SetupPlacementIndex == s.Players.Length * 2) { s.ActivePlayerId = s.Players[s.StartingPlayerIndex].Id; s.Turn = 1; s.Phase = GamePhase.ProductionAwaitRoll; }
                     else { var offset = s.SetupPlacementIndex < s.Players.Length ? s.SetupPlacementIndex : 2 * s.Players.Length - s.SetupPlacementIndex - 1; s.ActivePlayerId = s.Players[(s.StartingPlayerIndex + offset) % s.Players.Length].Id; s.Phase = GamePhase.SetupSettlement; }
@@ -204,7 +204,7 @@ namespace Catan.Core.M2
                     ActionPhase(s); ValidateSettlement(s, p, c.TargetId, false); Pay(s, p, new ResourceBag { Wood = 1, Brick = 1, Wool = 1, Wheat = 1 }); PlaceSettlement(s, p, c.TargetId); break;
                 case CommandKind.BuildCity:
                     ActionPhase(s); Require(p.Pieces.Cities > 0, "NoCities", "城市库存不足。");
-                    Require(s.Settlements.Any(x => x.PlayerId == p.Id && x.LocationId == c.TargetId), "NotOwnSettlement", "只能升级自己的定居点。");
+                    Require(s.Settlements.Any(x => x.PlayerId == p.Id && x.LocationId == c.TargetId), "NotOwnSettlement", "只能升级自己的村庄。");
                     Pay(s, p, new ResourceBag { Wheat = 2, Ore = 3 }); s.Settlements = s.Settlements.Where(x => x.LocationId != c.TargetId).ToArray();
                     s.Cities = Append(s.Cities, Placement(c.TargetId, p.Id)); p.Pieces.Cities--; p.Pieces.Settlements++; break;
                 case CommandKind.BankTrade:
@@ -262,16 +262,16 @@ namespace Catan.Core.M2
         private void ValidateSettlement(GameState s, PlayerState p, string vertex, bool setup)
         {
             Require(scenario.Topology.Vertices.Any(v => v.Id == vertex), "UnknownVertex", "请选择有效顶点。");
-            Require(p.Pieces.Settlements > 0, "NoSettlements", "定居点库存不足。");
+            Require(p.Pieces.Settlements > 0, "NoSettlements", "村庄库存不足。");
             Require(!Buildings(s).Any(x => x.LocationId == vertex), "OccupiedVertex", "这个顶点已有建筑。");
-            Require(!scenario.Topology.Edges.Where(e => e.Vertices.Contains(vertex)).Any(e => Buildings(s).Any(b => e.Vertices.Contains(b.LocationId))), "DistanceRule", "定居点之间必须至少间隔两条边。");
-            if (!setup) Require(s.Roads.Any(r => r.PlayerId == p.Id && EdgeAt(r.LocationId).Vertices.Contains(vertex)), "DisconnectedSettlement", "定居点必须连接自己的道路。");
+            Require(!scenario.Topology.Edges.Where(e => e.Vertices.Contains(vertex)).Any(e => Buildings(s).Any(b => e.Vertices.Contains(b.LocationId))), "DistanceRule", "村庄之间必须至少间隔两条边。");
+            if (!setup) Require(s.Roads.Any(r => r.PlayerId == p.Id && EdgeAt(r.LocationId).Vertices.Contains(vertex)), "DisconnectedSettlement", "村庄必须连接自己的道路。");
         }
         private void ValidateRoad(GameState s, PlayerState p, string edge, string anchor)
         {
             var location = scenario.Topology.Edges.FirstOrDefault(e => e.Id == edge); Require(location != null, "UnknownEdge", "请选择有效道路边。");
             Require(p.Pieces.Roads > 0, "NoRoads", "道路库存不足。"); Require(!s.Roads.Any(r => r.LocationId == edge), "OccupiedEdge", "这条边已有道路。");
-            if (anchor != null) Require(location.Vertices.Contains(anchor), "RoadNotAtAnchor", "开局道路必须连接刚放置的定居点。");
+            if (anchor != null) Require(location.Vertices.Contains(anchor), "RoadNotAtAnchor", "开局道路必须连接刚放置的村庄。");
             else Require(location.Vertices.Any(v => Buildings(s).Any(b => b.LocationId == v && b.PlayerId == p.Id) ||
                 (!Buildings(s).Any(b => b.LocationId == v && b.PlayerId != p.Id) && s.Roads.Any(r => r.PlayerId == p.Id && EdgeAt(r.LocationId).Vertices.Contains(v)))), "DisconnectedRoad", "道路必须连接己方建筑或未被对方建筑截断的道路。");
         }

@@ -1,4 +1,4 @@
-param([string]$BuildRoot='.local/Catan1.6.1-自动亮牌与玩家显示')
+param([string]$BuildRoot='.local/Catan1.6.2-地图修路与界面优化')
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Player = & (Join-Path $PSScriptRoot 'Find-GamePlayer.ps1') -BuildRoot $BuildRoot

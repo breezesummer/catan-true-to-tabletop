@@ -245,7 +245,7 @@ public sealed class TabletopCollectionTimeline
     {
         // 联机一次同步可带多条命令；产出按该条命令发生时已公开的棋盘定位，不能拿最终强盗位置或城市等级反推过去。
         if(entry.Kind=="MoveRobber"&&entry.TargetId!=null)foreach(var tile in tiles)tile.Blocked=tile.Id==entry.TargetId;
-        foreach(var change in (entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>()).Where(c=>c.Category=="piece"&&(c.Name=="定居点"||c.Name=="城市")))
+        foreach(var change in (entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>()).Where(c=>c.Category=="piece"&&(c.Name=="村庄"||c.Name=="城市")))
         {
             foreach(var tile in tiles.Where(t=>t.Vertices.Contains(change.LocationId)))
             {

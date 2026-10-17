@@ -22,13 +22,13 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
     void Require(bool value,string message){checks++;if(!value)throw new InvalidOperationException(message);}
     IEnumerator Start()
     {
-        var args=Environment.GetCommandLineArgs();bool cards=args.Contains("--card-player-verify");int flag=Array.IndexOf(args,cards?"--card-player-verify":"--interaction-verify");if(flag<0)yield break;
+        var args=Environment.GetCommandLineArgs();bool cards=args.Contains("--card-player-verify"),polish=args.Contains("--table-polish-verify");int flag=Array.IndexOf(args,polish?"--table-polish-verify":cards?"--card-player-verify":"--interaction-verify");if(flag<0)yield break;
         output=Path.GetFullPath(args[flag+1]);
         if(!output.StartsWith(Path.GetFullPath(".local")+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)){Application.Quit(1);yield break;}
         Directory.CreateDirectory(output);app=GetComponent<M6App>();
         gameObject.AddComponent<InteractionCaptureBegin>().Owner=this;gameObject.AddComponent<InteractionCaptureEnd>().Owner=this;
-        if(cards)while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
-        yield return null;var run=cards?VerifyCardPlayers():args.Contains("--resource-layout-review")?VerifyResourceLayouts():Verify();
+        if(cards||polish)while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
+        yield return null;var run=polish?VerifyTablePolish():cards?VerifyCardPlayers():args.Contains("--resource-layout-review")?VerifyResourceLayouts():Verify();
         while(true)
         {
             object next;
@@ -112,13 +112,13 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
         Require(host.Submit(offer).Success,"报价夹具失败");city.M6Refresh();table=city.VerificationBoard.TableScene;
         yield return null;yield return new WaitForEndOfFrame();
         var sides=OperationOfferPerspective.For(city.VerificationOperationSnapshot);Require(sides.OwnGive[2]==2&&sides.OtherGive[0]==1,"收到交易的两侧颠倒");yield return Capture("06-接收交易缺牌红色");
-        stage="金矿居中八牌";app.StartGame("seafarers","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+        stage="金矿五资源";app.StartGame("seafarers","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
         var sea=GetComponent<M3App>();var seaSession=(Catan.Core.M3.SeafarersGameSession)typeof(M3LocalGameHost).GetField("session",Private).GetValue(sea.VerificationHost);
         var seaState=seaSession.GetAuthoritativeStateForTesting();seaState.ActivePlayerId="P1";seaState.Phase=Catan.Core.M3.GamePhase.GoldChoice;seaState.SetupPlacementIndex=8;seaState.Turn=9;seaState.PendingDecision=null;
         seaState.GoldClaims=new[]{new Catan.Core.M3.GoldClaim{PlayerId="P1",Amount=2}};seaState.GoldReturnPhase=Catan.Core.M3.GamePhase.Action;
         seaState.PendingDecision=new Catan.Core.M3.PendingDecision{Kind="Gold",PlayerId="P1",ReturnPhase=Catan.Core.M3.GamePhase.Action};
         typeof(Catan.Core.M3.SeafarersGameSession).GetField("state",Private).SetValue(seaSession,seaState);seaSession.AssertInvariants();sea.M6Refresh();table=sea.VerificationBoard.TableScene;
-        yield return null;yield return Capture("07-金矿居中八牌");
+        yield return null;yield return Capture("07-金矿五资源");
         if(Environment.GetCommandLineArgs().Contains("--interaction-review")||Environment.GetCommandLineArgs().Contains("--resource-card-review"))yield return new WaitForSecondsRealtime(45);
         stage="保存退出与重新加载";app.StartGame("base","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
         string saved=app.ExportEnvelope(),path=Path.Combine(output,"隔离保存.json");app.MenuReviewSavePath=path;app.SaveAndReturnToMainMenu();

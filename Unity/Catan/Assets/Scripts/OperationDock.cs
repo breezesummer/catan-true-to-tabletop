@@ -178,7 +178,7 @@ public sealed partial class OperationDock
             small=new GUIStyle(text){fontSize=12};heading=new GUIStyle(text){fontSize=21,fontStyle=FontStyle.Bold};
             center=new GUIStyle(text){alignment=TextAnchor.MiddleCenter,fontSize=13};
             tableLabel=new GUIStyle(small){alignment=TextAnchor.MiddleCenter};
-            quantityFont=MobileTabletop.Enabled?font:Font.CreateDynamicFontFromOSFont(new[]{"KaiTi","楷体","STKaiti","SimSun"},36);
+            quantityFont=font;
             quantity=new GUIStyle(center){font=quantityFont??font,fontSize=34,fontStyle=FontStyle.BoldAndItalic,wordWrap=false,alignment=TextAnchor.LowerRight};
         }
         text.normal.textColor=Ink;heading.normal.textColor=Ink;center.normal.textColor=Ink;
@@ -520,11 +520,12 @@ public sealed partial class OperationDock
         }
         GUI.matrix=matrix;
     }
-    void HandleHandInput(OperationSnapshot s)
+    void HandleHandInput(OperationSnapshot s)=>ProcessHandInput(s,Event.current);
+    internal void ProcessHandInput(OperationSnapshot s,Event e)
     {
         if(!GUI.enabled)return;
         if(MobileTabletop.Enabled&&Input.touchCount>1){dragGood=-1;dragging=false;return;}
-        var e=Event.current;HandFace hit=null;
+        HandFace hit=null;
         if(hoveredHand!=null&&handHoverAnchor.Contains(e.mousePosition))hit=faces.FirstOrDefault(face=>face.Key==hoveredHand);
         if(hit==null)for(int i=faces.Count-1;i>=0;i--)if(faces[i].Shape.Contains(e.mousePosition)){hit=faces[i];break;}
         bool overPaper=(tradeOpen||s.Offer!=null)&&TradeRect.Contains(e.mousePosition)||s.Discard==null&&previewCard!=null&&CardRect.Contains(e.mousePosition)||facilityTrack>=0;
@@ -535,7 +536,7 @@ public sealed partial class OperationDock
         }
         if(e.type==EventType.MouseDown&&e.button==1&&hit!=null&&hit.Good>=0&&!overPaper)
         {
-            ChangeHandQuantity(s,hit.Good,-1);e.Use();return;
+            ChangeHandCard(s,hit.Good,hit.Ordinal,true);e.Use();return;
         }
         if(e.type==EventType.MouseDown&&e.button==0&&hit!=null&&!overPaper)
         {
@@ -551,17 +552,18 @@ public sealed partial class OperationDock
             if(dragging&&tradeOpen&&playerTrade&&GiveDropRect.Contains(e.mousePosition))
             {Selection.SelectCard(dragGood,dragOrdinal,s.Goods[dragGood]);Array.Copy(Selection.Selected,give,8);message="";}
             else if(!dragging)
-            {ChangeHandQuantity(s,dragGood,MobileTabletop.Enabled&&Time.unscaledTimeAsDouble-handPressedAt>=.5?-1:1);}
+            {ChangeHandCard(s,dragGood,dragOrdinal,MobileTabletop.Enabled&&Time.unscaledTimeAsDouble-handPressedAt>=.5);}
             dragGood=-1;dragging=false;e.Use();
         }
     }
-    void ChangeHandQuantity(OperationSnapshot s,int good,int delta)
+    void ChangeHandCard(OperationSnapshot s,int good,int ordinal,bool putBack)
     {
-        var selected=(int[])Selection.Selected.Clone();
-        string error=OperationCardQuantity.Change(selected,good,delta,s.Goods[good],s.Discard!=null&&!s.Discard.Special?s.Discard.Amount:int.MaxValue);
-        if(error!=null){s.Notify?.Invoke(error);return;}
+        bool selected=Selection.IsCardSelected(good,ordinal);
+        if(putBack&&!selected)return;
+        if(!selected&&s.Discard!=null&&!s.Discard.Special&&Selection.Selected.Sum()>=s.Discard.Amount)
+        {s.Notify?.Invoke("已达到可选数量，不允许继续选择。");return;}
         s.Cancel?.Invoke();previewCard=null;Selection.BuildId=null;Selection.PieceOrdinal=-1;
-        Selection.SetCount(good,selected[good],s.Goods[good]);
+        Selection.Toggle(good,ordinal,s.Goods[good]);
         if(tradeOpen&&playerTrade){Array.Copy(Selection.Selected,give,8);message="";}
     }
     void DrawCost(OperationSnapshot s)
@@ -646,7 +648,7 @@ public sealed partial class OperationDock
     public static string FacilityAbility(int track,int level)
     {
         if(level<3)return "达到 3 级后解锁城市能力";
-        return track==0?"贸易所：商品可以 2 : 1 兑换资源或商品":track==1?"要塞：允许晋升精锐骑士":"排水渠：无产出时可选择一张资源（7 除外）";
+        return track==0?"贸易所：商品可以 2 : 1 兑换资源或商品":track==1?"要塞：允许晋升精锐骑士":"引水渠：无产出时可选择一张资源（7 除外）";
     }
     OperationSnapshot TradeValidationSnapshot(OperationSnapshot s)
     {
@@ -730,7 +732,8 @@ public sealed partial class OperationDock
             TradeCard(face,i,missing);
             var caption=new GUIStyle(center);if(missing)caption.normal.textColor=Missing;
             Label(new Rect(x,y+79,100,25),Names[i]+" × "+bag[i],caption);
-            if(paying||bank)Label(new Rect(x+69,y+6,32,26),(paying?"有 ":"余 ")+(paying?s.Goods[i]:s.Bank[i]),small);
+            if(paying)Label(new Rect(x+69,y+6,32,26),"有 "+s.Goods[i],small);
+            else if(bank&&s.Bank[i]==0)Label(new Rect(x+60,y+6,43,48),"库存为0",small);
             if(bank&&paying)Label(new Rect(x+69,y+37,32,26),TradeValidationSnapshot(s).Rates[i]+":1",small);
             int delta=TabletopCardInput.Delta(face);
             if(delta!=0)

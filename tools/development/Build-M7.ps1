@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='.local/Catan1.6.1-自动亮牌与玩家显示')
+param([switch]$VerifyPlayer,[string]$OutputRoot='.local/Catan1.6.2-地图修路与界面优化')
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m7FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))

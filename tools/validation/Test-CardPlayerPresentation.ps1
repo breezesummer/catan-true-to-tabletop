@@ -1,4 +1,4 @@
-param([string]$BuildRoot='.local/Catan1.6.1-自动亮牌与玩家显示',[int]$TimeoutSeconds=150,[switch]$Visible)
+param([string]$BuildRoot='.local/Catan1.6.2-地图修路与界面优化',[int]$TimeoutSeconds=150,[switch]$Visible)
 $ErrorActionPreference='Stop'
 $reviewRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $reviewRoot=Join-Path $reviewRepo $BuildRoot

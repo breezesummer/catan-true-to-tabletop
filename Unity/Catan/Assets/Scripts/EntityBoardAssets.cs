@@ -68,7 +68,10 @@ public static class EntityBoardAssets
         var colour = PlayerComponentAssets.ColourKey(seatColour);
         if (colour == null) return null; // Legal/illegal previews retain their readable tint.
         if (colour == "beige") colour = "ivory";
-        return Instantiate(Root + "ships/ship-" + colour, label, bottom, edgeRotation, parent);
+        var instance=Instantiate(Root+"ships/ship-"+colour,label,bottom,edgeRotation,parent);
+        int index=System.Array.IndexOf(BoardRenderer.SeatColors,seatColour);
+        PlayerComponentAssets.MatchBuildingPlastic(instance,"P"+(index+1));
+        return instance;
     }
 
     public static GameObject Robber(string label, Vector3 bottom, Transform parent)

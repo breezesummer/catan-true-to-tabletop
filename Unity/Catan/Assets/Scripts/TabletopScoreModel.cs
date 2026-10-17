@@ -64,7 +64,7 @@ public static class TabletopScoreModel
         var p=view.Players.First(x=>x.Id==playerId);
         var rows=Buildings(view.Board.Settlements,view.Board.Cities,playerId);
         Awards(rows,playerId,view.LongestRoadPlayerId,null,"最长航线");
-        Add(rows,"登岛奖励","在新岛屿建立定居点",p.BonusVictoryPoints);
+        Add(rows,"登岛奖励","在新岛屿建立村庄",p.BonusVictoryPoints);
         CityBonuses(rows,view.Board.Metropolises.Count(m=>m.PlayerId==playerId),p.DefenderPoints,view.MerchantPlayerId==playerId);
         Add(rows,"印刷术","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M5.ProgressCardKind.Printing));
         Add(rows,"宪法","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M5.ProgressCardKind.Constitution));
@@ -74,7 +74,7 @@ public static class TabletopScoreModel
     {
         var rows=new List<TabletopScoreRow>();
         int villages=settlements.Count(p=>p.PlayerId==playerId),towns=cities.Count(p=>p.PlayerId==playerId);
-        Add(rows,"定居点",villages+" 座 × 1 分",villages);
+        Add(rows,"村庄",villages+" 座 × 1 分",villages);
         Add(rows,"城市",towns+" 座 × 2 分",towns*2);
         return rows;
     }

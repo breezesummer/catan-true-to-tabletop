@@ -68,7 +68,8 @@ public sealed partial class M3App : MonoBehaviour
         if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGameDialog||view==null||ai!=null&&!ai.IsHumanTurn)return;
         var mouse=released?MobileTabletop.ScreenPoint(releasePoint):pointer;
-        if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(MobileTabletop.Logical(mouse)))return;
+        if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(MobileTabletop.Logical(mouse))){board.ClearPreview();hover="";return;}
+        if(ai!=null&&view.Phase==GamePhase.RoadBuilding){UpdateFreeRoadPlacement(mouse,boardClick);return;}
         if(ai!=null&&!holding&&boardClick){PickTabletopObject(mouse);return;}
         if(!holding)return;
         var candidate=ResolveTarget(mouse);
@@ -232,10 +233,10 @@ public sealed partial class M3App : MonoBehaviour
         switch(code)
         {
             case "NotActivePlayer":return "请换到当前行动席位。";
-            case "DistanceRule":return "定居点之间必须至少间隔两条边。";
+            case "DistanceRule":return "村庄之间必须至少间隔两条边。";
             case "OccupiedVertex":case "OccupiedEdge":return "此处已有棋子。";
             case "DisconnectedRoad":case "DisconnectedSettlement":return "必须连接自己的道路，且不能穿过他人的建筑。";
-            case "MustTouchPendingSettlement":return "开局道路必须连接刚放下的定居点。";
+            case "MustTouchPendingSettlement":return "开局道路必须连接刚放下的村庄。";
             case "InsufficientResources":return "资源不足，请查看手牌和建造费用。";
             case "MustRollFirst":return "请先掷骰。";
             case "AlreadyRolled":return "本回合已经掷骰。";
@@ -285,7 +286,7 @@ public sealed partial class M3App : MonoBehaviour
         Label(1085,846,335,42,"规则按官方 2025 航海家。\nTab 切换视角 · 滚轮缩放 · Esc 取消",small);
         Panel(new Rect(0,808,1065,92),new Color(.045f,.09f,.10f));
         Label(28,818,1008,40,status);
-        Label(28,859,1008,25,holding?"绿色可落点 · 单击放置 · 红色目标将拒绝 · Esc / 右键取消":"建筑需连到自己路网；城市需升级自己的定居点。所有操作均由规则核心验证。",small);
+        Label(28,859,1008,25,holding?"绿色可落点 · 单击放置 · 红色目标将拒绝 · Esc / 右键取消":"建筑需连到自己路网；城市需升级自己的村庄。所有操作均由规则核心验证。",small);
         if(help&&!curtain&&view!=null)DrawGuide();
         if(newGameDialog)DrawNewGame();
         if(!curtain&&!newGameDialog&&view!=null)cardArt.DrawPreview(text,small,button);
@@ -332,13 +333,13 @@ public sealed partial class M3App : MonoBehaviour
             var port=view.NextSetupPort;
             Label(1085,288,331,102,"新世界：轮流安置翻开的港口。\n当前港口："+(port.Resource.HasValue?ResourceNames[(int)port.Resource.Value]+" 2:1":"通用 3:1")+"\n选择绿色沿岸空边；港口之间须保持间隔。");
             if(Button(1085,421,331,"安置当前港口",41))Pickup(CommandKind.SetupPort);
-            Label(1085,477,331,69,"港口全部安置后，开始正常定居点和道路 / 船的开局。",small);return;
+            Label(1085,477,331,69,"港口全部安置后，开始正常村庄和道路 / 船的开局。",small);return;
         }
         if(view.Phase==GamePhase.SetupSettlement||view.Phase==GamePhase.SetupRoad)
         {
             bool road=view.Phase==GamePhase.SetupRoad;
-            Label(1085,288,330,65,road?"放置连接刚才定居点的道路或船。\n道路须沿陆地，船须沿海域。":"按剧本顺序放置村与路 / 船。\n最后一轮起始村获得相邻资源。");
-            if(Button(1085,367,331,holding?"取消拿起 [Esc]":road?"拿起开局道路":"拿起开局定居点",42))
+            Label(1085,288,330,65,road?"放置连接刚才村庄的道路或船。\n道路须沿陆地，船须沿海域。":"按剧本顺序放置村与路 / 船。\n最后一轮起始村获得相邻资源。");
+            if(Button(1085,367,331,holding?"取消拿起 [Esc]":road?"拿起开局道路":"拿起开局村庄",42))
             {if(holding)CancelPickup();else Pickup(road?CommandKind.SetupRoad:CommandKind.SetupSettlement);}
             if(road&&Button(1085,417,331,"拿起开局船",38))Pickup(CommandKind.SetupShip);
             Label(1085,472,330,76,ai==null?"选择绿色标记并单击放下。\n相邻顶点之间不能同时建村。\n完成后自动遮蔽并提示下一席位。":"选择绿色标记并单击放下。\n相邻顶点之间不能同时建村。\n其他席位由 AI 自动行动；始终只显示你的手牌。",small);return;
@@ -382,7 +383,7 @@ public sealed partial class M3App : MonoBehaviour
         if(Button(1085,325,160,"掷骰")){Submit(NewCommand(CommandKind.RollDice));return;}
         if(Button(1256,325,160,"结束回合")){Submit(NewCommand(CommandKind.EndTurn));return;}
         if(Button(1085,367,331,"建道路  ·  木 1 + 砖 1"))Pickup(CommandKind.BuildRoad);
-        if(Button(1085,410,331,"建定居点  ·  木砖羊麦各 1"))Pickup(CommandKind.BuildSettlement);
+        if(Button(1085,410,331,"建村庄  ·  木砖羊麦各 1"))Pickup(CommandKind.BuildSettlement);
         if(Button(1085,453,331,"升级城市  ·  麦 2 + 矿 3"))Pickup(CommandKind.BuildCity);
         if(Button(1085,498,160,"购买发展卡")){Submit(NewCommand(CommandKind.BuyDevelopmentCard));return;}
         if(Button(1256,498,160,"宣告胜利")){Submit(NewCommand(CommandKind.DeclareVictory));return;}
@@ -464,7 +465,7 @@ public sealed partial class M3App : MonoBehaviour
             {
                 var c=NewCommand(CommandKind.BankTrade);c.GiveResource=(Resource)give;c.ReceiveResource=(Resource)receive;c.GiveAmount=TradeRatio((Resource)give);c.ReceiveAmount=1;Submit(c);return;
             }
-            Label(1085,507,331,49,"银行库存 木 / 砖 / 羊 / 麦 / 矿\n"+string.Join("  /  ",Enumerable.Range(0,5).Select(i=>view.Bank[(Resource)i].ToString())),small);
+            Label(1085,507,331,49,string.Join("  /  ",Enumerable.Range(0,5).Where(i=>view.Bank[(Resource)i]==0).Select(i=>ResourceNames[i]+" 库存为0")),small);
             return;
         }
         var opponents=view.Players.Where(p=>p.Id!=seat).ToArray();tradeTarget%=opponents.Length;

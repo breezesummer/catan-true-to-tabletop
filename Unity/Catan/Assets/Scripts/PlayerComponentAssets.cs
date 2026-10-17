@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 // Public presentation data only. Asset colour is selected by seat identity, never by hidden state.
@@ -6,6 +7,29 @@ public static class PlayerComponentAssets
 {
     const string Root = "EntityAssets/v002/";
     static readonly Dictionary<string, GameObject> Models = new Dictionary<string, GameObject>();
+    static readonly Dictionary<string, Material> Plastics = new Dictionary<string, Material>();
+
+    // 每种颜色以现有村庄材质为准；只替换塑料，保留头盔、窗洞等独立细节。
+    public static Material BuildingPlastic(string playerId)
+    {
+        if(ColourKey(playerId)==null)return null;
+        if(!Plastics.TryGetValue(playerId,out var material))
+        {
+            var model=Model(BuildingResource("village",playerId));
+            material=model?.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials).FirstOrDefault(m=>m!=null&&m.name.Contains("Plastic"));
+            if(material!=null)Plastics[playerId]=material;
+        }
+        return material;
+    }
+    public static void MatchBuildingPlastic(GameObject instance,string playerId)
+    {
+        var plastic=BuildingPlastic(playerId);if(instance==null||plastic==null)return;
+        foreach(var renderer in instance.GetComponentsInChildren<Renderer>())
+        {
+            renderer.SetPropertyBlock(null);
+            renderer.sharedMaterials=renderer.sharedMaterials.Select(m=>m!=null&&m.name.Contains("Plastic")?plastic:m).ToArray();
+        }
+    }
 
     public static string ColourKey(string playerId)
     {
@@ -67,7 +91,7 @@ public static class PlayerComponentAssets
     {
         var resource = BuildingResource(type, playerId);
         var model = Model(resource);
-        if (model != null) return Instantiate(model, label, bottom, parent);
+        if (model != null) {var instance=Instantiate(model,label,bottom,parent);MatchBuildingPlastic(instance,playerId);return instance;}
         if (ColourKey(playerId) != "red" || (type != "city-with-wall" && type != "metropolis-with-wall")) return null;
 
         // v001 red uses the existing separate source models under a single neutral root.
@@ -79,13 +103,15 @@ public static class PlayerComponentAssets
         root.transform.rotation = Quaternion.Euler(0, 180, 0);
         Object.Instantiate(wall, root.transform, false);
         Object.Instantiate(insert, root.transform, false);
+        MatchBuildingPlastic(root,playerId);
         return root;
     }
 
     public static GameObject Knight(string playerId, int level, bool active, string label, Vector3 bottom, Transform parent)
     {
         var model = Model(KnightResource(playerId, level, active));
-        return model == null ? null : Instantiate(model, label, bottom, parent);
+        if(model==null)return null;
+        var instance=Instantiate(model,label,bottom,parent);MatchBuildingPlastic(instance,playerId);return instance;
     }
 
     static GameObject Instantiate(GameObject model, string label, Vector3 bottom, Transform parent)

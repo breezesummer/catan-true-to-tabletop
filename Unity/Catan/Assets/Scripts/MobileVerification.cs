@@ -208,7 +208,7 @@ public sealed class MobileVerification : MonoBehaviour
         var zero = MobileTabletop.Logical(MobileTabletop.ScreenPoint(Vector2.zero));
         var corner = MobileTabletop.Logical(MobileTabletop.ScreenPoint(new Vector2(1440, 900)));
         Require(zero.sqrMagnitude < .001f && (corner - new Vector2(1440, 900)).sqrMagnitude < .001f, "UI 与点击坐标不一致");
-        var font = Resources.Load<Font>("Fonts/NotoSansCJKsc-Regular");
+        var font = Resources.Load<Font>("Fonts/NotoSerifCJKsc-Regular");
         Require(font != null, "未打包中文字体");
         foreach (char character in "卡坦岛船骑贸粮") Require(font.HasCharacter(character), "中文字体缺少验收字形");
         if (request.StartsWith("open:", StringComparison.Ordinal))
@@ -328,7 +328,7 @@ public sealed class MobileVerification : MonoBehaviour
         foreach (var logical in new[] { new Vector2(59,51), new Vector2(141,51), new Vector2(223,51),
             new Vector2(305,51), new Vector2(387,51), new Vector2(720,50), new Vector2(1349,825) })
             Require(hudRects.Any(rect => rect.Contains(logical)), "未绘制完整 PC HUD 常驻入口");
-        // 组合模式含八类库存，最上方定居点从 y=430 开始；全部应在骰盘下方的左列。
+        // 组合模式含八类库存，最上方村庄从 y=430 开始；全部应在骰盘下方的左列。
         Require(Dock.VerificationBuildRects.Length > 0 && Dock.VerificationBuildRects.All(rect => rect.x >= 0 && rect.xMax < 155 && rect.y > 400 && rect.yMax <= 900),
             "未在 PC 左侧常驻建造区绘制库存棋子");
         sharedPcUiVerified = true;
@@ -411,7 +411,7 @@ public sealed class MobileVerification : MonoBehaviour
             sampledDarkest = sampledDarkest, sampledBrightest = sampledBrightest, sampledChromatic = sampledChromatic, captureAttempts = captureAttempts,
             screenWidth = Screen.width, screenHeight = Screen.height, safeLeft = safe.x, safeBottom = safe.y, safeWidth = safe.width, safeHeight = safe.height,
             viewportLeft = viewport.Left, viewportTop = viewport.Top, viewportWidth = viewport.Width, viewportHeight = viewport.Height,
-            sharedPcUi = sharedPcUiVerified, touchInputEnabled = MobileTabletop.Enabled, landscape = Screen.width > Screen.height, bundledChineseFont = Resources.Load<Font>("Fonts/NotoSansCJKsc-Regular") != null, independentProcessLoad = request == "load", images = images.ToArray()
+            sharedPcUi = sharedPcUiVerified, touchInputEnabled = MobileTabletop.Enabled, landscape = Screen.width > Screen.height, bundledChineseFont = Resources.Load<Font>("Fonts/NotoSerifCJKsc-Regular") != null, independentProcessLoad = request == "load", images = images.ToArray()
         }, true));
     }
 }

@@ -52,7 +52,7 @@ namespace Catan.Core.M3
             {
                 case "heading-for-new-shores":
                     s.Name = "驶向新海岸"; s.SourcePage = three ? 4 : 5; s.TargetVictoryPoints = 14; s.IslandBonusPoints = 2;
-                    s.Description = "主岛开局；每个新小岛的第一处定居点额外 2 分；14 分获胜。";
+                    s.Description = "主岛开局；每个新小岛的第一处村庄额外 2 分；14 分获胜。";
                     Build(s, three ? new[] { "b12 g5 . .", ". . . s4 o9", ". h4 s6 . h3 .", "s2 o5 w10 . g4", "b8 s10 s9 w8 . .", "h11 o3 b11 . o8", "h6 w5 . b10" }
                         : new[] { "o8 s11 . g4 .", ". . . . b5 o2", ". s5 w6 o4 . w9 .", "h12 b11 h3 s9 . g10", "b6 w10 d h11 w5 . .", "o3 s4 b9 s8 . b3", "h8 w2 o10 . h6" });
                     Regions(s); s.StartingTileIds = s.Regions.OrderByDescending(x => x.TileIds.Length).First().TileIds;
@@ -61,7 +61,7 @@ namespace Catan.Core.M3
                     break;
                 case "four-islands":
                     s.Name = "四座岛屿"; s.SourcePage = three ? 6 : 7; s.TargetVictoryPoints = 13; s.IslandBonusPoints = 2;
-                    s.Description = "任意岛开局；非起始岛的第一处定居点额外 2 分；13 分获胜。";
+                    s.Description = "任意岛开局；非起始岛的第一处村庄额外 2 分；13 分获胜。";
                     Build(s, three ? new[] { ". . h4 s3", "o4 w9 . h9 b5", "s6 o10 . w8 b11 .", ". . . . .", "h11 o8 w3 . b10 b6", "w5 s9 . o2 h5", "s12 . . ." }
                         : new[] { "s8 . w9 w11", "b10 . o3 h12 s5", "h5 w3 . b5 o10 .", ". . w6 . .", "b4 s9 . . w9 s11", "h6 o4 b2 . o8", "s10 h11 . h4" });
                     Regions(s); s.StartingTileIds = Land(s).Select(t => t.Id).ToArray();
@@ -170,7 +170,7 @@ namespace Catan.Core.M3
                     break;
                 case "cloth-for-catan":
                     s.Name="卡坦的布匹"; s.SourcePage=14; s.TargetVictoryPoints=14; s.SetupRounds=3; s.UseLongestRoute=false;
-                    s.Description="开局放三处定居点；连接村庄取布，每两布 1 分；14 分或五村耗尽时结算。";
+                    s.Description="开局放三处村庄；连接村庄取布，每两布 1 分；14 分或五村耗尽时结算。";
                     Build(s,new[] { "w4 s6 b5 s11 h8", "h3 w12 . . w3 o9", "h12 . . g . . .", ". d . . d .", ". . . g . . o2", "b9 h2 . . s11 o4", "s10 w6 o5 h10 b8" });
                     Regions(s); s.StartingTileIds=s.Tiles.Where(t=>t.Number.HasValue).Select(t=>t.Id).ToArray();
                     s.ForbiddenSettlementTileIds=Land(s).Where(t=>!t.Number.HasValue).Select(t=>t.Id).ToArray(); s.ForbiddenRobberTileIds=s.ForbiddenSettlementTileIds.ToArray();

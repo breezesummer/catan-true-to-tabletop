@@ -11,7 +11,10 @@ using UnityEngine.Rendering.Universal;
 public static class AndroidBuildConfiguration
 {
     public const string PackageId = "com.catandevelopment.threekingdoms";
-    public const int VersionCode = 10601;
+    public static int VersionCode
+    {
+        get{var version=Version.Parse(M6App.BuildVersion);return version.Major*10000+version.Minor*100+Math.Max(0,version.Build);}
+    }
 
     public static UniversalRenderPipelineAsset ConfigurePipeline(UniversalRenderPipelineAsset source)
     {

@@ -112,11 +112,11 @@ public sealed class TabletopAudioTests
     [Fact]
     public void CityPillageCrumblesButCityUpgradeAndMovementDoNot()
     {
-        var down = Entry(4, "ResolveChoice", Change("piece", "城市", -1), Change("piece", "定居点", 1));
+        var down = Entry(4, "ResolveChoice", Change("piece", "城市", -1), Change("piece", "村庄", 1));
         Assert.Contains(TabletopAudioModel.Classify(down), e => e.Cue == TabletopAudioCue.BuildingCollapse);
-        var upgrade = Entry(5, "BuildCity", Change("piece", "定居点", -1), Change("piece", "城市", 1));
+        var upgrade = Entry(5, "BuildCity", Change("piece", "村庄", -1), Change("piece", "城市", 1));
         Assert.DoesNotContain(TabletopAudioModel.Classify(upgrade), e => e.Cue == TabletopAudioCue.BuildingCollapse);
-        var wrongPlace = Entry(6, "ResolveChoice", Change("piece", "城市", -1), Change("piece", "定居点", 1, location: "v-8"));
+        var wrongPlace = Entry(6, "ResolveChoice", Change("piece", "城市", -1), Change("piece", "村庄", 1, location: "v-8"));
         Assert.DoesNotContain(TabletopAudioModel.Classify(wrongPlace), e => e.Cue == TabletopAudioCue.BuildingCollapse);
     }
     [Fact]

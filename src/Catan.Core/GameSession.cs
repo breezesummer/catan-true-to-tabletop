@@ -180,23 +180,23 @@ namespace Catan.Core
             var player = s.Players.FirstOrDefault(p => p.Id == c.PlayerId);
             if (player == null) return Reject("UnknownPlayer", "未知席位。");
             if (s.ActivePlayerId != c.PlayerId) return Reject("NotActivePlayer", "请由当前活动席位操作。");
-            if (s.PendingDecision != null && c.Kind != CommandKind.SetupRoad) return Reject("PendingDecision", "请先放置与新定居点相连的开局道路。");
+            if (s.PendingDecision != null && c.Kind != CommandKind.SetupRoad) return Reject("PendingDecision", "请先放置与新村庄相连的开局道路。");
             switch (c.Kind)
             {
                 case CommandKind.SetupSettlement:
-                    if (s.Phase != GamePhase.SetupSettlement) return Reject("WrongPhase", "当前不是开局定居点阶段。");
+                    if (s.Phase != GamePhase.SetupSettlement) return Reject("WrongPhase", "当前不是开局村庄阶段。");
                     if (!scenario.Topology.Vertices.Any(v => v.Id == c.TargetId)) return Reject("UnknownVertex", "请选择棋盘上的顶点。");
                     if (s.Settlements.Any(v => v.LocationId == c.TargetId)) return Reject("OccupiedVertex", "这个顶点已被占用。");
                     if (scenario.Topology.Edges.Where(e => e.Vertices.Contains(c.TargetId)).Any(e => s.Settlements.Any(v => e.Vertices.Contains(v.LocationId))))
-                        return Reject("DistanceRule", "定居点之间至少需要间隔两条边。");
-                    if (player.Pieces.Settlements <= 0) return Reject("NoSettlements", "定居点库存不足。");
+                        return Reject("DistanceRule", "村庄之间至少需要间隔两条边。");
+                    if (player.Pieces.Settlements <= 0) return Reject("NoSettlements", "村庄库存不足。");
                     return null;
                 case CommandKind.SetupRoad:
                     if (s.Phase != GamePhase.SetupRoad || s.PendingDecision == null) return Reject("WrongPhase", "当前没有开局道路待决。");
                     var setupEdge = scenario.Topology.Edges.FirstOrDefault(e => e.Id == c.TargetId);
                     if (setupEdge == null) return Reject("UnknownEdge", "请选择棋盘上的边。");
                     if (s.Roads.Any(e => e.LocationId == c.TargetId)) return Reject("OccupiedEdge", "这条边已有道路。");
-                    if (!setupEdge.Vertices.Contains(s.PendingDecision.AnchorVertexId)) return Reject("RoadNotAtAnchor", "道路必须连接刚放下的定居点。");
+                    if (!setupEdge.Vertices.Contains(s.PendingDecision.AnchorVertexId)) return Reject("RoadNotAtAnchor", "道路必须连接刚放下的村庄。");
                     if (player.Pieces.Roads <= 0) return Reject("NoRoads", "道路库存不足。");
                     if (s.SetupPlacementIndex == 7 && !BankCanPay(s, InitialProduction(s))) return Reject("ResourceShortageUnsupported", "银行供应不足；短缺分配将在 M2 实现。");
                     return null;
@@ -223,7 +223,7 @@ namespace Catan.Core
                     var edge = scenario.Topology.Edges.FirstOrDefault(e => e.Id == c.TargetId);
                     if (edge == null) return Reject("UnknownEdge", "请选择棋盘上的边。");
                     if (s.Roads.Any(e => e.LocationId == c.TargetId)) return Reject("OccupiedEdge", "这条边已有道路。");
-                    if (!edge.Vertices.Any(v => ConnectsToPlayer(s, v, c.PlayerId))) return Reject("DisconnectedRoad", "道路必须连接自己的道路或定居点。");
+                    if (!edge.Vertices.Any(v => ConnectsToPlayer(s, v, c.PlayerId))) return Reject("DisconnectedRoad", "道路必须连接自己的道路或村庄。");
                     if (player.Pieces.Roads <= 0) return Reject("NoRoads", "道路库存不足。");
                     if (Resources.Any(r => player.Resources[r] < scenario.RoadCost[r])) return Reject("InsufficientResources", "建路需要 1 木和 1 砖。");
                     return null;

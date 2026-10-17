@@ -119,14 +119,15 @@ public sealed class TabletopBankUI
     }
     static void DrawCount(TabletopScene table,Rect layout,int count)
     {
-        var area=table.ProjectLabel(new Rect(layout.xMax+1,layout.y+14,18,20));
-        GUI.Label(area,count.ToString(),new GUIStyle(ModernOperationUI.Center){wordWrap=false,fontSize=Mathf.Max(9,Mathf.RoundToInt(12*table.DisplayScale))});
+        if(count!=0)return;
+        var area=table.ProjectLabel(new Rect(layout.x-3,layout.yMax+1,layout.width+15,23));
+        GUI.Label(area,"库存为0",new GUIStyle(ModernOperationUI.Center){wordWrap=false,fontSize=Mathf.Max(9,Mathf.RoundToInt(12*table.DisplayScale))});
     }
     static TabletopWorldObjects.Hit Stack(TabletopScene table,string key,Rect layout,Texture2D texture,int count)
     {
         TabletopWorldObjects.Hit hit=null;
-        // 卡片同轴叠放，以真实纸张厚度表现数量，不增加透明牌套或装饰外框。
-        for(int i=0;i<Math.Min(5,count);i++)
+        // 非空牌堆统一厚度，不用层数透露库存。
+        for(int i=0;i<(count>0?3:0);i++)
             hit=table.Objects.Card(key+"-"+i,layout,texture,false,null,i*.00050f);
         return hit;
     }

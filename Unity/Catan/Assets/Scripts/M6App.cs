@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="1.6.1";
+    public const string BuildVersion="1.6.2";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -50,6 +50,8 @@ public sealed partial class M6App : MonoBehaviour
     MonoBehaviour presentation;
     float nextAction;
     readonly TabletopPromptSequence tablePrompts=new TabletopPromptSequence();
+    internal string RoadPlacementPrompt { get; private set; }="";
+    internal static readonly Color PromptColor=new Color(.96f,.90f,.68f);
     string promptContext,lastPromptStatus,lastPromptInstruction;
     bool promptWasHuman;
     internal bool TableDiceRolling;
@@ -145,6 +147,9 @@ public sealed partial class M6App : MonoBehaviour
     internal string CurrentTablePrompt=>tablePrompts.At(Time.unscaledTimeAsDouble);
     internal void UpdateTablePrompt(int turn,string phase,bool awaitingRoll,string instruction,string status)
     {
+        bool roadPlacement=instruction.StartsWith("请在地图上点击合法位置新建道路 ",StringComparison.Ordinal);
+        bool roadFinished=RoadPlacementPrompt.Length>0&&!roadPlacement;
+        RoadPlacementPrompt=IsHumanTurn&&roadPlacement?instruction:"";
         string context=turn+":"+phase+":"+CurrentActor;
         if(context!=promptContext)
         {
@@ -152,7 +157,7 @@ public sealed partial class M6App : MonoBehaviour
             {
                 string next=awaitingRoll?"请掷骰":instruction;
                 if(!promptWasHuman||awaitingRoll)tablePrompts.Show(Time.unscaledTimeAsDouble,"你的回合",next);
-                else tablePrompts.Show(Time.unscaledTimeAsDouble,next);
+                else tablePrompts.Show(Time.unscaledTimeAsDouble,roadFinished?TabletopRoadPlacement.Instruction(0,HistoryEntries):next);
             }
             else if(Finished)ShowTablePrompt(instruction);
             else tablePrompts.Show(Time.unscaledTimeAsDouble);
@@ -179,7 +184,7 @@ public sealed partial class M6App : MonoBehaviour
         ResetCardPresentation();ResetPlayerIdentity();
         TargetVictoryPoints=target;AiSpeedLevel=TabletopAiSpeed.Clamp(aiSpeedLevel??AiSpeedLevel);ResetBuildPresentation();
         networkMenu=false;menuPendingAction=null;tableMenu=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你使用 "+ColorLabel(human)+" 建筑。行动顺序由开局掷骰决定。";
-        promptContext=null;promptWasHuman=false;lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.Show(Time.unscaledTimeAsDouble);
+        promptContext=null;promptWasHuman=false;RoadPlacementPrompt="";lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.Show(Time.unscaledTimeAsDouble);
         switch(rules)
         {
             case "base":presentation=gameObject.AddComponent<M2App>();break;
@@ -310,7 +315,7 @@ public sealed partial class M6App : MonoBehaviour
                 if(ModernOperationUI.Button(new Rect(726,424,220,44),"切换俯视"))ToggleTableCamera();
                 if(ModernOperationUI.Button(new Rect(494,480,220,44),"保存并返回主页"))SaveAndReturnToMainMenu();
                 if(ModernOperationUI.Button(new Rect(726,480,220,44),"恢复存档")){tableMenu=false;LoadGame();}
-                if(ModernOperationUI.Button(new Rect(494,536,452,44),"返回主菜单")){tableMenu=false;ReturnToMainMenu();}
+                if(PastoralMenuUI.ReturnButton(new Rect(494,536,452,44),font)){tableMenu=false;ReturnToMainMenu();}
                 if(RuleSet=="seafarers"&&ModernOperationUI.Button(new Rect(494,592,452,36),"航海场景行动"))
                 {tableMenu=false;var sailing=GetComponent<M3App>();if(sailing!=null)sailing.ShowScenarioActions();}
                 if(TabletopAudio.Instance!=null)TabletopAudio.Instance.DrawSettings(new Rect(494,640,452,92),font);
@@ -318,13 +323,15 @@ public sealed partial class M6App : MonoBehaviour
             }
             if(NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),DisplayPlayerText(Network.Status),small);
             DrawOpeningOrder();
-            string prompt=DisplayPlayerText(CurrentTablePrompt);
+            string prompt=DisplayPlayerText(RoadPlacementPrompt.Length>0?RoadPlacementPrompt:CurrentTablePrompt);
             if(prompt.Length>0&&!TablePresentationBlocked&&!TableOverlayOpen)
             {
-                var promptStyle=new GUIStyle(title){fontSize=46,alignment=TextAnchor.MiddleCenter,wordWrap=true};
-                promptStyle.normal.textColor=new Color(.92f,.07f,.055f);
-                if(promptStyle.CalcSize(new GUIContent(prompt)).x>1050)promptStyle.fontSize=34;
-                var area=new Rect(180,375,1080,150);
+                bool primary=prompt=="你的回合"||Finished;
+                var promptStyle=new GUIStyle(title){fontSize=primary?46:26,alignment=TextAnchor.MiddleCenter,wordWrap=true};
+                promptStyle.normal.textColor=PromptColor;
+                if(promptStyle.CalcSize(new GUIContent(prompt)).x>1050)promptStyle.fontSize=primary?34:22;
+                var area=primary?new Rect(180,375,1080,150):new Rect(264,207,912,74);
+                if(!primary&&OpeningOrderMessage.Length>0)area.y+=48;
                 bool before=GUI.enabled;GUI.enabled=true;
                 var shadow=new GUIStyle(promptStyle);shadow.normal.textColor=new Color(.10f,.025f,.01f,.55f);
                 GUI.Label(new Rect(area.x+1,area.y+2,area.width,area.height),prompt,shadow);

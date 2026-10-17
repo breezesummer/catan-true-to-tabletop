@@ -39,7 +39,7 @@ public static class MobileTabletop
     public static float PickRadius(float desktopLogical)=>Enabled?Mathf.Max(desktopLogical,48)*Mathf.Min(Viewport.Width/1440,Viewport.Height/900):desktopLogical*Screen.width/1440;
     public static Font LoadFont(int size=18)
     {
-        if(Enabled){var bundled=Resources.Load<Font>("Fonts/NotoSansCJKsc-Regular");if(bundled!=null)return bundled;}
+        var bundled=Resources.Load<Font>("Fonts/NotoSerifCJKsc-Regular");if(bundled!=null)return bundled;
         return Font.CreateDynamicFontFromOSFont(new[]{"Microsoft YaHei","SimHei","Noto Sans CJK SC","Noto Sans CJK","Droid Sans Fallback","Arial"},size);
     }
     // IMGUI 原生滚轮之外补单指滑动，滚动区域不抢占按钮的短按。
