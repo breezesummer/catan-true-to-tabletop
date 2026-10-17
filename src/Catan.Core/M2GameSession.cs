@@ -127,7 +127,7 @@ namespace Catan.Core.M2
                 }
                 return new PlayerView
                 {
-                    PlayerId = playerId, ActivePlayerId = state.ActivePlayerId, Turn = state.Turn, Phase = state.Phase, PendingDecision = Json.Copy(state.PendingDecision),
+                    PlayerId = playerId, ActivePlayerId = state.ActivePlayerId, StartingPlayerId = state.Players[state.StartingPlayerIndex].Id, Turn = state.Turn, Phase = state.Phase, PendingDecision = Json.Copy(state.PendingDecision),
                     Discards = Json.Copy(state.Discards), TradeOffer = Json.Copy(state.TradeOffer), OwnResources = own.Resources.Copy(), OwnDevelopmentCards = Json.Copy(own.DevelopmentCards),
                     OwnVictoryPoints = VictoryPoints(state, playerId, true), TargetVictoryPoints = state.TargetVictoryPoints.Value, DevelopmentCardPlayedThisTurn = state.DevelopmentCardPlayedThisTurn, DevelopmentDeckCount = state.DevelopmentDeck.Length,
                     Bank = state.Bank.Copy(), Players = state.Players.Select(p => new PublicPlayer { Id = p.Id, ResourceCount = p.Resources.Total, DevelopmentCardCount = p.DevelopmentCards.Length,

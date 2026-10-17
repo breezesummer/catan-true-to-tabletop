@@ -165,6 +165,7 @@ public sealed partial class M2App : MonoBehaviour
     }
     void RefreshBoard(PlayerView current)
     {
+        ai?.ObservePlayerOrder(current.StartingPlayerId,current.Players.Select(p=>p.Id));
         string layout=string.Join("|",current.Board.Tiles.Select(t=>t.Id+":"+t.Resource+":"+t.Number));
         if(board==null||boardLayout!=layout)
         {
@@ -228,8 +229,8 @@ public sealed partial class M2App : MonoBehaviour
         badge=new GUIStyle(text){fontSize=14,alignment=TextAnchor.MiddleCenter};
     }
     static void Panel(Rect rect,Color color){var previous=GUI.color;GUI.color=color;GUI.DrawTexture(rect,Texture2D.whiteTexture);GUI.color=previous;}
-    bool Button(float x,float y,float width,string label,float height=34) => GUI.Button(new Rect(x,y,width,height),label,button);
-    void Label(float x,float y,float width,float height,string label,GUIStyle style=null) => GUI.Label(new Rect(x,y,width,height),label,style??text);
+    bool Button(float x,float y,float width,string label,float height=34) => GUI.Button(new Rect(x,y,width,height),M6App.DisplayPlayerText(label),button);
+    void Label(float x,float y,float width,float height,string label,GUIStyle style=null) => GUI.Label(new Rect(x,y,width,height),M6App.DisplayPlayerText(label),style??text);
     void OnGUI()
     {
         if(host==null&&!NetworkGame)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGameDialog||view==null?null:seat);

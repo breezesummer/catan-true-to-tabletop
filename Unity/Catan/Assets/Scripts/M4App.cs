@@ -86,6 +86,7 @@ public sealed partial class M4App : MonoBehaviour
     void Select(CommandKind kind){draft=New(kind);pickField="";scroll=Vector2.zero;}
     void Refresh(PlayerView v)
     {
+        ai?.ObservePlayerOrder(v.StartingPlayerId,v.Players.Select(p=>p.Id));
         string next=string.Join("|",v.Board.Tiles.Select(t=>t.Id+":"+t.Resource));
         if(board==null||next!=layout)
         {
@@ -165,9 +166,9 @@ public sealed partial class M4App : MonoBehaviour
         return nearest;
     }
     void Panel(Rect r,Color c){var old=GUI.color;GUI.color=c;GUI.DrawTexture(r,Texture2D.whiteTexture);GUI.color=old;}
-    bool Btn(string text)=>ai!=null?ModernOperationUI.LayoutButton(text):GUILayout.Button(text,button,GUILayout.MinHeight(32));
+    bool Btn(string text)=>ai!=null?ModernOperationUI.LayoutButton(M6App.DisplayPlayerText(text)):GUILayout.Button(M6App.DisplayPlayerText(text),button,GUILayout.MinHeight(32));
     void Text(string value,bool minor=false)
-    {if(ai!=null){ModernOperationUI.Styles(font);GUILayout.Label(value,minor?ModernOperationUI.Small:ModernOperationUI.Text);}else GUILayout.Label(value,minor?small:label);}
+    {value=M6App.DisplayPlayerText(value);if(ai!=null){ModernOperationUI.Styles(font);GUILayout.Label(value,minor?ModernOperationUI.Small:ModernOperationUI.Text);}else GUILayout.Label(value,minor?small:label);}
     void OnGUI()
     {
         if(host==null&&!NetworkGame)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=MobileTabletop.GuiMatrix;
@@ -271,7 +272,7 @@ public sealed partial class M4App : MonoBehaviour
         {
             var p=board.ScreenPoint(k.LocationId);p=MobileTabletop.Logical(p);
             if(ai==null)
-                GUI.Label(new Rect(p.x-26,p.y-36,86,21),k.PlayerId+" 骑"+k.Level+(k.Active?" ●":" ○"),small);
+                GUI.Label(new Rect(p.x-26,p.y-36,86,21),M6App.PlayerLabel(k.PlayerId)+" 骑"+k.Level+(k.Active?" ●":" ○"),small);
         }
     }
     void DrawControls()

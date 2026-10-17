@@ -22,7 +22,7 @@ public sealed partial class M6App
             return historyEntries;
         }
     }
-    public string[] HistoryPlayers => Enumerable.Range(1, PlayerCount).Select(i => "P" + i).ToArray();
+    public string[] HistoryPlayers => OrderedPlayers(Enumerable.Range(1, PlayerCount).Select(i => "P" + i));
     void BindHistory(Func<GameHistoryEntry[]> source, Func<int> revision)
     {
         historySource = source; historyRevision = revision; lastHistoryRevision = -1;

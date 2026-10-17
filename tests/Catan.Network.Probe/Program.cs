@@ -94,18 +94,19 @@ internal static class Program
         var saved = JsonSerializer.Deserialize<ResumeState>(File.ReadAllText(Path.Combine(directory, "private-resume.json")), JsonOptions)!;
         using var peer = new Peer(endpoint, pin, saved.Peer);
         var resumed = await peer.Call("Reconnect"); Check(resumed, "重启后原席位恢复");
-        // 心跳过期可在退出前转交管理权并增加房间修订号，但不能改变规则局面。
-        Require(resumed.Revision >= saved.Revision && resumed.ViewJson == saved.View, "服务重启改变已提交局面");
+        // 断线席位由服务端 AI 接管，服务恢复后可继续行动；重连不能回退已提交修订号。
+        Require(resumed.Revision >= saved.Revision, "服务重启后修订号倒退");
+        InspectPrivacy(resumed.ViewJson);
         saved.Request.ConnectionId = peer.ConnectionId; saved.Request.Credential = peer.Credential;
         var retry = await peer.Send(saved.Request);
         Require(retry.Success, "重启后命令重试失败：" + retry.Code);
         Require(retry.IsDuplicate, "重启后命令未命中持久去重账本");
         Require(retry.CommittedRevision == saved.Request.ExpectedRevision + 1, "重启后原命令提交修订号改变");
-        // 重连到重试之间，后台可把离线管理员交给该在线席位；房间修订号会增加，规则局面不能改变。
-        Require(retry.Revision >= resumed.Revision && retry.ViewJson == resumed.ViewJson, "重启后重复命令改变规则局面或修订号倒退");
+        // 后台托管可以继续推进；重复命令必须返回原始提交回执，不能重新执行该动作。
+        Require(retry.Revision >= resumed.Revision, "重启后重复命令的房间修订号倒退");
         var old = new NetworkRequest { Operation = "Get", RoomId = peer.RoomId, Credential = peer.Credential, ConnectionId = saved.Peer.ConnectionId };
         Require(!(await peer.Send(old)).Success, "旧连接未被取代");
-        WriteResult(directory, "restart", new { passed = true, restoredSeat = resumed.SeatId, exactView = true, durableLedger = true, staleConnectionRejected = true });
+        WriteResult(directory, "restart", new { passed = true, restoredSeat = resumed.SeatId, aiTakeoverAware = true, durableLedger = true, staleConnectionRejected = true });
     }
     private static async Task Matrix(string endpoint, string pin, string directory, bool all)
     {

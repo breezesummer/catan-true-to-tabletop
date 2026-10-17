@@ -33,7 +33,8 @@ public sealed class M7Client : MonoBehaviour
     public bool CommandPending=>pendingCommand!=null;
     public bool EnrollmentPending=>pendingEnrollment!=null;
     public bool ControlLost=>!automaticReconnect;
-    public bool CanInteract=>Connected&&!CommandPending&&!Busy;
+    public bool HumanControlAvailable { get; private set; }
+    public bool CanInteract=>Connected&&HumanControlAvailable&&!CommandPending&&!Busy;
     public string TransportMode { get; private set; }="未连接";
     public event Action ViewChanged;
     public event Action PreviewChanged;
@@ -56,6 +57,10 @@ public sealed class M7Client : MonoBehaviour
     float retryAt,nextPreviewAt,nextSyncAt,nextCommandRetry,nextHistoryAt,historyRetryDelay=2;
     string rememberedRuleSet;
     bool verification,automaticReconnect=true;
+    JoinRoomPayload reconnectJoinFallback;
+    string desiredDisplayName;
+    float nextRenameAt;
+    public void SetDisplayName(string value){desiredDisplayName=PlayerIdentityModel.NormalizeName(value);nextRenameAt=Time.unscaledTime+.6f;}
 
     void Awake(){storageDirectory=Path.Combine(Application.persistentDataPath,"m7-client");verification=Environment.GetCommandLineArgs().Contains("--m7-verify");}
     void Diagnose(string operation,Exception error)
@@ -70,9 +75,15 @@ public sealed class M7Client : MonoBehaviour
         Debug.LogWarning("CATAN_M7_TRANSPORT_DIAGNOSTIC "+operation+" "+string.Join(" -> ",details));
     }
     internal void UseCredentialDirectory(string path){if(http!=null)throw new InvalidOperationException("连接后不可切换凭据目录。");storageDirectory=path;}
+    internal void EnableVerification(){verification=true;}
     void Update()
     {
         while(main.TryDequeue(out var action))action();
+        if(Connected&&!Busy&&!CommandPending&&Room!=null&&!string.IsNullOrEmpty(desiredDisplayName)&&Time.unscaledTime>=nextRenameAt)
+        {
+            nextRenameAt=Time.unscaledTime+2;
+            if(Room.Seats.Any(s=>s.SeatId==SeatId&&s.DisplayName!=desiredDisplayName))Request("Rename",new NamePayload{DisplayName=desiredDisplayName});
+        }
         if(socketConnected&&(socket==null||socket.State!=WebSocketState.Open))socketConnected=false;
         if(Connected&&!previewBusy&&previewQueue.Count>0&&Time.unscaledTime>=nextPreviewAt){nextPreviewAt=Time.unscaledTime+.12f;SendPreview(previewQueue.Dequeue());}
         if(automaticReconnect&&!socketConnected&&!syncBusy&&!Busy&&http!=null&&connectionId!=null&&Time.unscaledTime>=nextSyncAt){nextSyncAt=Time.unscaledTime+1;PollState();}
@@ -90,7 +101,7 @@ public sealed class M7Client : MonoBehaviour
         return (T)decodedView;
     }
     public static string NormalizeFingerprint(string value)=>new string((value??"").Where(Uri.IsHexDigit).ToArray()).ToLowerInvariant();
-    public void ConfigureEndpoint(string address,string pin)
+    public void ConfigureEndpoint(string address,string pin,bool restoreIdentity=true)
     {
         var uri=new Uri(address.Trim().TrimEnd('/'));
         if(uri.Scheme!="https"||!string.IsNullOrEmpty(uri.UserInfo)||uri.AbsolutePath!="/"||!string.IsNullOrEmpty(uri.Query))throw new InvalidOperationException("请填写 https://主机:端口，不得附带路径或凭据。");
@@ -107,21 +118,45 @@ public sealed class M7Client : MonoBehaviour
             return actual.Scheme=="https"&&actual.Authority==uri.Authority&&certificate!=null&&CertificateMatches(certificate.GetRawCertData(),normalized);
         };
         http=new HttpClient(handler){Timeout=TimeSpan.FromSeconds(15)};
-        Status=normalized.Length>0?"已固定所核对的局域网证书。":"在线连接使用系统证书校验。";
-        LoadIdentity();
+        Status=normalized.Length>0?"已连接发现的局域网主机。":"在线连接使用系统证书校验。";
+        if(restoreIdentity)LoadIdentity();
     }
     internal static bool CertificateMatches(byte[] certificate,string expected)
     {
         using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(certificate)).Replace("-","").ToLowerInvariant()==expected;
     }
     public void ListRooms()=>Request("List");
-    public void Create(RoomSettings settings,string name,string password){if(EnrollmentPending){Status="上次创建或加入仍待确认，请先恢复该请求。";return;}rememberedRuleSet=settings.RuleSet;Request("Create",new CreateRoomPayload{Settings=settings,DisplayName=name,Password=password});}
-    public async void Join(string id,string name,string password)
+    public void Create(RoomSettings settings,string name,string password){SetDisplayName(name);ChangeRoom(null,()=>{rememberedRuleSet=settings.RuleSet;Request("Create",new CreateRoomPayload{Settings=settings,DisplayName=name,Password=password});});}
+    // 离开旧桌的回执或网络故障不能阻止玩家加入另一桌；各桌恢复身份单独保留。
+    async void ChangeRoom(string target,Action next)
+    {
+        if(http==null){Status="请先连接服务。";return;}
+        // 主动换桌优先于旧连接的自动重试；取消旧代请求后即可连接新房。
+        if(Busy)ConfigureEndpoint(Endpoint,Fingerprint,false);
+        if(target!=null&&RoomId==target)
+        {
+            if(Room!=null&&Connected){Status="你已在这个房间。";return;}
+            next();return;
+        }
+        if(RoomId==null&&!EnrollmentPending){next();return;}
+        Busy=true;int current=generation;string address=Endpoint,pin=Fingerprint;
+        if(connectionId!=null&&credential!=null)
+        {
+            try{using(var timeout=new CancellationTokenSource(TimeSpan.FromSeconds(2)))await Send(Envelope("Leave"),timeout.Token);}
+            catch(Exception){/* 旧主机不可达时由其连接租约触发 AI 接手。 */}
+        }
+        main.Enqueue(()=>{if(current!=generation)return;ConfigureEndpoint(address,pin,false);next();});
+    }
+    public void Join(string id,string name,string password)
+    {
+        SetDisplayName(name);
+        id=(id??"").Trim();if(id.Length==0){Status="请输入房间号。";return;}
+        string target=id;ChangeRoom(target,()=>JoinRoom(target,name,password));
+    }
+    async void JoinRoom(string id,string name,string password)
     {
         if(Busy||http==null){Status="请先连接服务，等待当前请求完成。";return;}
-        if(EnrollmentPending){Status="上次创建或加入仍待确认，请先恢复该请求。";return;}
-        id=(id??"").Trim();if(RoomId!=null&&RoomId!=id){Status="请先退出当前房间。";return;}
-        if(id.Length==0){Status="请输入房间号。";return;}
+        if(EnrollmentPending&&pendingEnrollment.RoomId==id){RetryEnrollment();return;}
         int current=generation;Busy=true;
         try
         {
@@ -131,7 +166,10 @@ public sealed class M7Client : MonoBehaviour
                 if(current!=generation)return;Busy=false;
                 var info=response.Room;if(!response.Success||info==null){Status=response.Message??"没有找到该房间。";return;}
                 if(info.RulesVersion!=NetworkProtocol.RulesVersion(info.RuleSet)||info.ScenarioVersion!=NetworkProtocol.ScenarioVersion(info.RuleSet)){Status="房间规则或场景版本不兼容，请更新客户端。";return;}
-                rememberedRuleSet=info.RuleSet;RoomId=id;Request("Join",new JoinRoomPayload{DisplayName=name,Password=password});
+                rememberedRuleSet=info.RuleSet;RoomId=id;
+                var payload=new JoinRoomPayload{DisplayName=name,Password=password};
+                if(TryLoadRoomIdentity(id)){reconnectJoinFallback=payload;Reconnect();}
+                else Request("Join",payload);
             });
         }
         catch(Exception){main.Enqueue(()=>{if(current==generation){Busy=false;Status="无法读取房间信息，请检查连接。";}});}
@@ -152,8 +190,8 @@ public sealed class M7Client : MonoBehaviour
     public void ConfigureRoom(RoomSettings settings)=>Request("Configure",settings);
     public void StartRoom()=>Request("Start");
     public void Reconnect(){if(string.IsNullOrEmpty(credential)||string.IsNullOrEmpty(RoomId)){Status="此设备没有该房间的恢复凭据，请从大厅加入。";return;}automaticReconnect=true;Request("Reconnect");}
-    public void ForgetIdentity(){try{if(File.Exists(IdentityPath))File.Delete(IdentityPath);}catch(IOException){}ClearEnrollment();EndSession();Status="已忘记本设备的恢复身份和待确认申请；可重新加入可用席位。";}
-    public void Leave()=>Request("Leave");
+    public void ForgetIdentity(){try{if(File.Exists(IdentityPath))File.Delete(IdentityPath);if(RoomId!=null&&File.Exists(RoomIdentityPath(RoomId)))File.Delete(RoomIdentityPath(RoomId));}catch(IOException){}ClearEnrollment();EndSession();Status="已忘记本设备的恢复身份和待确认申请；可重新加入可用席位。";}
+    public void Leave()=>ChangeRoom(null,()=>{Status="已退出房间，原对局可使用本设备身份重连。";ListRooms();});
     public void Transfer(string seat)=>Request("Transfer",new SeatPayload{SeatId=seat});
     NetworkRequest Envelope(string operation,string payload=null)
     {
@@ -234,6 +272,11 @@ public sealed class M7Client : MonoBehaviour
             main.Enqueue(()=>
             {
                 if(current!=generation||epoch!=connectionEpoch)return;Busy=false;
+                if(operation=="Reconnect"&&!response.Success&&reconnectJoinFallback!=null&&(response.Code=="Unauthorized"||response.Code=="RoomNotFound"))
+                {
+                    var fallback=reconnectJoinFallback;reconnectJoinFallback=null;credential=connectionId=null;automaticReconnect=true;
+                    Request("Join",fallback);return;
+                }
                 if(operation=="Leave"&&response.Success){if(Room==null||!Room.Started){try{if(File.Exists(IdentityPath))File.Delete(IdentityPath);}catch(IOException){}}EndSession();Status="已退出房间。已开始的房间可用此设备凭据恢复。";return;}
                 bool handshake=response.Success&&(operation=="Join"||operation=="Create"||operation=="Reconnect");
                 if(handshake&&request.EnrollmentCredential!=null)credential=request.EnrollmentCredential;
@@ -241,6 +284,7 @@ public sealed class M7Client : MonoBehaviour
                 if(enrollment&&!response.Success&&EnrollmentRejected(response.Code))ClearEnrollment();
                 if(handshake)
                 {
+                    reconnectJoinFallback=null;
                     if(SaveIdentity()&&enrollment){try{File.Delete(IdentityPath+".enrollment");pendingEnrollment=null;}catch(IOException){}}
                     StartSocket();if(pendingCommand!=null)SendPending();
                 }
@@ -284,7 +328,8 @@ public sealed class M7Client : MonoBehaviour
         }
         if(response.Room!=null&&!stale){Room=response.Room;rememberedRuleSet=Room.RuleSet;}
         if(response.Rooms!=null)Rooms=response.Rooms;
-        Connected=true;
+        Connected=response.Success||connectionId!=null;
+        if(response.Room!=null&&!stale)HumanControlAvailable=response.HumanControlAvailable;
         if(response.ViewJson!=null&&response.Revision>=Revision)
         {
             bool changed=response.Revision!=Revision||viewJson==null;
@@ -374,12 +419,41 @@ public sealed class M7Client : MonoBehaviour
     void Disconnected(string message){Connected=false;if(automaticReconnect)Status=message;retryAt=Time.unscaledTime+3;PreviewChanged?.Invoke();}
     string IdentityPath
     {
-        get{using(var sha=SHA256.Create())return Path.Combine(storageDirectory,BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(Endpoint??""))).Replace("-","")+".credential");}
+        get{return CredentialPath(Endpoint??"");}
+    }
+    string CredentialPath(string key){using(var sha=SHA256.Create())return Path.Combine(storageDirectory,BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(key))).Replace("-","")+".credential");}
+    string RoomIdentityPath(string room)=>CredentialPath((string.IsNullOrEmpty(Fingerprint)?Endpoint:"lan:"+Fingerprint)+"|"+room);
+    internal string[] RememberedRoomIds(string fingerprint)
+    {
+        var rooms=new List<string>();if(!Directory.Exists(storageDirectory))return rooms.ToArray();
+        foreach(var path in Directory.GetFiles(storageDirectory,"*.credential").OrderByDescending(File.GetLastWriteTimeUtc).Take(128))
+        {
+            try
+            {
+                var lines=M7CredentialStore.Read(path).Split('\n');
+                if(lines.Length==4&&lines[2]==NormalizeFingerprint(fingerprint)&&lines[0].Length>0&&lines[0].Length<=64&&!string.IsNullOrEmpty(lines[1]))rooms.Add(lines[0]);
+            }
+            catch(Exception){/* 无法读取的旧恢复材料不阻止发现和加入新房。 */}
+        }
+        return rooms.Distinct().Take(16).ToArray();
     }
     bool SaveIdentity()
     {
-        try{Directory.CreateDirectory(storageDirectory);M7CredentialStore.Write(IdentityPath,string.Join("\n",RoomId??"",credential??"",Fingerprint??"",rememberedRuleSet??""));return true;}
+        try{Directory.CreateDirectory(storageDirectory);string value=string.Join("\n",RoomId??"",credential??"",Fingerprint??"",rememberedRuleSet??"");M7CredentialStore.Write(RoomIdentityPath(RoomId),value);M7CredentialStore.Write(IdentityPath,value);return true;}
         catch(Exception){Status+=" 此设备无法安全保存恢复凭据，请保留本次待确认请求。";return false;}
+    }
+    bool TryLoadRoomIdentity(string room)
+    {
+        try
+        {
+            string path=RoomIdentityPath(room);if(!File.Exists(path))path=CredentialPath((Endpoint??"")+"|"+room);
+            if(!File.Exists(path))path=IdentityPath;
+            if(!File.Exists(path))return RoomId==room&&!string.IsNullOrEmpty(credential);
+            var lines=M7CredentialStore.Read(path).Split('\n');
+            if(lines.Length!=4||lines[0]!=room||lines[2]!=Fingerprint||string.IsNullOrEmpty(lines[1]))return false;
+            RoomId=room;credential=lines[1];rememberedRuleSet=lines[3];return true;
+        }
+        catch(Exception){return false;}
     }
     void LoadIdentity()
     {
@@ -398,7 +472,7 @@ public sealed class M7Client : MonoBehaviour
     {
         bool hadGame=Playing;
         generation++;connectionEpoch++;lifetime?.Cancel();socket?.Abort();socket?.Dispose();socket=null;http?.Dispose();http=null;lifetime?.Dispose();lifetime=null;
-        Playing=false;Connected=false;Busy=false;automaticReconnect=true;socketConnected=syncBusy=commandSending=false;TransportMode="未连接";Room=null;Rooms=Array.Empty<RoomSummary>();RoomId=SeatId=credential=connectionId=viewJson=rememberedRuleSet=null;decodedView=null;Revision=-1;History=Array.Empty<GameHistoryEntry>();historyCursor=0;pendingCommand=pendingEnrollment=null;historyBusy=historyDirty=previewBusy=false;nextHistoryAt=0;historyRetryDelay=2;previews.Clear();previewPending.Clear();previewQueue.Clear();
+        Playing=false;Connected=false;Busy=false;HumanControlAvailable=false;automaticReconnect=true;socketConnected=syncBusy=commandSending=false;TransportMode="未连接";Room=null;Rooms=Array.Empty<RoomSummary>();RoomId=SeatId=credential=connectionId=viewJson=rememberedRuleSet=null;decodedView=null;Revision=-1;History=Array.Empty<GameHistoryEntry>();historyCursor=0;pendingCommand=pendingEnrollment=null;reconnectJoinFallback=null;historyBusy=historyDirty=previewBusy=false;nextHistoryAt=0;historyRetryDelay=2;previews.Clear();previewPending.Clear();previewQueue.Clear();
         if(hadGame)SessionEnded?.Invoke();
     }
     void OnDestroy(){EndSession();}

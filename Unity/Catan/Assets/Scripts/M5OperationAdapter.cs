@@ -151,8 +151,7 @@ public sealed partial class M5App
     }
     OperationBuild AddDockBuild(OperationSnapshot s,CommandKind kind,string name,string icon,int count,int[] cost,bool legal,int suffix=-1)
     {
-        bool enough=Enumerable.Range(0,8).All(i=>s.Goods[i]>=cost[i]);
-        var build=new OperationBuild{Id=kind.ToString()+(suffix<0?"":":"+suffix),Name=name,Icon=icon,Count=count,Cost=cost,Available=ai.IsHumanTurn&&(count>0||kind==CommandKind.BuildCity)&&legal&&enough,Detail=cost.Sum()==0?"当前阶段免费放置":kind==CommandKind.PromoteKnight?"拿起高一级骑士，放到要晋升的己方骑士上":kind==CommandKind.ImproveCity?"点击翻开下一级设施并支付商品":"拿起棋子，再点击地图上的合法位置放下",UnavailableReason=!ai.IsHumanTurn?"等待当前行动或待决席位":count==0?"库存已用尽":!enough?"缺少所需资源":!legal?"当前阶段或连接条件没有合法目标":null};if(icon=="knight")build.Level=suffix;s.Builds.Add(build);return build;
+        var build=new OperationBuild{Id=kind.ToString()+(suffix<0?"":":"+suffix),Name=name,Icon=icon,Count=count,Cost=cost,Detail=cost.Sum()==0?"当前阶段免费放置":kind==CommandKind.PromoteKnight?"拿起高一级骑士，放到要晋升的己方骑士上":kind==CommandKind.ImproveCity?"点击翻开下一级设施并支付商品":"拿起棋子，再点击地图上的合法位置放下"};build.ConfigureAvailability(legal,s.Goods,kind!=CommandKind.BuildCity);if(icon=="knight")build.Level=suffix;s.Builds.Add(build);return build;
     }
     void DrawOperationLayout()
     {

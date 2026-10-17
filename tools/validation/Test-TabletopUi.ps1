@@ -1,7 +1,7 @@
 ﻿param([switch]$Graphics,[string]$BuildRoot='.local/m6-entity-v005', [int]$TimeoutSeconds = 900)
 $ErrorActionPreference = 'Stop'
 $tabletopRepo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
-$tabletopPlayer = Join-Path $tabletopRepo "$BuildRoot/Builds/Windows/CatanM6.exe"
+$tabletopPlayer = Join-Path $tabletopRepo "$BuildRoot/Builds/Windows/CatanM7.exe"
 if (!(Test-Path -LiteralPath $tabletopPlayer)) { throw '缺少 M6 程序，请先完成固定 Unity 构建。' }
 $tabletopMode = if ($Graphics) { 'graphics' } else { 'headless' }
 $tabletopOutput = Join-Path $tabletopRepo "$BuildRoot/tabletop-verification/$tabletopMode"

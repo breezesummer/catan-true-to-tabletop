@@ -72,11 +72,11 @@ public sealed class MedievalMenuVerification : MonoBehaviour
         Set("menuRule",1);Set("menuSetupStep",1);yield return Capture("new-game-maps");
         Set("menuSetupStep",2);yield return Capture("new-game-table");
         Go(1);yield return Capture("load-empty");
-        Go(4);Set("menuSettingsTab",0);yield return Capture("settings-sound");
-        Set("menuSettingsTab",1);yield return Capture("settings-appearance");
-        Go(2);yield return Capture("lan-connect");
-        Set("networkTab",1);yield return Capture("lan-join");
-        Set("networkTab",2);
+        Go(4);Set("menuSettingsTab",0);yield return Capture("settings-player");
+        Set("menuSettingsTab",1);yield return Capture("settings-sound");
+        Set("menuSettingsTab",2);yield return Capture("settings-appearance");
+        Go(2);yield return Capture("lan-room-list");
+        Set("networkTab",1);
         for(int part=0;part<3;part++){Set("networkSettingsPage",part);yield return Capture("lan-create-"+part);}
         string address=(string)typeof(M6App).GetField("networkAddress",Flags).GetValue(app);
         Go(3);Require(string.IsNullOrEmpty((string)typeof(M6App).GetField("networkAddress",Flags).GetValue(app)),"在线入口继承了局域网地址");

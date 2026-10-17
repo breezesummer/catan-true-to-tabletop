@@ -15,6 +15,9 @@ internal sealed class RuleRoomGame
     private readonly string ruleSet;
     private bool finished;
     internal int CommandCount { get; private set; }
+    internal string ActivePlayerId { get; private set; }
+    // 摆放轮也有独立边界；蛇形折返时同一颜色可连续摆放两轮。
+    internal string TurnKey { get; private set; }
     private RuleRoomGame(string rules, object session) { ruleSet = rules; this.session = session; Save(); }
     internal static (string Rules, string Scenario) Versions(string rules) => rules switch
     {
@@ -48,6 +51,8 @@ internal sealed class RuleRoomGame
         using var document = System.Text.Json.JsonDocument.Parse(json);
         finished = document.RootElement.TryGetProperty("WinnerPlayerId", out var winner) && winner.ValueKind == System.Text.Json.JsonValueKind.String && !string.IsNullOrEmpty(winner.GetString());
         CommandCount = document.RootElement.GetProperty("ProcessedCommands").GetArrayLength();
+        ActivePlayerId = document.RootElement.GetProperty("ActivePlayerId").GetString();
+        TurnKey = document.RootElement.GetProperty("Turn").GetInt32() + ":" + document.RootElement.GetProperty("SetupPlacementIndex").GetInt32() + ":" + ActivePlayerId;
         return json;
     }
     internal object View(string seat) => session switch { M2.BaseGameSession s => s.GetPlayerView(seat), M3.SeafarersGameSession s => s.GetPlayerView(seat), M4.CitiesKnightsGameSession s => s.GetPlayerView(seat), M5.CombinedGameSession s => s.GetPlayerView(seat), _ => throw new InvalidOperationException() };

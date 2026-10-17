@@ -17,6 +17,7 @@ public sealed partial class M6App : MonoBehaviour
         public bool Paused;
         public int AiSpeedLevel=1;
         public bool HasAiSpeed;
+        public string[] PlayerNames;
     }
 
     public string RuleSet { get; private set; }="base";
@@ -27,7 +28,7 @@ public sealed partial class M6App : MonoBehaviour
     public string InitialAuthority { get; private set; }
     public bool Paused { get; private set; }
     public string Fault { get; private set; }="";
-    public string Notice { get; private set; }="选择一种规则和你的席位，其他席位由本地 AI 执行。";
+    public string Notice { get; private set; }="选择一种规则和你的建筑颜色，其他玩家由本地 AI 执行。";
     public int AiSpeedLevel { get; private set; }=1;
     public int AiCommandsExecuted { get; private set; }
     public string LastCommandKind { get; private set; }="";
@@ -36,7 +37,7 @@ public sealed partial class M6App : MonoBehaviour
     public bool Finished=>Ready&&finished();
     public string CurrentActor=>Ready?actor():"";
     public bool IsHumanTurn=>Ready&&!Finished&&!TablePresentationBlocked&&CurrentActor==HumanSeat&&(!NetworkGame||Network.CanInteract);
-    public string WaitingText=>NetworkGame?(Network.CanInteract?"等待 "+CurrentActor+" 完成操作。":Network.Status):Fault!=""?"AI 已暂停："+Fault:Paused?"AI 已暂停。按 Esc 打开菜单继续。":Finished?"本局已结束。":"等待 "+CurrentActor+" · AI 正在行动。";
+    public string WaitingText=>NetworkGame?(Network.CanInteract?"等待 "+PlayerDisplayName(CurrentActor)+" 完成操作。":Network.Status):Fault!=""?"AI 已暂停："+Fault:Paused?"AI 已暂停。按 Esc 打开菜单继续。":Finished?"本局已结束。":"等待 "+PlayerDisplayName(CurrentActor)+" · AI 正在行动。";
     public string SavePath=>Path.Combine(Application.persistentDataPath,"m6-local-ai-v1.json");
 
     Func<string> actor,save;
@@ -122,16 +123,16 @@ public sealed partial class M6App : MonoBehaviour
         try
         {
             string result=decideAndSubmit(player);
-            if(result!=null){Fault=player+" 的命令被拒绝（"+result+"）。局面保留，可保存后检查。";Paused=true;ShowTablePrompt("AI 已暂停，按 Esc 查看菜单");return false;}
+            if(result!=null){Fault=PlayerDisplayName(player)+" 的命令被拒绝（"+result+"）。局面保留，可保存后检查。";Paused=true;ShowTablePrompt("AI 已暂停，按 Esc 查看菜单");return false;}
             AiCommandsExecuted++;
             refresh();
-            Notice=Finished?"本局结束。":IsHumanTurn?"轮到你完成行动或待决选择。":player+" 已完成本次操作，AI 正在继续行动。";
+            Notice=Finished?"本局结束。":IsHumanTurn?"轮到你完成行动或待决选择。":PlayerDisplayName(player)+" 已完成本次操作，AI 正在继续行动。";
             return true;
         }
         catch(Exception ex)
         {
             // Do not log command payloads, cards, saves, or exception messages containing private data.
-            Fault=player+" 决策失败（"+ex.GetType().Name+"）。";Paused=true;
+            Fault=PlayerDisplayName(player)+" 决策失败（"+ex.GetType().Name+"）。";Paused=true;
             ShowTablePrompt("AI 已暂停，按 Esc 查看菜单");
             Debug.LogError("CATAN_M6_AI_PAUSED: "+ex.GetType().Name);return false;
         }
@@ -166,15 +167,15 @@ public sealed partial class M6App : MonoBehaviour
     public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null,int? aiSpeedLevel=null)
     {
         ValidateConfiguration(rules,scenario,players,human);
-        if(!networkEntering&&NetworkGame)Network.EndSession();
+        if(!networkEntering&&Network!=null&&(Network.Playing||Network.Busy||Network.RoomId!=null||Network.EnrollmentPending))Network.EndSession();
         int target=Catan.Core.VictoryPointSettings.Resolve(targetVictoryPoints,DefaultVictoryPoints(rules,scenario,players),MaximumVictoryPoints(rules,scenario));
         if(close!=null)close();
         else if(presentation!=null){presentation.enabled=false;Destroy(presentation);}
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
-        ResetCardPresentation();
+        ResetCardPresentation();ResetPlayerIdentity();
         TargetVictoryPoints=target;AiSpeedLevel=TabletopAiSpeed.Clamp(aiSpeedLevel??AiSpeedLevel);ResetBuildPresentation();
-        networkMenu=false;menuPendingAction=null;tableMenu=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你的手牌始终只显示 "+human+"。";
+        networkMenu=false;menuPendingAction=null;tableMenu=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你使用 "+ColorLabel(human)+" 建筑。行动顺序由开局掷骰决定。";
         promptContext=null;promptWasHuman=false;lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.Show(Time.unscaledTimeAsDouble);
         switch(rules)
         {
@@ -194,7 +195,7 @@ public sealed partial class M6App : MonoBehaviour
     {
         if(NetworkGame)throw new InvalidOperationException("联机存档保存在服务器，客户端不能导出权威存档。");
         if(!Ready)throw new InvalidOperationException("No game to save");
-        return JsonUtility.ToJson(new SavedGame{RuleSet=RuleSet,ScenarioId=ScenarioId,PlayerCount=PlayerCount,HumanSeat=HumanSeat,Paused=Paused,AiSpeedLevel=AiSpeedLevel,HasAiSpeed=true,Authority=save()},true);
+        return JsonUtility.ToJson(new SavedGame{RuleSet=RuleSet,ScenarioId=ScenarioId,PlayerCount=PlayerCount,HumanSeat=HumanSeat,Paused=Paused,AiSpeedLevel=AiSpeedLevel,HasAiSpeed=true,PlayerNames=localPlayerNames.ToArray(),Authority=save()},true);
     }
     public void WriteSave(string path)
     {
@@ -237,7 +238,8 @@ public sealed partial class M6App : MonoBehaviour
         ValidateConfiguration(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat);
         ValidateAuthority(data); // Finish parsing before closing the current game.
         StartGame(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat,data.Paused,data.Authority,aiSpeedLevel:data.HasAiSpeed?data.AiSpeedLevel:1);
-        Notice="已恢复局面和席位配置。";
+        if(data.PlayerNames!=null&&data.PlayerNames.Length==data.PlayerCount)localPlayerNames=data.PlayerNames.Select(PlayerIdentityModel.NormalizeName).ToArray();
+        Notice="已恢复局面、玩家姓名和颜色配置。";
     }
     public void ShowMenu()
     {
@@ -312,7 +314,8 @@ public sealed partial class M6App : MonoBehaviour
                 ModernOperationUI.Label(new Rect(494,740,452,34),Notice,ModernOperationUI.Small);
             }
             if(NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),Network.Status,small);
-            string prompt=CurrentTablePrompt;
+            DrawOpeningOrder();
+            string prompt=DisplayPlayerText(CurrentTablePrompt);
             if(prompt.Length>0&&!TablePresentationBlocked&&!TableOverlayOpen)
             {
                 var promptStyle=new GUIStyle(title){fontSize=46,alignment=TextAnchor.MiddleCenter,wordWrap=true};
