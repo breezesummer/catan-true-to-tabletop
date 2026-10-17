@@ -24,3 +24,5 @@ Android 包名保持 `com.catandevelopment.threekingdoms`，版本名 `1.6`，�
 本次构建、独立回归、原生运行、覆盖安装、触控、发行包和发布结果见[发布验证摘要](verification/release-beta-1.6/summary.json)。原始日志、截图及私有测试局保存在 `.local/release-1.6/`，不进入发行附件。
 
 已知边界：旧港口几何专项曾因港口与建筑占地重合失败，此次不将该专项计为通过。Android 真机、用户完整对局、真实多机／公网、清洁环境及长期性能继续待验；本次内测发布不表示完整 M7／M8 退出，路线图保持原状态。
+
+已于 2026-10-17 20:49:06 +08:00 公开为 GitHub 预发布版本，标签对应源码提交 `adec765b0fc3e7b4f53418dd514ddd9878e7fa1e`。五个附件均核对 GitHub 返回的长度和 SHA-256，与本地最终产物一致。详见[公开发布回执](verification/release-beta-1.6/github-release.json)。
