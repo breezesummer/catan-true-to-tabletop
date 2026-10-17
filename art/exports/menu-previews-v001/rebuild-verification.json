@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "checks": 294,
+  "maps": 26,
+  "ruleImages": 4,
+  "imageBytesIdentical": true,
+  "cleanOutput": ".local/menu-previews-rebuild-v001",
+  "comparison": "重建输出与Unity安装资源逐图SHA-256一致",
+  "sourceCounts": "docs/acceptance/m3-v001/scenario-source-counts.json",
+  "unityRuntimeChecked": false
+}

@@ -190,4 +190,122 @@ public sealed class TabletopAudioTests
         Assert.True(wind.Average(v => v * v) > .00001);
         Assert.Equal(Digest(wind), Digest(TabletopAudioSynth.RenderAmbience()));
     }
+
+    [Theory]
+    [InlineData("贸易改良（现为 2 级）", TabletopAudioCue.TradeUpgrade)]
+    [InlineData("政治改良（现为 3 级）", TabletopAudioCue.PoliticsUpgrade)]
+    [InlineData("科学改良（现为 4 级）", TabletopAudioCue.ScienceUpgrade)]
+    public void ThreePublicImprovementTracksChooseSewingAnvilAndWriting(string name, TabletopAudioCue cue)
+    {
+        var entry = Entry(4, "ImproveCity", Change("status", name, 1));
+        Assert.Equal(cue, TabletopAudioModel.Classify(entry)[0].Cue);
+        // 相同名称放在隐藏手牌里不能变更音色，支付的商品也不参与分类。
+        Assert.Equal(TabletopAudioCue.FacilityUpgrade, TabletopAudioModel.Classify(Entry(5, "ImproveCity", Change("goods", name, -2)))[0].Cue);
+        var hidden = Change("status", name, 1); Set(hidden, "IsPrivate", true);
+        Assert.Equal(TabletopAudioCue.FacilityUpgrade, TabletopAudioModel.Classify(Entry(6, "ImproveCity", hidden))[0].Cue);
+        var crane = TabletopAudioModel.Classify(Entry(7, "PlayProgressCard", Change("status", name, 1)));
+        Assert.Equal(TabletopAudioCue.CardPlay, crane[0].Cue);
+        Assert.Contains(crane, e => e.Cue == cue && e.Delay >= .22);
+    }
+
+    [Fact]
+    public void KnightDevelopmentCardSlidesBeforeCavalryAndAllKnightActionsHaveDedicatedFeedback()
+    {
+        var events = TabletopAudioModel.Classify(Entry(1, "PlayKnight"));
+        Assert.Equal(TabletopAudioCue.CardPlay, events[0].Cue);
+        Assert.Contains(events, e => e.Cue == TabletopAudioCue.KnightCombat && e.Delay > events[0].Delay);
+        foreach (string command in new[] { "DisplaceKnight", "ChaseRobber", "ChasePirate", "AttackFortress" })
+            Assert.Equal(TabletopAudioCue.KnightCombat, TabletopAudioModel.Classify(Entry(1, command))[0].Cue);
+        Assert.Equal(TabletopAudioCue.KnightRecruit, TabletopAudioModel.Classify(Entry(1, "RecruitKnight"))[0].Cue);
+        Assert.Equal(TabletopAudioCue.KnightActivate, TabletopAudioModel.Classify(Entry(1, "ActivateKnight"))[0].Cue);
+    }
+
+    [Fact]
+    public void BarbarianSailingAndLandingAreSeparateAndOnlyExistingKnightsChargeForDefense()
+    {
+        var state = new TabletopAudioPublicModel(); state.Observe(false, false, 4, "", false, activeKnights: 2);
+        var sailing = state.Observe(false, false, 5, "", false, 1, 2);
+        Assert.Contains(sailing, e => e.Cue == TabletopAudioCue.BarbarianSail);
+        Assert.DoesNotContain(sailing, e => e.Cue == TabletopAudioCue.BarbarianInvasion || e.Cue == TabletopAudioCue.KnightCombat);
+        state.Observe(false, false, 6, "", false, 1, 2);
+        var landing = state.Observe(false, false, 0, "", false, 1, 0);
+        Assert.Contains(landing, e => e.Cue == TabletopAudioCue.KnightCombat);
+        Assert.Contains(landing, e => e.Cue == TabletopAudioCue.BarbarianInvasion);
+        Assert.DoesNotContain(landing, e => e.Cue == TabletopAudioCue.BarbarianSail);
+        var undefended = new TabletopAudioPublicModel(); undefended.Observe(false, false, 6, "", false);
+        Assert.DoesNotContain(undefended.Observe(false, false, 0, "", false, 1), e => e.Cue == TabletopAudioCue.KnightCombat);
+    }
+
+    [Fact]
+    public void ResolvingPillageAndReturningFromSevenDoesNotRepeatInvasionOrCavalry()
+    {
+        var state = new TabletopAudioPublicModel(); state.Observe(false, false, 6, "", false, 0, 3);
+        Assert.Contains(state.Observe(false, false, 7, "", false, 1, 3), e => e.Cue == TabletopAudioCue.BarbarianInvasion);
+        Assert.Empty(state.Observe(false, false, 0, "", false, 0, 0));
+        var pillage = Entry(10, "ResolveChoice", Change("piece", "城市", -1), Change("piece", "村庄", 1),
+            Change("piece", "2级骑士（激活）", -1, location: "v-8"), Change("piece", "2级骑士（休眠）", 1, location: "v-8"));
+        Assert.Contains(TabletopAudioModel.Classify(pillage), e => e.Cue == TabletopAudioCue.BuildingCollapse);
+        Assert.DoesNotContain(TabletopAudioModel.Classify(pillage), e => e.Cue == TabletopAudioCue.KnightCombat);
+        var defender = Entry(11, "ResolveChoice", Change("piece", "1级骑士（激活）", -1), Change("piece", "1级骑士（休眠）", 1));
+        Assert.DoesNotContain(TabletopAudioModel.Classify(defender), e => e.Cue == TabletopAudioCue.KnightCombat);
+        var displaced = Entry(12, "ResolveChoice", Change("piece", "1级骑士（激活）", -1), Change("piece", "1级骑士（休眠）", 1, location: "v-8"));
+        Assert.Contains(TabletopAudioModel.Classify(displaced), e => e.Cue == TabletopAudioCue.KnightCombat);
+    }
+
+    [Theory]
+    [InlineData("ResolveProgressChoice")]
+    [InlineData("PlayProgressCard")]
+    public void SmithingUsesPublicLevelIncreaseToPlayAnvilInsteadOfCavalry(string command)
+    {
+        var smithing = Entry(18, command, Change("piece", "1级骑士（激活）", -1), Change("piece", "2级骑士（激活）", 1));
+        var events = TabletopAudioModel.Classify(smithing);
+        Assert.Single(events, e => e.Cue == TabletopAudioCue.KnightPromote);
+        Assert.DoesNotContain(events, e => e.Cue == TabletopAudioCue.KnightCombat);
+        var ordinary = Entry(19, "PromoteKnight", Change("piece", "1级骑士（休眠）", -1), Change("piece", "2级骑士（休眠）", 1));
+        Assert.Single(TabletopAudioModel.Classify(ordinary), e => e.Cue == TabletopAudioCue.KnightPromote);
+    }
+
+    [Fact]
+    public void FiveEnvironmentsAreDistinctAudibleAndUseQuietLoopSeams()
+    {
+        var fingerprints = new List<string>();
+        for (int theme = 0; theme < 5; theme++)
+        {
+            var data = TabletopAudioSynth.RenderAmbience(theme);
+            Assert.Equal(12 * TabletopAudioSynth.SampleRate, data.Length);
+            Assert.Equal(0, data[0]); Assert.Equal(0, data[^1]);
+            Assert.True(data.Average(v => v * v) > .00001);
+            Assert.All(data, v => Assert.True(float.IsFinite(v) && Math.Abs(v) <= .701));
+            fingerprints.Add(Digest(data));
+        }
+        Assert.Equal(5, fingerprints.Distinct().Count());
+    }
+
+    [Fact]
+    public void OriginalMusicHasFullPhraseStructureDeterministicLoopAndSafePeak()
+    {
+        var data = TabletopAudioSynth.RenderMusic();
+        Assert.Equal(1280000, data.Length); Assert.True(data.Length / (double)TabletopAudioSynth.SampleRate > 50);
+        Assert.All(data, v => Assert.True(float.IsFinite(v) && Math.Abs(v) <= .70));
+        Assert.True(data.Average(v => v * v) > .0001);
+        Assert.True(Math.Abs(data[0] - data[^1]) < .01, "音乐首尾接缝应小于 0.01");
+        Assert.Equal(Digest(data), Digest(TabletopAudioSynth.RenderMusic()));
+        int bar = 80000;
+        Assert.NotEqual(Digest(data.Take(bar).ToArray()), Digest(data.Skip(bar * 8).Take(bar).ToArray()));
+    }
+
+    [Fact]
+    public void RapidThemeSwitchesPreserveUnityGainAndAllFourBusesHaveHeadroom()
+    {
+        var weights = new[] { 1f, 0, 0, 0, 0 };
+        for (int frame = 0; frame < 600; frame++)
+        {
+            TabletopAudioMix.FadeTheme(weights, frame / 7 % 5, .55f / 60);
+            Assert.InRange(weights.Sum(), .9999f, 1.0001f);
+            Assert.All(weights, w => Assert.InRange(w, 0, 1));
+        }
+        for (int frame = 0; frame < 240; frame++) TabletopAudioMix.FadeTheme(weights, 4, .55f / 60);
+        Assert.Equal(1, weights[4]); Assert.All(weights.Take(4), w => Assert.Equal(0, w));
+        Assert.InRange(TabletopAudioMix.PeakBound(.70f, .70f, .70f, .70f), .97f, .99f);
+    }
 }

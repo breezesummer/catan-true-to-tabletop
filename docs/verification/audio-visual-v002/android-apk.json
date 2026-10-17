@@ -1,0 +1,32 @@
+{
+  "status": "passed",
+  "checkedAtUtc": "2026-10-17T18:48:45.9317569Z",
+  "apk": "Catan1.6.3.apk",
+  "bytes": 338586020,
+  "sha256": "267BFE8C7E9F0F316D12AEB51517872C37BF47BBA6975BC9B153FDE0BE257A97",
+  "packageId": "com.catandevelopment.threekingdoms",
+  "versionName": "1.6.3",
+  "versionCode": 10603,
+  "minSdk": 26,
+  "targetSdk": 36,
+  "activity": "com.unity3d.player.UnityPlayerActivity",
+  "orientation": "sensorLandscape",
+  "landscape": true,
+  "glEsVersion": "0x30000",
+  "nativeArchitectures": [
+    "arm64-v8a",
+    "x86_64"
+  ],
+  "signatureV2Verified": true,
+  "signatureV3Verified": false,
+  "signaturePolicy": "minSdk 26 要求有效 v2；v3 仅记录，不强制。",
+  "signaturePolicySource": "https://source.android.com/docs/security/features/apksigning/v2",
+  "signerCertificateSha256": [
+    "EFD26F60A7807072FF61FB0DD4660FA00859B75E9B3857A742A4C7D6E3A2BF48"
+  ],
+  "debuggable": false,
+  "zipFiles": 993,
+  "forbiddenEntries": 0,
+  "developmentDataAbsent": true,
+  "failure": null
+}

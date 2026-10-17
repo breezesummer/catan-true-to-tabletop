@@ -50,7 +50,7 @@ public sealed partial class M6App
         PastoralMenuUI.Fill(new Rect(78,99,44,2),PastoralMenuUI.Gold);
         PastoralMenuUI.Label(new Rect(72,128,350,85),"卡坦岛",67,PastoralMenuUI.Ivory,true);
         PastoralMenuUI.Label(new Rect(78,217,330,45),"之 三 国 争 霸",28,new Color(.93f,.87f,.70f));
-        PastoralMenuUI.Label(new Rect(79,280,300,25),"沐着海风，筑起属于你的城邦。",13,new Color(.83f,.86f,.77f));
+        PastoralMenuUI.Label(new Rect(79,280,300,25),"山海之间，筑起属于你的城邦。",13,new Color(.83f,.86f,.77f));
         if(GUI.Button(new Rect(65,115,350,155),GUIContent.none,GUIStyle.none))NavigateMainMenu(-1);
         float delta=Mathf.Min(.05f,Time.unscaledTime-menuNavAt);
         for(int i=0;i<5;i++)
@@ -72,8 +72,8 @@ public sealed partial class M6App
         if(menuPage<0)
         {
             PastoralMenuUI.Round(new Rect(1004,768,340,79),new Color(.08f,.18f,.15f,.48f),12);
-            PastoralMenuUI.Label(new Rect(1027,782,300,23),"海风入港，麦浪归田",19,PastoralMenuUI.Ivory);
-            PastoralMenuUI.Label(new Rect(1027,816,295,20),"在这里，慢慢书写岛屿的故事。",12,new Color(.90f,.89f,.76f));
+            PastoralMenuUI.Label(new Rect(1027,782,300,23),PastoralMenuScene.Names[PastoralMenuScene.Selected],19,PastoralMenuUI.Ivory);
+            PastoralMenuUI.Label(new Rect(1027,816,295,20),PastoralMenuScene.Descriptions[PastoralMenuScene.Selected],12,new Color(.90f,.89f,.76f));
         }
         else
         {
@@ -114,8 +114,14 @@ public sealed partial class M6App
         if(menuSetupStep==0)
         {
             for(int i=0;i<4;i++)
-                if(PastoralMenuUI.Card(new Rect(495+(i%2)*428,278+(i/2)*175,410,157),RuleNames[i],RuleDescriptions[i],menuRule==i,(i+1).ToString("00")))
-                {if(menuRule!=i){menuRule=i;menuScenario=0;menuVictoryPoints=null;}}
+            {
+                var r=new Rect(495+(i%2)*428,278+(i/2)*175,410,157);
+                bool chosen=menuRule==i;
+                if(PastoralMenuUI.Button(r,"",true,false,chosen)&&!chosen){menuRule=i;menuScenario=0;menuVictoryPoints=null;}
+                MenuMapPreviews.DrawRule(new Rect(r.x+9,r.y+15,162,124),i);
+                PastoralMenuUI.Label(new Rect(r.x+182,r.y+22,211,33),RuleNames[i],21,chosen?PastoralMenuUI.Ivory:PastoralMenuUI.Ink,true);
+                PastoralMenuUI.Label(new Rect(r.x+182,r.y+71,211,68),RuleDescriptions[i],13,chosen?new Color(.84f,.90f,.80f):PastoralMenuUI.Muted);
+            }
             PastoralMenuUI.Label(new Rect(498,645,816,36),"每种玩法都保留完整的独立规则；接下来选择本局地图。",14,PastoralMenuUI.Muted);
         }
         else if(menuSetupStep==1)DrawMapChoices();
@@ -138,18 +144,21 @@ public sealed partial class M6App
         if(menuRule==0||menuRule==2)
         {
             PastoralMenuUI.Round(new Rect(495,280,838,225),new Color(.85f,.88f,.78f),12);
-            var image=Resources.Load<Texture2D>("PastoralMenu/v002/medieval-harbor");
-            if(image!=null)GUI.DrawTextureWithTexCoords(new Rect(496,281,836,223),image,new Rect(.35f,.2f,.61f,.39f));
+            MenuMapPreviews.DrawScenario(new Rect(496,281,836,223),menuRule,ids[menuScenario],menuPlayers);
             PastoralMenuUI.Label(new Rect(500,533,820,38),menuRule==0?"标准岛屿":"标准城市与骑士地图",25,null,true);
-            PastoralMenuUI.Label(new Rect(500,588,810,55),"地形、点数与港口随新局生成。\n继续设置人数、建筑颜色与本局胜利目标。",16,PastoralMenuUI.Muted);
+            PastoralMenuUI.Label(new Rect(500,588,810,70),MenuMapPreviews.ScenarioCaption(menuRule,ids[menuScenario],menuPlayers)+"\n地形、点数与港口随新局生成。",16,PastoralMenuUI.Muted);
             return;
         }
         for(int i=0;i<ids.Length;i++)
         {
-            var r=new Rect(495+(i%3)*285,280+(i/3)*122,267,108);
-            if(PastoralMenuUI.Card(r,ScenarioName(ids[i]),"剧本 "+(i+1).ToString("00")+"   ·   "+(menuRule==3?"双扩展":"航海家"),menuScenario==i))
-            {menuScenario=i;menuVictoryPoints=null;}
+            var r=new Rect(495+(i%3)*285,274+(i/3)*133,267,124);
+            bool chosen=menuScenario==i;
+            if(PastoralMenuUI.Button(r,"",true,false,chosen)){menuScenario=i;menuVictoryPoints=null;}
+            MenuMapPreviews.DrawScenarioThumbnail(new Rect(r.x+7,r.y+8,135,108),menuRule,ids[i],menuPlayers);
+            PastoralMenuUI.Label(new Rect(r.x+151,r.y+23,108,48),ScenarioName(ids[i]),18,chosen?PastoralMenuUI.Ivory:PastoralMenuUI.Ink,true);
+            PastoralMenuUI.Label(new Rect(r.x+151,r.y+83,108,30),menuPlayers+" 人 · 示意",12,chosen?new Color(.84f,.90f,.80f):PastoralMenuUI.Muted);
         }
+        PastoralMenuUI.Label(new Rect(499,678,824,28),MenuMapPreviews.ScenarioCaption(menuRule,ids[menuScenario],menuPlayers),12,PastoralMenuUI.Muted);
     }
     void DrawTableChoices()
     {
@@ -246,7 +255,7 @@ public sealed partial class M6App
     void DrawMainSettings()
     {
         MenuPageHeader("舒 适 地 游 玩","设置","让声音与桌面，配合你喜欢的游戏时光。");
-        menuSettingsTab=PastoralMenuUI.Segments(new Rect(495,216,838,39),menuSettingsTab,new[]{"玩家","声音","桌面外观"});
+        menuSettingsTab=PastoralMenuUI.Segments(new Rect(495,216,838,39),menuSettingsTab,new[]{"玩家","声音","桌面外观","主页风景"});
         if(menuSettingsTab==0)
         {
             if(menuPlayerName==null)menuPlayerName=LocalPlayerName;
@@ -261,15 +270,21 @@ public sealed partial class M6App
         {
             var audio=TabletopAudio.Instance;
             PastoralMenuUI.Label(new Rect(499,296,600,36),"听见海岸与每一次落子",24,null,true);
-            PastoralMenuUI.Label(new Rect(499,343,600,28),"音量与静音会自动保存，下次进入时沿用。",14,PastoralMenuUI.Muted);
+            PastoralMenuUI.Label(new Rect(499,336,600,25),"音量、语言与静音会自动保存。",14,PastoralMenuUI.Muted);
             if(audio==null){PastoralMenuUI.Label(new Rect(499,405,800,30),"声音正在准备中…");return;}
             if(PastoralMenuUI.Button(new Rect(1155,299,174,39),audio.Muted?"已静音 · 开启":"声音开启 · 静音",true,false,!audio.Muted))
             {audio.Muted=!audio.Muted;if(!audio.Muted)audio.Click();}
-            DrawMenuVolume(418,"总音量","控制游戏的整体音量",audio.MasterVolume,v=>audio.MasterVolume=v);
-            DrawMenuVolume(510,"操作音效","骰子、建造、卡牌与界面反馈",audio.EffectsVolume,v=>audio.EffectsVolume=v);
-            DrawMenuVolume(602,"海岸环境","让轻柔的自然环境陪伴游戏",audio.AmbientVolume,v=>audio.AmbientVolume=v);
+            DrawMenuVolume(365,"总音量","游戏的整体音量",audio.MasterVolume,v=>audio.MasterVolume=v);
+            DrawMenuVolume(422,"操作音效","交易、建造、骑士与卡牌",audio.EffectsVolume,v=>audio.EffectsVolume=v);
+            DrawMenuVolume(479,"背景音乐","舒缓的循环旋律",audio.MusicVolume,v=>audio.MusicVolume=v);
+            DrawMenuVolume(536,"自然环境","随主页风景切换的环境声",audio.AmbientVolume,v=>audio.AmbientVolume=v);
+            DrawMenuVolume(593,"骑士语音","招募和激活骑士的应答",audio.VoiceVolume,v=>audio.VoiceVolume=v);
+            PastoralMenuUI.Label(new Rect(499,663,225,28),"语音语言",17,null,true);
+            int voiceLanguage=PastoralMenuUI.Segments(new Rect(794,656,310,38),audio.VoiceLanguage,new[]{"中文","英语"});
+            if(voiceLanguage!=audio.VoiceLanguage)audio.VoiceLanguage=voiceLanguage;
+            if(PastoralMenuUI.Button(new Rect(1120,656,213,38),"试听骑士语音"))audio.PreviewVoice();
         }
-        else
+        else if(menuSettingsTab==2)
         {
             PastoralMenuUI.Label(new Rect(499,302,800,36),"选择桌面氛围",24,null,true);
             PastoralMenuUI.Label(new Rect(499,351,800,32),"进入对局后的桌面配色，随时也可在游戏菜单中切换。",14,PastoralMenuUI.Muted);
@@ -281,18 +296,39 @@ public sealed partial class M6App
                 PastoralMenuUI.Round(new Rect(r.x+22,r.y+117,r.width-44,40),colors[i%3],7);
                 if(hit)StrategyHudTheme.Select(i);
             }
-            PastoralMenuUI.Label(new Rect(499,652,800,44),"主页以中世纪海港风景呈现，桌面主题用于对局画面。",14,PastoralMenuUI.Muted);
+            PastoralMenuUI.Label(new Rect(499,652,800,44),"想更换主页风景，请打开上方「主页风景」。",14,PastoralMenuUI.Muted);
         }
+        else DrawMenuLandscapeSettings();
         PastoralMenuUI.Fill(new Rect(495,714,838,1),new Color(.48f,.54f,.42f,.20f));
         if(PastoralMenuUI.Button(new Rect(1117,751,216,46),"完成   →",true,true))
         {if(menuPlayerName!=null){LocalPlayerName=menuPlayerName;menuPlayerName=LocalPlayerName;}TabletopAudio.Instance?.FlushSettings();NavigateMainMenu(-1);}
     }
     void DrawMenuVolume(float y,string name,string detail,float value,Action<float> update)
     {
-        PastoralMenuUI.Label(new Rect(499,y,220,27),name,18,null,true);
-        PastoralMenuUI.Label(new Rect(499,y+33,260,24),detail,12,PastoralMenuUI.Muted);
-        float next=PastoralMenuUI.Slider(new Rect(794,y+17,449,20),value);
+        PastoralMenuUI.Label(new Rect(499,y,260,25),name,17,null,true);
+        PastoralMenuUI.Label(new Rect(499,y+27,280,21),detail,12,PastoralMenuUI.Muted);
+        float next=PastoralMenuUI.Slider(new Rect(794,y+13,449,20),value);
         PastoralMenuUI.Label(new Rect(1265,y+6,64,31),Mathf.RoundToInt(next*100)+"%",16,PastoralMenuUI.Forest,false,TextAnchor.MiddleRight);
         if(Mathf.Abs(next-value)>.0001f)update(next);
+    }
+    void DrawMenuLandscapeSettings()
+    {
+        PastoralMenuUI.Label(new Rect(499,276,800,30),"把喜欢的风景留在主页",23,null,true);
+        for(int i=0;i<PastoralMenuScene.ThemeCount;i++)
+        {
+            var r=new Rect(495+i*170,320,158,124);bool chosen=PastoralMenuScene.Selected==i;
+            if(PastoralMenuUI.Button(r,"",true,false,chosen))PastoralMenuScene.Select(i);
+            var image=PastoralMenuScene.Preview(i);
+            if(image!=null)GUI.DrawTexture(new Rect(r.x+6,r.y+6,146,86),image,ScaleMode.ScaleAndCrop);
+            PastoralMenuUI.Label(new Rect(r.x+5,r.y+97,r.width-10,22),PastoralMenuScene.Names[i],15,chosen?PastoralMenuUI.Ivory:PastoralMenuUI.Ink,chosen,TextAnchor.MiddleCenter);
+        }
+        var selected=PastoralMenuScene.Preview(PastoralMenuScene.Selected);
+        PastoralMenuUI.Round(new Rect(495,463,401,226),new Color(.10f,.22f,.18f),10);
+        if(selected!=null)GUI.DrawTexture(new Rect(500,468,391,216),selected,ScaleMode.ScaleAndCrop);
+        PastoralMenuUI.Label(new Rect(923,475,410,33),PastoralMenuScene.Names[PastoralMenuScene.Selected],24,null,true);
+        PastoralMenuUI.Label(new Rect(923,523,410,35),PastoralMenuScene.Descriptions[PastoralMenuScene.Selected],15,PastoralMenuUI.Muted);
+        if(PastoralMenuUI.Button(new Rect(923,577,410,44),PastoralMenuScene.Animated?"动态风景 · 已开启":"动态风景 · 已关闭",true,false,PastoralMenuScene.Animated))
+            PastoralMenuScene.Animated=!PastoralMenuScene.Animated;
+        PastoralMenuUI.Label(new Rect(923,638,410,50),"切换即生效，环境声随风景变化。\n关闭动态后保留静态原画。",13,PastoralMenuUI.Muted);
     }
 }

@@ -439,20 +439,22 @@ public sealed partial class M6App
         }
         else if(networkSettingsPage==1)
         {
-            GUILayout.Label("选择这一桌的玩法",label);GUILayout.Space(13);
-            int selected=GUILayout.Toolbar(menuRule,RuleNames,button,GUILayout.Height(48));
+            // 与本地开局使用相同预览；整个区域保持在首屏视口内。
+            var previewArea=GUILayoutUtility.GetRect(790,288);
+            int selected=GUI.Toolbar(new Rect(previewArea.x,previewArea.y,previewArea.width,42),menuRule,RuleNames,button);
             if(selected!=menuRule){menuRule=selected;menuScenario=0;menuVictoryPoints=null;}
-            GUILayout.Space(28);GUILayout.Label("本局地图",small);
+            MenuMapPreviews.DrawRule(new Rect(previewArea.x,previewArea.y+49,96,60),menuRule);
+            PastoralMenuUI.Label(new Rect(previewArea.x+113,previewArea.y+55,previewArea.width-125,52),RuleDescriptions[menuRule],14,PastoralMenuUI.Muted);
             var ids=ScenarioIds();menuScenario=Mathf.Clamp(menuScenario,0,ids.Length-1);
-            GUILayout.BeginHorizontal();
             if(menuRule==1||menuRule==3)
             {
-                if(GUILayout.Button("‹",button,GUILayout.Width(48),GUILayout.Height(42))){menuScenario=(menuScenario+ids.Length-1)%ids.Length;menuVictoryPoints=null;}
-                GUILayout.Label(ScenarioName(ids[menuScenario]),PastoralMenuUI.Center,GUILayout.Height(42));
-                if(GUILayout.Button("›",button,GUILayout.Width(48),GUILayout.Height(42))){menuScenario=(menuScenario+1)%ids.Length;menuVictoryPoints=null;}
+                if(PastoralMenuUI.Button(new Rect(previewArea.x,previewArea.y+119,43,36),"‹")){menuScenario=(menuScenario+ids.Length-1)%ids.Length;menuVictoryPoints=null;}
+                PastoralMenuUI.Label(new Rect(previewArea.x+57,previewArea.y+119,previewArea.width-114,36),ScenarioName(ids[menuScenario]),18,null,true,TextAnchor.MiddleCenter);
+                if(PastoralMenuUI.Button(new Rect(previewArea.xMax-43,previewArea.y+119,43,36),"›")){menuScenario=(menuScenario+1)%ids.Length;menuVictoryPoints=null;}
             }
-            else GUILayout.Label(menuRule==0?"标准岛屿":"标准城市与骑士地图",label,GUILayout.Height(42));
-            GUILayout.EndHorizontal();GUILayout.Space(25);GUILayout.Label(RuleDescriptions[menuRule],small);
+            else PastoralMenuUI.Label(new Rect(previewArea.x,previewArea.y+119,previewArea.width,36),menuRule==0?"标准岛屿":"标准城市与骑士地图",18,null,true,TextAnchor.MiddleCenter);
+            MenuMapPreviews.DrawScenarioThumbnail(new Rect(previewArea.x+6,previewArea.y+164,175,124),menuRule,ids[menuScenario],menuPlayers);
+            PastoralMenuUI.Label(new Rect(previewArea.x+208,previewArea.y+192,previewArea.width-220,80),MenuMapPreviews.ScenarioCaption(menuRule,ids[menuScenario],menuPlayers),15,PastoralMenuUI.Muted);
         }
         else
         {
