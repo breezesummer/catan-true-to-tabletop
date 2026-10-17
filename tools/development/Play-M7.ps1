@@ -1,3 +1,3 @@
-param([string]$BuildRoot='.local/menu-medieval-v002')
+param([string]$BuildRoot='.local/interaction-v013')
 $ErrorActionPreference='Stop'
 & (Join-Path $PSScriptRoot 'Play-M6.ps1') -BuildRoot $BuildRoot

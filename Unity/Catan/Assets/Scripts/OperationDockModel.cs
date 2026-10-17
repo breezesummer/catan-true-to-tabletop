@@ -174,3 +174,29 @@ public sealed class OperationSelection
         return trade.Receive[receive] > snapshot.Bank[receive] ? "银行库存不足" : null;
     }
 }
+
+// 所有交易均以观看者为左侧；只判断观看者自己的库存，不推测他人的隐藏手牌。
+public sealed class OperationOfferPerspective
+{
+    public bool OwnOffer, Involved;
+    public string OtherSeat;
+    public int[] OwnGive, OtherGive;
+    public static OperationOfferPerspective For(OperationSnapshot s)
+    {
+        var o=s.Offer;bool own=o.Proposer==s.Seat;
+        bool involved=own||o.Recipient==s.Seat||o.IsBroadcast&&s.OtherPlayers.Contains(o.Proposer);
+        return new OperationOfferPerspective{OwnOffer=own,Involved=involved,OtherSeat=own?(o.IsBroadcast?"*":o.Recipient):o.Proposer,
+            OwnGive=involved?(own?o.Give:o.Receive):new int[8],OtherGive=involved?(own?o.Receive:o.Give):o.Give};
+    }
+}
+public static class OperationResourceChoice
+{
+    public static string Add(int good,int amount,Catan.Core.ResourceBag selected,Catan.Core.ResourceBag bank)
+    {
+        if(good<0||good>=5)return "金矿只能领取资源，不能选择商品。";
+        if(selected.Total>=Math.Min(amount,bank.Total))return "已达到可选数量，不允许继续选择。";
+        var resource=(Catan.Core.Resource)good;
+        if(selected[resource]>=bank[resource])return "银行库存不足，不允许选择。";
+        selected[resource]++;return null;
+    }
+}

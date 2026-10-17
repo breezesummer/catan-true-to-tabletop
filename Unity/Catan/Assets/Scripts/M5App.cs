@@ -81,6 +81,7 @@ public sealed partial class M5App : MonoBehaviour
         if(ai!=null&&command==draft&&!DockKnightTargetMatches(command.TargetId)){status="请选择低一级的己方骑士晋升。";return null;}
         command.Id=string.IsNullOrEmpty(command.Id)?Guid.NewGuid().ToString("N"):command.Id;
         dock.Reset();CancelOperationDraft();var result=host.Submit(command);status=result.Success?"操作完成。":result.Message;
+        if(ai!=null&&result.Success&&ai.PresentPlayedCard(host.History(seat),M6Refresh))return result;
         pickField="";board.ClearPreview();view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);Refresh(view);
         if(result.Success)
         {
@@ -508,7 +509,10 @@ public sealed partial class M5App : MonoBehaviour
     }
     public M5LocalGameHost VerificationHost=>host;
     internal PlayerView M6View=>view;
-    internal void M6Refresh(){dock.Reset();seat=ai.HumanSeat;nextSeat=seat;curtain=false;if(NetworkGame)cardArt.Clear();view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);CancelOperationDraft();Refresh(view);status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，从面前拿起棋子与卡牌，或点击地图上的己方棋子。":ai.WaitingText;}
+    internal void M6Refresh(){
+        if(NetworkGame&&ai.WaitForPresentationHistory(ai.Network.View<PlayerView>()?.Events.LastOrDefault()?.Sequence??0,M6Refresh))return;
+        if(ai.PresentPlayedCard(NetworkGame?ai.Network.History:host.History(ai.HumanSeat),M6Refresh))return;
+        dock.Reset();seat=ai.HumanSeat;nextSeat=seat;curtain=false;if(NetworkGame)cardArt.Clear();view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);CancelOperationDraft();Refresh(view);status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，从面前拿起棋子与卡牌，或点击地图上的己方棋子。":ai.WaitingText;}
     internal void M6Visible(bool value){if(board!=null)board.gameObject.SetActive(value);}
     internal void M6Close(){enabled=false;if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}Destroy(this);}
     public M5BoardRenderer VerificationBoard=>board;

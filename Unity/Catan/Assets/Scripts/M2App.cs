@@ -145,6 +145,7 @@ public sealed partial class M2App : MonoBehaviour
         CancelPickup();
         dock.Reset();CancelOperationDraft();var result=host.Submit(command);
         status=result.Success?"操作完成。":"操作未执行："+Reason(result.ErrorCode,result.Message);
+        if(ai!=null&&result.Success&&ai.PresentPlayedCard(host.History(seat),M6Refresh))return result;
         view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);RefreshBoard(view);
         if(result.Success)
         {
@@ -504,6 +505,9 @@ public sealed partial class M2App : MonoBehaviour
     internal PlayerView M6View=>view;
     internal void M6Refresh()
     {
+        if(NetworkGame&&ai.WaitForPresentationHistory(ai.Network.View<PlayerView>()?.Events.LastOrDefault()?.Sequence??0,M6Refresh))return;
+        if(ai.PresentPlayedCard(NetworkGame?ai.Network.History:host.History(ai.HumanSeat),M6Refresh))return;
+
         dock.Reset();CancelOperationDraft();CancelPickup();seat=ai.HumanSeat;nextSeat=seat;curtain=false;if(NetworkGame)cardArt.Clear();view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);
 
         discard=new ResourceBag();offerGive=new ResourceBag();offerReceive=new ResourceBag();
