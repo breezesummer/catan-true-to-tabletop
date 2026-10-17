@@ -27,6 +27,7 @@ public sealed partial class M6App
     {
         historySource = source; historyRevision = revision; lastHistoryRevision = -1;
         historyEntries = Array.Empty<GameHistoryEntry>();
+        ResetCardPresentation(source());
         ResetTabletopAudioHistory();
     }
 }

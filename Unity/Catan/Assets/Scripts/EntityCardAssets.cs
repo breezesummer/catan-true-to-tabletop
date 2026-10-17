@@ -79,13 +79,13 @@ public static class EntityCardAssets
     public static Texture2D ResourceOrCommodityFront(int good) => good >= 0 && good < 8 ? Texture(Good(good).Front) : null;
     // v007：原始照片和印刷比例保持不变，只裁去实体圆角以外的拍摄背景。
     // 纸芯、投影与整面弱受光属于显示层，不重新加工照片或遮挡规则文字。
-    public static void DrawCardFace(Rect area,Texture2D texture,float elevation=0)
+    public static void DrawCardFace(Rect area,Texture2D texture,float elevation=0,Color? tint=null)
     {
         if(texture==null)return;
         var rect=FitCardRect(area,(float)texture.width/texture.height,GUI.matrix);
         DrawPaperDepth(rect,elevation);
         float radius=Mathf.Min(rect.width,rect.height)*.095f;
-        GUI.DrawTexture(rect,texture,ScaleMode.StretchToFill,true,0,Color.white,0,radius);
+        GUI.DrawTexture(rect,texture,ScaleMode.StretchToFill,true,0,tint??Color.white,0,radius);
         DrawPaperLight(rect,radius);
     }
     public static void DrawCardPaper(Rect rect,Color color,float elevation=0)

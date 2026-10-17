@@ -26,6 +26,7 @@ public sealed partial class TabletopUI
     GUIStyle text, small, center, title, button;
     Vector2 scroll;
     bool contextVisible;
+    public bool ContextVisible=>contextVisible;
     Vector2? contextAnchor;
     public Rect CurrentContextRect => contextAnchor.HasValue?new Rect(Mathf.Clamp(contextAnchor.Value.x+14,16,1440-ContextRect.width-16),Mathf.Clamp(contextAnchor.Value.y+10,16,900-ContextRect.height-16),ContextRect.width,ContextRect.height):ContextRect;
     public void SetContextAnchor(Vector2? anchor){contextAnchor=anchor;}

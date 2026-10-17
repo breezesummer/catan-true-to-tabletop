@@ -113,6 +113,7 @@ public sealed class M6PlayerVerification : MonoBehaviour
             stage=rules[i]+"-product-play";
             while(steps<240)
             {
+                while(app.TablePresentationBlocked)yield return null;
                 if(saving&&i==0&&!humanChoiceSaved&&app.IsHumanTurn)
                 {app.WriteSave(Path.Combine(directory,"human-choice.json"));humanChoiceSaved=true;}
                 if(app.IsHumanTurn)humanSteps++;
@@ -126,7 +127,7 @@ public sealed class M6PlayerVerification : MonoBehaviour
             if(saving&&i==0)
             {
                 stage="base-trade";
-                for(int step=0;step<240&&!(app.IsHumanTurn&&Phase=="Action"&&Base.M6View.TradeOffer==null&&Base.M6View.ActivePlayerId==app.HumanSeat&&Base.M6View.OwnResources.Total>0);step++){Advance();if(step%4==0)yield return null;}
+                for(int step=0;step<240&&!(app.IsHumanTurn&&Phase=="Action"&&Base.M6View.TradeOffer==null&&Base.M6View.ActivePlayerId==app.HumanSeat&&Base.M6View.OwnResources.Total>0);step++){while(app.TablePresentationBlocked)yield return null;Advance();if(step%4==0)yield return null;}
                 Require(app.IsHumanTurn&&Phase=="Action"&&Base.M6View.TradeOffer==null&&Base.M6View.ActivePlayerId==app.HumanSeat&&Base.M6View.OwnResources.Total>0,"No natural trade opportunity");
                 var v=Base.M6View;Resource give=Enumerable.Range(0,5).Select(n=>(Resource)n).First(r=>v.OwnResources[r]>0);Resource receive=(Resource)(((int)give+1)%5);
                 var trade=new Catan.Core.M2.Command{Id=Guid.NewGuid().ToString("N"),PlayerId=app.HumanSeat,Kind=Catan.Core.M2.CommandKind.ProposeTrade,OtherPlayerId=v.Players.First(p=>p.Id!=app.HumanSeat).Id,Give=new ResourceBag(),Receive=new ResourceBag()};

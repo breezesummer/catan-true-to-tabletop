@@ -88,7 +88,11 @@ public sealed class TabletopCollectionTimelineTests
         var monopoly = M2Harness.Cmd(M2.CommandKind.PlayMonopoly); monopoly.Resource = Resource.Ore;
         M2Harness.Accepted(game, monopoly);
         timeline.Observe("P1", game.GetHistory("P1"), 10);
-        Assert.Empty(timeline.Active(10.6));
+        var flights=timeline.Active(10.6);
+        Assert.Equal(5,flights.Length);
+        Assert.All(flights,flight=>{Assert.Equal("P1",flight.Player);Assert.Equal(4,flight.Good);Assert.NotNull(flight.SourcePlayerId);});
+        Assert.Equal(2,flights.Count(f=>f.SourcePlayerId=="P2"));Assert.Equal(3,flights.Count(f=>f.SourcePlayerId=="P3"));
+        timeline.Observe("P1",game.GetHistory("P1"),10.7);Assert.Equal(flights,timeline.Active(10.7));
         Assert.Equal(5, game.GetPlayerView("P1").OwnResources.Ore);
     }
 

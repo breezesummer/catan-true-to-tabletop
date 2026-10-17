@@ -11,10 +11,16 @@ public sealed partial class M6App
     readonly List<BuildFlight> buildFlights=new List<BuildFlight>();
     readonly Dictionary<string,BuildGlow> buildGlows=new Dictionary<string,BuildGlow>();
     object buildView;
+    readonly Dictionary<string,GameObject> buildModels=new Dictionary<string,GameObject>();
+    Edge[] movementEdges=Array.Empty<Edge>();
+    PiecePlacement[] movementRoutes=Array.Empty<PiecePlacement>(),movementBuildings=Array.Empty<PiecePlacement>();
     Transform buildBoard,buildEffects;
     Camera buildCamera;
     Func<string,Vector3> buildPosition;
     internal int VerificationBuildFlightCount=>buildFlights.Count;
+    internal int VerificationReplacementOldCount=>buildFlights.Count(f=>f.Replacement&&f.PreviousObject!=null);
+    internal int VerificationMovementWaypoints=>buildFlights.Where(f=>f.Route!=null).Select(f=>f.Route.Length).DefaultIfEmpty(0).Max();
+    internal Vector3 VerificationMovementPosition=>buildFlights.FirstOrDefault(f=>f.Route!=null)?.Object.transform.position??Vector3.zero;
     internal int VerificationBuildVisibleGlowCount => buildGlows.Values.Count(glow=>glow.Object!=null&&glow.RingMaterial!=null&&glow.RingMaterial.shader!=null&&glow.RingMaterial.shader.isSupported&&glow.Object.GetComponent<Renderer>()?.enabled==true);
     internal int VerificationBuildHighlightCount=>buildGlows.Count;
     internal int VerificationBuildHiddenRenderers=>buildFlights.Sum(f=>BuildRoots(f.Piece.LocationId).Sum(r=>r.GetComponentsInChildren<Renderer>().Count(renderer=>!renderer.enabled)));
@@ -33,6 +39,11 @@ public sealed partial class M6App
         public TabletopBuildPiece Piece;
         public GameObject Object;
         public Vector3 Destination;
+        public GameObject PreviousObject;
+        public Vector3[] Route;
+        public float[] RouteLengths;
+        public float RouteLength;
+        public bool Replacement;
         public double Started,Duration;
     }
     sealed class BuildGlow
@@ -50,7 +61,9 @@ public sealed partial class M6App
 
     void ResetBuildPresentation()
     {
-        foreach(var flight in buildFlights)if(flight.Object!=null)Destroy(flight.Object);
+        foreach(var flight in buildFlights.ToArray())FinishBuildFlight(flight);
+        foreach(var model in buildModels.Values)if(model!=null)Destroy(model);
+        buildModels.Clear();
         buildFlights.Clear();
         foreach(var glow in buildGlows.Values)ClearBuildGlow(glow);
         buildGlows.Clear();
@@ -67,6 +80,7 @@ public sealed partial class M6App
         if(presentation is M2App basic&&basic.M6View!=null)
         {
             var v=basic.M6View;view=v;turn=v.Turn;active=v.ActivePlayerId;
+            movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads;movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).ToArray();
             var b=basic.VerificationBoard;
             if(b!=null){board=b.CommittedPieces;camera=b.BoardCamera;table=b.TableScene;position=b.Position;}
             if(!ReferenceEquals(buildView,view))pieces=PublicPieces(v.Board.Settlements,v.Board.Roads,v.Board.Cities).ToArray();
@@ -74,6 +88,7 @@ public sealed partial class M6App
         else if(presentation is M3App sailing&&sailing.M6View!=null)
         {
             var v=sailing.M6View;view=v;turn=v.Turn;active=v.ActivePlayerId;
+            movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads.Concat(v.Board.Ships.Select(p=>new PiecePlacement{PlayerId=p.PlayerId,LocationId=p.LocationId})).ToArray();movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).ToArray();
             var b=sailing.VerificationBoard;if(b!=null){board=b.CommittedPieces;camera=b.BoardCamera;table=b.TableScene;position=b.Position;}
             if(!ReferenceEquals(buildView,view))pieces=PublicPieces(v.Board.Settlements,v.Board.Roads,v.Board.Cities)
                 .Concat(v.Board.Ships.Select(p=>new TabletopBuildPiece{Kind="ship",PlayerId=p.PlayerId,LocationId=p.LocationId})).ToArray();
@@ -81,6 +96,7 @@ public sealed partial class M6App
         else if(presentation is M4App cities&&cities.M6View!=null)
         {
             var v=cities.M6View;view=v;turn=v.Turn;active=v.ActivePlayerId;
+            movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads;movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).Concat(v.Board.Knights.Select(k=>new PiecePlacement{PlayerId=k.PlayerId,LocationId=k.LocationId})).ToArray();
             var b=cities.VerificationBoard;if(b!=null){board=b.CommittedPieces;camera=b.BoardCamera;table=b.TableScene;position=b.Position;}
             if(!ReferenceEquals(buildView,view))pieces=ExpandedPieces(PublicPieces(v.Board.Settlements,v.Board.Roads,v.Board.Cities),
                 v.Board.Walls.Select(p=>p.LocationId),v.Board.Metropolises.Select(p=>p.LocationId))
@@ -89,6 +105,7 @@ public sealed partial class M6App
         else if(presentation is M5App combined&&combined.M6View!=null)
         {
             var v=combined.M6View;view=v;turn=v.Turn;active=v.ActivePlayerId;
+            movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads.Concat(v.Board.Ships.Select(p=>new PiecePlacement{PlayerId=p.PlayerId,LocationId=p.LocationId})).ToArray();movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).Concat(v.Board.Knights.Select(k=>new PiecePlacement{PlayerId=k.PlayerId,LocationId=k.LocationId})).ToArray();
             var b=combined.VerificationBoard;if(b!=null){board=b.CommittedPieces;camera=b.BoardCamera;table=b.TableScene;position=b.Position;}
             if(!ReferenceEquals(buildView,view))pieces=ExpandedPieces(PublicPieces(v.Board.Settlements,v.Board.Roads,v.Board.Cities),
                 v.Board.Walls.Select(p=>p.LocationId),v.Board.Metropolises.Select(p=>p.LocationId))
@@ -104,7 +121,8 @@ public sealed partial class M6App
             var additions=buildTimeline.Observe(turn,active,pieces);
             foreach(var stale in buildFlights.Where(flight=>!buildTimeline.Contains(flight.Piece)).ToArray())FinishBuildFlight(stale);
             foreach(var piece in additions)
-                if(IsAiBuildSeat(piece.PlayerId))StartBuildFlight(piece);
+                if(piece.Previous!=null||IsAiBuildSeat(piece.PlayerId))StartBuildFlight(piece);
+            CacheBuildModels(pieces);
             SynchronizeBuildGlows();
         }
         AnimateBuildFlights();
@@ -138,19 +156,60 @@ public sealed partial class M6App
             if(name==location||name.StartsWith(location+" [",StringComparison.Ordinal)||name.EndsWith(" "+location,StringComparison.Ordinal)||name.Contains(" "+location+" ["))yield return root;
         }
     }
-    void StartBuildFlight(TabletopBuildPiece piece)
+    GameObject CopyBuildModel(string location)
     {
-        // 使用已落盘的同一网格复制展示；原模型临时隐藏，落地时恢复。
-        var destination=buildPosition(piece.LocationId);
-        var root=new GameObject(piece.PlayerId+" 建造 "+piece.Kind+" "+piece.LocationId);root.transform.SetParent(buildEffects,false);root.transform.position=destination;
-        foreach(var model in BuildRoots(piece.LocationId))
+        var root=new GameObject("展示模型 "+location);root.transform.SetParent(buildEffects,false);root.transform.position=buildPosition(location);
+        foreach(var model in BuildRoots(location))
         {
             var copy=Instantiate(model.gameObject,root.transform,true);
-            foreach(var renderer in copy.GetComponentsInChildren<Renderer>())renderer.enabled=true;
+            var originals=model.GetComponentsInChildren<Renderer>();var copies=copy.GetComponentsInChildren<Renderer>();
+            for(int i=0;i<copies.Length;i++)
+            {
+                copies[i].enabled=true;
+                var paint=buildGlows.Values.SelectMany(g=>g.Materials).FirstOrDefault(m=>m.Renderer==originals[i]);
+                if(paint!=null)copies[i].sharedMaterials=paint.Original;
+            }
             foreach(var collider in copy.GetComponentsInChildren<Collider>()){collider.enabled=false;Destroy(collider);}
         }
-        if(root.transform.childCount==0){Destroy(root);return;}
-        buildFlights.Add(new BuildFlight{Piece=piece,Object=root,Destination=destination,Started=Time.unscaledTimeAsDouble,Duration=TabletopAiSpeed.FlightDuration(AiSpeedLevel)});
+        if(root.transform.childCount==0){Destroy(root);return null;}return root;
+    }
+    void CacheBuildModels(TabletopBuildPiece[] pieces)
+    {
+        foreach(var model in buildModels.Values)if(model!=null)Destroy(model);buildModels.Clear();
+        foreach(var piece in pieces)
+        {
+            var model=CopyBuildModel(piece.LocationId);if(model==null)continue;
+            model.SetActive(false);buildModels[piece.Identity]=model;
+        }
+    }
+    void StartBuildFlight(TabletopBuildPiece piece)
+    {
+        var root=CopyBuildModel(piece.LocationId);if(root==null)return;
+        Vector3 destination=buildPosition(piece.LocationId);
+        var flight=new BuildFlight{Piece=piece,Object=root,Destination=destination,Started=Time.unscaledTimeAsDouble,Duration=TabletopAiSpeed.FlightDuration(AiSpeedLevel)};
+        if(piece.Previous!=null)
+        {
+            flight.Duration=Math.Max(.95,flight.Duration);
+            flight.Replacement=piece.Previous.LocationId==piece.LocationId;
+            if(flight.Replacement&&buildModels.TryGetValue(piece.Previous.Identity,out var old)&&old!=null)
+            {flight.PreviousObject=Instantiate(old,buildEffects);flight.PreviousObject.SetActive(true);}
+            if(!flight.Replacement)
+            {
+                var route=piece.Kind=="knight"?TabletopMovementPath.Find(piece.Previous.LocationId,piece.LocationId,piece.PlayerId,movementEdges,movementRoutes,movementBuildings):Array.Empty<string>();
+                flight.Route=route.Length>0?route.Select(buildPosition).ToArray():new[]{buildPosition(piece.Previous.LocationId),destination};
+                flight.RouteLengths=new float[flight.Route.Length];
+                for(int i=1;i<flight.Route.Length;i++){flight.RouteLength+=Vector3.Distance(flight.Route[i-1],flight.Route[i]);flight.RouteLengths[i]=flight.RouteLength;}
+                flight.Duration=Math.Max(flight.Duration,.55+flight.RouteLength*3);
+            }
+        }
+        buildFlights.Add(flight);
+    }
+    Vector3 MovementPosition(BuildFlight flight,float progress)
+    {
+        float distance=progress*flight.RouteLength;
+        for(int i=1;i<flight.Route.Length;i++)
+            if(distance<=flight.RouteLengths[i])return Vector3.Lerp(flight.Route[i-1],flight.Route[i],Mathf.InverseLerp(flight.RouteLengths[i-1],flight.RouteLengths[i],distance));
+        return flight.Destination;
     }
     void AnimateBuildFlights()
     {
@@ -158,25 +217,42 @@ public sealed partial class M6App
         foreach(var flight in buildFlights.ToArray())
         {
             float t=Mathf.Clamp01((float)((now-flight.Started)/flight.Duration));
-            if(flight.Object==null||t>=1)
-            {
-                FinishBuildFlight(flight);continue;
-            }
+            if(flight.Object==null||t>=1){FinishBuildFlight(flight);continue;}
             foreach(var target in BuildRoots(flight.Piece.LocationId))foreach(var renderer in target.GetComponentsInChildren<Renderer>())renderer.enabled=false;
-            // 头像是固定 HUD 坐标；射线反投影使不同缩放与宽高比下仍从头像飞出。
-            var avatar=TabletopUI.PlayerAvatarRect(int.Parse(flight.Piece.PlayerId.Substring(1))-1,PlayerCount);
-            var ray=buildCamera.ViewportPointToRay(new Vector3(avatar.center.x/1440,1-avatar.center.y/900,0));
-            var plane=new Plane(Vector3.up,new Vector3(0,.035f,0));
-            var start=plane.Raycast(ray,out float distance)?ray.GetPoint(distance):flight.Destination+Vector3.up*.15f;
-            float smooth=t*t*(3-2*t);
-            flight.Object.transform.position=Vector3.Lerp(start,flight.Destination,smooth)+Vector3.up*(Mathf.Sin(t*Mathf.PI)*.065f);
-            flight.Object.transform.localScale=Vector3.one*Mathf.Lerp(1.35f,1,t);
+            if(flight.Replacement)
+            {
+                // 旧棋子先抬起缩小，新棋子随后从上方落入同一锚点，城墙／大都会一并替换。
+                float take=Mathf.SmoothStep(0,1,t/.48f),put=Mathf.SmoothStep(0,1,(t-.43f)/.57f);
+                if(flight.PreviousObject!=null)
+                {
+                    flight.PreviousObject.transform.position=flight.Destination+Vector3.up*(take*.055f);
+                    flight.PreviousObject.transform.localScale=Vector3.one*(1-take);
+                }
+                flight.Object.transform.position=flight.Destination+Vector3.up*((1-put)*.055f);
+                flight.Object.transform.localScale=Vector3.one*put;
+            }
+            else if(flight.Route!=null)
+            {
+                float travel=Mathf.SmoothStep(0,1,Mathf.InverseLerp(.16f,.84f,t));
+                float lift=Mathf.SmoothStep(0,1,t/.16f)*(1-Mathf.SmoothStep(0,1,(t-.84f)/.16f));
+                flight.Object.transform.position=MovementPosition(flight,travel)+Vector3.up*(lift*.026f);
+            }
+            else
+            {
+                var avatar=TabletopUI.PlayerAvatarRect(int.Parse(flight.Piece.PlayerId.Substring(1))-1,PlayerCount);
+                var ray=buildCamera.ViewportPointToRay(new Vector3(avatar.center.x/1440,1-avatar.center.y/900,0));
+                var plane=new Plane(Vector3.up,new Vector3(0,.035f,0));
+                var start=plane.Raycast(ray,out float distance)?ray.GetPoint(distance):flight.Destination+Vector3.up*.15f;
+                float smooth=t*t*(3-2*t);
+                flight.Object.transform.position=Vector3.Lerp(start,flight.Destination,smooth)+Vector3.up*(Mathf.Sin(t*Mathf.PI)*.065f);
+                flight.Object.transform.localScale=Vector3.one*Mathf.Lerp(1.35f,1,t);
+            }
         }
     }
     void FinishBuildFlight(BuildFlight flight)
     {
         foreach(var target in BuildRoots(flight.Piece.LocationId))foreach(var renderer in target.GetComponentsInChildren<Renderer>())renderer.enabled=true;
-        if(flight.Object!=null)Destroy(flight.Object);buildFlights.Remove(flight);
+        if(flight.Object!=null)Destroy(flight.Object);if(flight.PreviousObject!=null)Destroy(flight.PreviousObject);buildFlights.Remove(flight);
     }
     void SynchronizeBuildGlows()
     {

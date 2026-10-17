@@ -157,9 +157,9 @@ public sealed partial class M4App
     {
         Styles();GUI.matrix=MobileTabletop.GuiMatrix;cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TableMenuOpen&&!tabletop.HistoryOpen;GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
+        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen;GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
         TabletopUI.DrawMapLabels(DrawBoardLabels);
-        tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TableMenuOpen);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
+        tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.PlayerName=ai.PlayerDisplayName;dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TablePresentationBlocked);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
         tabletop.BindDiscard(Operations(),dock);
         tabletop.BindLongestRoad(view.LongestRoadPlayerId,view.Players.FirstOrDefault(p=>p.Id==view.LongestRoadPlayerId)?.LongestRoadLength??0);
@@ -176,7 +176,8 @@ public sealed partial class M4App
         GUI.enabled=tableEnabled&&!dock.HasOverlay;
         if(OperationContextVisible)tabletop.DrawContext(operationActions?"棋子行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):"当前选择",DrawOperationControls);
         GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
-        tabletop.HandFlightsVisible=dock.ResourceHandVisible;if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableMenuOpen)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
+        tabletop.HandFlightsVisible=dock.ResourceHandVisible;if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TablePresentationBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
+        ai.TableOverlayOpen=dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen;
         ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
     }
     void EndTableTurn()

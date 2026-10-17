@@ -203,6 +203,23 @@ public sealed class TabletopCollectionTimeline
                     });
                 }
             }
+            // 垄断等卡牌的公开转移从失去资源的玩家飞出，绝不冒充银行产出。
+            // 私有偷取仍不生成资源正面；只使用投影历史已经公开的种类和数量。
+            if(entry.Kind=="PlayMonopoly"||entry.Kind=="PlayProgressCard")foreach(var group in changes.GroupBy(c=>c.GoodIndex))
+            {
+                var donors=group.Where(c=>c.Amount<0).ToArray();var remaining=donors.Select(c=>-c.Amount).ToArray();
+                int bank=Math.Max(0,group.Sum(c=>c.Amount));
+                foreach(var gain in group.Where(c=>c.Amount>0))
+                {
+                    int bankPart=Math.Min(bank,gain.Amount);bank-=bankPart;int needed=gain.Amount-bankPart;
+                    for(int donor=0;donor<donors.Length&&needed>0;donor++)
+                    {
+                        int amount=Math.Min(needed,remaining[donor]);needed-=amount;remaining[donor]-=amount;
+                        for(int i=0;i<amount;i++)flights.Add(new TabletopCollectionFlight{
+                            Player=gain.PlayerId,Good=gain.GoodIndex,SourcePlayerId=donors[donor].PlayerId,Started=now+Math.Min(.55,ordinal++*.06)});
+                    }
+                }
+            }
             if(production&&changes.Any(c=>c.Amount>0))productionPending=false;
             var cardChanges=(entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>()).Where(c=>c.Category=="development"||c.Category=="progress").ToArray();
             foreach(var gain in cardChanges.Where(c=>c.Amount>0))
