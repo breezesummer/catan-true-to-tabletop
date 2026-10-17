@@ -49,6 +49,15 @@ public sealed class OperationBuild
     public int[] Cost = new int[8];
     public bool Available;
     public string UnavailableReason;
+    // 缓存只保存当前规则视图的条件；菜单和展示动画的临时阻塞每帧单独判断。
+    public void ConfigureAvailability(bool legal, int[] owned, bool requiresSupply = true)
+    {
+        bool enough = Enumerable.Range(0, 8).All(i => owned[i] >= Cost[i]);
+        bool stocked = !requiresSupply || Count > 0;
+        Available = stocked && legal && enough;
+        UnavailableReason = !stocked ? "库存已用尽" : !enough ? "缺少所需资源" : !legal ? "当前阶段或连接条件没有合法目标" : null;
+    }
+    public bool CanPrepare(OperationSnapshot snapshot) => Available && snapshot != null && snapshot.CanInteract;
 }
 public sealed class OperationHandCard
 {

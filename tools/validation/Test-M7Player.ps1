@@ -2,12 +2,13 @@ param(
     [string]$BuildRoot='.local/m7-v001',
     [string]$Endpoint='https://127.0.0.1:47781',
     [Parameter(Mandatory=$true)][string]$FingerprintFile,
-    [int]$TimeoutSeconds=240
+    [int]$TimeoutSeconds=240,
+    [int]$DiscoveryPort=47772
 )
 $ErrorActionPreference='Stop'
 $m7Repo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $m7Root=[IO.Path]::GetFullPath((Join-Path $m7Repo $BuildRoot))
-$m7Player=Join-Path $m7Root 'Builds/Windows/CatanM6.exe'
+$m7Player=Join-Path $m7Root 'Builds/Windows/CatanM7.exe'
 $m7Fingerprint=(Get-Content -Raw -LiteralPath $FingerprintFile).Trim()
 $m7Modes=@(
     @{Rule='base';Scenario='base';Players=3},
@@ -19,7 +20,7 @@ foreach($m7Mode in $m7Modes){
     $m7Output=Join-Path $m7Root ('player-network/'+$m7Mode.Rule)
     New-Item -ItemType Directory -Force -Path $m7Output | Out-Null
     $m7Configuration=Join-Path $m7Output 'configuration.json'
-    @{Endpoint=$Endpoint;CertificateFingerprint=$m7Fingerprint;RuleSet=$m7Mode.Rule;ScenarioId=$m7Mode.Scenario;OutputDirectory=$m7Output;PlayerCount=$m7Mode.Players;MinimumTurn=3;TimeoutSeconds=$TimeoutSeconds} | ConvertTo-Json | Set-Content -LiteralPath $m7Configuration -Encoding UTF8
+    @{Endpoint=$Endpoint;CertificateFingerprint=$m7Fingerprint;RuleSet=$m7Mode.Rule;ScenarioId=$m7Mode.Scenario;OutputDirectory=$m7Output;PlayerCount=$m7Mode.Players;MinimumTurn=3;TimeoutSeconds=$TimeoutSeconds;DiscoveryPort=$DiscoveryPort} | ConvertTo-Json | Set-Content -LiteralPath $m7Configuration -Encoding UTF8
     $m7Log=Join-Path $m7Output 'player.log'
     $m7Args=@('-force-d3d11','-screen-fullscreen','0','-screen-width','1440','-screen-height','900','--m7-verify',('"'+$m7Configuration+'"'),'-logFile',('"'+$m7Log+'"'))
     $m7Process=Start-Process -FilePath $m7Player -ArgumentList $m7Args -WindowStyle Hidden -PassThru

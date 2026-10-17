@@ -1,4 +1,4 @@
-param([string]$BuildRoot='.local/release-1.6')
+param([string]$BuildRoot='.local/lan-repair-20261017')
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Player = Join-Path $m6RepoRoot "$BuildRoot/Builds/Windows/CatanM7.exe"

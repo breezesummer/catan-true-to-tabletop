@@ -46,12 +46,13 @@ public sealed class OperationUiVerification : MonoBehaviour
         Directory.CreateDirectory(directory);
         foreach(string rules in new[]{"base","seafarers","cities-knights","combined"})
         {
-            mode=rules;app.StartGame(mode,"heading-for-new-shores",3,"P1",true);
+            mode=rules;StartVerificationGame();
             yield return null;yield return null;
-            var initial=Snapshot;Require(initial!=null&&initial.Seat=="P1","Wrong private snapshot seat");
+            var initial=Snapshot;Require(initial!=null&&initial.Seat==app.HumanSeat,"Wrong private snapshot seat");
             Require(initial.Builds.Count>=4,"Inventory missing");
             Require(initial.GoodCount==(mode=="base"||mode=="seafarers"?5:8),"Goods mismatch");
             Require(initial.Builds.Count(b=>b.Track>=0)==(initial.GoodCount==8?3:0),"Facilities mismatch");
+            CheckCachedAvailabilityAfterMenu();
             string before=app.ExportEnvelope();
             var build=initial.Builds.First();Dock.Selection.Sync(initial);Dock.Selection.Choose(build,initial.Goods);
             Require(before==app.ExportEnvelope(),"Selection mutated authority");Dock.Reset();
@@ -95,6 +96,49 @@ public sealed class OperationUiVerification : MonoBehaviour
             app.ShowMenu();Require(!app.StepAi(),"Menu advanced AI");app.ResumeGame();yield return null;
         }
         File.WriteAllText(Path.Combine(directory,"result.json"),"{\"status\":\"passed\",\"modes\":4,\"checks\":"+checks+",\"unity\":\""+Application.unityVersion+"\"}");
+    }
+    void StartVerificationGame()
+    {
+        // 正常开局会随机决定先手；验收选先手的建筑颜色，不能假定 P1 总是先行动。
+        string authority,human;const uint seed=20261017;
+        switch(mode)
+        {
+            case "base":
+                var basic=Catan.Core.M2.BaseGameSession.Create(Resources.Load<TextAsset>("m1-scenario").text,3,seed);
+                human=basic.GetPlayerView("P1").ActivePlayerId;authority=basic.Save();break;
+            case "seafarers":
+                var sailing=Catan.Core.M3.SeafarersGameSession.Create("heading-for-new-shores",3,seed);
+                human=sailing.GetPlayerView("P1").ActivePlayerId;authority=sailing.Save();break;
+            case "cities-knights":
+                var cities=Catan.Core.M4.CitiesKnightsGameSession.Create(Resources.Load<TextAsset>("m1-scenario").text,3,seed);
+                human=cities.GetPlayerView("P1").ActivePlayerId;authority=cities.Save();break;
+            default:
+                var combined=Catan.Core.M5.CombinedGameSession.Create("heading-for-new-shores",3,seed);
+                human=combined.GetPlayerView("P1").ActivePlayerId;authority=combined.Save();break;
+        }
+        app.StartGame(mode,"heading-for-new-shores",3,human,true,authority);
+    }
+    void CheckCachedAvailabilityAfterMenu()
+    {
+        Require(app.IsHumanTurn,"缓存恢复验收必须从正常的人类先手回合开始");
+        string before=app.ExportEnvelope();
+        app.OpenTableMenu();
+        // 强制在展示阻塞期间首次投影同一个规则视图，复现曾经缓存为不可用的情况。
+        switch(mode)
+        {
+            case "base":GetComponent<M2App>().M7PreviewRefresh();break;
+            case "seafarers":GetComponent<M3App>().M7PreviewRefresh();break;
+            case "cities-knights":GetComponent<M4App>().M7PreviewRefresh();break;
+            default:GetComponent<M5App>().M7PreviewRefresh();break;
+        }
+        var cached=Snapshot;
+        var build=cached.Builds.FirstOrDefault(b=>b.Id=="SetupSettlement"&&b.Available);
+        Require(build!=null,"展示阻塞被缓存进合法建造的可用性");
+        Require(!build.CanPrepare(cached),"暂停菜单期间仍可准备建造");
+        app.HandleTableEscape();
+        Require(ReferenceEquals(cached,Snapshot),"关闭菜单不应依赖新规则视图");
+        Require(build.CanPrepare(Snapshot),"关闭菜单后合法建造未恢复，仍依赖交易刷新");
+        Require(before==app.ExportEnvelope(),"刷新建造可用性改变了权威状态");
     }
     void Advance()
     {

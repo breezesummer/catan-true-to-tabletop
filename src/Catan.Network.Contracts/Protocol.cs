@@ -4,7 +4,7 @@ namespace Catan.Network.Contracts
 {
     public static class NetworkProtocol
     {
-        public const int Version = 1;
+        public const int Version = 2;
         public const int MaximumRequestBytes = 65536;
         public const int MaximumResponseBytes = 4194304;
         public static string RulesVersion(string ruleSet)
@@ -34,7 +34,7 @@ namespace Catan.Network.Contracts
     {
         public int ProtocolVersion = NetworkProtocol.Version;
         public string RequestId;
-        // List, Create, Join, Reconnect, Get, History, Seat, Ready, Configure, Start, Command, Preview, Leave, Transfer.
+        // List, Describe, Create, Join, Reconnect, Get, History, Rename, Seat, Ready, Configure, Start, Command, Preview, Leave, Transfer, Recover, Revoke.
         public string Operation;
         public string RoomId;
         public string Credential;
@@ -64,6 +64,8 @@ namespace Catan.Network.Contracts
         public long CommittedRevision;
         public bool IsDuplicate;
         public string SeatId;
+        // 对局中由 AI 托管或等待下一自身回合接回时为 false；读取自己的可见局面仍获允许。
+        public bool HumanControlAvailable;
         public string RuleSet;
         public string ViewJson;
         public string HistoryJson;
@@ -81,7 +83,7 @@ namespace Catan.Network.Contracts
         public int? TargetVictoryPoints;
         public bool Listed = true;
         public string[] AiSeats = Array.Empty<string>();
-        // 已确认掉线等待，不自动托管；已保存房间不自动删除。
+        // 掉线由 AI 托管，重连在下一自身行动回合接回；权威存档保留。
     }
     public sealed class CreateRoomPayload
     {
@@ -91,6 +93,7 @@ namespace Catan.Network.Contracts
     }
     public sealed class JoinRoomPayload { public string DisplayName = "玩家"; public string Password; public string SeatId; }
     public sealed class SeatPayload { public string SeatId; }
+    public sealed class NamePayload { public string DisplayName; }
     public sealed class ReadyPayload { public bool Ready; }
     public sealed class HistoryPayload { public long AfterSequence; public int Limit = 100; }
     public sealed class RoomSummary
@@ -113,5 +116,5 @@ namespace Catan.Network.Contracts
         public long Revision;
         public SeatSummary[] Seats = Array.Empty<SeatSummary>();
     }
-    public sealed class SeatSummary { public string SeatId; public string DisplayName; public bool IsAi; public bool Ready; public bool Connected; public bool Occupied; }
+    public sealed class SeatSummary { public string SeatId; public string DisplayName; public bool IsAi; public bool ControlledByAi; public bool RejoinPending; public bool Ready; public bool Connected; public bool Occupied; }
 }

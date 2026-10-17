@@ -111,7 +111,9 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options)
             catch { enqueue(Error("InvalidMessage", "请求格式无效，未执行操作。")); continue; }
             if (request == null) { enqueue(Error("InvalidMessage", "请求不能为空。")); continue; }
             var current = binding.Read();
-            if (current != null && request.Operation != "List" && (request.ConnectionId != current.ConnectionId || request.Credential != current.Credential || request.RoomId != current.RoomId))
+            bool mayChangeRoom = request.Operation == "Create" || request.Operation == "Join" || request.Operation == "Reconnect";
+            bool publicQuery = request.Operation == "List" || request.Operation == "Describe";
+            if (current != null && !mayChangeRoom && !publicQuery && (request.ConnectionId != current.ConnectionId || request.Credential != current.Credential || request.RoomId != current.RoomId))
             {
                 enqueue(Error("ConnectionMismatch", "此连接已绑定原席位，请重新建立连接。", request.RequestId));
                 continue;
@@ -121,8 +123,9 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options)
             if (response.Success && !string.IsNullOrEmpty(response.ConnectionId) && !string.IsNullOrEmpty(response.RoomId))
             {
                 // 登记流程的长期凭据由客户端预先保存，成功回复不会再回传。
-                var credential = string.IsNullOrEmpty(response.Credential) ? request.Credential ?? request.EnrollmentCredential : response.Credential;
+                var credential = string.IsNullOrEmpty(response.Credential) ? mayChangeRoom && request.EnrollmentCredential != null ? request.EnrollmentCredential : request.Credential : response.Credential;
                 binding.Write(new NetworkRequest { Operation = "Get", RoomId = response.RoomId, ConnectionId = response.ConnectionId, Credential = credential });
+                if (current != null && current.ConnectionId != response.ConnectionId) rooms.Disconnect(current.ConnectionId);
             }
             if (response.Success && (request.Operation == "Leave" || request.Operation == "Revoke")) binding.Write(null);
         }
@@ -137,6 +140,8 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options)
             var request = binding.Read();
             if (request == null) continue;
             var response = Dispatch(request);
+            // 切房与推送可同时发生，旧房快照不能覆盖已经切换的新房界面。
+            if (!ReferenceEquals(request, binding.Read())) continue;
             response.RequestId = null;
             // 推送仍经过身份与当前控制权检查，只生成绑定席位的可见视图。
             if (response.Success) response.Code = "Push";

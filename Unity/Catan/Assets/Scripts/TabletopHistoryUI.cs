@@ -57,14 +57,14 @@ public sealed partial class TabletopHistoryUI
         if(ModernOperationUI.Button(new Rect(x,Window.y+70,108,34),"全部玩家",true,false,filter==null)){filter=null;historyScroll=diceScroll=Vector2.zero;}x+=118;
         foreach(var player in players)
         {
-            if(ModernOperationUI.Button(new Rect(x,Window.y+70,108,34),player,true,false,filter==player)){filter=player;historyScroll=diceScroll=Vector2.zero;}x+=118;
+            if(ModernOperationUI.Button(new Rect(x,Window.y+70,108,34),M6App.PlayerLabel(player),true,false,filter==player)){filter=player;historyScroll=diceScroll=Vector2.zero;}x+=118;
         }
         if(showDice)
         {
             var dice=new TabletopDiceHistory(entries,filter);
             DrawDiceStatistics(new Rect(Window.x+24,Window.y+126,420,Window.height-168),dice);
             diceScroll=DrawDiceRows(new Rect(Window.x+468,Window.y+126,Window.width-492,Window.height-168),dice.Rolls,diceScroll);
-            ModernOperationUI.Label(new Rect(Window.x+24,Window.yMax-30,650,22),"共 "+dice.Total+" 次掷骰"+(filter==null?"":" · 与 "+filter+" 相关"),ModernOperationUI.Small);
+            ModernOperationUI.Label(new Rect(Window.x+24,Window.yMax-30,650,22),"共 "+dice.Total+" 次掷骰"+(filter==null?"":" · 与 "+M6App.PlayerLabel(filter)+" 相关"),ModernOperationUI.Small);
             if(ModernOperationUI.Button(new Rect(Window.xMax-132,Window.yMax-34,106,25),"最新 ↓"))diceScroll.y=float.MaxValue;
             return;
         }
@@ -99,7 +99,7 @@ public sealed partial class TabletopHistoryUI
             float y=i*44;if(y+44<position.y||y>position.y+viewport.height)continue;
             var entry=entries[i];
             ModernOperationUI.Fill(new Rect(0,y+8,3,22),BoardRenderer.SeatColor(entry.PlayerId));
-            ModernOperationUI.Label(new Rect(12,y+5,185,30),"第 "+entry.Turn+" 回合 · "+entry.PlayerId);
+            ModernOperationUI.Label(new Rect(12,y+5,185,30),"第 "+entry.Turn+" 回合 · "+M6App.PlayerLabel(entry.PlayerId));
             Die(new Rect(211,y+5,28,28),entry.Dice1,new Color(.64f,.11f,.08f),false);
             Die(new Rect(245,y+5,28,28),entry.Dice2,new Color(.94f,.90f,.80f),false);
             if(!string.IsNullOrEmpty(entry.EventDie))Die(new Rect(279,y+5,28,28),EventFace(entry.EventDie),new Color(.21f,.25f,.27f),true);
@@ -116,7 +116,7 @@ public sealed partial class TabletopHistoryUI
         int columns=Math.Max(1,(int)(width/(compact?140:210)));
         return Math.Max(compact?22:28,header)+(entry.Dice1>0?34:0)+((changes+columns-1)/columns)*32+14;
     }
-    static string Caption(GameHistoryEntry entry)=>"第 "+entry.Turn+" 回合 · "+entry.PlayerId+"  "+entry.Action;
+    static string Caption(GameHistoryEntry entry)=>"第 "+entry.Turn+" 回合 · "+M6App.PlayerLabel(entry.PlayerId)+"  "+entry.Action;
     Vector2 DrawRows(Rect viewport,GameHistoryEntry[] entries,Vector2 position,bool compact)
     {
         MobileTabletop.ScrollTouch(viewport,ref position);
@@ -154,16 +154,17 @@ public sealed partial class TabletopHistoryUI
             var change=changes[i];float x=r.x+(i%columns)*cell+9,cy=y+(i/columns)*32;
             var label=new GUIStyle(ModernOperationUI.Small);label.normal.textColor=change.Amount<0?new Color(.95f,.64f,.51f):new Color(.60f,.83f,.68f);
             string amount=(change.Amount>0?"+":"")+change.Amount;
-            ModernOperationUI.Label(new Rect(x,cy,38,27),change.PlayerId,label);
+            float nameWidth=Math.Min(105,cell*.46f);
+            ModernOperationUI.Label(new Rect(x,cy,nameWidth,27),M6App.PlayerLabel(change.PlayerId),new GUIStyle(label){fontSize=10,wordWrap=true});
             if(change.GoodIndex>=0&&change.GoodIndex<8)
             {
-                OperationIconAssets.DrawGood(new Rect(x+33,cy+1,25,25),change.GoodIndex);
-                ModernOperationUI.Label(new Rect(x+64,cy,cell-74,28),amount,label);
+                OperationIconAssets.DrawGood(new Rect(x+nameWidth+3,cy+1,25,25),change.GoodIndex);
+                ModernOperationUI.Label(new Rect(x+nameWidth+32,cy,cell-nameWidth-42,28),amount,label);
             }
             else
             {
                 string name=!string.IsNullOrEmpty(change.Name)?change.Name:change.Category=="resource-count"?"手牌":"卡牌";
-                ModernOperationUI.Label(new Rect(x+33,cy,cell-45,29),amount+" "+name,label);
+                ModernOperationUI.Label(new Rect(x+nameWidth+3,cy,cell-nameWidth-14,29),amount+" "+name,label);
             }
         }
         ModernOperationUI.Fill(new Rect(r.x+7,r.yMax-5,r.width-14,1),new Color(.24f,.32f,.31f,.45f));

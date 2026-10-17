@@ -20,7 +20,9 @@ public sealed partial class M6App
         if(seat=="*")return "所有玩家";
         var named=NetworkGame?Network.Room?.Seats.FirstOrDefault(s=>s.SeatId==seat):null;
         if(named!=null&&!string.IsNullOrWhiteSpace(named.DisplayName))return named.DisplayName;
-        return seat==HumanSeat?"你 · "+seat:"玩家 "+seat;
+        if(seat==HumanSeat)return LocalPlayerName;
+        int index;
+        return seat!=null&&seat.Length==2&&int.TryParse(seat.Substring(1),out index)&&index>=1&&index<=localPlayerNames.Length?localPlayerNames[index-1]:ColorLabel(seat);
     }
     void ResetCardPresentation(GameHistoryEntry[] history=null)
     {
@@ -43,7 +45,7 @@ public sealed partial class M6App
     }
     internal bool WaitForPresentationHistory(long sequence,Action applyView)
     {
-        if((Network.History.LastOrDefault()?.Sequence??0)>=sequence)return false;
+        if(sequence<=presentedSequence||(Network.History.LastOrDefault()?.Sequence??0)>=sequence)return false;
         pendingNetworkSequence=sequence;pendingNetworkPresentation=applyView;return true;
     }
     void UpdateCardPresentation()

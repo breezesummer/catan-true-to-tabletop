@@ -245,7 +245,7 @@ public sealed partial class OperationDock
         for(int i=0;i<pieces.Length;i++)
         {
             var group=StockGroupLayout(pieces,i,false);
-            TabletopPieceDock.DrawFrame(group,Selection.BuildId==pieces[i].Id,pieces[i].Available);
+            TabletopPieceDock.DrawFrame(group,Selection.BuildId==pieces[i].Id,pieces[i].CanPrepare(s));
             DrawBuild(group,pieces[i],s);
         }
     }
@@ -304,7 +304,7 @@ public sealed partial class OperationDock
     }
     void PrepareBuild(OperationBuild build,OperationSnapshot s)
     {
-        if(!build.Available||!s.CanInteract){s.Notify?.Invoke(build.UnavailableReason??"当前不能使用");return;}
+        if(!build.CanPrepare(s)){s.Notify?.Invoke(!s.CanInteract?"等待当前行动或待决席位":build.UnavailableReason??"当前不能使用");return;}
         s.Cancel?.Invoke();Selection.Choose(build,s.Goods);tradeOpen=false;previewCard=null;message="";
         s.PrepareBuild?.Invoke(build);
     }
@@ -323,7 +323,7 @@ public sealed partial class OperationDock
         for(int i=pieceFaces.Count-1;i>=0;i--)if(pieceFaces[i].Shape.Contains(e.mousePosition)){hit=pieceFaces[i];break;}
         if(hit==null)return;
         var build=hit.Build;
-        if(!build.Available||!s.CanInteract){s.Notify?.Invoke(build.UnavailableReason??"当前不能拿起棋子");e.Use();return;}
+        if(!build.CanPrepare(s)){s.Notify?.Invoke(!s.CanInteract?"等待当前行动或待决席位":build.UnavailableReason??"当前不能拿起棋子");e.Use();return;}
         s.Cancel?.Invoke();Selection.Choose(build,s.Goods,hit.Ordinal);tradeOpen=false;previewCard=null;message="";
         pieceReleased=false;pieceDragging=false;heldPiece=null;
         s.PrepareBuild?.Invoke(build);heldPiece=build;pieceStart=e.mousePosition;
@@ -468,7 +468,7 @@ public sealed partial class OperationDock
         if(specialHand&&s.GoodCount==5)
         {
             var purchase=s.Builds.FirstOrDefault(b=>b.Icon=="development");
-            if(purchase!=null&&Button(new Rect(268,670,152,34),"购买发展卡",purchase.Available&&s.CanInteract))PrepareDevelopmentPurchase();
+            if(purchase!=null&&Button(new Rect(268,670,152,34),"购买发展卡",purchase.CanPrepare(s)))PrepareDevelopmentPurchase();
         }
         GUI.enabled=enabled;
     }
@@ -640,7 +640,7 @@ public sealed partial class OperationDock
         Fill(new Rect(788,298,184,2),accent);
         Label(new Rect(788,319,186,160),build.Detail??FacilityAbility(track,build.Level),text);
         Label(new Rect(788,506,186,72),build.Level>=5?"本设施已全部建成":"点击建设板上的下一等级，或使用下方按钮升级。",small);
-        if(Primary(new Rect(788,591,186,41),build.Level>=5?"已达最高等级":"建设第 "+(build.Level+1)+" 级",build.Available&&s.CanInteract&&build.Level<5))PrepareBuild(build,s);
+        if(Primary(new Rect(788,591,186,41),build.Level>=5?"已达最高等级":"建设第 "+(build.Level+1)+" 级",build.CanPrepare(s)&&build.Level<5))PrepareBuild(build,s);
         if(hoveredBuild!=null)DrawCost(s);
     }
     public static string FacilityAbility(int track,int level)

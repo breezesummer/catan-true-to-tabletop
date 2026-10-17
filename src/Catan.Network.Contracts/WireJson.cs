@@ -39,7 +39,7 @@ namespace Catan.Network.Contracts
         private static void CheckRoot(Type type)
         {
             var element = type.IsArray ? type.GetElementType() : type;
-            var messages = new[] { typeof(NetworkRequest), typeof(NetworkResponse), typeof(RoomSettings), typeof(CreateRoomPayload), typeof(JoinRoomPayload), typeof(SeatPayload), typeof(ReadyPayload), typeof(HistoryPayload), typeof(RoomSummary), typeof(SeatSummary) };
+            var messages = new[] { typeof(NetworkRequest), typeof(NetworkResponse), typeof(RoomSettings), typeof(CreateRoomPayload), typeof(JoinRoomPayload), typeof(SeatPayload), typeof(NamePayload), typeof(ReadyPayload), typeof(HistoryPayload), typeof(RoomSummary), typeof(SeatSummary) };
             if (!messages.Contains(element) && !Roots.Contains(element.FullName)) throw new SerializationException("不允许传输此对象类型。");
         }
         private static IEnumerable<MemberInfo> Members(Type type)

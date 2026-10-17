@@ -170,10 +170,21 @@ public sealed class TabletopUiVerification : MonoBehaviour
         Require(!app.StepAi()&&Authority==before,"游戏菜单中 AI 仍然执行命令");app.SetPaused(paused);
         app.HandleTableEscape();
         Require(!app.TableMenuOpen&&Authority==before,"关闭菜单改变局面或没有返回游戏");
-        app.ShowMenu();app.HandleTableEscape();
-        Require(app.MenuVisible&&!app.TableMenuOpen,"配置界面的 Esc 错误打开游戏菜单");
-        app.ResumeGame();
-        Require(!app.MenuVisible&&Authority==before,"返回当前局未保持权威状态");
+        app.ShowMenu();
+        // ShowMenu 先回到风景主页；从正式导航进入配置页，再逐层验证 Esc。
+        var navigate=typeof(M6App).GetMethod("NavigateMainMenu",PrivateInstance);
+        var setupStep=typeof(M6App).GetField("menuSetupStep",PrivateInstance);
+        var menuPage=typeof(M6App).GetField("menuPage",PrivateInstance);
+        Require(navigate!=null&&setupStep!=null&&menuPage!=null,"缺少当前分层菜单导航入口");
+        navigate.Invoke(app,new object[]{0});setupStep.SetValue(app,2);
+        app.HandleTableEscape();
+        Require(app.MenuVisible&&!app.TableMenuOpen&&(int)setupStep.GetValue(app)==1&&Authority==before,"配置第三步 Esc 未返回地图选择或改变了局面");
+        app.HandleTableEscape();
+        Require(app.MenuVisible&&!app.TableMenuOpen&&(int)setupStep.GetValue(app)==0&&Authority==before,"地图选择 Esc 未返回玩法选择或改变了局面");
+        app.HandleTableEscape();
+        Require(app.MenuVisible&&!app.TableMenuOpen&&(int)menuPage.GetValue(app)==-1&&Authority==before,"配置首页 Esc 未返回风景主页或改变了局面");
+        app.HandleTableEscape();
+        Require(!app.MenuVisible&&!app.TableMenuOpen&&Authority==before,"风景主页 Esc 未恢复当前对局或改变了局面");
         var tabletop=(TabletopUI)Presentation.GetType().GetField("tabletop",PrivateInstance).GetValue(Presentation);
         var history=(TabletopHistoryUI)typeof(TabletopUI).GetField("history",PrivateInstance).GetValue(tabletop);
         typeof(TabletopHistoryUI).GetProperty("IsOpen").GetSetMethod(true).Invoke(history,new object[]{true});
@@ -207,6 +218,16 @@ public sealed class TabletopUiVerification : MonoBehaviour
         var method = typeof(TabletopUI).GetMethod("OpponentOrder", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
         Require(method != null, "缺少可复用的公开相对座位布局函数");
         var ids = Enumerable.Range(1, players).Select(i => "P" + i).ToArray();
+        string first=mode=="base"?GetComponent<M2App>().M6View.StartingPlayerId:
+            mode=="seafarers"?GetComponent<M3App>().M6View.StartingPlayerId:
+            mode=="cities-knights"?GetComponent<M4App>().M6View.StartingPlayerId:GetComponent<M5App>().M6View.StartingPlayerId;
+        var actionOrder=PlayerIdentityModel.ActionOrder(first,ids);
+        Require(app.HistoryPlayers.SequenceEqual(actionOrder),"公开头像与历史玩家列表没有按真实行动顺序排列");
+        Require(app.OpeningOrderMessage=="你是第"+(Array.IndexOf(actionOrder,app.HumanSeat)+1)+"个行动的玩家","开局未提示自己的行动次序");
+        Require(app.PlayerDisplayName(app.HumanSeat)==app.LocalPlayerName,"人类玩家没有使用设置里的名字");
+        var aiNames=ids.Where(id=>id!=app.HumanSeat).Select(app.PlayerDisplayName).ToArray();
+        Require(aiNames.Distinct().Count()==players-1&&aiNames.All(PlayerIdentityModel.AiNames.Contains),"AI 没有使用互不重复的指定中文名字");
+
         var ordered = (string[])method.Invoke(null, new object[] { app.HumanSeat, ids });
         int own = Array.IndexOf(ids, app.HumanSeat);
         Require(ordered.Length == players - 1 && !ordered.Contains(app.HumanSeat), "自己的席位没有留在前方");

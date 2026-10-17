@@ -57,6 +57,8 @@ internal sealed class SavedRoom
     public string RulesVersion { get; set; }
     public string ScenarioVersion { get; set; }
     public string GameSave { get; set; }
+    public bool Closed { get; set; }
+    public Dictionary<string, string> AiDisplayNames { get; set; } = new(StringComparer.Ordinal);
     public List<SavedSeat> Seats { get; set; } = new();
     public Dictionary<string, SavedReceipt> Receipts { get; set; } = new(StringComparer.Ordinal);
     public Dictionary<string, SavedEnrollment> Enrollments { get; set; } = new(StringComparer.Ordinal);
@@ -71,6 +73,8 @@ internal sealed class SavedSeat
     public DateTimeOffset CredentialExpiresAtUtc { get; set; }
     public string EnrollmentId { get; set; }
     public string EnrollmentFingerprint { get; set; }
+    public bool ControlledByAi { get; set; }
+    public string RejoinAfterTurnKey { get; set; }
 }
 internal sealed class SavedEnrollment
 {

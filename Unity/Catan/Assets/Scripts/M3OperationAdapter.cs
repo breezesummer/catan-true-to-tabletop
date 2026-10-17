@@ -133,9 +133,7 @@ public sealed partial class M3App
     }
     void AddDockBuild(OperationSnapshot s,CommandKind kind,string name,string icon,int count,int[] cost,bool legal)
     {
-        bool enough=Enumerable.Range(0,8).All(i=>s.Goods[i]>=cost[i]);
-        bool available=ai.IsHumanTurn&&count>0&&legal&&enough;
-        s.Builds.Add(new OperationBuild{Id=kind.ToString(),Name=name,Icon=icon,Count=count,Cost=cost,Available=available,Detail=cost.Sum()==0?"当前阶段免费放置":"点击选择费用，再在棋盘放置",UnavailableReason=!ai.IsHumanTurn?"等待当前行动或待决席位":count==0?"库存已用尽":!enough?"缺少所需资源":!legal?"当前阶段或连接条件没有合法目标":null});
+        var build=new OperationBuild{Id=kind.ToString(),Name=name,Icon=icon,Count=count,Cost=cost,Detail=cost.Sum()==0?"当前阶段免费放置":"点击选择费用，再在棋盘放置"};build.ConfigureAvailability(legal,s.Goods);s.Builds.Add(build);
     }
     static string DockDevelopmentName(DevelopmentCardKind kind)=>new[]{"骑士","道路建设","丰收","垄断","胜利点"}[(int)kind];
     void DrawOperationLayout()

@@ -173,6 +173,7 @@ namespace Catan.Core.M5
     {
         public string PlayerId { get; internal set; }
         public string ActivePlayerId { get; internal set; }
+        public string StartingPlayerId { get; internal set; }
         public int Turn { get; internal set; }
         public GamePhase Phase { get; internal set; }
         public PendingDecision PendingDecision { get; internal set; }

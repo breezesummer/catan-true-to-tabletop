@@ -13,6 +13,7 @@ public sealed partial class M6App
     Action menuPendingAction;
     bool menuPendingAllowSave;
     string menuPendingCaption,menuInlineMessage="";
+    string menuPlayerName;
     string menuPreviewPath,menuPreviewText,menuPreviewBackupText;
     long menuPreviewStamp=-1,menuPreviewBackupStamp=-1;
     internal string MenuReviewSavePath;
@@ -122,7 +123,7 @@ public sealed partial class M6App
         var ids=ScenarioIds();menuScenario=Mathf.Clamp(menuScenario,0,ids.Length-1);
         string map=menuRule==0?"标准岛屿":menuRule==2?"标准城邦":ScenarioName(ids[menuScenario]);
         PastoralMenuUI.Label(new Rect(497,737,510,26),RuleNames[menuRule]+"  /  "+map,16,null,true);
-        PastoralMenuUI.Label(new Rect(497,774,500,23),menuPlayers+" 人同桌  ·  你的席位 P"+(menuHuman+1)+"  ·  "+(menuVictoryPoints??DefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers))+" 分获胜",13,PastoralMenuUI.Muted);
+        PastoralMenuUI.Label(new Rect(497,774,500,23),menuPlayers+" 人同桌  ·  你的建筑 "+PlayerIdentityModel.ColorNames[menuHuman]+"  ·  "+(menuVictoryPoints??DefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers))+" 分获胜",13,PastoralMenuUI.Muted);
         if(menuSetupStep>0&&PastoralMenuUI.Button(new Rect(1000,751,104,46),"上一步"))menuSetupStep--;
         if(PastoralMenuUI.Button(new Rect(1117,751,216,46),menuSetupStep==2?"启程 · 开始游戏":"下一步   →",true,true))
         {
@@ -139,7 +140,7 @@ public sealed partial class M6App
             var image=Resources.Load<Texture2D>("PastoralMenu/v002/medieval-harbor");
             if(image!=null)GUI.DrawTextureWithTexCoords(new Rect(496,281,836,223),image,new Rect(.35f,.2f,.61f,.39f));
             PastoralMenuUI.Label(new Rect(500,533,820,38),menuRule==0?"标准岛屿":"标准城市与骑士地图",25,null,true);
-            PastoralMenuUI.Label(new Rect(500,588,810,55),"地形、点数与港口随新局生成。\n继续设置人数、席位与本局胜利目标。",16,PastoralMenuUI.Muted);
+            PastoralMenuUI.Label(new Rect(500,588,810,55),"地形、点数与港口随新局生成。\n继续设置人数、建筑颜色与本局胜利目标。",16,PastoralMenuUI.Muted);
             return;
         }
         for(int i=0;i<ids.Length;i++)
@@ -156,8 +157,8 @@ public sealed partial class M6App
         PastoralMenuUI.Label(new Rect(499,324,400,24),"其余席位交给当前 AI，一起经营这座岛。",13,PastoralMenuUI.Muted);
         menuPlayers=PastoralMenuUI.Segments(new Rect(499,372,394,45),menuPlayers-3,new[]{"3 人同桌","4 人同桌"})+3;
         menuHuman=Mathf.Clamp(menuHuman,0,menuPlayers-1);
-        PastoralMenuUI.Label(new Rect(499,447,390,24),"你的席位",14,PastoralMenuUI.Muted);
-        menuHuman=PastoralMenuUI.Segments(new Rect(499,484,394,43),menuHuman,Enumerable.Range(1,menuPlayers).Select(i=>"P"+i).ToArray());
+        PastoralMenuUI.Label(new Rect(499,447,390,24),"你的建筑颜色 · 行动顺序由开局掷骰决定",14,PastoralMenuUI.Muted);
+        menuHuman=PastoralMenuUI.Segments(new Rect(499,484,394,43),menuHuman,PlayerIdentityModel.ColorNames.Take(menuPlayers).ToArray());
         PastoralMenuUI.Label(new Rect(499,565,390,24),"AI 行动节奏",14,PastoralMenuUI.Muted);
         menuAiSpeed=PastoralMenuUI.Segments(new Rect(499,603,394,43),menuAiSpeed,TabletopAiSpeed.Names);
         PastoralMenuUI.Fill(new Rect(926,286,1,374),new Color(.48f,.54f,.42f,.18f));
@@ -217,7 +218,7 @@ public sealed partial class M6App
             var data=JsonUtility.FromJson<SavedGame>(File.ReadAllText(path));
             if(data==null||data.Version!=1||string.IsNullOrEmpty(data.Authority))throw new InvalidDataException();
             ValidateConfiguration(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat);
-            return RuleNames[Array.IndexOf(RuleIds,data.RuleSet)]+"  ·  "+data.PlayerCount+" 人  ·  "+data.HumanSeat+"\n保存于 "+File.GetLastWriteTime(path).ToString("yyyy-MM-dd  HH:mm");
+            return RuleNames[Array.IndexOf(RuleIds,data.RuleSet)]+"  ·  "+data.PlayerCount+" 人  ·  "+ColorLabel(data.HumanSeat)+"建筑"+"\n保存于 "+File.GetLastWriteTime(path).ToString("yyyy-MM-dd  HH:mm");
         }
         catch{return "此存档无法预览，可能损坏或版本不兼容。";}
     }
@@ -244,8 +245,18 @@ public sealed partial class M6App
     void DrawMainSettings()
     {
         MenuPageHeader("舒 适 地 游 玩","设置","让声音与桌面，配合你喜欢的游戏时光。");
-        menuSettingsTab=PastoralMenuUI.Segments(new Rect(495,216,838,39),menuSettingsTab,new[]{"声音","桌面外观"});
+        menuSettingsTab=PastoralMenuUI.Segments(new Rect(495,216,838,39),menuSettingsTab,new[]{"玩家","声音","桌面外观"});
         if(menuSettingsTab==0)
+        {
+            if(menuPlayerName==null)menuPlayerName=LocalPlayerName;
+            PastoralMenuUI.Label(new Rect(499,302,800,36),"同桌伙伴眼中的你",24,null,true);
+            PastoralMenuUI.Label(new Rect(499,353,800,36),"本地游戏与联机共用这个名字，新加入房间时自动使用。",14,PastoralMenuUI.Muted);
+            PastoralMenuUI.Label(new Rect(499,422,220,28),"玩家名称",18,null,true);
+            menuPlayerName=GUI.TextField(new Rect(499,465,600,49),menuPlayerName,PlayerIdentityModel.MaximumNameLength,PastoralMenuUI.Field);
+            if(!string.IsNullOrWhiteSpace(menuPlayerName)&&LocalPlayerName!=PlayerIdentityModel.NormalizeName(menuPlayerName))LocalPlayerName=menuPlayerName;
+            PastoralMenuUI.Label(new Rect(499,539,800,32),"最多 20 个字。建筑颜色在开局或房间中选择，行动顺序由开局掷骰决定。",14,PastoralMenuUI.Muted);
+        }
+        else if(menuSettingsTab==1)
         {
             var audio=TabletopAudio.Instance;
             PastoralMenuUI.Label(new Rect(499,296,600,36),"听见海岸与每一次落子",24,null,true);
@@ -273,7 +284,7 @@ public sealed partial class M6App
         }
         PastoralMenuUI.Fill(new Rect(495,714,838,1),new Color(.48f,.54f,.42f,.20f));
         if(PastoralMenuUI.Button(new Rect(1117,751,216,46),"完成   →",true,true))
-        {TabletopAudio.Instance?.FlushSettings();NavigateMainMenu(-1);}
+        {if(menuPlayerName!=null){LocalPlayerName=menuPlayerName;menuPlayerName=LocalPlayerName;}TabletopAudio.Instance?.FlushSettings();NavigateMainMenu(-1);}
     }
     void DrawMenuVolume(float y,string name,string detail,float value,Action<float> update)
     {

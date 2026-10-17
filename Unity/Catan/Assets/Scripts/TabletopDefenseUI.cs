@@ -8,7 +8,7 @@ public sealed class TabletopDefenseUI
     string roadPlayer;
     int roadLength;
     bool roadBound;
-    public string MobileSummary => (position>=0?"蛮族 "+position+"/7 · "+(position==7?"本次防御 ":"防御 ")+strength+"/"+threat+"\n":"")+(roadBound?"最长路线 · "+(string.IsNullOrEmpty(roadPlayer)?"暂无":roadPlayer+" "+roadLength+" 段"):"");
+    public string MobileSummary => (position>=0?"蛮族 "+position+"/7 · "+(position==7?"本次防御 ":"防御 ")+strength+"/"+threat+"\n":"")+(roadBound?"最长路线 · "+(string.IsNullOrEmpty(roadPlayer)?"暂无":M6App.PlayerLabel(roadPlayer)+" "+roadLength+" 段"):"");
     static Texture2D ship,shield;
     public void Bind(int position,int strength,int threat)
     {this.position=position;this.strength=strength;this.threat=threat;}
@@ -47,10 +47,11 @@ public sealed class TabletopDefenseUI
         // 一条折线路径代表最长道路；公开奖励归属按 PlayerView 原样展示。
         var a=new Vector2(Area.x+14,y+18);var b=new Vector2(Area.x+21,y+8);var c=new Vector2(Area.x+30,y+17);var d=new Vector2(Area.x+37,y+6);
         StrategyHudArt.Line(a,b,gold,2);StrategyHudArt.Line(b,c,gold,2);StrategyHudArt.Line(c,d,gold,2);
-        GUI.Label(new Rect(Area.x+45,y-2,82,25),"最长道路",title);
-        var result=new Rect(Area.x+128,y-2,103,25);
+        GUI.Label(new Rect(Area.x+45,y-2,66,25),"最长道路",title);
+        var result=new Rect(Area.x+109,y-2,122,25);
         count.normal.textColor=string.IsNullOrEmpty(roadPlayer)?ModernOperationUI.Muted:gold;
-        GUI.Label(result,string.IsNullOrEmpty(roadPlayer)?"暂无归属":roadPlayer+" · "+roadLength+" 段",count);
+        string resultText=string.IsNullOrEmpty(roadPlayer)?"暂无归属":M6App.PlayerLabel(roadPlayer)+" · "+roadLength+" 段";
+        var resultStyle=new GUIStyle(count){fontSize=10,wordWrap=true};GUI.Label(result,resultText,resultStyle);
     }
     static void DrawIcon(Rect rect,Texture2D texture,Color color)
     {var previous=GUI.color;GUI.color=color;GUI.DrawTexture(rect,texture,ScaleMode.ScaleToFit);GUI.color=previous;}

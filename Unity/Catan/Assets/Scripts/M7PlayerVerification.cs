@@ -11,14 +11,15 @@ public sealed class M7PlayerVerification : MonoBehaviour
     [Serializable] public sealed class Configuration
     {
         public string Endpoint,CertificateFingerprint,RuleSet="base",ScenarioId="heading-for-new-shores",OutputDirectory;
-        public int PlayerCount=3,MinimumTurn=3,TimeoutSeconds=180;
+        public int PlayerCount=3,MinimumTurn=3,TimeoutSeconds=180,DiscoveryPort=47772;
+        public bool SkipLanDiscovery;
     }
     [Serializable] sealed class Report
     {
         public string RuleSet,ScenarioId,Result,Stage,Transport;
         public int PlayerCount,Turn,HumanCommands,ClientAiCommands;
         public long Revision;
-        public bool LocalAuthorityAbsent,LocalSaveRejected,ReconnectConfirmed,OwnSeatOnly;
+        public bool LocalAuthorityAbsent,LocalSaveRejected,ReconnectConfirmed,OwnSeatOnly,RoomSwitchConfirmed,OriginalRoomRestored,LanDiscoveryConfirmed,LanDiscoverySkipped,NameUpdateConfirmed;
     }
     M6App app;
     Configuration config;
@@ -27,10 +28,22 @@ public sealed class M7PlayerVerification : MonoBehaviour
     public void Initialize(M6App value){app=value;StartCoroutine(Run());}
     IEnumerator Run()
     {
-        int index=Array.IndexOf(Environment.GetCommandLineArgs(),"--m7-verify");if(index<0)yield break;
+        var args=Environment.GetCommandLineArgs();int index=Array.IndexOf(args,"--m7-verify");
+        string configuration=index>=0&&index+1<args.Length?args[index+1]:null;
+#if UNITY_ANDROID && !UNITY_EDITOR
+        if(configuration==null)
+            using(var player=new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            using(var activity=player.GetStatic<AndroidJavaObject>("currentActivity"))
+            using(var intent=activity.Call<AndroidJavaObject>("getIntent"))
+            {
+                configuration=intent.Call<string>("getStringExtra","catan_m7_verify");
+                if(configuration!=null)intent.Call("removeExtra","catan_m7_verify");
+            }
+#endif
+        if(string.IsNullOrEmpty(configuration))yield break;
         try
         {
-            config=JsonUtility.FromJson<Configuration>(File.ReadAllText(Environment.GetCommandLineArgs()[index+1]));Directory.CreateDirectory(config.OutputDirectory);
+            config=JsonUtility.FromJson<Configuration>(File.ReadAllText(configuration));Directory.CreateDirectory(config.OutputDirectory);app.Network.EnableVerification();
             report.RuleSet=config.RuleSet;report.ScenarioId=config.ScenarioId;report.PlayerCount=config.PlayerCount;deadline=Time.realtimeSinceStartup+config.TimeoutSeconds;
             app.Network.UseCredentialDirectory(Path.Combine(config.OutputDirectory,"private-client"));app.Network.ConfigureEndpoint(config.Endpoint,config.CertificateFingerprint);
         }
@@ -40,7 +53,7 @@ public sealed class M7PlayerVerification : MonoBehaviour
         {
             bool more;
             try{more=work.MoveNext();}
-            catch(Exception ex){report.Result="failed:"+ex.GetType().Name;Finish(false);yield break;}
+            catch(Exception ex){Debug.LogError("CATAN_M7_VERIFICATION_EXCEPTION: "+ex.GetType().Name+" "+ex.StackTrace);report.Result="failed:"+ex.GetType().Name;Finish(false);yield break;}
             if(!more){report.Result="passed";Finish(true);yield break;}yield return work.Current;
         }
     }
@@ -93,6 +106,29 @@ public sealed class M7PlayerVerification : MonoBehaviour
         }
         report.Turn=Turn();report.Revision=client.Revision;report.ClientAiCommands=app.AiCommandsExecuted;report.Transport=client.TransportMode;
         report.OwnSeatOnly=OwnSeat()==client.SeatId;Require(report.OwnSeatOnly,"only own seat is presented");
+        string originalRoom=client.RoomId,originalSeat=client.SeatId;
+        report.Stage="direct room switch";
+        client.Create(new RoomSettings{Name="切房恢复验证",Listed=true,RuleSet=config.RuleSet,ScenarioId=config.ScenarioId,PlayerCount=config.PlayerCount,AiSeats=config.PlayerCount==3?new[]{"P2","P3"}:new[]{"P2","P3","P4"}},"切房验证玩家",null);
+        while(Waiting(!client.Busy&&client.Room!=null&&client.RoomId!=originalRoom))yield return null;
+        string secondRoom=client.RoomId;report.RoomSwitchConfirmed=true;
+        if(!config.SkipLanDiscovery)
+        {
+            report.Stage="LAN room discovery";var discovery=new M7LanService().Discover(config.DiscoveryPort,client.RememberedRoomIds);
+            while(Waiting(discovery.IsCompleted))yield return null;
+            Require(!discovery.IsFaulted&&Array.Exists(discovery.Result,s=>Array.Exists(s.Rooms,r=>r.RoomId==secondRoom)),"automatic LAN discovery returns live room");report.LanDiscoveryConfirmed=true;
+            Require(Array.Exists(discovery.Result,s=>Array.Exists(s.Rooms,r=>r.RoomId==originalRoom)),"own offline room remains recoverable without public history rooms");
+        }
+        else report.LanDiscoverySkipped=true;
+        report.Stage="restore first room after switch";
+        // 相同证书和房间在不同主机地址下仍须找到同一份恢复身份。
+        client.ConfigureEndpoint(config.Endpoint.Replace("127.0.0.1","localhost"),config.CertificateFingerprint,false);
+        client.Join(originalRoom,"验证人类",null);
+        while(Waiting(!client.Busy&&client.Connected&&app.NetworkGame&&app.Ready&&client.RoomId==originalRoom&&client.Room!=null&&client.Room.RoomId==originalRoom))yield return null;
+        Require(client.SeatId==originalSeat&&OwnSeat()==originalSeat&&AuthorityAbsent(),"per-room credential restores original seat");
+        report.OriginalRoomRestored=true;
+        report.Stage="shared player name update";client.SetDisplayName("重连后的新名字");
+        while(Waiting(Array.Exists(client.Room.Seats,s=>s.SeatId==originalSeat&&s.DisplayName=="重连后的新名字")))yield return null;
+        report.NameUpdateConfirmed=true;
         yield return null;
         ScreenCapture.CaptureScreenshot(Path.Combine(config.OutputDirectory,"client.png"));yield return null;
     }
