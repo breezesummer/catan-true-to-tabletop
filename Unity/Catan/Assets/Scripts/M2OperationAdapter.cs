@@ -49,7 +49,7 @@ public sealed partial class M2App
         var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
         var port=view.Board.Ports.FirstOrDefault(p=>p.Id==id);
         if(port==null)return false;
-        if(!port.Vertices.Any(locations.Contains)){status="此港口未连接你的定居点或城市。";ai.ShowTablePrompt(status);return true;}
+        if(!port.Vertices.Any(locations.Contains)){status="此港口未连接你的村庄或城市。";ai.ShowTablePrompt(status);return true;}
         CancelOperationDraft();
         int? good=port.Resource.HasValue?(int?)((int)port.Resource.Value):null;
         dock.OpenPortTrade(good,good.HasValue?ResourceNames[good.Value]+"港口 · 2:1":"通用港口 · 3:1");
@@ -84,7 +84,7 @@ public sealed partial class M2App
             for(int i=0;i<5;i++)s.Rates[i]=4;
             s.OtherPlayers=view.Players.Where(p=>p.Id!=seat).Select(p=>p.Id).ToArray();
             bool setup=view.Phase==GamePhase.SetupSettlement,roadSetup=view.Phase==GamePhase.SetupRoad,freeRoad=view.Phase==GamePhase.RoadBuilding;
-            AddDockBuild(s,setup?CommandKind.SetupSettlement:CommandKind.BuildSettlement,"定居点","settlement",own.Pieces.Settlements,setup?DockCost():DockCost(1,1,1,1),view.LegalVertexIds.Length>0);
+            AddDockBuild(s,setup?CommandKind.SetupSettlement:CommandKind.BuildSettlement,"村庄","settlement",own.Pieces.Settlements,setup?DockCost():DockCost(1,1,1,1),view.LegalVertexIds.Length>0);
             AddDockBuild(s,roadSetup?CommandKind.SetupRoad:freeRoad?CommandKind.PlaceFreeRoad:CommandKind.BuildRoad,"道路","road",own.Pieces.Roads,roadSetup||freeRoad?DockCost():DockCost(1,1),view.LegalEdgeIds.Length>0);
             AddDockBuild(s,CommandKind.BuildCity,"城市","city",own.Pieces.Cities,DockCost(wheat:2,ore:3),view.LegalCityVertexIds.Length>0);
             AddDockBuild(s,CommandKind.BuyDevelopmentCard,"发展卡","development",view.DevelopmentDeckCount,DockCost(wool:1,wheat:1,ore:1),view.Phase==GamePhase.Action&&Preview(NewCommand(CommandKind.BuyDevelopmentCard)).Success);
@@ -159,8 +159,9 @@ public sealed partial class M2App
     }
     string TableInstruction()
     {
+        if(view.Phase==GamePhase.RoadBuilding)return TabletopRoadPlacement.Instruction(view.PendingDecision?.RemainingRoads??2,ai.HistoryEntries);
         if(holding)return "请选择合法位置放下棋子";
-        if(view.Phase==GamePhase.SetupSettlement)return "请放置定居点";
+        if(view.Phase==GamePhase.SetupSettlement)return "请放置村庄";
         if(view.Phase==GamePhase.SetupRoad)return "请放置道路";
         if(view.Phase==GamePhase.ProductionAwaitRoll)return "请掷骰";
         if(view.Phase==GamePhase.RobberSteal)return "请选择偷取对象";

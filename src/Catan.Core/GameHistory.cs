@@ -141,7 +141,7 @@ namespace Catan.Core
         private static readonly Dictionary<string, string> Names = new Dictionary<string, string>
         {
             {"SetupSettlement","摆放开局建筑"},{"SetupRoad","摆放开局道路"},{"SetupShip","摆放开局船"},{"SetupPort","摆放开局港口"},
-            {"RollDice","掷骰"},{"BuildRoad","建造道路"},{"BuildSettlement","建造定居点"},{"BuildCity","升级城市"},{"BuildShip","建造船"},
+            {"RollDice","掷骰"},{"BuildRoad","建造道路"},{"BuildSettlement","建造村庄"},{"BuildCity","升级城市"},{"BuildShip","建造船"},
             {"BankTrade","完成银行／港口交易"},{"ProposeTrade","提出交易"},{"AcceptTrade","接受交易"},{"RejectTrade","拒绝交易"},{"CancelTrade","取消交易"},
             {"BuyDevelopmentCard","购买发展卡"},{"PlayKnight","打出「骑士」"},{"PlayRoadBuilding","打出「道路建设」"},{"PlayYearOfPlenty","打出「丰收」"},{"PlayMonopoly","打出「垄断」"},
             {"PlaceFreeRoad","免费建造道路"},{"PlaceFreeShip","免费建造船"},{"FinishRoadBuilding","完成道路建设"},{"DiscardResources","弃置手牌"},

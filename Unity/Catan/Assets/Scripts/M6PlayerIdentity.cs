@@ -17,7 +17,7 @@ public sealed partial class M6App
     public static string ColorLabel(string id)=>PlayerIdentityModel.ColorLabel(id);
     public string PlayerName(string id)=>PlayerDisplayName(id);
     public static string PlayerLabel(string id)=>identityOwner!=null?identityOwner.PlayerDisplayName(id):ColorLabel(id);
-    public static string DisplayPlayerText(string value)=>PlayerIdentityModel.ReplaceIds(value,PlayerLabel);
+    public static string DisplayPlayerText(string value)=>PlayerIdentityModel.ReplaceIds(value,PlayerLabel).Replace("定居点","村庄");
     public static GUIStyle PlayerNameStyle(GUIStyle basis,string id)
     {
         var style=new GUIStyle(basis){richText=false};
@@ -55,9 +55,9 @@ public sealed partial class M6App
     }
     void DrawOpeningOrder()
     {
-        string message=OpeningOrderMessage;if(message.Length==0||tableMenu||CardPresentationBusy)return;
+        string message=OpeningOrderMessage;if(message.Length==0||tableMenu||CardPresentationBusy||TableOverlayOpen)return;
         var style=new GUIStyle(title){fontSize=30,alignment=TextAnchor.MiddleCenter,wordWrap=false};
-        style.normal.textColor=new Color(.95f,.055f,.035f);
-        GUI.Label(new Rect(365,224,710,48),message,style);
+        style.normal.textColor=PromptColor;
+        GUI.Label(new Rect(365,207,710,48),message,style);
     }
 }

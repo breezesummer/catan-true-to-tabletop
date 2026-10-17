@@ -88,9 +88,9 @@ public sealed class TabletopAudioModel
             result.Add(new TabletopAudioEvent(TabletopAudioCue.ResourceCollect, entry.Kind == "RollDice" ? .78 : .13));
         if (cue != TabletopAudioCue.CardDraw && changes.Any(c => c != null && c.Amount > 0 && (c.Category == "development" || c.Category == "progress")))
             result.Add(new TabletopAudioEvent(TabletopAudioCue.CardDraw, .18));
-        // 城市升级移除的是定居点，只有公开城市减少且同点变回定居点才表示倒塌。
+        // 城市升级移除的是村庄，只有公开城市减少且同点变回村庄才表示倒塌。
         bool collapsed = changes.Any(c => c != null && c.Category == "piece" && c.Name == "城市" && c.Amount < 0 &&
-            changes.Any(d => d != null && d.Category == "piece" && d.Name == "定居点" && d.Amount > 0 && d.PlayerId == c.PlayerId && d.LocationId == c.LocationId));
+            changes.Any(d => d != null && d.Category == "piece" && d.Name == "村庄" && d.Amount > 0 && d.PlayerId == c.PlayerId && d.LocationId == c.LocationId));
         if (collapsed) result.Add(new TabletopAudioEvent(TabletopAudioCue.BuildingCollapse, .10));
         if (entry.Kind == "RollDice" && entry.EventDie == "Barbarian")
             result.Add(new TabletopAudioEvent(TabletopAudioCue.BarbarianAdvance, .62));

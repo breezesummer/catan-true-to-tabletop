@@ -120,7 +120,7 @@ namespace Catan.Core.M5
             bool replacement=s.DowngradedCities.Any(x=>x.PlayerId==p.Id&&x.LocationId==target);
             Require(replacement||!s.DowngradedCities.Any(x=>x.PlayerId==p.Id),"RestorePillagedCityFirst","必须先恢复倒置的城市。");
             Require(p.Pieces.Cities>0||replacement,"NoCities","城市库存不足。");
-            Require(s.Settlements.Any(x=>x.PlayerId==p.Id&&x.LocationId==target),"NotOwnSettlement","只能升级自己的定居点。");
+            Require(s.Settlements.Any(x=>x.PlayerId==p.Id&&x.LocationId==target),"NotOwnSettlement","只能升级自己的村庄。");
             Pay(s,p,new ResourceBag {Wheat=wheat,Ore=ore}); s.Settlements=s.Settlements.Where(x=>x.LocationId!=target).ToArray(); s.Cities=Append(s.Cities,Placement(target,p.Id));
             if(replacement) s.DowngradedCities=s.DowngradedCities.Where(x=>x.LocationId!=target).ToArray(); else {p.Pieces.Cities--;p.Pieces.Settlements++;}
         }

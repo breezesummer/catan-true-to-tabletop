@@ -90,7 +90,7 @@ public sealed partial class M6App
     {
         if(networkWorking)return;networkWorking=true;Network.ClearError();int navigation=networkNavigation;
         PrepareLanService();
-        networkMessage=lanService.CanHost?"正在自动准备局域网服务并搜索房间…":"正在搜索同一网络的房间…";
+        networkMessage="";
         try
         {
             var found=await lanService.Discover(lanService.DiscoveryPort,Network.RememberedRoomIds);
@@ -136,7 +136,7 @@ public sealed partial class M6App
         if(PastoralMenuUI.Nav(new Rect(65,350,322,68),"房间列表","自动寻找身边的同伴",networkTab==0,0)){networkTab=0;networkScroll=Vector2.zero;}
         if(PastoralMenuUI.Nav(new Rect(65,435,322,68),"创建房间","选择玩法，等待好友入座",networkTab==1,0)){networkTab=1;networkSettingsPage=0;networkScroll=Vector2.zero;}
         if(Network.Room!=null&&PastoralMenuUI.Nav(new Rect(65,520,322,68),"当前房间",Network.Room.Name,networkTab==2,0)){networkTab=2;networkScroll=Vector2.zero;}
-        if(PastoralMenuUI.Button(new Rect(79,762,290,42),"←  返回主菜单")){networkMenu=false;menuPage=-1;}
+        if(PastoralMenuUI.ReturnButton(new Rect(79,762,290,42))){networkMenu=false;menuPage=-1;}
         PastoralMenuUI.Label(new Rect(79,840,310,25),ReleaseVersion,11,PastoralMenuUI.Ivory);
     }
     void DrawLanNetworkMenu()
@@ -202,7 +202,7 @@ public sealed partial class M6App
     void DrawLanRooms()
     {
         var rooms=networkFound.SelectMany(server=>server.Rooms.Select(room=>new{server,room})).GroupBy(item=>item.server.certificateFingerprint+"|"+item.room.RoomId).Select(group=>group.First()).ToArray();
-        if(rooms.Length==0)GUILayout.Label(networkWorking?"正在自动寻找本地房间…":"没有找到开放的房间。请重新搜索，或从左侧创建房间。",small);
+        if(rooms.Length==0&&!networkWorking)GUILayout.Label("没有找到开放的房间。请重新搜索，或从左侧创建房间。",small);
         foreach(var item in rooms)
         {
             var room=item.room;var r=GUILayoutUtility.GetRect(790,86);
@@ -222,6 +222,7 @@ public sealed partial class M6App
     string NetworkMenuStatus=>(!string.IsNullOrEmpty(Network.LastError)?Network.LastError:!string.IsNullOrEmpty(networkMessage)?networkMessage:Network.Status)+(networkLan?(lanPreparing?"\n本机托管服务准备中，可继续搜索和加入好友房间。":string.IsNullOrEmpty(lanPreparationIssue)?"":"\n"+lanPreparationIssue):"");
     void DrawNetworkStatus()
     {
+        if(networkLan&&networkTab==0&&networkWorking)return;
         GUILayout.BeginArea(new Rect(498,703,815,67));networkStatusScroll=GUILayout.BeginScrollView(networkStatusScroll);
         GUILayout.Label(DisplayPlayerText(NetworkMenuStatus),new GUIStyle(PastoralMenuUI.Small){wordWrap=true});GUILayout.EndScrollView();GUILayout.EndArea();
     }

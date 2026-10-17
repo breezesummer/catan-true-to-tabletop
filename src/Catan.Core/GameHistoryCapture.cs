@@ -19,7 +19,7 @@ namespace Catan.Core
                     var goods = Goods(p.Resources);
                     return new HistoryPlayer { Id = p.Id, Goods = goods, Development = p.DevelopmentCards.Select(c => c.Kind.ToString()).ToArray() };
                 }).ToArray(),
-                Pieces = Pieces(s.Settlements, "定居点").Concat(Pieces(s.Cities, "城市")).Concat(Pieces(s.Roads, "道路"))
+                Pieces = Pieces(s.Settlements, "村庄").Concat(Pieces(s.Cities, "城市")).Concat(Pieces(s.Roads, "道路"))
                     .ToArray()
             };
         }
@@ -35,7 +35,7 @@ namespace Catan.Core
                     var goods = Goods(p.Resources);
                     return new HistoryPlayer { Id = p.Id, Goods = goods, ClothTokens = p.Cloth, WonderLevel = p.WonderLevel, Development = p.DevelopmentCards.Select(c => c.Kind.ToString()).ToArray() };
                 }).ToArray(),
-                Pieces = Pieces(s.Settlements, "定居点").Concat(Pieces(s.Cities, "城市")).Concat(Pieces(s.Roads, "道路"))
+                Pieces = Pieces(s.Settlements, "村庄").Concat(Pieces(s.Cities, "城市")).Concat(Pieces(s.Roads, "道路"))
                     .Concat(s.Ships.Select(p => new HistoryPiece { PlayerId = p.PlayerId, LocationId = p.LocationId, Name = "船" }))
                     .ToArray()
             };
@@ -55,7 +55,7 @@ namespace Catan.Core
                     goods[5] = p.Commodities.Cloth; goods[6] = p.Commodities.Coin; goods[7] = p.Commodities.Paper;
                     return new HistoryPlayer { Id = p.Id, Goods = goods, Improvements = p.Improvements.ToArray(), Development = p.DevelopmentCards.Select(c => c.Kind.ToString()).ToArray(), Progress = p.ProgressCards.Select(c => c.ToString()).ToArray(), Victory = p.ProgressVictoryCards.Select(c => c.ToString()).ToArray() };
                 }).ToArray(),
-                Pieces = Pieces(s.Settlements, "定居点").Concat(Pieces(s.Cities, "城市")).Concat(Pieces(s.Roads, "道路"))
+                Pieces = Pieces(s.Settlements, "村庄").Concat(Pieces(s.Cities, "城市")).Concat(Pieces(s.Roads, "道路"))
                     .Concat(Pieces(s.Walls, "城墙")).Concat(s.Knights.Select(p => new HistoryPiece { PlayerId = p.PlayerId, LocationId = p.LocationId, Name = p.Level + "级骑士（" + (p.Active ? "激活" : "休眠") + "）" }))
                     .Concat(s.Metropolises.Select(p => new HistoryPiece { PlayerId = p.PlayerId, LocationId = p.LocationId, Name = new[] { "贸易", "政治", "科学" }[(int)p.Track] + "大都会" }))
                     .ToArray()
@@ -76,7 +76,7 @@ namespace Catan.Core
                     goods[5] = p.Commodities.Cloth; goods[6] = p.Commodities.Coin; goods[7] = p.Commodities.Paper;
                     return new HistoryPlayer { Id = p.Id, Goods = goods, Improvements = p.Improvements.ToArray(), Development = p.DevelopmentCards.Select(c => c.Kind.ToString()).ToArray(), Progress = p.ProgressCards.Select(c => c.ToString()).ToArray(), Victory = p.ProgressVictoryCards.Select(c => c.ToString()).ToArray() };
                 }).ToArray(),
-                Pieces = Pieces(s.Settlements, "定居点").Concat(Pieces(s.Cities, "城市")).Concat(Pieces(s.Roads, "道路"))
+                Pieces = Pieces(s.Settlements, "村庄").Concat(Pieces(s.Cities, "城市")).Concat(Pieces(s.Roads, "道路"))
                     .Concat(s.Ships.Select(p => new HistoryPiece { PlayerId = p.PlayerId, LocationId = p.LocationId, Name = "船" }))
                     .Concat(Pieces(s.Walls, "城墙")).Concat(s.Knights.Select(p => new HistoryPiece { PlayerId = p.PlayerId, LocationId = p.LocationId, Name = p.Level + "级骑士（" + (p.Active ? "激活" : "休眠") + "）" }))
                     .Concat(s.Metropolises.Select(p => new HistoryPiece { PlayerId = p.PlayerId, LocationId = p.LocationId, Name = new[] { "贸易", "政治", "科学" }[(int)p.Track] + "大都会" }))

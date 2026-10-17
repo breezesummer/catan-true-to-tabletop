@@ -62,7 +62,7 @@ namespace Catan.Core.M3
                     else s.PendingDecision.PlayerId = s.ActivePlayerId;
                     return true;
                 case CommandKind.SetupShip:
-                    Require(s.Phase == GamePhase.SetupRoad && s.PendingDecision != null, "WrongPhase", "请先摆放开局定居点。");
+                    Require(s.Phase == GamePhase.SetupRoad && s.PendingDecision != null, "WrongPhase", "请先摆放开局村庄。");
                     ValidateShip(s, p, c.TargetId, s.PendingDecision.AnchorVertexId); PlaceShip(s, p, c.TargetId); AdvanceSetup(s); return true;
                 case CommandKind.BuildShip:
                     ActionPhase(s); ValidateShip(s, p, c.TargetId, null); Pay(s, p, new ResourceBag { Wood = 1, Wool = 1 }); PlaceShip(s, p, c.TargetId); return true;
@@ -106,7 +106,7 @@ namespace Catan.Core.M3
             Require(p.ShipsRemaining > 0, "NoShips", "船库存不足。");
             Require(!s.Roads.Any(r => r.LocationId == edge) && !s.Ships.Any(r => r.LocationId == edge), "OccupiedEdge", "该边已有道路或船。");
             Require(SeaEdge(s, edge), "ShipOnLand", "船只能放在海边。"); Require(!PirateBlocks(s, edge), "PirateBlocksShip", "海盗封锁此边。");
-            if (anchor != null) Require(location.Vertices.Contains(anchor), "ShipNotAtAnchor", "开局船须连接刚建的定居点。");
+            if (anchor != null) Require(location.Vertices.Contains(anchor), "ShipNotAtAnchor", "开局船须连接刚建的村庄。");
             else Require(location.Vertices.Any(v => Buildings(s).Any(b => b.PlayerId == p.Id && b.LocationId == v) ||
                 (!Buildings(s).Any(b => b.PlayerId != p.Id && b.LocationId == v) && s.Ships.Any(r => r.PlayerId == p.Id && EdgeAt(r.LocationId).Vertices.Contains(v)))), "DisconnectedShip", "船须连接己方建筑或船，路船转换须经过己方建筑。");
             if (scenario.Id == "pirate-islands") ValidatePirateRoute(s, p, edge);
@@ -145,12 +145,12 @@ namespace Catan.Core.M3
         {
             var tiles = s.Tiles.Where(t => t.Vertices.Contains(vertex) && IsLand(t)).ToArray();
             var ownBeachhead = scenario.Id == "pirate-islands" && scenario.Fortresses.Any(f => f.PlayerId == p.Id && f.BeachheadVertexId == vertex);
-            Require(tiles.Length > 0 && (ownBeachhead || tiles.Any(t => !scenario.ForbiddenSettlementTileIds.Contains(t.Id))), "SeaSettlement", "此处不能建定居点。");
-            if (scenario.Id == "forgotten-tribe") Require(tiles.Any(t => t.Number.HasValue), "UnnumberedIsland", "只能在有号码的陆地上建定居点。");
+            Require(tiles.Length > 0 && (ownBeachhead || tiles.Any(t => !scenario.ForbiddenSettlementTileIds.Contains(t.Id))), "SeaSettlement", "此处不能建村庄。");
+            if (scenario.Id == "forgotten-tribe") Require(tiles.Any(t => t.Number.HasValue), "UnnumberedIsland", "只能在有号码的陆地上建村庄。");
             Require(!s.Fortresses.Any(f => f.Strength > 0 && f.VertexId == vertex), "FortressOccupied", "该点是海盗要塞。");
-            if (setup) Require(tiles.Any(t => scenario.StartingTileIds.Contains(t.Id)) && !scenario.BannedSetupVertexIds.Contains(vertex), "InvalidStartingRegion", "不能在此放置开局定居点。");
+            if (setup) Require(tiles.Any(t => scenario.StartingTileIds.Contains(t.Id)) && !scenario.BannedSetupVertexIds.Contains(vertex), "InvalidStartingRegion", "不能在此放置开局村庄。");
             if (scenario.Id == "pirate-islands" && !tiles.Any(t => scenario.StartingTileIds.Contains(t.Id)))
-                Require(scenario.Fortresses.Any(f => f.PlayerId == p.Id && f.BeachheadVertexId == vertex), "NotBeachhead", "海盗群岛只可在自己的滩头建立新定居点。");
+                Require(scenario.Fortresses.Any(f => f.PlayerId == p.Id && f.BeachheadVertexId == vertex), "NotBeachhead", "海盗群岛只可在自己的滩头建立新村庄。");
         }
         private void RecordRegion(GameState s, PlayerState p, string vertex, bool setup)
         {

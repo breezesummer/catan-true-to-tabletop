@@ -139,7 +139,7 @@ namespace Catan.Core.M5
         private void ValidateSeafaringSettlement(GameState s,PlayerState p,string vertex,bool setup)
         {
             var land=s.Tiles.Where(t=>IsLand(t)&&t.Vertices.Contains(vertex)).ToArray();
-            Require(land.Length>0,"SeaSettlement","定居点必须邻接陆地。");
+            Require(land.Length>0,"SeaSettlement","村庄必须邻接陆地。");
             if(setup)Require(land.Any(t=>seafaring.StartingTileIds.Contains(t.Id)),"InvalidStartingRegion","开局只能在主岛指定区域放置。");
         }
         private void RecordRegion(GameState s,PlayerState p,string vertex,bool setup)
