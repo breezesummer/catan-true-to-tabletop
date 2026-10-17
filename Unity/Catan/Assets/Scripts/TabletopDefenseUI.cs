@@ -8,7 +8,7 @@ public sealed class TabletopDefenseUI
     string roadPlayer;
     int roadLength;
     bool roadBound;
-    public string MobileSummary => (position>=0?"蛮族 "+position+"/7 · 防御 "+strength+"/"+threat+"\n":"")+(roadBound?"最长路线 · "+(string.IsNullOrEmpty(roadPlayer)?"暂无":roadPlayer+" "+roadLength+" 段"):"");
+    public string MobileSummary => (position>=0?"蛮族 "+position+"/7 · "+(position==7?"本次防御 ":"防御 ")+strength+"/"+threat+"\n":"")+(roadBound?"最长路线 · "+(string.IsNullOrEmpty(roadPlayer)?"暂无":roadPlayer+" "+roadLength+" 段"):"");
     static Texture2D ship,shield;
     public void Bind(int position,int strength,int threat)
     {this.position=position;this.strength=strength;this.threat=threat;}
@@ -34,7 +34,7 @@ public sealed class TabletopDefenseUI
                 ModernOperationUI.Round(new Rect(Area.x+14+i*32,Area.y+36,27,4),i<position?ModernOperationUI.Accent:ModernOperationUI.Surface);
             var defenseColor=threat==0||strength>=threat?new Color(.47f,.78f,.67f):ModernOperationUI.Error;
             DrawIcon(new Rect(Area.x+15,Area.y+47,19,23),shield,defenseColor);
-            GUI.Label(new Rect(Area.x+45,Area.y+46,145,25),"防御 / 蛮族力量",new GUIStyle(title){fontSize=12});
+            GUI.Label(new Rect(Area.x+45,Area.y+46,145,25),position==7?"本次防御 / 蛮族":"防御 / 蛮族力量",new GUIStyle(title){fontSize=12});
             count.normal.textColor=defenseColor;
             GUI.Label(new Rect(Area.x+179,Area.y+46,52,25),strength+" / "+threat,count);
             ModernOperationUI.Fill(new Rect(Area.x+13,Area.y+76,Area.width-26,1),ModernOperationUI.Line);

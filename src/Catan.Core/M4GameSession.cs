@@ -135,7 +135,9 @@ namespace Catan.Core.M4
                     LegalVertexIds = vertices, LegalCityVertexIds = cities, LegalEdgeIds = edges, LongestRoadPlayerId = state.LongestRoadPlayerId, LargestArmyPlayerId = state.LargestArmyPlayerId,
                     WinnerPlayerId = state.WinnerPlayerId, LastDice1 = state.LastDice1, LastDice2 = state.LastDice2, Events = Json.Copy(state.Events),
                     OwnCommodities = own.Commodities.Copy(), OwnImprovements = own.Improvements.ToArray(), CommodityBank = state.CommodityBank.Copy(),
-                    BarbarianPosition = state.BarbarianPosition, FirstBarbarianAttack = state.FirstBarbarianAttack, LastEventDie = state.LastEventDie
+                    BarbarianPosition = state.BarbarianPosition, FirstBarbarianAttack = state.FirstBarbarianAttack, LastEventDie = state.LastEventDie,
+                    DefenderStrength = state.BarbarianDefenseStrength ?? state.Knights.Where(k => k.Active).Sum(k => k.Level),
+                    BarbarianStrength = state.BarbarianAttackStrength ?? state.Cities.Length
                 };
                 view.Board.Knights = Json.Copy(state.Knights); view.Board.Walls = Json.Copy(state.Walls); view.Board.Metropolises = Json.Copy(state.Metropolises);
                 foreach (var pub in view.Players) { var actual = state.Players.Single(p => p.Id == pub.Id); pub.CommodityCount = 0; pub.Improvements = actual.Improvements.ToArray(); pub.DefenderPoints = actual.DefenderPoints; pub.WallSupply = 3-state.Walls.Count(w=>w.PlayerId==pub.Id); pub.KnightSupply = Enumerable.Range(1,3).Select(n=>2-state.Knights.Count(k=>k.PlayerId==pub.Id&&k.Level==n)-(state.PendingDecision?.DisplacedKnight is Knight displaced&&displaced.PlayerId==pub.Id&&displaced.Level==n?1:0)-state.DecisionQueue.Count(d=>d.DisplacedKnight!=null&&d.DisplacedKnight.PlayerId==pub.Id&&d.DisplacedKnight.Level==n)).ToArray(); }
@@ -163,6 +165,12 @@ namespace Catan.Core.M4
                 if (record == null || record.Command == null) throw new InvalidDataException("Malformed command history.");
                 var result = session.Execute(record.Command);
                 if (!result.Success || result.IsDuplicate) throw new InvalidDataException("Invalid saved command history.");
+            }
+            // 旧存档没有战斗快照；只能从完整指令重放补回，不能用已拆城后的数量推算。
+            if (!saved.BarbarianAttackStrength.HasValue && !saved.BarbarianDefenseStrength.HasValue)
+            {
+                saved.BarbarianAttackStrength = session.state.BarbarianAttackStrength;
+                saved.BarbarianDefenseStrength = session.state.BarbarianDefenseStrength;
             }
             if (session.Save() != Json.Write(saved)) throw new InvalidDataException("Saved authority differs from deterministic replay.");
             return session;

@@ -26,7 +26,7 @@ namespace Catan.Core.M5
             {
                 var next=s.DecisionQueue[0];s.DecisionQueue=s.DecisionQueue.Skip(1).ToArray();
                 if(next.Kind=="ProgressDraw") {DrawProgressCard(s,s.Players.Single(p=>p.Id==next.PlayerId),next.Track);CheckVictory(s);if(s.Phase==GamePhase.Finished)return;continue;}
-                if(next.Kind=="BarbarianReturnHome") {foreach(var knight in s.Knights)knight.Active=false;s.BarbarianPosition=0;if(s.PirateTileId==null)s.PirateTileId=seafaring.InitialPirateTileId;continue;}
+                if(next.Kind=="BarbarianReturnHome") {foreach(var knight in s.Knights)knight.Active=false;s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;if(s.PirateTileId==null)s.PirateTileId=seafaring.InitialPirateTileId;continue;}
                 if(next.Kind=="Aqueduct"&&s.Bank.Total==0)continue;
                 s.PendingDecision=next;s.Phase=GamePhase.PendingChoice;return;
             }
@@ -68,7 +68,9 @@ namespace Catan.Core.M5
             s.FirstBarbarianAttack=true;
             if(s.RobberTileId==null) s.RobberTileId=seafaring.InitialRobberTileId;
             var strength=s.Players.ToDictionary(p=>p.Id,p=>s.Knights.Where(k=>k.PlayerId==p.Id&&k.Active).Sum(k=>k.Level));
-            if(strength.Values.Sum()>=s.Cities.Length)
+            s.BarbarianAttackStrength=s.Cities.Length;
+            s.BarbarianDefenseStrength=strength.Values.Sum();
+            if(s.BarbarianDefenseStrength>=s.BarbarianAttackStrength)
             {
                 int best=strength.Values.Max(); var leaders=TurnOrder(s).Where(p=>strength[p.Id]==best).ToArray();
                 if(leaders.Length==1) leaders[0].DefenderPoints++;

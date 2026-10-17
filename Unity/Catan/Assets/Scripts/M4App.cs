@@ -197,7 +197,7 @@ public sealed partial class M4App : MonoBehaviour
             cardArt.GoodRow(Enumerable.Range(0,8).Select(Own).ToArray(),Goods,small);
             var own=view.Players.First(p=>p.Id==seat);Text("改良 贸易 "+own.Improvements[0]+" / 政治 "+own.Improvements[1]+" / 科学 "+own.Improvements[2]+"   城墙余 "+own.WallSupply,true);
             Text("路 "+own.Pieces.Roads+" / 村 "+own.Pieces.Settlements+" / 城 "+own.Pieces.Cities+"   骑士余 "+string.Join("/",own.KnightSupply),true);
-            Text("防御 "+view.Board.Knights.Where(k=>k.Active).Sum(k=>k.Level)+" / 蛮族力量 "+view.Board.Cities.Length+" · "+(view.FirstBarbarianAttack?"强盗已启用":"强盗尚未启用"),true);
+            Text("防御 "+view.DefenderStrength+" / 蛮族力量 "+view.BarbarianStrength+" · "+(view.FirstBarbarianAttack?"强盗已启用":"强盗尚未启用"),true);
             if(Btn(artOpen?"返回操作面板":"查看手牌与设施实体卡面")){artOpen=!artOpen;scroll=Vector2.zero;}
             scroll=GUILayout.BeginScrollView(scroll);
             if(artOpen)DrawEntityCards();else DrawControls();GUILayout.EndScrollView();GUILayout.EndArea();

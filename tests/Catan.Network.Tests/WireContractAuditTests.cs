@@ -66,6 +66,31 @@ public sealed class WireContractAuditTests
         Assert.ThrowsAny<Exception>(() => WireJson.Deserialize<M2.GameState>("{}"));
     }
     [Theory]
+    [InlineData("cities")][InlineData("combined")]
+    public void PublicBattleStrengthSurvivesTheClientServerWire(string rules)
+    {
+        dynamic game = rules == "cities"
+            ? (object)M4.CitiesKnightsGameSession.Create(Scenario, 4, 53)
+            : M5.CombinedGameSession.Create("heading-for-new-shores", 4, 53);
+        for (int n = 0; n < 16; n++)
+        {
+            dynamic view = game.GetPlayerView("P1");
+            bool settlement = view.Phase.ToString() == "SetupSettlement";
+            string kind = settlement ? "SetupSettlement" : "SetupRoad";
+            dynamic seat = game.GetPlayerView((string)view.ActivePlayerId);
+            dynamic command = rules == "cities" ? (object)new M4.Command { Kind = Enum.Parse<M4.CommandKind>(kind) }
+                : new M5.Command { Kind = Enum.Parse<M5.CommandKind>(kind) };
+            command.Id = "公开兵力协议-" + n; command.PlayerId = seat.PlayerId;
+            command.TargetId = settlement ? seat.LegalVertexIds[0] : seat.LegalEdgeIds[0];
+            Assert.True((bool)game.Execute(command).Success);
+        }
+        object original = game.GetPlayerView("P1");
+        dynamic restored = WireJson.Deserialize(WireJson.SerializeObject(original), original.GetType());
+        Assert.Equal(4, (int)restored.BarbarianStrength);
+        Assert.Equal(0, (int)restored.DefenderStrength);
+        game.AssertInvariants();
+    }
+    [Theory]
     [InlineData("{\"Operation\":\"List\",\"Authority\":\"secret\"}")]
     [InlineData("{\"Operation\":\"List\",\"Operation\":\"Command\"}")]
     [InlineData("{\"$type\":\"Catan.Core.M2.GameState\"}")]

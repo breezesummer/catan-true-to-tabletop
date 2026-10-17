@@ -26,7 +26,7 @@ namespace Catan.Core.M4
             {
                 var next=s.DecisionQueue[0];s.DecisionQueue=s.DecisionQueue.Skip(1).ToArray();
                 if(next.Kind=="ProgressDraw") {DrawProgressCard(s,s.Players.Single(p=>p.Id==next.PlayerId),next.Track);CheckVictory(s);if(s.Phase==GamePhase.Finished)return;continue;}
-                if(next.Kind=="BarbarianReturnHome") {foreach(var knight in s.Knights)knight.Active=false;s.BarbarianPosition=0;continue;}
+                if(next.Kind=="BarbarianReturnHome") {foreach(var knight in s.Knights)knight.Active=false;s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;continue;}
                 s.PendingDecision=next;s.Phase=GamePhase.PendingChoice;return;
             }
             if(s.ProductionPending) { s.ProductionPending=false; ResolveProduction(s); return; }
@@ -65,7 +65,9 @@ namespace Catan.Core.M4
             s.FirstBarbarianAttack=true;
             if(s.RobberTileId==null) s.RobberTileId=scenario.Topology.Tiles.Single(t=>t.Resource=="desert").Id;
             var strength=s.Players.ToDictionary(p=>p.Id,p=>s.Knights.Where(k=>k.PlayerId==p.Id&&k.Active).Sum(k=>k.Level));
-            if(strength.Values.Sum()>=s.Cities.Length)
+            s.BarbarianAttackStrength=s.Cities.Length;
+            s.BarbarianDefenseStrength=strength.Values.Sum();
+            if(s.BarbarianDefenseStrength>=s.BarbarianAttackStrength)
             {
                 int best=strength.Values.Max(); var leaders=TurnOrder(s).Where(p=>strength[p.Id]==best).ToArray();
                 if(leaders.Length==1) leaders[0].DefenderPoints++;

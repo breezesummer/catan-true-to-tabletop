@@ -1,0 +1,115 @@
+{
+  "日期": "2026-10-17",
+  "时区": "Asia/Shanghai",
+  "版本": "内测版1.5",
+  "状态": "通过",
+  "标题": "蛮族战斗力量显示修复与玩家混合交易核对 v001",
+  "触发条件": "四座城市、防御力量三；P4、P1、P3并列最低贡献。P4先拆城后剩余三城，旧界面显示绿色3/3，但P1仍须完成同次攻击的劫掠选择。两套扩展规则均已复现。",
+  "修复": "攻击开始时保存攻守力量；公开视图、桌面HUD和旧式界面统一使用本次快照；同次攻击全部结算后清除。旧存档通过完整指令重放补回快照。",
+  "规则来源": [
+    {
+      "文件": ".local/reference-cache/official-2025/v001/catan-cities-knights-2025-en.pdf",
+      "PDF页码": [
+        11
+      ],
+      "结论": "力量相等时守方获胜；失败时并列最低贡献者各失一城，全部完成后蛮族返航、骑士休眠。"
+    },
+    {
+      "文件": ".local/reference-cache/official-2025/v001/catan-base-2025-en.pdf",
+      "PDF页码": [
+        7
+      ],
+      "结论": "玩家间可自定多种资源的报价与数量，禁止无偿赠送和同类资源对换；银行和港口须按规定比例支付同一种资源。"
+    },
+    {
+      "文件": ".local/reference-cache/official-2025/v001/catan-cities-knights-2025-en.pdf",
+      "PDF页码": [
+        7
+      ],
+      "结论": "玩家间可交易任意组合的资源与商品；现有混合交易保持。"
+    }
+  ],
+  "修复前复现": {
+    "总数": 6,
+    "通过": 4,
+    "失败": 2,
+    "说明": "两套规则的固定战斗测试均在第一座城市被拆后得到3而非开战时的4；相等或更强的四项测试已通过。",
+    "报告": ".local/barbarian-trade-fix-v001/tests/before-fix.trx"
+  },
+  "验证": {
+    "rules": {
+      "总数": 943,
+      "通过": 943,
+      "失败": 0,
+      "报告": ".local/barbarian-trade-fix-v001/tests/rules.trx"
+    },
+    "network": {
+      "总数": 96,
+      "通过": 96,
+      "失败": 0,
+      "报告": ".local/barbarian-trade-fix-v001/tests/network.trx"
+    },
+    "server": {
+      "总数": 13,
+      "通过": 13,
+      "失败": 0,
+      "报告": ".local/barbarian-trade-fix-v001/tests/server.trx"
+    },
+    "targeted": {
+      "总数": 28,
+      "通过": 28,
+      "失败": 0,
+      "报告": ".local/barbarian-trade-fix-v001/tests/targeted.trx"
+    }
+  },
+  "去重测试总数": 1052,
+  "专项覆盖": [
+    "固定局面3对4及多名受害者顺序",
+    "真正3对3及4对3不劫掠",
+    "非待决玩家、无效城市和中途结束回合拒绝且状态不变",
+    "真实开局中途战斗存档、旧存档兼容、快照篡改与缺项拒绝",
+    "资源与棋子守恒、重复交易幂等",
+    "四规则定向和广播的多换一、一换多",
+    "公开力量通过客户端服务器协议往返"
+  ],
+  "构建与运行": {
+    "Unity": "6000.3.25f1 Windows 构建通过",
+    "独立进程保存恢复": "基础、航海家、城市与骑士、双扩展组合均通过",
+    "随包服务": "win-x64 自包含服务构建通过",
+    "程序集一致性": "项目插件、Windows客户端和随包房间服务三个程序集逐字节一致",
+    "缓存恢复": "首轮发现Library/ArtifactDB损坏，备份该文件及锁文件后重新导入并构建成功；还原六项本轮生成配置差异"
+  },
+  "产物": {
+    "Windows程序": {
+      "路径": ".local/barbarian-trade-fix-v001/Builds/Windows/CatanM6.exe",
+      "字节数": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    "随包房间服务": {
+      "路径": ".local/barbarian-trade-fix-v001/Builds/Windows/Server/Catan.Server.exe",
+      "字节数": 162304,
+      "SHA256": "2627e26e4133ff87ed2f7145d8b30cb045df63cc4ef3c5877847cf43bb620ff8"
+    },
+    "规则程序集": {
+      "路径": "Unity/Catan/Assets/Plugins/Catan.Core.dll",
+      "字节数": 557056,
+      "SHA256": "315133db7de2e969608578a592ed7c2ccef358e449a8e77ff7ca6d4b55b9e5ee"
+    },
+    "AI程序集": {
+      "路径": "Unity/Catan/Assets/Plugins/Catan.AI.dll",
+      "字节数": 148480,
+      "SHA256": "e88f226d80964f37718a42c2884c18e7f348fbab4ade1d0003a9da13c0abd550"
+    },
+    "网络程序集": {
+      "路径": "Unity/Catan/Assets/Plugins/Catan.Network.Contracts.dll",
+      "字节数": 13824,
+      "SHA256": "d99637d90beb695ece4381a454cb0fc4cca4e82542f013360c6efd4c62a61f6f"
+    }
+  },
+  "范围": {
+    "Android": "共用规则与界面源码；本轮未重新构建APK或进行真机验证",
+    "界面": "编译及独立运行验证通过；本轮未做实际窗口视觉验收",
+    "发布与阶段": "未发布新版本；ROADMAP阶段保持；真实多机与公网仍待验",
+    "工作区": "保留本轮开始前的无关工作区及暂存改动；使用独立索引提交本轮修复"
+  }
+}
