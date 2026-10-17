@@ -6,7 +6,8 @@ $lanOutput=Join-Path $lanRoot ('menu-'+[Guid]::NewGuid().ToString('N').Substring
 New-Item -ItemType Directory -Force $lanOutput | Out-Null
 $lanLog=Join-Path $lanOutput 'player.log'
 $lanArgs=@('-force-d3d11','-screen-fullscreen','0','-screen-width','1440','-screen-height','900','--lan-menu-verify',('"'+$lanOutput+'"'),'-logFile',('"'+$lanLog+'"'))
-$lanPlayer=Start-Process -FilePath (Join-Path $lanRoot 'Builds/Windows/CatanM7.exe') -ArgumentList $lanArgs -WindowStyle Hidden -PassThru
+$lanExecutable=& (Join-Path $PSScriptRoot '../development/Find-GamePlayer.ps1') -BuildRoot $BuildRoot
+$lanPlayer=Start-Process -FilePath $lanExecutable -ArgumentList $lanArgs -WindowStyle Hidden -PassThru
 try {
     $lanDeadline=[DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
     while(!$lanPlayer.WaitForExit(1000)) {

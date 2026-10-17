@@ -18,6 +18,16 @@ public sealed partial class M6App
     public string PlayerName(string id)=>PlayerDisplayName(id);
     public static string PlayerLabel(string id)=>identityOwner!=null?identityOwner.PlayerDisplayName(id):ColorLabel(id);
     public static string DisplayPlayerText(string value)=>PlayerIdentityModel.ReplaceIds(value,PlayerLabel);
+    public static GUIStyle PlayerNameStyle(GUIStyle basis,string id)
+    {
+        var style=new GUIStyle(basis){richText=false};
+        if(PlayerIdentityModel.IsPlayerId(id))
+        {
+            var color=BoardRenderer.SeatColor(id.ToUpperInvariant());
+            style.normal.textColor=style.hover.textColor=style.active.textColor=style.focused.textColor=color;
+        }
+        return style;
+    }
     internal static string[] OrderedPlayers(IEnumerable<string> ids)
     {
         var available=(ids??Array.Empty<string>()).ToArray();
@@ -45,7 +55,7 @@ public sealed partial class M6App
     }
     void DrawOpeningOrder()
     {
-        string message=OpeningOrderMessage;if(message.Length==0||tableMenu)return;
+        string message=OpeningOrderMessage;if(message.Length==0||tableMenu||CardPresentationBusy)return;
         var style=new GUIStyle(title){fontSize=30,alignment=TextAnchor.MiddleCenter,wordWrap=false};
         style.normal.textColor=new Color(.95f,.055f,.035f);
         GUI.Label(new Rect(365,224,710,48),message,style);

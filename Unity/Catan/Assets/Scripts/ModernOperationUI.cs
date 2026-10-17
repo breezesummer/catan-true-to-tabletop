@@ -39,7 +39,7 @@ public static class ModernOperationUI
         Round(r,Line);Round(new Rect(r.x+1,r.y+1,r.width-2,r.height-2),Background);
     }
     public static void Label(Rect r,string value,GUIStyle style=null){Styles();GUI.Label(r,value,style??Text);}
-    public static bool Button(Rect r,string caption,bool enabled=true,bool primary=false,bool selected=false)
+    public static bool Button(Rect r,string caption,bool enabled=true,bool primary=false,bool selected=false,string playerId=null)
     {
         Styles();bool old=GUI.enabled;GUI.enabled=old&&enabled;
         bool hover=GUI.enabled&&r.Contains(Event.current.mousePosition);
@@ -48,6 +48,7 @@ public static class ModernOperationUI
         Round(r,GUI.enabled?bg:Color.Lerp(Background,Surface,.6f));
         if(selected)Fill(new Rect(r.x+9,r.yMax-3,r.width-18,2),Accent);
         var label=new GUIStyle(Center);label.normal.textColor=!GUI.enabled?Muted:primary?Background:TextColor;
+        if(playerId!=null)label=M6App.PlayerNameStyle(label,playerId);
         GUI.Label(r,caption,label);bool result=GUI.Button(r,GUIContent.none,GUIStyle.none);GUI.enabled=old;
         result=result&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
         if(result)TabletopAudio.Instance?.Click();return result;
@@ -73,7 +74,7 @@ public static class ModernOperationUI
                 if(i==value)Fill(new Rect(r.x+7,r.yMax-3,r.width-14,2),Accent);
                 if(GUI.Button(r,GUIContent.none,GUIStyle.none)&&!MobileTabletop.TouchDragged)value=i;
             }
-            else if(Button(r,labels[i],true,false,i==value))value=i;
+            else if(Button(r,M6App.DisplayPlayerText(labels[i]),true,false,i==value,PlayerIdentityModel.IsPlayerId(labels[i])?labels[i]:null))value=i;
         }
         return value;
     }

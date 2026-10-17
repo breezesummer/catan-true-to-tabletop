@@ -1,5 +1,5 @@
 param(
-    [string]$OutputRoot = '.local/release-1.6',
+    [string]$OutputRoot = '.local/Catan1.6.1-自动亮牌与玩家显示',
     [switch]$Arm64Only
 )
 $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()
@@ -68,7 +68,8 @@ try {
     if (!(Select-String -LiteralPath (Join-Path $androidLogs 'unity-android-build.log') -Pattern 'CATAN_M6_ANDROID_BUILD_OK' -Quiet)) {
         throw '未找到 Android 构建成功标记。'
     }
-    $androidApk = Join-Path $androidOutputRoot 'Builds\Android\CatanM7.apk'
+    $androidFileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))
+    $androidApk = Join-Path $androidOutputRoot "Builds/Android/$androidFileStem.apk"
     if (!(Test-Path -LiteralPath $androidApk)) { throw '未找到构建后的 APK。' }
     $androidApkSigner = Join-Path $androidPlayerRoot 'SDK\build-tools\36.0.0\apksigner.bat'
     $androidSavedJavaHome = $env:JAVA_HOME

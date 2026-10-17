@@ -8,7 +8,7 @@ using UnityEngine;
 using C4=Catan.Core.M4;
 
 // 只在显式 --interaction-verify 下运行隔离显示夹具。不会读取或覆盖玩家的常规存档。
-public sealed class InteractionPresentationVerification:MonoBehaviour
+public sealed partial class InteractionPresentationVerification:MonoBehaviour
 {
     M6App app;
     string output,stage;
@@ -22,12 +22,13 @@ public sealed class InteractionPresentationVerification:MonoBehaviour
     void Require(bool value,string message){checks++;if(!value)throw new InvalidOperationException(message);}
     IEnumerator Start()
     {
-        var args=Environment.GetCommandLineArgs();int flag=Array.IndexOf(args,"--interaction-verify");if(flag<0)yield break;
+        var args=Environment.GetCommandLineArgs();bool cards=args.Contains("--card-player-verify");int flag=Array.IndexOf(args,cards?"--card-player-verify":"--interaction-verify");if(flag<0)yield break;
         output=Path.GetFullPath(args[flag+1]);
         if(!output.StartsWith(Path.GetFullPath(".local")+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)){Application.Quit(1);yield break;}
         Directory.CreateDirectory(output);app=GetComponent<M6App>();
         gameObject.AddComponent<InteractionCaptureBegin>().Owner=this;gameObject.AddComponent<InteractionCaptureEnd>().Owner=this;
-        yield return null;var run=args.Contains("--resource-layout-review")?VerifyResourceLayouts():Verify();
+        if(cards)while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
+        yield return null;var run=cards?VerifyCardPlayers():args.Contains("--resource-layout-review")?VerifyResourceLayouts():Verify();
         while(true)
         {
             object next;

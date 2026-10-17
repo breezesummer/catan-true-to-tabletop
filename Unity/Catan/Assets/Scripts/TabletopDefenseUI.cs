@@ -51,7 +51,7 @@ public sealed class TabletopDefenseUI
         var result=new Rect(Area.x+109,y-2,122,25);
         count.normal.textColor=string.IsNullOrEmpty(roadPlayer)?ModernOperationUI.Muted:gold;
         string resultText=string.IsNullOrEmpty(roadPlayer)?"暂无归属":M6App.PlayerLabel(roadPlayer)+" · "+roadLength+" 段";
-        var resultStyle=new GUIStyle(count){fontSize=10,wordWrap=true};GUI.Label(result,resultText,resultStyle);
+        var resultStyle=M6App.PlayerNameStyle(new GUIStyle(count){fontSize=10,wordWrap=true},roadPlayer);GUI.Label(result,resultText,resultStyle);
     }
     static void DrawIcon(Rect rect,Texture2D texture,Color color)
     {var previous=GUI.color;GUI.color=color;GUI.DrawTexture(rect,texture,ScaleMode.ScaleToFit);GUI.color=previous;}

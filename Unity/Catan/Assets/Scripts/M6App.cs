@@ -7,7 +7,9 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string ReleaseVersion="内测版1.6";
+    public const string BuildVersion="1.6.1";
+    public const string ProductFileName="Catan"+BuildVersion;
+    public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
     public sealed class SavedGame
     {
@@ -74,6 +76,7 @@ public sealed partial class M6App : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate=60;
+        StartCoroutine(ApplyGameWindowTitle());
         font=MobileTabletop.LoadFont();
         InitializeTabletopAudio();
         gameObject.AddComponent<MenuAudioVerification>().Initialize(this);
@@ -313,7 +316,7 @@ public sealed partial class M6App : MonoBehaviour
                 if(TabletopAudio.Instance!=null)TabletopAudio.Instance.DrawSettings(new Rect(494,640,452,92),font);
                 ModernOperationUI.Label(new Rect(494,740,452,34),Notice,ModernOperationUI.Small);
             }
-            if(NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),Network.Status,small);
+            if(NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),DisplayPlayerText(Network.Status),small);
             DrawOpeningOrder();
             string prompt=DisplayPlayerText(CurrentTablePrompt);
             if(prompt.Length>0&&!TablePresentationBlocked&&!TableOverlayOpen)

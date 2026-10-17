@@ -20,7 +20,7 @@ public sealed partial class OperationDock
     Font quantityFont;
     OperationSnapshot current;
     public Func<string,string> PlayerName;
-    string DisplayPlayer(string seat)=>PlayerName?.Invoke(seat)??(seat=="*"?"所有玩家":seat);
+    string DisplayPlayer(string seat)=>PlayerName?.Invoke(seat)??M6App.PlayerLabel(seat);
     string revision, scope, hoveredBuild, previewCard, message = "";
     bool tradeOpen, playerTrade;
     bool specialHand;
@@ -667,7 +667,7 @@ public sealed partial class OperationDock
         if(playerTrade)
         {
             target=Mathf.Clamp(target,0,Math.Max(0,s.OtherPlayers.Length-1));
-            for(int i=0;i<s.OtherPlayers.Length;i++)if(ModernOperationUI.Button(new Rect(766+i*130,229,121,35),DisplayPlayer(s.OtherPlayers[i]),true,false,target==i))target=i;
+            for(int i=0;i<s.OtherPlayers.Length;i++)if(ModernOperationUI.Button(new Rect(766+i*130,229,121,35),DisplayPlayer(s.OtherPlayers[i]),true,false,target==i,s.OtherPlayers[i]))target=i;
             if(dragging&&GiveDropRect.Contains(Event.current.mousePosition))Fill(GiveDropRect,new Color(.77f,.64f,.39f,.22f));
             DrawTradePlayer(new Rect(286,268,406,58),s.Seat);
             DrawTradePlayer(new Rect(744,268,406,58),s.OtherPlayers.Length>0?s.OtherPlayers[target]:"*");
@@ -712,7 +712,7 @@ public sealed partial class OperationDock
             StrategyHudArt.Disc(new Rect(area.x,area.y,52,52),BoardRenderer.SeatColor(seat)*.65f);
             StrategyHudArt.Avatar(new Rect(area.x+4,area.y+4,44,44),seat);
         }
-        Label(new Rect(area.x+88,area.y+8,area.width-88,36),DisplayPlayer(seat),heading);
+        Label(new Rect(area.x+88,area.y+8,area.width-88,36),DisplayPlayer(seat),M6App.PlayerNameStyle(heading,seat));
     }
     void TradeCard(Rect face,int good,bool missing)
     {
@@ -745,7 +745,10 @@ public sealed partial class OperationDock
         var offer=s.Offer;Paper(TradeRect);
         Label(new Rect(286,157,800,36),"交易报价",heading);
         var perspective=OperationOfferPerspective.For(s);
-        Label(new Rect(286,202,800,25),DisplayPlayer(offer.Proposer)+"  →  "+DisplayPlayer(offer.IsBroadcast?"*":offer.Recipient),small);
+        Label(new Rect(286,202,330,25),DisplayPlayer(offer.Proposer),M6App.PlayerNameStyle(small,offer.Proposer));
+        Label(new Rect(616,202,45,25),"→",small);
+        string recipient=offer.IsBroadcast?"*":offer.Recipient;
+        Label(new Rect(661,202,425,25),DisplayPlayer(recipient),M6App.PlayerNameStyle(small,recipient));
         DrawTradePlayer(new Rect(286,253,406,58),s.Seat);
         DrawTradePlayer(new Rect(744,253,406,58),perspective.OtherSeat);
         DrawOfferBag(new Rect(286,323,406,195),perspective.OwnGive,s.Goods);

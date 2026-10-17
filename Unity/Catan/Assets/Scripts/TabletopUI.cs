@@ -58,8 +58,12 @@ public sealed partial class TabletopUI
     public void DrawHistory(Font font,Catan.Core.GameHistoryEntry[] entries,string[] players)
     {if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);if(history.IsOpen||!contextVisible)history.Draw(font,entries,players);if(!history.IsOpen){DrawScoreDetails();DrawPlayerHint();}}
     public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
-    public void ObserveDice(long sequence,int first,int second,int? eventDie)
-    {dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);}
+    public void ObserveDice(long sequence,int first,int second,int? eventDie,Catan.Core.GameHistoryEntry presentationRoll=null)
+    {
+        if(presentationRoll!=null&&presentationRoll.Sequence>sequence)
+        {sequence=presentationRoll.Sequence;first=presentationRoll.Dice1;second=presentationRoll.Dice2;eventDie=presentationRoll.EventDie=="Science"?3:presentationRoll.EventDie=="Politics"?2:presentationRoll.EventDie=="Trade"?1:0;}
+        dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);
+    }
     static readonly Color Cream = new Color(.96f,.88f,.70f), Ink = new Color(.24f,.12f,.06f);
     public static readonly Color HotNumberColor = new Color(1f,.10f,.075f);
     public bool BlocksBoardInput(Vector2 p) => !TabletopScene.BoardArea.Contains(p) || HistoryBlocksInput(p) || defense.BlocksInput(p) || hits.Any(r=>r.Contains(p)) || worldHits.Any(h=>h.Contains(p)) || contextVisible && CurrentContextRect.Contains(p);
@@ -162,6 +166,7 @@ public sealed partial class TabletopUI
         StrategyHudArt.Disc(portrait,BoardRenderer.SeatColor(actor)*.62f,true);
         StrategyHudArt.Avatar(new Rect(portrait.x+6,portrait.y+6,portrait.width-12,portrait.height-12),actor);
         var actorStyle=new GUIStyle(title){fontSize=19,alignment=TextAnchor.MiddleLeft,wordWrap=false};
+        actorStyle=M6App.PlayerNameStyle(actorStyle,actor);
         string actorName=M6App.PlayerLabel(actor)+(actor==seat?" · 你":"");
         actorStyle.fontSize=Mathf.Min(19,Mathf.Max(10,Mathf.FloorToInt(19*193/Mathf.Max(193,actorStyle.CalcSize(new GUIContent(actorName)).x))));
         GUI.Label(new Rect(r.x+181,r.y+15,193,27),actorName,actorStyle);
@@ -209,7 +214,7 @@ public sealed partial class TabletopUI
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
             StrategyHudArt.Avatar(new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
-            GUI.Label(new Rect(x+4,70,width-8,24),M6App.PlayerLabel(player.Id),new GUIStyle(center){fontSize=10,fontStyle=FontStyle.Bold,wordWrap=true});
+            GUI.Label(new Rect(x+4,70,width-8,24),M6App.PlayerLabel(player.Id),M6App.PlayerNameStyle(new GUIStyle(center){fontSize=10,fontStyle=FontStyle.Bold,wordWrap=true},player.Id));
             int points=player.Score==null?player.Points:player.Id==own?player.Score.Total:player.Score.PublicPoints;
             int[] values={points,player.Improvements==null?0:player.Improvements[0],player.Improvements==null?0:player.Improvements[1],player.Improvements==null?0:player.Improvements[2],player.Resources,player.Cards};
             string[] hints={"胜利点 · 悬停查看分数构成","贸易设施等级","政治设施等级","科学设施等级",
@@ -257,7 +262,7 @@ public sealed partial class TabletopUI
         var label=new GUIStyle(center){fontSize=p.Improvements!=null&&!top?12:14,fontStyle=FontStyle.Bold};
         string levels=p.Improvements!=null&&p.Improvements.Length>=3&&seatRect.Contains(Event.current.mousePosition)?" · 贸"+p.Improvements[0]+" 政"+p.Improvements[1]+" 科"+p.Improvements[2]:"";
         var scoreRect=new Rect(layout.x,layout.y-4,layout.width,26);
-        TableLabel(scoreRect,M6App.PlayerLabel(p.Id)+"   "+(p.Score==null?p.Points:p.Score.PublicPoints)+" 分"+levels,label);
+        TableLabel(scoreRect,M6App.PlayerLabel(p.Id)+"   "+(p.Score==null?p.Points:p.Score.PublicPoints)+" 分"+levels,M6App.PlayerNameStyle(label,p.Id));
         ScoreHover(table.ProjectLabel(scoreRect),p.Score);
         DrawStock("road",p.Roads,p.Id,place);
         DrawStock("settlement",p.Settlements,p.Id,place);
@@ -329,7 +334,7 @@ public sealed partial class TabletopUI
         var panel=new Rect(x,Mathf.Clamp(y,12,900-height-12),364,height);
         ModernOperationUI.Panel(panel);
         var titleStyle=new GUIStyle(ModernOperationUI.Title){padding=new RectOffset(),alignment=TextAnchor.MiddleLeft,wordWrap=false};
-        GUI.Label(new Rect(panel.x+18,panel.y+12,328,40),M6App.PlayerLabel(score.PlayerId)+" · 分数构成",titleStyle);
+        GUI.Label(new Rect(panel.x+18,panel.y+12,328,40),M6App.PlayerLabel(score.PlayerId)+" · 分数构成",M6App.PlayerNameStyle(titleStyle,score.PlayerId));
         string total=score.IsOwn?"总分 "+score.Total+"  ·  明分 "+score.PublicPoints+"  ·  暗分 "+score.HiddenPoints:"公开得分 "+score.PublicPoints+" 分";
         var bodyStyle=new GUIStyle(ModernOperationUI.Text){padding=new RectOffset(),alignment=TextAnchor.MiddleLeft,wordWrap=false};
         var detailStyle=new GUIStyle(ModernOperationUI.Small){padding=new RectOffset(),alignment=TextAnchor.MiddleLeft,wordWrap=false};

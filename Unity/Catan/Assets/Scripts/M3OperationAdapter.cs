@@ -188,12 +188,12 @@ public sealed partial class M3App
     }
     void TableNote(string caption,Action content)
     {
-        tabletop.BeginContext(caption);
+        tabletop.BeginContext(M6App.DisplayPlayerText(caption));
         ModernOperationUI.Styles(font);var label=new GUIStyle(ModernOperationUI.Text);
         tableInk=label;content();tabletop.EndContext();
     }
     GUIStyle tableInk;
-    bool TableButton(string caption)=>ModernOperationUI.LayoutButton(caption);
+    bool TableButton(string caption)=>ModernOperationUI.LayoutButton(M6App.DisplayPlayerText(caption));
     internal void ShowScenarioActions()
     {CancelOperationDraft();dock.Reset();tableNotes=true;status="选择本剧本的航海行动；右键或 Esc 关闭。";}
     void DrawTableDecision()

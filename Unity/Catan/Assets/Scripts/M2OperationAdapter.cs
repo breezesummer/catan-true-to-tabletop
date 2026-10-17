@@ -177,7 +177,7 @@ public sealed partial class M2App
         tableInk=label;content();tabletop.EndContext();
     }
     GUIStyle tableInk;
-    bool TableButton(string caption)=>ModernOperationUI.LayoutButton(caption);
+    bool TableButton(string caption)=>ModernOperationUI.LayoutButton(M6App.DisplayPlayerText(caption));
     void DrawTableDecision()
     {
         if(preparedPurchase)

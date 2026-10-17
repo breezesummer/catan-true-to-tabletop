@@ -222,7 +222,7 @@ public sealed class TabletopCollectionTimeline
             }
             if(production&&changes.Any(c=>c.Amount>0))productionPending=false;
             var cardChanges=(entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>()).Where(c=>c.Category=="development"||c.Category=="progress").ToArray();
-            foreach(var gain in cardChanges.Where(c=>c.Amount>0))
+            foreach(var gain in cardChanges.Where(c=>c.Amount>0&&!(c.Category=="progress"&&!c.IsPrivate&&TabletopCardReveal.IsVictory(c.Name))))
             {
                 int art=gain.Category=="progress"?ProgressIndex(gain.Name):-1;
                 var source=cardChanges.FirstOrDefault(c=>c.Category==gain.Category&&c.Amount<0&&c.Name==gain.Name);
@@ -324,8 +324,6 @@ public sealed class TabletopCollectionTimeline
             // 所以未落地的新牌始终对应当前同类手牌的后缀；重绑插槽不能重置其飞行时间。
             var available=cards.Where(c=>c.Name==group.Key.CardName&&c.Progress==(group.Key.Category=="progress")).Reverse().ToArray();
             var newest=group.Reverse().ToArray();
-            // 印刷术与宪法抽到后直接公开展示，不进入可打出的进步手牌，仍需飞至页签。
-            if(available.Length==0&&newest.All(f=>f.CardId==null&&(f.ProgressIndex==7||f.ProgressIndex==21)))continue;
             for(int index=0;index<newest.Length;index++)
                 if(index<available.Length)newest[index].CardId=available[index].Id;
                 else flights.Remove(newest[index]);
