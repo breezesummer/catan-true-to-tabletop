@@ -3,6 +3,7 @@ $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Project = Join-Path $m6RepoRoot 'Unity\Catan'
+& (Join-Path $PSScriptRoot '../validation/Test-UnitySourceIntegrity.ps1') -ProjectPath $m6Project
 $m6OutputRoot = [IO.Path]::GetFullPath((Join-Path $m6RepoRoot $OutputRoot))
 $m6Logs = Join-Path $m6OutputRoot 'logs'
 New-Item -ItemType Directory -Force -Path $m6Logs,(Join-Path $m6Project 'Assets\Plugins'),(Join-Path $m6Project 'Assets\Resources') | Out-Null
