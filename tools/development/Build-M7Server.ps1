@@ -1,5 +1,5 @@
 param(
-    [string]$OutputRoot = '.local/m7-v001',
+    [string]$OutputRoot = '.local/release-1.6',
     [ValidateSet('win-x64','linux-x64','linux-arm64')][string]$Runtime = 'win-x64'
 )
 $ErrorActionPreference = 'Stop'

@@ -192,11 +192,30 @@ public sealed class OperationOfferPerspective
 public static class OperationResourceChoice
 {
     public static string Add(int good,int amount,Catan.Core.ResourceBag selected,Catan.Core.ResourceBag bank)
+        =>Change(good,1,amount,selected,bank);
+    public static string Change(int good,int delta,int amount,Catan.Core.ResourceBag selected,Catan.Core.ResourceBag bank)
     {
         if(good<0||good>=5)return "金矿只能领取资源，不能选择商品。";
+        if(delta==-1){var r=(Catan.Core.Resource)good;selected[r]=Math.Max(0,selected[r]-1);return null;}
+        if(delta!=1)return "无效的资源选择操作。";
         if(selected.Total>=Math.Min(amount,bank.Total))return "已达到可选数量，不允许继续选择。";
         var resource=(Catan.Core.Resource)good;
         if(selected[resource]>=bank[resource])return "银行库存不足，不允许选择。";
         selected[resource]++;return null;
+    }
+}
+
+// 只管理显示草稿，最终交易与领取仍由原规则入口验证。
+public static class OperationCardQuantity
+{
+    public static string Change(int[] selected,int good,int delta,int maximum,int totalLimit=int.MaxValue,bool singleKind=false)
+    {
+        if(selected==null||good<0||good>=selected.Length||delta!=1&&delta!=-1)return "无效的资源选择操作。";
+        if(delta<0){selected[good]=Math.Max(0,selected[good]-1);return null;}
+        if(selected[good]>=maximum)return "数量已达到上限，不允许继续选择。";
+        int total=singleKind?selected[good]:selected.Sum();
+        if(total>=totalLimit)return "已达到可选数量，不允许继续选择。";
+        if(singleKind)for(int i=0;i<selected.Length;i++)if(i!=good)selected[i]=0;
+        selected[good]++;return null;
     }
 }

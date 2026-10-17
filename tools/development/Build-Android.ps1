@@ -1,5 +1,5 @@
-﻿param(
-    [string]$OutputRoot = '.local/m6-android-pc-ui-v001',
+param(
+    [string]$OutputRoot = '.local/release-1.6',
     [switch]$Arm64Only
 )
 $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()
@@ -68,7 +68,7 @@ try {
     if (!(Select-String -LiteralPath (Join-Path $androidLogs 'unity-android-build.log') -Pattern 'CATAN_M6_ANDROID_BUILD_OK' -Quiet)) {
         throw '未找到 Android 构建成功标记。'
     }
-    $androidApk = Join-Path $androidOutputRoot 'Builds\Android\Catan.apk'
+    $androidApk = Join-Path $androidOutputRoot 'Builds\Android\CatanM7.apk'
     if (!(Test-Path -LiteralPath $androidApk)) { throw '未找到构建后的 APK。' }
     $androidApkSigner = Join-Path $androidPlayerRoot 'SDK\build-tools\36.0.0\apksigner.bat'
     $androidSavedJavaHome = $env:JAVA_HOME
