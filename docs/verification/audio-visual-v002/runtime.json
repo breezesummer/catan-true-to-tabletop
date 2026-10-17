@@ -1,0 +1,11 @@
+{
+    "status": "passed",
+    "version": "1.6.3",
+    "limitations": "自动运行与采样校验不等于真人听感、安卓真机或长时间性能验收。",
+    "checks": 259,
+    "captures": [],
+    "animatedPixels": [],
+    "fullUiPixelsCaptured": false,
+    "userSaveTouched": false,
+    "humanAudioListening": false
+}

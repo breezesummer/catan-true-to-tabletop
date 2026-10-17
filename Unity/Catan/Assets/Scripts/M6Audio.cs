@@ -13,6 +13,8 @@ public sealed partial class M6App
     internal string AudioScope => (presentation == null ? "menu" : presentation.GetInstanceID().ToString()) + ":" + HumanSeat;
     internal int AudioBarbarianPosition => presentation is M4App cities && cities.M6View != null ? cities.M6View.BarbarianPosition :
         presentation is M5App combined && combined.M6View != null ? combined.M6View.BarbarianPosition : -1;
+    internal int AudioActiveKnights => presentation is M4App cities ? cities.M6View?.Board?.Knights?.Count(k => k.Active) ?? 0 :
+        presentation is M5App combined ? combined.M6View?.Board?.Knights?.Count(k => k.Active) ?? 0 : 0;
     internal long AudioPublicSequence => presentation is M2App basic ? basic.M6View?.Events?.LastOrDefault()?.Sequence ?? 0 :
         presentation is M3App sailing ? sailing.M6View?.Events?.LastOrDefault()?.Sequence ?? 0 :
         presentation is M4App cities ? cities.M6View?.Events?.LastOrDefault()?.Sequence ?? 0 :
