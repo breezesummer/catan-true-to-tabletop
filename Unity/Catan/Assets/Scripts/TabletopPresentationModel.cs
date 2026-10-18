@@ -148,7 +148,7 @@ public static class TabletopCollectionSources
     }
 }
 
-// 只消费授权历史。资源转移不伪装成银行流出；发展/进步卡对手只绘制牌背。
+// 只消费授权历史。资源转移不伪装成银行流出；发展/发展卡对手只绘制牌背。
 public sealed class TabletopCollectionTimeline
 {
     readonly System.Collections.Generic.List<TabletopCollectionFlight> flights = new System.Collections.Generic.List<TabletopCollectionFlight>();
@@ -176,7 +176,7 @@ public sealed class TabletopCollectionTimeline
         if(latest==sequence){flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);return;}
         var updates=entries.Where(e=>e.Sequence>sequence).OrderBy(e=>e.Sequence).ToArray();
         var sourceTiles=CopyTiles(observedTiles??tiles??Array.Empty<TabletopCollectionTile>());
-        int inventions=updates.Count(e=>e.Action=="打出「发明」");bool numbersReliable=true;
+        int inventions=updates.Count(e=>e.Action=="使用「发明」");bool numbersReliable=true;
         foreach(var entry in updates)
         {
             ReplayPublicBoard(entry,sourceTiles,tiles,inventions,ref numbersReliable);
@@ -256,7 +256,7 @@ public sealed class TabletopCollectionTimeline
                 if(change.Name=="城市")tile.Cities=after;else tile.Settlements=after;
             }
         }
-        if(entry.Action!="打出「发明」")return;
+        if(entry.Action!="使用「发明」")return;
         // 现有公开历史未携带发明的两个目标；单次交换可由前后公开点数唯一恢复，多次合并则不猜测中间位置。
         if(inventions!=1||finalTiles==null){numbersReliable=false;return;}
         var changed=tiles.Where(t=>finalTiles.Any(final=>final.Id==t.Id&&final.Number!=t.Number)).ToArray();
@@ -306,12 +306,12 @@ public sealed class TabletopCollectionTimeline
             return productionOrigins.Concat(tiles.Where(t=>!t.Blocked&&t.Resource=="gold"&&(t.Number==lastRoll||entry.Turn==0)).OrderBy(t=>t.Id)
                 .SelectMany(t=>Enumerable.Repeat(t.Id,t.Settlements.Count(p=>p.PlayerId==player)+2*t.Cities.Count(p=>p.PlayerId==player)))).ToArray();
         if(production)return productionOrigins;
-        if(entry.Action=="打出「灌溉」"||entry.Action=="打出「采矿」")
+        if(entry.Action=="使用「灌溉」"||entry.Action=="使用「采矿」")
             return tiles.Where(t=>t.Resource==(good==3?"wheat":good==4?"ore":"")).OrderBy(t=>t.Id)
                 .SelectMany(t=>Enumerable.Repeat(t.Id,2*t.Settlements.Concat(t.Cities).Count(p=>p.PlayerId==player))).ToArray();
         return Array.Empty<string>();
     }
-    static int ProgressIndex(string name) => Array.IndexOf(new[]{"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻造","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"},name);
+    static int ProgressIndex(string name) => Array.IndexOf(new[]{"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻铁匠","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"},name);
     public TabletopResourceSlot[] SpecialSlots(string player,System.Collections.Generic.IEnumerable<OperationHandCard> owned,double now)
     {
         flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);

@@ -17,19 +17,20 @@ public sealed partial class InteractionPresentationVerification
     IEnumerator SettleFeedback(){double deadline=Time.unscaledTimeAsDouble+10;while(app.TablePresentationBlocked&&Time.unscaledTimeAsDouble<deadline)yield return null;Require(!app.TablePresentationBlocked,"动画没有结束");yield return null;}
     IEnumerator VerifyFeedback()
     {
-        yield return VerifyFeedback4();yield return VerifyFeedback5();
+        yield return VerifyFeedback4();yield return VerifyFeedback5();yield return VerifyOperationWindows();
         stage="百科与Esc返回";
         app.OpenTableMenu();PolishSetField(app,"encyclopediaOpen",true);
         yield return null;yield return null;
         Require(app.TableMenuOpen&&app.TablePresentationBlocked,"百科未阻止棋盘交互");
         app.HandleTableEscape();Require(app.TableMenuOpen&&!(bool)typeof(M6App).GetField("encyclopediaOpen",Private).GetValue(app),"Esc未从百科返回菜单");
         app.HandleTableEscape();Require(!app.TableMenuOpen,"Esc未从菜单返回游戏");
-        Require(M5App.Cards.Length==25&&M5App.CardHelp.All(s=>!string.IsNullOrEmpty(s)),"进步卡百科缺项");
+        Require(M5App.Cards.Length==25&&M5App.CardHelp.All(s=>!string.IsNullOrEmpty(s)),"发展卡百科缺项");
     }
 
     IEnumerator VerifyFeedback4()
     {
-        foreach(var card in new[]{Catan.Core.M4.ProgressCardKind.Merchant,Catan.Core.M4.ProgressCardKind.Medicine,Catan.Core.M4.ProgressCardKind.Engineering,Catan.Core.M4.ProgressCardKind.Diplomacy,Catan.Core.M4.ProgressCardKind.Intrigue,Catan.Core.M4.ProgressCardKind.Invention,Catan.Core.M4.ProgressCardKind.Smithing,Catan.Core.M4.ProgressCardKind.Treason})
+        int smithRuns=0;
+        foreach(var card in new[]{Catan.Core.M4.ProgressCardKind.Merchant,Catan.Core.M4.ProgressCardKind.Medicine,Catan.Core.M4.ProgressCardKind.Engineering,Catan.Core.M4.ProgressCardKind.Diplomacy,Catan.Core.M4.ProgressCardKind.Intrigue,Catan.Core.M4.ProgressCardKind.Invention,Catan.Core.M4.ProgressCardKind.Smithing,Catan.Core.M4.ProgressCardKind.Smithing,Catan.Core.M4.ProgressCardKind.Treason})
         {
             stage="cities-knights 地图卡牌 "+card;
             app.StartGame("cities-knights","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
@@ -47,6 +48,7 @@ public sealed partial class InteractionPresentationVerification
             state.ActivePlayerId="P1";state.Turn=9;state.Phase=Catan.Core.M4.GamePhase.Action;state.SetupPlacementIndex=8;state.PendingDecision=null;
             state.Settlements=new[]{Piece(village)};state.Cities=new[]{Piece(city)};state.Roads=new[]{Piece(e1.Id),Piece(e2.Id)};
             state.Knights=new[]{new Catan.Core.M4.Knight{PlayerId="P1",LocationId=a,Level=1,Active=true},new Catan.Core.M4.Knight{PlayerId="P2",LocationId=b,Level=1,Active=true}};
+            if(card==Catan.Core.M4.ProgressCardKind.Smithing&&++smithRuns==2)state.Knights=state.Knights.Concat(new[]{new Catan.Core.M4.Knight{PlayerId="P1",LocationId=c,Level=1,Active=true}}).ToArray();
             state.Players[0].Resources=new ResourceBag{Wheat=3,Ore=3};state.Players[0].ProgressCards=new[]{card};
             foreach(var player in state.Players){player.Pieces.Roads=15-state.Roads.Count(r=>r.PlayerId==player.Id);player.Pieces.Settlements=5-state.Settlements.Count(r=>r.PlayerId==player.Id);player.Pieces.Cities=4-state.Cities.Count(r=>r.PlayerId==player.Id);}
             foreach(Resource r in Enum.GetValues(typeof(Resource)))state.Bank[r]=19-state.Players.Sum(p=>p.Resources[r]);
@@ -62,7 +64,12 @@ public sealed partial class InteractionPresentationVerification
             string target=card==Catan.Core.M4.ProgressCardKind.Treason?b:card==Catan.Core.M4.ProgressCardKind.Smithing?action.TargetIds[0]:action.TargetId;
             input.Invoke(game,new object[]{renderer.ScreenPoint(target),false});Require(before==host.ExportSave(),"预览提前消耗卡牌");
             input.Invoke(game,new object[]{renderer.ScreenPoint(target),true});
-            if(card==Catan.Core.M4.ProgressCardKind.Smithing){var bubble=(TabletopChoiceBubble)game.GetType().GetField("mapChoice",Private).GetValue(game);Require(bubble.Active,"锻造没有单名/双名选择");bubble.Choose(0);}
+            if(card==Catan.Core.M4.ProgressCardKind.Smithing&&smithRuns==2)
+            {
+                Require(before==host.ExportSave(),"锻铁匠第一名选择提前消耗卡牌");
+                string second=game.M6View.Board.Knights.First(k=>k.PlayerId=="P1"&&k.LocationId!=target).LocationId;
+                input.Invoke(game,new object[]{renderer.ScreenPoint(second),true});
+            }
             yield return null;yield return SettleFeedback();
             Require(host.View("P1").OwnProgressCards.Length==0,"地图点选没有消耗所选卡牌 "+card);
             var after=session.GetAuthoritativeStateForTesting();
@@ -70,7 +77,7 @@ public sealed partial class InteractionPresentationVerification
             if(card==Catan.Core.M4.ProgressCardKind.Medicine)Require(after.Cities.Length==2&&after.Settlements.Length==0,"医学未升级村庄");
             if(card==Catan.Core.M4.ProgressCardKind.Engineering)Require(after.Walls.Length==1,"工程学没有建墙");
             if(card==Catan.Core.M4.ProgressCardKind.Diplomacy)Require(after.Roads.Length==1,"外交没有移除道路");
-            if(card==Catan.Core.M4.ProgressCardKind.Smithing)Require(after.Knights.First(k=>k.PlayerId=="P1").Level==2,"锻造没有晋升");
+            if(card==Catan.Core.M4.ProgressCardKind.Smithing)Require(after.Knights.Where(k=>k.PlayerId=="P1").All(k=>k.Level==2),"锻铁匠没有晋升全部所选骑士");
             if(card==Catan.Core.M4.ProgressCardKind.Treason)Require(after.PendingDecision.Kind=="ProgressTreasonRemove"&&after.PendingDecision.PlayerId=="P2","叛变越过对手选择权");
             session.AssertInvariants();
         }
@@ -104,7 +111,8 @@ public sealed partial class InteractionPresentationVerification
 
     IEnumerator VerifyFeedback5()
     {
-        foreach(var card in new[]{Catan.Core.M5.ProgressCardKind.Merchant,Catan.Core.M5.ProgressCardKind.Medicine,Catan.Core.M5.ProgressCardKind.Engineering,Catan.Core.M5.ProgressCardKind.Diplomacy,Catan.Core.M5.ProgressCardKind.Intrigue,Catan.Core.M5.ProgressCardKind.Invention,Catan.Core.M5.ProgressCardKind.Smithing,Catan.Core.M5.ProgressCardKind.Treason})
+        int smithRuns=0;
+        foreach(var card in new[]{Catan.Core.M5.ProgressCardKind.Merchant,Catan.Core.M5.ProgressCardKind.Medicine,Catan.Core.M5.ProgressCardKind.Engineering,Catan.Core.M5.ProgressCardKind.Diplomacy,Catan.Core.M5.ProgressCardKind.Intrigue,Catan.Core.M5.ProgressCardKind.Invention,Catan.Core.M5.ProgressCardKind.Smithing,Catan.Core.M5.ProgressCardKind.Smithing,Catan.Core.M5.ProgressCardKind.Treason})
         {
             stage="combined 地图卡牌 "+card;
             app.StartGame("combined","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
@@ -122,6 +130,7 @@ public sealed partial class InteractionPresentationVerification
             state.ActivePlayerId="P1";state.Turn=9;state.Phase=Catan.Core.M5.GamePhase.Action;state.SetupPlacementIndex=8;state.PendingDecision=null;
             state.Settlements=new[]{Piece(village)};state.Cities=new[]{Piece(city)};state.Roads=new[]{Piece(e1.Id),Piece(e2.Id)};
             state.Knights=new[]{new Catan.Core.M5.Knight{PlayerId="P1",LocationId=a,Level=1,Active=true},new Catan.Core.M5.Knight{PlayerId="P2",LocationId=b,Level=1,Active=true}};
+            if(card==Catan.Core.M5.ProgressCardKind.Smithing&&++smithRuns==2)state.Knights=state.Knights.Concat(new[]{new Catan.Core.M5.Knight{PlayerId="P1",LocationId=c,Level=1,Active=true}}).ToArray();
             state.Players[0].Resources=new ResourceBag{Wheat=3,Ore=3};state.Players[0].ProgressCards=new[]{card};
             foreach(var player in state.Players){player.Pieces.Roads=15-state.Roads.Count(r=>r.PlayerId==player.Id);player.Pieces.Settlements=5-state.Settlements.Count(r=>r.PlayerId==player.Id);player.Pieces.Cities=4-state.Cities.Count(r=>r.PlayerId==player.Id);}
             foreach(Resource r in Enum.GetValues(typeof(Resource)))state.Bank[r]=19-state.Players.Sum(p=>p.Resources[r]);
@@ -137,7 +146,12 @@ public sealed partial class InteractionPresentationVerification
             string target=card==Catan.Core.M5.ProgressCardKind.Treason?b:card==Catan.Core.M5.ProgressCardKind.Smithing?action.TargetIds[0]:action.TargetId;
             input.Invoke(game,new object[]{renderer.ScreenPoint(target),false});Require(before==host.ExportSave(),"预览提前消耗卡牌");
             input.Invoke(game,new object[]{renderer.ScreenPoint(target),true});
-            if(card==Catan.Core.M5.ProgressCardKind.Smithing){var bubble=(TabletopChoiceBubble)game.GetType().GetField("mapChoice",Private).GetValue(game);Require(bubble.Active,"锻造没有单名/双名选择");bubble.Choose(0);}
+            if(card==Catan.Core.M5.ProgressCardKind.Smithing&&smithRuns==2)
+            {
+                Require(before==host.ExportSave(),"锻铁匠第一名选择提前消耗卡牌");
+                string second=game.M6View.Board.Knights.First(k=>k.PlayerId=="P1"&&k.LocationId!=target).LocationId;
+                input.Invoke(game,new object[]{renderer.ScreenPoint(second),true});
+            }
             yield return null;yield return SettleFeedback();
             Require(host.View("P1").OwnProgressCards.Length==0,"地图点选没有消耗所选卡牌 "+card);
             var after=session.GetAuthoritativeStateForTesting();
@@ -145,7 +159,7 @@ public sealed partial class InteractionPresentationVerification
             if(card==Catan.Core.M5.ProgressCardKind.Medicine)Require(after.Cities.Length==2&&after.Settlements.Length==0,"医学未升级村庄");
             if(card==Catan.Core.M5.ProgressCardKind.Engineering)Require(after.Walls.Length==1,"工程学没有建墙");
             if(card==Catan.Core.M5.ProgressCardKind.Diplomacy)Require(after.Roads.Length==1,"外交没有移除道路");
-            if(card==Catan.Core.M5.ProgressCardKind.Smithing)Require(after.Knights.First(k=>k.PlayerId=="P1").Level==2,"锻造没有晋升");
+            if(card==Catan.Core.M5.ProgressCardKind.Smithing)Require(after.Knights.Where(k=>k.PlayerId=="P1").All(k=>k.Level==2),"锻铁匠没有晋升全部所选骑士");
             if(card==Catan.Core.M5.ProgressCardKind.Treason)Require(after.PendingDecision.Kind=="ProgressTreasonRemove"&&after.PendingDecision.PlayerId=="P2","叛变越过对手选择权");
             session.AssertInvariants();
         }
@@ -176,4 +190,60 @@ public sealed partial class InteractionPresentationVerification
         var choose=(TabletopChoiceBubble)current.GetType().GetField("mapChoice",Private).GetValue(current);Require(choose.Active,"海岸没有弹出道路/船选择");Require(saved==currentHost.ExportSave(),"确认前已经落子");choose.Choose(1);yield return null;yield return SettleFeedback();Require(currentHost.View("P1").Board.Ships.Length==1,"气泡船选项未建船");
         currentSession.AssertInvariants();
     }
+    IEnumerator VerifyOperationWindows()
+    {
+        foreach(string rules in new[]{"base","seafarers","cities-knights","combined"})
+        {
+            stage=rules+" 操作收起与恢复";app.StartGame(rules,"heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+            object game=rules=="base"?(object)GetComponent<M2App>():rules=="seafarers"?GetComponent<M3App>():rules=="cities-knights"?GetComponent<M4App>():GetComponent<M5App>();
+            var hud=(TabletopUI)game.GetType().GetField("tabletop",Private).GetValue(game);
+            var dock=(OperationDock)game.GetType().GetField("dock",Private).GetValue(game);
+            var host=PolishGet(game,"VerificationHost");
+            var session=host.GetType().GetField("session",Private).GetValue(host);
+            var state=session.GetType().GetMethod("GetAuthoritativeStateForTesting").Invoke(session,null);
+            PolishSet(state,"ActivePlayerId","P1");PolishSet(state,"Turn",9);PolishSet(state,"SetupPlacementIndex",8);PolishSetEnum(state,"Phase","Action");
+            session.GetType().GetField("state",Private).SetValue(session,state);game.GetType().GetMethod("M6Refresh",Private).Invoke(game,null);yield return null;
+            table=(TabletopScene)PolishGet(PolishGet(game,"VerificationBoard"),"TableScene");
+            string authority=(string)host.GetType().GetMethod("ExportSave").Invoke(host,null);
+            var snapshot=(OperationSnapshot)PolishGet(game,"VerificationOperationSnapshot");
+            // 隐藏窗口可能不派发 OnGUI；显式补上 Draw 的绑定，命令仍走原校验入口。
+            hud.BindOperations(snapshot,dock.PrepareDevelopmentPurchase,app.HistoryEntries);dock.Windows=hud.OperationWindows;
+            PolishSetField(dock,"current",snapshot);PolishSetField(dock,"scope",snapshot.Scope);PolishSetField(dock,"revision",snapshot.Revision);dock.Selection.Sync(snapshot);
+            if(snapshot.GoodCount==8){dock.OpenFacility(2);Require(dock.HasOverlay,"设施面板未开启");}
+            else {dock.OpenTrade();Require(dock.HasOverlay,"交易草稿未开启");}
+            if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture(rules+"-操作面板");
+            hud.OperationWindows.Hide(snapshot.GoodCount==8?"城市设施":"继续交易");
+            Require(!dock.HasOverlay&&hud.OperationHidden,"收起后仍有模态遮挡");
+            yield return null;
+            Require(authority==(string)host.GetType().GetMethod("ExportSave").Invoke(host,null),"收起修改了权威局面");
+            if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture(rules+"-收起后继续按钮");
+            hud.OperationWindows.Open();Require(dock.HasOverlay,"再次开启没有恢复原操作");dock.Reset();
+            // 亮牌/骑士替换动画期间，其他玩家仍可查看自己的资料。
+            var oldActor=(Func<string>)typeof(M6App).GetField("actor",Private).GetValue(app);
+            PolishSetField(app,"actor",(Func<string>)(()=>"P2"));PolishSetField(app,"pendingNetworkPresentation",(Action)(()=>{}));
+            Require(app.TablePresentationBlocked&&!app.TableInspectionBlocked,"其他玩家动画封锁了资料查看");
+            PolishSetField(app,"pendingNetworkPresentation",null);PolishSetField(app,"actor",oldActor);
+        }
+        foreach(string rules in new[]{"cities-knights","combined"})
+        {
+            stage=rules+" 引水渠收起";app.StartGame(rules,"heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+            object game=rules=="cities-knights"?(object)GetComponent<M4App>():GetComponent<M5App>();
+            var host=PolishGet(game,"VerificationHost");var session=host.GetType().GetField("session",Private).GetValue(host);
+            var state=session.GetType().GetMethod("GetAuthoritativeStateForTesting").Invoke(session,null);
+            PolishSet(state,"ActivePlayerId","P1");PolishSet(state,"Turn",9);PolishSet(state,"SetupPlacementIndex",8);PolishSetEnum(state,"Phase","PendingChoice");PolishSetEnum(state,"DecisionReturnPhase","Action");
+            var pending=Activator.CreateInstance(state.GetType().GetProperty("PendingDecision").PropertyType);PolishSet(pending,"Kind","Aqueduct");PolishSet(pending,"PlayerId","P1");PolishSetEnum(pending,"ReturnPhase","Action");PolishSet(state,"PendingDecision",pending);
+            session.GetType().GetField("state",Private).SetValue(session,state);game.GetType().GetMethod("M6Refresh",Private).Invoke(game,null);yield return null;
+            var hud=(TabletopUI)game.GetType().GetField("tabletop",Private).GetValue(game);
+            var snapshot=(OperationSnapshot)PolishGet(game,"VerificationOperationSnapshot");hud.BindOperations(snapshot,null,app.HistoryEntries);
+            var selected=(ResourceBag)game.GetType().GetField("resourceChoiceSelection",Private).GetValue(game);selected.Wheat=1;
+            string before=(string)host.GetType().GetMethod("ExportSave").Invoke(host,null);
+            hud.OperationWindows.Hide("引水渠 · 选择资源");yield return null;
+            Require(!(bool)PolishGet(game,"ResourceChoiceVisible")&&selected.Wheat==1,"收起未保留资源选择");
+            Require(before==(string)host.GetType().GetMethod("ExportSave").Invoke(host,null),"关闭待决意外确认领取");
+            hud.OperationWindows.Open();Require((bool)PolishGet(game,"ResourceChoiceVisible"),"待决界面不能再打开");
+            PolishSet(pending,"PlayerId","P2");session.GetType().GetField("state",Private).SetValue(session,state);game.GetType().GetMethod("M6Refresh",Private).Invoke(game,null);yield return null;
+            Require(!(bool)PolishGet(game,"ResourceChoiceVisible"),"其他玩家的引水渠遮挡本人的历史和手牌");
+        }
+    }
+
 }

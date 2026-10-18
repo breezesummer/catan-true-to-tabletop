@@ -64,7 +64,7 @@ public static class PastoralMenuUI
         Round(new Rect(r.x-2,r.y+6,r.width+4,r.height+2),new Color(.12f,.28f,.23f,.09f),25);
         Round(r,Paper,24);Round(new Rect(r.x+1,r.y+1,r.width-2,r.height-2),new Color(1,1,.98f,.26f),23);
     }
-    public static bool Button(Rect r,string caption,bool enabled=true,bool primary=false,bool selected=false)
+    public static bool Button(Rect r,string caption,bool enabled=true,bool primary=false,bool selected=false,Color? seatColor=null)
     {
         Styles();bool before=GUI.enabled;GUI.enabled=before&&enabled;
         bool over=GUI.enabled&&r.Contains(Event.current.mousePosition);
@@ -74,6 +74,7 @@ public static class PastoralMenuUI
         if(primary)Round(new Rect(r.x,r.y+3,r.width,r.height),new Color(.12f,.27f,.20f,.18f),12);
         Round(r,bg,primary?13:10);
         var ink=GUI.enabled?(primary||selected?new Color(1,.99f,.94f):Ink):Muted;
+        if(seatColor.HasValue)ink=seatColor.Value;
         Label(new Rect(r.x+8,r.y+1,r.width-16,r.height-2),caption,primary?19:16,ink,primary,TextAnchor.MiddleCenter);
         bool hit=GUI.Button(r,GUIContent.none,GUIStyle.none)&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
         GUI.enabled=before;if(hit)TabletopAudio.Instance?.Click();return hit;

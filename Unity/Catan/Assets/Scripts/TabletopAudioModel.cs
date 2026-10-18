@@ -176,12 +176,15 @@ public sealed class TabletopAudioPublicModel
     int previousBarbarian = -1;
     int previousActiveKnights;
     string previousPirate = "";
-    public void Reset() { Initialized = false; previousBarbarian = -1; previousPirate = ""; previousActiveKnights = 0; }
-    public TabletopAudioEvent[] Observe(bool human, bool finished, int barbarian, string pirate, bool pirateIslands, int newBarbarianAdvances = 0, int activeKnights = 0)
+    string previousOpportunity="";
+    public void Reset() { Initialized = false; previousBarbarian = -1; previousPirate = ""; previousActiveKnights = 0; previousOpportunity=""; }
+    public TabletopAudioEvent[] Observe(bool human, bool finished, int barbarian, string pirate, bool pirateIslands, int newBarbarianAdvances = 0, int activeKnights = 0,string opportunity="")
     {
         var result = new List<TabletopAudioEvent>();
         if (Initialized)
         {
+            // 复用三段上行钟声庆祝金矿/引水渠机会；同一待决持续存在时不重播。
+            if(!string.IsNullOrEmpty(opportunity)&&opportunity!=previousOpportunity)result.Add(new TabletopAudioEvent(TabletopAudioCue.FacilityUpgrade,.85));
             if (human && !wasHuman && !finished) result.Add(new TabletopAudioEvent(TabletopAudioCue.YourTurn, .12));
             if (finished && !wasFinished) result.Add(new TabletopAudioEvent(TabletopAudioCue.Victory, .18));
             if (previousBarbarian >= 0 && previousBarbarian < 7 && (barbarian == 7 || barbarian == 0 && (previousBarbarian == 6 || previousBarbarian + newBarbarianAdvances >= 7)))
@@ -194,7 +197,7 @@ public sealed class TabletopAudioPublicModel
             if (pirateIslands && !string.IsNullOrEmpty(previousPirate) && !string.IsNullOrEmpty(pirate) && pirate != previousPirate)
                 result.Add(new TabletopAudioEvent(TabletopAudioCue.PirateMove, .64));
         }
-        previousBarbarian = barbarian; previousActiveKnights = activeKnights; previousPirate = pirate ?? ""; wasHuman = human; wasFinished = finished; Initialized = true;
+        previousOpportunity=opportunity??"";previousBarbarian = barbarian; previousActiveKnights = activeKnights; previousPirate = pirate ?? ""; wasHuman = human; wasFinished = finished; Initialized = true;
         return result.ToArray();
     }
 }

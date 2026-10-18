@@ -23,6 +23,6 @@ public sealed partial class M6App
             ModernOperationUI.Label(new Rect(12,i*100+40,950,54),help[i],ModernOperationUI.Text);
         }
         GUI.EndScrollView();
-        ModernOperationUI.Label(new Rect(212,758,1014,42),encyclopediaCategory==0?"基础发展卡：新买的卡本回合不能使用；每回合最多使用一张（胜利点卡除外）。":"进步卡：通常在自己回合行动阶段使用；炼金术在掷骰前使用。只有超过四张时才可弃置。",ModernOperationUI.Small);
+        ModernOperationUI.Label(new Rect(212,758,1014,42),encyclopediaCategory==0?"基础发展卡：新买的卡本回合不能使用；每回合最多使用一张（胜利点卡除外）。":"发展卡：通常在自己回合行动阶段使用；炼金术在掷骰前使用。只有超过四张时才可弃置。",ModernOperationUI.Small);
     }
 }

@@ -19,6 +19,7 @@ public sealed partial class OperationDock
     GUIStyle text, small, heading, center, tableLabel, quantity;
     Font quantityFont;
     OperationSnapshot current;
+    public OperationWindowState Windows;
     public Func<string,string> PlayerName;
     string DisplayPlayer(string seat)=>PlayerName?.Invoke(seat)??M6App.PlayerLabel(seat);
     string revision, scope, hoveredBuild, previewCard, message = "";
@@ -127,7 +128,7 @@ public sealed partial class OperationDock
     internal bool VerificationHandsAreScreenSpace => faces.All(face=>face.Shape.World==null);
     internal int VerificationVisibleResourceCount => faces.Count(face=>face.Good>=0);
     internal int VerificationPendingResourceCount => current==null?0:Math.Max(0,current.Goods.Take(current.GoodCount).Sum()-VerificationVisibleResourceCount);
-    public bool HasOverlay => tradeOpen || facilityTrack>=0 || previewCard!=null&&current?.Discard==null || current!=null&&current.Offer!=null;
+    public bool HasOverlay => Windows?.Hidden!=true&&(tradeOpen || facilityTrack>=0 || previewCard!=null&&current?.Discard==null || current!=null&&current.Offer!=null);
     public bool IsDraggingPiece => pieceDragging;
     public bool ConsumeBuildRelease(out Vector2 releasedLogicalMouse)
     {releasedLogicalMouse=pieceReleasePoint;bool released=pieceReleased;pieceReleased=false;return released;}
@@ -136,7 +137,7 @@ public sealed partial class OperationDock
     public void OpenTrade(string target=null)
     {
         if(current==null||!current.CanTrade||!current.CanInteract||current.Offer!=null)return;
-        current.Cancel?.Invoke();tradeOpen=true;facilityTrack=-1;previewCard=null;Selection.BuildId=null;Selection.PieceOrdinal=-1;message="";
+        Windows?.Open();current.Cancel?.Invoke();tradeOpen=true;facilityTrack=-1;previewCard=null;Selection.BuildId=null;Selection.PieceOrdinal=-1;message="";
         portTrade=false;portGood=null;tradeTitle=target==null?"银行兑换":"玩家交易";
         playerTrade=target!=null;
         this.target=target==null?0:Math.Max(0,Array.IndexOf(current.OtherPlayers,target));
@@ -151,11 +152,12 @@ public sealed partial class OperationDock
     public void OpenFacility(int track)
     {
         if(OperationPanelOptions.Facility(current,track)==null||current.Offer!=null)return;
-        current.Cancel?.Invoke();Selection.Clear();tradeOpen=false;previewCard=null;facilityTrack=track;message="";
+        Windows?.Open();current.Cancel?.Invoke();Selection.Clear();tradeOpen=false;previewCard=null;facilityTrack=track;message="";
     }
     public int FacilityLevel(int track) => current?.Builds.FirstOrDefault(b=>b.Track==track)?.Level??0;
     public void Reset()
     {
+        Windows?.Clear();
         Selection.Clear(); tradeOpen=false;facilityTrack=-1;portTrade=false;portGood=null; previewCard=null; hoveredBuild=null; message="";
         Array.Clear(give,0,8);Array.Clear(receive,0,8); tooltipRect=Rect.zero;
         dragGood=-1;dragging=false;hits.Clear();faces.Clear();pieceFaces.Clear();
@@ -166,8 +168,8 @@ public sealed partial class OperationDock
     public bool BlocksBoardInput(Vector2 logicalMouse)
     {
         if(HasOverlay)return true;
-        return dragGood>=0 || hoveredHand!=null&&handHoverAnchor.Contains(logicalMouse) || (tradeOpen||current!=null&&current.Offer!=null)&&TradeRect.Contains(logicalMouse) ||
-            previewCard!=null&&current?.Discard==null&&CardRect.Contains(logicalMouse) || hits.Any(h=>h.Contains(logicalMouse));
+        return dragGood>=0 || hoveredHand!=null&&handHoverAnchor.Contains(logicalMouse) || Windows?.Hidden!=true&&((tradeOpen||current!=null&&current.Offer!=null)&&TradeRect.Contains(logicalMouse) ||
+            previewCard!=null&&current?.Discard==null&&CardRect.Contains(logicalMouse)) || hits.Any(h=>h.Contains(logicalMouse));
     }
     void Styles(Font font)
     {
@@ -202,6 +204,7 @@ public sealed partial class OperationDock
         if(scope!=snapshot.Scope){hoverAmounts.Clear();spreadAmounts.Clear();hoveredHand=null;handHoverAnchor=Rect.zero;handUpdated=Time.unscaledTimeAsDouble;fallbackOrder=new TabletopHandOrder();specialOrder=new TabletopSpecialHandOrder();specialHand=false;}
         if(scope!=snapshot.Scope||revision!=snapshot.Revision){Reset();scope=snapshot.Scope;revision=snapshot.Revision;}
         current=snapshot;Selection.Sync(snapshot);
+        if(HasOverlay)Windows?.Describe(snapshot.Offer!=null?"回应交易":tradeOpen?"继续交易":facilityTrack>=0?"城市设施":"使用发展卡");
         if(snapshot.Discard!=null)specialHand=snapshot.Discard.Special;
         hoveredBuild=null;tooltipRect=Rect.zero;hits.Clear();faces.Clear();pieceFaces.Clear();
         // 在任何世界组件接收 MouseDown 前，先按本帧屏幕布局确定手牌命中。
@@ -220,11 +223,19 @@ public sealed partial class OperationDock
         DrawHandTabs(snapshot);
         HandleHandInput(snapshot);
         HandleBuildInput(snapshot);
-        if(tradeOpen)DrawTrade(snapshot);
-        else if(snapshot.Offer!=null)DrawOffer(snapshot);
-        else if(previewCard!=null&&snapshot.Discard==null)DrawCardPreview(snapshot);
-        else if(facilityTrack>=0)DrawFacilities(snapshot);
-        else DrawCost(snapshot);
+        if(Windows?.Hidden!=true)
+        {
+            if(tradeOpen)DrawTrade(snapshot);
+            else if(snapshot.Offer!=null)DrawOffer(snapshot);
+            else if(previewCard!=null&&snapshot.Discard==null)DrawCardPreview(snapshot);
+            else if(facilityTrack>=0)DrawFacilities(snapshot);
+            else DrawCost(snapshot);
+            if(HasOverlay)
+            {
+                Rect panel=tradeOpen||snapshot.Offer!=null?TradeRect:facilityTrack>=0?new Rect(440,132,560,530):CardRect;
+                if(Button(new Rect(panel.xMax-153,panel.y+16,65,30),"收起"))Windows?.Hide(snapshot.Offer!=null?"回应交易":tradeOpen?"继续交易":facilityTrack>=0?"城市设施":"使用发展卡");
+            }
+        }
         HandlePieceInput(snapshot);
         if(dragging&&dragGood>=0)
         {
@@ -305,7 +316,7 @@ public sealed partial class OperationDock
     void PrepareBuild(OperationBuild build,OperationSnapshot s)
     {
         if(!build.CanPrepare(s)){s.Notify?.Invoke(!s.CanInteract?"等待当前行动或待决席位":build.UnavailableReason??"当前不能使用");return;}
-        s.Cancel?.Invoke();Selection.Choose(build,s.Goods);tradeOpen=false;previewCard=null;message="";
+        Windows?.Open();s.Cancel?.Invoke();Selection.Choose(build,s.Goods);tradeOpen=false;previewCard=null;message="";
         s.PrepareBuild?.Invoke(build);
     }
     void TableLabel(Rect r,string value,GUIStyle style)
@@ -367,7 +378,7 @@ public sealed partial class OperationDock
     void UpdateHandHover()
     {
         var mouse=Event.current.mousePosition;
-        bool overPaper=(tradeOpen||current.Offer!=null)&&TradeRect.Contains(mouse)||previewCard!=null&&CardRect.Contains(mouse)||facilityTrack>=0;
+        bool overPaper=Windows?.Hidden!=true&&((tradeOpen||current.Offer!=null)&&TradeRect.Contains(mouse)||previewCard!=null&&CardRect.Contains(mouse)||facilityTrack>=0);
         // 先还原上一帧实际显示位置，再决定命中；不能用未展开的底牌位置猜测鼠标所指。
         foreach(var face in faces)
         {
@@ -515,7 +526,7 @@ public sealed partial class OperationDock
         {
             r=EntityCardAssets.FitCardRect(r,TabletopHandLayout.CardWidth/TabletopHandLayout.CardHeight,GUI.matrix);
             EntityCardAssets.DrawCardPaper(r,new Color(.13f,.22f,.23f),face.Hover);
-            Label(new Rect(r.x+10,r.y+9,r.width-20,20),face.Card.Progress?"进步卡":"发展卡",small);
+            Label(new Rect(r.x+10,r.y+9,r.width-20,20),face.Card.Progress?"发展卡":"发展卡",small);
             Label(new Rect(r.x+11,r.y+36,r.width-22,64),face.Card.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=21});
         }
         GUI.matrix=matrix;
@@ -528,7 +539,7 @@ public sealed partial class OperationDock
         HandFace hit=null;
         if(hoveredHand!=null&&handHoverAnchor.Contains(e.mousePosition))hit=faces.FirstOrDefault(face=>face.Key==hoveredHand);
         if(hit==null)for(int i=faces.Count-1;i>=0;i--)if(faces[i].Shape.Contains(e.mousePosition)){hit=faces[i];break;}
-        bool overPaper=(tradeOpen||s.Offer!=null)&&TradeRect.Contains(e.mousePosition)||s.Discard==null&&previewCard!=null&&CardRect.Contains(e.mousePosition)||facilityTrack>=0;
+        bool overPaper=Windows?.Hidden!=true&&((tradeOpen||s.Offer!=null)&&TradeRect.Contains(e.mousePosition)||s.Discard==null&&previewCard!=null&&CardRect.Contains(e.mousePosition)||facilityTrack>=0);
         if(e.type==EventType.ScrollWheel&&hit!=null&&!overPaper)
         {
             // 全部手牌始终在场；手牌上滚动不再改变桌面相机距离。
@@ -540,7 +551,7 @@ public sealed partial class OperationDock
         }
         if(e.type==EventType.MouseDown&&e.button==0&&hit!=null&&!overPaper)
         {
-            if(hit.Card!=null){previewCard=previewCard==hit.Card.Id?null:hit.Card.Id;tradeOpen=false;if(s.Discard==null)s.Cancel?.Invoke();}
+            if(hit.Card!=null){Windows?.Open();previewCard=previewCard==hit.Card.Id?null:hit.Card.Id;tradeOpen=false;if(s.Discard==null)s.Cancel?.Invoke();}
             else{dragGood=hit.Good;dragOrdinal=hit.Ordinal;dragStart=e.mousePosition;handPressedAt=Time.unscaledTimeAsDouble;dragging=false;}
             e.Use();return;
         }
@@ -593,13 +604,13 @@ public sealed partial class OperationDock
         // 实体卡面独立完整摆放，操作说明位于一旁，不用面板边框包住卡牌。
         Paper(new Rect(704,167,360,459));
         Label(new Rect(725,190,271,39),c.Name,heading);
-        if(Button(new Rect(1011,181,32,32),"×")){previewCard=null;return;}
+        if(Button(new Rect(1011,181,32,32),"×")){Windows?.Hide("使用发展卡");return;}
         var texture=c.Progress&&c.ArtIndex>=0?EntityCardAssets.ProgressFront(c.ArtIndex):null;
         var face=new Rect(387,178,294,435);
         if(texture!=null)EntityCardAssets.DrawCardFace(face,texture);
         else{face=EntityCardAssets.FitCardRect(face,TabletopHandLayout.CardWidth/TabletopHandLayout.CardHeight,GUI.matrix);ModernOperationUI.Round(face,Surface);Label(face,c.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=28});}
         Label(new Rect(725,253,317,129),c.Detail??"选择使用后指定目标。",text);
-        string reason=c.UnavailableReason??(!s.CanInteract?"等待你的行动或待决选择":c.Name=="胜利点"?"胜利点保留在手中，无需主动打出":c.Progress?"当前阶段或目标条件不满足此卡的使用要求":"本回合买入的卡不能使用；每回合最多打出一张行动发展卡");
+        string reason=c.UnavailableReason??(!s.CanInteract?"等待你的行动或待决选择":c.Name=="胜利点"?"胜利点保留在手中，无需主动使用":c.Progress?"当前阶段或目标条件不满足此卡的使用要求":"本回合买入的卡不能使用；每回合最多使用一张行动发展卡");
         if(!c.Playable||!s.CanInteract)Label(new Rect(725,408,317,99),reason,small);
         if(Primary(new Rect(725,561,187,43),"使用卡牌",c.Playable&&s.CanInteract))
         {s.PrepareCard?.Invoke(c);previewCard=null;Selection.Clear();}
@@ -614,7 +625,7 @@ public sealed partial class OperationDock
         var area=new Rect(440,132,560,530);Paper(area);
         Label(new Rect(466,151,430,35),tracks[track]+"设施",heading);
         Label(new Rect(466,188,470,26),"翻开下一等级，建设你的城市文明。",small);
-        if(Button(new Rect(947,149,32,32),"×")){facilityTrack=-1;s.Cancel?.Invoke();return;}
+        if(Button(new Rect(947,149,32,32),"×")){Windows?.Hide("城市设施");return;}
         var texture=EntityCardAssets.Texture(EntityCardAssets.Guidance(false).Front);
         float[] cuts={0,.337f,.668f,1};
         // 在同一张完整建设板上铺满翻板；沿原照定位，但接合边不再留出可见暗缝。
@@ -650,7 +661,7 @@ public sealed partial class OperationDock
     public static string FacilityAbility(int track,int level)
     {
         if(level<3)return "达到 3 级后解锁城市能力";
-        return track==0?"贸易所：商品可以 2 : 1 兑换资源或商品":track==1?"要塞：允许晋升精锐骑士":"引水渠：无产出时可选择一张资源（7 除外）";
+        return track==0?"同业公会：商品可以 2 : 1 兑换资源或商品":track==1?"要塞：允许晋升精锐骑士":"引水渠：无产出时可选择一张资源（7 除外）";
     }
     OperationSnapshot TradeValidationSnapshot(OperationSnapshot s)
     {

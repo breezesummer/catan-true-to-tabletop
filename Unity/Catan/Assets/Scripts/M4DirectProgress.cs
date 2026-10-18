@@ -8,6 +8,18 @@ using CommandKind = Catan.Core.M4.CommandKind;
 
 public sealed partial class M4App
 {
+    object smithingView;
+    string[][] smithingPlans;
+    string[][] SmithingPlans()
+    {
+        if(!ReferenceEquals(smithingView,view))
+        {
+            smithingView=view;
+            smithingPlans=TabletopSmithingSelection.Plans(view.Board.Knights.Where(k=>k.PlayerId==seat).Select(k=>k.LocationId).ToArray(),ids=>
+            {var c=New(CommandKind.PlayProgressCard);c.ProgressCard=ProgressCardKind.Smithing;c.TargetIds=ids;return Preview(c).Success;});
+        }
+        return smithingPlans;
+    }
     bool DirectProgressActive => view!=null && (draft!=null && draft.Kind==CommandKind.PlayProgressCard &&
         new[]{ProgressCardKind.Engineering,ProgressCardKind.Medicine,ProgressCardKind.Invention,ProgressCardKind.Smithing,ProgressCardKind.Merchant,ProgressCardKind.Diplomacy,ProgressCardKind.Intrigue,ProgressCardKind.Taxation,ProgressCardKind.Treason}.Contains(draft.ProgressCard)
         || view.PendingDecision!=null && view.PendingDecision.PlayerId==seat && new[]{"PillageCity","Metropolis","DisplacedKnight","ProgressTreasonRemove","ProgressTreasonPlace"}.Contains(view.PendingDecision.Kind)
@@ -52,6 +64,12 @@ public sealed partial class M4App
             }
             if(kind==ProgressCardKind.Smithing)command.TargetIds=new[]{target};
         }
+        if(card&&kind==ProgressCardKind.Smithing)
+        {
+            var plan=SmithingPlans().FirstOrDefault(ids=>ids.Contains(target)&&(string.IsNullOrEmpty(draft.SourceId)||target!=draft.SourceId&&ids.Contains(draft.SourceId)));
+            command=plan==null?null:New(CommandKind.PlayProgressCard);
+            if(command!=null){command.ProgressCard=kind;command.TargetIds=plan;}
+        }
         bool valid=command!=null&&Preview(command).Success;
         if(type=="T")board.PreviewRobber(target,valid);else board.Preview(target,type=="E",valid);
         if(!click)return;
@@ -61,15 +79,9 @@ public sealed partial class M4App
             var options=view.LegalActions.Where(c=>!c.Decline&&c.TargetId==target).Select(DirectDecisionCommand).ToArray();
             mapChoice.Open(board.ScreenPoint(target),"选择安置骑士等级",options.Select(c=>c.KnightLevel+" 级骑士").ToArray(),i=>Submit(options[i]));return;
         }
-        if(card&&kind==ProgressCardKind.Smithing)
+        if(card&&kind==ProgressCardKind.Smithing&&command.TargetIds.Length==2&&string.IsNullOrEmpty(draft.SourceId))
         {
-            if(string.IsNullOrEmpty(draft.SourceId))
-            {
-                draft.SourceId=target;
-                mapChoice.Open(board.ScreenPoint(target),"锻造 · 已选一名骑士",new[]{"晋升这一名","继续选择第二名"},i=>{if(i==0)Submit(command);else ai.ShowTablePrompt("点选另一名骑士；再次点第一名可只晋升一名。");});return;
-            }
-            command.TargetIds=new[]{draft.SourceId,target}.Distinct().ToArray();
-            if(!Preview(command).Success){ai.ShowTablePrompt("不能同时晋升这两名骑士。");return;}
+            draft.SourceId=target;status="已选第一名骑士，请点选第二名可晋升骑士。";ai.ShowTablePrompt(status);return;
         }
         Submit(command);
     }

@@ -90,7 +90,8 @@ public sealed class RoomDirectory : IDisposable
         if ((payload.Password?.Length ?? 0) > 128) return Reject("InvalidPassword", "房间密码过长。");
         var versions = RuleRoomGame.Versions(payload.Settings.RuleSet);
         if (!VersionsMatch(request, versions.Rules, versions.Scenario)) return Reject("VersionMismatch", "规则或场景版本不同，请更新至同一版本。");
-        if (payload.Settings.AiSeats.Contains("P1")) return Reject("SeatOccupied", "创建者的 P1 席位不能同时设置为 AI。");
+        var managerSeat = SeatIds(payload.Settings.PlayerCount).FirstOrDefault(id => !payload.Settings.AiSeats.Contains(id));
+        if (managerSeat == null) return Reject("SeatOccupied", "请至少保留一个人类席位给房主。");
         var enrollment = EnrollmentIntent.Parse(request, payload);
         lock (directoryGate)
         {
@@ -101,11 +102,11 @@ public sealed class RoomDirectory : IDisposable
             }
             if (rooms.Values.Count(room => room.CountsTowardRoomLimit) >= options.MaximumRooms) return Reject("RoomLimit", "房间数量已达到此服务上限。");
             var credential = enrollment?.Credential ?? PrivateJson.Token();
-            var seat = NewSeat("P1", payload.DisplayName, credential);
+            var seat = NewSeat(managerSeat, payload.DisplayName, credential);
             var state = new SavedRoom
             {
                 RoomId = Convert.ToHexString(RandomNumberGenerator.GetBytes(6)), Revision = 1,
-                Settings = payload.Settings, ManagerSeatId = "P1", Seats = new() { seat },
+                Settings = payload.Settings, ManagerSeatId = managerSeat, Seats = new() { seat },
                 RulesVersion = versions.Rules, ScenarioVersion = versions.Scenario
             };
             AssignAiNames(state);
@@ -369,7 +370,13 @@ public sealed class RoomDirectory : IDisposable
                     if (!manager) return Snapshot(seat, "ManagerRequired", "只有管理员可以修改设置。", false);
                     if (game != null) return Snapshot(seat, "GameStarted", "对局已开始。", false);
                     var settings = WireJson.Deserialize<RoomSettings>(request.Payload); ValidateSettings(settings);
-                    if (state.Seats.Any(s => !SeatIds(settings.PlayerCount).Contains(s.SeatId) || settings.AiSeats.Contains(s.SeatId))) return Snapshot(seat, "SeatOccupied", "新配置不能移除或覆盖人类席位。", false);
+                    if (state.Seats.Any(s => s!=seat&&(!SeatIds(settings.PlayerCount).Contains(s.SeatId) || settings.AiSeats.Contains(s.SeatId)))) return Snapshot(seat, "SeatOccupied", "新配置不能移除或覆盖其他人类席位。", false);
+                    if(!SeatIds(settings.PlayerCount).Contains(seat.SeatId)||settings.AiSeats.Contains(seat.SeatId))
+                    {
+                        var nextSeat=SeatIds(settings.PlayerCount).Except(settings.AiSeats).Except(state.Seats.Where(s=>s!=seat).Select(s=>s.SeatId)).FirstOrDefault();
+                        if(nextSeat==null)return Snapshot(seat,"SeatOccupied","请为房主保留一个可用的人类席位。",false);
+                        seat.SeatId=nextSeat;state.ManagerSeatId=nextSeat;
+                    }
                     state.Settings = settings; AssignAiNames(state); (state.RulesVersion, state.ScenarioVersion) = RuleRoomGame.Versions(settings.RuleSet); ResetReady(); break;
                 case "Start":
                     if (!manager) return Snapshot(seat, "ManagerRequired", "只有管理员可以开始。", false);

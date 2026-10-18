@@ -7,6 +7,15 @@ namespace Catan.Audio.Tests;
 
 public sealed class TabletopAudioTests
 {
+    [Theory][InlineData("Gold")][InlineData("Aqueduct")]
+    public void BountyChimePlaysOnNewDecisionOnceAndNeverOnRestore(string kind)
+    {
+        var state=new TabletopAudioPublicModel();Assert.Empty(state.Observe(false,false,-1,"",false));
+        Assert.Single(state.Observe(false,false,-1,"",false,opportunity:"1:"+kind),e=>e.Cue==TabletopAudioCue.FacilityUpgrade);
+        Assert.Empty(state.Observe(false,false,-1,"",false,opportunity:"1:"+kind));
+        state.Reset();Assert.Empty(state.Observe(false,false,-1,"",false,opportunity:"1:"+kind));
+        Assert.Single(state.Observe(false,false,-1,"",false,opportunity:"2:"+kind),e=>e.Cue==TabletopAudioCue.FacilityUpgrade);
+    }
     static T Set<T>(T value, string name, object? field) where T : class
     { typeof(T).GetProperty(name)!.SetValue(value, field); return value; }
     static GameHistoryEntry Entry(long sequence, string kind = "EndTurn", params GameHistoryChange[] changes)
@@ -94,7 +103,7 @@ public sealed class TabletopAudioTests
     public void ResourceAndCardSoundsDoNotDependOnHiddenIdentityOrNumber()
     {
         var visible = TabletopAudioModel.Classify(Entry(2, "StealResource", Change("goods", "矿石", 1, good: 4), Change("progress", "间谍", 1)));
-        var redacted = TabletopAudioModel.Classify(Entry(2, "StealResource", Change("resource-count", "手牌", 5), Change("progress", "进步卡", 4)));
+        var redacted = TabletopAudioModel.Classify(Entry(2, "StealResource", Change("resource-count", "手牌", 5), Change("progress", "发展卡", 4)));
         Assert.Equal(visible.Select(e => (e.Cue, e.Delay)), redacted.Select(e => (e.Cue, e.Delay)));
         Assert.Single(visible, e => e.Cue == TabletopAudioCue.ResourceCollect);
         Assert.Single(visible, e => e.Cue == TabletopAudioCue.CardDraw);

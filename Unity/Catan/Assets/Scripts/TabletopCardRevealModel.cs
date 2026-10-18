@@ -11,11 +11,11 @@ public sealed class TabletopCardReveal
     public bool Progress, ImmediateVictory;
     public GameHistoryEntry? Roll;
     public static bool IsVictory(string name)=>name=="印刷术"||name=="宪法";
-    public int ProgressIndex=>Array.IndexOf(new[]{"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻造","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"},CardName);
+    public int ProgressIndex=>Array.IndexOf(new[]{"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻铁匠","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"},CardName);
     public static IEnumerable<TabletopCardReveal> From(GameHistoryEntry entry)
     {
         if(entry.Kind=="PlayKnight"||entry.Kind=="PlayRoadBuilding"||entry.Kind=="PlayYearOfPlenty"||entry.Kind=="PlayMonopoly"||entry.Kind=="PlayProgressCard")
-            yield return new TabletopCardReveal{PlayerId=entry.PlayerId,CardName=(entry.Action??"").Replace("打出「","").TrimEnd('」'),Progress=entry.Kind=="PlayProgressCard"};
+            yield return new TabletopCardReveal{PlayerId=entry.PlayerId,CardName=(entry.Action??"").Replace("使用「","").Replace("打出「","").TrimEnd('」'),Progress=entry.Kind=="PlayProgressCard"};
         foreach(var gain in (entry.Changes??Array.Empty<GameHistoryChange>()).Where(c=>!c.IsPrivate&&c.Amount>0&&(c.Category=="defender"||c.Category=="progress"&&IsVictory(c.Name))))
             for(int i=0;i<gain.Amount;i++)
                 yield return new TabletopCardReveal{PlayerId=gain.PlayerId,CardName=gain.Name,Progress=true,ImmediateVictory=true,Roll=entry.Kind=="RollDice"?entry:null};

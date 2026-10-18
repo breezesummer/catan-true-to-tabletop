@@ -62,7 +62,7 @@ namespace Catan.Core
                     return g.Details.GroupBy(d => Math.Sign(d.Amount)).Select(x => new GameHistoryChange
                     {
                         PlayerId = g.Details[0].PlayerId, Category = g.Details[0].Category == "goods" ? "resource-count" : g.Details[0].Category, Amount = x.Sum(d => d.Amount),
-                        Name = g.Details[0].Category == "goods" ? "手牌" : g.Details[0].Category == "development" ? "发展卡" : "进步卡"
+                        Name = g.Details[0].Category == "goods" ? "手牌" : g.Details[0].Category == "development" ? "发展卡" : "发展卡"
                     });
                 }).ToArray();
                 return entry;
@@ -141,35 +141,35 @@ namespace Catan.Core
         internal static readonly string[] GoodNames = { "木材", "砖块", "羊毛", "粮食", "矿石", "布匹", "钱币", "纸张" };
         private static readonly Dictionary<string, string> Names = new Dictionary<string, string>
         {
-            {"SetupSettlement","摆放开局建筑"},{"SetupRoad","摆放开局道路"},{"SetupShip","摆放开局船"},{"SetupPort","摆放开局港口"},
+            {"SetupSettlement","摆放开局建筑"},{"SetupRoad","建造了开局道路"},{"SetupShip","建造了开局船"},{"SetupPort","摆放开局港口"},
             {"RollDice","掷骰"},{"BuildRoad","建造道路"},{"BuildSettlement","建造村庄"},{"BuildCity","升级城市"},{"BuildShip","建造船"},
             {"BankTrade","完成银行／港口交易"},{"ProposeTrade","提出交易"},{"AcceptTrade","接受交易"},{"RejectTrade","拒绝交易"},{"CancelTrade","取消交易"},
-            {"BuyDevelopmentCard","购买发展卡"},{"PlayKnight","打出「骑士」"},{"PlayRoadBuilding","打出「道路建设」"},{"PlayYearOfPlenty","打出「丰收」"},{"PlayMonopoly","打出「垄断」"},
+            {"BuyDevelopmentCard","购买发展卡"},{"PlayKnight","使用「骑士」"},{"PlayRoadBuilding","使用「道路建设」"},{"PlayYearOfPlenty","使用「丰收」"},{"PlayMonopoly","使用「垄断」"},
             {"PlaceFreeRoad","免费建造道路"},{"PlaceFreeShip","免费建造船"},{"FinishRoadBuilding","完成道路建设"},{"DiscardResources","弃置手牌"},
             {"MoveRobber","移动强盗"},{"StealResource","偷取手牌"},{"EndTurn","结束回合"},{"DeclareVictory","宣告胜利"},
             {"MoveShip","移动船"},{"MovePirate","移动海盗"},{"ChooseGoldResources","领取金矿资源"},{"StealCloth","偷取布匹"},
             {"PlacePort","安置港口"},{"ClaimWonder","认领奇迹"},{"BuildWonder","建造奇迹"},{"AttackFortress","攻击海盗要塞"},{"ChooseInvasionRoute","选择海盗路线"},
-            {"BuildWall","建造城墙"},{"ImproveCity","升级城市改良"},{"RecruitKnight","招募骑士"},{"PromoteKnight","晋升骑士"},{"ActivateKnight","激活骑士"},
-            {"MoveKnight","移动骑士"},{"DisplaceKnight","驱逐骑士"},{"ChaseRobber","骑士驱赶强盗"},{"ChasePirate","骑士驱赶海盗"},{"DiscardProgressCard","弃置进步卡"},{"CommercialHarborOffer","使用商业港口"},
-            {"ResolveChoice","完成选择"},{"ResolveProgressChoice","完成进步卡选择"}
+            {"BuildWall","建造城墙"},{"ImproveCity","升级城市设施"},{"RecruitKnight","招募骑士"},{"PromoteKnight","晋升骑士"},{"ActivateKnight","激活骑士"},
+            {"MoveKnight","移动骑士"},{"DisplaceKnight","驱逐骑士"},{"ChaseRobber","骑士驱赶强盗"},{"ChasePirate","骑士驱赶海盗"},{"DiscardProgressCard","弃置发展卡"},{"CommercialHarborOffer","使用商业港口"},
+            {"ResolveChoice","完成选择"},{"ResolveProgressChoice","完成发展卡选择"}
         };
         private static readonly Dictionary<string, string> PendingNames = new Dictionary<string, string>
         {
             {"ProgressRoads","选择免费道路／船"},{"ProgressGuildDues","结算行会征费"},{"ProgressEspionage","结算间谍"},{"ProgressHarbor","完成商业港口交换"},
             {"ProgressWedding","交出婚礼礼物"},{"ProgressSabotage","弃置破坏要求的手牌"},{"ProgressTreasonRemove","移除被叛变的骑士"},{"ProgressTreasonPlace","安置叛变骑士"},
-            {"ProgressDraw","抽取进步卡"},{"ProgressDiscard","弃置超额进步卡"},{"DefenderProgress","领取保卫奖励"},{"Aqueduct","领取水渠资源"},
+            {"ProgressDraw","抽取发展卡"},{"ProgressDiscard","弃置超额发展卡"},{"DefenderProgress","领取保卫奖励"},{"Aqueduct","领取水渠资源"},
             {"PillageCity","选择降级城市"},{"DisplacedKnight","安置被驱逐的骑士"},{"Metropolis","安置大都会"}
         };
         private static string ActionName(HistoryAction action, string pending)
         {
-            if (action.Kind == "PlayProgressCard") return "打出「" + CardName(action.Card) + "」";
+            if (action.Kind == "PlayProgressCard") return "使用「" + CardName(action.Card) + "」";
             if ((action.Kind == "ResolveChoice" || action.Kind == "ResolveProgressChoice") && pending != null && PendingNames.TryGetValue(pending, out var choice)) return choice;
             return Names.TryGetValue(action.Kind, out var name) ? name : "完成操作";
         }
         internal static string CardName(string card)
         {
             string[] ids = {"Knight","RoadBuilding","YearOfPlenty","Monopoly","VictoryPoint","Alchemy","Crane","Engineering","Invention","Irrigation","Medicine","Mining","Printing","Smithing","CommercialHarbor","GuildDues","Merchant","MerchantFleet","ResourceMonopoly","TradeMonopoly","Diplomacy","Espionage","Encouragement","Intrigue","Taxation","Constitution","Treason","Wedding","Sabotage"};
-            string[] names = {"骑士","道路建设","丰收","垄断","胜利点","炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","锻造","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"};
+            string[] names = {"骑士","道路建设","丰收","垄断","胜利点","炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","锻铁匠","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"};
             int index = Array.IndexOf(ids, card); return index >= 0 ? names[index] : "卡牌";
         }
     }

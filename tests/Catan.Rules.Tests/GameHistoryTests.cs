@@ -71,7 +71,7 @@ public sealed class GameHistoryTests
         var command = M2Harness.Cmd(M2.CommandKind.PlayMonopoly); command.Resource = Resource.Ore;
         M2Harness.Accepted(game, command);
         var entry = Assert.Single(game.GetHistory("P4"));
-        Assert.Equal("打出「垄断」", entry.Action);
+        Assert.Equal("使用「垄断」", entry.Action);
         Assert.Contains(entry.Changes, c => c.PlayerId == "P1" && c.GoodIndex == 4 && c.Amount == 5);
         Assert.Contains(entry.Changes, c => c.PlayerId == "P2" && c.GoodIndex == 4 && c.Amount == -2);
         Assert.Contains(entry.Changes, c => c.PlayerId == "P3" && c.GoodIndex == 4 && c.Amount == -3);
@@ -141,7 +141,7 @@ public sealed class GameHistoryTests
         var choose = M4ProgressHarness.Cmd(M4.CommandKind.ResolveProgressChoice); choose.SelectedProgressCard = M4.ProgressCardKind.Medicine;
         choose.OtherPlayerId = "P3"; // 被规则忽略的恶意字段不得为第三人授予历史知情权。
         M4ProgressHarness.Accepted(game, choose);
-        Assert.Equal("打出「间谍」", game.GetHistory("P3")[0].Action);
+        Assert.Equal("使用「间谍」", game.GetHistory("P3")[0].Action);
         foreach (var viewer in new[] { "P1", "P2" }) Assert.Equal(2, game.GetHistory(viewer)[1].Changes.Count(c => c.Name == "医学"));
         Assert.DoesNotContain(game.GetHistory("P3")[1].Changes, c => c.Name == "医学");
         Assert.Equal(new[] { 1, -1 }, game.GetHistory("P3")[1].Changes.Select(c => c.Amount));
@@ -184,7 +184,7 @@ public sealed class GameHistoryTests
         var command = M4ProgressHarness.Play(M4.ProgressCardKind.Crane); command.Track = M4.ImprovementTrack.Science;
         M4ProgressHarness.Accepted(game, command);
         var entry = Assert.Single(game.GetHistory("P2"));
-        Assert.Equal("打出「起重机」", entry.Action);
+        Assert.Equal("使用「起重机」", entry.Action);
         Assert.Contains(entry.Changes, c => c.Category == "status" && c.Amount == 1 && c.Name == "科学改良（现为 1 级）");
         Assert.DoesNotContain(entry.Changes, c => c.Category == "goods");
     }

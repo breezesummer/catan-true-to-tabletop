@@ -6,10 +6,10 @@ using Catan.Core;
 public sealed partial class M4App
 {
     ResourceBag resourceChoiceSelection=new ResourceBag();
-    bool ResourceChoiceVisible=>view?.PendingDecision?.Kind=="Aqueduct";
+    bool ResourceChoiceVisible=>!tabletop.OperationHidden&&view?.PendingDecision?.PlayerId==seat&&view.PendingDecision.Kind=="Aqueduct";
     void DrawPendingResources()
     {
-        TabletopResourceChoiceUI.Draw(1,resourceChoiceSelection,view.Bank,ConfirmPendingResources,ai.ShowTablePrompt,"引水渠 · 选择资源");
+        TabletopResourceChoiceUI.Draw(1,resourceChoiceSelection,view.Bank,ConfirmPendingResources,ai.ShowTablePrompt,"引水渠 · 选择资源",tabletop.OperationWindows);
     }
     void ConfirmPendingResources()
     {
@@ -21,11 +21,11 @@ public sealed partial class M4App
 public sealed partial class M5App
 {
     ResourceBag resourceChoiceSelection=new ResourceBag();
-    bool ResourceChoiceVisible=>view?.PendingDecision?.Kind=="Gold"||view?.PendingDecision?.Kind=="Aqueduct";
+    bool ResourceChoiceVisible=>!tabletop.OperationHidden&&view?.PendingDecision?.PlayerId==seat&&(view.PendingDecision.Kind=="Gold"||view.PendingDecision.Kind=="Aqueduct");
     void DrawPendingResources()
     {
         bool gold=view.PendingDecision.Kind=="Gold";
-        TabletopResourceChoiceUI.Draw(gold?view.PendingDecision.Amount:1,resourceChoiceSelection,view.Bank,ConfirmPendingResources,ai.ShowTablePrompt,gold?"金矿 · 选择资源":"引水渠 · 选择资源");
+        TabletopResourceChoiceUI.Draw(gold?view.PendingDecision.Amount:1,resourceChoiceSelection,view.Bank,ConfirmPendingResources,ai.ShowTablePrompt,gold?"金矿 · 选择资源":"引水渠 · 选择资源",tabletop.OperationWindows);
     }
     void ConfirmPendingResources()
     {

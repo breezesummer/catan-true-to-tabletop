@@ -37,9 +37,9 @@ public sealed partial class M5App : MonoBehaviour
     bool artOpen;
     static readonly string[] Goods={"木材","砖","羊毛","谷物","矿石","布匹","钱币","纸张"};
     static readonly string[] Tracks={"贸易 · 布匹","政治 · 钱币","科学 · 纸张"};
-    internal static readonly string[] Cards={"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻造","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"};
+    internal static readonly string[] Cards={"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻铁匠","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"};
     internal static readonly string[] CardHelp={
-        "掷骰前指定红、白产出骰；事件骰照常随机掷出。","选择轨道，立即以少一张商品的费用改良一次。","选择自己的城市，免费建一面城墙。","选择两个地块交换数字；2、6、8、12 不能交换。","每个邻接自己建筑的麦田取 2 谷物；每个地块只算一次。","选择村庄，以 1 谷物和 2 矿石升级城市。","每个邻接自己建筑的山地取 2 矿石。","抽到后自动公开，得 1 分。","免费建设两条道路或船，逐条选择。","选择最多两名骑士免费晋升，每名每回合最多一次。","本回合可向每个对手提供一次资源，换取其自选商品。","选择分数高于自己的玩家，查看其手牌并取两张。","选择邻接自己建筑的资源地块（金矿除外），取得商人及 1 分，并以 2:1 交易该资源。","本回合所选资源或商品可按 2:1 交易。","每名对手交出所选资源最多两张。","每名对手交出所选商品最多一张。","移除一条开放道路或船；若是自己的，可立即免费重建同种棋子。","选择对手，仅你可查看其进步卡，并可取一张。","免费激活所有未激活骑士；本回合新激活者不能行动。","选择连接自己道路或船的对手骑士，将其驱离。","首次蛮族攻击后，将强盗移到新地块，向每名邻接对手各随机取一张。","抽到后自动公开，得 1 分。","对手选择移除一名骑士，你可招募同级或更低且同状态的骑士。","分数高于你的每名对手自选两张资源或商品给你。","分数不少于你的对手各弃掉一半资源和商品。"};
+        "掷骰前指定红、白产出骰；事件骰照常随机掷出。","选择轨道，立即以少一张商品的费用建造一级城市设施。","选择自己的城市，免费建一面城墙。","选择两个地块交换数字；2、6、8、12 不能交换。","每个邻接自己建筑的麦田取 2 谷物；每个地块只算一次。","选择村庄，以 1 谷物和 2 矿石升级城市。","每个邻接自己建筑的山地取 2 矿石。","抽到后自动公开，得 1 分。","免费建设两条道路或船，逐条选择。","选择两名可晋升骑士免费晋升；只有一名符合条件时选择一名，每名每回合最多晋升一次。","本回合可向每个对手提供一次资源，换取其自选商品。","选择分数高于自己的玩家，查看其手牌并取两张。","选择邻接自己建筑的资源地块（金矿除外），取得商人及 1 分，并以 2:1 交易该资源。","本回合所选资源或商品可按 2:1 交易。","每名对手交出所选资源最多两张。","每名对手交出所选商品最多一张。","移除一条开放道路或船；若是自己的，可立即免费重建同种棋子。","选择对手，仅你可查看其发展卡，并可取一张。","免费激活所有未激活骑士；本回合新激活者不能行动。","选择连接自己道路或船的对手骑士，将其驱离。","首次蛮族攻击后，将强盗移到新地块，向每名邻接对手各随机取一张。","抽到后自动公开，得 1 分。","对手选择移除一名骑士，你可招募同级或更低且同状态的骑士。","分数高于你的每名对手自选两张资源或商品给你。","分数不少于你的对手各弃掉一半资源和商品。"};
 
     public void Start()
     {
@@ -120,7 +120,7 @@ public sealed partial class M5App : MonoBehaviour
         var pointer=MobileTabletop.Pointer;
         bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(MobileTabletop.Logical(pointer));
         bool canMap=ai!=null&&!curtain&&!newGame&&!artOpen&&!ai.TableMenuOpen&&!blocked&&TabletopUI.ContainsMapScreenPoint(pointer);
-        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,draft==null&&!operationActions);
+        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,tabletop.OperationHidden||draft==null&&!operationActions);
         if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
         if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
@@ -136,6 +136,7 @@ public sealed partial class M5App : MonoBehaviour
         var logicalMouse=MobileTabletop.Logical(mouse);
         if(DockBlocksMouse(logicalMouse)||cardArt.BlocksBoardInput(logicalMouse)){board.ClearPreview();return;}
         if(ai==null&&(mouse.x>Screen.width*.70f||mouse.y<Screen.height*.15f||mouse.y>Screen.height*.90f))return;
+        if(ai!=null&&tabletop.OperationHidden){board.ClearPreview();return;}
         if(ai!=null&&DirectProgressActive){UpdateDirectProgress(mouse,boardClick);return;}
         if(ai!=null&&FreeRoadPlacementActive){UpdateFreeRoadPlacement(mouse,boardClick);return;}
         if(ai!=null&&draft==null&&boardClick){PickTabletopObject(mouse);return;}
@@ -168,6 +169,7 @@ public sealed partial class M5App : MonoBehaviour
     {
         if(mapPan.IsDragging){mapPan.Cancel(board.TableScene);return true;}
         if(tabletop.TryCloseOverlay())return true;
+        if(!tabletop.OperationHidden&&(dock.HasOverlay||tabletop.ContextVisible||mapChoice.Active||ResourceChoiceVisible))return tabletop.HideOperation();
         if(mapChoice.Active){mapChoice.Clear();return true;}
         bool active=draft!=null||operationActions||operationKnightTarget!=null||newGame||artOpen||cardArt.HasSelection||dock.HasCancelableInteraction;
         if(!active)return false;
@@ -199,14 +201,14 @@ public sealed partial class M5App : MonoBehaviour
         {
             GUILayout.BeginArea(new Rect(1040,80,370,660));Text("新开一局会替换当前未保存局面。");
             selectedScenario=new[]{"heading-for-new-shores","through-the-desert"}[Cycle("组合剧本",selectedScenario=="heading-for-new-shores"?0:1,new[]{"驶向新海岸","穿越沙漠"})];
-            Text("两个剧本均支持 3–4 人，目标 16 分。新岛奖励、金矿、商品、骑士和进步卡共同生效。",true);
+            Text("两个剧本均支持 3–4 人，目标 16 分。新岛奖励、金矿、商品、骑士和发展卡共同生效。",true);
             foreach(int n in new[]{3,4})if(Btn(n+" 人新局")){host.NewGame(selectedScenario,n);var v=host.View("P1");Refresh(v);SwitchSeat(v.ActivePlayerId);newGame=false;}
             GUILayout.Space(16);Text("组合兼容范围",true);Text("本阶段按 2025 城市与骑士规则第 12 页开放驶向新海岸、穿越沙漠。四岛、迷雾岛、遗忘部落、布匹、海盗岛、奇迹及新世界暂不开放组合；其单扩展版本可在 M3 游玩。",true);
             if(Btn("返回当前局"))newGame=false;GUILayout.EndArea();GUI.matrix=Matrix4x4.identity;return;
         }
         if(curtain)
         {
-            GUILayout.BeginArea(new Rect(1040,80,370,340));GUILayout.Label("请交给 "+nextSeat,heading);Text("资源、商品、进步卡和窥看信息均已遮蔽。\n\n请其他玩家暂时移开视线。");GUILayout.Space(30);
+            GUILayout.BeginArea(new Rect(1040,80,370,340));GUILayout.Label("请交给 "+nextSeat,heading);Text("资源、商品、发展卡和窥看信息均已遮蔽。\n\n请其他玩家暂时移开视线。");GUILayout.Space(30);
             if(Btn("我是 "+nextSeat+" · 查看手牌"))ConfirmSeat();GUILayout.EndArea();
         }
         else
@@ -214,7 +216,7 @@ public sealed partial class M5App : MonoBehaviour
             DrawBoardLabels();GUILayout.BeginArea(new Rect(1032,12,390,724));
             GUILayout.Label(seat+" · "+PhaseName(view.Phase)+" · "+view.OwnVictoryPoints+" 分",heading);
             cardArt.GoodRow(Enumerable.Range(0,8).Select(Own).ToArray(),Goods,small);
-            var own=view.Players.First(p=>p.Id==seat);Text("改良 贸易 "+own.Improvements[0]+" / 政治 "+own.Improvements[1]+" / 科学 "+own.Improvements[2]+"   城墙余 "+own.WallSupply,true);
+            var own=view.Players.First(p=>p.Id==seat);Text("城市设施 贸易 "+own.Improvements[0]+" / 政治 "+own.Improvements[1]+" / 科学 "+own.Improvements[2]+"   城墙余 "+own.WallSupply,true);
             Text("路 "+own.Pieces.Roads+" / 船 "+own.ShipsRemaining+" / 村 "+own.Pieces.Settlements+" / 城 "+own.Pieces.Cities+"   骑士余 "+string.Join("/",own.KnightSupply),true);
             Text("防御 "+view.DefenderStrength+" / 蛮族力量 "+view.BarbarianStrength+" · "+(view.FirstBarbarianAttack?"强盗 / 海盗已启用":"强盗 / 海盗尚未启用"),true);
             if(Btn(artOpen?"返回操作面板":"查看手牌与设施实体卡面")){artOpen=!artOpen;scroll=Vector2.zero;}
@@ -234,15 +236,15 @@ public sealed partial class M5App : MonoBehaviour
     void DrawEntityCards()
     {
         Text("悬停放大 · 点击固定查看与翻面。实体照片中的文字仅作外观，规则以操作提示为准。",true);
-        Text("我的进步卡");
+        Text("我的发展卡");
         foreach(var card in view.OwnProgressCards.Distinct())
         {
             GUILayout.BeginHorizontal();ProgressFace(card,CardName(card)+" ×"+view.OwnProgressCards.Count(c=>c==card));Text(CardHelp[(int)card],true);GUILayout.EndHorizontal();
         }
-        if(view.OwnProgressCards.Length==0)Text("当前没有进步卡。",true);
+        if(view.OwnProgressCards.Length==0)Text("当前没有发展卡。",true);
         if(view.PrivateTargetProgressCards!=null&&view.PrivateTargetProgressCards.Length>0)
         {
-            Text("本次待决允许查看的进步卡");
+            Text("本次待决允许查看的发展卡");
             foreach(var card in view.PrivateTargetProgressCards.Distinct())ProgressFace(card,"允许查看 · "+CardName(card));
         }
         Text("我的城市设施");
@@ -335,7 +337,7 @@ public sealed partial class M5App : MonoBehaviour
         }
         else
         {
-            int chosen=GUILayout.Toolbar(tab,new[]{"行动","骑士","改良","交易","进步卡"},button);if(chosen!=tab){tab=chosen;draft=null;pickField="";}
+            int chosen=GUILayout.Toolbar(tab,new[]{"行动","骑士","设施","交易","发展卡"},button);if(chosen!=tab){tab=chosen;draft=null;pickField="";}
             if(tab==0)
             {
                 GUILayout.BeginHorizontal();if(Btn("掷骰")){Submit(New(CommandKind.RollDice));GUIUtility.ExitGUI();}if(Btn("结束回合")){Submit(New(CommandKind.EndTurn));GUIUtility.ExitGUI();}GUILayout.EndHorizontal();
@@ -349,18 +351,18 @@ public sealed partial class M5App : MonoBehaviour
                 ActionButton("招募 · 羊1 矿1",CommandKind.RecruitKnight);ActionButton("晋升 · 羊1 矿1",CommandKind.PromoteKnight);ActionButton("激活 · 麦1",CommandKind.ActivateKnight);ActionButton("移动骑士",CommandKind.MoveKnight);ActionButton("驱离弱骑士",CommandKind.DisplaceKnight);ActionButton("驱逐强盗",CommandKind.ChaseRobber);
                 ActionButton("驱逐海盗",CommandKind.ChasePirate);
             }
-            if(tab==2){Text("每级费用等于新等级。三级获得能力；四级/五级争夺大都会。",true);ActionButton("城市改良",CommandKind.ImproveCity);}
+            if(tab==2){Text("每级费用等于新等级。三级获得能力；四级/五级争夺大都会。",true);ActionButton("城市设施",CommandKind.ImproveCity);}
             if(tab==3){ActionButton("银行与港口交易",CommandKind.BankTrade);ActionButton("玩家交易",CommandKind.ProposeTrade);}
             if(tab==4)
             {
-                Text("进步卡可当回合使用。仅炼金术在掷骰前使用；回合结束最多留 4 张。",true);
+                Text("发展卡可当回合使用。仅炼金术在掷骰前使用；回合结束最多留 4 张。",true);
                 foreach(var card in view.OwnProgressCards.Distinct())
                 {
                     GUILayout.BeginHorizontal();ProgressFace(card,CardName(card)+" ×"+view.OwnProgressCards.Count(c=>c==card));
                     if(Btn(CardName(card)+" ×"+view.OwnProgressCards.Count(c=>c==card))){draft=New(CommandKind.PlayProgressCard);draft.ProgressCard=card;}
                     GUILayout.EndHorizontal();
                 }
-                if(view.OwnProgressCards.Length==0)Text("当前没有进步卡。",true);
+                if(view.OwnProgressCards.Length==0)Text("当前没有发展卡。",true);
                 if(view.CommercialHarborPlayers.Length>0)ActionButton("商业港口 · 提供资源",CommandKind.CommercialHarborOffer);
             }
         }
@@ -447,12 +449,12 @@ public sealed partial class M5App : MonoBehaviour
         {draft.Commodity=(Commodity)Cycle("商品",(int)draft.Commodity,Goods.Skip(5).ToArray());resourceReady&=(int)draft.Commodity>=0;}
         if(view.PrivateTargetProgressCards!=null&&view.PrivateTargetProgressCards.Length>0)
         {
-            var cards=view.PrivateTargetProgressCards.Distinct().ToArray();draft.SelectedProgressCard=cards[Cycle("允许查看的进步卡",Math.Max(0,Array.IndexOf(cards,draft.SelectedProgressCard)),cards.Select(CardName).ToArray())];
+            var cards=view.PrivateTargetProgressCards.Distinct().ToArray();draft.SelectedProgressCard=cards[Cycle("允许查看的发展卡",Math.Max(0,Array.IndexOf(cards,draft.SelectedProgressCard)),cards.Select(CardName).ToArray())];
             ProgressFace(draft.SelectedProgressCard,"允许查看 · "+CardName(draft.SelectedProgressCard));
         }
         if(k==CommandKind.DiscardProgressCard)
         {
-            var cards=view.OwnProgressCards.Distinct().ToArray();if(cards.Length>0){var selected=cards[Cycle("进步卡",Math.Max(0,Array.IndexOf(cards,draft.ProgressCard)),cards.Select(CardName).ToArray())];draft.ProgressCard=selected;draft.SelectedProgressCard=selected;}
+            var cards=view.OwnProgressCards.Distinct().ToArray();if(cards.Length>0){var selected=cards[Cycle("发展卡",Math.Max(0,Array.IndexOf(cards,draft.ProgressCard)),cards.Select(CardName).ToArray())];draft.ProgressCard=selected;draft.SelectedProgressCard=selected;}
         }
         if(TabletopCardInput.Changed)GUIUtility.ExitGUI();
         if(!resourceReady){ModernOperationUI.Info("请点选一种资源或商品。",true);if(Btn("取消当前操作"))CancelOperationDraft();return;}
@@ -503,8 +505,8 @@ public sealed partial class M5App : MonoBehaviour
     static string CardName(ProgressCardKind c)=>Cards[(int)c];
     static string EventName(EventDie d)=>d==EventDie.Barbarian?"蛮族船":d==EventDie.Trade?"贸易":d==EventDie.Politics?"政治":"科学";
     static string PhaseName(GamePhase phase){switch(phase){case GamePhase.SetupSettlement:return "开局建筑";case GamePhase.SetupRoad:return "开局道路";case GamePhase.ProductionAwaitRoll:return "等待掷骰";case GamePhase.Action:return "行动";case GamePhase.Discard:return "弃牌";case GamePhase.RobberMove:return "移动强盗或海盗";case GamePhase.RobberSteal:return "偷取";case GamePhase.RoadBuilding:return "免费道路";case GamePhase.Finished:return "已结束";default:return "待决选择";}}
-    static string DecisionName(string key){switch(key){case "Gold":return "金矿选择资源";case "PillageCity":return "选择被劫掠的城市";case "Metropolis":return "放置大都会";case "DefenderProgress":return "防御奖励";case "Aqueduct":return "水渠选资源";case "DisplacedKnight":return "安置被驱离骑士";case "ProgressDiscard":return "进步卡超限";case "ProgressEspionage":return "间谍选牌";case "ProgressGuildDues":return "行会征费选牌";case "ProgressRoads":return "免费道路或船";case "ProgressHarbor":return "商业港口交商品";case "ProgressTreasonRemove":return "移除自己的骑士";case "ProgressTreasonPlace":return "放置替补骑士";case "ProgressWedding":return "婚礼赠礼";case "ProgressSabotage":return "破坏弃牌";default:return "按提示完成选择";}}
-    static string CommandName(CommandKind kind){switch(kind){case CommandKind.SetupShip:return "开局船";case CommandKind.BuildShip:return "建船";case CommandKind.MoveShip:return "移动船";case CommandKind.MovePirate:return "移动海盗";case CommandKind.ChasePirate:return "驱逐海盗";case CommandKind.SetupSettlement:return "开局建筑";case CommandKind.SetupRoad:return "开局道路";case CommandKind.BuildRoad:return "建道路";case CommandKind.BuildSettlement:return "建村庄";case CommandKind.BuildCity:return "升级城市";case CommandKind.BuildWall:return "城墙";case CommandKind.ImproveCity:return "城市改良";case CommandKind.RecruitKnight:return "招募骑士";case CommandKind.PromoteKnight:return "晋升骑士";case CommandKind.ActivateKnight:return "激活骑士";case CommandKind.MoveKnight:return "移动骑士";case CommandKind.DisplaceKnight:return "驱离骑士";case CommandKind.ChaseRobber:return "驱逐强盗";case CommandKind.PlayProgressCard:return "进步卡";case CommandKind.BankTrade:return "银行交易";case CommandKind.ProposeTrade:return "玩家交易";case CommandKind.DiscardResources:return "弃牌";case CommandKind.MoveRobber:return "移动强盗";case CommandKind.StealResource:return "选择偷取对象";default:return "完成待决操作";}}
+    static string DecisionName(string key){switch(key){case "Gold":return "金矿选择资源";case "PillageCity":return "选择被劫掠的城市";case "Metropolis":return "放置大都会";case "DefenderProgress":return "防御奖励";case "Aqueduct":return "水渠选资源";case "DisplacedKnight":return "安置被驱离骑士";case "ProgressDiscard":return "发展卡超限";case "ProgressEspionage":return "间谍选牌";case "ProgressGuildDues":return "行会征费选牌";case "ProgressRoads":return "免费道路或船";case "ProgressHarbor":return "商业港口交商品";case "ProgressTreasonRemove":return "移除自己的骑士";case "ProgressTreasonPlace":return "放置替补骑士";case "ProgressWedding":return "婚礼赠礼";case "ProgressSabotage":return "破坏弃牌";default:return "按提示完成选择";}}
+    static string CommandName(CommandKind kind){switch(kind){case CommandKind.SetupShip:return "开局船";case CommandKind.BuildShip:return "建船";case CommandKind.MoveShip:return "移动船";case CommandKind.MovePirate:return "移动海盗";case CommandKind.ChasePirate:return "驱逐海盗";case CommandKind.SetupSettlement:return "开局建筑";case CommandKind.SetupRoad:return "开局道路";case CommandKind.BuildRoad:return "建道路";case CommandKind.BuildSettlement:return "建村庄";case CommandKind.BuildCity:return "升级城市";case CommandKind.BuildWall:return "城墙";case CommandKind.ImproveCity:return "城市设施";case CommandKind.RecruitKnight:return "招募骑士";case CommandKind.PromoteKnight:return "晋升骑士";case CommandKind.ActivateKnight:return "激活骑士";case CommandKind.MoveKnight:return "移动骑士";case CommandKind.DisplaceKnight:return "驱离骑士";case CommandKind.ChaseRobber:return "驱逐强盗";case CommandKind.PlayProgressCard:return "发展卡";case CommandKind.BankTrade:return "银行交易";case CommandKind.ProposeTrade:return "玩家交易";case CommandKind.DiscardResources:return "弃牌";case CommandKind.MoveRobber:return "移动强盗";case CommandKind.StealResource:return "选择偷取对象";default:return "完成待决操作";}}
     static string OptionName(string value){ImprovementTrack track;if(Enum.TryParse(value,out track)&&Enum.IsDefined(typeof(ImprovementTrack),track))return Tracks[(int)track];return value;}
     string ChoiceLabel(Command c)
     {

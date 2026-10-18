@@ -408,7 +408,7 @@ public sealed partial class M6App
             PastoralMenuUI.Round(new Rect(r.x,r.y+1,r.width-5,59),new Color(.91f,.93f,.86f),9);
             PastoralMenuUI.Label(new Rect(r.x+17,r.y+16,410,30),ColorLabel(seat.SeatId)+"   "+(seat.Occupied||seat.IsAi?seat.DisplayName:"等待同伴入座")+(room.ManagerSeatId==seat.SeatId?" · 房主":""),18,BoardRenderer.SeatColor(seat.SeatId),true);
             PastoralMenuUI.Label(new Rect(r.x+420,r.y+21,190,25),seat.RejoinPending?"AI 托管 · 下回合接回":seat.ControlledByAi?"AI 操作中":seat.Ready?"已准备":seat.Connected?"在线 · 未准备":"等待连接",13,PastoralMenuUI.Muted);
-            if(!room.Started&&!seat.Occupied&&!seat.IsAi&&PastoralMenuUI.Button(new Rect(r.xMax-129,r.y+12,110,36),"坐这里",!Network.Busy))Network.SelectSeat(seat.SeatId);
+            if(!room.Started&&!seat.Occupied&&!seat.IsAi&&PastoralMenuUI.Button(new Rect(r.xMax-129,r.y+12,110,36),"坐这里",!Network.Busy,seatColor:BoardRenderer.SeatColor(seat.SeatId)))Network.SelectSeat(seat.SeatId);
             if(room.ManagerSeatId==Network.SeatId&&seat.Occupied&&!seat.IsAi&&seat.SeatId!=Network.SeatId&&PastoralMenuUI.Button(new Rect(r.xMax-129,r.y+12,110,36),"转交房主",!Network.Busy))Network.Transfer(seat.SeatId);
         }
     }
@@ -461,7 +461,16 @@ public sealed partial class M6App
             GUILayout.Label("同桌人数",small);
             menuPlayers=GUILayout.Toolbar(menuPlayers-3,new[]{"3 人同桌","4 人同桌"},button,GUILayout.Height(42))+3;
             GUILayout.Space(20);GUILayout.Label("由当前 AI 控制的席位  ·  留出至少一席给你",small);
-            GUILayout.BeginHorizontal();for(int i=0;i<menuPlayers;i++)networkAi[i]=GUILayout.Toggle(networkAi[i],ColorLabel("P"+(i+1)),button,GUILayout.Height(39));GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            for(int i=0;i<menuPlayers;i++)
+            {
+                var colorButton=new GUIStyle(button);var color=BoardRenderer.SeatColor("P"+(i+1));
+                colorButton.normal.textColor=colorButton.hover.textColor=colorButton.active.textColor=color;
+                colorButton.onNormal.textColor=colorButton.onHover.textColor=colorButton.onActive.textColor=color;
+                networkAi[i]=GUILayout.Toggle(networkAi[i],ColorLabel("P"+(i+1)),colorButton,GUILayout.Height(39));
+            }
+            GUILayout.EndHorizontal();
+            if(Enumerable.Range(0,menuPlayers).All(i=>networkAi[i]))GUILayout.Label("请为房主保留至少一种颜色。",small);
             var ids=ScenarioIds();int defaults=DefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
             if(menuVictoryPoints.HasValue)menuVictoryPoints=Mathf.Clamp(menuVictoryPoints.Value,5,maximum);
             int target=menuVictoryPoints??defaults;GUILayout.Space(26);GUILayout.Label("胜利目标",small);

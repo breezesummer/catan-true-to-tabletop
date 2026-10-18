@@ -14,6 +14,9 @@
     <ProjectReference Include="../../src/Catan.AI/Catan.AI.csproj" />
     <ProjectReference Include="../Catan.SaveProbe/Catan.SaveProbe.csproj" ReferenceOutputAssembly="false" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/OperationDockModel.cs" Link="Presentation/OperationDockModel.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/OperationWindowState.cs" Link="Presentation/OperationWindowState.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopHistoryModel.cs" Link="Presentation/TabletopHistoryModel.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopSmithingSelection.cs" Link="Presentation/TabletopSmithingSelection.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/PlayerIdentityModel.cs" Link="Presentation/PlayerIdentityModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopPresentationModel.cs" Link="Presentation/TabletopPresentationModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopCardRevealModel.cs" Link="Presentation/TabletopCardRevealModel.cs" />

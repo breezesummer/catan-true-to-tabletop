@@ -1,0 +1,61 @@
+{
+  "版本": "1.6.6",
+  "正式发布": false,
+  "文件": [
+    {
+      "文件": "game version/1.6/Catan1.6.6-Operation-History-Polish/Builds/Windows/Catan1.6.6.exe",
+      "字节数": 667136,
+      "sha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "文件": "game version/1.6/Catan1.6.6-Operation-History-Polish/Builds/Windows/Catan1.6.6_Data/Managed/Assembly-CSharp.dll",
+      "字节数": 1053184,
+      "sha256": "c3770981bbb6bb55ed7111d701e96b2925bbd2490308a2a75d69d4d2cffa64bd"
+    },
+    {
+      "文件": "game version/1.6/Catan1.6.6-Operation-History-Polish/Builds/Windows/Catan1.6.6_Data/Managed/Catan.Core.dll",
+      "字节数": 563200,
+      "sha256": "297d86720473f209e9e4f6d7a92d2c8fca7e69e5b04bc22af70fee7bf0290b82"
+    },
+    {
+      "文件": "game version/1.6/Catan1.6.6-Operation-History-Polish/Builds/Windows/Server/Catan.Core.dll",
+      "字节数": 563200,
+      "sha256": "297d86720473f209e9e4f6d7a92d2c8fca7e69e5b04bc22af70fee7bf0290b82"
+    },
+    {
+      "文件": "game version/1.6/Catan1.6.6-Operation-History-Polish/Builds/Windows/Server/Catan.Server.exe",
+      "字节数": 162304,
+      "sha256": "496c369a6cd849eda98f556346084c0e447eddc413db544f5ac8bc042d92b41d"
+    },
+    {
+      "文件": "game version/1.6/Catan1.6.6-Operation-History-Polish/Builds/Android/Catan1.6.6.apk",
+      "字节数": 345766101,
+      "sha256": "867e2358d36207492f6db87037249617b034aa2dee4fd6bce0cce3f95cacde67"
+    }
+  ],
+  "Android构建信息": {
+    "version": "1.6.6",
+    "packageId": "com.catandevelopment.threekingdoms",
+    "versionCode": 10606,
+    "minApi": 26,
+    "targetApi": 36,
+    "architectures": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "graphicsApi": "OpenGLES3",
+    "scriptingBackend": "IL2CPP",
+    "ui": "shared-pc-tabletop",
+    "coreAssemblySha256": "297d86720473f209e9e4f6d7a92d2c8fca7e69e5b04bc22af70fee7bf0290b82",
+    "aiAssemblySha256": "454176b7a2fd9a22a52a5a90d88fbe0b2a4535367beb7a78290b1ac3270ee82a",
+    "signingCertificateSha256": "efd26f60a7807072ff61fb0dd4660fa00859b75e9b3857a742a4c7d6e3a2bf48",
+    "apkSha256": "867e2358d36207492f6db87037249617b034aa2dee4fd6bce0cce3f95cacde67"
+  },
+  "既有修改按字节恢复数": 131,
+  "内测版本保留数": 5,
+  "已清理版本": [
+    "Catan1.6.1"
+  ],
+  "完整界面像素验收": false,
+  "Android真机验证": false
+}

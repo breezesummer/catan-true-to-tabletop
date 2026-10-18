@@ -97,7 +97,7 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
         yield return null;yield return new WaitForEndOfFrame();Require(app.VerificationMovementWaypoints==3,"移动没有经过道路拐点");
         authority=host.ExportSave();yield return new WaitForSecondsRealtime(.33f);
         Require(app.VerificationMovementPosition.y>city.VerificationBoard.Position(a).y,"移动棋子没有浮起");yield return Capture("03-沿路移动");yield return Settle();Require(authority==host.ExportSave(),"移动动画改变权威状态");
-        stage="进步卡先展示后效果";int before=city.M6View.OwnResources.Wheat;
+        stage="发展卡先展示后效果";int before=city.M6View.OwnResources.Wheat;
         var play=Command(C4.CommandKind.PlayProgressCard);play.ProgressCard=C4.ProgressCardKind.Irrigation;
         Require(city.Submit(play).Success,"出牌失败");Require(app.CardPresentationBusy,"没有出牌公告");
         string committed=host.ExportSave();Require(city.Submit(Command(C4.CommandKind.EndTurn))==null&&committed==host.ExportSave(),"出牌展示期间仍然能提交后续命令");

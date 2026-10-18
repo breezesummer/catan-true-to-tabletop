@@ -1,11 +1,12 @@
-param([string]$BuildRoot='game version/Catan1.6.5-Card-Interaction-Audio',[int]$TimeoutSeconds=300)
+﻿param([string]$BuildRoot='game version/1.6/Catan1.6.6-Operation-History-Polish',[int]$TimeoutSeconds=300,[switch]$Capture)
 $ErrorActionPreference='Stop'
 $feedbackRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $feedbackPlayer=& (Join-Path $PSScriptRoot '../development/Find-GamePlayer.ps1') -BuildRoot $BuildRoot
-$feedbackOutput=Join-Path $feedbackRepo '.local/feedback-ui-final'
+$feedbackOutput=Join-Path $feedbackRepo '.local/feedback-1.6.6/ui'
 New-Item -ItemType Directory -Force $feedbackOutput | Out-Null
 $feedbackLog=Join-Path $feedbackOutput 'player.log'
-$feedbackArgs=@('-batchmode','-nographics','-screen-width','1440','-screen-height','900','--feedback-verify',('"'+$feedbackOutput+'"'),'-logFile',('"'+$feedbackLog+'"'))
+$feedbackArgs=@('-force-d3d11','-screen-fullscreen','0','-screen-width','1440','-screen-height','900','--feedback-verify',('"'+$feedbackOutput+'"'),'-logFile',('"'+$feedbackLog+'"'))
+if($Capture){$feedbackArgs+='--feedback-screenshots'}
 $feedbackProcess=Start-Process -FilePath $feedbackPlayer -WorkingDirectory $feedbackRepo -ArgumentList $feedbackArgs -WindowStyle Hidden -PassThru
 $feedbackDeadline=[DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
 while(!$feedbackProcess.WaitForExit(1000)) {

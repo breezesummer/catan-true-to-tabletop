@@ -8,7 +8,8 @@ public sealed class TabletopChoiceBubble
     string[] labels;
     Action<int> select;
     Rect area;
-    public bool Active => select != null;
+    public OperationWindowState Windows;
+    public bool Active => select != null&&Windows?.Hidden!=true;
     public void Clear() { select=null; }
     internal void Choose(int index)
     {if(select==null||index<0||index>=labels.Length)return;var callback=select;Clear();callback(index);}
@@ -17,6 +18,7 @@ public sealed class TabletopChoiceBubble
         var point=MobileTabletop.Logical(screen);
         area=new Rect(Mathf.Clamp(point.x-150,24,1116),Mathf.Clamp(point.y-110,170,650),300,82+choices.Length*40);
         title=heading;labels=choices;select=callback;
+        Windows?.Describe(heading);
     }
     public void Draw()
     {
@@ -25,6 +27,6 @@ public sealed class TabletopChoiceBubble
         ModernOperationUI.Label(new Rect(area.x+12,area.y+8,276,28),title,ModernOperationUI.Text);
         for(int i=0;i<labels.Length;i++)if(ModernOperationUI.Button(new Rect(area.x+12,area.y+40+i*40,276,34),labels[i]))
         {Choose(i);GUIUtility.ExitGUI();}
-        if(ModernOperationUI.Button(new Rect(area.x+12,area.yMax-36,276,28),"取消"))Clear();
+        if(ModernOperationUI.Button(new Rect(area.x+12,area.yMax-36,276,28),"收起")){if(Windows==null)Clear();else Windows.Hide(title);}
     }
 }

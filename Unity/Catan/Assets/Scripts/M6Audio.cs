@@ -21,4 +21,15 @@ public sealed partial class M6App
         presentation is M5App combined ? combined.M6View?.Events?.LastOrDefault()?.Sequence ?? 0 : 0;
     internal string AudioPirateTile => presentation is M3App sailing ? sailing.M6View?.Board?.PirateTileId :
         presentation is M5App combined ? combined.M6View?.Board?.PirateTileId : null;
+    internal string AudioOpportunity
+    {
+        get
+        {
+            string kind=null;
+            if(presentation is M3App sailing&&sailing.M6View?.Phase==Catan.Core.M3.GamePhase.GoldChoice&&sailing.M6View.GoldClaims.FirstOrDefault()?.PlayerId==HumanSeat)kind="Gold";
+            if(presentation is M4App cities&&cities.M6View?.PendingDecision?.PlayerId==HumanSeat&&cities.M6View.PendingDecision.Kind=="Aqueduct")kind="Aqueduct";
+            if(presentation is M5App combined&&combined.M6View?.PendingDecision?.PlayerId==HumanSeat&&new[]{"Gold","Aqueduct"}.Contains(combined.M6View.PendingDecision.Kind))kind=combined.M6View.PendingDecision.Kind;
+            return kind==null?null:AudioPublicSequence+":"+kind;
+        }
+    }
 }

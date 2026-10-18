@@ -16,6 +16,7 @@ public sealed partial class M6App
     internal GameHistoryEntry CardPresentationRoll { get; private set; }
     internal bool CardPresentationBusy=>playedCards.Count>0;
     internal TabletopCardReveal PresentedCard=>playedCards.Count>0?playedCards.Peek():null;
+    public bool TableInspectionBlocked=>tableMenu;
     public bool TablePresentationBlocked=>tableMenu||CardPresentationBusy||pendingNetworkPresentation!=null||buildFlights.Any(f=>f.Piece.Previous!=null);
     public string PlayerDisplayName(string seat)
     {
@@ -90,6 +91,6 @@ public sealed partial class M6App
         var nameStyle=PlayerNameStyle(new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=29},entry.PlayerId);
         GUI.Label(new Rect(370,600,700,42),PlayerDisplayName(entry.PlayerId),nameStyle);
         if(!entry.ImmediateVictory)GUI.Label(new Rect(370,646,700,70),"使用了「"+card+"」",new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=27});
-        if(Event.current.isMouse)Event.current.Use();
+
     }
 }

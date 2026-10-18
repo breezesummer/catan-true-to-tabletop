@@ -109,7 +109,7 @@ public sealed class ProgressVictoryPresentationTests
     [Fact]
     public void HiddenCardsAndBaseVictoryCardsNeverCreateAnAutomaticPublicReveal()
     {
-        Assert.Empty(TabletopCardReveal.From(Entry(1,"RollDice","P1",Change("P2","印刷术",true),Change("P3","进步卡",false),Change("P4","胜利点",true))));
+        Assert.Empty(TabletopCardReveal.From(Entry(1,"RollDice","P1",Change("P2","印刷术",true),Change("P3","发展卡",false),Change("P4","胜利点",true))));
     }
     static GameHistoryEntry Entry(long sequence,string kind,string player,params GameHistoryChange[] changes)
     {var entry=new GameHistoryEntry();Set(entry,"Sequence",sequence);Set(entry,"Kind",kind);Set(entry,"PlayerId",player);Set(entry,"Changes",changes);return entry;}

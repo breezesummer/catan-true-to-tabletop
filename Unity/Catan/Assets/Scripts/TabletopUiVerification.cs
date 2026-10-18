@@ -36,6 +36,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
     OperationDock Dock => mode == "base" ? GetComponent<M2App>().VerificationOperationDock :
         mode == "seafarers" ? GetComponent<M3App>().VerificationOperationDock :
         mode == "cities-knights" ? GetComponent<M4App>().VerificationOperationDock : GetComponent<M5App>().VerificationOperationDock;
+    TabletopUI Hud => (TabletopUI)Presentation.GetType().GetField("tabletop",PrivateInstance).GetValue(Presentation);
     Camera BoardCamera => mode == "base" ? GetComponent<M2App>().VerificationBoard.BoardCamera :
         mode == "seafarers" ? GetComponent<M3App>().VerificationBoard.BoardCamera :
         mode == "cities-knights" ? GetComponent<M4App>().VerificationBoard.BoardCamera : GetComponent<M5App>().VerificationBoard.BoardCamera;
@@ -132,7 +133,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             Require(Dock.BlocksBoardInput(new Vector2(1220, 500)), "交易模态窗口未阻挡外侧桌面");
             Require(Dock.BlocksBoardInput(new Vector2(18, 18))&&Dock.BlocksBoardInput(new Vector2(1418, 882)), "交易模态窗口未完整阻挡背景输入");
             Require(before == Authority, "银行交换草稿改变权威状态");
-            app.HandleTableEscape();Require(!app.TableMenuOpen&&!Dock.TradeOpen,"Esc 未先关闭交换草稿");
+            app.HandleTableEscape();Require(!app.TableMenuOpen&&Dock.TradeOpen&&!Dock.HasOverlay&&Hud.OperationHidden,"Esc 未收起并保留交换草稿");
             app.HandleTableEscape();Require(app.TableMenuOpen,"关闭草稿后 Esc 无法打开菜单");
             app.HandleTableEscape();Require(!app.TableMenuOpen,"Esc 无法关闭游戏菜单");
             Require(Dock.Selection.Selected.Sum() == 0, "放回交换草稿未清空");
@@ -202,10 +203,14 @@ public sealed class TabletopUiVerification : MonoBehaviour
         string error=snapshot.Trade(new OperationTrade{OtherPlayer=OperationTrade.AllPlayers,Give=give,Receive=receive});
         Require(string.IsNullOrEmpty(error),"正式操作适配器拒绝合法全体报价");
         var offer=Snapshot.Offer;
-        Require(offer!=null&&offer.IsBroadcast&&offer.PendingRecipients.Length==app.PlayerCount-1,"全体报价没有覆盖其他席位");
+        // 缺料席位会自动拒绝；全员拒绝时报价立即结束。
+        if(offer==null){Require(owned.SequenceEqual(Snapshot.Goods),"全部自动拒绝后手牌改变");return;}
+        Require(offer.IsBroadcast&&offer.PendingRecipients.Concat(offer.RejectedRecipients).Distinct().Count()==app.PlayerCount-1,"全体报价没有覆盖其他席位");
         Require(offer.CanCancel&&!offer.CanAccept&&!offer.CanReject,"报价者回复权限不正确");
         Require(Snapshot.CanInteract,"报价者等待 AI 回复时不能撤回");
         Require(owned.SequenceEqual(Snapshot.Goods),"报价阶段已提前扣费");
+        BindDockForHeadless();
+        app.HandleTableEscape();Require(!app.TableMenuOpen&&Hud.OperationHidden&&Snapshot.Offer!=null,"收起交易报价取消了权威报价");
         app.HandleTableEscape();Require(app.TableMenuOpen&&Snapshot.Offer!=null,"已发出的交易报价阻止了 Esc 菜单或被界面取消");
         app.HandleTableEscape();Require(!app.TableMenuOpen&&owned.SequenceEqual(Snapshot.Goods),"报价期间关闭菜单改变了手牌");
         Snapshot.Respond("cancel");
@@ -478,6 +483,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
     {
         // -nographics 不调用 OnGUI；仅补上 Draw 的快照绑定，不绕过任何命令校验。
         typeof(OperationDock).GetField("current", PrivateInstance).SetValue(Dock, Snapshot);
+        Hud.BindOperations(Snapshot,Dock.PrepareDevelopmentPurchase,app.HistoryEntries);Dock.Windows=Hud.OperationWindows;
         Dock.Selection.Sync(Snapshot);
     }
 

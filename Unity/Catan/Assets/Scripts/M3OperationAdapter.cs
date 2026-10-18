@@ -27,7 +27,7 @@ public sealed partial class M3App
     {
         if(ai==null)return false;
         var p=logical??MobileTabletop.Logical(MobileTabletop.Pointer);
-        return mapChoice.Active||view?.Phase==GamePhase.GoldChoice||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||dock.BlocksBoardInput(p);
+        return mapChoice.Active||GoldChoiceVisible||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||dock.BlocksBoardInput(p);
     }
     void CancelOperationDraft(){mapChoice.Clear();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);preparedDevelopment=null;preparedPurchase=false;showSeafaring=false;tableNotes=false;tableVictim=null;CancelPickup();}
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
@@ -136,11 +136,14 @@ public sealed partial class M3App
         var build=new OperationBuild{Id=kind.ToString(),Name=name,Icon=icon,Count=count,Cost=cost,Detail=cost.Sum()==0?"当前阶段免费放置":"点击选择费用，再在棋盘放置"};build.ConfigureAvailability(legal,s.Goods);s.Builds.Add(build);
     }
     static string DockDevelopmentName(DevelopmentCardKind kind)=>new[]{"骑士","道路建设","丰收","垄断","胜利点"}[(int)kind];
+    bool GoldChoiceVisible=>!tabletop.OperationHidden&&view?.Phase==GamePhase.GoldChoice&&view.GoldClaims.Any(c=>c.PlayerId==seat);
     void DrawOperationLayout()
     {
         Styles();GUI.matrix=MobileTabletop.GuiMatrix;cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool enabled=GUI.enabled;GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&view.Phase!=GamePhase.GoldChoice&&!dock.HasOverlay&&!ai.TablePresentationBlocked&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
+        tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
+        dock.Windows=tabletop.OperationWindows;mapChoice.Windows=tabletop.OperationWindows;
+        bool enabled=GUI.enabled;GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!GoldChoiceVisible&&!dock.HasOverlay&&!ai.TablePresentationBlocked&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
         TabletopUI.DrawMapLabels(DrawBoardLabels);
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.PlayerName=ai.PlayerDisplayName;dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TablePresentationBlocked);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
@@ -155,15 +158,15 @@ public sealed partial class M3App
             ()=>Submit(NewCommand(CommandKind.RollDice)),()=>Submit(NewCommand(CommandKind.EndTurn)),TableSeatClick,
             ()=>{tableNotes=!tableNotes;},"航海日志",facility:dock.OpenFacility);
         GUI.enabled=enabled&&!mapChoice.Active&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!dock.HasOverlay;
-        if(ai.IsHumanTurn&&view.TradeOffer==null&&view.Phase!=GamePhase.GoldChoice)DrawTableDecision();
-        GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!ai.TablePresentationBlocked&&view.Phase!=GamePhase.GoldChoice&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=enabled;
-        if(view.Phase==GamePhase.GoldChoice&&ai.IsHumanTurn&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen)
+        if(ai.IsHumanTurn&&view.TradeOffer==null&&!GoldChoiceVisible&&!tabletop.OperationHidden)DrawTableDecision();
+        GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!ai.TableInspectionBlocked&&!GoldChoiceVisible&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=enabled;
+        if(GoldChoiceVisible&&ai.IsHumanTurn&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen)
         {
             var claim=view.GoldClaims.FirstOrDefault(c=>c.PlayerId==seat);
-            if(claim!=null)TabletopResourceChoiceUI.Draw(claim.Amount,gold,view.Bank,()=>{var c=NewCommand(CommandKind.ChooseGoldResources);c.Resources=gold.Copy();Submit(c);gold=new ResourceBag();},ai.ShowTablePrompt);
+            if(claim!=null)TabletopResourceChoiceUI.Draw(claim.Amount,gold,view.Bank,()=>{var c=NewCommand(CommandKind.ChooseGoldResources);c.Resources=gold.Copy();Submit(c);gold=new ResourceBag();},ai.ShowTablePrompt,windows:tabletop.OperationWindows);
         }
-        tabletop.HandFlightsVisible=dock.ResourceHandVisible;if(view.Phase!=GamePhase.GoldChoice&&(tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TablePresentationBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
-        ai.TableOverlayOpen=mapChoice.Active||dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen||view.Phase==GamePhase.GoldChoice;
+        tabletop.HandFlightsVisible=dock.ResourceHandVisible;if(!GoldChoiceVisible&&(tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableInspectionBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
+        ai.TableOverlayOpen=mapChoice.Active||dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen||GoldChoiceVisible;
         if(!ai.TablePresentationBlocked&&ai.IsHumanTurn)mapChoice.Draw();
         ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
     }
@@ -222,7 +225,7 @@ public sealed partial class M3App
         if(preparedDevelopment.HasValue)
         {
             var kind=preparedDevelopment.Value;
-            TableNote("打出 · "+DockDevelopmentName(kind),()=>{
+            TableNote("使用 · "+DockDevelopmentName(kind),()=>{
                 if(kind==DevelopmentCardKind.YearOfPlenty)
                 {
                     var limits=Enumerable.Range(0,8).Select(i=>i<5?view.Bank[(Resource)i]:0).ToArray();
@@ -235,13 +238,13 @@ public sealed partial class M3App
                     Array.Clear(preparedResourceCards,0,8);if(selected>=0)preparedResourceCards[selected]=1;
                 }
                 if(TabletopCardInput.Changed)GUIUtility.ExitGUI();
-                if(kind==DevelopmentCardKind.Knight)ModernOperationUI.Info("打出后移动强盗，并选择可偷取的玩家。");
+                if(kind==DevelopmentCardKind.Knight)ModernOperationUI.Info("使用后移动强盗，并选择可偷取的玩家。");
                 if(kind==DevelopmentCardKind.RoadBuilding)ModernOperationUI.Info("免费放置两段建设；每段分别选择合法位置。");
                 var c=NewCommand(kind==DevelopmentCardKind.Knight?CommandKind.PlayKnight:kind==DevelopmentCardKind.RoadBuilding?CommandKind.PlayRoadBuilding:kind==DevelopmentCardKind.Monopoly?CommandKind.PlayMonopoly:CommandKind.PlayYearOfPlenty);
                 if(kind==DevelopmentCardKind.YearOfPlenty){c.Resources=new ResourceBag();for(int i=0;i<5;i++)c.Resources[(Resource)i]=preparedResourceCards[i];}
                 if(kind==DevelopmentCardKind.Monopoly){int selected=Array.FindIndex(preparedResourceCards,n=>n>0);if(selected<0){ModernOperationUI.Info("请点选一种资源。",true);if(TableButton("放回手牌")){CancelOperationDraft();dock.Reset();}return;}c.Resource=(Resource)selected;}
                 var preview=Preview(c);if(!preview.Success)ModernOperationUI.Info(preview.Message,true);
-                GUILayout.Space(10);if(ModernOperationUI.LayoutButton("确认打出 · "+DockDevelopmentName(kind),preview.Success,true))Submit(c);
+                GUILayout.Space(10);if(ModernOperationUI.LayoutButton("确认使用 · "+DockDevelopmentName(kind),preview.Success,true))Submit(c);
                 if(TableButton("放回手牌")){CancelOperationDraft();dock.Reset();}
             });return;
         }

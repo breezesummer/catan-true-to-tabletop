@@ -9,9 +9,12 @@ public static class TabletopResourceChoiceUI
     static readonly string[] Names={"木头","砖块","羊毛","小麦","矿石","布匹","钱币","纸张"};
     static ResourceBag activeSelection;
     static string errorHint="";
-    public static void Draw(int amount,ResourceBag selection,ResourceBag bank,Action confirm,Action<string> notify,string caption="金矿 · 选择资源")
+    public static void Draw(int amount,ResourceBag selection,ResourceBag bank,Action confirm,Action<string> notify,string caption="金矿 · 选择资源",OperationWindowState windows=null)
     {
+        if(windows?.Hidden==true)return;
+        windows?.Describe(caption);
         ModernOperationUI.Panel(Area);
+        if(ModernOperationUI.Button(new Rect(1090,224,65,30),"收起")){windows?.Hide(caption);return;}
         if(!ReferenceEquals(activeSelection,selection)){activeSelection=selection;errorHint="";}
         int required=Math.Min(amount,bank.Total);
         ModernOperationUI.Label(new Rect(288,223,864,42),caption,ModernOperationUI.Title);

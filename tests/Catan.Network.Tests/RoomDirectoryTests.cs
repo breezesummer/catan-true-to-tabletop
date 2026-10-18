@@ -9,6 +9,24 @@ namespace Catan.Network.Tests;
 
 public sealed class RoomDirectoryTests
 {
+    [Theory][InlineData(3,new[]{"P1"},"P2")][InlineData(4,new[]{"P1","P2","P3"},"P4")]
+    public void RedCanBeAiAndCreatorUsesFirstHumanColor(int seats,string[] ai,string manager)
+    {
+        using var f=new Fixture();var host=f.Create(seats:seats,aiSeats:ai);
+        Assert.True(host.Success);Assert.Equal(manager,host.SeatId);Assert.Equal(manager,host.Room.ManagerSeatId);
+        Assert.True(host.Room.Seats.Single(s=>s.SeatId=="P1").IsAi);
+        f.Restart();var restored=f.Directory.Handle(Fixture.Request("Reconnect",host));Assert.True(restored.Success);Assert.Equal(manager,restored.SeatId);
+    }
+    [Fact] public void AssigningHostColorToAiMovesOnlyHostAndKeepsIdentity()
+    {
+        using var f=new Fixture();var host=f.Create();var other=f.Join(host);
+        var updated=f.Send(host,"Configure",new RoomSettings{PlayerCount=3,AiSeats=["P1"]});
+        Assert.True(updated.Success);Assert.Equal("P3",updated.SeatId);Assert.Equal("P3",updated.Room.ManagerSeatId);
+        Assert.Equal(other.SeatId,updated.Room.Seats.Single(s=>s.SeatId==other.SeatId).SeatId);
+        var rejected=f.Send(host,"Configure",new RoomSettings{PlayerCount=3,AiSeats=["P1","P2","P3"]});
+        Assert.False(rejected.Success);Assert.Equal(updated.Revision,rejected.Revision);Assert.Equal("P3",rejected.SeatId);
+        Assert.False(f.Create(aiSeats:["P1","P2","P3"]).Success);
+    }
     [Fact]
     public void PasswordPublicListAndVersionChecksAreEnforced()
     {

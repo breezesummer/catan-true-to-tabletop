@@ -256,7 +256,7 @@ public sealed class TabletopAudio : MonoBehaviour
             bool human = owner.CurrentActor == owner.HumanSeat, finished = owner.Finished;
             int barbarian = owner.AudioBarbarianPosition;
             string pirate = owner.AudioPirateTile;
-            var publicEvents = publicModel.Observe(human, finished, barbarian, pirate, owner.ScenarioId == "pirate-islands", added.Count(e => e.Cue == TabletopAudioCue.BarbarianAdvance), owner.AudioActiveKnights);
+            var publicEvents = publicModel.Observe(human, finished, barbarian, pirate, owner.ScenarioId == "pirate-islands", added.Count(e => e.Cue == TabletopAudioCue.BarbarianAdvance), owner.AudioActiveKnights,owner.AudioOpportunity);
             if (now >= reconnectQuietUntil) foreach (var e in publicEvents) Queue(e, now);
         }
         else { if (publicModel.Initialized) ResetHistory(); }

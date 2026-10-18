@@ -42,7 +42,7 @@ namespace Catan.Core.M5
         private static void ReturnProgressCard(GameState s, PlayerState p, ProgressCardKind card)
         {
             var index = Array.IndexOf(p.ProgressCards, card);
-            Require(index >= 0, "NoProgressCard", "你没有这张进步卡。");
+            Require(index >= 0, "NoProgressCard", "你没有这张发展卡。");
             p.ProgressCards = p.ProgressCards.Where((x, i) => i != index).ToArray();
             var deck = s.ProgressDecks.Single(d => d.Track == ProgressCatalog.Track(card));
             deck.Cards = Append(deck.Cards, card);
@@ -64,8 +64,8 @@ namespace Catan.Core.M5
             {
                 var pending = s.PendingDecision;
                 var forced = s.Phase == GamePhase.PendingChoice && pending != null && pending.Kind == "ProgressDiscard" && pending.PlayerId == p.Id;
-                Require(forced || (s.Phase == GamePhase.Action && s.ActivePlayerId == p.Id && pending == null), "WrongPhase", "当前不能弃进步卡。");
-                Require(legacyInteractionReplay || p.ProgressCards.Length > 4, "NoDiscardRequired", "进步卡未超过四张，不能弃置。");
+                Require(forced || (s.Phase == GamePhase.Action && s.ActivePlayerId == p.Id && pending == null), "WrongPhase", "当前不能弃发展卡。");
+                Require(legacyInteractionReplay || p.ProgressCards.Length > 4, "NoDiscardRequired", "发展卡未超过四张，不能弃置。");
                 Require(!ProgressCatalog.IsVictoryPoint(c.ProgressCard), "PublicVictoryCard", "胜利点卡不能丢弃。");
                 ReturnProgressCard(s, p, c.ProgressCard);
                 if (forced && p.ProgressCards.Length <= 4) { s.PendingDecision = null; ContinueDecisions(s); }
@@ -88,9 +88,9 @@ namespace Catan.Core.M5
                 return true;
             }
             if (c.Kind != CommandKind.PlayProgressCard) return false;
-            Require(s.ActivePlayerId == p.Id, "NotActivePlayer", "仅可在自己的回合使用进步卡。");
+            Require(s.ActivePlayerId == p.Id, "NotActivePlayer", "仅可在自己的回合使用发展卡。");
             Require(s.PendingDecision == null, "DecisionPending", "请先完成待决选择。");
-            Require(Enum.IsDefined(typeof(ProgressCardKind), c.ProgressCard), "UnknownCard", "未知进步卡。");
+            Require(Enum.IsDefined(typeof(ProgressCardKind), c.ProgressCard), "UnknownCard", "未知发展卡。");
             Require(!ProgressCatalog.IsVictoryPoint(c.ProgressCard), "PublicVictoryCard", "胜利点卡抽到时自动公开。");
             if (c.ProgressCard == ProgressCardKind.Alchemy)
                 Require(s.Phase == GamePhase.ProductionAwaitRoll && s.AlchemyDice1 == 0, "WrongPhase", "炼金术必须在本回合掷骰之前使用一次。");
@@ -187,7 +187,7 @@ namespace Catan.Core.M5
         private void ResolveProgressChoice(GameState s, PlayerState p, Command c)
         {
             var d = s.PendingDecision;
-            Require(s.Phase == GamePhase.PendingChoice && d != null && d.PlayerId == p.Id && d.Kind.StartsWith("Progress", StringComparison.Ordinal) && d.Kind != "ProgressDiscard", "WrongDecision", "当前没有需要你解决的进步卡选择。");
+            Require(s.Phase == GamePhase.PendingChoice && d != null && d.PlayerId == p.Id && d.Kind.StartsWith("Progress", StringComparison.Ordinal) && d.Kind != "ProgressDiscard", "WrongDecision", "当前没有需要你解决的发展卡选择。");
             switch (d.Kind)
             {
                 case "ProgressRoads":
@@ -209,7 +209,7 @@ namespace Catan.Core.M5
                     {
                         var other = s.Players.Single(x => x.Id == d.OtherPlayerId);
                         var index = Array.IndexOf(other.ProgressCards, c.SelectedProgressCard);
-                        Require(index >= 0 && !ProgressCatalog.IsVictoryPoint(c.SelectedProgressCard), "NoProgressCard", "只能选择对方手中的进步卡。");
+                        Require(index >= 0 && !ProgressCatalog.IsVictoryPoint(c.SelectedProgressCard), "NoProgressCard", "只能选择对方手中的发展卡。");
                         other.ProgressCards = other.ProgressCards.Where((x, i) => i != index).ToArray();
                         p.ProgressCards = Append(p.ProgressCards, c.SelectedProgressCard);
                     }
@@ -232,7 +232,7 @@ namespace Catan.Core.M5
                         s.Knights = Append(s.Knights, new Knight { PlayerId = p.Id, LocationId = c.TargetId, Level = c.KnightLevel, Active = d.KnightActive, ActivatedTurn = d.KnightActive ? s.Turn : -1, PromotedTurn = -1, ActedTurn = -1 });
                     }
                     break;
-                default: Require(false, "WrongDecision", "未知进步卡选择。"); break;
+                default: Require(false, "WrongDecision", "未知发展卡选择。"); break;
             }
             s.PendingDecision = null; ContinueDecisions(s);
         }

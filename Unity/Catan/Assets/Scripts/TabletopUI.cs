@@ -45,10 +45,14 @@ public sealed partial class TabletopUI
     string hoveredPlayerHint;
     Rect playerHintAnchor;
     OperationSnapshot operations;
+    public readonly OperationWindowState OperationWindows=new OperationWindowState();
+    public bool OperationHidden=>OperationWindows.Hidden;
+    public bool HideOperation()
+    {if(OperationWindows.Hidden)return false;OperationWindows.Hide(OperationWindows.Caption??"继续选择");return true;}
     Action purchaseDevelopment;
     Catan.Core.GameHistoryEntry[] bankHistory = Array.Empty<Catan.Core.GameHistoryEntry>();
     public void BindOperations(OperationSnapshot snapshot,Action purchase,Catan.Core.GameHistoryEntry[] entries)
-    {operations=snapshot;purchaseDevelopment=purchase;bankHistory=entries??Array.Empty<Catan.Core.GameHistoryEntry>();}
+    {operations=snapshot;OperationWindows.Sync(snapshot?.Scope,snapshot?.Revision);purchaseDevelopment=purchase;bankHistory=entries??Array.Empty<Catan.Core.GameHistoryEntry>();}
     public bool HistoryOpen => history.IsOpen;
     public bool HandFlightsVisible { get; set; }=true;
     public bool TryCloseOverlay()=>history.TryClose();
@@ -145,11 +149,13 @@ public sealed partial class TabletopUI
         string turnCaption=canRoll?"掷骰":phase.Contains("弃牌")||phase.IndexOf("Discard",StringComparison.OrdinalIgnoreCase)>=0?"等待弃牌":canEnd?"结束回合":actor!=seat?"等待玩家":"等待操作";
         hits.Add(EndTurnRect);bool turnEnabled=(canRoll||canEnd)&&!DiceRolling;
         if(DiscardActive){turnCaption=DiscardCaption;turnEnabled=DiscardReady;}
+        if(OperationHidden){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
         StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
         var turnStyle=new GUIStyle(title){fontSize=21,wordWrap=true};turnStyle.normal.textColor=turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
+        while(turnStyle.fontSize>11&&turnStyle.CalcHeight(new GUIContent(turnCaption),EndTurnRect.width-40)>60)turnStyle.fontSize--;
         GUI.Label(new Rect(EndTurnRect.x+20,EndTurnRect.y+35,EndTurnRect.width-40,60),turnCaption,turnStyle);
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
-        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(DiscardActive)ConfirmDiscard();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
+        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(OperationHidden)OperationWindows.Open();else if(DiscardActive)ConfirmDiscard();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
         DrawDiscardCount();
         GUI.enabled=tableEnabled;
     }
@@ -197,7 +203,7 @@ public sealed partial class TabletopUI
             if(over)
             {
                 string tip=names[i];
-                if(i>=2)tip+=" · "+level+" 级"+(level>=3?"\n"+(i==2?"商会：商品可按 2:1 兑换":i==3?"要塞：可以晋升精锐骑士":"水渠：掷骰非 7 且无产出时，选取一张资源"):"\n达到 3 级解锁能力");
+                if(i>=2)tip+=" · "+level+" 级"+(level>=3?"\n"+(i==2?"同业公会：商品可按 2:1 兑换":i==3?"要塞：可以晋升精锐骑士":"水渠：掷骰非 7 且无产出时，选取一张资源"):"\n达到 3 级解锁能力");
                 var tooltip=new Rect(r.x,125,246,i>=2?61:30);ModernOperationUI.Panel(tooltip);GUI.Label(new Rect(tooltip.x+10,tooltip.y+4,tooltip.width-20,tooltip.height-8),tip,ModernOperationUI.Small);
             }
         }
@@ -219,7 +225,7 @@ public sealed partial class TabletopUI
             int[] values={points,player.Improvements==null?0:player.Improvements[0],player.Improvements==null?0:player.Improvements[1],player.Improvements==null?0:player.Improvements[2],player.Resources,player.Cards};
             string[] hints={"胜利点 · 悬停查看分数构成","贸易设施等级","政治设施等级","科学设施等级",
                 "资源与商品 · 当前 / 七点保护线\n超出保护线后掷出 7，须弃去一半手牌",
-                player.SpecialHandLimit>0?"进步卡 · 当前 / 回合结束上限\n公开胜利点卡不占手牌上限":"发展卡 · 当前张数 / 无持有上限"};
+                player.SpecialHandLimit>0?"发展卡 · 当前 / 回合结束上限\n公开胜利点卡不占手牌上限":"发展卡 · 当前张数 / 无持有上限"};
             for(int row=0;row<6;row++)
             {
                 var r=new Rect(x+7,94+row*17,width-14,17);
@@ -353,9 +359,11 @@ public sealed partial class TabletopUI
     }
     public void BeginContext(string caption)
     {
+        OperationWindows.Describe(caption);
         var rect=CurrentContextRect;contextVisible=true;ModernOperationUI.Panel(rect);
         float header=44;
-        GUI.Label(new Rect(rect.x+18,rect.y+12,rect.width-36,header-12),caption,ModernOperationUI.Title);
+        GUI.Label(new Rect(rect.x+18,rect.y+12,rect.width-110,header-12),caption,ModernOperationUI.Title);
+        if(ModernOperationUI.Button(new Rect(rect.xMax-77,rect.y+10,60,28),"收起"))OperationWindows.Hide(caption);
         MobileTabletop.ScrollTouch(new Rect(rect.x+16,rect.y+header,rect.width-32,rect.height-header-12),ref scroll);
         GUILayout.BeginArea(new Rect(rect.x+16,rect.y+header,rect.width-32,rect.height-header-12));
         scroll=GUILayout.BeginScrollView(scroll);

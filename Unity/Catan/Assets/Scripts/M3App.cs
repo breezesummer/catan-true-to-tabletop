@@ -60,13 +60,13 @@ public sealed partial class M3App : MonoBehaviour
         var pointer=MobileTabletop.Pointer;
         bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(MobileTabletop.Logical(pointer));
         bool canMap=ai!=null&&!curtain&&!newGameDialog&&!ai.TableMenuOpen&&!blocked&&TabletopUI.ContainsMapScreenPoint(pointer);
-        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,!holding);
+        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,tabletop.OperationHidden||!holding);
         if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
         if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
         if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)&&!blocked&&(ai!=null||pointer.x<Screen.width*.70f)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();mapPan.Cancel(board.TableScene);}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
-        if(curtain||newGameDialog||view==null||ai!=null&&!ai.IsHumanTurn)return;
+        if(curtain||newGameDialog||view==null||ai!=null&&(!ai.IsHumanTurn||tabletop.OperationHidden))return;
         var mouse=released?MobileTabletop.ScreenPoint(releasePoint):pointer;
         if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(MobileTabletop.Logical(mouse))){board.ClearPreview();hover="";return;}
         if(ai!=null&&view.Phase==GamePhase.RoadBuilding){UpdateFreeRoadPlacement(mouse,boardClick);return;}
@@ -96,6 +96,7 @@ public sealed partial class M3App : MonoBehaviour
         if(mapChoice.Active){mapChoice.Clear();return true;}
         if(mapPan.IsDragging){mapPan.Cancel(board.TableScene);return true;}
         if(tabletop.TryCloseOverlay())return true;
+        if(!tabletop.OperationHidden&&(dock.HasOverlay||tabletop.ContextVisible||mapChoice.Active||GoldChoiceVisible))return tabletop.HideOperation();
         bool active=holding||preparedDevelopment.HasValue||preparedPurchase||showSeafaring||tableNotes||tableVictim!=null||newGameDialog||cardArt.HasSelection||dock.HasCancelableInteraction;
         if(!active)return false;
         dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();return true;
@@ -242,8 +243,8 @@ public sealed partial class M3App : MonoBehaviour
             case "MustRollFirst":return "请先掷骰。";
             case "AlreadyRolled":return "本回合已经掷骰。";
             case "PendingDecision":return "请先完成当前待决选择。";
-            case "DevelopmentCardBoughtThisTurn":case "NoPlayableCard":return "本回合买入的行动发展卡要等以后回合才能打出。";
-            case "DevelopmentCardAlreadyPlayed":return "每回合只能打出一张行动发展卡。";
+            case "DevelopmentCardBoughtThisTurn":case "NoPlayableCard":return "本回合买入的行动发展卡要等以后回合才能使用。";
+            case "DevelopmentCardAlreadyPlayed":return "每回合只能使用一张行动发展卡。";
             case "BankShortage":return "银行中该资源不足。";
             case "InvalidTradeRatio":return "交易比例不符合当前港口权限。";
             case "GameFinished":return "本局已结束。";
@@ -514,16 +515,16 @@ public sealed partial class M3App : MonoBehaviour
     int CardCount(DevelopmentCardKind kind) => view.OwnDevelopmentCards.Count(c=>c.Kind==kind);
     void DrawDevelopment()
     {
-        if(Button(1085,324,331,"打出骑士  ·  持有 "+CardCount(DevelopmentCardKind.Knight),31)){Submit(NewCommand(CommandKind.PlayKnight));return;}
+        if(Button(1085,324,331,"使用骑士  ·  持有 "+CardCount(DevelopmentCardKind.Knight),31)){Submit(NewCommand(CommandKind.PlayKnight));return;}
         if(Button(1085,361,331,"道路建设  ·  持有 "+CardCount(DevelopmentCardKind.RoadBuilding),31)){Submit(NewCommand(CommandKind.PlayRoadBuilding));return;}
         if(Button(1085,398,151,"选 1："+(plentyA<5?ResourceNames[plentyA]:"不取"),29))plentyA=(plentyA+1)%6;
         if(Button(1247,398,169,"选 2："+(plentyB<5?ResourceNames[plentyB]:"不取"),29))plentyB=(plentyB+1)%6;
         if(Button(1085,433,331,"发明（丰收） · 持有 "+CardCount(DevelopmentCardKind.YearOfPlenty),29))
         {var c=NewCommand(CommandKind.PlayYearOfPlenty);c.Resources=new ResourceBag();if(plentyA<5)c.Resources[(Resource)plentyA]++;if(plentyB<5)c.Resources[(Resource)plentyB]++;Submit(c);return;}
         if(Button(1085,468,151,"垄断："+ResourceNames[monopoly],29))monopoly=(monopoly+1)%5;
-        if(Button(1247,468,169,"打出垄断 ×"+CardCount(DevelopmentCardKind.Monopoly),29))
+        if(Button(1247,468,169,"使用垄断 ×"+CardCount(DevelopmentCardKind.Monopoly),29))
         {var c=NewCommand(CommandKind.PlayMonopoly);c.Resource=(Resource)monopoly;Submit(c);return;}
-        Label(1085,504,331,63,"发展卡实体照片尚缺，保留文字操作。隐藏胜利点卡："+CardCount(DevelopmentCardKind.VictoryPoint)+" 张。\n每回合限 1 张行动卡；当回合买入不能打出。发明取 2 张，银行不足时用“不取”取剩余。",small);
+        Label(1085,504,331,63,"发展卡实体照片尚缺，保留文字操作。隐藏胜利点卡："+CardCount(DevelopmentCardKind.VictoryPoint)+" 张。\n每回合限 1 张行动卡；当回合买入不能使用。发明取 2 张，银行不足时用“不取”取剩余。",small);
     }
     void DrawBoardLabels()
     {

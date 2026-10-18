@@ -2,7 +2,7 @@
 
 一款以实体桌游体验为目标的 3D 卡坦岛游戏，包含资源生产、交易、道路与聚落建设、海上探索，以及城市发展与骑士防御。项目强调在同一张桌面上观察地图、拿取棋子、摆放建筑和操作卡牌，逐步呈现立体地形收藏版的质感。
 
-项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本标识为**内测版1.6.5**；各可玩构建的实际版本与验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
+项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本标识为**内测版1.6.6**；各可玩构建的实际版本与验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
 
 ## 玩法与内容
 
@@ -10,7 +10,7 @@
 | ---------- | ------------------------------------------------------------------------------------------- |
 | 基础版     | 3–4 人，资源生产、建造、港口与玩家交易、发展卡、强盗、最长道路及最大骑士军队               |
 | 航海家     | 船、海盗、金矿、探索与九种剧本                                                              |
-| 城市与骑士 | 商品、城市改良、骑士、蛮族、进步卡、城墙及大都会                                            |
+| 城市与骑士 | 商品、城市设施、骑士、蛮族、发展卡、城墙及大都会                                            |
 | 双扩展组合 | 已支持“驶向新海岸”“穿越沙漠”的 3–4 人配置，具体范围见[组合兼容表](docs/M5_SCENARIOS.md) |
 
 单人模式可选择一个人类席位，其余由本地 AI 操作，支持暂停和保存恢复。好友联机包含局域网与在线大厅，已实现本机可验证的权威房间、加入、同步、断线恢复及服务器保存；真实多机与公网部署仍待验收。
@@ -28,16 +28,16 @@
 在仓库根目录执行统一 Windows 启动脚本：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1
 ```
 
 脚本选择当前默认可玩构建。操作方式见[M6 试玩说明](docs/M6_PLAYTEST.md)，联机连接与房间使用见[M7 使用说明](docs/M7_IMPLEMENTATION.md)。PC 与 Android 下载入口及验证范围见[内测版1.6发布记录](docs/RELEASE_BETA_1_6.md)。
 
-本地程序、APK 和分享包保存在 `.local`，不随源码仓库分发；历史构建路径及适用版本统一查阅[开发日志](The%20Farmer%27s%20Log.md)。本地缺少程序时，先按[开发环境](docs/ENVIRONMENT.md)配置固定工具链，再运行构建脚本：
+本地程序、APK 和分享包保存在 `game version`，按二级版本归档，不随源码仓库分发；历史构建路径及适用版本统一查阅[开发日志](The%20Farmer%27s%20Log.md)。本地缺少程序时，先按[开发环境](docs/ENVIRONMENT.md)配置固定工具链，再运行构建脚本：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-M7.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-Android.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-M7.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-Android.ps1
 ```
 
 ## 工程结构
