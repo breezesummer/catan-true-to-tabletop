@@ -16,11 +16,11 @@ public static class OperationIconAssets
         if(good<0||good>=8)throw new ArgumentOutOfRangeException(nameof(good));
         return new Rect(0,0,1,1);
     }
-    public static void DrawGood(Rect rect,int good,bool missing=false)
+    public static void DrawGood(Rect rect,int good,bool missing=false,Color? tint=null)
     {
         var texture=GoodTexture(good);var original=GUI.color;
         GUI.color=original*(missing?new Color(.55f,.55f,.55f,.8f):Color.white);
-        if(texture!=null)EntityCardAssets.DrawCardFace(rect,texture);
+        if(texture!=null)EntityCardAssets.DrawCardFace(rect,texture,tint:tint);
         else
         {
             if(fallbackStyle==null)fallbackStyle=new GUIStyle(GUI.skin.label){alignment=TextAnchor.MiddleCenter};

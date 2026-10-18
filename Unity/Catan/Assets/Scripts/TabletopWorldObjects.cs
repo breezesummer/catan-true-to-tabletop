@@ -386,6 +386,8 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         mesh.RecalculateNormals();meshes.Add(mesh);
         var obj=new GameObject("倒角实体骰子");obj.AddComponent<MeshFilter>().sharedMesh=mesh;obj.AddComponent<MeshRenderer>();return obj;
     }
+    // 历史记录直接复用骰子盘的事件骰面，图案与颜色只有一个来源。
+    internal Texture2D EventDieTexture(int value) => DieTexture(2,value);
     Texture2D DieTexture(int index,int value)
     {
         int key=index*10+value;if(diceTextures.TryGetValue(key,out var known))return known;

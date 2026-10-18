@@ -56,7 +56,7 @@ public sealed partial class TabletopUI
     bool HistoryBlocksInput(Vector2 p) => (history.IsOpen||!contextVisible)&&history.BlocksInput(p);
     public bool BlocksOverlayInput(Vector2 p) => HistoryBlocksInput(p)||contextVisible&&CurrentContextRect.Contains(p);
     public void DrawHistory(Font font,Catan.Core.GameHistoryEntry[] entries,string[] players)
-    {if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);if(history.IsOpen||!contextVisible)history.Draw(font,entries,players);if(!history.IsOpen){DrawScoreDetails();DrawPlayerHint();}}
+    {if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);if(history.IsOpen||!contextVisible)history.Draw(font,entries,players,table.Objects);if(!history.IsOpen){DrawScoreDetails();DrawPlayerHint();}}
     public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
     public void ObserveDice(long sequence,int first,int second,int? eventDie,Catan.Core.GameHistoryEntry presentationRoll=null)
     {

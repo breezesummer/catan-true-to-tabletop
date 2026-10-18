@@ -582,8 +582,8 @@ public sealed partial class OperationDock
         {
             for(int ordinal=0;ordinal<b.Cost[good];ordinal++)
             {
-                if(ordinal>=s.Goods[good])ModernOperationUI.Round(new Rect(x-2,tooltipRect.y+2,30,41),Missing);
-                OperationIconAssets.DrawGood(new Rect(x,tooltipRect.y+4,26,37),good);x+=32;
+                OperationIconAssets.DrawGood(new Rect(x,tooltipRect.y+4,26,37),good,
+                    tint:ordinal>=s.Goods[good]?new Color(1,.48f,.48f):Color.white);x+=32;
             }
         }
     }
@@ -720,8 +720,7 @@ public sealed partial class OperationDock
     }
     void TradeCard(Rect face,int good,bool missing)
     {
-        EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(good),0,missing?new Color(1,.23f,.23f,1):Color.white);
-        if(missing)Fill(new Rect(face.x,face.yMax-7,face.width,7),Missing);
+        EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(good),0,missing?new Color(1,.48f,.48f):Color.white);
     }
     void DrawTradeBag(OperationSnapshot s,Rect area,int[] bag,bool paying,bool bank=false)
     {
@@ -733,9 +732,8 @@ public sealed partial class OperationDock
             bool missing=paying&&bag[i]>s.Goods[i];var face=new Rect(x+12,y+1,54,77);
             TradeCard(face,i,missing);
             var caption=new GUIStyle(center);if(missing)caption.normal.textColor=Missing;
-            Label(new Rect(x,y+79,100,25),Names[i]+" × "+bag[i],caption);
-            if(paying&&!portTrade)Label(new Rect(x+69,y+6,32,26),"有 "+s.Goods[i],small);
-            else if(bank&&s.Bank[i]==0)Label(new Rect(x+60,y+6,43,48),"库存为0",small);
+            Label(new Rect(x,y+79,100,25),bag[i].ToString(),caption);
+            if(bank&&!paying&&s.Bank[i]==0)Label(new Rect(x+60,y+6,43,48),"库存为0",small);
             if(bank&&paying&&!portTrade)Label(new Rect(x+69,y+37,32,26),TradeValidationSnapshot(s).Rates[i]+":1",small);
             int delta=TabletopCardInput.Delta(face);
             if(delta!=0)
@@ -779,7 +777,7 @@ public sealed partial class OperationDock
             bool missing=owned!=null&&bag[i]>owned[i];
             TradeCard(new Rect(x+22,y,44,65),i,missing);
             var caption=new GUIStyle(center);if(missing)caption.normal.textColor=Missing;
-            Label(new Rect(x,y+66,87,25),"× "+bag[i],caption);index++;
+            Label(new Rect(x,y+66,87,25),bag[i].ToString(),caption);index++;
         }
     }
 }
