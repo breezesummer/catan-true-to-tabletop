@@ -1,5 +1,5 @@
 param(
-    [string]$OutputRoot = 'game version/Catan1.6.4-Trade-Animation-History',
+    [string]$OutputRoot = 'game version/Catan1.6.5-Card-Interaction-Audio',
     [ValidateSet('win-x64','linux-x64','linux-arm64')][string]$Runtime = 'win-x64'
 )
 $ErrorActionPreference = 'Stop'

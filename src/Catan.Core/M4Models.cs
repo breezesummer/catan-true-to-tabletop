@@ -94,6 +94,8 @@ namespace Catan.Core.M4
         [DataMember(Order=2)] public string Fingerprint { get; set; }
         [DataMember(Order=3)] public Command Command { get; set; }
         [DataMember(Order=4)] public GameEvent[] Events { get; set; }
+        // 缺省零用于重放既有存档；新操作由会话写入，客户端不能指定。
+        [DataMember(Order=5, EmitDefaultValue=false)] public int InteractionRevision { get; set; }
     }
     [DataContract] public sealed partial class RandomState
     {

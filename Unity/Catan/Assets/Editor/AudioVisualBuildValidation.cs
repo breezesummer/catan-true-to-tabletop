@@ -18,7 +18,7 @@ public static class AudioVisualBuildValidation
             foreach (string id in ids) foreach (int players in new[] { 3, 4 })
             { Texture(MenuMapPreviews.ScenarioTexture(rule, id, players), rule + "/" + id + "/" + players); count++; }
         }
-        const string audioRoot = "Assets/Resources/TabletopAudio/v002/";
+        const string audioRoot = "Assets/Resources/TabletopAudio/v003/";
         foreach (TabletopAudioCue cue in Enum.GetValues(typeof(TabletopAudioCue))) Audio(audioRoot + "Effects/" + cue + ".wav");
         for (int theme = 0; theme < 5; theme++) Audio(audioRoot + "Ambience/Theme" + theme + ".wav");
         Audio(audioRoot + "Music/SeaBreezeHome.wav");

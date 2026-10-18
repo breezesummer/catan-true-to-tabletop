@@ -522,10 +522,10 @@ public sealed class M2RulesTests
     [Fact]
     public void RejectedTradeAndCancelledTradeReturnToActionWithoutTransferringCards()
     {
-        var game = Fixture(s => Player(s).Resources = Bag(wood: 1));
+        var game = Fixture(s => { Player(s).Resources = Bag(wood: 1); Player(s,"P2").Resources = Bag(ore:1); });
         var offer = Cmd(CommandKind.ProposeTrade); offer.OtherPlayerId = "P2"; offer.Give = Bag(wood: 1); offer.Receive = Bag(ore: 1);
         Accepted(game, offer);
-        Rejected(game, Cmd(CommandKind.AcceptTrade, "P2"));
+        Rejected(game, Cmd(CommandKind.AcceptTrade, "P3"));
         Rejected(game, Cmd(CommandKind.CancelTrade, "P2"));
         Accepted(game, Cmd(CommandKind.RejectTrade, "P2"));
         Assert.Null(game.GetPlayerView("P1").TradeOffer);

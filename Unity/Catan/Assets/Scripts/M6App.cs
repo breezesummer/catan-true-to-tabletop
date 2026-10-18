@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="1.6.4";
+    public const string BuildVersion="1.6.5";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -91,7 +91,7 @@ public sealed partial class M6App : MonoBehaviour
         gameObject.AddComponent<CombinedMapVerification>();
         gameObject.AddComponent<TabletopV005Review>();
         gameObject.AddComponent<TabletopAiAnimationVerification>();
-        gameObject.AddComponent<InteractionPresentationVerification>();
+        if(GetComponent<InteractionPresentationVerification>()==null)gameObject.AddComponent<InteractionPresentationVerification>();
         gameObject.AddComponent<MobileVerification>().Initialize(this);
     }
     void Update()
@@ -108,6 +108,7 @@ public sealed partial class M6App : MonoBehaviour
     {
         if(MenuVisible){HandleMainMenuEscape();return;}
         if(!Ready)return;
+        if(encyclopediaOpen){encyclopediaOpen=false;return;}
         if(tableMenu){tableMenu=false;escapeDismissedInteraction=false;nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);return;}
         // 第一遍放回本地草稿；规则要求的待决面板即使自动出现，下一遍仍能打开菜单。
         if(!escapeDismissedInteraction)
@@ -183,7 +184,7 @@ public sealed partial class M6App : MonoBehaviour
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
         ResetCardPresentation();ResetPlayerIdentity();
         TargetVictoryPoints=target;AiSpeedLevel=TabletopAiSpeed.Clamp(aiSpeedLevel??AiSpeedLevel);ResetBuildPresentation();
-        networkMenu=false;menuPendingAction=null;tableMenu=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你使用 "+ColorLabel(human)+" 建筑。行动顺序由开局掷骰决定。";
+        networkMenu=false;menuPendingAction=null;tableMenu=false;encyclopediaOpen=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你使用 "+ColorLabel(human)+" 建筑。行动顺序由开局掷骰决定。";
         promptContext=null;promptWasHuman=false;RoadPlacementPrompt="";lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.Show(Time.unscaledTimeAsDouble);
         switch(rules)
         {
@@ -289,6 +290,7 @@ public sealed partial class M6App : MonoBehaviour
     void OnGUI()
     {
         Styles();GUI.depth=-100;GUI.matrix=MobileTabletop.GuiMatrix;
+        if(encyclopediaOpen&&tableMenu){DrawEncyclopedia();GUI.matrix=Matrix4x4.identity;return;}
         if(networkMenu){DrawNetworkMenu();GUI.matrix=Matrix4x4.identity;return;}
         if(MenuVisible)
         {
@@ -316,7 +318,8 @@ public sealed partial class M6App : MonoBehaviour
                 if(ModernOperationUI.Button(new Rect(494,480,220,44),"保存并返回主页"))SaveAndReturnToMainMenu();
                 if(ModernOperationUI.Button(new Rect(726,480,220,44),"恢复存档")){tableMenu=false;LoadGame();}
                 if(PastoralMenuUI.ReturnButton(new Rect(494,536,452,44),font)){tableMenu=false;ReturnToMainMenu();}
-                if(RuleSet=="seafarers"&&ModernOperationUI.Button(new Rect(494,592,452,36),"航海场景行动"))
+                if(ModernOperationUI.Button(new Rect(726,592,220,36),"游戏百科 · 发展卡"))encyclopediaOpen=true;
+                if(RuleSet=="seafarers"&&ModernOperationUI.Button(new Rect(494,592,220,36),"航海场景行动"))
                 {tableMenu=false;var sailing=GetComponent<M3App>();if(sailing!=null)sailing.ShowScenarioActions();}
                 if(TabletopAudio.Instance!=null)TabletopAudio.Instance.DrawSettings(new Rect(494,640,452,92),font);
                 ModernOperationUI.Label(new Rect(494,740,452,34),Notice,ModernOperationUI.Small);
@@ -330,7 +333,7 @@ public sealed partial class M6App : MonoBehaviour
                 var promptStyle=new GUIStyle(title){fontSize=primary?46:26,alignment=TextAnchor.MiddleCenter,wordWrap=true};
                 promptStyle.normal.textColor=PromptColor;
                 if(promptStyle.CalcSize(new GUIContent(prompt)).x>1050)promptStyle.fontSize=primary?34:22;
-                var area=primary?new Rect(180,375,1080,150):new Rect(264,207,912,74);
+                var area=primary?new Rect(180,375,1080,150):new Rect(264,126,912,64);
                 if(!primary&&OpeningOrderMessage.Length>0)area.y+=48;
                 bool before=GUI.enabled;GUI.enabled=true;
                 var shadow=new GUIStyle(promptStyle);shadow.normal.textColor=new Color(.10f,.025f,.01f,.55f);

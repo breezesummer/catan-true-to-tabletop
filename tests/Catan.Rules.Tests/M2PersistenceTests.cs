@@ -178,8 +178,8 @@ public sealed class M2PersistenceTests
         var current = game.GetPlayerView(game.GetPlayerView("P1").ActivePlayerId);
         Assert.Equal(GamePhase.Action, current.Phase);
         var give = Resources.First(r => current.OwnResources[r] > 0);
-        var receive = Resources.First(r => r != give);
-        var recipient = current.Players.First(p => p.Id != current.PlayerId).Id;
+        var recipient = current.Players.First(p => p.Id != current.PlayerId && Resources.Any(r => r != give && game.GetPlayerView(p.Id).OwnResources[r] > 0)).Id;
+        var receive = Resources.First(r => r != give && game.GetPlayerView(recipient).OwnResources[r] > 0);
         var offer = Cmd(CommandKind.ProposeTrade, current.PlayerId); offer.OtherPlayerId = recipient; offer.Give = Bag(); offer.Give[give] = 1; offer.Receive = Bag(); offer.Receive[receive] = 1;
         Accepted(game, offer);
         var restored = BaseGameSession.Load(AcceptanceFixture.Json, game.Save());

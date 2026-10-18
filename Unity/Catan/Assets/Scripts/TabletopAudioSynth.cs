@@ -4,7 +4,7 @@ using System;
 public static class TabletopAudioSynth
 {
     public const int SampleRate = 24000;
-    public const string RecipeVersion = "pastoral-tabletop-audio-v002";
+    public const string RecipeVersion = "pastoral-tabletop-audio-v003";
     const double Tau = Math.PI * 2;
 
     sealed class Sound
@@ -73,38 +73,14 @@ public static class TabletopAudioSynth
         }
         internal void Gallop(double at, double volume = 1)
         {
-            // 四拍蹄声与渐近低频尘土构成骑兵，不用 UI 铃音替代行动。
-            for (int i = 0; i < 5; i++)
-            {
-                double t = at + i * .22; double gain = volume * (.55 + .08 * i);
-                Wood(t, 135, gain); Wood(t + .065, 245, gain * .8);
-                Stone(t + .115, 96, gain * .55); Wood(t + .155, 190, gain * .60);
-                NoiseBurst(t, .22, .12 * gain, .075, 2);
-            }
+            // 少量不等间隔蹄声，去掉连续的低频四拍循环。
+            Wood(at, 340, .48*volume); Wood(at+.085, 520, .30*volume);
+            Wood(at+.29, 370, .34*volume); NoiseBurst(at+.12,.30,.16*volume,.22,4);
         }
         internal void Crowd(double at, double volume = 1)
         {
-            // 原创六声部 /hu/ 群体吼声：低基频、口腔共振与呼气，无任何商业游戏采样。
-            for (int member = 0; member < 6; member++)
-            {
-                double start = at + member * .017, f0 = 82 + member * 7.7, phase = member * .71;
-                int count = (int)(.73 * SampleRate), begin = (int)(start * SampleRate);
-                for (int i = 0; i < count && begin + i < Samples.Length; i++)
-                {
-                    double t = i / (double)SampleRate;
-                    double envelope = Math.Pow(Math.Sin(Math.PI * t / .73), 1.45);
-                    double f = f0 * t - 12 * t * t;
-                    double v = 0;
-                    for (int h = 1; h <= 22; h++)
-                    {
-                        double hz = f0 * h;
-                        double formant = .13 + Math.Exp(-Math.Pow((hz - 350) / 130, 2)) + .55 * Math.Exp(-Math.Pow((hz - 820) / 210, 2));
-                        v += Math.Sin(Tau * f * h + phase) * formant / (h * .85 + 1);
-                    }
-                    Samples[begin + i] += (float)(v * envelope * .068 * volume);
-                }
-                NoiseBurst(start, .19, .18 * volume, .25, 2);
-            }
+            // 不再用谐波堆叠伪造人声；战场动作使用轻微空气与衣甲声。
+            NoiseBurst(at,.24,.22*volume,.19,3); Metal(at+.06,780,.18*volume);
         }
         internal float[] Finish()
         {
@@ -142,9 +118,9 @@ public static class TabletopAudioSynth
             case TabletopAudioCue.CityBuild: s.Stone(0, 120); s.Stone(.18, 190, .86); s.Metal(.31, 660, .60); s.Bell(.36, 990, .44); break;
             case TabletopAudioCue.WallBuild: s.Stone(0, 160); s.Stone(.13, 180, .85); s.Stone(.27, 210, .75); break;
             case TabletopAudioCue.ShipBuild:
-                s.Wood(0, 165, .65); s.Tone(.13, .65, 66, .35, 5, -39);
-                s.NoiseBurst(.14, 1.28, 1.3, .16, 3); s.NoiseBurst(.21, .72, .62, .52, 3);
-                for (int i = 0; i < 9; i++) s.Tone(.29 + i * .10, .20, 220 + i * 31, .060, 5, -440);
+                s.Wood(0, 165, .65); s.Tone(.13, .25, 196, .06, 7);
+                s.NoiseBurst(.14,.48,.42,.24,5); s.NoiseBurst(.21,.30,.22,.42,5);
+                s.NoiseBurst(.30,.22,.16,.32,6);
                 break;
             case TabletopAudioCue.ShipMove: s.NoiseBurst(0, .78, .52, .045, 2); s.Wood(.09, 320, .40); s.Tone(.16, .55, 175, .06, 4, 220); break;
             case TabletopAudioCue.PortPlace: s.Wood(0, 380, .70); s.Metal(.14, 1045, .70); s.NoiseBurst(.09, .48, .23, .08, 3); break;
@@ -157,25 +133,23 @@ public static class TabletopAudioSynth
             case TabletopAudioCue.RobberMove: s.Crowd(.025, .85); s.Wood(.01, 140, .45); break;
             case TabletopAudioCue.PirateMove: s.Horn(0, 139, .74); s.NoiseBurst(.14, .74, .53, .055, 3); break;
             case TabletopAudioCue.KnightRecruit: s.Metal(0, 520, .95); s.Wood(.13, 240, .70); break;
-            case TabletopAudioCue.KnightPromote: s.Anvil(0, .86); s.Anvil(.32, .94); s.Anvil(.67, .70); break;
+            case TabletopAudioCue.KnightPromote: s.Anvil(0,.48); s.Bell(.22,1175,.30); break;
             case TabletopAudioCue.KnightActivate: s.Metal(0, 940, .9); s.Wood(.10, 210, .6); break;
             case TabletopAudioCue.KnightMove: s.Gallop(.02, .90); s.Metal(.75, 640, .20); break;
             case TabletopAudioCue.KnightCombat: s.Gallop(0, 1.08); s.Crowd(.39, .60); s.Metal(.97, 850, .36); break;
-            case TabletopAudioCue.BarbarianAdvance: s.Crowd(0); s.Stone(.14, 70, .36); break;
+            case TabletopAudioCue.BarbarianAdvance: s.Wood(0,310,.35); s.NoiseBurst(.08,.32,.22,.16,4); break;
             case TabletopAudioCue.BarbarianInvasion: s.Crowd(.03, 1.1); s.Crowd(.82, .70); s.Stone(.04, 65, .85); s.Horn(.91, 110, .47); break;
             case TabletopAudioCue.BarbarianSail: s.Horn(.08, 123.47, .90); s.Horn(.91, 98, .63); s.NoiseBurst(0, 2.1, .30, .035, 1); break;
             case TabletopAudioCue.BuildingCollapse:
-                s.Crowd(.10, .85); s.NoiseBurst(0, 1.42, .95, .19, 3);
-                for (int i = 0; i < 7; i++) s.Stone(i * .095, 72 + i * 16, .9 - i * .09);
+                s.NoiseBurst(0,.62,.42,.24,5);
+                s.Stone(0,220,.55); s.Stone(.17,310,.28); s.Stone(.39,420,.16);
                 s.Wood(.15, 130, .85); s.Wood(.44, 185, .6); break;
             case TabletopAudioCue.FacilityUpgrade: s.Wood(0, 340, .65); s.Metal(.08, 660, .45); s.Bell(.16, 880, .70); s.Bell(.30, 1109, .65); s.Bell(.44, 1319, .57); break;
             case TabletopAudioCue.TradeUpgrade:
-                for (int i = 0; i < 19; i++) { double at = i * .060; s.Wood(at, 430, .38); s.Metal(at + .024, 1060, .16); }
-                s.Tone(.04, 1.25, 92, .055, .5); s.NoiseBurst(.02, 1.28, .20, .12, .5); break;
-            case TabletopAudioCue.PoliticsUpgrade: s.Anvil(0, 1); s.Anvil(.39, .85); s.Anvil(.77, .72); break;
+                s.Paper(0,.55); s.Metal(.12,1568,.45); s.Bell(.25,1046,.36); break;
+            case TabletopAudioCue.PoliticsUpgrade: s.Metal(0,710,.55); s.Paper(.12,.35); s.Bell(.24,880,.38); break;
             case TabletopAudioCue.ScienceUpgrade:
-                for (int i = 0; i < 9; i++) { s.NoiseBurst(i * .125, .085, .50, .58, 1.5); s.NoiseBurst(i * .125 + .06, .043, .26, .80, 2); }
-                s.Paper(1.20, .52); break;
+                s.Paper(0,.62); s.Bell(.17,1175,.40); s.Bell(.30,1568,.30); break;
             case TabletopAudioCue.WonderBuild: s.Stone(0, 150, .8); s.Bell(.14, 523, .65); s.Bell(.26, 784, .7); s.Bell(.40, 1046, .7); break;
             case TabletopAudioCue.TurnEnd: s.Wood(0, 460, .64); s.Bell(.10, 587, .52); break;
             case TabletopAudioCue.YourTurn: s.Bell(0, 784, .82); s.Bell(.18, 1046, .75); break;
@@ -189,7 +163,17 @@ public static class TabletopAudioSynth
             case TabletopAudioCue.Network: s.Bell(0, 659.25, .53); s.Bell(.13, 783.99, .52); break;
             default: throw new ArgumentOutOfRangeException(nameof(cue));
         }
-        return s.Finish();
+        var samples=s.Finish();
+        double previous=0,filtered=0; int last=0;
+        for(int i=0;i<samples.Length;i++)
+        {
+            double input=samples[i]; filtered=.962*(filtered+input-previous);previous=input;
+            samples[i]=(float)(filtered*.78);if(Math.Abs(samples[i])>.0007)last=i;
+        }
+        int count=Math.Min(samples.Length,Math.Max(2400,last+360));
+        Array.Resize(ref samples,count);
+        for(int i=0;i<Math.Min(240,count);i++)samples[count-1-i]*=i/240f;
+        return samples;
     }
 
     public static float[] RenderAmbience() => RenderAmbience(0);

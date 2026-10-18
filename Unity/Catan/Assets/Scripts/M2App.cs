@@ -88,6 +88,7 @@ public sealed partial class M2App : MonoBehaviour
     }
     internal bool TryCancelTableInteraction()
     {
+        if(mapChoice.Active){mapChoice.Clear();return true;}
         if(mapPan.IsDragging){mapPan.Cancel(board.TableScene);return true;}
         if(tabletop.TryCloseOverlay())return true;
         bool active=holding||preparedDevelopment.HasValue||preparedPurchase||tableNotes||newGameDialog||cardArt.HasSelection||dock.HasCancelableInteraction;

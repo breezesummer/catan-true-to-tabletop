@@ -93,6 +93,7 @@ public sealed partial class M3App : MonoBehaviour
     }
     internal bool TryCancelTableInteraction()
     {
+        if(mapChoice.Active){mapChoice.Clear();return true;}
         if(mapPan.IsDragging){mapPan.Cancel(board.TableScene);return true;}
         if(tabletop.TryCloseOverlay())return true;
         bool active=holding||preparedDevelopment.HasValue||preparedPurchase||showSeafaring||tableNotes||tableVictim!=null||newGameDialog||cardArt.HasSelection||dock.HasCancelableInteraction;

@@ -10,7 +10,7 @@ public sealed class TabletopAudio : MonoBehaviour
     public const float EffectsHeadroom = TabletopAudioMix.Effects, AmbientHeadroom = TabletopAudioMix.Ambience,
         MusicHeadroom = TabletopAudioMix.Music, SpeechHeadroom = TabletopAudioMix.Speech;
     const string PreferencePrefix = "catan.audio.v1.";
-    const string AssetRoot = "TabletopAudio/v002/";
+    const string AssetRoot = "TabletopAudio/v003/";
     public static TabletopAudio Instance { get; private set; }
     public bool Ready { get; private set; }
     public int ClipCount => clips.Count;
@@ -284,7 +284,7 @@ public sealed class TabletopAudio : MonoBehaviour
         label.normal.textColor = pastoral ? PastoralMenuUI.Ink : ModernOperationUI.TextColor;
         GUI.Label(new Rect(area.x, area.y, 70, 24), "声音设置", label);
         if (ModernOperationUI.Button(new Rect(area.xMax - 254, area.y, 77, 24), muted ? "已静音" : "声音开启", true, false, !muted)) { Muted = !muted; if (!muted) Click(); }
-        if (ModernOperationUI.Button(new Rect(area.xMax - 169, area.y, 89, 24), voiceLanguage == 0 ? "语音：中文" : "语音：英语")) VoiceLanguage = 1 - VoiceLanguage;
+        if (ModernOperationUI.Button(new Rect(area.xMax - 169, area.y, 89, 24), voiceLanguage == 0 ? "真人：应答" : "真人：战呼")) VoiceLanguage = 1 - VoiceLanguage;
         if (ModernOperationUI.Button(new Rect(area.xMax - 72, area.y, 72, 24), "语音试听")) PreviewVoice();
         float width = area.width / 5;
         DrawCompactSlider(new Rect(area.x, area.y + 30, width - 10, 36), "总音量", master, v => MasterVolume = v, label);

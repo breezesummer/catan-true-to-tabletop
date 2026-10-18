@@ -81,14 +81,11 @@ public sealed class BroadcastTradeTests
     [InlineData("base")][InlineData("seafarers")][InlineData("cities")][InlineData("combined")]
     public void AiUsesOnlyItsOwnPermissionFilteredViewToRespond(string rules)
     {
-        var (game, session) = Fixture(rules);
+        var (game, session) = Fixture(rules, false);
         game.Accept(Offer(rules));
         var detached = game.View("P4");
         string projection = M6Game.Json(detached);
-        var reject = game.Decide(game.View("P2"));
-        Assert.Equal("RejectTrade", (string)reject.Kind.ToString());
-        reject.Id = Guid.NewGuid().ToString("N");
-        game.Accept(reject);
+        Assert.Equal(new[]{"P2"}, (string[])game.View().TradeOffer.RejectedPlayerIds);
         Assert.Throws<InvalidOperationException>(() => game.Decide(game.View("P2")));
         Assert.Throws<InvalidOperationException>(() => game.Decide(game.View("P1")));
         var accept = game.Decide(detached);
@@ -158,7 +155,7 @@ public sealed class BroadcastTradeTests
                     if ((string)player.Id == actor) continue;
                     ResourceBag theirs = game.View((string)player.Id).OwnResources;
                     var receives = Enum.GetValues<Resource>().Where(r => r != give && theirs[r] > 0).ToArray();
-                    if (receives.Length > 0) { opportunity = (actor, (string)player.Id, give, receives[0]); break; }
+                    if (receives.Length > 0 && ((Array)status.Players).Cast<dynamic>().Count(p => (string)p.Id != actor && ((ResourceBag)game.View((string)p.Id).OwnResources)[receives[0]] > 0) >= 2) { opportunity = (actor, (string)player.Id, give, receives[0]); break; }
                 }
             }
             if (opportunity == null)
@@ -189,7 +186,7 @@ public sealed class BroadcastTradeTests
         game.Accept(rejection); restored.Accept(rejection);
         Assert.Equal(game.Save(), restored.Save());
         restored = M6Game.Load(rules, game.Save());
-        Assert.Equal(new[] { rejecting }, (string[])restored.View().TradeOffer.RejectedPlayerIds);
+        Assert.Contains(rejecting, (string[])restored.View().TradeOffer.RejectedPlayerIds);
         Assert.False((bool)restored.View().TradeOffer.CanRespond(rejecting));
         var forged = System.Text.Json.Nodes.JsonNode.Parse(game.Save())!;
         forged["TradeOffer"]!["RejectedPlayerIds"]![0] = found.recipient;
@@ -211,11 +208,12 @@ public sealed class BroadcastTradeTests
         Assert.Equal("付出的资源超过手牌", OperationSelection.ValidateTrade(snapshot, trade));
     }
 
-    private static (M6Game game, dynamic session) Fixture(string rules)
+    private static (M6Game game, dynamic session) Fixture(string rules, bool p2CanPay = true)
     {
         void Hands(dynamic state)
         {
             state.Players[0].Resources.Wood = 2;
+            state.Players[1].Resources.Ore = p2CanPay ? 1 : 0;
             state.Players[2].Resources.Ore = 5;
             state.Players[3].Resources.Ore = 5;
         }

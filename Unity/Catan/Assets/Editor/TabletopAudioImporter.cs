@@ -5,11 +5,11 @@ using UnityEngine;
 // 这批 WAV 已按混音预算整形；有损编解码会重建出超过源峰值的采样，必须保持 PCM。
 public sealed class TabletopAudioImporter : AssetPostprocessor
 {
-    public override uint GetVersion() => 2;
+    public override uint GetVersion() => 3;
 
     void OnPreprocessAudio()
     {
-        if (!assetPath.StartsWith("Assets/Resources/TabletopAudio/v002/", StringComparison.Ordinal)) return;
+        if (!assetPath.StartsWith("Assets/Resources/TabletopAudio/", StringComparison.Ordinal)) return;
         var importer = (AudioImporter)assetImporter;
         var settings = importer.defaultSampleSettings;
         settings.compressionFormat = AudioCompressionFormat.PCM;

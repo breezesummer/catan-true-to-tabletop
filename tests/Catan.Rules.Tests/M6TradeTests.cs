@@ -38,6 +38,7 @@ public sealed class M6TradeTests
         }
         var game = new M6Game(rules, session);
         game.Accept(offer);
+        if(!affordable){Assert.Null((object?)game.View().TradeOffer);Assert.Equal(2,(int)game.View().OwnResources.Wood);game.AssertInvariants();return;}
         var response = game.Decide(game.View("P2"));
         Assert.Equal(affordable ? "AcceptTrade" : "RejectTrade", (string)response.Kind.ToString());
         response.Id = "m6-mixed-response";
@@ -77,6 +78,7 @@ public sealed class M6TradeTests
         offer.Receive = new ResourceBag { Ore = 1 };
         var game = new M6Game(rules, session);
         game.Accept(offer);
+        if(!affordable){Assert.Null((object?)game.View().TradeOffer);Assert.Equal(2,(int)game.View().OwnResources.Wood);game.AssertInvariants();return;}
         Assert.Equal("P1", (string)game.View().ActivePlayerId);
         Assert.Equal("P2", M6Game.Actor(game.View()));
         Assert.Throws<InvalidOperationException>(() => game.Decide(game.View("P3")));
@@ -118,10 +120,7 @@ public sealed class M6TradeTests
         Assert.Equal("ProposeTrade", (string)offer.Kind.ToString());
         offer.Id = "m6-propose";
         game.Accept(offer);
-        var response = game.Decide(game.View((string)offer.OtherPlayerId));
-        Assert.Equal("RejectTrade", (string)response.Kind.ToString());
-        response.Id = "m6-reject";
-        game.Accept(response);
+        Assert.Null((object?)game.View().TradeOffer);
         var continuation = game.Decide(game.View("P1"));
         Assert.NotEqual("ProposeTrade", (string)continuation.Kind.ToString());
         continuation.Id = "m6-after-reject";

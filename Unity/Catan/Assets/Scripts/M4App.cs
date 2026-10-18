@@ -27,8 +27,8 @@ public sealed partial class M4App : MonoBehaviour
     bool artOpen;
     static readonly string[] Goods={"木材","砖","羊毛","谷物","矿石","布匹","钱币","纸张"};
     static readonly string[] Tracks={"贸易 · 布匹","政治 · 钱币","科学 · 纸张"};
-    static readonly string[] Cards={"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻造","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"};
-    static readonly string[] CardHelp={
+    internal static readonly string[] Cards={"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻造","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"};
+    internal static readonly string[] CardHelp={
         "掷骰前指定红、白产出骰；事件骰照常随机掷出。","选择轨道，立即以少一张商品的费用改良一次。","选择自己的城市，免费建一面城墙。","选择两个地块交换数字；2、6、8、12 不能交换。","每个邻接自己建筑的麦田取 2 谷物；每个地块只算一次。","选择村庄，以 1 谷物和 2 矿石升级城市。","每个邻接自己建筑的山地取 2 矿石。","抽到后自动公开，得 1 分。","免费建设两条道路，逐条选择。","选择最多两名骑士免费晋升，每名每回合最多一次。","本回合可向每个对手提供一次资源，换取其自选商品。","选择分数高于自己的玩家，查看其手牌并取两张。","选择邻接自己建筑的地块，取得商人及 1 分，并以 2:1 交易该资源。","本回合所选资源或商品可按 2:1 交易。","每名对手交出所选资源最多两张。","每名对手交出所选商品最多一张。","移除一条开放道路；若是自己的，可立即免费建一条。","选择对手，仅你可查看其进步卡，并可取一张。","免费激活所有未激活骑士；本回合新激活者不能行动。","选择连接自己道路的对手骑士，将其驱离。","首次蛮族攻击后，将强盗移到新地块，向每名邻接对手各随机取一张。","抽到后自动公开，得 1 分。","对手选择移除一名骑士，你可招募同级或更低且同状态的骑士。","分数高于你的每名对手自选两张资源或商品给你。","分数不少于你的对手各弃掉一半资源和商品。"};
 
     public void Start()
@@ -86,6 +86,7 @@ public sealed partial class M4App : MonoBehaviour
     void Select(CommandKind kind){draft=New(kind);pickField="";scroll=Vector2.zero;}
     void Refresh(PlayerView v)
     {
+        mapChoice.Clear();
         ai?.ObservePlayerOrder(v.StartingPlayerId,v.Players.Select(p=>p.Id));
         string next=string.Join("|",v.Board.Tiles.Select(t=>t.Id+":"+t.Resource));
         if(board==null||next!=layout)
@@ -104,6 +105,7 @@ public sealed partial class M4App : MonoBehaviour
     {
         Vector2 releasedMouse;bool buildReleased=dock.ConsumeBuildRelease(out releasedMouse);
         if(board==null)return;
+        if(mapChoice.Active&&Input.GetMouseButtonDown(1)){mapChoice.Clear();return;}
         if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         var pointer=MobileTabletop.Pointer;
         bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(MobileTabletop.Logical(pointer));
@@ -124,6 +126,7 @@ public sealed partial class M4App : MonoBehaviour
         var logicalMouse=MobileTabletop.Logical(mouse);
         if(DockBlocksMouse(logicalMouse)||cardArt.BlocksBoardInput(logicalMouse)){board.ClearPreview();return;}
         if(ai==null&&(mouse.x>Screen.width*.70f||mouse.y<Screen.height*.15f||mouse.y>Screen.height*.90f))return;
+        if(ai!=null&&DirectProgressActive){UpdateDirectProgress(mouse,boardClick);return;}
         if(ai!=null&&FreeRoadPlacementActive){UpdateFreeRoadPlacement(mouse,boardClick);return;}
         if(ai!=null&&draft==null&&boardClick){PickTabletopObject(mouse);return;}
         if(draft==null||pickField=="")return;
@@ -155,6 +158,7 @@ public sealed partial class M4App : MonoBehaviour
     {
         if(mapPan.IsDragging){mapPan.Cancel(board.TableScene);return true;}
         if(tabletop.TryCloseOverlay())return true;
+        if(mapChoice.Active){mapChoice.Clear();return true;}
         bool active=draft!=null||operationActions||operationKnightTarget!=null||newGame||artOpen||cardArt.HasSelection||dock.HasCancelableInteraction;
         if(!active)return false;
         dock.Reset();CancelOperationDraft();pickField="";board.ClearPreview();newGame=false;artOpen=false;cardArt.Clear();return true;
@@ -421,7 +425,6 @@ public sealed partial class M4App : MonoBehaviour
             if(ModernOperationUI.LayoutButton(card?"确认使用 · "+CardName(draft.ProgressCard):"确认执行",legal,true)){Submit(draft);GUIUtility.ExitGUI();}
         }
         else if(Btn("确认执行")){Submit(draft);GUIUtility.ExitGUI();}
-        if(card&&Btn("弃置此进步卡")){var c=New(CommandKind.DiscardProgressCard);c.ProgressCard=draft.ProgressCard;c.SelectedProgressCard=draft.ProgressCard;Submit(c);GUIUtility.ExitGUI();}
         if(Btn("取消选择")){CancelOperationDraft();}
     }
     void Target(string title,string field,string type)

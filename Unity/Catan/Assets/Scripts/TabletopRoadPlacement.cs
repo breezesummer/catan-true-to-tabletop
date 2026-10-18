@@ -16,7 +16,7 @@ public static class TabletopRoadPlacement
     }
 
     public static void Update(Vector2 mouse,bool click,Edge[] edges,Tile[] tiles,string[] roads,string[] ships,
-        Func<string,Vector2> screen,Action<string,bool> roadPreview,Action<string,bool> shipPreview,Action clear,Action<string,bool> place)
+        Func<string,Vector2> screen,Action<string,bool> roadPreview,Action<string,bool> shipPreview,Action clear,Action<string,bool> place,TabletopChoiceBubble choice)
     {
         string target="";float distance=MobileTabletop.PickRadius(25);
         if(TabletopUI.ContainsMapScreenPoint(mouse))foreach(var id in roads.Concat(ships).Distinct())
@@ -37,6 +37,10 @@ public static class TabletopRoadPlacement
                 ship=Vector2.Dot(mouse-screen(target),screen(adjacent[0].Id)-screen(target))<0;
         }
         if(ship)shipPreview(target,true);else roadPreview(target,true);
-        if(click)place(target,ship);
+        if(click)
+        {
+            if(roads.Contains(target)&&ships.Contains(target))choice.Open(screen(target),"选择免费建设棋子",new[]{"道路","船"},i=>place(target,i==1));
+            else place(target,ship);
+        }
     }
 }

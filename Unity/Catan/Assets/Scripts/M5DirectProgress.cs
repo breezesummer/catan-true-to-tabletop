@@ -1,0 +1,76 @@
+using System;
+using System.Linq;
+using Catan.Core;
+using Catan.Core.M5;
+using UnityEngine;
+using Command = Catan.Core.M5.Command;
+using CommandKind = Catan.Core.M5.CommandKind;
+
+public sealed partial class M5App
+{
+    bool DirectProgressActive => view!=null && (draft!=null && draft.Kind==CommandKind.PlayProgressCard &&
+        new[]{ProgressCardKind.Engineering,ProgressCardKind.Medicine,ProgressCardKind.Invention,ProgressCardKind.Smithing,ProgressCardKind.Merchant,ProgressCardKind.Diplomacy,ProgressCardKind.Intrigue,ProgressCardKind.Taxation,ProgressCardKind.Treason}.Contains(draft.ProgressCard)
+        || view.PendingDecision!=null && view.PendingDecision.PlayerId==seat && new[]{"PillageCity","Metropolis","DisplacedKnight","ProgressTreasonRemove","ProgressTreasonPlace"}.Contains(view.PendingDecision.Kind)
+        && view.LegalActions.Any(c=>!c.Decline&&!string.IsNullOrEmpty(c.TargetId)));
+    Command DirectDecisionCommand(Command candidate)
+    {
+        if(candidate==null)return null;
+        var command=New(candidate.Kind,candidate.TargetId);
+        command.KnightLevel=candidate.KnightLevel;
+        command.Decline=candidate.Decline;
+        return command;
+    }
+    void BeginDirectProgress()
+    {
+        if(!DirectProgressActive)return;
+        status=draft.ProgressCard==ProgressCardKind.Treason?"点选对手的骑士以选择该玩家；由对手决定移除哪名骑士。":"请直接点选地图上的目标；右键或 Esc 取消。";
+        ai.ShowTablePrompt(status);
+    }
+    void UpdateDirectProgress(Vector2 mouse,bool click)
+    {
+        bool card=draft!=null&&draft.Kind==CommandKind.PlayProgressCard;
+        var kind=card?draft.ProgressCard:default(ProgressCardKind);
+        string type=card&&(kind==ProgressCardKind.Merchant||kind==ProgressCardKind.Taxation||kind==ProgressCardKind.Invention)?"T":card&&kind==ProgressCardKind.Diplomacy?"E":"V";
+        string target=Pick(type,mouse);
+        if(string.IsNullOrEmpty(target)){board.ClearPreview();return;}
+        Command command=null;
+        if(!card)command=DirectDecisionCommand(view.LegalActions.FirstOrDefault(c=>!c.Decline&&c.TargetId==target));
+        else
+        {
+            command=New(CommandKind.PlayProgressCard,target);command.ProgressCard=kind;
+            if(kind==ProgressCardKind.Treason){var knight=view.Board.Knights.FirstOrDefault(k=>k.LocationId==target&&k.PlayerId!=seat);if(knight==null)command=null;else command.OtherPlayerId=knight.PlayerId;}
+            if(kind==ProgressCardKind.Invention)
+            {
+                command.SourceId=draft.SourceId;
+                if(string.IsNullOrEmpty(draft.SourceId))
+                {
+                    var tile=view.Board.Tiles.FirstOrDefault(t=>t.Id==target);
+                    bool eligible=tile!=null&&new[]{3,4,5,9,10,11}.Contains(tile.Number??0);
+                    board.PreviewRobber(target,eligible);
+                    if(click&&eligible){draft.SourceId=target;status="已选第一枚数字，点选第二枚数字交换。";ai.ShowTablePrompt(status);}return;
+                }
+            }
+            if(kind==ProgressCardKind.Smithing)command.TargetIds=new[]{target};
+        }
+        bool valid=command!=null&&Preview(command).Success;
+        if(type=="T")board.PreviewRobber(target,valid);else board.Preview(target,type=="E",valid);
+        if(!click)return;
+        if(!valid){ai.ShowTablePrompt("此目标不符合卡牌效果，请选择其他目标。");return;}
+        if(!card&&view.PendingDecision.Kind=="ProgressTreasonPlace")
+        {
+            var options=view.LegalActions.Where(c=>!c.Decline&&c.TargetId==target).Select(DirectDecisionCommand).ToArray();
+            mapChoice.Open(board.ScreenPoint(target),"选择安置骑士等级",options.Select(c=>c.KnightLevel+" 级骑士").ToArray(),i=>Submit(options[i]));return;
+        }
+        if(card&&kind==ProgressCardKind.Smithing)
+        {
+            if(string.IsNullOrEmpty(draft.SourceId))
+            {
+                draft.SourceId=target;
+                mapChoice.Open(board.ScreenPoint(target),"锻造 · 已选一名骑士",new[]{"晋升这一名","继续选择第二名"},i=>{if(i==0)Submit(command);else ai.ShowTablePrompt("点选另一名骑士；再次点第一名可只晋升一名。");});return;
+            }
+            command.TargetIds=new[]{draft.SourceId,target}.Distinct().ToArray();
+            if(!Preview(command).Success){ai.ShowTablePrompt("不能同时晋升这两名骑士。");return;}
+        }
+        Submit(command);
+    }
+}

@@ -59,6 +59,7 @@ namespace Catan.Core.M4
                 var pending = s.PendingDecision;
                 var forced = s.Phase == GamePhase.PendingChoice && pending != null && pending.Kind == "ProgressDiscard" && pending.PlayerId == p.Id;
                 Require(forced || (s.Phase == GamePhase.Action && s.ActivePlayerId == p.Id && pending == null), "WrongPhase", "当前不能弃进步卡。");
+                Require(legacyInteractionReplay || p.ProgressCards.Length > 4, "NoDiscardRequired", "进步卡未超过四张，不能弃置。");
                 Require(!ProgressCatalog.IsVictoryPoint(c.ProgressCard), "PublicVictoryCard", "胜利点卡不能丢弃。");
                 ReturnProgressCard(s, p, c.ProgressCard);
                 if (forced && p.ProgressCards.Length <= 4) { s.PendingDecision = null; ContinueDecisions(s); }

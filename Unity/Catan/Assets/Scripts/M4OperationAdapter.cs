@@ -23,11 +23,11 @@ public sealed partial class M4App
     {
         if(ai==null)return false;
         var p=logicalMouse??MobileTabletop.Logical(MobileTabletop.Pointer);
-        return ResourceChoiceVisible||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||OperationContextVisible&&tabletop.CurrentContextRect.Contains(p)||dock.BlocksBoardInput(p);
+        return mapChoice.Active||ResourceChoiceVisible||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||OperationContextVisible&&tabletop.CurrentContextRect.Contains(p)||dock.BlocksBoardInput(p);
     }
-    void CancelOperationDraft(){resourceChoiceSelection=new ResourceBag();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null)board.ClearPreview();}
+    void CancelOperationDraft(){mapChoice.Clear();resourceChoiceSelection=new ResourceBag();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null)board.ClearPreview();}
     bool DirectTabletopPlacement=>draft!=null&&(draft.Kind==CommandKind.SetupSettlement||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.BuildSettlement||draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.BuildCity||draft.Kind==CommandKind.BuildWall||draft.Kind==CommandKind.RecruitKnight||draft.Kind==CommandKind.PromoteKnight||draft.Kind==CommandKind.ActivateKnight||draft.Kind==CommandKind.ChaseRobber||draft.Kind==CommandKind.MoveRobber||draft.Kind==CommandKind.PlaceFreeRoad||draft.Kind==CommandKind.MoveKnight||draft.Kind==CommandKind.DisplaceKnight);
-    bool OperationContextVisible=>view!=null&&(!FreeRoadPlacementActive||FreeRoadIds.Length==0)&&Operations().Discard==null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding&&view.LegalEdgeIds.Length==0);
+    bool OperationContextVisible=>view!=null&&!DirectProgressActive&&(!FreeRoadPlacementActive||FreeRoadIds.Length==0)&&Operations().Discard==null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding&&view.LegalEdgeIds.Length==0);
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
     static int[] DockGoods(ResourceBag r,CommodityBag c)=>Enumerable.Range(0,8).Select(i=>i<5?r[(Resource)i]:c[(Commodity)(i-5)]).ToArray();
     bool DockKnightTargetMatches(string target)=>operationKnightLevel<2||draft==null||draft.Kind!=CommandKind.PromoteKnight||view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==target&&k.Level==operationKnightLevel-1);
@@ -113,7 +113,7 @@ public sealed partial class M4App
                 if(b.Track>=0){operationFacilityLocked=true;draft.Track=(ImprovementTrack)b.Track;Submit(draft);}
                 else{operationKnightLevel=b.Id.Contains(":")?int.Parse(b.Id.Split(':')[1]):0;pickField="target";pickType=draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.PlaceFreeRoad?"E":"V";status="已拿起 "+b.Name+"，点击地图上的合法位置放下；右键或 Esc 放回。";}
             };
-            s.PrepareCard=c=>{CancelOperationDraft();Select(CommandKind.PlayProgressCard);draft.ProgressCard=(ProgressCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在操作面板设置效果并确认。";};
+            s.PrepareCard=c=>{CancelOperationDraft();Select(CommandKind.PlayProgressCard);draft.ProgressCard=(ProgressCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在操作面板设置效果并确认。";BeginDirectProgress();};
             if(view.OwnProgressCards.Length<=4||view.Phase!=GamePhase.Action||view.ActivePlayerId!=seat)handOverflowDiscard=false;
             s.ResourceHandLimit=7+2*view.Board.Walls.Count(w=>w.PlayerId==seat);s.SpecialHandLimit=4;
             var handDiscard=view.Phase==GamePhase.Discard?view.Discards.FirstOrDefault(d=>d.PlayerId==seat):null;
@@ -156,7 +156,7 @@ public sealed partial class M4App
     {
         Styles();GUI.matrix=MobileTabletop.GuiMatrix;cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!ResourceChoiceVisible;GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
+        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!ResourceChoiceVisible;GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
         TabletopUI.DrawMapLabels(DrawBoardLabels);
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.PlayerName=ai.PlayerDisplayName;dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TablePresentationBlocked);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
@@ -172,12 +172,14 @@ public sealed partial class M4App
             ()=>{bool open=!operationActions;dock.Reset();CancelOperationDraft();operationActions=open;},"骑士操作",facility:dock.OpenFacility);
         if(ai.IsHumanTurn&&draft==null&&view.Phase==GamePhase.RobberMove){Select(CommandKind.MoveRobber);pickField="target";pickType="T";status="拿起强盗，点击新的地块放下。";}
         tabletop.SetContextAnchor(operationActions&&operationKnightTarget!=null?(Vector2?)MobileTabletop.Logical(board.ScreenPoint(operationKnightTarget)):null);
-        GUI.enabled=tableEnabled&&!dock.HasOverlay;
+        GUI.enabled=tableEnabled&&!mapChoice.Active&&!dock.HasOverlay;
         if(OperationContextVisible&&!ResourceChoiceVisible)tabletop.DrawContext(operationActions?"棋子行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):"当前选择",DrawOperationControls);
-        GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||tableEnabled&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
+        GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&tableEnabled&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
         if(ResourceChoiceVisible&&ai.IsHumanTurn&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen)DrawPendingResources();
         tabletop.HandFlightsVisible=dock.ResourceHandVisible;if(!ResourceChoiceVisible&&(tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TablePresentationBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
-        ai.TableOverlayOpen=dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen||ResourceChoiceVisible;
+        ai.TableOverlayOpen=mapChoice.Active||dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen||ResourceChoiceVisible;
+        if(DirectProgressActive&&view.PendingDecision?.Kind=="ProgressTreasonPlace"&&!mapChoice.Active&&ai.IsHumanTurn&&ModernOperationUI.Button(new Rect(610,196,220,34),"放弃安置替补骑士")){var skip=New(CommandKind.ResolveProgressChoice);skip.Decline=true;Submit(skip);}
+        if(!ai.TablePresentationBlocked&&ai.IsHumanTurn)mapChoice.Draw();
         ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
     }
     void EndTableTurn()
@@ -192,6 +194,7 @@ public sealed partial class M4App
     }
     string TableInstruction()
     {
+        if(DirectProgressActive)return draft!=null&&draft.Kind==CommandKind.PlayProgressCard?status:"请直接点选地图目标 · "+DecisionName(view.PendingDecision.Kind);
         if(FreeRoadPlacementActive)return TabletopRoadPlacement.Instruction(view.PendingDecision?.Kind=="ProgressRoads"?view.PendingDecision.Amount:view.PendingDecision?.RemainingRoads??2,ai.HistoryEntries);
         if(view.Phase==GamePhase.Finished)return view.WinnerPlayerId+" 获胜";
         if(pickField!="")return "请选择合法位置放下棋子";

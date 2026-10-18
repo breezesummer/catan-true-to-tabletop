@@ -58,6 +58,6 @@ public sealed partial class M6App
         string message=OpeningOrderMessage;if(message.Length==0||tableMenu||CardPresentationBusy||TableOverlayOpen)return;
         var style=new GUIStyle(title){fontSize=30,alignment=TextAnchor.MiddleCenter,wordWrap=false};
         style.normal.textColor=PromptColor;
-        GUI.Label(new Rect(365,207,710,48),message,style);
+        GUI.Label(new Rect(365,126,710,48),message,style);
     }
 }

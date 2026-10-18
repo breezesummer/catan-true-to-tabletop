@@ -63,6 +63,8 @@ namespace Catan.Core.M5
             return session;
         }
 
+        private bool legacyInteractionReplay;
+
         public CommandResult Execute(Command command)
         {
             lock (gate)
@@ -82,7 +84,7 @@ namespace Catan.Core.M5
                 if (command.Kind == CommandKind.RollDice) { ev.Dice1 = next.LastDice1; ev.Dice2 = next.LastDice2; ev.Message = command.PlayerId + " 掷出 " + ev.Dice1 + "+" + ev.Dice2 + "。"; }
                 var receipt = new[] { ev };
                 next.Events = Append(next.Events, ev);
-                next.ProcessedCommands = Append(next.ProcessedCommands, new ProcessedCommand { CommandId = command.Id, Fingerprint = fingerprint, Command = command, Events = receipt });
+                next.ProcessedCommands = Append(next.ProcessedCommands, new ProcessedCommand { CommandId = command.Id, Fingerprint = fingerprint, Command = command, Events = receipt, InteractionRevision = !legacyInteractionReplay && (command.Kind == CommandKind.ProposeTrade || command.Kind == CommandKind.DiscardProgressCard) ? 1 : 0 });
                 AssertInvariants(next);
                 history.RecordAction(GameHistoryCapture.From(state), GameHistoryCapture.From(next), new HistoryAction
                 {
@@ -167,6 +169,8 @@ namespace Catan.Core.M5
             foreach (var record in saved.ProcessedCommands)
             {
                 if (record == null || record.Command == null) throw new InvalidDataException("Malformed command history.");
+                if (record.InteractionRevision < 0 || record.InteractionRevision > 1) throw new InvalidDataException("未知的交互规则修订。");
+                session.legacyInteractionReplay = record.InteractionRevision == 0;
                 var result = session.Execute(record.Command);
                 if (!result.Success || result.IsDuplicate) throw new InvalidDataException("Invalid saved command history.");
             }
@@ -176,6 +180,7 @@ namespace Catan.Core.M5
                 saved.BarbarianAttackStrength = session.state.BarbarianAttackStrength;
                 saved.BarbarianDefenseStrength = session.state.BarbarianDefenseStrength;
             }
+            session.legacyInteractionReplay = false;
             if (session.Save() != Json.Write(saved)) throw new InvalidDataException("Saved authority differs from deterministic replay.");
             return session;
         }
@@ -300,7 +305,7 @@ namespace Catan.Core.M5
             TransferBag(p.Resources, s.Bank, resources);TransferBag(p.Commodities,s.CommodityBank,commodities); s.Discards = s.Discards.Where(x => x.PlayerId != p.Id).ToArray();
             if (s.Discards.Length == 0) {if(s.FirstBarbarianAttack)s.Phase=GamePhase.RobberMove;else {s.Phase=GamePhase.Action;s.PendingDecision=null;}}
         }
-        private static void ProposeTrade(GameState s, PlayerState p, Command c)
+        private void ProposeTrade(GameState s, PlayerState p, Command c)
         {
             ActionPhase(s);
             bool broadcast = c.OtherPlayerId == TradeOffer.AllPlayers;
@@ -309,6 +314,12 @@ namespace Catan.Core.M5
             Require(ValidBag(give)&&ValidBag(receive)&&ValidBag(gc)&&ValidBag(rc)&&give.Total+gc.Total>0&&receive.Total+rc.Total>0&&!Resources.Any(r=>give[r]>0&&receive[r]>0)&&!Commodities.Any(r=>gc[r]>0&&rc[r]>0), "InvalidTrade", "双方均须交换不同种类的手牌。");
             Require(Covers(p.Resources,give)&&Covers(p.Commodities,gc), "InsufficientResources", "没有足够手牌提出此报价。");
             s.TradeOffer = new TradeOffer { ProposerId = p.Id, OtherPlayerId = c.OtherPlayerId, Give = give.Copy(), Receive = receive.Copy(), GiveCommodities=gc.Copy(),ReceiveCommodities=rc.Copy(), RecipientPlayerIds = broadcast ? s.Players.Where(x => x.Id != p.Id).Select(x => x.Id).ToArray() : null };
+            if (legacyInteractionReplay) return;
+            // 无力支付的接收者立即以普通拒绝处理，不公开缺少的牌种或数量。
+            var unavailable = s.Players.Where(x => x.Id != p.Id && (broadcast || x.Id == c.OtherPlayerId) &&
+                (!Covers(x.Resources, s.TradeOffer.Receive) || !Covers(x.Commodities, s.TradeOffer.ReceiveCommodities))).Select(x => x.Id).ToArray();
+            if (broadcast) s.TradeOffer.RejectedPlayerIds = unavailable;
+            if (broadcast ? s.TradeOffer.PendingRecipientIds.Length == 0 : unavailable.Length > 0) s.TradeOffer = null;
         }
         private static void ResolveTrade(GameState s, PlayerState p, Command c)
         {

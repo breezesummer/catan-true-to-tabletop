@@ -1,4 +1,4 @@
-param([string]$BuildRoot='game version/Catan1.6.4-Trade-Animation-History')
+param([string]$BuildRoot='game version/Catan1.6.5-Card-Interaction-Audio')
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Player = & (Join-Path $PSScriptRoot 'Find-GamePlayer.ps1') -BuildRoot $BuildRoot

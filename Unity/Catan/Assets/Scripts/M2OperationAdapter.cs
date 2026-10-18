@@ -25,9 +25,9 @@ public sealed partial class M2App
     {
         if(ai==null)return false;
         var p=logical??MobileTabletop.Logical(MobileTabletop.Pointer);
-        return ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||dock.BlocksBoardInput(p);
+        return mapChoice.Active||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||dock.BlocksBoardInput(p);
     }
-    void CancelOperationDraft(){if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);preparedDevelopment=null;preparedPurchase=false;tableNotes=false;CancelPickup();}
+    void CancelOperationDraft(){mapChoice.Clear();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);preparedDevelopment=null;preparedPurchase=false;tableNotes=false;CancelPickup();}
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
     // 银行和港口分别展示各自权限；最终指令仍由同一规则入口裁决。
     OperationSnapshot TradeValidationSnapshot()
@@ -129,7 +129,7 @@ public sealed partial class M2App
     {
         Styles();GUI.matrix=MobileTabletop.GuiMatrix;cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
-        bool enabled=GUI.enabled;GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!dock.HasOverlay&&!ai.TablePresentationBlocked&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
+        bool enabled=GUI.enabled;GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!dock.HasOverlay&&!ai.TablePresentationBlocked&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
         TabletopUI.DrawMapLabels(DrawBoardLabels);
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.PlayerName=ai.PlayerDisplayName;dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TablePresentationBlocked);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
@@ -143,11 +143,12 @@ public sealed partial class M2App
             ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.TradeOffer==null,
             ()=>Submit(NewCommand(CommandKind.RollDice)),()=>Submit(NewCommand(CommandKind.EndTurn)),TableSeatClick,
             ()=>{tableNotes=!tableNotes;},"回合备忘",facility:dock.OpenFacility);
-        GUI.enabled=enabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!dock.HasOverlay;
+        GUI.enabled=enabled&&!mapChoice.Active&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!dock.HasOverlay;
         if(ai.IsHumanTurn&&view.TradeOffer==null)DrawTableDecision();
-        GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=enabled;
+        GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=enabled;
         tabletop.HandFlightsVisible=dock.ResourceHandVisible;if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TablePresentationBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
-        ai.TableOverlayOpen=dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen;
+        ai.TableOverlayOpen=mapChoice.Active||dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen;
+        if(!ai.TablePresentationBlocked&&ai.IsHumanTurn)mapChoice.Draw();
         ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
     }
     void TableSeatClick(string target)

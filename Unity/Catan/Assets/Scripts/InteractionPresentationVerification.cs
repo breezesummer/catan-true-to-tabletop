@@ -22,13 +22,15 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
     void Require(bool value,string message){checks++;if(!value)throw new InvalidOperationException(message);}
     IEnumerator Start()
     {
-        var args=Environment.GetCommandLineArgs();bool cards=args.Contains("--card-player-verify"),polish=args.Contains("--table-polish-verify");int flag=Array.IndexOf(args,polish?"--table-polish-verify":cards?"--card-player-verify":"--interaction-verify");if(flag<0)yield break;
+        var args=Environment.GetCommandLineArgs();bool feedback=args.Contains("--feedback-verify");bool cards=args.Contains("--card-player-verify"),polish=args.Contains("--table-polish-verify");int flag=Array.IndexOf(args,feedback?"--feedback-verify":polish?"--table-polish-verify":cards?"--card-player-verify":"--interaction-verify");if(flag<0)yield break;
         output=Path.GetFullPath(args[flag+1]);
         if(!output.StartsWith(Path.GetFullPath(".local")+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)){Application.Quit(1);yield break;}
         Directory.CreateDirectory(output);app=GetComponent<M6App>();
+        if(feedback)Debug.Log("CATAN_FEEDBACK_START");
         gameObject.AddComponent<InteractionCaptureBegin>().Owner=this;gameObject.AddComponent<InteractionCaptureEnd>().Owner=this;
         if(cards||polish)while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
-        yield return null;var run=polish?VerifyTablePolish():cards?VerifyCardPlayers():args.Contains("--resource-layout-review")?VerifyResourceLayouts():Verify();
+        yield return null;var run=feedback?VerifyFeedback():polish?VerifyTablePolish():cards?VerifyCardPlayers():args.Contains("--resource-layout-review")?VerifyResourceLayouts():Verify();
+        run=FlattenVerification(run);
         while(true)
         {
             object next;
@@ -38,6 +40,11 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
         }
         File.WriteAllText(Path.Combine(output,"result.json"),"{\"状态\":\"通过\",\"断言数\":"+checks+",\"界面图数\":"+images+"}");
         Debug.Log("CATAN_INTERACTION_VERIFY_OK: checks="+checks+"; images="+images);Application.Quit(0);
+    }
+    static IEnumerator FlattenVerification(IEnumerator root)
+    {
+        var stack=new System.Collections.Generic.Stack<IEnumerator>();stack.Push(root);
+        while(stack.Count>0){var top=stack.Peek();if(!top.MoveNext()){stack.Pop();continue;}if(top.Current is IEnumerator nested)stack.Push(nested);else yield return top.Current;}
     }
     IEnumerator VerifyResourceLayouts()
     {
