@@ -113,7 +113,7 @@ public sealed partial class M6App
     }
     int networkTab,networkSettingsPage,networkNavigation;
     string menuLanAddress="https://127.0.0.1:47771",menuLanPin="",menuOnlineAddress="",networkPresentedRoom;
-    bool CanUseMenuEndpoint=>!string.IsNullOrEmpty(Network.Endpoint)&&
+    bool CanUseMenuEndpoint=>Network.EndpointConfigured&&!string.IsNullOrEmpty(Network.Endpoint)&&
         string.Equals(Network.Endpoint,(networkAddress??"").Trim().TrimEnd('/'),StringComparison.OrdinalIgnoreCase)&&
         (networkLan?M7Client.NormalizeFingerprint(networkPin)==Network.Fingerprint:string.IsNullOrEmpty(Network.Fingerprint));
     void OpenSeparatedNetworkMenu(bool local)

@@ -30,7 +30,7 @@ public sealed class LanMenuVerification : MonoBehaviour
             var listener=new TcpListener(IPAddress.Loopback,0);listener.Start();int port=((IPEndPoint)listener.LocalEndpoint).Port;listener.Stop();
             int discoveryPort;using(var udp=new UdpClient(0))discoveryPort=((IPEndPoint)udp.Client.LocalEndPoint).Port;
             app.ConfigureLanReview(Path.Combine(output,"private-server"),port,discoveryPort);
-            app.Network.UseCredentialDirectory(Path.Combine(output,"private-player"));deadline=Time.realtimeSinceStartup+120;
+            app.Network.UseCredentialDirectory(Path.Combine(output,"private-player"));deadline=Time.realtimeSinceStartup+240;
         }
         catch(Exception ex){Debug.LogError("CATAN_LAN_MENU_FAILED 配置 "+ex.GetType().Name);Application.Quit(1);yield break;}
         var stack=new Stack();stack.Push(Verify());
@@ -112,6 +112,25 @@ public sealed class LanMenuVerification : MonoBehaviour
         Call("RequestJoinRoom",lockedRoom,server,true);Require(Get("pendingJoinRoom")!=null);
         Set("joinPassword","验收密码");Call("ConfirmJoinPassword");
         yield return Wait(()=>!app.Network.Busy&&app.Network.Room?.RoomId==locked.RoomId);Require(app.Network.SeatId!=null);
+        // 对局结束与中途返回共用同一释放路径；重复检验同地址的新房不能复用已释放的客户端。
+        for(int round=0;round<2;round++)
+        {
+            stage="返回主页后重新创建房间 "+round;
+            app.Network.Playing=true;app.ReturnToMainMenu();
+            Require(!app.Network.EndpointConfigured);
+            Require(!(bool)typeof(M6App).GetProperty("CanUseMenuEndpoint",Flags).GetValue(app));
+            Call("OpenSeparatedNetworkMenu",true);
+            yield return Wait(()=>!(bool)Get("networkWorking")&&!(bool)Get("lanPreparing"));
+            Set("networkTab",1);Set("menuRule",0);Set("menuPlayers",4);
+            var ai=(bool[])Get("networkAi");for(int seat=1;seat<4;seat++)ai[seat]=true;
+            string previous=app.Network.RoomId;Call("CreateLanRoom");
+            yield return Wait(()=>!(bool)Get("networkWorking")&&!app.Network.Busy&&app.Network.Room!=null);
+            Require(app.Network.EndpointConfigured&&app.Network.RoomId!=previous&&string.IsNullOrEmpty(app.Network.LastError));
+            app.Network.Ready(true);yield return Wait(()=>!app.Network.Busy);
+            app.Network.StartRoom();yield return Wait(()=>app.Network.Playing);
+            Require(app.Ready);
+        }
+        yield return Capture("07-recreated-game-without-restarting");
     }
     M7Client MakeClient(string name,string pin)
     {

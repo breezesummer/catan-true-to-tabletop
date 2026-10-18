@@ -47,6 +47,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         public Hit Hit;
         public string Signature;
         public int Generation;
+        public int DieFace=-1;
         public Mesh[] OwnedMeshes;
         public Vector3 OriginalScale;
     }
@@ -60,7 +61,14 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     string group;
     int generation;
     public int ActiveCount => items.Values.Count(i => i.Object.activeSelf);
-    public void Initialize(TabletopScene owner) { scene = owner; }
+    public void Initialize(TabletopScene owner)
+    {
+        scene=owner;
+        // 在开局时准备有限骰面与资源贴图，避免首次动画中同步生成或加载。
+        for(int die=0;die<3;die++)for(int face=die==2?0:1;face<=(die==2?3:6);face++)DieTexture(die,face);
+        for(int good=0;good<8;good++)EntityCardAssets.ResourceOrCommodityFront(good);
+        EntityCardAssets.Texture(EntityCardAssets.Defender.Front);
+    }
     public void Begin(string name) { group = name + "/"; generation++; }
     public void End()
     {
@@ -307,6 +315,8 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         position.x += Mathf.Sin(progress*Mathf.PI*6+index)*motion*side*.15f;
         item.Object.transform.position = position;
         item.Object.transform.rotation = Quaternion.Euler(0,28+(rolling ? (1-Mathf.Pow(1-progress,3))*720*(index%2==0?1:-1) : 0),0);
+        if(item.DieFace==value)return item.Hit;
+        item.DieFace=value;
         int[] values;
         if(index==2)
         {

@@ -120,7 +120,7 @@ public sealed partial class M3App
             {
                 var error=OperationSelection.ValidateTrade(TradeValidationSnapshot(),t);if(error!=null)return error;
                 var c=NewCommand(t.Bank?CommandKind.BankTrade:CommandKind.ProposeTrade);
-                if(t.Bank){int g=Array.FindIndex(t.Give,n=>n>0),r=Array.FindIndex(t.Receive,n=>n>0);c.GiveResource=(Resource)g;c.ReceiveResource=(Resource)r;c.GiveAmount=t.Give[g];c.ReceiveAmount=t.Receive[r];}
+                if(t.Bank){int g=Array.FindIndex(t.Give,n=>n>0),r=Array.FindIndex(t.Receive,n=>n>0);c.GiveResource=(Resource)g;c.ReceiveResource=(Resource)r;c.GiveAmount=t.Give[g];c.ReceiveAmount=t.Receive.Sum();c.Receive=new ResourceBag();for(int i=0;i<5;i++)c.Receive[(Resource)i]=t.Receive[i];}
                 else{c.Give=new ResourceBag();c.Receive=new ResourceBag();c.OtherPlayerId=t.OtherPlayer;for(int i=0;i<5;i++){c.Give[(Resource)i]=t.Give[i];c.Receive[(Resource)i]=t.Receive[i];}}
                 var result=Submit(c);return result!=null&&result.Success?null:status;
             };

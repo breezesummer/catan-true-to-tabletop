@@ -120,7 +120,8 @@ public class M4CoreRulesTests
     }
     [Fact] public void DefenderWinAwardsOnePointAndDeactivatesAllKnights()
     {
-        var sites=Sites(2);var game=Fixture(s=>{s.Cities=new[]{Piece(sites[0])};s.Knights=new[]{new Knight {PlayerId="P2",LocationId=sites[1],Level=1,Active=true}};s.BarbarianPosition=6;Roll(s,7);});Accepted(game,Cmd(CommandKind.RollDice));Assert.Equal(1,game.GetPlayerView("P2").OwnVictoryPoints);Assert.False(game.GetPlayerView("P1").Board.Knights.Single().Active);Assert.Equal(0,game.GetPlayerView("P1").BarbarianPosition);
+        var sites=Sites(2);var game=Fixture(s=>{s.Cities=new[]{Piece(sites[0])};s.Knights=new[]{new Knight {PlayerId="P2",LocationId=sites[1],Level=1,Active=true}};s.BarbarianPosition=6;Roll(s,7);});Accepted(game,Cmd(CommandKind.RollDice));var reveal=Assert.Single(TabletopCardReveal.From(Assert.Single(game.GetHistory("P1"))));Assert.Equal("卡坦保卫者",reveal.CardName);Assert.Equal("P2",reveal.PlayerId);Assert.True(reveal.ImmediateVictory);
+        Assert.Equal(1,game.GetPlayerView("P2").OwnVictoryPoints);Assert.False(game.GetPlayerView("P1").Board.Knights.Single().Active);Assert.Equal(0,game.GetPlayerView("P1").BarbarianPosition);
     }
     [Fact] public void TiedDefendersChooseProgressInTurnOrderBeforeProduction()
     {

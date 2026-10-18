@@ -177,10 +177,10 @@ public sealed class OperationSelection
             if (trade.Give[i] > 0 && trade.Receive[i] > 0) return "同一种资源不能同时付出和获得";
         }
         if (!trade.Bank) return trade.OtherPlayer == OperationTrade.AllPlayers && snapshot.OtherPlayers.Length > 0 || snapshot.OtherPlayers.Contains(trade.OtherPlayer) ? null : "请选择交易玩家";
-        if (trade.Give.Count(n => n > 0) != 1 || trade.Receive.Count(n => n > 0) != 1) return "银行每次交换一种资源";
+        if (trade.Give.Count(n => n > 0) != 1) return "请选择一种付出资源";
         int give = Array.FindIndex(trade.Give, n => n > 0), receive = Array.FindIndex(trade.Receive, n => n > 0);
-        if (snapshot.Rates[give] < 2 || trade.Give[give] != snapshot.Rates[give] * trade.Receive[receive]) return "数量不符合当前港口比例";
-        return trade.Receive[receive] > snapshot.Bank[receive] ? "银行库存不足" : null;
+        if (snapshot.Rates[give] < 2 || trade.Give[give] != snapshot.Rates[give] * trade.Receive.Sum()) return "数量不符合当前港口比例";
+        return Enumerable.Range(0, snapshot.GoodCount).Any(i => trade.Receive[i] > snapshot.Bank[i]) ? "银行库存不足" : null;
     }
 }
 

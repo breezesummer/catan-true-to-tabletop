@@ -20,6 +20,8 @@ public sealed class M7Client : MonoBehaviour
 {
     public string Endpoint { get; private set; }
     public string Fingerprint { get; private set; }
+    // 保留的服务地址不代表传输仍可用；返回主页会释放客户端。
+    public bool EndpointConfigured=>http!=null&&lifetime!=null&&!lifetime.IsCancellationRequested;
     public string Status { get; private set; }="填写服务地址，或启动本机局域网服务。";
     public string LastError { get; private set; }="";
     public void ClearError(){LastError="";}

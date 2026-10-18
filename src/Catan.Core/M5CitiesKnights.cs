@@ -195,6 +195,20 @@ namespace Catan.Core.M5
         }
         private void BankTrade(GameState s,PlayerState p,Command c)
         {
+            if(c.Receive!=null&&Resources.Any(resource=>c.Receive[resource]!=0)||c.ReceiveCommodities!=null&&Commodities.Any(commodity=>c.ReceiveCommodities[commodity]!=0))
+            {
+                var resources=c.Receive??new ResourceBag();var commodities=c.ReceiveCommodities??new CommodityBag();
+                Require(ValidBag(resources)&&ValidBag(commodities),"InvalidTrade","请求资源无效。");
+                int total=resources.Total+commodities.Total;
+                Require(total>0&&total<=19&&c.GiveAmount>0&&c.GiveAmount<=19&&c.GiveAmount%total==0,"InvalidRatio","交换比例无效。");
+                int ratePerCard=c.GiveAmount/total;
+                for(int i=0;i<8;i++)
+                {
+                    int amount=i<5?resources[(Resource)i]:commodities[(Commodity)(i-5)];if(amount==0)continue;
+                    BankTrade(s,p,new Command{GiveIsCommodity=c.GiveIsCommodity,GiveResource=c.GiveResource,GiveCommodity=c.GiveCommodity,ReceiveIsCommodity=i>=5,ReceiveResource=i<5?(Resource)i:Resource.Wood,ReceiveCommodity=i>=5?(Commodity)(i-5):Commodity.Cloth,GiveAmount=ratePerCard*amount,ReceiveAmount=amount});
+                }
+                return;
+            }
             Require((c.GiveIsCommodity?Enum.IsDefined(typeof(Commodity),c.GiveCommodity):Enum.IsDefined(typeof(Resource),c.GiveResource))&&(c.ReceiveIsCommodity?Enum.IsDefined(typeof(Commodity),c.ReceiveCommodity):Enum.IsDefined(typeof(Resource),c.ReceiveResource)),"InvalidTrade","请选择有效资源或商品。");
             Require(c.GiveIsCommodity!=c.ReceiveIsCommodity||(c.GiveIsCommodity?c.GiveCommodity!=c.ReceiveCommodity:c.GiveResource!=c.ReceiveResource),"InvalidTrade","请选择不同的交换牌。");
             int rate=c.GiveIsCommodity?CommodityTradeRate(s,p.Id,c.GiveCommodity):TradeRate(s,p.Id,c.GiveResource);

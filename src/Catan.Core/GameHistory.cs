@@ -89,6 +89,7 @@ namespace Catan.Core
                 AddCards(groups, previous.Development, player.Development, player.Id, "development", action, counterpart, false);
                 AddCards(groups, previous.Progress, player.Progress, player.Id, "progress", action, counterpart, false);
                 AddCards(groups, previous.Victory, player.Victory, player.Id, "progress", action, counterpart, true);
+                if (player.DefenderPoints != previous.DefenderPoints) AddStatus(groups, player.Id, "defender", "卡坦保卫者", player.DefenderPoints - previous.DefenderPoints);
                 if (player.ClothTokens != previous.ClothTokens) AddStatus(groups, player.Id, "count", "布匹筹码", player.ClothTokens - previous.ClothTokens);
                 if (player.WonderLevel != previous.WonderLevel) AddStatus(groups, player.Id, "status", "奇迹（现为 " + player.WonderLevel + " 级）", player.WonderLevel - previous.WonderLevel);
                 for (int i = 0; i < player.Improvements.Length; i++)
@@ -180,7 +181,7 @@ namespace Catan.Core
     {
         internal string Id;
         internal int[] Goods;
-        internal int ClothTokens, WonderLevel;
+        internal int ClothTokens, WonderLevel, DefenderPoints;
         internal int[] Improvements = Array.Empty<int>();
         internal string[] Development, Progress = Array.Empty<string>(), Victory = Array.Empty<string>();
     }

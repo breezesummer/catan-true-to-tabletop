@@ -173,6 +173,7 @@ public sealed class TabletopCollectionTimeline
             var roll=entries.OrderBy(e=>e.Sequence).LastOrDefault(e=>e.Dice1>0);lastRoll=roll==null?0:roll.Dice1+roll.Dice2;
             productionPending=roll!=null&&lastRoll!=7&&!entries.Where(e=>e.Sequence>=roll.Sequence).Any(e=>e.Kind=="EndTurn"||e.Changes.Any(c=>c.Category=="goods"&&c.Amount>0));return;
         }
+        if(latest==sequence){flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);return;}
         var updates=entries.Where(e=>e.Sequence>sequence).OrderBy(e=>e.Sequence).ToArray();
         var sourceTiles=CopyTiles(observedTiles??tiles??Array.Empty<TabletopCollectionTile>());
         int inventions=updates.Count(e=>e.Action=="打出「发明」");bool numbersReliable=true;

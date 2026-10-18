@@ -56,3 +56,6 @@ Desktop.ini
 /Unity/Catan/*.csproj
 /Unity/Catan/*.sln
 /Unity/Catan/*.slnx
+
+# 本地可玩版本与构建验证产物
+/game version/

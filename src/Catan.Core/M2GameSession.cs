@@ -208,6 +208,14 @@ namespace Catan.Core.M2
                     Pay(s, p, new ResourceBag { Wheat = 2, Ore = 3 }); s.Settlements = s.Settlements.Where(x => x.LocationId != c.TargetId).ToArray();
                     s.Cities = Append(s.Cities, Placement(c.TargetId, p.Id)); p.Pieces.Cities--; p.Pieces.Settlements++; break;
                 case CommandKind.BankTrade:
+                    if(c.Receive!=null&&Resources.Any(resource=>c.Receive[resource]!=0))
+                    {
+                        Require(ValidBag(c.Receive)&&c.Receive.Total>0&&c.GiveAmount>0&&c.GiveAmount<=19&&c.GiveAmount%c.Receive.Total==0,"InvalidRatio","交换比例无效。");
+                        int batchRate=c.GiveAmount/c.Receive.Total;
+                        foreach(Resource resource in Resources)if(c.Receive[resource]>0)
+                            Apply(s,new Command{PlayerId=c.PlayerId,Kind=CommandKind.BankTrade,GiveResource=c.GiveResource,ReceiveResource=resource,GiveAmount=batchRate*c.Receive[resource],ReceiveAmount=c.Receive[resource]});
+                        break;
+                    }
                     ActionPhase(s); Require(Enum.IsDefined(typeof(Resource), c.GiveResource) && Enum.IsDefined(typeof(Resource), c.ReceiveResource) && c.GiveResource != c.ReceiveResource, "InvalidTrade", "请选择不同的有效资源。");
                     var rate = TradeRate(s, p.Id, c.GiveResource);
                     Require(c.ReceiveAmount > 0 && c.ReceiveAmount <= 19 && c.GiveAmount > 0 && c.GiveAmount <= 19 &&

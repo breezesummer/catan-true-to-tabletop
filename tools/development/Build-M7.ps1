@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='.local/Catan1.6.3-AudioVisual')
+param([switch]$VerifyPlayer,[string]$OutputRoot='game version/Catan1.6.4-Trade-Animation-History')
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m7FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))

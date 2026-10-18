@@ -573,16 +573,18 @@ public sealed partial class OperationDock
         var style=new GUIStyle(center){fontSize=14,wordWrap=false,alignment=TextAnchor.MiddleLeft};
         string title=b.Name+"：";
         float titleWidth=style.CalcSize(new GUIContent(title)).x+6;
-        float width=titleWidth+Math.Max(40,goods.Length*58)+20;
+        float width=titleWidth+Math.Max(40,goods.Sum(good=>b.Cost[good])*32)+20;
         tooltipRect=new Rect(Mathf.Clamp(costAnchor.x-width/2,12,1428-width),Mathf.Clamp(costAnchor.y-55,12,817),width,45);
         Paper(tooltipRect);float x=tooltipRect.x+10;
         Label(new Rect(x,tooltipRect.y,titleWidth,45),title,style);x+=titleWidth;
         if(goods.Length==0)Label(new Rect(x,tooltipRect.y,40,45),"免费",style);
         foreach(int good in goods)
         {
-            OperationIconAssets.DrawGood(new Rect(x,tooltipRect.y+4,26,37),good);
-            style.normal.textColor=b.Cost[good]>s.Goods[good]?Missing:Ink;
-            Label(new Rect(x+29,tooltipRect.y,27,45),"×"+b.Cost[good],style);x+=58;
+            for(int ordinal=0;ordinal<b.Cost[good];ordinal++)
+            {
+                if(ordinal>=s.Goods[good])ModernOperationUI.Round(new Rect(x-2,tooltipRect.y+2,30,41),Missing);
+                OperationIconAssets.DrawGood(new Rect(x,tooltipRect.y+4,26,37),good);x+=32;
+            }
         }
     }
     void DrawCardPreview(OperationSnapshot s)
@@ -732,13 +734,16 @@ public sealed partial class OperationDock
             TradeCard(face,i,missing);
             var caption=new GUIStyle(center);if(missing)caption.normal.textColor=Missing;
             Label(new Rect(x,y+79,100,25),Names[i]+" × "+bag[i],caption);
-            if(paying)Label(new Rect(x+69,y+6,32,26),"有 "+s.Goods[i],small);
+            if(paying&&!portTrade)Label(new Rect(x+69,y+6,32,26),"有 "+s.Goods[i],small);
             else if(bank&&s.Bank[i]==0)Label(new Rect(x+60,y+6,43,48),"库存为0",small);
-            if(bank&&paying)Label(new Rect(x+69,y+37,32,26),TradeValidationSnapshot(s).Rates[i]+":1",small);
+            if(bank&&paying&&!portTrade)Label(new Rect(x+69,y+37,32,26),TradeValidationSnapshot(s).Rates[i]+":1",small);
             int delta=TabletopCardInput.Delta(face);
             if(delta!=0)
             {
-                message=OperationCardQuantity.Change(bag,i,delta,bank&&!paying?s.Bank[i]:i<5?19:12,int.MaxValue,bank)??"";
+                int step=portTrade&&paying?TradeValidationSnapshot(s).Rates[i]:1;
+                int maximum=bank&&!paying?s.Bank[i]:i<5?19:12;
+                if(delta>0&&bag[i]+step>maximum)message="数量已达到上限，不允许继续选择。";
+                else for(int n=0;n<step;n++)message=OperationCardQuantity.Change(bag,i,delta,maximum,int.MaxValue,bank&&paying)??"";
                 if(paying)for(int good=0;good<8;good++)Selection.SetCount(good,bag[good],s.Goods[good]);
             }
         }

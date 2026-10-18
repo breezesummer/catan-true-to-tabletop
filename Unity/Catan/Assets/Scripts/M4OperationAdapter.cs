@@ -137,7 +137,7 @@ public sealed partial class M4App
                 if(t.Bank)
                 {
                     int g=Array.FindIndex(t.Give,n=>n>0),r=Array.FindIndex(t.Receive,n=>n>0);c.GiveIsCommodity=g>=5;c.ReceiveIsCommodity=r>=5;
-                    if(g<5)c.GiveResource=(Resource)g;else c.GiveCommodity=(Commodity)(g-5);if(r<5)c.ReceiveResource=(Resource)r;else c.ReceiveCommodity=(Commodity)(r-5);c.GiveAmount=t.Give[g];c.ReceiveAmount=t.Receive[r];
+                    if(g<5)c.GiveResource=(Resource)g;else c.GiveCommodity=(Commodity)(g-5);if(r<5)c.ReceiveResource=(Resource)r;else c.ReceiveCommodity=(Commodity)(r-5);c.GiveAmount=t.Give[g];c.ReceiveAmount=t.Receive.Sum();c.Receive=new ResourceBag();for(int i=0;i<5;i++)c.Receive[(Resource)i]=t.Receive[i];for(int i=5;i<8;i++)c.ReceiveCommodities[(Commodity)(i-5)]=t.Receive[i];
                 }
                 else{c.OtherPlayerId=t.OtherPlayer;for(int i=0;i<8;i++){if(i<5){c.Give[(Resource)i]=t.Give[i];c.Receive[(Resource)i]=t.Receive[i];}else{c.GiveCommodities[(Commodity)(i-5)]=t.Give[i];c.ReceiveCommodities[(Commodity)(i-5)]=t.Receive[i];}}}
                 var result=Submit(c);return result!=null&&result.Success?null:status;

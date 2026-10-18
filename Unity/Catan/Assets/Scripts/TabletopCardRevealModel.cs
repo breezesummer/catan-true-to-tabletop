@@ -16,7 +16,7 @@ public sealed class TabletopCardReveal
     {
         if(entry.Kind=="PlayKnight"||entry.Kind=="PlayRoadBuilding"||entry.Kind=="PlayYearOfPlenty"||entry.Kind=="PlayMonopoly"||entry.Kind=="PlayProgressCard")
             yield return new TabletopCardReveal{PlayerId=entry.PlayerId,CardName=(entry.Action??"").Replace("打出「","").TrimEnd('」'),Progress=entry.Kind=="PlayProgressCard"};
-        foreach(var gain in (entry.Changes??Array.Empty<GameHistoryChange>()).Where(c=>c.Category=="progress"&&!c.IsPrivate&&c.Amount>0&&IsVictory(c.Name)))
+        foreach(var gain in (entry.Changes??Array.Empty<GameHistoryChange>()).Where(c=>!c.IsPrivate&&c.Amount>0&&(c.Category=="defender"||c.Category=="progress"&&IsVictory(c.Name))))
             for(int i=0;i<gain.Amount;i++)
                 yield return new TabletopCardReveal{PlayerId=gain.PlayerId,CardName=gain.Name,Progress=true,ImmediateVictory=true,Roll=entry.Kind=="RollDice"?entry:null};
     }

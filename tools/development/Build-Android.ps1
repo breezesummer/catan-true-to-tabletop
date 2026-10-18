@@ -1,5 +1,5 @@
 param(
-    [string]$OutputRoot = '.local/Catan1.6.3-AudioVisual',
+    [string]$OutputRoot = 'game version/Catan1.6.4-Trade-Animation-History',
     [switch]$Arm64Only
 )
 $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()
