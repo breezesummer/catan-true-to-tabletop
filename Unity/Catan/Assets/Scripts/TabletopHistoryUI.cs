@@ -102,7 +102,7 @@ public sealed partial class TabletopHistoryUI
             float y=i*44;if(y+44<position.y||y>position.y+viewport.height)continue;
             var entry=entries[i];
             ModernOperationUI.Fill(new Rect(0,y+8,3,22),BoardRenderer.SeatColor(entry.PlayerId));
-            ModernOperationUI.Label(new Rect(12,y+5,185,30),"第 "+entry.Turn+" 回合 · "+M6App.PlayerLabel(entry.PlayerId),M6App.PlayerNameStyle(ModernOperationUI.Text,entry.PlayerId));
+            DrawCardLine(new Rect(12,y+5,185,30),"第 "+entry.Turn+" 回合 · ",entry.PlayerId,"",Array.Empty<GameHistoryChange>(),null,new GUIStyle(ModernOperationUI.Text){wordWrap=false});
             Die(new Rect(211,y+5,28,28),entry.Dice1,new Color(.64f,.11f,.08f),false);
             Die(new Rect(245,y+5,28,28),entry.Dice2,new Color(.94f,.90f,.80f),false);
             if(!string.IsNullOrEmpty(entry.EventDie))Die(new Rect(279,y+5,28,28),EventFace(entry.EventDie),new Color(.21f,.25f,.27f),true);
@@ -115,6 +115,7 @@ public sealed partial class TabletopHistoryUI
     sealed class HistoryLine
     {
         public string Player,Prefix,Suffix,Partner;
+        public bool Quote,Roll;
         public GameHistoryChange[] Cards=Array.Empty<GameHistoryChange>();
         public GameHistoryChange[] ReceivedCards=Array.Empty<GameHistoryChange>();
     }
@@ -125,6 +126,10 @@ public sealed partial class TabletopHistoryUI
         if(lines.TryGetValue(entry,out var cached))return cached;
         var result=new System.Collections.Generic.List<HistoryLine>();
         var changes=entry.Changes??Array.Empty<GameHistoryChange>();
+        if(entry.Kind=="ProposeTrade")
+            return lines[entry]=new[]{new HistoryLine{Player=entry.PlayerId,Prefix="提出交易：",Quote=true,
+                Cards=changes.Where(c=>c.Category=="offer"&&c.Amount<0).ToArray(),
+                ReceivedCards=changes.Where(c=>c.Category=="offer"&&c.Amount>0).ToArray()}};
         if(entry.Kind=="BankTrade"||entry.Kind=="AcceptTrade"||entry.Action=="完成商业港口交换")
         {
             // 只使用当前观看者已获准读取的成交变化，不从报价或权威手牌补全隐藏牌种。
@@ -137,7 +142,7 @@ public sealed partial class TabletopHistoryUI
         }
         bool paid=changes.Any(c=>c.Category=="goods"&&c.Amount<0&&c.PlayerId==entry.PlayerId);
         bool build=paid&&(entry.Kind.StartsWith("Build")||entry.Kind=="RecruitKnight"||entry.Kind=="PromoteKnight"||entry.Kind=="ActivateKnight"||entry.Kind=="ImproveCity"||entry.Kind=="BuyDevelopmentCard");
-        if(!build)result.Add(new HistoryLine{Player=entry.PlayerId,Prefix=M6App.DisplayPlayerText(entry.Action)});
+        if(!build)result.Add(new HistoryLine{Player=entry.PlayerId,Prefix=M6App.DisplayPlayerText(entry.Action),Roll=entry.Dice1>0});
         foreach(var group in changes.Where(c=>c.GoodIndex>=0&&c.GoodIndex<8).GroupBy(c=>new{c.PlayerId,Sign=Math.Sign(c.Amount),c.Category}))
         {
             string prefix=group.Key.Category=="offer"?(group.Key.Sign<0?"报价付出":"报价请求"):group.Key.Sign>0?"收取了":"打出了";
@@ -152,7 +157,7 @@ public sealed partial class TabletopHistoryUI
         }
         return lines[entry]=result.ToArray();
     }
-    static float Height(GameHistoryEntry entry,float width,bool compact)=>Lines(entry).Sum(line=>line.ReceivedCards.Length>0?64:32)+(entry.Dice1>0?34:0)+30;
+    static float Height(GameHistoryEntry entry,float width,bool compact)=>Lines(entry).Sum(line=>!line.Quote&&line.ReceivedCards.Length>0?64:32)+30;
     Vector2 DrawRows(Rect viewport,GameHistoryEntry[] entries,Vector2 position,bool compact)
     {
         MobileTabletop.ScrollTouch(viewport,ref position);
@@ -176,45 +181,57 @@ public sealed partial class TabletopHistoryUI
         float y=r.y+26;
         foreach(var line in Lines(entry))
         {
-            var style=M6App.PlayerNameStyle(new GUIStyle(ModernOperationUI.Text){fontSize=compact?11:15,wordWrap=false},line.Player);
-            DrawCardLine(new Rect(r.x+9,y,r.width-18,30),M6App.PlayerLabel(line.Player)+" "+line.Prefix,line.Cards,line.Suffix,style);y+=32;
-            if(line.ReceivedCards.Length>0)
+            var style=new GUIStyle(ModernOperationUI.Text){fontSize=compact?11:15,wordWrap=false};
+            DrawCardLine(new Rect(r.x+9,y,r.width-18,30),"",line.Player," "+line.Prefix,line.Cards,line.Suffix,style,
+                line.Quote?line.ReceivedCards:null,line.Roll?entry:null);y+=32;
+            if(!line.Quote&&line.ReceivedCards.Length>0)
             {
-                var partnerStyle=M6App.PlayerNameStyle(new GUIStyle(ModernOperationUI.Text){fontSize=compact?11:15,wordWrap=false},line.Partner);
-                string partner=PlayerIdentityModel.IsPlayerId(line.Partner)?M6App.PlayerLabel(line.Partner):line.Partner;
-                DrawCardLine(new Rect(r.x+9,y,r.width-18,30),"跟"+partner+"交易了",line.ReceivedCards,null,partnerStyle);y+=32;
+                DrawCardLine(new Rect(r.x+9,y,r.width-18,30),"跟",line.Partner,"交易了",line.ReceivedCards,null,
+                    new GUIStyle(ModernOperationUI.Text){fontSize=compact?11:15,wordWrap=false});y+=32;
             }
-        }
-        if(entry.Dice1>0)
-        {
-            Die(new Rect(r.x+9,y,26,26),entry.Dice1,new Color(.64f,.11f,.08f),false);
-            Die(new Rect(r.x+41,y,26,26),entry.Dice2,new Color(.94f,.90f,.80f),false);
-            if(!string.IsNullOrEmpty(entry.EventDie))Die(new Rect(r.x+73,y,26,26),EventFace(entry.EventDie),new Color(.21f,.25f,.27f),true);
         }
         ModernOperationUI.Fill(new Rect(r.x+7,r.yMax-3,r.width-14,1),new Color(.24f,.32f,.31f,.45f));
     }
-    static void DrawCardLine(Rect r,string prefix,GameHistoryChange[] cards,string suffix,GUIStyle style)
+    void DrawCardLine(Rect r,string beforeName,string player,string action,GameHistoryChange[] cards,string suffix,GUIStyle style,
+        GameHistoryChange[] requested=null,GameHistoryEntry roll=null)
     {
         // 中文衬线字体使用完整行高，避免继承默认标签内边距后被短文本框裁掉笔画。
         style.padding=new RectOffset(0,0,0,0);style.alignment=TextAnchor.MiddleLeft;
-        float prefixWidth=style.CalcSize(new GUIContent(prefix)).x+5;
-        float suffixWidth=style.CalcSize(new GUIContent(suffix??"")).x;
-        float cardsWidth=cards.Sum(c=>c.GoodIndex<0?style.CalcSize(new GUIContent(Math.Abs(c.Amount)+"张手牌")).x+5:Math.Abs(c.Amount)>1?48:24);
-        float scale=Math.Min(1,r.width/Math.Max(1,prefixWidth+cardsWidth+suffixWidth));
-        int fontSize=style.fontSize;style.fontSize=Math.Max(7,(int)(fontSize*scale));float x=r.x;
-        ModernOperationUI.Label(new Rect(x,r.y,prefixWidth*scale,30),prefix,style);x+=prefixWidth*scale;
-        foreach(var card in cards)
+        style.richText=false;
+        var metrics=new GUIStyle(style);
+        string name=PlayerIdentityModel.IsPlayerId(player)?M6App.PlayerLabel(player):player??"";
+        float TextWidth(string value)=>metrics.CalcSize(new GUIContent(value??"")).x;
+        float CardsWidth(GameHistoryChange[] values)=>values.Sum(c=>c.GoodIndex<0?TextWidth(Math.Abs(c.Amount)+"张手牌")+5:
+            24+(Math.Abs(c.Amount)>1?TextWidth("×"+Math.Abs(c.Amount))+4:0));
+        int diceCount=roll==null?0:string.IsNullOrEmpty(roll.EventDie)?2:3;
+        float width=TextWidth(beforeName)+TextWidth(name)+TextWidth(action)+5+CardsWidth(cards)+TextWidth(suffix)+diceCount*32;
+        if(requested!=null)width+=TextWidth(" → ")+CardsWidth(requested);
+        float scale=Math.Min(1,r.width/Math.Max(1,width));
+        style.fontSize=Math.Max(7,(int)(style.fontSize*scale));float x=r.x;
+        // 姓名独立绘制；动作、数量、箭头及其余文字始终使用主题默认文字色。
+        void Text(string value,GUIStyle textStyle,float padding=0)
         {
-            if(card.GoodIndex<0)
-            {
-                string hidden=Math.Abs(card.Amount)+"张手牌";style.fontSize=fontSize;
-                float width=style.CalcSize(new GUIContent(hidden)).x+5;style.fontSize=Math.Max(7,(int)(fontSize*scale));
-                ModernOperationUI.Label(new Rect(x,r.y,width*scale,30),hidden,style);x+=width*scale;continue;
-            }
-            EntityCardAssets.DrawCardFace(new Rect(x,r.y+2,20*scale,28*scale),EntityCardAssets.ResourceOrCommodityFront(card.GoodIndex));x+=24*scale;
-            if(Math.Abs(card.Amount)>1){ModernOperationUI.Label(new Rect(x,r.y,24*scale,30),"×"+Math.Abs(card.Amount),style);x+=24*scale;}
+            float span=(TextWidth(value)+padding)*scale;
+            ModernOperationUI.Label(new Rect(x,r.y,span,30),value??"",textStyle);x+=span;
         }
-        ModernOperationUI.Label(new Rect(x,r.y,suffixWidth*scale+2,30),suffix??"",style);
+        void Cards(GameHistoryChange[] values)
+        {
+            foreach(var card in values)
+            {
+                if(card.GoodIndex<0){Text(Math.Abs(card.Amount)+"张手牌",style,5);continue;}
+                EntityCardAssets.DrawCardFace(new Rect(x,r.y+2,20*scale,28*scale),EntityCardAssets.ResourceOrCommodityFront(card.GoodIndex));x+=24*scale;
+                if(Math.Abs(card.Amount)>1)Text("×"+Math.Abs(card.Amount),style,4);
+            }
+        }
+        Text(beforeName,style);Text(name,M6App.PlayerNameStyle(style,player));Text(action,style,5);Cards(cards);
+        if(requested!=null){Text(" → ",style);Cards(requested);}
+        Text(suffix,style);
+        if(roll!=null)
+        {
+            Die(new Rect(x,r.y+2,26*scale,26*scale),roll.Dice1,new Color(.64f,.11f,.08f),false);x+=32*scale;
+            Die(new Rect(x,r.y+2,26*scale,26*scale),roll.Dice2,new Color(.94f,.90f,.80f),false);x+=32*scale;
+            if(diceCount==3)Die(new Rect(x,r.y+2,26*scale,26*scale),EventFace(roll.EventDie),new Color(.21f,.25f,.27f),true);
+        }
     }
     // 骰面使用真实圆点与事件符号；基础版只有两骰，不伪造第三骰。
     static int EventFace(string value) => value=="Trade"?1:value=="Politics"?2:value=="Science"?3:0;
@@ -227,7 +244,8 @@ public sealed partial class TabletopHistoryUI
         }
         ModernOperationUI.Round(r,color);
         Color ink=color.r>.8f?new Color(.15f,.14f,.13f):new Color(.99f,.95f,.85f);
-        Action<float,float> dot=(x,y)=>TabletopUI.Token(new Rect(r.x+r.width*x-2,r.y+r.height*y-2,4,4),ink);
+        float dotSize=r.width*4/26;
+        Action<float,float> dot=(x,y)=>TabletopUI.Token(new Rect(r.x+r.width*x-dotSize/2,r.y+r.height*y-dotSize/2,dotSize,dotSize),ink);
         if(value%2==1)dot(.5f,.5f);
         if(value>=2){dot(.25f,.25f);dot(.75f,.75f);}
         if(value>=4){dot(.75f,.25f);dot(.25f,.75f);}
