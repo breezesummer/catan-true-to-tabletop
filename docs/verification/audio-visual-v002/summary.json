@@ -2,7 +2,7 @@
   "date": "2026-10-18",
   "version": "1.6.3",
   "title": "音效、五景动态主页与地图预览",
-  "status": "构建与自动检查通过；实际窗口画面、人工听感和安卓真机待验",
+  "status": "构建、自动检查与Windows可见窗口画面检查通过；人工听感和安卓真机待验",
   "artifacts": {
     "buildRoot": ".local/Catan1.6.3-AudioVisual",
     "windows": "Builds/Windows/Catan1.6.3.exe",
@@ -29,7 +29,7 @@
     "audioUnitTests": {"passed": 217, "failed": 0, "report": "audio-tests.trx"},
     "audioResources": {"files": 53, "cleanRebuildIdentical": true, "losslessPcmImport": true, "report": "audio-assets.json"},
     "previewResources": {"checks": 294, "cleanRebuildIdentical": true, "report": "map-previews.json"},
-    "windowsRuntime": {"checks": 259, "passed": true, "screenCaptures": 0, "report": "runtime.json"},
+    "windowsRuntime": {"checks": 302, "passed": true, "screenCaptures": 19, "report": "runtime.json", "captureManifest": "visible-captures.json", "resolution": [1440, 900], "processExitCode": 0},
     "unitySourceIntegrity": {"checkedTextFiles": 1771, "passed": true},
     "windowsBuild": true,
     "androidBuild": true,
@@ -43,16 +43,17 @@
     "androidPackage": {"report": "android-apk.json", "passed": true, "versionCode": 10603, "architectures": ["arm64-v8a", "x86_64"], "deviceInstallTested": false},
     "userSaveTouched": false,
     "humanAudioListening": false,
-    "visualReview": "原画与预览拼图已查看，完整游戏窗口尚无有效截图；可见窗口授权待回复",
+    "visualReview": "用户明确允许显示窗口后完成。五主题实际渲染方向与色彩正常，双帧均有变化；声音与风景设置、四玩法封面、四类地图页及联机预览无明显遮挡或裁切。窗口已退出，原设置已恢复，存档未改动。",
+    "invocationNotes": "本轮运行脚本已根据进程退出码和成功标记输出通过结果；外层PowerShell随后误读遗留LASTEXITCODE而报错。已独立核对302项结果、19张截图、成功标记及无运行异常，没有把外层误报当作游戏失败或重复计数。",
     "failedAttempts": [
       "首次Windows运行发现默认Vorbis导入使抽牌音效采样峰值超过预算；改为PCM无损导入，保持原验收阈值，重建后53段运行采样通过。",
-      "隐藏窗口未绘制，截图为黑帧；此尝试不计为视觉验收。259项结果使用明确跳过捕图的独立运行。"
+      "隐藏窗口未绘制，截图为黑帧；此尝试不计为视觉验收。首次259项结果明确跳过捕图；后续获得可见窗口授权后302项完整检查通过，以后者为最终运行结果，不叠加重复计数。"
     ]
   },
   "retention": {"keep": 5, "currentNamedBuildDirectories": 3, "removed": [], "officialReleasesPreserved": true},
   "limitations": [
     "本机缺少旧安卓签名密钥，沿用新内测签名，不能直接覆盖旧签名版本；未执行卸载或安装。",
-    "五主题实际动画、设置排版与画面方向仍需可见窗口确认。",
+    "本次完整界面截图来自Windows 1440×900窗口，不据此宣称其他分辨率或安卓设备画面已经验收。",
     "自动采样和事件映射检查不等同扬声器／耳机听感、安卓真机或长期性能验收。",
     "未满足当前阶段全部退出条件，未推进ROADMAP，也未创建公开发行版。"
   ]
