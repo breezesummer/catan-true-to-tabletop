@@ -1,11 +1,12 @@
 using UnityEngine;
 
-// 五幅原画与局部景物动画；展示时间独立于规则、存档和权威随机状态。
+// 原版港湾与五幅风景原画；展示时间独立于规则、存档和权威随机状态。
 public static class PastoralMenuScene
 {
-    public const int ThemeCount=5;
-    public static readonly string[] Names={"晨光港湾","金色麦田","林间溪谷","雪山城堡","月夜灯港"};
-    public static readonly string[] Descriptions={"波光与海鸟，陪你启航","风过麦田，丰收正当时","溪流与落叶，山林慢时光","轻雪落城，灯火待归人","月光入港，星灯映海面"};
+    public const int ThemeCount=6;
+    public const int ClassicHarbor=5;
+    public static readonly string[] Names={"晨光港湾","金色麦田","林间溪谷","雪山城堡","月夜灯港","经典港湾"};
+    public static readonly string[] Descriptions={"波光与海鸟，陪你启航","风过麦田，丰收正当时","溪流与落叶，山林慢时光","轻雪落城，灯火待归人","月光入港，星灯映海面","海风入港，麦浪归田"};
     static readonly string[] Paths={"dawn-harbor","golden-fields","forest-stream","snow-castle","moonlit-port"};
     static readonly Texture2D[] Artworks=new Texture2D[ThemeCount];
     static Texture2D shade;
@@ -13,7 +14,8 @@ public static class PastoralMenuScene
     static RenderTexture animatedFrame;
     static int selected=-1,lastFrame=-1,lastTheme=-1,audioTheme=-1;
     static bool? animated;
-    public static int Selected { get { if(selected<0)selected=Mathf.Clamp(PlayerPrefs.GetInt("Catan.Menu.Theme.v003",0),0,ThemeCount-1);return selected; } }
+    // 本轮首次打开恢复经典原画，后续继续记住所选风景；旧五景编号不变。
+    public static int Selected { get { if(selected<0)selected=Mathf.Clamp(PlayerPrefs.GetInt("Catan.Menu.Theme.Classic.v001",ClassicHarbor),0,ThemeCount-1);return selected; } }
     public static bool Animated
     {
         get { if(!animated.HasValue)animated=PlayerPrefs.GetInt("Catan.Menu.Animated.v003",1)!=0;return animated.Value; }
@@ -23,19 +25,19 @@ public static class PastoralMenuScene
     public static void Select(int index)
     {
         selected=Mathf.Clamp(index,0,ThemeCount-1);
-        PlayerPrefs.SetInt("Catan.Menu.Theme.v003",selected);PlayerPrefs.Save();SyncAudio();
+        PlayerPrefs.SetInt("Catan.Menu.Theme.Classic.v001",selected);PlayerPrefs.Save();SyncAudio();
     }
     public static Texture2D Preview(int index)
     {
         index=Mathf.Clamp(index,0,ThemeCount-1);
-        // 固定五项缓存，无逐帧加载；导入器压缩纹理，Android 上限 1024。
-        if(Artworks[index]==null)Artworks[index]=Resources.Load<Texture2D>("PastoralMenu/v003/"+Paths[index]);
+        // 直接复用保留的原图，不重绘或覆盖源文件。
+        if(Artworks[index]==null)Artworks[index]=Resources.Load<Texture2D>(index==ClassicHarbor?"PastoralMenu/v002/medieval-harbor":"PastoralMenu/v003/"+Paths[index]);
         return Artworks[index];
     }
     static void SyncAudio()
     {
         if(TabletopAudio.Instance!=null&&audioTheme!=Selected)
-        {TabletopAudio.Instance.SetMenuTheme(Selected);audioTheme=Selected;}
+        {TabletopAudio.Instance.SetMenuTheme(Selected==ClassicHarbor?0:Selected);audioTheme=Selected;}
     }
     public static void Draw(float time)=>DrawBackground(new Rect(0,0,1440,900),time);
     public static void DrawBackground(Rect full,float time)
@@ -98,7 +100,7 @@ public static class PastoralMenuScene
             }
             return;
         }
-        if(theme==0||theme==1)
+        if(theme==0||theme==1||theme==ClassicHarbor)
         {
             for(int i=0;i<4;i++)
             {

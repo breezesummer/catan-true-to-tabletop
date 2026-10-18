@@ -18,7 +18,15 @@ Shader "Hidden/Catan/LivingLandscape"
             {
                 float2 uv=i.uv,p=float2(uv.x,1-uv.y);float t=_Clock;
                 float water=0,grass=0,leaves=0;
-                if(_Theme<.5)water=oval(p,float2(.53,.63),float2(.18,.24));
+                if(_Theme>4.5)
+                {
+                    // 原版港湾：动画限定在开阔水域、前景麦田和左上树叶，避开城堡与桥梁。
+                    water=max(oval(p,float2(.88,.385),float2(.105,.052)),oval(p,float2(.90,.605),float2(.092,.095)));
+                    water=max(water,oval(p,float2(.79,.713),float2(.065,.025)));
+                    grass=smoothstep(.79,.87,p.y)*smoothstep(.52,.67,p.x);
+                    leaves=(1-smoothstep(.32,.51,p.x))*(1-smoothstep(.15,.28,p.y));
+                }
+                else if(_Theme<.5)water=oval(p,float2(.53,.63),float2(.18,.24));
                 else if(_Theme<1.5)grass=smoothstep(.58,.78,p.y)*smoothstep(.26,.40,p.x);
                 else if(_Theme<2.5){water=oval(p,float2(.79,.78),float2(.23,.28));leaves=(1-smoothstep(.25,.51,p.x))*smoothstep(.12,.8,p.y);}
                 else if(_Theme>3.5)water=oval(p,float2(.57,.73),float2(.31,.27));
@@ -33,7 +41,7 @@ Shader "Hidden/Catan/LivingLandscape"
                 float shimmer=sin(p.y*237-t*2+sin(p.x*37))*sin(p.x*61+t*.8);
                 c.rgb+=water*shimmer*.010;
                 // 暖窗呼吸只作用于原画的暖亮像素，水面倒影同步变化。
-                if(_Theme>2.5)
+                if(_Theme>2.5&&_Theme<4.5)
                 {
                     float warm=saturate((c.r-c.b)*5)*smoothstep(.35,.75,c.r);
                     c.rgb+=warm*(.035*sin(t*1.7+p.x*31)+.016*sin(t*3.1+p.y*23))*float3(1,.62,.22);

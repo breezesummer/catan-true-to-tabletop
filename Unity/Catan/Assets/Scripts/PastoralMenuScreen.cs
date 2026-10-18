@@ -314,12 +314,13 @@ public sealed partial class M6App
     void DrawMenuLandscapeSettings()
     {
         PastoralMenuUI.Label(new Rect(499,276,800,30),"把喜欢的风景留在主页",23,null,true);
-        for(int i=0;i<PastoralMenuScene.ThemeCount;i++)
+        for(int slot=0;slot<PastoralMenuScene.ThemeCount;slot++)
         {
-            var r=new Rect(495+i*170,320,158,124);bool chosen=PastoralMenuScene.Selected==i;
+            int i=slot==0?PastoralMenuScene.ClassicHarbor:slot-1;
+            var r=new Rect(495+slot*141,320,133,124);bool chosen=PastoralMenuScene.Selected==i;
             if(PastoralMenuUI.Button(r,"",true,false,chosen))PastoralMenuScene.Select(i);
             var image=PastoralMenuScene.Preview(i);
-            if(image!=null)GUI.DrawTexture(new Rect(r.x+6,r.y+6,146,86),image,ScaleMode.ScaleAndCrop);
+            if(image!=null)GUI.DrawTexture(new Rect(r.x+6,r.y+6,r.width-12,86),image,ScaleMode.ScaleAndCrop);
             PastoralMenuUI.Label(new Rect(r.x+5,r.y+97,r.width-10,22),PastoralMenuScene.Names[i],15,chosen?PastoralMenuUI.Ivory:PastoralMenuUI.Ink,chosen,TextAnchor.MiddleCenter);
         }
         var selected=PastoralMenuScene.Preview(PastoralMenuScene.Selected);

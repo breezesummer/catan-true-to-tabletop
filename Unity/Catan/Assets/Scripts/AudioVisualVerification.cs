@@ -119,17 +119,18 @@ public sealed class AudioVisualVerification : MonoBehaviour
         }
         Require(allMaps.Count == 26, "地图配置覆盖数不符");
         Require(MenuMapPreviews.ScenarioCaption(1, "fog-islands", 4).Contains("云雾"), "迷雾地图缺少说明");
-        stage = "五套动态主页";
+        stage = "经典港湾与五套动态主页";
         var landscapeShader = Resources.Load<Shader>("PastoralMenu/v003/LivingLandscape");
         Require(landscapeShader != null && landscapeShader.isSupported, "动态风景着色器缺失或不支持");
+        CheckClassicHarbor(landscapeShader);
         Go(-1);
         PastoralMenuScene.Animated = true;
-        for (int theme = 0; theme < 5; theme++)
+        for (int theme = 0; theme < PastoralMenuScene.ThemeCount; theme++)
         {
             PastoralMenuScene.Select(theme);
             yield return new WaitForSecondsRealtime(.4f);
             Require(PastoralMenuScene.ArtworkReady, "主题原画缺失 " + theme);
-            Require(audio.MenuTheme == theme, "主题环境音没有同步 " + theme);
+            Require(audio.MenuTheme == (theme == PastoralMenuScene.ClassicHarbor ? 0 : theme), "主题环境音没有同步 " + theme);
             CheckTexture(PastoralMenuScene.Preview(theme), "主题预览 " + theme);
             if (capturesEnabled)
             {
@@ -161,7 +162,7 @@ public sealed class AudioVisualVerification : MonoBehaviour
         for (int frame = 0; !app.Ready && frame < 240; frame++) yield return null;
         Require(app.Ready, "隔离对局未就绪");
         app.ShowMenu(); string authority = app.ExportEnvelope();
-        for (int theme = 0; theme < 5; theme++)
+        for (int theme = 0; theme < PastoralMenuScene.ThemeCount; theme++)
         {
             PastoralMenuScene.Select(theme); yield return null;
             Require(app.ExportEnvelope() == authority && !app.StepAi(), "主题改变了对局");
@@ -177,6 +178,42 @@ public sealed class AudioVisualVerification : MonoBehaviour
         var data = new float[clip.samples * clip.channels];
         Require(clip.GetData(data, 0) && data.Any(v => Math.Abs(v) > .0001f), "片段静音或不可读 " + name);
         Require(data.All(v => !float.IsNaN(v) && !float.IsInfinity(v) && Math.Abs(v) <= .701f), "片段无效或超出混音余量 " + name + " 峰值=" + data.Max(v => Math.Abs(v)));
+    }
+    // 独立离屏渲染可在隐藏窗口验证局部水波，不能代替完整菜单窗口验收。
+    void CheckClassicHarbor(Shader shader)
+    {
+        var art = PastoralMenuScene.Preview(PastoralMenuScene.ClassicHarbor);
+        Require(art == Resources.Load<Texture2D>("PastoralMenu/v002/medieval-harbor"), "经典港湾必须使用保留原图");
+        var material = new Material(shader);
+        var target = RenderTexture.GetTemporary(1280, 800, 0, RenderTextureFormat.ARGB32);
+        var frame = new Texture2D(1280, 800, TextureFormat.RGB24, false);
+        var previous = RenderTexture.active;
+        try
+        {
+            material.SetFloat("_Theme", PastoralMenuScene.ClassicHarbor);
+            Color32[] first = null;
+            for (int sample = 0; sample < 2; sample++)
+            {
+                material.SetFloat("_Clock", sample * 2f);
+                Graphics.Blit(art, target, material); RenderTexture.active = target;
+                frame.ReadPixels(new Rect(0, 0, 1280, 800), 0, 0); frame.Apply();
+                File.WriteAllBytes(Path.Combine(output, "classic-offscreen-" + sample + ".png"), frame.EncodeToPNG());
+                var pixels = frame.GetPixels32();
+                if (sample == 0) { first = pixels; continue; }
+                int waterChanges = 0, castleChanges = 0;
+                for (int y = 0; y < 800; y++) for (int x = 0; x < 1280; x++)
+                {
+                    int n = y * 1280 + x;
+                    int delta = Math.Abs(first[n].r - pixels[n].r) + Math.Abs(first[n].g - pixels[n].g) + Math.Abs(first[n].b - pixels[n].b);
+                    float px = x / 1280f, py = 1 - y / 800f;
+                    if (px > .82f && px < .97f && py > .54f && py < .69f && delta > 6) waterChanges++;
+                    if (px > .60f && px < .71f && py > .17f && py < .31f && delta > 0) castleChanges++;
+                }
+                Require(waterChanges > 100, "原港湾水面没有实际动态");
+                Require(castleChanges == 0, "原港湾城堡不应随水面扭曲");
+            }
+        }
+        finally { RenderTexture.active = previous; RenderTexture.ReleaseTemporary(target); Destroy(frame); Destroy(material); }
     }
     void CheckTexture(Texture2D texture, string name) => Require(texture != null && texture.width >= 256 && texture.height >= 128, "图片缺失 " + name);
     void Go(int page) => typeof(M6App).GetMethod("NavigateMainMenu", Private).Invoke(app, new object[] { page });
