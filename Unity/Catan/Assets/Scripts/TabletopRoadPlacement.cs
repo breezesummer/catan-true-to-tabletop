@@ -39,7 +39,7 @@ public static class TabletopRoadPlacement
         if(ship)shipPreview(target,true);else roadPreview(target,true);
         if(click)
         {
-            if(roads.Contains(target)&&ships.Contains(target))choice.Open(screen(target),"选择免费建设棋子",new[]{"道路","船"},i=>place(target,i==1));
+            if(roads.Contains(target)&&ships.Contains(target))choice.Open(screen(target),"选择道路或船",new[]{"道路","船"},i=>place(target,i==1));
             else place(target,ship);
         }
     }

@@ -68,6 +68,7 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
     }
     IEnumerator Verify()
     {
+        yield return VerifyPointerMenus();
         stage="城市骑士公开夹具";
         app.StartGame("cities-knights","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
         var city=GetComponent<M4App>();var host=city.VerificationHost;

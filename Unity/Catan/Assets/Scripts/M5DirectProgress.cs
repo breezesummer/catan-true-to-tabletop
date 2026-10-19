@@ -38,6 +38,14 @@ public sealed partial class M5App
         status=draft.ProgressCard==ProgressCardKind.Treason?"点选对手的骑士以选择该玩家；由对手决定移除哪名骑士。":"请直接点选地图上的目标；右键或 Esc 取消。";
         ai.ShowTablePrompt(status);
     }
+    void PreviewDirectTarget(string target,string card,Command command,bool legal)
+    {
+        var knight=view.Board.Knights.FirstOrDefault(k=>k.LocationId==target);
+        int level=knight?.Level??view.PendingDecision?.DisplacedKnight?.Level??command?.KnightLevel??view.PendingDecision?.KnightLevel??1;
+        bool active=knight?.Active??view.PendingDecision?.DisplacedKnight?.Active??view.PendingDecision?.KnightActive??false;
+        if(card=="Smithing")level++;
+        board.PreviewPiece(target,TabletopPointerPreview.ForEffect(card,view.PendingDecision?.Kind,level,active),seat,legal);
+    }
     void UpdateDirectProgress(Vector2 mouse,bool click)
     {
         bool card=draft!=null&&draft.Kind==CommandKind.PlayProgressCard;
@@ -58,7 +66,7 @@ public sealed partial class M5App
                 {
                     var tile=view.Board.Tiles.FirstOrDefault(t=>t.Id==target);
                     bool eligible=tile!=null&&new[]{3,4,5,9,10,11}.Contains(tile.Number??0);
-                    board.PreviewRobber(target,eligible);
+                    board.PreviewPiece(target,TabletopPointerPreview.ForEffect("Invention"),seat,eligible);
                     if(click&&eligible){draft.SourceId=target;status="已选第一枚数字，点选第二枚数字交换。";ai.ShowTablePrompt(status);}return;
                 }
             }
@@ -71,7 +79,7 @@ public sealed partial class M5App
             if(command!=null){command.ProgressCard=kind;command.TargetIds=plan;}
         }
         bool valid=command!=null&&Preview(command).Success;
-        if(type=="T")board.PreviewRobber(target,valid);else board.Preview(target,type=="E",valid);
+        PreviewDirectTarget(target,card?kind.ToString():null,command,valid);
         if(!click)return;
         if(!valid){ai.ShowTablePrompt("此目标不符合卡牌效果，请选择其他目标。");return;}
         if(!card&&view.PendingDecision.Kind=="ProgressTreasonPlace")

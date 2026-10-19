@@ -8,6 +8,41 @@ namespace Catan.Rules.Tests;
 
 public sealed class TabletopCollectionTimelineTests
 {
+    [Theory]
+    [InlineData(10.2,10.95)]
+    [InlineData(12,12)]
+    public void DelayedProductionHistoryUsesActualDiceFinishWithoutStartingAnotherRollDelay(double observed,double expectedStart)
+    {
+        var tile=M4CoreHarness.New().GetPlayerView("P1").Board.Tiles.First(t=>t.Resource=="wood");
+        var game=M4CoreHarness.Fixture(s=>
+        {
+            s.Phase=M4.GamePhase.ProductionAwaitRoll;
+            s.AlchemyDice1=Math.Min(6,tile.Number!.Value-1);s.AlchemyDice2=tile.Number.Value-s.AlchemyDice1;
+            s.Cities=[M4CoreHarness.Piece(tile.Vertices[0],"P2")];
+        });
+        var timeline=Baseline("P1",game.GetHistory("P1"));
+        M4CoreHarness.Accepted(game,M4CoreHarness.Cmd(M4.CommandKind.RollDice));
+        timeline.Observe("P1",game.GetHistory("P1"),observed,outcomesReadyAt:10.95);
+        Assert.Empty(timeline.Active(expectedStart-.001));
+        var flight=Assert.Single(timeline.Active(expectedStart));
+        Assert.Equal(expectedStart,flight.Started,6);Assert.Equal(0,flight.Progress(expectedStart));
+        Assert.Equal(10.95,timeline.OutcomesReadyAt,6);
+        Assert.Equal(1,game.GetPlayerView("P2").OwnResources.Wood);
+        Assert.Equal(1,game.GetPlayerView("P2").OwnCommodities.Paper);
+    }
+    [Fact]
+    public void AllNewBankGainsDuringARollWaitForTheSameDiceFinishAndKeepCardsOutOfTheHand()
+    {
+        var game=M2Harness.Fixture(s=>M2Harness.Player(s).Resources.Wood=8);
+        var timeline=Baseline("P1",game.GetHistory("P1"));
+        var exchange=M2Harness.Cmd(M2.CommandKind.BankTrade);exchange.GiveResource=Resource.Wood;exchange.GiveAmount=8;exchange.ReceiveResource=Resource.Ore;exchange.ReceiveAmount=2;
+        M2Harness.Accepted(game,exchange);
+        timeline.Observe("P1",game.GetHistory("P1"),10.2,outcomesReadyAt:10.95);
+        Assert.Empty(timeline.Active(10.949));
+        var pending=timeline.HandSlots("P1",new[]{0,0,0,0,2,0,0,0},5,10.3);
+        Assert.Equal(2,pending.Length);Assert.All(pending,slot=>{Assert.NotNull(slot.Flight);Assert.Equal(0,slot.Weight);});
+        Assert.Single(timeline.Active(10.95));Assert.Equal(2,timeline.Active(11.02).Length);
+    }
     [Fact]
     public void CityHarvestFliesOneResourceAndOneCommodityAfterTheDiceSettle()
     {

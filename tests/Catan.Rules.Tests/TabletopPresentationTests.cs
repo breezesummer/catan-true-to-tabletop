@@ -125,6 +125,76 @@ public sealed class TabletopPresentationTests
         var dice=new TabletopDicePresentation();dice.Observe(71,2,6,2,500);
         Assert.False(dice.IsRolling(500));Assert.Equal(2,dice.Face(0,500));Assert.Equal(6,dice.Face(1,500));Assert.Equal(2,dice.Face(2,500));
     }
+    static Catan.Core.GameHistoryEntry History(long sequence,string kind)
+    {
+        var entry=new Catan.Core.GameHistoryEntry();
+        typeof(Catan.Core.GameHistoryEntry).GetProperty("Sequence")!.SetValue(entry,sequence);
+        typeof(Catan.Core.GameHistoryEntry).GetProperty("Kind")!.SetValue(entry,kind);
+        return entry;
+    }
+    [Fact]
+    public void HarvestNarrationAndFollowingChoicesWaitForTheActualDiceToSettle()
+    {
+        var dice=new TabletopDicePresentation();dice.Observe(1,4,3,1,0);
+        var before=History(1,"RollDice");var roll=History(2,"RollDice");var choice=History(3,"ResolveChoice");
+        var entries=new[]{before,roll,choice};
+        dice.Observe(2,5,3,2,10);
+        Assert.Equal(10.95,dice.SettlesAt,6);
+        Assert.Equal(new[]{before},dice.VisibleHistory(entries,10));
+        Assert.Equal(new[]{before},dice.VisibleHistory(entries,10.949));
+        Assert.Equal(entries,dice.VisibleHistory(entries,10.95));
+        // 重绘不能刷新截止时刻；原投影对象与数组保持不变。
+        dice.Observe(2,5,3,2,10.8);Assert.Equal(10.95,dice.SettlesAt,6);Assert.Equal(3,entries.Length);
+    }
+    [Theory]
+    [InlineData("RollDice")]
+    [InlineData("PlayProgressCard")]
+    public void HistoryArrivingBeforeItsNetworkViewCannotShowOrConsumeFutureRollOutcomes(string kind)
+    {
+        var dice=new TabletopDicePresentation();dice.Observe(1,3,2,null,0);
+        var before=History(1,"RollDice");var roll=History(5,kind);var choice=History(6,"ChooseGoldResources");
+        typeof(Catan.Core.GameHistoryEntry).GetProperty("Dice1")!.SetValue(roll,4);
+        typeof(Catan.Core.GameHistoryEntry).GetProperty("Dice2")!.SetValue(roll,4);
+        var entries=new[]{before,roll,choice};
+        Assert.Equal(new[]{before},dice.KnownHistory(entries));
+        Assert.Equal(new[]{before},dice.VisibleHistory(entries,10));
+        dice.Observe(5,4,4,null,20);
+        Assert.Equal(entries,dice.KnownHistory(entries));
+        Assert.Equal(new[]{before},dice.VisibleHistory(entries,20.9));
+        Assert.Equal(entries,dice.VisibleHistory(entries,20.95));
+        var restored=new TabletopDicePresentation();restored.Observe(5,4,4,null,100);
+        Assert.Equal(entries,restored.VisibleHistory(entries,100));
+    }
+    [Fact]
+    public void DiceHandCountsHoldBothCategoriesAndEachSeatUntilSettledAndResetBetweenGames()
+    {
+        var counts=new TabletopHandCountPresentation();
+        Assert.Equal(3,counts.Observe("game1","P1",false,3,false));
+        Assert.Equal(1,counts.Observe("game1","P1",true,1,false));
+        Assert.Equal(6,counts.Observe("game1","P2",false,6,false));
+        Assert.Equal(3,counts.Observe("game1","P1",false,5,true));
+        Assert.Equal(1,counts.Observe("game1","P1",true,2,true));
+        Assert.Equal(6,counts.Observe("game1","P2",false,8,true));
+        Assert.Equal(3,counts.Observe("game1","P1",false,5,true));
+        Assert.Equal(5,counts.Observe("game1","P1",false,5,false));
+        Assert.Equal(2,counts.Observe("game1","P1",true,2,false));
+        Assert.Equal(8,counts.Observe("game1","P2",false,8,false));
+        Assert.Equal(0,counts.Observe("game2","P1",false,0,true));
+        Assert.Equal(4,counts.Observe("game2","P2",false,4,true));
+        // 首次连接已在途的局面只建立当前计数基线，不从其他席位猜测隐藏手牌。
+        Assert.Equal(7,counts.Observe("game2","P3",false,7,true));
+    }
+    [Fact]
+    public void EmptyBankMarkerWaitsForDiceSettlementAndDoesNotBorrowAnotherResourceCount()
+    {
+        var counts=new TabletopHandCountPresentation();
+        Assert.Equal(1,counts.Observe("game","bank:0",false,1,false));
+        Assert.Equal(4,counts.Observe("game","bank:1",false,4,false));
+        Assert.Equal(1,counts.Observe("game","bank:0",false,0,true));
+        Assert.Equal(4,counts.Observe("game","bank:1",false,2,true));
+        Assert.Equal(0,counts.Observe("game","bank:0",false,0,false));
+        Assert.Equal(2,counts.Observe("game","bank:1",false,2,false));
+    }
     [Theory]
     [InlineData(282,409)]
     [InlineData(682,919)]

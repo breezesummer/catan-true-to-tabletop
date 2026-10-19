@@ -69,12 +69,13 @@ public sealed partial class M6App
         if(elapsed<0)return;
         float enter=Mathf.SmoothStep(0,1,elapsed/.48f),leave=Mathf.SmoothStep(0,1,(elapsed-1.63f)/.52f);
         float x=Mathf.Lerp(-260,610,enter)+leave*1100;
-        var face=new Rect(x,260,220,326);
+        // 头像、姓名、动作提示与卡面共用中轴，按阅读顺序由上至下进退场。
+        var face=new Rect(x,336,220,326);
         if(entry.ImmediateVictory)
         {
             int place=Array.IndexOf(HistoryPlayers,entry.PlayerId);
             var destination=TabletopUI.PlayerAvatarRect(Math.Max(0,place),PlayerCount);
-            face=new Rect(Mathf.Lerp(Mathf.Lerp(-260,610,enter),destination.center.x-22,leave),Mathf.Lerp(260,destination.yMax+3,leave),Mathf.Lerp(220,44,leave),Mathf.Lerp(326,65,leave));
+            face=new Rect(Mathf.Lerp(Mathf.Lerp(-260,610,enter),destination.center.x-22,leave),Mathf.Lerp(336,destination.yMax+3,leave),Mathf.Lerp(220,44,leave),Mathf.Lerp(326,65,leave));
         }
         Panel(new Rect(0,0,1440,900),new Color(0,0,0,.30f));
         Texture2D texture=null;
@@ -84,13 +85,13 @@ public sealed partial class M6App
         else
         {
             ModernOperationUI.Panel(face);
-            GUI.Label(new Rect(x+16,380,188,80),card,new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=32});
-            GUI.Label(new Rect(x+16,290,188,40),"发展卡",new GUIStyle(label){alignment=TextAnchor.MiddleCenter});
+            GUI.Label(new Rect(face.x+16,face.y+120,face.width-32,80),card,new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=32});
+            GUI.Label(new Rect(face.x+16,face.y+30,face.width-32,40),"发展卡",new GUIStyle(label){alignment=TextAnchor.MiddleCenter});
         }
-        StrategyHudArt.Avatar(new Rect(x+75,175,70,70),entry.PlayerId);
+        StrategyHudArt.Avatar(new Rect(x+75,135,70,70),entry.PlayerId);
         var nameStyle=PlayerNameStyle(new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=29},entry.PlayerId);
-        GUI.Label(new Rect(370,600,700,42),PlayerDisplayName(entry.PlayerId),nameStyle);
-        if(!entry.ImmediateVictory)GUI.Label(new Rect(370,646,700,70),"使用了「"+card+"」",new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=27});
+        GUI.Label(new Rect(x-240,219,700,42),PlayerDisplayName(entry.PlayerId),nameStyle);
+        GUI.Label(new Rect(x-240,264,700,54),(entry.ImmediateVictory?"获得了「":"使用了「")+card+"」",new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=27});
 
     }
 }

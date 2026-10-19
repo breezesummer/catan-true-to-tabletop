@@ -17,7 +17,7 @@ public sealed partial class InteractionPresentationVerification
     IEnumerator SettleFeedback(){double deadline=Time.unscaledTimeAsDouble+10;while(app.TablePresentationBlocked&&Time.unscaledTimeAsDouble<deadline)yield return null;Require(!app.TablePresentationBlocked,"动画没有结束");yield return null;}
     IEnumerator VerifyFeedback()
     {
-        yield return VerifyBasicCardAction();yield return VerifyFeedback4();yield return VerifyFeedback5();yield return VerifyBroadcastRecipientClose();yield return VerifyOperationWindows();
+        yield return VerifyBasicCardAction();yield return VerifyImmediateProgressActions();yield return VerifyFeedback4();yield return VerifyFeedback5();yield return VerifyBroadcastRecipientClose();yield return VerifyOperationWindows();
         stage="百科与Esc返回";
         app.OpenTableMenu();
         if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("游戏菜单");
@@ -75,6 +75,81 @@ public sealed partial class InteractionPresentationVerification
         Require(host.View("P1").Players.First(p=>p.Id=="P1").PlayedKnights==1&&host.View("P1").Phase==Catan.Core.M2.GamePhase.RobberMove,"右下角使用骑士未走正常出牌与强盗待决");
         snapshot=game.VerificationOperationSnapshot;hud=BindFeedbackCardHud(game);before=host.ExportSave();
         CheckCardPreviewHud(hud,dock,snapshot,snapshot.Cards[0]);Require(snapshot.RequiresSelection&&!hud.CardActionReady,"强盗待决仍允许使用其他卡牌");hud.ConfirmCardAction();Require(before==host.ExportSave(),"预览绕过了强盗待决");dock.Reset();session.AssertInvariants();
+    }
+
+    // 逐张从正式预览的右下角入口使用，区分无需参数的执行与必须保留的效果选择。
+    IEnumerator VerifyImmediateProgressActions()
+    {
+        foreach(string rules in new[]{"cities-knights","combined"})
+        foreach(string card in new[]{"RoadBuilding","Irrigation","Mining","CommercialHarbor","Encouragement","Wedding","Sabotage","MerchantFleet"})
+        {
+            stage=rules+" 发展卡直接使用 "+card;
+            app.StartGame(rules,"heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+            object game=rules=="cities-knights"?(object)GetComponent<M4App>():GetComponent<M5App>();
+            var host=PolishGet(game,"VerificationHost");var session=host.GetType().GetField("session",Private).GetValue(host);
+            var state=session.GetType().GetMethod("GetAuthoritativeStateForTesting").Invoke(session,null);
+            var board=PolishGet(PolishGet(game,"M6View"),"Board");var tiles=(Tile[])PolishGet(board,"Tiles");var edges=(Edge[])PolishGet(board,"Edges");
+            string harvest=card=="Mining"?"ore":"wheat";string village=tiles.First(t=>t.Resource==harvest).Vertices[0];
+            var road=edges.First(e=>e.Vertices.Contains(village)&&tiles.Any(t=>t.Resource!="sea"&&t.Resource!="fog"&&e.Vertices.All(t.Vertices.Contains)));string knightSite=road.Vertices.First(v=>v!=village);
+            string city=((Vertex[])PolishGet(board,"Vertices")).First(v=>v.Id!=knightSite&&v.Id!=village&&!edges.Any(e=>e.Vertices.Contains(village)&&e.Vertices.Contains(v.Id))).Id;
+            PolishSet(state,"ActivePlayerId","P1");PolishSet(state,"Turn",9);PolishSet(state,"SetupPlacementIndex",8);PolishSetEnum(state,"Phase","Action");PolishSet(state,"PendingDecision",null);
+            PolishSet(state,"Settlements",new[]{Piece(village)});PolishSet(state,"Cities",new[]{new PiecePlacement{PlayerId="P2",LocationId=city}});PolishSet(state,"Roads",new[]{Piece(road.Id)});
+            var knightType=state.GetType().GetProperty("Knights").PropertyType.GetElementType();var knight=Activator.CreateInstance(knightType);
+            PolishSet(knight,"PlayerId","P1");PolishSet(knight,"LocationId",knightSite);PolishSet(knight,"Level",1);PolishSet(knight,"Active",false);
+            var knights=Array.CreateInstance(knightType,1);knights.SetValue(knight,0);PolishSet(state,"Knights",knights);
+            var players=(Array)PolishGet(state,"Players");var own=players.GetValue(0);var other=players.GetValue(1);
+            PolishSet(own,"Resources",new ResourceBag{Wood=2});PolishSet(other,"Resources",new ResourceBag{Wood=4});
+            var cardType=own.GetType().GetProperty("ProgressCards").PropertyType.GetElementType();var kind=Enum.Parse(cardType,card);
+            var cards=Array.CreateInstance(cardType,1);cards.SetValue(kind,0);PolishSet(own,"ProgressCards",cards);
+            foreach(var player in players)
+            {
+                string id=(string)PolishGet(player,"Id");var pieces=PolishGet(player,"Pieces");
+                PolishSet(pieces,"Roads",id=="P1"?14:15);PolishSet(pieces,"Settlements",id=="P1"?4:5);PolishSet(pieces,"Cities",id=="P2"?3:4);
+            }
+            var bank=(ResourceBag)PolishGet(state,"Bank");foreach(Resource resource in Enum.GetValues(typeof(Resource)))bank[resource]=19-players.Cast<object>().Sum(p=>((ResourceBag)PolishGet(p,"Resources"))[resource]);
+            foreach(var deck in (Array)PolishGet(state,"ProgressDecks"))
+            {
+                var remaining=((Array)PolishGet(deck,"Cards")).Cast<object>().ToList();remaining.Remove(kind);
+                var ordered=Array.CreateInstance(cardType,remaining.Count);for(int i=0;i<remaining.Count;i++)ordered.SetValue(remaining[i],i);PolishSet(deck,"Cards",ordered);
+            }
+            session.GetType().GetField("state",Private).SetValue(session,state);session.GetType().GetMethod("AssertInvariants").Invoke(session,null);
+            game.GetType().GetMethod("M6Refresh",Private).Invoke(game,null);yield return null;yield return SettleFeedback();
+            var hud=BindFeedbackCardHud(game);var dock=(OperationDock)PolishGet(game,"VerificationOperationDock");var snapshot=(OperationSnapshot)PolishGet(game,"VerificationOperationSnapshot");
+            var selected=snapshot.Cards.Single(c=>c.ArtIndex==Convert.ToInt32(kind));Require(selected.Playable,"直接使用夹具没有合法卡牌 "+card);
+            Func<string> save=()=>(string)host.GetType().GetMethod("ExportSave").Invoke(host,null);string before=save();
+            CheckCardPreviewHud(hud,dock,snapshot,selected);Require(hud.CardActionReady&&save()==before,"使用前预览错误消耗牌 "+card);
+            hud.ConfirmCardAction();
+            if(card=="MerchantFleet")
+            {
+                yield return null;yield return null;
+                var draft=game.GetType().GetField("draft",Private).GetValue(game);
+                Require(save()==before&&!app.CardPresentationBusy,"商船队选择效果前已经耗卡或播放出牌动画");
+                Require(draft!=null&&PolishGet(draft,"Kind").ToString()=="PlayProgressCard"&&PolishGet(draft,"ProgressCard").ToString()==card,"商船队未保留合法用牌草稿");
+                Require((bool)PolishGet(game,"OperationContextVisible")&&!dock.HasOverlay,"商船队没有从预览进入效果选择");
+                Require(Vector2.Distance(hud.CurrentContextRect.center,new Vector2(720,450))<.01f,"发展卡必要选择弹窗没有居中");
+                if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture(rules+"-商船队必要选择居中");
+                snapshot.Cancel?.Invoke();Require(save()==before,"取消商船队效果选择改变了权威局面");
+                session.GetType().GetMethod("AssertInvariants").Invoke(session,null);continue;
+            }
+            var after=session.GetType().GetMethod("GetAuthoritativeStateForTesting").Invoke(session,null);
+            Require(((Array)PolishGet(((Array)PolishGet(after,"Players")).GetValue(0),"ProgressCards")).Length==0&&save()!=before,"无需参数的发展卡没有立即打出 "+card);
+            Require(game.GetType().GetField("draft",Private).GetValue(game)==null&&!dock.HasOverlay,"无需参数的发展卡残留二次确认草稿 "+card);
+            Require(app.CardPresentationBusy&&app.PresentedCard.ProgressIndex==Convert.ToInt32(kind),"直接出牌未经过正式卡牌动画 "+card);
+            if(card=="RoadBuilding")Require(PolishGet(PolishGet(after,"PendingDecision"),"Kind").ToString()=="ProgressRoads"&&(int)PolishGet(PolishGet(after,"PendingDecision"),"Amount")==2,"道路建设没有直接进入两段地图建设");
+            if(card=="Irrigation"||card=="Mining")
+            {
+                var resources=(ResourceBag)PolishGet(((Array)PolishGet(after,"Players")).GetValue(0),"Resources");var resource=card=="Mining"?Resource.Ore:Resource.Wheat;
+                Require(resources[resource]==2*tiles.Count(t=>t.Resource==harvest&&t.Vertices.Contains(village)),"采矿或灌溉没有直接结算资源 "+card);
+            }
+            if(card=="CommercialHarbor")Require(((string[])PolishGet(after,"CommercialHarborPlayers")).Length==3&&PolishGet(after,"Phase").ToString()=="Action","商业港口没有直接授予交换额度");
+            if(card=="Encouragement")Require(((Array)PolishGet(after,"Knights")).Cast<object>().All(k=>(bool)PolishGet(k,"Active")&&(int)PolishGet(k,"ActivatedTurn")==9),"鼓舞没有直接激活骑士");
+            if(card=="Wedding"||card=="Sabotage")
+            {
+                var pending=PolishGet(after,"PendingDecision");Require(pending!=null&&PolishGet(pending,"Kind").ToString()==(card=="Wedding"?"ProgressWedding":"ProgressSabotage")&&(string)PolishGet(pending,"PlayerId")=="P2"&&(int)PolishGet(pending,"Amount")==2,"全体效果没有直接交给合法对手完成选择 "+card);
+                Require(((ResourceBag)PolishGet(((Array)PolishGet(after,"Players")).GetValue(1),"Resources")).Wood==4,"全体效果越过了对手的选牌权");
+            }
+            yield return SettleFeedback();session.GetType().GetMethod("AssertInvariants").Invoke(session,null);
+        }
     }
 
     IEnumerator VerifyFeedback4()
@@ -274,7 +349,9 @@ public sealed partial class InteractionPresentationVerification
         foreach(var p in s.Players){p.Pieces.Roads=15;p.Pieces.Cities=4;p.Pieces.Settlements=p.Id=="P1"?4:5;}
         typeof(Catan.Core.M5.CombinedGameSession).GetField("state",Private).SetValue(currentSession,s);currentSession.AssertInvariants();current.M6Refresh();yield return null;
         string saved=currentHost.ExportSave();typeof(M5App).GetMethod("UpdateFreeRoadPlacement",Private).Invoke(current,new object[]{current.VerificationBoard.ScreenPoint(edge.Id),true});
-        var choose=(TabletopChoiceBubble)current.GetType().GetField("mapChoice",Private).GetValue(current);Require(choose.Active,"海岸没有弹出道路/船选择");Require(saved==currentHost.ExportSave(),"确认前已经落子");choose.Choose(1);yield return null;yield return SettleFeedback();Require(currentHost.View("P1").Board.Ships.Length==1,"气泡船选项未建船");
+        var choose=(TabletopChoiceBubble)current.GetType().GetField("mapChoice",Private).GetValue(current);Require(choose.Active,"海岸没有弹出道路/船选择");Require(saved==currentHost.ExportSave(),"确认前已经落子");
+        if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("组合地图-道路或船选择菜单");
+        choose.Choose(1);yield return null;yield return SettleFeedback();Require(currentHost.View("P1").Board.Ships.Length==1,"气泡船选项未建船");
         currentSession.AssertInvariants();
     }
     IEnumerator VerifyRequiredChoicePrompt(string expected)

@@ -19,7 +19,22 @@ public readonly struct TabletopAudioEvent
 {
     public readonly TabletopAudioCue Cue;
     public readonly double Delay;
-    public TabletopAudioEvent(TabletopAudioCue cue, double delay = 0) { Cue = cue; Delay = delay; }
+    public readonly long RollSequence;
+    public TabletopAudioEvent(TabletopAudioCue cue, double delay = 0,long rollSequence=0) { Cue = cue; Delay = delay; RollSequence=rollSequence; }
+}
+
+public static class TabletopAudioTiming
+{
+    public static bool WaitForDice(TabletopAudioCue cue) => cue==TabletopAudioCue.ResourceCollect||cue==TabletopAudioCue.CardDraw||cue==TabletopAudioCue.FacilityUpgrade;
+    public static bool CanPlay(TabletopAudioCue cue,bool diceRolling,bool cardPresentationBusy)
+        =>!WaitForDice(cue)||!diceRolling&&!cardPresentationBusy;
+    public static double ScheduledAt(TabletopAudioEvent entry,double now,long rollSequence,double settlesAt,bool rolling)
+    {
+        // 同一次掷骰的音效直接对齐实际落定时刻，联机历史迟到不再重复等待 .95 秒。
+        if(entry.RollSequence>0&&entry.RollSequence==rollSequence&&entry.Cue!=TabletopAudioCue.DiceRoll)
+            return Math.Max(now,settlesAt)+Math.Max(0,entry.Delay-TabletopDicePresentation.Duration);
+        return Math.Max(now+entry.Delay,rolling&&WaitForDice(entry.Cue)?settlesAt:double.NegativeInfinity);
+    }
 }
 
 // 与 Unity 无关的总线预算与主题交叉淡化，供导出和混音上界检查复用。
@@ -68,6 +83,7 @@ public sealed class TabletopAudioModel
     {
         if (entry == null) return Array.Empty<TabletopAudioEvent>();
         var result = new List<TabletopAudioEvent>();
+        bool rolls=TabletopDicePresentation.IsRoll(entry);
         TabletopAudioCue cue;
         var changes = entry.Changes ?? Array.Empty<GameHistoryChange>();
         switch (entry.Kind)
@@ -112,9 +128,9 @@ public sealed class TabletopAudioModel
             result.Add(new TabletopAudioEvent(improvement, cue == TabletopAudioCue.CardPlay ? .22 : .10));
         // 未知资源和隐藏卡牌一律使用同一种收牌声；不依赖牌名、GoodIndex、数量或持牌人。
         if (cue != TabletopAudioCue.TradeComplete && changes.Any(c => c != null && c.Amount > 0 && (c.Category == "goods" || c.Category == "resource-count")))
-            result.Add(new TabletopAudioEvent(TabletopAudioCue.ResourceCollect, entry.Kind == "RollDice" ? .78 : .13));
+            result.Add(new TabletopAudioEvent(TabletopAudioCue.ResourceCollect, rolls ? TabletopDicePresentation.Duration : .13));
         if (cue != TabletopAudioCue.CardDraw && changes.Any(c => c != null && c.Amount > 0 && (c.Category == "development" || c.Category == "progress")))
-            result.Add(new TabletopAudioEvent(TabletopAudioCue.CardDraw, .18));
+            result.Add(new TabletopAudioEvent(TabletopAudioCue.CardDraw, rolls ? TabletopDicePresentation.Duration : .18));
         // 城市升级移除的是村庄，只有公开城市减少且同点变回村庄才表示倒塌。
         bool collapsed = changes.Any(c => c != null && c.Category == "piece" && c.Name == "城市" && c.Amount < 0 &&
             changes.Any(d => d != null && d.Category == "piece" && d.Name == "村庄" && d.Amount > 0 && d.PlayerId == c.PlayerId && d.LocationId == c.LocationId));
@@ -130,7 +146,7 @@ public sealed class TabletopAudioModel
             if (changes.Any(c => c != null && c.Category == "piece" && c.Amount > 0 && c.Name != null && c.Name.Contains("大都会")))
                 result.Add(new TabletopAudioEvent(TabletopAudioCue.FacilityUpgrade, .10));
         }
-        return result.ToArray();
+        return rolls?result.Select(e=>new TabletopAudioEvent(e.Cue,e.Delay,entry.Sequence)).ToArray():result.ToArray();
     }
 
     static string KnightIdentity(string name) => (name ?? "").Replace("（激活）", "").Replace("（休眠）", "");

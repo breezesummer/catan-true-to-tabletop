@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="1.6.12";
+    public const string BuildVersion="1.6.13";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -38,7 +38,7 @@ public sealed partial class M6App : MonoBehaviour
     public bool Ready=>actor!=null;
     public bool Finished=>Ready&&finished();
     public string CurrentActor=>Ready?actor():"";
-    public bool IsHumanTurn=>Ready&&!Finished&&!TablePresentationBlocked&&CurrentActor==HumanSeat&&(!NetworkGame||Network.CanInteract);
+    public bool IsHumanTurn=>Ready&&!Finished&&!TablePresentationBlocked&&!TableDiceRolling&&CurrentActor==HumanSeat&&(!NetworkGame||Network.CanInteract);
     public string WaitingText=>NetworkGame?(Network.CanInteract?"等待 "+PlayerDisplayName(CurrentActor)+" 完成操作。":Network.Status):Fault!=""?"AI 已暂停："+Fault:Paused?"AI 已暂停。按 Esc 打开菜单继续。":Finished?"本局已结束。":"等待 "+PlayerDisplayName(CurrentActor)+" · AI 正在行动。";
     public string SavePath=>Path.Combine(Application.persistentDataPath,"m6-local-ai-v1.json");
 
@@ -61,7 +61,7 @@ public sealed partial class M6App : MonoBehaviour
     bool tableMenu, escapeDismissedInteraction;
     public bool TableMenuOpen=>tableMenu;
     public void OpenTableMenu(){if(!Ready)return;ResetTablePauseMenu();tableMenu=true;escapeDismissedInteraction=false;}
-    public bool BlocksTableInput(Vector2 p)=>MenuVisible||TablePresentationBlocked||ClosedTableSelection&&SelectionPromptArea.Contains(p);
+    public bool BlocksTableInput(Vector2 p)=>MenuVisible||TablePresentationBlocked||TableDiceRolling||ClosedTableSelection&&SelectionPromptArea.Contains(p);
     void ToggleTableCamera()
     {
         var b=FindFirstObjectByType<BoardRenderer>();if(b!=null)b.SetCamera(!b.TopView);
@@ -124,7 +124,7 @@ public sealed partial class M6App : MonoBehaviour
     // At most one decision is computed and submitted in each call/frame. No wait loop blocks input.
     public bool StepAi()
     {
-        if(NetworkGame||MenuVisible||TablePresentationBlocked||!Ready||Paused||Finished||IsHumanTurn)return false;
+        if(NetworkGame||MenuVisible||TablePresentationBlocked||TableDiceRolling||!Ready||Paused||Finished||IsHumanTurn)return false;
         string player=CurrentActor;
         try
         {
@@ -307,7 +307,7 @@ public sealed partial class M6App : MonoBehaviour
             if(!tableMenu&&NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),DisplayPlayerText(Network.Status),small);
             DrawOpeningOrder();
             string prompt=DisplayPlayerText(RoadPlacementPrompt.Length>0?RoadPlacementPrompt:CurrentTablePrompt);
-            if(prompt.Length>0&&!TablePresentationBlocked&&(!TableOverlayOpen||HasRequiredTableSelection))
+            if(prompt.Length>0&&!TablePresentationBlocked&&!TableMapChoiceOpen&&(!TableOverlayOpen||HasRequiredTableSelection))
             {
                 bool primary=prompt=="你的回合"||Finished;
                 var promptStyle=new GUIStyle(title){fontSize=primary?46:26,alignment=TextAnchor.MiddleCenter,wordWrap=true};

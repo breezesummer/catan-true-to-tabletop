@@ -86,7 +86,7 @@ public sealed class M6PlayerVerification : MonoBehaviour
         {
             object next;
             try{if(!work.MoveNext())break;next=work.Current;}
-            catch(Exception ex){Debug.LogError("CATAN_M6_PLAYER_VERIFY_FAILED: stage="+stage+"; type="+ex.GetType().Name);Application.Quit(1);yield break;}
+            catch(Exception ex){Debug.LogError("CATAN_M6_PLAYER_VERIFY_FAILED: stage="+stage+"; type="+ex.GetType().Name+"; message="+ex.Message);Application.Quit(1);yield break;}
             yield return next;
         }
         Debug.Log(save>=0?"CATAN_M6_PLAYER_SAVE_OK: four rule families; mixed human/AI seats; pause; fixed private view; UI ownership boundary; human wait; AI trade response; versioned authority+seat saves":"CATAN_M6_PLAYER_LOAD_OK: independent process; four rule families; exact authority+seat roundtrip; continued product AI; human choice and trade restored");
@@ -113,12 +113,14 @@ public sealed class M6PlayerVerification : MonoBehaviour
             stage=rules[i]+"-product-play";
             while(steps<240)
             {
-                while(app.TablePresentationBlocked)yield return null;
+                while(app.TableDiceRolling||app.TablePresentationBlocked)yield return null;
+                if(humanSteps>=3&&app.AiCommandsExecuted>=4&&app.IsHumanTurn&&Turn>=3&&(Phase=="Action"||Phase=="ProductionAwaitRoll"))break;
                 if(saving&&i==0&&!humanChoiceSaved&&app.IsHumanTurn)
                 {app.WriteSave(Path.Combine(directory,"human-choice.json"));humanChoiceSaved=true;}
                 if(app.IsHumanTurn)humanSteps++;
                 Advance();steps++;
-                if(steps%4==0)yield return null;
+                // 掷骰展示在正式 OnGUI 中观察新历史，必须先交还一帧再检查滚骰锁。
+                yield return null;
                 if(humanSteps>=3&&app.AiCommandsExecuted>=4&&app.IsHumanTurn&&Turn>=3&&(Phase=="Action"||Phase=="ProductionAwaitRoll"))break;
             }
             Require(steps<240&&app.AiCommandsExecuted>0&&humanSteps>0,"Mixed seats did not progress");
@@ -127,13 +129,38 @@ public sealed class M6PlayerVerification : MonoBehaviour
             if(saving&&i==0)
             {
                 stage="base-trade";
-                for(int step=0;step<240&&!(app.IsHumanTurn&&Phase=="Action"&&Base.M6View.TradeOffer==null&&Base.M6View.ActivePlayerId==app.HumanSeat&&Base.M6View.OwnResources.Total>0);step++){while(app.TablePresentationBlocked)yield return null;Advance();if(step%4==0)yield return null;}
-                Require(app.IsHumanTurn&&Phase=="Action"&&Base.M6View.TradeOffer==null&&Base.M6View.ActivePlayerId==app.HumanSeat&&Base.M6View.OwnResources.Total>0,"No natural trade opportunity");
-                var v=Base.M6View;Resource give=Enumerable.Range(0,5).Select(n=>(Resource)n).First(r=>v.OwnResources[r]>0);Resource receive=(Resource)(((int)give+1)%5);
-                var trade=new Catan.Core.M2.Command{Id=Guid.NewGuid().ToString("N"),PlayerId=app.HumanSeat,Kind=Catan.Core.M2.CommandKind.ProposeTrade,OtherPlayerId=v.Players.First(p=>p.Id!=app.HumanSeat).Id,Give=new ResourceBag(),Receive=new ResourceBag()};
-                trade.Give[give]=1;trade.Receive[receive]=1;Require(Base.Submit(trade)?.Success==true,"Normal human trade failed");
+                bool pendingTrade=false;
+                for(int step=0;step<240&&!pendingTrade;step++)
+                {
+                    while(app.TableDiceRolling||app.TablePresentationBlocked)yield return null;
+                    // 等待掷骰和飞牌后重新检查机会，不能先推进而错过刚进入的行动阶段。
+                    if(app.IsHumanTurn&&Phase=="Action"&&Base.M6View.TradeOffer==null&&Base.M6View.ActivePlayerId==app.HumanSeat&&Base.M6View.OwnResources.Total>0)
+                    {
+                        var v=Base.M6View;
+                        // 只按自己的手牌与公开席位试有限的 1:1 组合；支付不足的接收者由正常规则自动拒绝。
+                        foreach(var target in v.Players.Where(p=>p.Id!=app.HumanSeat))
+                        {
+                            foreach(Resource give in Enum.GetValues(typeof(Resource)))
+                            {
+                                if(v.OwnResources[give]==0)continue;
+                                foreach(Resource receive in Enum.GetValues(typeof(Resource)))
+                                {
+                                    if(give==receive)continue;
+                                    var trade=new Catan.Core.M2.Command{Id=Guid.NewGuid().ToString("N"),PlayerId=app.HumanSeat,Kind=Catan.Core.M2.CommandKind.ProposeTrade,OtherPlayerId=target.Id,Give=new ResourceBag(),Receive=new ResourceBag()};
+                                    trade.Give[give]=1;trade.Receive[receive]=1;Require(Base.Submit(trade)?.Success==true,"Normal human trade probe failed");
+                                    pendingTrade=Base.M6View.TradeOffer!=null;if(pendingTrade)break;
+                                }
+                                if(pendingTrade)break;
+                            }
+                            if(pendingTrade)break;
+                        }
+                    }
+                    if(pendingTrade)break;
+                    Advance();yield return null;
+                }
+                Require(pendingTrade,"No natural trade opportunity survived automatic rejection");
                 Require(!app.IsHumanTurn&&Base.M6View.TradeOffer!=null,"Trade actor not routed to AI");app.WriteSave(Path.Combine(directory,"ai-trade.json"));
-                CheckHumanBoundary();Advance();Require(Base.M6View.TradeOffer==null,"AI trade reply did not resolve");
+                CheckHumanBoundary();while(app.TableDiceRolling||app.TablePresentationBlocked)yield return null;Advance();Require(Base.M6View.TradeOffer==null,"AI trade reply did not resolve");
             }
         }
         if(saving)
@@ -146,8 +173,10 @@ public sealed class M6PlayerVerification : MonoBehaviour
         else
         {
             stage="restore-human-choice";app.ReadSave(Path.Combine(directory,"human-choice.json"));yield return null;yield return null;
+            while(app.TableDiceRolling||app.TablePresentationBlocked)yield return null;
             Require(app.Paused&&app.IsHumanTurn,"Human pending seat lost");CheckHumanWait();Advance();
             stage="restore-ai-trade";app.ReadSave(Path.Combine(directory,"ai-trade.json"));yield return null;yield return null;
+            while(app.TableDiceRolling||app.TablePresentationBlocked)yield return null;
             Require(app.Paused&&!app.IsHumanTurn&&Base.M6View.TradeOffer!=null,"AI trade pending seat lost");Advance();Require(Base.M6View.TradeOffer==null,"Restored AI trade did not resolve");
         }
     }

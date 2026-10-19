@@ -5,20 +5,26 @@ using UnityEngine;
 // 金矿仅显示五种资源，领取上限仍由同一规则入口验证。
 public static class TabletopResourceChoiceUI
 {
-    public static readonly Rect Area=new Rect(258,205,924,416);
+    public static readonly Rect Area=new Rect(258,242,924,416);
     static readonly string[] Names={"木头","砖块","羊毛","小麦","矿石","布匹","钱币","纸张"};
     static ResourceBag activeSelection;
     static string errorHint="";
     public static void Draw(int amount,ResourceBag selection,ResourceBag bank,Action confirm,Action<string> notify,string caption="金矿 · 选择资源",OperationWindowState windows=null)
     {
         if(windows?.Suppressed==true)return;
+        bool previous=ModernOperationUI.MenuContext;ModernOperationUI.UseMenuContext(true);
+        try
+        {
         windows?.Describe(caption);
         ModernOperationUI.Panel(Area);
+        GUI.BeginGroup(new Rect(0,37,1440,900));
+        try
+        {
         if(ModernOperationUI.Button(new Rect(1070,224,32,30),"—")){windows?.Hide(caption);return;}
         if(ModernOperationUI.Button(new Rect(1114,224,32,30),"×")){windows?.Close();return;}
         if(!ReferenceEquals(activeSelection,selection)){activeSelection=selection;errorHint="";}
         int required=Math.Min(amount,bank.Total);
-        ModernOperationUI.Label(new Rect(288,223,760,42),caption,ModernOperationUI.Title);
+        PastoralMenuUI.Label(new Rect(288,223,864,42),caption,23,PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
         ModernOperationUI.Label(new Rect(288,269,864,32),TabletopCardInput.Hint+" · 已选 "+selection.Total+" / "+required+" 张",ModernOperationUI.Center);
         for(int i=0;i<5;i++)
         {
@@ -41,5 +47,9 @@ public static class TabletopResourceChoiceUI
         ModernOperationUI.Label(new Rect(288,511,864,30),errorHint,hint);
         if(ModernOperationUI.Button(new Rect(288,561,186,40),"清空选择")){foreach(Resource r in Enum.GetValues(typeof(Resource)))selection[r]=0;errorHint="";}
         if(ModernOperationUI.Button(new Rect(490,561,662,40),"确认领取 "+required+" 张资源",selection.Total==required,true))confirm();
+        }
+        finally{GUI.EndGroup();}
+        }
+        finally{ModernOperationUI.UseMenuContext(previous);}
     }
 }

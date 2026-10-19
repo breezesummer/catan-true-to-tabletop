@@ -12,6 +12,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" PrivateAssets="all" />
     <ProjectReference Include="../../src/Catan.Core/Catan.Core.csproj" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopAudioModel.cs" Link="Presentation/TabletopAudioModel.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopDicePresentation.cs" Link="Presentation/TabletopDicePresentation.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopAudioSynth.cs" Link="Presentation/TabletopAudioSynth.cs" />
   </ItemGroup>
 </Project>

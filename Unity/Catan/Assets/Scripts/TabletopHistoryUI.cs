@@ -15,6 +15,8 @@ public sealed partial class TabletopHistoryUI
     bool follow = true, showDice;
     bool collapsed;
     TabletopWorldObjects diceArt;
+    TabletopDicePresentation dicePresentation;
+    public void BindDice(TabletopDicePresentation value) { dicePresentation=value; }
     public OperationWindowState Windows;
     public bool IsOpen { get; private set; }
     public void Open(){Windows?.Open();IsOpen=true;}
@@ -27,6 +29,7 @@ public sealed partial class TabletopHistoryUI
         diceArt=objects;
         ModernOperationUI.Styles(font);
         entries=entries??Array.Empty<GameHistoryEntry>();players=players??Array.Empty<string>();
+        if(dicePresentation!=null)entries=dicePresentation.VisibleHistory(entries,Time.unscaledTimeAsDouble);
         if(!ReferenceEquals(cachedEntries,entries)){cachedEntries=entries;lines.Clear();}
         long sequence=entries.Length==0?0:entries[entries.Length-1].Sequence;
         if(sequence!=lastSequence)

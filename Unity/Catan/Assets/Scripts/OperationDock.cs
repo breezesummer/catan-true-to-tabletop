@@ -55,6 +55,7 @@ public sealed partial class OperationDock
     Rect handHoverAnchor;
     double handUpdated;
     TabletopCollectionTimeline collections;
+    readonly TabletopHandCountPresentation displayedHandCounts=new TabletopHandCountPresentation();
     bool collectionFlightsVisible;
     TabletopScene table;
     public void BindTable(TabletopScene scene) { table=scene; }
@@ -504,8 +505,11 @@ public sealed partial class OperationDock
         Rect resource=new Rect(155,727,96,43),special=new Rect(155,777,96,43),sort=new Rect(155,830,96,32);
         Register(resource);Register(special);Register(sort);
         bool handEnabled=GUI.enabled;GUI.enabled=handEnabled&&s.Discard==null;
-        if(StrategyHudArt.HandControl(resource,"资源卡",0,!specialHand,new TabletopHandCounter(s.Goods.Take(s.GoodCount).Sum(),s.ResourceHandLimit))){specialHand=false;hoveredHand=null;handHoverAnchor=Rect.zero;}
-        if(StrategyHudArt.HandControl(special,"发展卡",1,specialHand,new TabletopHandCounter(s.Cards.Count,s.SpecialHandLimit))){specialHand=true;hoveredHand=null;handHoverAnchor=Rect.zero;}
+        bool holdCounts=collections!=null&&Time.unscaledTimeAsDouble<collections.OutcomesReadyAt;
+        int resourceCount=displayedHandCounts.Observe(s.Scope,s.Seat,false,s.Goods.Take(s.GoodCount).Sum(),holdCounts);
+        int specialCount=displayedHandCounts.Observe(s.Scope,s.Seat,true,s.Cards.Count,holdCounts);
+        if(StrategyHudArt.HandControl(resource,"资源卡",0,!specialHand,new TabletopHandCounter(resourceCount,s.ResourceHandLimit))){specialHand=false;hoveredHand=null;handHoverAnchor=Rect.zero;}
+        if(StrategyHudArt.HandControl(special,"发展卡",1,specialHand,new TabletopHandCounter(specialCount,s.SpecialHandLimit))){specialHand=true;hoveredHand=null;handHoverAnchor=Rect.zero;}
         GUI.enabled=handEnabled;
         if(StrategyHudArt.HandControl(sort,"整理手牌",2))
         {

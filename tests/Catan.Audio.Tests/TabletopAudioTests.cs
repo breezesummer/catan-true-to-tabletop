@@ -7,6 +7,19 @@ namespace Catan.Audio.Tests;
 
 public sealed class TabletopAudioTests
 {
+    [Theory]
+    [InlineData(TabletopAudioCue.ResourceCollect)]
+    [InlineData(TabletopAudioCue.CardDraw)]
+    [InlineData(TabletopAudioCue.FacilityUpgrade)]
+    public void VictoryCardRevealKeepsHarvestSoundsQueuedUntilViewAppliesWhileDiceSoundRemainsImmediate(TabletopAudioCue cue)
+    {
+        Assert.False(TabletopAudioTiming.CanPlay(cue,true,true));
+        Assert.False(TabletopAudioTiming.CanPlay(cue,false,true));
+        Assert.False(TabletopAudioTiming.CanPlay(cue,true,false));
+        Assert.True(TabletopAudioTiming.CanPlay(cue,false,false));
+        Assert.True(TabletopAudioTiming.CanPlay(TabletopAudioCue.DiceRoll,true,true));
+        Assert.True(TabletopAudioTiming.CanPlay(TabletopAudioCue.CardPlay,false,true));
+    }
     [Theory][InlineData("Gold")][InlineData("Aqueduct")]
     public void BountyChimePlaysOnNewDecisionOnceAndNeverOnRestore(string kind)
     {
@@ -114,9 +127,36 @@ public sealed class TabletopAudioTests
         var entry = Entry(3, "RollDice", Change("goods", "木材", 2)); Set(entry, "EventDie", "Barbarian");
         var events = TabletopAudioModel.Classify(entry);
         Assert.Contains(events, e => e.Cue == TabletopAudioCue.DiceRoll && e.Delay == 0);
-        Assert.Contains(events, e => e.Cue == TabletopAudioCue.ResourceCollect && e.Delay >= .75);
+        Assert.Contains(events, e => e.Cue == TabletopAudioCue.ResourceCollect && e.Delay >= TabletopDicePresentation.Duration);
         Assert.Contains(events, e => e.Cue == TabletopAudioCue.BarbarianAdvance);
         Set(entry, "EventDie", "Science"); Assert.DoesNotContain(TabletopAudioModel.Classify(entry), e => e.Cue == TabletopAudioCue.BarbarianAdvance);
+    }
+    [Fact]
+    public void ResourceAndProgressCardDrawSoundsBeginOnlyAfterActualDiceFinish()
+    {
+        var entry=Entry(7,"RollDice",Change("goods","木材",1),Change("progress","发展卡",1));
+        var events=TabletopAudioModel.Classify(entry);
+        foreach(var cue in new[]{TabletopAudioCue.ResourceCollect,TabletopAudioCue.CardDraw})
+        {
+            var sound=Assert.Single(events,e=>e.Cue==cue);
+            Assert.Equal(7,sound.RollSequence);Assert.True(sound.Delay>=TabletopDicePresentation.Duration);
+            Assert.Equal(10.95,TabletopAudioTiming.ScheduledAt(sound,10.2,7,10.95,true),6);
+            // 历史在骰子停止之后才到，不会再增加一次 .95 秒等待。
+            Assert.Equal(12,TabletopAudioTiming.ScheduledAt(sound,12,7,10.95,false),6);
+        }
+        Assert.Equal(10.2,TabletopAudioTiming.ScheduledAt(events[0],10.2,7,10.95,true),6);
+    }
+    [Theory]
+    [InlineData(TabletopAudioCue.ResourceCollect)]
+    [InlineData(TabletopAudioCue.CardDraw)]
+    [InlineData(TabletopAudioCue.FacilityUpgrade)]
+    public void FollowUpResourceRewardsAlsoWaitForDiceWithoutDelayingUnrelatedActions(TabletopAudioCue cue)
+    {
+        var sound=new TabletopAudioEvent(cue,.13);
+        Assert.Equal(10.95,TabletopAudioTiming.ScheduledAt(sound,10.2,7,10.95,true),6);
+        Assert.Equal(12.13,TabletopAudioTiming.ScheduledAt(sound,12,7,10.95,false),6);
+        var road=new TabletopAudioEvent(TabletopAudioCue.RoadBuild,.13);
+        Assert.Equal(10.33,TabletopAudioTiming.ScheduledAt(road,10.2,7,10.95,true),6);
     }
     [Fact]
     public void CityPillageCrumblesButCityUpgradeAndMovementDoNot()

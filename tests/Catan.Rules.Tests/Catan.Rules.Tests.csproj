@@ -17,12 +17,14 @@
     <Compile Include="../../Unity/Catan/Assets/Scripts/OperationWindowState.cs" Link="Presentation/OperationWindowState.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopHistoryModel.cs" Link="Presentation/TabletopHistoryModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopSmithingSelection.cs" Link="Presentation/TabletopSmithingSelection.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopPointerPreview.cs" Link="Presentation/TabletopPointerPreview.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/PlayerIdentityModel.cs" Link="Presentation/PlayerIdentityModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopPresentationModel.cs" Link="Presentation/TabletopPresentationModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopCardRevealModel.cs" Link="Presentation/TabletopCardRevealModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopHandOrder.cs" Link="Presentation/TabletopHandOrder.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopHandCounter.cs" Link="Presentation/TabletopHandCounter.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopDiceHistory.cs" Link="Presentation/TabletopDiceHistory.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopDicePresentation.cs" Link="Presentation/TabletopDicePresentation.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopScoreModel.cs" Link="Presentation/TabletopScoreModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopCameraModel.cs" Link="Presentation/TabletopCameraModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopBuildTimeline.cs" Link="Presentation/TabletopBuildTimeline.cs" />

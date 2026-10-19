@@ -1,5 +1,5 @@
 param(
-    [string]$OutputRoot = 'game version/1.6/Catan1.6.12-Cloud-Online',
+    [string]$OutputRoot = 'game version/1.6/Catan1.6.13-Card-Action-Flow',
     [ValidateSet('win-x64','linux-x64','linux-arm64')][string]$Runtime = 'win-x64'
 )
 $ErrorActionPreference = 'Stop'

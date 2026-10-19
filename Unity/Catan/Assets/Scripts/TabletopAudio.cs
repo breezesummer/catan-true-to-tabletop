@@ -33,6 +33,8 @@ public sealed class TabletopAudio : MonoBehaviour
     readonly TabletopAudioModel model = new TabletopAudioModel();
     readonly TabletopAudioPublicModel publicModel = new TabletopAudioPublicModel();
     readonly TabletopAudioLimiter limiter = new TabletopAudioLimiter();
+    TabletopDicePresentation dice;
+    public void BindDice(TabletopDicePresentation value) { dice=value; }
     struct Scheduled { internal TabletopAudioCue Cue; internal double At; }
     readonly List<Scheduled> scheduled = new List<Scheduled>();
     AudioSource[] voices = Array.Empty<AudioSource>();
@@ -204,9 +206,12 @@ public sealed class TabletopAudio : MonoBehaviour
     void Queue(TabletopAudioEvent e, double now)
     {
         if (scheduled.Count >= 32) return;
+        // 迟到历史无需在已停止的骰子上补播滚动声；收获声仍按公开结果正常执行。
+        if(e.Cue==TabletopAudioCue.DiceRoll&&e.RollSequence>0&&dice!=null&&e.RollSequence==dice.Sequence&&!dice.IsRolling(now))return;
+        double at=dice==null?now+e.Delay:TabletopAudioTiming.ScheduledAt(e,now,dice.Sequence,dice.SettlesAt,dice.IsRolling(now));
         // 同一帧同类收牌/卡牌事件合并，既不暴露手牌数量，也不会堆叠增益。
-        if (scheduled.Any(s => s.Cue == e.Cue && Math.Abs(s.At - now - e.Delay) < .04)) return;
-        scheduled.Add(new Scheduled { Cue = e.Cue, At = now + e.Delay });
+        if (scheduled.Any(s => s.Cue == e.Cue && Math.Abs(s.At - at) < .04)) return;
+        scheduled.Add(new Scheduled { Cue = e.Cue, At = at });
     }
     void Update()
     {
@@ -250,7 +255,8 @@ public sealed class TabletopAudio : MonoBehaviour
             if (scope != previousScope) { ResetHistory(); previousScope = scope; }
             // 历史请求与 PlayerView 同步是异步的；重连短暂静默期间持续建立基线。
             if (now < reconnectQuietUntil) model.Reset();
-            var added = model.Observe(scope, owner.HistoryEntries, owner.AudioPublicSequence);
+            var history=owner.HistoryEntries;
+            var added = model.Observe(scope, dice?.KnownHistory(history)??history, owner.AudioPublicSequence);
             if (now >= reconnectQuietUntil) foreach (var e in added) Queue(e, now);
             // 网络 Busy 只是传输状态；不能把每次请求完成误报为新的人类回合。
             bool human = owner.CurrentActor == owner.HumanSeat, finished = owner.Finished;
@@ -268,7 +274,17 @@ public sealed class TabletopAudio : MonoBehaviour
         }
         previousNotice = notice;
         for (int i = scheduled.Count - 1; i >= 0; i--)
-            if (scheduled[i].At <= now) { var cue = scheduled[i].Cue; scheduled.RemoveAt(i); Play(cue); }
+            if (scheduled[i].At <= now)
+            {
+                bool rolling=dice!=null&&dice.IsRolling(now);
+                // 公开胜利牌退场前仍展示旧视图；保留收牌事件至 applyView 后，与真正起飞同帧衔接。
+                if(!TabletopAudioTiming.CanPlay(scheduled[i].Cue,rolling,owner.CardPresentationBusy))
+                {
+                    if(rolling){var delayed=scheduled[i];delayed.At=dice.SettlesAt;scheduled[i]=delayed;}
+                    continue;
+                }
+                var cue = scheduled[i].Cue; scheduled.RemoveAt(i); Play(cue);
+            }
         if (Input.GetKeyDown(KeyCode.Escape)) Click(true);
     }
     void UpdateListener()

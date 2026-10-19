@@ -57,6 +57,7 @@ public sealed partial class M3App : MonoBehaviour
         if((host==null&&!NetworkGame)||board==null)return;
         RefreshTablePrompt();
         Vector2 releasePoint=Vector2.zero;bool released=ai!=null&&dock.ConsumeBuildRelease(out releasePoint);
+        if(mapChoice.Active&&Input.GetMouseButtonDown(1)){mapChoice.Clear();return;}
         if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         var pointer=MobileTabletop.Pointer;
         bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(MobileTabletop.Logical(pointer));
@@ -64,7 +65,12 @@ public sealed partial class M3App : MonoBehaviour
         bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,tabletop.OperationHidden||!holding);
         if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
         if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
-        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)&&!blocked&&(ai!=null||pointer.x<Screen.width*.70f)){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();mapPan.Cancel(board.TableScene);}
+        if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)&&!blocked&&(ai!=null||pointer.x<Screen.width*.70f))
+        {
+            bool buildingMenu=ai!=null&&Input.GetMouseButtonDown(1)&&PickTabletopBuilding(pointer);
+            if(!buildingMenu){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();}
+            mapPan.Cancel(board.TableScene);
+        }
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGameDialog||view==null||ai!=null&&(!ai.IsHumanTurn||tabletop.OperationHidden))return;
@@ -78,7 +84,7 @@ public sealed partial class M3App : MonoBehaviour
         {
             hover=candidate;
             bool valid=hover!=""&&placementLegalIds.Contains(hover);
-            if(IsToken(placement))board.PreviewRobber(hover,valid);else if(IsShip(placement))board.PreviewShip(hover,valid);else board.Preview(hover,IsRoad(placement),valid);
+            board.PreviewPiece(hover,TabletopPointerPreview.ForCommand(placement.ToString()),seat,valid);
         }
         bool guideHit=ai==null&&help&&mouse.x>24f*Screen.width/1440f&&mouse.x<732f*Screen.width/1440f&&mouse.y>104f*Screen.height/900f&&mouse.y<227f*Screen.height/900f;
         if((ai!=null?boardClick||released:Input.GetMouseButtonDown(0))&&!guideHit&&(ai!=null||mouse.x<Screen.width*.73f&&mouse.y>Screen.height*.10f&&mouse.y<Screen.height*.895f))

@@ -16,18 +16,24 @@ public sealed class TabletopChoiceBubble
     public void Open(Vector2 screen,string heading,string[] choices,Action<int> callback)
     {
         var point=MobileTabletop.Logical(screen);
-        area=new Rect(Mathf.Clamp(point.x-150,24,1116),Mathf.Clamp(point.y-110,170,650),300,82+choices.Length*40);
+        float height=70+choices.Length*46;
+        area=new Rect(Mathf.Clamp(point.x-160,24,1096),Mathf.Clamp(point.y-height*.5f,24,876-height),320,height);
         title=heading;labels=choices;select=callback;
         Windows?.Describe(heading);
     }
     public void Draw()
     {
         if(!Active)return;
+        bool previous=ModernOperationUI.MenuContext;ModernOperationUI.UseMenuContext(true);
+        try
+        {
         ModernOperationUI.Panel(area);
-        ModernOperationUI.Label(new Rect(area.x+12,area.y+8,192,28),title,ModernOperationUI.Text);
+        PastoralMenuUI.Label(new Rect(area.x+18,area.y+9,area.width-106,32),title,18,PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
         if(ModernOperationUI.Button(new Rect(area.xMax-82,area.y+8,30,28),"—")){if(Windows==null)Clear();else Windows.Hide(title);}
         if(ModernOperationUI.Button(new Rect(area.xMax-42,area.y+8,30,28),"×")){if(Windows==null)Clear();else Windows.Close();}
-        for(int i=0;i<labels.Length;i++)if(ModernOperationUI.Button(new Rect(area.x+12,area.y+40+i*40,276,34),labels[i]))
+        for(int i=0;i<labels.Length;i++)if(ModernOperationUI.Button(new Rect(area.x+18,area.y+51+i*46,area.width-36,38),labels[i]))
         {Choose(i);GUIUtility.ExitGUI();}
+        }
+        finally{ModernOperationUI.UseMenuContext(previous);}
     }
 }

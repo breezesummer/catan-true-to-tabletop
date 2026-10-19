@@ -1,4 +1,4 @@
-param([string]$BuildRoot='game version/1.6/Catan1.6.12-Cloud-Online')
+param([string]$BuildRoot='game version/1.6/Catan1.6.13-Card-Action-Flow')
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Player = & (Join-Path $PSScriptRoot 'Find-GamePlayer.ps1') -BuildRoot $BuildRoot

@@ -77,7 +77,7 @@ public sealed partial class M4App
         if(operationView!=view)
         {
             operationView=view;var own=view.Players.First(p=>p.Id==seat);
-            var s=new OperationSnapshot{Scope="M4:"+seat,Seat=seat,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),RequiresSelection=TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString()),GoodCount=8,Goods=DockGoods(view.OwnResources,view.OwnCommodities),Bank=DockGoods(view.Bank,view.CommodityBank),OtherPlayers=view.Players.Where(p=>p.Id!=seat).Select(p=>p.Id).ToArray()};
+            var s=new OperationSnapshot{Scope="M4:"+seat,Seat=seat,PublicSequence=view.Events.LastOrDefault()?.Sequence??0,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),RequiresSelection=TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString()),GoodCount=8,Goods=DockGoods(view.OwnResources,view.OwnCommodities),Bank=DockGoods(view.Bank,view.CommodityBank),OtherPlayers=view.Players.Where(p=>p.Id!=seat).Select(p=>p.Id).ToArray()};
             s.CollectionTiles=TabletopCollectionSources.Project(view.Board.Tiles,view.Board.Settlements,view.Board.Cities,view.Board.RobberTileId,s.GoodCount==8);s.CollectionPosition=id=>{var point=MobileTabletop.Logical(board.ScreenPoint(id));return new TabletopCardPose{X=point.x,Y=point.y};};
             for(int i=0;i<8;i++)s.Rates[i]=BankTradeRate(i);
             bool setup=view.Phase==GamePhase.SetupSettlement,citySetup=setup&&view.Board.Settlements.Any(p=>p.PlayerId==seat),villageSetup=setup&&!citySetup;
@@ -113,7 +113,7 @@ public sealed partial class M4App
                 if(b.Track>=0){operationFacilityLocked=true;draft.Track=(ImprovementTrack)b.Track;Submit(draft);}
                 else{operationKnightLevel=b.Id.Contains(":")?int.Parse(b.Id.Split(':')[1]):0;pickField="target";pickType=draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.PlaceFreeRoad?"E":"V";status="已拿起 "+b.Name+"，点击地图上的合法位置放下；右键或 Esc 放回。";}
             };
-            s.PrepareCard=c=>{CancelOperationDraft();Select(CommandKind.PlayProgressCard);draft.ProgressCard=(ProgressCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在操作面板设置效果并确认。";BeginDirectProgress();};
+            s.PrepareCard=PrepareProgressCard;
             if(view.OwnProgressCards.Length<=4||view.Phase!=GamePhase.Action||view.ActivePlayerId!=seat)handOverflowDiscard=false;
             s.ResourceHandLimit=7+2*view.Board.Walls.Count(w=>w.PlayerId==seat);s.SpecialHandLimit=4;
             var handDiscard=view.Phase==GamePhase.Discard?view.Discards.FirstOrDefault(d=>d.PlayerId==seat):null;
@@ -175,7 +175,7 @@ public sealed partial class M4App
         if(ai.IsHumanTurn&&draft==null&&view.Phase==GamePhase.RobberMove){Select(CommandKind.MoveRobber);pickField="target";pickType="T";status="拿起强盗，点击新的地块放下。";}
         tabletop.SetContextAnchor(operationActions&&operationKnightTarget!=null?(Vector2?)MobileTabletop.Logical(board.ScreenPoint(operationKnightTarget)):null);
         GUI.enabled=tableEnabled&&!mapChoice.Active&&!dock.HasOverlay;
-        if(OperationContextVisible&&!ResourceChoiceVisible)tabletop.DrawContext(operationActions?"棋子行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):"当前选择",DrawOperationControls);
+        if(OperationContextVisible&&!ResourceChoiceVisible)tabletop.DrawContext(operationActions?"骑士行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):draft!=null&&draft.Kind==CommandKind.PlayProgressCard?CardName(draft.ProgressCard):"当前选择",DrawOperationControls);
         GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!ai.TableInspectionBlocked&&!ResourceChoiceVisible&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
         if(ResourceChoiceVisible&&ai.IsHumanTurn&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen)DrawPendingResources();
         tabletop.HandFlightsVisible=dock.ResourceHandVisible;if(!ResourceChoiceVisible&&(tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableInspectionBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
@@ -226,12 +226,12 @@ public sealed partial class M4App
             if(knight!=null)
             {
                 Text(new[]{"","基础骑士","强力骑士","精锐骑士"}[knight.Level]+"  ·  "+(knight.Active?"已激活":"未激活"));
-                Text(knight.Active&&knight.ActivatedTurn==view.Turn?"本回合刚激活，下一回合可行动。":"选择动作后，在地图上点选目标。",true);
+                if(knight.Active&&knight.ActivatedTurn==view.Turn)Text("本回合刚激活",true);
             }
-            else Text("点击地图选中己方骑士，或先选择下方动作。",true);
+            else Text("请选择己方骑士。",true);
             GUILayout.Space(8);
-            TabletopAction("升级骑士 · 羊毛 1 + 矿石 1",CommandKind.PromoteKnight);
-            TabletopAction("激活骑士 · 谷物 1",CommandKind.ActivateKnight);
+            TabletopAction("晋升 · 羊毛1 矿石1",CommandKind.PromoteKnight);
+            TabletopAction("激活 · 小麦1",CommandKind.ActivateKnight);
             TabletopAction("移动骑士",CommandKind.MoveKnight);
             TabletopAction("驱离弱骑士",CommandKind.DisplaceKnight);
             TabletopAction("驱逐强盗",CommandKind.ChaseRobber);
@@ -252,19 +252,7 @@ public sealed partial class M4App
         bool from=kind==CommandKind.MoveKnight||kind==CommandKind.DisplaceKnight;
         bool knightAction=kind==CommandKind.PromoteKnight||kind==CommandKind.ActivateKnight||from||kind==CommandKind.ChaseRobber;
         bool legal=view.LegalActions.Any(c=>c.Kind==kind&&(!knightAction||operationKnightTarget==null||(from?c.SourceId:c.TargetId)==operationKnightTarget));
-        if(!ModernOperationUI.LayoutButton(text,legal))
-        {
-            if(!legal)
-            {
-                var selected=view.Board.Knights.FirstOrDefault(k=>k.PlayerId==seat&&k.LocationId==operationKnightTarget);
-                string reason=selected==null?"当前没有符合条件的棋子或合法目标":
-                    kind==CommandKind.PromoteKnight?(selected.Level==3?"这名骑士已达到最高等级":view.OwnResources.Wool<1||view.OwnResources.Ore<1?"升级需要 1 羊毛和 1 矿石":"本回合已升级，或缺少高一级骑士库存与政治设施等级"):
-                    kind==CommandKind.ActivateKnight?(selected.Active?"这名骑士已经激活":view.OwnResources.Wheat<1?"需要 1 张谷物":"当前阶段无法激活"):
-                    !selected.Active?"请先激活这名骑士":selected.ActivatedTurn==view.Turn?"本回合刚激活，暂不能行动":"没有可达的合法目标";
-                ModernOperationUI.Info(reason);
-            }
-            return;
-        }
+        if(!ModernOperationUI.LayoutButton(text,legal))return;
         string knight=operationKnightTarget;
         CancelOperationDraft();Select(kind);
         if(kind==CommandKind.CommercialHarborOffer)return;
@@ -286,6 +274,32 @@ public sealed partial class M4App
         var projected=board.ScreenPoint(vertex);tabletop.SetContextAnchor(MobileTabletop.Logical(projected));
         status="选择这名骑士的动作；右键空白处或 Esc 收起。";return true;
     }
+    bool PickTabletopContext(Vector2 mouse)
+    {
+        if(draft!=null)return false;
+        return PickTabletopKnight(mouse)||PickTabletopBuilding(mouse);
+    }
+    bool PickTabletopBuilding(Vector2 mouse)
+    {
+        if(view==null||curtain||newGame||artOpen||!ai.IsHumanTurn)return false;
+        return OpenTabletopBuildingMenu(Pick("V",mouse));
+    }
+    bool OpenTabletopBuildingMenu(string vertex)
+    {
+        if(view==null||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null)return false;
+        bool village=view.Board.Settlements.Any(p=>p.PlayerId==seat&&p.LocationId==vertex);
+        bool city=view.Board.Cities.Any(p=>p.PlayerId==seat&&p.LocationId==vertex);
+        if(!village&&!city)return false;
+        dock.Reset();CancelOperationDraft();
+        if(city&&view.Board.Walls.Any(p=>p.LocationId==vertex)){ai.ShowTablePrompt(status="这座城市已有城墙。");return true;}
+        var kind=village?CommandKind.BuildCity:CommandKind.BuildWall;
+        mapChoice.Open(board.ScreenPoint(vertex),village?"村庄升级":"城市城墙",new[]{village?"升级城市 · 小麦2 矿石3":"修建城墙 · 砖块2"},i=>{
+            var command=New(kind,vertex);var preview=Preview(command);
+            if(preview.Success)Submit(command);else ai.ShowTablePrompt(status=preview.Message);
+        });return true;
+    }
+    internal bool VerificationOpenBuilding(string vertex)=>OpenTabletopBuildingMenu(vertex);
+    internal void VerificationChooseBuildingUpgrade()=>mapChoice.Choose(0);
     internal bool VerificationSelectKnight(string vertex)
     {
         if(view==null||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null||!view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==vertex))return false;
@@ -300,6 +314,19 @@ public sealed partial class M4App
 
         if(operationActions)CancelOperationDraft();
         return false;
+    }
+    void PrepareProgressCard(OperationHandCard card)
+    {
+        CancelOperationDraft();Select(CommandKind.PlayProgressCard);
+        draft.ProgressCard=(ProgressCardKind)int.Parse(card.Id.Split(':')[0]);
+        switch(draft.ProgressCard)
+        {
+            case ProgressCardKind.Irrigation:case ProgressCardKind.Mining:case ProgressCardKind.RoadBuilding:
+            case ProgressCardKind.CommercialHarbor:case ProgressCardKind.Encouragement:case ProgressCardKind.Wedding:case ProgressCardKind.Sabotage:
+                Submit(draft);return;
+        }
+        if(DirectProgressActive){BeginDirectProgress();return;}
+        status="请选择"+card.Name+"的效果。";
     }
     internal OperationSnapshot VerificationOperationSnapshot=>Operations();
     internal OperationDock VerificationOperationDock=>dock;

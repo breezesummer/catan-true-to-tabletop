@@ -9,6 +9,10 @@ public sealed class TabletopBankUI
 {
     public static readonly Rect Area = new Rect(18,55,220,210);
     readonly TabletopCollectionTimeline timeline = new TabletopCollectionTimeline();
+    TabletopDicePresentation dice;
+    readonly TabletopHandCountPresentation displayedBankCounts=new TabletopHandCountPresentation();
+    public void BindDice(TabletopDicePresentation value) { dice=value; }
+    int DisplayedBankCount(OperationSnapshot snapshot,int good)=>displayedBankCounts.Observe(snapshot.Scope,"bank:"+good,false,snapshot.Bank[good],dice!=null&&dice.IsRolling(Time.unscaledTimeAsDouble));
     public TabletopCollectionTimeline Collections => timeline;
     internal int VerificationCollectingFlightCount => timeline.Active(Time.unscaledTimeAsDouble).Length;
     internal string[] VerificationCollectionOrigins => timeline.Active(Time.unscaledTimeAsDouble).Select(f=>f.SourceTileId??(f.IsSpecial?f.Category+":"+f.Track:"bank")).ToArray();
@@ -27,8 +31,8 @@ public sealed class TabletopBankUI
     {
         if(snapshot==null)return;
         current=snapshot;sources.Clear();specialSources.Clear();destinations.Clear();ownDestinations.Clear();ownSlotIndices.Clear();
-        timeline.Observe(snapshot.Scope,entries,Time.unscaledTimeAsDouble,snapshot.CollectionTiles);
-        for(int good=0;good<snapshot.GoodCount;good++)sources[good]=new Rect(42,32,34,48);
+        timeline.Observe(snapshot.Scope,dice?.KnownHistory(entries)??entries,Time.unscaledTimeAsDouble,snapshot.CollectionTiles,dice?.SettlesAt);
+        for(int good=0;good<snapshot.GoodCount;good++){DisplayedBankCount(snapshot,good);sources[good]=new Rect(42,32,34,48);}
         developmentSource=new Rect(70,32,34,48);
         for(int track=0;track<3;track++)specialSources[track]=new Rect(54+track*8,32,34,48);
         var slots=timeline.HandSlots(snapshot.Seat,snapshot.Goods,snapshot.GoodCount,Time.unscaledTimeAsDouble);
@@ -48,13 +52,13 @@ public sealed class TabletopBankUI
     {
         if(snapshot==null)return;
         current=snapshot;sources.Clear();specialSources.Clear();destinations.Clear();ownDestinations.Clear();ownSlotIndices.Clear();
-        timeline.Observe(snapshot.Scope,entries,Time.unscaledTimeAsDouble,snapshot.CollectionTiles);
+        timeline.Observe(snapshot.Scope,dice?.KnownHistory(entries)??entries,Time.unscaledTimeAsDouble,snapshot.CollectionTiles,dice?.SettlesAt);
         var title=table.ProjectLabel(new Rect(24,55,208,25));hits.Add(title);
         developmentSource=table.ProjectLabel(StackLayout(snapshot.GoodCount==5?5:9));
         if(ModernOperationUI.Button(title,"银行",snapshot.CanTrade))trade?.Invoke(null);
         for(int good=0;good<snapshot.GoodCount;good++)
         {
-            int count=snapshot.Bank[good];var layout=StackLayout(good);
+            int count=DisplayedBankCount(snapshot,good);var layout=StackLayout(good);
             var hit=Stack(table,"bank-good-"+good,layout,EntityCardAssets.Texture(EntityCardAssets.Good(good).Front),count);
             sources[good]=hit==null?table.ProjectLabel(layout):hit.Rect;
             if(hit!=null)

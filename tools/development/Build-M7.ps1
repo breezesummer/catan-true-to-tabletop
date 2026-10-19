@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.6/Catan1.6.12-Cloud-Online')
+param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.6/Catan1.6.13-Card-Action-Flow')
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m7FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))

@@ -102,6 +102,7 @@ public sealed class BoardRenderer : MonoBehaviour
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)
     {
         if(numberTokens!=null)numberTokens.Refresh(boardTiles);
+        ClearPreview();
         foreach(Transform t in pieces){t.gameObject.SetActive(false);Destroy(t.gameObject);}
         foreach(var p in settlements)
             if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
@@ -161,16 +162,20 @@ public sealed class BoardRenderer : MonoBehaviour
         var p=BoardCamera.WorldToScreenPoint(Position(id)+Vector3.up*.005f); return new Vector2(p.x,Screen.height-p.y);
     }
     public void Preview(string id, bool road, bool legal)
-    {
-        ClearPreview(); if(string.IsNullOrEmpty(id))return;
-        ghost=Piece(road,id,legal?new Color(.3f,1f,.75f):new Color(1f,.22f,.2f),transform);
-    }
+    {PreviewPiece(id,TabletopPointerPreview.ForCommand(road?"BuildRoad":"BuildSettlement"),"P1",legal);}
     public void PreviewRobber(string id,bool legal)
+    {PreviewPiece(id,TabletopPointerPreview.ForCommand("MoveRobber"),"P1",legal);}
+    string pointerPreviewKey;
+    public void PreviewPiece(string id,TabletopPointerPreview preview,string seat,bool legal)
     {
-        ClearPreview();if(string.IsNullOrEmpty(id))return;
-        ghost=Robber(id,legal?new Color(.3f,1f,.75f):new Color(1f,.22f,.2f),transform,false);
+        string key=id+":"+preview.Kind+":"+preview.Level+":"+preview.Active+":"+seat+":"+legal;
+        if(ghost!=null&&pointerPreviewKey==key)return;
+        ClearPreview();if(string.IsNullOrEmpty(id))return;pointerPreviewKey=key;
+        var rotation=id.StartsWith("E")?rotations[id]:Quaternion.identity;
+        ghost=OperationPieceAssets.PointerPreview(preview,seat,Position(id),rotation,transform,legal);
     }
-    public void ClearPreview() { if(ghost!=null)Destroy(ghost); ghost=null; }
+    internal GameObject VerificationPointerPreview=>ghost;
+    public void ClearPreview() { pointerPreviewKey=null;if(ghost!=null){ghost.SetActive(false);Destroy(ghost);} ghost=null; }
     bool operationLayout;
     public void SetOperationLayout(bool enabled)
     {

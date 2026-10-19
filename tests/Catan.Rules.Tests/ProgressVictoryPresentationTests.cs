@@ -9,6 +9,61 @@ namespace Catan.Rules.Tests;
 public sealed class ProgressVictoryPresentationTests
 {
     [Theory]
+    [InlineData(false)] [InlineData(true)]
+    public void VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(bool combined)
+    {
+        GameHistoryEntry[] history;long appliedSequence;int[] owned;
+        if(combined)
+        {
+            var tile=M5Harness.New().GetPlayerView("P1").Board.Tiles.First(t=>t.Resource=="wood");
+            var game=M5Harness.Fixture(s=>
+            {
+                s.Phase=M5.GamePhase.ProductionAwaitRoll;s.Random.State=2;
+                s.AlchemyDice1=Math.Max(1,tile.Number!.Value-6);s.AlchemyDice2=tile.Number.Value-s.AlchemyDice1;
+                s.Cities=[M5Harness.Piece(tile.Vertices[0])];M5Harness.Player(s,"P2").Improvements[(int)M5.ImprovementTrack.Science]=5;
+            });
+            var state=game.GetAuthoritativeStateForTesting();var deck=state.ProgressDecks.Single(d=>d.Track==M5.ImprovementTrack.Science);
+            deck.Cards=new[]{M5.ProgressCardKind.Printing}.Concat(deck.Cards.Where(c=>c!=M5.ProgressCardKind.Printing)).ToArray();M5Harness.SetState(game,state);
+            M5Harness.Accepted(game,M5Harness.Cmd(M5.CommandKind.RollDice));
+            var view=game.GetPlayerView("P1");history=game.GetHistory("P1");appliedSequence=view.Events.Last().Sequence;
+            owned=[view.OwnResources.Wood,view.OwnResources.Brick,view.OwnResources.Wool,view.OwnResources.Wheat,view.OwnResources.Ore,view.OwnCommodities.Cloth,view.OwnCommodities.Coin,view.OwnCommodities.Paper];
+        }
+        else
+        {
+            var tile=M4CoreHarness.New().GetPlayerView("P1").Board.Tiles.First(t=>t.Resource=="wood");
+            var game=M4CoreHarness.Fixture(s=>
+            {
+                s.Phase=M4.GamePhase.ProductionAwaitRoll;s.Random.State=2;
+                s.AlchemyDice1=Math.Max(1,tile.Number!.Value-6);s.AlchemyDice2=tile.Number.Value-s.AlchemyDice1;
+                s.Cities=[M4CoreHarness.Piece(tile.Vertices[0])];M4CoreHarness.Player(s,"P2").Improvements[(int)M4.ImprovementTrack.Science]=5;
+            });
+            var state=game.GetAuthoritativeStateForTesting();var deck=state.ProgressDecks.Single(d=>d.Track==M4.ImprovementTrack.Science);
+            deck.Cards=new[]{M4.ProgressCardKind.Printing}.Concat(deck.Cards.Where(c=>c!=M4.ProgressCardKind.Printing)).ToArray();M4CoreHarness.SetState(game,state);
+            M4CoreHarness.Accepted(game,M4CoreHarness.Cmd(M4.CommandKind.RollDice));
+            var view=game.GetPlayerView("P1");history=game.GetHistory("P1");appliedSequence=view.Events.Last().Sequence;
+            owned=[view.OwnResources.Wood,view.OwnResources.Brick,view.OwnResources.Wool,view.OwnResources.Wheat,view.OwnResources.Ore,view.OwnCommodities.Cloth,view.OwnCommodities.Coin,view.OwnCommodities.Paper];
+        }
+        var entry=Assert.Single(history);var reveal=Assert.Single(TabletopCardReveal.From(entry));
+        Assert.Equal("P2",reveal.PlayerId);Assert.Equal("印刷术",reveal.CardName);Assert.Same(entry,reveal.Roll);
+        var oldSnapshot=new OperationSnapshot{Scope="game:P1",Seat="P1",GoodCount=8,PublicSequence=0};
+        var currentSnapshot=new OperationSnapshot{Scope="game:P1",Seat="P1",GoodCount=8,PublicSequence=appliedSequence,Goods=owned};
+        var dice=new TabletopDicePresentation();dice.Observe(0,0,0,0,0);dice.Observe(entry.Sequence,entry.Dice1,entry.Dice2,3,10);
+        var collections=new TabletopCollectionTimeline();collections.Observe(oldSnapshot.Scope,[],0);
+        foreach(double now in new[]{10,10.95,12})
+        {
+            Assert.Empty(oldSnapshot.PresentedHistory(history));
+            collections.Observe(oldSnapshot.Scope,oldSnapshot.PresentedHistory(history),now,outcomesReadyAt:dice.SettlesAt);
+            Assert.Empty(collections.Active(now));Assert.Empty(collections.HandSlots("P1",oldSnapshot.Goods,8,now));
+        }
+        // 卡牌退场后应用真正的新视图，飞牌此时才进入队列，不能被旧手牌数量取消。
+        Assert.False(dice.IsRolling(13.1));
+        collections.Observe(currentSnapshot.Scope,currentSnapshot.PresentedHistory(history),13.1,outcomesReadyAt:dice.SettlesAt);
+        Assert.NotEmpty(collections.Active(13.1));
+        var slots=collections.HandSlots("P1",owned,8,13.1);Assert.Equal(owned.Sum(),slots.Length);Assert.All(slots,slot=>Assert.NotNull(slot.Flight));
+        Assert.DoesNotContain(collections.Active(13.1),flight=>flight.CardName=="印刷术");
+        Assert.Equal(history,dice.VisibleHistory(currentSnapshot.PresentedHistory(history),13.1));
+    }
+    [Theory]
     [InlineData(false,"Printing","P1")] [InlineData(false,"Printing","P2")]
     [InlineData(false,"Constitution","P1")] [InlineData(false,"Constitution","P2")]
     [InlineData(true,"Printing","P1")] [InlineData(true,"Printing","P2")]

@@ -7,6 +7,12 @@ using System.Linq;
 public sealed class OperationSnapshot
 {
     public string Scope, Revision, Status, Phase, Seat;
+    public long PublicSequence=long.MaxValue;
+    public Catan.Core.GameHistoryEntry[] PresentedHistory(Catan.Core.GameHistoryEntry[] entries)
+    {
+        entries=entries??Array.Empty<Catan.Core.GameHistoryEntry>();
+        return entries.Length==0||entries.All(e=>e.Sequence<=PublicSequence)?entries:entries.Where(e=>e.Sequence<=PublicSequence).ToArray();
+    }
     public bool CanTrade, CanInteract, RequiresSelection;
     public int[] Goods = new int[8], Bank = new int[8], Rates = new int[8];
     public int GoodCount = 5;

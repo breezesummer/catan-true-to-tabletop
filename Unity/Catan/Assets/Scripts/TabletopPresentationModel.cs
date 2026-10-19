@@ -114,33 +114,6 @@ public static class TabletopSelectionPrompt
         }
     }
 }
-public sealed class TabletopDicePresentation
-{
-    public const double Duration = .95;
-    public int First { get; private set; } = 1;
-    public int Second { get; private set; } = 6;
-    public int? Event { get; private set; }
-    long sequence;
-    bool initialized;
-    double started = double.NegativeInfinity;
-    public void Observe(long rollSequence, int first, int second, int? eventDie, double now)
-    {
-        // 首次连接视图（含读档）直接显示已确认结果；相同点数的新掷骰仍会启动动画。
-        if (initialized && rollSequence != sequence && rollSequence > 0) started = now;
-        initialized = true; sequence = rollSequence;
-        First = first > 0 ? first : 1; Second = second > 0 ? second : 6; Event = eventDie;
-    }
-    public bool IsRolling(double now) => now - started < Duration;
-    public float Progress(double now) => (float)Math.Max(0, Math.Min(1, (now - started) / Duration));
-    public int Face(int die, double now)
-    {
-        if (!IsRolling(now)) return die == 0 ? First : die == 1 ? Second : Event ?? 0;
-        int step = (int)((now - started) * 20) + die * 3;
-        // 只生成过渡画面，不接触任何随机数生成器或最终骰点。
-        return die < 2 ? step % 6 + 1 : step % 6 < 3 ? 0 : step % 6 - 2;
-    }
-}
-
 public sealed class TabletopCollectionFlight
 {
     public string Player;
@@ -199,8 +172,10 @@ public sealed class TabletopCollectionTimeline
     TabletopCollectionTile[] observedTiles;
     int lastRoll;
     bool productionPending;
-    public void Observe(string playerScope,Catan.Core.GameHistoryEntry[] entries,double now,TabletopCollectionTile[] tiles=null)
+    public double OutcomesReadyAt { get; private set; } = double.NegativeInfinity;
+    public void Observe(string playerScope,Catan.Core.GameHistoryEntry[] entries,double now,TabletopCollectionTile[] tiles=null,double? outcomesReadyAt=null)
     {
+        OutcomesReadyAt=outcomesReadyAt??double.NegativeInfinity;
         entries=entries??Array.Empty<Catan.Core.GameHistoryEntry>();
         long latest=entries.Length==0?0:entries.Max(e=>e.Sequence);
         if(!initialized||scope!=playerScope||latest<sequence)
@@ -217,6 +192,8 @@ public sealed class TabletopCollectionTimeline
         int inventions=updates.Count(e=>e.Action=="使用「发明」");bool numbersReliable=true;
         foreach(var entry in updates)
         {
+            // 动画统一对齐真实骰子落定时间；历史迟到时不能再从零重复等待一次掷骰。
+            double collectionStart=Math.Max(now,outcomesReadyAt??(entry.Dice1>0?now+TabletopDicePresentation.Duration:now));
             ReplayPublicBoard(entry,sourceTiles,tiles,inventions,ref numbersReliable);
             if(entry.Dice1>0){lastRoll=entry.Dice1+entry.Dice2;productionPending=lastRoll!=7;}
             if(entry.Kind=="EndTurn")productionPending=false;
@@ -238,7 +215,7 @@ public sealed class TabletopCollectionTimeline
                     int amount=Math.Min(fromBank,gain.Amount);fromBank-=amount;
                     var origins=Origins(entry,gain.PlayerId,gain.GoodIndex,production,production&&!numbersReliable?Array.Empty<TabletopCollectionTile>():sourceTiles);
                     for(int i=0;i<amount;i++)flights.Add(new TabletopCollectionFlight {
-                        Player=gain.PlayerId,Good=gain.GoodIndex,SourceTileId=origins.ElementAtOrDefault(i),Started=now+(entry.Dice1>0?TabletopDicePresentation.Duration:0)+Math.Min(.55,ordinal++*.06)
+                        Player=gain.PlayerId,Good=gain.GoodIndex,SourceTileId=origins.ElementAtOrDefault(i),Started=collectionStart+Math.Min(.55,ordinal++*.06)
                     });
                 }
             }
@@ -255,7 +232,7 @@ public sealed class TabletopCollectionTimeline
                     {
                         int amount=Math.Min(needed,remaining[donor]);needed-=amount;remaining[donor]-=amount;
                         for(int i=0;i<amount;i++)flights.Add(new TabletopCollectionFlight{
-                            Player=gain.PlayerId,Good=gain.GoodIndex,SourcePlayerId=donors[donor].PlayerId,Started=now+Math.Min(.55,ordinal++*.06)});
+                            Player=gain.PlayerId,Good=gain.GoodIndex,SourcePlayerId=donors[donor].PlayerId,Started=collectionStart+Math.Min(.55,ordinal++*.06)});
                     }
                 }
             }
@@ -268,7 +245,7 @@ public sealed class TabletopCollectionTimeline
                 for(int i=0;i<gain.Amount;i++)flights.Add(new TabletopCollectionFlight{
                     Player=gain.PlayerId,Good=-1,Category=gain.Category,CardName=gain.Name,ProgressIndex=art,
                     Track=art>=0?(art<10?2:art<16?0:1):entry.EventDie=="Science"?2:entry.EventDie=="Trade"?0:entry.EventDie=="Politics"?1:-1,
-                    SourcePlayerId=source?.PlayerId,Started=now+(entry.Dice1>0?TabletopDicePresentation.Duration:0)+Math.Min(.55,ordinal++*.06)});
+                    SourcePlayerId=source?.PlayerId,Started=collectionStart+Math.Min(.55,ordinal++*.06)});
             }
         }
         observedTiles=tiles==null?sourceTiles:CopyTiles(tiles);

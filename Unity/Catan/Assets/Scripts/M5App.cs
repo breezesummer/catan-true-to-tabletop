@@ -127,7 +127,7 @@ public sealed partial class M5App : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)&&!blocked&&(ai!=null||pointer.x<Screen.width*.70f))
         {
-            bool knightMenu=ai!=null&&Input.GetMouseButtonDown(1)&&!blocked&&PickTabletopKnight(pointer);
+            bool knightMenu=ai!=null&&Input.GetMouseButtonDown(1)&&!blocked&&PickTabletopContext(pointer);
             if(!knightMenu){dock.Reset();CancelOperationDraft();pickField="";board.ClearPreview();newGame=false;cardArt.Clear();}
             mapPan.Cancel(board.TableScene);
         }
@@ -147,7 +147,7 @@ public sealed partial class M5App : MonoBehaviour
         {
             bool valid=ai==null||!DirectTabletopPlacement||pickField!="source"||(draft.Kind==CommandKind.MoveShip?view.MovableShipEdgeIds.Contains(target):view.LegalActions.Any(c=>c.Kind==draft.Kind&&c.SourceId==target));
             if(pickField=="target") {string old=draft.TargetId;draft.TargetId=target;valid=Preview(draft).Success&&(ai==null||DockKnightTargetMatches(target));draft.TargetId=old;}
-            if(pickType=="T")board.PreviewRobber(target,valid);else if(IsShip(draft))board.PreviewShip(target,valid);else board.Preview(target,pickType=="E",valid);
+            PreviewOperationTarget(target,valid);
             if((ai!=null?boardClick:Input.GetMouseButtonDown(0))||buildReleased)
             {
                 if(ai!=null&&!DockKnightTargetMatches(target)){status="请选择低一级的己方骑士晋升。";return;}
@@ -165,6 +165,19 @@ public sealed partial class M5App : MonoBehaviour
                 pickField="";board.ClearPreview();status=ai!=null?"目标已选中，请在操作面板确认。":"已选择 "+target+"；检查面板后确认。";
             }
         }
+        else board.ClearPreview();
+    }
+    void PreviewOperationTarget(string target,bool legal)
+    {
+        var selected=view.Board.Knights.FirstOrDefault(k=>k.LocationId==(string.IsNullOrEmpty(draft.SourceId)?target:draft.SourceId));
+        int level=selected?.Level??1;
+        if(draft.Kind==CommandKind.PromoteKnight)level=operationKnightLevel>0?operationKnightLevel:level+1;
+        if(draft.Kind==CommandKind.RecruitKnight)level=1;
+        bool setupCity=draft.Kind==CommandKind.SetupSettlement&&view.Board.Settlements.Any(p=>p.PlayerId==seat);
+        var preview=TabletopPointerPreview.ForCommand(draft.Kind.ToString(),setupCity,level,selected?.Active??false);
+        if(draft.Kind==CommandKind.PlayProgressCard||draft.Kind==CommandKind.ResolveChoice||draft.Kind==CommandKind.ResolveProgressChoice)
+            preview=TabletopPointerPreview.ForEffect(draft.Kind==CommandKind.PlayProgressCard?draft.ProgressCard.ToString():null,view.PendingDecision?.Kind,level,selected?.Active??false);
+        board.PreviewPiece(target,preview,seat,legal);
     }
     internal bool TryCancelTableInteraction()
     {
@@ -384,10 +397,10 @@ public sealed partial class M5App : MonoBehaviour
     void ActionButton(string text,CommandKind kind){if(Btn(text))Select(kind);}
     void DrawDraft()
     {
-        GUILayout.Space(10);Text("当前选择 · "+CommandName(draft.Kind));
+        GUILayout.Space(6);if(ai==null)Text("当前选择 · "+CommandName(draft.Kind));
         var k=draft.Kind;var pending=view.PendingDecision==null?"":view.PendingDecision.Kind;
         bool card=k==CommandKind.PlayProgressCard;bool resourceReady=true;
-        if(card){Text(CardName(draft.ProgressCard));Text(CardHelp[(int)draft.ProgressCard],true);if(ai==null&&view.OwnProgressCards.Contains(draft.ProgressCard))ProgressFace(draft.ProgressCard,CardName(draft.ProgressCard));}
+        if(card&&ai==null){Text(CardName(draft.ProgressCard));Text(CardHelp[(int)draft.ProgressCard],true);if(view.OwnProgressCards.Contains(draft.ProgressCard))ProgressFace(draft.ProgressCard,CardName(draft.ProgressCard));}
         if(k==CommandKind.ImproveCity&&ai!=null&&operationFacilityLocked)Text("设施轨道："+Tracks[(int)draft.Track]);
         else if(k==CommandKind.ImproveCity||card&&draft.ProgressCard==ProgressCardKind.Crane||pending=="DefenderProgress")draft.Track=(ImprovementTrack)Cycle("轨道",(int)draft.Track,Tracks);
         bool source=k==CommandKind.MoveKnight||k==CommandKind.DisplaceKnight||k==CommandKind.MoveShip;

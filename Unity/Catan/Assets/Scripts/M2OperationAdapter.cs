@@ -62,6 +62,23 @@ public sealed partial class M2App
 
         return false;
     }
+    bool PickTabletopBuilding(Vector2 mouse)
+    {
+        if(view==null||curtain||newGameDialog||holding||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null)return false;
+        var village=view.Board.Settlements.Where(p=>p.PlayerId==seat).OrderBy(p=>Vector2.Distance(mouse,board.ScreenPoint(p.LocationId))).FirstOrDefault();
+        return village!=null&&Vector2.Distance(mouse,board.ScreenPoint(village.LocationId))<MobileTabletop.PickRadius(25f)&&OpenTabletopBuildingMenu(village.LocationId);
+    }
+    bool OpenTabletopBuildingMenu(string vertex)
+    {
+        if(view==null||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null||!view.Board.Settlements.Any(p=>p.PlayerId==seat&&p.LocationId==vertex))return false;
+        dock.Reset();CancelOperationDraft();
+        mapChoice.Open(board.ScreenPoint(vertex),"村庄升级",new[]{"升级城市 · 小麦2 矿石3"},i=>{
+            var command=NewCommand(CommandKind.BuildCity,vertex);var preview=Preview(command);
+            if(preview.Success)Submit(command);else ai.ShowTablePrompt(status=preview.Message);
+        });return true;
+    }
+    internal bool VerificationOpenBuilding(string vertex)=>OpenTabletopBuildingMenu(vertex);
+    internal void VerificationChooseBuildingUpgrade()=>mapChoice.Choose(0);
     internal bool VerificationOpenPort(string id)
     {
         if(view==null||!Operations().CanTrade)return false;
@@ -77,7 +94,7 @@ public sealed partial class M2App
         {
             operationView=view;
             var own=view.Players.First(p=>p.Id==seat);
-            var s=new OperationSnapshot{Scope="M2:"+seat,Seat=seat,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),RequiresSelection=TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString()),GoodCount=5};
+            var s=new OperationSnapshot{Scope="M2:"+seat,Seat=seat,PublicSequence=view.Events.LastOrDefault()?.Sequence??0,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),RequiresSelection=TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString()),GoodCount=5};
             s.CollectionTiles=TabletopCollectionSources.Project(view.Board.Tiles,view.Board.Settlements,view.Board.Cities,view.Board.RobberTileId,s.GoodCount==8);s.CollectionPosition=id=>{var point=MobileTabletop.Logical(board.ScreenPoint(id));return new TabletopCardPose{X=point.x,Y=point.y};};
             s.Goods=DockCost(view.OwnResources.Wood,view.OwnResources.Brick,view.OwnResources.Wool,view.OwnResources.Wheat,view.OwnResources.Ore);
             s.Bank=DockCost(view.Bank.Wood,view.Bank.Brick,view.Bank.Wool,view.Bank.Wheat,view.Bank.Ore);
@@ -186,7 +203,7 @@ public sealed partial class M2App
     {
         tabletop.BeginContext(caption);
         ModernOperationUI.Styles(font);var label=new GUIStyle(ModernOperationUI.Text);
-        tableInk=label;content();tabletop.EndContext();
+        tableInk=label;try{content();}finally{tabletop.EndContext();}
     }
     GUIStyle tableInk;
     bool TableButton(string caption)=>ModernOperationUI.LayoutButton(M6App.DisplayPlayerText(caption));

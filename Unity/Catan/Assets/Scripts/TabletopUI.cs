@@ -15,7 +15,7 @@ public sealed class TabletopSeat
 
 public sealed partial class TabletopUI
 {
-    public static readonly Rect ContextRect = new Rect(982, 315, 432, 390);
+    public static readonly Rect ContextRect = new Rect(460, 205, 520, 490);
     public static readonly Rect EndTurnRect = new Rect(1284,760,130,130);
     internal static readonly Rect SpecialRect = new Rect(1278,744,144,43);
     readonly List<Rect> hits = new List<Rect>();
@@ -28,12 +28,13 @@ public sealed partial class TabletopUI
     bool contextVisible;
     public bool ContextVisible=>contextVisible;
     Vector2? contextAnchor;
-    public Rect CurrentContextRect => contextAnchor.HasValue?new Rect(Mathf.Clamp(contextAnchor.Value.x+14,16,1440-ContextRect.width-16),Mathf.Clamp(contextAnchor.Value.y+10,16,900-ContextRect.height-16),ContextRect.width,ContextRect.height):ContextRect;
+    public Rect CurrentContextRect => contextAnchor.HasValue?new Rect(Mathf.Clamp(contextAnchor.Value.x+14,16,1440-392-16),Mathf.Clamp(contextAnchor.Value.y+10,16,900-390-16),392,390):ContextRect;
     public void SetContextAnchor(Vector2? anchor){contextAnchor=anchor;}
     static Texture2D disc;
     readonly TabletopDicePresentation dice = new TabletopDicePresentation();
     readonly TabletopHistoryUI history = new TabletopHistoryUI();
     readonly TabletopBankUI bank = new TabletopBankUI();
+    readonly TabletopHandCountPresentation displayedHandCounts=new TabletopHandCountPresentation();
     readonly TabletopDefenseUI defense = new TabletopDefenseUI();
     public void BindDefense(int position,int strength,int threat) { defense.Bind(position,strength,threat); }
     public void BindLongestRoad(string playerId,int length) { defense.BindLongestRoad(playerId,length); }
@@ -60,7 +61,7 @@ public sealed partial class TabletopUI
     Action purchaseDevelopment;
     Catan.Core.GameHistoryEntry[] bankHistory = Array.Empty<Catan.Core.GameHistoryEntry>();
     public void BindOperations(OperationSnapshot snapshot,Action purchase,Catan.Core.GameHistoryEntry[] entries)
-    {operations=snapshot;OperationWindows.Sync(snapshot?.Scope,snapshot?.Revision);purchaseDevelopment=purchase;bankHistory=entries??Array.Empty<Catan.Core.GameHistoryEntry>();}
+    {operations=snapshot;OperationWindows.Sync(snapshot?.Scope,snapshot?.Revision);purchaseDevelopment=purchase;bankHistory=snapshot?.PresentedHistory(entries)??entries??Array.Empty<Catan.Core.GameHistoryEntry>();}
     internal string CardActionCaption {get{var card=discardDock?.PreviewCard(operations);return card==null?null:"使用\n"+card.Name;}}
     internal bool CardActionReady => discardDock?.CanUsePreviewCard(operations)==true&&!DiceRolling;
     internal void ConfirmCardAction(){if(CardActionReady)discardDock.UsePreviewCard(operations);}
@@ -71,13 +72,14 @@ public sealed partial class TabletopUI
     bool HistoryBlocksInput(Vector2 p) => (history.IsOpen||!contextVisible)&&history.BlocksInput(p);
     public bool BlocksOverlayInput(Vector2 p) => HistoryBlocksInput(p)||contextVisible&&CurrentContextRect.Contains(p);
     public void DrawHistory(Font font,Catan.Core.GameHistoryEntry[] entries,string[] players)
-    {history.Windows=OperationWindows;if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);if(history.IsOpen||!contextVisible)history.Draw(font,entries,players,table.Objects);if(!history.IsOpen){DrawScoreDetails();DrawPlayerHint();}}
+    {history.Windows=OperationWindows;if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);if(history.IsOpen||!contextVisible)history.Draw(font,operations?.PresentedHistory(entries)??entries,players,table.Objects);if(!history.IsOpen){DrawScoreDetails();DrawPlayerHint();}}
     public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
     public void ObserveDice(long sequence,int first,int second,int? eventDie,Catan.Core.GameHistoryEntry presentationRoll=null)
     {
         if(presentationRoll!=null&&presentationRoll.Sequence>sequence)
         {sequence=presentationRoll.Sequence;first=presentationRoll.Dice1;second=presentationRoll.Dice2;eventDie=presentationRoll.EventDie=="Science"?3:presentationRoll.EventDie=="Politics"?2:presentationRoll.EventDie=="Trade"?1:0;}
         dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);
+        bank.BindDice(dice);history.BindDice(dice);TabletopAudio.Instance?.BindDice(dice);
     }
     static readonly Color Cream = new Color(.96f,.88f,.70f), Ink = new Color(.24f,.12f,.06f);
     public static readonly Color HotNumberColor = new Color(1f,.10f,.075f);
@@ -234,7 +236,9 @@ public sealed partial class TabletopUI
             StrategyHudArt.Avatar(new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
             GUI.Label(new Rect(x+4,70,width-8,24),M6App.PlayerLabel(player.Id),M6App.PlayerNameStyle(new GUIStyle(center){fontSize=10,fontStyle=FontStyle.Bold,wordWrap=true},player.Id));
             int points=player.Score==null?player.Points:player.Id==own?player.Score.Total:player.Score.PublicPoints;
-            int[] values={points,player.Improvements==null?0:player.Improvements[0],player.Improvements==null?0:player.Improvements[1],player.Improvements==null?0:player.Improvements[2],player.Resources,player.Cards};
+            int resources=displayedHandCounts.Observe(operations?.Scope,player.Id,false,player.Resources,DiceRolling);
+            int cards=displayedHandCounts.Observe(operations?.Scope,player.Id,true,player.Cards,DiceRolling);
+            int[] values={points,player.Improvements==null?0:player.Improvements[0],player.Improvements==null?0:player.Improvements[1],player.Improvements==null?0:player.Improvements[2],resources,cards};
             string[] hints={"胜利点 · 悬停查看分数构成","贸易设施等级","政治设施等级","科学设施等级",
                 "资源与商品 · 当前 / 七点保护线\n超出保护线后掷出 7，须弃去一半手牌",
                 player.SpecialHandLimit>0?"发展卡 · 当前 / 回合结束上限\n公开胜利点卡不占手牌上限":"发展卡 · 当前张数 / 无持有上限"};
@@ -372,17 +376,19 @@ public sealed partial class TabletopUI
     public void BeginContext(string caption)
     {
         OperationWindows.Describe(caption);
+        ModernOperationUI.UseMenuContext(true);
         var rect=CurrentContextRect;contextVisible=true;ModernOperationUI.Panel(rect);
-        float header=44;
-        GUI.Label(new Rect(rect.x+18,rect.y+12,rect.width-120,header-12),caption,ModernOperationUI.Title);
+        float header=72;
+        PastoralMenuUI.Label(new Rect(rect.x+80,rect.y+17,rect.width-160,36),caption,23,PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
+        PastoralMenuUI.Fill(new Rect(rect.center.x-30,rect.y+61,60,2),PastoralMenuUI.Gold);
         if(ModernOperationUI.Button(new Rect(rect.xMax-91,rect.y+10,32,28),"—"))OperationWindows.Hide(caption);
         if(ModernOperationUI.Button(new Rect(rect.xMax-49,rect.y+10,32,28),"×"))CloseOperation();
         MobileTabletop.ScrollTouch(new Rect(rect.x+16,rect.y+header,rect.width-32,rect.height-header-12),ref scroll);
-        GUILayout.BeginArea(new Rect(rect.x+16,rect.y+header,rect.width-32,rect.height-header-12));
+        GUILayout.BeginArea(new Rect(rect.x+24,rect.y+header,rect.width-48,rect.height-header-18));
         scroll=GUILayout.BeginScrollView(scroll);
     }
-    public void EndContext(){GUILayout.EndScrollView();GUILayout.EndArea();}
-    public void DrawContext(string caption,Action content){BeginContext(caption);content();EndContext();}
+    public void EndContext(){GUILayout.EndScrollView();GUILayout.EndArea();ModernOperationUI.UseMenuContext(false);}
+    public void DrawContext(string caption,Action content){BeginContext(caption);try{content();}finally{EndContext();}}
     public static void NumberToken(Vector2 p,int? number,string fallback,GUIStyle style)
     {
         // 数字已放回棋盘的实体点数牌，服从三维深度；沙漠保留原始地貌。
