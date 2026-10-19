@@ -1,4 +1,6 @@
 # Unity generated data
+# Assets 下的 .meta、场景、ProjectSettings 和运行所需 Plugins DLL 保持版本管理。
+# 构建产生的无功能序列化差异应还原，不使用忽略规则隐藏这些文件。
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -9,6 +11,12 @@
 [Rr]ecordings/
 [Bb]uild/
 [Bb]uilds/
+
+# 本项目的缓存也可能是外部目录软链接；不加结尾斜杠以同时匹配两种形式。
+/Unity/Catan/[Ll]ibrary
+/Unity/Catan/[Tt]emp
+/Unity/Catan/[Ll]ogs
+/Unity/Catan/[Uu]ser[Ss]ettings
 
 # .NET and local editor state
 **/bin/
