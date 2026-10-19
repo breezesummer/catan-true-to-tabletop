@@ -77,7 +77,7 @@ public sealed partial class M2App
         {
             operationView=view;
             var own=view.Players.First(p=>p.Id==seat);
-            var s=new OperationSnapshot{Scope="M2:"+seat,Seat=seat,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),GoodCount=5};
+            var s=new OperationSnapshot{Scope="M2:"+seat,Seat=seat,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),RequiresSelection=TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString()),GoodCount=5};
             s.CollectionTiles=TabletopCollectionSources.Project(view.Board.Tiles,view.Board.Settlements,view.Board.Cities,view.Board.RobberTileId,s.GoodCount==8);s.CollectionPosition=id=>{var point=MobileTabletop.Logical(board.ScreenPoint(id));return new TabletopCardPose{X=point.x,Y=point.y};};
             s.Goods=DockCost(view.OwnResources.Wood,view.OwnResources.Brick,view.OwnResources.Wool,view.OwnResources.Wheat,view.OwnResources.Ore);
             s.Bank=DockCost(view.Bank.Wood,view.Bank.Brick,view.Bank.Wool,view.Bank.Wheat,view.Bank.Ore);
@@ -151,7 +151,11 @@ public sealed partial class M2App
         tabletop.HandFlightsVisible=dock.ResourceHandVisible;if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableInspectionBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
         ai.TableOverlayOpen=mapChoice.Active||dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen;
         if(!ai.TablePresentationBlocked&&ai.IsHumanTurn)mapChoice.Draw();
-        ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
+        RefreshTablePrompt();GUI.matrix=Matrix4x4.identity;
+    }
+    void RefreshTablePrompt()
+    {
+        if(ai!=null&&view!=null)ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status,holding||TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString()));
     }
     void TableSeatClick(string target)
     {
@@ -163,7 +167,7 @@ public sealed partial class M2App
     string TableInstruction()
     {
         if(view.Phase==GamePhase.RoadBuilding)return TabletopRoadPlacement.Instruction(view.PendingDecision?.RemainingRoads??2,ai.HistoryEntries);
-        if(holding)return "请选择合法位置放下棋子";
+        if(holding)return placement==CommandKind.MoveRobber?"请选择强盗要前往的新地块":"请选择合法位置放下棋子";
         if(view.Phase==GamePhase.SetupSettlement)return "请放置村庄";
         if(view.Phase==GamePhase.SetupRoad)return "请放置道路";
         if(view.Phase==GamePhase.ProductionAwaitRoll)return "请掷骰";
@@ -192,7 +196,6 @@ public sealed partial class M2App
                 GUILayout.Space(12);var purchase=NewCommand(CommandKind.BuyDevelopmentCard);
                 var preview=Preview(purchase);if(!preview.Success)ModernOperationUI.Info(preview.Message,true);
                 if(ModernOperationUI.LayoutButton("确认购买 · 抽取 1 张",preview.Success,true))Submit(purchase);
-                if(TableButton("取消购买")){CancelOperationDraft();dock.Reset();}
             });return;
         }
         if(preparedDevelopment.HasValue)

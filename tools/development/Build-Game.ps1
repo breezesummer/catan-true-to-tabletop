@@ -1,6 +1,6 @@
-﻿param(
+param(
     [ValidateSet('All','Windows','Android','Server')][string]$Target='All',
-    [string]$OutputRoot='game version/1.6/Catan1.6.9-Online-Ip-Lobby',
+    [string]$OutputRoot='game version/1.6/Catan1.6.10-Choice-Trade-History',
     [switch]$VerifyPlayer,
     [switch]$Arm64Only
 )

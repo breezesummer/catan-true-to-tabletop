@@ -36,7 +36,7 @@ public static class TabletopHistoryModel
         var result=new List<TabletopHistoryLine>();
         var changes=entry.Changes??Array.Empty<GameHistoryChange>();
         var consumed=new HashSet<GameHistoryChange>();
-        string action=(entry.Action??"").Replace("打出", "使用").Replace("发展卡","发展卡").Replace("城市设施","城市设施").Replace("锻铁匠","锻铁匠");
+        string action=(entry.Action??"").Replace("打出", "使用").Replace("使用了","使用");
         if(entry.Kind=="ProposeTrade")return new[]{new TabletopHistoryLine{Player=entry.PlayerId,Prefix="提出交易：",Quote=true,
             Cards=changes.Where(c=>c.Category=="offer"&&c.Amount<0).ToArray(),ReceivedCards=changes.Where(c=>c.Category=="offer"&&c.Amount>0).ToArray()}};
         if(entry.Kind=="BankTrade"||entry.Kind=="AcceptTrade"||action=="完成商业港口交换")
@@ -61,7 +61,7 @@ public static class TabletopHistoryModel
                 foreach(var giver in moved.Where(c=>c.Amount<0&&c.PlayerId!=receiver).GroupBy(c=>c.PlayerId))
                 {
                     var cards=giver.Select(c=>{consumed.Add(c);return c;}).ToArray();
-                    result.Add(new TabletopHistoryLine{Player=receiver,Prefix=wedding?"收取了":steal||action=="结算行会征费"?"偷取了":"收获了",Partner=giver.Key,
+                    result.Add(new TabletopHistoryLine{Player=receiver,Prefix=wedding?"收取了":steal||action=="结算行会征费"?"偷取了":"获得了",Partner=giver.Key,
                         PartnerAction=wedding?"交出的婚礼礼物：":steal?" "+cards.Sum(c=>Math.Abs(c.Amount))+"张"+(cards.Any(c=>c.Category=="progress")?"发展卡":entry.Kind=="StealCloth"?"布匹":"手牌"):"的手牌：",
                         Cards=steal?Array.Empty<GameHistoryChange>():cards});
                 }
@@ -72,11 +72,30 @@ public static class TabletopHistoryModel
         bool build=paid&&(entry.Kind.StartsWith("Build")||new[]{"RecruitKnight","PromoteKnight","ActivateKnight","ImproveCity","BuyDevelopmentCard"}.Contains(entry.Kind));
         bool facility=changes.Any(c=>c.Category=="status"&&c.Amount>0&&(c.Name??"").Contains("改良"));
         bool setup=entry.Kind=="SetupSettlement"||entry.Kind=="SetupRoad"||entry.Kind=="SetupShip";
-        bool showAction=(!transfer||result.Count==0||entry.Kind.StartsWith("Play"))&&!build&&!setup&&entry.Kind!="ImproveCity";
+        bool discard=entry.Kind=="DiscardResources"||action=="弃置破坏要求的手牌";
+        bool pillage=false;
+        foreach(var city in changes.Where(c=>c.Category=="piece"&&c.Name=="城市"&&c.Amount<0))
+        {
+            var village=changes.FirstOrDefault(c=>c.Category=="piece"&&c.Name=="村庄"&&c.Amount>0&&c.PlayerId==city.PlayerId&&c.LocationId==city.LocationId);
+            if(village==null)continue;
+            var walls=changes.Where(c=>c.Category=="piece"&&c.Name=="城墙"&&c.Amount<0&&c.PlayerId==city.PlayerId&&c.LocationId==city.LocationId).ToArray();
+            result.Add(new TabletopHistoryLine{Player=city.PlayerId,Prefix="的城市被海盗掠夺，已"+(walls.Length>0?"失去城墙并":"")+"降级为村庄"});
+            consumed.Add(city);consumed.Add(village);foreach(var wall in walls)consumed.Add(wall);pillage=true;
+        }
+        if(discard)
+        {
+            foreach(var group in changes.Where(c=>Goods(c)&&c.Amount<0).GroupBy(c=>c.PlayerId))
+            {
+                bool sabotage=action=="弃置破坏要求的手牌";
+                result.Add(new TabletopHistoryLine{Player=group.Key,Prefix=(sabotage?"因「破坏」":"因掷出7")+"弃置了"+group.Sum(c=>-c.Amount)+"张手牌",Emphasis=sabotage?"破坏":null,Track=sabotage?1:-1});
+                foreach(var c in group)consumed.Add(c);
+            }
+        }
+        bool showAction=(!transfer||result.Count==0||entry.Kind.StartsWith("Play"))&&!build&&!setup&&entry.Kind!="ImproveCity"&&!discard&&!(pillage&&action=="选择降级城市");
         if(showAction)
         {
             string card=changes.FirstOrDefault(c=>c.PlayerId==entry.PlayerId&&c.Amount<0&&c.Category=="progress"&&action.Contains(c.Name))?.Name;
-            result.Insert(0,new TabletopHistoryLine{Player=entry.PlayerId,Prefix=action.Replace("使用「","使用了「"),Roll=entry.Dice1>0,Emphasis=card,Track=card==null?-1:CardTrack(card)});
+            result.Insert(0,new TabletopHistoryLine{Player=entry.PlayerId,Prefix=action,Roll=entry.Dice1>0,Emphasis=card,Track=card==null?-1:CardTrack(card)});
         }
         if(setup)
         {
@@ -92,7 +111,7 @@ public static class TabletopHistoryModel
                 int start=c.Name.IndexOf("现为 ",StringComparison.Ordinal)+3;
                 int level=start>=3&&start<c.Name.Length&&char.IsDigit(c.Name[start])?c.Name[start]-'0':0;
                 var cost=changes.Where(d=>Goods(d)&&d.Amount<0&&d.PlayerId==c.PlayerId).ToArray();
-                result.Add(new TabletopHistoryLine{Player=c.PlayerId,Prefix=cost.Length>0?"使用了":"建造了",Cards=cost,
+                result.Add(new TabletopHistoryLine{Player=c.PlayerId,Prefix=cost.Length>0?"使用":"建造了",Cards=cost,
                     Suffix=(cost.Length>0?"建造了":"")+FacilityName(track,level),Emphasis=FacilityName(track,level),Track=track});
                 consumed.Add(c);foreach(var d in cost)consumed.Add(d);
             }
@@ -109,13 +128,17 @@ public static class TabletopHistoryModel
         foreach(var group in changes.Where(c=>!consumed.Contains(c)&&(c.GoodIndex>=0&&c.GoodIndex<8||c.Category=="resource-count")).GroupBy(c=>new{c.PlayerId,Sign=Math.Sign(c.Amount),c.Category}))
         {
             string suffix=build&&group.Key.PlayerId==entry.PlayerId&&group.Key.Sign<0?action.Replace("建造","建造了").Replace("招募骑士","建造了骑士").Replace("升级","升级了").Replace("晋升","晋升了").Replace("激活","激活了").Replace("购买","购买了"):"";
-            result.Add(new TabletopHistoryLine{Player=group.Key.PlayerId,Prefix=group.Key.Sign>0?"收获了":"使用了",Suffix=suffix,Cards=group.ToArray()});
+            result.Add(new TabletopHistoryLine{Player=group.Key.PlayerId,Prefix=group.Key.Sign>0?"获得了":"使用",Suffix=suffix,Cards=group.ToArray()});
         }
         foreach(var c in changes.Where(c=>!consumed.Contains(c)&&c.GoodIndex<0&&c.Category!="resource-count"))
         {
             if(c.Category=="piece"&&(build||action.Contains(c.Name)))continue;
             if(c.Amount<0&&(c.Category=="progress"||c.Category=="development")&&action.Contains(c.Name))continue;
-            result.Add(new TabletopHistoryLine{Player=c.PlayerId,Prefix=(c.Amount>0?"获得了":"失去了")+c.Name+(Math.Abs(c.Amount)>1?" ×"+Math.Abs(c.Amount):""),Emphasis=c.Category=="progress"?c.Name:null,Track=c.Category=="progress"?CardTrack(c.Name):-1});
+            bool card=c.Category=="progress"||c.Category=="development";
+            bool victory=c.Category=="defender"||c.Category=="progress"&&new[]{"宪法","石碑","印刷术"}.Contains(c.Name);
+            string verb=c.Amount>0?(c.Category=="piece"&&c.Name=="城墙"?"建造了":"获得了"):"失去了";
+            result.Add(new TabletopHistoryLine{Player=c.PlayerId,Prefix=verb+c.Name+(victory?"（1分）":"")+(Math.Abs(c.Amount)>1?" ×"+Math.Abs(c.Amount):""),Emphasis=card?c.Name:null,
+                Track=card?(c.CardTrack>=0?c.CardTrack:CardTrack(c.Name)>=0?CardTrack(c.Name):3):-1});
         }
         return result.ToArray();
     }

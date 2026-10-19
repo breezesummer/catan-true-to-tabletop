@@ -43,7 +43,7 @@ public sealed class FeedbackHistoryTests
     public void FacilityCostAndNameAreOneColoredSentence(int track,int level,string name)
     {
         var e=Entry("ImproveCity","升级城市设施",Change("P1","goods","商品",-level,5+track),Change("P1","status",new[]{"贸易","政治","科学"}[track]+"改良（现为 "+level+" 级）",1));
-        var line=Assert.Single(TabletopHistoryModel.Lines(e));Assert.Equal("使用了",line.Prefix);Assert.Equal("建造了"+name,line.Suffix);Assert.Equal(name,line.Emphasis);Assert.Equal(track,line.Track);Assert.Single(line.Cards);
+        var line=Assert.Single(TabletopHistoryModel.Lines(e));Assert.Equal("使用",line.Prefix);Assert.Equal("建造了"+name,line.Suffix);Assert.Equal(name,line.Emphasis);Assert.Equal(track,line.Track);Assert.Single(line.Cards);
     }
     [Theory][InlineData("村庄")][InlineData("城市")]
     public void SetupBuildingsAreConstructionWithoutDuplicateGainedPieces(string piece)
@@ -55,7 +55,7 @@ public sealed class FeedbackHistoryTests
     }
     [Theory][InlineData("锻铁匠",2)][InlineData("商业港口",0)][InlineData("婚礼",1)]
     public void PlayedProgressCardUsesAuthorizedTrackColor(string name,int track)
-    {var line=Assert.Single(TabletopHistoryModel.Lines(Entry("PlayProgressCard","使用「"+name+"」",Change("P1","progress",name,-1))));Assert.Equal("使用了「"+name+"」",line.Prefix);Assert.Equal(name,line.Emphasis);Assert.Equal(track,line.Track);Assert.Equal(-1,TabletopHistoryModel.CardTrack("发展卡"));}
+    {var line=Assert.Single(TabletopHistoryModel.Lines(Entry("PlayProgressCard","使用「"+name+"」",Change("P1","progress",name,-1))));Assert.Equal("使用「"+name+"」",line.Prefix);Assert.Equal(name,line.Emphasis);Assert.Equal(track,line.Track);Assert.Equal(-1,TabletopHistoryModel.CardTrack("发展卡"));}
     [Fact] public void HiddenOperationRetainsCaptionUntilStateChanges()
     {var window=new OperationWindowState();window.Sync("P1","1");window.Hide("婚礼赠礼");window.Sync("P1","1");Assert.True(window.Hidden);Assert.Equal("婚礼赠礼",window.Caption);window.Open();Assert.False(window.Hidden);window.Hide("金矿");window.Sync("P1","2");Assert.False(window.Hidden);Assert.Null(window.Caption);}
     [Fact] public void SmithingPrefersACompletePairIncludingSupplyReleaseOrder()

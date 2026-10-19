@@ -11,7 +11,9 @@ public sealed partial class M6App
         Panel(new Rect(0,0,1440,900),new Color(0,0,0,.64f));
         ModernOperationUI.Panel(new Rect(180,80,1080,740));
         ModernOperationUI.Label(new Rect(212,100,760,44),"游戏百科 · 发展卡",ModernOperationUI.Title);
-        if(ModernOperationUI.Button(new Rect(1060,104,166,38),"返回 · Esc"))encyclopediaOpen=false;
+        if(ModernOperationUI.Button(new Rect(1134,104,38,34),"—"))
+        {bool fromMenu=tableMenu;encyclopediaOpen=false;tableMenu=false;CurrentTableWindows?.Hide("游戏百科",()=>{tableMenu=fromMenu;encyclopediaOpen=true;});}
+        if(ModernOperationUI.Button(new Rect(1188,104,38,34),"×"))encyclopediaOpen=false;
         for(int i=0;i<2;i++)if(ModernOperationUI.Button(new Rect(212+i*252,158,240,38),i==0?"基础版 / 航海家":"城市与骑士 / 组合",true,false,encyclopediaCategory==i))
         {encyclopediaCategory=i;encyclopediaScroll=Vector2.zero;}
         string[] names=encyclopediaCategory==0?new[]{"骑士","道路建设","丰收","垄断","胜利点"}:M5App.Cards;

@@ -296,7 +296,7 @@ public sealed partial class M6App
         PastoralMenuUI.Label(new Rect(458,367,520,32),pendingJoinRoom.Name,16,PastoralMenuUI.Muted);
         GUI.SetNextControlName("lan-join-password");
         joinPassword=GUI.PasswordField(new Rect(458,414,520,44),joinPassword,'●',128,PastoralMenuUI.Field);
-        if(PastoralMenuUI.Button(new Rect(654,519,150,43),"取消"))CancelJoinPassword();
+        if(PastoralMenuUI.Button(new Rect(940,316,38,34),"×"))CancelJoinPassword();
         if(pendingJoinRoom!=null&&PastoralMenuUI.Button(new Rect(822,519,156,43),"确认加入",!Network.Busy&&(networkLan||OnlineRoomActionsAvailable)&&joinPassword.Length>0,true))
             ConfirmJoinPassword();
         if(Event.current.type==EventType.KeyDown&&Event.current.keyCode==KeyCode.Escape){CancelJoinPassword();Event.current.Use();}

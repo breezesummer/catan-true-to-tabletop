@@ -9,11 +9,14 @@ namespace Catan.Core
         private static HistoryPiece[] Pieces(PiecePlacement[] pieces, string name) => pieces.Select(p => new HistoryPiece { PlayerId = p.PlayerId, LocationId = p.LocationId, Name = name }).ToArray();
         internal static HistorySnapshot From(M2.GameState s)
         {
+            // 报价可能在所有接收者自动拒绝后立即清空；已确认指令仍保存完整公开报价。
+            var proposal = s.ProcessedCommands.LastOrDefault()?.Command;
+            if (proposal?.Kind != M2.CommandKind.ProposeTrade) proposal = null;
             return new HistorySnapshot
             {
                 Turn = s.Turn, Sequence = s.EventSequence, Dice1 = s.LastDice1, Dice2 = s.LastDice2,
                 PendingKind = s.PendingDecision?.Kind, OtherPlayerId = s.TradeOffer?.ProposerId,
-                OfferGive = Goods(s.TradeOffer?.Give), OfferReceive = Goods(s.TradeOffer?.Receive),
+                OfferGive = Goods(s.TradeOffer?.Give ?? proposal?.Give), OfferReceive = Goods(s.TradeOffer?.Receive ?? proposal?.Receive),
                 Players = s.Players.Select(p =>
                 {
                     var goods = Goods(p.Resources);
@@ -25,11 +28,14 @@ namespace Catan.Core
         }
         internal static HistorySnapshot From(M3.GameState s)
         {
+            // 报价可能在所有接收者自动拒绝后立即清空；已确认指令仍保存完整公开报价。
+            var proposal = s.ProcessedCommands.LastOrDefault()?.Command;
+            if (proposal?.Kind != M3.CommandKind.ProposeTrade) proposal = null;
             return new HistorySnapshot
             {
                 Turn = s.Turn, Sequence = s.EventSequence, Dice1 = s.LastDice1, Dice2 = s.LastDice2,
                 PendingKind = s.PendingDecision?.Kind, OtherPlayerId = s.TradeOffer?.ProposerId,
-                OfferGive = Goods(s.TradeOffer?.Give), OfferReceive = Goods(s.TradeOffer?.Receive),
+                OfferGive = Goods(s.TradeOffer?.Give ?? proposal?.Give), OfferReceive = Goods(s.TradeOffer?.Receive ?? proposal?.Receive),
                 Players = s.Players.Select(p =>
                 {
                     var goods = Goods(p.Resources);
@@ -42,12 +48,15 @@ namespace Catan.Core
         }
         internal static HistorySnapshot From(M4.GameState s)
         {
+            // 报价可能在所有接收者自动拒绝后立即清空；已确认指令仍保存完整公开报价。
+            var proposal = s.ProcessedCommands.LastOrDefault()?.Command;
+            if (proposal?.Kind != M4.CommandKind.ProposeTrade) proposal = null;
             return new HistorySnapshot
             {
                 Turn = s.Turn, Sequence = s.EventSequence, Dice1 = s.LastDice1, Dice2 = s.LastDice2,
                 PendingKind = s.PendingDecision?.Kind, OtherPlayerId = s.PendingDecision?.OtherPlayerId ?? s.TradeOffer?.ProposerId,
-                OfferGive = Goods(s.TradeOffer?.Give, s.TradeOffer?.GiveCommodities.Cloth ?? 0, s.TradeOffer?.GiveCommodities.Coin ?? 0, s.TradeOffer?.GiveCommodities.Paper ?? 0),
-                OfferReceive = Goods(s.TradeOffer?.Receive, s.TradeOffer?.ReceiveCommodities.Cloth ?? 0, s.TradeOffer?.ReceiveCommodities.Coin ?? 0, s.TradeOffer?.ReceiveCommodities.Paper ?? 0),
+                OfferGive = Goods(s.TradeOffer?.Give ?? proposal?.Give, s.TradeOffer?.GiveCommodities.Cloth ?? proposal?.GiveCommodities?.Cloth ?? 0, s.TradeOffer?.GiveCommodities.Coin ?? proposal?.GiveCommodities?.Coin ?? 0, s.TradeOffer?.GiveCommodities.Paper ?? proposal?.GiveCommodities?.Paper ?? 0),
+                OfferReceive = Goods(s.TradeOffer?.Receive ?? proposal?.Receive, s.TradeOffer?.ReceiveCommodities.Cloth ?? proposal?.ReceiveCommodities?.Cloth ?? 0, s.TradeOffer?.ReceiveCommodities.Coin ?? proposal?.ReceiveCommodities?.Coin ?? 0, s.TradeOffer?.ReceiveCommodities.Paper ?? proposal?.ReceiveCommodities?.Paper ?? 0),
                 EventDie = s.LastEventDie.ToString(),
                 Players = s.Players.Select(p =>
                 {
@@ -63,12 +72,15 @@ namespace Catan.Core
         }
         internal static HistorySnapshot From(M5.GameState s)
         {
+            // 报价可能在所有接收者自动拒绝后立即清空；已确认指令仍保存完整公开报价。
+            var proposal = s.ProcessedCommands.LastOrDefault()?.Command;
+            if (proposal?.Kind != M5.CommandKind.ProposeTrade) proposal = null;
             return new HistorySnapshot
             {
                 Turn = s.Turn, Sequence = s.EventSequence, Dice1 = s.LastDice1, Dice2 = s.LastDice2,
                 PendingKind = s.PendingDecision?.Kind, OtherPlayerId = s.PendingDecision?.OtherPlayerId ?? s.TradeOffer?.ProposerId,
-                OfferGive = Goods(s.TradeOffer?.Give, s.TradeOffer?.GiveCommodities.Cloth ?? 0, s.TradeOffer?.GiveCommodities.Coin ?? 0, s.TradeOffer?.GiveCommodities.Paper ?? 0),
-                OfferReceive = Goods(s.TradeOffer?.Receive, s.TradeOffer?.ReceiveCommodities.Cloth ?? 0, s.TradeOffer?.ReceiveCommodities.Coin ?? 0, s.TradeOffer?.ReceiveCommodities.Paper ?? 0),
+                OfferGive = Goods(s.TradeOffer?.Give ?? proposal?.Give, s.TradeOffer?.GiveCommodities.Cloth ?? proposal?.GiveCommodities?.Cloth ?? 0, s.TradeOffer?.GiveCommodities.Coin ?? proposal?.GiveCommodities?.Coin ?? 0, s.TradeOffer?.GiveCommodities.Paper ?? proposal?.GiveCommodities?.Paper ?? 0),
+                OfferReceive = Goods(s.TradeOffer?.Receive ?? proposal?.Receive, s.TradeOffer?.ReceiveCommodities.Cloth ?? proposal?.ReceiveCommodities?.Cloth ?? 0, s.TradeOffer?.ReceiveCommodities.Coin ?? proposal?.ReceiveCommodities?.Coin ?? 0, s.TradeOffer?.ReceiveCommodities.Paper ?? proposal?.ReceiveCommodities?.Paper ?? 0),
                 EventDie = s.LastEventDie.ToString(),
                 Players = s.Players.Select(p =>
                 {

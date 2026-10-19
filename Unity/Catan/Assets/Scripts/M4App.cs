@@ -105,6 +105,7 @@ public sealed partial class M4App : MonoBehaviour
     {
         Vector2 releasedMouse;bool buildReleased=dock.ConsumeBuildRelease(out releasedMouse);
         if(board==null)return;
+        RefreshTablePrompt();
         if(mapChoice.Active&&Input.GetMouseButtonDown(1)){mapChoice.Clear();return;}
         if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         var pointer=MobileTabletop.Pointer;
@@ -418,7 +419,7 @@ public sealed partial class M4App : MonoBehaviour
             var cards=view.OwnProgressCards.Distinct().ToArray();if(cards.Length>0){var selected=cards[Cycle("发展卡",Math.Max(0,Array.IndexOf(cards,draft.ProgressCard)),cards.Select(CardName).ToArray())];draft.ProgressCard=selected;draft.SelectedProgressCard=selected;}
         }
         if(TabletopCardInput.Changed)GUIUtility.ExitGUI();
-        if(!resourceReady){ModernOperationUI.Info("请点选一种资源或商品。",true);if(Btn("取消当前操作"))CancelOperationDraft();return;}
+        if(!resourceReady){ModernOperationUI.Info("请点选一种资源或商品。",true);return;}
         GUILayout.Space(8);
         if(ai!=null)
         {
@@ -427,7 +428,6 @@ public sealed partial class M4App : MonoBehaviour
             if(ModernOperationUI.LayoutButton(card?"确认使用 · "+CardName(draft.ProgressCard):"确认执行",legal,true)){Submit(draft);GUIUtility.ExitGUI();}
         }
         else if(Btn("确认执行")){Submit(draft);GUIUtility.ExitGUI();}
-        if(Btn("取消选择")){CancelOperationDraft();}
     }
     void Target(string title,string field,string type)
     {

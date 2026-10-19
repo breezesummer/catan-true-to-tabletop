@@ -46,9 +46,17 @@ public sealed partial class TabletopUI
     Rect playerHintAnchor;
     OperationSnapshot operations;
     public readonly OperationWindowState OperationWindows=new OperationWindowState();
-    public bool OperationHidden=>OperationWindows.Hidden;
+    public bool OperationHidden=>OperationWindows.Suppressed;
+    public bool OperationClosed=>OperationWindows.Closed;
     public bool HideOperation()
-    {if(OperationWindows.Hidden)return false;OperationWindows.Hide(OperationWindows.Caption??"继续选择");return true;}
+    {if(OperationWindows.Suppressed)return false;OperationWindows.Hide(OperationWindows.Caption??"继续选择");return true;}
+    public void CloseOperation()
+    {
+        bool required=operations?.RequiresSelection==true||operations?.Discard!=null;
+        operations?.Cancel?.Invoke();
+        discardDock?.Reset();
+        if(required)OperationWindows.Close();else OperationWindows.Clear();
+    }
     Action purchaseDevelopment;
     Catan.Core.GameHistoryEntry[] bankHistory = Array.Empty<Catan.Core.GameHistoryEntry>();
     public void BindOperations(OperationSnapshot snapshot,Action purchase,Catan.Core.GameHistoryEntry[] entries)
@@ -60,7 +68,7 @@ public sealed partial class TabletopUI
     bool HistoryBlocksInput(Vector2 p) => (history.IsOpen||!contextVisible)&&history.BlocksInput(p);
     public bool BlocksOverlayInput(Vector2 p) => HistoryBlocksInput(p)||contextVisible&&CurrentContextRect.Contains(p);
     public void DrawHistory(Font font,Catan.Core.GameHistoryEntry[] entries,string[] players)
-    {if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);if(history.IsOpen||!contextVisible)history.Draw(font,entries,players,table.Objects);if(!history.IsOpen){DrawScoreDetails();DrawPlayerHint();}}
+    {history.Windows=OperationWindows;if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);if(history.IsOpen||!contextVisible)history.Draw(font,entries,players,table.Objects);if(!history.IsOpen){DrawScoreDetails();DrawPlayerHint();}}
     public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
     public void ObserveDice(long sequence,int first,int second,int? eventDie,Catan.Core.GameHistoryEntry presentationRoll=null)
     {
@@ -149,13 +157,13 @@ public sealed partial class TabletopUI
         string turnCaption=canRoll?"掷骰":phase.Contains("弃牌")||phase.IndexOf("Discard",StringComparison.OrdinalIgnoreCase)>=0?"等待弃牌":canEnd?"结束回合":actor!=seat?"等待玩家":"等待操作";
         hits.Add(EndTurnRect);bool turnEnabled=(canRoll||canEnd)&&!DiceRolling;
         if(DiscardActive){turnCaption=DiscardCaption;turnEnabled=DiscardReady;}
-        if(OperationHidden){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
+        if(OperationWindows.Hidden){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
         StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
         var turnStyle=new GUIStyle(title){fontSize=21,wordWrap=true};turnStyle.normal.textColor=turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
         while(turnStyle.fontSize>11&&turnStyle.CalcHeight(new GUIContent(turnCaption),EndTurnRect.width-40)>60)turnStyle.fontSize--;
         GUI.Label(new Rect(EndTurnRect.x+20,EndTurnRect.y+35,EndTurnRect.width-40,60),turnCaption,turnStyle);
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
-        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(OperationHidden)OperationWindows.Open();else if(DiscardActive)ConfirmDiscard();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
+        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(OperationWindows.Hidden)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
         DrawDiscardCount();
         GUI.enabled=tableEnabled;
     }
@@ -362,8 +370,9 @@ public sealed partial class TabletopUI
         OperationWindows.Describe(caption);
         var rect=CurrentContextRect;contextVisible=true;ModernOperationUI.Panel(rect);
         float header=44;
-        GUI.Label(new Rect(rect.x+18,rect.y+12,rect.width-110,header-12),caption,ModernOperationUI.Title);
-        if(ModernOperationUI.Button(new Rect(rect.xMax-77,rect.y+10,60,28),"收起"))OperationWindows.Hide(caption);
+        GUI.Label(new Rect(rect.x+18,rect.y+12,rect.width-120,header-12),caption,ModernOperationUI.Title);
+        if(ModernOperationUI.Button(new Rect(rect.xMax-91,rect.y+10,32,28),"—"))OperationWindows.Hide(caption);
+        if(ModernOperationUI.Button(new Rect(rect.xMax-49,rect.y+10,32,28),"×"))CloseOperation();
         MobileTabletop.ScrollTouch(new Rect(rect.x+16,rect.y+header,rect.width-32,rect.height-header-12),ref scroll);
         GUILayout.BeginArea(new Rect(rect.x+16,rect.y+header,rect.width-32,rect.height-header-12));
         scroll=GUILayout.BeginScrollView(scroll);

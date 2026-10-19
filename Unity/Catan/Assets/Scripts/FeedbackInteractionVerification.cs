@@ -85,6 +85,19 @@ public sealed partial class InteractionPresentationVerification
         var current=GetComponent<M4App>();var currentHost=current.VerificationHost;
         var currentSession=(Catan.Core.M4.CitiesKnightsGameSession)typeof(M4LocalGameHost).GetField("session",Private).GetValue(currentHost);
         var s=currentSession.GetAuthoritativeStateForTesting();
+        stage="M4 叛变受害者持续选择提示";
+        var beforeTreason=currentSession.GetAuthoritativeStateForTesting();
+        string betrayedKnight=s.Knights.First(k=>k.PlayerId=="P1").LocationId;
+        s.Phase=Catan.Core.M4.GamePhase.PendingChoice;s.DecisionReturnPhase=Catan.Core.M4.GamePhase.Action;
+        s.PendingDecision=new Catan.Core.M4.PendingDecision{Kind="ProgressTreasonRemove",PlayerId="P1",OtherPlayerId="P2",Options=new[]{betrayedKnight},ReturnPhase=Catan.Core.M4.GamePhase.Action};
+        s.DecisionQueue=Array.Empty<Catan.Core.M4.PendingDecision>();
+        typeof(Catan.Core.M4.CitiesKnightsGameSession).GetField("state",Private).SetValue(currentSession,s);
+        current.M6Refresh();yield return null;yield return SettleFeedback();yield return VerifyRequiredChoicePrompt("叛变");
+        typeof(M4App).GetMethod("UpdateDirectProgress",Private).Invoke(current,new object[]{current.VerificationBoard.ScreenPoint(betrayedKnight),true});
+        yield return null;yield return SettleFeedback();
+        Require(!currentSession.GetAuthoritativeStateForTesting().Knights.Any(k=>k.LocationId==betrayedKnight),"叛变地图选择未移除骑士");
+        Require(!app.CurrentTablePrompt.Contains("选择要移除"),"完成叛变选择后旧提示仍在显示");
+        s=beforeTreason;
         stage="M4 拆城待决地图选择";
         string pillageTarget=s.Cities.First(x=>x.PlayerId=="P1").LocationId;
         s.Phase=Catan.Core.M4.GamePhase.PendingChoice;s.DecisionReturnPhase=Catan.Core.M4.GamePhase.Action;
@@ -93,9 +106,11 @@ public sealed partial class InteractionPresentationVerification
         typeof(Catan.Core.M4.CitiesKnightsGameSession).GetField("state",Private).SetValue(currentSession,s);
         current.M6Refresh();yield return null;yield return SettleFeedback();
         Require((bool)PolishGet(current,"DirectProgressActive"),"拆城未进入地图待决模式");
+        yield return VerifyRequiredChoicePrompt("降级为村庄");
         typeof(M4App).GetMethod("UpdateDirectProgress",Private).Invoke(current,new object[]{current.VerificationBoard.ScreenPoint(pillageTarget),true});
         yield return null;yield return SettleFeedback();
         Require(!currentSession.GetAuthoritativeStateForTesting().Cities.Any(x=>x.LocationId==pillageTarget),"地图点选未执行拆城待决");
+        Require(!app.HasRequiredTableSelection,"完成拆城后选择提示没有清除");
         currentSession.AssertInvariants();
         s=currentSession.GetAuthoritativeStateForTesting();
 
@@ -167,6 +182,19 @@ public sealed partial class InteractionPresentationVerification
         var current=GetComponent<M5App>();var currentHost=current.VerificationHost;
         var currentSession=(Catan.Core.M5.CombinedGameSession)typeof(M5LocalGameHost).GetField("session",Private).GetValue(currentHost);
         var s=currentSession.GetAuthoritativeStateForTesting();
+        stage="M5 叛变受害者持续选择提示";
+        var beforeTreason=currentSession.GetAuthoritativeStateForTesting();
+        string betrayedKnight=s.Knights.First(k=>k.PlayerId=="P1").LocationId;
+        s.Phase=Catan.Core.M5.GamePhase.PendingChoice;s.DecisionReturnPhase=Catan.Core.M5.GamePhase.Action;
+        s.PendingDecision=new Catan.Core.M5.PendingDecision{Kind="ProgressTreasonRemove",PlayerId="P1",OtherPlayerId="P2",Options=new[]{betrayedKnight},ReturnPhase=Catan.Core.M5.GamePhase.Action};
+        s.DecisionQueue=Array.Empty<Catan.Core.M5.PendingDecision>();
+        typeof(Catan.Core.M5.CombinedGameSession).GetField("state",Private).SetValue(currentSession,s);
+        current.M6Refresh();yield return null;yield return SettleFeedback();yield return VerifyRequiredChoicePrompt("叛变");
+        typeof(M5App).GetMethod("UpdateDirectProgress",Private).Invoke(current,new object[]{current.VerificationBoard.ScreenPoint(betrayedKnight),true});
+        yield return null;yield return SettleFeedback();
+        Require(!currentSession.GetAuthoritativeStateForTesting().Knights.Any(k=>k.LocationId==betrayedKnight),"叛变地图选择未移除骑士");
+        Require(!app.CurrentTablePrompt.Contains("选择要移除"),"完成叛变选择后旧提示仍在显示");
+        s=beforeTreason;
         stage="M5 拆城待决地图选择";
         string pillageTarget=s.Cities.First(x=>x.PlayerId=="P1").LocationId;
         s.Phase=Catan.Core.M5.GamePhase.PendingChoice;s.DecisionReturnPhase=Catan.Core.M5.GamePhase.Action;
@@ -175,9 +203,11 @@ public sealed partial class InteractionPresentationVerification
         typeof(Catan.Core.M5.CombinedGameSession).GetField("state",Private).SetValue(currentSession,s);
         current.M6Refresh();yield return null;yield return SettleFeedback();
         Require((bool)PolishGet(current,"DirectProgressActive"),"拆城未进入地图待决模式");
+        yield return VerifyRequiredChoicePrompt("降级为村庄");
         typeof(M5App).GetMethod("UpdateDirectProgress",Private).Invoke(current,new object[]{current.VerificationBoard.ScreenPoint(pillageTarget),true});
         yield return null;yield return SettleFeedback();
         Require(!currentSession.GetAuthoritativeStateForTesting().Cities.Any(x=>x.LocationId==pillageTarget),"地图点选未执行拆城待决");
+        Require(!app.HasRequiredTableSelection,"完成拆城后选择提示没有清除");
         currentSession.AssertInvariants();
         s=currentSession.GetAuthoritativeStateForTesting();
 
@@ -190,6 +220,16 @@ public sealed partial class InteractionPresentationVerification
         var choose=(TabletopChoiceBubble)current.GetType().GetField("mapChoice",Private).GetValue(current);Require(choose.Active,"海岸没有弹出道路/船选择");Require(saved==currentHost.ExportSave(),"确认前已经落子");choose.Choose(1);yield return null;yield return SettleFeedback();Require(currentHost.View("P1").Board.Ships.Length==1,"气泡船选项未建船");
         currentSession.AssertInvariants();
     }
+    IEnumerator VerifyRequiredChoicePrompt(string expected)
+    {
+        yield return null;
+        Require(app.HasRequiredTableSelection&&app.CurrentTablePrompt.Contains(expected),"次级屏幕没有说明当前棋子选择；"+RequiredChoicePromptDiagnostic(expected));
+        yield return new WaitForSecondsRealtime(1.8f);
+        app.ShowTablePrompt("验证提示保留");yield return null;
+        Require(app.HasRequiredTableSelection&&app.CurrentTablePrompt.Contains(expected),"未完成的棋子选择提示超时或被短通知覆盖；"+RequiredChoicePromptDiagnostic(expected));
+        if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture(stage);
+    }
+    string RequiredChoicePromptDiagnostic(string expected)=>"预期="+expected+"，required="+app.HasRequiredTableSelection+"，human="+app.IsHumanTurn+"，actor="+app.CurrentActor+"，seat="+app.HumanSeat+"，blocked="+app.TablePresentationBlocked+"，prompt="+app.CurrentTablePrompt;
     IEnumerator VerifyOperationWindows()
     {
         foreach(string rules in new[]{"base","seafarers","cities-knights","combined"})
@@ -217,7 +257,17 @@ public sealed partial class InteractionPresentationVerification
             yield return null;
             Require(authority==(string)host.GetType().GetMethod("ExportSave").Invoke(host,null),"收起修改了权威局面");
             if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture(rules+"-收起后继续按钮");
-            hud.OperationWindows.Open();Require(dock.HasOverlay,"再次开启没有恢复原操作");dock.Reset();
+            hud.OperationWindows.Open();Require(dock.HasOverlay,"再次开启没有恢复原操作");
+            dock.CloseWindow(snapshot);
+            Require(!dock.HasOverlay&&!hud.OperationWindows.Hidden&&hud.OperationWindows.Caption==null,"×关闭仍把窗口收入回合按钮");
+            Require(authority==(string)host.GetType().GetMethod("ExportSave").Invoke(host,null),"×关闭草稿修改了权威局面");
+            if(snapshot.GoodCount==8){dock.OpenFacility(2);Require(dock.HasOverlay,"关闭后不能从设施重新开启");dock.CloseWindow(snapshot);}
+            // 掷骰前关闭设施也必须恢复掷骰按钮，不能残留“城市设施”。
+            PolishSetEnum(state,"Phase","ProductionAwaitRoll");session.GetType().GetField("state",Private).SetValue(session,state);game.GetType().GetMethod("M6Refresh",Private).Invoke(game,null);yield return null;
+            snapshot=(OperationSnapshot)PolishGet(game,"VerificationOperationSnapshot");hud.BindOperations(snapshot,dock.PrepareDevelopmentPurchase,app.HistoryEntries);
+            PolishSetField(dock,"current",snapshot);
+            if(snapshot.GoodCount==8){dock.OpenFacility(2);Require(dock.HasOverlay,"掷骰前设施不能打开");dock.CloseWindow(snapshot);Require(!hud.OperationWindows.Hidden&&hud.OperationWindows.Caption==null,"掷骰前关闭设施仍覆盖回合按钮");}
+            dock.Reset();
             // 亮牌/骑士替换动画期间，其他玩家仍可查看自己的资料。
             var oldActor=(Func<string>)typeof(M6App).GetField("actor",Private).GetValue(app);
             PolishSetField(app,"actor",(Func<string>)(()=>"P2"));PolishSetField(app,"pendingNetworkPresentation",(Action)(()=>{}));
@@ -241,6 +291,9 @@ public sealed partial class InteractionPresentationVerification
             Require(!(bool)PolishGet(game,"ResourceChoiceVisible")&&selected.Wheat==1,"收起未保留资源选择");
             Require(before==(string)host.GetType().GetMethod("ExportSave").Invoke(host,null),"关闭待决意外确认领取");
             hud.OperationWindows.Open();Require((bool)PolishGet(game,"ResourceChoiceVisible"),"待决界面不能再打开");
+            hud.OperationWindows.Close();yield return null;
+            Require(!hud.OperationWindows.Hidden&&hud.OperationWindows.Caption==null&&app.HasRequiredTableSelection,"关闭强制选择错误地进入回合按钮或清除了提示");
+            hud.OperationWindows.Open();Require((bool)PolishGet(game,"ResourceChoiceVisible"),"关闭后的强制选择不能恢复");
             PolishSet(pending,"PlayerId","P2");session.GetType().GetField("state",Private).SetValue(session,state);game.GetType().GetMethod("M6Refresh",Private).Invoke(game,null);yield return null;
             Require(!(bool)PolishGet(game,"ResourceChoiceVisible"),"其他玩家的引水渠遮挡本人的历史和手牌");
         }

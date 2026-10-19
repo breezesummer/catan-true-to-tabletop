@@ -68,12 +68,50 @@ public sealed class TabletopPromptSequence
     public const double Duration = 1.5;
     string[] messages = Array.Empty<string>();
     double started;
+    public string RequiredSelection { get; private set; } = "";
+    // 选择提示由当前交互状态决定；定时通知、重绘和收起窗口均不能让未完成的选择消失。
+    public void RequireSelection(string instruction) => RequiredSelection = instruction ?? "";
     public void Show(double now, params string[] values)
     { started = now; messages = values.Where(value => !string.IsNullOrWhiteSpace(value)).ToArray(); }
     public string At(double now)
     {
+        if (RequiredSelection.Length > 0) return RequiredSelection;
         int index = (int)Math.Floor((now - started) / Duration);
         return index < 0 || index >= messages.Length ? "" : messages[index];
+    }
+}
+public static class TabletopSelectionPrompt
+{
+    // 四种规则包共用的权威选择阶段；普通行动和等待掷骰仍使用短暂提示。
+    public static bool RequiredPhase(string phase)
+    {
+        switch (phase)
+        {
+            case "SetupSettlement": case "SetupRoad": case "Discard": case "RobberMove":
+            case "RobberSteal": case "RoadBuilding": case "GoldChoice": case "PortPlacement":
+            case "SetupPort": case "PendingChoice": return true;
+            default: return false;
+        }
+    }
+    public static string Decision(string kind)
+    {
+        switch (kind)
+        {
+            case "PillageCity": return "请选择要降级为村庄的城市";
+            case "Metropolis": return "请选择要安置大都会的城市";
+            case "DisplacedKnight": return "请选择合法位置安置被驱逐的骑士";
+            case "ProgressTreasonRemove": return "你受到「叛变」影响，请选择要移除的己方骑士";
+            case "ProgressTreasonPlace": return "请选择合法位置安置替补骑士";
+            case "Gold": case "Aqueduct": return "请选择要获得的资源";
+            case "ProgressDiscard": return "请选择要弃掉的发展卡";
+            case "ProgressSabotage": return "你受到「破坏」影响，请选择要弃掉的手牌";
+            case "ProgressWedding": return "请选择要交出的婚礼赠礼";
+            case "ProgressHarbor": return "请选择要交出的商品";
+            case "ProgressEspionage": return "请选择要获得的发展卡";
+            case "ProgressGuildDues": return "请选择要获得的手牌";
+            case "DefenderProgress": return "请选择防御奖励的发展卡类别";
+            default: return "请完成当前选择";
+        }
     }
 }
 public sealed class TabletopDicePresentation

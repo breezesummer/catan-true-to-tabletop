@@ -60,6 +60,45 @@ public sealed class TabletopPresentationTests
         sequence.Show(10.5,"操作完成");Assert.Equal("操作完成",sequence.At(10.5));Assert.Equal("",sequence.At(12));
     }
     [Theory]
+    [InlineData("PillageCity","降级为村庄","城市")]
+    [InlineData("ProgressTreasonRemove","叛变","己方骑士")]
+    [InlineData("ProgressTreasonPlace","安置","替补骑士")]
+    [InlineData("DisplacedKnight","安置","被驱逐的骑士")]
+    [InlineData("Metropolis","大都会","城市")]
+    public void UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(string kind,string action,string piece)
+    {
+        var sequence=new TabletopPromptSequence();
+        string instruction=TabletopSelectionPrompt.Decision(kind);
+        Assert.Contains(action,instruction);Assert.Contains(piece,instruction);
+        sequence.RequireSelection(instruction);
+        sequence.Show(10,"你的回合",instruction);
+        Assert.Equal(instruction,sequence.At(10));Assert.Equal(instruction,sequence.At(120));
+        // 保存、错误点击等短暂通知不能盖掉尚未完成的选择。
+        sequence.Show(120,"游戏已保存");Assert.Equal(instruction,sequence.At(120));Assert.Equal(instruction,sequence.At(600));
+        sequence.RequireSelection("请选择合法位置放下这艘船");Assert.Equal("请选择合法位置放下这艘船",sequence.At(600));
+        sequence.RequireSelection("");Assert.Equal("",sequence.At(600));
+        sequence.Show(600,"操作完成");Assert.Equal("操作完成",sequence.At(600));Assert.Equal("",sequence.At(602));
+    }
+    [Theory]
+    [InlineData("SetupSettlement")]
+    [InlineData("SetupRoad")]
+    [InlineData("Discard")]
+    [InlineData("RobberMove")]
+    [InlineData("RobberSteal")]
+    [InlineData("RoadBuilding")]
+    [InlineData("GoldChoice")]
+    [InlineData("PortPlacement")]
+    [InlineData("SetupPort")]
+    [InlineData("PendingChoice")]
+    public void EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(string phase)
+        =>Assert.True(TabletopSelectionPrompt.RequiredPhase(phase));
+    [Theory]
+    [InlineData("Action")]
+    [InlineData("ProductionAwaitRoll")]
+    [InlineData("Finished")]
+    public void OrdinaryTurnPromptsRetainTheirOriginalDuration(string phase)
+        =>Assert.False(TabletopSelectionPrompt.RequiredPhase(phase));
+    [Theory]
     [InlineData(0)]
     [InlineData(1)]
     [InlineData(2)]

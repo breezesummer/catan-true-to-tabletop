@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="1.6.9";
+    public const string BuildVersion="1.6.10";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -61,7 +61,7 @@ public sealed partial class M6App : MonoBehaviour
     bool tableMenu, escapeDismissedInteraction;
     public bool TableMenuOpen=>tableMenu;
     public void OpenTableMenu(){if(!Ready)return;tableMenu=true;escapeDismissedInteraction=false;}
-    public bool BlocksTableInput(Vector2 p)=>MenuVisible||TablePresentationBlocked;
+    public bool BlocksTableInput(Vector2 p)=>MenuVisible||TablePresentationBlocked||ClosedTableSelection&&SelectionPromptArea.Contains(p);
     void ToggleTableCamera()
     {
         var b=FindFirstObjectByType<BoardRenderer>();if(b!=null)b.SetCamera(!b.TopView);
@@ -146,8 +146,10 @@ public sealed partial class M6App : MonoBehaviour
     public void SetPaused(bool value){if(NetworkGame){Notice="联机 AI 由服务器调度；其他玩家断线时等待。";return;}Paused=value;if(!value)Fault="";nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);ShowTablePrompt(value?"AI 已暂停":"AI 已继续");}
     public void ShowTablePrompt(string value)=>tablePrompts.Show(Time.unscaledTimeAsDouble,value);
     internal string CurrentTablePrompt=>tablePrompts.At(Time.unscaledTimeAsDouble);
-    internal void UpdateTablePrompt(int turn,string phase,bool awaitingRoll,string instruction,string status)
+    internal bool HasRequiredTableSelection=>tablePrompts.RequiredSelection.Length>0;
+    internal void UpdateTablePrompt(int turn,string phase,bool awaitingRoll,string instruction,string status,bool requiresSelection=false)
     {
+        tablePrompts.RequireSelection(IsHumanTurn&&requiresSelection?instruction:"");
         bool roadPlacement=instruction.StartsWith("请在地图上点击合法位置新建道路 ",StringComparison.Ordinal);
         bool roadFinished=RoadPlacementPrompt.Length>0&&!roadPlacement;
         RoadPlacementPrompt=IsHumanTurn&&roadPlacement?instruction:"";
@@ -185,7 +187,7 @@ public sealed partial class M6App : MonoBehaviour
         ResetCardPresentation();ResetPlayerIdentity();
         TargetVictoryPoints=target;AiSpeedLevel=TabletopAiSpeed.Clamp(aiSpeedLevel??AiSpeedLevel);ResetBuildPresentation();
         networkMenu=false;menuPendingAction=null;tableMenu=false;encyclopediaOpen=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你使用 "+ColorLabel(human)+" 建筑。行动顺序由开局掷骰决定。";
-        promptContext=null;promptWasHuman=false;RoadPlacementPrompt="";lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.Show(Time.unscaledTimeAsDouble);
+        promptContext=null;promptWasHuman=false;RoadPlacementPrompt="";lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.RequireSelection("");tablePrompts.Show(Time.unscaledTimeAsDouble);
         switch(rules)
         {
             case "base":presentation=gameObject.AddComponent<M2App>();break;
@@ -304,7 +306,8 @@ public sealed partial class M6App : MonoBehaviour
                 Panel(new Rect(0,0,1440,900),new Color(0,0,0,.48f));
                 ModernOperationUI.Panel(new Rect(460,112,520,676));
                 ModernOperationUI.Label(new Rect(494,137,310,44),"游戏菜单",ModernOperationUI.Title);
-                ModernOperationUI.Label(new Rect(814,149,132,25),"Esc 返回游戏",ModernOperationUI.Small);
+                if(ModernOperationUI.Button(new Rect(858,137,36,32),"—")){tableMenu=false;CurrentTableWindows?.Hide("游戏菜单",()=>tableMenu=true);}
+                if(ModernOperationUI.Button(new Rect(910,137,36,32),"×")){tableMenu=false;nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);}
                 ModernOperationUI.Label(new Rect(494,187,452,24),"卡坦岛之三国争霸 · "+ReleaseVersion,ModernOperationUI.Small);
                 string configuration="当前扩展 · "+RuleNames[Array.IndexOf(RuleIds,RuleSet)];
                 if(RuleSet=="seafarers"||RuleSet=="combined")configuration+=" · "+Catan.Core.M3.SeafarersScenarios.Create(ScenarioId,PlayerCount).Name;
@@ -312,7 +315,6 @@ public sealed partial class M6App : MonoBehaviour
                 ModernOperationUI.Label(new Rect(494,273,452,23),"界面主题",ModernOperationUI.Small);
                 for(int i=0;i<StrategyHudTheme.Names.Length;i++)
                     if(ModernOperationUI.Button(new Rect(494+i*154,303,144,40),StrategyHudTheme.Names[i],true,false,StrategyHudTheme.Selected==i))StrategyHudTheme.Select(i);
-                if(ModernOperationUI.Button(new Rect(494,365,452,46),"返回游戏",true,true)){tableMenu=false;nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);}
                 if(ModernOperationUI.Button(new Rect(494,424,220,44),NetworkGame?"联机房间":Paused?"继续 AI":"暂停 AI")){if(NetworkGame)OpenNetworkMenu();else SetPaused(!Paused);}
                 if(ModernOperationUI.Button(new Rect(726,424,220,44),"切换俯视"))ToggleTableCamera();
                 if(ModernOperationUI.Button(new Rect(494,480,220,44),"保存并返回主页"))SaveAndReturnToMainMenu();
@@ -327,18 +329,21 @@ public sealed partial class M6App : MonoBehaviour
             if(NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),DisplayPlayerText(Network.Status),small);
             DrawOpeningOrder();
             string prompt=DisplayPlayerText(RoadPlacementPrompt.Length>0?RoadPlacementPrompt:CurrentTablePrompt);
-            if(prompt.Length>0&&!TablePresentationBlocked&&!TableOverlayOpen)
+            if(prompt.Length>0&&!TablePresentationBlocked&&(!TableOverlayOpen||HasRequiredTableSelection))
             {
                 bool primary=prompt=="你的回合"||Finished;
                 var promptStyle=new GUIStyle(title){fontSize=primary?46:26,alignment=TextAnchor.MiddleCenter,wordWrap=true};
                 promptStyle.normal.textColor=PromptColor;
-                if(promptStyle.CalcSize(new GUIContent(prompt)).x>1050)promptStyle.fontSize=primary?34:22;
-                var area=primary?new Rect(180,375,1080,150):new Rect(264,126,912,64);
+                if(ClosedTableSelection)prompt+=" · 点击继续选择";
+                var area=primary?new Rect(180,375,1080,150):SelectionPromptArea;
+                area.height=Mathf.Max(area.height,promptStyle.CalcHeight(new GUIContent(prompt),area.width));
                 if(!primary&&OpeningOrderMessage.Length>0)area.y+=48;
                 bool before=GUI.enabled;GUI.enabled=true;
                 var shadow=new GUIStyle(promptStyle);shadow.normal.textColor=new Color(.10f,.025f,.01f,.55f);
                 GUI.Label(new Rect(area.x+1,area.y+2,area.width,area.height),prompt,shadow);
-                GUI.Label(area,prompt,promptStyle);GUI.enabled=before;
+                GUI.Label(area,prompt,promptStyle);
+                if(ClosedTableSelection&&GUI.Button(area,GUIContent.none,GUIStyle.none))CurrentTableWindows.Open();
+                GUI.enabled=before;
             }
         }
         if(!MenuVisible&&!tableMenu)DrawPlayedCard();

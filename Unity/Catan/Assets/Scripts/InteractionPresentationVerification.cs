@@ -109,16 +109,18 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
         if(Environment.GetCommandLineArgs().Contains("--resource-card-review"))yield return new WaitForSecondsRealtime(45);
         city.VerificationOperationDock.Reset();
         stage="交易发起";yield return new WaitForEndOfFrame();city.VerificationOperationDock.OpenTrade("P2");yield return Capture("05-发起交易");if(Environment.GetCommandLineArgs().Contains("--resource-card-review"))yield return new WaitForSecondsRealtime(45);city.VerificationOperationDock.Reset();
-        stage="接收交易方向与缺牌";
+        stage="接收交易请求布局";
         app.StartGame("cities-knights","heading-for-new-shores",4,"P2",true);yield return null;yield return null;
         city=GetComponent<M4App>();host=city.VerificationHost;
         session=(C4.CitiesKnightsGameSession)typeof(M4LocalGameHost).GetField("session",Private).GetValue(host);state=session.GetAuthoritativeStateForTesting();
         state.ActivePlayerId="P1";state.Phase=C4.GamePhase.Action;state.SetupPlacementIndex=8;state.Turn=9;state.PendingDecision=null;state.Players[0].Resources.Wood=1;state.Bank.Wood=18;
+        // 接收者须有支付能力，否则真实规则会自动拒绝请求，无法展示回应窗口。
+        state.Players[1].Resources.Wool=2;state.Bank.Wool=17;
         typeof(C4.CitiesKnightsGameSession).GetField("state",Private).SetValue(session,state);session.AssertInvariants();
         var offer=Command(C4.CommandKind.ProposeTrade);offer.OtherPlayerId="P2";offer.Give=new ResourceBag{Wood=1};offer.Receive=new ResourceBag{Wool=2};
         Require(host.Submit(offer).Success,"报价夹具失败");city.M6Refresh();table=city.VerificationBoard.TableScene;
         yield return null;yield return new WaitForEndOfFrame();
-        var sides=OperationOfferPerspective.For(city.VerificationOperationSnapshot);Require(sides.OwnGive[2]==2&&sides.OtherGive[0]==1,"收到交易的两侧颠倒");yield return Capture("06-接收交易缺牌红色");
+        var sides=OperationOfferPerspective.For(city.VerificationOperationSnapshot);Require(sides.OwnGive[2]==2&&sides.OtherGive[0]==1,"收到交易的两侧颠倒");yield return Capture("06-接收交易请求");
         stage="金矿五资源";app.StartGame("seafarers","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
         var sea=GetComponent<M3App>();var seaSession=(Catan.Core.M3.SeafarersGameSession)typeof(M3LocalGameHost).GetField("session",Private).GetValue(sea.VerificationHost);
         var seaState=seaSession.GetAuthoritativeStateForTesting();seaState.ActivePlayerId="P1";seaState.Phase=Catan.Core.M3.GamePhase.GoldChoice;seaState.SetupPlacementIndex=8;seaState.Turn=9;seaState.PendingDecision=null;

@@ -77,7 +77,7 @@ public sealed partial class M5App
         if(operationView!=view)
         {
             operationView=view;var own=view.Players.First(p=>p.Id==seat);
-            var s=new OperationSnapshot{Scope="M5:"+seat,Seat=seat,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),GoodCount=8,Goods=DockGoods(view.OwnResources,view.OwnCommodities),Bank=DockGoods(view.Bank,view.CommodityBank),OtherPlayers=view.Players.Where(p=>p.Id!=seat).Select(p=>p.Id).ToArray()};
+            var s=new OperationSnapshot{Scope="M5:"+seat,Seat=seat,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),RequiresSelection=TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString()),GoodCount=8,Goods=DockGoods(view.OwnResources,view.OwnCommodities),Bank=DockGoods(view.Bank,view.CommodityBank),OtherPlayers=view.Players.Where(p=>p.Id!=seat).Select(p=>p.Id).ToArray()};
             s.CollectionTiles=TabletopCollectionSources.Project(view.Board.Tiles,view.Board.Settlements,view.Board.Cities,view.Board.RobberTileId,s.GoodCount==8);s.CollectionPosition=id=>{var point=MobileTabletop.Logical(board.ScreenPoint(id));return new TabletopCardPose{X=point.x,Y=point.y};};
             for(int i=0;i<8;i++)s.Rates[i]=BankTradeRate(i);
             bool setup=view.Phase==GamePhase.SetupSettlement,citySetup=setup&&view.Board.Settlements.Any(p=>p.PlayerId==seat),villageSetup=setup&&!citySetup;
@@ -186,7 +186,11 @@ public sealed partial class M5App
         ai.TableOverlayOpen=mapChoice.Active||dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen||ResourceChoiceVisible;
         if(DirectProgressActive&&view.PendingDecision?.Kind=="ProgressTreasonPlace"&&!mapChoice.Active&&ai.IsHumanTurn&&ModernOperationUI.Button(new Rect(610,196,220,34),"放弃安置替补骑士")){var skip=New(CommandKind.ResolveProgressChoice);skip.Decline=true;Submit(skip);}
         if(!ai.TablePresentationBlocked&&ai.IsHumanTurn)mapChoice.Draw();
-        ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status);GUI.matrix=Matrix4x4.identity;
+        RefreshTablePrompt();GUI.matrix=Matrix4x4.identity;
+    }
+    void RefreshTablePrompt()
+    {
+        if(ai!=null&&view!=null)ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status,RequiresTableSelection);
     }
     void EndTableTurn()
     {
@@ -198,19 +202,23 @@ public sealed partial class M5App
         }
         Submit(New(CommandKind.EndTurn));
     }
+    bool RequiresTableSelection=>DirectProgressActive||pickField!=""||handOverflowDiscard||operationActions&&operationKnightTarget==null||TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString());
     string TableInstruction()
     {
-        if(DirectProgressActive)return draft!=null&&draft.Kind==CommandKind.PlayProgressCard?status:"请直接点选地图目标 · "+DecisionName(view.PendingDecision.Kind);
+        if(DirectProgressActive)return draft!=null&&draft.Kind==CommandKind.PlayProgressCard?status:TabletopSelectionPrompt.Decision(view.PendingDecision.Kind);
         if(FreeRoadPlacementActive)return TabletopRoadPlacement.Instruction(view.PendingDecision?.Kind=="ProgressRoads"?view.PendingDecision.Amount:view.PendingDecision?.RemainingRoads??2,ai.HistoryEntries);
         if(view.Phase==GamePhase.Finished)return view.WinnerPlayerId+" 获胜";
-        if(pickField!="")return "请选择合法位置放下棋子";
+        if(pickField=="source")return draft?.Kind==CommandKind.MoveShip?"请选择要移动的船":"请选择要行动的己方骑士";
+        if(pickField!="")return draft?.Kind==CommandKind.MoveRobber?"请选择强盗要前往的新地块":draft?.Kind==CommandKind.MovePirate?"请选择海盗要前往的新海域":"请选择地图上的合法目标";
+        if(handOverflowDiscard)return "发展卡超过 4 张，请选择要弃掉的发展卡";
         if(view.Phase==GamePhase.ProductionAwaitRoll)return "请掷骰";
         if(view.Phase==GamePhase.SetupSettlement)return view.Board.Settlements.Any(p=>p.PlayerId==seat)?"请放置城市":"请放置村庄";
         if(view.Phase==GamePhase.SetupRoad)return "请放置道路或船";
         if(view.Phase==GamePhase.Discard)return "请选择要弃掉的牌";
         if(view.Phase==GamePhase.RobberMove)return "请移动强盗或海盗";
         if(view.Phase==GamePhase.RobberSteal)return "请选择偷取对象";
-        if(view.Phase==GamePhase.PendingChoice)return "请完成当前选择";
+        if(view.Phase==GamePhase.PendingChoice)return TabletopSelectionPrompt.Decision(view.PendingDecision?.Kind);
+        if(operationActions&&operationKnightTarget==null)return "请选择地图上的己方骑士，再选择行动";
         return "请选择你的行动";
     }
     void DrawOperationControls()
@@ -232,7 +240,6 @@ public sealed partial class M5App
             TabletopAction("驱离弱骑士",CommandKind.DisplaceKnight);
             TabletopAction("驱逐强盗",CommandKind.ChaseRobber);
             TabletopAction("驱逐海盗",CommandKind.ChasePirate);
-            GUILayout.Space(8);if(Btn("关闭行动面板"))CancelOperationDraft();
             return;
         }
         if(view.Phase==GamePhase.RobberMove)

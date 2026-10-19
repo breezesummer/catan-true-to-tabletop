@@ -7,7 +7,7 @@ using System.Linq;
 public sealed class OperationSnapshot
 {
     public string Scope, Revision, Status, Phase, Seat;
-    public bool CanTrade, CanInteract;
+    public bool CanTrade, CanInteract, RequiresSelection;
     public int[] Goods = new int[8], Bank = new int[8], Rates = new int[8];
     public int GoodCount = 5;
     public TabletopCollectionTile[] CollectionTiles = Array.Empty<TabletopCollectionTile>();
@@ -169,6 +169,7 @@ public sealed class OperationSelection
         if (trade == null || trade.Give == null || trade.Receive == null || trade.Give.Length != 8 || trade.Receive.Length != 8) return "交易内容无效";
         if (trade.Give.Any(n => n < 0) || trade.Receive.Any(n => n < 0)) return "数量不能为负数";
         for (int i = 0; i < 8; i++) if (trade.Give[i] > (i < 5 ? 19 : 12) || trade.Receive[i] > (i < 5 ? 19 : 12)) return "数量超过资源供应";
+        if (!snapshot.Goods.Take(snapshot.GoodCount).Any(n => n > 0)) return "当前没有可付出的资源或商品";
         if (trade.Give.Sum() == 0 || trade.Receive.Sum() == 0) return "请在两侧选择资源";
         for (int i = 0; i < 8; i++)
         {

@@ -340,6 +340,33 @@ public sealed class OperationDockTests
         Assert.Equal(-1, OperationPanelOptions.PaymentChoice(null!, Wood));
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void EmptyHandCannotSendEitherTradeTypeAndExplainsWhy(bool bank)
+    {
+        var snapshot = Snapshot();
+        snapshot.Goods = Bag();
+        var trade = new OperationTrade { Bank = bank, OtherPlayer = "P2" };
+
+        Assert.Equal("当前没有可付出的资源或商品", OperationSelection.ValidateTrade(snapshot, trade));
+        trade.Give[Wood] = 1;
+        trade.Receive[Ore] = 1;
+        Assert.Equal("当前没有可付出的资源或商品", OperationSelection.ValidateTrade(snapshot, trade));
+        Assert.Equal(Bag(), snapshot.Goods);
+    }
+
+    [Fact]
+    public void OwnedResourcesStillCannotSendAQuoteWithEitherSideEmpty()
+    {
+        var snapshot = Snapshot();
+        var trade = new OperationTrade { OtherPlayer = "P2", Give = Bag((Wood, 1)) };
+        Assert.Equal("请在两侧选择资源", OperationSelection.ValidateTrade(snapshot, trade));
+        trade.Give = Bag();
+        trade.Receive = Bag((Ore, 1));
+        Assert.Equal("请在两侧选择资源", OperationSelection.ValidateTrade(snapshot, trade));
+    }
+
     [Fact]
     public void OpeningTradeSelectsAnOwnedResourceAndPreservesAStillVisibleChoice()
     {

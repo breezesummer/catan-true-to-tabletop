@@ -15,8 +15,9 @@ public sealed partial class TabletopHistoryUI
     bool follow = true, showDice;
     bool collapsed;
     TabletopWorldObjects diceArt;
+    public OperationWindowState Windows;
     public bool IsOpen { get; private set; }
-    public void Open(){IsOpen=true;}
+    public void Open(){Windows?.Open();IsOpen=true;}
     public bool TryClose()
     {if(!IsOpen)return false;IsOpen=false;return true;}
     public bool BlocksInput(Vector2 p) => IsOpen || (collapsed?Collapsed:Feed).Contains(p);
@@ -39,7 +40,7 @@ public sealed partial class TabletopHistoryUI
         if(collapsed)
         {if(ModernOperationUI.Button(Collapsed,"历史 ‹"))collapsed=false;return;}
         ModernOperationUI.Round(Feed,new Color(ModernOperationUI.Background.r,ModernOperationUI.Background.g,ModernOperationUI.Background.b,.42f));
-        if(ModernOperationUI.Button(new Rect(Feed.x+10,Feed.y+5,76,25),"历史"))IsOpen=true;
+        if(ModernOperationUI.Button(new Rect(Feed.x+10,Feed.y+5,76,25),"历史"))Open();
         if(ModernOperationUI.Button(new Rect(Feed.xMax-39,Feed.y+5,29,25),"›")){collapsed=true;return;}
         var recent=entries.Skip(Math.Max(0,entries.Length-40)).ToArray();
         var area=new Rect(Feed.x+8,Feed.y+36,Feed.width-16,Feed.height-44);
@@ -55,7 +56,8 @@ public sealed partial class TabletopHistoryUI
         ModernOperationUI.Label(new Rect(Window.x+24,Window.y+18,112,35),"历史",ModernOperationUI.Title);
         if(ModernOperationUI.Button(new Rect(Window.x+142,Window.y+18,108,34),"操作",true,false,!showDice))showDice=false;
         if(ModernOperationUI.Button(new Rect(Window.x+258,Window.y+18,108,34),"掷骰",true,false,showDice))showDice=true;
-        if(ModernOperationUI.Button(new Rect(Window.xMax-78,Window.y+18,52,32),"关闭")){IsOpen=false;return;}
+        if(ModernOperationUI.Button(new Rect(Window.xMax-126,Window.y+18,44,32),"—")){Windows?.Hide("历史记录",Open);IsOpen=false;return;}
+        if(ModernOperationUI.Button(new Rect(Window.xMax-74,Window.y+18,44,32),"×")){IsOpen=false;return;}
         float x=Window.x+24;
         if(ModernOperationUI.Button(new Rect(x,Window.y+70,108,34),"全部玩家",true,false,filter==null)){filter=null;historyScroll=diceScroll=Vector2.zero;}x+=118;
         foreach(var player in players)
@@ -94,20 +96,24 @@ public sealed partial class TabletopHistoryUI
     Vector2 DrawDiceRows(Rect viewport,GameHistoryEntry[] entries,Vector2 position)
     {
         MobileTabletop.ScrollTouch(viewport,ref position);
-        float width=viewport.width-22,total=entries.Length*44;
+        var style=new GUIStyle(ModernOperationUI.Text){wordWrap=false};
+        float RowHeight(GameHistoryEntry entry)=>Math.Max(44,DrawCardLine(new Rect(0,0,185,30),"第 "+entry.Turn+" 回合 · ",entry.PlayerId,"",Array.Empty<GameHistoryChange>(),null,style,draw:false)+14);
+        float width=viewport.width-22,total=entries.Sum(RowHeight);
         position.y=Mathf.Clamp(position.y,0,Math.Max(0,total-viewport.height));
         position=GUI.BeginScrollView(viewport,position,new Rect(0,0,width,Math.Max(viewport.height,total)),false,false);
+        float y=0;
         for(int i=0;i<entries.Length;i++)
         {
-            float y=i*44;if(y+44<position.y||y>position.y+viewport.height)continue;
             var entry=entries[i];
-            ModernOperationUI.Fill(new Rect(0,y+8,3,22),BoardRenderer.SeatColor(entry.PlayerId));
-            DrawCardLine(new Rect(12,y+5,185,30),"第 "+entry.Turn+" 回合 · ",entry.PlayerId,"",Array.Empty<GameHistoryChange>(),null,new GUIStyle(ModernOperationUI.Text){wordWrap=false});
-            Die(new Rect(211,y+5,28,28),entry.Dice1,new Color(.64f,.11f,.08f),false);
-            Die(new Rect(245,y+5,28,28),entry.Dice2,new Color(.94f,.90f,.80f),false);
-            if(!string.IsNullOrEmpty(entry.EventDie))Die(new Rect(279,y+5,28,28),EventFace(entry.EventDie),new Color(.21f,.25f,.27f),true);
-            ModernOperationUI.Label(new Rect(332,y+5,98,30),(entry.Dice1+entry.Dice2)+" 点",ModernOperationUI.Center);
-            ModernOperationUI.Fill(new Rect(8,y+41,width-16,1),new Color(.24f,.32f,.31f,.45f));
+            float height=RowHeight(entry),rowY=y;y+=height;
+            if(rowY+height<position.y||rowY>position.y+viewport.height)continue;
+            ModernOperationUI.Fill(new Rect(0,rowY+8,3,22),BoardRenderer.SeatColor(entry.PlayerId));
+            DrawCardLine(new Rect(12,rowY+5,185,30),"第 "+entry.Turn+" 回合 · ",entry.PlayerId,"",Array.Empty<GameHistoryChange>(),null,style);
+            Die(new Rect(211,rowY+5,28,28),entry.Dice1,new Color(.64f,.11f,.08f),false);
+            Die(new Rect(245,rowY+5,28,28),entry.Dice2,new Color(.94f,.90f,.80f),false);
+            if(!string.IsNullOrEmpty(entry.EventDie))Die(new Rect(279,rowY+5,28,28),EventFace(entry.EventDie),new Color(.21f,.25f,.27f),true);
+            ModernOperationUI.Label(new Rect(332,rowY+5,98,30),(entry.Dice1+entry.Dice2)+" 点",ModernOperationUI.Center);
+            ModernOperationUI.Fill(new Rect(8,rowY+height-3,width-16,1),new Color(.24f,.32f,.31f,.45f));
         }
         if(entries.Length==0)ModernOperationUI.Label(new Rect(8,12,width-16,36),"尚未掷骰",ModernOperationUI.Small);
         GUI.EndScrollView();return position;
@@ -119,7 +125,21 @@ public sealed partial class TabletopHistoryUI
         if(!lines.TryGetValue(entry,out var value))lines[entry]=value=TabletopHistoryModel.Lines(entry);
         return value;
     }
-    static float Height(GameHistoryEntry entry,float width,bool compact)=>Lines(entry).Sum(line=>line.Trade&&line.ReceivedCards.Length>0?64:32)+30;
+    float Height(GameHistoryEntry entry,float width,bool compact)
+    {
+        float height=30;
+        foreach(var line in Lines(entry))
+        {
+            height+=HistoryLine(new Rect(0,0,width-18,0),line,entry,compact,false)+2;
+            if(line.Trade&&line.ReceivedCards.Length>0)
+                height+=DrawCardLine(new Rect(0,0,width-18,0),"跟",line.Partner,"交易了",line.ReceivedCards,null,HistoryStyle(compact),draw:false)+2;
+        }
+        return height;
+    }
+    static GUIStyle HistoryStyle(bool compact)=>new GUIStyle(ModernOperationUI.Text){fontSize=compact?11:15,wordWrap=false};
+    float HistoryLine(Rect r,TabletopHistoryLine line,GameHistoryEntry entry,bool compact,bool draw=true)=>
+        DrawCardLine(r,"",line.Player," "+line.Prefix,line.Cards,line.Suffix,HistoryStyle(compact),
+            line.Quote?line.ReceivedCards:null,line.Roll?entry:null,line.Trade?null:line.Partner,line.PartnerAction,line.Emphasis,line.Track,draw);
     Vector2 DrawRows(Rect viewport,GameHistoryEntry[] entries,Vector2 position,bool compact)
     {
         MobileTabletop.ScrollTouch(viewport,ref position);
@@ -143,46 +163,48 @@ public sealed partial class TabletopHistoryUI
         float y=r.y+26;
         foreach(var line in Lines(entry))
         {
-            var style=new GUIStyle(ModernOperationUI.Text){fontSize=compact?11:15,wordWrap=false};
-            DrawCardLine(new Rect(r.x+9,y,r.width-18,30),"",line.Player," "+line.Prefix,line.Cards,line.Suffix,style,
-                line.Quote?line.ReceivedCards:null,line.Roll?entry:null,line.Trade?null:line.Partner,line.PartnerAction,line.Emphasis,line.Track);y+=32;
+            y+=HistoryLine(new Rect(r.x+9,y,r.width-18,30),line,entry,compact)+2;
             if(line.Trade&&line.ReceivedCards.Length>0)
             {
-                DrawCardLine(new Rect(r.x+9,y,r.width-18,30),"跟",line.Partner,"交易了",line.ReceivedCards,null,
-                    new GUIStyle(ModernOperationUI.Text){fontSize=compact?11:15,wordWrap=false});y+=32;
+                y+=DrawCardLine(new Rect(r.x+9,y,r.width-18,30),"跟",line.Partner,"交易了",line.ReceivedCards,null,HistoryStyle(compact))+2;
             }
         }
         ModernOperationUI.Fill(new Rect(r.x+7,r.yMax-3,r.width-14,1),new Color(.24f,.32f,.31f,.45f));
     }
-    void DrawCardLine(Rect r,string beforeName,string player,string action,GameHistoryChange[] cards,string suffix,GUIStyle style,
-        GameHistoryChange[] requested=null,GameHistoryEntry roll=null,string partner=null,string partnerAction=null,string emphasis=null,int track=-1)
+    float DrawCardLine(Rect r,string beforeName,string player,string action,GameHistoryChange[] cards,string suffix,GUIStyle style,
+        GameHistoryChange[] requested=null,GameHistoryEntry roll=null,string partner=null,string partnerAction=null,string emphasis=null,int track=-1,bool draw=true)
     {
         // 中文衬线字体使用完整行高，避免继承默认标签内边距后被短文本框裁掉笔画。
         style.padding=new RectOffset(0,0,0,0);style.alignment=TextAnchor.MiddleLeft;
         style.richText=false;
-        var metrics=new GUIStyle(style);
         string name=PlayerIdentityModel.IsPlayerId(player)?M6App.PlayerLabel(player):player??"";
-        float TextWidth(string value)=>metrics.CalcSize(new GUIContent(value??"")).x;
-        float CardsWidth(GameHistoryChange[] values)=>values.Sum(c=>c.GoodIndex<0?TextWidth(Math.Abs(c.Amount)+"张手牌")+5:
-            24+(Math.Abs(c.Amount)>1?TextWidth("×"+Math.Abs(c.Amount))+4:0));
         int diceCount=roll==null?0:string.IsNullOrEmpty(roll.EventDie)?2:3;
         string partnerName=PlayerIdentityModel.IsPlayerId(partner)?M6App.PlayerLabel(partner):partner??"";
-        float width=TextWidth(beforeName)+TextWidth(name)+TextWidth(action)+5+TextWidth(partnerName)+TextWidth(partnerAction)+CardsWidth(cards)+TextWidth(suffix)+diceCount*32;
-        if(requested!=null)width+=TextWidth(" → ")+CardsWidth(requested);
-        float scale=Math.Min(1,r.width/Math.Max(1,width));
-        style.fontSize=Math.Max(7,(int)(style.fontSize*scale));float x=r.x;
+        float x=r.x,y=r.y;
+        // 文本、卡面和骰子共用流式布局；测量与绘制走同一路径，长记录增加行高而不缩字。
+        void Advance(float width)
+        {
+            if(x>r.x&&x+width>r.xMax){x=r.x;y+=30;}
+        }
         // 姓名独立绘制；动作、数量、箭头及其余文字始终使用主题默认文字色。
         void Text(string value,GUIStyle textStyle,float padding=0)
         {
-            float span=(TextWidth(value)+padding)*scale;
-            ModernOperationUI.Label(new Rect(x,r.y,span,30),value??"",textStyle);x+=span;
+            var characters=System.Globalization.StringInfo.GetTextElementEnumerator(value??"");
+            while(characters.MoveNext())
+            {
+                string character=characters.GetTextElement();
+                if(character=="\n"){x=r.x;y+=30;continue;}
+                float span=textStyle.CalcSize(new GUIContent(character)).x;Advance(span);
+                if(draw)ModernOperationUI.Label(new Rect(x,y,span+1,30),character,textStyle);x+=span;
+            }
+            if(padding>0){Advance(padding);x+=padding;}
         }
         void ColoredText(string value)
         {
             value=value??"";int at=string.IsNullOrEmpty(emphasis)?-1:value.IndexOf(emphasis,StringComparison.Ordinal);
             if(at<0||track<0){Text(value,style);return;}
             Text(value.Substring(0,at),style);
-            var colored=new GUIStyle(style);colored.normal.textColor=track==0?new Color(.94f,.73f,.25f):track==1?new Color(.40f,.67f,.94f):new Color(.49f,.79f,.42f);
+            var colored=new GUIStyle(style);colored.normal.textColor=track==0?new Color(.94f,.73f,.25f):track==1?new Color(.40f,.67f,.94f):track==2?new Color(.49f,.79f,.42f):new Color(.88f,.71f,.47f);
             Text(emphasis,colored);Text(value.Substring(at+emphasis.Length),style);
         }
         void Cards(GameHistoryChange[] values)
@@ -190,7 +212,9 @@ public sealed partial class TabletopHistoryUI
             foreach(var card in values)
             {
                 if(card.GoodIndex<0){Text(Math.Abs(card.Amount)+"张手牌",style,5);continue;}
-                EntityCardAssets.DrawCardFace(new Rect(x,r.y+2,20*scale,28*scale),EntityCardAssets.ResourceOrCommodityFront(card.GoodIndex));x+=24*scale;
+                string count=Math.Abs(card.Amount)>1?"×"+Math.Abs(card.Amount):"";
+                Advance(24+style.CalcSize(new GUIContent(count)).x+(count.Length>0?4:0));
+                if(draw)EntityCardAssets.DrawCardFace(new Rect(x,y+2,20,28),EntityCardAssets.ResourceOrCommodityFront(card.GoodIndex));x+=24;
                 if(Math.Abs(card.Amount)>1)Text("×"+Math.Abs(card.Amount),style,4);
             }
         }
@@ -201,10 +225,11 @@ public sealed partial class TabletopHistoryUI
         ColoredText(suffix);
         if(roll!=null)
         {
-            Die(new Rect(x,r.y+2,26*scale,26*scale),roll.Dice1,new Color(.64f,.11f,.08f),false);x+=32*scale;
-            Die(new Rect(x,r.y+2,26*scale,26*scale),roll.Dice2,new Color(.94f,.90f,.80f),false);x+=32*scale;
-            if(diceCount==3)Die(new Rect(x,r.y+2,26*scale,26*scale),EventFace(roll.EventDie),new Color(.21f,.25f,.27f),true);
+            Advance(32);if(draw)Die(new Rect(x,y+2,26,26),roll.Dice1,new Color(.64f,.11f,.08f),false);x+=32;
+            Advance(32);if(draw)Die(new Rect(x,y+2,26,26),roll.Dice2,new Color(.94f,.90f,.80f),false);x+=32;
+            if(diceCount==3){Advance(32);if(draw)Die(new Rect(x,y+2,26,26),EventFace(roll.EventDie),new Color(.21f,.25f,.27f),true);}
         }
+        return y-r.y+30;
     }
     // 骰面使用真实圆点与事件符号；基础版只有两骰，不伪造第三骰。
     static int EventFace(string value) => value=="Trade"?1:value=="Politics"?2:value=="Science"?3:0;

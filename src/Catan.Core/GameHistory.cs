@@ -32,6 +32,8 @@ namespace Catan.Core
         public int Amount { get; internal set; }
         public string Name { get; internal set; }
         public string LocationId { get; internal set; }
+        // 进步卡牌背颜色属于公开信息；-1 表示没有轨道，不包含隐藏卡牌身份。
+        public int CardTrack { get; internal set; } = -1;
         public bool IsPrivate { get; internal set; }
         internal GameHistoryChange Copy() => (GameHistoryChange)MemberwiseClone();
     }
@@ -62,7 +64,8 @@ namespace Catan.Core
                     return g.Details.GroupBy(d => Math.Sign(d.Amount)).Select(x => new GameHistoryChange
                     {
                         PlayerId = g.Details[0].PlayerId, Category = g.Details[0].Category == "goods" ? "resource-count" : g.Details[0].Category, Amount = x.Sum(d => d.Amount),
-                        Name = g.Details[0].Category == "goods" ? "手牌" : g.Details[0].Category == "development" ? "发展卡" : "发展卡"
+                        Name = g.Details[0].Category == "goods" ? "手牌" : "发展卡",
+                        CardTrack = g.Details[0].CardTrack
                     });
                 }).ToArray();
                 return entry;
@@ -133,7 +136,8 @@ namespace Catan.Core
                 bool visible = isPublic || played;
                 groups.Add(new Group
                 {
-                    Details = new[] { new GameHistoryChange { PlayerId = player, Category = category, Amount = c.Count, Name = CardName(c.Card), IsPrivate = !visible } },
+                    Details = new[] { new GameHistoryChange { PlayerId = player, Category = category, Amount = c.Count, Name = CardName(c.Card), IsPrivate = !visible,
+                        CardTrack = category == "progress" && Enum.TryParse(c.Card, out M4.ProgressCardKind progress) && Enum.IsDefined(typeof(M4.ProgressCardKind), progress) ? (int)M4.ProgressCatalog.Track(progress) : -1 } },
                     Viewers = visible ? null : action.Kind == "ResolveProgressChoice" && action.PendingKind == "ProgressEspionage" ? new[] { action.PlayerId, counterpart, player } : new[] { player }
                 });
             }

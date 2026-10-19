@@ -55,6 +55,7 @@ public sealed partial class M3App : MonoBehaviour
     void Update()
     {
         if((host==null&&!NetworkGame)||board==null)return;
+        RefreshTablePrompt();
         Vector2 releasePoint=Vector2.zero;bool released=ai!=null&&dock.ConsumeBuildRelease(out releasePoint);
         if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         var pointer=MobileTabletop.Pointer;
