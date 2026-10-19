@@ -159,7 +159,7 @@ public sealed partial class M5App
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
         dock.Windows=tabletop.OperationWindows;mapChoice.Windows=tabletop.OperationWindows;
-        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!ResourceChoiceVisible;GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&tableEnabled&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
+        bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!ResourceChoiceVisible;GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&tableEnabled&&!dock.BlocksHudInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
         TabletopUI.DrawMapLabels(DrawBoardLabels);
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.PlayerName=ai.PlayerDisplayName;dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TablePresentationBlocked);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);

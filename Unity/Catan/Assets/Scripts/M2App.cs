@@ -92,7 +92,14 @@ public sealed partial class M2App : MonoBehaviour
         if(mapChoice.Active){mapChoice.Clear();return true;}
         if(mapPan.IsDragging){mapPan.Cancel(board.TableScene);return true;}
         if(tabletop.TryCloseOverlay())return true;
-        if(!tabletop.OperationHidden&&(dock.HasOverlay||tabletop.ContextVisible||mapChoice.Active))return tabletop.HideOperation();
+        if(!tabletop.OperationHidden&&(dock.HasOverlay||tabletop.ContextVisible||mapChoice.Active))
+        {
+            var snapshot=Operations();
+            if(dock.HasOverlay&&snapshot.Offer!=null){dock.CloseWindow(snapshot);return true;}
+            dock.Reset();CancelOperationDraft();tabletop.CloseOperation();
+            // 规则要求完成的待决仅关闭本地窗口，仍从选择提示继续。
+            return true;
+        }
         bool active=holding||preparedDevelopment.HasValue||preparedPurchase||tableNotes||newGameDialog||cardArt.HasSelection||dock.HasCancelableInteraction;
         if(!active)return false;
         dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();return true;

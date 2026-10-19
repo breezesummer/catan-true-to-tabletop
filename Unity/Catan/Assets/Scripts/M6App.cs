@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="1.6.10";
+    public const string BuildVersion="1.6.11";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -60,7 +60,7 @@ public sealed partial class M6App : MonoBehaviour
     int? menuVictoryPoints;
     bool tableMenu, escapeDismissedInteraction;
     public bool TableMenuOpen=>tableMenu;
-    public void OpenTableMenu(){if(!Ready)return;tableMenu=true;escapeDismissedInteraction=false;}
+    public void OpenTableMenu(){if(!Ready)return;ResetTablePauseMenu();tableMenu=true;escapeDismissedInteraction=false;}
     public bool BlocksTableInput(Vector2 p)=>MenuVisible||TablePresentationBlocked||ClosedTableSelection&&SelectionPromptArea.Contains(p);
     void ToggleTableCamera()
     {
@@ -109,7 +109,7 @@ public sealed partial class M6App : MonoBehaviour
         if(MenuVisible){HandleMainMenuEscape();return;}
         if(!Ready)return;
         if(encyclopediaOpen){encyclopediaOpen=false;return;}
-        if(tableMenu){tableMenu=false;escapeDismissedInteraction=false;nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);return;}
+        if(tableMenu){if(HandleTablePausePageEscape())return;CloseTablePauseMenu();escapeDismissedInteraction=false;return;}
         // 第一遍放回本地草稿；规则要求的待决面板即使自动出现，下一遍仍能打开菜单。
         if(!escapeDismissedInteraction)
         {
@@ -119,7 +119,7 @@ public sealed partial class M6App : MonoBehaviour
                 presentation is M5App combined&&combined.TryCancelTableInteraction();
             if(cancelled){escapeDismissedInteraction=true;return;}
         }
-        escapeDismissedInteraction=false;tableMenu=true;
+        OpenTableMenu();
     }
     // At most one decision is computed and submitted in each call/frame. No wait loop blocks input.
     public bool StepAi()
@@ -302,31 +302,9 @@ public sealed partial class M6App : MonoBehaviour
         {
             if(tableMenu)
             {
-                ModernOperationUI.Styles(font);
-                Panel(new Rect(0,0,1440,900),new Color(0,0,0,.48f));
-                ModernOperationUI.Panel(new Rect(460,112,520,676));
-                ModernOperationUI.Label(new Rect(494,137,310,44),"游戏菜单",ModernOperationUI.Title);
-                if(ModernOperationUI.Button(new Rect(858,137,36,32),"—")){tableMenu=false;CurrentTableWindows?.Hide("游戏菜单",()=>tableMenu=true);}
-                if(ModernOperationUI.Button(new Rect(910,137,36,32),"×")){tableMenu=false;nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);}
-                ModernOperationUI.Label(new Rect(494,187,452,24),"卡坦岛之三国争霸 · "+ReleaseVersion,ModernOperationUI.Small);
-                string configuration="当前扩展 · "+RuleNames[Array.IndexOf(RuleIds,RuleSet)];
-                if(RuleSet=="seafarers"||RuleSet=="combined")configuration+=" · "+Catan.Core.M3.SeafarersScenarios.Create(ScenarioId,PlayerCount).Name;
-                ModernOperationUI.Label(new Rect(494,221,452,44),configuration,ModernOperationUI.Text);
-                ModernOperationUI.Label(new Rect(494,273,452,23),"界面主题",ModernOperationUI.Small);
-                for(int i=0;i<StrategyHudTheme.Names.Length;i++)
-                    if(ModernOperationUI.Button(new Rect(494+i*154,303,144,40),StrategyHudTheme.Names[i],true,false,StrategyHudTheme.Selected==i))StrategyHudTheme.Select(i);
-                if(ModernOperationUI.Button(new Rect(494,424,220,44),NetworkGame?"联机房间":Paused?"继续 AI":"暂停 AI")){if(NetworkGame)OpenNetworkMenu();else SetPaused(!Paused);}
-                if(ModernOperationUI.Button(new Rect(726,424,220,44),"切换俯视"))ToggleTableCamera();
-                if(ModernOperationUI.Button(new Rect(494,480,220,44),"保存并返回主页"))SaveAndReturnToMainMenu();
-                if(ModernOperationUI.Button(new Rect(726,480,220,44),"恢复存档")){tableMenu=false;LoadGame();}
-                if(PastoralMenuUI.ReturnButton(new Rect(494,536,452,44),font)){tableMenu=false;ReturnToMainMenu();}
-                if(ModernOperationUI.Button(new Rect(726,592,220,36),"游戏百科 · 发展卡"))encyclopediaOpen=true;
-                if(RuleSet=="seafarers"&&ModernOperationUI.Button(new Rect(494,592,220,36),"航海场景行动"))
-                {tableMenu=false;var sailing=GetComponent<M3App>();if(sailing!=null)sailing.ShowScenarioActions();}
-                if(TabletopAudio.Instance!=null)TabletopAudio.Instance.DrawSettings(new Rect(494,640,452,92),font);
-                ModernOperationUI.Label(new Rect(494,740,452,34),Notice,ModernOperationUI.Small);
+                DrawTablePauseMenu();
             }
-            if(NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),DisplayPlayerText(Network.Status),small);
+            if(!tableMenu&&NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),DisplayPlayerText(Network.Status),small);
             DrawOpeningOrder();
             string prompt=DisplayPlayerText(RoadPlacementPrompt.Length>0?RoadPlacementPrompt:CurrentTablePrompt);
             if(prompt.Length>0&&!TablePresentationBlocked&&(!TableOverlayOpen||HasRequiredTableSelection))

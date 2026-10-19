@@ -170,7 +170,14 @@ public sealed partial class M5App : MonoBehaviour
     {
         if(mapPan.IsDragging){mapPan.Cancel(board.TableScene);return true;}
         if(tabletop.TryCloseOverlay())return true;
-        if(!tabletop.OperationHidden&&(dock.HasOverlay||tabletop.ContextVisible||mapChoice.Active||ResourceChoiceVisible))return tabletop.HideOperation();
+        if(!tabletop.OperationHidden&&(dock.HasOverlay||tabletop.ContextVisible||mapChoice.Active||ResourceChoiceVisible))
+        {
+            var snapshot=Operations();
+            if(dock.HasOverlay&&snapshot.Offer!=null){dock.CloseWindow(snapshot);return true;}
+            dock.Reset();CancelOperationDraft();tabletop.CloseOperation();
+            // 规则要求完成的待决仅关闭本地窗口，仍从选择提示继续。
+            return true;
+        }
         if(mapChoice.Active){mapChoice.Clear();return true;}
         bool active=draft!=null||operationActions||operationKnightTarget!=null||newGame||artOpen||cardArt.HasSelection||dock.HasCancelableInteraction;
         if(!active)return false;

@@ -113,6 +113,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             CheckProjection(false); CheckProjection(true); SetTop(false);
             BindDockForHeadless();
             CheckEscapeMenu();
+            CheckRequiredWindowClosure();
             string before = Authority;
             Dock.OpenTrade(); Require(!Dock.TradeOpen, "开局阶段错误开放交换草稿");
             Require(before == Authority, "尝试打开交换改变权威状态");
@@ -133,7 +134,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             Require(Dock.BlocksBoardInput(new Vector2(1220, 500)), "交易模态窗口未阻挡外侧桌面");
             Require(Dock.BlocksBoardInput(new Vector2(18, 18))&&Dock.BlocksBoardInput(new Vector2(1418, 882)), "交易模态窗口未完整阻挡背景输入");
             Require(before == Authority, "银行交换草稿改变权威状态");
-            app.HandleTableEscape();Require(!app.TableMenuOpen&&Dock.TradeOpen&&!Dock.HasOverlay&&Hud.OperationHidden,"Esc 未收起并保留交换草稿");
+            app.HandleTableEscape();Require(!app.TableMenuOpen&&!Dock.TradeOpen&&!Dock.HasOverlay&&!Hud.OperationWindows.Hidden,"Esc 未关闭交换窗口或仍保留了最小化草稿");
             app.HandleTableEscape();Require(app.TableMenuOpen,"关闭草稿后 Esc 无法打开菜单");
             app.HandleTableEscape();Require(!app.TableMenuOpen,"Esc 无法关闭游戏菜单");
             Require(Dock.Selection.Selected.Sum() == 0, "放回交换草稿未清空");
@@ -169,8 +170,10 @@ public sealed class TabletopUiVerification : MonoBehaviour
         Require(app.TableMenuOpen&&app.BlocksTableInput(Vector2.zero)&&app.BlocksTableInput(new Vector2(1439,899)),"Esc 菜单未完整阻挡桌面");
         bool paused=app.Paused;app.SetPaused(false);
         Require(!app.StepAi()&&Authority==before,"游戏菜单中 AI 仍然执行命令");app.SetPaused(paused);
+        CheckPauseSettingsReturn(before);
         app.HandleTableEscape();
         Require(!app.TableMenuOpen&&Authority==before,"关闭菜单改变局面或没有返回游戏");
+        Require(app.Paused==paused,"关闭菜单没有恢复原有暂停设置");
         app.ShowMenu();
         // ShowMenu 先回到风景主页；从正式导航进入配置页，再逐层验证 Esc。
         var navigate=typeof(M6App).GetMethod("NavigateMainMenu",PrivateInstance);
@@ -194,6 +197,84 @@ public sealed class TabletopUiVerification : MonoBehaviour
         app.HandleTableEscape();Require(!app.TableMenuOpen&&Authority==before,"历史与菜单切换改变了权威局面");
     }
 
+    void CheckPauseSettingsReturn(string before)
+    {
+        var page=typeof(M6App).GetField("tablePausePage",PrivateInstance);
+        Require(page!=null,"游戏菜单缺少独立设置页");
+        page.SetValue(app,1);
+        Require(app.TablePauseSettingsOpen&&app.TablePresentationBlocked&&!app.StepAi()&&before==Authority,"游戏设置页没有继续暂停对局");
+        app.HandleTableEscape();
+        Require(app.TableMenuOpen&&!app.TablePauseSettingsOpen&&app.TablePresentationBlocked&&!app.StepAi()&&before==Authority,"设置页 Esc 没有返回暂停中的游戏菜单");
+    }
+
+    void CheckRequiredWindowClosure()
+    {
+        // 仅在显式验证中替换固定待决夹具；窗口动作前后仍逐字比较完整权威存档。
+        object host=Presentation.GetType().GetProperty("VerificationHost",BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance).GetValue(Presentation);
+        object session=host.GetType().GetField("session",PrivateInstance).GetValue(host);
+        var stateField=session.GetType().GetField("state",PrivateInstance);
+        object original=session.GetType().GetMethod("GetAuthoritativeStateForTesting").Invoke(session,null);
+        object state=session.GetType().GetMethod("GetAuthoritativeStateForTesting").Invoke(session,null);
+        void Set(object target,string name,object value)=>target.GetType().GetProperty(name).SetValue(target,value);
+        void Phase(object target,string name,string value)
+        {var property=target.GetType().GetProperty(name);property.SetValue(target,Enum.Parse(property.PropertyType,value));}
+        try
+        {
+            Set(state,"ActivePlayerId",app.HumanSeat);Set(state,"Turn",9);
+            string phase=mode=="base"?"RoadBuilding":mode=="seafarers"?"GoldChoice":"PendingChoice";
+            string kind=mode=="base"?"RoadBuilding":mode=="cities-knights"?"Aqueduct":"Gold";
+            Phase(state,"Phase",phase);
+            var decisionProperty=state.GetType().GetProperty("PendingDecision");
+            object decision=Activator.CreateInstance(decisionProperty.PropertyType);
+            Set(decision,"Kind",kind);Set(decision,"PlayerId",app.HumanSeat);Phase(decision,"ReturnPhase","Action");
+            if(mode=="base")Set(decision,"RemainingRoads",2);
+            if(mode=="combined")
+            {
+                Set(decision,"Amount",1);
+                // 组合规则金矿待领取数量受实际建筑上界约束，夹具必须有对应村庄。
+                var combined=(Catan.Core.M5.GameState)state;
+                string vertex=combined.Tiles.First(t=>t.Resource=="gold").Vertices[0];
+                combined.Settlements=new[]{new PiecePlacement{PlayerId=app.HumanSeat,LocationId=vertex}};
+                combined.Players.First(p=>p.Id==app.HumanSeat).Pieces.Settlements--;
+            }
+            decisionProperty.SetValue(state,decision);
+            if(mode=="seafarers")
+            {
+                var claimsProperty=state.GetType().GetProperty("GoldClaims");
+                var claims=Array.CreateInstance(claimsProperty.PropertyType.GetElementType(),1);
+                object claim=Activator.CreateInstance(claimsProperty.PropertyType.GetElementType());
+                Set(claim,"PlayerId",app.HumanSeat);Set(claim,"Amount",1);claims.SetValue(claim,0);claimsProperty.SetValue(state,claims);
+                Phase(state,"GoldReturnPhase","Action");
+            }
+            if(mode=="cities-knights"||mode=="combined")Phase(state,"DecisionReturnPhase","Action");
+            stateField.SetValue(session,state);session.GetType().GetMethod("AssertInvariants",Type.EmptyTypes).Invoke(session,null);
+            Presentation.GetType().GetMethod("M6Refresh",PrivateInstance).Invoke(Presentation,null);
+            BindDockForHeadless();
+            if(mode=="base")Hud.RegisterContext(); // 无图形模式不执行道路建设窗口的 OnGUI。
+            Presentation.GetType().GetMethod("RefreshTablePrompt",PrivateInstance).Invoke(Presentation,null);
+            Require(Snapshot.RequiresSelection&&app.HasRequiredTableSelection,"固定待决没有进入必须完成的选择阶段");
+            string before=Authority;
+            app.HandleTableEscape();
+            Require(!app.TableMenuOpen&&Hud.OperationClosed&&!Hud.OperationWindows.Hidden&&!Dock.HasOverlay,"Esc 待决窗口未关闭或变成了最小化");
+            BindDockForHeadless();
+            Presentation.GetType().GetMethod("RefreshTablePrompt",PrivateInstance).Invoke(Presentation,null);
+            Require(Hud.OperationClosed&&app.ClosedTableSelection&&app.HasRequiredTableSelection&&before==Authority,"重新绑定后待决窗口自动出现或权威待决被取消");
+            app.HandleTableEscape();Require(app.TableMenuOpen&&Hud.OperationClosed&&before==Authority,"关闭待决窗口后 Esc 未进入游戏菜单");
+            CheckPauseSettingsReturn(before);
+            app.HandleTableEscape();Require(!app.TableMenuOpen&&Hud.OperationClosed&&before==Authority,"离开暂停菜单重新打开了已关闭待决窗口");
+            Hud.OperationWindows.Open();
+            Require(!Hud.OperationHidden&&!app.ClosedTableSelection&&Snapshot.RequiresSelection&&before==Authority,"关闭的待决窗口无法重新打开继续选择");
+        }
+        finally
+        {
+            stateField.SetValue(session,original);
+            Presentation.GetType().GetMethod("M6Refresh",PrivateInstance).Invoke(Presentation,null);
+            typeof(TabletopUI).GetField("contextVisible",PrivateInstance).SetValue(Hud,false);
+            Hud.OperationWindows.Clear();BindDockForHeadless();
+            Presentation.GetType().GetMethod("RefreshTablePrompt",PrivateInstance).Invoke(Presentation,null);
+        }
+    }
+
     void VerifyBroadcast()
     {
         var snapshot=Snapshot;int good=Array.FindIndex(snapshot.Goods,n=>n>0);
@@ -210,11 +291,11 @@ public sealed class TabletopUiVerification : MonoBehaviour
         Require(Snapshot.CanInteract,"报价者等待 AI 回复时不能撤回");
         Require(owned.SequenceEqual(Snapshot.Goods),"报价阶段已提前扣费");
         BindDockForHeadless();
-        app.HandleTableEscape();Require(!app.TableMenuOpen&&Hud.OperationHidden&&Snapshot.Offer!=null,"收起交易报价取消了权威报价");
-        app.HandleTableEscape();Require(app.TableMenuOpen&&Snapshot.Offer!=null,"已发出的交易报价阻止了 Esc 菜单或被界面取消");
-        app.HandleTableEscape();Require(!app.TableMenuOpen&&owned.SequenceEqual(Snapshot.Goods),"报价期间关闭菜单改变了手牌");
-        Snapshot.Respond("cancel");
-        Require(Snapshot.Offer==null&&owned.SequenceEqual(Snapshot.Goods),"全体报价撤回未保持原手牌");
+        app.HandleTableEscape();BindDockForHeadless();
+        Require(!app.TableMenuOpen&&!Dock.HasOverlay&&!Hud.OperationWindows.Suppressed&&Snapshot.Offer==null,"Esc 未按关闭按钮行为撤销自己的报价，或仍保留窗口入口");
+        Require(owned.SequenceEqual(Snapshot.Goods),"Esc 撤销全体报价改变了手牌");
+        app.HandleTableEscape();Require(app.TableMenuOpen&&Snapshot.Offer==null,"关闭报价窗口后 Esc 未打开游戏菜单");
+        app.HandleTableEscape();Require(!app.TableMenuOpen&&Snapshot.Offer==null&&owned.SequenceEqual(Snapshot.Goods),"报价撤回后切换菜单改变了手牌或重新出现报价");
     }
 
     void CheckSeatOrder(int players)
@@ -483,6 +564,8 @@ public sealed class TabletopUiVerification : MonoBehaviour
     {
         // -nographics 不调用 OnGUI；仅补上 Draw 的快照绑定，不绕过任何命令校验。
         typeof(OperationDock).GetField("current", PrivateInstance).SetValue(Dock, Snapshot);
+        typeof(OperationDock).GetField("scope", PrivateInstance).SetValue(Dock, Snapshot.Scope);
+        typeof(OperationDock).GetField("revision", PrivateInstance).SetValue(Dock, Snapshot.Revision);
         Hud.BindOperations(Snapshot,Dock.PrepareDevelopmentPurchase,app.HistoryEntries);Dock.Windows=Hud.OperationWindows;
         Dock.Selection.Sync(Snapshot);
     }

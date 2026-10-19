@@ -17,14 +17,64 @@ public sealed partial class InteractionPresentationVerification
     IEnumerator SettleFeedback(){double deadline=Time.unscaledTimeAsDouble+10;while(app.TablePresentationBlocked&&Time.unscaledTimeAsDouble<deadline)yield return null;Require(!app.TablePresentationBlocked,"动画没有结束");yield return null;}
     IEnumerator VerifyFeedback()
     {
-        yield return VerifyFeedback4();yield return VerifyFeedback5();yield return VerifyOperationWindows();
+        yield return VerifyBasicCardAction();yield return VerifyFeedback4();yield return VerifyFeedback5();yield return VerifyBroadcastRecipientClose();yield return VerifyOperationWindows();
         stage="百科与Esc返回";
-        app.OpenTableMenu();PolishSetField(app,"encyclopediaOpen",true);
+        app.OpenTableMenu();
+        if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("游戏菜单");
+        PolishSetField(app,"tablePausePage",1);yield return null;
+        Require(app.TablePauseSettingsOpen,"游戏菜单的设置页未打开");
+        if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("游戏设置");
+        app.HandleTableEscape();Require(app.TableMenuOpen&&!app.TablePauseSettingsOpen,"Esc未从设置返回游戏菜单");
+        PolishSetField(app,"encyclopediaOpen",true);
         yield return null;yield return null;
         Require(app.TableMenuOpen&&app.TablePresentationBlocked,"百科未阻止棋盘交互");
+        if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("游戏百科");
         app.HandleTableEscape();Require(app.TableMenuOpen&&!(bool)typeof(M6App).GetField("encyclopediaOpen",Private).GetValue(app),"Esc未从百科返回菜单");
         app.HandleTableEscape();Require(!app.TableMenuOpen,"Esc未从菜单返回游戏");
         Require(M5App.Cards.Length==25&&M5App.CardHelp.All(s=>!string.IsNullOrEmpty(s)),"发展卡百科缺项");
+    }
+
+    TabletopUI BindFeedbackCardHud(object game)
+    {
+        var hud=(TabletopUI)game.GetType().GetField("tabletop",Private).GetValue(game);
+        var dock=(OperationDock)game.GetType().GetField("dock",Private).GetValue(game);
+        var snapshot=(OperationSnapshot)PolishGet(game,"VerificationOperationSnapshot");
+        hud.BindOperations(snapshot,dock.PrepareDevelopmentPurchase,app.HistoryEntries);hud.BindDiscard(snapshot,dock);dock.Windows=hud.OperationWindows;
+        PolishSetField(dock,"current",snapshot);PolishSetField(dock,"scope",snapshot.Scope);PolishSetField(dock,"revision",snapshot.Revision);PolishSetField(dock,"specialHand",true);dock.Selection.Sync(snapshot);
+        table=(TabletopScene)PolishGet(PolishGet(game,"VerificationBoard"),"TableScene");return hud;
+    }
+    void CheckCardPreviewHud(TabletopUI hud,OperationDock dock,OperationSnapshot snapshot,OperationHandCard card)
+    {
+        dock.ToggleCardPreview(snapshot,card);
+        Require(dock.PreviewCard(snapshot)==card&&hud.CardActionCaption=="使用\n"+card.Name,"预览没有把所选卡牌移到右下角使用入口");
+        Require(dock.BlocksBoardInput(new Vector2(720,430))&&!dock.BlocksHudInput(TabletopUI.EndTurnRect.center),"预览未阻挡棋盘或右下角按钮被遮挡");
+    }
+    IEnumerator VerifyBasicCardAction()
+    {
+        stage="基础发展卡右下角使用";app.StartGame("base","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+        var game=GetComponent<M2App>();var host=game.VerificationHost;
+        var session=(Catan.Core.M2.BaseGameSession)typeof(M2LocalGameHost).GetField("session",Private).GetValue(host);
+        var state=session.GetAuthoritativeStateForTesting();state.ActivePlayerId="P1";state.Turn=9;state.Phase=Catan.Core.M2.GamePhase.Action;state.SetupPlacementIndex=8;state.PendingDecision=null;
+        state.Players[0].DevelopmentCards=new[]{
+            new Catan.Core.M2.DevelopmentCard{Kind=Catan.Core.M2.DevelopmentCardKind.Knight,BoughtTurn=1},
+            new Catan.Core.M2.DevelopmentCard{Kind=Catan.Core.M2.DevelopmentCardKind.YearOfPlenty,BoughtTurn=9},
+            new Catan.Core.M2.DevelopmentCard{Kind=Catan.Core.M2.DevelopmentCardKind.VictoryPoint,BoughtTurn=1}};
+        var deck=state.DevelopmentDeck.ToList();foreach(var card in state.Players[0].DevelopmentCards)deck.Remove(card.Kind);state.DevelopmentDeck=deck.ToArray();
+        typeof(Catan.Core.M2.BaseGameSession).GetField("state",Private).SetValue(session,state);session.AssertInvariants();game.M6Refresh();yield return null;yield return SettleFeedback();
+        var snapshot=game.VerificationOperationSnapshot;var dock=game.VerificationOperationDock;var hud=BindFeedbackCardHud(game);string before=host.ExportSave();
+        foreach(var card in snapshot.Cards.Where(c=>!c.Playable))
+        {
+            CheckCardPreviewHud(hud,dock,snapshot,card);Require(!hud.CardActionReady,"新买卡或胜利点卡错误允许使用");hud.ConfirmCardAction();
+            Require(before==host.ExportSave(),"查看或尝试使用不可用卡改变了权威局面");dock.ToggleCardPreview(snapshot,card);
+            Require(!dock.HasOverlay&&hud.CardActionCaption==null,"再次点击同一张牌未关闭预览");
+        }
+        var knight=snapshot.Cards.First(c=>c.Playable);CheckCardPreviewHud(hud,dock,snapshot,knight);
+        Require(before==host.ExportSave()&&hud.CardActionReady,"合法卡牌预览提前出牌或使用入口被禁用");
+        if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("基础发展卡预览");
+        hud.ConfirmCardAction();yield return null;yield return SettleFeedback();
+        Require(host.View("P1").Players.First(p=>p.Id=="P1").PlayedKnights==1&&host.View("P1").Phase==Catan.Core.M2.GamePhase.RobberMove,"右下角使用骑士未走正常出牌与强盗待决");
+        snapshot=game.VerificationOperationSnapshot;hud=BindFeedbackCardHud(game);before=host.ExportSave();
+        CheckCardPreviewHud(hud,dock,snapshot,snapshot.Cards[0]);Require(snapshot.RequiresSelection&&!hud.CardActionReady,"强盗待决仍允许使用其他卡牌");hud.ConfirmCardAction();Require(before==host.ExportSave(),"预览绕过了强盗待决");dock.Reset();session.AssertInvariants();
     }
 
     IEnumerator VerifyFeedback4()
@@ -56,7 +106,11 @@ public sealed partial class InteractionPresentationVerification
             typeof(Catan.Core.M4.CitiesKnightsGameSession).GetField("state",Private).SetValue(session,state);session.AssertInvariants();game.M6Refresh();yield return null;yield return SettleFeedback();
             var action=game.M6View.LegalActions.FirstOrDefault(x=>x.Kind==Catan.Core.M4.CommandKind.PlayProgressCard&&x.ProgressCard==card);
             Require(action!=null,"夹具没有合法用牌动作 "+card);
-            game.VerificationOperationSnapshot.PrepareCard(new OperationHandCard{Id=((int)card)+":0",Name=card.ToString()});
+            var snapshot=game.VerificationOperationSnapshot;var hud=BindFeedbackCardHud(game);string previewBefore=host.ExportSave();
+            CheckCardPreviewHud(hud,game.VerificationOperationDock,snapshot,snapshot.Cards.First(x=>x.ArtIndex==(int)card));
+            Require(hud.CardActionReady&&previewBefore==host.ExportSave(),"进步卡预览提前消耗牌或无法使用");
+            if(card==Catan.Core.M4.ProgressCardKind.Merchant&&Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("城市骑士发展卡预览");
+            hud.ConfirmCardAction();Require(previewBefore==host.ExportSave(),"进入地图选目标时提前消耗进步卡");
             Require((bool)PolishGet(game,"DirectProgressActive"),"未进入地图用牌模式");Require(!(bool)PolishGet(game,"OperationContextVisible"),"旧菜单仍然遮挡棋盘");
             var input=typeof(M4App).GetMethod("UpdateDirectProgress",Private);
             string before=host.ExportSave();input.Invoke(game,new object[]{new Vector2(-100,-100),true});Require(before==host.ExportSave(),"非法地图点击改变状态");
@@ -153,7 +207,10 @@ public sealed partial class InteractionPresentationVerification
             typeof(Catan.Core.M5.CombinedGameSession).GetField("state",Private).SetValue(session,state);session.AssertInvariants();game.M6Refresh();yield return null;yield return SettleFeedback();
             var action=game.M6View.LegalActions.FirstOrDefault(x=>x.Kind==Catan.Core.M5.CommandKind.PlayProgressCard&&x.ProgressCard==card);
             Require(action!=null,"夹具没有合法用牌动作 "+card);
-            game.VerificationOperationSnapshot.PrepareCard(new OperationHandCard{Id=((int)card)+":0",Name=card.ToString()});
+            var snapshot=game.VerificationOperationSnapshot;var hud=BindFeedbackCardHud(game);string previewBefore=host.ExportSave();
+            CheckCardPreviewHud(hud,game.VerificationOperationDock,snapshot,snapshot.Cards.First(x=>x.ArtIndex==(int)card));
+            Require(hud.CardActionReady&&previewBefore==host.ExportSave(),"组合进步卡预览提前消耗牌或无法使用");hud.ConfirmCardAction();
+            Require(previewBefore==host.ExportSave(),"组合进步卡进入地图选目标时提前消耗牌");
             Require((bool)PolishGet(game,"DirectProgressActive"),"未进入地图用牌模式");Require(!(bool)PolishGet(game,"OperationContextVisible"),"旧菜单仍然遮挡棋盘");
             var input=typeof(M5App).GetMethod("UpdateDirectProgress",Private);
             string before=host.ExportSave();input.Invoke(game,new object[]{new Vector2(-100,-100),true});Require(before==host.ExportSave(),"非法地图点击改变状态");
@@ -230,6 +287,42 @@ public sealed partial class InteractionPresentationVerification
         if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture(stage);
     }
     string RequiredChoicePromptDiagnostic(string expected)=>"预期="+expected+"，required="+app.HasRequiredTableSelection+"，human="+app.IsHumanTurn+"，actor="+app.CurrentActor+"，seat="+app.HumanSeat+"，blocked="+app.TablePresentationBlocked+"，prompt="+app.CurrentTablePrompt;
+    IEnumerator VerifyBroadcastRecipientClose()
+    {
+        foreach(int players in new[]{3,4})
+        {
+            stage=players+"人广播报价接收者关闭";app.StartGame("base","heading-for-new-shores",players,"P2",true);yield return null;yield return null;
+            var game=GetComponent<M2App>();var host=game.VerificationHost;var dock=game.VerificationOperationDock;
+            var session=(Catan.Core.M2.BaseGameSession)typeof(M2LocalGameHost).GetField("session",Private).GetValue(host);
+            var state=session.GetAuthoritativeStateForTesting();state.ActivePlayerId="P1";state.Turn=9;state.Phase=Catan.Core.M2.GamePhase.Action;state.SetupPlacementIndex=players*2;state.PendingDecision=null;
+            foreach(var player in state.Players)player.Resources=player.Id=="P1"?new ResourceBag{Wood=1}:new ResourceBag{Wool=1};
+            foreach(Resource resource in Enum.GetValues(typeof(Resource)))state.Bank[resource]=19-state.Players.Sum(p=>p.Resources[resource]);
+            typeof(Catan.Core.M2.BaseGameSession).GetField("state",Private).SetValue(session,state);session.AssertInvariants();
+            Require(host.Submit(new Catan.Core.M2.Command{Id=Guid.NewGuid().ToString("N"),PlayerId="P1",Kind=Catan.Core.M2.CommandKind.ProposeTrade,OtherPlayerId="*",Give=new ResourceBag{Wood=1},Receive=new ResourceBag{Wool=1}}).Success,"广播接收者夹具未能正常报价");
+            game.M6Refresh();yield return null;yield return SettleFeedback();
+            var hud=BindFeedbackCardHud(game);var snapshot=game.VerificationOperationSnapshot;string revision=snapshot.Revision;
+            Require(snapshot.Offer!=null&&snapshot.Offer.CanReject&&dock.HasOverlay,"可回应的广播报价没有向人类接收者开放");
+            int responses=0;var respond=snapshot.Respond;snapshot.Respond=choice=>{responses++;respond(choice);};
+            app.HandleTableEscape();string immediate=host.ExportSave();dock.CloseWindow(snapshot);
+            Require(responses==1&&immediate==host.ExportSave(),"异步关闭期间重复提交拒绝");yield return null;yield return SettleFeedback();
+            Require(responses==1&&!app.TableMenuOpen,"Esc未恰好提交一次拒绝并关闭广播报价");
+            var offer=host.View("P2").TradeOffer;
+            Require(offer!=null&&offer.RejectedPlayerIds.Contains("P2")&&offer.PendingRecipientIds.Length==players-2,"拒绝错误撤回了其他人仍可回应的报价");
+            string declined=host.ExportSave();
+            hud=BindFeedbackCardHud(game);snapshot=game.VerificationOperationSnapshot;
+            Require(snapshot.Revision!=revision&&!OperationDock.HasActionableOffer(snapshot)&&!dock.HasOverlay&&!dock.BlocksBoardInput(new Vector2(720,430)),"拒绝后的新版本投影仍重新弹出广播报价或阻挡桌面");
+            int repeats=0;respond=snapshot.Respond;snapshot.Respond=choice=>{repeats++;respond(choice);};dock.CloseWindow(snapshot);
+            Require(repeats==0&&declined==host.ExportSave(),"已拒绝的席位再次关闭时重复回应报价");
+            app.HandleTableEscape();Require(app.TableMenuOpen&&declined==host.ExportSave(),"关闭广播报价后再次Esc未打开菜单");app.HandleTableEscape();
+            // 非参与者看到公开报价状态时，也不能被无操作权限的模态窗口锁住或代替接收者拒绝。
+            Require(host.Submit(new Catan.Core.M2.Command{Id=Guid.NewGuid().ToString("N"),PlayerId="P1",Kind=Catan.Core.M2.CommandKind.CancelTrade}).Success,"旁观报价夹具未能撤回旧报价");
+            Require(host.Submit(new Catan.Core.M2.Command{Id=Guid.NewGuid().ToString("N"),PlayerId="P1",Kind=Catan.Core.M2.CommandKind.ProposeTrade,OtherPlayerId="P3",Give=new ResourceBag{Wood=1},Receive=new ResourceBag{Wool=1}}).Success,"旁观报价夹具未能建立定向报价");
+            game.M6Refresh();yield return null;hud=BindFeedbackCardHud(game);snapshot=game.VerificationOperationSnapshot;
+            Require(snapshot.Offer!=null&&!OperationDock.HasActionableOffer(snapshot)&&!dock.HasOverlay,"非参与者被定向报价的模态窗口锁住");
+            int spectatorResponses=0;respond=snapshot.Respond;snapshot.Respond=choice=>{spectatorResponses++;respond(choice);};string watching=host.ExportSave();dock.CloseWindow(snapshot);
+            Require(spectatorResponses==0&&watching==host.ExportSave(),"旁观者关闭窗口替其他人提交了拒绝");session.AssertInvariants();
+        }
+    }
     IEnumerator VerifyOperationWindows()
     {
         foreach(string rules in new[]{"base","seafarers","cities-knights","combined"})

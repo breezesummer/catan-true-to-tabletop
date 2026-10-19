@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.6/Catan1.6.10-Choice-Trade-History',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
+param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.6/Catan1.6.11-Pause-Menu-Card-UI',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))

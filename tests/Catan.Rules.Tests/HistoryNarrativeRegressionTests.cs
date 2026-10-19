@@ -115,7 +115,7 @@ public sealed class HistoryNarrativeRegressionTests
         Assert.DoesNotContain(projected.Changes, c => c.Name == own.Name);
         var line = TabletopHistoryModel.Lines(projected).Single(l => l.Emphasis == "发展卡");
         Assert.Equal(track, line.Track);
-        Assert.Equal("获得了发展卡", line.Prefix);
+        Assert.Equal("收获发展卡", line.Prefix);
     }
 
     [Theory][InlineData(M4.ProgressCardKind.Printing, "印刷术")][InlineData(M4.ProgressCardKind.Constitution, "宪法")]
@@ -135,7 +135,7 @@ public sealed class HistoryNarrativeRegressionTests
         choose.Track = deck.Track;
         M4CoreHarness.Accepted(game, choose);
         var line = TabletopHistoryModel.Lines(Assert.Single(game.GetHistory("P2"))).Single(l => l.Emphasis == name);
-        Assert.Equal("获得了" + name + "（1分）", line.Prefix);
+        Assert.Equal("收获" + name + "（1分）", line.Prefix);
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public sealed class HistoryNarrativeRegressionTests
             s.AlchemyDice1 = 6; s.AlchemyDice2 = 1; s.Random.State = 1;
         });
         M4CoreHarness.Accepted(game, M4CoreHarness.Cmd(M4.CommandKind.RollDice));
-        Assert.Contains(TabletopHistoryModel.Lines(Assert.Single(game.GetHistory("P1"))), l => l.Player == "P2" && l.Prefix == "获得了卡坦保卫者（1分）");
+        Assert.Contains(TabletopHistoryModel.Lines(Assert.Single(game.GetHistory("P1"))), l => l.Player == "P2" && l.Prefix == "收获卡坦保卫者（1分）");
     }
 
     [Fact]
@@ -189,7 +189,7 @@ public sealed class HistoryNarrativeRegressionTests
     }
 
     [Fact]
-    public void ResourceMonopolyUsesGainedForEachAffectedPlayer()
+    public void ResourceMonopolyUsesHarvestForEachAffectedPlayer()
     {
         var game = M4ProgressHarness.Fixture(M4.ProgressCardKind.ResourceMonopoly, s =>
         {
@@ -200,7 +200,7 @@ public sealed class HistoryNarrativeRegressionTests
         M4ProgressHarness.Accepted(game, command);
         var lines = TabletopHistoryModel.Lines(Assert.Single(game.GetHistory("P4")));
         Assert.Equal("使用「资源垄断」", lines[0].Prefix);
-        Assert.Equal(2, lines.Count(l => l.Prefix == "获得了" && l.Partner != null));
-        Assert.DoesNotContain(lines, l => l.Prefix.Contains("收获"));
+        Assert.Equal(2, lines.Count(l => l.Prefix == "收获" && l.Partner != null));
+        Assert.DoesNotContain(lines, l => l.Prefix.Contains("获得了"));
     }
 }

@@ -108,7 +108,11 @@ public sealed partial class M3App
                 s.Offer=new OperationOffer{Proposer=t.ProposerId,Recipient=t.OtherPlayerId,IsBroadcast=t.IsBroadcast,PendingRecipients=t.PendingRecipientIds,RejectedRecipients=t.RejectedPlayerIds??Array.Empty<string>(),Give=DockCost(t.Give.Wood,t.Give.Brick,t.Give.Wool,t.Give.Wheat,t.Give.Ore),Receive=DockCost(t.Receive.Wood,t.Receive.Brick,t.Receive.Wool,t.Receive.Wheat,t.Receive.Ore),CanAccept=t.CanRespond(seat),CanReject=t.CanRespond(seat),CanCancel=seat==t.ProposerId};
             }
             s.PrepareBuild=b=>{CancelOperationDraft();var k=(CommandKind)Enum.Parse(typeof(CommandKind),b.Id);if(k==CommandKind.BuyDevelopmentCard){preparedPurchase=true;status="已选发展卡，请在桌面确认购买。";}else Pickup(k);};
-            s.PrepareCard=c=>{CancelOperationDraft();preparedResourceCards=new int[8];preparedDevelopment=(DevelopmentCardKind)int.Parse(c.Id.Split(':')[0]);status="已选择 "+c.Name+"，请在桌面确认出牌。";};
+            s.PrepareCard=c=>{
+                CancelOperationDraft();var kind=(DevelopmentCardKind)int.Parse(c.Id.Split(':')[0]);
+                if(kind==DevelopmentCardKind.Knight||kind==DevelopmentCardKind.RoadBuilding){Submit(NewCommand(kind==DevelopmentCardKind.Knight?CommandKind.PlayKnight:CommandKind.PlayRoadBuilding));return;}
+                preparedResourceCards=new int[8];preparedDevelopment=kind;status="已选择 "+c.Name+"，请选择资源并确认出牌。";
+            };
             var handDiscard=view.Phase==GamePhase.Discard?view.Discards.FirstOrDefault(d=>d.PlayerId==seat):null;
             if(handDiscard!=null)s.Discard=new OperationDiscard{Amount=handDiscard.Amount,Confirm=(selected,card)=>{
                 var c=NewCommand(CommandKind.DiscardResources);c.Resources=new ResourceBag();
@@ -143,7 +147,7 @@ public sealed partial class M3App
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
         dock.Windows=tabletop.OperationWindows;mapChoice.Windows=tabletop.OperationWindows;
-        bool enabled=GUI.enabled;GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!GoldChoiceVisible&&!dock.HasOverlay&&!ai.TablePresentationBlocked&&!dock.BlocksBoardInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
+        bool enabled=GUI.enabled;GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!GoldChoiceVisible&&!ai.TablePresentationBlocked&&!dock.BlocksHudInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
         TabletopUI.DrawMapLabels(DrawBoardLabels);
         tabletop.BindTable(board.TableScene);dock.BindTable(board.TableScene);dock.PlayerName=ai.PlayerDisplayName;dock.BindCollections(tabletop.Collections,!tabletop.HistoryOpen&&!ai.TablePresentationBlocked);tabletop.BindCollectionOcclusion(dock.DrawLandingOcclusion);tabletop.HandFlightsVisible=dock.ResourceHandVisible;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);

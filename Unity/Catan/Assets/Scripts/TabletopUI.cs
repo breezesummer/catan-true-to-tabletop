@@ -61,6 +61,9 @@ public sealed partial class TabletopUI
     Catan.Core.GameHistoryEntry[] bankHistory = Array.Empty<Catan.Core.GameHistoryEntry>();
     public void BindOperations(OperationSnapshot snapshot,Action purchase,Catan.Core.GameHistoryEntry[] entries)
     {operations=snapshot;OperationWindows.Sync(snapshot?.Scope,snapshot?.Revision);purchaseDevelopment=purchase;bankHistory=entries??Array.Empty<Catan.Core.GameHistoryEntry>();}
+    internal string CardActionCaption {get{var card=discardDock?.PreviewCard(operations);return card==null?null:"使用\n"+card.Name;}}
+    internal bool CardActionReady => discardDock?.CanUsePreviewCard(operations)==true&&!DiceRolling;
+    internal void ConfirmCardAction(){if(CardActionReady)discardDock.UsePreviewCard(operations);}
     public bool HistoryOpen => history.IsOpen;
     public bool HandFlightsVisible { get; set; }=true;
     public bool TryCloseOverlay()=>history.TryClose();
@@ -156,6 +159,8 @@ public sealed partial class TabletopUI
         table.Objects.End();
         string turnCaption=canRoll?"掷骰":phase.Contains("弃牌")||phase.IndexOf("Discard",StringComparison.OrdinalIgnoreCase)>=0?"等待弃牌":canEnd?"结束回合":actor!=seat?"等待玩家":"等待操作";
         hits.Add(EndTurnRect);bool turnEnabled=(canRoll||canEnd)&&!DiceRolling;
+        string cardCaption=CardActionCaption;
+        if(cardCaption!=null){turnCaption=cardCaption;turnEnabled=CardActionReady;}
         if(DiscardActive){turnCaption=DiscardCaption;turnEnabled=DiscardReady;}
         if(OperationWindows.Hidden){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
         StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
@@ -163,7 +168,7 @@ public sealed partial class TabletopUI
         while(turnStyle.fontSize>11&&turnStyle.CalcHeight(new GUIContent(turnCaption),EndTurnRect.width-40)>60)turnStyle.fontSize--;
         GUI.Label(new Rect(EndTurnRect.x+20,EndTurnRect.y+35,EndTurnRect.width-40,60),turnCaption,turnStyle);
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
-        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(OperationWindows.Hidden)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
+        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(OperationWindows.Hidden)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(cardCaption!=null)ConfirmCardAction();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
         DrawDiscardCount();
         GUI.enabled=tableEnabled;
     }
@@ -195,7 +200,7 @@ public sealed partial class TabletopUI
         string[] names={"银行","玩家交易","贸易设施","政治设施","科学设施"};
         for(int i=0;i<5;i++)
         {
-            var r=new Rect(24+i*82,16,70,70);hits.Add(new Rect(r.x,r.y,r.width,105));
+            var r=new Rect(24+i*82,16,70,70);hits.Add(new Rect(r.x,r.y,r.width,85));
             bool available=i<2||own?.Improvements!=null;
             bool over=r.Contains(Event.current.mousePosition);
             var face=i==2?new Color(.38f,.26f,.045f):i==3?new Color(.045f,.17f,.31f):i==4?new Color(.10f,.25f,.09f):ModernOperationUI.Surface;
@@ -205,7 +210,6 @@ public sealed partial class TabletopUI
             var marker=new Rect(r.center.x-11,r.yMax-7,22,22);TabletopUI.Token(marker,new Color(.045f,.055f,.05f));
             var levelStyle=new GUIStyle(center){fontSize=12,fontStyle=FontStyle.Bold};levelStyle.normal.textColor=StrategyHudArt.Gold;
             GUI.Label(marker,i<2?"•":level.ToString(),levelStyle);
-            GUI.Label(new Rect(r.x-5,r.yMax+17,r.width+10,21),names[i],new GUIStyle(center){fontSize=11});
             bool prior=GUI.enabled;GUI.enabled=prior&&available;
             if(GUI.Button(r,GUIContent.none,GUIStyle.none)){if(i<2)trade?.Invoke(i==0?null:"");else facility?.Invoke(i-2);}GUI.enabled=prior;
             if(over)

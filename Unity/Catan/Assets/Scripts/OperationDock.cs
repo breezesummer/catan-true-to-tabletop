@@ -15,7 +15,7 @@ public sealed partial class OperationDock
     static Color Muted => ModernOperationUI.Muted;
     static Color Missing => ModernOperationUI.Error;
     static readonly Rect TradeRect = new Rect(262,139,916,506);
-    static readonly Rect CardRect = new Rect(376,167,688,459), GiveDropRect = new Rect(286,276,386,266);
+    static readonly Rect CardRect = new Rect(573,167,294,435), GiveDropRect = new Rect(286,276,386,266);
     GUIStyle text, small, heading, center, tableLabel, quantity;
     Font quantityFont;
     OperationSnapshot current;
@@ -98,7 +98,27 @@ public sealed partial class OperationDock
     internal int[] VerificationTradeGiveGoods => tradeOpen?OperationPanelOptions.PaymentGoods(current,portTrade?portGood:null):Array.Empty<int>();
     public bool ResourceHandVisible => !specialHand;
     internal bool DiscardMatches(OperationSnapshot snapshot) => ReferenceEquals(current,snapshot);
+    // 报价权限来自当前所属席位投影；已拒绝者和旁观者不会被其他人的待回应报价锁住。
+    internal static bool HasActionableOffer(OperationSnapshot snapshot) => snapshot?.Offer!=null&&(snapshot.Offer.CanAccept||snapshot.Offer.CanReject||snapshot.Offer.CanCancel);
     public OperationHandCard SelectedDiscardCard => current?.Discard?.Special==true ? current.Cards.FirstOrDefault(c=>c.Id==previewCard) : null;
+    internal OperationHandCard PreviewCard(OperationSnapshot snapshot) => ReferenceEquals(current,snapshot)&&Windows?.Suppressed!=true&&!tradeOpen&&facilityTrack<0&&snapshot?.Discard==null&&!HasActionableOffer(snapshot) ? snapshot?.Cards.FirstOrDefault(c=>c.Id==previewCard) : null;
+    internal void ToggleCardPreview(OperationSnapshot snapshot,OperationHandCard card)
+    {
+        if(!ReferenceEquals(current,snapshot)||card==null||!snapshot.Cards.Contains(card))return;
+        Windows?.Open();previewCard=previewCard==card.Id?null:card.Id;tradeOpen=false;facilityTrack=-1;
+        if(previewCard==null)Windows?.Clear();
+        if(snapshot.Discard==null){Selection.Clear();snapshot.Cancel?.Invoke();}
+    }
+    internal bool CanUsePreviewCard(OperationSnapshot snapshot)
+    {
+        var card=PreviewCard(snapshot);
+        return card!=null&&card.Playable&&snapshot.CanInteract&&!snapshot.RequiresSelection&&snapshot.Offer==null&&snapshot.PrepareCard!=null;
+    }
+    internal void UsePreviewCard(OperationSnapshot snapshot)
+    {
+        if(!CanUsePreviewCard(snapshot))return;
+        var card=PreviewCard(snapshot);previewCard=null;Selection.Clear();Windows?.Clear();snapshot.PrepareCard(card);
+    }
     public bool HasCancelableInteraction => tradeOpen || facilityTrack>=0 || previewCard!=null || Selection.BuildId!=null || Selection.Selected.Any(n=>n>0) || heldPiece!=null || dragging;
     // 银行牌堆与旧购买流程共用这一入口，仍由适配层校验并提交指令。
     public void PrepareDevelopmentPurchase()
@@ -128,7 +148,7 @@ public sealed partial class OperationDock
     internal bool VerificationHandsAreScreenSpace => faces.All(face=>face.Shape.World==null);
     internal int VerificationVisibleResourceCount => faces.Count(face=>face.Good>=0);
     internal int VerificationPendingResourceCount => current==null?0:Math.Max(0,current.Goods.Take(current.GoodCount).Sum()-VerificationVisibleResourceCount);
-    public bool HasOverlay => Windows?.Suppressed!=true&&(tradeOpen || facilityTrack>=0 || previewCard!=null&&current?.Discard==null || current!=null&&current.Offer!=null);
+    public bool HasOverlay => Windows?.Suppressed!=true&&(tradeOpen || facilityTrack>=0 || previewCard!=null&&current?.Discard==null || HasActionableOffer(current));
     public bool IsDraggingPiece => pieceDragging;
     public bool ConsumeBuildRelease(out Vector2 releasedLogicalMouse)
     {releasedLogicalMouse=pieceReleasePoint;bool released=pieceReleased;pieceReleased=false;return released;}
@@ -151,7 +171,7 @@ public sealed partial class OperationDock
     }
     public void OpenFacility(int track)
     {
-        if(OperationPanelOptions.Facility(current,track)==null||current.Offer!=null)return;
+        if(OperationPanelOptions.Facility(current,track)==null||HasActionableOffer(current))return;
         Windows?.Open();current.Cancel?.Invoke();Selection.Clear();tradeOpen=false;previewCard=null;facilityTrack=track;message="";
     }
     public int FacilityLevel(int track) => current?.Builds.FirstOrDefault(b=>b.Track==track)?.Level??0;
@@ -168,16 +188,25 @@ public sealed partial class OperationDock
     internal void CloseWindow(OperationSnapshot snapshot)
     {
         var offer=snapshot?.Offer;
+        bool alreadyClosed=Windows?.Closed==true;
         Reset();snapshot?.Cancel?.Invoke();
-        if(offer!=null)snapshot.Respond?.Invoke(offer.Proposer==snapshot.Seat?"cancel":"reject");
-        Windows?.Clear();
+        if(offer!=null)
+        {
+            Windows?.Close();
+            if(!alreadyClosed&&offer.CanCancel)snapshot.Respond?.Invoke("cancel");
+            else if(!alreadyClosed&&offer.CanReject)snapshot.Respond?.Invoke("reject");
+            Windows?.Close();
+        }
+        else Windows?.Clear();
     }
     public bool BlocksBoardInput(Vector2 logicalMouse)
     {
         if(HasOverlay)return true;
-        return dragGood>=0 || hoveredHand!=null&&handHoverAnchor.Contains(logicalMouse) || Windows?.Suppressed!=true&&((tradeOpen||current!=null&&current.Offer!=null)&&TradeRect.Contains(logicalMouse) ||
+        return dragGood>=0 || hoveredHand!=null&&handHoverAnchor.Contains(logicalMouse) || Windows?.Suppressed!=true&&((tradeOpen||HasActionableOffer(current))&&TradeRect.Contains(logicalMouse) ||
             previewCard!=null&&current?.Discard==null&&CardRect.Contains(logicalMouse)) || hits.Any(h=>h.Contains(logicalMouse));
     }
+    // 预览仍阻挡桌面操作，右下角圆钮专门承担当前卡牌的使用入口。
+    internal bool BlocksHudInput(Vector2 logicalMouse) => PreviewCard(current)!=null&&TabletopUI.EndTurnRect.Contains(logicalMouse)?false:BlocksBoardInput(logicalMouse);
     void Styles(Font font)
     {
         ModernOperationUI.Styles(font);
@@ -211,7 +240,7 @@ public sealed partial class OperationDock
         if(scope!=snapshot.Scope){hoverAmounts.Clear();spreadAmounts.Clear();hoveredHand=null;handHoverAnchor=Rect.zero;handUpdated=Time.unscaledTimeAsDouble;fallbackOrder=new TabletopHandOrder();specialOrder=new TabletopSpecialHandOrder();specialHand=false;}
         if(scope!=snapshot.Scope||revision!=snapshot.Revision){Reset();scope=snapshot.Scope;revision=snapshot.Revision;}
         current=snapshot;Selection.Sync(snapshot);
-        if(HasOverlay)Windows?.Describe(snapshot.Offer!=null?"回应交易":tradeOpen?"继续交易":facilityTrack>=0?"城市设施":"使用发展卡");
+        if(HasOverlay)Windows?.Describe(HasActionableOffer(snapshot)?"回应交易":tradeOpen?"继续交易":facilityTrack>=0?"城市设施":"使用发展卡");
         if(snapshot.Discard!=null)specialHand=snapshot.Discard.Special;
         hoveredBuild=null;tooltipRect=Rect.zero;hits.Clear();faces.Clear();pieceFaces.Clear();
         // 在任何世界组件接收 MouseDown 前，先按本帧屏幕布局确定手牌命中。
@@ -233,14 +262,14 @@ public sealed partial class OperationDock
         if(Windows?.Suppressed!=true)
         {
             if(tradeOpen)DrawTrade(snapshot);
-            else if(snapshot.Offer!=null)DrawOffer(snapshot);
+            else if(HasActionableOffer(snapshot))DrawOffer(snapshot);
             else if(previewCard!=null&&snapshot.Discard==null)DrawCardPreview(snapshot);
             else if(facilityTrack>=0)DrawFacilities(snapshot);
             else DrawCost(snapshot);
-            if(HasOverlay)
+            if(HasOverlay&&previewCard==null)
             {
-                Rect panel=tradeOpen||snapshot.Offer!=null?TradeRect:facilityTrack>=0?new Rect(440,132,560,530):CardRect;
-                if(Button(new Rect(panel.xMax-98,panel.y+16,32,30),"—"))Windows?.Hide(snapshot.Offer!=null?"回应交易":tradeOpen?"继续交易":facilityTrack>=0?"城市设施":"使用发展卡");
+                Rect panel=tradeOpen||HasActionableOffer(snapshot)?TradeRect:facilityTrack>=0?new Rect(440,132,560,530):CardRect;
+                if(Button(new Rect(panel.xMax-98,panel.y+16,32,30),"—"))Windows?.Hide(HasActionableOffer(snapshot)?"回应交易":tradeOpen?"继续交易":facilityTrack>=0?"城市设施":"使用发展卡");
                 if(Button(new Rect(panel.xMax-54,panel.y+16,32,30),"×"))CloseWindow(snapshot);
             }
         }
@@ -386,7 +415,7 @@ public sealed partial class OperationDock
     void UpdateHandHover()
     {
         var mouse=Event.current.mousePosition;
-        bool overPaper=Windows?.Suppressed!=true&&((tradeOpen||current.Offer!=null)&&TradeRect.Contains(mouse)||previewCard!=null&&CardRect.Contains(mouse)||facilityTrack>=0);
+        bool overPaper=Windows?.Suppressed!=true&&((tradeOpen||HasActionableOffer(current))&&TradeRect.Contains(mouse)||previewCard!=null&&CardRect.Contains(mouse)||facilityTrack>=0);
         // 先还原上一帧实际显示位置，再决定命中；不能用未展开的底牌位置猜测鼠标所指。
         foreach(var face in faces)
         {
@@ -547,7 +576,7 @@ public sealed partial class OperationDock
         HandFace hit=null;
         if(hoveredHand!=null&&handHoverAnchor.Contains(e.mousePosition))hit=faces.FirstOrDefault(face=>face.Key==hoveredHand);
         if(hit==null)for(int i=faces.Count-1;i>=0;i--)if(faces[i].Shape.Contains(e.mousePosition)){hit=faces[i];break;}
-        bool overPaper=Windows?.Suppressed!=true&&((tradeOpen||s.Offer!=null)&&TradeRect.Contains(e.mousePosition)||s.Discard==null&&previewCard!=null&&CardRect.Contains(e.mousePosition)||facilityTrack>=0);
+        bool overPaper=Windows?.Suppressed!=true&&((tradeOpen||HasActionableOffer(s))&&TradeRect.Contains(e.mousePosition)||s.Discard==null&&previewCard!=null&&CardRect.Contains(e.mousePosition)||facilityTrack>=0);
         if(e.type==EventType.ScrollWheel&&hit!=null&&!overPaper)
         {
             // 全部手牌始终在场；手牌上滚动不再改变桌面相机距离。
@@ -559,7 +588,7 @@ public sealed partial class OperationDock
         }
         if(e.type==EventType.MouseDown&&e.button==0&&hit!=null&&!overPaper)
         {
-            if(hit.Card!=null){Windows?.Open();previewCard=previewCard==hit.Card.Id?null:hit.Card.Id;tradeOpen=false;if(s.Discard==null)s.Cancel?.Invoke();}
+            if(hit.Card!=null)ToggleCardPreview(s,hit.Card);
             else{dragGood=hit.Good;dragOrdinal=hit.Ordinal;dragStart=e.mousePosition;handPressedAt=Time.unscaledTimeAsDouble;dragging=false;}
             e.Use();return;
         }
@@ -609,18 +638,13 @@ public sealed partial class OperationDock
     void DrawCardPreview(OperationSnapshot s)
     {
         var c=s.Cards.FirstOrDefault(x=>x.Id==previewCard);if(c==null){previewCard=null;return;}
-        // 实体卡面独立完整摆放，操作说明位于一旁，不用面板边框包住卡牌。
-        Paper(new Rect(704,167,360,459));
-        Label(new Rect(725,190,271,39),c.Name,heading);
+        // 只放大完整卡面；使用入口统一放在右下角回合按钮。
         var texture=c.Progress&&c.ArtIndex>=0?EntityCardAssets.ProgressFront(c.ArtIndex):null;
-        var face=new Rect(387,178,294,435);
+        var face=CardRect;
         if(texture!=null)EntityCardAssets.DrawCardFace(face,texture);
         else{face=EntityCardAssets.FitCardRect(face,TabletopHandLayout.CardWidth/TabletopHandLayout.CardHeight,GUI.matrix);ModernOperationUI.Round(face,Surface);Label(face,c.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=28});}
-        Label(new Rect(725,253,317,129),c.Detail??"选择使用后指定目标。",text);
-        string reason=c.UnavailableReason??(!s.CanInteract?"等待你的行动或待决选择":c.Name=="胜利点"?"胜利点保留在手中，无需主动使用":c.Progress?"当前阶段或目标条件不满足此卡的使用要求":"本回合买入的卡不能使用；每回合最多使用一张行动发展卡");
-        if(!c.Playable||!s.CanInteract)Label(new Rect(725,408,317,99),reason,small);
-        if(Primary(new Rect(725,561,187,43),"使用卡牌",c.Playable&&s.CanInteract))
-        {s.PrepareCard?.Invoke(c);previewCard=null;Selection.Clear();}
+        if(GUI.enabled&&Event.current.type==EventType.MouseDown&&Event.current.button==0&&face.Contains(Event.current.mousePosition))
+        {previewCard=null;Windows?.Clear();Event.current.Use();}
     }
     void DrawFacilities(OperationSnapshot s)
     {
@@ -772,6 +796,7 @@ public sealed partial class OperationDock
     }
     void DrawOffer(OperationSnapshot s)
     {
+        if(!HasActionableOffer(s))return;
         var offer=s.Offer;DrawTradeFrame("交易请求",1);
         var perspective=OperationOfferPerspective.For(s);
         DrawTradePlayer(new Rect(286,246,386,58),s.Seat);

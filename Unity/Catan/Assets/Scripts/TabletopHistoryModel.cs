@@ -61,7 +61,7 @@ public static class TabletopHistoryModel
                 foreach(var giver in moved.Where(c=>c.Amount<0&&c.PlayerId!=receiver).GroupBy(c=>c.PlayerId))
                 {
                     var cards=giver.Select(c=>{consumed.Add(c);return c;}).ToArray();
-                    result.Add(new TabletopHistoryLine{Player=receiver,Prefix=wedding?"收取了":steal||action=="结算行会征费"?"偷取了":"获得了",Partner=giver.Key,
+                    result.Add(new TabletopHistoryLine{Player=receiver,Prefix=wedding?"收取了":steal||action=="结算行会征费"?"偷取了":"收获",Partner=giver.Key,
                         PartnerAction=wedding?"交出的婚礼礼物：":steal?" "+cards.Sum(c=>Math.Abs(c.Amount))+"张"+(cards.Any(c=>c.Category=="progress")?"发展卡":entry.Kind=="StealCloth"?"布匹":"手牌"):"的手牌：",
                         Cards=steal?Array.Empty<GameHistoryChange>():cards});
                 }
@@ -128,7 +128,7 @@ public static class TabletopHistoryModel
         foreach(var group in changes.Where(c=>!consumed.Contains(c)&&(c.GoodIndex>=0&&c.GoodIndex<8||c.Category=="resource-count")).GroupBy(c=>new{c.PlayerId,Sign=Math.Sign(c.Amount),c.Category}))
         {
             string suffix=build&&group.Key.PlayerId==entry.PlayerId&&group.Key.Sign<0?action.Replace("建造","建造了").Replace("招募骑士","建造了骑士").Replace("升级","升级了").Replace("晋升","晋升了").Replace("激活","激活了").Replace("购买","购买了"):"";
-            result.Add(new TabletopHistoryLine{Player=group.Key.PlayerId,Prefix=group.Key.Sign>0?"获得了":"使用",Suffix=suffix,Cards=group.ToArray()});
+            result.Add(new TabletopHistoryLine{Player=group.Key.PlayerId,Prefix=group.Key.Sign>0?"收获":"使用",Suffix=suffix,Cards=group.ToArray()});
         }
         foreach(var c in changes.Where(c=>!consumed.Contains(c)&&c.GoodIndex<0&&c.Category!="resource-count"))
         {
@@ -136,7 +136,7 @@ public static class TabletopHistoryModel
             if(c.Amount<0&&(c.Category=="progress"||c.Category=="development")&&action.Contains(c.Name))continue;
             bool card=c.Category=="progress"||c.Category=="development";
             bool victory=c.Category=="defender"||c.Category=="progress"&&new[]{"宪法","石碑","印刷术"}.Contains(c.Name);
-            string verb=c.Amount>0?(c.Category=="piece"&&c.Name=="城墙"?"建造了":"获得了"):"失去了";
+            string verb=c.Amount>0?(c.Category=="piece"&&c.Name=="城墙"?"建造了":"收获"):"失去了";
             result.Add(new TabletopHistoryLine{Player=c.PlayerId,Prefix=verb+c.Name+(victory?"（1分）":"")+(Math.Abs(c.Amount)>1?" ×"+Math.Abs(c.Amount):""),Emphasis=card?c.Name:null,
                 Track=card?(c.CardTrack>=0?c.CardTrack:CardTrack(c.Name)>=0?CardTrack(c.Name):3):-1});
         }
