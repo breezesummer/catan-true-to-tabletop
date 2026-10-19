@@ -2,7 +2,7 @@
 
 一款以实体桌游体验为目标的 3D 卡坦岛游戏，包含资源生产、交易、道路与聚落建设、海上探索，以及城市发展与骑士防御。项目强调在同一张桌面上观察地图、拿取棋子、摆放建筑和操作卡牌，逐步呈现立体地形收藏版的质感。
 
-项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本标识为**内测版1.6.6**；各可玩构建的实际版本与验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
+项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本标识为**内测版1.6.7**；各可玩构建的实际版本与验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
 
 ## 玩法与内容
 
@@ -40,6 +40,8 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-M7.ps1
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-Android.ps1
 ```
 
+macOS 开发入口为 `tools/development/Start-Dev.command`，打开 Unity 使用 `Start-Unity.command`；Windows 与 macOS 的构建、签名配置和验证入口见[分系统构建说明](docs/CROSS_PLATFORM_BUILD.md)。
+
 ## 工程结构
 
 | 目录                                                                       | 用途                                   |
@@ -62,6 +64,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-Android.
 - [开发路线](docs/ROADMAP.md)：阶段目标、退出条件与当前状态。
 - [开发日志](The%20Farmer%27s%20Log.md)：时间轴、每轮改动、发布入口与实际验证。
 - [开发环境](docs/ENVIRONMENT.md)：工具链、环境配置与开发入口。
+- [分系统构建](docs/CROSS_PLATFORM_BUILD.md)：Windows／macOS 启动、双端打包和 Android 签名迁移。
 - [本地规则索引](assets/references/rules/README.md)：规则原件与查询入口。
 - [美术生产规范](docs/ART_PIPELINE.md)：参考采集、资产制作、导入和复现。
 - [本地 AI 验收](docs/M6_ACCEPTANCE.md)：AI、规则与独立完整对局证据。

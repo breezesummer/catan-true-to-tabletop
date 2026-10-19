@@ -1,5 +1,7 @@
 # 开发环境
 
+2026-10-19 补齐 macOS 分系统入口：工具目录使用仓库上两级的 `Development`，不再引用旧的 `develepment`。Mac 上启动开发环境／Unity 和构建 Windows／Android 使用 `.command`，Windows 保留 PowerShell；路径覆盖、Android 签名及实际验证范围见[分系统构建说明](CROSS_PLATFORM_BUILD.md)和[1.6.7 验证记录](verification/cross-platform-build-1.6.7/README.md)。以下 Windows 配置及历史验证记录保留。
+
 2026-10-15 新增同版本 Unity 6000.3.25f1 Android Build Support（revision `e1dba0a9aba4`），没有另建 Unity 工程或更换编辑器。模块保存在原 Editor 的 `Data/PlaybackEngines/AndroidPlayer`，SDK API／Build Tools 36、NDK r27c `27.2.12479018`、Temurin JDK `17.0.18+8`、Unity 自带 Gradle `9.3.1` 均已实际读取版本。官方模块安装包 1,548,575,120 字节，MD5 `AA3D7C889732969EABF48BFFF342B8E6` 与 Unity Technologies SF 数字签名有效；JDK ZIP 的 SHA-256 与官方链接的 `15e8817d1f5db6db3571ebe7430ef37f7fa8e60e8ff6f3e18ca1cb4c29f78774` 一致。临时下载转发仅用于本任务，完成后已停止并清理配置，未修改系统代理、路由或原有节点。
 
 安卓构建入口为 `tools/development/Build-Android.ps1`，Gradle 缓存与签名材料分别保存在本项目 `.local/development/caches/gradle` 与 `.local/development/credentials/android`。用于验收的 Google API 35 x86_64 模拟器位于 `D:/Development/Android`，通过 WHPX 与 SwiftShader 无窗口运行；它属于本地测试设备，不代替真实手机的性能确认。实际 APK 与设备结果见 [安卓适配说明](ANDROID_PORT_V001.md) 和 [本轮验证摘要](verification/android-port-v001/summary.json)。以下 M0 配置与历史验证记录保留原文。

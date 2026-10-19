@@ -1,5 +1,5 @@
 ﻿param(
-    [string]$OutputRoot = 'game version/1.6/Catan1.6.6-Operation-History-Polish',
+    [string]$OutputRoot = 'game version/1.6/Catan1.6.7-CrossPlatformBuild',
     [switch]$Arm64Only
 )
 $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()
@@ -16,7 +16,9 @@ New-Item -ItemType Directory -Force -Path $androidLogs,(Join-Path $androidProjec
 
 & $toolchain.dotnet build (Join-Path $androidRepoRoot 'src\Catan.AI\Catan.AI.csproj') -c Release --disable-build-servers -m:1
 if ($LASTEXITCODE -ne 0) { throw '共用规则与 AI 程序集构建失败。' }
-foreach ($androidAssemblyName in @('Catan.Core','Catan.AI')) {
+& $toolchain.dotnet build (Join-Path $androidRepoRoot 'src/Catan.Network.Contracts/Catan.Network.Contracts.csproj') -c Release --disable-build-servers -m:1
+if ($LASTEXITCODE -ne 0) { throw '共享网络协议程序集构建失败。' }
+foreach ($androidAssemblyName in @('Catan.Core','Catan.AI','Catan.Network.Contracts')) {
     $androidAssemblySource = Join-Path $androidRepoRoot "src\$androidAssemblyName\bin\Release\netstandard2.1\$androidAssemblyName.dll"
     $androidAssemblyTarget = Join-Path $androidProject "Assets\Plugins\$androidAssemblyName.dll"
     if (!(Test-Path -LiteralPath $androidAssemblyTarget) -or (Get-FileHash -LiteralPath $androidAssemblySource).Hash -ne (Get-FileHash -LiteralPath $androidAssemblyTarget).Hash) {
