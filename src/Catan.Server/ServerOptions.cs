@@ -43,7 +43,7 @@ public sealed record ServerOptions
             RequestLimitPer10Seconds = int.TryParse(Read("--request-limit-per-10s", "300"), out var rate) && rate >= 1 && rate <= 100000 ? rate : throw new ArgumentException("每十秒请求上限须在 1–100000 之间。")
         };
         if (options.ServerName.Length is < 1 or > 64) throw new ArgumentException("服务名称须为 1–64 个字符。");
-        if (options.Online && options.CertificatePath == null) throw new ArgumentException("在线服务必须提供有效域名证书，不能使用自动局域网证书。");
+        if (options.Online && options.CertificatePath != null) throw new ArgumentException("在线服务使用 HTTP / WebSocket，无需证书；请移除 --certificate 参数。");
         return options;
     }
 }

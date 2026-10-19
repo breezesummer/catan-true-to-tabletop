@@ -16,8 +16,14 @@ public sealed class ServerBoundaryTests
         => Assert.Throws<ArgumentException>(() => ServerOptions.Parse(new[] { option, value }));
 
     [Fact]
-    public void OnlineModeNeverFallsBackToSelfSignedCertificate()
-        => Assert.Throws<ArgumentException>(() => ServerOptions.Parse(new[] { "--mode", "online" }));
+    public void OnlineModeDoesNotRequireCertificateOrDiscovery()
+    {
+        var options = ServerOptions.Parse(new[] { "--mode", "online" });
+        Assert.True(options.Online);
+        Assert.Null(options.CertificatePath);
+        Assert.False(options.EnableDiscovery);
+        Assert.Throws<ArgumentException>(() => ServerOptions.Parse(new[] { "--mode", "online", "--certificate", "server.pfx" }));
+    }
 
     [Fact]
     public void DiscoveryDisabledAliasAndExplicitTestRateAreApplied()
@@ -71,6 +77,7 @@ public sealed class ServerBoundaryTests
             {
                 first = files.Fingerprint;
                 Assert.Equal(64, first.Length);
+                Assert.NotNull(files.Certificate);
                 Assert.True(files.Certificate.HasPrivateKey);
                 Assert.Equal(first, File.ReadAllText(Path.Combine(directory, "server-fingerprint.txt")).Trim());
                 Assert.ThrowsAny<IOException>(() => new PrivateServerFiles(options));

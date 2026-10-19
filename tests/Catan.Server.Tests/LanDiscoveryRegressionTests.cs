@@ -35,7 +35,9 @@ public sealed class LanDiscoveryRegressionTests
     [Fact]
     public async Task UnansweredLocalProbeDoesNotAbortDelayedResponseFromAnotherHost()
     {
-        var other=IPAddress.Parse("127.0.0.2");
+        // macOS 不自动启用其他 127/8 别名；仅把无人监听的探测发给别名。
+        var unanswered=IPAddress.Parse("127.0.0.2");
+        var other=IPAddress.Loopback;
         using var server=new UdpClient(new IPEndPoint(other,0));
         int port=((IPEndPoint)server.Client.LocalEndPoint!).Port;
         var reply=Task.Run(async()=>
@@ -45,7 +47,7 @@ public sealed class LanDiscoveryRegressionTests
             await Task.Delay(100);
             await server.SendAsync(Encoding.UTF8.GetBytes("远端房间"),query.RemoteEndPoint);
         });
-        var packets=await M7LanDiscovery.Search(port,_=>{},500,new[]{IPAddress.Loopback,other});
+        var packets=await M7LanDiscovery.Search(port,_=>{},500,new[]{unanswered,other});
         await reply.WaitAsync(TimeSpan.FromSeconds(3));
         Assert.Contains(packets,p=>p.RemoteEndPoint.Address.Equals(other)&&Encoding.UTF8.GetString(p.Buffer)=="远端房间");
     }
@@ -56,7 +58,7 @@ public sealed class LanDiscoveryRegressionTests
         using var key=RSA.Create(2048);
         var request=new CertificateRequest("CN=localhost",key,HashAlgorithmName.SHA256,RSASignaturePadding.Pkcs1);
         using var generated=request.CreateSelfSigned(DateTimeOffset.UtcNow.AddMinutes(-1),DateTimeOffset.UtcNow.AddDays(1));
-        using var certificate=X509CertificateLoader.LoadPkcs12(generated.Export(X509ContentType.Pfx),null,OperatingSystem.IsWindows()?X509KeyStorageFlags.UserKeySet|X509KeyStorageFlags.PersistKeySet:X509KeyStorageFlags.EphemeralKeySet);
+        using var certificate=X509CertificateLoader.LoadPkcs12(generated.Export(X509ContentType.Pfx),null,OperatingSystem.IsWindows()?X509KeyStorageFlags.UserKeySet|X509KeyStorageFlags.PersistKeySet:OperatingSystem.IsMacOS()?X509KeyStorageFlags.DefaultKeySet:X509KeyStorageFlags.EphemeralKeySet);
         string pin=certificate.GetCertHashString(HashAlgorithmName.SHA256);
         var builder=WebApplication.CreateBuilder();builder.Logging.ClearProviders();
         builder.WebHost.ConfigureKestrel(options=>options.Listen(IPAddress.Loopback,0,listen=>listen.UseHttps(certificate)));
@@ -109,7 +111,7 @@ public sealed class LanDiscoveryRegressionTests
     {
         const string secret="private-token-password-path";
         string socket=M7NetworkErrors.Describe("搜索",new HttpRequestException(secret,new SocketException((int)SocketError.ConnectionRefused)));
-        Assert.Contains("搜索失败",socket);Assert.Contains("主机未接受连接",socket);Assert.DoesNotContain(secret,socket);
+        Assert.Contains("搜索失败",socket);Assert.Contains("服务器未接受连接",socket);Assert.DoesNotContain(secret,socket);
         Assert.Contains("[TLS]",M7NetworkErrors.Describe("加入",new HttpRequestException(secret,new AuthenticationException(secret))));
         Assert.Contains("[TIMEOUT]",M7NetworkErrors.Describe("加入",new TaskCanceledException(secret)));
         Assert.Contains("[HTTP 429]",M7NetworkErrors.Describe("列表",Assert.Throws<M7NetworkFailure>(()=>M7NetworkErrors.RequireHttp(HttpStatusCode.TooManyRequests))));

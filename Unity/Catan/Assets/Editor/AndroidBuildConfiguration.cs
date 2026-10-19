@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Xml.Linq;
 using UnityEditor;
+using UnityEditor.Android;
 using UnityEditor.Build;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -76,7 +78,8 @@ public static class AndroidBuildConfiguration
         PlayerSettings.Android.applicationEntry = AndroidApplicationEntry.Activity;
         PlayerSettings.Android.optimizedFramePacing = true;
         PlayerSettings.Android.renderOutsideSafeArea = true;
-        PlayerSettings.Android.forceInternetPermission = false;
+        PlayerSettings.Android.forceInternetPermission = true;
+        PlayerSettings.insecureHttpOption = InsecureHttpOption.AlwaysAllowed;
         PlayerSettings.defaultInterfaceOrientation = UIOrientation.AutoRotation;
         PlayerSettings.allowedAutorotateToLandscapeLeft = true;
         PlayerSettings.allowedAutorotateToLandscapeRight = true;
@@ -143,5 +146,23 @@ public static class AndroidBuildConfiguration
         public string ui;
         public string coreAssemblySha256;
         public string aiAssemblySha256;
+    }
+}
+
+// Unity 的 HTTP 选项只控制引擎请求；Android 平台清单也须允许公网 IP 的明文连接。
+public sealed class OnlineLobbyAndroidManifest : IPostGenerateGradleAndroidProject
+{
+    public int callbackOrder => 1000;
+
+    public void OnPostGenerateGradleAndroidProject(string path)
+    {
+        string manifest=Path.Combine(path,"src/main/AndroidManifest.xml");
+        var document=XDocument.Load(manifest,LoadOptions.PreserveWhitespace);
+        var application=document.Root?.Element("application");
+        if(application==null)throw new InvalidOperationException("Android 应用清单缺少 application，停止构建。");
+        XNamespace android="http://schemas.android.com/apk/res/android";
+        application.SetAttributeValue(android+"usesCleartextTraffic","true");
+        document.Save(manifest);
+        Debug.Log("CATAN_ONLINE_HTTP_MANIFEST_OK: Android 正式包允许 HTTP / WS 在线大厅。");
     }
 }

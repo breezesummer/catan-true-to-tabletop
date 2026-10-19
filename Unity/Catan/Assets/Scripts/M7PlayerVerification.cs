@@ -121,7 +121,7 @@ public sealed class M7PlayerVerification : MonoBehaviour
         else report.LanDiscoverySkipped=true;
         report.Stage="restore first room after switch";
         // 相同证书和房间在不同主机地址下仍须找到同一份恢复身份。
-        client.ConfigureEndpoint(config.Endpoint.Replace("127.0.0.1","localhost"),config.CertificateFingerprint,false);
+        client.ConfigureEndpoint(config.SkipLanDiscovery?config.Endpoint:config.Endpoint.Replace("127.0.0.1","localhost"),config.CertificateFingerprint,false);
         client.Join(originalRoom,"验证人类",null);
         while(Waiting(!client.Busy&&client.Connected&&app.NetworkGame&&app.Ready&&client.RoomId==originalRoom&&client.Room!=null&&client.Room.RoomId==originalRoom))yield return null;
         Require(client.SeatId==originalSeat&&OwnSeat()==originalSeat&&AuthorityAbsent(),"per-room credential restores original seat");

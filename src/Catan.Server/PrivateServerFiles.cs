@@ -9,13 +9,13 @@ namespace Catan.Server;
 
 public sealed class PrivateServerFiles : IDisposable
 {
-    // Schannel 服务端握手要求持久化用户密钥容器；Linux 可直接使用临时密钥。
+    // Schannel 握手要求持久化用户密钥；macOS 不支持 EphemeralKeySet，Linux 使用临时密钥。
     private static X509KeyStorageFlags KeyStorage => OperatingSystem.IsWindows()
         ? X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.PersistKeySet
-        : X509KeyStorageFlags.EphemeralKeySet;
+        : OperatingSystem.IsMacOS() ? X509KeyStorageFlags.DefaultKeySet : X509KeyStorageFlags.EphemeralKeySet;
     private readonly FileStream instanceLock;
-    public X509Certificate2 Certificate { get; }
-    public string Fingerprint { get; }
+    public X509Certificate2? Certificate { get; }
+    public string Fingerprint { get; } = "";
 
     public PrivateServerFiles(ServerOptions options)
     {
@@ -25,9 +25,12 @@ public sealed class PrivateServerFiles : IDisposable
         { throw new ServerStartupException("DATA_IN_USE", "服务存档目录正由另一个进程使用，请关闭旧版游戏或重复服务。"); }
         try
         {
-            Certificate = LoadCertificate(options);
-            Fingerprint = Certificate.GetCertHashString(HashAlgorithmName.SHA256);
-            WritePrivate(Path.Combine(options.DataDirectory, "server-fingerprint.txt"), Fingerprint + Environment.NewLine);
+            if (!options.Online)
+            {
+                Certificate = LoadCertificate(options);
+                Fingerprint = Certificate.GetCertHashString(HashAlgorithmName.SHA256);
+                WritePrivate(Path.Combine(options.DataDirectory, "server-fingerprint.txt"), Fingerprint + Environment.NewLine);
+            }
         }
         catch { instanceLock.Dispose(); throw; }
     }
@@ -94,5 +97,5 @@ public sealed class PrivateServerFiles : IDisposable
         return X509CertificateLoader.LoadPkcs12FromFile(pfx, password, KeyStorage);
     }
 
-    public void Dispose() { Certificate.Dispose(); instanceLock.Dispose(); }
+    public void Dispose() { Certificate?.Dispose(); instanceLock.Dispose(); }
 }

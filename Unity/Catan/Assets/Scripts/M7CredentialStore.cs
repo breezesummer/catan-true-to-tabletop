@@ -8,6 +8,22 @@ using UnityEngine;
 // 任一平台不能安全保存时明确失败，绝不退回明文令牌。
 internal static class M7CredentialStore
 {
+#if UNITY_EDITOR
+    // macOS 编辑器仅用于菜单与传输验收；正式 Windows / Android 保管实现不变。
+    // 合成凭据只存内存，磁盘占位不含凭据；不触碰普通玩家目录，也不冒充跨进程保管验证。
+    static string verificationRoot;
+    static readonly System.Collections.Generic.Dictionary<string,string> verificationValues=new System.Collections.Generic.Dictionary<string,string>();
+    internal static void EnableEditorVerification(string directory)
+    {
+        if(Array.IndexOf(Environment.GetCommandLineArgs(),"--online-lobby-verify")<0)
+            throw new InvalidOperationException("仅显式在线大厅验收可使用编辑器凭据替身。");
+        string root=Path.GetFullPath(Path.Combine(Application.dataPath,"../../..", ".local"))+Path.DirectorySeparatorChar;
+        string requested=Path.GetFullPath(directory)+Path.DirectorySeparatorChar;
+        if(!requested.StartsWith(root,StringComparison.Ordinal))throw new InvalidOperationException("验收凭据目录必须位于项目 .local。");
+        verificationRoot=requested;verificationValues.Clear();
+    }
+    static bool IsEditorVerification(string path)=>verificationRoot!=null&&Path.GetFullPath(path).StartsWith(verificationRoot,StringComparison.Ordinal);
+#endif
     [StructLayout(LayoutKind.Sequential)] struct Blob { public int Length; public IntPtr Data; }
     [DllImport("crypt32.dll",SetLastError=true,CharSet=CharSet.Unicode)] static extern bool CryptProtectData(ref Blob input,string description,IntPtr entropy,IntPtr reserved,IntPtr prompt,int flags,out Blob output);
     [DllImport("crypt32.dll",SetLastError=true,CharSet=CharSet.Unicode)] static extern bool CryptUnprotectData(ref Blob input,IntPtr description,IntPtr entropy,IntPtr reserved,IntPtr prompt,int flags,out Blob output);
@@ -109,6 +125,10 @@ internal static class M7CredentialStore
 #endif
     internal static void Write(string path,string value)
     {
+#if UNITY_EDITOR
+        if(IsEditorVerification(path))
+        {verificationValues[Path.GetFullPath(path)]=value;File.WriteAllText(path,"仅编辑器验收占位；凭据保存在本进程内存。");return;}
+#endif
         var plain=Encoding.UTF8.GetBytes(value);byte[] encrypted;
         try{encrypted=Transform(plain,true);}finally{Array.Clear(plain,0,plain.Length);}
         string temporary=path+".tmp";File.WriteAllBytes(temporary,encrypted);
@@ -122,6 +142,9 @@ internal static class M7CredentialStore
     }
     internal static string Read(string path)
     {
+#if UNITY_EDITOR
+        if(IsEditorVerification(path))return verificationValues[Path.GetFullPath(path)];
+#endif
         var plain=Transform(File.ReadAllBytes(path),false);
         try{return Encoding.UTF8.GetString(plain);}finally{Array.Clear(plain,0,plain.Length);}
     }

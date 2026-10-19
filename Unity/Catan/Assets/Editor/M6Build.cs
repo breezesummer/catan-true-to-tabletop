@@ -91,8 +91,10 @@ public static class M6Build
         app.AddComponent<TabletopMarkerVerification>();
         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), "Assets/M6.unity");
         PlayerSettings.companyName = "CatanDevelopment";
-        PlayerSettings.productName = "Catan M6";
+        PlayerSettings.productName = M6App.ProductFileName;
         PlayerSettings.bundleVersion = M6App.BuildVersion;
+        // 在线大厅按用户要求直接连接公网 IP，正式包同样允许 HTTP / WS。
+        PlayerSettings.insecureHttpOption = InsecureHttpOption.AlwaysAllowed;
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
         PlayerSettings.SetApiCompatibilityLevel(NamedBuildTarget.Standalone, ApiCompatibilityLevel.NET_Standard);
         PlayerSettings.defaultScreenWidth = 1440;

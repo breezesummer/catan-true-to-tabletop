@@ -36,4 +36,4 @@
 
 ## 验证入口
 
-加载工程开发环境后运行 `dotnet test tests/Catan.Network.Tests/Catan.Network.Tests.csproj`。测试覆盖所有 26 种规则／剧本／人数配置的房间开局，身份、重连、准备、管理权、并发、幂等、过期修订、保存失败、重启待决、失效凭据、输出类型与序列化隐私。完整 HTTPS／WSS 进程验证和 Unity 可玩构建由上层交付记录另行登记。
+加载工程开发环境后运行 `dotnet test tests/Catan.Network.Tests/Catan.Network.Tests.csproj`。测试覆盖所有 26 种规则／剧本／人数配置的房间开局，身份、重连、准备、管理权、并发、幂等、过期修订、保存失败、重启待决、失效凭据、输出类型与序列化隐私。完整在线 HTTP／WS、局域网 HTTPS／WSS 进程验证和 Unity 可玩构建由上层交付记录另行登记。

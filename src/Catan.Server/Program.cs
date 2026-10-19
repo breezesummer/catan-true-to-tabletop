@@ -25,7 +25,12 @@ try
         kestrel.Limits.MaxConcurrentUpgradedConnections = options.MaxConnections;
         kestrel.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(10);
         kestrel.Limits.KeepAliveTimeout = TimeSpan.FromSeconds(40);
-        kestrel.ListenAnyIP(options.Port, listen => { listen.Protocols = HttpProtocols.Http1AndHttp2; listen.UseHttps(privateFiles.Certificate); });
+        kestrel.ListenAnyIP(options.Port, listen =>
+        {
+            // 公网大厅直接通过 IP 使用 HTTP / WS；局域网保留自动发现绑定的 HTTPS 证书。
+            listen.Protocols = options.Online ? HttpProtocols.Http1 : HttpProtocols.Http1AndHttp2;
+            if (!options.Online) listen.UseHttps(privateFiles.Certificate ?? throw new InvalidOperationException("缺少局域网服务证书。"));
+        });
     });
     builder.Services.AddSingleton(options);
     builder.Services.AddSingleton(rooms);
@@ -43,18 +48,23 @@ try
     {
         context.Response.Headers.CacheControl = "no-store";
         context.Response.Headers["X-Content-Type-Options"] = "nosniff";
-        if (!context.Request.IsHttps || context.Request.QueryString.HasValue || context.Request.Headers.ContainsKey("Origin")) { context.Response.StatusCode = 400; return; }
+        if ((!options.Online && !context.Request.IsHttps) || context.Request.QueryString.HasValue || context.Request.Headers.ContainsKey("Origin")) { context.Response.StatusCode = 400; return; }
         try { await next(context); }
         catch when (!context.Response.HasStarted) { context.Response.StatusCode = 503; await context.Response.WriteAsync("服务暂不可用，请稍后重新连接。"); }
     });
     app.UseWebSockets(new WebSocketOptions { KeepAliveInterval = TimeSpan.FromSeconds(15), KeepAliveTimeout = TimeSpan.FromSeconds(15) });
-    app.MapGet("/health", () => Results.Json(new { status = "ok", protocolVersion = NetworkProtocol.Version, serverName = options.ServerName, httpsPort = options.Port, certificateFingerprint = privateFiles.Fingerprint }));
+    app.MapGet("/health", () => Results.Json(new
+    {
+        status = "ok", protocolVersion = NetworkProtocol.Version, serverName = options.ServerName,
+        transport = options.Online ? "http" : "https", httpPort = options.Online ? options.Port : 0,
+        httpsPort = options.Online ? 0 : options.Port, certificateFingerprint = privateFiles.Fingerprint
+    }));
     app.MapPost("/api/request", (HttpContext context, NetworkTransport transport) => transport.HttpAsync(context));
     app.Map("/ws", (HttpContext context, NetworkTransport transport) => transport.WebSocketAsync(context));
     app.Lifetime.ApplicationStarted.Register(() =>
     {
-        Console.WriteLine($"卡坦 M7 房间服务已启动，HTTPS 端口：{options.Port}；模式：{(options.Online ? "在线" : "局域网")}。");
-        Console.WriteLine($"局域网证书 SHA-256 指纹：{privateFiles.Fingerprint}");
+        Console.WriteLine($"卡坦 M7 房间服务已启动，{(options.Online ? "HTTP / WS" : "HTTPS / WSS")} 端口：{options.Port}；模式：{(options.Online ? "在线" : "局域网")}。");
+        if (!options.Online) Console.WriteLine($"局域网证书 SHA-256 指纹：{privateFiles.Fingerprint}");
     });
     await app.RunAsync();
 }
