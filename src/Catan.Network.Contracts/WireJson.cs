@@ -47,6 +47,7 @@ namespace Catan.Network.Contracts
             bool contract = type.IsDefined(typeof(DataContractAttribute), false);
             return type.GetMembers(BindingFlags.Public | BindingFlags.Instance).Where(m =>
                 (m is FieldInfo || m is PropertyInfo p && p.GetIndexParameters().Length == 0 && p.GetGetMethod() != null && p.GetSetMethod(true) != null)
+                && !m.IsDefined(typeof(IgnoreDataMemberAttribute), false)
                 && (!contract || m.IsDefined(typeof(DataMemberAttribute), false))).OrderBy(m => m.Name, StringComparer.Ordinal);
         }
         private static string Name(MemberInfo member) => member.GetCustomAttribute<DataMemberAttribute>()?.Name ?? member.Name;

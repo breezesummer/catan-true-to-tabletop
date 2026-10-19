@@ -261,6 +261,7 @@ namespace Catan.Core.M3
         public DiscardRequirement[] Discards { get; internal set; }
         public TradeOffer TradeOffer { get; internal set; }
         public ResourceBag OwnResources { get; internal set; }
+        [IgnoreDataMember] public OpponentHandView[] OpponentHands { get; internal set; } = Array.Empty<OpponentHandView>();
         public DevelopmentCard[] OwnDevelopmentCards { get; internal set; }
         public int OwnVictoryPoints { get; internal set; }
         public bool DevelopmentCardPlayedThisTurn { get; internal set; }

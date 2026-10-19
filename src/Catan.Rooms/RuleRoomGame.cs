@@ -101,7 +101,8 @@ internal sealed class RuleRoomGame
         return ((bool)result.Success, (string)result.ErrorCode, (string)result.Message);
     }
     internal bool Finished => finished;
-    internal object Decide(string seat) => View(seat) switch
+    private object AiView(string seat) => session switch { M2.BaseGameSession s => s.GetAiPlayerView(seat), M3.SeafarersGameSession s => s.GetAiPlayerView(seat), M4.CitiesKnightsGameSession s => s.GetAiPlayerView(seat), M5.CombinedGameSession s => s.GetAiPlayerView(seat), _ => throw new InvalidOperationException() };
+    internal object Decide(string seat) => AiView(seat) switch
     {
         M2.PlayerView v => new BaseGameAi().Decide(v), M3.PlayerView v => new SeafarersAi().Decide(v),
         M4.PlayerView v => new CitiesKnightsAi().Decide(v), M5.PlayerView v => new CombinedAi().Decide(v),

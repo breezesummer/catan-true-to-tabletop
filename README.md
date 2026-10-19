@@ -67,5 +67,6 @@ macOS 开发入口为 `tools/development/Start-Dev.command`，打开 Unity 使�
 - [分系统构建](docs/CROSS_PLATFORM_BUILD.md)：Windows／macOS 启动、双端打包和 Android 签名迁移。
 - [本地规则索引](assets/references/rules/README.md)：规则原件与查询入口。
 - [美术生产规范](docs/ART_PIPELINE.md)：参考采集、资产制作、导入和复现。
+- [AI 2.0 补丁](docs/AI_PATCH_2_0.md)：当前 AI 策略、交易限制和专用信息权限。
 - [本地 AI 验收](docs/M6_ACCEPTANCE.md)：AI、规则与独立完整对局证据。
 - [联机验收](docs/M7_ACCEPTANCE.md)：本机已验证范围与后续待验事项。

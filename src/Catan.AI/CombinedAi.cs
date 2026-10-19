@@ -106,6 +106,11 @@ public sealed class CombinedAi
         var winning = legal.Where(c => view.OwnVictoryPoints + PointGain(view, c) >= view.TargetVictoryPoints)
             .OrderByDescending(c => ActionValue(view, c)).ThenBy(c => c.TargetId, StringComparer.Ordinal).FirstOrDefault();
         if (winning != null) return winning;
+        // 对手即将终局时，先执行确有阻碍收益的蓝牌或截路；自己的立即胜利仍排在最前。
+        var urgentTactic = legal.Where(c => UrgentInterference(view, c))
+            .OrderByDescending(c => c.Kind == CommandKind.PlayProgressCard ? ProgressValue(view, c) : BlockValue(view, c))
+            .ThenBy(c => c.TargetId, StringComparer.Ordinal).FirstOrDefault();
+        if (urgentTactic != null) return urgentTactic;
 
         var knights = view.Board.Knights.Where(k => k.PlayerId == view.PlayerId).ToArray();
         var me = view.Players.Single(p => p.Id == view.PlayerId);
@@ -122,7 +127,9 @@ public sealed class CombinedAi
         if (scoring.command != null) return scoring.command;
         var card = legal.Where(c => c.Kind == CommandKind.PlayProgressCard && ProgressValue(view, c) > 0).OrderByDescending(c => ProgressValue(view, c)).FirstOrDefault();
         if (card != null) return card;
-        var harbor = legal.Where(c => c.Kind == CommandKind.CommercialHarborOffer).OrderByDescending(c => view.OwnResources[c.Resource]).FirstOrDefault();
+        var harbor = legal.Where(c => c.Kind == CommandKind.CommercialHarborOffer
+            && view.Players.Any(p => p.Id == c.OtherPlayerId && p.CommodityCount > 0)
+            && AiOpponentStrategy.TradePenalty(view, c.OtherPlayerId) <= 0).OrderByDescending(c => view.OwnResources[c.Resource]).FirstOrDefault();
         if (harbor != null) return harbor;
 
         // 只投入一张激活麦或一次晋升争取近期唯一最高兵力，避免四人局中无止境军备竞赛。
@@ -131,6 +138,14 @@ public sealed class CombinedAi
 
         var chase = legal.FirstOrDefault(c => c.Kind == CommandKind.ChaseRobber);
         if (chase != null && view.BarbarianPosition < 5 && view.Board.Tiles.Any(t => t.Id == view.Board.RobberTileId && Buildings(view).Any(b => b.PlayerId == view.PlayerId && t.Vertices.Contains(b.LocationId)))) return chase;
+        var chasePirate = legal.FirstOrDefault(c => c.Kind == CommandKind.ChasePirate);
+        if (chasePirate != null && (view.BarbarianPosition < 4 || view.OwnResources.Wheat > 0))
+        {
+            double current = TokenValue(view, new Command { Kind = CommandKind.MovePirate, TargetId = view.Board.PirateTileId });
+            double best = view.Board.Tiles.Where(t => t.Resource == "sea" && t.Id != view.Board.PirateTileId)
+                .Select(t => TokenValue(view, new Command { Kind = CommandKind.MovePirate, TargetId = t.Id })).DefaultIfEmpty(0).Max();
+            if (best - current > 20) return chasePirate;
+        }
         var wall = legal.FirstOrDefault(c => c.Kind == CommandKind.BuildWall);
         if (wall != null && view.OwnResources.Brick >= 3 && view.OwnResources.Total + view.OwnCommodities.Total >= 7) return wall;
         var expansion = Expansion(view);
@@ -200,19 +215,15 @@ public sealed class CombinedAi
         view.Board.Tiles, view.Board.Edges, Buildings(view), view.PlayerId, vertex, length, RollsLeft(view), view.OwnVictoryPoints, view.TargetVictoryPoints);
     private static int Missing(ResourceBag hand, ResourceBag cost) => Resources.Sum(r => Math.Max(0, cost[r] - hand[r]));
 
-    private static double Threat(PlayerView view, string player)
-    {
-        var rival = view.Players.Single(p => p.Id == player);
-        return rival.VictoryPoints * 5 + (rival.VictoryPoints >= view.TargetVictoryPoints - 3 ? 20 : 0) + Math.Min(4, rival.ResourceCount);
-    }
+    private static double Threat(PlayerView view, string player) => AiOpponentStrategy.Threat(view, player);
 
     private static double TokenValue(PlayerView view, Command c)
     {
         var tile = view.Board.Tiles.FirstOrDefault(t => t.Id == c.TargetId);
         if (tile == null) return 0;
         if (c.Kind == CommandKind.MovePirate)
-            return view.Board.Ships.Where(s => view.Board.Edges.Any(e => e.Id == s.LocationId && e.Vertices.All(tile.Vertices.Contains)))
-                .Sum(s => s.PlayerId == view.PlayerId ? -100 : 8 + Threat(view, s.PlayerId) / 2);
+            return SeafaringPlanning.PirateBlockadeValue(view.Board.Tiles, view.Board.Edges, Buildings(view), view.Board.Roads,
+                view.Board.Ships.Select(ship => (ship.PlayerId, ship.LocationId)), view.PlayerId, c.TargetId, id => Threat(view, id));
         return Buildings(view).Where(b => tile.Vertices.Contains(b.LocationId)).Sum(b =>
         {
             if (b.PlayerId == view.PlayerId) return -100 - Pips(tile.Number) * 8.0;
@@ -317,7 +328,7 @@ public sealed class CombinedAi
             if (c.ProgressCard == ProgressCardKind.Crane && GainsMetropolis(view, c.Track)) points += 2;
         }
         if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 5 &&
-            (c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildShip || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight))
+            (c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildShip || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight || c.Kind == CommandKind.MoveKnight || c.Kind == CommandKind.DisplaceKnight))
             points += RouteAwardGain(view, c);
         return points;
     }
@@ -341,27 +352,101 @@ public sealed class CombinedAi
                 int length = ProjectedRouteLength(view, view.PlayerId, c);
                 int needed = Math.Max(5, view.Players.Where(p => p.Id != view.PlayerId).Max(p => p.LongestRoadLength) + 1);
                 return length > view.Players.Single(p => p.Id == view.PlayerId).LongestRoadLength && needed - length == 1 ? 22 : 0;
-            case CommandKind.RecruitKnight: return BlockValue(view, c);
+            case CommandKind.RecruitKnight: case CommandKind.MoveKnight: case CommandKind.DisplaceKnight: case CommandKind.ActivateKnight: return KnightTacticValue(view, c);
             default: return 0;
         }
     }
 
+    private static double KnightTacticValue(PlayerView view, Command c)
+    {
+        if (c.Kind != CommandKind.ActivateKnight) return BlockValue(view, c);
+        var knight = view.Board.Knights.FirstOrDefault(k => k.PlayerId == view.PlayerId && k.LocationId == c.TargetId);
+        if (knight == null) return 0;
+        // 本回合激活只能为下回合准备，不把尚不能行动的骑士算成立即截路。
+        var routes = view.Board.Roads.Where(r => r.PlayerId == view.PlayerId).Select(r => r.LocationId).Concat(view.Board.Ships.Where(ship => ship.PlayerId == view.PlayerId).Select(ship => ship.LocationId)).ToHashSet();
+        var seen = new HashSet<string> { knight.LocationId }; var queue = new Queue<string>(); queue.Enqueue(knight.LocationId);
+        double best = 0;
+        while (queue.Count > 0)
+        {
+            string vertex = queue.Dequeue();
+            foreach (var edge in view.Board.Edges.Where(e => routes.Contains(e.Id) && e.Vertices.Contains(vertex)))
+            {
+                string next = edge.Vertices.Single(v => v != vertex);
+                if (!seen.Add(next) || Buildings(view).Any(b => b.PlayerId != view.PlayerId && b.LocationId == next)) continue;
+                var occupant = view.Board.Knights.FirstOrDefault(k => k.LocationId == next);
+                if (occupant == null || occupant.PlayerId == view.PlayerId) queue.Enqueue(next);
+                if (Buildings(view).Any(b => b.LocationId == next) || occupant != null && (occupant.PlayerId == view.PlayerId || occupant.Level >= knight.Level)) continue;
+                best = Math.Max(best, BlockValue(view, new Command { Kind = occupant == null ? CommandKind.MoveKnight : CommandKind.DisplaceKnight,
+                    PlayerId = view.PlayerId, SourceId = knight.LocationId, TargetId = next }));
+            }
+        }
+        return best >= 20 ? best * 0.65 - 3 : 0;
+    }
+
+    // catan-cities-knights-2025-en.pdf 第 9–10 页：敌骑士截断道路；第 12 页同样适用于船线。
+    // 只评估规则视图给出的合法招募/移动/驱逐，不自行生成跨越敌棋子的移动。
     private static double BlockValue(PlayerView view, Command c)
     {
-        if (c.Kind != CommandKind.RecruitKnight && c.Kind != CommandKind.BuildSettlement) return 0;
-        var threatening = view.Players.Where(p => p.Id != view.PlayerId && p.VictoryPoints >= view.TargetVictoryPoints - 4).ToArray();
-        if (threatening.Length == 0) return 0;
+        bool moves = c.Kind == CommandKind.MoveKnight || c.Kind == CommandKind.DisplaceKnight;
+        if (!moves && c.Kind != CommandKind.RecruitKnight && c.Kind != CommandKind.BuildSettlement) return 0;
         double benefit = 0;
-        foreach (var rival in threatening)
+        foreach (var rival in view.Players.Where(p => p.Id != view.PlayerId))
         {
-            var adjacent = view.Board.Edges.Where(e => e.Vertices.Contains(c.TargetId)).Select(e => e.Id).ToArray();
-            if (!view.Board.Roads.Any(r => r.PlayerId == rival.Id && adjacent.Contains(r.LocationId)) &&
-                !view.Board.Ships.Any(s => s.PlayerId == rival.Id && adjacent.Contains(s.LocationId))) continue;
-            if (view.LongestRoadPlayerId == rival.Id && ProjectedRouteLength(view, rival.Id, c) < rival.LongestRoadLength) benefit = Math.Max(benefit, 18);
-            // 只在自己本来能到达的点抢占；不为干扰一个对手另外铺设昂贵支路。
-            if (c.Kind == CommandKind.BuildSettlement) benefit = Math.Max(benefit, 6);
+            double At(string vertex)
+            {
+                if (vertex == null) return 0;
+                var adjacent = view.Board.Edges.Where(e => e.Vertices.Contains(vertex)).Select(e => e.Id).ToArray();
+                int routes = view.Board.Roads.Count(r => r.PlayerId == rival.Id && adjacent.Contains(r.LocationId)) + view.Board.Ships.Count(r => r.PlayerId == rival.Id && adjacent.Contains(r.LocationId));
+                if (routes == 0) return 0;
+                bool frontier = view.Board.Edges.Any(e => e.Vertices.Contains(vertex) && !view.Board.Roads.Any(r => r.LocationId == e.Id) && !view.Board.Ships.Any(ship => ship.LocationId == e.Id));
+                bool site = view.Board.Tiles.Any(t => t.Resource != "sea" && t.Resource != "fog" && t.Vertices.Contains(vertex))
+                    && !view.Board.Edges.Where(e => e.Vertices.Contains(vertex)).Any(e => Buildings(view).Any(b => e.Vertices.Contains(b.LocationId)));
+                double value = frontier ? 6 + Threat(view, rival.Id) / 8 : 0;
+                if (site && view.Board.Ships.Any(ship => ship.PlayerId == rival.Id && adjacent.Contains(ship.LocationId))) value += 30 + Threat(view, rival.Id) / 2;
+                else if (site) value += 8;
+                return value;
+            }
+            double target = At(c.TargetId) - (moves ? At(c.SourceId) : 0);
+            int projected = ProjectedRouteLength(view, rival.Id, c);
+            if (view.LongestRoadPlayerId == rival.Id && projected < rival.LongestRoadLength)
+            {
+                bool losesAward = projected < 5 || view.Players.Any(p => p.Id != rival.Id && p.LongestRoadLength > projected);
+                target += (losesAward ? 45 : 16) + Threat(view, rival.Id) / 2;
+            }
+            benefit = Math.Max(benefit, target);
         }
-        return benefit;
+        if (moves && view.BarbarianPosition >= 4 && view.OwnResources.Wheat == 0)
+        {
+            int remaining = view.Board.Knights.Where(k => k.PlayerId == view.PlayerId && k.Active && k.LocationId != c.SourceId).Sum(k => k.Level);
+            if (remaining < DefenseGoal(view)) benefit -= 45;
+        }
+        return Math.Max(0, benefit);
+    }
+
+    private static IEnumerable<string> AffectedOpponents(PlayerView view, Command c)
+    {
+        if (c.OtherPlayerId != null && c.OtherPlayerId != view.PlayerId) return new[] { c.OtherPlayerId };
+        if (c.ProgressCard == ProgressCardKind.Taxation)
+            return Buildings(view).Where(b => b.PlayerId != view.PlayerId && view.Board.Tiles.Any(t => t.Id == c.TargetId && t.Vertices.Contains(b.LocationId))).Select(b => b.PlayerId).Distinct();
+        if (c.ProgressCard == ProgressCardKind.Diplomacy)
+            return view.Board.Roads.Where(r => r.LocationId == c.TargetId && r.PlayerId != view.PlayerId).Select(r => r.PlayerId);
+        if (c.ProgressCard == ProgressCardKind.Intrigue)
+            return view.Board.Knights.Where(k => k.LocationId == c.TargetId && k.PlayerId != view.PlayerId).Select(k => k.PlayerId);
+        if (c.ProgressCard == ProgressCardKind.Sabotage || c.ProgressCard == ProgressCardKind.Wedding)
+            return view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount + p.CommodityCount > 0
+                && (c.ProgressCard == ProgressCardKind.Sabotage ? p.VictoryPoints >= view.OwnVictoryPoints : p.VictoryPoints > view.OwnVictoryPoints)).Select(p => p.Id);
+        return Array.Empty<string>();
+    }
+
+    private static bool UrgentInterference(PlayerView view, Command c)
+    {
+        bool urgent(string id) => AiOpponentStrategy.MinimumWinningActions(view, id) <= 2;
+        if (c.Kind == CommandKind.PlayProgressCard && ProgressCatalog.Track(c.ProgressCard) == ImprovementTrack.Politics)
+            return AffectedOpponents(view, c).Any(urgent) && ProgressValue(view, c) > 0;
+        if (BlockValue(view, c) <= 0) return false;
+        return view.Players.Where(p => p.Id != view.PlayerId && urgent(p.Id)).Any(p =>
+            ProjectedRouteLength(view, p.Id, c) < p.LongestRoadLength ||
+            view.Board.Edges.Any(e => e.Vertices.Contains(c.TargetId) && view.Board.Roads.Any(r => r.PlayerId == p.Id && r.LocationId == e.Id)) || view.Board.Edges.Any(e => e.Vertices.Contains(c.TargetId) && view.Board.Ships.Any(ship => ship.PlayerId == p.Id && ship.LocationId == e.Id)));
     }
 
     private static int RouteAwardGain(PlayerView view, Command c)
@@ -369,7 +454,7 @@ public sealed class CombinedAi
         int own = ProjectedRouteLength(view, view.PlayerId, c);
         if (own < 5) return 0;
         var lengths = view.Players.ToDictionary(p => p.Id, p => p.Id == view.PlayerId ? own :
-            c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight ? ProjectedRouteLength(view, p.Id, c) : p.LongestRoadLength);
+            c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight || c.Kind == CommandKind.MoveKnight || c.Kind == CommandKind.DisplaceKnight ? ProjectedRouteLength(view, p.Id, c) : p.LongestRoadLength);
         int maximum = lengths.Values.Max();
         var leaders = lengths.Where(x => x.Value == maximum).Select(x => x.Key).ToArray();
         string holder = leaders.Contains(view.LongestRoadPlayerId) ? view.LongestRoadPlayerId : leaders.Length == 1 ? leaders[0] : null;
@@ -382,15 +467,17 @@ public sealed class CombinedAi
         var roads = view.Board.Roads.Where(r => r.PlayerId == player).Select(r => r.LocationId).ToHashSet();
         var ships = view.Board.Ships.Where(s => s.PlayerId == player).Select(s => s.LocationId).ToHashSet();
         var anchors = Buildings(view).Where(b => b.PlayerId == player).Select(b => b.LocationId).ToHashSet();
+        bool movesKnight = c.Kind == CommandKind.MoveKnight || c.Kind == CommandKind.DisplaceKnight;
         var blocked = Buildings(view).Where(b => b.PlayerId != player).Select(b => b.LocationId)
-            .Concat(view.Board.Knights.Where(k => k.PlayerId != player).Select(k => k.LocationId)).ToHashSet();
+            .Concat(view.Board.Knights.Where(k => k.PlayerId != player && !(movesKnight && k.LocationId == c.SourceId)
+                && !(c.Kind == CommandKind.DisplaceKnight && k.LocationId == c.TargetId)).Select(k => k.LocationId)).ToHashSet();
         if (player == view.PlayerId)
         {
             if (c.Kind == CommandKind.BuildRoad) roads.Add(c.TargetId);
             if (c.Kind == CommandKind.BuildShip) ships.Add(c.TargetId);
             if (c.Kind == CommandKind.BuildSettlement) anchors.Add(c.TargetId);
         }
-        else if (c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight) blocked.Add(c.TargetId);
+        else if (c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight || movesKnight) blocked.Add(c.TargetId);
         var edges = view.Board.Edges.Where(e => roads.Contains(e.Id) || ships.Contains(e.Id)).ToArray();
         var adjacent = edges.SelectMany(e => e.Vertices).Distinct().ToDictionary(v => v, v => edges.Where(e => e.Vertices.Contains(v)).ToArray());
         var used = new HashSet<string>();
@@ -422,6 +509,21 @@ public sealed class CombinedAi
     private static double ProgressValue(PlayerView view, Command c)
     {
         double value = CardValue(c.ProgressCard);
+        // 商业港口的发起方可自由挑人，也须遵守交易禁令；被迫交商品的待决仍照规则完成。
+        if (c.ProgressCard == ProgressCardKind.CommercialHarbor)
+            return view.OwnResources.Total > 0 && view.Players.Any(p => p.Id != view.PlayerId && p.CommodityCount > 0
+                && AiOpponentStrategy.TradePenalty(view, p.Id) <= 0) ? value : -1;
+        if (c.ProgressCard == ProgressCardKind.Taxation)
+        {
+            var tile = view.Board.Tiles.FirstOrDefault(t => t.Id == c.TargetId);
+            if (tile == null) return -1;
+            var victims = AffectedOpponents(view, c).Where(id => view.Players.Any(p => p.Id == id && p.ResourceCount + p.CommodityCount > 0)).ToArray();
+            double relief = view.Board.Tiles.Where(t => t.Id == view.Board.RobberTileId)
+                .Sum(t => Buildings(view).Where(b => b.PlayerId == view.PlayerId && t.Vertices.Contains(b.LocationId)).Sum(b => Pips(t.Number) * 8.0));
+            return TokenValue(view, new Command { Kind = CommandKind.MoveRobber, TargetId = c.TargetId }) + relief + victims.Sum(id => 12 + Threat(view, id) / 4) - 1;
+        }
+        if (c.ProgressCard == ProgressCardKind.Diplomacy || c.ProgressCard == ProgressCardKind.Intrigue || c.ProgressCard == ProgressCardKind.Sabotage || c.ProgressCard == ProgressCardKind.Wedding)
+            value += AffectedOpponents(view, c).Sum(id => Threat(view, id));
         if (c.ProgressCard == ProgressCardKind.Crane) return ImprovementValue(view, c.Track);
         if (c.ProgressCard == ProgressCardKind.ResourceMonopoly) return 10 + (19 - view.Bank[c.Resource] - view.OwnResources[c.Resource]) * 2;
         if (c.ProgressCard == ProgressCardKind.TradeMonopoly) return 10 + (12 - view.CommodityBank[c.Commodity] - view.OwnCommodities[c.Commodity]) * 3;
@@ -435,7 +537,7 @@ public sealed class CombinedAi
         if (c.ProgressCard == ProgressCardKind.Diplomacy && view.Board.Roads.Any(r => r.LocationId == c.TargetId && r.PlayerId == view.PlayerId)) return -1;
         if (c.ProgressCard == ProgressCardKind.Medicine) value += Value(view, c.TargetId);
         if (c.ProgressCard == ProgressCardKind.Merchant && view.MerchantPlayerId != view.PlayerId) value += 30;
-        if (c.OtherPlayerId != null) value += view.Players.Single(p => p.Id == c.OtherPlayerId).VictoryPoints;
+        if (c.OtherPlayerId != null) value += Threat(view, c.OtherPlayerId);
         return value;
     }
 
@@ -449,7 +551,7 @@ public sealed class CombinedAi
             case "PillageCity": return -Value(view, c.TargetId);
             case "Metropolis": return Value(view, c.TargetId);
             case "DefenderProgress": return c.Track == ImprovementTrack.Science ? 30 : c.Track == ImprovementTrack.Trade ? 20 : 10;
-            case "DisplacedKnight": case "ProgressTreasonPlace": return c.KnightLevel * 10 - Value(view, c.TargetId);
+            case "DisplacedKnight": case "ProgressTreasonPlace": return c.KnightLevel * 10 - Value(view, c.TargetId) + BlockValue(view, new Command { Kind = CommandKind.RecruitKnight, TargetId = c.TargetId });
             case "ProgressEspionage": return CardValue(c.SelectedProgressCard);
             case "ProgressHarbor": return view.OwnCommodities[c.Commodity];
             case "ProgressRoads":
@@ -480,7 +582,7 @@ public sealed class CombinedAi
         var affordable = Covers(view.OwnResources, offer.Receive) && Commodities.All(c => view.OwnCommodities[c] >= costs[c]);
         double benefit = TradeValue(view.OwnResources, offer.Give, offer.Receive);
         benefit += Commodities.Sum(c => (gives[c] - costs[c]) * (view.OwnImprovements[(int)(c == Commodity.Paper ? ImprovementTrack.Science : c == Commodity.Cloth ? ImprovementTrack.Trade : ImprovementTrack.Politics)] < 5 ? 2.5 : 1.0));
-        return new Command { PlayerId = view.PlayerId, Kind = affordable && benefit >= -0.01 ? CommandKind.AcceptTrade : CommandKind.RejectTrade };
+        return new Command { PlayerId = view.PlayerId, Kind = affordable && benefit - AiOpponentStrategy.TradePenalty(view, offer.ProposerId) >= -0.01 ? CommandKind.AcceptTrade : CommandKind.RejectTrade };
     }
     // 先调动闲置船节省两张牌；来源由公开权限给出，移走后仍须保留目标连接。
     private static Command RepositionShip(PlayerView view, (string target, string[] path, bool ship)? expansion)
@@ -517,12 +619,26 @@ public sealed class CombinedAi
         var needs = Resources.Where(r => view.OwnResources[r] < goal[r]).OrderBy(r => view.OwnResources[r] - goal[r]).ToArray();
         var surplus = Resources.Where(r => view.OwnResources[r] > goal[r]).OrderByDescending(r => view.OwnResources[r] - goal[r]).ToArray();
         if (needs.Length == 0 || surplus.Length == 0) return null;
-        var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0)
-            .OrderBy(p => p.VictoryPoints).ThenByDescending(p => p.ResourceCount).ThenBy(p => p.Id, StringComparer.Ordinal).FirstOrDefault();
-        if (partner == null) return null;
-        var give = Bag(); give[surplus[0]] = 1;
-        var receive = Bag(); receive[needs[0]] = 1;
-        return new Command { PlayerId = view.PlayerId, Kind = CommandKind.ProposeTrade, OtherPlayerId = partner.Id, Give = give, Receive = receive };
+        // 只向确实持有所需资源的安全对象报价；近终局交易须带来足够大的自身收益。
+        foreach (var need in needs)
+        foreach (var surplusResource in surplus)
+        {
+            var give = Bag(); give[surplusResource] = 1;
+            var receive = Bag(); receive[need] = 1;
+            double benefit = TradeValue(view.OwnResources, receive, give) + 2;
+            // 自己也只差一分且此报价补齐当前目标时，才重新考虑两三步可赢的对手。
+            // 一步可赢和领先六分的禁令仍以无穷大门槛保持绝对优先。
+            if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 1
+                && Resources.All(r => view.OwnResources[r] + receive[r] - give[r] >= goal[r])) benefit += 16;
+            var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0
+                && AiOpponentStrategy.CanSupply(view.OpponentHands, p.Id, need)
+                && benefit >= AiOpponentStrategy.TradePenalty(view, p.Id))
+                .OrderBy(p => AiOpponentStrategy.TradePenalty(view, p.Id)).ThenBy(p => p.VictoryPoints)
+                .ThenByDescending(p => p.ResourceCount).ThenBy(p => p.Id, StringComparer.Ordinal).FirstOrDefault();
+            if (partner != null)
+                return new Command { PlayerId = view.PlayerId, Kind = CommandKind.ProposeTrade, OtherPlayerId = partner.Id, Give = give, Receive = receive };
+        }
+        return null;
     }
     private static bool Covers(ResourceBag hand, ResourceBag cost) => Resources.All(r => hand[r] >= cost[r]);
     private static PiecePlacement[] Buildings(PlayerView view) => view.Board.Settlements.Concat(view.Board.Cities).ToArray();

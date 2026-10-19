@@ -25,23 +25,27 @@ namespace Catan.AI
 
         internal static double SetupValue(Catan.Core.M2.PlayerView view, string vertex) => SetupValue(
             view.Board.Tiles, view.Board.Edges, view.Board.Settlements.Concat(view.Board.Cities),
-            view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, false, false);
+            view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, false, false,
+            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId));
 
         internal static double SetupValue(Catan.Core.M3.PlayerView view, string vertex) => SetupValue(
             view.Board.Tiles, view.Board.Edges, view.Board.Settlements.Concat(view.Board.Cities),
-            view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, true, false);
+            view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, true, false,
+            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId));
 
         internal static double SetupValue(Catan.Core.M4.PlayerView view, string vertex) => SetupValue(
             view.Board.Tiles, view.Board.Edges, view.Board.Settlements.Concat(view.Board.Cities),
-            view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, false, true);
+            view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, false, true,
+            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId));
 
         internal static double SetupValue(Catan.Core.M5.PlayerView view, string vertex) => SetupValue(
             view.Board.Tiles, view.Board.Edges, view.Board.Settlements.Concat(view.Board.Cities),
-            view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, true, true);
+            view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, true, true,
+            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId));
 
         private static double SetupValue(Tile[] tiles, Edge[] edges, IEnumerable<PiecePlacement> buildings,
             IEnumerable<(Resource? resource, string[] vertices)> ports, string player, string vertex,
-            bool seafaring, bool citiesKnights)
+            bool seafaring, bool citiesKnights, int openingSeat)
         {
             var allBuildings = buildings.ToArray();
             var owned = allBuildings.Where(b => b.PlayerId == player).Select(b => b.LocationId).ToArray();
@@ -61,6 +65,17 @@ namespace Catan.AI
             // 第二次摆放为城市，木地产纸，支持尽早获得排水渠。
             if (initialCity) value += local.Where(t => t.Resource == "wood").Sum(t => Pips(t.Number) * 0.9);
             if (seafaring && tiles.Any(t => t.Resource == "sea" && t.Vertices.Contains(vertex))) value += 2;
+
+            // 四人蛇形初设的中间席位适度抢占集中木砖；只影响首轮，肥沃多资源点仍可胜出。
+            var contestOpening = owned.Length == 0 && (openingSeat == 2 || openingSeat == 3);
+            if (contestOpening)
+                value += new[] { "brick", "wood" }.Max(resource =>
+                {
+                    var matching = local.Where(t => t.Resource == resource).ToArray();
+                    var production = matching.Sum(t => Pips(t.Number));
+                    if (matching.Length >= 2 && production >= 7) return Math.Min(6.0, production * 0.65);
+                    return matching.Any(t => Pips(t.Number) >= 4) ? 4.5 : 0;
+                });
 
             foreach (var port in ports)
             {
@@ -82,8 +97,21 @@ namespace Catan.AI
                 var benefit = port.resource.HasValue ? Math.Max(0, production - 3) * preference : 2.0;
                 if (alreadyPort && !local.Any(t => port.resource.HasValue && t.Resource == port.resource.Value.ToString().ToLowerInvariant())) continue;
                 value += benefit * (nearPort ? 0.25 : 1.0);
+                if (contestOpening && port.resource == Resource.Brick && onPort
+                    && local.Sum(t => Pips(t.Number)) >= 4
+                    && tiles.Where(t => t.Resource == "brick").Sum(t => Pips(t.Number)) >= 8)
+                    value += 2.5;
+
             }
             return value;
+        }
+
+        private static int OpeningSeat(string[] players, string startingPlayer, string player)
+        {
+            if (players.Length != 4) return 0;
+            var start = Array.IndexOf(players, startingPlayer);
+            var index = Array.IndexOf(players, player);
+            return start < 0 || index < 0 ? 0 : (index - start + players.Length) % players.Length + 1;
         }
 
         // Marginal value declines as a hand accumulates a resource. This is computed from
