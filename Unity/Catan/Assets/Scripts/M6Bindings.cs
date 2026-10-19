@@ -13,7 +13,7 @@ public sealed partial class M6App
         var policy=new BaseGameAi();
         Bind(app,()=>Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M2.GamePhase.Finished,player=>
         {
-            var command=policy.Decide(host.View(player));
+            var command=policy.Decide(host.AiView(player));
             if(command==null)return "NoDecision";
             if(command.PlayerId!=player)return "WrongSeat";
             command.Id=Guid.NewGuid().ToString("N");
@@ -29,7 +29,7 @@ public sealed partial class M6App
         var policy=new SeafarersAi();
         Bind(app,()=>Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M3.GamePhase.Finished,player=>
         {
-            var command=policy.Decide(host.View(player));
+            var command=policy.Decide(host.AiView(player));
             if(command==null)return "NoDecision";
             if(command.PlayerId!=player)return "WrongSeat";
             command.Id=Guid.NewGuid().ToString("N");
@@ -45,7 +45,7 @@ public sealed partial class M6App
         var policy=new CitiesKnightsAi();
         Bind(app,()=>M4App.Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M4.GamePhase.Finished,player=>
         {
-            var command=policy.Decide(host.View(player));
+            var command=policy.Decide(host.AiView(player));
             if(command==null)return "NoDecision";
             if(command.PlayerId!=player)return "WrongSeat";
             command.Id=Guid.NewGuid().ToString("N");
@@ -61,7 +61,7 @@ public sealed partial class M6App
         var policy=new CombinedAi();
         Bind(app,()=>M5App.Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M5.GamePhase.Finished,player=>
         {
-            var command=policy.Decide(host.View(player));
+            var command=policy.Decide(host.AiView(player));
             if(command==null)return "NoDecision";
             if(command.PlayerId!=player)return "WrongSeat";
             command.Id=Guid.NewGuid().ToString("N");

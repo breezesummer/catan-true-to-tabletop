@@ -45,10 +45,10 @@ public sealed class BaseGameAi
                 var discard = Make(CommandKind.DiscardResources); discard.Resources = cards; return discard;
             case GamePhase.RobberMove:
                 var destination = view.Board.Tiles.Where(t => t.Id != view.Board.RobberTileId).OrderByDescending(t =>
-                    Buildings(view).Where(b => t.Vertices.Contains(b.LocationId)).Sum(b => b.PlayerId == view.PlayerId ? -100 : 10 + view.Players.Single(p => p.Id == b.PlayerId).ResourceCount)).First();
+                    Buildings(view).Where(b => t.Vertices.Contains(b.LocationId)).Sum(b => b.PlayerId == view.PlayerId ? -100 : Pips(t.Number) * 3 + AiOpponentStrategy.Threat(view, b.PlayerId) * 2 + view.Players.Single(p => p.Id == b.PlayerId).ResourceCount)).First();
                 return Make(CommandKind.MoveRobber, destination.Id);
             case GamePhase.RobberSteal:
-                var theft = Make(CommandKind.StealResource); theft.OtherPlayerId = view.PendingDecision.EligibleVictimIds.OrderByDescending(id => view.Players.Single(p => p.Id == id).ResourceCount).First(); return theft;
+                var theft = Make(CommandKind.StealResource); theft.OtherPlayerId = view.PendingDecision.EligibleVictimIds.OrderByDescending(id => AiOpponentStrategy.Threat(view, id) * 2 + view.Players.Single(p => p.Id == id).ResourceCount).First(); return theft;
             case GamePhase.RoadBuilding:
                 return view.LegalEdgeIds.Length == 0 ? Make(CommandKind.FinishRoadBuilding) : Make(CommandKind.PlaceFreeRoad, BestRoad(view, view.LegalEdgeIds));
             case GamePhase.ProductionAwaitRoll:
@@ -57,7 +57,7 @@ public sealed class BaseGameAi
             default: throw new InvalidOperationException("Unexpected phase " + view.Phase);
         }
         if (view.TradeOffer != null)
-        { var offer = view.TradeOffer; return Make(Covers(view.OwnResources, offer.Receive) && TradeValue(view.OwnResources, offer.Give, offer.Receive) >= -0.01 ? CommandKind.AcceptTrade : CommandKind.RejectTrade); }
+        { var offer = view.TradeOffer; return Make(Covers(view.OwnResources, offer.Receive) && TradeValue(view.OwnResources, offer.Give, offer.Receive) - AiOpponentStrategy.TradePenalty(view, offer.ProposerId) >= -0.01 ? CommandKind.AcceptTrade : CommandKind.RejectTrade); }
         if (view.LegalCityVertexIds.Length > 0)
             return Make(CommandKind.BuildCity, view.LegalCityVertexIds.OrderByDescending(v => Value(view, v)).First());
         if (view.LegalVertexIds.Length > 0)
@@ -115,12 +115,26 @@ public sealed class BaseGameAi
         var needs = Resources.Where(r => view.OwnResources[r] < goal[r]).OrderBy(r => view.OwnResources[r] - goal[r]).ToArray();
         var surplus = Resources.Where(r => view.OwnResources[r] > goal[r]).OrderByDescending(r => view.OwnResources[r] - goal[r]).ToArray();
         if (needs.Length == 0 || surplus.Length == 0) return null;
-        var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0)
-            .OrderBy(p => p.VictoryPoints).ThenByDescending(p => p.ResourceCount).ThenBy(p => p.Id, StringComparer.Ordinal).FirstOrDefault();
-        if (partner == null) return null;
-        var give = Bag(); give[surplus[0]] = 1;
-        var receive = Bag(); receive[needs[0]] = 1;
-        return new Command { PlayerId = view.PlayerId, Kind = CommandKind.ProposeTrade, OtherPlayerId = partner.Id, Give = give, Receive = receive };
+        // 只向确实持有所需资源的安全对象报价；近终局交易须带来足够大的自身收益。
+        foreach (var need in needs)
+        foreach (var surplusResource in surplus)
+        {
+            var give = Bag(); give[surplusResource] = 1;
+            var receive = Bag(); receive[need] = 1;
+            double benefit = TradeValue(view.OwnResources, receive, give) + 2;
+            // 自己也只差一分且此报价补齐当前目标时，才重新考虑两三步可赢的对手。
+            // 一步可赢和领先六分的禁令仍以无穷大门槛保持绝对优先。
+            if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 1
+                && Resources.All(r => view.OwnResources[r] + receive[r] - give[r] >= goal[r])) benefit += 16;
+            var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0
+                && AiOpponentStrategy.CanSupply(view.OpponentHands, p.Id, need)
+                && benefit >= AiOpponentStrategy.TradePenalty(view, p.Id))
+                .OrderBy(p => AiOpponentStrategy.TradePenalty(view, p.Id)).ThenBy(p => p.VictoryPoints)
+                .ThenByDescending(p => p.ResourceCount).ThenBy(p => p.Id, StringComparer.Ordinal).FirstOrDefault();
+            if (partner != null)
+                return new Command { PlayerId = view.PlayerId, Kind = CommandKind.ProposeTrade, OtherPlayerId = partner.Id, Give = give, Receive = receive };
+        }
+        return null;
     }
     private static bool Covers(ResourceBag hand, ResourceBag cost) => Resources.All(r => hand[r] >= cost[r]);
     private static PiecePlacement[] Buildings(PlayerView view) => view.Board.Settlements.Concat(view.Board.Cities).ToArray();

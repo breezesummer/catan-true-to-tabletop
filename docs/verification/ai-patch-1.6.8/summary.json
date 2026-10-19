@@ -1,0 +1,755 @@
+{
+  "日期": "2026-10-19",
+  "时区": "Asia/Shanghai",
+  "版本": "1.6.8",
+  "源基线": "8d88206",
+  "验证环境": "macOS / Unity 6000.3.25f1 / .NET SDK 10.0.401",
+  "测试": [
+    {
+      "文件": "rules-final.trx",
+      "总计": 1136,
+      "通过": 1136,
+      "失败": 0,
+      "未执行": 0,
+      "失败明细": []
+    },
+    {
+      "文件": "Catan.Network.Tests.trx",
+      "总计": 115,
+      "通过": 115,
+      "失败": 0,
+      "未执行": 0,
+      "失败明细": []
+    },
+    {
+      "文件": "Catan.Server.Tests.trx",
+      "总计": 23,
+      "通过": 19,
+      "失败": 4,
+      "未执行": 0,
+      "失败明细": [
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.CertificateFingerprintSurvivesRestartAndAnotherWriterIsRejected",
+          "原因": "System.PlatformNotSupportedException : This platform does not support loading with EphemeralKeySet. Remove the flag to allow keys to be temporarily created on disk."
+        },
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.DiscoveryKeepsHealthyRoomsAndReportsTheHostWhoseHttpsListFails",
+          "原因": "System.PlatformNotSupportedException : This platform does not support loading with EphemeralKeySet. Remove the flag to allow keys to be temporarily created on disk."
+        },
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.UnansweredLocalProbeDoesNotAbortDelayedResponseFromAnotherHost",
+          "原因": "System.Net.Sockets.SocketException : Can't assign requested address"
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.MissingCertificateSecretDoesNotSilentlyReplaceTrustedIdentity",
+          "原因": "System.PlatformNotSupportedException : This platform does not support loading with EphemeralKeySet. Remove the flag to allow keys to be temporarily created on disk."
+        }
+      ]
+    },
+    {
+      "文件": "Catan.Audio.Tests.trx",
+      "总计": 219,
+      "通过": 219,
+      "失败": 0,
+      "未执行": 0,
+      "失败明细": []
+    }
+  ],
+  "AI专项": {
+    "AiTradeEmbargoTests": 62,
+    "AiTacticalPatchTests": 22,
+    "Ai20SeafaringSetupTests": 19,
+    "AiOpponentHandViewTests": 13
+  },
+  "完整AI对局": {
+    "局数": 52,
+    "指令总数": 23393,
+    "最少回合": 49,
+    "最多回合": 124,
+    "明细": [
+      {
+        "规则": "seafarers",
+        "剧本": "fog-islands",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P4",
+        "回合": 94,
+        "指令": 510,
+        "秒": 5.87,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "heading-for-new-shores",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P1",
+        "回合": 91,
+        "指令": 500,
+        "秒": 7.74,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "pirate-islands",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P4",
+        "回合": 119,
+        "指令": 695,
+        "秒": 13.06,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "heading-for-new-shores",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 74,
+        "指令": 362,
+        "秒": 4.06,
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "剧本": "heading-for-new-shores",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 86,
+        "指令": 495,
+        "秒": 73.04,
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "剧本": "through-the-desert",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 83,
+        "指令": 460,
+        "秒": 24.41,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "cloth-for-catan",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P2",
+        "回合": 117,
+        "指令": 668,
+        "秒": 61.31,
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "剧本": "through-the-desert",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 71,
+        "指令": 437,
+        "秒": 9.02,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "cloth-for-catan",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 92,
+        "指令": 506,
+        "秒": 6.61,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "wonders-of-catan",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P2",
+        "回合": 124,
+        "指令": 614,
+        "秒": 98.55,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "heading-for-new-shores",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 70,
+        "指令": 367,
+        "秒": 4.69,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "new-world",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P2",
+        "回合": 101,
+        "指令": 565,
+        "秒": 8.56,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "pirate-islands",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P2",
+        "回合": 99,
+        "指令": 532,
+        "秒": 44.63,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "wonders-of-catan",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P1",
+        "回合": 107,
+        "指令": 559,
+        "秒": 41.72,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "four-islands",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 77,
+        "指令": 384,
+        "秒": 4.28,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "wonders-of-catan",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 97,
+        "指令": 466,
+        "秒": 7.52,
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "剧本": "heading-for-new-shores",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P1",
+        "回合": 85,
+        "指令": 537,
+        "秒": 11.14,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "four-islands",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 64,
+        "指令": 324,
+        "秒": 28.08,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "wonders-of-catan",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P1",
+        "回合": 76,
+        "指令": 394,
+        "秒": 25.4,
+        "结果": "Passed"
+      },
+      {
+        "规则": "cities",
+        "剧本": "base",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 105,
+        "指令": 670,
+        "秒": 75.24,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "pirate-islands",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 115,
+        "指令": 611,
+        "秒": 11.25,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "new-world",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P2",
+        "回合": 80,
+        "指令": 437,
+        "秒": 6.78,
+        "结果": "Passed"
+      },
+      {
+        "规则": "cities",
+        "剧本": "base",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 58,
+        "指令": 332,
+        "秒": 13.92,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "cloth-for-catan",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P2",
+        "回合": 104,
+        "指令": 648,
+        "秒": 11.64,
+        "结果": "Passed"
+      },
+      {
+        "规则": "cities",
+        "剧本": "base",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P1",
+        "回合": 50,
+        "指令": 281,
+        "秒": 71.8,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "fog-islands",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P1",
+        "回合": 117,
+        "指令": 579,
+        "秒": 8.34,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "forgotten-tribe",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 94,
+        "指令": 477,
+        "秒": 6.09,
+        "结果": "Passed"
+      },
+      {
+        "规则": "base",
+        "剧本": "base",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P1",
+        "回合": 49,
+        "指令": 233,
+        "秒": 5.15,
+        "结果": "Passed"
+      },
+      {
+        "规则": "base",
+        "剧本": "base",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 80,
+        "指令": 461,
+        "秒": 2.91,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "forgotten-tribe",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P2",
+        "回合": 85,
+        "指令": 468,
+        "秒": 23.15,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "through-the-desert",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P2",
+        "回合": 85,
+        "指令": 429,
+        "秒": 38.0,
+        "结果": "Passed"
+      },
+      {
+        "规则": "base",
+        "剧本": "base",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P1",
+        "回合": 55,
+        "指令": 259,
+        "秒": 5.33,
+        "结果": "Passed"
+      },
+      {
+        "规则": "cities",
+        "剧本": "base",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P2",
+        "回合": 68,
+        "指令": 445,
+        "秒": 25.63,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "new-world",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 107,
+        "指令": 529,
+        "秒": 8.05,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "forgotten-tribe",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P1",
+        "回合": 91,
+        "指令": 481,
+        "秒": 18.15,
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "剧本": "heading-for-new-shores",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P4",
+        "回合": 73,
+        "指令": 536,
+        "秒": 11.74,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "fog-islands",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P4",
+        "回合": 83,
+        "指令": 437,
+        "秒": 39.72,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "fog-islands",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P1",
+        "回合": 65,
+        "指令": 341,
+        "秒": 5.08,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "new-world",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 103,
+        "指令": 521,
+        "秒": 32.52,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "through-the-desert",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P2",
+        "回合": 60,
+        "指令": 314,
+        "秒": 4.57,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "cloth-for-catan",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 76,
+        "指令": 420,
+        "秒": 5.24,
+        "结果": "Passed"
+      },
+      {
+        "规则": "base",
+        "剧本": "base",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P4",
+        "回合": 60,
+        "指令": 322,
+        "秒": 1.71,
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "剧本": "through-the-desert",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 60,
+        "指令": 349,
+        "秒": 5.51,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "heading-for-new-shores",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 58,
+        "指令": 323,
+        "秒": 20.83,
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "剧本": "through-the-desert",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P1",
+        "回合": 50,
+        "指令": 330,
+        "秒": 6.67,
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "剧本": "heading-for-new-shores",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P4",
+        "回合": 80,
+        "指令": 533,
+        "秒": 11.86,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "four-islands",
+        "人数": 4,
+        "种子": 97,
+        "胜者": "P4",
+        "回合": 63,
+        "指令": 329,
+        "秒": 3.29,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "four-islands",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P4",
+        "回合": 70,
+        "指令": 374,
+        "秒": 12.19,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "forgotten-tribe",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 74,
+        "指令": 378,
+        "秒": 36.64,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "through-the-desert",
+        "人数": 3,
+        "种子": 97,
+        "胜者": "P3",
+        "回合": 65,
+        "指令": 305,
+        "秒": 14.6,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "through-the-desert",
+        "人数": 3,
+        "种子": 2027,
+        "胜者": "P3",
+        "回合": 58,
+        "指令": 305,
+        "秒": 3.38,
+        "结果": "Passed"
+      },
+      {
+        "规则": "seafarers",
+        "剧本": "pirate-islands",
+        "人数": 4,
+        "种子": 2027,
+        "胜者": "P4",
+        "回合": 94,
+        "指令": 561,
+        "秒": 9.94,
+        "结果": "Passed"
+      }
+    ]
+  },
+  "构建": {
+    "游戏版本": "1.6.8",
+    "构建宿主": "macOS",
+    "目标": "all",
+    "测试签名": true,
+    "完成时间": "2026-10-19T18:03:10.252025+08:00",
+    "运行验收": "本次仅验证构建与签名；Windows 运行和 Android 真机另行验证。"
+  },
+  "Android": {
+    "version": "1.6.8",
+    "packageId": "com.catandevelopment.threekingdoms",
+    "versionCode": 10608,
+    "minApi": 26,
+    "targetApi": 36,
+    "architectures": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "graphicsApi": "OpenGLES3",
+    "scriptingBackend": "IL2CPP",
+    "ui": "shared-pc-tabletop",
+    "coreAssemblySha256": "3df182776b3ab2f919af66f1dc52c097d354f1b0669a12c85f78a6dc00e3e031",
+    "aiAssemblySha256": "9fbf16f8bf201d4b0ee89f95d849cc6c62250d2087134a9cb78d519b39918187",
+    "signingCertificateSha256": "5a573fab5646d61de99ab72f984562fa98fa068724c39b5bdf48695878cf41e5",
+    "apkSha256": "f7a3da5d51ada510f18d7f0e87cd40aeac89fb8dff5b416e0c3d23b3e86ec83e",
+    "signingPurpose": "build-verification-only"
+  },
+  "产物": [
+    {
+      "路径": "game version/1.6/Catan1.6.8-AI2-Strategy-Patch-SigningTest/Builds/Windows/Catan1.6.8.exe",
+      "字节": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "路径": "game version/1.6/Catan1.6.8-AI2-Strategy-Patch-SigningTest/Builds/Windows/Server/Catan.Server.exe",
+      "字节": 162304,
+      "SHA256": "103aad780562b1bb290c2573d25227e713aa6a8712b0cb71146080d50bcca55f"
+    },
+    {
+      "路径": "game version/1.6/Catan1.6.8-AI2-Strategy-Patch-SigningTest/Builds/Android/Catan1.6.8.apk",
+      "字节": 345925337,
+      "SHA256": "f7a3da5d51ada510f18d7f0e87cd40aeac89fb8dff5b416e0c3d23b3e86ec83e"
+    }
+  ],
+  "程序集": {
+    "Catan.Core": "3df182776b3ab2f919af66f1dc52c097d354f1b0669a12c85f78a6dc00e3e031",
+    "Catan.AI": "9fbf16f8bf201d4b0ee89f95d849cc6c62250d2087134a9cb78d519b39918187",
+    "Catan.Network.Contracts": "60b2ae8c587e13a44bd6709ae691426e569ddb8aa254c8621b5534ac51f718b8"
+  },
+  "验证代码指纹": {
+    "Unity/Catan/Assets/Scripts/M2LocalGameHost.cs": "9445bad6443ef75b754b07b88aa07bf1fe24b77a8077cdd0a9bb7344b1a7af66",
+    "Unity/Catan/Assets/Scripts/M3LocalGameHost.cs": "6c61cfa4ea60ae568a2cc44c66e1cb4dd12767c76aa699a5ac654d5db945e216",
+    "Unity/Catan/Assets/Scripts/M4LocalGameHost.cs": "da8c10704a38ee72f37309a032d35e207eb3016169aff27dfddcd3fb0375414f",
+    "Unity/Catan/Assets/Scripts/M5LocalGameHost.cs": "5ccaeeed0260d0fac2e25e5bf50bb1028b2f3a9914e5adcdc9592a840cd6bac2",
+    "Unity/Catan/Assets/Scripts/M6App.cs": "3fbbf8e947c13c625e2d6609b7bfdc5805592f99bfb52f090974ac878b310600",
+    "Unity/Catan/Assets/Scripts/M6Bindings.cs": "d4b190371307db57df53b3d2ba2f28af7404c7677132a7e9c07e736a31470fd1",
+    "src/Catan.AI/AiHeuristics.cs": "7819c0a4b9767506aca2ce5698d766c7183be4936008baa33e84cc5fa13f2ee4",
+    "src/Catan.AI/AiOpponentStrategy.cs": "eeab3aa0bf69425645dea322f87eeaace065228a49f5582290debb6e8d99305f",
+    "src/Catan.AI/BaseGameAi.cs": "94532d42e8c19e37cdccda9ba8fc1c2932f7dfb7b76fccb5b050e604de02ed14",
+    "src/Catan.AI/CitiesKnightsAi.cs": "7705deb8a9215812e1a8b1f40bd88c35d9ff2baf2fb33b637f7c1073a92c3adf",
+    "src/Catan.AI/CombinedAi.cs": "cf9884b5802c03b3f2387485ebe69273baba585271473aa5ba7f837178cf6069",
+    "src/Catan.AI/SeafarersAi.cs": "673cbf32ffdafeea7cd33b486cc77eb0356b3450d45ea407eccf5c0add01c6fe",
+    "src/Catan.Core/AiOpponentHands.cs": "c6cbb0a48d64656448ead0df2378fcb5ec8a99793a0bdc5251fc2325f21f0c59",
+    "src/Catan.Core/M2GameSession.cs": "97df0b45c2bf7f9be6581aa29089d5098597eb6234dadc066224237cbd599df4",
+    "src/Catan.Core/M2Models.cs": "342069ae783bbebc022fa6f0c0f564a0123b9333540591c1c1295c64648bd167",
+    "src/Catan.Core/M3GameSession.cs": "0e88ecf156b5936d05726dff1cd02c6257631bf0d83297d6147c85eafe032b38",
+    "src/Catan.Core/M3Models.cs": "aa82ff884ec814429f6595adbb345192321897ec350cbee3c4f89f8af7e274c5",
+    "src/Catan.Core/M4GameSession.cs": "d1dfa6958d272466bbe383842fbacdaec7da98bf21a0ae58b2a7359a96866712",
+    "src/Catan.Core/M4Models.cs": "3eed82790898c29e91a85623beb879838af5553481aa25bb5a7596ba95c6156c",
+    "src/Catan.Core/M5GameSession.cs": "d56789b8310c936875dc7d2e91f5caf4af9e012d129095a4ffa00dadf78d925b",
+    "src/Catan.Core/M5Models.cs": "e35de6946660831f5aaeecece393efc14625d277cc76af5f435e9711b587eb33",
+    "src/Catan.Network.Contracts/WireJson.cs": "37aeee4b1cba404787bcc780c3e233a1084afa40c34550afb628636f31b28e53",
+    "src/Catan.Rooms/RuleRoomGame.cs": "f3bf3eb652890b3d8ae0bdd8065a0058e5350d2cf5eda7c73648e891a5258ff2",
+    "tests/Catan.Network.Tests/WireContractAuditTests.cs": "6fe4ace020cb25533048d83ae7a1d6ec91761ad510929f975dab5e4b60d61822",
+    "tests/Catan.Rules.Tests/Ai20SeafaringSetupTests.cs": "40cf6638d1f6a59dbeae78b7c769a77bb13884a725ed73d22d11e761ac699fea",
+    "tests/Catan.Rules.Tests/AiOpponentHandViewTests.cs": "655fd9a6cb7b0b39b57d39c87ac8e666a649c830866bb4cff30623598f3a5798",
+    "tests/Catan.Rules.Tests/AiTacticalPatchTests.cs": "45c65590bbe5f6f3469cc76989a120cdee74ab4678d1ac56081c72a5c66c98e1",
+    "tests/Catan.Rules.Tests/AiTradeEmbargoTests.cs": "bc90312966f4af504f4565184f45002f932dfc50ca8e512977f4ce5f6692975a",
+    "tests/Catan.Rules.Tests/M6FullGameTests.cs": "99442be70c5b7977aa320b6f7340599155dc9aa369f6a2611f21531d11de2122"
+  },
+  "待验事项": [
+    "Windows实际启动和窗口标题",
+    "Android真机安装、触控与真实联机",
+    "用户对战强度试玩",
+    "当前macOS环境下4项服务端证书/回环地址检查失败，不宣称全套服务端通过"
+  ],
+  "APK独立检查": {
+    "版本": "1.6.8",
+    "构建号": 10608,
+    "应用名": "Catan1.6.8",
+    "最低API": 26,
+    "目标API": 36,
+    "架构": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "屏幕方向": "sensorLandscape（6）",
+    "可调试": false,
+    "开发私有路径或密钥文件": [],
+    "签名": "APK v2（独立测试签名）"
+  },
+  "隔离工作区": {
+    "分支": "codex/ai2-strategy-patch",
+    "基线": "8d88206",
+    "原因": "避免纳入原工作区并行开发的1.6.9联机改动"
+  },
+  "产物复制": {
+    "目标": "/Users/breezesummer/开发栈/Project/catan-true-to-tabletop/game version/1.6/Catan1.6.8-AI2-Strategy-Patch-SigningTest",
+    "构建文件数": 532,
+    "核对": "逐文件SHA-256一致；验收记录随后同步附入logs/verification"
+  }
+}

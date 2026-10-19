@@ -66,6 +66,26 @@ public sealed class WireContractAuditTests
         Assert.ThrowsAny<Exception>(() => WireJson.Deserialize<M2.GameState>("{}"));
     }
     [Theory]
+    [InlineData("base")][InlineData("seafarers")][InlineData("cities-knights")][InlineData("combined")]
+    public void AiOpponentHandsCannotEnterNetworkSnapshotsOrBeInjectedByClients(string rules)
+    {
+        dynamic game = rules switch
+        {
+            "base" => (object)M2.BaseGameSession.Create(Scenario, 4, 97),
+            "seafarers" => M3.SeafarersGameSession.Create("heading-for-new-shores", 4, 97),
+            "cities-knights" => M4.CitiesKnightsGameSession.Create(Scenario, 4, 97),
+            _ => M5.CombinedGameSession.Create("heading-for-new-shores", 4, 97)
+        };
+        object aiView = game.GetAiPlayerView("P1");
+        Assert.Equal(3, ((OpponentHandView[])((dynamic)aiView).OpponentHands).Length);
+        string wire = WireJson.SerializeObject(aiView);
+        Assert.DoesNotContain("OpponentHands", wire);
+        Assert.Equal(WireJson.SerializeObject((object)game.GetPlayerView("P1")), wire);
+        dynamic restored = WireJson.Deserialize(wire, aiView.GetType());
+        Assert.Empty((OpponentHandView[])restored.OpponentHands);
+        Assert.ThrowsAny<Exception>(() => WireJson.Deserialize("{\"OpponentHands\":[]}", aiView.GetType()));
+    }
+    [Theory]
     [InlineData("cities")][InlineData("combined")]
     public void PublicBattleStrengthSurvivesTheClientServerWire(string rules)
     {

@@ -40,7 +40,7 @@ public sealed class M6FullGameTests(ITestOutputHelper output)
         while (game.View().Phase.ToString() != "Finished" && count < 10000)
         {
             dynamic status = game.View();
-            dynamic view = game.View(M6Game.Actor(status));
+            dynamic view = game.AiView(M6Game.Actor(status));
             string decision = view.Phase + "/" + view.PendingDecision?.Kind + (view.TradeOffer != null ? "/TradeResponse" : "");
             decisions.Add(decision);
             bool checkDecision = savedDecisions.Add(decision);
@@ -55,7 +55,7 @@ public sealed class M6FullGameTests(ITestOutputHelper output)
                 Assert.Equal(before, game.Save());
                 var restored = M6Game.Load(rules, before!);
                 Assert.Equal(before, restored.Save());
-                Assert.Equal(M6Game.Json(command), M6Game.Json(restored.Decide(restored.View(M6Game.Actor(status)))));
+                Assert.Equal(M6Game.Json(command), M6Game.Json(restored.Decide(restored.AiView(M6Game.Actor(status)))));
                 command.Id = $"m6-{count++}";
                 Assert.Equal(projected, M6Game.Json(view)); // Returned LegalActions must be detached too.
                 game.Accept(command);
@@ -74,7 +74,7 @@ public sealed class M6FullGameTests(ITestOutputHelper output)
         dynamic last = game.View();
         Assert.True(last.Phase.ToString() == "Finished", $"{rules}/{scenario}/{seats}/seed={seed}: {count} commands, turn={last.Turn}, no winner; actions={JsonSerializer.Serialize(actions)}");
         Assert.False(string.IsNullOrEmpty((string?)last.WinnerPlayerId));
-        Assert.Throws<InvalidOperationException>(() => game.Decide(game.View((string)last.WinnerPlayerId)));
+        Assert.Throws<InvalidOperationException>(() => game.Decide(game.AiView((string)last.WinnerPlayerId)));
         Assert.Equal(game.Save(), M6Game.Load(rules, game.Save()).Save());
         output.WriteLine($"rules={rules}, scenario={scenario}, seats={seats}, seed={seed}, winner={last.WinnerPlayerId}, turn={last.Turn}, commands={count}, seconds={clock.Elapsed.TotalSeconds:F2}");
         output.WriteLine("saved-decisions=" + string.Join(",", savedDecisions.Order()));
@@ -86,6 +86,7 @@ public sealed class M6FullGameTests(ITestOutputHelper output)
 internal sealed class M6Game(string rules, object session)
 {
     internal dynamic View(string player = "P1") => ((dynamic)session).GetPlayerView(player);
+    internal dynamic AiView(string player = "P1") => ((dynamic)session).GetAiPlayerView(player);
     internal string Save() => ((dynamic)session).Save();
     internal void AssertInvariants() => ((dynamic)session).AssertInvariants();
     internal dynamic Execute(object command) => ((dynamic)session).Execute((dynamic)command);

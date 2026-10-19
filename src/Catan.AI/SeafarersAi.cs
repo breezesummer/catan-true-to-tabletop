@@ -74,7 +74,7 @@ public sealed class SeafarersAi
             default: throw new InvalidOperationException("Unexpected phase " + view.Phase);
         }
         if (view.TradeOffer != null)
-        { var offer = view.TradeOffer; return Make(Covers(view.OwnResources, offer.Receive) && TradeValue(view.OwnResources, offer.Give, offer.Receive) >= -0.01 ? CommandKind.AcceptTrade : CommandKind.RejectTrade); }
+        { var offer = view.TradeOffer; return Make(Covers(view.OwnResources, offer.Receive) && TradeValue(view.OwnResources, offer.Give, offer.Receive) - AiOpponentStrategy.TradePenalty(view, offer.ProposerId) >= -0.01 ? CommandKind.AcceptTrade : CommandKind.RejectTrade); }
         var me = view.Players.Single(p => p.Id == view.PlayerId);
         var win = view.LegalVertexIds.Where(v => view.OwnVictoryPoints + SettlementPoints(view, v) >= view.TargetVictoryPoints)
             .OrderByDescending(v => SettlementPoints(view, v)).ThenBy(v => v).FirstOrDefault();
@@ -206,12 +206,26 @@ public sealed class SeafarersAi
         var needs = Resources.Where(r => view.OwnResources[r] < goal[r]).OrderBy(r => view.OwnResources[r] - goal[r]).ToArray();
         var surplus = Resources.Where(r => view.OwnResources[r] > goal[r]).OrderByDescending(r => view.OwnResources[r] - goal[r]).ToArray();
         if (needs.Length == 0 || surplus.Length == 0) return null;
-        var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0)
-            .OrderBy(p => p.VictoryPoints).ThenByDescending(p => p.ResourceCount).ThenBy(p => p.Id, StringComparer.Ordinal).FirstOrDefault();
-        if (partner == null) return null;
-        var give = Bag(); give[surplus[0]] = 1;
-        var receive = Bag(); receive[needs[0]] = 1;
-        return new Command { PlayerId = view.PlayerId, Kind = CommandKind.ProposeTrade, OtherPlayerId = partner.Id, Give = give, Receive = receive };
+        // 只向确实持有所需资源的安全对象报价；近终局交易须带来足够大的自身收益。
+        foreach (var need in needs)
+        foreach (var surplusResource in surplus)
+        {
+            var give = Bag(); give[surplusResource] = 1;
+            var receive = Bag(); receive[need] = 1;
+            double benefit = TradeValue(view.OwnResources, receive, give) + 2;
+            // 自己也只差一分且此报价补齐当前目标时，才重新考虑两三步可赢的对手。
+            // 一步可赢和领先六分的禁令仍以无穷大门槛保持绝对优先。
+            if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 1
+                && Resources.All(r => view.OwnResources[r] + receive[r] - give[r] >= goal[r])) benefit += 16;
+            var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0
+                && AiOpponentStrategy.CanSupply(view.OpponentHands, p.Id, need)
+                && benefit >= AiOpponentStrategy.TradePenalty(view, p.Id))
+                .OrderBy(p => AiOpponentStrategy.TradePenalty(view, p.Id)).ThenBy(p => p.VictoryPoints)
+                .ThenByDescending(p => p.ResourceCount).ThenBy(p => p.Id, StringComparer.Ordinal).FirstOrDefault();
+            if (partner != null)
+                return new Command { PlayerId = view.PlayerId, Kind = CommandKind.ProposeTrade, OtherPlayerId = partner.Id, Give = give, Receive = receive };
+        }
+        return null;
     }
     private static bool Covers(ResourceBag hand, ResourceBag cost) => Resources.All(r => hand[r] >= cost[r]);
     private static PiecePlacement[] Buildings(PlayerView view) => view.Board.Settlements.Concat(view.Board.Cities).ToArray();
@@ -224,7 +238,7 @@ public sealed class SeafarersAi
     private static double TheftValue(PlayerView view, string playerId)
     {
         var player = view.Players.Single(p => p.Id == playerId);
-        return player.ResourceCount == 0 ? 0 : 3 + player.VictoryPoints * 0.8 + Math.Min(2, player.ResourceCount * 0.2);
+        return player.ResourceCount == 0 ? 0 : 3 + AiOpponentStrategy.Threat(view, playerId) + Math.Min(2, player.ResourceCount * 0.2);
     }
 
     // 威胁评分只使用公开的产出点数、建筑和航线；优先压制领跑者并避免阻断自己。
@@ -233,7 +247,7 @@ public sealed class SeafarersAi
         var buildings = Buildings(view);
         double RobberValue(Tile tile) => buildings.Where(b => tile.Vertices.Contains(b.LocationId)).Sum(b =>
             b.PlayerId == view.PlayerId ? -10 - Pips(tile.Number) * (view.Board.Cities.Contains(b) ? 2 : 1) :
-            Pips(tile.Number) * (view.Board.Cities.Contains(b) ? 2 : 1) * (0.6 + view.Players.Single(p => p.Id == b.PlayerId).VictoryPoints * 0.1))
+            Pips(tile.Number) * (view.Board.Cities.Contains(b) ? 2 : 1) * (0.6 + AiOpponentStrategy.Threat(view, b.PlayerId) * 0.15))
             + buildings.Where(b => b.PlayerId != view.PlayerId && tile.Vertices.Contains(b.LocationId)).Select(b => TheftValue(view, b.PlayerId)).DefaultIfEmpty(0).Max();
         var destination = view.Board.Tiles.Where(t => t.Id != view.Board.RobberTileId && t.Resource != "sea" && t.Resource != "fog"
             && (view.ScenarioId != "forgotten-tribe" && view.ScenarioId != "cloth-for-catan" || t.Number.HasValue))
@@ -244,7 +258,9 @@ public sealed class SeafarersAi
         double PirateValue(Tile tile)
         {
             var ships = view.Board.Ships.Where(s => view.Board.Edges.Any(e => e.Id == s.LocationId && e.Vertices.All(tile.Vertices.Contains))).ToArray();
-            return ships.Sum(s => s.PlayerId == view.PlayerId ? -12 : 2 + view.Players.Single(p => p.Id == s.PlayerId).VictoryPoints * 0.5)
+            return SeafaringPlanning.PirateBlockadeValue(view.Board.Tiles, view.Board.Edges, buildings, view.Board.Roads,
+                view.Board.Ships.Select(s => (s.PlayerId, s.LocationId)), view.PlayerId, tile.Id,
+                id => AiOpponentStrategy.Threat(view, id))
                 + ships.Where(s => s.PlayerId != view.PlayerId).Select(s => TheftValue(view, s.PlayerId)).DefaultIfEmpty(0).Max();
         }
         var sea = view.Board.Tiles.Where(t => t.Resource == "sea" && t.Id != view.Board.PirateTileId).OrderByDescending(PirateValue).ThenBy(t => t.Id).FirstOrDefault();
@@ -426,7 +442,69 @@ internal static class SeafaringPlanning
         // 每段路或船花两张牌，村庄花四张；按平均每轮一段施工预留四次掷骰的延迟。
         // 同分落点只有额外产出能偿还绕行费用时，才值得多造船追逐肥地。
         var payback = Production(tiles, target) * Math.Max(0, remainingRolls - pathLength * 4);
-        return points * 12 + payback - (4 + pathLength * 2);
+        // 穿越沙漠的彼岸和离岸小岛都奖励两分；可到达的新岛额外优先，避免持续把砖木投入沙漠走廊。
+        var islandPriority = scenarioId == "through-the-desert" && points > 1
+            && IsNewIsland(tiles, buildings.Where(b => b.PlayerId == playerId).ToArray(), target) ? 12 : 0;
+        return points * 12 + payback - (4 + pathLength * 2) + islandPriority;
+    }
+
+    // 沙漠属于同一物理陆块；计分区域虽可能被沙漠分开，却不能据此把陆路彼岸算成独立海岛。
+    private static bool IsNewIsland(Tile[] tiles, PiecePlacement[] owned, string target)
+    {
+        var land = tiles.Where(t => t.Resource != "sea" && t.Resource != "fog").ToArray();
+        var region = land.Where(t => t.Vertices.Contains(target)).ToList();
+        if (region.Count == 0) return false;
+        var visited = region.Select(t => t.Id).ToHashSet();
+        for (var i = 0; i < region.Count; i++)
+            foreach (var next in land.Where(t => !visited.Contains(t.Id) && t.Vertices.Intersect(region[i].Vertices).Count() >= 2))
+            { visited.Add(next.Id); region.Add(next); }
+        return !region.Any(t => owned.Any(b => t.Vertices.Contains(b.LocationId)));
+    }
+
+    // 来源：catan-seafarers-2025-en.pdf，第2页。海盗同时禁止其六条边建船及船舶进出。
+    // 除现存船外，还评估从对方建筑/船尾合法延伸的空边，才能在船到达之前封锁登陆口。
+    internal static double PirateBlockadeValue(Tile[] tiles, Edge[] edges, PiecePlacement[] buildings, PiecePlacement[] roads,
+        IEnumerable<(string playerId, string edgeId)> ships, string playerId, string pirateTileId, Func<string, double> threat)
+    {
+        var tile = tiles.Single(t => t.Id == pirateTileId);
+        var fleet = ships.ToArray();
+        var border = edges.Where(e => e.Vertices.All(tile.Vertices.Contains)).ToArray();
+        var occupied = roads.Select(r => r.LocationId).Concat(fleet.Select(s => s.edgeId)).ToHashSet();
+        var blockedShips = fleet.Where(s => border.Any(e => e.Id == s.edgeId)).ToArray();
+        var value = blockedShips.Sum(s => s.playerId == playerId ? -100 : 8 + Math.Min(120, threat(s.playerId)) * 0.2);
+        var candidates = border.Where(e => !occupied.Contains(e.Id)).ToArray();
+        foreach (var owner in fleet.Select(s => s.playerId).Concat(buildings.Select(b => b.PlayerId)).Distinct())
+        {
+            var owned = buildings.Where(b => b.PlayerId == owner).ToArray();
+            var shipVertices = edges.Where(e => fleet.Any(s => s.playerId == owner && s.edgeId == e.Id)).SelectMany(e => e.Vertices).ToHashSet();
+            bool CanExtend(string v) => !buildings.Any(b => b.LocationId == v && b.PlayerId != owner)
+                && (owned.Any(b => b.LocationId == v) || shipVertices.Contains(v));
+            var landings = new Dictionary<string, bool>();
+            bool CanLand(string v)
+            {
+                if (landings.TryGetValue(v, out var cached)) return cached;
+                var possible = tiles.Any(t => t.Number.HasValue && t.Vertices.Contains(v))
+                    && !buildings.Any(b => b.LocationId == v)
+                    && !edges.Where(e => e.Vertices.Contains(v)).Any(e => buildings.Any(b => e.Vertices.Contains(b.LocationId)))
+                    && IsNewIsland(tiles, owned, v);
+                landings[v] = possible;
+                return possible;
+            }
+            double extension = 0;
+            foreach (var edge in candidates)
+                foreach (var root in edge.Vertices.Where(CanExtend))
+                {
+                    var end = edge.Vertices.First(v => v != root);
+                    if (buildings.Any(b => b.LocationId == end && b.PlayerId != owner)) continue;
+                    // 一船能登岛最急迫；再隔一船仍有阻止扩张的价值，普通船线保持较小权重。
+                    var landing = CanLand(end) ? 14 : edges.Any(next => next.Id != edge.Id && !occupied.Contains(next.Id)
+                        && next.Vertices.Contains(end) && tiles.Any(t => (t.Resource == "sea" || t.Resource == "fog") && next.Vertices.All(t.Vertices.Contains))
+                        && next.Vertices.Any(v => v != end && CanLand(v))) ? 7 : 0;
+                    extension = Math.Max(extension, 6 + landing + Math.Min(120, threat(owner)) * 0.3);
+                }
+            value += owner == playerId ? -extension * 2 : extension;
+        }
+        return value;
     }
 }
 }

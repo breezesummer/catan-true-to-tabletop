@@ -105,6 +105,20 @@ namespace Catan.Core.M3
             }
         }
 
+        /// <summary>由持有权威会话的 AI 调度入口调用；普通显示和网络仍使用 GetPlayerView。</summary>
+        public PlayerView GetAiPlayerView(string playerId)
+        {
+            lock (gate)
+            {
+                var view = GetPlayerView(playerId);
+                view.OpponentHands = state.Players.Where(p => p.Id != playerId).Select(p => new OpponentHandView
+                {
+                    PlayerId = p.Id, Resources = p.Resources.Copy(), DevelopmentCardCount = p.DevelopmentCards.Length,
+                }).ToArray();
+                return view;
+            }
+        }
+
         public PlayerView GetPlayerView(string playerId)
         {
             lock (gate)
