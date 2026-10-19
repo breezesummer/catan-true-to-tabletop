@@ -12,12 +12,33 @@ using M3 = Catan.Core.M3;
 using M4 = Catan.Core.M4;
 using M5 = Catan.Core.M5;
 
-// 独立网络探针：所有测试玩家只能从实际 HTTPS/WSS 响应取得 PlayerView。
+// 独立网络探针：所有测试玩家只能从实际 HTTP(S)/WS(S) 响应取得 PlayerView。
 // 凭据及故障恢复材料只写到调用方指定的 .local 私有验证目录，不进入公开结果。
 internal static class Program
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true, IncludeFields = true };
+    private static readonly SemaphoreSlim RequestGate = new(1, 1);
+    private static long lastRequestAt;
+    private static int pollMs = 35, requestDelayMs;
     private static string Option(string[] args, string name, string fallback = "") { int n = Array.IndexOf(args, name); return n >= 0 && n + 1 < args.Length ? args[n + 1] : fallback; }
+    private static int DelayOption(string[] args, string name, int fallback, int minimum = 0)
+        => int.TryParse(Option(args, name, fallback.ToString()), out int value) && value >= minimum && value <= 60000 ? value : throw new ArgumentException(name + " 必须是 " + minimum + "–60000 的整数毫秒。");
+    // 同一进程内所有 HTTP / WS 请求共用节流；独立工作进程分别使用同一配置。
+    private static async Task PaceRequest()
+    {
+        if (requestDelayMs == 0) return;
+        await RequestGate.WaitAsync();
+        try
+        {
+            if (lastRequestAt != 0)
+            {
+                double remaining = requestDelayMs - Stopwatch.GetElapsedTime(lastRequestAt).TotalMilliseconds;
+                if (remaining > 0) await Task.Delay(TimeSpan.FromMilliseconds(remaining));
+            }
+            lastRequestAt = Stopwatch.GetTimestamp();
+        }
+        finally { RequestGate.Release(); }
+    }
     internal static void Require(bool ok, string message) { if (!ok) throw new InvalidOperationException(message); }
     public static async Task<int> Main(string[] args)
     {
@@ -26,7 +47,13 @@ internal static class Program
             string mode = Option(args, "--mode", "smoke"), directory = Path.GetFullPath(Option(args, "--output", ".local/m7-v001/network"));
             Directory.CreateDirectory(directory);
             if (mode == "worker") { await Worker(Option(args, "--config")); return 0; }
-            string endpoint = Option(args, "--endpoint", "https://127.0.0.1:47781"), pin = File.ReadAllText(Option(args, "--fingerprint")).Trim().Replace(":", "").Replace("-", "");
+            pollMs = DelayOption(args, "--poll-ms", 35, 1);
+            requestDelayMs = DelayOption(args, "--request-delay-ms", 0);
+            string endpoint = Option(args, "--endpoint", "https://127.0.0.1:47781");
+            var address = new Uri(endpoint);
+            Require(address.Scheme is "http" or "https" && string.IsNullOrEmpty(address.UserInfo) && address.AbsolutePath == "/" && string.IsNullOrEmpty(address.Query) && string.IsNullOrEmpty(address.Fragment), "服务地址须为 HTTP / HTTPS 根地址。");
+            string pin = address.Scheme == "https" ? File.ReadAllText(Option(args, "--fingerprint")).Trim().Replace(":", "").Replace("-", "") : "";
+            Require(address.Scheme != "https" || pin.Length == 64 && pin.All(Uri.IsHexDigit), "局域网 HTTPS 验收必须提供有效的 SHA-256 指纹文件。");
             if (mode is "smoke" or "prepare") await Smoke(endpoint, pin, directory);
             else if (mode == "resume") await Resume(endpoint, pin, directory);
             else if (mode == "matrix") await Matrix(endpoint, pin, directory, args.Contains("--all"));
@@ -48,16 +75,28 @@ internal static class Program
     }
     private static async Task Smoke(string endpoint, string pin, string directory)
     {
+        bool tls = new Uri(endpoint).Scheme == "https";
         using var unauthenticated = new Peer(endpoint, pin);
         var wrongProtocol = await unauthenticated.Send(new NetworkRequest { Operation = "List", ProtocolVersion = -1 });
         Require(!wrongProtocol.Success, "错误协议被接受");
-        using (var wrongPin = new Peer(endpoint, new string('0', 64)))
+        if (tls)
         {
+            using var wrongPin = new Peer(endpoint, new string('0', 64));
             bool refused = false; try { await wrongPin.Call("List"); } catch (HttpRequestException) { refused = true; }
             Require(refused, "证书指纹不符仍能建立连接");
         }
         var (peers, start) = await CreateGame(endpoint, pin, "base", "base", 3);
         using var p1 = peers[0]; using var p2 = peers[1]; using var p3 = peers[2];
+        Require(peers.All(peer => !string.IsNullOrEmpty(peer.Credential)) && peers.Select(peer => peer.Credential).Distinct().Count() == peers.Length && peers.Select(peer => peer.SeatId).Distinct().Count() == peers.Length, "验证玩家未使用独立身份和席位");
+        var listing = await unauthenticated.Call("List"); Check(listing, "公开房间列表");
+        Require(listing.Rooms.Any(room => room.RoomId == start.RoomId), "公开列表缺少在线验证房间");
+        Require(listing.ViewJson == null && listing.HistoryJson == null && listing.Credential == null && listing.ConnectionId == null, "公开列表泄露私有席位信息");
+        foreach (var peer in peers)
+        {
+            var snapshot = await peer.Call("Get"); Check(snapshot, "逐席位读取本人视图");
+            InspectSeatView(snapshot.ViewJson, peer.SeatId);
+            Require(!WireJson.Serialize(listing).Contains(peer.Credential, StringComparison.Ordinal), "公开列表泄露恢复凭据");
+        }
         dynamic view = ReadView("base", start.ViewJson);
         var actor = peers.Single(p => p.SeatId == Actor(view, "base"));
         var latest = await actor.Call("Get");
@@ -76,18 +115,39 @@ internal static class Program
         InspectPrivacy(after.ViewJson); InspectPrivacy(history.HistoryJson);
         using (var socket = new ClientWebSocket())
         {
-            socket.Options.RemoteCertificateValidationCallback = (_, cert, _, _) => cert != null && Convert.ToHexString(SHA256.HashData(cert.GetRawCertData())).Equals(pin, StringComparison.OrdinalIgnoreCase);
-            await socket.ConnectAsync(new Uri(endpoint.Replace("https://", "wss://") + "/ws"), CancellationToken.None);
-            var bytes = Encoding.UTF8.GetBytes(WireJson.Serialize(actor.Request("Get")));
-            await socket.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
-            using var data = new MemoryStream(); var buffer = new byte[16384]; WebSocketReceiveResult result;
-            do { result = await socket.ReceiveAsync(buffer, CancellationToken.None); data.Write(buffer, 0, result.Count); } while (!result.EndOfMessage);
-            Check(WireJson.Deserialize<NetworkResponse>(Encoding.UTF8.GetString(data.ToArray())), "WSS读取本人视图");
-            await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+            if (tls) socket.Options.RemoteCertificateValidationCallback = (_, cert, _, _) => cert != null && Convert.ToHexString(SHA256.HashData(cert.GetRawCertData())).Equals(pin, StringComparison.OrdinalIgnoreCase);
+            using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+            var socketAddress = new UriBuilder(endpoint) { Scheme = tls ? "wss" : "ws", Port = new Uri(endpoint).Port, Path = "/ws" }.Uri;
+            await PaceRequest();
+            await socket.ConnectAsync(socketAddress, deadline.Token);
+            var socketRequest = actor.Request("Get");
+            var bytes = Encoding.UTF8.GetBytes(WireJson.Serialize(socketRequest));
+            await PaceRequest();
+            await socket.SendAsync(bytes, WebSocketMessageType.Text, true, deadline.Token);
+            var received = await ReceiveSocket(socket, deadline.Token);
+            Check(received, "WebSocket 读取本人视图");
+            Require(received.RequestId == socketRequest.RequestId, "WebSocket 回执编号不符");
+            InspectSeatView(received.ViewJson, actor.SeatId);
+            var pushed = await ReceiveSocket(socket, deadline.Token);
+            Check(pushed, "WebSocket 推送本人视图");
+            Require(pushed.Code == "Push" && pushed.RequestId == null && pushed.Revision >= received.Revision, "WebSocket 未推送有效最新视图");
+            InspectSeatView(pushed.ViewJson, actor.SeatId);
+            await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", deadline.Token);
         }
-        var durable = await actor.Call("Get"); Check(durable, "WSS断开后同步");
+        var durable = await actor.Call("Get"); Check(durable, "WebSocket 断开后同步");
         File.WriteAllText(Path.Combine(directory, "private-resume.json"), JsonSerializer.Serialize(new ResumeState { Endpoint = endpoint, Pin = pin, Peer = actor.State(), Request = request, Revision = durable.Revision, View = durable.ViewJson }, JsonOptions));
-        WriteResult(directory, "smoke", new { passed = true, checks = 10, protocolRejection = true, certificatePinMismatch = true, separateCredentials = 3, duplicate = true, commandCollision = true, seatForgery = true, unchangedInvalidState = true, history = true, https = true, wss = true });
+        WriteResult(directory, "smoke", new { passed = true, checks = tls ? 13 : 12, transport = tls ? "https" : "http", socketTransport = tls ? "wss" : "ws", certificatePinCheckPerformed = tls, certificatePinMismatch = tls ? (bool?)true : null, separateCredentials = 3, duplicate = true, commandCollision = true, seatForgery = true, unchangedInvalidState = true, history = true, publicLobby = true, seatProjection = true, socketPush = true, http = !tls, ws = !tls, https = tls, wss = tls, requestDelayMs, pollMs });
+    }
+    private static async Task<NetworkResponse> ReceiveSocket(ClientWebSocket socket, CancellationToken cancellation)
+    {
+        using var data = new MemoryStream(); var buffer = new byte[16384]; WebSocketReceiveResult part;
+        do
+        {
+            part = await socket.ReceiveAsync(buffer, cancellation);
+            Require(part.MessageType == WebSocketMessageType.Text && data.Length + part.Count <= NetworkProtocol.MaximumResponseBytes, "WebSocket 响应类型或长度无效");
+            data.Write(buffer, 0, part.Count);
+        } while (!part.EndOfMessage);
+        return WireJson.Deserialize<NetworkResponse>(Encoding.UTF8.GetString(data.ToArray()));
     }
     private static async Task Resume(string endpoint, string pin, string directory)
     {
@@ -96,7 +156,8 @@ internal static class Program
         var resumed = await peer.Call("Reconnect"); Check(resumed, "重启后原席位恢复");
         // 断线席位由服务端 AI 接管，服务恢复后可继续行动；重连不能回退已提交修订号。
         Require(resumed.Revision >= saved.Revision, "服务重启后修订号倒退");
-        InspectPrivacy(resumed.ViewJson);
+        Require(resumed.SeatId == saved.Peer.SeatId, "服务重启后恢复到其他席位");
+        InspectSeatView(resumed.ViewJson, peer.SeatId);
         saved.Request.ConnectionId = peer.ConnectionId; saved.Request.Credential = peer.Credential;
         var retry = await peer.Send(saved.Request);
         Require(retry.Success, "重启后命令重试失败：" + retry.Code);
@@ -106,7 +167,7 @@ internal static class Program
         Require(retry.Revision >= resumed.Revision, "重启后重复命令的房间修订号倒退");
         var old = new NetworkRequest { Operation = "Get", RoomId = peer.RoomId, Credential = peer.Credential, ConnectionId = saved.Peer.ConnectionId };
         Require(!(await peer.Send(old)).Success, "旧连接未被取代");
-        WriteResult(directory, "restart", new { passed = true, restoredSeat = resumed.SeatId, aiTakeoverAware = true, durableLedger = true, staleConnectionRejected = true });
+        WriteResult(directory, "restart", new { passed = true, transport = new Uri(endpoint).Scheme, restoredSeat = resumed.SeatId, aiTakeoverAware = true, durableLedger = true, staleConnectionRejected = true, requestDelayMs, pollMs });
     }
     private static async Task Matrix(string endpoint, string pin, string directory, bool all)
     {
@@ -128,6 +189,7 @@ internal static class Program
                 {
                     dynamic publicView = ReadView(config.rules, current.ViewJson); string seat = Actor(publicView, config.rules);
                     var peer = peers.Single(p => p.SeatId == seat); current = await peer.Call("Get"); Check(current, "取得行动席位视图");
+                    InspectSeatView(current.ViewJson, peer.SeatId);
                     dynamic view = ReadView(config.rules, current.ViewJson); decisions.Add(view.Phase.ToString() + "/" + (view.PendingDecision?.Kind ?? ""));
                     dynamic command = Decide(config.rules, view); command.Id = Guid.NewGuid().ToString("N");
                     var request = peer.Request("Command", WireJson.SerializeObject(command)); request.CommandId = command.Id; request.ExpectedRevision = current.Revision;
@@ -136,9 +198,9 @@ internal static class Program
                     if (count % 100 == 0) Console.WriteLine($"M7_GAME_PROGRESS {config.rules}/{config.scenario}/{config.seats} commands={count}");
                 }
                 Require(current.Room.Finished, "网络整局未达到胜利");
-                foreach (var p in peers) { var response = await p.Call("Get"); Check(response, "终局同步"); InspectPrivacy(response.ViewJson); Require(response.Revision == current.Revision && response.Room.Finished, "终局不同步"); }
+                foreach (var p in peers) { var response = await p.Call("Get"); Check(response, "终局同步"); InspectSeatView(response.ViewJson, p.SeatId); Require(response.Revision == current.Revision && response.Room.Finished, "终局不同步"); }
                 var ordered = latencies.Order().ToArray();
-                var result = new { rules = config.rules, scenario = config.scenario, seats = config.seats, commands = count, retries, seconds = watch.Elapsed.TotalSeconds, p95CommandMs = ordered[(int)((ordered.Length - 1) * .95)], pending = decisions.Order().ToArray(), passed = true };
+                var result = new { rules = config.rules, scenario = config.scenario, seats = config.seats, commands = count, retries, seconds = watch.Elapsed.TotalSeconds, p95CommandMs = ordered[(int)((ordered.Length - 1) * .95)], latencyIncludesRequestPacing = requestDelayMs > 0, requestDelayMs, pollMs, transport = new Uri(endpoint).Scheme, pending = decisions.Order().ToArray(), passed = true };
                 results.Add(result); WriteResult(directory, "matrix", new { passed = true, completed = results.Count, requested = configs.Count, games = results });
                 Console.WriteLine($"M7_GAME_OK {config.rules}/{config.scenario}/{config.seats} commands={count} seconds={watch.Elapsed.TotalSeconds:F1}");
             }
@@ -154,7 +216,7 @@ internal static class Program
             foreach (var p in peers)
             {
                 string config = Path.Combine(directory, "private-worker-" + session + "-" + p.SeatId + ".json");
-                File.WriteAllText(config, JsonSerializer.Serialize(new WorkerConfig { Endpoint = endpoint, Pin = pin, Peer = p.State(), Rules = rules, Output = Path.Combine(directory, "worker-" + session + "-" + p.SeatId + ".json") }, JsonOptions));
+                File.WriteAllText(config, JsonSerializer.Serialize(new WorkerConfig { Endpoint = endpoint, Pin = pin, Peer = p.State(), Rules = rules, PollMs = pollMs, RequestDelayMs = requestDelayMs, Output = Path.Combine(directory, "worker-" + session + "-" + p.SeatId + ".json") }, JsonOptions));
                 var start = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, CreateNoWindow = true };
                 if (string.Equals(Path.GetFileNameWithoutExtension(Environment.ProcessPath), "dotnet", StringComparison.OrdinalIgnoreCase)) start.ArgumentList.Add(typeof(Program).Assembly.Location);
                 start.ArgumentList.Add("--mode"); start.ArgumentList.Add("worker"); start.ArgumentList.Add("--config"); start.ArgumentList.Add(config);
@@ -164,20 +226,23 @@ internal static class Program
             await Task.WhenAll(processes.Select(p => p.WaitForExitAsync(timeout.Token)));
             Require(processes.All(p => p.ExitCode == 0), "独立客户端进程失败");
             var done = await peers[0].Call("Get"); Check(done, "独立进程终局"); Require(done.Room.Finished, "独立进程未完成对局");
-            WriteResult(directory, "process-" + rules + "-" + seats, new { passed = true, rules, scenario, seats, independentClientProcesses = processes.Count, seconds = watch.Elapsed.TotalSeconds, revision = done.Revision });
+            WriteResult(directory, "process-" + rules + "-" + seats, new { passed = true, rules, scenario, seats, independentClientProcesses = processes.Count, seconds = watch.Elapsed.TotalSeconds, revision = done.Revision, transport = new Uri(endpoint).Scheme, requestDelayMs, pollMs });
         }
         finally { foreach (var p in processes) { if (!p.HasExited) p.Kill(true); p.Dispose(); } foreach (var p in peers) p.Dispose(); }
     }
     private static async Task Worker(string configPath)
     {
         var config = JsonSerializer.Deserialize<WorkerConfig>(File.ReadAllText(configPath), JsonOptions)!;
+        pollMs = config.PollMs; requestDelayMs = config.RequestDelayMs;
+        Require(pollMs is >= 1 and <= 60000 && requestDelayMs is >= 0 and <= 60000, "子进程请求节流配置无效");
         using var peer = new Peer(config.Endpoint, config.Pin, config.Peer); int commands = 0, stale = 0; var watch = Stopwatch.StartNew();
         while (watch.Elapsed < TimeSpan.FromMinutes(28))
         {
             var response = await peer.Call("Get"); Check(response, "子进程获取本人视图");
+            InspectSeatView(response.ViewJson, peer.SeatId);
             if (response.Room.Finished) { File.WriteAllText(config.Output, JsonSerializer.Serialize(new { passed = true, seat = peer.SeatId, commands, stale, seconds = watch.Elapsed.TotalSeconds }, JsonOptions)); return; }
             dynamic view = ReadView(config.Rules, response.ViewJson);
-            if (Actor(view, config.Rules) != peer.SeatId) { await Task.Delay(35); continue; }
+            if (Actor(view, config.Rules) != peer.SeatId) { await Task.Delay(pollMs); continue; }
             dynamic command = Decide(config.Rules, view); command.Id = Guid.NewGuid().ToString("N");
             var request = peer.Request("Command", WireJson.SerializeObject(command)); request.CommandId = command.Id; request.ExpectedRevision = response.Revision;
             var result = await peer.Send(request);
@@ -197,13 +262,22 @@ internal static class Program
     }
     private static void InspectPrivacy(string json)
     {
-        foreach (string secret in new[] { "\"RandomState\"", "\"ProcessedCommands\"", "\"Authority\"", "\"DevelopmentDeck\"", "\"ProgressDecks\"", "\"Credential\"" }) Require(!json.Contains(secret, StringComparison.Ordinal), "网络视图包含禁传字段");
+        foreach (string secret in new[] { "\"RandomState\"", "\"InitialSeed\"", "\"ProcessedCommands\"", "\"Authority\"", "\"DevelopmentDeck\"", "\"ProgressDecks\"", "\"Credential\"", "\"CredentialHash\"", "\"OpponentHands\"", "\"FogTileContents\"", "\"GameSave\"" }) Require(!json.Contains(secret, StringComparison.Ordinal), "网络视图包含禁传字段");
+    }
+    private static void InspectSeatView(string json, string seatId)
+    {
+        InspectPrivacy(json);
+        using var document = JsonDocument.Parse(json);
+        Require(document.RootElement.GetProperty("PlayerId").GetString() == seatId, "客户端取得其他席位视图");
+        foreach (var player in document.RootElement.GetProperty("Players").EnumerateArray())
+            foreach (string field in new[] { "Resources", "Commodities", "DevelopmentCards", "ProgressCards" })
+                Require(!player.TryGetProperty(field, out _), "公开玩家投影包含隐藏手牌构成");
     }
     private static void Check(NetworkResponse response, string action) => Require(response.Success, action + "失败：" + response.Code);
     private static void WriteResult(string directory, string name, object result) { File.WriteAllText(Path.Combine(directory, name + ".json"), JsonSerializer.Serialize(result, JsonOptions)); Console.WriteLine("M7_PROBE_OK " + name); }
     public sealed class PeerState { public string RoomId = "", Credential = "", ConnectionId = "", SeatId = "", RuleSet = "", RulesVersion = "", ScenarioVersion = ""; public long Revision; }
     public sealed class ResumeState { public string Endpoint = "", Pin = "", View = ""; public PeerState Peer = new(); public NetworkRequest Request = new(); public long Revision; }
-    public sealed class WorkerConfig { public string Endpoint = "", Pin = "", Rules = "", Output = ""; public PeerState Peer = new(); }
+    public sealed class WorkerConfig { public string Endpoint = "", Pin = "", Rules = "", Output = ""; public PeerState Peer = new(); public int PollMs = 35, RequestDelayMs; }
     private sealed class Peer : IDisposable
     {
         private readonly HttpClient client;
@@ -211,7 +285,8 @@ internal static class Program
         public long Revision;
         public Peer(string endpoint, string pin, PeerState? state = null)
         {
-            var handler = new HttpClientHandler { UseProxy = false, ServerCertificateCustomValidationCallback = (_, cert, _, _) => cert != null && Convert.ToHexString(SHA256.HashData(cert.RawData)).Equals(pin, StringComparison.OrdinalIgnoreCase) };
+            var handler = new HttpClientHandler { UseProxy = false, AllowAutoRedirect = false };
+            if (new Uri(endpoint).Scheme == "https") handler.ServerCertificateCustomValidationCallback = (_, cert, _, _) => cert != null && Convert.ToHexString(SHA256.HashData(cert.RawData)).Equals(pin, StringComparison.OrdinalIgnoreCase);
             client = new HttpClient(handler) { BaseAddress = new Uri(endpoint), Timeout = TimeSpan.FromSeconds(60) };
             if (state != null) { RoomId = state.RoomId; Credential = state.Credential; ConnectionId = state.ConnectionId; SeatId = state.SeatId; RuleSet = state.RuleSet; RulesVersion = state.RulesVersion; ScenarioVersion = state.ScenarioVersion; Revision = state.Revision; }
         }
@@ -229,6 +304,7 @@ internal static class Program
         }
         public async Task<NetworkResponse> Send(NetworkRequest request)
         {
+            await PaceRequest();
             using var response = await client.PostAsync("/api/request", new StringContent(WireJson.Serialize(request), Encoding.UTF8, "application/json"));
             response.EnsureSuccessStatusCode(); var data = WireJson.Deserialize<NetworkResponse>(await response.Content.ReadAsStringAsync());
             if (data.Success) { if (!string.IsNullOrEmpty(data.RoomId)) RoomId = data.RoomId; if (!string.IsNullOrEmpty(data.Credential)) Credential = data.Credential; if (!string.IsNullOrEmpty(data.ConnectionId)) ConnectionId = data.ConnectionId; if (!string.IsNullOrEmpty(data.SeatId)) SeatId = data.SeatId; if (!string.IsNullOrEmpty(data.RuleSet)) RuleSet = data.RuleSet; if (data.Room != null) { RulesVersion = data.Room.RulesVersion; ScenarioVersion = data.Room.ScenarioVersion; } Revision = data.Revision; }

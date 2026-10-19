@@ -1,0 +1,23 @@
+[Unit]
+Description=卡坦岛之三国争霸在线房间服务
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=catan
+Group=catan
+WorkingDirectory=/opt/catan-server/current
+ExecStart=/opt/catan-server/current/Catan.Server --mode online --data-dir /var/lib/catan-m7 --port 47771
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=45
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/catan-m7
+
+[Install]
+WantedBy=multi-user.target

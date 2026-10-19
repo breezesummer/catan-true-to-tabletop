@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "rules": "combined",
+  "scenario": "through-the-desert",
+  "seats": 4,
+  "independentClientProcesses": 4,
+  "seconds": 149.2621292,
+  "revision": 291,
+  "transport": "http",
+  "requestDelayMs": 250,
+  "pollMs": 500
+}

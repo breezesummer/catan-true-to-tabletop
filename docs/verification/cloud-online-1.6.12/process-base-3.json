@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "rules": "base",
+  "scenario": "base",
+  "seats": 3,
+  "independentClientProcesses": 3,
+  "seconds": 224.6013136,
+  "revision": 429,
+  "transport": "http",
+  "requestDelayMs": 250,
+  "pollMs": 500
+}

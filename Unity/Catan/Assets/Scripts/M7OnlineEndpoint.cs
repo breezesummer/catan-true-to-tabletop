@@ -5,6 +5,7 @@ using System.Net;
 public static class M7OnlineEndpoint
 {
     public const int DefaultPort=47771;
+    public const string DefaultEndpoint="http://175.178.212.142:47771";
     public static string Normalize(string address)
     {
         string value=(address??"").Trim();

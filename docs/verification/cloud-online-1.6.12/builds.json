@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-20",
+  "version": "1.6.12",
+  "buildRoot": "game version/1.6/Catan1.6.12-Cloud-Online",
+  "pc": "Builds/Windows/Catan1.6.12.exe",
+  "android": "Builds/Android/Catan1.6.12.apk",
+  "linuxServer": "Server/linux-x64/Catan.Server",
+  "pcManagedSha256": "6c25f3225994f775b4a0212d5b3167041d9be8e8f2ca101041ae4869be46550c",
+  "androidSha256": "6d27697893e95bcb019cb88283d63f4392ad3735a5ac0188d124379d7ec878b2",
+  "linuxServerAssemblySha256": "a8e0496149ed62a05a3b96fe6aabd3fcbc5930a927519b2b7df39b221c2e54b9",
+  "generatedUnityFilesRestored": 129,
+  "retentionKept": 5,
+  "retentionRemoved": [
+    "Catan1.6.5-Card-Interaction-Audio"
+  ],
+  "androidSigningMatches1_6_11": true
+}

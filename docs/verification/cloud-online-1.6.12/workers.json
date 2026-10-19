@@ -1,0 +1,30 @@
+[
+  {
+    "rules": "base",
+    "clients": 3,
+    "commands": 422,
+    "stale": 0,
+    "passed": true
+  },
+  {
+    "rules": "seafarers",
+    "clients": 4,
+    "commands": 508,
+    "stale": 0,
+    "passed": true
+  },
+  {
+    "rules": "cities-knights",
+    "clients": 4,
+    "commands": 471,
+    "stale": 0,
+    "passed": true
+  },
+  {
+    "rules": "combined",
+    "clients": 4,
+    "commands": 282,
+    "stale": 0,
+    "passed": true
+  }
+]

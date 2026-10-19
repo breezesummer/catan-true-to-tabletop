@@ -27,6 +27,7 @@ TestResults/
 *.suo
 
 # Local caches and credentials
+/codex.pem
 __pycache__/
 *.pyc
 .venv/

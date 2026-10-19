@@ -1,6 +1,6 @@
 param(
     [ValidateSet('All','Windows','Android','Server')][string]$Target='All',
-    [string]$OutputRoot='game version/1.6/Catan1.6.11-Pause-Menu-Card-UI',
+    [string]$OutputRoot='game version/1.6/Catan1.6.12-Cloud-Online',
     [switch]$VerifyPlayer,
     [switch]$Arm64Only
 )

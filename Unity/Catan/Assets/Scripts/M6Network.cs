@@ -33,7 +33,11 @@ public sealed partial class M6App
     void InitializeNetwork()
     {
         // 显式验收入口使用独立配置，不读取玩家保存的服务器地址。
-        if(!OnlineReviewMode)menuOnlineAddress=PlayerPrefs.GetString(OnlineAddressPreference,"");
+        if(!OnlineReviewMode)
+        {
+            menuOnlineAddress=PlayerPrefs.GetString(OnlineAddressPreference,M7OnlineEndpoint.DefaultEndpoint);
+            if(string.IsNullOrWhiteSpace(menuOnlineAddress))menuOnlineAddress=M7OnlineEndpoint.DefaultEndpoint;
+        }
         networkOnlineDraft=menuOnlineAddress;
         Network=gameObject.AddComponent<M7Client>();Network.ViewChanged+=ApplyNetworkView;
         Network.SessionEnded+=CloseNetworkPresentation;

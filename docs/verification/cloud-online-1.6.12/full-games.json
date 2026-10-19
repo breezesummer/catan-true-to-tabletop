@@ -1,0 +1,73 @@
+{
+  "passed": true,
+  "games": 4,
+  "totalIndependentClientProcesses": 15.0,
+  "totalCommands": 1683.0,
+  "totalStale": 0.0,
+  "results": [
+    {
+      "rules": "base",
+      "scenario": "base",
+      "seats": 3,
+      "passed": true,
+      "independentClientProcesses": 3,
+      "completedWorkers": 3,
+      "allWorkersPassed": true,
+      "commands": 422.0,
+      "stale": 0.0,
+      "seconds": 224.6013136,
+      "revision": 429,
+      "transport": "http",
+      "requestDelayMs": 250,
+      "pollMs": 500
+    },
+    {
+      "rules": "seafarers",
+      "scenario": "heading-for-new-shores",
+      "seats": 4,
+      "passed": true,
+      "independentClientProcesses": 4,
+      "completedWorkers": 4,
+      "allWorkersPassed": true,
+      "commands": 508.0,
+      "stale": 0.0,
+      "seconds": 434.5953287,
+      "revision": 517,
+      "transport": "http",
+      "requestDelayMs": 250,
+      "pollMs": 500
+    },
+    {
+      "rules": "cities-knights",
+      "scenario": "base",
+      "seats": 4,
+      "passed": true,
+      "independentClientProcesses": 4,
+      "completedWorkers": 4,
+      "allWorkersPassed": true,
+      "commands": 471.0,
+      "stale": 0.0,
+      "seconds": 383.8357141,
+      "revision": 480,
+      "transport": "http",
+      "requestDelayMs": 250,
+      "pollMs": 500
+    },
+    {
+      "rules": "combined",
+      "scenario": "through-the-desert",
+      "seats": 4,
+      "passed": true,
+      "independentClientProcesses": 4,
+      "completedWorkers": 4,
+      "allWorkersPassed": true,
+      "commands": 282.0,
+      "stale": 0.0,
+      "seconds": 149.2621292,
+      "revision": 291,
+      "transport": "http",
+      "requestDelayMs": 250,
+      "pollMs": 500
+    }
+  ]
+}

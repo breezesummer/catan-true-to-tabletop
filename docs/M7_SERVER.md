@@ -2,7 +2,7 @@
 
 日期：2026-10-15；当前行为更新于 2026-10-19。服务端使用 ASP.NET Core / .NET 10，同一代码可发布为 Windows 局域网后台服务或 Linux 在线服务。按用户要求，在线模式直接通过公网 IP 使用 HTTP `/api/request` 和 WS `/ws`，不要求域名和证书；局域网模式保留 HTTPS/WSS 与自动证书发现。规则、随机数、当前 AI、命令去重及权威存档均留在服务端。
 
-当前用户要求持久访客凭据、存档不自动删除、房间公开可加入（设密码时校验密码）；2026-10-17 更新为离线 AI 接管、重连下一次本人行动时交还控制。服务运行时，即使全体人类离线也继续推进至完局；本轮仍以本机可验证部分为范围。当前没有用户云服务器，本文件提供部署方法，不代表已部署在线大厅或通过跨网络验收。
+当前用户要求持久访客凭据、存档不自动删除、房间公开可加入（设密码时校验密码）；2026-10-17 更新为离线 AI 接管、重连下一次本人行动时交还控制。服务运行时，即使全体人类离线也继续推进至完局。2026-10-20 已实际部署用户云服务器，在线地址为 `http://175.178.212.142:47771`，客户端填写 `175.178.212.142:47771`。部署、验证范围和剩余待验项见 [云端验证记录](verification/cloud-online-1.6.12/README.md)。
 
 ## Windows 随包服务
 
@@ -12,7 +12,7 @@
 pwsh -NoProfile -File tools/development/Build-M7Server.ps1
 ```
 
-默认输出 `game version/1.6/Catan1.6.9-Online-Ip-Lobby/Builds/Windows/Server/Catan.Server.exe`，连同该目录所有文件一起放在游戏 EXE 旁的 `Server` 目录。该发布包含 .NET 运行时；是否能在未安装 .NET 的清洁 Windows 机器运行仍须实际验证，不能用开发机成功启动代替。
+默认输出 `game version/1.6/Catan1.6.12-Cloud-Online/Builds/Windows/Server/Catan.Server.exe`，连同该目录所有文件一起放在游戏 EXE 旁的 `Server` 目录。该发布包含 .NET 运行时；是否能在未安装 .NET 的清洁 Windows 机器运行仍须实际验证，不能用开发机成功启动代替。
 
 手动启动示例：
 
@@ -54,7 +54,7 @@ WS/WSS 首次成功加入/重连/读取后绑定该物理连接的凭据、控�
 
 UDP 查询为 ASCII `CATAN_M7_DISCOVER_V1`。回应为 UTF-8 JSON，字段为 `game`、`protocolVersion`、`serverName`、`httpsPort`、`certificateFingerprint`、`rooms`，只含最多三个公开房间的名称/规则/人数/开始/密码标记。客户端使用响应源 IP 加 HTTPS 端口连接。发现仅响应 RFC1918、环回与链路本地源地址，每源地址 10 秒 4 次，响应不超过 1200 字节。客户端收到服务发现后，会通过绑定该证书的 HTTPS 查询完整当前房间列表；无在线人类、已关闭和已结束的房间不列出。未列出但未关闭的大厅可按房间号加入；已开局房间只允许原身份恢复。
 
-## Linux 在线部署准备
+## Linux 在线部署
 
 在开发机发布相应平台：
 
@@ -101,6 +101,6 @@ HTTP/WS 按用户选择明文传输，房间密码、玩家恢复凭据及所属
 
 升级时先停止服务、备份整个私有目录及权限，然后替换程序，再用同一目录启动。不要同时运行两个进程或实例写同一份存档，不将私有目录放入分享包或公开网站。自包含程序的运行时安全更新需要重新发布。
 
-部署之后仍需真实跨运营商网络、多人完整局、断线与进程重启、长期内存/延迟/容量和清洁环境验收。未进行这些检查前，M7 总阶段退出条件仍未全部满足。此次不修改既有随机算法；面向陌生人的大规模开放需要单独评估随机状态推断和滥用风险。
+本轮公网独立客户端完整局、正式 Windows 客户端重连及实际服务进程重启的已通过范围见 [云端验收](verification/cloud-online-1.6.12/README.md)。真实多台玩家设备、跨运营商、Android 真机、复杂断网组合、长期内存／延迟／容量和清洁环境仍须分别验收，M7 总阶段退出条件尚未全部满足。此次不修改既有随机算法；面向陌生人的大规模开放需要单独评估随机状态推断和滥用风险。
 
 实现参考：[微软 WebSocket 生命周期及保活说明](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/websockets?view=aspnetcore-10.0)、[Kestrel HTTPS 端点配置](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/endpoints?view=aspnetcore-10.0)。实际测试结果集中记录在 M7 验收文档，不用部署示例代替部署事实。

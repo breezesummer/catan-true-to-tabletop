@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "transport": "http",
+  "restoredSeat": "P3",
+  "aiTakeoverAware": true,
+  "durableLedger": true,
+  "staleConnectionRejected": true,
+  "requestDelayMs": 250,
+  "pollMs": 500
+}
