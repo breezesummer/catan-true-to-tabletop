@@ -1,0 +1,769 @@
+{
+  "schema": "ultra-u0-performance-comparison-v1",
+  "date": "2026-10-21",
+  "version": "1.7.0",
+  "sourceCommit": "e58b314",
+  "foregroundRounds": [
+    2,
+    3
+  ],
+  "backgroundControlRound": 1,
+  "windowsVisibleAuthorized": true,
+  "codeModified": false,
+  "theme": "真实桌游",
+  "target": {
+    "width": 1920,
+    "height": 1080,
+    "targetFps": 60,
+    "vSyncCount": 1,
+    "msaa": 4,
+    "renderScale": 1,
+    "api": "Direct3D11",
+    "p95BudgetMs": 18.3
+  },
+  "allAuthorityUnchanged": true,
+  "foregroundP95Comparison": [
+    {
+      "scenario": "ordinary",
+      "p95Round2Ms": 17.0475,
+      "p95Round3Ms": 17.0619,
+      "absoluteP95DifferenceMs": 0.0144
+    },
+    {
+      "scenario": "maximum",
+      "p95Round2Ms": 16.9806,
+      "p95Round3Ms": 17.0542,
+      "absoluteP95DifferenceMs": 0.0736
+    },
+    {
+      "scenario": "crowded",
+      "p95Round2Ms": 16.8986,
+      "p95Round3Ms": 16.9199,
+      "absoluteP95DifferenceMs": 0.0213
+    },
+    {
+      "scenario": "fog",
+      "p95Round2Ms": 17.0528,
+      "p95Round3Ms": 17.086,
+      "absoluteP95DifferenceMs": 0.0332
+    }
+  ],
+  "rounds": [
+    {
+      "round": 1,
+      "scenario": "ordinary",
+      "foregroundComparison": false,
+      "sampleCount": 1801,
+      "focusedFrames": 0,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6651,
+        "p95": 16.9364,
+        "p99": 17.0863,
+        "max": 17.8468
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.662,
+        "p95": 16.9295,
+        "p99": 17.0218,
+        "max": 17.357
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.66604,
+        "p95": 15.98636,
+        "p99": 16.12904,
+        "max": 16.32344
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        918,
+        918,
+        918
+      ],
+      "allocatedPeakBytes": 119123110,
+      "reservedPeakBytes": 227004416,
+      "monoUsedPeakBytes": 14942208,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1238,
+        "p95": 1238,
+        "p99": 1238,
+        "max": 1238
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 464813,
+        "p95": 464813,
+        "p99": 464813,
+        "max": 464813
+      },
+      "csvSha256": "ea91459e9f6ff6eca25974ef57d93db0a09b563e54704ce8bb918fb250bcb953",
+      "summarySha256": "b37493956cfc794ddc9a555e35257a52ed77a6268c59b2ee0f6fd10dffd9738d"
+    },
+    {
+      "round": 1,
+      "scenario": "maximum",
+      "foregroundComparison": false,
+      "sampleCount": 1801,
+      "focusedFrames": 0,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6669,
+        "p95": 16.9028,
+        "p99": 17.0121,
+        "max": 17.184
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.669,
+        "p95": 16.892,
+        "p99": 16.9796,
+        "max": 17.1258
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.55368,
+        "p95": 15.89324,
+        "p99": 16.05616,
+        "max": 16.37732
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        748,
+        748,
+        748
+      ],
+      "allocatedPeakBytes": 121176262,
+      "reservedPeakBytes": 227004416,
+      "monoUsedPeakBytes": 17858560,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1534,
+        "p95": 1534,
+        "p99": 1534,
+        "max": 1534
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 491407,
+        "p95": 491407,
+        "p99": 491407,
+        "max": 491407
+      },
+      "csvSha256": "65b9358fdc23567b50551816e5afbbdb2cbb12209be626a1d4294ece3d77aa4f",
+      "summarySha256": "35e155bae57c8ebd1443a9b849dfb539dfedb1bee68340406b5ba851bd0d1f46"
+    },
+    {
+      "round": 1,
+      "scenario": "crowded",
+      "foregroundComparison": false,
+      "sampleCount": 1801,
+      "focusedFrames": 0,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6677,
+        "p95": 16.8407,
+        "p99": 16.983,
+        "max": 19.0514
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.6673,
+        "p95": 16.8206,
+        "p99": 16.9491,
+        "max": 64.2925
+      },
+      "gpuMs": {
+        "validSamples": 1797,
+        "p50": 15.61556,
+        "p95": 15.83892,
+        "p99": 15.96292,
+        "max": 18.8486
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 0.997779,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        1469,
+        1469,
+        1469
+      ],
+      "allocatedPeakBytes": 150845526,
+      "reservedPeakBytes": 260558848,
+      "monoUsedPeakBytes": 23175168,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1934,
+        "p95": 1934,
+        "p99": 1934,
+        "max": 1934
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 1869383,
+        "p95": 1869383,
+        "p99": 1869383,
+        "max": 1869383
+      },
+      "csvSha256": "f342465f6ffdeaa8bd5186adc52dec814c5d460e4a0623d152b9eb5df789f47c",
+      "summarySha256": "2c91035ffb75feb22ba0a34c63f0f94d5ed83baaae8bfc8d5e92aa642d8bad46"
+    },
+    {
+      "round": 1,
+      "scenario": "fog",
+      "foregroundComparison": false,
+      "sampleCount": 1801,
+      "focusedFrames": 0,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6606,
+        "p95": 16.9817,
+        "p99": 17.0821,
+        "max": 17.2014
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.6636,
+        "p95": 16.9624,
+        "p99": 17.0522,
+        "max": 17.1744
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.58704,
+        "p95": 16.1356,
+        "p99": 16.27344,
+        "max": 16.4186
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        629,
+        629,
+        629
+      ],
+      "allocatedPeakBytes": 150152182,
+      "reservedPeakBytes": 260558848,
+      "monoUsedPeakBytes": 20844544,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1440,
+        "p95": 1440,
+        "p99": 1440,
+        "max": 1440
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 526995,
+        "p95": 526995,
+        "p99": 526995,
+        "max": 526995
+      },
+      "csvSha256": "73e0407d19d22265a526fcfc2dcde37cac7fd456ff353cb68989f9bc8d77d6dc",
+      "summarySha256": "a68f83b8c414c1c684da44bbf8946edea7934011cba83240c62c374c33c84822"
+    },
+    {
+      "round": 2,
+      "scenario": "ordinary",
+      "foregroundComparison": true,
+      "sampleCount": 1801,
+      "focusedFrames": 1801,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6748,
+        "p95": 17.0475,
+        "p99": 17.2932,
+        "max": 17.7317
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.6758,
+        "p95": 17.0167,
+        "p99": 17.2497,
+        "max": 17.6678
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.66176,
+        "p95": 16.1506,
+        "p99": 16.31104,
+        "max": 16.51616
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        921,
+        921,
+        921
+      ],
+      "allocatedPeakBytes": 119167350,
+      "reservedPeakBytes": 227004416,
+      "monoUsedPeakBytes": 14983168,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1238,
+        "p95": 1238,
+        "p99": 1238,
+        "max": 1238
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 464813,
+        "p95": 464813,
+        "p99": 464813,
+        "max": 464813
+      },
+      "csvSha256": "0740932e3262c8f04abfbd61c4f560db395d1d009b0f767ae860805d0596d3ec",
+      "summarySha256": "c3b5ca2df9c319000869312426c413e86b60ead2be3aa6dc759ed6121ec0677d"
+    },
+    {
+      "round": 2,
+      "scenario": "maximum",
+      "foregroundComparison": true,
+      "sampleCount": 1801,
+      "focusedFrames": 1801,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6693,
+        "p95": 16.9806,
+        "p99": 17.1938,
+        "max": 17.5822
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.6668,
+        "p95": 16.9267,
+        "p99": 17.1361,
+        "max": 17.5148
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.55536,
+        "p95": 15.98748,
+        "p99": 16.23712,
+        "max": 16.47192
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        748,
+        748,
+        748
+      ],
+      "allocatedPeakBytes": 121025950,
+      "reservedPeakBytes": 227004416,
+      "monoUsedPeakBytes": 17813504,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1534,
+        "p95": 1534,
+        "p99": 1534,
+        "max": 1534
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 491407,
+        "p95": 491407,
+        "p99": 491407,
+        "max": 491407
+      },
+      "csvSha256": "2e7271cd5f710738dbd9497edaecc38f573b885dee9e841925ca4a8464e3d312",
+      "summarySha256": "745462ca7b431ee4b38ecfde23f5df0f1b75abe498c2131ac371648ef704c035"
+    },
+    {
+      "round": 2,
+      "scenario": "crowded",
+      "foregroundComparison": true,
+      "sampleCount": 1801,
+      "focusedFrames": 1801,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6628,
+        "p95": 16.8986,
+        "p99": 17.023,
+        "max": 22.9372
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.667,
+        "p95": 16.8314,
+        "p99": 17.0208,
+        "max": 61.6912
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.57392,
+        "p95": 15.77548,
+        "p99": 15.8538,
+        "max": 22.13418
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        1441,
+        1441,
+        1441
+      ],
+      "allocatedPeakBytes": 150710366,
+      "reservedPeakBytes": 260558848,
+      "monoUsedPeakBytes": 23986176,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1934,
+        "p95": 1934,
+        "p99": 1934,
+        "max": 1934
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 1869383,
+        "p95": 1869383,
+        "p99": 1869383,
+        "max": 1869383
+      },
+      "csvSha256": "bbc253963d68feba161a4b7706f8a22bce29f81fe578a01735a2229f07d66567",
+      "summarySha256": "f63db7c529ea3db9526b4c0990fab5eff6c6bccac76fc2772942db0aa4103bdb"
+    },
+    {
+      "round": 2,
+      "scenario": "fog",
+      "foregroundComparison": true,
+      "sampleCount": 1801,
+      "focusedFrames": 1801,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6719,
+        "p95": 17.0528,
+        "p99": 17.2753,
+        "max": 17.5915
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.6726,
+        "p95": 17.0186,
+        "p99": 17.208,
+        "max": 17.5431
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.57648,
+        "p95": 16.10828,
+        "p99": 16.30744,
+        "max": 16.47264
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        615,
+        615,
+        615
+      ],
+      "allocatedPeakBytes": 150019830,
+      "reservedPeakBytes": 260558848,
+      "monoUsedPeakBytes": 21004288,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1440,
+        "p95": 1440,
+        "p99": 1440,
+        "max": 1440
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 526995,
+        "p95": 526995,
+        "p99": 526995,
+        "max": 526995
+      },
+      "csvSha256": "7e212a91124390660b143d17f84f73c420036f060a07e326095935e857e7e5f5",
+      "summarySha256": "a03bac15a52e6c0eb00f5f0d9119f5696a6024cb0812b7d7c4d3af9d435c3b78"
+    },
+    {
+      "round": 3,
+      "scenario": "ordinary",
+      "foregroundComparison": true,
+      "sampleCount": 1801,
+      "focusedFrames": 1801,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6687,
+        "p95": 17.0619,
+        "p99": 17.2802,
+        "max": 17.7917
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.6718,
+        "p95": 16.9944,
+        "p99": 17.1997,
+        "max": 17.7717
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.64416,
+        "p95": 16.17044,
+        "p99": 16.34376,
+        "max": 16.57192
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        918,
+        918,
+        918
+      ],
+      "allocatedPeakBytes": 119075126,
+      "reservedPeakBytes": 227004416,
+      "monoUsedPeakBytes": 14942208,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1238,
+        "p95": 1238,
+        "p99": 1238,
+        "max": 1238
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 464813,
+        "p95": 464813,
+        "p99": 464813,
+        "max": 464813
+      },
+      "csvSha256": "30dd092c8f0beb20293a42213d20d399875b50a3f136ce73b34833f49f693171",
+      "summarySha256": "f9909eb8e014f0727abd00eae1be8bb4587350a9bed0db449d9380e84044f639"
+    },
+    {
+      "round": 3,
+      "scenario": "maximum",
+      "foregroundComparison": true,
+      "sampleCount": 1801,
+      "focusedFrames": 1801,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.666,
+        "p95": 17.0542,
+        "p99": 17.2165,
+        "max": 17.5326
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.6686,
+        "p95": 16.9713,
+        "p99": 17.1883,
+        "max": 17.5178
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.5142,
+        "p95": 16.00152,
+        "p99": 16.21808,
+        "max": 16.42492
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        737,
+        737,
+        737
+      ],
+      "allocatedPeakBytes": 121143518,
+      "reservedPeakBytes": 227004416,
+      "monoUsedPeakBytes": 17981440,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1534,
+        "p95": 1534,
+        "p99": 1534,
+        "max": 1534
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 491407,
+        "p95": 491407,
+        "p99": 491407,
+        "max": 491407
+      },
+      "csvSha256": "c58fd131f7946b05389ac28155be51d7184f51f3e821c5f4623b59743a67fa56",
+      "summarySha256": "2db490479b7215ac90182de7d022348585a992ff734cf7145d6a6311a640a229"
+    },
+    {
+      "round": 3,
+      "scenario": "crowded",
+      "foregroundComparison": true,
+      "sampleCount": 1801,
+      "focusedFrames": 1801,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6669,
+        "p95": 16.9199,
+        "p99": 17.0183,
+        "max": 20.2711
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.6671,
+        "p95": 16.8746,
+        "p99": 17.034,
+        "max": 61.0255
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.57676,
+        "p95": 15.77204,
+        "p99": 15.86312,
+        "max": 19.32076
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        1447,
+        1447,
+        1447
+      ],
+      "allocatedPeakBytes": 150706102,
+      "reservedPeakBytes": 260558848,
+      "monoUsedPeakBytes": 23080960,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1934,
+        "p95": 1934,
+        "p99": 1934,
+        "max": 1934
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 1869383,
+        "p95": 1869383,
+        "p99": 1869383,
+        "max": 1869383
+      },
+      "csvSha256": "8c59baff7169de7729cd50e86d75701f8dfb528687ca0a253117008fd1e7c16e",
+      "summarySha256": "b1eb6d9f8361a07c7a6e6dec8d4a7c1acf845481169c9e116f18ca7aa2ca2b84"
+    },
+    {
+      "round": 3,
+      "scenario": "fog",
+      "foregroundComparison": true,
+      "sampleCount": 1801,
+      "focusedFrames": 1801,
+      "renderedFrames": 1802,
+      "frameMs": {
+        "validSamples": 1801,
+        "p50": 16.6684,
+        "p95": 17.086,
+        "p99": 17.2634,
+        "max": 17.5971
+      },
+      "spikesOver50Ms": 0,
+      "p95BudgetMs": 18.3,
+      "p95WithinBudget": true,
+      "cpuMs": {
+        "validSamples": 1801,
+        "p50": 16.6748,
+        "p95": 17.0049,
+        "p99": 17.2451,
+        "max": 17.5094
+      },
+      "gpuMs": {
+        "validSamples": 1801,
+        "p50": 15.5688,
+        "p95": 16.11136,
+        "p99": 16.3486,
+        "max": 16.56304
+      },
+      "cpuTimingCoverage": 1,
+      "gpuTimingCoverage": 1,
+      "gcAllocationCoverage": 0,
+      "gcCollections": [
+        628,
+        628,
+        628
+      ],
+      "allocatedPeakBytes": 150032710,
+      "reservedPeakBytes": 260558848,
+      "monoUsedPeakBytes": 20848640,
+      "drawCalls": {
+        "validSamples": 1801,
+        "p50": 1440,
+        "p95": 1440,
+        "p99": 1440,
+        "max": 1440
+      },
+      "triangles": {
+        "validSamples": 1801,
+        "p50": 526995,
+        "p95": 526995,
+        "p99": 526995,
+        "max": 526995
+      },
+      "csvSha256": "7a43adabfb3a0fed2b9a37ebc2985aa27291b75fc0497d38ecd6761bb2973a3c",
+      "summarySha256": "b62af694bf9bb8e09d4c14a9ed50570d45fb65a9419fe724cede4e08379f0761"
+    }
+  ],
+  "notes": [
+    "第1轮可见但全部无焦点，保留为后台对照；第2和3轮全程有焦点，构成同条件复测。",
+    "CPU/GPU来自异步FrameTimingManager；拥挤局面的起始CPU时序峰保留，不能与同条frameMs认作同一帧。",
+    "GC分配计数器不可用；进程工作集返回0不可用。GC摘要的区间边界在CSV之外，不能由首末行完全复算。",
+    "第1轮日志含DXGI GetFrameStatistics时间戳异常；第2和3轮是否有同类异常以原始日志及独立复核为准。",
+    "首轮调用外层检查了环境初始化遗留LASTEXITCODE并抛错；采样脚本已核验实际游戏退出码、成功标记和result，launch证明内部完整流程完成。",
+    "本结果只覆盖暂停规则/AI的短时固定镜头，不代表正常对局、Android或长期热稳定。"
+  ]
+}

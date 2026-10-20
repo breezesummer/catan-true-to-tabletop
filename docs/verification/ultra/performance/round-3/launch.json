@@ -1,0 +1,36 @@
+{
+  "schema": "ultra-baseline-launch-v1",
+  "startedUtc": "2026-10-20T17:51:03.6146097+00:00",
+  "finishedUtc": "2026-10-20T17:53:49.0009973+00:00",
+  "playerSha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+  "managedAssemblies": [
+    {
+      "file": "Assembly-CSharp.dll",
+      "sha256": "a1e3aabe71ed376efe8892cb6ccd4f2fa8ce979d46721defb7bdc34f541b38f2"
+    },
+    {
+      "file": "Catan.Core.dll",
+      "sha256": "308c7c3e9bf7b26d42427611f768af9d3b83e7b712503dfb367cf85a36d74eb8"
+    },
+    {
+      "file": "Catan.AI.dll",
+      "sha256": "a5461d959e0d091a1c92bc9007d35cf98f8fc575a89bff35ebfa33a0229283a3"
+    },
+    {
+      "file": "Catan.Network.Contracts.dll",
+      "sha256": "6f03909d5bace7bb9b17907d61f8cf273edd58920421b11c4e94d98a00b5f3ff"
+    }
+  ],
+  "fixtureFileHashesVerified": true,
+  "captureOnly": false,
+  "performanceMeasured": true,
+  "width": 1920,
+  "height": 1080,
+  "sampleSeconds": 30,
+  "warmupSeconds": 8,
+  "hiddenWindow": false,
+  "windowStyle": "Normal",
+  "batchMode": false,
+  "graphics": "Direct3D11",
+  "note": "窗口显示模式按实际启动参数记录，焦点和持续渲染由运行时实测；不视为人工交互、Android 真机或热稳定验收。权威夹具只在 .local。"
+}

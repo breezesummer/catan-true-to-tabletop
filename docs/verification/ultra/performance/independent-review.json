@@ -1,0 +1,993 @@
+{
+  "schema": "ultra-u0-independent-review-v1",
+  "日期": "2026-10-21",
+  "时区": "Asia/Shanghai",
+  "方式": "仅用 Python 标准库读取 CSV、JSON 与日志；未启动游戏或 Unity。",
+  "范围": [
+    "round-2",
+    "round-3"
+  ],
+  "方法": [
+    "对有限有效值排序，使用零基下标 ceil(n×q)-1 取得 nearest-rank 分位数，独立复算 P50/P95/P99/max；允许6位十进制序列化带来的1.1e-6绝对误差。",
+    "重新计算采样数、时长、焦点数、渲染末值/逐行增量、帧间隔>50ms、CPU/GPU覆盖率、绘制/批次/三角形有效数和分布。",
+    "重新计算Unity分配/保留/Mono采样峰值与首末分配值、GC分配计数器可用率，定位CPU峰值样本。",
+    "逐字段比较两轮launch（排除起止时间）与四局device，逐字节比较公开fixtures.json，核对结果与成功日志。"
+  ],
+  "统计匹配": true,
+  "不匹配项": [],
+  "launch非时间字段差异": {},
+  "device字段差异": {
+    "ordinary": {},
+    "maximum": {},
+    "crowded": {},
+    "fog": {}
+  },
+  "fixtures逐字节一致": true,
+  "运行结果": {
+    "round-2": {
+      "status": "passed",
+      "performanceMeasured": true,
+      "scenarios": 4,
+      "authorityUnchanged": true,
+      "screenshotsPerScenario": 4,
+      "androidDeviceVerified": false
+    },
+    "round-3": {
+      "status": "passed",
+      "performanceMeasured": true,
+      "scenarios": 4,
+      "authorityUnchanged": true,
+      "screenshotsPerScenario": 4,
+      "androidDeviceVerified": false
+    }
+  },
+  "日志核对": {
+    "round-2": {
+      "DXGI时间戳警告": false,
+      "逐场景成功标记": 4,
+      "最终成功标记": true
+    },
+    "round-3": {
+      "DXGI时间戳警告": false,
+      "逐场景成功标记": 4,
+      "最终成功标记": true
+    }
+  },
+  "汇总": {
+    "同局面P95绝对差毫秒": {
+      "ordinary": 0.0144,
+      "maximum": 0.0736,
+      "crowded": 0.0213,
+      "fog": 0.0332
+    },
+    "最大同局面P95绝对差毫秒": 0.0736,
+    "两轮全部局面最大帧间隔毫秒": 22.9372,
+    "两轮全部局面最大CPU时序毫秒": 61.6912,
+    "两轮全部局面最大GPU时序毫秒": 22.13418,
+    "CPU覆盖率最小值": 1.0,
+    "GPU覆盖率最小值": 1.0,
+    "帧间隔超过50毫秒样本合计": 0,
+    "聚焦采样合计": 14408,
+    "采样合计": 14408,
+    "各轮全局最高P95毫秒": {
+      "round-2": 17.0528,
+      "round-3": 17.086
+    },
+    "两轮全局最高P95之差毫秒": 0.0332
+  },
+  "逐局复算": [
+    {
+      "轮次": "round-2",
+      "局面": "ordinary",
+      "复算分布": {
+        "frameMs": {
+          "validSamples": 1801,
+          "p50": 16.6748,
+          "p95": 17.0475,
+          "p99": 17.2932,
+          "max": 17.7317
+        },
+        "cpuMs": {
+          "validSamples": 1801,
+          "p50": 16.6758,
+          "p95": 17.0167,
+          "p99": 17.2497,
+          "max": 17.6678
+        },
+        "gpuMs": {
+          "validSamples": 1801,
+          "p50": 15.66176,
+          "p95": 16.1506,
+          "p99": 16.31104,
+          "max": 16.51616
+        },
+        "drawCalls": {
+          "validSamples": 1801,
+          "p50": 1238.0,
+          "p95": 1238.0,
+          "p99": 1238.0,
+          "max": 1238.0
+        },
+        "batches": {
+          "validSamples": 1801,
+          "p50": 1238.0,
+          "p95": 1238.0,
+          "p99": 1238.0,
+          "max": 1238.0
+        },
+        "triangles": {
+          "validSamples": 1801,
+          "p50": 464813.0,
+          "p95": 464813.0,
+          "p99": 464813.0,
+          "max": 464813.0
+        }
+      },
+      "复算计数与内存": {
+        "sampleCount": 1801,
+        "sampleSeconds": 30.015534,
+        "focusedFrames": 1801,
+        "renderedFrames": 1802,
+        "spikesOver50Ms": 0,
+        "cpuTimingCoverage": 1.0,
+        "gpuTimingCoverage": 1.0,
+        "gcValidSamples": 0,
+        "gcCounterCoverage": 0.0,
+        "allocatedPeakBytes": 119167350,
+        "reservedPeakBytes": 227004416,
+        "monoUsedPeakBytes": 14983168,
+        "allocatedStartBytes": 118882958,
+        "allocatedEndBytes": 118973414
+      },
+      "渲染首值": 2,
+      "相邻采样渲染计数增量最小最大": [
+        1,
+        1
+      ],
+      "CPU最大样本": {
+        "frame": "1506",
+        "elapsedSeconds": "25.115662",
+        "frameMs": "16.7671",
+        "cpuMs": "17.6678",
+        "gpuMs": "14.32604",
+        "gc0": "1427",
+        "gc1": "1427",
+        "gc2": "1427",
+        "drawCalls": "1238",
+        "csvPhysicalLine": 1508,
+        "generationChangeFromPrevious": [
+          0,
+          0,
+          0
+        ]
+      },
+      "CPU超过50毫秒样本数": 0,
+      "GC的CSV首末差": [
+        919,
+        919,
+        919
+      ],
+      "GC摘要完整区间差": [
+        921,
+        921,
+        921
+      ],
+      "GC边界增量": [
+        2,
+        2,
+        2
+      ],
+      "进程工作集首末": [
+        0,
+        0
+      ]
+    },
+    {
+      "轮次": "round-2",
+      "局面": "maximum",
+      "复算分布": {
+        "frameMs": {
+          "validSamples": 1801,
+          "p50": 16.6693,
+          "p95": 16.9806,
+          "p99": 17.1938,
+          "max": 17.5822
+        },
+        "cpuMs": {
+          "validSamples": 1801,
+          "p50": 16.6668,
+          "p95": 16.9267,
+          "p99": 17.1361,
+          "max": 17.5148
+        },
+        "gpuMs": {
+          "validSamples": 1801,
+          "p50": 15.55536,
+          "p95": 15.98748,
+          "p99": 16.23712,
+          "max": 16.47192
+        },
+        "drawCalls": {
+          "validSamples": 1801,
+          "p50": 1534.0,
+          "p95": 1534.0,
+          "p99": 1534.0,
+          "max": 1534.0
+        },
+        "batches": {
+          "validSamples": 1801,
+          "p50": 1534.0,
+          "p95": 1534.0,
+          "p99": 1534.0,
+          "max": 1534.0
+        },
+        "triangles": {
+          "validSamples": 1801,
+          "p50": 491407.0,
+          "p95": 491407.0,
+          "p99": 491407.0,
+          "max": 491407.0
+        }
+      },
+      "复算计数与内存": {
+        "sampleCount": 1801,
+        "sampleSeconds": 30.015729,
+        "focusedFrames": 1801,
+        "renderedFrames": 1802,
+        "spikesOver50Ms": 0,
+        "cpuTimingCoverage": 1.0,
+        "gpuTimingCoverage": 1.0,
+        "gcValidSamples": 0,
+        "gcCounterCoverage": 0.0,
+        "allocatedPeakBytes": 121025950,
+        "reservedPeakBytes": 227004416,
+        "monoUsedPeakBytes": 17813504,
+        "allocatedStartBytes": 120816950,
+        "allocatedEndBytes": 120721254
+      },
+      "渲染首值": 2,
+      "相邻采样渲染计数增量最小最大": [
+        1,
+        1
+      ],
+      "CPU最大样本": {
+        "frame": "1104",
+        "elapsedSeconds": "18.416028",
+        "frameMs": "16.7491",
+        "cpuMs": "17.5148",
+        "gpuMs": "14.60876",
+        "gc0": "2510",
+        "gc1": "2510",
+        "gc2": "2510",
+        "drawCalls": "1534",
+        "csvPhysicalLine": 1106,
+        "generationChangeFromPrevious": [
+          1,
+          1,
+          1
+        ]
+      },
+      "CPU超过50毫秒样本数": 0,
+      "GC的CSV首末差": [
+        747,
+        747,
+        747
+      ],
+      "GC摘要完整区间差": [
+        748,
+        748,
+        748
+      ],
+      "GC边界增量": [
+        1,
+        1,
+        1
+      ],
+      "进程工作集首末": [
+        0,
+        0
+      ]
+    },
+    {
+      "轮次": "round-2",
+      "局面": "crowded",
+      "复算分布": {
+        "frameMs": {
+          "validSamples": 1801,
+          "p50": 16.6628,
+          "p95": 16.8986,
+          "p99": 17.023,
+          "max": 22.9372
+        },
+        "cpuMs": {
+          "validSamples": 1801,
+          "p50": 16.667,
+          "p95": 16.8314,
+          "p99": 17.0208,
+          "max": 61.6912
+        },
+        "gpuMs": {
+          "validSamples": 1801,
+          "p50": 15.57392,
+          "p95": 15.77548,
+          "p99": 15.8538,
+          "max": 22.13418
+        },
+        "drawCalls": {
+          "validSamples": 1801,
+          "p50": 1934.0,
+          "p95": 1934.0,
+          "p99": 1934.0,
+          "max": 1934.0
+        },
+        "batches": {
+          "validSamples": 1801,
+          "p50": 1934.0,
+          "p95": 1934.0,
+          "p99": 1934.0,
+          "max": 1934.0
+        },
+        "triangles": {
+          "validSamples": 1801,
+          "p50": 1869383.0,
+          "p95": 1869383.0,
+          "p99": 1869383.0,
+          "max": 1869383.0
+        }
+      },
+      "复算计数与内存": {
+        "sampleCount": 1801,
+        "sampleSeconds": 30.004098,
+        "focusedFrames": 1801,
+        "renderedFrames": 1802,
+        "spikesOver50Ms": 0,
+        "cpuTimingCoverage": 1.0,
+        "gpuTimingCoverage": 1.0,
+        "gcValidSamples": 0,
+        "gcCounterCoverage": 0.0,
+        "allocatedPeakBytes": 150710366,
+        "reservedPeakBytes": 260558848,
+        "monoUsedPeakBytes": 23986176,
+        "allocatedStartBytes": 150118822,
+        "allocatedEndBytes": 150222526
+      },
+      "渲染首值": 2,
+      "相邻采样渲染计数增量最小最大": [
+        1,
+        1
+      ],
+      "CPU最大样本": {
+        "frame": "2",
+        "elapsedSeconds": "0.039417",
+        "frameMs": "13.2531",
+        "cpuMs": "61.6912",
+        "gpuMs": "12.26916",
+        "gc0": "4359",
+        "gc1": "4359",
+        "gc2": "4359",
+        "drawCalls": "1934",
+        "csvPhysicalLine": 4,
+        "generationChangeFromPrevious": [
+          1,
+          1,
+          1
+        ]
+      },
+      "CPU超过50毫秒样本数": 1,
+      "GC的CSV首末差": [
+        1439,
+        1439,
+        1439
+      ],
+      "GC摘要完整区间差": [
+        1441,
+        1441,
+        1441
+      ],
+      "GC边界增量": [
+        2,
+        2,
+        2
+      ],
+      "进程工作集首末": [
+        0,
+        0
+      ]
+    },
+    {
+      "轮次": "round-2",
+      "局面": "fog",
+      "复算分布": {
+        "frameMs": {
+          "validSamples": 1801,
+          "p50": 16.6719,
+          "p95": 17.0528,
+          "p99": 17.2753,
+          "max": 17.5915
+        },
+        "cpuMs": {
+          "validSamples": 1801,
+          "p50": 16.6726,
+          "p95": 17.0186,
+          "p99": 17.208,
+          "max": 17.5431
+        },
+        "gpuMs": {
+          "validSamples": 1801,
+          "p50": 15.57648,
+          "p95": 16.10828,
+          "p99": 16.30744,
+          "max": 16.47264
+        },
+        "drawCalls": {
+          "validSamples": 1801,
+          "p50": 1440.0,
+          "p95": 1440.0,
+          "p99": 1440.0,
+          "max": 1440.0
+        },
+        "batches": {
+          "validSamples": 1801,
+          "p50": 1440.0,
+          "p95": 1440.0,
+          "p99": 1440.0,
+          "max": 1440.0
+        },
+        "triangles": {
+          "validSamples": 1801,
+          "p50": 526995.0,
+          "p95": 526995.0,
+          "p99": 526995.0,
+          "max": 526995.0
+        }
+      },
+      "复算计数与内存": {
+        "sampleCount": 1801,
+        "sampleSeconds": 30.015519,
+        "focusedFrames": 1801,
+        "renderedFrames": 1802,
+        "spikesOver50Ms": 0,
+        "cpuTimingCoverage": 1.0,
+        "gpuTimingCoverage": 1.0,
+        "gcValidSamples": 0,
+        "gcCounterCoverage": 0.0,
+        "allocatedPeakBytes": 150019830,
+        "reservedPeakBytes": 260558848,
+        "monoUsedPeakBytes": 21004288,
+        "allocatedStartBytes": 149722958,
+        "allocatedEndBytes": 149652558
+      },
+      "渲染首值": 2,
+      "相邻采样渲染计数增量最小最大": [
+        1,
+        1
+      ],
+      "CPU最大样本": {
+        "frame": "977",
+        "elapsedSeconds": "16.29966",
+        "frameMs": "16.8264",
+        "cpuMs": "17.5431",
+        "gpuMs": "14.42012",
+        "gc0": "6495",
+        "gc1": "6495",
+        "gc2": "6495",
+        "drawCalls": "1440",
+        "csvPhysicalLine": 979,
+        "generationChangeFromPrevious": [
+          1,
+          1,
+          1
+        ]
+      },
+      "CPU超过50毫秒样本数": 0,
+      "GC的CSV首末差": [
+        614,
+        614,
+        614
+      ],
+      "GC摘要完整区间差": [
+        615,
+        615,
+        615
+      ],
+      "GC边界增量": [
+        1,
+        1,
+        1
+      ],
+      "进程工作集首末": [
+        0,
+        0
+      ]
+    },
+    {
+      "轮次": "round-3",
+      "局面": "ordinary",
+      "复算分布": {
+        "frameMs": {
+          "validSamples": 1801,
+          "p50": 16.6687,
+          "p95": 17.0619,
+          "p99": 17.2802,
+          "max": 17.7917
+        },
+        "cpuMs": {
+          "validSamples": 1801,
+          "p50": 16.6718,
+          "p95": 16.9944,
+          "p99": 17.1997,
+          "max": 17.7717
+        },
+        "gpuMs": {
+          "validSamples": 1801,
+          "p50": 15.64416,
+          "p95": 16.17044,
+          "p99": 16.34376,
+          "max": 16.57192
+        },
+        "drawCalls": {
+          "validSamples": 1801,
+          "p50": 1238.0,
+          "p95": 1238.0,
+          "p99": 1238.0,
+          "max": 1238.0
+        },
+        "batches": {
+          "validSamples": 1801,
+          "p50": 1238.0,
+          "p95": 1238.0,
+          "p99": 1238.0,
+          "max": 1238.0
+        },
+        "triangles": {
+          "validSamples": 1801,
+          "p50": 464813.0,
+          "p95": 464813.0,
+          "p99": 464813.0,
+          "max": 464813.0
+        }
+      },
+      "复算计数与内存": {
+        "sampleCount": 1801,
+        "sampleSeconds": 30.015786,
+        "focusedFrames": 1801,
+        "renderedFrames": 1802,
+        "spikesOver50Ms": 0,
+        "cpuTimingCoverage": 1.0,
+        "gpuTimingCoverage": 1.0,
+        "gcValidSamples": 0,
+        "gcCounterCoverage": 0.0,
+        "allocatedPeakBytes": 119075126,
+        "reservedPeakBytes": 227004416,
+        "monoUsedPeakBytes": 14942208,
+        "allocatedStartBytes": 118743638,
+        "allocatedEndBytes": 119025294
+      },
+      "渲染首值": 2,
+      "相邻采样渲染计数增量最小最大": [
+        1,
+        1
+      ],
+      "CPU最大样本": {
+        "frame": "586",
+        "elapsedSeconds": "9.783255",
+        "frameMs": "16.3869",
+        "cpuMs": "17.7717",
+        "gpuMs": "14.468",
+        "gc0": "954",
+        "gc1": "954",
+        "gc2": "954",
+        "drawCalls": "1238",
+        "csvPhysicalLine": 588,
+        "generationChangeFromPrevious": [
+          0,
+          0,
+          0
+        ]
+      },
+      "CPU超过50毫秒样本数": 0,
+      "GC的CSV首末差": [
+        916,
+        916,
+        916
+      ],
+      "GC摘要完整区间差": [
+        918,
+        918,
+        918
+      ],
+      "GC边界增量": [
+        2,
+        2,
+        2
+      ],
+      "进程工作集首末": [
+        0,
+        0
+      ]
+    },
+    {
+      "轮次": "round-3",
+      "局面": "maximum",
+      "复算分布": {
+        "frameMs": {
+          "validSamples": 1801,
+          "p50": 16.666,
+          "p95": 17.0542,
+          "p99": 17.2165,
+          "max": 17.5326
+        },
+        "cpuMs": {
+          "validSamples": 1801,
+          "p50": 16.6686,
+          "p95": 16.9713,
+          "p99": 17.1883,
+          "max": 17.5178
+        },
+        "gpuMs": {
+          "validSamples": 1801,
+          "p50": 15.5142,
+          "p95": 16.00152,
+          "p99": 16.21808,
+          "max": 16.42492
+        },
+        "drawCalls": {
+          "validSamples": 1801,
+          "p50": 1534.0,
+          "p95": 1534.0,
+          "p99": 1534.0,
+          "max": 1534.0
+        },
+        "batches": {
+          "validSamples": 1801,
+          "p50": 1534.0,
+          "p95": 1534.0,
+          "p99": 1534.0,
+          "max": 1534.0
+        },
+        "triangles": {
+          "validSamples": 1801,
+          "p50": 491407.0,
+          "p95": 491407.0,
+          "p99": 491407.0,
+          "max": 491407.0
+        }
+      },
+      "复算计数与内存": {
+        "sampleCount": 1801,
+        "sampleSeconds": 30.015264,
+        "focusedFrames": 1801,
+        "renderedFrames": 1802,
+        "spikesOver50Ms": 0,
+        "cpuTimingCoverage": 1.0,
+        "gpuTimingCoverage": 1.0,
+        "gcValidSamples": 0,
+        "gcCounterCoverage": 0.0,
+        "allocatedPeakBytes": 121143518,
+        "reservedPeakBytes": 227004416,
+        "monoUsedPeakBytes": 17981440,
+        "allocatedStartBytes": 120719878,
+        "allocatedEndBytes": 120787590
+      },
+      "渲染首值": 2,
+      "相邻采样渲染计数增量最小最大": [
+        1,
+        1
+      ],
+      "CPU最大样本": {
+        "frame": "1623",
+        "elapsedSeconds": "27.065334",
+        "frameMs": "16.6313",
+        "cpuMs": "17.5178",
+        "gpuMs": "14.26468",
+        "gc0": "2709",
+        "gc1": "2709",
+        "gc2": "2709",
+        "drawCalls": "1534",
+        "csvPhysicalLine": 1625,
+        "generationChangeFromPrevious": [
+          1,
+          1,
+          1
+        ]
+      },
+      "CPU超过50毫秒样本数": 0,
+      "GC的CSV首末差": [
+        736,
+        736,
+        736
+      ],
+      "GC摘要完整区间差": [
+        737,
+        737,
+        737
+      ],
+      "GC边界增量": [
+        1,
+        1,
+        1
+      ],
+      "进程工作集首末": [
+        0,
+        0
+      ]
+    },
+    {
+      "轮次": "round-3",
+      "局面": "crowded",
+      "复算分布": {
+        "frameMs": {
+          "validSamples": 1801,
+          "p50": 16.6669,
+          "p95": 16.9199,
+          "p99": 17.0183,
+          "max": 20.2711
+        },
+        "cpuMs": {
+          "validSamples": 1801,
+          "p50": 16.6671,
+          "p95": 16.8746,
+          "p99": 17.034,
+          "max": 61.0255
+        },
+        "gpuMs": {
+          "validSamples": 1801,
+          "p50": 15.57676,
+          "p95": 15.77204,
+          "p99": 15.86312,
+          "max": 19.32076
+        },
+        "drawCalls": {
+          "validSamples": 1801,
+          "p50": 1934.0,
+          "p95": 1934.0,
+          "p99": 1934.0,
+          "max": 1934.0
+        },
+        "batches": {
+          "validSamples": 1801,
+          "p50": 1934.0,
+          "p95": 1934.0,
+          "p99": 1934.0,
+          "max": 1934.0
+        },
+        "triangles": {
+          "validSamples": 1801,
+          "p50": 1869383.0,
+          "p95": 1869383.0,
+          "p99": 1869383.0,
+          "max": 1869383.0
+        }
+      },
+      "复算计数与内存": {
+        "sampleCount": 1801,
+        "sampleSeconds": 30.004484,
+        "focusedFrames": 1801,
+        "renderedFrames": 1802,
+        "spikesOver50Ms": 0,
+        "cpuTimingCoverage": 1.0,
+        "gpuTimingCoverage": 1.0,
+        "gcValidSamples": 0,
+        "gcCounterCoverage": 0.0,
+        "allocatedPeakBytes": 150706102,
+        "reservedPeakBytes": 260558848,
+        "monoUsedPeakBytes": 23080960,
+        "allocatedStartBytes": 150156270,
+        "allocatedEndBytes": 150628406
+      },
+      "渲染首值": 2,
+      "相邻采样渲染计数增量最小最大": [
+        1,
+        1
+      ],
+      "CPU最大样本": {
+        "frame": "2",
+        "elapsedSeconds": "0.040838",
+        "frameMs": "13.3088",
+        "cpuMs": "61.0255",
+        "gpuMs": "13.0378",
+        "gc0": "4374",
+        "gc1": "4374",
+        "gc2": "4374",
+        "drawCalls": "1934",
+        "csvPhysicalLine": 4,
+        "generationChangeFromPrevious": [
+          1,
+          1,
+          1
+        ]
+      },
+      "CPU超过50毫秒样本数": 1,
+      "GC的CSV首末差": [
+        1445,
+        1445,
+        1445
+      ],
+      "GC摘要完整区间差": [
+        1447,
+        1447,
+        1447
+      ],
+      "GC边界增量": [
+        2,
+        2,
+        2
+      ],
+      "进程工作集首末": [
+        0,
+        0
+      ]
+    },
+    {
+      "轮次": "round-3",
+      "局面": "fog",
+      "复算分布": {
+        "frameMs": {
+          "validSamples": 1801,
+          "p50": 16.6684,
+          "p95": 17.086,
+          "p99": 17.2634,
+          "max": 17.5971
+        },
+        "cpuMs": {
+          "validSamples": 1801,
+          "p50": 16.6748,
+          "p95": 17.0049,
+          "p99": 17.2451,
+          "max": 17.5094
+        },
+        "gpuMs": {
+          "validSamples": 1801,
+          "p50": 15.5688,
+          "p95": 16.11136,
+          "p99": 16.3486,
+          "max": 16.56304
+        },
+        "drawCalls": {
+          "validSamples": 1801,
+          "p50": 1440.0,
+          "p95": 1440.0,
+          "p99": 1440.0,
+          "max": 1440.0
+        },
+        "batches": {
+          "validSamples": 1801,
+          "p50": 1440.0,
+          "p95": 1440.0,
+          "p99": 1440.0,
+          "max": 1440.0
+        },
+        "triangles": {
+          "validSamples": 1801,
+          "p50": 526995.0,
+          "p95": 526995.0,
+          "p99": 526995.0,
+          "max": 526995.0
+        }
+      },
+      "复算计数与内存": {
+        "sampleCount": 1801,
+        "sampleSeconds": 30.015712,
+        "focusedFrames": 1801,
+        "renderedFrames": 1802,
+        "spikesOver50Ms": 0,
+        "cpuTimingCoverage": 1.0,
+        "gpuTimingCoverage": 1.0,
+        "gcValidSamples": 0,
+        "gcCounterCoverage": 0.0,
+        "allocatedPeakBytes": 150032710,
+        "reservedPeakBytes": 260558848,
+        "monoUsedPeakBytes": 20848640,
+        "allocatedStartBytes": 149455990,
+        "allocatedEndBytes": 149685126
+      },
+      "渲染首值": 2,
+      "相邻采样渲染计数增量最小最大": [
+        1,
+        1
+      ],
+      "CPU最大样本": {
+        "frame": "393",
+        "elapsedSeconds": "6.566342",
+        "frameMs": "17.1631",
+        "cpuMs": "17.5094",
+        "gpuMs": "13.56088",
+        "gc0": "6323",
+        "gc1": "6323",
+        "gc2": "6323",
+        "drawCalls": "1440",
+        "csvPhysicalLine": 395,
+        "generationChangeFromPrevious": [
+          1,
+          1,
+          1
+        ]
+      },
+      "CPU超过50毫秒样本数": 0,
+      "GC的CSV首末差": [
+        626,
+        626,
+        626
+      ],
+      "GC摘要完整区间差": [
+        628,
+        628,
+        628
+      ],
+      "GC边界增量": [
+        2,
+        2,
+        2
+      ],
+      "进程工作集首末": [
+        0,
+        0
+      ]
+    }
+  ],
+  "原始证据SHA256": {
+    "round-2": {
+      "ordinary/summary.json": "c3b5ca2df9c319000869312426c413e86b60ead2be3aa6dc759ed6121ec0677d",
+      "ordinary/frames.csv": "0740932e3262c8f04abfbd61c4f560db395d1d009b0f767ae860805d0596d3ec",
+      "maximum/summary.json": "745462ca7b431ee4b38ecfde23f5df0f1b75abe498c2131ac371648ef704c035",
+      "maximum/frames.csv": "2e7271cd5f710738dbd9497edaecc38f573b885dee9e841925ca4a8464e3d312",
+      "crowded/summary.json": "f63db7c529ea3db9526b4c0990fab5eff6c6bccac76fc2772942db0aa4103bdb",
+      "crowded/frames.csv": "bbc253963d68feba161a4b7706f8a22bce29f81fe578a01735a2229f07d66567",
+      "fog/summary.json": "a03bac15a52e6c0eb00f5f0d9119f5696a6024cb0812b7d7c4d3af9d435c3b78",
+      "fog/frames.csv": "7e212a91124390660b143d17f84f73c420036f060a07e326095935e857e7e5f5"
+    },
+    "round-3": {
+      "ordinary/summary.json": "f9909eb8e014f0727abd00eae1be8bb4587350a9bed0db449d9380e84044f639",
+      "ordinary/frames.csv": "30dd092c8f0beb20293a42213d20d399875b50a3f136ce73b34833f49f693171",
+      "maximum/summary.json": "2db490479b7215ac90182de7d022348585a992ff734cf7145d6a6311a640a229",
+      "maximum/frames.csv": "c58fd131f7946b05389ac28155be51d7184f51f3e821c5f4623b59743a67fa56",
+      "crowded/summary.json": "b1eb6d9f8361a07c7a6e6dec8d4a7c1acf845481169c9e116f18ca7aa2ca2b84",
+      "crowded/frames.csv": "8c59baff7169de7729cd50e86d75701f8dfb528687ca0a253117008fd1e7c16e",
+      "fog/summary.json": "b62af694bf9bb8e09d4c14a9ed50570d45fb65a9419fe724cede4e08379f0761",
+      "fog/frames.csv": "7a43adabfb3a0fed2b9a37ebc2985aa27291b75fc0497d38ecd6761bb2973a3c"
+    }
+  },
+  "限制": [
+    "GC摘要的gcStart/gcEnd在CSV首末样本之外读取；CSV无法精确重建完整区间收集数。差额单列为边界增量，未把它当作统计错误或采样期间分配量。",
+    "两轮GC逐帧分配计数器均不可用；进程工作集接口返回0，不代表零内存占用。",
+    "CPU/GPU为FrameTimingManager异步时序，CSV未记录frameStartTimestamp；起始样本CPU峰值与同条frameMs不同，保留原始max，不推断具体成因。",
+    "ProfilerRecorder计数与短时镜头测试不能独立定位CPU/GPU瓶颈，也不能证明30分钟热稳定或Android性能。",
+    "round-1焦点覆盖率为0，仅作失焦持续渲染对照；没有混入round-2/3同条件前台比较。"
+  ],
+  "报告复核": {
+    "comparison统计和CSV与摘要校验值匹配": true,
+    "前台Unity分配峰值MiB两位小数": {
+      "ordinary": [
+        "113.65",
+        "113.56"
+      ],
+      "maximum": [
+        "115.42",
+        "115.53"
+      ],
+      "crowded": [
+        "143.73",
+        "143.72"
+      ],
+      "fog": [
+        "143.07",
+        "143.08"
+      ]
+    },
+    "相对链接检查": {
+      "performance/README.md": {
+        "已检查": 11,
+        "失效": 0
+      },
+      "U0-baseline.md": {
+        "已检查": 22,
+        "失效": 0
+      },
+      "The Farmer's Log.md首条": {
+        "已检查": 2,
+        "失效": 0
+      }
+    },
+    "结论": "所查报告数值、焦点条件、CPU峰及限制说明一致；保持U0实施中，没有宣称具体瓶颈已定位或Android已通过。"
+  }
+}
