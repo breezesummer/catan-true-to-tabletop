@@ -6,7 +6,7 @@ public sealed class MedievalMenuTextureImporter : AssetPostprocessor
 {
     void OnPreprocessTexture()
     {
-        if(assetPath!="Assets/Resources/PastoralMenu/v002/medieval-harbor.png")return;
+        if(assetPath!="Assets/Resources/PastoralMenu/v002/medieval-harbor.png"&&!assetPath.StartsWith("Assets/Resources/PastoralMenu/v004/"))return;
         var importer=(TextureImporter)assetImporter;
         importer.textureType=TextureImporterType.Default;
         importer.mipmapEnabled=false;
@@ -16,5 +16,6 @@ public sealed class MedievalMenuTextureImporter : AssetPostprocessor
         importer.wrapMode=TextureWrapMode.Clamp;
         importer.filterMode=FilterMode.Bilinear;
         importer.isReadable=false;
+        importer.alphaIsTransparency=assetPath.EndsWith("/title.png");
     }
 }

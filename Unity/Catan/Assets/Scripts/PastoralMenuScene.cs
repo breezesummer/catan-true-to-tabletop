@@ -3,10 +3,11 @@ using UnityEngine;
 // 原版港湾与五幅风景原画；展示时间独立于规则、存档和权威随机状态。
 public static class PastoralMenuScene
 {
-    public const int ThemeCount=6;
+    public const int ThemeCount=7;
+    public const int CollectorTable=6;
     public const int ClassicHarbor=5;
-    public static readonly string[] Names={"晨光港湾","金色麦田","林间溪谷","雪山城堡","月夜灯港","经典港湾"};
-    public static readonly string[] Descriptions={"波光与海鸟，陪你启航","风过麦田，丰收正当时","溪流与落叶，山林慢时光","轻雪落城，灯火待归人","月光入港，星灯映海面","海风入港，麦浪归田"};
+    public static readonly string[] Names={"晨光港湾","金色麦田","林间溪谷","雪山城堡","月夜灯港","经典港湾","山海棋桌"};
+    public static readonly string[] Descriptions={"波光与海鸟，陪你启航","风过麦田，丰收正当时","溪流与落叶，山林慢时光","轻雪落城，灯火待归人","月光入港，星灯映海面","海风入港，麦浪归田","一桌山海，静候同伴"};
     static readonly string[] Paths={"dawn-harbor","golden-fields","forest-stream","snow-castle","moonlit-port"};
     static readonly Texture2D[] Artworks=new Texture2D[ThemeCount];
     static Texture2D shade;
@@ -15,7 +16,7 @@ public static class PastoralMenuScene
     static int selected=-1,lastFrame=-1,lastTheme=-1,audioTheme=-1;
     static bool? animated;
     // 本轮首次打开恢复经典原画，后续继续记住所选风景；旧五景编号不变。
-    public static int Selected { get { if(selected<0)selected=Mathf.Clamp(PlayerPrefs.GetInt("Catan.Menu.Theme.Classic.v001",ClassicHarbor),0,ThemeCount-1);return selected; } }
+    public static int Selected { get { if(selected<0)selected=Mathf.Clamp(PlayerPrefs.GetInt("Catan.Menu.Theme.Collector.v001",CollectorTable),0,ThemeCount-1);return selected; } }
     public static bool Animated
     {
         get { if(!animated.HasValue)animated=PlayerPrefs.GetInt("Catan.Menu.Animated.v003",1)!=0;return animated.Value; }
@@ -25,19 +26,19 @@ public static class PastoralMenuScene
     public static void Select(int index)
     {
         selected=Mathf.Clamp(index,0,ThemeCount-1);
-        PlayerPrefs.SetInt("Catan.Menu.Theme.Classic.v001",selected);PlayerPrefs.Save();SyncAudio();
+        PlayerPrefs.SetInt("Catan.Menu.Theme.Collector.v001",selected);PlayerPrefs.Save();SyncAudio();
     }
     public static Texture2D Preview(int index)
     {
         index=Mathf.Clamp(index,0,ThemeCount-1);
         // 直接复用保留的原图，不重绘或覆盖源文件。
-        if(Artworks[index]==null)Artworks[index]=Resources.Load<Texture2D>(index==ClassicHarbor?"PastoralMenu/v002/medieval-harbor":"PastoralMenu/v003/"+Paths[index]);
+        if(Artworks[index]==null)Artworks[index]=Resources.Load<Texture2D>(index==CollectorTable?"PastoralMenu/v004/collector-table":index==ClassicHarbor?"PastoralMenu/v002/medieval-harbor":"PastoralMenu/v003/"+Paths[index]);
         return Artworks[index];
     }
     static void SyncAudio()
     {
         if(TabletopAudio.Instance!=null&&audioTheme!=Selected)
-        {TabletopAudio.Instance.SetMenuTheme(Selected==ClassicHarbor?0:Selected);audioTheme=Selected;}
+        {TabletopAudio.Instance.SetMenuTheme(Selected>=ClassicHarbor?0:Selected);audioTheme=Selected;}
     }
     public static void Draw(float time)=>DrawBackground(new Rect(0,0,1440,900),time);
     public static void DrawBackground(Rect full,float time)
@@ -49,8 +50,9 @@ public static class PastoralMenuScene
             float aspect=full.width*Mathf.Abs(GUI.matrix.m00)/(full.height*Mathf.Abs(GUI.matrix.m11));
             float sourceAspect=(float)artwork.width/artwork.height;
             float w=Mathf.Min(1,aspect/sourceAspect),h=Mathf.Min(1,sourceAspect/aspect);
-            GUI.DrawTextureWithTexCoords(full,Animated?Animate(artwork,time):artwork,new Rect((1-w)*.52f,(1-h)*.5f,w,h));
-            if(Animated)DrawAtmosphere(full,time,Selected);
+            // 棋桌不使用风景水波变形，避免桌面、骰子与卡牌扭曲。左对齐裁切保留菜单负空间。
+            GUI.DrawTextureWithTexCoords(full,Animated&&Selected!=CollectorTable?Animate(artwork,time):artwork,new Rect(Selected==CollectorTable?0:(1-w)*.52f,(1-h)*.5f,w,h));
+            if(Animated&&Selected!=CollectorTable)DrawAtmosphere(full,time,Selected);
         }
         else PastoralMenuUI.Fill(full,new Color(.17f,.25f,.22f));
         if(shade==null)
@@ -59,7 +61,7 @@ public static class PastoralMenuScene
             for(int x=0;x<256;x++){float t=x/255f;shade.SetPixel(x,0,new Color(.035f,.075f,.065f,Mathf.Lerp(.84f,0,Mathf.SmoothStep(0,1,t/.57f))));}
             shade.Apply(false,true);
         }
-        GUI.DrawTexture(full,shade);
+        if(Selected!=CollectorTable)GUI.DrawTexture(full,shade);
     }
     static Texture Animate(Texture2D artwork,float time)
     {

@@ -31,6 +31,7 @@ public sealed class AndroidTexturePolicy : AssetPostprocessor
 
     static int MaxSize(string path)
     {
+        if (path.Contains("/PastoralMenu/v004/")) return 2048;
         if (EntityCardTextureImporter.IsCardTexture(path)) return 2048;
         if (path.Contains("/NumberTokens/")) return 256;
         if (path.Contains("oak-albedo")) return 2048;

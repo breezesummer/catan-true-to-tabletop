@@ -24,7 +24,8 @@ public static class AudioVisualBuildValidation
         Audio(audioRoot + "Music/SeaBreezeHome.wav");
         foreach (string language in new[] { "zh", "en" }) foreach (string action in new[] { "KnightRecruit", "KnightActivate" })
         for (int variant = 1; variant <= 2; variant++) Audio(audioRoot + "Voices/" + language + "/" + action + variant.ToString("D2") + ".wav");
-        Debug.Log("CATAN_AUDIO_VISUAL_TEXTURES_OK: " + count + " 张地图、4 张玩法封面与5张主页原画完整。");
+        Texture(Resources.Load<Texture2D>("PastoralMenu/v004/title"),"独立菜单标题");
+        Debug.Log("CATAN_AUDIO_VISUAL_TEXTURES_OK: " + count + " 张地图、4 张玩法封面与"+PastoralMenuScene.ThemeCount+"张主页原画、独立标题完整。");
     }
     static void Texture(Texture2D value, string name)
     {

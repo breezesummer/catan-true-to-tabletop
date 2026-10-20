@@ -1,6 +1,6 @@
 param(
     [ValidateSet('All','Windows','Android','Server')][string]$Target='All',
-    [string]$OutputRoot='game version/1.6/Catan1.6.13-Card-Action-Flow',
+    [string]$OutputRoot='game version/1.6/Catan1.6.14-Collector-Menu',
     [switch]$VerifyPlayer,
     [switch]$Arm64Only
 )

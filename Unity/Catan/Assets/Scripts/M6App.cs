@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="1.6.13";
+    public const string BuildVersion="1.6.14";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]

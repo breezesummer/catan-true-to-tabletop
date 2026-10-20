@@ -1,5 +1,5 @@
 param(
-    [string]$OutputRoot = 'game version/1.6/Catan1.6.13-Card-Action-Flow',
+    [string]$OutputRoot = 'game version/1.6/Catan1.6.14-Collector-Menu',
     [switch]$Arm64Only
 )
 $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()

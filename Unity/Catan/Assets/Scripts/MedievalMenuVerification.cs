@@ -25,13 +25,21 @@ public sealed class MedievalMenuVerification : MonoBehaviour
             app=FindFirstObjectByType<M6App>();
             output=Path.GetFullPath(args[flag+1]);
             // 验收只接受项目中 .local 的目录，不使用或覆盖用户存档。
-            string root=Path.GetFullPath(Path.Combine(Application.dataPath,"../../../../.."));
+            var project=new DirectoryInfo(Application.dataPath);
+            while(project!=null&&!File.Exists(Path.Combine(project.FullName,"docs","PROJECT_BRIEF.md")))project=project.Parent;
+            string root=project?.FullName??throw new DirectoryNotFoundException("未找到项目");
             string local=Path.GetFullPath(Path.Combine(root,".local"))+Path.DirectorySeparatorChar;
             if(!output.StartsWith(local,StringComparison.OrdinalIgnoreCase))
                 throw new InvalidDataException("验收目录必须位于 .local");
             if(app==null||Application.isBatchMode)throw new InvalidOperationException();
             Directory.CreateDirectory(output);saveDigest=Digest(app.SavePath);
             app.MenuReviewSavePath=Path.Combine(output,"private-review-save.json");
+            app.ConfigureOnlineReview(Path.Combine(output,"private-online-address.txt"));
+            app.Network.UseCredentialDirectory(Path.Combine(output,"private-player"));
+            var listener=new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback,0);listener.Start();
+            int port=((System.Net.IPEndPoint)listener.LocalEndpoint).Port;listener.Stop();
+            int discovery;using(var udp=new System.Net.Sockets.UdpClient(0))discovery=((System.Net.IPEndPoint)udp.Client.LocalEndPoint).Port;
+            app.ConfigureLanReview(Path.Combine(output,"private-server"),port,discovery);
         }
         catch(Exception e){Debug.LogError("CATAN_MEDIEVAL_MENU_VERIFY_FAILED: "+e.GetType().Name);Application.Quit(1);yield break;}
         var enumerators=new Stack();enumerators.Push(Review());
@@ -51,6 +59,8 @@ public sealed class MedievalMenuVerification : MonoBehaviour
         while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
         yield return null;yield return null;
         Require(PastoralMenuScene.ArtworkReady,"背景未打入构建");
+        Require(Resources.Load<Texture2D>("PastoralMenu/v004/title")!=null,"标题未打入构建");
+        Require(PastoralMenuScene.Preview(PastoralMenuScene.CollectorTable)!=null,"棋桌背景未打入构建");
         foreach(int number in new[]{2,3,4,5,6,8,9,10,11,12})
             Require(Resources.Load<Texture2D>("TabletopUI/v008/NumberTokens/number-"+number)!=null,"数字贴图未打入构建");
         foreach(string id in new[]{"port-generic","port-wood","port-brick","port-wool","port-wheat","port-ore","catan-victory-marker","number-token-back"})
@@ -61,7 +71,7 @@ public sealed class MedievalMenuVerification : MonoBehaviour
             Require(texture!=null&&prefab!=null&&prefab.GetComponentsInChildren<Renderer>(true)
                 .SelectMany(r=>r.sharedMaterials).Any(m=>m!=null&&m.mainTexture==texture),"实体标记贴图引用丢失");
         }
-        foreach(var size in new[]{new Vector2Int(1440,900),new Vector2Int(1280,720),new Vector2Int(1920,1080)})
+        foreach(var size in new[]{new Vector2Int(1440,900),new Vector2Int(1280,720),new Vector2Int(1920,1080),new Vector2Int(1920,900)})
         {
             Screen.SetResolution(size.x,size.y,false);yield return new WaitForSecondsRealtime(.5f);
             Go(-1);yield return Capture("home-"+size.x+"x"+size.y);
@@ -75,6 +85,7 @@ public sealed class MedievalMenuVerification : MonoBehaviour
         Go(4);Set("menuSettingsTab",0);yield return Capture("settings-player");
         Set("menuSettingsTab",1);yield return Capture("settings-sound");
         Set("menuSettingsTab",2);yield return Capture("settings-appearance");
+        Set("menuSettingsTab",3);yield return Capture("settings-landscape");
         Go(2);yield return Capture("lan-room-list");
         Set("networkTab",1);
         for(int part=0;part<3;part++){Set("networkSettingsPage",part);yield return Capture("lan-create-"+part);}

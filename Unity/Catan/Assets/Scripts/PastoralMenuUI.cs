@@ -4,9 +4,10 @@ using System.Collections.Generic;
 // 中世纪田园菜单控件。与桌内主题分离，不改变规则和存档字段。
 public static class PastoralMenuUI
 {
-    public static readonly Color Ink=new Color(.15f,.28f,.25f),Muted=new Color(.43f,.50f,.42f);
-    public static readonly Color Forest=new Color(.20f,.39f,.31f),Sage=new Color(.88f,.91f,.83f),Paper=new Color(.985f,.973f,.925f,.97f);
-    public static readonly Color Gold=new Color(.76f,.63f,.38f),Ivory=new Color(.98f,.96f,.88f);
+    public static readonly Color Ink=new Color(.22f,.17f,.11f),Muted=new Color(.46f,.38f,.27f);
+    public static readonly Color Forest=new Color(.19f,.29f,.23f),Sage=new Color(.88f,.85f,.75f),Paper=new Color(.94f,.88f,.73f);
+    public static readonly Color Gold=new Color(.86f,.69f,.37f),Ivory=new Color(.95f,.90f,.79f);
+    static Texture2D paperGrain,hexMarker;
     static Font currentFont;
     static Texture2D neutral,hover,selected,field;
     static readonly Dictionary<int,GUIStyle> labelStyles=new Dictionary<int,GUIStyle>();
@@ -26,8 +27,8 @@ public static class PastoralMenuUI
         HeroSmall=new GUIStyle(Text){fontSize=20};HeroSmall.normal.textColor=new Color(.24f,.39f,.34f);
         if(neutral==null)
         {
-            neutral=ControlTexture(new Color(.91f,.92f,.86f));hover=ControlTexture(new Color(.85f,.89f,.79f));
-            selected=ControlTexture(Forest);field=ControlTexture(new Color(1,.995f,.97f));
+            neutral=ControlTexture(new Color(.86f,.79f,.64f));hover=ControlTexture(new Color(.94f,.86f,.68f));
+            selected=ControlTexture(Forest);field=ControlTexture(new Color(.99f,.95f,.85f));
         }
         Control=new GUIStyle(GUI.skin.button){font=currentFont,fontSize=17,wordWrap=true,border=new RectOffset(12,12,12,12),padding=new RectOffset(12,12,5,5),margin=new RectOffset(3,3,3,3),alignment=TextAnchor.MiddleCenter};
         Control.normal.background=neutral;Control.normal.textColor=Ink;Control.hover.background=hover;Control.hover.textColor=Ink;
@@ -60,19 +61,39 @@ public static class PastoralMenuUI
     {if(r.width<=0||r.height<=0)return;GUI.DrawTexture(r,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,c,0,Mathf.Min(radius,Mathf.Min(r.width,r.height)*.5f));}
     public static void Panel(Rect r)
     {
-        Round(new Rect(r.x-5,r.y+14,r.width+10,r.height+4),new Color(.12f,.28f,.23f,.08f),28);
-        Round(new Rect(r.x-2,r.y+6,r.width+4,r.height+2),new Color(.12f,.28f,.23f,.09f),25);
-        Round(r,Paper,24);Round(new Rect(r.x+1,r.y+1,r.width-2,r.height-2),new Color(1,1,.98f,.26f),23);
+        Round(new Rect(r.x-7,r.y+9,r.width+14,r.height+12),new Color(0,0,0,.36f),9);
+        Round(r,new Color(.18f,.105f,.055f),5);
+        Round(new Rect(r.x+3,r.y+3,r.width-6,r.height-6),Gold,4);
+        Round(new Rect(r.x+5,r.y+5,r.width-10,r.height-10),new Color(.31f,.20f,.10f),3);
+        Fill(new Rect(r.x+12,r.y+12,r.width-24,r.height-24),Paper);
+        if(paperGrain==null)
+        {
+            paperGrain=new Texture2D(128,128,TextureFormat.RGBA32,false){name="菜单纸面细纹",wrapMode=TextureWrapMode.Repeat,hideFlags=HideFlags.HideAndDontSave};
+            for(int y=0;y<128;y++)for(int x=0;x<128;x++)
+            {
+                uint hash=unchecked((uint)(x+y*128+1)*747796405u+2891336453u);
+                hash=unchecked(((hash>>((int)(hash>>28)+4))^hash)*277803737u);
+                float n=((hash>>22)^hash)%256/255f;
+                paperGrain.SetPixel(x,y,new Color(.34f,.22f,.09f,n*.035f));
+            }
+            paperGrain.Apply(false,true);
+        }
+        var inside=new Rect(r.x+12,r.y+12,r.width-24,r.height-24);
+        GUI.DrawTextureWithTexCoords(inside,paperGrain,new Rect(0,0,inside.width/128,inside.height/128));
+        Fill(new Rect(r.x+22,r.y+22,r.width-44,1),new Color(.57f,.40f,.20f,.35f));
+        Fill(new Rect(r.x+22,r.yMax-23,r.width-44,1),new Color(.57f,.40f,.20f,.35f));
     }
     public static bool Button(Rect r,string caption,bool enabled=true,bool primary=false,bool selected=false,Color? seatColor=null)
     {
         Styles();bool before=GUI.enabled;GUI.enabled=before&&enabled;
         bool over=GUI.enabled&&r.Contains(Event.current.mousePosition);
-        Color bg=primary||selected?Forest:new Color(.915f,.931f,.877f);
+        Color bg=primary||selected?Forest:new Color(.87f,.80f,.66f);
         if(over)bg=Color.Lerp(bg,primary||selected?Color.white:Forest,primary||selected?.08f:.08f);
-        if(!GUI.enabled)bg=new Color(.91f,.91f,.87f);
-        if(primary)Round(new Rect(r.x,r.y+3,r.width,r.height),new Color(.12f,.27f,.20f,.18f),12);
-        Round(r,bg,primary?13:10);
+        if(!GUI.enabled)bg=new Color(.84f,.80f,.71f);
+        Round(new Rect(r.x,r.y+3,r.width,r.height),new Color(.12f,.07f,.03f,.22f),4);
+        Round(r,primary||selected?Gold:new Color(.55f,.40f,.23f,.6f),4);
+        Round(new Rect(r.x+1,r.y+1,r.width-2,r.height-2),bg,3);
+        Fill(new Rect(r.x+7,r.y+3,r.width-14,1),new Color(1,.94f,.72f,.18f));
         var ink=GUI.enabled?(primary||selected?new Color(1,.99f,.94f):Ink):Muted;
         if(seatColor.HasValue)ink=seatColor.Value;
         Label(new Rect(r.x+8,r.y+1,r.width-16,r.height-2),caption,primary?19:16,ink,primary,TextAnchor.MiddleCenter);
@@ -112,14 +133,42 @@ public static class PastoralMenuUI
     public static bool Nav(Rect r,string text,string detail,bool selected,float blend)
     {
         bool over=GUI.enabled&&r.Contains(Event.current.mousePosition);
-        float value=selected?1:blend;
-        Round(r,new Color(.97f,.96f,.87f,.04f+.12f*value),9);
-        if(selected)Fill(new Rect(r.x,r.y+13,2,r.height-26),Gold);
-        Label(new Rect(r.x+23+4*value,r.y+10,r.width-58,30),text,24,Ivory,selected);
-        if(value>.05f)Label(new Rect(r.x+25,r.y+43,r.width-56,20),detail,11,new Color(.87f,.88f,.76f,value));
-        Label(new Rect(r.xMax-33,r.y+15,24,30),selected||over?"›":"·",23,new Color(.91f,.83f,.63f,.7f));
-        bool hit=GUI.Button(r,GUIContent.none,GUIStyle.none);
+        float value=selected||over?1:blend;
+        var ink=Color.Lerp(Ivory,new Color(1,.81f,.42f),value);
+        Label(new Rect(r.x+57,r.y+2,r.width-60,r.height),text,28,new Color(0,0,0,.65f),false,TextAnchor.MiddleLeft);
+        Label(new Rect(r.x+56+2*value,r.y,r.width-60,r.height),text,28,ink,false,TextAnchor.MiddleLeft);
+        if(value>.01f)
+        {
+            Hex(new Vector2(r.x+17,r.center.y),12,new Color(1,.78f,.33f,value));
+            Fill(new Rect(r.x+226,r.center.y,Mathf.Max(0,r.width-226)*value,1),new Color(.87f,.68f,.32f,value*.8f));
+        }
+        bool hit=GUI.Button(r,GUIContent.none,GUIStyle.none)&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
         if(hit)TabletopAudio.Instance?.Click();return hit;
+    }
+    public static void Hex(Vector2 center,float radius,Color color)
+    {
+        // 直接画局部纹理，避免 GUIUtility 在非等比视口下旋转线段导致标记散开。
+        if(hexMarker==null)
+        {
+            hexMarker=new Texture2D(64,64,TextureFormat.RGBA32,false){name="菜单六角选中标记",wrapMode=TextureWrapMode.Clamp,hideFlags=HideFlags.HideAndDontSave};
+            for(int y=0;y<64;y++)for(int x=0;x<64;x++)
+            {
+                float px=Mathf.Abs((x-31.5f)/30),py=Mathf.Abs((y-31.5f)/30);
+                float d=Mathf.Max(py/.8660254f,px+py*.5773503f);
+                float alpha=d>.98f?Mathf.Clamp01((1.02f-d)*25):d>.80f?1:d>.69f?0:.50f;
+                hexMarker.SetPixel(x,y,new Color(1,1,1,alpha));
+            }
+            hexMarker.Apply(false,true);
+        }
+        var old=GUI.color;GUI.color=color;
+        GUI.DrawTexture(new Rect(center.x-radius,center.y-radius,radius*2,radius*2),hexMarker);
+        GUI.color=old;
+    }
+    public static void RoomRow(Rect r)
+    {
+        Round(r,new Color(.80f,.70f,.51f,.32f),3);
+        Fill(new Rect(r.x,r.y,3,r.height),new Color(.63f,.44f,.20f,.7f));
+        Fill(new Rect(r.x+10,r.yMax-1,r.width-20,1),new Color(.53f,.38f,.20f,.25f));
     }
     public static bool Card(Rect r,string heading,string detail,bool selected,string number="")
     {

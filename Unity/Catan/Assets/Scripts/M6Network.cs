@@ -171,17 +171,18 @@ public sealed partial class M6App
     int lanRoomPage;
     void DrawLanShell()
     {
-        if(pastoralMenuFont==null)pastoralMenuFont=Resources.Load<Font>("Fonts/NotoSansCJKsc-Regular");
+        if(pastoralMenuFont==null)pastoralMenuFont=Resources.Load<Font>("Fonts/NotoSerifCJKsc-Regular");
         PastoralMenuUI.Styles(pastoralMenuFont??font);PastoralMenuScene.Draw(Time.unscaledTime);
-        PastoralMenuUI.Label(new Rect(78,65,300,28),networkLan?"与同一网络的好友相聚":"与远方的好友相聚",14,PastoralMenuUI.Ivory);
-        PastoralMenuUI.Label(new Rect(72,127,350,80),networkLan?"局域网联机":"在线联机大厅",networkLan?43:36,PastoralMenuUI.Ivory,true);
-        PastoralMenuUI.Label(new Rect(79,234,300,45),"玩家："+NetworkPlayerName,18,PastoralMenuUI.Ivory);
+        PastoralMenuUI.Label(new Rect(78,76,300,28),"卡坦岛 · 之三国争霸",18,PastoralMenuUI.Gold);
+        PastoralMenuUI.Fill(new Rect(79,120,275,1),new Color(.86f,.69f,.37f,.5f));
+        PastoralMenuUI.Label(new Rect(72,150,350,80),networkLan?"局域网联机":"在线大厅",43,PastoralMenuUI.Ivory,true);
+        PastoralMenuUI.Label(new Rect(79,254,300,62),"玩家："+NetworkPlayerName,18,PastoralMenuUI.Ivory);
         if(PastoralMenuUI.Nav(new Rect(65,350,322,68),"房间列表",networkLan?"自动寻找身边的同伴":"浏览大厅，与好友同桌",networkTab==0,0)){networkTab=0;networkScroll=Vector2.zero;}
         if(PastoralMenuUI.Nav(new Rect(65,435,322,68),"创建房间","选择玩法，等待好友入座",networkTab==1,0)){networkTab=1;networkSettingsPage=0;networkScroll=Vector2.zero;}
         if(MenuNetworkRoom!=null&&PastoralMenuUI.Nav(new Rect(65,520,322,68),"当前房间",MenuNetworkRoom.Name,networkTab==2,0)){networkTab=2;networkScroll=Vector2.zero;}
-        if(!networkLan&&PastoralMenuUI.Nav(new Rect(65,MenuNetworkRoom==null?520:605,322,68),"服务器地址","填写公网 IP，保存后自动连接",networkTab==3,0)){networkTab=3;networkScroll=Vector2.zero;}
+        if(!networkLan&&PastoralMenuUI.Nav(new Rect(65,MenuNetworkRoom==null?520:605,322,68),"连接设置","",networkTab==3,0)){networkTab=3;networkScroll=Vector2.zero;}
         if(PastoralMenuUI.ReturnButton(new Rect(79,762,290,42))){networkMenu=false;menuPage=-1;}
-        PastoralMenuUI.Label(new Rect(79,840,310,25),ReleaseVersion,11,PastoralMenuUI.Ivory);
+        PastoralMenuUI.Label(new Rect(79,840,310,25),ReleaseVersion,12,new Color(.76f,.69f,.54f));
     }
     void DrawLanNetworkMenu()
     {
@@ -227,6 +228,7 @@ public sealed partial class M6App
             else DrawNetworkRecovery();
         }
         GUILayout.EndScrollView();GUILayout.EndArea();
+        MobileTabletop.ScrollTouch(new Rect(495,282,838,370),ref networkScroll);
         label=savedLabel;title=savedTitle;small=savedSmall;button=savedButton;
         if(onlineUnavailable)DrawOnlineLobbyMessage();
         PastoralMenuUI.Fill(new Rect(495,701,838,1),new Color(.48f,.54f,.42f,.20f));
@@ -246,7 +248,8 @@ public sealed partial class M6App
             {
                 var own=room.Seats.FirstOrDefault(s=>s.SeatId==Network.SeatId);
                 if(PastoralMenuUI.Button(new Rect(1093,779,240,40),own!=null&&own.Ready?"取消准备":"我准备好了",!Network.Busy&&!onlineUnavailable,true))Network.Ready(own==null||!own.Ready);
-                if(room.ManagerSeatId==Network.SeatId&&PastoralMenuUI.Button(new Rect(839,779,240,40),"所有人准备后开始",!Network.Busy&&!onlineUnavailable))Network.StartRoom();
+                bool allReady=room.Seats.Length==room.PlayerCount&&room.Seats.All(s=>s.IsAi||s.Occupied&&s.Connected&&s.Ready);
+                if(room.ManagerSeatId==Network.SeatId&&PastoralMenuUI.Button(new Rect(839,779,240,40),allReady?"开始游戏":room.Seats.Any(s=>!s.Occupied&&!s.IsAi)?"等待同伴入座":"等待玩家准备",allReady&&!Network.Busy&&!onlineUnavailable))Network.StartRoom();
             }
             if(lanRoomPage==1&&room.ManagerSeatId==Network.SeatId&&!room.Started&&PastoralMenuUI.Button(new Rect(1093,779,240,40),"应用房间配置",!Network.Busy&&!onlineUnavailable,true))Network.ConfigureRoom(NetworkSettings());
             if(room.Started&&NetworkGame&&Ready&&PastoralMenuUI.Button(new Rect(1093,779,240,40),"返回联机对局  →",true,true)){networkMenu=false;ResumeGame();}
@@ -260,7 +263,7 @@ public sealed partial class M6App
         foreach(var item in rooms)
         {
             var room=item.room;var r=GUILayoutUtility.GetRect(790,86);
-            PastoralMenuUI.Round(new Rect(r.x,r.y+2,r.width-6,79),new Color(.91f,.93f,.86f),10);
+            PastoralMenuUI.RoomRow(new Rect(r.x,r.y+2,r.width-6,79));
             PastoralMenuUI.Label(new Rect(r.x+18,r.y+10,r.width-157,28),room.Name+"  ·  "+room.OccupiedSeats+"/"+room.PlayerCount+" 人",18,null,true);
             bool remembered=item.server.RememberedRooms.Contains(room.RoomId);
             bool joined=JoinedRoom(room,item.server);
@@ -397,11 +400,11 @@ public sealed partial class M6App
         foreach(var room in Network.Rooms)
         {
             var r=GUILayoutUtility.GetRect(790,86);
-            PastoralMenuUI.Round(new Rect(r.x,r.y+2,r.width-6,79),new Color(.91f,.93f,.86f),10);
+            PastoralMenuUI.RoomRow(new Rect(r.x,r.y+2,r.width-6,79));
             PastoralMenuUI.Label(new Rect(r.x+18,r.y+10,r.width-157,28),room.Name+"  ·  "+room.OccupiedSeats+"/"+room.PlayerCount+" 人",18,null,true);
             bool remembered=Network.HasRoomIdentity(room.RoomId),joined=JoinedRoom(room);
             string status=joined?"我的房间 · "+(room.Started?"对局中":"等待开局"):remembered&&room.Started?"我的进行中对局 · 可恢复原玩家":room.Started?"对局中 · 原玩家可恢复":"等待开局";
-            PastoralMenuUI.Label(new Rect(r.x+18,r.y+43,r.width-155,26),"房间号 "+room.RoomId+"  ·  "+status+(M7RoomEntry.NeedsPassword(room.HasPassword,remembered,room.Started)?"  ·  需要密码":"  ·  直接加入"),13,PastoralMenuUI.Muted);
+            PastoralMenuUI.Label(new Rect(r.x+18,r.y+43,r.width-155,26),NetworkRuleCaption(room.RuleSet)+" · "+status+(M7RoomEntry.NeedsPassword(room.HasPassword,remembered,room.Started)?" · 需要密码":" · 直接加入"),13,PastoralMenuUI.Muted);
             if(joined)PastoralMenuUI.Label(new Rect(r.xMax-122,r.y+23,104,37),"已加入",16,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
             else if(PastoralMenuUI.Button(new Rect(r.xMax-122,r.y+23,104,37),remembered&&room.Started?"重连":"加入",OnlineRoomActionsAvailable))RequestJoinRoom(room,null,remembered);
         }
@@ -416,18 +419,32 @@ public sealed partial class M6App
     {
         var room=Network.Room;
         GUILayout.Label(room.Name+"  ·  房间号 "+room.RoomId,label);
-        GUILayout.Label("你的建筑颜色："+ColorLabel(Network.SeatId)+"  ·  "+room.PlayerCount+" 人  ·  "+room.TargetVictoryPoints+" 分",small);
-        GUILayout.Space(17);
-        foreach(var seat in room.Seats)
+        GUILayout.BeginHorizontal();
+        int target=room.TargetVictoryPoints??DefaultVictoryPoints(room.RuleSet,room.ScenarioId,room.PlayerCount);
+        GUILayout.Label(NetworkRuleCaption(room.RuleSet)+" · "+room.PlayerCount+" 人 · "+target+" 分 · 你的颜色："+ColorLabel(Network.SeatId),small);
+        if(GUILayout.Button("复制房间号",button,GUILayout.Width(125),GUILayout.Height(28)))GUIUtility.systemCopyBuffer=room.RoomId;
+        GUILayout.EndHorizontal();GUILayout.Space(12);
+        for(int row=0;row<room.Seats.Length;row+=2)
         {
-            var r=GUILayoutUtility.GetRect(790,66);
-            PastoralMenuUI.Round(new Rect(r.x,r.y+1,r.width-5,59),new Color(.91f,.93f,.86f),9);
-            PastoralMenuUI.Label(new Rect(r.x+17,r.y+16,410,30),ColorLabel(seat.SeatId)+"   "+(seat.Occupied||seat.IsAi?seat.DisplayName:"等待同伴入座")+(room.ManagerSeatId==seat.SeatId?" · 房主":""),18,BoardRenderer.SeatColor(seat.SeatId),true);
-            PastoralMenuUI.Label(new Rect(r.x+420,r.y+21,190,25),seat.RejoinPending?"AI 托管 · 下回合接回":seat.ControlledByAi?"AI 操作中":seat.Ready?"已准备":seat.Connected?"在线 · 未准备":"等待连接",13,PastoralMenuUI.Muted);
-            if(!room.Started&&!seat.Occupied&&!seat.IsAi&&PastoralMenuUI.Button(new Rect(r.xMax-129,r.y+12,110,36),"坐这里",!Network.Busy,seatColor:BoardRenderer.SeatColor(seat.SeatId)))Network.SelectSeat(seat.SeatId);
-            if(room.ManagerSeatId==Network.SeatId&&seat.Occupied&&!seat.IsAi&&seat.SeatId!=Network.SeatId&&PastoralMenuUI.Button(new Rect(r.xMax-129,r.y+12,110,36),"转交房主",!Network.Busy))Network.Transfer(seat.SeatId);
+            var line=GUILayoutUtility.GetRect(790,140);
+            for(int column=0;column<2&&row+column<room.Seats.Length;column++)
+            {
+                var seat=room.Seats[row+column];float width=(line.width-20)*.5f;
+                var r=new Rect(line.x+column*(width+14),line.y+2,width,130);
+                PastoralMenuUI.RoomRow(r);
+                var seatColor=BoardRenderer.SeatColor(seat.SeatId);
+                PastoralMenuUI.Hex(new Vector2(r.x+27,r.y+29),11,seatColor);
+                PastoralMenuUI.Label(new Rect(r.x+50,r.y+14,r.width-64,28),ColorLabel(seat.SeatId)+(seat.SeatId==Network.SeatId?" · 你":"")+(room.ManagerSeatId==seat.SeatId?" · 房主":""),16,PastoralMenuUI.Muted);
+                string name=seat.Occupied||seat.IsAi?seat.DisplayName:"等待同伴入座";
+                var nameStyle=new GUIStyle(PastoralMenuUI.Text){fontSize=20,fontStyle=FontStyle.Bold,wordWrap=false,clipping=TextClipping.Clip};
+                GUI.Label(new Rect(r.x+18,r.y+45,r.width-36,32),new GUIContent(name,name),nameStyle);
+                PastoralMenuUI.Label(new Rect(r.x+18,r.y+91,r.width-145,26),seat.RejoinPending?"AI 托管 · 下回合接回":seat.ControlledByAi?"AI 操作中":seat.Ready?"已准备":!seat.Occupied?"空席":seat.Connected?"在线 · 未准备":"离线",13,seat.Ready?PastoralMenuUI.Forest:PastoralMenuUI.Muted);
+                if(!room.Started&&!seat.Occupied&&!seat.IsAi&&PastoralMenuUI.Button(new Rect(r.xMax-117,r.y+86,100,33),"坐这里",!Network.Busy))Network.SelectSeat(seat.SeatId);
+                if(room.ManagerSeatId==Network.SeatId&&seat.Occupied&&!seat.IsAi&&seat.SeatId!=Network.SeatId&&PastoralMenuUI.Button(new Rect(r.xMax-117,r.y+86,100,33),"转交房主",!Network.Busy))Network.Transfer(seat.SeatId);
+            }
         }
     }
+    static string NetworkRuleCaption(string rule)=>rule=="seafarers"?"航海家":rule=="cities-knights"?"城市与骑士":rule=="combined"?"双扩展组合":"基础版";
     void DrawNetworkRecovery()
     {
         GUILayout.Label("连接与原席位恢复",label);GUILayout.Space(10);

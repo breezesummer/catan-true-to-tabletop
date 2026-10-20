@@ -24,7 +24,9 @@ public sealed class LanMenuVerification : MonoBehaviour
         try
         {
             output=Path.GetFullPath(args[index+1]);
-            string local=Path.GetFullPath(Path.Combine(Application.dataPath,"../../../../../.local"))+Path.DirectorySeparatorChar;
+            var project=new DirectoryInfo(Application.dataPath);
+            while(project!=null&&!File.Exists(Path.Combine(project.FullName,"docs","PROJECT_BRIEF.md")))project=project.Parent;
+            string local=Path.Combine(project?.FullName??throw new DirectoryNotFoundException("未找到项目"),".local")+Path.DirectorySeparatorChar;
             if(!output.StartsWith(local,StringComparison.OrdinalIgnoreCase)||Application.isBatchMode)throw new InvalidOperationException("验收必须使用 .local 独立目录和可渲染客户端。");
             Directory.CreateDirectory(output);app=FindFirstObjectByType<M6App>();
             var listener=new TcpListener(IPAddress.Loopback,0);listener.Start();int port=((IPEndPoint)listener.LocalEndpoint).Port;listener.Stop();

@@ -35,7 +35,9 @@ public sealed class AudioVisualVerification : MonoBehaviour
         {
             if (flag + 1 >= args.Length) throw new InvalidDataException("缺少独立输出目录");
             output = Path.GetFullPath(args[flag + 1]);
-            string root = Path.GetFullPath(Path.Combine(Application.dataPath, "../../../../..", ".local")) + Path.DirectorySeparatorChar;
+            var project = new DirectoryInfo(Application.dataPath);
+            while(project!=null&&!File.Exists(Path.Combine(project.FullName,"docs","PROJECT_BRIEF.md")))project=project.Parent;
+            string root = Path.Combine(project?.FullName??throw new DirectoryNotFoundException("未找到项目"),".local") + Path.DirectorySeparatorChar;
             if (!output.StartsWith(root, StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("验收输出须位于项目.local");
             Directory.CreateDirectory(output);
             capturesEnabled = Array.IndexOf(args, "--audio-visual-no-capture") < 0;
@@ -130,7 +132,7 @@ public sealed class AudioVisualVerification : MonoBehaviour
             PastoralMenuScene.Select(theme);
             yield return new WaitForSecondsRealtime(.4f);
             Require(PastoralMenuScene.ArtworkReady, "主题原画缺失 " + theme);
-            Require(audio.MenuTheme == (theme == PastoralMenuScene.ClassicHarbor ? 0 : theme), "主题环境音没有同步 " + theme);
+            Require(audio.MenuTheme == (theme >= PastoralMenuScene.ClassicHarbor ? 0 : theme), "主题环境音没有同步 " + theme);
             CheckTexture(PastoralMenuScene.Preview(theme), "主题预览 " + theme);
             if (capturesEnabled)
             {
@@ -139,7 +141,9 @@ public sealed class AudioVisualVerification : MonoBehaviour
                 yield return Capture("theme-" + theme + "-b");
                 int difference = ChangedPixels(captures[captures.Count - 2], captures[captures.Count - 1]);
                 animatedPixels.Add(difference);
-                Require(difference > 100, "主题两帧没有实际动画 " + theme);
+                if(theme==PastoralMenuScene.CollectorTable)
+                    Require(difference==0,"静态棋桌不应随时间变形");
+                else Require(difference > 100, "主题两帧没有实际动画 " + theme);
             }
         }
         Go(4); Set("menuSettingsTab", 1); yield return Capture("settings-sound");
