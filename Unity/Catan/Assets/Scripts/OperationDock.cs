@@ -248,15 +248,14 @@ public sealed partial class OperationDock
         // 悬停只向上轻推，并让相邻手牌让出一小段空间；点击再向上推高。
         PrepareHand(snapshot);
         bool dockEnabled=GUI.enabled;
-        bool overHand=hoveredHand!=null&&handHoverAnchor.Contains(Event.current.mousePosition)||faces.Any(face=>face.Shape.Contains(Event.current.mousePosition))||HandTabsArea.Contains(Event.current.mousePosition)||
-            (Selection.Selected.Sum()>0||Selection.BuildId!=null)&&CancelSelectionRect.Contains(Event.current.mousePosition);
+        bool overHand=hoveredHand!=null&&handHoverAnchor.Contains(Event.current.mousePosition)||faces.Any(face=>face.Shape.Contains(Event.current.mousePosition))||HandTabsArea.Contains(Event.current.mousePosition);
         GUI.enabled=dockEnabled&&(Event.current.type==EventType.Repaint||!HasOverlay&&!overHand);
         table.Objects.Begin("own");
         DrawBuilds(snapshot);
         table.Objects.End();
         GUI.enabled=dockEnabled;
         if(overHand)hoveredBuild=null;
-        DrawHand(snapshot);
+        DrawHand();
         DrawHandTabs(snapshot);
         HandleHandInput(snapshot);
         HandleBuildInput(snapshot);
@@ -465,7 +464,7 @@ public sealed partial class OperationDock
             face.Shape.Angle=0;
         }
     }
-    void DrawHand(OperationSnapshot s)
+    void DrawHand()
     {
         landingFaces.Clear();
         var handSlots=specialHand?specialSlots:resourceSlots;
@@ -495,10 +494,8 @@ public sealed partial class OperationDock
             }
             hits.Add(face.Shape);
         }
-        if((Selection.Selected.Sum()>0||Selection.BuildId!=null)&&Button(CancelSelectionRect,"×"))
-        {Selection.Clear();s.Cancel?.Invoke();message="";}
     }
-    static readonly Rect HandTabsArea = new Rect(151,681,104,189), CancelSelectionRect = new Rect(217,681,34,34);
+    static readonly Rect HandTabsArea = new Rect(151,681,104,189);
     void DrawHandTabs(OperationSnapshot s)
     {
         bool enabled=GUI.enabled;GUI.enabled=enabled&&!HasOverlay;

@@ -62,7 +62,7 @@ public sealed partial class TabletopUI
     Catan.Core.GameHistoryEntry[] bankHistory = Array.Empty<Catan.Core.GameHistoryEntry>();
     public void BindOperations(OperationSnapshot snapshot,Action purchase,Catan.Core.GameHistoryEntry[] entries)
     {operations=snapshot;OperationWindows.Sync(snapshot?.Scope,snapshot?.Revision);purchaseDevelopment=purchase;bankHistory=snapshot?.PresentedHistory(entries)??entries??Array.Empty<Catan.Core.GameHistoryEntry>();}
-    internal string CardActionCaption {get{var card=discardDock?.PreviewCard(operations);return card==null?null:"使用\n"+card.Name;}}
+    internal string CardActionCaption {get{var card=discardDock?.PreviewCard(operations);return card==null?null:CardActionReady?"使用\n"+card.Name:"未满足\n使用条件";}}
     internal bool CardActionReady => discardDock?.CanUsePreviewCard(operations)==true&&!DiceRolling;
     internal void ConfirmCardAction(){if(CardActionReady)discardDock.UsePreviewCard(operations);}
     public bool HistoryOpen => history.IsOpen;
