@@ -58,6 +58,7 @@ public sealed class TabletopAiAnimationVerification:MonoBehaviour
     }
     IEnumerator Verify()
     {
+        VerifyCacheChanges();
         yield return new WaitForEndOfFrame();CaptureImage("00-开局AI速度选项");
         string[] modes={"base","seafarers","cities-knights","combined"};int[] speeds={0,1,2,1};
         for(int i=0;i<modes.Length;i++)
@@ -80,6 +81,7 @@ public sealed class TabletopAiAnimationVerification:MonoBehaviour
                 yield return new WaitForEndOfFrame();Sample(mode,speed,"起飞",started);
                 Require(app.VerificationBuildFlightCount>0,"公开建造没有产生飞行模型");
                 Require(app.VerificationBuildHiddenRenderers>0,"飞行时目标模型提前出现");
+                VerifyUnchangedRefresh();
                 CaptureImage(mode+"-"+action+"-起飞");
                 yield return new WaitForSecondsRealtime((float)TabletopAiSpeed.FlightDuration(speed)*.44f);
                 yield return new WaitForEndOfFrame();Sample(mode,speed,"途中",started);CaptureImage(mode+"-"+action+"-途中");
@@ -93,7 +95,58 @@ public sealed class TabletopAiAnimationVerification:MonoBehaviour
                 Require(action!=0||app.VerificationBuildVisibleGlowCount>0,"本回合光环网格或着色器没有进入实际构建");
                 Require(action==0?app.VerificationBuildHighlightCount>0:app.VerificationBuildHighlightCount==0,action==0?"本回合建筑没有发光高亮":"初设转交下一席位后高亮没有清除");
             }
+            if(mode=="cities-knights")
+            {
+                var board=app.GetComponent<M4App>().VerificationBoard;board.ShowComponentSamples();
+                var ids=board.CommittedPieces.Cast<Transform>().Select(t=>t.GetInstanceID()).ToArray();
+                board.ShowComponentSamples();
+                Require(ids.SequenceEqual(board.CommittedPieces.Cast<Transform>().Select(t=>t.GetInstanceID())),"城墙、骑士、大都会重复刷新没有复用");
+            }
+            if(mode=="combined")
+            {
+                var board=app.GetComponent<M5App>().VerificationBoard;board.ShowComponentSamples();
+                var ids=board.CommittedPieces.Cast<Transform>().Select(t=>t.GetInstanceID()).ToArray();
+                board.ShowComponentSamples();
+                Require(ids.SequenceEqual(board.CommittedPieces.Cast<Transform>().Select(t=>t.GetInstanceID())),"双扩展棋子重复刷新没有复用");
+            }
         }
+    }
+    void VerifyCacheChanges()
+    {
+        var root=new GameObject("增量缓存验收");
+        var cache=new TabletopPieceCache();
+        void Render(string group,string key,string appearance)
+        {
+            cache.Begin(group,root.transform);
+            using(var change=cache.Update(key,appearance))
+                if(change.Changed)
+                    for(int i=0;i<2;i++)new GameObject(key+i).transform.SetParent(root.transform,false);
+            cache.End();
+        }
+        Render("棋子","V1","骑士1未激活");var original=root.transform.GetChild(0).gameObject;
+        Render("船","E1","P1");var ship=root.transform.GetChild(2).gameObject;
+        Render("棋子","V1","骑士1未激活");
+        Require(root.transform.childCount==4&&root.transform.GetChild(0).gameObject==original,"未变化的多根模型被重建");
+        Render("棋子","V1","骑士1已激活");
+        Require(!original.activeSelf&&original.transform.parent==null&&ship.activeSelf&&root.transform.childCount==4,"外观改变没有局部替换或误删船");
+        cache.Begin("棋子",root.transform);cache.End();
+        Require(root.transform.childCount==2&&root.transform.GetChild(0).gameObject==ship,"移除棋子破坏了其他分组");
+        Render("船","E2","P1");
+        Require(!ship.activeSelf&&root.transform.childCount==2,"移动后残留旧船");
+        Destroy(root);
+    }
+    void VerifyUnchangedRefresh()
+    {
+        Transform root;Action refresh;
+        if(app.GetComponent<M2App>() is M2App basic){root=basic.VerificationBoard.CommittedPieces;refresh=basic.M6Refresh;}
+        else if(app.GetComponent<M3App>() is M3App sailing){root=sailing.VerificationBoard.CommittedPieces;refresh=sailing.M6Refresh;}
+        else if(app.GetComponent<M4App>() is M4App cities){root=cities.VerificationBoard.CommittedPieces;refresh=cities.M6Refresh;}
+        else {var combined=app.GetComponent<M5App>();root=combined.VerificationBoard.CommittedPieces;refresh=combined.M6Refresh;}
+        var ids=root.Cast<Transform>().Select(t=>t.GetInstanceID()).ToArray();
+        int hidden=app.VerificationBuildHiddenRenderers,flights=app.VerificationBuildFlightCount;
+        for(int i=0;i<5;i++)refresh();
+        Require(ids.SequenceEqual(root.Cast<Transform>().Select(t=>t.GetInstanceID())),"相同棋盘刷新重建了棋子");
+        Require(hidden==app.VerificationBuildHiddenRenderers&&flights==app.VerificationBuildFlightCount,"重复刷新破坏了飞行或目标隐藏状态");
     }
     static void AcceptanceStart(string mode,out string authority,out string human)
     {

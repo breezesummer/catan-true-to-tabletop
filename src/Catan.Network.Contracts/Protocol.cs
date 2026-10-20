@@ -69,6 +69,9 @@ namespace Catan.Network.Contracts
         public string RuleSet;
         public string ViewJson;
         public string HistoryJson;
+        // 与快照同一修订、同一观看权限的近期展示记录；不推进完整历史分页游标。
+        public string PresentationHistoryJson;
+        public long PresentationHistoryAfterSequence;
         public long HistoryCursor;
         public bool HasMoreHistory;
         public RoomSummary[] Rooms = Array.Empty<RoomSummary>();

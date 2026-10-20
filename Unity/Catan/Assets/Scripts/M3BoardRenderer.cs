@@ -94,29 +94,44 @@ public sealed class M3BoardRenderer : MonoBehaviour
     {
         switch(r) { case "wood":return new Color(.16f,.36f,.25f); case "brick":return new Color(.62f,.28f,.18f); case "wool":return new Color(.49f,.62f,.3f); case "wheat":return new Color(.78f,.59f,.25f); case "sea":case "water":return new Color(.07f,.34f,.52f); case "gold":return new Color(.92f,.71f,.15f); case "fog":case "hidden":return new Color(.30f,.34f,.40f); default:return new Color(.68f,.58f,.41f); }
     }
+    readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)
     {
         if(numberTokens!=null)numberTokens.Refresh(boardTiles);
         ClearPreview();
-        foreach(Transform t in pieces){t.gameObject.SetActive(false);Destroy(t.gameObject);}
+        pieceCache.Begin("basic",pieces);
         foreach(var p in settlements)
+        using(var change=pieceCache.Update("settlement:"+p.LocationId,p.PlayerId))
+        {
+            if(!change.Changed)continue;
             if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
                 Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
-        foreach(var p in roads) Piece(true,p.LocationId,SeatColor(p.PlayerId),pieces);
+        }
+        foreach(var p in roads)
+        using(var change=pieceCache.Update("road:"+p.LocationId,p.PlayerId))
+            if(change.Changed)Piece(true,p.LocationId,SeatColor(p.PlayerId),pieces);
         foreach(var p in cities)
+        using(var change=pieceCache.Update("city:"+p.LocationId,p.PlayerId))
         {
+            if(!change.Changed)continue;
             if(PlayerComponentAssets.Building("city",p.PlayerId,"City "+p.LocationId,Position(p.LocationId),pieces)!=null)continue;
             var city=Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces,false);
             city.name="City "+p.LocationId;
             city.transform.localScale=new Vector3(.02f,.023f,.015f);
             city.transform.position=Position(p.LocationId)+Vector3.up*.012f;
         }
-        if(!string.IsNullOrEmpty(robberTileId)) Robber(robberTileId,new Color(.08f,.075f,.09f),pieces);
+        if(!string.IsNullOrEmpty(robberTileId))
+        using(var change=pieceCache.Update("robber",robberTileId))
+            if(change.Changed)Robber(robberTileId,new Color(.08f,.075f,.09f),pieces);
+        pieceCache.End();
     }
     public void RefreshSeafarers(Catan.Core.M3.ShipPlacement[] ships,string pirateTileId)
     {
+        pieceCache.Begin("ships",pieces);
         foreach(var ship in ships)
+        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+ship.IsWarship))
         {
+            if(!change.Changed)continue;
             var mesh=Ship(ship.LocationId,SeatColor(ship.PlayerId),pieces);
             if(ship.IsWarship)
             {
@@ -130,10 +145,15 @@ public sealed class M3BoardRenderer : MonoBehaviour
             }
         }
         if(!string.IsNullOrEmpty(pirateTileId))
+        using(var change=pieceCache.Update("pirate",pirateTileId))
         {
+            if(change.Changed)
+            {
             var marker=Robber(pirateTileId,new Color(.20f,.05f,.25f),pieces,true);
             marker.name="Pirate "+pirateTileId;
+            }
         }
+        pieceCache.End();
     }
     public void RefreshReferenceMarkers(Catan.Core.M3.PlayerView view)
     {

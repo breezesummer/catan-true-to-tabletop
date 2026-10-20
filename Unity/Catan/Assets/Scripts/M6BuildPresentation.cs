@@ -12,6 +12,7 @@ public sealed partial class M6App
     readonly Dictionary<string,BuildGlow> buildGlows=new Dictionary<string,BuildGlow>();
     object buildView;
     readonly Dictionary<string,GameObject> buildModels=new Dictionary<string,GameObject>();
+    readonly Dictionary<string,bool> buildModelActive=new Dictionary<string,bool>();
     Edge[] movementEdges=Array.Empty<Edge>();
     PiecePlacement[] movementRoutes=Array.Empty<PiecePlacement>(),movementBuildings=Array.Empty<PiecePlacement>();
     Transform buildBoard,buildEffects;
@@ -64,6 +65,7 @@ public sealed partial class M6App
         foreach(var flight in buildFlights.ToArray())FinishBuildFlight(flight);
         foreach(var model in buildModels.Values)if(model!=null)Destroy(model);
         buildModels.Clear();
+        buildModelActive.Clear();
         buildFlights.Clear();
         foreach(var glow in buildGlows.Values)ClearBuildGlow(glow);
         buildGlows.Clear();
@@ -175,11 +177,21 @@ public sealed partial class M6App
     }
     void CacheBuildModels(TabletopBuildPiece[] pieces)
     {
-        foreach(var model in buildModels.Values)if(model!=null)Destroy(model);buildModels.Clear();
+        var identities=new HashSet<string>(pieces.Select(p=>p.Identity));
+        foreach(var key in buildModels.Keys.Where(key=>!identities.Contains(key)).ToArray())
+        {
+            if(buildModels[key]!=null)Destroy(buildModels[key]);
+            buildModels.Remove(key);buildModelActive.Remove(key);
+        }
         foreach(var piece in pieces)
         {
+            if(buildModels.TryGetValue(piece.Identity,out var existing)&&existing!=null)
+            {
+                if(buildModelActive[piece.Identity]==piece.Active)continue;
+                Destroy(existing);buildModels.Remove(piece.Identity);
+            }
             var model=CopyBuildModel(piece.LocationId);if(model==null)continue;
-            model.SetActive(false);buildModels[piece.Identity]=model;
+            model.SetActive(false);buildModels[piece.Identity]=model;buildModelActive[piece.Identity]=piece.Active;
         }
     }
     void StartBuildFlight(TabletopBuildPiece piece)

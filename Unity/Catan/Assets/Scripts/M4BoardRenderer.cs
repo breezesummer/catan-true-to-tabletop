@@ -131,22 +131,29 @@ public sealed class M4BoardRenderer : MonoBehaviour
     }
     void RenderExpansion(PiecePlacement[] walls,Catan.Core.M4.Knight[] knights,Catan.Core.M4.Metropolis[] metropolises,string merchant)
     {
+        pieceCache.Begin("expansion",pieces);
         foreach(var wall in walls)
         {
             if(metropolises.Any(m=>m.LocationId==wall.LocationId))continue;
-            if(PlayerComponentAssets.Building("city-with-wall",wall.PlayerId,"City with wall "+wall.LocationId,Position(wall.LocationId),pieces)!=null)continue;
-            // Keep a readable city and wall when the colour-specific model is unavailable.
-            CityFallback(wall.LocationId,SeatColor(wall.PlayerId));
-            var root = MarkerRoot("Wall "+wall.LocationId, Position(wall.LocationId));
-            for(int i=0;i<4;i++)
+            using(var change=pieceCache.Update("wall:"+wall.LocationId,wall.PlayerId))
             {
-                float angle=i*90*Mathf.Deg2Rad;
-                var part=Marker(PrimitiveType.Cube,root,new Vector3(Mathf.Cos(angle)*.012f,.004f,Mathf.Sin(angle)*.012f),new Vector3(.028f,.008f,.003f),SeatColor(wall.PlayerId));
-                part.transform.localRotation=Quaternion.Euler(0,90-i*90,0);
+                if(!change.Changed)continue;
+                if(PlayerComponentAssets.Building("city-with-wall",wall.PlayerId,"City with wall "+wall.LocationId,Position(wall.LocationId),pieces)!=null)continue;
+                // Keep a readable city and wall when the colour-specific model is unavailable.
+                CityFallback(wall.LocationId,SeatColor(wall.PlayerId));
+                var root = MarkerRoot("Wall "+wall.LocationId, Position(wall.LocationId));
+                for(int i=0;i<4;i++)
+                {
+                    float angle=i*90*Mathf.Deg2Rad;
+                    var part=Marker(PrimitiveType.Cube,root,new Vector3(Mathf.Cos(angle)*.012f,.004f,Mathf.Sin(angle)*.012f),new Vector3(.028f,.008f,.003f),SeatColor(wall.PlayerId));
+                    part.transform.localRotation=Quaternion.Euler(0,90-i*90,0);
+                }
             }
         }
         foreach(var k in knights)
+        using(var change=pieceCache.Update("knight:"+k.LocationId,k.PlayerId+":"+k.Level+":"+k.Active))
         {
+            if(!change.Changed)continue;
             var asset=PlayerComponentAssets.Knight(k.PlayerId,k.Level,k.Active,"Knight L"+k.Level+" "+k.LocationId,Position(k.LocationId),pieces);
             var root=asset!=null?asset.transform:MarkerRoot("Knight L"+k.Level+" "+k.LocationId,Position(k.LocationId));
             if(asset==null)
@@ -163,29 +170,36 @@ public sealed class M4BoardRenderer : MonoBehaviour
         foreach(var m in metropolises)
         {
             var hasWall=walls.Any(w=>w.LocationId==m.LocationId);
-            var asset=PlayerComponentAssets.Building(hasWall?"metropolis-with-wall":"metropolis",m.PlayerId,"Metropolis "+m.Track+" "+m.LocationId,Position(m.LocationId),pieces);
-            var root=asset!=null?asset.transform:MarkerRoot("Metropolis "+m.Track+" "+m.LocationId,Position(m.LocationId));
-            var color=new[]{new Color(.93f,.67f,.2f),new Color(.26f,.51f,.92f),new Color(.26f,.75f,.39f)}[(int)m.Track];
-            if(asset==null)
+            using(var change=pieceCache.Update("metropolis:"+m.LocationId,m.PlayerId+":"+m.Track+":"+hasWall))
             {
-                CityFallback(m.LocationId,SeatColor(m.PlayerId));
-                for(int i=0;i<3;i++)Marker(PrimitiveType.Cube,root,new Vector3((i-1)*.009f,.032f,0),new Vector3(.005f,.014f,.005f),color);
-                Marker(PrimitiveType.Cube,root,new Vector3(0,.027f,0),new Vector3(.027f,.005f,.008f),color);
-                if(hasWall)
-                    for(int i=0;i<4;i++)
-                    {
-                        float angle=i*90*Mathf.Deg2Rad;
-                        var part=Marker(PrimitiveType.Cube,root,new Vector3(Mathf.Cos(angle)*.012f,.004f,Mathf.Sin(angle)*.012f),new Vector3(.028f,.008f,.003f),SeatColor(m.PlayerId));
-                        part.transform.localRotation=Quaternion.Euler(0,90-i*90,0);
-                    }
+                if(!change.Changed)continue;
+                var asset=PlayerComponentAssets.Building(hasWall?"metropolis-with-wall":"metropolis",m.PlayerId,"Metropolis "+m.Track+" "+m.LocationId,Position(m.LocationId),pieces);
+                var root=asset!=null?asset.transform:MarkerRoot("Metropolis "+m.Track+" "+m.LocationId,Position(m.LocationId));
+                var color=new[]{new Color(.93f,.67f,.2f),new Color(.26f,.51f,.92f),new Color(.26f,.75f,.39f)}[(int)m.Track];
+                if(asset==null)
+                {
+                    CityFallback(m.LocationId,SeatColor(m.PlayerId));
+                    for(int i=0;i<3;i++)Marker(PrimitiveType.Cube,root,new Vector3((i-1)*.009f,.032f,0),new Vector3(.005f,.014f,.005f),color);
+                    Marker(PrimitiveType.Cube,root,new Vector3(0,.027f,0),new Vector3(.027f,.005f,.008f),color);
+                    if(hasWall)
+                        for(int i=0;i<4;i++)
+                        {
+                            float angle=i*90*Mathf.Deg2Rad;
+                            var part=Marker(PrimitiveType.Cube,root,new Vector3(Mathf.Cos(angle)*.012f,.004f,Mathf.Sin(angle)*.012f),new Vector3(.028f,.008f,.003f),SeatColor(m.PlayerId));
+                            part.transform.localRotation=Quaternion.Euler(0,90-i*90,0);
+                        }
+                }
+                var track=Marker(PrimitiveType.Cylinder,root,new Vector3(-.018f,.002f,0),new Vector3(.007f,.002f,.007f),color);
+                track.name="Metropolis track: "+m.Track;
+                // One / two / three pips also distinguish tracks when colour alone is unclear.
+                for(int i=0;i<=(int)m.Track;i++)
+                    Marker(PrimitiveType.Sphere,track.transform,new Vector3((i-(int)m.Track*.5f)*.23f,1.3f,0),new Vector3(.18f,.45f,.18f),Color.white);
             }
-            var track=Marker(PrimitiveType.Cylinder,root,new Vector3(-.018f,.002f,0),new Vector3(.007f,.002f,.007f),color);
-            track.name="Metropolis track: "+m.Track;
-            // One / two / three pips also distinguish tracks when colour alone is unclear.
-            for(int i=0;i<=(int)m.Track;i++)
-                Marker(PrimitiveType.Sphere,track.transform,new Vector3((i-(int)m.Track*.5f)*.23f,1.3f,0),new Vector3(.18f,.45f,.18f),Color.white);
         }
-        RefreshMerchant(merchant);
+        if(!string.IsNullOrEmpty(merchant))
+        using(var change=pieceCache.Update("merchant",merchant))
+            if(change.Changed)RefreshMerchant(merchant);
+        pieceCache.End();
     }
     // Isolated visual sample arrangement. It never changes a game session or its PlayerView.
     public void ShowComponentSamples()
@@ -216,25 +230,40 @@ public sealed class M4BoardRenderer : MonoBehaviour
             Marker(PrimitiveType.Capsule,root,new Vector3(0,.019f,0),new Vector3(.008f,.016f,.008f),new Color(.8f,.4f,.85f));
         }
     }
+    int renderedBarbarianPosition=int.MinValue;
     public void RefreshBarbarians(int position)
     {
+        if(renderedBarbarianPosition==position&&barbarianShip!=null)return;
+        renderedBarbarianPosition=position;
         if(barbarianShip!=null){barbarianShip.SetActive(false);Destroy(barbarianShip);}
         barbarianShip=barbarianTrack==null?null:EntityBoardAssets.BarbarianShip(position,barbarianTrack.transform,publicMarkers);
     }
+    readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId)
     {
         ClearPreview();
-        foreach(Transform t in pieces){t.gameObject.SetActive(false);Destroy(t.gameObject);}
+        pieceCache.Begin("basic",pieces);
         foreach(var p in settlements)
+        using(var change=pieceCache.Update("settlement:"+p.LocationId,p.PlayerId))
+        {
+            if(!change.Changed)continue;
             if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
                 Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
-        foreach(var p in roads) Piece(true,p.LocationId,SeatColor(p.PlayerId),pieces);
+        }
+        foreach(var p in roads)
+        using(var change=pieceCache.Update("road:"+p.LocationId,p.PlayerId))
+            if(change.Changed)Piece(true,p.LocationId,SeatColor(p.PlayerId),pieces);
         foreach(var p in cities)
+        using(var change=pieceCache.Update("city:"+p.LocationId,p.PlayerId))
         {
+            if(!change.Changed)continue;
             if(PlayerComponentAssets.Building("city",p.PlayerId,"City "+p.LocationId,Position(p.LocationId),pieces)!=null)continue;
             CityFallback(p.LocationId,SeatColor(p.PlayerId));
         }
-        if(!string.IsNullOrEmpty(robberTileId)) Robber(robberTileId,new Color(.08f,.075f,.09f),pieces);
+        if(!string.IsNullOrEmpty(robberTileId))
+        using(var change=pieceCache.Update("robber",robberTileId))
+            if(change.Changed)Robber(robberTileId,new Color(.08f,.075f,.09f),pieces);
+        pieceCache.End();
     }
     void CityFallback(string id,Color color)
     {

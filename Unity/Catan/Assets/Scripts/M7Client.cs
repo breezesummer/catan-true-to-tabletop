@@ -393,6 +393,9 @@ public sealed class M7Client : MonoBehaviour
         if(response.ViewJson!=null&&response.Revision>=Revision)
         {
             bool changed=response.Revision!=Revision||viewJson==null;
+            // 只有近期记录与已接收记录连续，或首次入桌时才直接采用；长时间掉线仍分页补齐，避免漏播卡牌。
+            if(changed&&response.PresentationHistoryJson!=null&&(viewJson==null||(History.LastOrDefault()?.Sequence??0)>=response.PresentationHistoryAfterSequence))
+                MergeHistory(WireJson.Deserialize<GameHistoryEntry[]>(response.PresentationHistoryJson));
             Revision=response.Revision;viewJson=response.ViewJson;
             if(changed){decodedView=null;previews.Clear();previewQueue.Clear();previewPending.Clear();ViewChanged?.Invoke();historyDirty=true;FetchHistory();}
         }
@@ -419,12 +422,19 @@ public sealed class M7Client : MonoBehaviour
                 if(current!=generation||match!=matchEpoch)return;historyBusy=false;
                 if(epoch!=connectionEpoch||!response.Success){RetryHistory();return;}
                 if(response.Room?.GameNumber!=Room?.GameNumber){historyDirty=true;nextHistoryAt=0;return;}
-                History=History.Concat(entries).GroupBy(e=>e.Sequence).Select(g=>g.First()).OrderBy(e=>e.Sequence).ToArray();historyCursor=Math.Max(historyCursor,response.HistoryCursor);
+                MergeHistory(entries);historyCursor=Math.Max(historyCursor,response.HistoryCursor);
                 historyRetryDelay=2;nextHistoryAt=0;historyDirty|=response.HasMoreHistory||Revision>requestedRevision;
                 if(historyDirty)FetchHistory();
             });
         }
         catch(Exception){main.Enqueue(()=>{if(current==generation&&match==matchEpoch){historyBusy=false;RetryHistory();}});}
+    }
+    void MergeHistory(GameHistoryEntry[] entries)
+    {
+        if(entries==null||entries.Length==0)return;
+        var known=new HashSet<long>(History.Select(e=>e.Sequence));
+        var added=entries.Where(e=>known.Add(e.Sequence)).ToArray();
+        if(added.Length>0)History=History.Concat(added).OrderBy(e=>e.Sequence).ToArray();
     }
     void RetryHistory(){historyDirty=true;nextHistoryAt=Time.unscaledTime+historyRetryDelay;historyRetryDelay=Math.Min(30,historyRetryDelay*2);}
     async void PollState()

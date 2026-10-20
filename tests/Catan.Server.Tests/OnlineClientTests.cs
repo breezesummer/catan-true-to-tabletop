@@ -16,6 +16,48 @@ namespace Catan.Server.Tests;
 
 public sealed class OnlineClientTests
 {
+    static string HistoryJson(params long[] sequences)=>"["+string.Join(",",sequences.Select(s=>"{\"Sequence\":"+s+",\"Kind\":\"BuildRoad\"}"))+"]";
+
+    [Fact]
+    public void SnapshotHistoryIsReadyBeforeViewNotificationAndDoesNotSkipBackfill()
+    {
+        var client=Client();
+        try
+        {
+            int notified=0;
+            client.ViewChanged+=()=>{notified++;Assert.Equal(notified,client.History.Last().Sequence);};
+            void Apply(long revision,string history,long after=0)=>Method("Apply").Invoke(client,new object[]{
+                new NetworkResponse{Success=true,Revision=revision,ViewJson="{}",PresentationHistoryJson=history,PresentationHistoryAfterSequence=after},false,false});
+            Apply(1,HistoryJson(1));Apply(2,HistoryJson(1,2));
+            Assert.Equal(2,notified);Assert.Equal(new long[]{1,2},client.History.Select(e=>e.Sequence));
+            Assert.Equal(0L,Field("historyCursor").GetValue(client));
+            Apply(2,HistoryJson(1,2));
+            Assert.Equal(2,notified);Assert.Equal(2,client.History.Length);
+            // 心跳／推送的同修订响应不重复解析展示记录。
+            Apply(2,"无需解析的重复内容");
+            // 迟到的旧快照不能让已展示记录倒退。
+            Apply(1,HistoryJson(1));Assert.Equal(2,client.Revision);
+        }
+        finally{client.EndSession();}
+    }
+
+    [Fact]
+    public void MissingHistoryRangeFallsBackToPagingAndRestartDropsOldHistory()
+    {
+        var client=Client();
+        try
+        {
+            void Apply(long revision,int game,string history,long after)=>Method("Apply").Invoke(client,new object[]{
+                new NetworkResponse{Success=true,Revision=revision,Room=new RoomSummary{GameNumber=game},ViewJson="{}",PresentationHistoryJson=history,PresentationHistoryAfterSequence=after},false,false});
+            Apply(1,1,HistoryJson(1),0);
+            Apply(2,1,HistoryJson(80,81),79);
+            Assert.Equal(1,Assert.Single(client.History).Sequence);
+            Apply(3,2,HistoryJson(1,2),0);
+            Assert.Equal(new long[]{1,2},client.History.Select(e=>e.Sequence));
+        }
+        finally{client.EndSession();}
+    }
+
     [Theory]
     [InlineData("203.0.113.10", "http://203.0.113.10:47771")]
     [InlineData(" 203.0.113.10:48888 ", "http://203.0.113.10:48888")]

@@ -19,7 +19,7 @@ public sealed class M7PlayerVerification : MonoBehaviour
         public string RuleSet,ScenarioId,Result,Stage,Transport;
         public int PlayerCount,Turn,HumanCommands,ClientAiCommands;
         public long Revision;
-        public bool LocalAuthorityAbsent,LocalSaveRejected,ReconnectConfirmed,OwnSeatOnly,RoomSwitchConfirmed,OriginalRoomRestored,LanDiscoveryConfirmed,LanDiscoverySkipped,NameUpdateConfirmed;
+        public bool LocalAuthorityAbsent,LocalSaveRejected,ReconnectConfirmed,OwnSeatOnly,RoomSwitchConfirmed,OriginalRoomClosed,LanDiscoveryConfirmed,LanDiscoverySkipped,NameUpdateConfirmed;
     }
     M6App app;
     Configuration config;
@@ -106,7 +106,7 @@ public sealed class M7PlayerVerification : MonoBehaviour
         }
         report.Turn=Turn();report.Revision=client.Revision;report.ClientAiCommands=app.AiCommandsExecuted;report.Transport=client.TransportMode;
         report.OwnSeatOnly=OwnSeat()==client.SeatId;Require(report.OwnSeatOnly,"only own seat is presented");
-        string originalRoom=client.RoomId,originalSeat=client.SeatId;
+        string originalRoom=client.RoomId;
         report.Stage="direct room switch";
         client.Create(new RoomSettings{Name="切房恢复验证",Listed=true,RuleSet=config.RuleSet,ScenarioId=config.ScenarioId,PlayerCount=config.PlayerCount,AiSeats=config.PlayerCount==3?new[]{"P2","P3"}:new[]{"P2","P3","P4"}},"切房验证玩家",null);
         while(Waiting(!client.Busy&&client.Room!=null&&client.RoomId!=originalRoom))yield return null;
@@ -116,18 +116,29 @@ public sealed class M7PlayerVerification : MonoBehaviour
             report.Stage="LAN room discovery";var discovery=new M7LanService().Discover(config.DiscoveryPort,client.RememberedRoomIds);
             while(Waiting(discovery.IsCompleted))yield return null;
             Require(!discovery.IsFaulted&&Array.Exists(discovery.Result,s=>Array.Exists(s.Rooms,r=>r.RoomId==secondRoom)),"automatic LAN discovery returns live room");report.LanDiscoveryConfirmed=true;
-            Require(Array.Exists(discovery.Result,s=>Array.Exists(s.Rooms,r=>r.RoomId==originalRoom)),"own offline room remains recoverable without public history rooms");
         }
         else report.LanDiscoverySkipped=true;
-        report.Stage="restore first room after switch";
-        // 相同证书和房间在不同主机地址下仍须找到同一份恢复身份。
-        client.ConfigureEndpoint(config.SkipLanDiscovery?config.Endpoint:config.Endpoint.Replace("127.0.0.1","localhost"),config.CertificateFingerprint,false);
-        client.Join(originalRoom,"验证人类",null);
-        while(Waiting(!client.Busy&&client.Connected&&app.NetworkGame&&app.Ready&&client.RoomId==originalRoom&&client.Room!=null&&client.Room.RoomId==originalRoom))yield return null;
-        Require(client.SeatId==originalSeat&&OwnSeat()==originalSeat&&AuthorityAbsent(),"per-room credential restores original seat");
-        report.OriginalRoomRestored=true;
+        report.Stage="确认旧房销毁";
+        // 换房允许退出请求在两秒后超时；这种情况下按现行规则等待断线宽限清理。
+        float closedDeadline=Time.realtimeSinceStartup+65;
+        while(true)
+        {
+            while(Waiting(!client.Busy))yield return null;
+            bool oldRoomFound=false;client.ClearError();
+            client.DescribeRoom(originalRoom,_=>oldRoomFound=true);
+            while(Waiting(!client.Busy))yield return null;
+            if(!oldRoomFound&&client.LastError.Contains("RoomNotFound"))break;
+            Require(Time.realtimeSinceStartup<closedDeadline,"旧房超过断线宽限后仍未销毁");
+            yield return new WaitForSecondsRealtime(.5f);
+        }
+        report.OriginalRoomClosed=true;
+        client.ClearError();
+        report.Stage="新房准备";client.Ready(true);while(Waiting(!client.Busy))yield return null;
+        report.Stage="新房开局";client.StartRoom();
+        while(Waiting(app.NetworkGame&&app.Ready&&client.RoomId==secondRoom))yield return null;
+        Require(OwnSeat()==client.SeatId&&AuthorityAbsent(),"换房后仍只展示本人视图且没有本地权威");
         report.Stage="shared player name update";client.SetDisplayName("重连后的新名字");
-        while(Waiting(Array.Exists(client.Room.Seats,s=>s.SeatId==originalSeat&&s.DisplayName=="重连后的新名字")))yield return null;
+        while(Waiting(Array.Exists(client.Room.Seats,s=>s.SeatId==client.SeatId&&s.DisplayName=="重连后的新名字")))yield return null;
         report.NameUpdateConfirmed=true;
         yield return null;
         ScreenCapture.CaptureScreenshot(Path.Combine(config.OutputDirectory,"client.png"));yield return null;

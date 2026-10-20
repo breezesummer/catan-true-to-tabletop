@@ -9,6 +9,31 @@ namespace Catan.Network.Tests;
 
 public sealed class RoomDirectoryTests
 {
+    [Fact]
+    public void RecentPresentationHistoryMatchesSeatProjectionAndSurvivesDuplicateCommands()
+    {
+        using var f=new Fixture();var clients=f.StartHumans();
+        for(int i=0;i<8;i++)
+        {
+            var actor=f.Actor(clients);
+            var command=new BaseGameAi().Decide(WireJson.Deserialize<M2.PlayerView>(actor.ViewJson));
+            command.Id="presentation-"+i;
+            var request=f.Command(actor,command);
+            var committed=f.Directory.Handle(request);Assert.True(committed.Success);
+            var duplicate=f.Directory.Handle(request);Assert.True(duplicate.IsDuplicate);
+            Assert.Equal(committed.PresentationHistoryJson,duplicate.PresentationHistoryJson);
+            foreach(var client in clients)
+            {
+                var snapshot=f.Directory.Handle(Fixture.Request("Get",client));
+                var page=f.Send(client,"History",new HistoryPayload{Limit=200});
+                Assert.Equal(page.HistoryJson,snapshot.PresentationHistoryJson);
+                Assert.Equal(0,snapshot.PresentationHistoryAfterSequence);
+                Assert.DoesNotContain("Random",snapshot.PresentationHistoryJson);
+                Assert.Equal(snapshot.ViewJson,f.Directory.Handle(Fixture.Request("Get",client)).ViewJson);
+            }
+        }
+    }
+
     [Theory][InlineData(3,new[]{"P1"},"P2")][InlineData(4,new[]{"P1","P2","P3"},"P4")]
     public void RedCanBeAiAndCreatorUsesFirstHumanColor(int seats,string[] ai,string manager)
     {
@@ -157,9 +182,9 @@ public sealed class RoomDirectoryTests
     public void LobbyLastLeaveClosesRoomAndNeverRelistsHistoryAfterRestart()
     {
         using var f = new Fixture(); var player = f.Create(); Assert.True(f.Send(player, "Leave").Success);
-        Assert.Equal("Unauthorized", f.Directory.Handle(Fixture.Request("Reconnect", player)).Code);
-        Assert.Empty(f.Directory.ListPublicRooms()); Assert.NotEmpty(f.Storage.Documents);
-        f.Restart(); Assert.Empty(f.Directory.ListPublicRooms()); Assert.Equal("RoomClosed", f.Join(player).Code);
+        Assert.Equal("RoomNotFound", f.Directory.Handle(Fixture.Request("Reconnect", player)).Code);
+        Assert.Empty(f.Directory.ListPublicRooms()); Assert.Empty(f.Storage.Documents);
+        f.Restart(); Assert.Empty(f.Directory.ListPublicRooms()); Assert.Equal("RoomNotFound", f.Join(player).Code);
         Assert.True(f.Create().Success);
     }
 
@@ -262,19 +287,19 @@ public sealed class RoomDirectoryTests
         foreach (var seat in legacy["Seats"]!.AsArray()) { seat!.AsObject().Remove("ControlledByAi"); seat.AsObject().Remove("RejoinAfterTurnKey"); }
         var legacyDocument = legacy.ToJsonString(); f.Storage.Documents[host.RoomId] = legacyDocument;
         f.Restart(); Assert.Equal(legacyDocument, f.Storage.Documents[host.RoomId]);
-        var denied = f.Directory.Handle(new() { Operation = "List", ProtocolVersion = 1 }); Assert.Equal("ProtocolMismatch", denied.Code); Assert.Equal(2, denied.ProtocolVersion);
+        var denied = f.Directory.Handle(new() { Operation = "List", ProtocolVersion = 1 }); Assert.Equal("ProtocolMismatch", denied.Code); Assert.Equal(NetworkProtocol.Version, denied.ProtocolVersion);
         var restored = f.Directory.Handle(Fixture.Request("Reconnect", host)); restored.Credential = host.Credential;
-        Assert.True(restored.Success); Assert.Equal(2, restored.ProtocolVersion); Assert.Equal(host.RoomId, restored.RoomId);
+        Assert.True(restored.Success); Assert.Equal(NetworkProtocol.Version, restored.ProtocolVersion); Assert.Equal(host.RoomId, restored.RoomId);
         Assert.All(restored.Room.Seats.Where(s => s.IsAi), s => Assert.Contains(s.DisplayName, new[] { "哈基米", "吃白饭的大肥鲸", "糖包", "我是奶龙" }));
         using var upgraded = System.Text.Json.JsonDocument.Parse(f.Storage.Documents[host.RoomId]);
-        Assert.Equal(2, upgraded.RootElement.GetProperty("ProtocolVersion").GetInt32());
+        Assert.Equal(NetworkProtocol.Version, upgraded.RootElement.GetProperty("ProtocolVersion").GetInt32());
         Assert.Equal(2, upgraded.RootElement.GetProperty("AiDisplayNames").EnumerateObject().Count());
     }
 
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    [InlineData(3)]
+    [InlineData(999)]
     public void UnknownPrivateProtocolVersionsFailClosedWithoutOverwritingSave(int version)
     {
         using var f = new Fixture(); var room = f.Create();
@@ -388,7 +413,15 @@ public sealed class RoomDirectoryTests
         using var f = new Fixture(); var host = f.Create(); var request = Enrollment(operation, operation == "Join" ? host.RoomId : null);
         var client = f.Directory.Handle(request); client.Credential = request.EnrollmentCredential;
         Assert.True(f.Send(client, "Leave").Success); f.Restart();
-        var replay = f.Directory.Handle(request); Assert.False(replay.Success); Assert.Equal("Unauthorized", replay.Code); Assert.Null(replay.Room); Assert.Null(replay.Credential);
+        var replay = f.Directory.Handle(request);
+        if(operation=="Create")
+        {
+            // 最后一人退出后房间及登记账本已销毁；再次创建可以得到新房，但不能恢复原房。
+            Assert.True(replay.Success);Assert.False(replay.IsDuplicate);Assert.NotEqual(client.RoomId,replay.RoomId);
+            Assert.Equal("RoomNotFound",f.Directory.Handle(Fixture.Request("Reconnect",client)).Code);
+        }
+        else {Assert.False(replay.Success);Assert.Equal("Unauthorized",replay.Code);Assert.Null(replay.Room);}
+        Assert.Null(replay.Credential);
     }
 
     [Fact]
@@ -420,10 +453,10 @@ public sealed class RoomDirectoryTests
         var replacement = f.Create(); Assert.True(replacement.Success);
         clock += TimeSpan.FromSeconds(11); Assert.True(f.Directory.Handle(Fixture.Request("Get", replacement)).Success);
         await f.Directory.TickAiAsync();
-        Assert.Equal("Unauthorized", f.Directory.Handle(Fixture.Request("Reconnect", abandoned)).Code);
-        Assert.Equal("RoomClosed", f.Join(abandoned).Code);
+        Assert.Equal("RoomNotFound", f.Directory.Handle(Fixture.Request("Reconnect", abandoned)).Code);
+        Assert.Equal("RoomNotFound", f.Join(abandoned).Code);
         f.Restart(); Assert.Empty(f.Directory.ListPublicRooms());
-        Assert.Equal("RoomClosed", f.Join(abandoned).Code);
+        Assert.Equal("RoomNotFound", f.Join(abandoned).Code);
         var restored = f.Directory.Handle(Fixture.Request("Reconnect", replacement)); Assert.True(restored.Success);
         Assert.Single(f.Directory.ListPublicRooms()); Assert.Equal(replacement.RoomId, f.Directory.ListPublicRooms()[0].RoomId);
     }
@@ -500,7 +533,7 @@ public sealed class RoomDirectoryTests
     }
 
     [Fact]
-    public async Task LateHeartbeatAndExplicitLeaveBothUseAiWithoutLeakingPrivateState()
+    public async Task LateHeartbeatThenLastOnlinePlayerLeaveClosesWithoutLeakingPrivateState()
     {
         var clock = DateTimeOffset.UtcNow;
         using var f = new Fixture(new RoomDirectoryOptions { Clock = () => clock, ConnectionTimeout = TimeSpan.FromSeconds(10) });
@@ -509,12 +542,12 @@ public sealed class RoomDirectoryTests
         var late = f.Directory.Handle(Fixture.Request("Get", actor));
         Assert.False(late.HumanControlAvailable); Assert.True(late.Room.Seats.Single(s => s.SeatId == actor.SeatId).RejoinPending);
         Assert.True(f.Send(actor, "Leave").Success); Assert.Empty(f.Directory.ListPublicRooms());
-        Assert.Equal(1, await f.Directory.TickAiAsync());
+        Assert.Equal(0, await f.Directory.TickAiAsync());
         var description = f.Directory.Handle(new() { Operation = "Describe", RoomId = actor.RoomId });
-        Assert.False(description.Room.Paused); Assert.Null(description.ViewJson); Assert.Null(description.Credential);
+        Assert.Equal("RoomNotFound",description.Code);Assert.Null(description.Room); Assert.Null(description.ViewJson); Assert.Null(description.Credential);
         var publicWire = WireJson.Serialize(description);
         foreach (var forbidden in new[] { "CredentialHash", "RejoinAfterTurnKey", "RandomState", "OwnResources", "GameSave" }) Assert.DoesNotContain(forbidden, publicWire);
-        var resumed = f.Directory.Handle(Fixture.Request("Reconnect", actor)); Assert.True(resumed.Success); Assert.False(resumed.HumanControlAvailable);
+        var resumed = f.Directory.Handle(Fixture.Request("Reconnect", actor)); Assert.False(resumed.Success);Assert.Equal("RoomNotFound",resumed.Code);
     }
 
     [Fact]

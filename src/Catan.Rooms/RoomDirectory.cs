@@ -262,8 +262,28 @@ public sealed class RoomDirectory : IDisposable
                 return response;
             }
         }
+        private long projectionRevision=-1;
+        private readonly Dictionary<string,(string View,string History,long After)> projections=new();
         private NetworkResponse Snapshot(SavedSeat seat, string code = null, string message = "已同步。", bool success = true, string credential = null)
-            => new() { Success = success, Code = code, Message = message, RoomId = state.RoomId, Revision = state.Revision, CommittedRevision = state.Revision, SeatId = seat?.SeatId, HumanControlAvailable = seat != null && !state.Closed && (game == null || !seat.ControlledByAi && Connected(seat)), RuleSet = state.Settings.RuleSet, Room = PublicSummary(), ViewJson = seat == null || game == null ? null : game.ViewJson(seat.SeatId), Credential = credential, ConnectionId = seat?.ConnectionId, CredentialExpiresAtUtc = seat?.CredentialExpiresAtUtc.ToString("O") };
+        {
+            var response=new NetworkResponse { Success = success, Code = code, Message = message, RoomId = state.RoomId, Revision = state.Revision, CommittedRevision = state.Revision, SeatId = seat?.SeatId, HumanControlAvailable = seat != null && !state.Closed && (game == null || !seat.ControlledByAi && Connected(seat)), RuleSet = state.Settings.RuleSet, Room = PublicSummary(), Credential = credential, ConnectionId = seat?.ConnectionId, CredentialExpiresAtUtc = seat?.CredentialExpiresAtUtc.ToString("O") };
+            if(seat!=null&&game!=null)
+            {
+                // 仍在房间锁内验证身份和控制权；只复用同一修订、同一席位的不可变投影。
+                if(projectionRevision!=state.Revision){projections.Clear();projectionRevision=state.Revision;}
+                if(!projections.TryGetValue(seat.SeatId,out var projection))
+                {
+                    var history=game.History(seat.SeatId,0);
+                    int first=Math.Max(0,history.Length-64);
+                    projection=(game.ViewJson(seat.SeatId),WireJson.Serialize(history.Skip(first).ToArray()),first==0?0:history[first-1].Sequence);
+                    projections.Add(seat.SeatId,projection);
+                }
+                response.ViewJson=projection.View;
+                response.PresentationHistoryAfterSequence=projection.After;
+                response.PresentationHistoryJson=projection.History;
+            }
+            return response;
+        }
         internal NetworkResponse Handle(NetworkRequest request)
         {
             lock (gate)
