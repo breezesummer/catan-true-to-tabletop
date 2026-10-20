@@ -10,6 +10,21 @@ namespace Catan.Network.Tests;
 
 public sealed class WireContractAuditTests
 {
+    [Fact]
+    public async Task ConcurrentWireDecodingKeepsSeatDataIndependentAndStillRejectsInvalidFields()
+    {
+        var game=M5.CombinedGameSession.Create("through-the-desert",4,97);
+        var wires=Enumerable.Range(1,4).Select(n=>WireJson.Serialize(game.GetPlayerView("P"+n))).ToArray();
+        await Task.WhenAll(Enumerable.Range(0,32).Select(n=>Task.Run(()=>
+        {
+            int seat=n%4;
+            var view=WireJson.Deserialize<M5.PlayerView>(wires[seat]);
+            Assert.Equal("P"+(seat+1),view.PlayerId);
+            Assert.Equal(wires[seat],WireJson.Serialize(view));
+            Assert.ThrowsAny<Exception>(()=>WireJson.Deserialize<NetworkResponse>("{\"Revision\":1,\"Revision\":2}"));
+            Assert.ThrowsAny<Exception>(()=>WireJson.Deserialize<M5.PlayerView>("{\"OpponentHands\":[]}"));
+        })));
+    }
     private static string Scenario
     {
         get

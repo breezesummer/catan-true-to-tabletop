@@ -95,6 +95,7 @@ public sealed partial class M5App : MonoBehaviour
     void Select(CommandKind kind){draft=New(kind);pickField="";scroll=Vector2.zero;}
     void Refresh(PlayerView v)
     {
+        using var frameCost=FrameCost.Measure(FrameCost.Stage.BoardRefresh);
         mapChoice.Clear();
         ai?.ObservePlayerOrder(v.StartingPlayerId,v.Players.Select(p=>p.Id));
         summary=new PublicSummary{ScenarioName=v.ScenarioName,ActivePlayerId=v.ActivePlayerId,TargetVictoryPoints=v.TargetVictoryPoints,Turn=v.Turn,BarbarianPosition=v.BarbarianPosition,LastDice1=v.LastDice1,LastDice2=v.LastDice2,LastEventDie=v.LastEventDie,Players=v.Players};
@@ -209,6 +210,7 @@ public sealed partial class M5App : MonoBehaviour
     {value=M6App.DisplayPlayerText(value);if(ai!=null){ModernOperationUI.Styles(font);GUILayout.Label(value,minor?ModernOperationUI.Small:ModernOperationUI.Text);}else GUILayout.Label(value,minor?small:label);}
     void OnGUI()
     {
+        using var frameCost=FrameCost.Measure(FrameCost.Stage.Gui);
         if(host==null&&!NetworkGame)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=MobileTabletop.GuiMatrix;
         Panel(new Rect(0,0,1440,125),new Color(.045f,.09f,.10f));
         GUI.Label(new Rect(25,15,700,36),"CATAN  /  航海家 × 城市与骑士",heading);

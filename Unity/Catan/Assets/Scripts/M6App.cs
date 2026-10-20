@@ -96,6 +96,7 @@ public sealed partial class M6App : MonoBehaviour
     }
     void Update()
     {
+        using var frameCost=FrameCost.Measure(FrameCost.Stage.GameUpdate);
         UpdateCardPresentation();
         if(MobileTabletop.Enabled)_=MobileTabletop.TouchDragged;
         if(Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(1))escapeDismissedInteraction=false;
@@ -291,6 +292,7 @@ public sealed partial class M6App : MonoBehaviour
     static void Panel(Rect rect,Color color){var old=GUI.color;GUI.color=color;GUI.DrawTexture(rect,Texture2D.whiteTexture);GUI.color=old;}
     void OnGUI()
     {
+        using var frameCost=FrameCost.Measure(FrameCost.Stage.Gui);
         Styles();GUI.depth=-100;GUI.matrix=MobileTabletop.GuiMatrix;
         if(encyclopediaOpen&&tableMenu){DrawEncyclopedia();GUI.matrix=Matrix4x4.identity;return;}
         if(networkMenu){DrawNetworkMenu();GUI.matrix=Matrix4x4.identity;return;}

@@ -83,6 +83,7 @@ public sealed class M7Client : MonoBehaviour
     internal void EnableVerification(){verification=true;}
     void Update()
     {
+        using var frameCost=FrameCost.Measure(FrameCost.Stage.NetworkUpdate);
         while(main.TryDequeue(out var action))action();
         if(Connected&&!Busy&&!CommandPending&&Room!=null&&!string.IsNullOrEmpty(desiredDisplayName)&&Time.unscaledTime>=nextRenameAt)
         {
@@ -103,7 +104,7 @@ public sealed class M7Client : MonoBehaviour
     }
     public T View<T>() where T:class
     {
-        if(decodedView==null||!(decodedView is T))decodedView=WireJson.Deserialize<T>(viewJson);
+        if(decodedView==null||!(decodedView is T))decodedView=FrameCost.Decode<T>(viewJson,FrameCost.Stage.ViewDecode);
         return (T)decodedView;
     }
     public static string NormalizeFingerprint(string value)=>new string((value??"").Where(Uri.IsHexDigit).ToArray()).ToLowerInvariant();
@@ -341,7 +342,9 @@ public sealed class M7Client : MonoBehaviour
                 var buffer=new byte[8192];int count;
                 while((count=await stream.ReadAsync(buffer,0,buffer.Length,cancel))>0){if(bytes.Length+count>NetworkProtocol.MaximumResponseBytes)throw new M7NetworkFailure("RESPONSE_SIZE","服务响应超过大小限制。");bytes.Write(buffer,0,count);}
                 NetworkResponse result;
-                try{result=WireJson.Deserialize<NetworkResponse>(Encoding.UTF8.GetString(bytes.ToArray()));}
+                // 只移交独立字节副本；完成后仍回到 Unity 上下文，由原有代次检查和 Update 应用。
+                var payload=bytes.ToArray();
+                try{result=await Task.Run(()=>FrameCost.Decode<NetworkResponse>(Encoding.UTF8.GetString(payload),FrameCost.Stage.ResponseDecode),cancel);}
                 catch(Exception){throw new M7NetworkFailure("RESPONSE_FORMAT","服务响应格式无效，请确认双方游戏版本一致。");}
                 if(result==null)throw new M7NetworkFailure("RESPONSE_FORMAT","服务返回空响应。");
                 if(result.ProtocolVersion!=NetworkProtocol.Version)throw new M7NetworkFailure("PROTOCOL","联机协议不兼容，请所有玩家更新至同一版本。");
@@ -351,6 +354,7 @@ public sealed class M7Client : MonoBehaviour
     }
     void Apply(NetworkResponse response,bool handshake=false,bool roomList=false)
     {
+        using var frameCost=FrameCost.Measure(FrameCost.Stage.NetworkApply);
         if(response.ProtocolVersion!=NetworkProtocol.Version){Disconnected("联机协议不兼容，请更新客户端。");return;}
         MarkLobbyResponse(response);
         Status=response.Message??(response.Success?"已连接。":"请求被拒绝。");
@@ -395,7 +399,7 @@ public sealed class M7Client : MonoBehaviour
             bool changed=response.Revision!=Revision||viewJson==null;
             // 只有近期记录与已接收记录连续，或首次入桌时才直接采用；长时间掉线仍分页补齐，避免漏播卡牌。
             if(changed&&response.PresentationHistoryJson!=null&&(viewJson==null||(History.LastOrDefault()?.Sequence??0)>=response.PresentationHistoryAfterSequence))
-                MergeHistory(WireJson.Deserialize<GameHistoryEntry[]>(response.PresentationHistoryJson));
+                MergeHistory(FrameCost.Decode<GameHistoryEntry[]>(response.PresentationHistoryJson,FrameCost.Stage.HistoryDecode));
             Revision=response.Revision;viewJson=response.ViewJson;
             if(changed){decodedView=null;previews.Clear();previewQueue.Clear();previewPending.Clear();ViewChanged?.Invoke();historyDirty=true;FetchHistory();}
         }
@@ -416,7 +420,7 @@ public sealed class M7Client : MonoBehaviour
         try
         {
             var response=await Send(Envelope("History",WireJson.Serialize(new HistoryPayload{AfterSequence=historyCursor,Limit=100})),lifetime.Token);
-            var entries=string.IsNullOrEmpty(response.HistoryJson)?Array.Empty<GameHistoryEntry>():WireJson.Deserialize<GameHistoryEntry[]>(response.HistoryJson);
+            var entries=string.IsNullOrEmpty(response.HistoryJson)?Array.Empty<GameHistoryEntry>():FrameCost.Decode<GameHistoryEntry[]>(response.HistoryJson,FrameCost.Stage.HistoryDecode);
             main.Enqueue(()=>
             {
                 if(current!=generation||match!=matchEpoch)return;historyBusy=false;
@@ -465,7 +469,9 @@ public sealed class M7Client : MonoBehaviour
                 {
                     WebSocketReceiveResult result;
                     do{result=await ws.ReceiveAsync(new ArraySegment<byte>(buffer),cancel);if(result.MessageType==WebSocketMessageType.Close)throw new IOException("连接关闭。");if(result.MessageType!=WebSocketMessageType.Text||message.Length+result.Count>NetworkProtocol.MaximumResponseBytes)throw new IOException("无效消息。");message.Write(buffer,0,result.Count);}while(!result.EndOfMessage);
-                    var response=WireJson.Deserialize<NetworkResponse>(Encoding.UTF8.GetString(message.ToArray()));
+                    var payload=message.ToArray();
+                    // 等待当前消息解析完成才继续接收，避免同一连接的快照被并行解析打乱。
+                    var response=await Task.Run(()=>FrameCost.Decode<NetworkResponse>(Encoding.UTF8.GetString(payload),FrameCost.Stage.ResponseDecode),cancel);
                     main.Enqueue(()=>{if(current==generation&&socket==ws)Apply(response);});
                 }
             }

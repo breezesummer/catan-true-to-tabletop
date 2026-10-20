@@ -83,6 +83,7 @@ public sealed class M7PlayerVerification : MonoBehaviour
             if(Waiting(client.Connected&&!client.CommandPending&&!client.Busy&&app.IsHumanTurn)){yield return null;continue;}
             long before=client.Revision;
             object command;
+            using(FrameCost.Measure(FrameCost.Stage.HarnessDecision))
             switch(config.RuleSet)
             {
                 case "base":command=new BaseGameAi().Decide(GetComponent<M2App>().M6View);break;
