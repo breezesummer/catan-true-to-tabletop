@@ -167,6 +167,8 @@ public sealed partial class M4App
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,(int)view.LastEventDie,ai.CardPresentationRoll);
         tabletop.BindDefense(view.BarbarianPosition,view.DefenderStrength,view.BarbarianStrength);
         ai.TableDiceRolling=tabletop.DiceRolling;
+        // 本轮绘制共用掷骰前的快照，避免点击掷骰后手牌先于动画刷新数量。
+        var displayedOperations=Operations();
         tabletop.Draw(font,seat,Actor(view),PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,
             view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Score=TabletopScoreModel.For(view,p.Id),Resources=p.ResourceCount,Cards=p.ProgressCardCount,ResourceHandLimit=7+2*view.Board.Walls.Count(w=>w.PlayerId==p.Id),SpecialHandLimit=4,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Improvements=p.Improvements}).ToArray(),
             ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll,ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.PendingDecision==null&&view.TradeOffer==null,
@@ -176,7 +178,7 @@ public sealed partial class M4App
         tabletop.SetContextAnchor(operationActions&&operationKnightTarget!=null?(Vector2?)MobileTabletop.Logical(board.ScreenPoint(operationKnightTarget)):null);
         GUI.enabled=tableEnabled&&!mapChoice.Active&&!dock.HasOverlay;
         if(OperationContextVisible&&!ResourceChoiceVisible)tabletop.DrawContext(operationActions?"骑士行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):draft!=null&&draft.Kind==CommandKind.PlayProgressCard?CardName(draft.ProgressCard):"当前选择",DrawOperationControls);
-        GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!ai.TableInspectionBlocked&&!ResourceChoiceVisible&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(Operations(),font);GUI.enabled=previousEnabled;
+        GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!ai.TableInspectionBlocked&&!ResourceChoiceVisible&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(displayedOperations,font);GUI.enabled=previousEnabled;
         if(ResourceChoiceVisible&&ai.IsHumanTurn&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen)DrawPendingResources();
         tabletop.HandFlightsVisible=dock.ResourceHandVisible;if(!ResourceChoiceVisible&&(tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableInspectionBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
         ai.TableOverlayOpen=mapChoice.Active||dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen||ResourceChoiceVisible;
