@@ -1,0 +1,6007 @@
+{
+  "schemaVersion": 1,
+  "manifestId": "ultra-u0-cards-v001",
+  "recordedOn": "2026-10-21",
+  "timeZone": "Asia/Shanghai",
+  "targetVersion": "1.7.0",
+  "status": "U0 静态盘点；ultra 牌面未制作/未接入",
+  "scopeNotes": [
+    "仅盘点当前已支持基础、航海家、城市骑士、组合模式；跨模式同牌复用同 ID。",
+    "cards 包含真正手牌和已有规则中的纸板/公开组件；category 与 quantity.kind 区分，不能把所有条目相加当牌库总数。",
+    "唯一正面定义包括当前无图片但官方实际存在的奖励/奇观/辅助板。牌背是共享资产，翻板的 reverse 是公开状态面，不是隐藏牌背。",
+    "所有中文为项目工作译名或本文工作译文，未声称与用户实体印刷同版；图片生成文字不能成为规则源。",
+    "null 表示不适用或未取得；配合 quantity.kind、现状说明解读，不表示零张。",
+    "三种 player-aid 仅为官方组件参考（reference-only/missing-in-runtime），不计入当前 63 项运行展示重绘目标，不创建额外运行时卡牌或资产 ID。"
+  ],
+  "summary": {
+    "frontDefinitions": 66,
+    "handCardKinds": 38,
+    "publicComponentDefinitions": 28,
+    "publicReverseDefinitions": 15,
+    "sharedHiddenBackDefinitions": 6,
+    "ultraProducedFaces": 0,
+    "resourceSupply": 95,
+    "commoditySupply": 36,
+    "baseDevelopmentDeck": 25,
+    "progressDeck": 54,
+    "progressDeckByTrack": {
+      "science": 18,
+      "trade": 18,
+      "politics": 18
+    },
+    "pirateIslandsDevelopmentDeck": {
+      "threePlayers": 20,
+      "fourPlayers": 25
+    },
+    "forgottenTribeGiftCards": {
+      "count": 4,
+      "includedInBaseDevelopment25": true,
+      "initialRemainingDeck": 21
+    },
+    "existingUniqueTexturePaths": 71,
+    "currentRuntimeRedrawDefinitions": 63,
+    "referenceOnlyDefinitions": 3
+  },
+  "ruleSources": {
+    "catan-base-2025-en": {
+      "path": ".local/reference-cache/official-2025/v001/catan-base-2025-en.pdf",
+      "sha256": "0d81a40c1d4eb5eb438a62f80d71cdaab5f00404722c3cfa0b106d79b635ebc6",
+      "pdfPageCount": 12
+    },
+    "catan-seafarers-2025-en": {
+      "path": ".local/reference-cache/official-2025/v001/catan-seafarers-2025-en.pdf",
+      "sha256": "a499abe2b613afd618dd3c806790400c7e84adebcc9b9ab19a24fb80dd04b099",
+      "pdfPageCount": 20
+    },
+    "catan-cities-knights-2025-en": {
+      "path": ".local/reference-cache/official-2025/v001/catan-cities-knights-2025-en.pdf",
+      "sha256": "dac9f01afe9006e3b517aa257363c844eb2a9ff4b6578d3127f5d8d861c9a540",
+      "pdfPageCount": 16
+    }
+  },
+  "referenceRegistry": {
+    "assets/references/inbox/发展卡/绿色发展卡/印刷厂.jpg": {
+      "sha256": "193a5d761f6cc257b3cf97ecc64a1e40cf2975dc3774e194cc4d603c40ab261e",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg": {
+      "sha256": "07b84fce82cb038e187e4df65187327862c663e672aa39a135e98a6ac15b686d",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/绿色发展卡/发明家.jpg": {
+      "sha256": "8e94d08bf0c7c4aae6f996baa69aff9f80007e599d2a7e21090df0b27cd515b4",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/绿色发展卡/工程师.jpg": {
+      "sha256": "9fa002ec01cd40d1d1829749299651c221b637160dc9fcf2a8720d99ef66a7de",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/绿色发展卡/新建道路.jpg": {
+      "sha256": "aa68f9356c6dcba85dde9fe0c48df16b145f6e840d54b999ebbb48d05d81fd3a",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/绿色发展卡/灌溉.jpg": {
+      "sha256": "cb814cc85bd78f540a77778feb01965bc7f532bfa92ce8a9a2a30ad489df36e3",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/绿色发展卡/炼金术士.jpg": {
+      "sha256": "fdd11dc04cdeb1852f2d0dc0989e8ab5107ff4b644efc6ee6c0833b43a7a64b5",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/绿色发展卡/药物.jpg": {
+      "sha256": "dea107041e44f6cfe1499be46d48fdb8cfb4aeb209d738f4294bf0d2a44e6136",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/绿色发展卡/起重机.jpg": {
+      "sha256": "4b4410aaf7f70757ec42550905979ed7e2d71bb34248aec702b63b17634a8b9d",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/绿色发展卡/采矿.jpg": {
+      "sha256": "48a9ed9e7023938e109e296d15a35aa1935535634c35ea8f5aafb123d0b8dc3a",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/绿色发展卡/锻铁匠.jpg": {
+      "sha256": "11f4ea4b5715ed7a5c0bef506989a6e5b41b478cf532094cb19cff464c4449cd",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/蓝色发展卡/主教.jpg": {
+      "sha256": "bfb60c325097072da02d860d99408f85b5ed1a7f2ab522a31ae58bf149a61cd3",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/蓝色发展卡/卡背.jpg": {
+      "sha256": "f60c11e4a588f9440b4650a4f6ef0ea65d11edbba98accb30f6fc486b29d542f",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/蓝色发展卡/叛徒.jpg": {
+      "sha256": "119668bcf462a92f25912cbc6f014e5cbcece98d44aa5d919606a514911122f9",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/蓝色发展卡/外交官.jpg": {
+      "sha256": "99a94fe632101f48fd35d09c1574186c8c74da5bccf35e3a67c3ad0e8af8f960",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/蓝色发展卡/婚礼.jpg": {
+      "sha256": "2cbb13cac70476ba44b0a3e1d6eff682ef55e56e754e3e4f6dbb7c480d4f198b",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/蓝色发展卡/指挥官.jpg": {
+      "sha256": "929bf6b316911507ae7fe482ce31914ac899571339b2b612adf516170b4abe4c",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/蓝色发展卡/权谋.jpg": {
+      "sha256": "e45dbea2c62be9da56bb4208b2df6678ca5b77d101ec6c964bafde97716a1159",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/蓝色发展卡/石碑.jpg": {
+      "sha256": "6b1b15e1c252644d40847741214abef3c7625df22a2e2b1fc6ed7c92cf3b7520",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/蓝色发展卡/破坏者.jpg": {
+      "sha256": "289a21b92cf666a44a71a1387c34cbdaed590e07dc0045d0e4f192b4f74ae72a",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/蓝色发展卡/间谍.jpg": {
+      "sha256": "1f0e00204c452d42ff8494aab5b403d683f75237f190b552240ce972ea1710ab",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/黄色发展卡/垄断商品.jpg": {
+      "sha256": "f82c632e708f3b18fbcbbf659e24cdfbe5cd3820c67570797efcbf98bc45aedc",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/黄色发展卡/垄断资源.jpg": {
+      "sha256": "c294aaecc121a8b3c928800815a9fb9a7c53191ab16f2c3fed3f406068221f6b",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/黄色发展卡/大商家.jpg": {
+      "sha256": "84f20acb4ec5b09ca2f2665ae92bd385e142a3a9b9969d5ba862386e1644870f",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg": {
+      "sha256": "f788acd3fea19ef3e5538bdcb9ddb7c9e296c4699308c7b7f6bfa706484c8eae",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/黄色发展卡/黄色商人.jpg": {
+      "sha256": "6eee74bc121c8c4553cc73662493a34244702751e28f419133826893f519be05",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/黄色发展卡/黄色商港.jpg": {
+      "sha256": "ca5b9c536051d00bcffbf660b82ec0f5422e0fe783c7e921ebfd8e811b0e0a52",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/发展卡/黄色发展卡/黄色贸易船队.jpg": {
+      "sha256": "bc098f34a3c24515909249e53eeacf75b0e0906e88bf28107cd20844044b5c8a",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/商品牌/布匹.jpg": {
+      "sha256": "19a3b7d05fed239a580430dcf8944c7ea35e074ec0884c609819e107c7395e8e",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/商品牌/纸张.jpg": {
+      "sha256": "ef81a32d3d33f5eb7833ce0ef4c957ecafac945deb8a9f40614e05edb718b95f",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/商品牌/银币.jpg": {
+      "sha256": "9111063c9b5e664a56b9da7de8e5cfdc2be9e93cf6e41da78df189afaff05a4f",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/城市设施升级卡.jpg": {
+      "sha256": "259f8fea1625d858b8263aeb23be9093dbd9e851a7c6f54fd2d285108d22047b",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/城市设施满级卡.jpg": {
+      "sha256": "b8d21623a6f7e50aa94ed5175843be9e27b4293d21f0cc87463e4a713bdacc5b",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/绿色1级修道院反面.jpg": {
+      "sha256": "42ff7a13f67186932958144e740e9baabb55852495737c25ed47bf22132543f9",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/绿色1级修道院正面.jpg": {
+      "sha256": "a1cd408ec3836e30484a3af3748c11aea5e1d26c9df79a3f7c0024bc6a422eb1",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/绿色2级图书馆反面.jpg": {
+      "sha256": "01d0f5995917cccf70c07aac76e48326d89e2e51488821470b2b6ff94ffc74db",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/绿色2级图书馆正面.jpg": {
+      "sha256": "c6d8bcf2e273db47d76e5eb8c4aa0994cf7b20df74f6728f8871ce2e602bc0c9",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/绿色3级引水渠反面.jpg": {
+      "sha256": "b51b65f5d32dc3b2cbf3fabf8081dd593742a5ec91df0f1e466cb6ec82cf6c60",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/绿色3级引水渠正面.jpg": {
+      "sha256": "d98f48c3ff4316861fc65af9f9cdd392309863615e678c673d1c7509c9db7110",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/绿色4级剧院反面.jpg": {
+      "sha256": "24bf2d0900e7298534fbf2d3371f01c80c0b8793e2003e6412c8f83262e865ce",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/绿色4级剧院正面.jpg": {
+      "sha256": "80240f514813768fa062cbfd4654d5632c13bb727b73a617a294a1a635cecd84",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/绿色5级大学反面.jpg": {
+      "sha256": "0f63cbb4d66fe6ebe210ea74de7c5cdb978cb78969131b54f963f0fa2206869e",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/绿色5级大学正面.jpg": {
+      "sha256": "9a1da53e73325de91f79e3e62ecc2dd7229794d36062eb2ae41f12a906f62b86",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/蓝色1级市政厅反面.jpg": {
+      "sha256": "fa16744b0bc7195954b0807061c0b36eca94426492cbe45b9d466c39c0514c6c",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg": {
+      "sha256": "9b50c7580c4259ca9e70d7e7dca3e63bb7278f35b78e72cb55dfc8695e698ce9",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/蓝色2级教堂反面.jpg": {
+      "sha256": "00dd4ede6283b5afa2e1c97a9199dde46aacb6530bc4a98e9e792f1d36d55760",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/蓝色2级教堂正面.jpg": {
+      "sha256": "028c7fd304662fd71def80ef3716738fe7cdce4d3c2a99042451172f046175e8",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/蓝色3级要塞反面.jpg": {
+      "sha256": "b5bb7fa20b123e9778617608758e0f9f787e8332e2ecf8516d982200e70d73e8",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/蓝色3级要塞正面.jpg": {
+      "sha256": "2117621f40a921979231681343a62b5106066465572e4fab43f92dbc4ed2b043",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/蓝色4级大教堂反面.jpg": {
+      "sha256": "8d7ea0a760c3da54477c604361cd0b45686d6b7134bd37eddbff9aee6f7ae3c8",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/蓝色4级大教堂正面.jpg": {
+      "sha256": "975723c52b0916b38f4cfca4003551c8084bf0da98b711e216f0e27c4ee4dade",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/蓝色5级卡坦议会反面.jpg": {
+      "sha256": "0b5ba5c628de7ecbdbc75c672eddc2b482743753e58376f6bca37e9224294450",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/蓝色5级卡坦议会正面.jpg": {
+      "sha256": "1f7f6b59e9704eb70cb8e717f006afb948154efea53358a0e4dae15327c5c9d6",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/黄色1级市场反面.jpg": {
+      "sha256": "27f7f2a556c51d77cdd4868e80293907b311f2e7e3c3f773c141486393a11cbb",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/黄色1级市场正面.jpg": {
+      "sha256": "a8450574cd4fa21d43eea6323a2ef97cd440457b9e02a983326ffc8f11f928fd",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/黄色2级行会反面.jpg": {
+      "sha256": "79b507a4d1d444aa161e17e3f6441c898caafc3a3773ec0aa464febffcb7ec53",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/黄色2级行会正面.jpg": {
+      "sha256": "540960fc3e640a4e9615ee3ff291aa42baa110586501566f58c5fe07d309eedd",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/黄色3级同业公会反面.jpg": {
+      "sha256": "5cfca97514cf5fb2257b39a040f072ec9cbcc5255dd8d9978f92c5ab3faff9fd",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/黄色3级同业公会正面.jpg": {
+      "sha256": "1c73f7921f1950a7d06d8f14b4bd3a19dcc012093b69d77861bfbd18d16e449b",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/黄色4级银行反面.jpg": {
+      "sha256": "ed70a9c8410ec6ee604641ad6d88536169c57ba10fa8ef8a33c7462764453701",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/黄色4级银行正面.jpg": {
+      "sha256": "3ab1ed82e1466b12c23aa07223d7feaa1354a0ab2554299f592857502885438a",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/黄色5级商业中心反面.jpg": {
+      "sha256": "47a03876ccca518a456d7a2915bb185b3eec83e8df8d7e51ee8834d4f23ee0f4",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/城市设施/黄色5级商业中心正面.jpg": {
+      "sha256": "cd951c3af7ce30f7c48359706fef7c918f73d7d842fd74fc0d3d1f31f15d5c3b",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/奖励卡/卡坦保卫者.jpg": {
+      "sha256": "3c32e1d715f85010436610507e90a69038a1848770b8e386bbbbb4fe535424da",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/资源牌/小麦.jpg": {
+      "sha256": "90597e7807eddf96c8757fd84588e2f24350412355a8cee0ce7580d6203c2429",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/资源牌/木头.jpg": {
+      "sha256": "447133145e2d82dc15142e61ff22e26267da1a37e6d543c2c68b1a6617b588be",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/资源牌/砖头.jpg": {
+      "sha256": "b70eb1432b2d36665dd5a50582147bcf73d08ee4849f2c41bd682090d6c27ec4",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/资源牌/羊毛.jpg": {
+      "sha256": "0dbfd3ba45889231041354cd7c4b410b11ece05ca06ec53091c3ea345fa8bc7b",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/资源牌/资源牌背面.jpg": {
+      "sha256": "3d94957d49632f67bbd04945cb8e9c6a3eac9bc1bd38c06060adba1b036d5ab0",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    },
+    "assets/references/inbox/资源牌/铁矿石.jpg": {
+      "sha256": "3cc8d4bbee405952035bc075d8e741124f888d50cd402ae8662244b23aac8a10",
+      "role": "原始实体照片，仅为视觉参考，禁止作为规则与中文效果权威来源"
+    }
+  },
+  "sourceSnapshots": {
+    "Unity/Catan/Assets/Scripts/EntityCardAssets.cs": "64033789c7ae859e71a93e280a3158e44e1560536851c79780d0fc080ae7b81e",
+    "Unity/Catan/Assets/Scripts/M4App.cs": "ed724f270d4af8cd023d52f606e0e58baabca04e8771d2e710003e56249826ac",
+    "Unity/Catan/Assets/Scripts/M5App.cs": "38bf759d09f499d3d7400ed3522c587c67789ce36970e9c7fa2b411f25a15b79",
+    "Unity/Catan/Assets/Scripts/M6Encyclopedia.cs": "409d6e758ababc86b4a0a5b0408cad9db92e1e95fa320c4a41cc6d8050e6f1b5",
+    "Unity/Catan/Assets/Scripts/TabletopBankUI.cs": "f274789becc68d650ded4a8cf02975bad359d329522a62658f936450dba7fc16",
+    "src/Catan.Core/M2GameSession.cs": "66279f35737c0cfe2058afe4b5211617e5bdef24f30a457c5033867c2d6ce905",
+    "src/Catan.Core/M2Models.cs": "f0f83f4c21718a396846cc32ac271deac862d0feb06ae7be749247b3aa90dc46",
+    "src/Catan.Core/M3GameSession.cs": "f438e33cb6123c6735a935469f76cf56736fb8c7cff2173512b1ebee1c8f17dd",
+    "src/Catan.Core/M3Models.cs": "fbd89fbe6a521667d19a86aebfaf075554cf95b4276edbf0ba078c977d7d031a",
+    "src/Catan.Core/M3Scenarios.cs": "daa45b0728b0fc89311610dacde92f4a273f88011bd298d8821855b31e8a9738",
+    "src/Catan.Core/M3Seafaring.cs": "216c690fc0786640b7b0d02f1dfc89ddd1b5f09a2369fef384d9b8708663a52e",
+    "src/Catan.Core/M4CitiesKnights.cs": "59a7fdd5ecf590d6e80a91cf44e599cda33c704e6bbb74154afc2e406a13c037",
+    "src/Catan.Core/M4ExpansionModels.cs": "0b977e2a2afcf1bb9eb1f1eae392c9cbfbbc2872357c6057a528e8e09d60f422",
+    "src/Catan.Core/M4ProgressCards.cs": "da4cb4270fff46a48b42d5b058b6f89ffa89e25fe262a27540ddc87a487e2526",
+    "src/Catan.Core/M4ProgressModels.cs": "a48c0339f7acf6a971c78408ca2f8cf398ec043a9873debd69028f1fbb58b80a",
+    "src/Catan.Core/M5CitiesKnights.cs": "6b28707688603a2649e843a440d0173ad8ab911f26776b94f7c46f68aaa7c708",
+    "src/Catan.Core/M5ExpansionModels.cs": "f263f38315f7e2a11b97027a1bb38e587c32e8e26b7566b966e35c8767367885",
+    "src/Catan.Core/M5ProgressCards.cs": "c411e7d42413d22e624ac79d097f08f9406da5074f8603703aff04493ab53233",
+    "src/Catan.Core/M5ProgressModels.cs": "6d735b7ccbd7f60931d6039a62630b5059a648787c193fa6a02db9abd31cc368"
+  },
+  "privacyPolicies": {
+    "goods": {
+      "front": "本人手牌、公共银行库存、已经公开或经当前卡效授权的牌；对手未授权手牌仅合计张数。",
+      "back": "对手资源与商品统一 hand-hidden；不得用商品专用背/尺寸/边缘/飞行动作区分。",
+      "ai": "专用 AI PlayerView 可知对手资源与商品完整构成；不得将该视图接入人类渲染/网络。"
+    },
+    "development": {
+      "front": "仅本人持有牌、已经打出的牌；胜利点在本人的胜利条件满足时公开。百科可展示静态牌种，但不得关联他人实例。",
+      "back": "未获授权时仅 development-hidden；无具体牌种、购买顺序或牌库顺序。",
+      "ai": "只知对手基础发展牌数量，不知具体隐藏牌。"
+    },
+    "progress": {
+      "front": "本人手牌或间谍待决中 PrivateTargetProgressCards 授权；出牌后公开。百科静态牌种不代表对手手牌。",
+      "back": "公共三牌堆按已知轨道使用科学/贸易/政治背；不知道颜色的对手隐藏手牌使用 special-hidden。",
+      "ai": "专用 AI 可知对手各颜色数量，人类公开投影只给 ProgressCardCount；渲染不得读取 AI 颜色数组。"
+    },
+    "progress-victory": {
+      "front": "印刷术与宪法抽到立即公开，进入 ProgressVictoryCards；不计普通手牌上限，不可被间谍夺取。",
+      "back": "抽取前与对应颜色其他进步牌共用背面，禁止提前露出分值牌身份。"
+    },
+    "public": {
+      "front": "公共组件、公开等级/归属/费用/说明；从 PlayerView 或静态已知规则取值。",
+      "back": "无隐藏身份；双面建设板仅表示公开建设状态。"
+    }
+  },
+  "displayEntrypoints": {
+    "asset-resolver": {
+      "path": "Unity/Catan/Assets/Scripts/EntityCardAssets.cs",
+      "symbols": [
+        "Good",
+        "Progress",
+        "Improvement",
+        "Guidance",
+        "Defender",
+        "Display.DrawPreview"
+      ],
+      "usage": "直接贴图与详情授权登记；现有主入口"
+    },
+    "hand-detail": {
+      "path": "Unity/Catan/Assets/Scripts/OperationDock.cs",
+      "symbols": [
+        "DrawSpecialHand",
+        "DrawResourceHand",
+        "DrawCardPreview",
+        "DrawHandFace"
+      ],
+      "usage": "手牌、悬停、详情、出牌按钮"
+    },
+    "trade": {
+      "path": "Unity/Catan/Assets/Scripts/OperationDock.cs",
+      "symbols": [
+        "DrawTrade",
+        "DrawTradeBag",
+        "DrawOfferBag"
+      ],
+      "usage": "银行/港口/玩家交易及报价"
+    },
+    "discard": {
+      "path": "Unity/Catan/Assets/Scripts/TabletopDiscardUI.cs",
+      "symbols": [
+        "BindDiscard",
+        "DrawDiscardCount"
+      ],
+      "usage": "弃牌与手牌选择联动"
+    },
+    "resource-choice": {
+      "path": "Unity/Catan/Assets/Scripts/TabletopResourceChoiceUI.cs",
+      "symbols": [
+        "Draw"
+      ],
+      "usage": "金矿、丰收、水渠、商船队、垄断等必要选牌"
+    },
+    "legacy-choice": {
+      "path": "Unity/Catan/Assets/Scripts/ModernOperationUI.cs",
+      "symbols": [
+        "ResourceOrCommodityFront"
+      ],
+      "usage": "共享资源商品选择与计数控件"
+    },
+    "bank-flight": {
+      "path": "Unity/Catan/Assets/Scripts/TabletopBankUI.cs",
+      "symbols": [
+        "Draw",
+        "DrawFlight",
+        "DevelopmentBack"
+      ],
+      "usage": "银行牌堆、收牌/交易飞牌；他人只显示授权类别牌背"
+    },
+    "played-reveal": {
+      "path": "Unity/Catan/Assets/Scripts/M6CardPresentation.cs",
+      "symbols": [
+        "DrawPlayedCard"
+      ],
+      "usage": "公开出牌与即时胜利分演出"
+    },
+    "history": {
+      "path": "Unity/Catan/Assets/Scripts/TabletopHistoryUI.cs",
+      "symbols": [
+        "ResourceOrCommodityFront"
+      ],
+      "usage": "已授权历史的资源商品缩略图；特殊牌当前文字"
+    },
+    "score": {
+      "path": "Unity/Catan/Assets/Scripts/TabletopScoreModel.cs",
+      "symbols": [
+        "Awards",
+        "CityBonuses"
+      ],
+      "usage": "头像分值明细、最长路/军队/保卫者/公开VP计分"
+    },
+    "defense": {
+      "path": "Unity/Catan/Assets/Scripts/TabletopDefenseUI.cs",
+      "symbols": [
+        "Draw"
+      ],
+      "usage": "最长道路归属与蛮族防御状态；当前符号/文字"
+    },
+    "encyclopedia": {
+      "path": "Unity/Catan/Assets/Scripts/M6Encyclopedia.cs",
+      "symbols": [
+        "DrawEncyclopedia"
+      ],
+      "usage": "基础5类及进步25类中文百科，当前文字展示"
+    },
+    "facility": {
+      "path": "Unity/Catan/Assets/Scripts/OperationDock.cs",
+      "symbols": [
+        "DrawFacilities",
+        "FacilityAbility"
+      ],
+      "usage": "城市建设板、等级翻板、费用与能力"
+    },
+    "world-paper": {
+      "path": "Unity/Catan/Assets/Scripts/TabletopWorldObjects.cs",
+      "symbols": [
+        "Card",
+        "ImprovementBack",
+        "Guidance"
+      ],
+      "usage": "桌面牌片网格、建设板与贴图缓存"
+    },
+    "hand-icons": {
+      "path": "Unity/Catan/Assets/Scripts/StrategyHudArt.cs",
+      "symbols": [
+        "HandCardIcon"
+      ],
+      "usage": "仅类别示意的手牌页图标，不表示对手真实构成"
+    },
+    "base-adapter": {
+      "path": "Unity/Catan/Assets/Scripts/M2OperationAdapter.cs",
+      "symbols": [
+        "DockDevelopmentName"
+      ],
+      "usage": "基础枚举到中文/费用/手牌映射"
+    },
+    "sea-adapter": {
+      "path": "Unity/Catan/Assets/Scripts/M3OperationAdapter.cs",
+      "symbols": [
+        "DockDevelopmentName"
+      ],
+      "usage": "航海枚举到中文/费用/手牌映射"
+    },
+    "cities-adapter": {
+      "path": "Unity/Catan/Assets/Scripts/M4OperationAdapter.cs",
+      "symbols": [
+        "OperationSnapshot"
+      ],
+      "usage": "城市骑士授权手牌、待决与设施映射"
+    },
+    "combined-adapter": {
+      "path": "Unity/Catan/Assets/Scripts/M5OperationAdapter.cs",
+      "symbols": [
+        "OperationSnapshot"
+      ],
+      "usage": "组合授权手牌、待决与设施映射"
+    },
+    "legacy-base": {
+      "path": "Unity/Catan/Assets/Scripts/M2App.cs",
+      "symbols": [
+        "CardCount"
+      ],
+      "usage": "本地基础独立入口、隐私换座与文字发展卡"
+    },
+    "legacy-sea": {
+      "path": "Unity/Catan/Assets/Scripts/M3App.cs",
+      "symbols": [
+        "CardCount",
+        "WonderName"
+      ],
+      "usage": "航海独立入口、奇观名称/费用/条件与剧本奖励；GiftCardEdgeIds 在地图以“礼”文字标记"
+    },
+    "legacy-cities": {
+      "path": "Unity/Catan/Assets/Scripts/M4App.cs",
+      "symbols": [
+        "ProgressFace",
+        "Cards",
+        "CardHelp"
+      ],
+      "usage": "进步牌、合法私有目标选牌、公开分值、翻板及详情"
+    },
+    "legacy-combined": {
+      "path": "Unity/Catan/Assets/Scripts/M5App.cs",
+      "symbols": [
+        "ProgressFace",
+        "Cards",
+        "CardHelp"
+      ],
+      "usage": "组合进步牌、合法私有目标选牌、公开分值、翻板及详情"
+    },
+    "cost-icons": {
+      "path": "Unity/Catan/Assets/Scripts/OperationIconAssets.cs",
+      "symbols": [
+        "GoodTexture",
+        "DrawGood"
+      ],
+      "usage": "建造费用、缺料状态、资源商品缩略图"
+    },
+    "opponent-summary": {
+      "path": "Unity/Catan/Assets/Scripts/TabletopUI.cs",
+      "symbols": [
+        "OpponentHandCardLayout"
+      ],
+      "usage": "旧桌面对手合计手牌用统一资源牌背装饰，既不分具体资源也不分特殊牌身份"
+    }
+  },
+  "sharedBacks": [
+    {
+      "id": "hand-hidden",
+      "nameZh": "资源与商品共同隐藏牌背",
+      "existingPaths": [
+        "Unity/Catan/Assets/Resources/PhotoSamples/v001/resource-back.png",
+        "Unity/Catan/Assets/Resources/EntityAssets/v001/resource-cards/resource-back-original.png"
+      ],
+      "allowedInformation": "资源与商品合计手牌；不暴露类型或资源/商品分组",
+      "referencePaths": [
+        "assets/references/inbox/资源牌/资源牌背面.jpg"
+      ],
+      "ultraAssetId": "ultra/hand-hidden/back",
+      "productionStatus": "待 U2 样板与 U7A 制作"
+    },
+    {
+      "id": "development-hidden",
+      "nameZh": "基础发展牌共同背面",
+      "existingPaths": [],
+      "proceduralSource": "Unity/Catan/Assets/Scripts/TabletopBankUI.cs:DevelopmentBack",
+      "allowedInformation": "基础发展牌类别及公开张数",
+      "referencePaths": [],
+      "ultraAssetId": "ultra/development-hidden/back",
+      "productionStatus": "待 U2 样板与 U7A 制作"
+    },
+    {
+      "id": "special-hidden",
+      "nameZh": "未知颜色特殊牌通用背面",
+      "existingPaths": [],
+      "proceduralSource": "Unity/Catan/Assets/Scripts/TabletopBankUI.cs:DevelopmentBack",
+      "allowedInformation": "特殊牌总数；不表达进步牌颜色构成",
+      "referencePaths": [],
+      "ultraAssetId": "ultra/special-hidden/back",
+      "productionStatus": "待 U2 样板与 U7A 制作"
+    },
+    {
+      "id": "progress-science-hidden",
+      "nameZh": "科学进步牌共同背面",
+      "existingPaths": [
+        "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-back-original.png"
+      ],
+      "allowedInformation": "已公开的牌堆颜色，或当前观看者已经合法知道的颜色；不得凭隐藏牌 ID 选择",
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "ultraAssetId": "ultra/progress-science-hidden/back",
+      "productionStatus": "待 U2 样板与 U7A 制作"
+    },
+    {
+      "id": "progress-trade-hidden",
+      "nameZh": "贸易进步牌共同背面",
+      "existingPaths": [
+        "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-trade/progress-trade-back-original.png"
+      ],
+      "allowedInformation": "已公开的牌堆颜色，或当前观看者已经合法知道的颜色；不得凭隐藏牌 ID 选择",
+      "referencePaths": [
+        "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg"
+      ],
+      "ultraAssetId": "ultra/progress-trade-hidden/back",
+      "productionStatus": "待 U2 样板与 U7A 制作"
+    },
+    {
+      "id": "progress-politics-hidden",
+      "nameZh": "政治进步牌共同背面",
+      "existingPaths": [
+        "Unity/Catan/Assets/Resources/EntityAssets/v003/progress-politics/progress-politics-back-original.png"
+      ],
+      "allowedInformation": "已公开的牌堆颜色，或当前观看者已经合法知道的颜色；不得凭隐藏牌 ID 选择",
+      "referencePaths": [
+        "assets/references/inbox/发展卡/蓝色发展卡/卡背.jpg"
+      ],
+      "ultraAssetId": "ultra/progress-politics-hidden/back",
+      "productionStatus": "待 U2 样板与 U7A 制作"
+    }
+  ],
+  "cards": [
+    {
+      "id": "resource-wood",
+      "category": "resource",
+      "nameZh": "木材",
+      "ruleNameEn": "Wood",
+      "rulePacks": [
+        "base",
+        "seafarers",
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "固定银行供应",
+        "perGame": 19,
+        "perPlayer": null,
+        "source": "src/Catan.Core/M2GameSession.cs:Create"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            6,
+            7
+          ]
+        }
+      ],
+      "effectZh": "资源通过产出/交易等合法结算取得，用于规则规定的建造与交换。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:Names",
+        "Unity/Catan/Assets/Scripts/M5App.cs:Goods"
+      ],
+      "victoryPoints": 0,
+      "cost": null,
+      "privacyPolicy": "goods",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "trade",
+        "discard",
+        "resource-choice",
+        "legacy-choice",
+        "bank-flight",
+        "history",
+        "world-paper",
+        "base-adapter",
+        "sea-adapter",
+        "cities-adapter",
+        "combined-adapter",
+        "cost-icons",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/PhotoSamples/v001/wood-front.png",
+        "reverse": null,
+        "hiddenBackId": "hand-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/resource-wood/front",
+        "reverseId": null,
+        "hiddenBackId": "hand-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/资源牌/木头.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [],
+      "ruleEnum": "Wood",
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "resource-brick",
+      "category": "resource",
+      "nameZh": "砖块",
+      "ruleNameEn": "Brick",
+      "rulePacks": [
+        "base",
+        "seafarers",
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "固定银行供应",
+        "perGame": 19,
+        "perPlayer": null,
+        "source": "src/Catan.Core/M2GameSession.cs:Create"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            6,
+            7
+          ]
+        }
+      ],
+      "effectZh": "资源通过产出/交易等合法结算取得，用于规则规定的建造与交换。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:Names",
+        "Unity/Catan/Assets/Scripts/M5App.cs:Goods"
+      ],
+      "victoryPoints": 0,
+      "cost": null,
+      "privacyPolicy": "goods",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "trade",
+        "discard",
+        "resource-choice",
+        "legacy-choice",
+        "bank-flight",
+        "history",
+        "world-paper",
+        "base-adapter",
+        "sea-adapter",
+        "cities-adapter",
+        "combined-adapter",
+        "cost-icons",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/resource-cards/resource-brick-front.png",
+        "reverse": null,
+        "hiddenBackId": "hand-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/resource-brick/front",
+        "reverseId": null,
+        "hiddenBackId": "hand-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/资源牌/砖头.jpg",
+        "assets/references/inbox/资源牌/资源牌背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [],
+      "ruleEnum": "Brick",
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "resource-wool",
+      "category": "resource",
+      "nameZh": "羊毛",
+      "ruleNameEn": "Wool",
+      "rulePacks": [
+        "base",
+        "seafarers",
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "固定银行供应",
+        "perGame": 19,
+        "perPlayer": null,
+        "source": "src/Catan.Core/M2GameSession.cs:Create"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            6,
+            7
+          ]
+        }
+      ],
+      "effectZh": "资源通过产出/交易等合法结算取得，用于规则规定的建造与交换。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:Names",
+        "Unity/Catan/Assets/Scripts/M5App.cs:Goods"
+      ],
+      "victoryPoints": 0,
+      "cost": null,
+      "privacyPolicy": "goods",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "trade",
+        "discard",
+        "resource-choice",
+        "legacy-choice",
+        "bank-flight",
+        "history",
+        "world-paper",
+        "base-adapter",
+        "sea-adapter",
+        "cities-adapter",
+        "combined-adapter",
+        "cost-icons",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/resource-cards/resource-wool-front.png",
+        "reverse": null,
+        "hiddenBackId": "hand-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/resource-wool/front",
+        "reverseId": null,
+        "hiddenBackId": "hand-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/资源牌/羊毛.jpg",
+        "assets/references/inbox/资源牌/资源牌背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [],
+      "ruleEnum": "Wool",
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "resource-grain",
+      "category": "resource",
+      "nameZh": "谷物",
+      "ruleNameEn": "Wheat",
+      "rulePacks": [
+        "base",
+        "seafarers",
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "固定银行供应",
+        "perGame": 19,
+        "perPlayer": null,
+        "source": "src/Catan.Core/M2GameSession.cs:Create"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            6,
+            7
+          ]
+        }
+      ],
+      "effectZh": "资源通过产出/交易等合法结算取得，用于规则规定的建造与交换。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:Names",
+        "Unity/Catan/Assets/Scripts/M5App.cs:Goods"
+      ],
+      "victoryPoints": 0,
+      "cost": null,
+      "privacyPolicy": "goods",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "trade",
+        "discard",
+        "resource-choice",
+        "legacy-choice",
+        "bank-flight",
+        "history",
+        "world-paper",
+        "base-adapter",
+        "sea-adapter",
+        "cities-adapter",
+        "combined-adapter",
+        "cost-icons",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/resource-cards/resource-grain-front.png",
+        "reverse": null,
+        "hiddenBackId": "hand-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/resource-grain/front",
+        "reverseId": null,
+        "hiddenBackId": "hand-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/资源牌/小麦.jpg",
+        "assets/references/inbox/资源牌/资源牌背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "grain 资产对应规则枚举 Wheat；中文谷物/小麦/粮食是现有同义展示，不是额外牌种。"
+      ],
+      "ruleEnum": "Wheat",
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "resource-ore",
+      "category": "resource",
+      "nameZh": "矿石",
+      "ruleNameEn": "Ore",
+      "rulePacks": [
+        "base",
+        "seafarers",
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "固定银行供应",
+        "perGame": 19,
+        "perPlayer": null,
+        "source": "src/Catan.Core/M2GameSession.cs:Create"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            6,
+            7
+          ]
+        }
+      ],
+      "effectZh": "资源通过产出/交易等合法结算取得，用于规则规定的建造与交换。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:Names",
+        "Unity/Catan/Assets/Scripts/M5App.cs:Goods"
+      ],
+      "victoryPoints": 0,
+      "cost": null,
+      "privacyPolicy": "goods",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "trade",
+        "discard",
+        "resource-choice",
+        "legacy-choice",
+        "bank-flight",
+        "history",
+        "world-paper",
+        "base-adapter",
+        "sea-adapter",
+        "cities-adapter",
+        "combined-adapter",
+        "cost-icons",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/resource-cards/resource-ore-front.png",
+        "reverse": null,
+        "hiddenBackId": "hand-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/resource-ore/front",
+        "reverseId": null,
+        "hiddenBackId": "hand-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/资源牌/铁矿石.jpg",
+        "assets/references/inbox/资源牌/资源牌背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [],
+      "ruleEnum": "Ore",
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "commodity-cloth",
+      "category": "commodity",
+      "nameZh": "布匹",
+      "ruleNameEn": "Cloth",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "固定银行供应",
+        "perGame": 12,
+        "perPlayer": null,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:CommodityBank"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            7,
+            8
+          ]
+        }
+      ],
+      "effectZh": "城市在相应地形生产商品；可交易，升级对应城市改良时支付。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:Names",
+        "Unity/Catan/Assets/Scripts/M5App.cs:Goods"
+      ],
+      "victoryPoints": 0,
+      "cost": null,
+      "privacyPolicy": "goods",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "trade",
+        "discard",
+        "resource-choice",
+        "legacy-choice",
+        "bank-flight",
+        "history",
+        "world-paper",
+        "base-adapter",
+        "sea-adapter",
+        "cities-adapter",
+        "combined-adapter",
+        "cost-icons",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/commodity-cards/commodity-cloth-front.png",
+        "reverse": null,
+        "hiddenBackId": "hand-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/commodity-cloth/front",
+        "reverseId": null,
+        "hiddenBackId": "hand-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/商品牌/布匹.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "商品没有独立原照牌背；隐藏展示必须与资源一致。"
+      ],
+      "ruleEnum": "Cloth",
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "commodity-coin",
+      "category": "commodity",
+      "nameZh": "钱币",
+      "ruleNameEn": "Coin",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "固定银行供应",
+        "perGame": 12,
+        "perPlayer": null,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:CommodityBank"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            7,
+            8
+          ]
+        }
+      ],
+      "effectZh": "城市在相应地形生产商品；可交易，升级对应城市改良时支付。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:Names",
+        "Unity/Catan/Assets/Scripts/M5App.cs:Goods"
+      ],
+      "victoryPoints": 0,
+      "cost": null,
+      "privacyPolicy": "goods",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "trade",
+        "discard",
+        "resource-choice",
+        "legacy-choice",
+        "bank-flight",
+        "history",
+        "world-paper",
+        "base-adapter",
+        "sea-adapter",
+        "cities-adapter",
+        "combined-adapter",
+        "cost-icons",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/commodity-cards/commodity-coin-front.png",
+        "reverse": null,
+        "hiddenBackId": "hand-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/commodity-coin/front",
+        "reverseId": null,
+        "hiddenBackId": "hand-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/商品牌/银币.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "商品没有独立原照牌背；隐藏展示必须与资源一致。"
+      ],
+      "ruleEnum": "Coin",
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "commodity-paper",
+      "category": "commodity",
+      "nameZh": "纸张",
+      "ruleNameEn": "Paper",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "固定银行供应",
+        "perGame": 12,
+        "perPlayer": null,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:CommodityBank"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            7,
+            8
+          ]
+        }
+      ],
+      "effectZh": "城市在相应地形生产商品；可交易，升级对应城市改良时支付。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:Names",
+        "Unity/Catan/Assets/Scripts/M5App.cs:Goods"
+      ],
+      "victoryPoints": 0,
+      "cost": null,
+      "privacyPolicy": "goods",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "trade",
+        "discard",
+        "resource-choice",
+        "legacy-choice",
+        "bank-flight",
+        "history",
+        "world-paper",
+        "base-adapter",
+        "sea-adapter",
+        "cities-adapter",
+        "combined-adapter",
+        "cost-icons",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/commodity-cards/commodity-paper-front.png",
+        "reverse": null,
+        "hiddenBackId": "hand-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/commodity-paper/front",
+        "reverseId": null,
+        "hiddenBackId": "hand-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/商品牌/纸张.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "商品没有独立原照牌背；隐藏展示必须与资源一致。"
+      ],
+      "ruleEnum": "Paper",
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "development-knight",
+      "category": "development",
+      "nameZh": "骑士",
+      "ruleNameEn": "Knight",
+      "rulePacks": [
+        "base",
+        "seafarers"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "基础发展牌库",
+        "perGame": 14,
+        "scenarioOverrides": {
+          "pirate-islands-3": 14,
+          "pirate-islands-4": 19
+        },
+        "source": "src/Catan.Core/M2GameSession.cs:Create; src/Catan.Core/M3GameSession.cs:Create"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            9,
+            10
+          ]
+        },
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            2,
+            3,
+            12,
+            16,
+            17
+          ]
+        }
+      ],
+      "effectZh": "移动强盗并向一名合法目标随机取一张资源；航海家可改移海盗；海盗群岛只将距起点最近的普通船升级军舰。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M2OperationAdapter.cs:DockDevelopmentName",
+        "Unity/Catan/Assets/Scripts/M3OperationAdapter.cs:DockDevelopmentName",
+        "Unity/Catan/Assets/Scripts/M6Encyclopedia.cs:DrawEncyclopedia"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": {
+          "Wool": 1,
+          "Wheat": 1,
+          "Ore": 1
+        },
+        "play": {}
+      },
+      "privacyPolicy": "development",
+      "displayEntrypoints": [
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "base-adapter",
+        "sea-adapter",
+        "legacy-base",
+        "legacy-sea",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": "development-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/development-knight/front",
+        "reverseId": null,
+        "hiddenBackId": "development-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "缺少实体正面与背面照片；正面使用文字，牌背由程序绘制。",
+        "海盗群岛四人把五张印刷胜利点牌当骑士；工程直接创建 19 张 Knight，不保留被转换牌面的身份。清单不伪造额外规则卡类。"
+      ],
+      "ruleEnum": "Knight",
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "development-road-building",
+      "category": "development",
+      "nameZh": "道路建设",
+      "ruleNameEn": "Road Building",
+      "rulePacks": [
+        "base",
+        "seafarers"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "基础发展牌库",
+        "perGame": 2,
+        "scenarioOverrides": {
+          "pirate-islands-3": 2,
+          "pirate-islands-4": 2
+        },
+        "source": "src/Catan.Core/M2GameSession.cs:Create; src/Catan.Core/M3GameSession.cs:Create"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            9,
+            10
+          ]
+        },
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            2,
+            3,
+            12,
+            16,
+            17
+          ]
+        }
+      ],
+      "effectZh": "免费建设最多两段道路；航海家可选道路或船，逐段验证。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M2OperationAdapter.cs:DockDevelopmentName",
+        "Unity/Catan/Assets/Scripts/M3OperationAdapter.cs:DockDevelopmentName",
+        "Unity/Catan/Assets/Scripts/M6Encyclopedia.cs:DrawEncyclopedia"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": {
+          "Wool": 1,
+          "Wheat": 1,
+          "Ore": 1
+        },
+        "play": {}
+      },
+      "privacyPolicy": "development",
+      "displayEntrypoints": [
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "base-adapter",
+        "sea-adapter",
+        "legacy-base",
+        "legacy-sea",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": "development-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/development-road-building/front",
+        "reverseId": null,
+        "hiddenBackId": "development-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "缺少实体正面与背面照片；正面使用文字，牌背由程序绘制。"
+      ],
+      "ruleEnum": "RoadBuilding",
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "development-year-of-plenty",
+      "category": "development",
+      "nameZh": "丰收",
+      "ruleNameEn": "Invention",
+      "rulePacks": [
+        "base",
+        "seafarers"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "基础发展牌库",
+        "perGame": 2,
+        "scenarioOverrides": {
+          "pirate-islands-3": 2,
+          "pirate-islands-4": 2
+        },
+        "source": "src/Catan.Core/M2GameSession.cs:Create; src/Catan.Core/M3GameSession.cs:Create"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            9,
+            10
+          ]
+        },
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            2,
+            3,
+            12,
+            16,
+            17
+          ]
+        }
+      ],
+      "effectZh": "从银行取得两张资源，可同种；受银行剩余供应限制。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M2OperationAdapter.cs:DockDevelopmentName",
+        "Unity/Catan/Assets/Scripts/M3OperationAdapter.cs:DockDevelopmentName",
+        "Unity/Catan/Assets/Scripts/M6Encyclopedia.cs:DrawEncyclopedia"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": {
+          "Wool": 1,
+          "Wheat": 1,
+          "Ore": 1
+        },
+        "play": {}
+      },
+      "privacyPolicy": "development",
+      "displayEntrypoints": [
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "base-adapter",
+        "sea-adapter",
+        "legacy-base",
+        "legacy-sea",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": "development-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/development-year-of-plenty/front",
+        "reverseId": null,
+        "hiddenBackId": "development-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "缺少实体正面与背面照片；正面使用文字，牌背由程序绘制。",
+        "2025 官方名为 Invention；现有枚举 YearOfPlenty、中文“丰收/发明（丰收）”保留，避免与进步牌 Invention 混为同一牌种。"
+      ],
+      "ruleEnum": "YearOfPlenty",
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "development-monopoly",
+      "category": "development",
+      "nameZh": "垄断",
+      "ruleNameEn": "Monopoly",
+      "rulePacks": [
+        "base",
+        "seafarers"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "基础发展牌库",
+        "perGame": 2,
+        "scenarioOverrides": {
+          "pirate-islands-3": 2,
+          "pirate-islands-4": 2
+        },
+        "source": "src/Catan.Core/M2GameSession.cs:Create; src/Catan.Core/M3GameSession.cs:Create"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            9,
+            10
+          ]
+        },
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            2,
+            3,
+            12,
+            16,
+            17
+          ]
+        }
+      ],
+      "effectZh": "指定一种资源，所有对手交出该种全部资源。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M2OperationAdapter.cs:DockDevelopmentName",
+        "Unity/Catan/Assets/Scripts/M3OperationAdapter.cs:DockDevelopmentName",
+        "Unity/Catan/Assets/Scripts/M6Encyclopedia.cs:DrawEncyclopedia"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": {
+          "Wool": 1,
+          "Wheat": 1,
+          "Ore": 1
+        },
+        "play": {}
+      },
+      "privacyPolicy": "development",
+      "displayEntrypoints": [
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "base-adapter",
+        "sea-adapter",
+        "legacy-base",
+        "legacy-sea",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": "development-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/development-monopoly/front",
+        "reverseId": null,
+        "hiddenBackId": "development-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "缺少实体正面与背面照片；正面使用文字，牌背由程序绘制。"
+      ],
+      "ruleEnum": "Monopoly",
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "development-victory-point",
+      "category": "development",
+      "nameZh": "胜利点",
+      "ruleNameEn": "Victory Point",
+      "rulePacks": [
+        "base",
+        "seafarers"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "基础发展牌库",
+        "perGame": 5,
+        "scenarioOverrides": {
+          "pirate-islands-3": 0,
+          "pirate-islands-4": 0
+        },
+        "source": "src/Catan.Core/M2GameSession.cs:Create; src/Catan.Core/M3GameSession.cs:Create"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            9,
+            10
+          ]
+        },
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            2,
+            3,
+            12,
+            16,
+            17
+          ]
+        }
+      ],
+      "effectZh": "隐藏持有计 1 分；自己的回合达到胜利条件时公开。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M2OperationAdapter.cs:DockDevelopmentName",
+        "Unity/Catan/Assets/Scripts/M3OperationAdapter.cs:DockDevelopmentName",
+        "Unity/Catan/Assets/Scripts/M6Encyclopedia.cs:DrawEncyclopedia"
+      ],
+      "victoryPoints": 1,
+      "cost": {
+        "acquisition": {
+          "Wool": 1,
+          "Wheat": 1,
+          "Ore": 1
+        },
+        "play": {}
+      },
+      "privacyPolicy": "development",
+      "displayEntrypoints": [
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "base-adapter",
+        "sea-adapter",
+        "legacy-base",
+        "legacy-sea",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": "development-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/development-victory-point/front",
+        "reverseId": null,
+        "hiddenBackId": "development-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "缺少实体正面与背面照片；正面使用文字，牌背由程序绘制。",
+        "海盗群岛四人把五张印刷胜利点牌当骑士；工程直接创建 19 张 Knight，不保留被转换牌面的身份。清单不伪造额外规则卡类。"
+      ],
+      "ruleEnum": "VictoryPoint",
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "progress-science-alchemy",
+      "category": "progress",
+      "nameZh": "炼金术",
+      "ruleNameEn": "Alchemy",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "science",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            13
+          ]
+        }
+      ],
+      "effectZh": "掷骰前指定红、白产出骰；事件骰照常随机掷出。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[0]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[0]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-alchemy-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-science-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-science-alchemy/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-science-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/炼金术士.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Alchemy",
+      "ruleOrdinal": 0,
+      "effectByRulePack": {
+        "cities-knights": "掷骰前指定红、白产出骰；事件骰照常随机掷出。",
+        "combined": "掷骰前指定红、白产出骰；事件骰照常随机掷出。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-science-crane",
+      "category": "progress",
+      "nameZh": "起重机",
+      "ruleNameEn": "Crane",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "science",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            13
+          ]
+        }
+      ],
+      "effectZh": "选择轨道，立即以少一张商品的费用建造一级城市设施。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[1]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[1]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {
+          "commodityDiscount": 1
+        }
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-crane-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-science-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-science-crane/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-science-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/起重机.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Crane",
+      "ruleOrdinal": 1,
+      "effectByRulePack": {
+        "cities-knights": "选择轨道，立即以少一张商品的费用建造一级城市设施。",
+        "combined": "选择轨道，立即以少一张商品的费用建造一级城市设施。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-science-engineering",
+      "category": "progress",
+      "nameZh": "工程学",
+      "ruleNameEn": "Engineering",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 1,
+        "track": "science",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            13
+          ]
+        }
+      ],
+      "effectZh": "选择自己的城市，免费建一面城墙。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[2]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[2]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-engineering-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-science-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-science-engineering/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-science-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/工程师.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Engineering",
+      "ruleOrdinal": 2,
+      "effectByRulePack": {
+        "cities-knights": "选择自己的城市，免费建一面城墙。",
+        "combined": "选择自己的城市，免费建一面城墙。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-science-invention",
+      "category": "progress",
+      "nameZh": "发明",
+      "ruleNameEn": "Invention",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "science",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            13
+          ]
+        },
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            12
+          ]
+        }
+      ],
+      "effectZh": "选择两个地块交换数字；2、6、8、12 不能交换。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[3]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[3]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-invention-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-science-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-science-invention/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-science-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/发明家.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Invention",
+      "ruleOrdinal": 3,
+      "effectByRulePack": {
+        "cities-knights": "选择两个地块交换数字；2、6、8、12 不能交换。",
+        "combined": "选择两个地块交换数字；2、6、8、12 不能交换。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-science-irrigation",
+      "category": "progress",
+      "nameZh": "灌溉",
+      "ruleNameEn": "Irrigation",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "science",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            13
+          ]
+        }
+      ],
+      "effectZh": "每个邻接自己建筑的麦田取 2 谷物；每个地块只算一次。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[4]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[4]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-irrigation-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-science-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-science-irrigation/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-science-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/灌溉.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Irrigation",
+      "ruleOrdinal": 4,
+      "effectByRulePack": {
+        "cities-knights": "每个邻接自己建筑的麦田取 2 谷物；每个地块只算一次。",
+        "combined": "每个邻接自己建筑的麦田取 2 谷物；每个地块只算一次。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-science-medicine",
+      "category": "progress",
+      "nameZh": "医学",
+      "ruleNameEn": "Medicine",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "science",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            13
+          ]
+        }
+      ],
+      "effectZh": "选择村庄，以 1 谷物和 2 矿石升级城市。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[5]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[5]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {
+          "Wheat": 1,
+          "Ore": 2
+        }
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-medicine-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-science-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-science-medicine/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-science-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/药物.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Medicine",
+      "ruleOrdinal": 5,
+      "effectByRulePack": {
+        "cities-knights": "选择村庄，以 1 谷物和 2 矿石升级城市。",
+        "combined": "选择村庄，以 1 谷物和 2 矿石升级城市。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-science-mining",
+      "category": "progress",
+      "nameZh": "采矿",
+      "ruleNameEn": "Mining",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "science",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            14
+          ]
+        }
+      ],
+      "effectZh": "每个邻接自己建筑的山地取 2 矿石。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[6]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[6]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-mining-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-science-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-science-mining/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-science-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/采矿.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Mining",
+      "ruleOrdinal": 6,
+      "effectByRulePack": {
+        "cities-knights": "每个邻接自己建筑的山地取 2 矿石。",
+        "combined": "每个邻接自己建筑的山地取 2 矿石。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-science-printing",
+      "category": "progress",
+      "nameZh": "印刷术",
+      "ruleNameEn": "Printing",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 1,
+        "track": "science",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            14
+          ]
+        }
+      ],
+      "effectZh": "抽到后自动公开，得 1 分。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[7]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[7]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 1,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress-victory",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-printing-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-science-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-science-printing/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-science-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/印刷厂.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Printing",
+      "ruleOrdinal": 7,
+      "effectByRulePack": {
+        "cities-knights": "抽到后自动公开，得 1 分。",
+        "combined": "抽到后自动公开，得 1 分。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-science-road-building",
+      "category": "progress",
+      "nameZh": "道路建设",
+      "ruleNameEn": "Road Building",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "science",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            14
+          ]
+        },
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            12
+          ]
+        }
+      ],
+      "effectZh": "免费建设两条道路，逐条选择。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[8]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[8]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-road-building-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-science-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-science-road-building/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-science-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/新建道路.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。",
+        "基础扩展与组合帮助文字存在合法模式差异，须按规则包选择文字。"
+      ],
+      "ruleEnum": "RoadBuilding",
+      "ruleOrdinal": 8,
+      "effectByRulePack": {
+        "cities-knights": "免费建设两条道路，逐条选择。",
+        "combined": "免费建设两条道路或船，逐条选择。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-science-smithing",
+      "category": "progress",
+      "nameZh": "锻铁匠",
+      "ruleNameEn": "Smithing",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "science",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            14
+          ]
+        }
+      ],
+      "effectZh": "选择两名可晋升骑士免费晋升；只有一名符合条件时选择一名，每名每回合最多晋升一次。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[9]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[9]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-science/progress-science-smithing-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-science-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-science-smithing/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-science-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/绿色发展卡/锻铁匠.jpg",
+        "assets/references/inbox/发展卡/绿色发展卡/发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Smithing",
+      "ruleOrdinal": 9,
+      "effectByRulePack": {
+        "cities-knights": "选择两名可晋升骑士免费晋升；只有一名符合条件时选择一名，每名每回合最多晋升一次。",
+        "combined": "选择两名可晋升骑士免费晋升；只有一名符合条件时选择一名，每名每回合最多晋升一次。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-trade-commercial-harbor",
+      "category": "progress",
+      "nameZh": "商业港口",
+      "ruleNameEn": "Commercial Harbor",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "trade",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            14
+          ]
+        }
+      ],
+      "effectZh": "本回合可向每个对手提供一次资源，换取其自选商品。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[10]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[10]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-trade/progress-trade-commercial-harbor-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-trade-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-trade-commercial-harbor/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-trade-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/黄色发展卡/黄色商港.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "CommercialHarbor",
+      "ruleOrdinal": 10,
+      "effectByRulePack": {
+        "cities-knights": "本回合可向每个对手提供一次资源，换取其自选商品。",
+        "combined": "本回合可向每个对手提供一次资源，换取其自选商品。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-trade-guild-dues",
+      "category": "progress",
+      "nameZh": "行会征费",
+      "ruleNameEn": "Guild Dues",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "trade",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            14
+          ]
+        }
+      ],
+      "effectZh": "选择分数高于自己的玩家，查看其手牌并取两张。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[11]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[11]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-trade/progress-trade-guild-dues-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-trade-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-trade-guild-dues/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-trade-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/黄色发展卡/大商家.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "GuildDues",
+      "ruleOrdinal": 11,
+      "effectByRulePack": {
+        "cities-knights": "选择分数高于自己的玩家，查看其手牌并取两张。",
+        "combined": "选择分数高于自己的玩家，查看其手牌并取两张。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-trade-merchant",
+      "category": "progress",
+      "nameZh": "商人",
+      "ruleNameEn": "Merchant",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 6,
+        "track": "trade",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            14
+          ]
+        },
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            12
+          ]
+        }
+      ],
+      "effectZh": "选择邻接自己建筑的地块，取得商人及 1 分，并以 2:1 交易该资源。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[12]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[12]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 1,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-trade/progress-trade-merchant-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-trade-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-trade-merchant/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-trade-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/黄色发展卡/黄色商人.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。",
+        "基础扩展与组合帮助文字存在合法模式差异，须按规则包选择文字。"
+      ],
+      "ruleEnum": "Merchant",
+      "ruleOrdinal": 12,
+      "effectByRulePack": {
+        "cities-knights": "选择邻接自己建筑的地块，取得商人及 1 分，并以 2:1 交易该资源。",
+        "combined": "选择邻接自己建筑的资源地块（金矿除外），取得商人及 1 分，并以 2:1 交易该资源。"
+      },
+      "victoryPointCondition": "控制商人时 +1 分，不是每打出一张商人牌永久加 1 分。",
+      "runtimeStatus": "existing-texture",
+      "scoreMode": "只在控制商人期间计分，多张不累加"
+    },
+    {
+      "id": "progress-trade-merchant-fleet",
+      "category": "progress",
+      "nameZh": "商船队",
+      "ruleNameEn": "Merchant Fleet",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "trade",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            15
+          ]
+        }
+      ],
+      "effectZh": "本回合所选资源或商品可按 2:1 交易。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[13]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[13]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-trade/progress-trade-merchant-fleet-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-trade-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-trade-merchant-fleet/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-trade-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/黄色发展卡/黄色贸易船队.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "MerchantFleet",
+      "ruleOrdinal": 13,
+      "effectByRulePack": {
+        "cities-knights": "本回合所选资源或商品可按 2:1 交易。",
+        "combined": "本回合所选资源或商品可按 2:1 交易。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-trade-resource-monopoly",
+      "category": "progress",
+      "nameZh": "资源垄断",
+      "ruleNameEn": "Resource Monopoly",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 4,
+        "track": "trade",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            15
+          ]
+        }
+      ],
+      "effectZh": "每名对手交出所选资源最多两张。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[14]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[14]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-trade/progress-trade-resource-monopoly-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-trade-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-trade-resource-monopoly/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-trade-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/黄色发展卡/垄断资源.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "ResourceMonopoly",
+      "ruleOrdinal": 14,
+      "effectByRulePack": {
+        "cities-knights": "每名对手交出所选资源最多两张。",
+        "combined": "每名对手交出所选资源最多两张。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-trade-trade-monopoly",
+      "category": "progress",
+      "nameZh": "商品垄断",
+      "ruleNameEn": "Trade Monopoly",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "trade",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            15
+          ]
+        }
+      ],
+      "effectZh": "每名对手交出所选商品最多一张。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[15]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[15]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-trade/progress-trade-trade-monopoly-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-trade-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-trade-trade-monopoly/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-trade-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/黄色发展卡/垄断商品.jpg",
+        "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "TradeMonopoly",
+      "ruleOrdinal": 15,
+      "effectByRulePack": {
+        "cities-knights": "每名对手交出所选商品最多一张。",
+        "combined": "每名对手交出所选商品最多一张。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-politics-diplomacy",
+      "category": "progress",
+      "nameZh": "外交",
+      "ruleNameEn": "Diplomacy",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "politics",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            15
+          ]
+        },
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            12
+          ]
+        }
+      ],
+      "effectZh": "移除一条开放道路；若是自己的，可立即免费建一条。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[16]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[16]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-politics/progress-politics-diplomacy-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-politics-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-politics-diplomacy/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-politics-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/蓝色发展卡/外交官.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。",
+        "基础扩展与组合帮助文字存在合法模式差异，须按规则包选择文字。"
+      ],
+      "ruleEnum": "Diplomacy",
+      "ruleOrdinal": 16,
+      "effectByRulePack": {
+        "cities-knights": "移除一条开放道路；若是自己的，可立即免费建一条。",
+        "combined": "移除一条开放道路或船；若是自己的，可立即免费重建同种棋子。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-politics-espionage",
+      "category": "progress",
+      "nameZh": "间谍",
+      "ruleNameEn": "Espionage",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 3,
+        "track": "politics",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            15
+          ]
+        }
+      ],
+      "effectZh": "选择对手，仅你可查看其发展卡，并可取一张。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[17]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[17]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-politics/progress-politics-espionage-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-politics-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-politics-espionage/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-politics-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/蓝色发展卡/间谍.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Espionage",
+      "ruleOrdinal": 17,
+      "effectByRulePack": {
+        "cities-knights": "选择对手，仅你可查看其发展卡，并可取一张。",
+        "combined": "选择对手，仅你可查看其发展卡，并可取一张。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-politics-encouragement",
+      "category": "progress",
+      "nameZh": "鼓舞",
+      "ruleNameEn": "Encouragement",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "politics",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            15
+          ]
+        }
+      ],
+      "effectZh": "免费激活所有未激活骑士；本回合新激活者不能行动。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[18]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[18]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-politics/progress-politics-encouragement-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-politics-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-politics-encouragement/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-politics-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/蓝色发展卡/指挥官.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Encouragement",
+      "ruleOrdinal": 18,
+      "effectByRulePack": {
+        "cities-knights": "免费激活所有未激活骑士；本回合新激活者不能行动。",
+        "combined": "免费激活所有未激活骑士；本回合新激活者不能行动。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-politics-intrigue",
+      "category": "progress",
+      "nameZh": "谋略",
+      "ruleNameEn": "Intrigue",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "politics",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            15
+          ]
+        },
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            12
+          ]
+        }
+      ],
+      "effectZh": "选择连接自己道路的对手骑士，将其驱离。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[19]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[19]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-politics/progress-politics-intrigue-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-politics-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-politics-intrigue/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-politics-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/蓝色发展卡/权谋.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。",
+        "基础扩展与组合帮助文字存在合法模式差异，须按规则包选择文字。"
+      ],
+      "ruleEnum": "Intrigue",
+      "ruleOrdinal": 19,
+      "effectByRulePack": {
+        "cities-knights": "选择连接自己道路的对手骑士，将其驱离。",
+        "combined": "选择连接自己道路或船的对手骑士，将其驱离。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-politics-taxation",
+      "category": "progress",
+      "nameZh": "征税",
+      "ruleNameEn": "Taxation",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "politics",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            16
+          ]
+        },
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            12
+          ]
+        }
+      ],
+      "effectZh": "首次蛮族攻击后，将强盗移到新地块，向每名邻接对手各随机取一张。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[20]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[20]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-politics/progress-politics-taxation-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-politics-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-politics-taxation/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-politics-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/蓝色发展卡/主教.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Taxation",
+      "ruleOrdinal": 20,
+      "effectByRulePack": {
+        "cities-knights": "首次蛮族攻击后，将强盗移到新地块，向每名邻接对手各随机取一张。",
+        "combined": "首次蛮族攻击后，将强盗移到新地块，向每名邻接对手各随机取一张。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-politics-constitution",
+      "category": "progress",
+      "nameZh": "宪法",
+      "ruleNameEn": "Constitution",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 1,
+        "track": "politics",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            16
+          ]
+        }
+      ],
+      "effectZh": "抽到后自动公开，得 1 分。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[21]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[21]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 1,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress-victory",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-politics/progress-politics-constitution-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-politics-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-politics-constitution/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-politics-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/蓝色发展卡/石碑.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Constitution",
+      "ruleOrdinal": 21,
+      "effectByRulePack": {
+        "cities-knights": "抽到后自动公开，得 1 分。",
+        "combined": "抽到后自动公开，得 1 分。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-politics-treason",
+      "category": "progress",
+      "nameZh": "叛变",
+      "ruleNameEn": "Treason",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "politics",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            16
+          ]
+        }
+      ],
+      "effectZh": "对手选择移除一名骑士，你可招募同级或更低且同状态的骑士。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[22]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[22]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-politics/progress-politics-treason-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-politics-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-politics-treason/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-politics-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/蓝色发展卡/叛徒.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Treason",
+      "ruleOrdinal": 22,
+      "effectByRulePack": {
+        "cities-knights": "对手选择移除一名骑士，你可招募同级或更低且同状态的骑士。",
+        "combined": "对手选择移除一名骑士，你可招募同级或更低且同状态的骑士。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-politics-wedding",
+      "category": "progress",
+      "nameZh": "婚礼",
+      "ruleNameEn": "Wedding",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "politics",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            16
+          ]
+        }
+      ],
+      "effectZh": "分数高于你的每名对手自选两张资源或商品给你。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[23]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[23]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-politics/progress-politics-wedding-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-politics-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-politics-wedding/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-politics-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/蓝色发展卡/婚礼.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Wedding",
+      "ruleOrdinal": 23,
+      "effectByRulePack": {
+        "cities-knights": "分数高于你的每名对手自选两张资源或商品给你。",
+        "combined": "分数高于你的每名对手自选两张资源或商品给你。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "progress-politics-sabotage",
+      "category": "progress",
+      "nameZh": "破坏",
+      "ruleNameEn": "Sabotage",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "卡牌",
+      "quantity": {
+        "kind": "进步牌库",
+        "perGame": 2,
+        "track": "politics",
+        "source": "src/Catan.Core/M4ProgressModels.cs:ProgressCatalog.Count; src/Catan.Core/M5ProgressModels.cs:ProgressCatalog.Count"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            16
+          ]
+        }
+      ],
+      "effectZh": "分数不少于你的对手各弃掉一半资源和商品。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M4App.cs:CardHelp[24]",
+        "Unity/Catan/Assets/Scripts/M5App.cs:CardHelp[24]",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "acquisition": "事件骰/防守并列奖励/合法卡效取得，不购买",
+        "play": {}
+      },
+      "privacyPolicy": "progress",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "hand-detail",
+        "bank-flight",
+        "played-reveal",
+        "history",
+        "encyclopedia",
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined",
+        "opponent-summary"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/progress-politics/progress-politics-sabotage-front.png",
+        "reverse": null,
+        "hiddenBackId": "progress-politics-hidden"
+      },
+      "ultraAssets": {
+        "frontId": "ultra/progress-politics-sabotage/front",
+        "reverseId": null,
+        "hiddenBackId": "progress-politics-hidden",
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/发展卡/蓝色发展卡/破坏者.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧实体照片只作视觉参考；2025 英文规则与已核对中文效果决定重排文字。"
+      ],
+      "ruleEnum": "Sabotage",
+      "ruleOrdinal": 24,
+      "effectByRulePack": {
+        "cities-knights": "分数不少于你的对手各弃掉一半资源和商品。",
+        "combined": "分数不少于你的对手各弃掉一半资源和商品。"
+      },
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "award-longest-route",
+      "category": "award",
+      "nameZh": "最长道路／航线",
+      "ruleNameEn": "Longest Route",
+      "rulePacks": [
+        "base",
+        "seafarers",
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开奖励板",
+      "quantity": {
+        "kind": "唯一归属奖励",
+        "perGame": 1,
+        "scenarioOverrides": {
+          "cloth-for-catan": 0,
+          "pirate-islands": 0
+        },
+        "source": "src/Catan.Core/M3Scenarios.cs:UseLongestRoute"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        },
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            2,
+            14,
+            16
+          ]
+        }
+      ],
+      "effectZh": "至少五段的最长合法道路/航线归属奖励，持有者得 2 分；平局与断路按规则更新。",
+      "chineseTextSources": [
+        "docs/M2_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/TabletopScoreModel.cs:Awards"
+      ],
+      "victoryPoints": 2,
+      "cost": null,
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "score",
+        "defense",
+        "legacy-base",
+        "legacy-sea",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/award-longest-route/front",
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "官方实体为奖励板；当前仅公开归属、符号与分值文字，无独立牌面。"
+      ],
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "award-largest-army",
+      "category": "award",
+      "nameZh": "最大骑士军队",
+      "ruleNameEn": "Largest Army",
+      "rulePacks": [
+        "base",
+        "seafarers"
+      ],
+      "representation": "公开奖励板",
+      "quantity": {
+        "kind": "唯一归属奖励",
+        "perGame": 1,
+        "scenarioOverrides": {
+          "pirate-islands": 0
+        },
+        "source": "src/Catan.Core/M3Scenarios.cs:UseLargestArmy"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            9
+          ]
+        },
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            16
+          ]
+        }
+      ],
+      "effectZh": "最先打出至少三张骑士者获得，更多骑士者接替；持有者得 2 分。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/TabletopScoreModel.cs:Awards"
+      ],
+      "victoryPoints": 2,
+      "cost": null,
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "score",
+        "legacy-base",
+        "legacy-sea"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/award-largest-army/front",
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "城市与骑士及组合模式不使用此奖；当前无独立照片卡面。"
+      ],
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "defender",
+      "category": "award",
+      "nameZh": "卡坦保卫者",
+      "ruleNameEn": "Defender victory point token",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开分值标记的卡面表达",
+      "quantity": {
+        "kind": "累计公开防守分",
+        "perGame": null,
+        "printedSetCount": 6,
+        "source": "src/Catan.Core/M4CitiesKnights.cs:BarbarianAttack; src/Catan.Core/M5CitiesKnights.cs:BarbarianAttack",
+        "note": "规则原件为 6 枚 VP 标记；工程每次唯一最高防守贡献时 DefenderPoints++，未限制总枚数。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            11
+          ]
+        }
+      ],
+      "effectZh": "成功防守时贡献唯一最高者获得 1 分；并列最高者各选择一类进步牌。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/TabletopScoreModel.cs:CityBonuses",
+        "Unity/Catan/Assets/Scripts/M6CardPresentation.cs:DrawPlayedCard"
+      ],
+      "victoryPoints": 1,
+      "cost": null,
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "played-reveal",
+        "score",
+        "legacy-cities",
+        "legacy-combined",
+        "world-paper"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/defender-card/defender-card-front.png",
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/defender/front",
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/奖励卡/卡坦保卫者.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 组件为 6 枚 VP 标记，现有视觉用旧版“卡坦保卫者”卡；计数器无牌库上限。U0 仅登记，未改变规则。",
+        "背面未提供；本组件公开展示，不使用隐藏背面。"
+      ],
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-trade-1",
+      "category": "improvement",
+      "nameZh": "贸易 1 级 · 市场",
+      "ruleNameEn": "Market",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 1 级，支付 1 张布匹。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Cloth": 1
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-1-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-1-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-trade-1/front",
+        "reverseId": "ultra/improvement-trade-1/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/黄色1级市场正面.jpg",
+        "assets/references/inbox/城市设施/黄色1级市场反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "trade",
+      "level": 1,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-trade-2",
+      "category": "improvement",
+      "nameZh": "贸易 2 级 · 交易所",
+      "ruleNameEn": "Trading House",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 2 级，支付 2 张布匹。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Cloth": 2
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-2-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-2-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-trade-2/front",
+        "reverseId": "ultra/improvement-trade-2/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/黄色2级行会正面.jpg",
+        "assets/references/inbox/城市设施/黄色2级行会反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "trade",
+      "level": 2,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-trade-3",
+      "category": "improvement",
+      "nameZh": "贸易 3 级 · 同业公会",
+      "ruleNameEn": "Merchant Guild",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 3 级，支付 3 张布匹。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Cloth": 3
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-3-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-3-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-trade-3/front",
+        "reverseId": "ultra/improvement-trade-3/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/黄色3级同业公会正面.jpg",
+        "assets/references/inbox/城市设施/黄色3级同业公会反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "trade",
+      "level": 3,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-trade-4",
+      "category": "improvement",
+      "nameZh": "贸易 4 级 · 银行",
+      "ruleNameEn": "Bank",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 4 级，支付 4 张布匹。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Cloth": 4
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-4-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-4-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-trade-4/front",
+        "reverseId": "ultra/improvement-trade-4/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/黄色4级银行正面.jpg",
+        "assets/references/inbox/城市设施/黄色4级银行反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "trade",
+      "level": 4,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-trade-5",
+      "category": "improvement",
+      "nameZh": "贸易 5 级 · 大交易所",
+      "ruleNameEn": "Great Exchange",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 5 级，支付 5 张布匹。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Cloth": 5
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-5-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-trade-5-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-trade-5/front",
+        "reverseId": "ultra/improvement-trade-5/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/黄色5级商业中心正面.jpg",
+        "assets/references/inbox/城市设施/黄色5级商业中心反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "trade",
+      "level": 5,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-politics-1",
+      "category": "improvement",
+      "nameZh": "政治 1 级 · 市政厅",
+      "ruleNameEn": "Town Hall",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 1 级，支付 1 张钱币。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Coin": 1
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-1-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-1-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-politics-1/front",
+        "reverseId": "ultra/improvement-politics-1/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg",
+        "assets/references/inbox/城市设施/蓝色1级市政厅反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "politics",
+      "level": 1,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-politics-2",
+      "category": "improvement",
+      "nameZh": "政治 2 级 · 大使馆",
+      "ruleNameEn": "Embassy",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 2 级，支付 2 张钱币。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Coin": 2
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-2-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-2-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-politics-2/front",
+        "reverseId": "ultra/improvement-politics-2/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/蓝色2级教堂正面.jpg",
+        "assets/references/inbox/城市设施/蓝色2级教堂反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "politics",
+      "level": 2,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-politics-3",
+      "category": "improvement",
+      "nameZh": "政治 3 级 · 要塞",
+      "ruleNameEn": "Fortress",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 3 级，支付 3 张钱币。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Coin": 3
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-3-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-3-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-politics-3/front",
+        "reverseId": "ultra/improvement-politics-3/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/蓝色3级要塞正面.jpg",
+        "assets/references/inbox/城市设施/蓝色3级要塞反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "politics",
+      "level": 3,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-politics-4",
+      "category": "improvement",
+      "nameZh": "政治 4 级 · 法院",
+      "ruleNameEn": "Courthouse",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 4 级，支付 4 张钱币。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Coin": 4
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-4-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-4-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-politics-4/front",
+        "reverseId": "ultra/improvement-politics-4/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/蓝色4级大教堂正面.jpg",
+        "assets/references/inbox/城市设施/蓝色4级大教堂反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "politics",
+      "level": 4,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-politics-5",
+      "category": "improvement",
+      "nameZh": "政治 5 级 · 议会",
+      "ruleNameEn": "High Assembly",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 5 级，支付 5 张钱币。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Coin": 5
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-5-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-politics-5-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-politics-5/front",
+        "reverseId": "ultra/improvement-politics-5/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/蓝色5级卡坦议会正面.jpg",
+        "assets/references/inbox/城市设施/蓝色5级卡坦议会反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "politics",
+      "level": 5,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-science-1",
+      "category": "improvement",
+      "nameZh": "科学 1 级 · 学校",
+      "ruleNameEn": "School",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 1 级，支付 1 张纸张。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Paper": 1
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-1-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-1-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-science-1/front",
+        "reverseId": "ultra/improvement-science-1/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/绿色1级修道院正面.jpg",
+        "assets/references/inbox/城市设施/绿色1级修道院反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "science",
+      "level": 1,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-science-2",
+      "category": "improvement",
+      "nameZh": "科学 2 级 · 图书馆",
+      "ruleNameEn": "Library",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 2 级，支付 2 张纸张。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Paper": 2
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-2-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-2-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-science-2/front",
+        "reverseId": "ultra/improvement-science-2/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/绿色2级图书馆正面.jpg",
+        "assets/references/inbox/城市设施/绿色2级图书馆反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "science",
+      "level": 2,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-science-3",
+      "category": "improvement",
+      "nameZh": "科学 3 级 · 引水渠",
+      "ruleNameEn": "Aqueduct",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 3 级，支付 3 张纸张。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Paper": 3
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-3-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-3-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-science-3/front",
+        "reverseId": "ultra/improvement-science-3/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/绿色3级引水渠正面.jpg",
+        "assets/references/inbox/城市设施/绿色3级引水渠反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "science",
+      "level": 3,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-science-4",
+      "category": "improvement",
+      "nameZh": "科学 4 级 · 剧院",
+      "ruleNameEn": "Theater",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 4 级，支付 4 张纸张。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Paper": 4
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-4-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-4-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-science-4/front",
+        "reverseId": "ultra/improvement-science-4/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/绿色4级剧院正面.jpg",
+        "assets/references/inbox/城市设施/绿色4级剧院反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "science",
+      "level": 4,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "improvement-science-5",
+      "category": "improvement",
+      "nameZh": "科学 5 级 · 大学",
+      "ruleNameEn": "University",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "公开建设板等级组件",
+      "quantity": {
+        "kind": "每玩家公开等级翻板",
+        "perGame": null,
+        "perPlayer": 1,
+        "source": "src/Catan.Core/M4ExpansionModels.cs:Improvements",
+        "note": "每位玩家各轨 5 级，3/4 人局各复用 3/4 份；不是抽牌。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "逐级升级到 5 级，支付 5 张纸张。三级解锁轨道能力；四、五级按归属规则争取大都会。",
+      "chineseTextSources": [
+        "docs/M4_RULES_CHECKLIST.md",
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:FacilityAbility",
+        "本清单中文设施名为 2025 英文名工作译名，旧照片题名保留在 referencePaths。"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "upgrade": {
+          "Paper": 5
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-5-front.png",
+        "reverse": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/improvement-science-5-back.png",
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/improvement-science-5/front",
+        "reverseId": "ultra/improvement-science-5/reverse",
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/绿色5级大学正面.jpg",
+        "assets/references/inbox/城市设施/绿色5级大学反面.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "2025 是带等级方块的建设板，现有资产是旧实体双面翻板。",
+        "EntityCardAssets.Improvement/Display 与 OperationDock/TabletopWorldObjects 对 built 时正反面选择相反；U1/U7A 接入时必须按“已建/待建”语义核对，不按 front 文件名推断。"
+      ],
+      "track": "science",
+      "level": 5,
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "guidance-upgrade",
+      "category": "guidance",
+      "nameZh": "升级提示板",
+      "ruleNameEn": "City improvement board guidance",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "既有公开辅助板",
+      "quantity": {
+        "kind": "静态参考图",
+        "perGame": null,
+        "perPlayer": null,
+        "note": "两个现有展示状态，不是额外规则组件或牌库。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "三类城市改良的等级、费用、能力与大都会说明。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:DrawFacilities",
+        "art/recipes/entity-conversion-v001/city-improvements/recipe.json"
+      ],
+      "victoryPoints": 0,
+      "cost": null,
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/guidance-upgrade-front.png",
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/guidance-upgrade/front",
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/城市设施升级卡.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧整板照片含组合摆放、孔洞与已摆翻板，不应当作新的规则卡；ultra 需独立排版。",
+        "底面未知，公开说明不需要身份牌背。"
+      ],
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "guidance-max",
+      "category": "guidance",
+      "nameZh": "满级提示板",
+      "ruleNameEn": "City improvement board guidance",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "既有公开辅助板",
+      "quantity": {
+        "kind": "静态参考图",
+        "perGame": null,
+        "perPlayer": null,
+        "note": "两个现有展示状态，不是额外规则组件或牌库。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            8
+          ]
+        }
+      ],
+      "effectZh": "三类城市改良的等级、费用、能力与大都会说明。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/OperationDock.cs:DrawFacilities",
+        "art/recipes/entity-conversion-v001/city-improvements/recipe.json"
+      ],
+      "victoryPoints": 0,
+      "cost": null,
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "asset-resolver",
+        "facility",
+        "world-paper",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": "Unity/Catan/Assets/Resources/EntityAssets/v001/city-improvements/guidance-max-front.png",
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/guidance-max/front",
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [
+        "assets/references/inbox/城市设施/城市设施满级卡.jpg"
+      ],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "旧整板照片含组合摆放、孔洞与已摆翻板，不应当作新的规则卡；ultra 需独立排版。",
+        "底面未知，公开说明不需要身份牌背。"
+      ],
+      "runtimeStatus": "existing-texture"
+    },
+    {
+      "id": "wonder-great-wall",
+      "category": "wonder",
+      "nameZh": "长城",
+      "ruleNameEn": "Great Wall",
+      "rulePacks": [
+        "seafarers"
+      ],
+      "representation": "公开剧本奇观板",
+      "quantity": {
+        "kind": "剧本唯一奇观板",
+        "perGame": 1,
+        "scenario": "wonders-of-catan",
+        "source": "src/Catan.Core/M3Scenarios.cs:Advanced"
+      },
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1,
+            18,
+            19
+          ]
+        }
+      ],
+      "effectZh": "在长城标记点已有建筑后可认领；独占一座奇观。每级支付相同五资源，四级完成获胜；或达到目标分且层数独占领先获胜。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M3App.cs:WonderName",
+        "docs/M3_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "eachLevel": {
+          "Wood": 1,
+          "Brick": 3,
+          "Wheat": 1
+        },
+        "levels": 4
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "legacy-sea"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/wonder-great-wall/front",
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "官方确有奇观板；当前仅模型定义、文字条件/费用/等级，无独立正背面图片。",
+        "仅航海单扩展支持该剧本；组合模式不因此获得奇观牌。"
+      ],
+      "ruleId": "great-wall",
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "wonder-great-bridge",
+      "category": "wonder",
+      "nameZh": "大桥",
+      "ruleNameEn": "Great Bridge",
+      "rulePacks": [
+        "seafarers"
+      ],
+      "representation": "公开剧本奇观板",
+      "quantity": {
+        "kind": "剧本唯一奇观板",
+        "perGame": 1,
+        "scenario": "wonders-of-catan",
+        "source": "src/Catan.Core/M3Scenarios.cs:Advanced"
+      },
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1,
+            18,
+            19
+          ]
+        }
+      ],
+      "effectZh": "在大桥标记点已有建筑后可认领；独占一座奇观。每级支付相同五资源，四级完成获胜；或达到目标分且层数独占领先获胜。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M3App.cs:WonderName",
+        "docs/M3_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "eachLevel": {
+          "Wood": 3,
+          "Wool": 1,
+          "Wheat": 1
+        },
+        "levels": 4
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "legacy-sea"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/wonder-great-bridge/front",
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "官方确有奇观板；当前仅模型定义、文字条件/费用/等级，无独立正背面图片。",
+        "仅航海单扩展支持该剧本；组合模式不因此获得奇观牌。"
+      ],
+      "ruleId": "great-bridge",
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "wonder-grand-monument",
+      "category": "wonder",
+      "nameZh": "纪念碑",
+      "ruleNameEn": "Grand Monument",
+      "rulePacks": [
+        "seafarers"
+      ],
+      "representation": "公开剧本奇观板",
+      "quantity": {
+        "kind": "剧本唯一奇观板",
+        "perGame": 1,
+        "scenario": "wonders-of-catan",
+        "source": "src/Catan.Core/M3Scenarios.cs:Advanced"
+      },
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1,
+            18,
+            19
+          ]
+        }
+      ],
+      "effectZh": "拥有港口城市且航线至少五段后可认领；独占一座奇观。每级支付相同五资源，四级完成获胜；或达到目标分且层数独占领先获胜。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M3App.cs:WonderName",
+        "docs/M3_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "eachLevel": {
+          "Wheat": 3,
+          "Ore": 2
+        },
+        "levels": 4
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "legacy-sea"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/wonder-grand-monument/front",
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "官方确有奇观板；当前仅模型定义、文字条件/费用/等级，无独立正背面图片。",
+        "仅航海单扩展支持该剧本；组合模式不因此获得奇观牌。"
+      ],
+      "ruleId": "grand-monument",
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "wonder-grand-theater",
+      "category": "wonder",
+      "nameZh": "大剧院",
+      "ruleNameEn": "Grand Theater",
+      "rulePacks": [
+        "seafarers"
+      ],
+      "representation": "公开剧本奇观板",
+      "quantity": {
+        "kind": "剧本唯一奇观板",
+        "perGame": 1,
+        "scenario": "wonders-of-catan",
+        "source": "src/Catan.Core/M3Scenarios.cs:Advanced"
+      },
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1,
+            18,
+            19
+          ]
+        }
+      ],
+      "effectZh": "拥有两座城市后可认领；独占一座奇观。每级支付相同五资源，四级完成获胜；或达到目标分且层数独占领先获胜。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M3App.cs:WonderName",
+        "docs/M3_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "eachLevel": {
+          "Wood": 1,
+          "Brick": 1,
+          "Wool": 3
+        },
+        "levels": 4
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "legacy-sea"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/wonder-grand-theater/front",
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "官方确有奇观板；当前仅模型定义、文字条件/费用/等级，无独立正背面图片。",
+        "仅航海单扩展支持该剧本；组合模式不因此获得奇观牌。"
+      ],
+      "ruleId": "grand-theater",
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "wonder-grand-castle",
+      "category": "wonder",
+      "nameZh": "大城堡",
+      "ruleNameEn": "Grand Castle",
+      "rulePacks": [
+        "seafarers"
+      ],
+      "representation": "公开剧本奇观板",
+      "quantity": {
+        "kind": "剧本唯一奇观板",
+        "perGame": 1,
+        "scenario": "wonders-of-catan",
+        "source": "src/Catan.Core/M3Scenarios.cs:Advanced"
+      },
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1,
+            18,
+            19
+          ]
+        }
+      ],
+      "effectZh": "拥有一座城市且至少六分后可认领；独占一座奇观。每级支付相同五资源，四级完成获胜；或达到目标分且层数独占领先获胜。",
+      "chineseTextSources": [
+        "Unity/Catan/Assets/Scripts/M3App.cs:WonderName",
+        "docs/M3_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "eachLevel": {
+          "Brick": 1,
+          "Wheat": 1,
+          "Ore": 3
+        },
+        "levels": 4
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "legacy-sea"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": "ultra/wonder-grand-castle/front",
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅完成 U0 清单，待 U2 样板与 U7A 制作",
+      "differences": [
+        "官方确有奇观板；当前仅模型定义、文字条件/费用/等级，无独立正背面图片。",
+        "仅航海单扩展支持该剧本；组合模式不因此获得奇观牌。"
+      ],
+      "ruleId": "grand-castle",
+      "runtimeStatus": "existing-text-or-symbol"
+    },
+    {
+      "id": "aid-base",
+      "category": "player-aid",
+      "nameZh": "基础版建造费用与回合说明",
+      "ruleNameEn": "Base player aid",
+      "rulePacks": [
+        "base",
+        "seafarers"
+      ],
+      "representation": "规则原件中的双面辅助板，当前文字控件",
+      "quantity": {
+        "kind": "公开玩家辅助板",
+        "perGame": null,
+        "perPlayer": 1,
+        "printedSetCount": 4,
+        "note": "纸板辅助组件，不是卡牌手牌；当前界面使用等价费用/提示。"
+      },
+      "rules": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3,
+            8,
+            9
+          ]
+        }
+      ],
+      "effectZh": "按该模式展示公开建造费用、回合顺序与相关限制。",
+      "chineseTextSources": [
+        "docs/M2_RULES_CHECKLIST.md",
+        "docs/M3_RULES_CHECKLIST.md",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "road": {
+          "Wood": 1,
+          "Brick": 1
+        },
+        "settlement": {
+          "Wood": 1,
+          "Brick": 1,
+          "Wool": 1,
+          "Wheat": 1
+        },
+        "city": {
+          "Wheat": 2,
+          "Ore": 3
+        },
+        "development": {
+          "Wool": 1,
+          "Wheat": 1,
+          "Ore": 1
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "base-adapter",
+        "sea-adapter",
+        "legacy-base",
+        "legacy-sea"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": null,
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅参考清单：当前无独立牌面；不新增运行牌种，后续按真实展示需求决策",
+      "differences": [
+        "本地官方 PDF 展示正反面；尚无实体照片与独立运行时卡面，U7A 必须登记对应展示入口再决定排版，不新增规则功能。"
+      ],
+      "reverseRuleSource": [
+        {
+          "source": "catan-base-2025-en",
+          "pdfPages": [
+            3
+          ]
+        }
+      ],
+      "runtimeStatus": "reference-only/missing-in-runtime"
+    },
+    {
+      "id": "aid-seafarers",
+      "category": "player-aid",
+      "nameZh": "航海家船只费用与说明",
+      "ruleNameEn": "Seafarers player aid",
+      "rulePacks": [
+        "seafarers",
+        "combined"
+      ],
+      "representation": "规则原件中的双面辅助板，当前文字控件",
+      "quantity": {
+        "kind": "公开玩家辅助板",
+        "perGame": null,
+        "perPlayer": 1,
+        "printedSetCount": 4,
+        "note": "纸板辅助组件，不是卡牌手牌；当前界面使用等价费用/提示。"
+      },
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1,
+            2,
+            3
+          ]
+        }
+      ],
+      "effectZh": "按该模式展示公开建造费用、回合顺序与相关限制。",
+      "chineseTextSources": [
+        "docs/M2_RULES_CHECKLIST.md",
+        "docs/M3_RULES_CHECKLIST.md",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "ship": {
+          "Wood": 1,
+          "Wool": 1
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "sea-adapter",
+        "combined-adapter",
+        "legacy-sea",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": null,
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅参考清单：当前无独立牌面；不新增运行牌种，后续按真实展示需求决策",
+      "differences": [
+        "本地官方 PDF 展示正反面；尚无实体照片与独立运行时卡面，U7A 必须登记对应展示入口再决定排版，不新增规则功能。"
+      ],
+      "reverseRuleSource": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1
+          ]
+        }
+      ],
+      "runtimeStatus": "reference-only/missing-in-runtime"
+    },
+    {
+      "id": "aid-cities-knights",
+      "category": "player-aid",
+      "nameZh": "城市与骑士建造费用与回合说明",
+      "ruleNameEn": "Cities & Knights player aid",
+      "rulePacks": [
+        "cities-knights",
+        "combined"
+      ],
+      "representation": "规则原件中的双面辅助板，当前文字控件",
+      "quantity": {
+        "kind": "公开玩家辅助板",
+        "perGame": null,
+        "perPlayer": 1,
+        "printedSetCount": 4,
+        "note": "纸板辅助组件，不是卡牌手牌；当前界面使用等价费用/提示。"
+      },
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            6,
+            8,
+            9,
+            10
+          ]
+        }
+      ],
+      "effectZh": "按该模式展示公开建造费用、回合顺序与相关限制。",
+      "chineseTextSources": [
+        "docs/M2_RULES_CHECKLIST.md",
+        "docs/M3_RULES_CHECKLIST.md",
+        "docs/M4_RULES_CHECKLIST.md"
+      ],
+      "victoryPoints": 0,
+      "cost": {
+        "wall": {
+          "Brick": 2
+        },
+        "recruitKnight": {
+          "Wool": 1,
+          "Ore": 1
+        },
+        "promoteKnight": {
+          "Wool": 1,
+          "Ore": 1
+        },
+        "activateKnight": {
+          "Wheat": 1
+        }
+      },
+      "privacyPolicy": "public",
+      "displayEntrypoints": [
+        "cities-adapter",
+        "combined-adapter",
+        "legacy-cities",
+        "legacy-combined"
+      ],
+      "existingAssets": {
+        "front": null,
+        "reverse": null,
+        "hiddenBackId": null
+      },
+      "ultraAssets": {
+        "frontId": null,
+        "reverseId": null,
+        "hiddenBackId": null,
+        "frontPath": null,
+        "reversePath": null,
+        "thumbnailPath": null
+      },
+      "referencePaths": [],
+      "productionStatus": "仅参考清单：当前无独立牌面；不新增运行牌种，后续按真实展示需求决策",
+      "differences": [
+        "本地官方 PDF 展示正反面；尚无实体照片与独立运行时卡面，U7A 必须登记对应展示入口再决定排版，不新增规则功能。"
+      ],
+      "reverseRuleSource": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3
+          ]
+        }
+      ],
+      "runtimeStatus": "reference-only/missing-in-runtime"
+    }
+  ],
+  "scenarioAudit": [
+    {
+      "id": "heading-for-new-shores",
+      "cardDelta": "共用基础牌；首次登岛分为公开标记，不新增手牌",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "id": "four-islands",
+      "cardDelta": "共用基础牌；首次登岛分为公开标记",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            6,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fog-islands",
+      "cardDelta": "共用基础牌；未知地图不是可供客户端读取的牌库",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            8,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "id": "through-the-desert",
+      "cardDelta": "共用基础牌；地区奖励分为公开标记",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            10,
+            11
+          ]
+        }
+      ]
+    },
+    {
+      "id": "forgotten-tribe",
+      "cardDelta": "25 张发展牌中取 4 张背面朝上的奖励，剩余 21 张；不增造礼物牌；另有 8 个 VP 边标记",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            12,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cloth-for-catan",
+      "cardDelta": "布匹为 50 枚计分标记（8 村各 5 + 总库 10），不是城市骑士 12 张布匹商品牌；不计最长航线",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            14,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pirate-islands",
+      "cardDelta": "三人移除 5 VP 牌；四人以 19 Knight 替代 14 Knight + 5 印刷 VP 牌；没有最长航线/最大军队",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            16,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wonders-of-catan",
+      "cardDelta": "五种公开奇观板已单列；登岛分为标记",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1,
+            18,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "id": "new-world",
+      "cardDelta": "共用基础牌；新世界未新增专用牌",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            20
+          ]
+        }
+      ]
+    }
+  ],
+  "combinationAudit": {
+    "supportedScenarios": [
+      "heading-for-new-shores",
+      "through-the-desert"
+    ],
+    "rules": [
+      {
+        "source": "catan-cities-knights-2025-en",
+        "pdfPages": [
+          12
+        ]
+      }
+    ],
+    "cards": "复用资源、商品、进步牌、城市改良与最长航线；基础发展牌和最大军队停用；没有独立组合牌库。"
+  },
+  "nonCardExclusions": [
+    {
+      "id": "gold-resource",
+      "reason": "金矿产出选择现有五资源，不存在第六种金卡。",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seafarers-cloth",
+      "reason": "50 枚布匹计分标记，不是 12 张布匹商品牌；纳入棋盘/标记资产迁移清单。",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1,
+            14,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seafarers-vp",
+      "reason": "登岛/部落分使用官方 VP 标记，现有 BonusVictoryPoints/BonusEdgeIds，不虚构专用胜利牌。",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1,
+            4,
+            6,
+            10,
+            12,
+            18,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "id": "merchant-metropolis",
+      "reason": "商人控制分和大都会分绑定公开棋子/归属，不新增奖励手牌。",
+      "rules": [
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            7,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ports-robber-pirate-fog",
+      "reason": "港口、强盗、海盗、迷雾及蛮族事件是棋盘组件/骰子；不虚构事件卡或隐藏地图牌面。",
+      "rules": [
+        {
+          "source": "catan-seafarers-2025-en",
+          "pdfPages": [
+            1,
+            2,
+            8
+          ]
+        },
+        {
+          "source": "catan-cities-knights-2025-en",
+          "pdfPages": [
+            3,
+            6,
+            11
+          ]
+        }
+      ]
+    }
+  ],
+  "openIssues": [
+    {
+      "id": "U0-C01",
+      "severity": "资料缺口",
+      "detail": "基础发展牌、奖励板、奇观板、三类辅助板缺少用户实体正背照片；可按锁定规则制作原创 ultra 排版，尺寸仍须标估算。"
+    },
+    {
+      "id": "U0-C02",
+      "severity": "规则/实体差异",
+      "detail": "2025 防守奖励为 6 VP 标记；工程以 DefenderPoints 无上限累计和旧保卫者卡显示，不在主题任务中修改计分。"
+    },
+    {
+      "id": "U0-C03",
+      "severity": "表现差异",
+      "detail": "旧城市翻板建成方向在 EntityCardAssets.Display 与桌面/OperationDock 方向相反，需要真实窗口确认各入口。"
+    },
+    {
+      "id": "U0-C04",
+      "severity": "排版风险",
+      "detail": "旧照片中大商家/指挥官/破坏者等文字与 2025 名称/效果可能不同，所有 25 类进步牌重排必须使用中文数据与逐项 PDF 页码。"
+    },
+    {
+      "id": "U0-C05",
+      "severity": "入口差异",
+      "detail": "百科当前将 M5 CardHelp 用于“城市与骑士/组合”共同页，部分含船/金矿文字；U7A 应区分规则包，不能把显示帮助当规则判断。"
+    },
+    {
+      "id": "U0-C06",
+      "severity": "隐私边界",
+      "detail": "人类 PublicPlayer 只提供普通进步牌总数；AI 的颜色数量不属于人类主题输入。未知颜色背面不得按隐藏身份取色。"
+    },
+    {
+      "id": "U0-C07",
+      "severity": "未实施",
+      "detail": "所有 ultra 正面、背面、缩略图、中文实际尺寸校对及双端主题映射均待 U2/U7A；本清单不表示美术或性能验收通过。"
+    },
+    {
+      "id": "U0-C08",
+      "severity": "入口差异",
+      "detail": "旧桌面对手展示将资源与特殊牌合计最多六张，统一资源背面；部落奖励卡边以“礼”标记，奇观仅旧航海文字控件。主题接入应保持现有隐私，不把缺少图片误报为已有专用卡图。"
+    }
+  ],
+  "isolationAudit": {
+    "recordedOn": "2026-10-21",
+    "baseCommit": "f009fba",
+    "reason": "原共享工作区另一个线程同时加入 FrameCost 性能计时并构建；迁到独立工作树重新核对。只更新此隔离清单为实际字节哈希，不修改原工作区。",
+    "verification": "源码文本逐字符对比；8 个文件仅换行差异，M4App/M5App 仅两行性能计时代码不同。牌面语义与盘点一致。",
+    "changedSnapshots": [
+      {
+        "path": "Unity/Catan/Assets/Scripts/EntityCardAssets.cs",
+        "previousSharedWorkspaceSha256": "9c1fadfd0a6d986c3bb485b73495d6b2795cd46a75a633c77d13de34227bb9c7",
+        "isolatedSha256": "64033789c7ae859e71a93e280a3158e44e1560536851c79780d0fc080ae7b81e",
+        "verification": "仅 Git 检出换行差异（LF/CRLF），文本逐字符一致。"
+      },
+      {
+        "path": "Unity/Catan/Assets/Scripts/M4App.cs",
+        "previousSharedWorkspaceSha256": "699e62bb038a4782509f17c82224d2733ff3ca9c0da1e46e4505ef136a2a3578",
+        "isolatedSha256": "ed724f270d4af8cd023d52f606e0e58baabca04e8771d2e710003e56249826ac",
+        "verification": "原共享工作区多出 Refresh/OnGUI 两行 FrameCost 性能计时；移除这两行后全部文本一致。卡名、效果、数量、权限与牌面映射均无差异。"
+      },
+      {
+        "path": "Unity/Catan/Assets/Scripts/M5App.cs",
+        "previousSharedWorkspaceSha256": "ed5e15606def5e810489bd6054ad00267af97201731e037073c365349939494f",
+        "isolatedSha256": "38bf759d09f499d3d7400ed3522c587c67789ce36970e9c7fa2b411f25a15b79",
+        "verification": "原共享工作区多出 Refresh/OnGUI 两行 FrameCost 性能计时；移除这两行后全部文本一致。卡名、效果、数量、权限与牌面映射均无差异。"
+      },
+      {
+        "path": "Unity/Catan/Assets/Scripts/TabletopBankUI.cs",
+        "previousSharedWorkspaceSha256": "baf34bd2c9b469316f92c5c005c3cc9b660820494dffb8d27af68a732af16fa9",
+        "isolatedSha256": "f274789becc68d650ded4a8cf02975bad359d329522a62658f936450dba7fc16",
+        "verification": "仅 Git 检出换行差异（LF/CRLF），文本逐字符一致。"
+      },
+      {
+        "path": "src/Catan.Core/M3Scenarios.cs",
+        "previousSharedWorkspaceSha256": "c3f15355ce4ffca65023a97b94cef00d37563ebc7eec333814368e87baf0686e",
+        "isolatedSha256": "daa45b0728b0fc89311610dacde92f4a273f88011bd298d8821855b31e8a9738",
+        "verification": "仅 Git 检出换行差异（LF/CRLF），文本逐字符一致。"
+      },
+      {
+        "path": "src/Catan.Core/M3Seafaring.cs",
+        "previousSharedWorkspaceSha256": "1d8ac711045476c6820c3e6ab8d39a990fcf90c8533d18ee99c16e9f3d69bdf2",
+        "isolatedSha256": "216c690fc0786640b7b0d02f1dfc89ddd1b5f09a2369fef384d9b8708663a52e",
+        "verification": "仅 Git 检出换行差异（LF/CRLF），文本逐字符一致。"
+      },
+      {
+        "path": "src/Catan.Core/M4ExpansionModels.cs",
+        "previousSharedWorkspaceSha256": "54171e332c437e29f7481787406ffd75d5b9ade6613b0ab8599e98f6ac10daab",
+        "isolatedSha256": "0b977e2a2afcf1bb9eb1f1eae392c9cbfbbc2872357c6057a528e8e09d60f422",
+        "verification": "仅 Git 检出换行差异（LF/CRLF），文本逐字符一致。"
+      },
+      {
+        "path": "src/Catan.Core/M4ProgressModels.cs",
+        "previousSharedWorkspaceSha256": "077f3f3b241d44d68f5f8283ea23e4e46f7d3bd3521c7294d6c8518b76d2e5ea",
+        "isolatedSha256": "a48c0339f7acf6a971c78408ca2f8cf398ec043a9873debd69028f1fbb58b80a",
+        "verification": "仅 Git 检出换行差异（LF/CRLF），文本逐字符一致。"
+      },
+      {
+        "path": "src/Catan.Core/M5ExpansionModels.cs",
+        "previousSharedWorkspaceSha256": "447fd80b4ea8e731247e52aa91e0b12eeb5bd2c4d3b6dd017b50b0153ab869bf",
+        "isolatedSha256": "f263f38315f7e2a11b97027a1bb38e587c32e8e26b7566b966e35c8767367885",
+        "verification": "仅 Git 检出换行差异（LF/CRLF），文本逐字符一致。"
+      },
+      {
+        "path": "src/Catan.Core/M5ProgressModels.cs",
+        "previousSharedWorkspaceSha256": "8c1f6408ddd0af805499f4328ead01980494dd203359f93adb90b487cfa5794b",
+        "isolatedSha256": "6d735b7ccbd7f60931d6039a62630b5059a648787c193fa6a02db9abd31cc368",
+        "verification": "仅 Git 检出换行差异（LF/CRLF），文本逐字符一致。"
+      }
+    ]
+  }
+}

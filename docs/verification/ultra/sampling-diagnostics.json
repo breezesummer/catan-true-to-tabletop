@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-21",
+  "results": [
+    {
+      "status": "failed",
+      "errorType": "InvalidOperationException",
+      "stage": "ordinary：逐帧采样"
+    },
+    {
+      "status": "failed",
+      "errorType": "InvalidOperationException",
+      "stage": "ordinary：逐帧采样",
+      "operation": "样本容量检查",
+      "sampledFrames": 6010,
+      "stackTrace": "  at UltraBaselineProbe+<Run>d__26.MoveNext () [0x004ca] in <eb4d5431235940d7b78ee07b317c1332>:0 \r\n  at UltraBaselineProbe+<GuardedRun>d__25.MoveNext () [0x0002b] in <eb4d5431235940d7b78ee07b317c1332>:0 "
+    }
+  ],
+  "interpretation": "隐藏窗口的逐帧循环超过采样容量，失败结果不作为帧率证据；首轮截图为显式URP单相机采集。后续增加实际渲染不足的提前拒绝，并提供需明确授权的可见窗口入口。"
+}

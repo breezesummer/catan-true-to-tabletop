@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.6/Catan1.6.16-Room-Lifecycle',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile,[switch]$SkipVerification)
+param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.7/Catan1.7.0-Ultra-Baseline',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile,[switch]$SkipVerification)
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))

@@ -96,6 +96,8 @@ public static class M6Build
         PlayerSettings.companyName = "CatanDevelopment";
         PlayerSettings.productName = M6App.ProductFileName;
         PlayerSettings.bundleVersion = M6App.BuildVersion;
+        // U0 构建后基线需要真实 CPU/GPU 时间；采样器仅在显式验证参数下运行。
+        PlayerSettings.enableFrameTimingStats = true;
         // 在线大厅按用户要求直接连接公网 IP，正式包同样允许 HTTP / WS。
         PlayerSettings.insecureHttpOption = InsecureHttpOption.AlwaysAllowed;
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);

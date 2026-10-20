@@ -1,6 +1,7 @@
 param(
-    [string]$OutputRoot = 'game version/1.6/Catan1.6.14-Collector-Menu',
-    [switch]$Arm64Only
+    [string]$OutputRoot = 'game version/1.7/Catan1.7.0-Ultra-Baseline',
+    [switch]$Arm64Only,
+    [string]$GradleUserHome = ''
 )
 $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
@@ -53,7 +54,8 @@ $androidPreviousGradleHome = $env:GRADLE_USER_HOME
 try {
     $env:CATAN_ANDROID_KEYSTORE = $androidKeystore
     $env:CATAN_ANDROID_KEYSTORE_PASS = $androidPassword
-    $env:GRADLE_USER_HOME = Join-Path $androidRepoRoot '.local\development\caches\gradle'
+    # 较长的隔离工作树路径可能超过 Android Ninja 的 260 字符限制；允许本次构建显式复用短缓存路径。
+    $env:GRADLE_USER_HOME = if ($GradleUserHome) { [IO.Path]::GetFullPath($GradleUserHome) } else { Join-Path $androidRepoRoot '.local\development\caches\gradle' }
     New-Item -ItemType Directory -Force $env:GRADLE_USER_HOME | Out-Null
     if (!(Test-Path -LiteralPath $androidKeystore)) {
         & $androidKeytool -genkeypair -keystore $androidKeystore -storetype JKS -alias catan-internal `

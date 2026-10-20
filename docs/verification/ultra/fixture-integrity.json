@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "date": "2026-10-21",
+  "fixtureHashChecks": 4,
+  "modifiedFixtureRejectedBeforeLaunch": true,
+  "standardFixturesUnchanged": true,
+  "outputCreatedForRejectedRun": false,
+  "powershellSyntaxValid": true
+}

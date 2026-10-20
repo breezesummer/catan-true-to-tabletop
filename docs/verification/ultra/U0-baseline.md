@@ -1,0 +1,118 @@
+# U0 现状与性能基线
+
+日期：2026年10月21日。工作分支：`codex/ultra-u0-1.7.0`。游戏版本：`1.7.0`。本轮按用户明确指定升级至 1.7.0，属于 U0 开发构建，不作正式发布。
+
+## 工作区与可运行基线
+
+开始时 HEAD 为 `f009fba2892ccc4caa125fc1e2ceea935496107d`（优化联机历史展示与棋子增量刷新，覆盖1.6.16），原分支为 `dev-1.0`。存在 README 的方案导航、项目约定中的双主题与全牌面决策、开发日志的新条目，以及尚未跟踪的 ultra 方案。这些内容均与本轮依据相关，保留原文；开始时补丁及方案副本保存在本地 `.local/ultra-u0-start`。
+
+最初建立 `codex/ultra-u0-baseline` 后，检测到同目录另一个任务新增 `FrameCost`、联机测量代码及 Unity 构建改写。本轮转至独立工作树与 `codex/ultra-u0-1.7.0` 分支，仅复制 U0 文件；不纳入这些并行代码，也不清理原工作区中的并行改动。Unity Library 使用独立副本，下载依赖缓存复用已有缓存。
+
+本轮代码及产物所在工作树为 `C:/Users/BreezeSummer/.codex/worktrees/ultra-u0/catan-true-to-tabletop`。下文所有相对路径均以此为根；原目录有并行构建，不覆盖其同名产物。
+
+原可运行版本为 `game version/1.6/Catan1.6.16-Room-Lifecycle`。U0 新构建放入 `game version/1.7/Catan1.7.0-Ultra-Baseline`，程序、窗口和 APK 名为 `Catan1.7.0`；Android 版本代码为 `10700`。本轮没有修改规则、AI、存档协议或云端服务，也未实现 U1 的主题切换。
+
+原 Windows 游戏程序集 `Catan1.6.16_Data/Managed/Assembly-CSharp.dll` 的 SHA-256 为 `c1e6eaa1d01a5231dd532e3247c2a3812838099f835f8d028419123f3ab6d71d`。后续对照使用有 U0 采样工具的 1.7.0；不能把新工具产生的结果标成历史 1.6.16 实测。
+
+## 设备与预算
+
+目标 PC 使用本机 Intel Core i5-14600KF（14 核 / 20 线程）、AMD Radeon RX 9070 XT、31.83 GiB 系统报告的物理内存总量，Windows 11 专业版 10.0.26200，AMD 驱动 32.0.22042.14002。设备登记见 [pc-device.json](pc-device.json)；运行时图形 API、分辨率与 Unity 内存按实际采样记录。
+
+PC 固定目标为 1920×1080、60 FPS，稳定区间 P95 帧间隔 ≤18.3 ms；P99 和 >50 ms 尖峰单列。当前真实桌游画质为原桌面 URP 配置，不冒称尚未实施的 ultra 高画质。CPU/GPU 分解时间只有引擎返回有效值时才计入，缺失值为 `null`；不拿帧间隔代替 GPU 耗时。
+
+执行 `adb devices -l` 未发现设备。Android 基线机型、硬件、发热后表现和实测性能均待登记，不能标记通过；中档 60 FPS / P95 ≤18.3 ms、低档 30 FPS / P95 ≤36.7 ms 仅保留为待真机冻结的建议目标。模拟器结果不能替代真机。
+
+## 范围与证据入口
+
+- [资产迁移清单](U0-asset-migration.md)：实际地图、四类渲染器、材质处理、预览、动画和直接加载入口。
+- [全牌面清单](../../../art/recipes/ultra/v001/cards/card-manifest.json)：稳定牌种、张数、来源页码、展示权限、资产与使用界面。
+- 原始参考须按实际存在的原件登记，缺少的 ultra 专用参考保持待补。
+
+已枚举 26 个规则／人数配置及 17 类资产迁移入口，并登记 192 个既有参考原件的 SHA-256。最大地图为 49 格，当前组合规则最大为 42 格。清单包含四类棋盘渲染器、直接加载、材质修补、厚板处理、建造预览、动画、牌面、海盗／蛮族船及静态缓存。
+
+全牌面清单包含 66 项定义：63 项当前运行展示重绘项、3 项仅参考辅助板，其中真正手牌为 38 类。71 个运行贴图路径、70 张照片、19 份源码快照、25 个显示入口及三份本地规则 PDF 原件通过校验，见 [校验结果](cards-validation.json)。2025 规则组件与现有旧版照片／实现之间的差异单独登记；没有据此新增牌种、改变规则或制作 ultra 美术。
+
+## 固定局面与截图
+
+四种夹具均经合法指令生成、两遍确定性重放、逐步不变量及精确保存恢复检查。权威文件保留在 `.local/ultra/u0-fixtures`；公开的 [fixtures.json](capture/fixtures.json) 记录规模、选取条件和合成夹具校验值。
+
+| 局面 | 规则／地图 | 格／点／边 | 主棋子 | 已接受指令 | 其他 |
+| --- | --- | --- | --- | --- | --- |
+| 普通 | 基础版／标准 | 19／54／72 | 16 | 16 | 4 人，种子 97 |
+| 最大 | 航海家／卡坦奇观 | 49／124／172 | 16 | 16 | 4 人，种子 97 |
+| 拥挤 | 组合／穿越沙漠 | 42／108／149 | 59 | 426 | 3 城墙、1 大都会；4 人，种子 2027 |
+| 迷雾 | 航海家／迷雾岛 | 42／108／149 | 16 | 16 | 12 格未揭示；4 人，种子 97 |
+
+主棋子指村庄、城市、道路、船和骑士，不含附着城墙及大都会。拥挤样本选取完整合法对局中组件最多且无待决的非终局；生成过程共检查 437 条合法指令，选定局面位于第 426 条之后。基础版夹具封装沿用通用场景字段，实际棋盘以 `mapId=standard` 为准。
+
+镜头路线 v1 为全桌斜视 → 全桌高角 → 0.55 倍近景 → 向右移动近景正交半高的 0.8 倍 → 回全桌，四段等时平滑插值。每局保存四个独立端点图像。
+
+2026-10-21 01:13（北京时间）完成仅截图运行：16 张 1920×1080 URP 棋盘图有效，四局前后权威存档完全一致。人工检查四张全景与拥挤近景，棋盘和组件可辨认，迷雾保持通用灰色遮蔽。图像仅含棋盘相机，不含 IMGUI。
+
+| 普通 | 最大 | 拥挤 | 迷雾 |
+| --- | --- | --- | --- |
+| [全景](capture/ordinary/camera-0.png) | [全景](capture/maximum/camera-0.png) | [全景](capture/crowded/camera-0.png)／[近景](capture/crowded/camera-2.png) | [全景](capture/fog/camera-0.png) |
+
+## 已取得的数据与性能限制
+
+本轮结果为 [`captured-only`](capture/result.json)，`performanceMeasured=false`。原始设备、质量配置及构建程序集校验值见 [launch.json](capture/launch.json) 和各局面的 `summary.json`。运行配置为 Direct3D11、1920×1080、MSAA 4、渲染比例 1、阴影距离 4。Unity 质量档名为已有的 `Ultra`，主题仍为真实桌游；该档名不代表已实现豪华典藏版 ultra。
+
+以下为同一进程按普通 → 最大 → 拥挤 → 迷雾依次加载、各预热 8 秒后的离屏棋盘快照。驻留缓存可能跨局面保留，不能据表差值推导单局资源成本或内存泄漏。
+
+| 局面 | 活跃 Renderer | 活跃材质去重数 | 驻留纹理数 | 纹理运行内存估计 MiB | Unity 分配 MiB | Unity 保留 MiB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 普通 | 75 | 122 | 96 | 103.23 | 96.87 | 186.49 |
+| 最大 | 107 | 191 | 97 | 103.23 | 97.99 | 186.49 |
+| 拥挤 | 181 | 183 | 99 | 103.23 | 120.42 | 206.49 |
+| 迷雾 | 98 | 168 | 99 | 103.23 | 120.02 | 206.49 |
+
+纹理运行内存不是显存精确占用；单次快照不是峰值。隐藏窗口可能不执行完整 IMGUI，因此也不是完整前台 UI 常驻内存。进程工作集接口本轮返回 0，未取得可用值，不据此声称进程占用为零。
+
+正常性能模式曾在隐藏窗口采样到 100 个更新循环，但相机连续渲染为 0 帧，工具按预期拒绝通过，见 [拒绝证据](hidden-window-rejection.json)。更早的计数器及采样容量诊断见 [sampling-diagnostics.json](sampling-diagnostics.json)。显式离屏截图可以成功，不能证明游戏在持续渲染。故本轮没有有效 FPS、P50／P95／P99、CPU／GPU 耗时、绘制调用或 GC 逐帧基线，也不能确认主要瓶颈或宣布达到预算。
+
+显示游戏窗口需取得本次会话的明确授权，当前尚未收到，因此没有执行 `-VisibleWindow`。待授权后应在同一设备、构建、夹具、镜头和分辨率下运行两轮独立采样，再比较帧时间和覆盖率。Android 未连接真机，性能与热稳定保持待验。
+
+## 测量边界
+
+测试局面使用离线合成对局。AI 只通过专用 `PlayerView` 决策，每条指令仍走规则 `Execute`，随后检查不变量；固定种子重放和保存恢复必须得到一致结果。公开材料仅记录人类可见棋盘的规模、组件数和摘要；包含牌库、隐藏地图或随机状态的权威夹具保存在 `.local`。
+
+性能采样在构建后的游戏中执行，关闭 AI 推进并验证采样前后权威存档一致。报告记录运行方式，后台／隐藏窗口的数据只代表该运行条件。离屏截图用于确认棋盘渲染有效，不冒充完整 UI、真实操作或前台长期性能验收。
+
+采样工具只在显式验证参数下挂载；普通游玩没有采样数组、逐帧统计或文件写入。Unity 构建启用 Frame Timing Stats，供显式采样读取 CPU/GPU 时间；数字是否可用仍由运行结果确认。
+
+## 验证与构建
+
+- 规则／展示测试 1,233／1,233、网络测试 116／116 通过，共 1,349 项，见 [tests.json](tests.json)。这些测试在原目录并行变更出现前启动，本轮未改动其规则、AI、网络生产源码。
+- 隔离 Windows 首次构建完成四规则混合人类／AI 席位、暂停、固定私有视图、保存、独立进程精确恢复与继续行动验证。随后仅修改显式 U0 验证工具，最终 Windows 构建及四局截图通过。
+- 夹具篡改负例通过：SHA-256 不符时拒绝启动，不创建输出结果，见 [fixture-integrity.json](fixture-integrity.json)。正常性能模式的无渲染负例通过。
+- 卡清单完整性、源码快照、照片和规则原件校验通过；采样脚本语法及独立代码复核通过。
+- Windows 客户端、随包服务和 Android APK 已构建。Android 首次因长工作树路径触发 Ninja 260 字符限制，增加可选短 Gradle 缓存路径后成功，签名验证通过。APK 为 IL2CPP／OpenGL ES 3，支持 ARM64、x86_64，最低 Android API 26，版本 1.7.0／10700。
+
+构建入口、版本、程序集／APK SHA-256、签名证书摘要及验证完成标记集中在 [builds.json](builds.json)。完整日志保留在本工作树构建目录 `logs`。本工作树仅有一个开发版本，按最多保留五个版本执行检查，无需清理；不跨工作树删除其他任务的产物。
+
+产物入口：
+
+- [Windows 程序](../../../game%20version/1.7/Catan1.7.0-Ultra-Baseline/Builds/Windows/Catan1.7.0.exe)
+- [Android 安装包](../../../game%20version/1.7/Catan1.7.0-Ultra-Baseline/Builds/Android/Catan1.7.0.apk)
+
+## 复现入口
+
+命令在本工作树根目录执行，完整说明见 [夹具与采样工具](../../../tools/validation/UltraBaselineFixtures/README.md)。复测使用原夹具，只有有意重新生成时才加 `-RegenerateFixtures`。
+
+```powershell
+# 隐藏窗口，仅截图与资源快照；每次使用新的输出目录。
+./tools/validation/Measure-UltraBaseline.ps1 `
+  -Player 'game version/1.7/Catan1.7.0-Ultra-Baseline/Builds/Windows/Catan1.7.0.exe' `
+  -OutputDirectory 'docs/verification/ultra/capture-round-2' `
+  -CaptureOnly -WarmupSeconds 8
+
+# 已取得显示窗口授权后执行两轮，分别使用 round-1、round-2。
+./tools/validation/Measure-UltraBaseline.ps1 `
+  -Player 'game version/1.7/Catan1.7.0-Ultra-Baseline/Builds/Windows/Catan1.7.0.exe' `
+  -OutputDirectory 'docs/verification/ultra/performance/round-1' `
+  -VisibleWindow -SampleSeconds 30 -WarmupSeconds 8 -Width 1920 -Height 1080
+```
+
+## 退出状态
+
+本轮完成 U0 的现状盘点、合法固定局面、全牌面清单、采样工具及静态视觉／资源证据，版本升级至 1.7.0。PC 持续渲染的两轮性能测量、主要瓶颈判断、Android 真机与热稳定验证，以及 ultra 专用参考原图仍待补，**U0 保持实施中，未满足全面退出条件**。没有开始 U1，不标记 M8 完成；`docs/ROADMAP.md` 保持原状态。

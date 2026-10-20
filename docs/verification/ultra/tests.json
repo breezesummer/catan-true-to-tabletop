@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-21",
+  "sourceBase": "f009fba2892ccc4caa125fc1e2ceea935496107d",
+  "tests": [
+    {
+      "suite": "rules",
+      "total": 1233,
+      "passed": 1233,
+      "failed": 0,
+      "start": "2026-10-21T00:48:53.9351690+08:00",
+      "finish": "2026-10-21T00:56:25.3848461+08:00",
+      "trxSha256": "a0db161c4c3722fafbe539f88779c509fdf5fd0fa824a3669d20f8f2764c341f"
+    },
+    {
+      "suite": "network",
+      "total": 116,
+      "passed": 116,
+      "failed": 0,
+      "start": "2026-10-21T00:48:53.8090217+08:00",
+      "finish": "2026-10-21T00:49:04.6172978+08:00",
+      "trxSha256": "f02e3f32c863da834b6004f54542e3136e237d2854d78d42cc24661f329e0abb"
+    }
+  ],
+  "note": "原工作区在并行代码出现前启动；本轮未改动规则、AI或网络协议。原始TRX在.local/ultra-u0-tests。"
+}

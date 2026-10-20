@@ -1,0 +1,77 @@
+{
+  "date": "2026-10-21",
+  "version": "1.7.0",
+  "branch": "codex/ultra-u0-1.7.0",
+  "workspace": "C:/Users/BreezeSummer/.codex/worktrees/ultra-u0/catan-true-to-tabletop",
+  "output": "game version/1.7/Catan1.7.0-Ultra-Baseline",
+  "formalRelease": false,
+  "windows": {
+    "path": "game version/1.7/Catan1.7.0-Ultra-Baseline/Builds/Windows/Catan1.7.0.exe",
+    "sha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+    "managedAssemblies": [
+      {
+        "file": "Assembly-CSharp.dll",
+        "sha256": "a1e3aabe71ed376efe8892cb6ccd4f2fa8ce979d46721defb7bdc34f541b38f2"
+      },
+      {
+        "file": "Catan.Core.dll",
+        "sha256": "308c7c3e9bf7b26d42427611f768af9d3b83e7b712503dfb367cf85a36d74eb8"
+      },
+      {
+        "file": "Catan.AI.dll",
+        "sha256": "a5461d959e0d091a1c92bc9007d35cf98f8fc575a89bff35ebfa33a0229283a3"
+      },
+      {
+        "file": "Catan.Network.Contracts.dll",
+        "sha256": "6f03909d5bace7bb9b17907d61f8cf273edd58920421b11c4e94d98a00b5f3ff"
+      }
+    ],
+    "buildSucceeded": true,
+    "playerVerification": "四规则混合席位、暂停、私有视图、保存与独立进程恢复通过；完成于首次隔离Windows构建，后续仅变更显式U0验证工具",
+    "verificationMarkers": [
+      "CATAN_M6_MIXED_SEATS_OK: base; players=3; human=P2; AI commands=17; public turn=3; target points=11",
+      "CATAN_M6_MIXED_SEATS_OK: seafarers; players=4; human=P3; AI commands=28; public turn=3; target points=15",
+      "CATAN_M6_MIXED_SEATS_OK: cities-knights; players=3; human=P1; AI commands=18; public turn=3; target points=14",
+      "CATAN_M6_MIXED_SEATS_OK: combined; players=4; human=P4; AI commands=22; public turn=3; target points=17",
+      "CATAN_M6_PLAYER_SAVE_OK: four rule families; mixed human/AI seats; pause; fixed private view; UI ownership boundary; human wait; AI trade response; versioned authority+seat saves",
+      "CATAN_M6_MIXED_SEATS_OK: base; players=3; human=P2; AI commands=12; public turn=7; target points=11",
+      "CATAN_M6_MIXED_SEATS_OK: seafarers; players=4; human=P3; AI commands=12; public turn=7; target points=15",
+      "CATAN_M6_MIXED_SEATS_OK: cities-knights; players=3; human=P1; AI commands=10; public turn=7; target points=14",
+      "CATAN_M6_MIXED_SEATS_OK: combined; players=4; human=P4; AI commands=15; public turn=6; target points=17",
+      "CATAN_M6_PLAYER_LOAD_OK: independent process; four rule families; exact authority+seat roundtrip; continued product AI; human choice and trade restored"
+    ]
+  },
+  "android": {
+    "path": "game version/1.7/Catan1.7.0-Ultra-Baseline/Builds/Android/Catan1.7.0.apk",
+    "bytes": 352070369,
+    "buildSucceeded": true,
+    "signatureVerified": true,
+    "deviceVerified": false,
+    "metadata": {
+      "version": "1.7.0",
+      "packageId": "com.catandevelopment.threekingdoms",
+      "versionCode": 10700,
+      "minApi": 26,
+      "targetApi": 36,
+      "architectures": [
+        "arm64-v8a",
+        "x86_64"
+      ],
+      "graphicsApi": "OpenGLES3",
+      "scriptingBackend": "IL2CPP",
+      "ui": "shared-pc-tabletop",
+      "coreAssemblySha256": "308c7c3e9bf7b26d42427611f768af9d3b83e7b712503dfb367cf85a36d74eb8",
+      "aiAssemblySha256": "a5461d959e0d091a1c92bc9007d35cf98f8fc575a89bff35ebfa33a0229283a3",
+      "signingCertificateSha256": "efd26f60a7807072ff61fb0dd4660fa00859b75e9b3857a742a4c7d6e3a2bf48",
+      "apkSha256": "2708ed98876e275594e9bbbb820f04f2b250fa2c300766072c187884e1660505"
+    },
+    "buildRetryReason": "首次因长工作树Gradle依赖路径触发Ninja 260字符错误；显式短Gradle缓存路径后成功",
+    "signatureLogSha256": "8836ea1995eaf735ab337124925d55becff4cf2149f3f73e9e528ae43a322079"
+  },
+  "retention": {
+    "keep": 5,
+    "developmentVersionsInThisWorktree": 1,
+    "deleted": 0,
+    "note": "原目录有并行任务与构建，不跨工作树清理。"
+  }
+}
