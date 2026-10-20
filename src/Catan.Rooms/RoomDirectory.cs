@@ -36,6 +36,7 @@ public sealed class RoomDirectory : IDisposable
             {
                 var saved = PrivateJson.Read<SavedRoom>(json);
                 ValidateRecovery(saved);
+                if (saved.Closed) { TryDeleteRoom(saved.RoomId); continue; }
                 rooms.Add(saved.RoomId, new Room(this, saved));
             }
         }
@@ -61,6 +62,7 @@ public sealed class RoomDirectory : IDisposable
         catch (Exception ex) when (ex is ArgumentException || ex is System.Runtime.Serialization.SerializationException || ex is System.Xml.XmlException || ex is FormatException || ex is OverflowException || ex is NullReferenceException)
         { response = Reject("InvalidRequest", "请求字段无效，请刷新后重试。"); }
         response.RequestId = request.RequestId;
+        RemoveClosedRooms();
         return response;
     }
     public RoomSummary[] ListPublicRooms()
@@ -79,7 +81,19 @@ public sealed class RoomDirectory : IDisposable
         Room[] copy; lock (directoryGate) copy = rooms.Values.ToArray();
         int advanced = 0;
         foreach (var room in copy) { cancellationToken.ThrowIfCancellationRequested(); if (room.TickAi()) advanced++; }
+        RemoveClosedRooms();
         return Task.FromResult(advanced);
+    }
+    private void TryDeleteRoom(string id)
+    {
+        try { storage.Delete(id); }
+        catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException) { /* 已提交的关闭标记阻止房间在重启后复活。 */ }
+    }
+    private void RemoveClosedRooms()
+    {
+        lock (directoryGate)
+            foreach (var pair in rooms.Where(pair => pair.Value.Closed).ToArray())
+            { rooms.Remove(pair.Key); TryDeleteRoom(pair.Key); }
     }
     public void Dispose() => storage.Dispose();
     private NetworkResponse Create(NetworkRequest request)
@@ -154,8 +168,8 @@ public sealed class RoomDirectory : IDisposable
     }
     private static void ValidateRecovery(SavedRoom room)
     {
-        if (room == null || room.Format != 1 || room.ProtocolVersion != 1 && room.ProtocolVersion != NetworkProtocol.Version || room.Revision < 1 || room.RoomId?.Length != 12 || room.Receipts == null || room.Seats == null || room.Enrollments == null) throw new InvalidDataException();
-        // v2 新增的姓名/托管字段不改变权威规则存档；只迁移已知 v1 私有格式，对外不接受旧协议。
+        if (room == null || room.Format != 1 || room.ProtocolVersion != 1 && room.ProtocolVersion != 2 && room.ProtocolVersion != NetworkProtocol.Version || room.Revision < 1 || room.RoomId?.Length != 12 || room.Receipts == null || room.Seats == null || room.Enrollments == null) throw new InvalidDataException();
+        // 迁移已知旧私有格式；v3 新增对局编号，对外拒绝不能重建牌桌的旧客户端。
         // 原存档保留到下一次原子事务提交，不在恢复过程覆盖文件。
         room.ProtocolVersion = NetworkProtocol.Version;
         ValidateSettings(room.Settings);
@@ -208,6 +222,10 @@ public sealed class RoomDirectory : IDisposable
             if (state.GameSave != null) { game = RuleRoomGame.Load(state.Settings.RuleSet, state.GameSave, owner.baseScenario); game.Save(); }
         }
         private bool Connected(SavedSeat seat) => seat.ConnectionId != null && lastSeen.TryGetValue(seat.ConnectionId, out var seen) && owner.options.Clock() - seen < owner.options.ConnectionTimeout;
+        internal bool Closed { get { lock (gate) return state.Closed; } }
+        private bool Abandoned => state.Seats.All(seat => seat.ConnectionId == null ||
+            !Connected(seat) && owner.options.Clock() - (disconnectedSince.TryGetValue(seat.SeatId, out var since) ? since :
+                lastSeen.TryGetValue(seat.ConnectionId, out var seen) ? seen : owner.options.Clock()) >= owner.options.ConnectionTimeout);
         internal bool CountsTowardRoomLimit { get { lock (gate) return !state.Closed && !(game?.Finished ?? false) && (game != null || state.Seats.Any(Connected)); } }
         internal RoomSummary Summary() { lock (gate) return PublicSummary(); }
         private RoomSummary PublicSummary() => new()
@@ -216,7 +234,7 @@ public sealed class RoomDirectory : IDisposable
             RulesVersion = state.RulesVersion, ScenarioVersion = state.ScenarioVersion, PlayerCount = state.Settings.PlayerCount,
             OccupiedSeats = state.Seats.Count + state.Settings.AiSeats.Length, TargetVictoryPoints = state.Settings.TargetVictoryPoints,
             HasPassword = state.PasswordHash != null, Listed = state.Settings.Listed && !state.Closed && !(game?.Finished ?? false) && state.Seats.Any(Connected), Started = game != null, Finished = game?.Finished ?? false,
-            Paused = paused, ManagerSeatId = state.ManagerSeatId, Revision = state.Revision,
+            Paused = paused, ManagerSeatId = state.ManagerSeatId, Revision = state.Revision, GameNumber = state.GameNumber,
             Seats = SeatIds(state.Settings.PlayerCount).Select(id =>
             {
                 var human = state.Seats.SingleOrDefault(s => s.SeatId == id); bool ai = state.Settings.AiSeats.Contains(id);
@@ -250,6 +268,7 @@ public sealed class RoomDirectory : IDisposable
         {
             lock (gate)
             {
+                if (state.Closed) return Reject("RoomClosed", "房间已销毁，请创建或加入其他房间。");
                 if (request.Operation == "Describe") return new NetworkResponse { Success = true, RoomId = state.RoomId, RuleSet = state.Settings.RuleSet, Revision = state.Revision, Room = PublicSummary() };
                 if (request.Operation == "Join") return Join(request);
                 if (!VersionsMatch(request, state.RulesVersion, state.ScenarioVersion)) return Reject("VersionMismatch", "规则或场景版本不同，请更新至同一版本。");
@@ -282,6 +301,8 @@ public sealed class RoomDirectory : IDisposable
                     try { owner.storage.Commit(state.RoomId, PrivateJson.Write(state)); paused = false; return Snapshot(seat); }
                     catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException) { return Snapshot(seat, "PersistenceFailed", "保存仍不可用，房间继续暂停。", false); }
                 }
+                // 主动离开不依赖旧局面修订号，也不能被暂停或其他玩家的行动阻塞。
+                if (request.Operation == "Leave" || request.Operation == "Revoke") return ChangeRoom(request, seat);
                 if (paused) return Snapshot(seat, "RoomPaused", "保存失败后房间已暂停，请管理员恢复保存或重启服务。", false);
                 if (request.ExpectedRevision != state.Revision) return Snapshot(seat, "StaleRevision", "房间已更新，请根据最新局面重试。", false);
                 return ChangeRoom(request, seat);
@@ -382,7 +403,19 @@ public sealed class RoomDirectory : IDisposable
                     if (!manager) return Snapshot(seat, "ManagerRequired", "只有管理员可以开始。", false);
                     if (game != null) return Snapshot(seat, "GameStarted", "对局已开始。", false);
                     if (state.Seats.Count + state.Settings.AiSeats.Length != state.Settings.PlayerCount || state.Seats.Any(s => !s.Ready || !Connected(s))) return Snapshot(seat, "NotReady", "需要所有席位有人或 AI，且全部人类在线并准备。", false);
-                    game = RuleRoomGame.Create(state.Settings, owner.baseScenario); state.GameSave = game.Save(); break;
+                    game = RuleRoomGame.Create(state.Settings, owner.baseScenario); state.GameSave = game.Save(); state.GameNumber++; break;
+                case "Restart":
+                    if (!manager) return Snapshot(seat, "ManagerRequired", "只有房主可以重新开始对局。", false);
+                    if (game == null) return Snapshot(seat, "NotStarted", "对局尚未开始。", false);
+                    // 重新创建权威局面，重新抽取种子并决定地图与起始顺序。
+                    var nextGame = RuleRoomGame.Create(state.Settings, owner.baseScenario);
+                    while (nextGame.StartingPlayerIndex == game.StartingPlayerIndex)
+                        nextGame = RuleRoomGame.Create(state.Settings, owner.baseScenario);
+                    game = nextGame; state.GameSave = game.Save(); state.GameNumber++;
+                    state.Receipts.Clear();
+                    foreach (var human in state.Seats)
+                    { human.ControlledByAi = !Connected(human); human.RejoinAfterTurnKey = null; }
+                    break;
                 case "Transfer":
                     if (!manager) return Snapshot(seat, "ManagerRequired", "只有管理员可以移交管理权。", false);
                     var target = WireJson.Deserialize<SeatPayload>(request.Payload).SeatId;
@@ -398,8 +431,7 @@ public sealed class RoomDirectory : IDisposable
                         if (request.Operation == "Revoke") { seat.CredentialHash = PrivateJson.Hash(PrivateJson.Token()); seat.CredentialExpiresAtUtc = owner.options.Clock(); }
                     }
                     if (manager) state.ManagerSeatId = state.Seats.Where(s => s != seat).OrderByDescending(Connected).Select(s => s.SeatId).FirstOrDefault() ?? state.Seats.FirstOrDefault()?.SeatId;
-                    // 最后一位大厅玩家离开即结束；保留私有存档和身份收据，公开列表不再展示历史房间。
-                    if (game == null && state.Seats.Count == 0) state.Closed = true;
+                    if (Abandoned) state.Closed = true;
                     break;
                 default: return Snapshot(seat, "UnknownOperation", "未知联机操作。", false);
             }
@@ -454,6 +486,12 @@ public sealed class RoomDirectory : IDisposable
             lock (gate)
             {
                 if (state.Closed) return false;
+                if (Abandoned)
+                {
+                    var beforeClose = PrivateJson.Copy(state);
+                    state.Closed = true; state.Revision++; Commit(beforeClose);
+                    return false;
+                }
                 if (!paused)
                 {
                     SavedRoom prior = null; bool changed = false;

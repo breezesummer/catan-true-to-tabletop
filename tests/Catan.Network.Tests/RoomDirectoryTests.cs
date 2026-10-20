@@ -578,6 +578,7 @@ public sealed class RoomDirectoryTests
         public bool Fail; public readonly Dictionary<string, string> Documents = new();
         public IEnumerable<string> LoadAll() => Documents.Values.ToArray();
         public void Commit(string roomId, string privateDocument) { if (Fail) throw new IOException("模拟写入失败"); Documents[roomId] = privateDocument; }
+        public void Delete(string roomId) { if (Fail) throw new IOException("模拟删除失败"); Documents.Remove(roomId); }
         public void Dispose() { }
     }
     private sealed class Fixture : IDisposable

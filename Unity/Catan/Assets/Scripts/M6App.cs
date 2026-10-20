@@ -272,7 +272,7 @@ public sealed partial class M6App : MonoBehaviour
     public void ReturnToMainMenu()
     {
         ResetCardPresentation();ResetBuildPresentation();
-        if(NetworkGame)Network.EndSession();
+        if(NetworkGame)Network.Leave();
         close?.Invoke();presentation=null;actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         historySource=null;historyEntries=Array.Empty<Catan.Core.GameHistoryEntry>();lastHistoryRevision=-1;
         tableMenu=false;MenuVisible=true;TableDiceRolling=false;NavigateMainMenu(-1);

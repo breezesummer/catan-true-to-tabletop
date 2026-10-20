@@ -10,6 +10,7 @@ public sealed partial class M6App
     public bool NetworkGame=>Network!=null&&Network.Playing;
     M7LanService lanService=new M7LanService();
     bool networkMenu,networkEntering,networkLan=true,networkWorking;
+    int networkPresentedGame=-1;
     string networkAddress="https://127.0.0.1:47771",networkPin="",networkRoomId="",networkPassword="",networkRoomName="卡坦好友房间",networkMessage="";
     bool networkListed=true;
     readonly bool[] networkAi={false,false,false,false};
@@ -54,9 +55,9 @@ public sealed partial class M6App
     void ApplyNetworkView()
     {
         if(Network.Room==null||!Network.Room.Started||string.IsNullOrEmpty(Network.SeatId))return;
-        if(!NetworkGame)
+        if(!NetworkGame||networkPresentedGame!=Network.Room.GameNumber)
         {
-            var room=Network.Room;networkEntering=true;Network.Playing=true;networkMenu=false;
+            var room=Network.Room;networkPresentedGame=room.GameNumber;networkEntering=true;Network.Playing=true;networkMenu=false;
             try{StartGame(room.RuleSet=="cities"?"cities-knights":room.RuleSet,room.RuleSet=="base"||room.RuleSet=="cities"||room.RuleSet=="cities-knights"?"heading-for-new-shores":room.ScenarioId,room.PlayerCount,Network.SeatId,targetVictoryPoints:room.TargetVictoryPoints);}
             finally{networkEntering=false;}
             Notice="已连接房间 "+room.RoomId+"。离线时 AI 接手，重连后在下次自己的回合恢复操作。";
@@ -83,6 +84,7 @@ public sealed partial class M6App
     void OpenNetworkMenu(){networkMenu=true;MenuVisible=true;if(presentation!=null)presentation.enabled=false;visible?.Invoke(false);}
     void CloseNetworkPresentation()
     {
+        networkPresentedGame=-1;
         close?.Invoke();presentation=null;actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;MenuVisible=true;tableMenu=false;networkMenu=true;
     }
     RoomSettings NetworkSettings()=>new RoomSettings{Name=networkRoomName,RuleSet=RuleIds[menuRule],ScenarioId=menuRule==0||menuRule==2?"base":ScenarioIds()[Mathf.Clamp(menuScenario,0,ScenarioIds().Length-1)],PlayerCount=menuPlayers,TargetVictoryPoints=menuVictoryPoints,Listed=networkListed,AiSeats=Enumerable.Range(0,menuPlayers).Where(i=>networkAi[i]).Select(i=>"P"+(i+1)).ToArray()};

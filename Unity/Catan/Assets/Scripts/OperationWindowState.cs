@@ -1,6 +1,6 @@
 #nullable disable
 using System;
-// 收起保留回合按钮入口；关闭只隐藏本地窗口，权威待决仍由规则入口完成。
+// 收起与关闭均只隐藏本地窗口；强制待决保留回合按钮恢复入口，仍由规则入口完成。
 public sealed class OperationWindowState
 {
     string scope, revision;

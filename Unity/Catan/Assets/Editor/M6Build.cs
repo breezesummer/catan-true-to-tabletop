@@ -46,6 +46,8 @@ public static class M6Build
         if (android && !BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Android, BuildTarget.Android))
             throw new Exception("请安装当前 Unity 版本的 Android Build Support。");
         if (android) AndroidTexturePolicy.ApplyExistingTextures();
+        if (!Array.Exists(Environment.GetCommandLineArgs(), argument => argument == "--skip-build-verification"))
+        {
         EntityCardTextureImporter.VerifyImportedCards();
         VerifyPresentationTextures();
         AudioVisualBuildValidation.Verify();
@@ -59,6 +61,7 @@ public static class M6Build
         var restored = CombinedGameSession.Load(session.Save());
         if (restored.Save() != session.Save()) throw new Exception("Unity M6 save roundtrip failed");
         Debug.Log("CATAN_M6_UNITY_CORE_OK: netstandard2.1 execution and authoritative save roundtrip");
+        }
 
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         var pipeline = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>("Assets/M1Pipeline.asset");

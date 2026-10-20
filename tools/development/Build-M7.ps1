@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.6/Catan1.6.14-Collector-Menu')
+param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.6/Catan1.6.16-Room-Lifecycle',[switch]$SkipVerification)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m7FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))
@@ -10,7 +10,7 @@ New-Item -ItemType Directory -Force -Path $m7Plugins | Out-Null
 if($LASTEXITCODE -ne 0){throw 'M7 共享网络协议构建失败。'}
 $m7Contract=Join-Path $m7RepoRoot 'src/Catan.Network.Contracts/bin/Release/netstandard2.1/Catan.Network.Contracts.dll'
 Copy-Item -LiteralPath $m7Contract -Destination (Join-Path $m7Plugins 'Catan.Network.Contracts.dll') -Force
-& (Join-Path $PSScriptRoot 'Build-M6.ps1') -OutputRoot $OutputRoot -VerifyPlayer:$VerifyPlayer
+& (Join-Path $PSScriptRoot 'Build-M6.ps1') -OutputRoot $OutputRoot -VerifyPlayer:$VerifyPlayer -SkipVerification:$SkipVerification
 if($LASTEXITCODE -ne 0){throw 'M7 Unity 客户端构建失败。'}
 & (Join-Path $PSScriptRoot 'Build-M7Server.ps1') -OutputRoot $OutputRoot
 if($LASTEXITCODE -ne 0){throw 'M7 自包含 Windows 房间服务发布失败。'}

@@ -164,13 +164,15 @@ public sealed partial class TabletopUI
         string cardCaption=CardActionCaption;
         if(cardCaption!=null){turnCaption=cardCaption;turnEnabled=CardActionReady;}
         if(DiscardActive){turnCaption=DiscardCaption;turnEnabled=DiscardReady;}
-        if(OperationWindows.Hidden){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
+        // 必选窗口被 Esc 或叉号关闭后，回合按钮仍须提供恢复入口。
+        bool resumeOperation=OperationWindows.Hidden||OperationWindows.Closed&&(operations?.RequiresSelection==true||operations?.Discard!=null);
+        if(resumeOperation){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
         StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
         var turnStyle=new GUIStyle(title){fontSize=21,wordWrap=true};turnStyle.normal.textColor=turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
         while(turnStyle.fontSize>11&&turnStyle.CalcHeight(new GUIContent(turnCaption),EndTurnRect.width-40)>60)turnStyle.fontSize--;
         GUI.Label(new Rect(EndTurnRect.x+20,EndTurnRect.y+35,EndTurnRect.width-40,60),turnCaption,turnStyle);
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
-        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(OperationWindows.Hidden)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(cardCaption!=null)ConfirmCardAction();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
+        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(resumeOperation)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(cardCaption!=null)ConfirmCardAction();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
         DrawDiscardCount();
         GUI.enabled=tableEnabled;
     }

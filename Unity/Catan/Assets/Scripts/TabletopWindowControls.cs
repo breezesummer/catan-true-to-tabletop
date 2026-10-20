@@ -10,7 +10,7 @@ public sealed partial class M6App
     bool TableMapChoiceOpen=>presentation is M2App basic?basic.ChoiceMenuOpen:
         presentation is M3App sailing?sailing.ChoiceMenuOpen:presentation is M4App cities?cities.ChoiceMenuOpen:
         presentation is M5App combined&&combined.ChoiceMenuOpen;
-    // 强制选择不能被取消。关闭其窗口后，从常驻的次级屏幕提示重新打开。
+    // 强制选择不能被取消。关闭后可从右下回合按钮或常驻选择提示重新打开。
     OperationWindowState CurrentTableWindows => presentation is M2App basic ? basic.WindowHud.OperationWindows :
         presentation is M3App sailing ? sailing.WindowHud.OperationWindows :
         presentation is M4App cities ? cities.WindowHud.OperationWindows :

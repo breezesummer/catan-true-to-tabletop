@@ -9,6 +9,7 @@ public interface IRoomStorage : IDisposable
 {
     IEnumerable<string> LoadAll();
     void Commit(string roomId, string privateDocument);
+    void Delete(string roomId);
 }
 
 public sealed class AtomicRoomStorage : IRoomStorage
@@ -41,6 +42,11 @@ public sealed class AtomicRoomStorage : IRoomStorage
         }
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
+    public void Delete(string roomId)
+    {
+        if (roomId.Length != 12 || roomId.Any(c => !char.IsAsciiLetterOrDigit(c))) throw new InvalidDataException("房间标识无效。");
+        File.Delete(Path.Combine(directory, roomId + ".room.json"));
+    }
     public void Dispose() => ownership.Dispose();
 }
 
@@ -57,6 +63,7 @@ internal sealed class SavedRoom
     public string RulesVersion { get; set; }
     public string ScenarioVersion { get; set; }
     public string GameSave { get; set; }
+    public int GameNumber { get; set; }
     public bool Closed { get; set; }
     public Dictionary<string, string> AiDisplayNames { get; set; } = new(StringComparer.Ordinal);
     public List<SavedSeat> Seats { get; set; } = new();

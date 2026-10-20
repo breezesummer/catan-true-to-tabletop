@@ -1,10 +1,10 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.6/Catan1.6.14-Collector-Menu',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile)
+param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.6/Catan1.6.16-Room-Lifecycle',[switch]$ImportTabletopMarkers,[switch]$ImportMountainTile,[switch]$SkipVerification)
 $m6BuildClock = [Diagnostics.Stopwatch]::StartNew()
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Project = Join-Path $m6RepoRoot 'Unity\Catan'
-& (Join-Path $PSScriptRoot '../validation/Test-UnitySourceIntegrity.ps1') -ProjectPath $m6Project
+if (!$SkipVerification) { & (Join-Path $PSScriptRoot '../validation/Test-UnitySourceIntegrity.ps1') -ProjectPath $m6Project }
 $m6OutputRoot = [IO.Path]::GetFullPath((Join-Path $m6RepoRoot $OutputRoot))
 $m6Logs = Join-Path $m6OutputRoot 'logs'
 New-Item -ItemType Directory -Force -Path $m6Logs,(Join-Path $m6Project 'Assets\Plugins'),(Join-Path $m6Project 'Assets\Resources') | Out-Null
@@ -20,11 +20,12 @@ foreach ($assemblyName in @('Catan.Core','Catan.AI')) {
 }
 Copy-Item -LiteralPath (Join-Path $m6RepoRoot 'docs\acceptance\v0.1\scenario.json') -Destination (Join-Path $m6Project 'Assets\Resources\m1-scenario.json') -Force
 $m6BuildMethod=if($ImportMountainTile){'EntityIntegrationBuild.BuildMountainTile'}elseif($ImportTabletopMarkers){'EntityIntegrationBuild.BuildTabletopMarkers'}else{'M6Build.Build'}
-& $toolchain.unity -batchmode -nographics -quit -buildTarget Win64 -projectPath $m6Project -executeMethod $m6BuildMethod --m6-output-root $m6OutputRoot -logFile (Join-Path $m6Logs 'unity-build.log') | Out-Host
+$m6ExtraArguments = if ($SkipVerification) { @('--skip-build-verification') } else { @() }
+& $toolchain.unity -batchmode -nographics -quit -buildTarget Win64 -projectPath $m6Project -executeMethod $m6BuildMethod --m6-output-root $m6OutputRoot @m6ExtraArguments -logFile (Join-Path $m6Logs 'unity-build.log') | Out-Host
 if ($LASTEXITCODE -ne 0) { throw "Unity 构建失败，请检查 $m6Logs/unity-build.log。" }
 if (!(Select-String -LiteralPath (Join-Path $m6Logs 'unity-build.log') -Pattern 'CATAN_M6_UNITY_BUILD_OK' -Quiet)) { throw '未找到 Unity 构建成功标记。' }
 Write-Host ("M6 .NET / Unity 构建耗时 {0:N1} 秒。" -f $m6BuildClock.Elapsed.TotalSeconds)
-if ($VerifyPlayer) {
+if ($VerifyPlayer -and !$SkipVerification) {
     $m6Player = Join-Path $m6OutputRoot "Builds/Windows/$m6FileStem.exe"
     $m6Evidence = Join-Path $m6OutputRoot 'verification'
     New-Item -ItemType Directory -Force $m6Evidence | Out-Null

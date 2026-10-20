@@ -92,6 +92,7 @@ public sealed class RoomSwitchTransportTests
         private readonly Dictionary<string, string> documents = new();
         public IEnumerable<string> LoadAll() => documents.Values.ToArray();
         public void Commit(string roomId, string privateDocument) => documents[roomId] = privateDocument;
+        public void Delete(string roomId) => documents.Remove(roomId);
         public void Dispose() { }
     }
 }

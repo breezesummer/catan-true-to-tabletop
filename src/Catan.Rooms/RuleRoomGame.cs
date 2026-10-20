@@ -16,6 +16,7 @@ internal sealed class RuleRoomGame
     private bool finished;
     internal int CommandCount { get; private set; }
     internal string ActivePlayerId { get; private set; }
+    internal int StartingPlayerIndex { get; private set; }
     // 摆放轮也有独立边界；蛇形折返时同一颜色可连续摆放两轮。
     internal string TurnKey { get; private set; }
     private RuleRoomGame(string rules, object session) { ruleSet = rules; this.session = session; Save(); }
@@ -52,6 +53,7 @@ internal sealed class RuleRoomGame
         finished = document.RootElement.TryGetProperty("WinnerPlayerId", out var winner) && winner.ValueKind == System.Text.Json.JsonValueKind.String && !string.IsNullOrEmpty(winner.GetString());
         CommandCount = document.RootElement.GetProperty("ProcessedCommands").GetArrayLength();
         ActivePlayerId = document.RootElement.GetProperty("ActivePlayerId").GetString();
+        StartingPlayerIndex = document.RootElement.GetProperty("StartingPlayerIndex").GetInt32();
         TurnKey = document.RootElement.GetProperty("Turn").GetInt32() + ":" + document.RootElement.GetProperty("SetupPlacementIndex").GetInt32() + ":" + ActivePlayerId;
         return json;
     }
