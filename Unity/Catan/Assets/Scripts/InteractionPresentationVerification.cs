@@ -6,6 +6,8 @@ using System.Reflection;
 using Catan.Core;
 using UnityEngine;
 using C4=Catan.Core.M4;
+using Commodity=Catan.Core.M4.Commodity;
+using CommodityBag=Catan.Core.M4.CommodityBag;
 
 // 只在显式 --interaction-verify 下运行隔离显示夹具。不会读取或覆盖玩家的常规存档。
 public sealed partial class InteractionPresentationVerification:MonoBehaviour
@@ -68,6 +70,7 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
     }
     IEnumerator Verify()
     {
+        yield return VerifyTradeCardSizing();
         yield return VerifyPointerMenus();
         stage="城市骑士公开夹具";
         app.StartGame("cities-knights","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
@@ -136,6 +139,68 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
         app.ReadSave(path);yield return null;yield return null;Require(app.Ready&&app.ExportEnvelope()==saved,"退出后不能独立读档");
         string blocker=Path.Combine(output,"目录阻断");File.WriteAllText(blocker,"测试");app.MenuReviewSavePath=Path.Combine(blocker,"失败.json");app.SaveAndReturnToMainMenu();
         Require(app.Ready&&!app.MenuVisible,"保存失败却丢弃当前游戏");app.MenuReviewSavePath=null;app.ReturnToMainMenu();Require(!app.Ready&&app.MenuVisible,"返回主菜单未清理对局");
+    }
+    IEnumerator VerifyTradeCardSizing()
+    {
+        stage="交易资源牌自适应";app.StartGame("cities-knights","heading-for-new-shores",4,"P2",true);yield return null;yield return null;
+        var game=GetComponent<M4App>();var host=game.VerificationHost;
+        var session=(C4.CitiesKnightsGameSession)typeof(M4LocalGameHost).GetField("session",Private).GetValue(host);
+        var state=session.GetAuthoritativeStateForTesting();state.ActivePlayerId="P1";state.Phase=C4.GamePhase.Action;state.Turn=9;state.SetupPlacementIndex=8;state.PendingDecision=null;
+        for(int p=0;p<2;p++)
+        {
+            state.Players[p].Resources=new ResourceBag{Wood=6,Brick=6,Wool=6,Wheat=6,Ore=6};
+            state.Players[p].Commodities=new CommodityBag{Cloth=3,Coin=3,Paper=3};
+        }
+        foreach(Resource r in Enum.GetValues(typeof(Resource)))state.Bank[r]=19-state.Players.Sum(p=>p.Resources[r]);
+        foreach(Commodity c in Enum.GetValues(typeof(Commodity)))state.CommodityBank[c]=12-state.Players.Sum(p=>p.Commodities[c]);
+        session.GetType().GetField("state",Private).SetValue(session,state);session.AssertInvariants();game.M6Refresh();table=game.VerificationBoard.TableScene;yield return null;
+        foreach(int count in new[]{1,3,5,7})
+        {
+            stage="交易请求资源种类 "+count;
+            var offer=Command(C4.CommandKind.ProposeTrade);offer.PlayerId="P1";offer.OtherPlayerId="P2";
+            offer.Give=new ResourceBag();offer.Receive=new ResourceBag();offer.GiveCommodities=new CommodityBag();offer.ReceiveCommodities=new CommodityBag();
+            for(int good=0;good<count;good++){if(good<5)offer.Give[(Resource)good]=1;else offer.GiveCommodities[(Commodity)(good-5)]=1;}
+            offer.ReceiveCommodities.Paper=1;
+            Require(host.Submit(offer).Success,"自适应交易报价夹具失败");game.M6Refresh();yield return null;yield return null;
+            string before=host.ExportSave();yield return Capture("交易资源-"+count+"种请求");
+            Require(before==host.ExportSave(),"交易资源排版改变了权威局面");
+            var cancel=Command(C4.CommandKind.CancelTrade);cancel.PlayerId="P1";Require(host.Submit(cancel).Success,"自适应交易报价无法撤回");game.M6Refresh();
+        }
+        foreach(int count in new[]{1,8})
+        {
+            stage="交易资源点击与排版 "+count;
+            state=session.GetAuthoritativeStateForTesting();state.ActivePlayerId="P2";
+            state.Players[1].Resources=count==1?new ResourceBag{Wood=4}:new ResourceBag{Wood=4,Brick=4,Wool=4,Wheat=4,Ore=4};
+            state.Players[1].Commodities=count==1?new CommodityBag():new CommodityBag{Cloth=3,Coin=3,Paper=3};
+            foreach(Resource r in Enum.GetValues(typeof(Resource)))state.Bank[r]=19-state.Players.Sum(p=>p.Resources[r]);
+            foreach(Commodity c in Enum.GetValues(typeof(Commodity)))state.CommodityBank[c]=12-state.Players.Sum(p=>p.Commodities[c]);
+            session.GetType().GetField("state",Private).SetValue(session,state);session.AssertInvariants();game.M6Refresh();yield return null;yield return null;
+            var dock=game.VerificationOperationDock;dock.Reset();dock.OpenTrade();yield return null;
+            var snapshot=game.VerificationOperationSnapshot;var goods=OperationPanelOptions.PaymentGoods(snapshot);
+            Require(goods.Length==count,"付出侧没有按可用资源展示");
+            var area=new Rect(286,326,386,218);var receiveArea=new Rect(768,326,386,218);
+            var give=(int[])typeof(OperationDock).GetField("give",Private).GetValue(dock);var receive=(int[])typeof(OperationDock).GetField("receive",Private).GetValue(dock);
+            var first=OperationTradeCardLayout.Arrange(count,area.width,area.height)[0];var ore=OperationTradeCardLayout.Arrange(8,receiveArea.width,receiveArea.height)[4];
+            string before=host.ExportSave();
+            yield return PolishGui(()=>{
+                var saved=Event.current;
+                var draw=typeof(OperationDock).GetMethod("DrawTradeBag",Private);
+                try
+                {
+                    for(int click=0;click<4;click++)
+                    {
+                        Event.current=new Event{type=EventType.MouseDown,button=0,mousePosition=new Vector2(area.x+first.X+first.Width/2,area.y+first.Y+first.Height/2)};
+                        draw.Invoke(dock,new object[]{snapshot,area,give,true,true});
+                    }
+                    Event.current=new Event{type=EventType.MouseDown,button=0,mousePosition=new Vector2(receiveArea.x+ore.X+ore.Width/2,receiveArea.y+ore.Y+ore.Height/2)};
+                    draw.Invoke(dock,new object[]{snapshot,receiveArea,receive,false,true});
+                }
+                finally{Event.current=saved;}
+            });
+            Require(give[0]==4&&give.Skip(1).Sum()==0&&receive[4]==1&&receive.Sum()==1,"缩放后的资源牌点击命中不正确");
+            Require(before==host.ExportSave(),"调整交易草稿改变权威局面");
+            yield return Capture(count==1?"交易资源-单种付出放大":"交易资源-八种选择收缩");dock.Reset();session.AssertInvariants();
+        }
     }
     static PiecePlacement Piece(string location)=>new PiecePlacement{PlayerId="P1",LocationId=location};
     static C4.Command Command(C4.CommandKind kind,string target=null)=>new C4.Command{Id=Guid.NewGuid().ToString("N"),PlayerId="P1",Kind=kind,TargetId=target};

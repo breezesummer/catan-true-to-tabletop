@@ -235,3 +235,44 @@ public static class OperationCardQuantity
         selected[good]++;return null;
     }
 }
+
+// 根据展示数量选择可容纳的最大卡面，短行与整组始终居中，计数保留独立空间。
+public readonly struct OperationTradeCardSlot
+{
+    public readonly float X,Y,Width,Height;
+    public const float CaptionHeight=22;
+    public float CaptionY=>Y+Height;
+    public OperationTradeCardSlot(float x,float y,float width,float height)
+    {X=x;Y=y;Width=width;Height=height;}
+}
+public static class OperationTradeCardLayout
+{
+    public const float Aspect=108f/151f;
+    public static OperationTradeCardSlot[] Arrange(int count,float width,float height)
+    {
+        if(count<=0||width<=0||height<=OperationTradeCardSlot.CaptionHeight)return Array.Empty<OperationTradeCardSlot>();
+        const float horizontalGap=12,verticalGap=10,maxWidth=112;
+        float bestWidth=0;int columns=1,bestEmpty=int.MaxValue;
+        for(int candidate=1;candidate<=Math.Min(count,8);candidate++)
+        {
+            int rows=(count+candidate-1)/candidate;
+            float availableHeight=(height-(rows-1)*verticalGap)/rows-OperationTradeCardSlot.CaptionHeight;
+            float cardWidth=Math.Min(maxWidth,Math.Min((width-(candidate-1)*horizontalGap)/candidate,availableHeight*Aspect));
+            int empty=candidate*rows-count;
+            if(cardWidth>bestWidth+.01f||Math.Abs(cardWidth-bestWidth)<=.01f&&empty<bestEmpty)
+            {bestWidth=cardWidth;columns=candidate;bestEmpty=empty;}
+        }
+        if(bestWidth<=0)return Array.Empty<OperationTradeCardSlot>();
+        int rowCount=(count+columns-1)/columns;
+        float cardHeight=bestWidth/Aspect,rowHeight=cardHeight+OperationTradeCardSlot.CaptionHeight;
+        float top=(height-rowCount*rowHeight-(rowCount-1)*verticalGap)/2;
+        var slots=new OperationTradeCardSlot[count];
+        for(int index=0;index<count;index++)
+        {
+            int row=index/columns,inRow=Math.Min(columns,count-row*columns);
+            float left=(width-inRow*bestWidth-(inRow-1)*horizontalGap)/2;
+            slots[index]=new OperationTradeCardSlot(left+index%columns*(bestWidth+horizontalGap),top+row*(rowHeight+verticalGap),bestWidth,cardHeight);
+        }
+        return slots;
+    }
+}

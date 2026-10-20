@@ -729,7 +729,7 @@ public sealed partial class OperationDock
             DrawTradeBag(s,new Rect(286,326,386,218),give,true,true);
             DrawTradeBag(s,new Rect(768,326,386,218),receive,false,true);
         }
-        DrawTradeArrows(new Rect(686,373,68,46));
+        DrawTradeArrows(new Rect(686,(playerTrade?444:435)-OperationTradeCardSlot.CaptionHeight/2-23,68,46));
         var trade=new OperationTrade{Bank=!playerTrade,OtherPlayer=s.OtherPlayers.Length>0?s.OtherPlayers[target]:null,Give=(int[])give.Clone(),Receive=(int[])receive.Clone()};
         string error=OperationSelection.ValidateTrade(validation,trade);
         var hint=new GUIStyle(small){alignment=TextAnchor.MiddleCenter};hint.normal.textColor=error==null?Muted:Missing;
@@ -770,23 +770,26 @@ public sealed partial class OperationDock
         }
         Label(new Rect(start+avatarWidth+14,area.y,nameWidth,area.height),name,nameStyle);
     }
-    void TradeCard(Rect face,int good,bool missing)
+    Rect TradeCard(Rect face,int good,bool missing)
     {
-        EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(good),0,missing?new Color(1,.48f,.48f):Color.white);
+        var texture=EntityCardAssets.ResourceOrCommodityFront(good);
+        face=EntityCardAssets.FitCardRect(face,texture!=null?(float)texture.width/texture.height:OperationTradeCardLayout.Aspect,GUI.matrix);
+        EntityCardAssets.DrawCardFace(face,texture,0,missing?new Color(1,.48f,.48f):Color.white);
+        return face;
     }
     void DrawTradeBag(OperationSnapshot s,Rect area,int[] bag,bool paying,bool bank=false)
     {
-        var goods=bank&&paying?OperationPanelOptions.PaymentGoods(s,portTrade?portGood:null):Enumerable.Range(0,s.GoodCount).ToArray();
+        var goods=paying?OperationPanelOptions.PaymentGoods(s,bank&&portTrade?portGood:null):Enumerable.Range(0,s.GoodCount).ToArray();
         if(goods.Length==0)Label(new Rect(area.x,area.y+32,area.width,60),"当前没有可以付出的资源。",new GUIStyle(small){alignment=TextAnchor.MiddleCenter});
+        var slots=OperationTradeCardLayout.Arrange(goods.Length,area.width,area.height);
         for(int index=0;index<goods.Length;index++)
         {
-            int i=goods[index],row=index/4,rowCount=Math.Min(4,goods.Length-row*4);
-            float cell=area.width/4,x=area.center.x-rowCount*cell/2+(index%4)*cell,y=area.y+row*101;
-            bool missing=paying&&bag[i]>s.Goods[i];var face=new Rect(x+(cell-50)/2,y+1,50,72);
-            TradeCard(face,i,missing);
-            var caption=new GUIStyle(center);if(missing)caption.normal.textColor=Missing;
-            Label(new Rect(x,y+74,cell,25),bag[i].ToString(),caption);
-            if(bank&&!paying&&s.Bank[i]==0)Label(new Rect(x,y+23,cell,46),"库存为0",new GUIStyle(small){alignment=TextAnchor.MiddleCenter});
+            int i=goods[index];var slot=slots[index];
+            bool missing=paying&&bag[i]>s.Goods[i];
+            var face=TradeCard(new Rect(area.x+slot.X,area.y+slot.Y,slot.Width,slot.Height),i,missing);
+            var caption=new GUIStyle(center){fontSize=Mathf.Clamp(Mathf.RoundToInt(slot.Width*.19f),13,18),padding=new RectOffset(),wordWrap=false};if(missing)caption.normal.textColor=Missing;
+            Label(new Rect(area.x+slot.X,area.y+slot.CaptionY,slot.Width,OperationTradeCardSlot.CaptionHeight),bag[i].ToString(),caption);
+            if(bank&&!paying&&s.Bank[i]==0)Label(face,"库存为0",new GUIStyle(small){alignment=TextAnchor.MiddleCenter});
             int delta=TabletopCardInput.Delta(face);
             if(delta!=0)
             {
@@ -807,7 +810,7 @@ public sealed partial class OperationDock
         DrawTradePlayer(new Rect(768,246,386,58),perspective.OtherSeat);
         DrawOfferBag(new Rect(286,323,386,195),perspective.OwnGive,s.Goods);
         DrawOfferBag(new Rect(768,323,386,195),perspective.OtherGive,null);
-        DrawTradeArrows(new Rect(686,367,68,46));
+        DrawTradeArrows(new Rect(686,420.5f-OperationTradeCardSlot.CaptionHeight/2-23,68,46));
         bool missing=Enumerable.Range(0,8).Any(i=>perspective.OwnGive[i]>s.Goods[i]);
         string status=offer.IsBroadcast?(perspective.OwnOffer?"等待 "+offer.PendingRecipients.Length+" 位玩家回应":offer.RejectedRecipients.Contains(s.Seat)?"已拒绝，等待其他玩家回应":"任意一人接受即成交"):
             !perspective.Involved?"等待回应":perspective.OwnOffer?"等待对方回应":"";
@@ -819,29 +822,21 @@ public sealed partial class OperationDock
     void DrawOfferBag(Rect area,int[] bag,int[] owned)
     {
         var goods=Enumerable.Range(0,8).Where(good=>bag[good]>0).ToArray();
-        int rows=(goods.Length+3)/4;
+        var slots=OperationTradeCardLayout.Arrange(goods.Length,area.width,area.height);
         for(int index=0;index<goods.Length;index++)
         {
-            int i=goods[index],row=index/4,rowCount=Math.Min(4,goods.Length-row*4);
-            float cell=area.width/4,x=area.center.x-rowCount*cell/2+(index%4)*cell,y=area.center.y-rows*93/2+row*93;
+            int i=goods[index];var slot=slots[index];
             bool missing=owned!=null&&bag[i]>owned[i];
-            TradeCard(new Rect(x+(cell-48)/2,y,48,70),i,missing);
-            var caption=new GUIStyle(center);if(missing)caption.normal.textColor=Missing;
-            Label(new Rect(x,y+71,cell,22),bag[i].ToString(),caption);
+            TradeCard(new Rect(area.x+slot.X,area.y+slot.Y,slot.Width,slot.Height),i,missing);
+            var caption=new GUIStyle(center){fontSize=Mathf.Clamp(Mathf.RoundToInt(slot.Width*.19f),13,18),padding=new RectOffset(),wordWrap=false};if(missing)caption.normal.textColor=Missing;
+            Label(new Rect(area.x+slot.X,area.y+slot.CaptionY,slot.Width,OperationTradeCardSlot.CaptionHeight),bag[i].ToString(),caption);
         }
     }
 
     void DrawTradeFrame(string title,int icon,int? good=null)
     {
-        StrategyHudArt.Plaque(TradeRect,ModernOperationUI.Background,Color.Lerp(StrategyHudArt.Gold,Line,.25f));
         var plaque=new Rect(TradeRect.center.x-180,152,360,51);
-        StrategyHudArt.Plaque(plaque,Surface,StrategyHudArt.Gold);
-        var style=new GUIStyle(heading){alignment=TextAnchor.MiddleCenter};
-        float textWidth=style.CalcSize(new GUIContent(title)).x;
-        float left=plaque.center.x-(textWidth+43)/2;
-        if(good.HasValue)OperationIconAssets.DrawGood(new Rect(left+3,plaque.y+8,23,34),good.Value);
-        else StrategyHudArt.Icon(new Rect(left,plaque.y+11,29,29),icon);
-        Label(new Rect(left+39,plaque.y+4,textWidth+4,plaque.height-8),title,style);
+        ModernOperationUI.WindowFrame(TradeRect,plaque,title,icon,good,heading);
     }
     static Texture2D tradeArrows;
     static void DrawTradeArrows(Rect area)

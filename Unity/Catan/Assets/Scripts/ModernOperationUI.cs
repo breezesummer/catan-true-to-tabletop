@@ -4,29 +4,22 @@ using UnityEngine;
 // 仅绘制操作界面；所有确认操作仍由各适配器提交到共同规则入口。
 public static class ModernOperationUI
 {
-    public static bool MenuContext { get; private set; }
-    public static Color Background => MenuContext?PastoralMenuUI.Paper:StrategyHudTheme.Background;
-    public static Color Surface => MenuContext?PastoralMenuUI.Sage:StrategyHudTheme.Surface;
-    public static Color TextColor => MenuContext?PastoralMenuUI.Ink:StrategyHudTheme.Text;
-    public static Color Muted => MenuContext?PastoralMenuUI.Muted:StrategyHudTheme.Muted;
-    public static Color Accent => MenuContext?PastoralMenuUI.Forest:StrategyHudTheme.Accent;
-    public static Color Line => MenuContext?PastoralMenuUI.Gold:StrategyHudTheme.Line;
+    public static Color Background => StrategyHudTheme.Background;
+    public static Color Surface => StrategyHudTheme.Surface;
+    public static Color TextColor => StrategyHudTheme.Text;
+    public static Color Muted => StrategyHudTheme.Muted;
+    public static Color Accent => StrategyHudTheme.Accent;
+    public static Color Line => StrategyHudTheme.Line;
     public static readonly Color Error=new Color(.98f,.53f,.40f);
     static Font currentFont;
-    static Font menuFont;
-    static Font MenuFont=>menuFont!=null?menuFont:(menuFont=Resources.Load<Font>("Fonts/NotoSansCJKsc-Regular"))??currentFont;
     static int themeVersion=-1;
-    static bool styledMenu;
-    public static void UseMenuContext(bool enabled)
-    {MenuContext=enabled;Styles();if(enabled)PastoralMenuUI.Styles(MenuFont);}
     public static GUIStyle Text, Small, Title, Center;
     public static void Styles(Font font=null)
     {
-        if(Text!=null&&(font==null||font==currentFont)&&themeVersion==StrategyHudTheme.Version&&styledMenu==MenuContext)return;
+        if(Text!=null&&(font==null||font==currentFont)&&themeVersion==StrategyHudTheme.Version)return;
         themeVersion=StrategyHudTheme.Version;
-        styledMenu=MenuContext;
         if(font!=null)currentFont=font;
-        Text=new GUIStyle(GUI.skin.label){font=MenuContext?MenuFont:currentFont,fontSize=16,wordWrap=true};Text.normal.textColor=TextColor;
+        Text=new GUIStyle(GUI.skin.label){font=currentFont,fontSize=16,wordWrap=true};Text.normal.textColor=TextColor;
         Small=new GUIStyle(Text){fontSize=12};Small.normal.textColor=Muted;
         Title=new GUIStyle(Text){fontSize=22,fontStyle=FontStyle.Bold};
         Center=new GUIStyle(Text){fontSize=14,alignment=TextAnchor.MiddleCenter};
@@ -42,19 +35,27 @@ public static class ModernOperationUI
     }
     public static void Panel(Rect r)
     {
-        if(MenuContext){PastoralMenuUI.Panel(r);return;}
         Round(new Rect(r.x-5,r.y+7,r.width+10,r.height+9),new Color(0,0,0,.20f));
         Round(r,Line);Round(new Rect(r.x+1,r.y+1,r.width-2,r.height-2),Background);
+    }
+    // 操作窗口与交易窗口共用同一纹理雕边、标题牌和字体。
+    public static void WindowFrame(Rect area,Rect plaque,string caption,int icon=-1,int? good=null,GUIStyle heading=null)
+    {
+        Styles();
+        StrategyHudArt.Plaque(area,Background,Color.Lerp(StrategyHudArt.Gold,Line,.25f));
+        StrategyHudArt.Plaque(plaque,Surface,StrategyHudArt.Gold);
+        var style=new GUIStyle(heading??Title){alignment=TextAnchor.MiddleCenter};
+        if(heading==null)style.fontSize=21;
+        bool hasIcon=icon>=0||good.HasValue;
+        float textWidth=Mathf.Min(style.CalcSize(new GUIContent(caption)).x,plaque.width-(hasIcon?58:20));
+        float left=plaque.center.x-(textWidth+(hasIcon?43:0))/2;
+        if(good.HasValue)OperationIconAssets.DrawGood(new Rect(left+3,plaque.y+8,23,34),good.Value);
+        else if(icon>=0)StrategyHudArt.Icon(new Rect(left,plaque.y+11,29,29),icon);
+        GUI.Label(new Rect(left+(hasIcon?39:0),plaque.y+4,textWidth+4,plaque.height-8),caption,style);
     }
     public static void Label(Rect r,string value,GUIStyle style=null){Styles();GUI.Label(r,value,style??Text);}
     public static bool Button(Rect r,string caption,bool enabled=true,bool primary=false,bool selected=false,string playerId=null)
     {
-        if(MenuContext)
-        {
-            PastoralMenuUI.Styles(MenuFont);
-            return PastoralMenuUI.Button(r,caption,enabled,primary,selected,
-                playerId==null?(Color?)null:M6App.PlayerNameStyle(Center,playerId).normal.textColor);
-        }
         Styles();bool old=GUI.enabled;GUI.enabled=old&&enabled;
         bool hover=GUI.enabled&&r.Contains(Event.current.mousePosition);
         Color bg=primary?Accent:selected?Color.Lerp(Surface,Accent,.24f):Surface;

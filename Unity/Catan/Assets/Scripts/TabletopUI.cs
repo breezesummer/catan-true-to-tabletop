@@ -376,18 +376,17 @@ public sealed partial class TabletopUI
     public void BeginContext(string caption)
     {
         OperationWindows.Describe(caption);
-        ModernOperationUI.UseMenuContext(true);
-        var rect=CurrentContextRect;contextVisible=true;ModernOperationUI.Panel(rect);
+        var rect=CurrentContextRect;contextVisible=true;
+        float titleWidth=Mathf.Min(300,rect.width-180);
+        ModernOperationUI.WindowFrame(rect,new Rect(rect.center.x-titleWidth/2,rect.y+13,titleWidth,44),caption);
         float header=72;
-        PastoralMenuUI.Label(new Rect(rect.x+80,rect.y+17,rect.width-160,36),caption,23,PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
-        PastoralMenuUI.Fill(new Rect(rect.center.x-30,rect.y+61,60,2),PastoralMenuUI.Gold);
         if(ModernOperationUI.Button(new Rect(rect.xMax-91,rect.y+10,32,28),"—"))OperationWindows.Hide(caption);
         if(ModernOperationUI.Button(new Rect(rect.xMax-49,rect.y+10,32,28),"×"))CloseOperation();
         MobileTabletop.ScrollTouch(new Rect(rect.x+16,rect.y+header,rect.width-32,rect.height-header-12),ref scroll);
         GUILayout.BeginArea(new Rect(rect.x+24,rect.y+header,rect.width-48,rect.height-header-18));
         scroll=GUILayout.BeginScrollView(scroll);
     }
-    public void EndContext(){GUILayout.EndScrollView();GUILayout.EndArea();ModernOperationUI.UseMenuContext(false);}
+    public void EndContext(){GUILayout.EndScrollView();GUILayout.EndArea();}
     public void DrawContext(string caption,Action content){BeginContext(caption);try{content();}finally{EndContext();}}
     public static void NumberToken(Vector2 p,int? number,string fallback,GUIStyle style)
     {

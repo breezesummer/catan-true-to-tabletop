@@ -12,11 +12,8 @@ public static class TabletopResourceChoiceUI
     public static void Draw(int amount,ResourceBag selection,ResourceBag bank,Action confirm,Action<string> notify,string caption="金矿 · 选择资源",OperationWindowState windows=null)
     {
         if(windows?.Suppressed==true)return;
-        bool previous=ModernOperationUI.MenuContext;ModernOperationUI.UseMenuContext(true);
-        try
-        {
         windows?.Describe(caption);
-        ModernOperationUI.Panel(Area);
+        ModernOperationUI.WindowFrame(Area,new Rect(Area.center.x-180,Area.y+13,360,51),caption);
         GUI.BeginGroup(new Rect(0,37,1440,900));
         try
         {
@@ -24,7 +21,6 @@ public static class TabletopResourceChoiceUI
         if(ModernOperationUI.Button(new Rect(1114,224,32,30),"×")){windows?.Close();return;}
         if(!ReferenceEquals(activeSelection,selection)){activeSelection=selection;errorHint="";}
         int required=Math.Min(amount,bank.Total);
-        PastoralMenuUI.Label(new Rect(288,223,864,42),caption,23,PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
         ModernOperationUI.Label(new Rect(288,269,864,32),TabletopCardInput.Hint+" · 已选 "+selection.Total+" / "+required+" 张",ModernOperationUI.Center);
         for(int i=0;i<5;i++)
         {
@@ -49,7 +45,5 @@ public static class TabletopResourceChoiceUI
         if(ModernOperationUI.Button(new Rect(490,561,662,40),"确认领取 "+required+" 张资源",selection.Total==required,true))confirm();
         }
         finally{GUI.EndGroup();}
-        }
-        finally{ModernOperationUI.UseMenuContext(previous);}
     }
 }
