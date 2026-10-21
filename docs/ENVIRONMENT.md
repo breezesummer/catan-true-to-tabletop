@@ -1,5 +1,11 @@
 # 开发环境
 
+2026-10-21 按用户要求将 Windows Blender 更新为官网当前稳定版 `5.2.2 LTS`（`D:\Development\Blender\blender-5.2.2-windows-x64\blender.exe`），`toolchain.json` 与开始菜单入口已同步；旧版 `4.5.14 LTS` 保留用于回退。官方 ZIP 的 SHA-256 为 `3849d17a682cba006075aaa3f3597ecb5c9c30ec31035b2e092c53e40679b535`，与官方校验文件一致；项目原有合成立方体脚本在新版保存 `.blend`、导出 FBX 通过。下文 M0 工具版本与验收记录保留其历史含义。
+
+同日接入用户指定的 [Blender Lab 官方 MCP](https://www.blender.org/lab/mcp-server/)：Blender 扩展 `MCP 1.0.3`，官方服务源码 `https://projects.blender.org/lab/blender_mcp.git`、提交 `dbbf836ad4b1025f14a2b3b504c43903f39e0b04`，Python 包自身版本 `1.0.2`，安装于 `D:\Development\Blender\mcp-official-env`。Codex 用户配置中的 `blender` 使用该环境的 `Scripts\blender-mcp.exe --transport stdio`，环境变量为 `BLENDER_MCP_HOST=127.0.0.1`、`BLENDER_MCP_PORT=19876`、`BLENDER_PATH` 指向新版 Blender；默认端口 9876 位于本机 Windows 保留段 9782–9881，因此改用已验证可绑定的 19876，仅监听本机。默认用户与项目专用 Blender 配置均已安装并启用官方扩展、自动启动与其要求的在线访问；项目原有 `.local/development/blender/4.5` 继续作为共享配置目录，目录名称不代表实际执行版本。
+
+实际通过标准 MCP 客户端完成握手、列出 26 个工具、读取场景、创建并删除测试物体后核对场景恢复，以及离线查询 `bpy.types.Object` 文档。记录、校验文件及验证脚本位于 `D:\Development\Blender\setup-20261021`。最初安装的社区项目 `mcp-for-blender` 已移除，最终配置使用上述官方项目。Codex 需完全退出并重新打开，以便当前会话重新加载 MCP 工具；启动 Blender 后扩展自动提供连接。本轮仅更新开发环境配置与记录，未修改游戏代码或递增游戏版本，未重建游戏，也不改变 ROADMAP 阶段。
+
 2026-10-19 补齐 macOS 分系统入口：工具目录使用仓库上两级的 `Development`，不再引用旧的 `develepment`。Mac 上启动开发环境／Unity 和构建 Windows／Android 使用 `.command`，Windows 保留 PowerShell；路径覆盖、Android 签名及实际验证范围见[分系统构建说明](CROSS_PLATFORM_BUILD.md)和[1.6.7 验证记录](verification/cross-platform-build-1.6.7/README.md)。以下 Windows 配置及历史验证记录保留。
 
 2026-10-15 新增同版本 Unity 6000.3.25f1 Android Build Support（revision `e1dba0a9aba4`），没有另建 Unity 工程或更换编辑器。模块保存在原 Editor 的 `Data/PlaybackEngines/AndroidPlayer`，SDK API／Build Tools 36、NDK r27c `27.2.12479018`、Temurin JDK `17.0.18+8`、Unity 自带 Gradle `9.3.1` 均已实际读取版本。官方模块安装包 1,548,575,120 字节，MD5 `AA3D7C889732969EABF48BFFF342B8E6` 与 Unity Technologies SF 数字签名有效；JDK ZIP 的 SHA-256 与官方链接的 `15e8817d1f5db6db3571ebe7430ef37f7fa8e60e8ff6f3e18ca1cb4c29f78774` 一致。临时下载转发仅用于本任务，完成后已停止并清理配置，未修改系统代理、路由或原有节点。
