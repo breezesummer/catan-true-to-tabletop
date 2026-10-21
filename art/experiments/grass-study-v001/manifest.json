@@ -1,0 +1,89 @@
+{
+  "日期": "2026-10-21",
+  "项目约定版本": "1.7.5",
+  "状态": "操控流程未通过；无可验收草地样片",
+  "参考原件": "assets/prototypes/ultra/v006/terrain-states/grassland-pristine-v006.png",
+  "原件SHA256": "cfadf9ba3c3e716f1ba30ec99d3e2cf1f55224c5c61fc502a95651aae073cdbb",
+  "文件": [
+    {
+      "path": "验证记录.md",
+      "bytes": 6063,
+      "sha256": "ccad460ab715147a5e2c11a275e36140e90f2af47576e543dc69371ab63f08e5"
+    },
+    {
+      "path": "A-control-test.blend",
+      "bytes": 509916,
+      "sha256": "0fbf3f6c2b18be4b893a989f831fd1bd4c3061d1cc2a709fbe5be48edc3fa944"
+    },
+    {
+      "path": "B-terrain-before-light.blend",
+      "bytes": 2325907,
+      "sha256": "a472f533f673f245586a216e0c6b317e5a471181b4506ebb628a413b8f6c55d0"
+    },
+    {
+      "path": "B-terrain.blend",
+      "bytes": 2325907,
+      "sha256": "a9b5cbfb8eb36c578f408bebab685cc1e7533d622af494b46918b6302e536de9"
+    },
+    {
+      "path": "build_study.py",
+      "bytes": 4361,
+      "sha256": "c9dd4d87eeac6e5578c1b3e387156b1cf361f51e03fe712224bb7612af0ed4c9"
+    },
+    {
+      "path": "evidence/A-drag3-after.jpg",
+      "bytes": 230426,
+      "sha256": "e2269e13ac18c089c7e91fc79893e5e83c185491d368e25cbc4288da0b2e823c"
+    },
+    {
+      "path": "evidence/A-drag3-before.jpg",
+      "bytes": 228661,
+      "sha256": "bfe04494432f56bbae272a51545952ab64f043e30263b2d5312657dca9fc5d1b"
+    },
+    {
+      "path": "evidence/A-readback.json",
+      "bytes": 582,
+      "sha256": "88c4ad89d7bc6048d9998132921f5face250852dafcb72bd0c592b09170e5d0c"
+    },
+    {
+      "path": "evidence/A-readback.log",
+      "bytes": 185,
+      "sha256": "915949314c0a0de55e89b42338056a8a6a66e7f8924871dededccb88967ad988"
+    },
+    {
+      "path": "evidence/A-reopened.jpg",
+      "bytes": 221431,
+      "sha256": "b66af30f5998e260967b1cfa8699ee9ba4055d86f09f33cffae9a223f53ecc53"
+    },
+    {
+      "path": "evidence/A-saved.jpg",
+      "bytes": 222969,
+      "sha256": "3570f61262d53a4ff02995d11f2d6e72c548cc4e245391be2e3a319478689964"
+    },
+    {
+      "path": "evidence/B-build.log",
+      "bytes": 11021,
+      "sha256": "93310162d22338681e5a70c3a242b6d99af4eae798a7082543f9490761a22909"
+    },
+    {
+      "path": "reference-v006.png",
+      "bytes": 3219050,
+      "sha256": "cfadf9ba3c3e716f1ba30ec99d3e2cf1f55224c5c61fc502a95651aae073cdbb"
+    },
+    {
+      "path": "renders/B-terrain-before-light.png",
+      "bytes": 1064308,
+      "sha256": "341fb58ef83b5935c657ca60835d34225c628e85b9d78f71d0a0aaf96b619814"
+    },
+    {
+      "path": "renders/B-terrain-main.png",
+      "bytes": 1088569,
+      "sha256": "31b7150dd128ada4bf762e3f327d574ba677c6ee3c8986f0c0413e8a625ed3f9"
+    },
+    {
+      "path": "renders/B-terrain-side.png",
+      "bytes": 752433,
+      "sha256": "dd18901fa224cdb290644b513125962762068ab6b2fb15083bd8cc229b364d0e"
+    }
+  ]
+}
