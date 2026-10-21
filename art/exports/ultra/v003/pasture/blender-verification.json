@@ -1,0 +1,19 @@
+{
+  "source": {
+    "meshes": 38,
+    "triangles": 1381236,
+    "vertexColors": true,
+    "materialSlots": 2
+  },
+  "fbx": {
+    "meshes": 38,
+    "triangles": 1381236,
+    "vertexColors": true,
+    "materialSlots": 2
+  },
+  "status": "通过",
+  "finiteVertices": true,
+  "validIndices": true,
+  "compressedRoundTrip": true,
+  "meshSha256": "e367d5f666473cf7facff9246e6de05a1aacb53e4d5a4aec7f7ae28017c968d2"
+}

@@ -51,6 +51,12 @@ art/exports/photo-samples-v*/textures/
 art/previews/entity-conversion-v*/
 art/previews/photo-samples-v*/
 
+# U2 重制的完整模型保留本地，通过已提交配方重建；游戏压缩网格与验收图入库。
+art/source/ultra/v003/pasture/*.blend
+art/exports/ultra/v003/pasture/*.fbx
+art/exports/ultra/v003/pasture/pasture-mesh.json
+art/exports/ultra/v003/pasture/pasture-mesh.bytes
+
 # 操作系统与编辑器临时文件；截图及版本化验证报告仍保存
 .DS_Store
 Thumbs.db

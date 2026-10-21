@@ -773,3 +773,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Start-De
 - 优化后局域网/公网首轮动画样本最长间隔分别 27.670ms / 32.880ms，最终 Windows 公网复测 13.212ms。隐藏窗口未执行正常 OnGUI，不能将这些样本当成可见窗口/GPU/手机帧率保证；后台分配与 GC、首次入桌及切房峰值仍需区别对待。
 - 252 项自动测试、四规则实际公网联机（28 条本席指令）、四规则三速度八次建造动画状态检查通过。Windows 和 Android 构建覆盖至 `game version/1.7/Catan1.7.0-Ultra-Baseline`；APK 1.7.0/10700、ARM64+x86_64、v2 签名及开发数据排除验证通过。未进行手机性能实测。
 - 保留最近五个内测版本，清理 1.6.11。路线图阶段退出条件不变。数值原始样本、复现脚本及限制见 [联机帧耗时记录](docs/verification/network-frame-profile-1.7.0/README.md)。
+
+## 2026年10月21日｜1.7.4 U2草原真实模型重制
+
+用户否决1.7.3占位质感后，重做连续草坡、六角覆盖的弯曲草毯、六只含四肢头耳与交叠羊毛的羊，以及不规则土层、土粒和细根。提供真实Blender/Cycles四视图、源模型、FBX和Unity同源压缩网格，保留v002原件；明确棚拍与游戏截图的区别。
+
+Windows构建完成；源模型／FBX回读、坐标及索引检查、gzip往返、干净目录重建一致性通过。独立程序通过18种分区、96项拾取入口、四类规则包和恢复检查。最大49格压力开销显著增加，离屏提交时间不等于GPU帧时间，Android及长期性能未验。本轮未制作Android包、不正式发布。
+
+自查仍有草叶方向程序化、羊毛重复、侧面土层融合不足和游戏细草混叠，不能宣布原型完整还原或U2通过。对照与真实截图见 [草原重制记录](docs/verification/ultra/U2-pasture-remodel.md)。版本为1.7.4，Windows入口在 `game version/1.7/Catan1.7.4-Pasture-Remodel`，保留最近5版；ROADMAP未改变。
