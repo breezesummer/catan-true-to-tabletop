@@ -126,7 +126,7 @@ namespace Catan.Core.M5
                     break;
                 case ProgressCardKind.Merchant:
                     var merchantTile = s.Tiles.FirstOrDefault(t => t.Id == c.TargetId);
-                    Require(merchantTile != null && merchantTile.Resource != "sea" && merchantTile.Resource != "gold" && Buildings(s).Any(b => b.PlayerId == p.Id && merchantTile.Vertices.Contains(b.LocationId)), "InvalidMerchantHex", "商人必须放在你建筑相邻的陆地上。");
+                    Require(merchantTile != null && IsLand(merchantTile) && merchantTile.Resource != "gold" && Buildings(s).Any(b => b.PlayerId == p.Id && merchantTile.Vertices.Contains(b.LocationId)), "InvalidMerchantHex", "商人必须放在你建筑相邻的陆地上。");
                     s.MerchantPlayerId = p.Id; s.MerchantTileId = merchantTile.Id; break;
                 case ProgressCardKind.MerchantFleet:
                     if (c.ChooseCommodity) { Require(Enum.IsDefined(typeof(Commodity), c.Commodity), "InvalidCommodity", "商品类型错误。"); s.MerchantFleetCommodities = s.MerchantFleetCommodities.Union(new[] { c.Commodity }).ToArray(); }
@@ -228,7 +228,7 @@ namespace Catan.Core.M5
                 case "ProgressTreasonPlace":
                     if (!c.Decline)
                     {
-                        Require(d.Options.Contains(c.TargetId) && c.KnightLevel >= 1 && c.KnightLevel <= d.KnightLevel && s.Knights.Count(k => k.PlayerId == p.Id && k.Level == c.KnightLevel) < 2, "InvalidTreasonReplacement", "请选择可用等级及合法空顶点。");
+                        Require(d.Options.Contains(c.TargetId) && !Occupied(s,c.TargetId) && c.KnightLevel >= 1 && c.KnightLevel <= d.KnightLevel && s.Knights.Count(k => k.PlayerId == p.Id && k.Level == c.KnightLevel) < 2, "InvalidTreasonReplacement", "请选择可用等级及合法空顶点。");
                         s.Knights = Append(s.Knights, new Knight { PlayerId = p.Id, LocationId = c.TargetId, Level = c.KnightLevel, Active = d.KnightActive, ActivatedTurn = d.KnightActive ? s.Turn : -1, PromotedTurn = -1, ActedTurn = -1 });
                     }
                     break;
@@ -280,8 +280,7 @@ namespace Catan.Core.M5
         }
         private string[] ProgressKnightPlaces(GameState s, string player)
         {
-            var occupied = Buildings(s).Select(b => b.LocationId).Concat(s.Knights.Select(k => k.LocationId)).ToArray();
-            return OwnRouteEdges(s,player).SelectMany(e=>e.Vertices).Distinct().Where(v => !occupied.Contains(v)).ToArray();
+                        return OwnRouteEdges(s,player).SelectMany(e=>e.Vertices).Distinct().Where(v => !Occupied(s,v)).ToArray();
         }
         private bool ProgressRoadIsOpen(GameState s, PiecePlacement road)
         {
@@ -293,7 +292,7 @@ namespace Catan.Core.M5
         private void ProgressTaxation(GameState s, PlayerState p, string tileId)
         {
             var tile = s.Tiles.FirstOrDefault(t => t.Id == tileId);
-            Require(s.FirstBarbarianAttack && tile != null && tile.Resource != "sea" && tile.Id != s.RobberTileId, "InvalidTaxation", "首轮蛮族攻击后才能将强盗移至另一个陆地。");
+            Require(s.FirstBarbarianAttack && seafaring.Id != "pirate-islands" && tile != null && IsLand(tile) && !seafaring.ForbiddenRobberTileIds.Contains(tileId) && tile.Id != s.RobberTileId, "InvalidTaxation", "首轮蛮族攻击后才能将强盗移至另一个陆地。");
             s.RobberTileId = tile.Id;
             var victims = Buildings(s).Where(b => b.PlayerId != p.Id && tile.Vertices.Contains(b.LocationId)).Select(b => b.PlayerId).Distinct().ToArray();
             foreach (var id in victims)

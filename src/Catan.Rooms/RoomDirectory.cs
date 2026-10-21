@@ -150,8 +150,8 @@ public sealed class RoomDirectory : IDisposable
         if (s.RuleSet == "cities") s.RuleSet = "cities-knights";
         ValidateName(s.Name); RuleRoomGame.Versions(s.RuleSet);
         if (s.RuleSet == "base" || s.RuleSet == "cities-knights") { if (s.ScenarioId != "base") throw new ArgumentException("基础场景无效。"); }
-        else if (s.RuleSet == "seafarers" ? !Catan.Core.M3.SeafarersScenarios.Ids.Contains(s.ScenarioId) : !new[] { "heading-for-new-shores", "through-the-desert" }.Contains(s.ScenarioId)) throw new ArgumentException("剧本无效。");
-        if (s.TargetVictoryPoints.HasValue && !VictoryPointSettings.IsValid(s.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(s.ScenarioId))) throw new ArgumentException("胜利分数无效。");
+        else if (s.RuleSet == "seafarers" ? !Catan.Core.M3.SeafarersScenarios.Ids.Contains(s.ScenarioId) : !Catan.Core.M5.CombinedScenarios.Ids.Contains(s.ScenarioId)) throw new ArgumentException("剧本无效。");
+        if (s.TargetVictoryPoints.HasValue && !VictoryPointSettings.IsValid(s.TargetVictoryPoints, s.RuleSet=="seafarers"?VictoryPointSettings.MaximumForScenario(s.ScenarioId):VictoryPointSettings.Maximum)) throw new ArgumentException("胜利分数无效。");
         if (s.AiSeats == null || s.AiSeats.Distinct().Count() != s.AiSeats.Length || s.AiSeats.Any(id => !SeatIds(s.PlayerCount).Contains(id))) throw new ArgumentException("AI 席位无效。");
     }
     private static IEnumerable<string> SeatIds(int count) => Enumerable.Range(1, count).Select(i => "P" + i);

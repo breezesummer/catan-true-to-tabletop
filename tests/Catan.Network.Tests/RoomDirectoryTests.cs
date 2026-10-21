@@ -227,7 +227,7 @@ public sealed class RoomDirectoryTests
         {
             yield return new object[] { "base", "base", seats }; yield return new object[] { "cities-knights", "base", seats };
             foreach (var scenario in Catan.Core.M3.SeafarersScenarios.Ids) yield return new object[] { "seafarers", scenario, seats };
-            foreach (var scenario in new[] { "heading-for-new-shores", "through-the-desert" }) yield return new object[] { "combined", scenario, seats };
+            foreach (var scenario in Catan.Core.M5.CombinedScenarios.Ids) yield return new object[] { "combined", scenario, seats };
         }
     }
     [Theory, MemberData(nameof(Configurations))]

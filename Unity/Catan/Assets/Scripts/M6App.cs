@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="1.7.1";
+    public const string BuildVersion="1.7.3";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -73,7 +73,7 @@ public sealed partial class M6App : MonoBehaviour
     GUIStyle label,title,button,small;
     static readonly string[] RuleIds={"base","seafarers","cities-knights","combined"};
     static readonly string[] RuleNames={"基础版","航海家","城市与骑士","双扩展组合"};
-    static readonly string[] CombinedIds={"heading-for-new-shores","through-the-desert"};
+    static readonly string[] CombinedIds=Catan.Core.M5.CombinedScenarios.Ids;
 
     void Start()
     {
@@ -281,7 +281,7 @@ public sealed partial class M6App : MonoBehaviour
     internal void ResumeGame(){MenuVisible=false;presentation.enabled=true;visible(true);nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);}
     string[] ScenarioIds()=>menuRule==3?CombinedIds:menuRule==1?Catan.Core.M3.SeafarersScenarios.Ids:new[]{"heading-for-new-shores"};
     string ScenarioName(string id)=>Catan.Core.M3.SeafarersScenarios.Create(id,menuPlayers).Name;
-    static int DefaultVictoryPoints(string rules,string scenario,int players)=>rules=="base"?10:rules=="cities-knights"?13:rules=="combined"?16:Catan.Core.M3.SeafarersScenarios.Create(scenario,players).TargetVictoryPoints;
+    static int DefaultVictoryPoints(string rules,string scenario,int players)=>rules=="base"?10:rules=="cities-knights"?13:rules=="combined"?Catan.Core.M5.CombinedScenarios.Create(scenario,players).TargetVictoryPoints:Catan.Core.M3.SeafarersScenarios.Create(scenario,players).TargetVictoryPoints;
     static int MaximumVictoryPoints(string rules,string scenario)=>rules=="seafarers"?Catan.Core.VictoryPointSettings.MaximumForScenario(scenario):Catan.Core.VictoryPointSettings.Maximum;
     void Styles()
     {

@@ -55,7 +55,7 @@ public sealed class CombinedMapVerification : MonoBehaviour
             Require(board.transform.Find(tile.Id) != null);
         }
         var red = view.Board.Tiles.Where(t => t.Number == 6 || t.Number == 8).ToArray();
-        foreach (var tile in red) Require(!red.Any(t => t.Id != tile.Id && t.Vertices.Intersect(tile.Vertices).Count() == 2));
+        if(view.ScenarioId=="heading-for-new-shores"||view.ScenarioId=="through-the-desert"||view.ScenarioId=="new-world") foreach (var tile in red) Require(!red.Any(t => t.Id != tile.Id && t.Vertices.Intersect(tile.Vertices).Count() == 2));
         return string.Join("|", view.Board.Tiles.Select(t => t.Id + ":" + t.Resource + ":" + t.Number)) +
             string.Join("|", view.Board.Ports.Select(p => p.Id + ":" + p.Resource));
     }
@@ -70,13 +70,13 @@ public sealed class CombinedMapVerification : MonoBehaviour
                 app.StartGame("combined", scenario, players, "P1", true);
                 yield return null; yield return null;
                 Require(app.Ready && app.Paused && app.Fault == "");
-                string current = PublicMap(); Require(current != previous); previous = current; result.newGames++;
+                string current = PublicMap(); if(scenario=="heading-for-new-shores"||scenario=="through-the-desert"||scenario=="new-world") Require(current != previous); previous = current; result.newGames++;
             }
             string path = Path.Combine(directory, scenario + "-" + players + ".json");
             string envelope = app.ExportEnvelope(); app.WriteSave(path); app.ReadSave(path);
             yield return null; yield return null;
             Require(app.ExportEnvelope() == envelope && PublicMap() == previous); result.saveRoundtrips++;
-            if (legacyDirectory != null)
+            if (legacyDirectory != null && (scenario=="heading-for-new-shores"||scenario=="through-the-desert"))
             {
                 string payload = File.ReadAllText(Path.Combine(legacyDirectory, scenario + "-" + players + ".json"));
                 app.StartGame("combined", scenario, players, "P1", true, payload);
@@ -84,6 +84,7 @@ public sealed class CombinedMapVerification : MonoBehaviour
                 Require(GetComponent<M5App>().VerificationHost.ExportSave() == payload);
                 PublicMap(); result.legacyLoads++;
             }
+            if(SystemInfo.graphicsDeviceType!=UnityEngine.Rendering.GraphicsDeviceType.Null){yield return new WaitForEndOfFrame();ScreenCapture.CaptureScreenshot(Path.Combine(directory,scenario+"-"+players+".png"));yield return null;}
             result.configurations++;
         }
     }

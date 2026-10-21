@@ -35,13 +35,8 @@ public sealed class M5CombinationTests
         Assert.Null(s.LargestArmyPlayerId); Invariants(g);
     }
 
-    [Theory]
-    [InlineData("four-islands")] [InlineData("fog-islands")] [InlineData("forgotten-tribe")]
-    [InlineData("cloth-for-catan")] [InlineData("pirate-islands")] [InlineData("wonders-of-catan")]
-    [InlineData("new-world")] [InlineData("unknown")]
-    public void UnsupportedScenariosAreExplicitlyRejected(string scenario) =>
-        Assert.ThrowsAny<ArgumentException>(() => CombinedGameSession.Create(scenario));
-
+    [Theory] [InlineData("unknown")]
+    public void UnsupportedScenariosAreExplicitlyRejected(string scenario) => Assert.ThrowsAny<ArgumentException>(() => CombinedGameSession.Create(scenario));
     [Theory] [InlineData(2)] [InlineData(5)]
     public void UnsupportedPlayerCountsAreRejected(int players) =>
         Assert.ThrowsAny<ArgumentException>(() => CombinedGameSession.Create("heading-for-new-shores", players));

@@ -22,7 +22,7 @@ public sealed class M6FullGameTests(ITestOutputHelper output)
             yield return new object[] { "cities", "base", seats, seed };
             foreach (string scenario in new[] { "heading-for-new-shores", "four-islands", "fog-islands", "through-the-desert", "forgotten-tribe", "cloth-for-catan", "pirate-islands", "wonders-of-catan", "new-world" })
                 yield return new object[] { "seafarers", scenario, seats, seed };
-            foreach (string scenario in new[] { "heading-for-new-shores", "through-the-desert" })
+            foreach (string scenario in M5.CombinedScenarios.Ids)
                 yield return new object[] { "combined", scenario, seats, seed };
         }
     }

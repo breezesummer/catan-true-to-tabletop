@@ -12,7 +12,7 @@ using static Catan.AI.AiHeuristics;
 namespace Catan.AI
 {
 /// <summary>根据当前玩家的合法视图，确定性地选择行动；以尽快获胜及保住早期城市为目标。</summary>
-public sealed class CombinedAi
+public sealed partial class CombinedAi
 {
     private static readonly Resource[] Resources = (Resource[])Enum.GetValues(typeof(Resource));
     private static readonly Commodity[] Commodities = (Commodity[])Enum.GetValues(typeof(Commodity));
@@ -65,10 +65,7 @@ public sealed class CombinedAi
         }
         if (view.Phase == GamePhase.RobberMove)
         {
-            var blockers = legal.Where(c => c.Kind == CommandKind.MovePirate).ToList();
-            if (view.PendingDecision?.Token != "pirate-only")
-                blockers.AddRange(view.Board.Tiles.Where(t => t.Id != view.Board.RobberTileId && t.Resource != "sea" && t.Resource != "fog")
-                    .Select(t => Make(CommandKind.MoveRobber, t.Id)));
+            var blockers = legal.Where(c => c.Kind == CommandKind.MovePirate || c.Kind == CommandKind.MoveRobber).ToList();
             return blockers.OrderByDescending(c => TokenValue(view, c)).ThenBy(c => c.TargetId, StringComparer.Ordinal).First();
         }
         if (view.Phase == GamePhase.RobberSteal)
@@ -102,7 +99,8 @@ public sealed class CombinedAi
         legal.AddRange(view.LegalShipEdgeIds.Select(v => Make(CommandKind.BuildShip, v)));
 
         // 立即终局优先于保城、发展生产和所有干扰行动，包括领取大都会的下一步待决。
-        if (view.OwnVictoryPoints >= view.TargetVictoryPoints) return Make(CommandKind.DeclareVictory);
+        if (view.OwnVictoryPoints >= view.TargetVictoryPoints && view.ScenarioId != "pirate-islands" && view.ScenarioId != "wonders-of-catan") return Make(CommandKind.DeclareVictory);
+        var special = SpecialAction(view, legal); if (special != null) return special;
         var winning = legal.Where(c => view.OwnVictoryPoints + PointGain(view, c) >= view.TargetVictoryPoints)
             .OrderByDescending(c => ActionValue(view, c)).ThenBy(c => c.TargetId, StringComparer.Ordinal).FirstOrDefault();
         if (winning != null) return winning;
@@ -189,6 +187,7 @@ public sealed class CombinedAi
             var road = legal.FirstOrDefault(c => c.Kind == (expansion.Value.ship ? CommandKind.BuildShip : CommandKind.BuildRoad) && c.TargetId == expansion.Value.path[0]);
             if (road != null) return road;
         }
+        var specialGoal=SpecialGoal(view);if(specialGoal!=null){desired=specialGoal;commodityGoal=new();}
         var proposal = ProposeTrade(view, desired); if (proposal != null) return proposal;
         foreach (var need in Resources.Where(r => view.OwnResources[r] < desired[r] && view.Bank[r] > 0).Select(r => (resource: r, commodity: (Commodity?)null))
             .Concat(Commodities.Where(c => view.OwnCommodities[c] < commodityGoal[c] && view.CommodityBank[c] > 0).Select(c => (resource: default(Resource), commodity: (Commodity?)c))))

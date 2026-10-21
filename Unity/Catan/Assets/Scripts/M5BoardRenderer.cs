@@ -118,6 +118,13 @@ public sealed class M5BoardRenderer : MonoBehaviour
     }
     public void Refresh(PlayerView view)
     {
+        foreach(var tile in view.Board.Tiles.Where(t=>terrainTypes[t.Id]!=t.Resource))
+        {
+            var old=transform.Find(tile.Id);if(old!=null)Destroy(old.gameObject);
+            var obj=EntityBoardAssets.Terrain(tile.Resource,tiles[tile.Id],transform);
+            if(obj!=null)obj.name=tile.Id;
+            terrainTypes[tile.Id]=tile.Resource;
+        }
         RefreshReferenceMarkers(view);
         if(numberTokens!=null)numberTokens.Refresh(view.Board.Tiles);
         RefreshProjectedPieces(view.Board.Settlements,view.Board.Roads,view.Board.Cities,view.Board.RobberTileId,

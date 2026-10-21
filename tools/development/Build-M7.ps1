@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.7/Catan1.7.1-U0-Profiling',[switch]$SkipVerification)
+param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.7/Catan1.7.3-Combined-Scenarios',[switch]$SkipVerification)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m7FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))
