@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "recordedDate": "2026-10-21",
+  "timeZone": "Asia/Shanghai",
+  "deviceId": "pc-14600kf-9070xt",
+  "cpu": "Intel(R) Core(TM) i5-14600KF",
+  "physicalCores": 14,
+  "logicalProcessors": 20,
+  "physicalMemoryBytes": 34178269184,
+  "os": "Microsoft Windows 11 专业版",
+  "osVersion": "10.0.26200",
+  "gpu": [
+    {
+      "Name": "AMD Radeon RX 9070 XT",
+      "DriverVersion": "32.0.22042.14002"
+    }
+  ],
+  "excludedVirtualAdapters": [
+    "GameViewer Virtual Display Adapter",
+    "MuMu Virtual Display Adapter"
+  ],
+  "targetWidth": 1920,
+  "targetHeight": 1080,
+  "targetFps": 60,
+  "p95BudgetMs": 18.3,
+  "androidPhysicalDevice": null,
+  "androidStatus": "adb 未检测到连接设备，机型与性能待验",
+  "notes": "运行时图形 API、显存与画质以采样报告为准，不含机器标识符或设备序列号。"
+}

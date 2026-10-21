@@ -1,0 +1,15 @@
+{
+  "schema": "ultra-baseline-launch-v1",
+  "startedUtc": "2026-10-21T02:18:35.0218008+00:00",
+  "finishedUtc": "2026-10-21T02:20:20.5273643+00:00",
+  "playerSha256": "b9fc30bb05ca93a042831974149a681d656963e3e612ecafd9ae826759d739ad",
+  "width": 1920,
+  "height": 1080,
+  "sampleSeconds": 15,
+  "warmupSeconds": 8,
+  "drainFrames": 16,
+  "hiddenWindow": false,
+  "batchMode": false,
+  "graphics": "Direct3D11",
+  "note": "后台真实渲染的独立构建采样；不视为前台交互、Android 真机或热稳定验收。权威夹具只在 .local。"
+}

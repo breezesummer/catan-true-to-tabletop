@@ -96,6 +96,8 @@ public static class M6Build
         PlayerSettings.companyName = "CatanDevelopment";
         PlayerSettings.productName = M6App.ProductFileName;
         PlayerSettings.bundleVersion = M6App.BuildVersion;
+        // U0 构建后基线需要真实 CPU/GPU 时间；采样器仅在显式验证参数下运行。
+        PlayerSettings.enableFrameTimingStats = true;
         // 在线大厅按用户要求直接连接公网 IP，正式包同样允许 HTTP / WS。
         PlayerSettings.insecureHttpOption = InsecureHttpOption.AlwaysAllowed;
         PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.Mono2x);
@@ -115,7 +117,7 @@ public static class M6Build
         var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions {
             scenes = new[] { "Assets/M6.unity" }, locationPathName = output,
             target = android ? BuildTarget.Android : BuildTarget.StandaloneWindows64,
-            options = BuildOptions.None
+            options = Array.IndexOf(args, "--ultra-development-build") >= 0 ? BuildOptions.Development : BuildOptions.None
         });
         if (report.summary.result != UnityEditor.Build.Reporting.BuildResult.Succeeded)
             throw new Exception(android ? "M6 Android build failed" : "M6 Windows build failed");
