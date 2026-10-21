@@ -437,12 +437,12 @@ public sealed partial class M2App : MonoBehaviour
         if(Button(1085,361,331,"道路建设  ·  持有 "+CardCount(DevelopmentCardKind.RoadBuilding),31)){Submit(NewCommand(CommandKind.PlayRoadBuilding));return;}
         if(Button(1085,398,151,"选 1："+(plentyA<5?ResourceNames[plentyA]:"不取"),29))plentyA=(plentyA+1)%6;
         if(Button(1247,398,169,"选 2："+(plentyB<5?ResourceNames[plentyB]:"不取"),29))plentyB=(plentyB+1)%6;
-        if(Button(1085,433,331,"发明（丰收） · 持有 "+CardCount(DevelopmentCardKind.YearOfPlenty),29))
+        if(Button(1085,433,331,"发明家（丰收） · 持有 "+CardCount(DevelopmentCardKind.YearOfPlenty),29))
         {var c=NewCommand(CommandKind.PlayYearOfPlenty);c.Resources=new ResourceBag();if(plentyA<5)c.Resources[(Resource)plentyA]++;if(plentyB<5)c.Resources[(Resource)plentyB]++;Submit(c);return;}
         if(Button(1085,468,151,"垄断："+ResourceNames[monopoly],29))monopoly=(monopoly+1)%5;
         if(Button(1247,468,169,"使用垄断 ×"+CardCount(DevelopmentCardKind.Monopoly),29))
         {var c=NewCommand(CommandKind.PlayMonopoly);c.Resource=(Resource)monopoly;Submit(c);return;}
-        Label(1085,504,331,63,"发展卡实体照片尚缺，保留文字操作。隐藏胜利点卡："+CardCount(DevelopmentCardKind.VictoryPoint)+" 张。\n每回合限 1 张行动卡；当回合买入不能使用。发明取 2 张，银行不足时用“不取”取剩余。",small);
+        Label(1085,504,331,63,"发展卡实体照片尚缺，保留文字操作。隐藏胜利点卡："+CardCount(DevelopmentCardKind.VictoryPoint)+" 张。\n每回合限 1 张行动卡；当回合买入不能使用。发明家取 2 张，银行不足时用“不取”取剩余。",small);
     }
     void DrawBoardLabels()
     {

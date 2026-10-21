@@ -72,7 +72,7 @@ public static class StrategyHudArt
     public static void HandCardIcon(Rect rect,bool special)
     {
         // 先在图标内建立等比像素坐标，再围绕共同底部旋转，避免外层缩放把枢轴移到桌面。
-        // 三色发展/进步牌背或三张相同资源牌背只表示类别，不表示隐藏手牌构成。
+        // 三色发展卡背或三张相同资源牌背只表示类别，不表示隐藏手牌构成。
         var matrix=GUI.matrix;
         float scaleX=matrix.MultiplyVector(Vector3.right).magnitude,scaleY=matrix.MultiplyVector(Vector3.up).magnitude;
         if(rect.width<=0||rect.height<=0||scaleX<=0||scaleY<=0)return;

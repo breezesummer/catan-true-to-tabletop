@@ -88,7 +88,7 @@ public sealed class TabletopBankUI
         else for(int track=0;track<3;track++)
         {
             var layout=StackLayout(8+track);
-            // 进步牌库顺序不在公开视图中；仅展示三类牌背，不估算剩余张数。
+            // 发展卡库顺序不在公开视图中；仅展示三类牌背，不估算剩余张数。
             var hit=Stack(table,"bank-progress-"+track,layout,EntityCardAssets.ProgressBack(track),3);
             specialSources[track]=hit==null?table.ProjectLabel(layout):hit.Rect;
             worldHits.Add(hit);
@@ -185,7 +185,7 @@ public sealed class TabletopBankUI
     public static Texture2D DevelopmentBack()
     {
         if(developmentBack!=null)return developmentBack;
-        // 尚无发展牌背原照；保留简洁的程序绘制占位，不冒用资源或进步牌背。
+        // 尚无发展牌背原照；保留简洁的程序绘制占位，不冒用资源或发展卡背。
         const int w=160,h=240;var pixels=new Color[w*h];
         for(int y=0;y<h;y++)for(int x=0;x<w;x++)
         {

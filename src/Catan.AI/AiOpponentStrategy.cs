@@ -120,7 +120,7 @@ internal static class AiOpponentStrategy
         if (v.Scenario != "pirate-islands" && p.DevelopmentCards > 0 && v.ArmyHolder != player && p.PlayedKnights + 1 >= 3 &&
             p.PlayedKnights + 1 > v.Seats.Where(s => s.Id != player).Max(s => s.PlayedKnights))
             best = Math.Min(best, Math.Max(1, gap - 1));
-        // 公开的改良等级足以识别下一次改良夺取两分的威胁，不能假定持有某张进步卡。
+        // 公开的改良等级足以识别下一次改良夺取两分的威胁，不能假定持有某张发展卡。
         if (v.Cities.Any(c => c.PlayerId == player && !v.MetropolisVertices.Contains(c.LocationId)))
             for (int track = 0; track < p.Levels.Length; track++)
             {
@@ -176,7 +176,7 @@ internal static class AiOpponentStrategy
         return best;
     }
     // 自己已有五段线路时，建村或骑士占点切断领跑者也可能立刻取得最长路。
-    // 这里只预测公开棋盘上的单次占点；不猜进步卡、未来骰子或多轮路线组合。
+    // 这里只预测公开棋盘上的单次占点；不猜发展卡、未来骰子或多轮路线组合。
     private static int BlockingAwardGain(Position v, Seat p)
     {
         var ownedIds = v.Routes.Concat(v.Ships).Where(r => r.PlayerId == p.Id).Select(r => r.LocationId).ToHashSet();

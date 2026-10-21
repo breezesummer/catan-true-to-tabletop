@@ -65,6 +65,7 @@ macOS 开发入口为 `tools/development/Start-Dev.command`，打开 Unity 使�
 - [开发日志](The%20Farmer%27s%20Log.md)：时间轴、每轮改动、发布入口与实际验证。
 - [开发环境](docs/ENVIRONMENT.md)：工具链、环境配置与开发入口。
 - [分系统构建](docs/CROSS_PLATFORM_BUILD.md)：Windows／macOS 启动、双端打包和 Android 签名迁移。
+- [游戏百科](docs/GAME_ENCYCLOPEDIA.md)：发展卡实体名称、牌面描述与照片来源。
 - [本地规则索引](assets/references/rules/README.md)：规则原件与查询入口。
 - [美术生产规范](docs/ART_PIPELINE.md)：参考采集、资产制作、导入和复现。
 - [豪华典藏版ultra主题实施方案](docs/ULTRA_THEME_IMPLEMENTATION_PLAN.md)：真实桌游与 ultra 双主题、三维资产、环境动态及分步验收。

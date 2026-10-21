@@ -260,7 +260,7 @@ public sealed partial class M5App
         }
         if(view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal){DrawControls();return;}
         if(draft!=null)DrawDraft();
-        else if(view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0){Text("商业港口可向每位剩余对手提供一次资源。",true);TabletopAction("商业港口 · 提供资源",CommandKind.CommercialHarborOffer);}
+        else if(view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0){Text("商港可向每位剩余对手提供一次资源。",true);TabletopAction("商港 · 提供资源",CommandKind.CommercialHarborOffer);}
     }
     void TabletopAction(string text,CommandKind kind)
     {

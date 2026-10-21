@@ -54,8 +54,8 @@ public static class TabletopScoreModel
         var rows=Buildings(view.Board.Settlements,view.Board.Cities,playerId);
         Awards(rows,playerId,view.LongestRoadPlayerId,null,"最长道路");
         CityBonuses(rows,view.Board.Metropolises.Count(m=>m.PlayerId==playerId),p.DefenderPoints,view.MerchantPlayerId==playerId);
-        Add(rows,"印刷术","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M4.ProgressCardKind.Printing));
-        Add(rows,"宪法","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M4.ProgressCardKind.Constitution));
+        Add(rows,"印刷厂","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M4.ProgressCardKind.Printing));
+        Add(rows,"石碑","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M4.ProgressCardKind.Constitution));
         return new TabletopScoreBreakdown(playerId,playerId==view.PlayerId,rows);
     }
     public static TabletopScoreBreakdown For(Catan.Core.M5.PlayerView view,string playerId)
@@ -66,8 +66,8 @@ public static class TabletopScoreModel
         Awards(rows,playerId,view.LongestRoadPlayerId,null,"最长航线");
         Add(rows,"登岛奖励","在新岛屿建立村庄",p.BonusVictoryPoints);
         CityBonuses(rows,view.Board.Metropolises.Count(m=>m.PlayerId==playerId),p.DefenderPoints,view.MerchantPlayerId==playerId);
-        Add(rows,"印刷术","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M5.ProgressCardKind.Printing));
-        Add(rows,"宪法","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M5.ProgressCardKind.Constitution));
+        Add(rows,"印刷厂","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M5.ProgressCardKind.Printing));
+        Add(rows,"石碑","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M5.ProgressCardKind.Constitution));
         return new TabletopScoreBreakdown(playerId,playerId==view.PlayerId,rows);
     }
     static List<TabletopScoreRow> Buildings(PiecePlacement[] settlements,PiecePlacement[] cities,string playerId)

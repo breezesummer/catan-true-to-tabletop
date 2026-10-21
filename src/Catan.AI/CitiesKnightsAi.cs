@@ -416,7 +416,7 @@ public sealed class CitiesKnightsAi
     private static double ProgressValue(PlayerView view, Command c)
     {
         double value = CardValue(c.ProgressCard);
-        // 商业港口的发起方可自由挑人，也须遵守交易禁令；被迫交商品的待决仍照规则完成。
+        // 商港的发起方可自由挑人，也须遵守交易禁令；被迫交商品的待决仍照规则完成。
         if (c.ProgressCard == ProgressCardKind.CommercialHarbor)
             return view.OwnResources.Total > 0 && view.Players.Any(p => p.Id != view.PlayerId && p.CommodityCount > 0
                 && AiOpponentStrategy.TradePenalty(view, p.Id) <= 0) ? value : -1;

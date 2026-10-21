@@ -10,8 +10,8 @@ public sealed class TabletopCardReveal
     public string PlayerId="", CardName="";
     public bool Progress, ImmediateVictory;
     public GameHistoryEntry? Roll;
-    public static bool IsVictory(string name)=>name=="印刷术"||name=="宪法";
-    public int ProgressIndex=>Array.IndexOf(new[]{"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻铁匠","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"},CardName);
+    public static bool IsVictory(string name)=>name=="印刷厂"||name=="石碑";
+    public int ProgressIndex=>Array.IndexOf(Catan.Core.DevelopmentCardText.Names,CardName);
     public static IEnumerable<TabletopCardReveal> From(GameHistoryEntry entry)
     {
         if(entry.Kind=="PlayKnight"||entry.Kind=="PlayRoadBuilding"||entry.Kind=="PlayYearOfPlenty"||entry.Kind=="PlayMonopoly"||entry.Kind=="PlayProgressCard")

@@ -20,7 +20,7 @@ public static class TabletopHandLayout
     }
     public static int ResourceCapacity(bool hasSpecialCards) => int.MaxValue;
     public static int SpecialCapacity(bool hasResources) => int.MaxValue;
-    // 资源和发展/进步牌共用完整区域；页签选择决定当前显示哪副手牌。
+    // 资源和发展卡共用完整区域；页签选择决定当前显示哪副手牌。
     public static float ResourceCenter(bool hasSpecialCards) => (RestLeft + RestRight) / 2;
     public static float ResourceWidth(bool hasSpecialCards) => RestRight - RestLeft;
     public static float SpecialCenter(bool hasResources) => (RestLeft + RestRight) / 2;
@@ -100,11 +100,11 @@ public static class TabletopSelectionPrompt
             case "PillageCity": return "请选择要降级为村庄的城市";
             case "Metropolis": return "请选择要安置大都会的城市";
             case "DisplacedKnight": return "请选择合法位置安置被驱逐的骑士";
-            case "ProgressTreasonRemove": return "你受到「叛变」影响，请选择要移除的己方骑士";
+            case "ProgressTreasonRemove": return "你受到「叛徒」影响，请选择要移除的己方骑士";
             case "ProgressTreasonPlace": return "请选择合法位置安置替补骑士";
             case "Gold": case "Aqueduct": return "请选择要获得的资源";
             case "ProgressDiscard": return "请选择要弃掉的发展卡";
-            case "ProgressSabotage": return "你受到「破坏」影响，请选择要弃掉的手牌";
+            case "ProgressSabotage": return "你受到「破坏者」影响，请选择要弃掉的手牌";
             case "ProgressWedding": return "请选择要交出的婚礼赠礼";
             case "ProgressHarbor": return "请选择要交出的商品";
             case "ProgressEspionage": return "请选择要获得的发展卡";
@@ -189,7 +189,7 @@ public sealed class TabletopCollectionTimeline
         if(latest==sequence){flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);return;}
         var updates=entries.Where(e=>e.Sequence>sequence).OrderBy(e=>e.Sequence).ToArray();
         var sourceTiles=CopyTiles(observedTiles??tiles??Array.Empty<TabletopCollectionTile>());
-        int inventions=updates.Count(e=>e.Action=="使用「发明」");bool numbersReliable=true;
+        int inventions=updates.Count(e=>e.Action=="使用「发明家」");bool numbersReliable=true;
         foreach(var entry in updates)
         {
             // 动画统一对齐真实骰子落定时间；历史迟到时不能再从零重复等待一次掷骰。
@@ -271,8 +271,8 @@ public sealed class TabletopCollectionTimeline
                 if(change.Name=="城市")tile.Cities=after;else tile.Settlements=after;
             }
         }
-        if(entry.Action!="使用「发明」")return;
-        // 现有公开历史未携带发明的两个目标；单次交换可由前后公开点数唯一恢复，多次合并则不猜测中间位置。
+        if(entry.Action!="使用「发明家」")return;
+        // 现有公开历史未携带发明家的两个目标；单次交换可由前后公开点数唯一恢复，多次合并则不猜测中间位置。
         if(inventions!=1||finalTiles==null){numbersReliable=false;return;}
         var changed=tiles.Where(t=>finalTiles.Any(final=>final.Id==t.Id&&final.Number!=t.Number)).ToArray();
         if(changed.Length!=0&&changed.Length!=2){numbersReliable=false;return;}
@@ -326,7 +326,7 @@ public sealed class TabletopCollectionTimeline
                 .SelectMany(t=>Enumerable.Repeat(t.Id,2*t.Settlements.Concat(t.Cities).Count(p=>p.PlayerId==player))).ToArray();
         return Array.Empty<string>();
     }
-    static int ProgressIndex(string name) => Array.IndexOf(new[]{"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻铁匠","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"},name);
+    static int ProgressIndex(string name) => Array.IndexOf(Catan.Core.DevelopmentCardText.Names,name);
     public TabletopResourceSlot[] SpecialSlots(string player,System.Collections.Generic.IEnumerable<OperationHandCard> owned,double now)
     {
         flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);

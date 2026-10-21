@@ -75,7 +75,7 @@ namespace Catan.Core.M5
             {
                 Require(s.ActivePlayerId == p.Id, "NotActivePlayer", "请由当前玩家操作。"); ActionPhase(s);
                 var target = OtherProgressPlayer(s, p, c.OtherPlayerId);
-                Require(s.CommercialHarborPlayers.Contains(target.Id), "HarborAlreadyUsed", "本回合未获得对该玩家的商业港口交换额度。");
+                Require(s.CommercialHarborPlayers.Contains(target.Id), "HarborAlreadyUsed", "本回合未获得对该玩家的商港交换额度。");
                 Require(Enum.IsDefined(typeof(Resource), c.Resource) && p.Resources[c.Resource] > 0, "InsufficientResources", "必须选择自己持有的资源。");
                 var used = Array.IndexOf(s.CommercialHarborPlayers, target.Id);
                 s.CommercialHarborPlayers = s.CommercialHarborPlayers.Where((x, i) => i != used).ToArray();
@@ -93,7 +93,7 @@ namespace Catan.Core.M5
             Require(Enum.IsDefined(typeof(ProgressCardKind), c.ProgressCard), "UnknownCard", "未知发展卡。");
             Require(!ProgressCatalog.IsVictoryPoint(c.ProgressCard), "PublicVictoryCard", "胜利点卡抽到时自动公开。");
             if (c.ProgressCard == ProgressCardKind.Alchemy)
-                Require(s.Phase == GamePhase.ProductionAwaitRoll && s.AlchemyDice1 == 0, "WrongPhase", "炼金术必须在本回合掷骰之前使用一次。");
+                Require(s.Phase == GamePhase.ProductionAwaitRoll && s.AlchemyDice1 == 0, "WrongPhase", "炼金术士必须在本回合掷骰之前使用一次。");
             else ActionPhase(s);
             ReturnProgressCard(s, p, c.ProgressCard);
             switch (c.ProgressCard)
@@ -121,7 +121,7 @@ namespace Catan.Core.M5
                     s.CommercialHarborPlayers = s.CommercialHarborPlayers.Concat(s.Players.Where(x => x.Id != p.Id).Select(x => x.Id)).ToArray(); break;
                 case ProgressCardKind.GuildDues:
                     var rich = OtherProgressPlayer(s, p, c.OtherPlayerId);
-                    Require(VictoryPoints(s, rich.Id, true) > VictoryPoints(s, p.Id, true), "NotMoreVictoryPoints", "行会会费只能选择胜利点比你高的玩家。");
+                    Require(VictoryPoints(s, rich.Id, true) > VictoryPoints(s, p.Id, true), "NotMoreVictoryPoints", "大商家只能选择胜利点比你高的玩家。");
                     if (ProgressHandSize(rich) > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressGuildDues", PlayerId = p.Id, OtherPlayerId = rich.Id, Amount = Math.Min(2, ProgressHandSize(rich)) });
                     break;
                 case ProgressCardKind.Merchant:
@@ -193,7 +193,7 @@ namespace Catan.Core.M5
                 case "ProgressRoads":
                     if (!c.Decline)
                     {
-                        Require(!(d.RoadsOnly&&c.BuildShip)&&!(d.ShipsOnly&&!c.BuildShip),"WrongRouteType","外交移除后须重建同种棋子。");
+                        Require(!(d.RoadsOnly&&c.BuildShip)&&!(d.ShipsOnly&&!c.BuildShip),"WrongRouteType","外交官移除后须重建同种棋子。");
                         if(c.BuildShip) {ValidateShip(s,p,c.TargetId,null);PlaceShip(s,p,c.TargetId);} else {ValidateRoad(s,p,c.TargetId,null);PlaceRoad(s,p,c.TargetId);} d.Amount--;
                         if(d.Amount>0&&(d.RoadsOnly?HasLegalRoad(s,p):d.ShipsOnly?HasLegalShip(s,p):HasLegalRoute(s,p)))return;
                     }

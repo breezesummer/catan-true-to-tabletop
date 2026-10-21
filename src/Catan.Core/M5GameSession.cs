@@ -255,7 +255,7 @@ namespace Catan.Core.M5
                     StealHandCard(s,p,victim);
                     FinishDecision(s); break;
                 case CommandKind.EndTurn:
-                    ActionPhase(s); Require(p.ProgressCards.Length<=4,"ProgressHandLimit","结束回合前须将进步牌减至四张。"); ClearProgressTurn(s); s.ShipMovedThisTurn = false; s.ActivePlayerId = s.Players[(Array.FindIndex(s.Players, x => x.Id == p.Id) + 1) % s.Players.Length].Id; s.Turn++; s.Phase = GamePhase.ProductionAwaitRoll; break;
+                    ActionPhase(s); Require(p.ProgressCards.Length<=4,"ProgressHandLimit","结束回合前须将发展卡减至四张。"); ClearProgressTurn(s); s.ShipMovedThisTurn = false; s.ActivePlayerId = s.Players[(Array.FindIndex(s.Players, x => x.Id == p.Id) + 1) % s.Players.Length].Id; s.Turn++; s.Phase = GamePhase.ProductionAwaitRoll; break;
                 case CommandKind.BuildWall: ActionPhase(s); BuildWall(s,p,c.TargetId); break;
                 case CommandKind.ImproveCity: ActionPhase(s); BuildImprovement(s,p,c.Track); break;
                 case CommandKind.RecruitKnight: ActionPhase(s); RecruitKnight(s,p,c.TargetId); break;
