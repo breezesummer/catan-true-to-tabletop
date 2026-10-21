@@ -1,5 +1,5 @@
 param(
-    [string]$OutputRoot = 'game version/1.7/Catan1.7.2-Ultra-Themes',
+    [string]$OutputRoot = 'game version/1.7/Catan1.7.3-Ultra-Pasture',
     [switch]$Arm64Only
 )
 $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()

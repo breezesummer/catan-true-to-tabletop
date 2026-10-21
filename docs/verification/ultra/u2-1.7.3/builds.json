@@ -1,0 +1,19 @@
+{
+  "version": "1.7.3",
+  "windowsBuild": "通过",
+  "androidBuild": "通过",
+  "androidSignature": "通过",
+  "androidDevice": "未连接，待验",
+  "files": [
+    {
+      "path": "Builds/Windows/Catan1.7.3.exe",
+      "bytes": 667136,
+      "sha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "path": "Builds/Android/Catan1.7.3.apk",
+      "bytes": 328620717,
+      "sha256": "bd80912fb5e9f0a421352ffe0b5b24ccec60394795d8bbaa33b7e62a3a61de7a"
+    }
+  ]
+}

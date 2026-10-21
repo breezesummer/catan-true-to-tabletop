@@ -1,0 +1,15 @@
+{
+  "source": {
+    "meshes": 38,
+    "triangles": 35572,
+    "vertexColors": true,
+    "materialSlots": 2
+  },
+  "fbx": {
+    "meshes": 38,
+    "triangles": 35572,
+    "vertexColors": true,
+    "materialSlots": 2
+  },
+  "status": "通过"
+}

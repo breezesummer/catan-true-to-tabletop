@@ -34,7 +34,7 @@ public sealed partial class M6App
             ThemeSwitchResidentBytes=UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong();
             if(VerificationFailThemeLoad){VerificationFailThemeLoad=false;throw new InvalidOperationException("验证注入");}
             BoardThemeController.Persist();
-            BoardThemeController.Status="已切换为「"+target.Name+"」。"+(target==BoardThemeDefinition.Ultra?"当前为开发占位模型。":"");
+            BoardThemeController.Status="已切换为「"+target.Name+"」。"+(target==BoardThemeDefinition.Ultra?"当前为 U2 草原与玉牌样板，其他组件仍为占位。":"");
         }
         catch(Exception ex)
         {
@@ -66,7 +66,7 @@ public sealed partial class M6App
         for(int i=0;i<2;i++)
         {
             var theme=BoardThemeDefinition.All[i];var r=new Rect(area.x+i*(area.width/2+8),area.y+44,area.width/2-8,136);
-            if(PastoralMenuUI.Card(r,theme.Name,i==0?"实体桌游组件":"开发占位模型",BoardThemeController.Current==theme)&&!BoardThemeController.Switching)RequestBoardTheme(theme.Id);
+            if(PastoralMenuUI.Card(r,theme.Name,i==0?"实体桌游组件":"草原与薄玉牌样板",BoardThemeController.Current==theme)&&!BoardThemeController.Switching)RequestBoardTheme(theme.Id);
             // 简明示意预览，正式资产样板在 U2 替换。
             var preview=new Rect(r.x+20,r.y+93,r.width-40,28);
             PastoralMenuUI.Round(preview,i==0?new Color(.34f,.25f,.17f):theme.TableColor,5);

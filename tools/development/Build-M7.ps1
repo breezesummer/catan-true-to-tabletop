@@ -1,4 +1,4 @@
-param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.7/Catan1.7.2-Ultra-Themes',[switch]$SkipVerification)
+param([switch]$VerifyPlayer,[string]$OutputRoot='game version/1.7/Catan1.7.3-Ultra-Pasture',[switch]$SkipVerification)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m7FileStem='Catan'+(& (Join-Path $PSScriptRoot 'Get-GameVersion.ps1'))

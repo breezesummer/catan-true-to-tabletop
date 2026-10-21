@@ -10,7 +10,7 @@ public sealed class BoardThemeDefinition
     BoardThemeDefinition(string id,string name,string version,string description,Color table,Color light,float intensity)
     {Id=id;Name=name;AssetVersion=version;Description=description;TableColor=table;LightColor=light;LightIntensity=intensity;}
     public static readonly BoardThemeDefinition Tabletop=new BoardThemeDefinition("tabletop","真实桌游","v005","实体组件与原照牌面",Color.white,new Color(1,.95f,.87f),1.22f);
-    public static readonly BoardThemeDefinition Ultra=new BoardThemeDefinition("ultra","豪华典藏版ultra","u1-placeholder-v001","开发占位 · 正式地形与牌面尚未接入",new Color(.30f,.23f,.15f),new Color(1,.89f,.71f),1.35f);
+    public static readonly BoardThemeDefinition Ultra=new BoardThemeDefinition("ultra","豪华典藏版ultra","u2-pasture-v002","U2 草原与玉牌样板 · 其他地形及棋子仍为占位",new Color(.30f,.23f,.15f),new Color(1,.89f,.71f),1.35f);
     public static readonly BoardThemeDefinition[] All={Tabletop,Ultra};
     public static BoardThemeDefinition Find(string id)=>Array.Find(All,t=>t.Id==id);
 }
@@ -22,6 +22,7 @@ public static class BoardThemeController
     static string PreferenceName()
     {
         var args=Environment.GetCommandLineArgs();
+        if(Array.IndexOf(args,"--ultra-pasture-verify")>=0)return "catan.board-theme.verification.u2";
         if(Array.IndexOf(args,"--ultra-theme-verify")<0)return "catan.board-theme.v1";
         int role=Array.IndexOf(args,"--ultra-theme-role");
         return "catan.board-theme.verification.v1."+(role>=0&&role+1<args.Length?args[role+1]:"local");

@@ -8,6 +8,7 @@ public sealed class TabletopNumberTokens : MonoBehaviour
 {
     readonly List<Material> materials=new List<Material>();
     Mesh tokenMesh;
+    UltraNumberTokens jade;
     Dictionary<string,Vector3> positions;
     string signature;
     public static TabletopNumberTokens Create(Transform parent,Tile[] tiles,Dictionary<string,Vector3> positions)
@@ -17,10 +18,14 @@ public sealed class TabletopNumberTokens : MonoBehaviour
     }
     void Initialize(Tile[] tiles,Dictionary<string,Vector3> positions)
     {
-        this.positions=positions;tokenMesh=CreateMesh();Refresh(tiles);
+        this.positions=positions;
+        if(BoardThemeController.IsUltra){gameObject.name="悬浮薄玉牌 U2";jade=gameObject.AddComponent<UltraNumberTokens>();jade.Initialize(positions);}
+        else tokenMesh=CreateMesh();
+        Refresh(tiles);
     }
     public void Refresh(Tile[] tiles)
     {
+        if(jade!=null){jade.Refresh(tiles);return;}
         if(tiles==null)return;
         var visible=tiles.Where(t=>t.Number.HasValue&&t.Number.Value>=2&&t.Number.Value<=12&&t.Number.Value!=7&&
             t.Resource!="desert"&&t.Resource!="fog"&&t.Resource!="hidden"&&t.Resource!="sea"&&t.Resource!="water")

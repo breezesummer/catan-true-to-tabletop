@@ -1,0 +1,16 @@
+{
+  "version": "u2-pasture-v002",
+  "lods": 2,
+  "checks": [
+    "全部网格索引/数值有效",
+    "真实模型尺寸与8毫米共享边",
+    "景观不侵占道路带",
+    "开发区模块未跨玩家区域",
+    "全部合法组合投影面积为每座三分之一",
+    "低LOD减少三角形",
+    "干净目录重建逐字节相同"
+  ],
+  "minimumRoadClearanceMm": 6.143,
+  "maximumHeightMm": 16.755,
+  "sha256": "5ecceb26cece2a2d4abb8506104e66392f8531af22bb64321054ccdcf605c044"
+}

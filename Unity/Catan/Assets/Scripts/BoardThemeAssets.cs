@@ -18,18 +18,19 @@ public static class BoardThemeAssets
         if(models.TryGetValue(resource,out var cached))return cached;
         if(templates==null)
         {
-            var root=new GameObject("ultra 开发占位模板（有限共享缓存）");root.SetActive(false);
+            var root=new GameObject("ultra 主题模板（有限共享缓存）");root.SetActive(false);
             UnityEngine.Object.DontDestroyOnLoad(root);templates=root.transform;
             neutral=BoardRenderer.Material(new Color(.20f,.28f,.28f));neutral.name="ultra 占位中性色";
             player=BoardRenderer.Material(Color.white);player.name="ultra 玩家色";
             gold=BoardRenderer.Material(new Color(.80f,.63f,.29f),true);gold.name="ultra 占位识别线";
         }
-        var obj=new GameObject("ultra 开发占位 · "+resource);obj.transform.SetParent(templates,false);
-        var stamp=obj.AddComponent<BoardThemeStamp>();stamp.ThemeId="ultra";stamp.AssetVersion="u1-placeholder-v001";
+        var obj=new GameObject((resource.EndsWith("/tile-pasture",StringComparison.Ordinal)?"ultra 草原三维样板 · ":"ultra 开发占位 · ")+resource);obj.transform.SetParent(templates,false);
+        var stamp=obj.AddComponent<BoardThemeStamp>();stamp.ThemeId="ultra";stamp.AssetVersion=idVersion(resource);
         try { Build(obj.transform,resource); }
         catch {UnityEngine.Object.Destroy(obj);throw;}
         models.Add(resource,obj);return obj;
     }
+    static string idVersion(string resource)=>resource.EndsWith("/tile-pasture",StringComparison.Ordinal)?UltraPastureAssets.Version:"u1-placeholder-v001";
     static void Part(Transform root,PrimitiveType shape,Vector3 position,Vector3 scale,Material material)
     {
         var part=GameObject.CreatePrimitive(shape);part.name="开发占位几何";part.transform.SetParent(root,false);
@@ -42,6 +43,7 @@ public static class BoardThemeAssets
     {
         string id=path.Substring(path.LastIndexOf('/')+1);
         bool terrain=id.StartsWith("tile-")||id=="forest";
+        if(id=="tile-pasture"){UltraPastureAssets.Build(root);return;}
         if(terrain)
         {
             var tile=new GameObject("公开地形占位");tile.transform.SetParent(root,false);

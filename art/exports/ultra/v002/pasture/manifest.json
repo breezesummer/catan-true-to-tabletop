@@ -1,0 +1,37 @@
+{
+  "version": "u2-pasture-v002",
+  "unit": "米",
+  "radius": 0.0395,
+  "interiorRadius": 0.029,
+  "surfaceHeight": 0.008,
+  "seed": "80..85 / 140..145",
+  "reference": "assets/prototypes/ultra/v006/terrain-states/grassland-*-v006.png",
+  "meshSha256": "5ecceb26cece2a2d4abb8506104e66392f8531af22bb64321054ccdcf605c044",
+  "stats": [
+    {
+      "lod": 0,
+      "pristineTriangles": 11032,
+      "allVariantsTriangles": 27293
+    },
+    {
+      "lod": 1,
+      "pristineTriangles": 2039,
+      "allVariantsTriangles": 8279
+    }
+  ],
+  "note": "静态样板；低/高LOD共享同一布局和羊的数量。FBX用于交换，Unity显式网格保留颜色和轴向。",
+  "references": [
+    {
+      "path": "assets/prototypes/ultra/v006/terrain-states/grassland-coast-v006.png",
+      "sha256": "48a89d46dd31fd397c1f75ff718a7da2b45eb4eb1ce26b28b9a9fbf20696a933"
+    },
+    {
+      "path": "assets/prototypes/ultra/v006/terrain-states/grassland-developed-v006.png",
+      "sha256": "db5f7d2c5845de443f956f71fd114d635b502748525c5dc906355157807254c9"
+    },
+    {
+      "path": "assets/prototypes/ultra/v006/terrain-states/grassland-pristine-v006.png",
+      "sha256": "cfadf9ba3c3e716f1ba30ec99d3e2cf1f55224c5c61fc502a95651aae073cdbb"
+    }
+  ]
+}

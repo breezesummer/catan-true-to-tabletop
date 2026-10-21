@@ -1,0 +1,60 @@
+{
+    "version": "1.7.3",
+    "result": "通过",
+    "error": "",
+    "device": "Intel(R) Core(TM) i5-14600KF / AMD Radeon RX 9070 XT / Direct3D11",
+    "legalLayouts": 18,
+    "rulePackages": 4,
+    "stressTiles": 49,
+    "pickChecks": 96,
+    "orderIndependent": true,
+    "upgradeSameArea": true,
+    "ownershipAndRemoval": true,
+    "restore": true,
+    "publicOnly": true,
+    "noColliders": true,
+    "performance": [
+        {
+            "name": "最大49格真实桌游（1440×900棋盘离屏，含帧调度）",
+            "frames": 360,
+            "renderers": 107,
+            "renderedFrames": 360,
+            "gcAvailable": false,
+            "p50": 0.5667,
+            "p95": 0.6704,
+            "p99": 0.7951,
+            "maxGc": -1,
+            "draws": 767,
+            "triangles": 379085,
+            "allocated": 134740907
+        },
+        {
+            "name": "最大49格草原样板混合占位（1440×900棋盘离屏，含帧调度）",
+            "frames": 360,
+            "renderers": 392,
+            "renderedFrames": 360,
+            "gcAvailable": false,
+            "p50": 0.5583,
+            "p95": 0.6308,
+            "p99": 0.7791,
+            "maxGc": -1,
+            "draws": 911,
+            "triangles": 77098,
+            "allocated": 133523859
+        },
+        {
+            "name": "最大49格全部开发草原合成压力（1440×900棋盘离屏，含帧调度）",
+            "frames": 360,
+            "renderers": 848,
+            "renderedFrames": 360,
+            "gcAvailable": false,
+            "p50": 0.6075,
+            "p95": 0.7132,
+            "p99": 0.8111,
+            "maxGc": -1,
+            "draws": 1015,
+            "triangles": 507892,
+            "allocated": 136263875
+        }
+    ]
+}

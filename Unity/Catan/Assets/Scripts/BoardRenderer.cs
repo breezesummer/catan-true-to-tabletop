@@ -20,6 +20,7 @@ public sealed class BoardRenderer : MonoBehaviour
     private GameObject feltTable;
     private TabletopScene tableScene;
     private TabletopNumberTokens numberTokens;
+    private UltraBoardEnvironment ultraEnvironment;
     public TabletopScene TableScene => tableScene;
     public TabletopReferenceMarkers ReferenceMarkers { get; private set; }
     private GameObject ghost;
@@ -64,6 +65,7 @@ public sealed class BoardRenderer : MonoBehaviour
             }
             obj.name = tile.Id;
         }
+        ultraEnvironment=UltraBoardEnvironment.Create(transform,boardTiles,vertices);
         numberTokens=TabletopNumberTokens.Create(transform,boardTiles,tiles);
         ReferenceMarkers=TabletopReferenceMarkers.Create(transform,boardTiles,vertices,boardEdges);
         var table = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -103,6 +105,7 @@ public sealed class BoardRenderer : MonoBehaviour
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)
     {
         if(numberTokens!=null)numberTokens.Refresh(boardTiles);
+        ultraEnvironment?.Refresh(settlements,cities);
         ClearPreview();
         pieceCache.Begin("basic",pieces);
         foreach(var p in settlements)

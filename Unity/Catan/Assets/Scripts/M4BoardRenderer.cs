@@ -21,6 +21,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
     private GameObject feltTable;
     private TabletopScene tableScene;
     private TabletopNumberTokens numberTokens;
+    private UltraBoardEnvironment ultraEnvironment;
     public TabletopScene TableScene => tableScene;
     public TabletopReferenceMarkers ReferenceMarkers { get; private set; }
     private Transform publicMarkers;
@@ -71,6 +72,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
             }
             obj.name = tile.Id;
         }
+        ultraEnvironment=UltraBoardEnvironment.Create(transform,boardTiles,vertices);
         numberTokens=TabletopNumberTokens.Create(transform,boardTiles,tiles);
         ReferenceMarkers=TabletopReferenceMarkers.Create(transform,boardTiles,vertices,boardEdges);
         var table = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -124,6 +126,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
     public void RefreshProjectedPieces(PiecePlacement[] settlements,PiecePlacement[] roads,PiecePlacement[] cities,string robberTileId,
         PiecePlacement[] walls,Catan.Core.M4.Knight[] knights,Catan.Core.M4.Metropolis[] metropolises,string merchant,int? barbarianPosition=null)
     {
+        ultraEnvironment?.Refresh(settlements,cities);
         var expanded=new HashSet<string>(walls.Select(w=>w.LocationId).Concat(metropolises.Select(m=>m.LocationId)));
         Refresh(settlements,roads,cities.Where(c=>!expanded.Contains(c.LocationId)).ToArray(),robberTileId);
         RenderExpansion(walls,knights,metropolises,merchant);

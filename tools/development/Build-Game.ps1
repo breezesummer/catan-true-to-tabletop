@@ -1,6 +1,6 @@
 param(
     [ValidateSet('All','Windows','Android','Server')][string]$Target='All',
-    [string]$OutputRoot='game version/1.7/Catan1.7.2-Ultra-Themes',
+    [string]$OutputRoot='game version/1.7/Catan1.7.3-Ultra-Pasture',
     [switch]$VerifyPlayer,
     [switch]$SkipVerification,
     [switch]$Arm64Only
