@@ -92,6 +92,13 @@ public sealed partial class M5App : MonoBehaviour
     }
     Command New(CommandKind kind,string target=null)=>new Command{Id=Guid.NewGuid().ToString("N"),PlayerId=seat,Kind=kind,TargetId=target,Resources=new ResourceBag(),Commodities=new CommodityBag(),Give=new ResourceBag(),Receive=new ResourceBag(),GiveCommodities=new CommodityBag(),ReceiveCommodities=new CommodityBag(),ChosenDice1=1,ChosenDice2=1};
     void Select(CommandKind kind){draft=New(kind);pickField="";scroll=Vector2.zero;}
+    internal void RebuildTheme()
+    {
+        mapPan.Cancel(board?.TableScene);mapChoice.Clear();dock.Reset();CancelOperationDraft();pickField="";board?.ClearPreview();cardArt.Clear();
+        layout=null;
+        var current=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);
+        if(current!=null){view=current;Refresh(current);}
+    }
     void Refresh(PlayerView v)
     {
         using var frameCost=FrameCost.Measure(FrameCost.Stage.BoardRefresh);
@@ -101,10 +108,12 @@ public sealed partial class M5App : MonoBehaviour
         string next=v.ScenarioId+"|"+string.Join("|",v.Board.Tiles.Select(t=>t.Id+":"+t.Resource));
         if(board==null||next!=layout)
         {
-            bool top=board!=null&&board.TopView;
+            bool existing=board!=null,top=existing&&board.TopView;float zoom=existing?board.Zoom:0;
+            var cameraState=board!=null&&board.TableScene!=null?board.TableScene.CaptureView():(TabletopScene.ViewState?)null;
             if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}
             board=new GameObject("M5 board").AddComponent<M5BoardRenderer>();board.Initialize(v.Board.Tiles,v.Board.Vertices,v.Board.Edges);
-            board.SetCamera(top);layout=next;
+            if(existing)board.ChangeZoom(zoom-board.Zoom);board.SetCamera(top);layout=next;
+            board.SetOperationLayout(ai!=null);if(cameraState.HasValue&&board.TableScene!=null)board.TableScene.RestoreView(cameraState.Value);
         }
         board.SetOperationLayout(ai!=null);board.Refresh(v);board.ShowTerrain(terrain);
     }

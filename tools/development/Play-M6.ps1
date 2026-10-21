@@ -1,4 +1,4 @@
-param([string]$BuildRoot='game version/1.7/Catan1.7.1-U0-Profiling')
+param([string]$BuildRoot='game version/1.7/Catan1.7.2-Ultra-Themes')
 . (Join-Path $PSScriptRoot 'Enter-DevEnvironment.ps1')
 $m6RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $m6Player = & (Join-Path $PSScriptRoot 'Find-GamePlayer.ps1') -BuildRoot $BuildRoot

@@ -1,0 +1,72 @@
+[
+  {
+    "rules": "base",
+    "kind": "\u5F00\u5C40\u6446\u653E",
+    "phase": "SetupRoad",
+    "legalCommands": 1,
+    "file": "pending-base-1.json"
+  },
+  {
+    "rules": "base",
+    "kind": "\u4EA4\u6613",
+    "phase": "Action",
+    "legalCommands": 18,
+    "file": "pending-base-2.json"
+  },
+  {
+    "rules": "base",
+    "kind": "\u5F3A\u76D7",
+    "phase": "RobberMove",
+    "legalCommands": 22,
+    "file": "pending-base-3.json"
+  },
+  {
+    "rules": "base",
+    "kind": "\u5176\u4ED6\u5F85\u51B3",
+    "phase": "RoadBuilding",
+    "legalCommands": 227,
+    "file": "pending-base-4.json"
+  },
+  {
+    "rules": "base",
+    "kind": "\u5F03\u724C",
+    "phase": "Discard",
+    "legalCommands": 246,
+    "file": "pending-base-5.json"
+  },
+  {
+    "rules": "combined",
+    "kind": "\u5F00\u5C40\u6446\u653E",
+    "phase": "SetupRoad",
+    "legalCommands": 1,
+    "file": "pending-combined-1.json"
+  },
+  {
+    "rules": "combined",
+    "kind": "\u4EA4\u6613",
+    "phase": "Action",
+    "legalCommands": 23,
+    "file": "pending-combined-2.json"
+  },
+  {
+    "rules": "combined",
+    "kind": "\u5F03\u724C",
+    "phase": "Discard",
+    "legalCommands": 40,
+    "file": "pending-combined-3.json"
+  },
+  {
+    "rules": "combined",
+    "kind": "\u5176\u4ED6\u5F85\u51B3",
+    "phase": "PendingChoice",
+    "legalCommands": 78,
+    "file": "pending-combined-4.json"
+  },
+  {
+    "rules": "combined",
+    "kind": "\u5F3A\u76D7",
+    "phase": "RobberMove",
+    "legalCommands": 156,
+    "file": "pending-combined-5.json"
+  }
+]

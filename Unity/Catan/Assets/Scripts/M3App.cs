@@ -207,6 +207,13 @@ public sealed partial class M3App : MonoBehaviour
         if(current.PendingDecision!=null&&!string.IsNullOrEmpty(current.PendingDecision.PlayerId))return current.PendingDecision.PlayerId;
         return current.ActivePlayerId;
     }
+    internal void RebuildTheme()
+    {
+        mapPan.Cancel(board?.TableScene);mapChoice.Clear();dock.Reset();CancelOperationDraft();CancelPickup();cardArt.Clear();
+        boardLayout=null;
+        var current=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);
+        if(current!=null){view=current;RefreshBoard(current);}
+    }
     void RefreshBoard(PlayerView current)
     {
         using var frameCost=FrameCost.Measure(FrameCost.Stage.BoardRefresh);
@@ -215,10 +222,12 @@ public sealed partial class M3App : MonoBehaviour
         if(board==null||boardLayout!=layout)
         {
             bool existing=board!=null,top=existing&&board.TopView;float zoom=existing?board.Zoom:0;
+            var cameraState=board!=null&&board.TableScene!=null?board.TableScene.CaptureView():(TabletopScene.ViewState?)null;
             if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}
             board=new GameObject("M3 board").AddComponent<M3BoardRenderer>();
             board.Initialize(current.Board.Tiles,current.Board.Vertices,current.Board.Edges);
             if(existing)board.ChangeZoom(zoom-board.Zoom);board.SetCamera(top);board.ShowTerrain(terrain);boardLayout=layout;
+            board.SetOperationLayout(ai!=null);if(cameraState.HasValue&&board.TableScene!=null)board.TableScene.RestoreView(cameraState.Value);
         }
         board.SetOperationLayout(ai!=null);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId,current.Board.Tiles);
         board.RefreshSeafarers(current.Board.Ships,current.Board.PirateTileId);

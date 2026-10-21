@@ -77,7 +77,7 @@ public sealed class TabletopScene : MonoBehaviour
         ConfigureLighting();
         var wood = MakeMaterial("烟熏橡木细纹哑光清漆 v005", Color.white, .29f);
         var grain=Resources.Load<Texture2D>("TabletopUI/v005/smoked-oak-albedo");
-        if(grain!=null)
+        if(grain!=null&&!BoardThemeController.IsUltra)
         {
             grain.filterMode=FilterMode.Trilinear;grain.anisoLevel=16;
             // 纹理按 0.75 米的实际覆盖范围平铺；无等距拼接线，也不随视角放大纹理。
@@ -89,7 +89,7 @@ public sealed class TabletopScene : MonoBehaviour
                 wood.SetFloat("_BumpScale",.32f);wood.EnableKeyword("_NORMALMAP");
             }
         }
-        else wood.color = new Color(.335f,.266f,.202f);
+        else wood.color = BoardThemeController.IsUltra?BoardThemeController.Current.TableColor:new Color(.335f,.266f,.202f);
         var table = GameObject.CreatePrimitive(PrimitiveType.Cube);
         table.name = "细纹哑光橡木桌面"; table.transform.SetParent(transform, false);
         table.transform.position = center + new Vector3(0, -.025f, 0);
@@ -101,7 +101,8 @@ public sealed class TabletopScene : MonoBehaviour
         var rim = MakeMaterial("海框纸板侧面", new Color(.025f, .16f, .22f), .16f);
         CreatePolygon("海框厚度", outline.Select(p => new Vector3(p.x, -.0025f, p.z)).ToArray(), rim, .004f);
         var sea = MakeMaterial("深青色覆膜海框 v005", Color.white, .32f);
-        var waves = SeaTexture(); textures.Add(waves); sea.SetTexture("_BaseMap", waves);
+        if(BoardThemeController.IsUltra)sea.color=new Color(.08f,.32f,.37f);
+        else {var waves = SeaTexture(); textures.Add(waves); sea.SetTexture("_BaseMap", waves);}
         CreatePolygon("海面边框", outline, sea, 0);
         InitializeLayout();
         Objects=gameObject.AddComponent<TabletopWorldObjects>();Objects.Initialize(this);
@@ -117,8 +118,8 @@ public sealed class TabletopScene : MonoBehaviour
         foreach(var light in FindObjectsByType<Light>(FindObjectsSortMode.None))
         {
             if(light.type!=LightType.Directional)continue;
-            light.intensity=1.22f;
-            light.color=new Color(1,.95f,.87f);
+            light.intensity=BoardThemeController.Current.LightIntensity;
+            light.color=BoardThemeController.Current.LightColor;
             light.transform.rotation=Quaternion.Euler(48,-38,0);
             light.shadows=LightShadows.Soft;
             light.shadowStrength=.78f;
@@ -199,6 +200,9 @@ public sealed class TabletopScene : MonoBehaviour
         panOffset.x=Mathf.Clamp(panOffset.x,-limit,limit);panOffset.z=Mathf.Clamp(panOffset.z,-limit,limit);
         IsPanning=true;ApplyCamera();
     }
+    public struct ViewState { public Vector3 Pan; public bool Top; public float Zoom; }
+    public ViewState CaptureView()=>new ViewState{Pan=panOffset,Top=topView,Zoom=zoom};
+    public void RestoreView(ViewState state){panOffset=state.Pan;topView=state.Top;zoom=state.Zoom;IsPanning=false;if(boardCamera!=null)ApplyCamera();}
     public void EndPan() => IsPanning=false;
     public void ResetPan()
     {

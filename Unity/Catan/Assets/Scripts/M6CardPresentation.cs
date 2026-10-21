@@ -17,7 +17,7 @@ public sealed partial class M6App
     internal bool CardPresentationBusy=>playedCards.Count>0;
     internal TabletopCardReveal PresentedCard=>playedCards.Count>0?playedCards.Peek():null;
     public bool TableInspectionBlocked=>tableMenu;
-    public bool TablePresentationBlocked=>tableMenu||CardPresentationBusy||pendingNetworkPresentation!=null||buildFlights.Any(f=>f.Piece.Previous!=null);
+    public bool TablePresentationBlocked=>BoardThemeController.Switching||tableMenu||CardPresentationBusy||pendingNetworkPresentation!=null||buildFlights.Any(f=>f.Piece.Previous!=null);
     public string PlayerDisplayName(string seat)
     {
         if(seat=="*")return "所有玩家";

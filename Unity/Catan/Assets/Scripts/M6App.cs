@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="1.7.1";
+    public const string BuildVersion="1.7.2";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -97,6 +97,7 @@ public sealed partial class M6App : MonoBehaviour
     void Update()
     {
         using var frameCost=FrameCost.Measure(FrameCost.Stage.GameUpdate);
+        UpdateBoardTheme();
         UpdateCardPresentation();
         if(MobileTabletop.Enabled)_=MobileTabletop.TouchDragged;
         if(Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(1))escapeDismissedInteraction=false;

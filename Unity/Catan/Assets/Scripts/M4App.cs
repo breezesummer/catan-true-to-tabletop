@@ -83,6 +83,13 @@ public sealed partial class M4App : MonoBehaviour
     }
     Command New(CommandKind kind,string target=null)=>new Command{Id=Guid.NewGuid().ToString("N"),PlayerId=seat,Kind=kind,TargetId=target,Resources=new ResourceBag(),Commodities=new CommodityBag(),Give=new ResourceBag(),Receive=new ResourceBag(),GiveCommodities=new CommodityBag(),ReceiveCommodities=new CommodityBag(),ChosenDice1=1,ChosenDice2=1};
     void Select(CommandKind kind){draft=New(kind);pickField="";scroll=Vector2.zero;}
+    internal void RebuildTheme()
+    {
+        mapPan.Cancel(board?.TableScene);mapChoice.Clear();dock.Reset();CancelOperationDraft();pickField="";board?.ClearPreview();cardArt.Clear();
+        layout=null;
+        var current=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);
+        if(current!=null){view=current;Refresh(current);}
+    }
     void Refresh(PlayerView v)
     {
         using var frameCost=FrameCost.Measure(FrameCost.Stage.BoardRefresh);
@@ -92,9 +99,11 @@ public sealed partial class M4App : MonoBehaviour
         if(board==null||next!=layout)
         {
             bool top=board!=null&&board.TopView;float zoom=board==null?.255f:board.Zoom;
+            var cameraState=board!=null&&board.TableScene!=null?board.TableScene.CaptureView():(TabletopScene.ViewState?)null;
             if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}
             board=new GameObject("M4 board").AddComponent<M4BoardRenderer>();board.Initialize(v.Board.Tiles,v.Board.Vertices,v.Board.Edges);
             board.ChangeZoom(zoom-board.Zoom);board.SetCamera(top);layout=next;
+            board.SetOperationLayout(ai!=null);if(cameraState.HasValue&&board.TableScene!=null)board.TableScene.RestoreView(cameraState.Value);
         }
         board.SetOperationLayout(ai!=null);board.Refresh(v);board.ShowTerrain(terrain);
     }

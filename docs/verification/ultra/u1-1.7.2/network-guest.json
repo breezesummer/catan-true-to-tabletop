@@ -1,0 +1,18 @@
+{
+    "version": "1.7.2",
+    "result": "通过",
+    "mode": "本机双进程联机 guest",
+    "configurations": 0,
+    "switches": 2,
+    "commands": 7,
+    "turn": 3,
+    "pendingCases": 0,
+    "revision": 25,
+    "observedSwitchResidentBytes": 101594935,
+    "authorityUnchanged": false,
+    "cameraPreserved": false,
+    "rollback": false,
+    "persistence": true,
+    "reconnected": true,
+    "samples": []
+}

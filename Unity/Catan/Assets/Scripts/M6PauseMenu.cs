@@ -81,18 +81,9 @@ public sealed partial class M6App
     }
     void DrawTablePauseAppearance()
     {
-        PastoralMenuUI.Label(new Rect(337,343,766,35),"选择桌面氛围",23,PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
-        PastoralMenuUI.Label(new Rect(337,389,766,28),"切换即生效，游戏菜单继续保持主页的田园风格。",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
-        var colors=new[]{new Color(.21f,.28f,.30f),new Color(.85f,.79f,.65f),new Color(.15f,.25f,.22f)};
-        for(int i=0;i<StrategyHudTheme.Names.Length;i++)
-        {
-            var r=new Rect(337+i*261,452,244,180);bool chosen=StrategyHudTheme.Selected==i;
-            if(PastoralMenuUI.Button(r,"",true,false,chosen))StrategyHudTheme.Select(i);
-            PastoralMenuUI.Round(new Rect(r.x+20,r.y+21,r.width-40,70),colors[i%colors.Length],9);
-            PastoralMenuUI.Label(new Rect(r.x+14,r.y+113,r.width-28,36),StrategyHudTheme.Names[i],21,chosen?PastoralMenuUI.Ivory:PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
-        }
-        PastoralMenuUI.Label(new Rect(337,662,766,31),"外观偏好会自动保存。",13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+        DrawBoardThemeSettings(new Rect(337,325,766,390));
     }
+
     void DrawTablePauseAudio()
     {
         var audio=TabletopAudio.Instance;

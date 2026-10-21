@@ -107,7 +107,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
             PlayerComponentAssets.BuildingResource(kind == "settlement" ? "village" : kind == "wall" ? "city-wall" : kind, seat);
         var model = PlayerComponentAssets.Model(resource);
         if (model == null) return null;
-        var item = Get(key, resource+seat, () => {
+        var item = Get(key, BoardThemeAssets.CacheKey(resource)+seat, () => {
             var instance=Instantiate(model);
             PlayerComponentAssets.MatchBuildingPlastic(instance,seat);
             return instance;

@@ -29,6 +29,7 @@ public static class OperationPieceAssets
         else if (icon.Contains("city")) kind = "city";
         else if (icon.Contains("settlement") || icon.Contains("village")) kind = "settlement";
         else return null;
+        if(BoardThemeController.IsUltra)return BoardThemeAssets.Icon(kind,seat,level);
         string path = Root + kind + "-" + colour;
         if (!Textures.TryGetValue(path, out var texture))
         {

@@ -1,0 +1,25 @@
+{
+  "日期": "2026-10-21",
+  "版本": "1.7.2",
+  "构建目录": "game version/1.7/Catan1.7.2-Ultra-Themes",
+  "Windows脚本程序集SHA256": "00eefc4cb217c79cfbce2fd2b5e4cc1b8c374803738aee6421af9868ffa4daca",
+  "Android包SHA256": "8d4c28273d3c141448b6ee5a91660ebcdf1f90d3c1975f8804ad662ab10ae070",
+  "Android清单": {
+    "version": "1.7.2",
+    "packageId": "com.catandevelopment.threekingdoms",
+    "versionCode": 10702,
+    "minApi": 26,
+    "targetApi": 36,
+    "architectures": [
+      "arm64-v8a"
+    ],
+    "graphicsApi": "OpenGLES3",
+    "scriptingBackend": "IL2CPP",
+    "ui": "shared-pc-tabletop",
+    "coreAssemblySha256": "8f4df208d4410cc471a5b7f716b4b9a81e181dc2a6ef7dedb685790196b33080",
+    "aiAssemblySha256": "6cda83ee54bb5b1bb9a531d92c566a9094052864834e5555660d30dedb19bbf5",
+    "signingCertificateSha256": "efd26f60a7807072ff61fb0dd4660fa00859b75e9b3857a742a4c7d6e3a2bf48",
+    "apkSha256": "8d4c28273d3c141448b6ee5a91660ebcdf1f90d3c1975f8804ad662ab10ae070"
+  },
+  "说明": "开发构建；Windows运行检查通过；Android已构建验签，未连接真机。"
+}

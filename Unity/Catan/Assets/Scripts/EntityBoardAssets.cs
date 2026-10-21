@@ -52,7 +52,7 @@ public static class EntityBoardAssets
         // v001 has already converted the photographed flat-top hexagon to the board's
         // 30-degree pointy hexagon. Its 8 mm top matches the existing placement surface.
         var tile = Instantiate(TerrainResource(resource), resource, bottom, Quaternion.identity, parent);
-        TabletopPhysicalTileV005.Apply(tile);
+        if(!BoardThemeController.IsUltra)TabletopPhysicalTileV005.Apply(tile);
         return tile;
     }
 

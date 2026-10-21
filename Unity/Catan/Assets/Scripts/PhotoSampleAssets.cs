@@ -23,7 +23,7 @@ public static class PhotoSampleAssets
     }
     public static GameObject Piece(bool road, string label, Vector3 bottom, Quaternion rotation, Color color, Transform parent)
     {
-        var model = Model(road ? "road" : "village");
+        var model = PlayerComponentAssets.Model(Root+(road ? "road" : "village"));
         if (model == null) return null;
         var instance = Object.Instantiate(model, bottom, rotation, parent);
         instance.name = label;

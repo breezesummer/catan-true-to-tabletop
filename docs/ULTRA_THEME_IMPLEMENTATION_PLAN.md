@@ -1,6 +1,6 @@
 # 豪华典藏版ultra主题实施方案
 
-日期：2026年10月21日。状态：U0 的PC性能归因与逐棋子覆盖已补齐（1.7.1），Android真机待验；U1及后续待开始。适用平台：Windows、Android。实际结果见 [U0 基线记录](verification/ultra/U0-baseline.md)。
+日期：2026年10月21日。状态：U0 的PC性能归因与逐棋子覆盖已补齐（1.7.1），Android真机待验；U1 双主题基础已实现（1.7.2），实机与人工交互待验，见 [U1 记录](verification/ultra/U1-themes.md)；U2及后续待开始。适用平台：Windows、Android。实际结果见 [U0 基线记录](verification/ultra/U0-baseline.md)。
 
 本次升级新增可切换主题「豪华典藏版ultra」，现有外观主题正式命名为「真实桌游」。两者共用规则、地图、AI、存档及联机协议；ultra 负责立体微缩地形、环境动态与对应光照材质。玩家可以继续使用真实桌游，也可以在同一局游戏中切换至 ultra。
 

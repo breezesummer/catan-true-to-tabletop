@@ -12,7 +12,7 @@ public static class PlayerComponentAssets
     // 每种颜色以现有村庄材质为准；只替换塑料，保留头盔、窗洞等独立细节。
     public static Material BuildingPlastic(string playerId)
     {
-        if(ColourKey(playerId)==null)return null;
+        if(BoardThemeController.IsUltra||ColourKey(playerId)==null)return null;
         if(!Plastics.TryGetValue(playerId,out var material))
         {
             var model=Model(BuildingResource("village",playerId));
@@ -23,6 +23,7 @@ public static class PlayerComponentAssets
     }
     public static void MatchBuildingPlastic(GameObject instance,string playerId)
     {
+        if(BoardThemeController.IsUltra){if(ColourKey(playerId)!=null)BoardThemeAssets.Tint(instance,BoardRenderer.SeatColor(playerId));return;}
         var plastic=BuildingPlastic(playerId);if(instance==null||plastic==null)return;
         foreach(var renderer in instance.GetComponentsInChildren<Renderer>())
         {
@@ -54,6 +55,7 @@ public static class PlayerComponentAssets
     public static GameObject Model(string resource)
     {
         if (string.IsNullOrEmpty(resource)) return null;
+        if(BoardThemeController.IsUltra)return BoardThemeAssets.Model(resource);
         if (!Models.TryGetValue(resource, out var model) || model == null)
         {
             model = Resources.Load<GameObject>(resource);
@@ -66,6 +68,7 @@ public static class PlayerComponentAssets
     {
         var colour = ColourKey(playerId);
         if (colour == null) return null;
+        if(BoardThemeController.IsUltra)return "Ultra/u1-placeholder-v001/"+type+"-"+colour;
         if (colour != "red") return Root + "player-buildings/" + type + "-" + colour;
         switch (type)
         {
