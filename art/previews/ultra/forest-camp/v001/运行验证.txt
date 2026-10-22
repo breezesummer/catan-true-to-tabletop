@@ -1,0 +1,4 @@
+版本：1.7.6
+图形设备：AMD Radeon RX 9070 XT
+真实Unity Player渲染：四视角
+未执行：Android真机、完整棋盘集成与性能验收。

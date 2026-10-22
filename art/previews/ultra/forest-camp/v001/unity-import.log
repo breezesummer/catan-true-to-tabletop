@@ -1,0 +1,524 @@
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.3/staging' branch; Version is '6000.3.25f1 (e1dba0a9aba4) revision 14801824'; Using compiler version '194234433'; Build Type 'Release'
+[Licensing::IpcConnector] Channel LicenseClient-BreezeSummer doesn't exist
+OS: 'Windows 11  (10.0.26200) Professional' Language: 'zh' Physical Memory: 32594 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-10-22T01:52:41Z
+[Licensing::Module] Successfully launched the LicensingClient (PId: 19508)
+
+COMMAND LINE ARGUMENTS:
+D:\Development\Unity\6000.3.25f1\Editor\Unity.exe
+-batchmode
+-nographics
+-quit
+-projectPath
+D:/Project/catan-true-to-tabletop/Unity/Catan
+-executeMethod
+ForestCampAssetBuild.Import
+-logFile
+D:/Project/catan-true-to-tabletop/art/previews/ultra/forest-camp/v001/unity-import.log
+Successfully changed project path to: D:/Project/catan-true-to-tabletop/Unity/Catan
+D:/Project/catan-true-to-tabletop/Unity/Catan
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-remapper-allocator-initial-capacity=32768"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+Player connection [51520]  Target information:
+
+Player connection [51520]  * "[IP] 192.168.1.164 [Port] 55504 [Flags] 2 [Guid] 1764687676 [EditorId] 1764687676 [Version] 1048832 [Id] WindowsEditor(7,BreezePro) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor"
+
+Player connection [51520]  * "[IP] 172.24.48.1 [Port] 55504 [Flags] 2 [Guid] 1764687676 [EditorId] 1764687676 [Version] 1048832 [Id] WindowsEditor(7,BreezePro) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor"
+
+Player connection [51520]  * "[IP] 172.26.96.1 [Port] 55504 [Flags] 2 [Guid] 1764687676 [EditorId] 1764687676 [Version] 1048832 [Id] WindowsEditor(7,BreezePro) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor"
+
+Player connection [51520]  * "[IP] 198.18.0.1 [Port] 55504 [Flags] 2 [Guid] 1764687676 [EditorId] 1764687676 [Version] 1048832 [Id] WindowsEditor(7,BreezePro) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor"
+
+Player connection [51520] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [51520] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-BreezeSummer" at "2026-10-22T01:52:41.2551892Z"
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 19508, path: "D:/Development/Unity/6000.3.25f1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Package Manager] Connected to IPC stream "Upm-31120" after 0.2 seconds.
+[Licensing::Module] Licensing is not yet initialized.
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.18.3+d7ffd15
+  Session Id:              e6579e5b43d44fce9cf1b3eea52339c3
+  Correlation Id:          4b5a78e601b0cf3cab823e5c73f8fc34
+  External correlation Id: 4654041502041404201
+  Machine Id:              r+7BhNLeAfIYu/1oIG/Iwr4sur0=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-BreezeSummer" (connect: 0.24s, validation: 0.14s, handshake: 0.04s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-BreezeSummer-notifications" at "2026-10-22T01:52:41.4307241Z"
+[Licensing::Module] Connected to LicensingClient (PId: 19508, launch time: 0.00, total connection time: 0.42s)
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 15669777760632-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.01
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Licensing Background thread has ended after 0.45s
+[Licensing::Module] Licensing is initialized (took 0.02s).
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+Artifact Garbage Collection - Removed 2 unused hashed content files
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 6000.3.25f1 (e1dba0a9aba4)
+[Subsystems] Discovering subsystems at path D:/Development/Unity/6000.3.25f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path D:/Project/catan-true-to-tabletop/Unity/Catan/Assets
+Forcing GfxDevice: Null
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+NullGfxDevice:
+    Version:  NULL 1.0 [1.0]
+    Renderer: Null Device
+    Vendor:   Unity Technologies
+Initialize mono
+Mono path[0] = 'D:/Development/Unity/6000.3.25f1/Editor/Data/Managed'
+Mono path[1] = 'D:/Development/Unity/6000.3.25f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
+Mono config path = 'D:/Development/Unity/6000.3.25f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56120
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+ImportWorker Server TCP listen port: 0
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: D:/Development/Unity/6000.3.25f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+[Licensing::Client] Successfully resolved entitlement details
+Register platform support module: D:/Development/Unity/6000.3.25f1/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll
+Registered in 0.002604 seconds.
+- Loaded All Assemblies, in  0.288 seconds
+Native extension for Android target not found
+Native extension for WindowsStandalone target not found
+Package Manager log level set to [2]
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:False
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.265 seconds
+Domain Reload Profiling: 553ms
+	BeginReloadAssembly (103ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (0ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (17ms)
+	RebuildCommonClasses (25ms)
+	RebuildNativeTypeToScriptingClass (8ms)
+	initialDomainReloadingComplete (31ms)
+	LoadAllAssembliesAndSetupDomain (121ms)
+		LoadAssemblies (86ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (118ms)
+			TypeCache.Refresh (117ms)
+				TypeCache.ScanAssembly (107ms)
+			BuildScriptInfoCaches (0ms)
+			ResolveRequiredComponents (0ms)
+	FinalizeReload (265ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (239ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (38ms)
+			SetLoadedEditorAssemblies (3ms)
+			BeforeProcessingInitializeOnLoad (54ms)
+			ProcessInitializeOnLoadAttributes (89ms)
+			ProcessInitializeOnLoadMethodAttributes (56ms)
+			AfterProcessingInitializeOnLoad (0ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (0ms)
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 22 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.searcher@4.9.5 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.searcher@a463122f2c00)
+    com.unity.burst@1.8.30 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.burst@2f3d916873ea)
+    com.unity.mathematics@1.3.3 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.mathematics@19a9377c4ffa)
+    com.unity.collections@2.6.8 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.collections@84e8eb3fc12e)
+    com.unity.nuget.mono-cecil@1.11.6 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff)
+    com.unity.test-framework.performance@3.5.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.test-framework.performance@8b56083ec0f0)
+  Built-in packages:
+    com.unity.render-pipelines.universal@17.3.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.render-pipelines.universal@a0dd9d2bd983)
+    com.unity.modules.androidjni@1.0.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.modules.androidjni)
+    com.unity.modules.audio@1.0.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.modules.audio)
+    com.unity.modules.physics@1.0.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.modules.physics)
+    com.unity.modules.imgui@1.0.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.modules.jsonserialize)
+    com.unity.modules.screencapture@1.0.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.modules.screencapture)
+    com.unity.modules.imageconversion@1.0.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.modules.imageconversion)
+    com.unity.render-pipelines.core@17.3.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.render-pipelines.core@3f80e92e91c2)
+    com.unity.shadergraph@17.3.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.shadergraph@2fa139ee8b62)
+    com.unity.render-pipelines.universal-config@17.0.3 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.render-pipelines.universal-config@8dc1aab4af1d)
+    com.unity.ugui@2.0.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.ugui@f3ea87521141)
+    com.unity.modules.terrain@1.0.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.modules.terrain)
+    com.unity.test-framework@1.6.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.test-framework@bd7f943e9647)
+    com.unity.modules.ui@1.0.0 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.modules.ui)
+    com.unity.ext.nunit@2.0.5 (location: D:\Project\catan-true-to-tabletop\Unity\Catan\Library\PackageCache\com.unity.ext.nunit@d8c07649098d)
+[Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.01 seconds
+[ScriptCompilation] Requested script compilation because: Assetdatabase observed changes in script compilation related files
+Starting: D:\Development\Unity\6000.3.25f1\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: D:/Project/catan-true-to-tabletop/Unity/Catan
+DisplayProgressbar: Compiling Scripts
+ExitCode: 0 Duration: 1s222ms
+[347/577    0s] WriteResponseFile Library/Bee/artifacts/rsp/4747638433968585886.rsp
+[466/577    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+[569/577    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp.dll (+2 others)
+Assets\Scripts\UltraBaselineProbe.cs(44,12): warning CS0108: 'UltraBaselineProbe.camera' hides inherited member 'Component.camera'. Use the new keyword if hiding was intended.
+[570/577    0s] Csc Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp-Editor.dll (+2 others)
+[571/577    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Assembly-CSharp-Editor.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp-Editor.dll, with 137 defines and 307 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[572/577    0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp-Editor.pdb
+[573/577    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/Assembly-CSharp.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/Assembly-CSharp.dll, with 139 defines and 267 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[574/577    0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp.pdb
+[575/577    0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp-Editor.dll
+[576/577    0s] CopyFiles Library/ScriptAssemblies/Assembly-CSharp.dll
+*** Tundra build success (1.20 seconds), 10 items updated, 577 evaluated
+Assets\Scripts\UltraBaselineProbe.cs(44,12): warning CS0108: 'UltraBaselineProbe.camera' hides inherited member 'Component.camera'. Use the new keyword if hiding was intended.
+AssetDatabase: script compilation time: 1.513451s
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.838 seconds
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Native extension for Android target not found
+Native extension for WindowsStandalone target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  1.627 seconds
+Domain Reload Profiling: 2465ms
+	BeginReloadAssembly (244ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (18ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (134ms)
+	RebuildCommonClasses (24ms)
+	RebuildNativeTypeToScriptingClass (9ms)
+	initialDomainReloadingComplete (16ms)
+	LoadAllAssembliesAndSetupDomain (545ms)
+		LoadAssemblies (521ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (89ms)
+			TypeCache.Refresh (65ms)
+				TypeCache.ScanAssembly (58ms)
+			BuildScriptInfoCaches (16ms)
+			ResolveRequiredComponents (6ms)
+	FinalizeReload (1628ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1508ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (18ms)
+			SetLoadedEditorAssemblies (3ms)
+			BeforeProcessingInitializeOnLoad (89ms)
+			ProcessInitializeOnLoadAttributes (1305ms)
+			ProcessInitializeOnLoadMethodAttributes (91ms)
+			AfterProcessingInitializeOnLoad (2ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (15ms)
+Start importing Assets/Resources/TabletopUI/v008/NumberTokens/number-11.png using Guid(30c943502155483695c3640c06e5ad6e) (TextureImporter) -> (artifact id: 'fbec9d2147174d39121859b6b14760db') in 0.0456825 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/ship-beige.png using Guid(11851e20fe804d22be89fdbb586eb895) (TextureImporter) -> (artifact id: 'd914eaab9e9e1a2f145a41d2fd653517') in 0.0115828 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/city-orange.png using Guid(112f6ffa011f4e9eafa0f044bbb3429d) (TextureImporter) -> (artifact id: 'f7372ee7c845f566bbf801049fad6847') in 0.0105796 seconds
+Start importing Assets/Resources/EntityAssets/v005/tabletop-markers/port-ore-front.png using Guid(116f5b77d4c41b1489a732c428242687) (TextureImporter) -> (artifact id: '82454fe0af461e3a7e4888fb410d5a4d') in 0.0360657 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-2-orange.png using Guid(2140b132a1b366ca7763aa9dfc7f895a) (TextureImporter) -> (artifact id: '80545b410ed8b038bcbe042cd6c5835d') in 0.0112896 seconds
+Start importing Assets/Resources/MenuPreviews/v001/rule-combined.png using Guid(314faf93310a8a9469e971c9faf8e063) (TextureImporter) -> (artifact id: '29860cd7c7a2d8ea5a35576c7124ec83') in 0.0167432 seconds
+Start importing Assets/Resources/TabletopUI/v008/NumberTokens/number-2.png using Guid(410cd287fc0249069d5a285e8d96ae51) (TextureImporter) -> (artifact id: '161a8e7332979aaec2bdc5d51c45f98a') in 0.016384 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-1-orange.png using Guid(510ad5b8985b87c1d34ab030651a40c6) (TextureImporter) -> (artifact id: 'c348c29ce97a876349f397cded71ef11') in 0.0051177 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-heading-for-new-shores-3.png using Guid(f1298b0b918d7b54b8a496efbf5ad07a) (TextureImporter) -> (artifact id: '3c6957a9066ed764530a9cc9590f72a0') in 0.0190343 seconds
+Start importing Assets/Resources/EntityAssets/v005/tabletop-markers/port-wheat-front.png using Guid(128ee3adafb27fc468acfc77a79ebe36) (TextureImporter) -> (artifact id: 'e389472119c9536f0fae8669267d83be') in 0.0278036 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/city-orange.png using Guid(322c48aaa6b0b46d0e44e06d97b0b12c) (TextureImporter) -> (artifact id: '8ca70f6d5504a0191ab49ce1293fbaa2') in 0.013235 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-forgotten-tribe-3.png using Guid(429f0751acd23ef49be788087e243c0f) (TextureImporter) -> (artifact id: '1906d6b195bc1cc846dd247f9af24f64') in 0.0176928 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/road-blue.png using Guid(62f53a3712a64cf89b07b51f8451a461) (TextureImporter) -> (artifact id: '2cedbe3d640afc02040bf09cc15842b2') in 0.012838 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-1-beige.png using Guid(62b9313528944b76857ee33669ba1bf1) (TextureImporter) -> (artifact id: 'e0ea64685d0020de9722eefcbee418f2') in 0.0212838 seconds
+Start importing Assets/Resources/PastoralMenu/v003/moonlit-port.png using Guid(829046ecf1f04dce91ae6e85d890cd98) (TextureImporter) -> (artifact id: '777123f13e6650b69b92a7563f8028df') in 0.048865 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/wall-red.png using Guid(92efaf965a6cc444e768947f64e2d122) (TextureImporter) -> (artifact id: '34c2c542487ea0dc262de5f4df2d3e39') in 0.004734 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-1-beige.png using Guid(b2e8006803f1254838196452a0034c85) (TextureImporter) -> (artifact id: 'da8e2fa6eb97c4d2fbcdbc83f7095673') in 0.0120149 seconds
+Start importing Assets/Resources/TabletopUI/v003/oak-table-albedo.png using Guid(b21e8ca933bf7ce95b2c98604da61f3f) (TextureImporter) -> (artifact id: 'e2ebcc56e155d4cb75972f16d9dc09e1') in 0.0492293 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-3-beige.png using Guid(c22ea230073049009b36df19dcc1b10e) (TextureImporter) -> (artifact id: '6d47d00af5921b0036ae20a7c470ea51') in 0.0043355 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/road-beige.png using Guid(f25f437183b44902834643136b45207e) (TextureImporter) -> (artifact id: '8f174bfcf99935dd6abf726a8f6cfc03') in 0.010531 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-3-orange.png using Guid(13517f10ec65475386eca23a8168c8f3) (TextureImporter) -> (artifact id: '548e534ce0ae978eb5acba4f5504a3cc') in 0.010445 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-3-blue.png using Guid(3381fcc1d174424a7fe48b2d7b24ca73) (TextureImporter) -> (artifact id: 'aa8aff8c0e9062b8ac8981630621886f') in 0.0047296 seconds
+Start importing Assets/Resources/TabletopUI/v008/NumberTokens/number-6.png using Guid(835d312689d3479cbbe86aa101f8823c) (TextureImporter) -> (artifact id: '49a43555e1d08bfd3bcb773018c86898') in 0.0100658 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/ship-blue.png using Guid(a31eae2d20644162b0078b142c514888) (TextureImporter) -> (artifact id: '92282a3094f3dd94b8ce6c531aa22aa5') in 0.0045584 seconds
+Start importing Assets/Resources/MenuPreviews/v001/cities-knights-standard-3.png using Guid(e3ce4b5aad916304c91511292bd3f684) (TextureImporter) -> (artifact id: 'c93278df3dcf50f48f6b2e112ca1fb5a') in 0.0168051 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/settlement-blue.png using Guid(347bd2c8fff445ea8e6132fbc36c3225) (TextureImporter) -> (artifact id: 'f81ad8a5c927f4342b394fb9bf5d35a3') in 0.0109597 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/road-orange.png using Guid(a4d698189da048f4ad6ca93ea747dea8) (TextureImporter) -> (artifact id: '42b24880ffe355ac3abd622405fdb782') in 0.0098831 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-2-red.png using Guid(a4b864d87c09477685c156c334d7f11a) (TextureImporter) -> (artifact id: 'bdc582750bf3db7310103f5eb80c6929') in 0.0091271 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/city-red.png using Guid(05529e788c53468dad5edf3c57afe619) (TextureImporter) -> (artifact id: 'ac55005840503fde9d5df07c6213e9cb') in 0.0114512 seconds
+Start importing Assets/Resources/MenuPreviews/v001/combined-through-the-desert-3.png using Guid(35f46c5280eb15d458004f1f47bf9d0b) (TextureImporter) -> (artifact id: '41f9988804dd0bcf1f2cf77d26d9ed62') in 0.0171577 seconds
+Start importing Assets/Resources/PastoralMenu/v004/title.png using Guid(7528704c8da1de14b8e300259cb6855c) (TextureImporter) -> (artifact id: '975f10867cc6009ff08d4b3241b29d0d') in 0.0439797 seconds
+Start importing Assets/Resources/TabletopUI/v008/NumberTokens/number-10.png using Guid(753f156af6224c98995f553b386bdc69) (TextureImporter) -> (artifact id: '12cc58cf913d2ee0eb5212050a2410b2') in 0.0110874 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/settlement-red.png using Guid(8512e27e8a9a49b3be18bb161ee93aba) (TextureImporter) -> (artifact id: 'e948b825c0a7cd877397315a59990372') in 0.0053858 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/settlement-orange.png using Guid(9522480371c72aed82af623fe8574a11) (TextureImporter) -> (artifact id: 'f5a25f27a9cc726d987c9a2324627383') in 0.0112829 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/wall-orange.png using Guid(d5891e303016c116c4ebf47b88348df6) (TextureImporter) -> (artifact id: '07c098f63b6e546be4f76dd216ad4469') in 0.0096763 seconds
+Start importing Assets/Resources/MenuPreviews/v001/rule-seafarers.png using Guid(d5da422940b1a88479b2064ae06ef9f2) (TextureImporter) -> (artifact id: '26d765318db04ff92fe6eb750585fe39') in 0.0115794 seconds
+Start importing Assets/Resources/EntityAssets/v005/tabletop-markers/port-generic-front.png using Guid(f5e7260e76bd826469abed9795fc11ff) (TextureImporter) -> (artifact id: 'bb42be614428d67701695ed9c263d4de') in 0.0264403 seconds
+Start importing Assets/Resources/MenuPreviews/v001/base-standard-3.png using Guid(06441f149e07106469d24fd46ba64c50) (TextureImporter) -> (artifact id: '207398b6a561006123da24f6d8ed098d') in 0.0176937 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/wall-beige.png using Guid(167e456999014cf2a9b7de5ae280a9a7) (TextureImporter) -> (artifact id: '6e44d3d786456fa1e5880cd9886041a7') in 0.0046679 seconds
+Start importing Assets/Resources/MenuPreviews/v001/combined-heading-for-new-shores-4.png using Guid(265f4e2d41d251643acc59c626967154) (TextureImporter) -> (artifact id: '6dc53b7372127ce27648d6cbb1c9b874') in 0.0149342 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-1-orange.png using Guid(4602efb752e543f4a4e8ca42e1546e12) (TextureImporter) -> (artifact id: '37261b819bafc59094b527b3e3778dc0') in 0.0097663 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-cloth-for-catan-3.png using Guid(46ccb0231c7d7a44db6e25daef6a27ad) (TextureImporter) -> (artifact id: '7208637685760eb18bd15119e1a88e6d') in 0.0166258 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-2-orange.png using Guid(6666f054903040aa93cfe0df07a7634a) (TextureImporter) -> (artifact id: '783d24317046a0e7f32223bb442aa509') in 0.0111457 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/ship-orange.png using Guid(7691439ff52d1bc2fbca7fa3e1c7257d) (TextureImporter) -> (artifact id: 'f4e141b75733f3117e6399c39dd79201') in 0.0099868 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/road-red.png using Guid(9672440e376848609ae4ddace76cdecd) (TextureImporter) -> (artifact id: '3e9492f33a3ae546f4561b56acb3b6f1') in 0.0043914 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/ship-blue.png using Guid(96a8fa15a60eea9d09a5c508e64c445a) (TextureImporter) -> (artifact id: '550de239588dd258d506c9bb8b472443') in 0.0039117 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-wonders-of-catan-3.png using Guid(d62a3b47cf5e20b4bab135e7c09b41d6) (TextureImporter) -> (artifact id: '1792d85edde0e1372c68543936243945') in 0.0112392 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/city-red.png using Guid(07ccf3af1e2131ca8b70ac9f2b564918) (TextureImporter) -> (artifact id: 'e0c482e976a8facc48aeb6ab788efdaf') in 0.0108276 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-3-red.png using Guid(272306711935667c0a49342c91dccd2b) (TextureImporter) -> (artifact id: '3ef266d1df37b0c5ea9c6407a6579a26') in 0.0091798 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-four-islands-4.png using Guid(377b7d2417fdec84080b9332cfadb665) (TextureImporter) -> (artifact id: '6f392ae3fcc7c99a39a577d6361cafff') in 0.0164757 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-four-islands-3.png using Guid(57cb77dcc53463f409757880513b640e) (TextureImporter) -> (artifact id: '929342db505551d6979e8f626af1d483') in 0.0152721 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-2-blue.png using Guid(8754c31512625ccddef80d36204a3b42) (TextureImporter) -> (artifact id: '37f98f00180145ec947e97da5cac0bf9') in 0.0100463 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-2-blue.png using Guid(a78ceaef1fe447549bb355ddbcb38e5f) (TextureImporter) -> (artifact id: '0d5aaed3725ddad599343b19207a96c3') in 0.0092455 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/settlement-beige.png using Guid(a7ccc1f11cdd445a6300c0fbf81daf8b) (TextureImporter) -> (artifact id: 'ce87b933f104636c961dbdef16c03629') in 0.0106109 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-through-the-desert-3.png using Guid(b7e5e6910d0aab849b68ebebab4d8738) (TextureImporter) -> (artifact id: '03e23b4654a9942d3b14b6618adfb755') in 0.0101777 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-new-world-4.png using Guid(b78d4415724b5aa499049944ec0b64fd) (TextureImporter) -> (artifact id: 'e9c686b1e27fa96a53f1fca754e782b0') in 0.0161282 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-wonders-of-catan-4.png using Guid(c7730136dd0cd8e40b136d2784f0a5ac) (TextureImporter) -> (artifact id: '744e7b23db60951603ff10df3e633775') in 0.0103692 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/city-blue.png using Guid(c7b444e455137fab6bccc0e10c29d2dd) (TextureImporter) -> (artifact id: '628602f4b0b80562b1afa4fb00679900') in 0.0086524 seconds
+Start importing Assets/Resources/TabletopUI/v008/NumberTokens/number-4.png using Guid(f70dada03af74b54aa900e065a0dfd6b) (TextureImporter) -> (artifact id: '4b66ce1315f08ac998b67cddbf18362a') in 0.0086702 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/road-red.png using Guid(1867cd984fc7918304b319113d455d28) (TextureImporter) -> (artifact id: '9d4ba3a441901b183b7851061dea631c') in 0.0048802 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-1-red.png using Guid(28c14cd43503ded9c366c5f0e1a436c8) (TextureImporter) -> (artifact id: '54072daf04e08a5c2ed44958458a1521') in 0.0103556 seconds
+Start importing Assets/Resources/MenuPreviews/v001/rule-cities-knights.png using Guid(78619ad5f02d55b4682ec45fd0cf78d6) (TextureImporter) -> (artifact id: '77d9228a8195668aef5596b8f0e34d05') in 0.0180055 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/wall-beige.png using Guid(a820d46b2a8f0a56dae9422cc6f879b0) (TextureImporter) -> (artifact id: '29007eb42b73c28513aca272df1a8975') in 0.0102049 seconds
+Start importing Assets/Resources/MenuPreviews/v001/cities-knights-standard-4.png using Guid(b8134126e52efac43a7c283641a69bf9) (TextureImporter) -> (artifact id: '4f01cd09cdb19e8bba8631ff21f941c2') in 0.0165356 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/ship-orange.png using Guid(f8c0f1e4fced48b08020d5725ca9cba6) (TextureImporter) -> (artifact id: '2dab08b85a146c7b98a169cf5cb4d376') in 0.009606 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/ship-red.png using Guid(493168db84de8a3dff35ad4f1d760eb5) (TextureImporter) -> (artifact id: '15861ac74098cafbfb92b2df22e7b9cd') in 0.0114148 seconds
+Start importing Assets/Resources/TabletopUI/v008/NumberTokens/number-12.png using Guid(69527edbd9724f1ca8b54b0289b2233e) (TextureImporter) -> (artifact id: 'c5df92ab2263aa4f52372e166b7ae684') in 0.0143408 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/city-beige.png using Guid(697374aa7f2e40eead58483d03881003) (TextureImporter) -> (artifact id: '134e96e4dc5b28bbb969248fc46bfa14') in 0.0103757 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/road-beige.png using Guid(89e915a449337640da46fc11c6346e3a) (TextureImporter) -> (artifact id: 'f98b891a19fea5b67db2b06de07bb8c5') in 0.0090907 seconds
+Start importing Assets/Resources/EntityAssets/v005/tabletop-markers/catan-victory-marker.png using Guid(a950fcacae5bb85448211ba482249a9c) (TextureImporter) -> (artifact id: 'a53a7e1e98655ab665c01126af02d14a') in 0.0315884 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/road-orange.png using Guid(1a0c9209236877a9c9ebb3a5dfb0834b) (TextureImporter) -> (artifact id: '9e918ec676f99812c331d13e3630059b') in 0.0107579 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-3-blue.png using Guid(3a4b5a0d72d446359967db20e090e203) (TextureImporter) -> (artifact id: '39c9bcd1eb1f81f63c60c217462da592') in 0.0090745 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-3-beige.png using Guid(8a52a8bb796200afa6687df0d8d85834) (TextureImporter) -> (artifact id: 'e4dbea1f53657ab974f876f4c2e71496') in 0.011858 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/wall-blue.png using Guid(9acefeeb323e41389cf9a3ad41116c95) (TextureImporter) -> (artifact id: 'cb82a69d5a089b4dd981abaa70992a67') in 0.0097803 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/settlement-red.png using Guid(aa0eea8efdf6b84f6be0a7b7c89efe47) (TextureImporter) -> (artifact id: '5f316ddd7560c0cf07c17d0d436afdb0') in 0.011103 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-2-red.png using Guid(ba43ccbd8dd24cefc2b3c2cd1fafe7b8) (TextureImporter) -> (artifact id: 'a5d846fb6b99a1514763a570a9f0e276') in 0.0077477 seconds
+Start importing Assets/Resources/EntityAssets/v005/tabletop-markers/port-wood-front.png using Guid(caaab05482f4aa5498a0b69829590305) (TextureImporter) -> (artifact id: 'd93c18e2c7d425c32c500d6a93c24757') in 0.0330847 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-2-beige.png using Guid(2b704ca8b1144a0db128f32c4988b5c7) (TextureImporter) -> (artifact id: '44e78df5a08e420810ae33d87b56ea64') in 0.0043697 seconds
+Start importing Assets/Resources/MenuPreviews/v001/combined-heading-for-new-shores-3.png using Guid(2b7828a75b0e706479b11b5482f737c4) (TextureImporter) -> (artifact id: 'ddfafba2a4b71df9dc4d5d92d8fe1155') in 0.0174006 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-new-world-3.png using Guid(3b8a15654e68ddf4791b0778bb1a87c5) (TextureImporter) -> (artifact id: '5094388315c97016215485ae3a319b71') in 0.0157632 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-fog-islands-3.png using Guid(6bb9bfc671857654e9f83a385ec9f637) (TextureImporter) -> (artifact id: '2793fcd6b0a6e37a3a3740c9fca6723a') in 0.0170655 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/city-beige.png using Guid(7baa0a7d0e5fcfc16fb9a1122e97269c) (TextureImporter) -> (artifact id: '526f18ad1f596ea80f7a31adc82ec2e6') in 0.0091909 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-1-blue.png using Guid(9b07c8b901564e07babd36b3d11dbe6b) (TextureImporter) -> (artifact id: '14069b836426baf4f346039dc8c2b40f') in 0.0047737 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-fog-islands-4.png using Guid(9b27deeffa07db34eb01a1b9aef1bb0b) (TextureImporter) -> (artifact id: 'e759a18e352d2ee60823ea7457e69171') in 0.0165812 seconds
+Start importing Assets/Resources/TabletopUI/v008/NumberTokens/number-5.png using Guid(9b089777847d47ee8fdf545ae73e37e0) (TextureImporter) -> (artifact id: 'd8bdb6a5899fa7995868773692fa7741') in 0.0152354 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/settlement-orange.png using Guid(9bdbc3c6f308401dbc2c44414c16e4bd) (TextureImporter) -> (artifact id: '73b3f8f524889553e0d37ab059af8ff0') in 0.011102 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-cloth-for-catan-4.png using Guid(abb9033f9e71acc4ea4e4eb4aee65499) (TextureImporter) -> (artifact id: '04609248e6ba5c6e6247eff691827423') in 0.0171213 seconds
+Start importing Assets/Resources/TabletopUI/v008/NumberTokens/number-3.png using Guid(bb2c249bcdc14da3b20234f3416d139b) (TextureImporter) -> (artifact id: '3da78c24f595a92d79e6319b8b1f4f96') in 0.0085544 seconds
+Start importing Assets/Resources/EntityAssets/v005/tabletop-markers/port-wool-front.png using Guid(cbc6809c9cfa28a4cb4badc163a3948c) (TextureImporter) -> (artifact id: '50918e885b2d3059fbd7e210e6a4c3a1') in 0.0337663 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/wall-blue.png using Guid(db08e6f826d9aaebf53a80b074cbd8b0) (TextureImporter) -> (artifact id: 'ed74c86e012b8e0e5cb7af42cb1375d9') in 0.0120376 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/settlement-blue.png using Guid(eba7fc70920f7b30f735c181bbde6d7c) (TextureImporter) -> (artifact id: 'bd8e3c73b32b955f10dfb18ddf0e31a8') in 0.0052988 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/ship-beige.png using Guid(eb29db8121100e9ba5ce1d227128a2cf) (TextureImporter) -> (artifact id: 'a2ea9dbef5f4c95e379a1a8b1230afbe') in 0.0110257 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/city-blue.png using Guid(1c394c29c795457192bc9871cea56c36) (TextureImporter) -> (artifact id: '36aabdfd461553b2900fbc2ea8bc322a') in 0.0118582 seconds
+Start importing Assets/Resources/PastoralMenu/v003/snow-castle.png using Guid(1cf9ab269ca643dab93834c806bee427) (TextureImporter) -> (artifact id: 'b07f9989ea9c24a664114f2379a4089e') in 0.0436291 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-3-orange.png using Guid(4c1e4ce27815a0ea68a43f3a5f90ab07) (TextureImporter) -> (artifact id: '5ddeffaa5cb7a14721bef622ff68d0a0') in 0.0109985 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-2-beige.png using Guid(5c7848ce95b0a273f5742e0a6f9c2f9c) (TextureImporter) -> (artifact id: '911ecfe20b85436f7281e1df07c49fca') in 0.0109439 seconds
+Start importing Assets/Resources/PastoralMenu/v003/golden-fields.png using Guid(6cb2857b700741a7aee542bff3ab9d8f) (TextureImporter) -> (artifact id: '881f595bc66d0f2331f819ff9c28b452') in 0.0432177 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/road-blue.png using Guid(ac881f83221d19e7832c6922c4fe8ed9) (TextureImporter) -> (artifact id: '99715069d3c2ab751dfabd04c7dfde51') in 0.0121958 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/settlement-beige.png using Guid(fc58d0239c3f45a59f4264c854f54a58) (TextureImporter) -> (artifact id: '95ef1d5fee4b19954e1d2f90abf2ac2c') in 0.0047493 seconds
+Start importing Assets/Resources/EntityAssets/v005/tabletop-markers/number-token-back.png using Guid(fc4b9a2544df8b0459c7e26f53d9be8e) (TextureImporter) -> (artifact id: '58ee4d94a92bc30c2444d1a0213aeaf2') in 0.0237107 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/ship-red.png using Guid(0dbd278818d4433ab57c3cc2988883ae) (TextureImporter) -> (artifact id: '0c3f55029f159d0f2fb086319e34831f') in 0.0043772 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-forgotten-tribe-4.png using Guid(5dab3fa0d4749d642a11d9af7e3dd250) (TextureImporter) -> (artifact id: 'd67944ad740d1ddf6da0d5f5d5aa2bc0') in 0.0104766 seconds
+Start importing Assets/Resources/PastoralMenu/v003/dawn-harbor.png using Guid(9de444eb15ca4464886fbecf1dceddc9) (TextureImporter) -> (artifact id: 'c0e7d2b51ebc4ba3e501c3c510a9e8f5') in 0.0433641 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-pirate-islands-4.png using Guid(9d17d124545aea846a92756c3ceba37e) (TextureImporter) -> (artifact id: 'd6cb9bfec127a25ba89657fd5e716d2c') in 0.0182563 seconds
+Start importing Assets/Resources/EntityAssets/v005/tabletop-markers/port-brick-front.png using Guid(ad690a5862087b849be5a1c810c15d26) (TextureImporter) -> (artifact id: '13897a8d19c7e989c4aa402ef88b4c3e') in 0.0315201 seconds
+Start importing Assets/Resources/PastoralMenu/v002/medieval-harbor.png using Guid(bd77e523774b63b4293d89280d3a19ab) (TextureImporter) -> (artifact id: '4ee459aca54379bae29c9426ecb5b02c') in 0.0365905 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-1-red.png using Guid(edfee99eb6104eb69a4ac260204a9ccf) (TextureImporter) -> (artifact id: 'aefa2941c2876f75643bfcfee3b9f800') in 0.0097664 seconds
+Start importing Assets/Resources/TabletopUI/v008/NumberTokens/number-8.png using Guid(fd81eb7b1cd74db283199998a77a51b4) (TextureImporter) -> (artifact id: 'd4daceab37898394dc87bc503b443def') in 0.0145706 seconds
+Start importing Assets/Resources/MenuPreviews/v001/combined-through-the-desert-4.png using Guid(0e750017994494749858417e56798a0d) (TextureImporter) -> (artifact id: '02ca76e44c7bb885225582d2b5421d0e') in 0.0107102 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-heading-for-new-shores-4.png using Guid(3e5636b1ae6f31e4c8410fc331340edc) (TextureImporter) -> (artifact id: 'b6d59d1377cee1dab1c4eb332c911ede') in 0.0175569 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/knight-3-red.png using Guid(5e1e43f4300944499b5a4d037a8dabb5) (TextureImporter) -> (artifact id: '6aedd824539df00b1d80012dcefe7023') in 0.0100038 seconds
+Start importing Assets/Resources/TabletopUI/v008/NumberTokens/number-9.png using Guid(6e2252c1c4464fa3953b267695e63ff7) (TextureImporter) -> (artifact id: '9989d26cdc3d74180680747989a5d654') in 0.0142768 seconds
+Start importing Assets/Resources/MenuPreviews/v001/base-standard-4.png using Guid(7eff6c40db7f3e241a246d65dc001148) (TextureImporter) -> (artifact id: '42141cc8343c7735a978f3dad42ba358') in 0.0155733 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/wall-orange.png using Guid(ae8d2d10b5584abea093f276c86eac98) (TextureImporter) -> (artifact id: 'b5ddadd94358e9c4cff8e16627e194bf') in 0.0103612 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-through-the-desert-4.png using Guid(ce97e2d25e29df6448f2edde5dd5ce01) (TextureImporter) -> (artifact id: 'e9e821a5147070c7cff5d29c4f44dcff') in 0.0165929 seconds
+Start importing Assets/Resources/PastoralMenu/v003/forest-stream.png using Guid(deb18c96bfa8474ea249dfd4daf9e35a) (TextureImporter) -> (artifact id: '7bff2ba3b76b407e15caa1afb63f21ab') in 0.0435969 seconds
+Start importing Assets/Resources/PastoralMenu/v004/collector-table.png using Guid(fe2d6f19989d09e48a2304b5a9f97891) (TextureImporter) -> (artifact id: 'd1bd0956fc27f3daed9a2413a0c8087f') in 0.0385847 seconds
+Start importing Assets/Resources/OperationUI/v001/pieces/knight-1-blue.png using Guid(0f67d86f59eb9659f4bb4cb62f082d50) (TextureImporter) -> (artifact id: '9da8986a3a133953be43b59290611d94') in 0.0041302 seconds
+Start importing Assets/Resources/OperationUI/v002/pieces/wall-red.png using Guid(1f83466c068e42d99a48966d0f7b8d8e) (TextureImporter) -> (artifact id: '05b083ab6ff5e066db668b74863771f0') in 0.0086628 seconds
+Start importing Assets/Resources/MenuPreviews/v001/rule-base.png using Guid(6f8891dbd6e721240b446ac2ef19bce4) (TextureImporter) -> (artifact id: 'bd8e4e0806ff0ce0e96d60f58b7695ea') in 0.0110282 seconds
+Start importing Assets/Resources/MenuPreviews/v001/seafarers-pirate-islands-3.png using Guid(9f88834f20c5b1746adedfff8d32747d) (TextureImporter) -> (artifact id: '097c92ce025481ae4209e9601cbe2a6a') in 0.015489 seconds
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Asset Pipeline Refresh (id=1ffdca8cd123a3a4c83045cc498004f2): Total: 6.177 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	Summary:
+		Imports: total=121 (actual=121, local cache=0, cache server=0)
+		Asset DB Process Time: managed=50 ms, native=3653 ms
+		Asset DB Callback time: managed=94 ms, native=9 ms
+		Scripting: domain reloads=1, domain reload time=838 ms, compile time=1514 ms, other=17 ms
+		Project Asset Count: scripts=827, non-scripts=2423
+		Asset File Changes: new=0, changed=123, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokeCustomDependenciesCallbacks: 0.001ms
+	InvokePackagesCallback: 8.300ms
+	ApplyChangesToAssetFolders: 0.367ms
+	Scan: 43.873ms
+	OnSourceAssetsModified: 0.940ms
+	CategorizeAssetsWithTransientArtifact: 10.423ms
+	ProcessAssetsWithTransientArtifactChanges: 25.447ms
+	CategorizeAssets: 38.827ms
+	ImportOutOfDateAssets: 3521.151ms (115.006ms without children)
+		ImportManagerImport: 1890.568ms (4.784ms without children)
+			ImportInProcess: 1885.247ms
+			UpdateCategorizedAssets: 0.538ms
+		CompileScripts: 1514.438ms
+		ReloadNativeAssets: 0.019ms
+		UnloadImportedAssets: 0.410ms
+		ReloadImportedAssets: 0.012ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.301ms
+		InitializingProgressBar: 0.005ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.000ms
+		OnDemandSchedulerStart: 0.392ms
+	PostProcessAllAssets: 94.333ms
+	Hotreload: 1.092ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.001ms
+	UnloadStreamsBegin: 1.832ms
+	PersistCurrentRevisions: 0.077ms
+	UnloadStreamsEnd: 0.000ms
+	GenerateScriptTypeHashes: 7.822ms
+	Untracked: 2430.534ms
+
+Application.AssetDatabase Initial Refresh End
+Scanning for USB devices : 7.224ms
+Initializing Unity extensions:
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-Catan1.7.6
+Unloading 19 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 3318 unused Assets / (2.2 MB). Loaded Objects now: 4172.
+Memory consumption went from 168.1 MB to 165.9 MB.
+Total: 5.138500 ms (FindLiveObjects: 0.277800 ms CreateObjectMapping: 0.106200 ms MarkObjects: 3.955700 ms  DeleteObjects: 0.798000 ms)
+
+Asset Pipeline Refresh (id=74eb2bfe61dcf5e499c9525a5f648a58): Total: 0.056 seconds - Initiated by RefreshV2(NoUpdateAssetOptions)
+Start importing Assets/Resources/Ultra/ForestCamp/v001/forest-atlas.png using Guid(8419282d4d252d246837f8f4d24491af) (TextureImporter) -> (artifact id: '184e95648c806f975c7a80d78eae9f2b') in 0.0499723 seconds
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Asset Pipeline Refresh (id=0641dbe58c0e2984fbcd32f7e153db60): Total: 0.061 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Start importing Assets/Resources/Ultra/ForestCamp/v001/leaf-cluster.png using Guid(507920f06934dde439b857dae3791d1c) (TextureImporter) -> (artifact id: 'ee33cd2647d876f5361aea12ebe61b1d') in 0.0437306 seconds
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Asset Pipeline Refresh (id=49b48d92cff957745af5c955f347a682): Total: 0.052 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Start importing Assets/Resources/Ultra/ForestCamp/v001/detail-atlas.png using Guid(3389a6e9835cd164bb2fa3273e14d2dc) (TextureImporter) -> (artifact id: '428345f13cdb7169c3982d25d261d76b') in 0.0505542 seconds
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Asset Pipeline Refresh (id=633a00751d4e10f44a832749630c221d): Total: 0.059 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Start importing Assets/Resources/Ultra/ForestCamp/v001/forest-camp.fbx using Guid(e5961b07f53d7604585344add78fc378) (FBXImporter)Launched and connected shader compiler UnityShaderCompiler.exe after 0.01 seconds
+ -> (artifact id: 'b8dde4bbec7536e2bc0eecb3bd702675') in 0.1458457 seconds
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Asset Pipeline Refresh (id=da3706dff660e9542a850d15aee871bf): Total: 0.154 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Asset Pipeline Refresh (id=6d0e52e8dfa54cd4db299a85a4224e17): Total: 0.007 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+Start importing Assets/Resources/Ultra/ForestCamp/v001/绳.mat using Guid(105efe335a6308844865e1e00f5e1201) (NativeFormatImporter) -> (artifact id: '384df9a436c6862d681ca20d28c7b9ed') in 0.0013283 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/泥土.mat using Guid(f129ef91afcfac94089f076e0627da75) (NativeFormatImporter) -> (artifact id: 'abfc635112c6a0b91c73e84429a199a7') in 0.0009394 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/叶簇.mat using Guid(c35ee8a83542bae4fa8711fdd49b9292) (NativeFormatImporter) -> (artifact id: '0bd9935b1013b3c9418a0f554df1fc94') in 0.00087 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/亮叶.mat using Guid(04547e81539f494409a20a9df599f48f) (NativeFormatImporter) -> (artifact id: 'fb174a654d9f34da790c9007c231efb7') in 0.0008517 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/红布.mat using Guid(143a54a46dab693448a9c9d268b51aeb) (NativeFormatImporter) -> (artifact id: '8871209fb29a0fd0b62aec9d315b1b0d') in 0.000839 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/树皮.mat using Guid(547340717e826e243a404cb6c059a0ac) (NativeFormatImporter) -> (artifact id: 'b0300e7071d626125392752fe022f6db') in 0.0009344 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/衣.mat using Guid(856b51672d71e9540a69b279240d3ad2) (NativeFormatImporter) -> (artifact id: '89c57039f3b16756e7576f13c63e5421') in 0.0008743 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/裤.mat using Guid(36e80d887c330c84cb4013e3847ff2e2) (NativeFormatImporter) -> (artifact id: 'ef5e0f97a0b08837b4a19b6169a9c800') in 0.0010734 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/浅木.mat using Guid(5754189dfb1aa1f47be30c850b0be343) (NativeFormatImporter) -> (artifact id: 'd8f22dd6467106ccf3f0917624241693') in 0.0010021 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/苔石.mat using Guid(2846a2e4f7570cf41a66c749d91dfdae) (NativeFormatImporter) -> (artifact id: 'c9e58b78298fcd5c3475d881a5ff9d0d') in 0.0008812 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/肤.mat using Guid(3cb5b0849f4562b428846e0a92e11af4) (NativeFormatImporter) -> (artifact id: '16685c2cbf5408c6342c04b112065913') in 0.0008728 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/叶片.mat using Guid(eed89de2c08b3644a8b4c0a75659de43) (NativeFormatImporter) -> (artifact id: 'bf48ad50d0ce9a0cfa45922a310f6fed') in 0.000855 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/铁.mat using Guid(4f9a6a41c645237489718f335e0a170b) (NativeFormatImporter) -> (artifact id: 'fbed0dcd8409cd3643ffccd236a79cb9') in 0.0008611 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/林地.mat using Guid(8f777c76479a34045b6590e5a7e7229b) (NativeFormatImporter) -> (artifact id: '6bea02d5592d134d4d9668d1e6da743c') in 0.0007736 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/浅木.asset using Guid(7043563ab35c46c468e3b927f126f212) (NativeFormatImporter) -> (artifact id: 'c85d0b6fe3b61e387e1c2a9fa6294324') in 0.0009682 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/苔石.asset using Guid(5183afb6e6f223d4e9ac19c3a29325a5) (NativeFormatImporter) -> (artifact id: '7df98fd74e40702e854747c0bc29c5fc') in 0.0009424 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/肤.asset using Guid(f37404c014a2d514fa7873c4391a914c) (NativeFormatImporter) -> (artifact id: 'eb0b3279afa40a127206ba9da8f284f7') in 0.0009696 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/红布.asset using Guid(95f11f3de911d6f49a6237e643833e16) (NativeFormatImporter) -> (artifact id: '746510db69d8fc6503b11fd371bbb18a') in 0.0008728 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/树皮.asset using Guid(95d37929d9f9bd4438ff982c82eba0f8) (NativeFormatImporter) -> (artifact id: 'f4e7a7446cca4d6e5f9289c72eeba6be') in 0.0010586 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/泥土.asset using Guid(6763bd778e1802847b42b9377b9e0560) (NativeFormatImporter) -> (artifact id: '56572af5d278903f94211c5aa7b580d9') in 0.0008725 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/铁.asset using Guid(870760ce1a7143846902f6d0e86ae0a6) (NativeFormatImporter) -> (artifact id: '07636c64c691c52bd1b1ea34cf08b204') in 0.0008179 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/林地.asset using Guid(e70e90a663f0f604fba1ddcc8c345e90) (NativeFormatImporter) -> (artifact id: 'fe5029d5042fb140ae85d267522f7760') in 0.000776 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/亮叶.asset using Guid(eb1330fed0592204c8b0cb3c3bd1260d) (NativeFormatImporter) -> (artifact id: 'c09d88b3cd6da1513e6795f32e6a5132') in 0.00142 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/衣.asset using Guid(5d2927d9737f24d47a4ac659f1cf1817) (NativeFormatImporter) -> (artifact id: 'd764ead5501ba83d39019d4a7564a988') in 0.0010048 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/裤.asset using Guid(9d37291832bc7154e8d72ce8f0d875e2) (NativeFormatImporter) -> (artifact id: 'afb41bdd3a7aee2d3f86994c51b66caf') in 0.000955 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/绳.asset using Guid(de4addf150b6ee042b45ed2d888190c1) (NativeFormatImporter) -> (artifact id: '9a93f4bc13f78c1bc7479b294f8c0134') in 0.0009019 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/叶簇.asset using Guid(cf8c5577e13e29b4f8ad420c5c9d249f) (NativeFormatImporter) -> (artifact id: '7de5187ebc4e22d564c9b9dc8394554b') in 0.0010876 seconds
+Start importing Assets/Resources/Ultra/ForestCamp/v001/叶片.asset using Guid(ef64fd6b67cbfdb4398c56aed8f4d17e) (NativeFormatImporter) -> (artifact id: 'cc0d6e7c56742df61a527a24fbcc522a') in 0.0008537 seconds
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Asset Pipeline Refresh (id=f305e27fa177f3044b00f9028057e288): Total: 0.055 seconds - Initiated by StopAssetImportingV2(NoUpdateAssetOptions)
+FOREST_CAMP_IMPORT_OK tris=5990
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+ForestCampAssetBuild:Import () (at Assets/Editor/ForestCampAssetBuild.cs:102)
+
+(Filename: Assets/Editor/ForestCampAssetBuild.cs Line: 102)
+
+Batchmode quit successfully invoked - shutting down!
+Curl error 42: Callback aborted
+Killing ADB server in 2.0750519 seconds.
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input System polling thread exited.
+Input System module state changed to: Shutdown.
+[Licensing::IpcConnector] LicenseClient-BreezeSummer-notifications channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-BreezeSummer channel disconnected successfully.
+AcceleratorClientConnectionCallback - disconnected - :0
+Cleanup mono
+Exiting batchmode successfully now!
+Exiting without the bug reporter. Application will terminate with return code 0

@@ -1,0 +1,5 @@
+00:00.375  blend            | Read blend: "D:\Project\catan-true-to-tabletop\art\source\ultra\forest-camp\v001\forest-camp.blend"
+FOREST_INDEPENDENT_AUDIT_OK {'源文件总三角形': 5990, '缺失外部文件': [], '非法UV坐标': 0, '包围盒米': [[-0.03949999809265137, -0.03420800343155861, -0.003001999808475375], [0.03949999809265137, 0.03420800343155861, 0.025531724095344543]], '装饰到六边形边界最小投影距离米': 0.003149070316992856, '贴图': [{'名称': 'detail-atlas.png', '尺寸': [1254, 1254], '已打包': True}, {'名称': 'forest-atlas.png', '尺寸': [1254, 1254], '已打包': True}, {'名称': 'leaf-cluster.png', '尺寸': [1254, 1254], '已打包': True}]}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

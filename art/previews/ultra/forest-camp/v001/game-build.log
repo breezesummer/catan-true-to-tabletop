@@ -1,0 +1,41 @@
+  正在确定要还原的项目…
+  已还原 D:\Project\catan-true-to-tabletop\src\Catan.Network.Contracts\Catan.Network.Contracts.csproj (用时 135 毫秒)。
+  Catan.Network.Contracts -> D:\Project\catan-true-to-tabletop\src\Catan.Network.Contracts\bin\Release\netstandard2.1\Catan.Network.Contracts.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.68
+Unity 源文件完整性检查通过：1968 个文本配置／脚本。
+  正在确定要还原的项目…
+  已还原 D:\Project\catan-true-to-tabletop\src\Catan.Core\Catan.Core.csproj (用时 124 毫秒)。
+  已还原 D:\Project\catan-true-to-tabletop\src\Catan.AI\Catan.AI.csproj (用时 124 毫秒)。
+  Catan.Core -> D:\Project\catan-true-to-tabletop\src\Catan.Core\bin\Release\netstandard2.1\Catan.Core.dll
+  Catan.AI -> D:\Project\catan-true-to-tabletop\src\Catan.AI\bin\Release\netstandard2.1\Catan.AI.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:00.83
+M6 .NET / Unity 构建耗时 17.8 秒。
+Windows 程序已生成：D:\Project\catan-true-to-tabletop\game version\1.7\Catan1.7.6-Forest-Camp/Builds/Windows/Catan1.7.6.exe
+  正在确定要还原的项目…
+  已还原 D:\Project\catan-true-to-tabletop\src\Catan.Core\Catan.Core.csproj (用时 148 毫秒)。
+  已还原 D:\Project\catan-true-to-tabletop\src\Catan.AI\Catan.AI.csproj (用时 152 毫秒)。
+  已还原 D:\Project\catan-true-to-tabletop\src\Catan.Rooms\Catan.Rooms.csproj (用时 152 毫秒)。
+  已还原 D:\Project\catan-true-to-tabletop\src\Catan.Network.Contracts\Catan.Network.Contracts.csproj (用时 148 毫秒)。
+  已还原 D:\Project\catan-true-to-tabletop\src\Catan.Server\Catan.Server.csproj (用时 152 毫秒)。
+  Catan.Network.Contracts -> D:\Project\catan-true-to-tabletop\src\Catan.Network.Contracts\bin\Release\netstandard2.1\Catan.Network.Contracts.dll
+  Catan.Core -> D:\Project\catan-true-to-tabletop\src\Catan.Core\bin\Release\netstandard2.1\Catan.Core.dll
+  Catan.AI -> D:\Project\catan-true-to-tabletop\src\Catan.AI\bin\Release\netstandard2.1\Catan.AI.dll
+  Catan.Rooms -> D:\Project\catan-true-to-tabletop\src\Catan.Rooms\bin\Release\net10.0\Catan.Rooms.dll
+  Catan.Server -> D:\Project\catan-true-to-tabletop\src\Catan.Server\bin\Release\net10.0\win-x64\Catan.Server.dll
+  Catan.Server -> D:\Project\catan-true-to-tabletop\game version\1.7\Catan1.7.6-Forest-Camp\Builds\Windows\Server\
+M7 自包含房间服务已生成：D:\Project\catan-true-to-tabletop\game version\1.7\Catan1.7.6-Forest-Camp\Builds\Windows\Server
+Windows 客户端与随包服务：D:\Project\catan-true-to-tabletop\game version\1.7\Catan1.7.6-Forest-Camp/Builds/Windows/Catan1.7.6.exe
+
+保留上限 版本数 已清理
+-------- ------ ------
+       5      5 {}
