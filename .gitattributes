@@ -14,3 +14,6 @@ art/source/** -text
 
 # 独立美术试验的源文件、脚本与证据按校验清单保留原始字节。
 art/experiments/** -text
+
+# Ultra 原型、实际提示词和校验记录保留原始字节，避免换行转换破坏追溯。
+assets/prototypes/** -text

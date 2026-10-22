@@ -1,0 +1,110 @@
+[
+  {
+    "file": "G01__original.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "alpha_zero_ratio": 0.7260612928580695,
+    "alpha_255_ratio": 0.00042225325529279194,
+    "alpha_partial_ratio": 0.2735164538866377,
+    "bbox_nonzero": [
+      0,
+      21,
+      1248,
+      1238
+    ],
+    "bbox_alpha128": [
+      107,
+      345,
+      1202,
+      1021
+    ],
+    "nonzero_alpha_mode": 253,
+    "alpha_253_ratio": 0.1634018350210745
+  },
+  {
+    "file": "G01__front.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "alpha_zero_ratio": 0.7052010917535975,
+    "alpha_255_ratio": 0.0007720112227792913,
+    "alpha_partial_ratio": 0.2940268970236233,
+    "bbox_nonzero": [
+      0,
+      17,
+      1254,
+      1221
+    ],
+    "bbox_alpha128": [
+      42,
+      437,
+      1243,
+      1030
+    ],
+    "nonzero_alpha_mode": 253,
+    "alpha_253_ratio": 0.20341732611941626
+  },
+  {
+    "file": "G01__side.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "alpha_zero_ratio": 0.7511020555593712,
+    "alpha_255_ratio": 0.0005786904552958444,
+    "alpha_partial_ratio": 0.24831925398533305,
+    "bbox_nonzero": [
+      0,
+      19,
+      1223,
+      1228
+    ],
+    "bbox_alpha128": [
+      80,
+      377,
+      1220,
+      961
+    ],
+    "nonzero_alpha_mode": 253,
+    "alpha_253_ratio": 0.17261064434320542
+  },
+  {
+    "file": "G01__top.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_min": 0,
+    "alpha_max": 255,
+    "alpha_zero_ratio": 0.5631732840874115,
+    "alpha_255_ratio": 0.00046486013496842006,
+    "alpha_partial_ratio": 0.43636185577762004,
+    "bbox_nonzero": [
+      0,
+      9,
+      1240,
+      1254
+    ],
+    "bbox_alpha128": [
+      89,
+      170,
+      1202,
+      1104
+    ],
+    "nonzero_alpha_mode": 253,
+    "alpha_253_ratio": 0.3109265660889937
+  }
+]

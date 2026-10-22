@@ -1,0 +1,268 @@
+{
+  "日期": "2026-10-21",
+  "工具": "内置 image_gen",
+  "版本": "v006",
+  "状态": "二维概念图，用户已于2026-10-21确认采用，作为五类地形后续建模的美术基准；未接入游戏",
+  "记录": [
+    {
+      "地形": "高山",
+      "标识": "iron",
+      "状态": "原始态",
+      "稿次": 1,
+      "参考原件": "D:/Project/catan-true-to-tabletop/assets/prototypes/ultra/v005/terrain-states/iron-pristine-v005.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-98e53f8b-e542-4508-8b2e-70995f4d8a4a.png",
+      "最终文件": "iron-pristine-v006.png"
+    },
+    {
+      "地形": "丘陵",
+      "标识": "brick",
+      "状态": "原始态",
+      "稿次": 1,
+      "参考原件": "D:/Project/catan-true-to-tabletop/assets/prototypes/ultra/v005/terrain-states/brick-pristine-v005.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-594824d2-5b75-46c1-af18-813a171d89b7.png",
+      "最终文件": "brick-pristine-v006.png"
+    },
+    {
+      "地形": "草原",
+      "标识": "grassland",
+      "状态": "原始态",
+      "稿次": 1,
+      "参考原件": "D:/Project/catan-true-to-tabletop/assets/prototypes/ultra/v004/terrain-states/grassland-pristine-v004.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-53a9dc9b-6312-4903-a72d-f93b3ac36fe7.png",
+      "最终文件": null
+    },
+    {
+      "地形": "麦田",
+      "标识": "wheatfield",
+      "状态": "原始态",
+      "稿次": 1,
+      "参考原件": "D:/Project/catan-true-to-tabletop/assets/prototypes/ultra/v004/terrain-states/wheatfield-pristine-v004.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-cf841ccd-659e-4f6e-9b38-c6b7ae0adba0.png",
+      "最终文件": "wheatfield-pristine-v006.png"
+    },
+    {
+      "地形": "森林",
+      "标识": "forest",
+      "状态": "原始态",
+      "稿次": 1,
+      "参考原件": "D:/Project/catan-true-to-tabletop/assets/prototypes/ultra/v004/terrain-states/forest-pristine-v004.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-49e9c7a3-0c28-41b2-a53c-9583fb345cca.png",
+      "最终文件": null
+    },
+    {
+      "地形": "草原",
+      "标识": "grassland",
+      "状态": "原始态",
+      "稿次": 2,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-53a9dc9b-6312-4903-a72d-f93b3ac36fe7.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-d0998270-964c-46cc-ae1c-f2942c350c97.png",
+      "最终文件": "grassland-pristine-v006.png"
+    },
+    {
+      "地形": "森林",
+      "标识": "forest",
+      "状态": "原始态",
+      "稿次": 2,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-49e9c7a3-0c28-41b2-a53c-9583fb345cca.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-ea40dfc0-ee77-4c37-8b03-9a8940fcc0e3.png",
+      "最终文件": "forest-pristine-v006.png"
+    },
+    {
+      "地形": "高山",
+      "标识": "iron",
+      "状态": "海岸态",
+      "稿次": 1,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-98e53f8b-e542-4508-8b2e-70995f4d8a4a.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-a91704b0-0b2a-4e22-b260-e5502d16454a.png",
+      "最终文件": "iron-coast-v006.png"
+    },
+    {
+      "地形": "高山",
+      "标识": "iron",
+      "状态": "局部开发态",
+      "稿次": 1,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-98e53f8b-e542-4508-8b2e-70995f4d8a4a.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-5e9961ac-d261-482d-aaab-47e1c780f43c.png",
+      "最终文件": "iron-developed-v006.png"
+    },
+    {
+      "地形": "丘陵",
+      "标识": "brick",
+      "状态": "海岸态",
+      "稿次": 1,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-594824d2-5b75-46c1-af18-813a171d89b7.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-13e7ecdc-d999-4749-b9f3-c6b0d771fef5.png",
+      "最终文件": "brick-coast-v006.png"
+    },
+    {
+      "地形": "丘陵",
+      "标识": "brick",
+      "状态": "局部开发态",
+      "稿次": 1,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-594824d2-5b75-46c1-af18-813a171d89b7.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-37583a24-6e45-4cc7-9412-a53f2695c961.png",
+      "最终文件": "brick-developed-v006.png"
+    },
+    {
+      "地形": "草原",
+      "标识": "grassland",
+      "状态": "海岸态",
+      "稿次": 1,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-d0998270-964c-46cc-ae1c-f2942c350c97.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-5b6fee45-3b38-4dca-bbdb-511d3bc6e329.png",
+      "最终文件": "grassland-coast-v006.png"
+    },
+    {
+      "地形": "草原",
+      "标识": "grassland",
+      "状态": "局部开发态",
+      "稿次": 1,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-d0998270-964c-46cc-ae1c-f2942c350c97.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-1c625c00-15a2-4bc7-8519-93df7e2b6ee6.png",
+      "最终文件": "grassland-developed-v006.png"
+    },
+    {
+      "地形": "麦田",
+      "标识": "wheatfield",
+      "状态": "海岸态",
+      "稿次": 1,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-cf841ccd-659e-4f6e-9b38-c6b7ae0adba0.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-3628504e-81e4-4cbe-99db-3db43dabb628.png",
+      "最终文件": "wheatfield-coast-v006.png"
+    },
+    {
+      "地形": "麦田",
+      "标识": "wheatfield",
+      "状态": "局部开发态",
+      "稿次": 1,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-cf841ccd-659e-4f6e-9b38-c6b7ae0adba0.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-d2c2e101-ef14-4b92-99d8-27a8c0b87137.png",
+      "最终文件": "wheatfield-developed-v006.png"
+    },
+    {
+      "地形": "森林",
+      "标识": "forest",
+      "状态": "海岸态",
+      "稿次": 1,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-ea40dfc0-ee77-4c37-8b03-9a8940fcc0e3.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-290ab7d3-716c-45ef-8185-c7bf7e2b099d.png",
+      "最终文件": "forest-coast-v006.png"
+    },
+    {
+      "地形": "森林",
+      "标识": "forest",
+      "状态": "局部开发态",
+      "稿次": 1,
+      "参考原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-ea40dfc0-ee77-4c37-8b03-9a8940fcc0e3.png",
+      "输出原件": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15d77-3dd8-74b2-8d92-1b25a30a17d7\\exec-24e2b028-5434-4110-b71c-618860ee66e9.png",
+      "最终文件": "forest-developed-v006.png"
+    }
+  ],
+  "文件": [
+    {
+      "文件": "iron-pristine-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 3116380,
+      "SHA256": "8493DE05924B4518BAC196F3EA2786DC60B2F63F99481D0456A2B3E7CD54F0AA"
+    },
+    {
+      "文件": "brick-pristine-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 3090322,
+      "SHA256": "5C290CFA4340F8A6B80677623E85ADF86D6848DD71E44427EEB1B39B78BEDE07"
+    },
+    {
+      "文件": "wheatfield-pristine-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 3073591,
+      "SHA256": "415A4D1DE420F630480C9E54B2BCB84BB8E355AB06507644DD16CBBDB4CC7918"
+    },
+    {
+      "文件": "grassland-pristine-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 3219050,
+      "SHA256": "CFADF9BA3C3E716F1BA30EC99D3E2CF1F55224C5C61FC502A95651AAE073CDBB"
+    },
+    {
+      "文件": "forest-pristine-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 3128015,
+      "SHA256": "F7C13B39B21ABCD0CB77C5FC4CFFB648B9B76EA6EEFA96E1B1DDA3F4DE25B364"
+    },
+    {
+      "文件": "iron-coast-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 2699851,
+      "SHA256": "D0A6720E2BAC5EDDD4DC3CA5225ABD853C50D1624F1B62979789D59460DD435D"
+    },
+    {
+      "文件": "iron-developed-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 2981590,
+      "SHA256": "255A54AA4084F78C5E2CE43C2420744297A0CF20CBC35B9FA5E0ECA0DDE8AEFA"
+    },
+    {
+      "文件": "brick-coast-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 2625861,
+      "SHA256": "9C25C057DCDA8733F113B804D584194777A67EDE0E3D27F6223A2712921CC9C1"
+    },
+    {
+      "文件": "brick-developed-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 2982362,
+      "SHA256": "7C1FB45876FA0E1708B2A513603AE5E43D24CCDEEBC3BC3945EF750BA75A9083"
+    },
+    {
+      "文件": "grassland-coast-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 2615393,
+      "SHA256": "48A89D46DD31FD397C1F75FF718A7DA2B45EB4EB1CE26B28B9A9FBF20696A933"
+    },
+    {
+      "文件": "grassland-developed-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 2978490,
+      "SHA256": "DB5F7D2C5845DE443F956F71FD114D635B502748525C5DC906355157807254C9"
+    },
+    {
+      "文件": "wheatfield-coast-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 2525734,
+      "SHA256": "8E3007D5B41FF176808DCC6FC65C1BF5B2302F79487FE8374A17AD0036B34866"
+    },
+    {
+      "文件": "wheatfield-developed-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 3019867,
+      "SHA256": "98272FE3DB2CC3A8D8ADFE5E3E84A7E92B136ECB2D7129CF6973077352C46BEC"
+    },
+    {
+      "文件": "forest-coast-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 2632292,
+      "SHA256": "D53ACFC72C9B886C3A787B9130E33468D209FEA0EA483C99066E35336330DA28"
+    },
+    {
+      "文件": "forest-developed-v006.png",
+      "宽度": 1254,
+      "高度": 1254,
+      "字节数": 3065408,
+      "SHA256": "F3876A7683088C3B927AA7EB890A8A1F5FE93E3852F85E0EE60C616D1EE0CA44"
+    }
+  ]
+}

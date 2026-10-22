@@ -1,0 +1,98 @@
+{
+  "K01__front.png": {
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_ratio": 0.513725,
+    "bbox": [
+      39,
+      21,
+      1208,
+      1220
+    ],
+    "bbox_alpha_gt16": [
+      65,
+      304,
+      1204,
+      1043
+    ]
+  },
+  "K01__original.png": {
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_ratio": 0.621238,
+    "bbox": [
+      0,
+      19,
+      1226,
+      1254
+    ],
+    "bbox_alpha_gt16": [
+      154,
+      224,
+      1191,
+      1070
+    ]
+  },
+  "K01__side.png": {
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_ratio": 0.697029,
+    "bbox": [
+      33,
+      39,
+      1222,
+      1254
+    ],
+    "bbox_alpha_gt16": [
+      118,
+      359,
+      1156,
+      930
+    ]
+  },
+  "K01__top.png": {
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_ratio": 0.331856,
+    "bbox": [
+      0,
+      3,
+      1202,
+      1254
+    ],
+    "bbox_alpha_gt16": [
+      96,
+      131,
+      1166,
+      1169
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "file": "T03__front.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alpha0": 1060587,
+    "bbox": [
+      113,
+      47,
+      1205,
+      1203
+    ]
+  },
+  {
+    "file": "T03__original__rejected_v1.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alpha0": 991706,
+    "bbox": [
+      0,
+      0,
+      1245,
+      1253
+    ]
+  },
+  {
+    "file": "T03__original.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alpha0": 1073629,
+    "bbox": [
+      43,
+      7,
+      1219,
+      1219
+    ]
+  },
+  {
+    "file": "T03__side.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alpha0": 1117336,
+    "bbox": [
+      0,
+      22,
+      1239,
+      1219
+    ]
+  },
+  {
+    "file": "T03__top__rejected_v1.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alpha0": 1124540,
+    "bbox": [
+      0,
+      0,
+      1245,
+      1229
+    ]
+  },
+  {
+    "file": "T03__top.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alpha0": 1134362,
+    "bbox": [
+      0,
+      0,
+      1239,
+      1253
+    ]
+  }
+]

@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-21",
+  "tool": "内置 image_gen",
+  "status": "二维概念原型，待用户确认",
+  "assets": [
+    {
+      "file": "forest-pristine-v004.png",
+      "source": "exec-0b74a9b9-508a-4661-bcee-635af0ebac3b.png",
+      "reference": "../../v002/number-display/forest-floating-token-v002.png",
+      "notes": "参考关系为制作流程，非几何重建。",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2958090,
+      "sha256": "5b7514cae807d4f76cfd163004da3d89dc67eaf39d836a5a35c2f0910a9e3848"
+    },
+    {
+      "file": "grassland-pristine-v004.png",
+      "source": "exec-a2f8fc63-b4a4-4a92-b6e9-894d0182941d.png",
+      "reference": "../../v002/number-display/forest-floating-token-v002.png",
+      "notes": "最终遵循无石头、少量羊群；原始及海岸图经过定向修正，开发图使用修正后原始图。",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3028931,
+      "sha256": "939d80231e60c3b70bf06d3cc25507fd2425a7331106ae6862b7ffe51d7e4745"
+    },
+    {
+      "file": "wheatfield-pristine-v004.png",
+      "source": "exec-1ba01d06-f7fe-4ba8-a7d1-a5fc5e7fccf3.png",
+      "reference": "../../v002/number-display/forest-floating-token-v002.png",
+      "notes": "参考关系为制作流程，非几何重建。",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3155738,
+      "sha256": "02557db5b77ed6a366c500679c4b6573a49de4d83ef3dafad99f561ee4866212"
+    },
+    {
+      "file": "forest-coast-v004.png",
+      "source": "exec-f3649af0-c89e-4e35-9681-7b195a22b0f0.png",
+      "reference": "forest-pristine-v004.png",
+      "notes": "参考关系为制作流程，非几何重建。",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2636643,
+      "sha256": "1f2390df6f950efd7b574455e705b0de03ff67e9d48bee62e2ec56dd0c352a59"
+    },
+    {
+      "file": "grassland-coast-v004.png",
+      "source": "exec-6e3a4b54-d0c8-4a35-90c1-9271f179df08.png",
+      "reference": "grassland-pristine-v004.png",
+      "notes": "最终遵循无石头、少量羊群；原始及海岸图经过定向修正，开发图使用修正后原始图。",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2443262,
+      "sha256": "4f0c6a28b3f25d319ccc832b752a04a966c550f2fac4b44b7a1212dbfd5fe5a3"
+    },
+    {
+      "file": "wheatfield-coast-v004.png",
+      "source": "exec-b7d00215-22d4-4dd2-9834-f8f1bece6a18.png",
+      "reference": "wheatfield-pristine-v004.png",
+      "notes": "参考关系为制作流程，非几何重建。",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2554180,
+      "sha256": "1ad781570ee6b37c233d46d4caab5849542e935307a3e0f77aaf90de7a4119f3"
+    },
+    {
+      "file": "forest-developed-v004.png",
+      "source": "exec-ccb195c0-0749-4f42-a67b-98f7fd13d0bc.png",
+      "reference": "forest-pristine-v004.png",
+      "notes": "参考关系为制作流程，非几何重建。",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2949681,
+      "sha256": "6016373056bdcaf70a4afce56a2865795c9517fd8ebdceec5a8cb960ee42ad0b"
+    },
+    {
+      "file": "grassland-developed-v004.png",
+      "source": "exec-0544f8dc-d2b8-4db6-876c-aa99473fe7d0.png",
+      "reference": "grassland-pristine-v004.png",
+      "notes": "最终遵循无石头、少量羊群；原始及海岸图经过定向修正，开发图使用修正后原始图。",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2976812,
+      "sha256": "dbdd9aabb3babb671359f4686d07049aaa5eaa2b507dcfc503af03e482c6f545"
+    },
+    {
+      "file": "wheatfield-developed-v004.png",
+      "source": "exec-808dc068-e51b-427a-aa84-4854bb478293.png",
+      "reference": "wheatfield-pristine-v004.png",
+      "notes": "参考关系为制作流程，非几何重建。",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3079046,
+      "sha256": "226c81916fa2e76bb05710bf2f54f1b84a75656db84fb424c7ab9c4fbc7fe09a"
+    }
+  ]
+}

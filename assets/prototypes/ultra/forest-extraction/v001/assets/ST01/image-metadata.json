@@ -1,0 +1,310 @@
+[
+  {
+    "file": "ST01__front-v1-rejected.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.6117203258981149,
+    "alpha_partial_ratio": 0.3878097265782987,
+    "alpha_opaque_ratio": 0.0004699475235864055,
+    "nonzero_alpha_bbox": [
+      19,
+      25,
+      1241,
+      1254
+    ],
+    "bbox_width_ratio": 0.9744816586921851,
+    "bbox_height_ratio": 0.9800637958532695,
+    "alpha_ge_250_ratio": 0.3732922272333,
+    "main_alpha_ge_128_bbox": [
+      24,
+      326,
+      1238,
+      1053
+    ],
+    "main_bbox_width_ratio": 0.9681020733652312,
+    "main_bbox_height_ratio": 0.5797448165869219,
+    "dominant_alpha": [
+      [
+        0,
+        961940
+      ],
+      [
+        253,
+        529255
+      ],
+      [
+        252,
+        46218
+      ],
+      [
+        251,
+        6604
+      ]
+    ]
+  },
+  {
+    "file": "ST01__front.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.6963871909729377,
+    "alpha_partial_ratio": 0.30312950710835374,
+    "alpha_opaque_ratio": 0.00048330191870861726,
+    "nonzero_alpha_bbox": [
+      0,
+      0,
+      1228,
+      1222
+    ],
+    "bbox_width_ratio": 0.9792663476874003,
+    "bbox_height_ratio": 0.9744816586921851,
+    "alpha_ge_250_ratio": 0.2890495231845018,
+    "main_alpha_ge_128_bbox": [
+      48,
+      407,
+      1209,
+      982
+    ],
+    "main_bbox_width_ratio": 0.9258373205741627,
+    "main_bbox_height_ratio": 0.4585326953748006,
+    "dominant_alpha": [
+      [
+        0,
+        1095080
+      ],
+      [
+        253,
+        412853
+      ],
+      [
+        252,
+        30272
+      ],
+      [
+        1,
+        6237
+      ]
+    ]
+  },
+  {
+    "file": "ST01__original.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.5780475365592465,
+    "alpha_partial_ratio": 0.4216478560472517,
+    "alpha_opaque_ratio": 0.0003046073935018785,
+    "nonzero_alpha_bbox": [
+      0,
+      0,
+      1216,
+      1254
+    ],
+    "bbox_width_ratio": 0.9696969696969697,
+    "bbox_height_ratio": 1.0,
+    "alpha_ge_250_ratio": 0.40183120553304386,
+    "main_alpha_ge_128_bbox": [
+      63,
+      192,
+      1199,
+      1100
+    ],
+    "main_bbox_width_ratio": 0.9059011164274322,
+    "main_bbox_height_ratio": 0.7240829346092504,
+    "dominant_alpha": [
+      [
+        0,
+        908989
+      ],
+      [
+        253,
+        330610
+      ],
+      [
+        252,
+        277685
+      ],
+      [
+        251,
+        18100
+      ]
+    ]
+  },
+  {
+    "file": "ST01__side.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.6889913997695413,
+    "alpha_partial_ratio": 0.31051575945809134,
+    "alpha_opaque_ratio": 0.0004928407723673399,
+    "nonzero_alpha_bbox": [
+      0,
+      31,
+      1235,
+      1254
+    ],
+    "bbox_width_ratio": 0.9848484848484849,
+    "bbox_height_ratio": 0.9752791068580542,
+    "alpha_ge_250_ratio": 0.2953203655797461,
+    "main_alpha_ge_128_bbox": [
+      38,
+      348,
+      1220,
+      959
+    ],
+    "main_bbox_width_ratio": 0.9425837320574163,
+    "main_bbox_height_ratio": 0.48724082934609253,
+    "dominant_alpha": [
+      [
+        0,
+        1083450
+      ],
+      [
+        253,
+        306979
+      ],
+      [
+        252,
+        144528
+      ],
+      [
+        1,
+        8701
+      ]
+    ]
+  },
+  {
+    "file": "ST01__top-v1-rejected.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.4904535152583503,
+    "alpha_partial_ratio": 0.5091789209140002,
+    "alpha_opaque_ratio": 0.0003675638276494484,
+    "nonzero_alpha_bbox": [
+      0,
+      47,
+      1242,
+      1254
+    ],
+    "bbox_width_ratio": 0.9904306220095693,
+    "bbox_height_ratio": 0.9625199362041468,
+    "alpha_ge_250_ratio": 0.488725710898967,
+    "main_alpha_ge_128_bbox": [
+      45,
+      78,
+      1229,
+      1192
+    ],
+    "main_bbox_width_ratio": 0.9441786283891547,
+    "main_bbox_height_ratio": 0.8883572567783095,
+    "dominant_alpha": [
+      [
+        0,
+        771246
+      ],
+      [
+        253,
+        532594
+      ],
+      [
+        252,
+        212294
+      ],
+      [
+        251,
+        17434
+      ]
+    ]
+  },
+  {
+    "file": "ST01__top-v2-rejected.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.5050988352423759,
+    "alpha_partial_ratio": 0.4947510867933935,
+    "alpha_opaque_ratio": 0.00015007796423057064,
+    "nonzero_alpha_bbox": [
+      0,
+      0,
+      1218,
+      1254
+    ],
+    "bbox_width_ratio": 0.9712918660287081,
+    "bbox_height_ratio": 1.0,
+    "alpha_ge_250_ratio": 0.4748867420108921,
+    "main_alpha_ge_128_bbox": [
+      68,
+      59,
+      1205,
+      1195
+    ],
+    "main_bbox_width_ratio": 0.9066985645933014,
+    "main_bbox_height_ratio": 0.9059011164274322,
+    "dominant_alpha": [
+      [
+        0,
+        794276
+      ],
+      [
+        253,
+        549935
+      ],
+      [
+        252,
+        173301
+      ],
+      [
+        251,
+        16852
+      ]
+    ]
+  },
+  {
+    "file": "ST01__top.png",
+    "width": 1254,
+    "height": 1254,
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.42691775473190735,
+    "alpha_partial_ratio": 0.5728355069201204,
+    "alpha_opaque_ratio": 0.0002467383479722941,
+    "nonzero_alpha_bbox": [
+      30,
+      0,
+      1240,
+      1254
+    ],
+    "bbox_width_ratio": 0.9649122807017544,
+    "bbox_height_ratio": 1.0,
+    "alpha_ge_250_ratio": 0.5510258719148168,
+    "main_alpha_ge_128_bbox": [
+      32,
+      27,
+      1237,
+      1231
+    ],
+    "main_bbox_width_ratio": 0.9609250398724083,
+    "main_bbox_height_ratio": 0.960127591706539,
+    "dominant_alpha": [
+      [
+        0,
+        671335
+      ],
+      [
+        252,
+        422228
+      ],
+      [
+        253,
+        393202
+      ],
+      [
+        251,
+        41747
+      ]
+    ]
+  }
+]

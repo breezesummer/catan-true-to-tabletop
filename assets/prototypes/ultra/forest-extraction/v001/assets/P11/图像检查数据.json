@@ -1,0 +1,93 @@
+{
+  "measurement": "2026-10-22，System.Drawing LockBits 实测原PNG；未缩放、未改alpha；包围盒阈值alpha>=128。",
+  "images": [
+    {
+      "view": "original",
+      "width": 1254,
+      "height": 1254,
+      "pixelFormat": "RGBA 8位（System.Drawing 读取为 Format32bppArgb）",
+      "alphaZeroCount": 1202032,
+      "alphaPartialCount": 370104,
+      "alphaOpaqueCount": 380,
+      "alphaNearOpaque250PlusCount": 329506,
+      "alphaZeroRatio": 0.7644004894067851,
+      "alphaPartialRatio": 0.23535785963386063,
+      "alphaOpaqueRatio": 0.00024165095935430863,
+      "alphaNearOpaque250PlusRatio": 0.209540634244739,
+      "bboxAlpha128Inclusive": [
+        158,
+        239,
+        1191,
+        1067
+      ],
+      "bboxWidth": 1034,
+      "bboxHeight": 829
+    },
+    {
+      "view": "front",
+      "width": 1254,
+      "height": 1254,
+      "pixelFormat": "RGBA 8位（System.Drawing 读取为 Format32bppArgb）",
+      "alphaZeroCount": 1036190,
+      "alphaPartialCount": 536085,
+      "alphaOpaqueCount": 241,
+      "alphaNearOpaque250PlusCount": 495260,
+      "alphaZeroRatio": 0.6589376515087922,
+      "alphaPartialRatio": 0.3409090909090909,
+      "alphaOpaqueRatio": 0.00015325758211681153,
+      "alphaNearOpaque250PlusRatio": 0.31494751086793393,
+      "bboxAlpha128Inclusive": [
+        150,
+        120,
+        1105,
+        1131
+      ],
+      "bboxWidth": 956,
+      "bboxHeight": 1012
+    },
+    {
+      "view": "side",
+      "width": 1254,
+      "height": 1254,
+      "pixelFormat": "RGBA 8位（System.Drawing 读取为 Format32bppArgb）",
+      "alphaZeroCount": 1211090,
+      "alphaPartialCount": 361072,
+      "alphaOpaqueCount": 354,
+      "alphaNearOpaque250PlusCount": 309772,
+      "alphaZeroRatio": 0.7701606851694991,
+      "alphaPartialRatio": 0.22961419788415507,
+      "alphaOpaqueRatio": 0.00022511694634585593,
+      "alphaNearOpaque250PlusRatio": 0.19699131837132342,
+      "bboxAlpha128Inclusive": [
+        99,
+        275,
+        1155,
+        1002
+      ],
+      "bboxWidth": 1057,
+      "bboxHeight": 728
+    },
+    {
+      "view": "top",
+      "width": 1254,
+      "height": 1254,
+      "pixelFormat": "RGBA 8位（System.Drawing 读取为 Format32bppArgb）",
+      "alphaZeroCount": 1296072,
+      "alphaPartialCount": 276306,
+      "alphaOpaqueCount": 138,
+      "alphaNearOpaque250PlusCount": 241057,
+      "alphaZeroRatio": 0.824202742611204,
+      "alphaPartialRatio": 0.1757094999351358,
+      "alphaOpaqueRatio": 0.00008775745366024893,
+      "alphaNearOpaque250PlusRatio": 0.15329382976071468,
+      "bboxAlpha128Inclusive": [
+        329,
+        99,
+        925,
+        1086
+      ],
+      "bboxWidth": 597,
+      "bboxHeight": 988
+    }
+  ]
+}

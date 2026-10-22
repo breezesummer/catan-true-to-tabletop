@@ -1,0 +1,20 @@
+{
+  "资产": "S04 前中部深绿卵叶灌木丛",
+  "日期": "2026-10-22",
+  "工具": "内置 image_gen__imagegen；未使用 CLI",
+  "原场景": "../../reference.png",
+  "最终图": {
+    "S04__original.png": "C:/Users/BreezeSummer/.codex/generated_images/01a15f7a-d80b-7a13-b24c-de81cc15536a/exec-1387c809-67c4-4242-89bb-01579c393d6e.png",
+    "S04__front.png": "C:/Users/BreezeSummer/.codex/generated_images/01a15f7a-d80b-7a13-b24c-de81cc15536a/exec-f388ae3d-8ed1-4afe-9fa2-22e800cf9b5d.png",
+    "S04__side.png": "C:/Users/BreezeSummer/.codex/generated_images/01a15f7a-d80b-7a13-b24c-de81cc15536a/exec-8754b4b3-2e03-4c0d-a543-7857694da1e5.png",
+    "S04__top.png": "C:/Users/BreezeSummer/.codex/generated_images/01a15f7a-d80b-7a13-b24c-de81cc15536a/exec-ca5b9483-c227-44b0-b698-318fa48b8366.png"
+  },
+  "返工旧稿": {
+    "S04__side-attempt01.png": "C:/Users/BreezeSummer/.codex/generated_images/01a15f7a-d80b-7a13-b24c-de81cc15536a/exec-f76866b9-6d48-4e58-bb6f-fccd091b533d.png",
+    "S04__top-attempt01.png": "C:/Users/BreezeSummer/.codex/generated_images/01a15f7a-d80b-7a13-b24c-de81cc15536a/exec-46288055-4051-4c19-b175-a8590c4abcf6.png"
+  },
+  "调用顺序": ["original", "front", "side", "side返工", "top", "top返工"],
+  "参考绑定": "original只引用原场景；front、side、top及返工均同时引用原场景与审核后的original，不以上一张派生视图作为唯一参考。",
+  "提示词说明": "__实际提示词.txt为首稿调用实际全文；side、top最终图使用对应__返工实际提示词.txt全文。",
+  "声明": "生成图片为辅助参考，不是真实网格或Unity验收图；尺寸及隐藏结构为制作推定。"
+}

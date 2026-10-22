@@ -1,0 +1,137 @@
+[
+  {
+    "file": "G03__front.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_ratio": 0.804924,
+    "bbox_alpha_gt0": [
+      21,
+      17,
+      1238,
+      1254
+    ],
+    "bbox_alpha_gt127": [
+      345,
+      74,
+      1002,
+      1200
+    ],
+    "alpha_full_ratio": 0.000838,
+    "alpha_partial_ratio": 0.194238
+  },
+  {
+    "file": "G03__original.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_ratio": 0.824984,
+    "bbox_alpha_gt0": [
+      33,
+      21,
+      1200,
+      1238
+    ],
+    "bbox_alpha_gt127": [
+      343,
+      66,
+      990,
+      1190
+    ],
+    "alpha_full_ratio": 0.000819,
+    "alpha_partial_ratio": 0.174197
+  },
+  {
+    "file": "G03__side.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_ratio": 0.885219,
+    "bbox_alpha_gt0": [
+      41,
+      39,
+      1230,
+      1254
+    ],
+    "bbox_alpha_gt127": [
+      442,
+      75,
+      855,
+      1196
+    ],
+    "alpha_full_ratio": 0.00027,
+    "alpha_partial_ratio": 0.114511
+  },
+  {
+    "file": "G03__top.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_ratio": 0.864403,
+    "bbox_alpha_gt0": [
+      0,
+      32,
+      1240,
+      1206
+    ],
+    "bbox_alpha_gt127": [
+      226,
+      425,
+      1105,
+      888
+    ],
+    "alpha_full_ratio": 0.000279,
+    "alpha_partial_ratio": 0.135319
+  },
+  {
+    "file": "G03__top.rejected-v1.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_ratio": 0.805444,
+    "bbox_alpha_gt0": [
+      41,
+      19,
+      1208,
+      1254
+    ],
+    "bbox_alpha_gt127": [
+      298,
+      102,
+      1016,
+      1207
+    ],
+    "alpha_full_ratio": 0.001032,
+    "alpha_partial_ratio": 0.193524
+  }
+]

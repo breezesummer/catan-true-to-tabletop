@@ -1,0 +1,58 @@
+[
+  {
+    "file": "R08__front.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 252
+  },
+  {
+    "file": "R08__original.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 252
+  },
+  {
+    "file": "R08__side.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 252
+  },
+  {
+    "file": "R08__top-attempt-v3.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 253
+  },
+  {
+    "file": "R08__top-rejected-v1.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 253
+  },
+  {
+    "file": "R08__top-rejected-v2.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 252
+  },
+  {
+    "file": "R08__top.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 253
+  }
+]

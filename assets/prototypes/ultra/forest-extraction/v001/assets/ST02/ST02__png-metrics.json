@@ -1,0 +1,116 @@
+[
+  {
+    "file": "ST02__front.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZero": 1163761,
+    "alpha255": 239,
+    "alphaPartial": 408516,
+    "alphaAtLeast250": 383589,
+    "alphaZeroRatio": 0.740063,
+    "bboxAlphaAtLeast128": [
+      85,
+      405,
+      1170,
+      936
+    ],
+    "bboxWidth": 1086,
+    "bboxHeight": 532
+  },
+  {
+    "file": "ST02__original.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZero": 1114548,
+    "alpha255": 242,
+    "alphaPartial": 457726,
+    "alphaAtLeast250": 434125,
+    "alphaZeroRatio": 0.708767,
+    "bboxAlphaAtLeast128": [
+      170,
+      277,
+      1109,
+      1019
+    ],
+    "bboxWidth": 940,
+    "bboxHeight": 743
+  },
+  {
+    "file": "ST02__side.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZero": 1137871,
+    "alpha255": 422,
+    "alphaPartial": 434223,
+    "alphaAtLeast250": 411510,
+    "alphaZeroRatio": 0.723599,
+    "bboxAlphaAtLeast128": [
+      123,
+      377,
+      1177,
+      935
+    ],
+    "bboxWidth": 1055,
+    "bboxHeight": 559
+  },
+  {
+    "file": "ST02__top-v1-rejected.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZero": 965601,
+    "alpha255": 527,
+    "alphaPartial": 606388,
+    "alphaAtLeast250": 583937,
+    "alphaZeroRatio": 0.614048,
+    "bboxAlphaAtLeast128": [
+      117,
+      135,
+      1160,
+      1143
+    ],
+    "bboxWidth": 1044,
+    "bboxHeight": 1009
+  },
+  {
+    "file": "ST02__top-v2-rejected.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZero": 940390,
+    "alpha255": 68,
+    "alphaPartial": 632058,
+    "alphaAtLeast250": 598933,
+    "alphaZeroRatio": 0.598016,
+    "bboxAlphaAtLeast128": [
+      127,
+      143,
+      1137,
+      1118
+    ],
+    "bboxWidth": 1011,
+    "bboxHeight": 976
+  },
+  {
+    "file": "ST02__top.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZero": 870160,
+    "alpha255": 388,
+    "alphaPartial": 701968,
+    "alphaAtLeast250": 675357,
+    "alphaZeroRatio": 0.553355,
+    "bboxAlphaAtLeast128": [
+      77,
+      139,
+      1176,
+      1184
+    ],
+    "bboxWidth": 1100,
+    "bboxHeight": 1046
+  }
+]

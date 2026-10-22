@@ -1,0 +1,44 @@
+[
+  {
+    "id": "original_v1_rejected",
+    "file": "T03__original__rejected_v1.png",
+    "prompt": "T03__original__actual_prompt.txt",
+    "mode": "内置ImageGen",
+    "output_hint": "Generated images are saved to C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002 as C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002\\exec-18aded63-1a51-44e3-89ad-2efdea3380f2.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "original_v2_selected",
+    "file": "T03__original.png",
+    "prompt": "T03__original__actual_prompt_v2.txt",
+    "mode": "内置ImageGen",
+    "output_hint": "Generated images are saved to C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002 as C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002\\exec-1560ac57-e90d-499a-a16d-2acd0a3d759a.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "front_selected",
+    "file": "T03__front.png",
+    "prompt": "T03__front__actual_prompt.txt",
+    "mode": "内置ImageGen",
+    "output_hint": "Generated images are saved to C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002 as C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002\\exec-b7e5d904-1460-40d4-a10b-b30e3b956f20.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "side_selected",
+    "file": "T03__side.png",
+    "prompt": "T03__side__actual_prompt.txt",
+    "mode": "内置ImageGen",
+    "output_hint": "Generated images are saved to C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002 as C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002\\exec-4782583d-1855-40e9-8945-993b75edcdd4.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "top_v1_rejected",
+    "file": "T03__top__rejected_v1.png",
+    "prompt": "T03__top__actual_prompt.txt",
+    "mode": "内置ImageGen",
+    "output_hint": "Generated images are saved to C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002 as C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002\\exec-2ce936a5-f7f2-4b56-9c8b-213f052ec3e6.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  {
+    "id": "top_v2_selected",
+    "file": "T03__top.png",
+    "prompt": "T03__top__actual_prompt_v2.txt",
+    "mode": "内置ImageGen",
+    "output_hint": "Generated images are saved to C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002 as C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f47-9c3a-7a82-a523-f4d417cf7002\\exec-f1c8a908-fb48-4c28-89c2-9196f192c258.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  }
+]

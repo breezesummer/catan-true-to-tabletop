@@ -1,0 +1,42 @@
+{
+  "tool": "内置image_gen__imagegen",
+  "model": "工具未返回",
+  "reference": "../../reference.png",
+  "items": [
+    {
+      "file": "original-rejected-five-posts.png",
+      "prompt": "original-rejected-five-posts.actual-prompt.txt",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f96-76e5-71c3-a22d-c75821ca2690\\exec-6cfbedc3-cca4-47d3-bbc3-75aea79aeff5.png"
+    },
+    {
+      "file": "original.png",
+      "prompt": "original.actual-prompt.txt",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f96-76e5-71c3-a22d-c75821ca2690\\exec-a2897771-bd67-461f-b681-44cfb51b91bc.png"
+    },
+    {
+      "file": "front-rejected-top-face.png",
+      "prompt": "front-rejected-top-face.actual-prompt.txt",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f96-76e5-71c3-a22d-c75821ca2690\\exec-cc65aa8d-3244-46a0-837e-4b3df17e4b0f.png"
+    },
+    {
+      "file": "front.png",
+      "prompt": "front.actual-prompt.txt",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f96-76e5-71c3-a22d-c75821ca2690\\exec-2ad27ecf-f053-4e4d-9c7a-25a301074af2.png"
+    },
+    {
+      "file": "side-rejected-top-face.png",
+      "prompt": "side-rejected-top-face.actual-prompt.txt",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f96-76e5-71c3-a22d-c75821ca2690\\exec-d49ce582-c287-487f-928e-3f89ef4a39f9.png"
+    },
+    {
+      "file": "side.png",
+      "prompt": "side.actual-prompt.txt",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f96-76e5-71c3-a22d-c75821ca2690\\exec-844bff45-7c20-4903-90ba-66b1c173a6bf.png"
+    },
+    {
+      "file": "top.png",
+      "prompt": "top.actual-prompt.txt",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f96-76e5-71c3-a22d-c75821ca2690\\exec-342d6500-7e24-46f3-bb6c-57bd1c26ed09.png"
+    }
+  ]
+}

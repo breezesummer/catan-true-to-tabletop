@@ -1,0 +1,54 @@
+[
+  {
+    "file": "T04__front.png",
+    "alphaThreshold": 128,
+    "bbox": [
+      174,
+      50,
+      1120,
+      1226
+    ],
+    "widthRatio": 0.755,
+    "heightRatio": 0.939,
+    "lowAlphaPixels": 33044
+  },
+  {
+    "file": "T04__original.png",
+    "alphaThreshold": 128,
+    "bbox": [
+      201,
+      49,
+      1104,
+      1186
+    ],
+    "widthRatio": 0.721,
+    "heightRatio": 0.907,
+    "lowAlphaPixels": 41277
+  },
+  {
+    "file": "T04__side.png",
+    "alphaThreshold": 128,
+    "bbox": [
+      289,
+      39,
+      1010,
+      1208
+    ],
+    "widthRatio": 0.576,
+    "heightRatio": 0.933,
+    "lowAlphaPixels": 30604
+  },
+  {
+    "file": "T04__top.png",
+    "alphaThreshold": 128,
+    "bbox": [
+      166,
+      195,
+      1118,
+      1072
+    ],
+    "widthRatio": 0.76,
+    "heightRatio": 0.7,
+    "lowAlphaPixels": 33574
+  }
+]

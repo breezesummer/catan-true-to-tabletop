@@ -1,0 +1,130 @@
+[
+  {
+    "file": "T11__front.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "alpha0_pixels": 1186318,
+    "alpha255_pixels": 298,
+    "partial_alpha_pixels": 385900,
+    "alpha_ge240_pixels": 344430,
+    "raw_alpha_bbox": [
+      27,
+      39,
+      1216,
+      1222
+    ],
+    "alpha_ge128_bbox": [
+      368,
+      45,
+      896,
+      1218
+    ],
+    "visible_width": 528,
+    "visible_height": 1173,
+    "width_fraction": 0.421053,
+    "height_fraction": 0.935407
+  },
+  {
+    "file": "T11__original.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "alpha0_pixels": 1194341,
+    "alpha255_pixels": 312,
+    "partial_alpha_pixels": 377863,
+    "alpha_ge240_pixels": 330213,
+    "raw_alpha_bbox": [
+      0,
+      0,
+      1248,
+      1254
+    ],
+    "alpha_ge128_bbox": [
+      372,
+      38,
+      885,
+      1224
+    ],
+    "visible_width": 513,
+    "visible_height": 1186,
+    "width_fraction": 0.409091,
+    "height_fraction": 0.945774
+  },
+  {
+    "file": "T11__side.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "alpha0_pixels": 1213600,
+    "alpha255_pixels": 89,
+    "partial_alpha_pixels": 358827,
+    "alpha_ge240_pixels": 307847,
+    "raw_alpha_bbox": [
+      27,
+      36,
+      1208,
+      1224
+    ],
+    "alpha_ge128_bbox": [
+      393,
+      49,
+      868,
+      1221
+    ],
+    "visible_width": 475,
+    "visible_height": 1172,
+    "width_fraction": 0.378788,
+    "height_fraction": 0.934609
+  },
+  {
+    "file": "T11__top.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "alpha0_pixels": 1355259,
+    "alpha255_pixels": 134,
+    "partial_alpha_pixels": 217123,
+    "alpha_ge240_pixels": 197907,
+    "raw_alpha_bbox": [
+      41,
+      37,
+      1219,
+      1223
+    ],
+    "alpha_ge128_bbox": [
+      359,
+      364,
+      928,
+      916
+    ],
+    "visible_width": 569,
+    "visible_height": 552,
+    "width_fraction": 0.453748,
+    "height_fraction": 0.440191
+  }
+]

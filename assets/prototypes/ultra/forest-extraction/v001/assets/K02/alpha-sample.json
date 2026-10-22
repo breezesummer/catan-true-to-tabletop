@@ -1,0 +1,380 @@
+[
+  {
+    "file": "K02__front__rejected-v1.png",
+    "note": "每8像素抽样Alpha分布，非完整像素计数",
+    "most_common_alpha": [
+      {
+        "alpha": 0,
+        "sample_count": 14080
+      },
+      {
+        "alpha": 253,
+        "sample_count": 7777
+      },
+      {
+        "alpha": 252,
+        "sample_count": 2069
+      },
+      {
+        "alpha": 1,
+        "sample_count": 184
+      },
+      {
+        "alpha": 251,
+        "sample_count": 164
+      },
+      {
+        "alpha": 250,
+        "sample_count": 53
+      },
+      {
+        "alpha": 2,
+        "sample_count": 24
+      },
+      {
+        "alpha": 249,
+        "sample_count": 23
+      },
+      {
+        "alpha": 3,
+        "sample_count": 23
+      },
+      {
+        "alpha": 248,
+        "sample_count": 20
+      },
+      {
+        "alpha": 254,
+        "sample_count": 17
+      },
+      {
+        "alpha": 247,
+        "sample_count": 14
+      }
+    ]
+  },
+  {
+    "file": "K02__front.png",
+    "note": "每8像素抽样Alpha分布，非完整像素计数",
+    "most_common_alpha": [
+      {
+        "alpha": 0,
+        "sample_count": 15066
+      },
+      {
+        "alpha": 253,
+        "sample_count": 7737
+      },
+      {
+        "alpha": 252,
+        "sample_count": 1140
+      },
+      {
+        "alpha": 1,
+        "sample_count": 160
+      },
+      {
+        "alpha": 251,
+        "sample_count": 137
+      },
+      {
+        "alpha": 250,
+        "sample_count": 77
+      },
+      {
+        "alpha": 2,
+        "sample_count": 44
+      },
+      {
+        "alpha": 249,
+        "sample_count": 37
+      },
+      {
+        "alpha": 248,
+        "sample_count": 28
+      },
+      {
+        "alpha": 4,
+        "sample_count": 21
+      },
+      {
+        "alpha": 247,
+        "sample_count": 19
+      },
+      {
+        "alpha": 254,
+        "sample_count": 14
+      }
+    ]
+  },
+  {
+    "file": "K02__original.png",
+    "note": "每8像素抽样Alpha分布，非完整像素计数",
+    "most_common_alpha": [
+      {
+        "alpha": 0,
+        "sample_count": 16985
+      },
+      {
+        "alpha": 253,
+        "sample_count": 4574
+      },
+      {
+        "alpha": 252,
+        "sample_count": 2435
+      },
+      {
+        "alpha": 1,
+        "sample_count": 146
+      },
+      {
+        "alpha": 251,
+        "sample_count": 143
+      },
+      {
+        "alpha": 250,
+        "sample_count": 66
+      },
+      {
+        "alpha": 249,
+        "sample_count": 30
+      },
+      {
+        "alpha": 2,
+        "sample_count": 28
+      },
+      {
+        "alpha": 248,
+        "sample_count": 23
+      },
+      {
+        "alpha": 3,
+        "sample_count": 18
+      },
+      {
+        "alpha": 247,
+        "sample_count": 18
+      },
+      {
+        "alpha": 4,
+        "sample_count": 15
+      }
+    ]
+  },
+  {
+    "file": "K02__side__rejected-v1.png",
+    "note": "每8像素抽样Alpha分布，非完整像素计数",
+    "most_common_alpha": [
+      {
+        "alpha": 0,
+        "sample_count": 17394
+      },
+      {
+        "alpha": 253,
+        "sample_count": 5447
+      },
+      {
+        "alpha": 252,
+        "sample_count": 1159
+      },
+      {
+        "alpha": 251,
+        "sample_count": 147
+      },
+      {
+        "alpha": 1,
+        "sample_count": 143
+      },
+      {
+        "alpha": 250,
+        "sample_count": 58
+      },
+      {
+        "alpha": 2,
+        "sample_count": 37
+      },
+      {
+        "alpha": 3,
+        "sample_count": 30
+      },
+      {
+        "alpha": 249,
+        "sample_count": 19
+      },
+      {
+        "alpha": 4,
+        "sample_count": 17
+      },
+      {
+        "alpha": 254,
+        "sample_count": 11
+      },
+      {
+        "alpha": 248,
+        "sample_count": 10
+      }
+    ]
+  },
+  {
+    "file": "K02__side.png",
+    "note": "每8像素抽样Alpha分布，非完整像素计数",
+    "most_common_alpha": [
+      {
+        "alpha": 0,
+        "sample_count": 16382
+      },
+      {
+        "alpha": 253,
+        "sample_count": 5528
+      },
+      {
+        "alpha": 252,
+        "sample_count": 2164
+      },
+      {
+        "alpha": 1,
+        "sample_count": 160
+      },
+      {
+        "alpha": 251,
+        "sample_count": 115
+      },
+      {
+        "alpha": 2,
+        "sample_count": 38
+      },
+      {
+        "alpha": 250,
+        "sample_count": 38
+      },
+      {
+        "alpha": 249,
+        "sample_count": 17
+      },
+      {
+        "alpha": 248,
+        "sample_count": 15
+      },
+      {
+        "alpha": 246,
+        "sample_count": 15
+      },
+      {
+        "alpha": 244,
+        "sample_count": 11
+      },
+      {
+        "alpha": 245,
+        "sample_count": 10
+      }
+    ]
+  },
+  {
+    "file": "K02__top__rejected-v1.png",
+    "note": "每8像素抽样Alpha分布，非完整像素计数",
+    "most_common_alpha": [
+      {
+        "alpha": 0,
+        "sample_count": 13436
+      },
+      {
+        "alpha": 252,
+        "sample_count": 5557
+      },
+      {
+        "alpha": 253,
+        "sample_count": 4799
+      },
+      {
+        "alpha": 251,
+        "sample_count": 348
+      },
+      {
+        "alpha": 1,
+        "sample_count": 106
+      },
+      {
+        "alpha": 250,
+        "sample_count": 88
+      },
+      {
+        "alpha": 249,
+        "sample_count": 47
+      },
+      {
+        "alpha": 2,
+        "sample_count": 37
+      },
+      {
+        "alpha": 3,
+        "sample_count": 36
+      },
+      {
+        "alpha": 248,
+        "sample_count": 25
+      },
+      {
+        "alpha": 245,
+        "sample_count": 12
+      },
+      {
+        "alpha": 5,
+        "sample_count": 12
+      }
+    ]
+  },
+  {
+    "file": "K02__top.png",
+    "note": "每8像素抽样Alpha分布，非完整像素计数",
+    "most_common_alpha": [
+      {
+        "alpha": 0,
+        "sample_count": 14622
+      },
+      {
+        "alpha": 253,
+        "sample_count": 5469
+      },
+      {
+        "alpha": 252,
+        "sample_count": 3794
+      },
+      {
+        "alpha": 1,
+        "sample_count": 153
+      },
+      {
+        "alpha": 251,
+        "sample_count": 135
+      },
+      {
+        "alpha": 250,
+        "sample_count": 57
+      },
+      {
+        "alpha": 249,
+        "sample_count": 52
+      },
+      {
+        "alpha": 2,
+        "sample_count": 49
+      },
+      {
+        "alpha": 248,
+        "sample_count": 38
+      },
+      {
+        "alpha": 247,
+        "sample_count": 29
+      },
+      {
+        "alpha": 246,
+        "sample_count": 20
+      },
+      {
+        "alpha": 4,
+        "sample_count": 14
+      }
+    ]
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "view": "original",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 252
+  },
+  {
+    "view": "front",
+    "width": 1512,
+    "height": 1040,
+    "pixelFormat": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 253
+  },
+  {
+    "view": "side",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 253
+  },
+  {
+    "view": "top",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "cornerAlpha": 0,
+    "centerAlpha": 253
+  }
+]

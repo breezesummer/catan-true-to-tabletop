@@ -1,0 +1,132 @@
+[
+  {
+    "file": "S07__front.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_ratio": 0.6934943746200357,
+    "bbox_alpha_gt0": [
+      0,
+      33,
+      1234,
+      1229
+    ],
+    "bbox_alpha_gt127": [
+      43,
+      361,
+      1230,
+      993
+    ],
+    "alpha_partial_ratio": 0.30625507149052855
+  },
+  {
+    "file": "S07__original.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_ratio": 0.704100943964958,
+    "bbox_alpha_gt0": [
+      0,
+      19,
+      1236,
+      1254
+    ],
+    "bbox_alpha_gt127": [
+      78,
+      328,
+      1208,
+      987
+    ],
+    "alpha_partial_ratio": 0.29549651641064384
+  },
+  {
+    "file": "S07__side.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_ratio": 0.7337235360403328,
+    "bbox_alpha_gt0": [
+      0,
+      0,
+      1234,
+      1230
+    ],
+    "bbox_alpha_gt127": [
+      97,
+      326,
+      1172,
+      934
+    ],
+    "alpha_partial_ratio": 0.26606915287348426
+  },
+  {
+    "file": "S07__top.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_ratio": 0.5877816187561844,
+    "bbox_alpha_gt0": [
+      0,
+      38,
+      1253,
+      1254
+    ],
+    "bbox_alpha_gt127": [
+      77,
+      263,
+      1202,
+      1014
+    ],
+    "alpha_partial_ratio": 0.4120619440438126
+  },
+  {
+    "file": "S07__top.rejected-v1.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_zero_ratio": 0.6363451945798961,
+    "bbox_alpha_gt0": [
+      0,
+      20,
+      1240,
+      1254
+    ],
+    "bbox_alpha_gt127": [
+      56,
+      278,
+      1213,
+      1040
+    ],
+    "alpha_partial_ratio": 0.36334320286725225
+  }
+]

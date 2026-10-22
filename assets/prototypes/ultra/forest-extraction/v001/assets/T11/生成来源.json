@@ -1,0 +1,31 @@
+{
+  "工具": "内置 image_gen__imagegen",
+  "透明背景参数": true,
+  "参考": "每次均使用原始场景；正侧顶同时附原角度采用图，不以上一张派生图为唯一参考。",
+  "生成记录": [
+    {
+      "说明": "原角度初次（弃用）",
+      "来源输出": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f62-9a64-7d80-8f27-8d8906b139c1\\exec-8a33ac53-d694-48f1-a4cf-3f8a6d78cc9e.png"
+    },
+    {
+      "说明": "原角度返工（采用）",
+      "来源输出": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f62-9a64-7d80-8f27-8d8906b139c1\\exec-1831efd3-f7a2-4c6f-b79b-1981e90c24c8.png"
+    },
+    {
+      "说明": "正视（采用）",
+      "来源输出": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f62-9a64-7d80-8f27-8d8906b139c1\\exec-7379c7c9-9227-41b2-a37f-f7b5d7d08815.png"
+    },
+    {
+      "说明": "侧视（采用）",
+      "来源输出": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f62-9a64-7d80-8f27-8d8906b139c1\\exec-1932831a-b677-47f8-afc6-e3e39a4f880a.png"
+    },
+    {
+      "说明": "顶视初次（弃用）",
+      "来源输出": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f62-9a64-7d80-8f27-8d8906b139c1\\exec-3524e6d7-7cdf-4e84-a94c-600f111bd079.png"
+    },
+    {
+      "说明": "顶视尺度返工（采用）",
+      "来源输出": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15f62-9a64-7d80-8f27-8d8906b139c1\\exec-7b6b8d82-a379-4af2-8840-2da9d95300c0.png"
+    }
+  ]
+}

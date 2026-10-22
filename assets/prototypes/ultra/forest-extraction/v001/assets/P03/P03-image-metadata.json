@@ -1,0 +1,114 @@
+[
+  {
+    "file": "P03__front-v1-rejected.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.8193455583281823,
+    "alpha_full_ratio": 0.0010295602715648044,
+    "bbox_alpha_gt0": [
+      0,
+      89,
+      1240,
+      1232
+    ]
+  },
+  {
+    "file": "P03__front.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.8078747688417797,
+    "alpha_full_ratio": 0.000387277458544142,
+    "bbox_alpha_gt0": [
+      0,
+      55,
+      1236,
+      1254
+    ]
+  },
+  {
+    "file": "P03__original.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.8186263287623147,
+    "alpha_full_ratio": 0.0004108066309023247,
+    "bbox_alpha_gt0": [
+      0,
+      28,
+      1234,
+      1254
+    ]
+  },
+  {
+    "file": "P03__side-v1-rejected.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.9443592306850932,
+    "alpha_full_ratio": 0.00023147618211833774,
+    "bbox_alpha_gt0": [
+      0,
+      0,
+      1198,
+      1166
+    ]
+  },
+  {
+    "file": "P03__side.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.9441926187078542,
+    "alpha_full_ratio": 0.0002995200048838931,
+    "bbox_alpha_gt0": [
+      0,
+      33,
+      1224,
+      1214
+    ]
+  },
+  {
+    "file": "P03__top-v1-rejected.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.9310143744165401,
+    "alpha_full_ratio": 0.00013290802764486976,
+    "bbox_alpha_gt0": [
+      21,
+      33,
+      1230,
+      1254
+    ]
+  },
+  {
+    "file": "P03__top.png",
+    "size": [
+      1774,
+      887
+    ],
+    "mode": "RGBA",
+    "alpha_zero_ratio": 0.8912126685215102,
+    "alpha_full_ratio": 9.469107196648571e-05,
+    "bbox_alpha_gt0": [
+      67,
+      37,
+      1768,
+      804
+    ]
+  }
+]

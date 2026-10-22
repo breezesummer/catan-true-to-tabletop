@@ -1,0 +1,110 @@
+[
+  {
+    "file": "T12__original.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_bbox": [
+      55,
+      19,
+      1216,
+      1244
+    ],
+    "alpha0_count": 1090400,
+    "alpha253_count": 288396,
+    "alpha255_count": 557,
+    "bbox_alpha_gt127": [
+      224,
+      116,
+      1037,
+      1190
+    ]
+  },
+  {
+    "file": "T12__front.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_bbox": [
+      0,
+      0,
+      1253,
+      1254
+    ],
+    "alpha0_count": 946677,
+    "alpha253_count": 379287,
+    "alpha255_count": 378,
+    "bbox_alpha_gt127": [
+      183,
+      24,
+      1083,
+      1245
+    ]
+  },
+  {
+    "file": "T12__side.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_bbox": [
+      0,
+      17,
+      1238,
+      1254
+    ],
+    "alpha0_count": 1070181,
+    "alpha253_count": 166463,
+    "alpha255_count": 407,
+    "bbox_alpha_gt127": [
+      256,
+      60,
+      1028,
+      1203
+    ]
+  },
+  {
+    "file": "T12__top.png",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "alpha_bbox": [
+      0,
+      12,
+      1234,
+      1254
+    ],
+    "alpha0_count": 913353,
+    "alpha253_count": 235711,
+    "alpha255_count": 435,
+    "bbox_alpha_gt127": [
+      93,
+      167,
+      1173,
+      1102
+    ]
+  }
+]

@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-21",
+  "tool": "内置 image_gen",
+  "status": "概念原型，待用户确认",
+  "assets": [
+    {
+      "key": "brick-pristine",
+      "name": "砖土原始态",
+      "file": "brick-pristine-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-3d4d6e28-e1d6-4f38-b905-5cf8cbbd9486.png",
+      "reference": "D:/Project/catan-true-to-tabletop/assets/prototypes/ultra/v004/terrain-states/forest-pristine-v004.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3047016,
+      "sha256": "08db37ce8ebc14e7a2cd2ce4017405e48a26db2b48dbba9e98ddd226c44ac2f3"
+    },
+    {
+      "key": "iron-pristine",
+      "name": "铁矿原始态",
+      "file": "iron-pristine-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-d929092b-0dd5-4768-b2f9-b5e75a543bd9.png",
+      "reference": "D:/Project/catan-true-to-tabletop/assets/prototypes/ultra/v004/terrain-states/forest-pristine-v004.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3055016,
+      "sha256": "cd416d4106c439a2a612f32e6a597353fc659f34d4e5f35163a9d0916f366bb1"
+    },
+    {
+      "key": "gold-pristine",
+      "name": "金矿原始态",
+      "file": "gold-pristine-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-ad79fd66-ffff-4633-b0aa-555a6ba2a5ba.png",
+      "reference": "D:/Project/catan-true-to-tabletop/assets/prototypes/ultra/v004/terrain-states/forest-pristine-v004.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3082062,
+      "sha256": "cd64c7bbdb5a29770e416f35fc88e47d7af54dbab5ae8e8213de9ecb1debb381"
+    },
+    {
+      "key": "desert-pristine",
+      "name": "沙漠原始态",
+      "file": "desert-pristine-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-dfdf3aa4-d89e-4c75-986b-493c396c9369.png",
+      "reference": "D:/Project/catan-true-to-tabletop/assets/prototypes/ultra/v004/terrain-states/forest-pristine-v004.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2796376,
+      "sha256": "766ad91e64c77fb7bef5d79310975c211f644354cd28d9ff10044aeda83513c3"
+    },
+    {
+      "key": "ocean-pristine",
+      "name": "海洋原始态",
+      "file": "ocean-pristine-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-35a497fe-5a07-4500-8c33-3661876de4e6.png",
+      "reference": "D:/Project/catan-true-to-tabletop/assets/prototypes/ultra/v004/terrain-states/forest-pristine-v004.png",
+      "correction": "海面降浪与减少白沫修正",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2578306,
+      "sha256": "8553ee7ba363a35bc858b52e8dc4b5df4a3e6dc911015949b0f778ba6020f004"
+    },
+    {
+      "key": "brick-coast",
+      "name": "砖土海岸态",
+      "file": "brick-coast-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-bee7d686-c22f-4034-87c7-eaf3a1498250.png",
+      "reference": "C:/Users/BreezeSummer/.codex/generated_images/01a15c3d-c906-7182-8e41-d3736702ba30/exec-3d4d6e28-e1d6-4f38-b905-5cf8cbbd9486.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2501641,
+      "sha256": "ad5e803aa4a1b31840f49ae08c5068b7660d491425c0d6f520a17703fa849c52"
+    },
+    {
+      "key": "iron-coast",
+      "name": "铁矿海岸态",
+      "file": "iron-coast-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-1ba8341c-f5bf-4490-afec-4af6fc6aac89.png",
+      "reference": "C:/Users/BreezeSummer/.codex/generated_images/01a15c3d-c906-7182-8e41-d3736702ba30/exec-d929092b-0dd5-4768-b2f9-b5e75a543bd9.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2600092,
+      "sha256": "1b0a2e324033b1543fa77e0e3d69bde7af623e9d65c784f1479f9ceb4b441635"
+    },
+    {
+      "key": "gold-coast",
+      "name": "金矿海岸态",
+      "file": "gold-coast-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-869875d8-5dad-474a-9df0-a7bd800bde94.png",
+      "reference": "C:/Users/BreezeSummer/.codex/generated_images/01a15c3d-c906-7182-8e41-d3736702ba30/exec-ad79fd66-ffff-4633-b0aa-555a6ba2a5ba.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2610986,
+      "sha256": "9a299e0354b378efe82bf7a733ad6e170b576378fe4d2b64674998e6a018a572"
+    },
+    {
+      "key": "desert-coast",
+      "name": "沙漠海岸态",
+      "file": "desert-coast-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-b366c735-b4a4-414c-b375-004a5fea5f83.png",
+      "reference": "C:/Users/BreezeSummer/.codex/generated_images/01a15c3d-c906-7182-8e41-d3736702ba30/exec-dfdf3aa4-d89e-4c75-986b-493c396c9369.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2364875,
+      "sha256": "138f4cde8570424c57fe3b8915d4db1af5e05fcad9a48ecffb111a5ce36d09c8"
+    },
+    {
+      "key": "brick-developed",
+      "name": "砖土局部砖窑",
+      "file": "brick-developed-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-e0d7b48d-decd-4c4d-8f7e-399ceb70f3a5.png",
+      "reference": "C:/Users/BreezeSummer/.codex/generated_images/01a15c3d-c906-7182-8e41-d3736702ba30/exec-3d4d6e28-e1d6-4f38-b905-5cf8cbbd9486.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2956407,
+      "sha256": "825bb732572b8394f1dd2ea675b83133b8e08c5cf9e55453ccfb8ec4c23113b0"
+    },
+    {
+      "key": "iron-developed",
+      "name": "铁矿局部采掘",
+      "file": "iron-developed-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-2c09e266-a700-49e7-830e-967e8e856872.png",
+      "reference": "C:/Users/BreezeSummer/.codex/generated_images/01a15c3d-c906-7182-8e41-d3736702ba30/exec-d929092b-0dd5-4768-b2f9-b5e75a543bd9.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3016212,
+      "sha256": "6dcd2ee8d15c9a31082f6909fd4463d292c6d21b5944d00fb532129ee75dd130"
+    },
+    {
+      "key": "gold-developed",
+      "name": "金矿局部采掘淘洗",
+      "file": "gold-developed-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-42f8c3c4-1021-4f86-9db5-b1d3a2a63df7.png",
+      "reference": "C:/Users/BreezeSummer/.codex/generated_images/01a15c3d-c906-7182-8e41-d3736702ba30/exec-ad79fd66-ffff-4633-b0aa-555a6ba2a5ba.png",
+      "correction": "无",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3024197,
+      "sha256": "0859a5c9bf98d00a575b045ae47bb1f4ad10a30a4598f810a4e1a331bb4812ec"
+    },
+    {
+      "key": "ocean-harbor",
+      "name": "海洋通用商埠",
+      "file": "ocean-harbor-v005.png",
+      "source": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15c3d-c906-7182-8e41-d3736702ba30\\exec-735a2993-eaf9-4ed0-9820-b156856f4335.png",
+      "reference": "C:/Users/BreezeSummer/.codex/generated_images/01a15c3d-c906-7182-8e41-d3736702ba30/exec-de0b9c95-a47f-47ef-813a-ff6fefd42e6b.png",
+      "correction": "海面降浪与减少白沫修正",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2593856,
+      "sha256": "cb745576d66ab7c29741e94592fb2f8c79aafceb725942b5b3de532c73753d65"
+    }
+  ]
+}

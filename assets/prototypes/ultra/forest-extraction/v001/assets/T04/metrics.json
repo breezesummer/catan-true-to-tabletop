@@ -1,0 +1,62 @@
+[
+  {
+    "file": "T04__front.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "bbox": [
+      0,
+      0,
+      1237,
+      1253
+    ],
+    "widthRatio": 0.987,
+    "heightRatio": 1.0,
+    "transparentRatio": 0.543
+  },
+  {
+    "file": "T04__original.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "bbox": [
+      0,
+      8,
+      1253,
+      1253
+    ],
+    "widthRatio": 1.0,
+    "heightRatio": 0.994,
+    "transparentRatio": 0.571
+  },
+  {
+    "file": "T04__side.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "bbox": [
+      0,
+      7,
+      1239,
+      1213
+    ],
+    "widthRatio": 0.989,
+    "heightRatio": 0.963,
+    "transparentRatio": 0.648
+  },
+  {
+    "file": "T04__top.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "bbox": [
+      0,
+      0,
+      1243,
+      1253
+    ],
+    "widthRatio": 0.992,
+    "heightRatio": 1.0,
+    "transparentRatio": 0.627
+  }
+]

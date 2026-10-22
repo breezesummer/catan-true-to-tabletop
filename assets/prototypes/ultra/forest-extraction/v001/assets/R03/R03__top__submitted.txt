@@ -1,0 +1,3 @@
+Change camera to be DIRECTLY ABOVE this exact same mossy rock. Perfect ORTHOGRAPHIC PLAN view, parallel projection down -Y, exactly 90 degrees downward. Show the TOP surface, its same gray cracked facets and yellow-green moss. The highest point is at the CENTER of the image. The silhouette is an irregular rounded oval footprint, no horizontal ground baseline or tall domed elevation silhouette. Do not retain the reference oblique camera. No large front wall. Isolated same rock, no ground or foliage, transparent square canvas with margin.
+
+固定身份与造型：小型圆钝灰色岩石，局部有浅绿苔痕，原图只露顶部和小段侧面。本次重建的相对尺寸规格为宽 W=0.6、高 H=0.35、深 L=0.5，单位仅为本资产内部相对单位，不是实测米数。这些尺寸及隐藏结构是统一制作约定，不能声称它们已由参考图精确测得。保留可辨认的颜色、材质、轮廓特征和结构连接，不改成其他款式。

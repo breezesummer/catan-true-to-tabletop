@@ -1,0 +1,116 @@
+[
+  {
+    "file": "S04__front.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "alphaZero": 824709,
+    "alphaOpaque": 589,
+    "alphaPartial": 747218,
+    "bbox": [
+      0,
+      5,
+      1254,
+      1254
+    ],
+    "bboxWidth": 1254,
+    "bboxHeight": 1249
+  },
+  {
+    "file": "S04__original.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "alphaZero": 950296,
+    "alphaOpaque": 598,
+    "alphaPartial": 621622,
+    "bbox": [
+      0,
+      17,
+      1238,
+      1254
+    ],
+    "bboxWidth": 1238,
+    "bboxHeight": 1237
+  },
+  {
+    "file": "S04__side-attempt01.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "alphaZero": 1042017,
+    "alphaOpaque": 490,
+    "alphaPartial": 530009,
+    "bbox": [
+      0,
+      0,
+      1236,
+      1190
+    ],
+    "bboxWidth": 1236,
+    "bboxHeight": 1190
+  },
+  {
+    "file": "S04__side.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "alphaZero": 1071776,
+    "alphaOpaque": 352,
+    "alphaPartial": 500388,
+    "bbox": [
+      0,
+      62,
+      1240,
+      1213
+    ],
+    "bboxWidth": 1240,
+    "bboxHeight": 1151
+  },
+  {
+    "file": "S04__top-attempt01.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "alphaZero": 916663,
+    "alphaOpaque": 1038,
+    "alphaPartial": 654815,
+    "bbox": [
+      0,
+      32,
+      1224,
+      1254
+    ],
+    "bboxWidth": 1224,
+    "bboxHeight": 1222
+  },
+  {
+    "file": "S04__top.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "alphaZero": 903813,
+    "alphaOpaque": 677,
+    "alphaPartial": 668026,
+    "bbox": [
+      0,
+      37,
+      1238,
+      1254
+    ],
+    "bboxWidth": 1238,
+    "bboxHeight": 1217
+  }
+]

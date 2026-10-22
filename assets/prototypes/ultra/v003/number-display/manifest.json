@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-21",
+  "tool": "内置 image_gen",
+  "status": "候选原型，待选择",
+  "reference": "../../v002/number-display/forest-floating-token-v002.png",
+  "assets": [
+    {
+      "file": "open-ring-v003.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2713677,
+      "sha256": "5bed6485caf4013b16db84a1b3ad249ee847d1781c3f83ca544773153b50f3f3"
+    },
+    {
+      "file": "wooden-tally-v003.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2668522,
+      "sha256": "cb9e78726b820aa85221402ea6973e0776924bddc39daa6ac9658a8bbc5a7f56"
+    },
+    {
+      "file": "outline-number-v003.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2717670,
+      "sha256": "7f1e318e79b69c4f529469d31b3f96225e694a38d8691d68bb6244f2919441ea"
+    }
+  ]
+}

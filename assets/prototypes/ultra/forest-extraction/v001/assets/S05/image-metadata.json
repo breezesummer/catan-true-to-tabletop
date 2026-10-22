@@ -1,0 +1,287 @@
+[
+  {
+    "file": "S05__front.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZeroPct": 69.223,
+    "alphaPartialPct": 30.725,
+    "alphaOpaquePct": 0.051,
+    "nonzeroAlphaBBox": [
+      0,
+      39,
+      1235,
+      1203
+    ],
+    "bboxWidthPct": 98.565,
+    "bboxHeightPct": 92.903,
+    "alphaHistogramMostFrequent": [
+      {
+        "alpha": 0,
+        "pixels": 1088546
+      },
+      {
+        "alpha": 253,
+        "pixels": 280443
+      },
+      {
+        "alpha": 252,
+        "pixels": 142584
+      },
+      {
+        "alpha": 251,
+        "pixels": 15627
+      },
+      {
+        "alpha": 1,
+        "pixels": 10696
+      },
+      {
+        "alpha": 250,
+        "pixels": 6078
+      },
+      {
+        "alpha": 249,
+        "pixels": 3063
+      },
+      {
+        "alpha": 2,
+        "pixels": 2383
+      }
+    ],
+    "alpha128BBox": [
+      43,
+      386,
+      1231,
+      983
+    ]
+  },
+  {
+    "file": "S05__original.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZeroPct": 64.88,
+    "alphaPartialPct": 35.085,
+    "alphaOpaquePct": 0.036,
+    "nonzeroAlphaBBox": [
+      0,
+      19,
+      1252,
+      1221
+    ],
+    "bboxWidthPct": 99.92,
+    "bboxHeightPct": 95.933,
+    "alphaHistogramMostFrequent": [
+      {
+        "alpha": 0,
+        "pixels": 1020243
+      },
+      {
+        "alpha": 252,
+        "pixels": 304790
+      },
+      {
+        "alpha": 253,
+        "pixels": 133521
+      },
+      {
+        "alpha": 251,
+        "pixels": 35014
+      },
+      {
+        "alpha": 1,
+        "pixels": 19550
+      },
+      {
+        "alpha": 250,
+        "pixels": 12453
+      },
+      {
+        "alpha": 249,
+        "pixels": 6611
+      },
+      {
+        "alpha": 248,
+        "pixels": 3728
+      }
+    ],
+    "alpha128BBox": [
+      58,
+      272,
+      1218,
+      1042
+    ]
+  },
+  {
+    "file": "S05__side.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZeroPct": 72.214,
+    "alphaPartialPct": 27.769,
+    "alphaOpaquePct": 0.017,
+    "nonzeroAlphaBBox": [
+      0,
+      49,
+      1221,
+      1221
+    ],
+    "bboxWidthPct": 97.448,
+    "bboxHeightPct": 93.541,
+    "alphaHistogramMostFrequent": [
+      {
+        "alpha": 0,
+        "pixels": 1135579
+      },
+      {
+        "alpha": 253,
+        "pixels": 233175
+      },
+      {
+        "alpha": 252,
+        "pixels": 135184
+      },
+      {
+        "alpha": 251,
+        "pixels": 15705
+      },
+      {
+        "alpha": 1,
+        "pixels": 13324
+      },
+      {
+        "alpha": 250,
+        "pixels": 6736
+      },
+      {
+        "alpha": 2,
+        "pixels": 3576
+      },
+      {
+        "alpha": 249,
+        "pixels": 3555
+      }
+    ],
+    "alpha128BBox": [
+      144,
+      324,
+      1152,
+      987
+    ]
+  },
+  {
+    "file": "S05__side.rejected-v1.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZeroPct": 71.426,
+    "alphaPartialPct": 28.545,
+    "alphaOpaquePct": 0.029,
+    "nonzeroAlphaBBox": [
+      0,
+      17,
+      1239,
+      1253
+    ],
+    "bboxWidthPct": 98.884,
+    "bboxHeightPct": 98.644,
+    "alphaHistogramMostFrequent": [
+      {
+        "alpha": 0,
+        "pixels": 1123190
+      },
+      {
+        "alpha": 253,
+        "pixels": 245798
+      },
+      {
+        "alpha": 252,
+        "pixels": 141490
+      },
+      {
+        "alpha": 251,
+        "pixels": 14545
+      },
+      {
+        "alpha": 1,
+        "pixels": 14329
+      },
+      {
+        "alpha": 250,
+        "pixels": 5783
+      },
+      {
+        "alpha": 249,
+        "pixels": 3008
+      },
+      {
+        "alpha": 2,
+        "pixels": 2578
+      }
+    ],
+    "alpha128BBox": [
+      64,
+      365,
+      1208,
+      948
+    ]
+  },
+  {
+    "file": "S05__top.png",
+    "width": 1254,
+    "height": 1254,
+    "pixelFormat": "Format32bppArgb",
+    "alphaZeroPct": 59.719,
+    "alphaPartialPct": 40.246,
+    "alphaOpaquePct": 0.035,
+    "nonzeroAlphaBBox": [
+      0,
+      29,
+      1235,
+      1237
+    ],
+    "bboxWidthPct": 98.565,
+    "bboxHeightPct": 96.411,
+    "alphaHistogramMostFrequent": [
+      {
+        "alpha": 0,
+        "pixels": 939084
+      },
+      {
+        "alpha": 253,
+        "pixels": 356268
+      },
+      {
+        "alpha": 252,
+        "pixels": 211301
+      },
+      {
+        "alpha": 1,
+        "pixels": 17834
+      },
+      {
+        "alpha": 251,
+        "pixels": 15714
+      },
+      {
+        "alpha": 250,
+        "pixels": 5474
+      },
+      {
+        "alpha": 249,
+        "pixels": 2594
+      },
+      {
+        "alpha": 2,
+        "pixels": 2476
+      }
+    ],
+    "alpha128BBox": [
+      29,
+      265,
+      1231,
+      1037
+    ]
+  }
+]

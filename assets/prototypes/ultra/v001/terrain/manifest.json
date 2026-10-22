@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-21",
+  "version": "v001",
+  "tool": "内置 image_gen",
+  "status": "概念原型，待用户确认",
+  "purpose": "二维风格参考，不是三维模型",
+  "prompts": "PROMPTS.md",
+  "assets": [
+    {
+      "file": "grassland-v001.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3211364,
+      "sha256": "4cfdd6b0d41bdba943f31a47e5a31c963160ccfdb440ba2910c36c7c8e5cf338",
+      "reference": null
+    },
+    {
+      "file": "forest-v001.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3128855,
+      "sha256": "42602092ef44eae6f0e46525f45ae4f8d385cecd251c37d46af605a5e5db0a88",
+      "reference": "grassland-v001.png"
+    },
+    {
+      "file": "wheatfield-v001.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 3155916,
+      "sha256": "f35acc0c5067d14c4f3b380bc5016a28596fe0bfa99d6e818f16b71a8925a17f",
+      "reference": "grassland-v001.png"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "asset": "P11",
+  "name": "右后锯马支架",
+  "tool": "内置 image_gen__imagegen",
+  "date": "2026-10-22",
+  "scene": "../../reference.png",
+  "referenceRole": "场景图定位及材质；original 独立图固定身份",
+  "outputs": {
+    "original": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15fa0-635b-7c22-a1cb-f123d370e2d1\\exec-6746814d-1283-415b-a0c4-0aa65ab73e3e.png",
+    "front": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15fa0-635b-7c22-a1cb-f123d370e2d1\\exec-d1cf4c62-4186-4391-80e9-e653a352df89.png",
+    "side": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15fa0-635b-7c22-a1cb-f123d370e2d1\\exec-e37985aa-13b3-4077-b960-59e315b8cb78.png",
+    "top": "C:\\Users\\BreezeSummer\\.codex\\generated_images\\01a15fa0-635b-7c22-a1cb-f123d370e2d1\\exec-bd281aa7-2268-4343-9615-a7314c298fb6.png"
+  }
+}

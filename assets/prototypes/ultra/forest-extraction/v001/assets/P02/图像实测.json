@@ -1,0 +1,170 @@
+[
+  {
+    "file": "front-rejected-top-face.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "RGBA PNG",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "transparentRatio": 0.875021,
+    "alpha1to15Pixels": 26136,
+    "alpha16to127Pixels": 5099,
+    "alpha128to255Pixels": 165296,
+    "bboxAlphaPositive": [
+      47,
+      144,
+      1208,
+      1180
+    ],
+    "bboxAlpha128": [
+      50,
+      513,
+      1204,
+      793
+    ]
+  },
+  {
+    "file": "front.png",
+    "width": 1774,
+    "height": 887,
+    "format": "RGBA PNG",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "transparentRatio": 0.782313,
+    "alpha1to15Pixels": 38767,
+    "alpha16to127Pixels": 7139,
+    "alpha128to255Pixels": 296633,
+    "bboxAlphaPositive": [
+      31,
+      39,
+      1754,
+      863
+    ],
+    "bboxAlpha128": [
+      70,
+      307,
+      1705,
+      665
+    ]
+  },
+  {
+    "file": "original-rejected-five-posts.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "RGBA PNG",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "transparentRatio": 0.863506,
+    "alpha1to15Pixels": 22927,
+    "alpha16to127Pixels": 4521,
+    "alpha128to255Pixels": 187191,
+    "bboxAlphaPositive": [
+      23,
+      37,
+      1210,
+      1230
+    ],
+    "bboxAlpha128": [
+      70,
+      293,
+      1207,
+      1014
+    ]
+  },
+  {
+    "file": "original.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "RGBA PNG",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "transparentRatio": 0.845166,
+    "alpha1to15Pixels": 24797,
+    "alpha16to127Pixels": 4909,
+    "alpha128to255Pixels": 213773,
+    "bboxAlphaPositive": [
+      23,
+      19,
+      1212,
+      1254
+    ],
+    "bboxAlpha128": [
+      78,
+      249,
+      1208,
+      1072
+    ]
+  },
+  {
+    "file": "side-rejected-top-face.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "RGBA PNG",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "transparentRatio": 0.966522,
+    "alpha1to15Pixels": 3454,
+    "alpha16to127Pixels": 1262,
+    "alpha128to255Pixels": 47929,
+    "bboxAlphaPositive": [
+      57,
+      31,
+      1200,
+      1198
+    ],
+    "bboxAlpha128": [
+      567,
+      368,
+      688,
+      884
+    ]
+  },
+  {
+    "file": "side.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "RGBA PNG",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "transparentRatio": 0.968491,
+    "alpha1to15Pixels": 4179,
+    "alpha16to127Pixels": 1153,
+    "alpha128to255Pixels": 44216,
+    "bboxAlphaPositive": [
+      97,
+      45,
+      985,
+      1198
+    ],
+    "bboxAlpha128": [
+      560,
+      425,
+      692,
+      922
+    ]
+  },
+  {
+    "file": "top.png",
+    "width": 1254,
+    "height": 1254,
+    "format": "RGBA PNG",
+    "alphaMin": 0,
+    "alphaMax": 255,
+    "transparentRatio": 0.95185,
+    "alpha1to15Pixels": 10768,
+    "alpha16to127Pixels": 2405,
+    "alpha128to255Pixels": 62543,
+    "bboxAlphaPositive": [
+      41,
+      31,
+      1224,
+      1230
+    ],
+    "bboxAlpha128": [
+      48,
+      597,
+      1209,
+      684
+    ]
+  }
+]
