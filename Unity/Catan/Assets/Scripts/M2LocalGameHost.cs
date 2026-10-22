@@ -1,0 +1,42 @@
+using System;
+using System.IO;
+using Catan.Core.M2;
+using UnityEngine;
+
+// Local authority boundary. The presentation receives only its seat's PlayerView.
+public sealed class M2LocalGameHost
+{
+    private BaseGameSession session;
+    private readonly string topology;
+    public M2LocalGameHost(int players = 4)
+    {
+        topology = Resources.Load<TextAsset>("m1-scenario").text;
+        NewGame(players);
+    }
+    public void NewGame(int players = 4) => NewGame(players, unchecked((uint)Guid.NewGuid().GetHashCode()));
+    public void NewGame(int players, uint seed, int? targetVictoryPoints = null) { session = BaseGameSession.Create(topology, players, seed, targetVictoryPoints); }
+    public PlayerView View(string seat) => session.GetPlayerView(seat);
+    internal PlayerView AiView(string seat) => session.GetAiPlayerView(seat);
+    public Catan.Core.GameHistoryEntry[] History(string seat, long afterSequence = 0) => session.GetHistory(seat, afterSequence);
+    public CommandResult Submit(Command command) => session.Execute(command);
+    public CommandResult Preview(Command command) => session.Preview(command);
+    public string ExportSave() => session.Save();
+    public void ImportSave(string json) { session = BaseGameSession.Load(topology, json); }
+    public string SavePath => Path.Combine(Application.persistentDataPath, "m2-authority-v2.json");
+    public void Save() => WriteSave(SavePath);
+    public void Load() => ReadSave(SavePath);
+    public void WriteSave(string path)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
+        var temporary = path + ".tmp";
+        File.WriteAllText(temporary, session.Save());
+        if (File.Exists(path)) File.Replace(temporary, path, path + ".bak");
+        else File.Move(temporary, path);
+    }
+    public void ReadSave(string path)
+    {
+        // Parsing and validation finish before replacing the running game.
+        var restored = BaseGameSession.Load(topology, File.ReadAllText(path));
+        session = restored;
+    }
+}

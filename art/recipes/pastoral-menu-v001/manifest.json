@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "assetId": "pastoral-menu-v001",
+  "createdDate": "2026-10-16",
+  "title": "卡坦岛之三国争霸 · 现代田园动态菜单",
+  "scope": "外菜单与大厅的独立矢量景观、菜单样式；不作为游戏棋盘或三维地形模型交付",
+  "origin": {
+    "type": "原创程序化矢量代码",
+    "description": "风景与控件由本仓库 C# 几何配方和独立 Shader 在运行时重建，不采样附图或其他图片。",
+    "externalSamples": [],
+    "externalAudio": [],
+    "originalReferencesModified": false,
+    "bitmapUsedAsMesh": false
+  },
+  "canvas": {
+    "logicalWidth": 1440,
+    "logicalHeight": 900,
+    "units": "菜单逻辑像素",
+    "viewportTransform": "MobileTabletop.GuiMatrix：沿用桌面与移动端共用画布、安全区和触控映射",
+    "checkedCaptureResolutions": [[1440, 900]],
+    "otherResolutionVerification": "由本轮主验收统一记录；本配方不将尚未审查的截图视作已验收"
+  },
+  "sources": [
+    "Unity/Catan/Assets/Scripts/PastoralMenuScene.cs",
+    "Unity/Catan/Assets/Scripts/PastoralMenuUI.cs",
+    "Unity/Catan/Assets/Scripts/PastoralMenuScreen.cs",
+    "Unity/Catan/Assets/Resources/PastoralMenu/PastoralMenuVector.shader"
+  ],
+  "rebuild": {
+    "unityVersion": "6000.3.25f1",
+    "entryPoint": "PastoralMenuScene.DrawBackground(Rect full, float time)",
+    "menuEntryPoint": "M6App.DrawPastoralMainMenu()",
+    "steps": [
+      "将所列源文件、对应 meta 与 Resources Shader 一并导入正式 Unity 工程。",
+      "OnGUI 使用 MobileTabletop.GuiMatrix，并在 EventType.Repaint 调用矢量风景绘制入口。",
+      "提供同一显示时间值时，由固定参数重新生成相同布局；控件使用独立暖白与森林绿样式。",
+      "正式 Windows 构建及图形验收参照 docs/MENU_AUDIO_V001.md 和对应验证摘要。"
+    ],
+    "layoutRandomness": "固定序号加数学噪声；不调用 UnityEngine.Random，不访问规则随机状态",
+    "animationClock": "Time.unscaledTime，仅参与显示",
+    "geometry": "运行时原生三角形、椭圆、曲线带和耳切多边形；海岸使用 Catmull-Rom 曲线采样",
+    "smallUiTextures": "圆角控件纹理由 C# 配方运行时生成；不含外采样内容"
+  },
+  "landscapeElements": ["海湾与帆船", "分层远山、雪峰与森林", "蜿蜒河流和木桥", "村舍、炊烟与风车", "麦田和田垄", "牧场、围栏与八只羊"],
+  "animations": [
+    {"element": "云层", "behavior": "按不同速度水平平移"},
+    {"element": "海洋", "behavior": "波光平移与岸边白浪起伏"},
+    {"element": "帆船", "behavior": "缓慢漂移与上下轻摆"},
+    {"element": "河流", "behavior": "沿河道向下移动的流线"},
+    {"element": "麦田", "behavior": "逐簇相位错开的风吹麦穗"},
+    {"element": "羊群", "behavior": "缓移、摆腿与低头吃草"},
+    {"element": "村庄", "behavior": "风车叶片转动与炊烟升腾"},
+    {"element": "鸟群和近景草", "behavior": "飞鸟振翅滑翔与草叶轻摆"}
+  ],
+  "layout": {
+    "settingsPanel": [838, 30, 562, 840],
+    "configurationViewport": [866, 149, 506, 464],
+    "configurationContent": [0, 0, 488, 512],
+    "primaryAction": [870, 620, 498, 49],
+    "audioSettings": [870, 789, 498, 42],
+    "notes": "配置区保留滚轮、原生拖动及触控滚动；主要开局、读取存档和大厅按钮固定可见。"
+  },
+  "privacy": "仅绘制公开菜单配置；不读取 PlayerView、隐藏手牌、牌库顺序、权威存档或网络秘密。",
+  "visualReview": {
+    "firstActualCapture": ".local/menu-audio-v001/menu-audio-visual-review/01-menu-1440x900.png",
+    "result": "六类景观元素、标题和设置卡正常出图。首图发现胜利目标控件底部裁切，配置视口由 452 增高为 464；原生滚动条视觉替换为细轨。",
+    "finalBuildVerification": "由本轮主验收统一记录。"
+  }
+}

@@ -1,0 +1,199 @@
+{
+  "status": "passed",
+  "typeId": "progress-politics",
+  "assets": [
+    {
+      "id": "progress-politics-diplomacy",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-politics-espionage",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-politics-encouragement",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-politics-intrigue",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-politics-taxation",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-politics-constitution",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-politics-treason",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-politics-wedding",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "progress-politics-sabotage",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.05400000140070915,
+        0.07999999821186066,
+        0.0003000130503343357
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/progress-politics-constitution-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-politics-diplomacy-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-politics-encouragement-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-politics-espionage-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-politics-intrigue-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-politics-sabotage-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-politics-taxation-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-politics-treason-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    },
+    {
+      "path": "textures/progress-politics-wedding-front.png",
+      "width": 1024,
+      "height": 1536,
+      "verified": true
+    }
+  ],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

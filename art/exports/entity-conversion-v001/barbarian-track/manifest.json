@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "barbarian-track",
+  "label": "蛮族入侵异形轨道板",
+  "recipePath": "art/recipes/entity-conversion-v001/barbarian-track/recipe.json",
+  "recipeSha256": "e7f4dca4c4a555107733b264072f6edb634564c7145814b60bd68de6ecf8e300",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v001/barbarian-track/build_track.py",
+      "sha256": "10e3cd349292582831731fe7bc9368971b9134dcc1e0d0720edcbfb35f9d286f"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimated; 190 x 200 x 1.5 mm; photo-derived silhouette ratio about 0.95; not physically measured or user-approved",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/单位/海盗入侵卡.jpg",
+      "sha256": "c394f472541936a13a2e90c02702ace117903b783f3dba6c10130bbdf49da72a",
+      "role": "visible front of barbarian invasion track; filename says pirate invasion and is retained unchanged"
+    }
+  ],
+  "assets": [
+    {
+      "id": "barbarian-track",
+      "label": "蛮族入侵轨道板（原文件海盗入侵卡）",
+      "kind": "custom",
+      "dimensionsMm": [
+        190,
+        200,
+        1.5
+      ],
+      "meshObjects": 1,
+      "triangles": 300,
+      "geometrySha256": "8d829c2c0a22b4f8a7b114137aecf8618c7e92a4ee9b7d6faf6012f93d6d0bb6",
+      "blenderBounds": {
+        "min": [
+          -0.0949999988079071,
+          -0.10000000149011612,
+          0.0
+        ],
+        "max": [
+          0.0949999988079071,
+          0.10000000149011612,
+          0.001500000013038516
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.0949999988079071,
+          0.0,
+          -0.10000000149011612
+        ],
+        "max": [
+          0.0949999988079071,
+          0.001500000013038516,
+          0.10000000149011612
+        ]
+      },
+      "materials": [
+        {
+          "name": "barbarian-track_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "barbarian-track-front.png"
+        },
+        {
+          "name": "barbarian-track_UnseenBackNeutral",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.6100000143051147,
+            0.49000000953674316,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": null
+        },
+        {
+          "name": "barbarian-track_UnseenPaperEdgeNeutral",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "22b2f96b60dc63ffdfe924193491dc3253aa8d702384c0ec0c7a8abf879ed5dc",
+      "blendSha256": "18c8cbb88a64e2de5739b3dba530ce037284ef1257bfb6c72e57bbfcc15d936a",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/barbarian-track-front.png",
+      "sha256": "a0ac9f03d95cc65bffa0b79f4a4cfd12e6e0e93b0367d3078b4502f15c1fbb8a"
+    }
+  ],
+  "limitations": [
+    "原件3072x4096保持不变；PIL四点投影只重采样原照片像素，保留插画、反光、模糊和磨损，无AI重绘、OCR、补画或颜色替换。",
+    "真实轮廓是两角外突圆弧与两处内凹的异形薄板；手工轮廓为照片近似，不能当作实测刀模。",
+    "主体直边延长线定义透视框，校正画布扩展到包含全部轮廓；textureJobs.quad是扩展虚拟外接框，sourceOutline是真实可见外边。",
+    "校正PNG矩形内仍有桌面像素，实际凹多边形厚壳通过匹配UV只显示轮廓内像素；外沿可能保留少量照片阴影或桌面。",
+    "纵向印刷保留：7个浅色轨道圈与左下红色登陆圈；右上起点为远景船，另6浅色圈为线描船。",
+    "未提供背面；backTexture为null，未知底面和纸边使用明确中性材质，未借用其他卡背。",
+    "190x200x1.5mm仅工作估算；主体框宽高比0.61用近圆形印刷辅助观察，实体比例、厚度、纸面材质与版本未知。",
+    "这是静态轨道视觉资产，轨道圈不是本子任务制作的交互控件；规则语义为蛮族入侵，不按海盗文件名或旧版照片改变规则。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "f9e3197622eb76d8a4331835cca663baaee3b1eced2c99b51ad7eb3c7f01d956",
+    "game-camera.png": "58b9c0e4c18e60b9556be8a20256d2a309bc805cea35659b1c00ff781cc3e5e8",
+    "side.png": "557102665e81a40d2ce670f24df7fca2d58677e2d4fbe3a53e4a2b671a74afec",
+    "top.png": "68c90ae7ceb74ad419cbca39f858d93eeadc1c17d92e18dce29ff15b5da76e31"
+  }
+}

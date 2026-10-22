@@ -1,0 +1,12 @@
+[
+  {
+    "path": "game version\\Catan1.6.5-Card-Interaction-Audio\\Builds\\Windows\\Catan1.6.5.exe",
+    "bytes": 667136,
+    "sha256": "3070E580E019576B9AFCDEB4FEC18D03CEBC119F6AE84D597412905C749AD653"
+  },
+  {
+    "path": "game version\\Catan1.6.5-Card-Interaction-Audio\\Builds\\Android\\Catan1.6.5.apk",
+    "bytes": 345716085,
+    "sha256": "90EED79FF2F6E1B8F7AFEA3E58EC04B830DF0D981F7CDB00C34998275BB456C9"
+  }
+]

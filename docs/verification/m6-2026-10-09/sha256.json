@@ -1,0 +1,297 @@
+﻿[
+    {
+        "path":  ".local/m6/Builds/Windows/CatanM6.exe",
+        "sha256":  "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+        "bytes":  667136
+    },
+    {
+        "path":  ".local/m6/Builds/Windows/CatanM6_Data/Managed/Assembly-CSharp.dll",
+        "sha256":  "bb1a1a557251b9d7958500e60c5b4a593e6424d07342d01583b6e9764a47b162",
+        "bytes":  229888
+    },
+    {
+        "path":  ".local/m6/Builds/Windows/CatanM6_Data/Managed/Catan.AI.dll",
+        "sha256":  "206965fc8c5c0ebd633c7cd26707396d62b513099ad961f0eb507bc348cb29c8",
+        "bytes":  97792
+    },
+    {
+        "path":  ".local/m6/Builds/Windows/CatanM6_Data/Managed/Catan.Core.dll",
+        "sha256":  "c5780564dbf443764e4d48940f22a7feb3fe1046fe76925dbc9dadf9ae233f6d",
+        "bytes":  518144
+    },
+    {
+        "path":  "docs/M6_ACCEPTANCE.md",
+        "sha256":  "bf42bd10ade47c702c8b762c662f6a09ef950d05441f46885f752db30312eb81",
+        "bytes":  9344
+    },
+    {
+        "path":  "docs/M6_ARCHITECTURE.md",
+        "sha256":  "0d4924b42ac66cf70538cb13983b7903628ff25d691a8a2b8533e0cb5d584c44",
+        "bytes":  3135
+    },
+    {
+        "path":  "docs/M6_PLAYTEST.md",
+        "sha256":  "c1dda0ed785d6140a0e5aad2ede57c1c511ff92c10c209bb1f86a1eff8e3368b",
+        "bytes":  3028
+    },
+    {
+        "path":  "docs/M6_STRATEGY.md",
+        "sha256":  "41b85f09caf1c765217d7a66c41077416380c837a263ab8c8d88eee197ef1290",
+        "bytes":  2432
+    },
+    {
+        "path":  "docs/ROADMAP.md",
+        "sha256":  "c41bb9c48477a6ad5fd1915e8bb4fe57d679d76fafe4acbfdc2f5e2c12e884df",
+        "bytes":  9891
+    },
+    {
+        "path":  "docs/verification/m6-2026-10-09/m6-rules.trx",
+        "sha256":  "018c57a380a36104c72cd0d95c59b59701af1dd3fb7223aa1d2a9e48af8b493f",
+        "bytes":  754151
+    },
+    {
+        "path":  "docs/verification/m6-2026-10-09/m6-ui-combined-menu.jpg",
+        "sha256":  "e77d3a99e35ef5e10e2923b31415f00c7c504594f5fdb73ffae489d68f8e9979",
+        "bytes":  142086
+    },
+    {
+        "path":  "docs/verification/m6-2026-10-09/m6-ui-menu.jpg",
+        "sha256":  "78be3d336386fe19f66e2049a474dd738861392008180ca72a6b9416475ad460",
+        "bytes":  140831
+    },
+    {
+        "path":  "docs/verification/m6-2026-10-09/m6-ui-restored-human.jpg",
+        "sha256":  "a8fd0b060c216b14d5ffbe5a72a736482fb90d41c18d1844a2260023616ca45c",
+        "bytes":  216443
+    },
+    {
+        "path":  "docs/verification/m6-2026-10-09/matches.json",
+        "sha256":  "40e29fbadeda66cfef0136161045ac97e3d276760f7df9f063c11649cf24e788",
+        "bytes":  97644
+    },
+    {
+        "path":  "docs/verification/m6-2026-10-09/player-load.log",
+        "sha256":  "8bb3bf2776b1da3ec7d7ce59b292b937ecd79c991d0d68c373e5b0a1252eb325",
+        "bytes":  2044
+    },
+    {
+        "path":  "docs/verification/m6-2026-10-09/player-save.log",
+        "sha256":  "0ae4544ee1b49f3e292898e3fbed194f775c84e256bde3f14e1cf15183899966",
+        "bytes":  2074
+    },
+    {
+        "path":  "docs/verification/m6-2026-10-09/unity-build.log",
+        "sha256":  "0f96cd4f8d566ac62f76eb586904279cd6f7f5f8360ce1f35b89cc6110ee7f19",
+        "bytes":  324884
+    },
+    {
+        "path":  "README.md",
+        "sha256":  "1a4b1f22b0e6206fb683a8db6e57cafcf3b8ecfb1b370cd7ce53ec9baab91b5c",
+        "bytes":  10352
+    },
+    {
+        "path":  "src/Catan.AI/AiHeuristics.cs",
+        "sha256":  "6cdf296dc56a5f2b3944768996f604b7ec46c621c6d2ba680796731b83627e0a",
+        "bytes":  1266
+    },
+    {
+        "path":  "src/Catan.AI/BaseGameAi.cs",
+        "sha256":  "9b03e2745da409127f894523f59f0c067966659d3518c7af4e5f6f238f1a901e",
+        "bytes":  12747
+    },
+    {
+        "path":  "src/Catan.AI/bin/Release/netstandard2.1/Catan.AI.dll",
+        "sha256":  "206965fc8c5c0ebd633c7cd26707396d62b513099ad961f0eb507bc348cb29c8",
+        "bytes":  97792
+    },
+    {
+        "path":  "src/Catan.AI/Catan.AI.csproj",
+        "sha256":  "e9c17f0bca4ab96ce462b7e5736de2ce557ce34676946d188383d9d67668e88b",
+        "bytes":  401
+    },
+    {
+        "path":  "src/Catan.AI/CitiesKnightsAi.cs",
+        "sha256":  "1dcf883fee98acb189bcd748f15fa14d66c7efcf88c94453cff9046cd5b0db1d",
+        "bytes":  21228
+    },
+    {
+        "path":  "src/Catan.AI/CombinedAi.cs",
+        "sha256":  "def94f6c1b9c0367892a4ab347a89a367c8714b0dcbd1d1ba7e6a7f55236eb9c",
+        "bytes":  24975
+    },
+    {
+        "path":  "src/Catan.AI/SeafarersAi.cs",
+        "sha256":  "1aef88136b9e2cedd1ebef59b07cbcc2ecdc7ce07d787ca55b382018effdc0ae",
+        "bytes":  21949
+    },
+    {
+        "path":  "src/Catan.Core/bin/Release/netstandard2.1/Catan.Core.dll",
+        "sha256":  "c5780564dbf443764e4d48940f22a7feb3fe1046fe76925dbc9dadf9ae233f6d",
+        "bytes":  518144
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/Catan.Rules.Tests.csproj",
+        "sha256":  "428170def875bf60e9f5eaa4896133fac815e1712584f322ad1e71cd837dc692",
+        "bytes":  916
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M6BoundaryTests.cs",
+        "sha256":  "c5a3543ccb56a3112df8faa712104db91b45d277446bbd97c7d1a32c898d1cff",
+        "bytes":  5995
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M6CitiesPendingTests.cs",
+        "sha256":  "1e0211260b59bd3cfe278fad45b9a07b16b378a16eb72175d80c56f0cae2b3a6",
+        "bytes":  6220
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M6CombinedPendingTests.cs",
+        "sha256":  "8d401cea2c797645297fe02b075d4ea20df3c9af070985353c49bf0050ba46dc",
+        "bytes":  6438
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M6FullGameTests.cs",
+        "sha256":  "f866c56f5dba5a1c573825308c28afe014d22ce98b7c6504a06ad1a10cf6330c",
+        "bytes":  6904
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M6SeafaringTests.cs",
+        "sha256":  "04f60251c1ea2b5306df0dd451ec7611af7ae82430aa83d4f46412ff96c986ee",
+        "bytes":  4580
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M6TradeTests.cs",
+        "sha256":  "aa8bddcaeb0b2a2ecf5a848080222a34d14b185282ff054706646177c18ff489",
+        "bytes":  5983
+    },
+    {
+        "path":  "tools/development/Build-M1.ps1",
+        "sha256":  "d720375f76ec3bf09088f82a4e005ff81b1a223fdae9fd3c7977b017d615138a",
+        "bytes":  3296
+    },
+    {
+        "path":  "tools/development/Build-M2.ps1",
+        "sha256":  "f40ccb661b63fe6ca85b949bf5291af03d99d4d889fd89b2a5e460076a65c20e",
+        "bytes":  3407
+    },
+    {
+        "path":  "tools/development/Build-M3.ps1",
+        "sha256":  "538f1b63fc22e19b9f4f0c8b02afc1ed66b1795bfc8960b459a8fc729ea54f5d",
+        "bytes":  3838
+    },
+    {
+        "path":  "tools/development/Build-M4.ps1",
+        "sha256":  "b740abf8570e1874ab75c52f9cf6954be4116133566d3cca7704358fa08629d0",
+        "bytes":  3320
+    },
+    {
+        "path":  "tools/development/Build-M5.ps1",
+        "sha256":  "fc5195cdea6cc30202f86baea069a70d62c9d8ec4a80f7c5fce4a14ee931a495",
+        "bytes":  3320
+    },
+    {
+        "path":  "tools/development/Build-M6.ps1",
+        "sha256":  "7e14f542097479e32d14b49d8e9c6b490519e7e92e5209d5622b8092be1f6e4f",
+        "bytes":  3315
+    },
+    {
+        "path":  "tools/development/Play-M6.ps1",
+        "sha256":  "f00afe11e9eea4ba4a9bde72d834822616cca68a54d0a637a9f936ca3c833c75",
+        "bytes":  600
+    },
+    {
+        "path":  "tools/validation/Export-M6Evidence.ps1",
+        "sha256":  "fb7caf79eb7c5c97acb6a280cfe2ed1d38facbe9f628ed9b2926c6e843047a18",
+        "bytes":  5081
+    },
+    {
+        "path":  "tools/validation/Test-M6Rules.ps1",
+        "sha256":  "dd8911ae88942606e8771b8f0b171f39193d57c2725dc5fd3fb30530f00b4965",
+        "bytes":  909
+    },
+    {
+        "path":  "Unity/Catan/Assets/Editor/M6Build.cs",
+        "sha256":  "09086fc159ea626b24b3000ad79b91fd6f296c05c82b0781e5d5a3a0d9650acd",
+        "bytes":  3820
+    },
+    {
+        "path":  "Unity/Catan/Assets/M6.unity",
+        "sha256":  "c3483d7ca3b9d047882bc99da22b531f688cdcffdd2ebee9b4fb2d969f6b4114",
+        "bytes":  11416
+    },
+    {
+        "path":  "Unity/Catan/Assets/Plugins/Catan.AI.dll",
+        "sha256":  "206965fc8c5c0ebd633c7cd26707396d62b513099ad961f0eb507bc348cb29c8",
+        "bytes":  97792
+    },
+    {
+        "path":  "Unity/Catan/Assets/Plugins/Catan.Core.dll",
+        "sha256":  "c5780564dbf443764e4d48940f22a7feb3fe1046fe76925dbc9dadf9ae233f6d",
+        "bytes":  518144
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M2App.cs",
+        "sha256":  "1a08299b98d7dd7e0063627c1c168bb1d41109ec0c9bca046e23b93bd63c373e",
+        "bytes":  30568
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M2LocalGameHost.cs",
+        "sha256":  "2bf3d528e0aa6b14d0ff1b071cb7903aea1d3806f0e7e83faf265f27d08f6ae8",
+        "bytes":  1779
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M3App.cs",
+        "sha256":  "01d7c7c84df947ec252799fb58f8f5a2dc60af665949871a61974ceac981c438",
+        "bytes":  42634
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M3LocalGameHost.cs",
+        "sha256":  "8b8668c5f9cb696bb50a73ad5f90eb5393b1771f5f45115462333ea398f1d23c",
+        "bytes":  1916
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M4App.cs",
+        "sha256":  "4720265e09775922436c072e5f95a1147c787e37a316cdf1b9fa96adce42e563",
+        "bytes":  33240
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M4LocalGameHost.cs",
+        "sha256":  "044049a968282ea1327c2c3b022408377ffb0a61387f48542fde16ee08f8ad24",
+        "bytes":  1854
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M5App.cs",
+        "sha256":  "bdc3ad10ae7c9729f89150d0d430101e6aeddc550ae5ff7fbc7391fed3c0bf59",
+        "bytes":  37514
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M5LocalGameHost.cs",
+        "sha256":  "f4cc6bdc41b5260661306230e3550871f6356152d4101b7732e50ff0a0ee87d2",
+        "bytes":  1778
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M6App.cs",
+        "sha256":  "6770c80da95ed0ba5f0c06002e1a3cd10efdf379e219215431e4cf80eabee0a9",
+        "bytes":  12351
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M6Bindings.cs",
+        "sha256":  "a02a562ab49cafdbf3de83286b2e68b06529aa1aaaf48ae2e15f95c9bfeeea4e",
+        "bytes":  4927
+    },
+    {
+        "path":  "Unity/Catan/Assets/Scripts/M6PlayerVerification.cs",
+        "sha256":  "76f654df14044ab8c06ab738e22be82fd60ba6bf5461389ab3e557c8e2c0b968",
+        "bytes":  10686
+    },
+    {
+        "path":  "Unity/Catan/Packages/packages-lock.json",
+        "sha256":  "c5a5c9bfe76e4c918384fc1fb6abdbee668aeef448b3ef3d2b4c69c84a5c3221",
+        "bytes":  4432
+    },
+    {
+        "path":  "Unity/Catan/ProjectSettings/ProjectSettings.asset",
+        "sha256":  "4abfad67afb7fb2e47708dde88e5a87e9fb6827f64401876314cabfef8b1d306",
+        "bytes":  20633
+    }
+]

@@ -1,0 +1,43 @@
+{
+    "status": "passed",
+    "version": "1.6.14",
+    "limitations": "自动运行与采样校验不等于真人听感、安卓真机或长时间性能验收。",
+    "checks": 323,
+    "captures": [
+        "theme-0-a.png",
+        "theme-0-b.png",
+        "theme-1-a.png",
+        "theme-1-b.png",
+        "theme-2-a.png",
+        "theme-2-b.png",
+        "theme-3-a.png",
+        "theme-3-b.png",
+        "theme-4-a.png",
+        "theme-4-b.png",
+        "theme-5-a.png",
+        "theme-5-b.png",
+        "theme-6-a.png",
+        "theme-6-b.png",
+        "settings-sound.png",
+        "settings-appearance.png",
+        "settings-landscapes.png",
+        "rule-covers.png",
+        "maps-0.png",
+        "maps-1.png",
+        "maps-2.png",
+        "maps-3.png",
+        "network-map-preview.png"
+    ],
+    "animatedPixels": [
+        62772,
+        237028,
+        156919,
+        26812,
+        98827,
+        118089,
+        0
+    ],
+    "fullUiPixelsCaptured": true,
+    "userSaveTouched": false,
+    "humanAudioListening": false
+}

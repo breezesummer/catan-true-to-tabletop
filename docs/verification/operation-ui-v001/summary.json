@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-11",
+  "timezone": "Asia/Shanghai",
+  "iteration": "operation-ui-v001",
+  "tests": {
+    "existingRules": 496,
+    "operationDock": 61,
+    "totalPassed": 557,
+    "failed": 0,
+    "skipped": 0,
+    "executions": 2
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "windowsMonoBuild": "passed",
+    "independentSaveProcess": "passed",
+    "independentLoadProcess": "passed",
+    "operationModes": 4,
+    "runtimeChecks": 221,
+    "runtimeCheckCountIncludesNormalAiAdvancement": true
+  },
+  "visual": {
+    "inspected": "Combined-mode normal and maximized Windows player layout",
+    "realMouseEndToEnd": "not reliably verified",
+    "hiddenScreenshots": "black; excluded from visual evidence",
+    "userPlaytest": "pending"
+  },
+  "assets": {
+    "goodsUvIcons": 8,
+    "meshThumbnails": 32,
+    "uniqueBlendSources": 29,
+    "cleanThumbnailRebuildHashes": "matched",
+    "newMeshes": 0
+  },
+  "privateArtifacts": "Authoritative saves, card contents, deck order and random state remain local; omitted from public evidence",
+  "evidence": [
+    {
+      "path": ".local/operation-ui-v001/test-results/rules-regression.trx",
+      "sha256": "cadb1e7d87a1fe0d4e53c9aaa6e243d7b9b6c45bb31aed62d7148ee6841b0284"
+    },
+    {
+      "path": ".local/operation-ui-v001/test-results/operation-dock.trx",
+      "sha256": "b64068d30aa73202d2ba9a1917558fe286f3ca54f9c4984ea74c684f32d1593e"
+    },
+    {
+      "path": ".local/m6/logs/unity-build.log",
+      "sha256": "0138283fffcc5921e95aef47679f8b2f87b9307e793c1e2bf616f001ae21746b"
+    },
+    {
+      "path": ".local/m6/logs/player-save.log",
+      "sha256": "92da57cb268e07d031f32bfd08598302a404e74e172bbc7406f6bf016839a232"
+    },
+    {
+      "path": ".local/m6/logs/player-load.log",
+      "sha256": "a9481e14ba98984a84ebf0421d1dfd7ce182c8765aca342b79100e2bb7409bdb"
+    },
+    {
+      "path": ".local/operation-ui-v001/result.json",
+      "sha256": "db3db114cd07c7b3ba953698309bf26f1d99053b58fddc6ea2fbe1683cf80d88"
+    },
+    {
+      "path": ".local/operation-ui-v001/player.log",
+      "sha256": "2b2c5432dd3e65b1fb56ddb5d8842f1e6f43cb07be9302d2fba0dd740ce608c8"
+    }
+  ]
+}

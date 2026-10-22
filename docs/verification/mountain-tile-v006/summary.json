@@ -1,0 +1,85 @@
+{
+  "status": "passed",
+  "verifiedAt": "2026-10-15T12:26:08.110804+08:00",
+  "assetVersion": "entity-conversion-v006",
+  "scope": "将矿石地形从资源牌派生图替换为用户高山板块原照；四种玩法共享美术映射",
+  "originalReference": {
+    "path": "assets/references/archives/mountain-tile-v006/高山.jpg",
+    "sha256": "3fb55da76875624c901e791892a44e122bde8ee35b343e73f9ac455bf27b084d",
+    "matchesUserAttachmentAndInbox": true
+  },
+  "texture": {
+    "path": "art/source/entity-conversion-v006/ore-tile/textures/tile-ore-top.png",
+    "sha256": "47dc0f3b1c53c71f0d06c7c1b62086be9d7e8d64b9d186bae4920dfe17003499",
+    "matchesUnityRuntime": true
+  },
+  "blender": {
+    "version": "4.5.14 LTS",
+    "assets": 1,
+    "meshObjects": 1,
+    "triangles": 20,
+    "sourceBlendAndFbxReadback": true,
+    "closedMeshUvBottomPivot": true,
+    "cleanRebuildGeometryMaterialsTexturesReferences": true,
+    "fourPreviewViews": true,
+    "sourceMeasurements": "估算尺寸，未实测"
+  },
+  "dotnet": {
+    "passed": 112,
+    "failed": 0,
+    "skipped": 0,
+    "filter": "TabletopPresentationTests|TabletopCameraTests|OperationDockTests",
+    "evidence": "related-dotnet.trx",
+    "fullRuleSuiteRerun": false
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "importedAssets": 1,
+    "windowsBuild": true,
+    "netStandard21AndAiExecutionAndAuthorityRoundtrip": true,
+    "runtimeSourceInstances": 60,
+    "runtimeViews": [
+      "base/game-camera",
+      "base/top",
+      "seafarers/game-camera",
+      "seafarers/top",
+      "cities-knights/game-camera",
+      "cities-knights/top",
+      "combined/game-camera",
+      "combined/top"
+    ],
+    "oreUsesMountainTileArt": true,
+    "oreResourceCardUnchanged": true,
+    "unrevealedTerrainStillHidden": true,
+    "artCollidersAbsent": true,
+    "previewColoursReadable": true
+  },
+  "player": {
+    "independentSaveLoadProcesses": 2,
+    "ruleSets": [
+      "base",
+      "seafarers",
+      "cities-knights",
+      "combined"
+    ],
+    "exactAuthoritySeatRoundtrip": true,
+    "continuedCurrentAi": true,
+    "privateSaveLocation": ".local/m6-mountain-v006/verification"
+  },
+  "playable": {
+    "path": ".local/m6-mountain-v006/Builds/Windows/CatanM6.exe",
+    "exeSha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+    "releaseVersion": "1.3",
+    "defaultPlayScriptsUpdated": true,
+    "wechatPackageRequested": false
+  },
+  "notVerified": [
+    "用户最终外观确认",
+    "实物毫米尺寸及未知背面",
+    "真实鼠标完整链路",
+    "用户本人完整对局",
+    "长期性能"
+  ],
+  "milestones": "M7/M8 状态保持",
+  "workingTree": "保留会话开始前已有的无关修改；只提交本轮资产、接入和验证改动"
+}

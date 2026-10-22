@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "blue-politics-back-v001",
+  "classifiedDate": "2026-10-10",
+  "originalsPreserved": true,
+  "assets": [
+    {
+      "id": "physical-progress-politics-back-001",
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/卡背.jpg",
+      "sha256": "f60c11e4a588f9440b4650a4f6ef0ea65d11edbba98accb30f6fc486b29d542f",
+      "kind": "photograph",
+      "edition": null,
+      "referenceRole": "politics-common-back",
+      "measuredDimensionsMm": null,
+      "pixelSize": [
+        3072,
+        4096
+      ],
+      "mustPreserve": [
+        "original photograph bytes",
+        "printed artwork"
+      ],
+      "notes": "Omitted by the frozen v001 catalog; added without modifying earlier catalog or outputs."
+    }
+  ]
+}

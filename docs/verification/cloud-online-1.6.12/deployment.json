@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-20",
+  "version": "1.6.12",
+  "endpoint": "http://175.178.212.142:47771",
+  "platform": "Ubuntu 24.04.4 LTS / linux-x64",
+  "service": "catan-m7.service",
+  "enabled": true,
+  "serviceUser": "catan",
+  "releaseDirectory": "/opt/catan-server/releases/1.6.12",
+  "currentLink": "/opt/catan-server/current",
+  "dataDirectory": "/var/lib/catan-m7",
+  "dataDirectoryMode": "0700",
+  "dataFilesMode": "0600",
+  "archiveSha256": "2a05e51136209977c256af1b9415e3611116313d64c0230c6f35de382bc6dcff",
+  "defaultRequestLimitPer10Seconds": 300,
+  "defaultAiIntervalMs": 300,
+  "tls": false,
+  "lanDiscovery": false
+}

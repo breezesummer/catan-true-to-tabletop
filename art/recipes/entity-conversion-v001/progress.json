@@ -1,0 +1,132 @@
+{
+  "types": [
+    {
+      "id": "tiles",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 6
+    },
+    {
+      "id": "resource-cards",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 4
+    },
+    {
+      "id": "commodity-cards",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 3
+    },
+    {
+      "id": "progress-trade",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 6
+    },
+    {
+      "id": "progress-science",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 10
+    },
+    {
+      "id": "progress-politics",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 9
+    },
+    {
+      "id": "city-improvements",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 17
+    },
+    {
+      "id": "defender-card",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 1
+    },
+    {
+      "id": "barbarian-track",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 1
+    },
+    {
+      "id": "ships",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 4
+    },
+    {
+      "id": "city",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 1
+    },
+    {
+      "id": "city-wall",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 1
+    },
+    {
+      "id": "metropolis",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 1
+    },
+    {
+      "id": "knights",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 6
+    },
+    {
+      "id": "robber",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 1
+    },
+    {
+      "id": "pirate",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 1
+    },
+    {
+      "id": "barbarian-ship",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 1
+    },
+    {
+      "id": "merchant",
+      "status": "已转化",
+      "converted": true,
+      "unityImported": true,
+      "assetCount": 1
+    }
+  ],
+  "completed": 18,
+  "assetCount": 74
+}

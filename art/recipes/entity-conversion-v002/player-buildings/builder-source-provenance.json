@@ -1,0 +1,27 @@
+{
+  "copiedBuilders": [
+    {
+      "originalPath": "art/recipes/entity-conversion-v001/city/builder.py",
+      "originalSha256": "8ac9724331570016838a841d1224173d3831ab504141d1bca7a60e7acd5d0136",
+      "copiedPath": "art/recipes/entity-conversion-v002/player-buildings/city_builder.py",
+      "copiedSha256": "8ac9724331570016838a841d1224173d3831ab504141d1bca7a60e7acd5d0136",
+      "bytesIdentical": true
+    },
+    {
+      "originalPath": "art/recipes/entity-conversion-v001/metropolis/builder.py",
+      "originalSha256": "da34bd0546a33ff8c0faa8334f5bb72e4f6959c0f1d228776daebc9998996dd0",
+      "copiedPath": "art/recipes/entity-conversion-v002/player-buildings/metropolis_builder.py",
+      "copiedSha256": "da34bd0546a33ff8c0faa8334f5bb72e4f6959c0f1d228776daebc9998996dd0",
+      "bytesIdentical": true
+    },
+    {
+      "originalPath": "art/recipes/entity-conversion-v001/city-wall/builder.py",
+      "originalSha256": "dd89253382445824847f94a10b044681ac4a262bd185633eb1f657e5c8f1f3e3",
+      "copiedPath": "art/recipes/entity-conversion-v002/player-buildings/wall_builder.py",
+      "copiedSha256": "dd89253382445824847f94a10b044681ac4a262bd185633eb1f657e5c8f1f3e3",
+      "bytesIdentical": true
+    }
+  ],
+  "villageAncestry": "tools/art/generate_photo_samples.py make_village/gable; adapted rounded footings and deterministic UV",
+  "villageAncestrySha256": "f3c721ba1dd6c90b825e279c901d5385d280bf1d0cb7981dd2e1e8dda475e7c0"
+}

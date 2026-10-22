@@ -1,13 +1,22 @@
 # Unity generated data
+# Assets 下的 .meta、场景、ProjectSettings 和运行所需 Plugins DLL 保持版本管理。
+# 构建产生的无功能序列化差异应还原，不使用忽略规则隐藏这些文件。
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
+.utmp/
 [Mm]emoryCaptures/
 [Rr]ecordings/
 [Bb]uild/
 [Bb]uilds/
+
+# 本项目的缓存也可能是外部目录软链接；不加结尾斜杠以同时匹配两种形式。
+/Unity/Catan/[Ll]ibrary
+/Unity/Catan/[Tt]emp
+/Unity/Catan/[Ll]ogs
+/Unity/Catan/[Uu]ser[Ss]ettings
 
 # .NET and local editor state
 **/bin/
@@ -18,6 +27,7 @@ TestResults/
 *.suo
 
 # Local caches and credentials
+/codex.pem
 __pycache__/
 *.pyc
 .venv/
@@ -30,3 +40,31 @@ node_modules/
 # Blender recovery files; source .blend files remain tracked
 *.blend1
 *.blend2
+
+# 可由已保存的脚本、配方和源贴图重建的中间文件（本地保留）
+art/source/entity-conversion-v*/**/*.blend
+art/source/photo-samples-v*/*.blend
+art/exports/entity-conversion-v*/**/*.fbx
+art/exports/entity-conversion-v*/**/textures/
+art/exports/photo-samples-v*/*.fbx
+art/exports/photo-samples-v*/textures/
+art/previews/entity-conversion-v*/
+art/previews/photo-samples-v*/
+
+# 操作系统与编辑器临时文件；截图及版本化验证报告仍保存
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.bak
+
+# Office 编辑锁文件与 Unity 自动生成的 IDE 工程
+~$*.docx
+~$*.xlsx
+~$*.pptx
+/Unity/Catan/*.csproj
+/Unity/Catan/*.sln
+/Unity/Catan/*.slnx
+
+# 本地可玩版本与构建验证产物
+/game version/

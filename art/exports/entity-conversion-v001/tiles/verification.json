@@ -1,0 +1,141 @@
+{
+  "status": "passed",
+  "typeId": "tiles",
+  "assets": [
+    {
+      "id": "tile-pasture",
+      "meshObjects": 1,
+      "triangles": 20,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.0685892105102539,
+        0.07919999957084656,
+        0.00800001335089684
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "tile-sea",
+      "meshObjects": 1,
+      "triangles": 20,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.0685892105102539,
+        0.07919999957084656,
+        0.00800001335089684
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "tile-gold",
+      "meshObjects": 1,
+      "triangles": 20,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.0685892105102539,
+        0.07919999957084656,
+        0.00800001335089684
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "tile-desert",
+      "meshObjects": 1,
+      "triangles": 20,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.0685892105102539,
+        0.07919999957084656,
+        0.00800001335089684
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "tile-fields",
+      "meshObjects": 1,
+      "triangles": 20,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.0685892105102539,
+        0.07919999957084656,
+        0.00800001335089684
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "tile-hills",
+      "meshObjects": 1,
+      "triangles": 20,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.0685892105102539,
+        0.07919999957084656,
+        0.00800001335089684
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/tile-desert-top.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/tile-fields-top.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/tile-gold-top.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/tile-hills-top.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/tile-pasture-top.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/tile-sea-top.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    }
+  ],
+  "previews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": null,
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

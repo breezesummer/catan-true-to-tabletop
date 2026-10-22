@@ -1,0 +1,337 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "ships",
+  "label": "航海家船棋子（四色实体照片参考）",
+  "recipePath": "art/recipes/entity-conversion-v001/ships/recipe.json",
+  "recipeSha256": "e9fcbd15833b12607468ec71ca71382c16955d62822fafae1ddf66a0df54bf74",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v001/ships/builder.py",
+      "sha256": "4e3f33ffc708eb0a6550bca974bdc0ccdf20a5f702a7efe3d40909cfa771629c"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimate-not-measured",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/道路/红色船.jpg",
+      "sha256": "6806502e4359ba5a57708b2592d59a6d50ebdd50960fa60feb008f3c99ef8a41",
+      "role": "red-sculpted-ship-silhouette-and-material"
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/蓝色船.jpg",
+      "sha256": "ecf10735f231a6df85cd1cf0022a56abcaaa480912df8dbecad0cc05417afb00",
+      "role": "blue-sculpted-ship-silhouette-and-material"
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/橘色船.jpg",
+      "sha256": "cbc8d96556b54eaaa48e3add32301d9e729261119e44eb0dd15c184c7571fdf1",
+      "role": "orange-sculpted-ship-silhouette-and-material"
+    },
+    {
+      "originalPath": "assets/references/inbox/道路/米色船.jpg",
+      "sha256": "936c676c0d0162ec76b3aed481c0dcf00adb5344e026f35e980a6f1b11f935fa",
+      "role": "ivory-sculpted-ship-silhouette-and-material"
+    }
+  ],
+  "assets": [
+    {
+      "id": "ship-red",
+      "label": "红色船",
+      "kind": "custom",
+      "dimensionsMm": [
+        9,
+        26,
+        28
+      ],
+      "meshObjects": 2,
+      "triangles": 6188,
+      "geometrySha256": "b9bb5acc9b5c13d0812e066e8df54490bf9129347f52f02517c55642d9d64cf9",
+      "blenderBounds": {
+        "min": [
+          -0.0044999998062849045,
+          -0.013000000268220901,
+          0.0
+        ],
+        "max": [
+          0.0044999998062849045,
+          0.013000000268220901,
+          0.02800000086426735
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.0044999998062849045,
+          0.0,
+          -0.013000000268220901
+        ],
+        "max": [
+          0.0044999998062849045,
+          0.02800000086426735,
+          0.013000000268220901
+        ]
+      },
+      "materials": [
+        {
+          "name": "ship-red_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.550000011920929,
+            0.009999999776482582,
+            0.023000000044703484,
+            1.0
+          ],
+          "roughness": 0.3100000023841858,
+          "texture": null
+        },
+        {
+          "name": "ship-red_Window_Shadow",
+          "baseColorLinearRgba": [
+            0.18700000643730164,
+            0.0034000000450760126,
+            0.007819999940693378,
+            1.0
+          ],
+          "roughness": 0.6499999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "0259fa2b115b6c2ac817f5fe6eeabba8fd737aa9c1cd4299c8ef48509da9770e",
+      "blendSha256": "c98d81e5c8661d7fbc79be5e3ce2fd00e5d559666f3071259fcf9a809d2e6a53",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "ship-blue",
+      "label": "蓝色船",
+      "kind": "custom",
+      "dimensionsMm": [
+        9,
+        26,
+        28
+      ],
+      "meshObjects": 2,
+      "triangles": 6188,
+      "geometrySha256": "b9bb5acc9b5c13d0812e066e8df54490bf9129347f52f02517c55642d9d64cf9",
+      "blenderBounds": {
+        "min": [
+          -0.0044999998062849045,
+          -0.013000000268220901,
+          0.0
+        ],
+        "max": [
+          0.0044999998062849045,
+          0.013000000268220901,
+          0.02800000086426735
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.0044999998062849045,
+          0.0,
+          -0.013000000268220901
+        ],
+        "max": [
+          0.0044999998062849045,
+          0.02800000086426735,
+          0.013000000268220901
+        ]
+      },
+      "materials": [
+        {
+          "name": "ship-blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.02500000037252903,
+            0.06499999761581421,
+            0.14000000059604645,
+            1.0
+          ],
+          "roughness": 0.3100000023841858,
+          "texture": null
+        },
+        {
+          "name": "ship-blue_Window_Shadow",
+          "baseColorLinearRgba": [
+            0.008500000461935997,
+            0.022099999710917473,
+            0.047600001096725464,
+            1.0
+          ],
+          "roughness": 0.6499999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "bd33546c1834b56d31293da08585f114bb7a06f35a9ab6d780cb004027a0cefc",
+      "blendSha256": "54a6e26a22142ca4e3aee8e6a62095b9ea3cc881dd6423d388bc3bd5e863771b",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "ship-orange",
+      "label": "橘色船",
+      "kind": "custom",
+      "dimensionsMm": [
+        9,
+        26,
+        28
+      ],
+      "meshObjects": 2,
+      "triangles": 6188,
+      "geometrySha256": "b9bb5acc9b5c13d0812e066e8df54490bf9129347f52f02517c55642d9d64cf9",
+      "blenderBounds": {
+        "min": [
+          -0.0044999998062849045,
+          -0.013000000268220901,
+          0.0
+        ],
+        "max": [
+          0.0044999998062849045,
+          0.013000000268220901,
+          0.02800000086426735
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.0044999998062849045,
+          0.0,
+          -0.013000000268220901
+        ],
+        "max": [
+          0.0044999998062849045,
+          0.02800000086426735,
+          0.013000000268220901
+        ]
+      },
+      "materials": [
+        {
+          "name": "ship-orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.9399999976158142,
+            0.3199999928474426,
+            0.02500000037252903,
+            1.0
+          ],
+          "roughness": 0.3100000023841858,
+          "texture": null
+        },
+        {
+          "name": "ship-orange_Window_Shadow",
+          "baseColorLinearRgba": [
+            0.319599986076355,
+            0.1088000014424324,
+            0.008500000461935997,
+            1.0
+          ],
+          "roughness": 0.6499999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "7a62c46a2ec2985c40704ac9c4d1993b9b008e0c08ded197a66a9a148718d767",
+      "blendSha256": "4c2486e5e051ab801d42c09b8b8c3e7c205056df644bfdb6009003e5c6268e8c",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "ship-ivory",
+      "label": "米色船",
+      "kind": "custom",
+      "dimensionsMm": [
+        9,
+        26,
+        28
+      ],
+      "meshObjects": 2,
+      "triangles": 6188,
+      "geometrySha256": "b9bb5acc9b5c13d0812e066e8df54490bf9129347f52f02517c55642d9d64cf9",
+      "blenderBounds": {
+        "min": [
+          -0.0044999998062849045,
+          -0.013000000268220901,
+          0.0
+        ],
+        "max": [
+          0.0044999998062849045,
+          0.013000000268220901,
+          0.02800000086426735
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.0044999998062849045,
+          0.0,
+          -0.013000000268220901
+        ],
+        "max": [
+          0.0044999998062849045,
+          0.02800000086426735,
+          0.013000000268220901
+        ]
+      },
+      "materials": [
+        {
+          "name": "ship-ivory_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.75,
+            0.6399999856948853,
+            0.4000000059604645,
+            1.0
+          ],
+          "roughness": 0.3100000023841858,
+          "texture": null
+        },
+        {
+          "name": "ship-ivory_Window_Shadow",
+          "baseColorLinearRgba": [
+            0.2549999952316284,
+            0.2176000028848648,
+            0.13600000739097595,
+            1.0
+          ],
+          "roughness": 0.6499999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "7a454e91d0c67a6f39446f63c15c9444ae888bd9684a904fea445f92982601c3",
+      "blendSha256": "8d2cd4e861603fef159b11383be8476f188c3d7d3f39fbd847c21e0f05dff930",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [],
+  "limitations": [
+    "四张照片均为单个斜侧视角；背面、底部与实际尺寸未知。",
+    "参数化网格依可见轮廓制作，非摄影测量或扫描复原。",
+    "未见侧面和舱门采用对称/简化浮雕近似，塑料颜色受原照光照与白平衡影响。",
+    "估算尺寸为本地 X 宽 9、Y 长 26、Z 高 28 mm，最终长轴对应 Unity Z。",
+    "底心枢轴位于估算支承面；水线基准估算为底面以上 1.6 mm，尚无实测。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "f1a89b0c225b283183e8e0c98d57000d87946bc86bf70120c763e4953d0a25a9",
+    "game-camera.png": "5af5b51a5b4b54ed566ac388e7c9e056f783200d3998fa45d387a54daf6c0986",
+    "side.png": "3d6758c8d3a07af9675637716fb5de4c0af616a7e25e7687b88af9bea9c0e84f",
+    "top.png": "f7f2ddb713173b905b223a8fb6779eb06cc9d904b3eded20ceb4911c52c12212"
+  }
+}

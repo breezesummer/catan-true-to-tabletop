@@ -1,0 +1,84 @@
+{
+  "status": "passed",
+  "date": "2026-10-16",
+  "timezone": "Asia/Shanghai",
+  "game": "卡坦岛之三国争霸",
+  "release": "内测版1.4",
+  "iteration": "ui-feedback-v012",
+  "sourceBranch": "codex/ui-feedback-v012",
+  "artifact": ".local/ui-feedback-v012-final/Builds/Windows/CatanM6.exe",
+  "dotnet": {
+    "fullRun": 861,
+    "finalTargetedRun": 94,
+    "deduplicatedPassed": 890,
+    "completeAiGames": 52,
+    "runs": [
+      {
+        "file": ".local/m6-ui-v012/dotnet-results/ui-feedback-v012.trx",
+        "passed": 861,
+        "sha256": "85569330c4a498075e8ecf29b7d4d491c0070f3b09e6c5a1b6d3111834ad6ff1"
+      },
+      {
+        "file": ".local/m6-ui-v012/dotnet-results/final-ui-feedback-v012.trx",
+        "passed": 94,
+        "sha256": "69075820a91e3506adc90704a3df9f9a0473ca825c08baf302e99d6ceb6edc4f"
+      }
+    ]
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "windowsBuild": true,
+    "bundledLocalServer": true,
+    "allCopiedFilesMatch": true,
+    "copiedFiles": 514,
+    "runtimeAssemblySha256": "957ca0539866ff165d04189f7185473421088ef9721b951d627d49bfc2fc386e"
+  },
+  "persistence": {
+    "fourRuleSets": true,
+    "separateSaveAndLoadProcesses": true,
+    "path": ".local/ui-feedback-v012-final/persistence"
+  },
+  "headlessUi": {
+    "configurations": 28,
+    "checks": 19365,
+    "path": ".local/ui-feedback-v012-final/tabletop-verification/headless/result.json"
+  },
+  "visibleWindow": {
+    "aiRuleSets": 4,
+    "aiSpeedLevels": 3,
+    "buildFlights": 8,
+    "aiFrames": 25,
+    "glowVisuallyConfirmed": true,
+    "collectionCases": [
+      "development-purchase",
+      "progress-draw",
+      "resource-production"
+    ],
+    "collectionFrames": 15,
+    "collectionOwnCardHiddenUntilArrival": true,
+    "productionSourceVerified": "T04",
+    "manualResourceDiscard": "11张选5张；0/5至5/5，选择弃牌变确认；确认后6张",
+    "manualProgressDiscard": "5张选1张；右下确认后4张",
+    "manualActiveOverflow": "主动回合5张，点结束回合后自动切进步手牌并显示选择弃牌",
+    "paths": [
+      ".local/ui-feedback-v012-final/ai-animation",
+      ".local/m6-ui-v012/collection-animation"
+    ]
+  },
+  "limitations": [
+    "联机AI速度仍由服务器统一调度，本地三档选择仅控制单人AI",
+    "同批网络历史合并多次发明时，中间产出暂从银行飞入，后续公开快照恢复来源",
+    "未重建安卓APK；未验证真实多机/外网、完整用户整局和长期性能"
+  ],
+  "milestonesUnchanged": [
+    "M7",
+    "M8"
+  ],
+  "wechat": {
+    "requested": true,
+    "group": "卡坦内测开发组",
+    "status": "sent",
+    "confirmedAt": "2026-10-16T00:32:26+08:00",
+    "evidence": "Windows微信目标群中完整绿色消息气泡，输入框已清空，发送等待标记已消失；未上传压缩包"
+  }
+}

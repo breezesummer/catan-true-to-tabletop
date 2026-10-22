@@ -1,0 +1,41 @@
+{
+  "status": "passed",
+  "typeId": "barbarian-track",
+  "assets": [
+    {
+      "id": "barbarian-track",
+      "meshObjects": 1,
+      "triangles": 300,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.1899999976158142,
+        0.20000000298023224,
+        0.0015000326032517108
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/barbarian-track-front.png",
+      "width": 1946,
+      "height": 2048,
+      "verified": true
+    }
+  ],
+  "previews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": null,
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

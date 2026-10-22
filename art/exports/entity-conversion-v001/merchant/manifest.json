@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "merchant",
+  "label": "中性色商人与双轮货车（实体单照参考）",
+  "recipePath": "art/recipes/entity-conversion-v001/merchant/recipe.json",
+  "recipeSha256": "cddcaa76928b7aeaa84e6b9593d4b02eb10da51d90d604da512e1e5b4a178e47",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v001/merchant/builder.py",
+      "sha256": "0a8f79e083d483a624aabbb4f1206e393372ba1d53e6aab265025d3c0782dbec"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimate-not-measured",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/单位/商人.jpg",
+      "sha256": "17fcefec438a51016dcc51a76bc9f69a12c098732ad6cb01d5b4df6c6fddf344",
+      "role": "neutral-merchant-pulling-two-wheel-cargo-cart-oblique-front"
+    }
+  ],
+  "assets": [
+    {
+      "id": "merchant-neutral-cart",
+      "label": "米灰商人与双轮货车",
+      "kind": "custom",
+      "dimensionsMm": [
+        14,
+        19,
+        25
+      ],
+      "meshObjects": 1,
+      "triangles": 12748,
+      "geometrySha256": "bf513b94974a383e6523994bb0d04684e65de9fe453304db17cdbe9e4b80f03f",
+      "blenderBounds": {
+        "min": [
+          -0.007000000216066837,
+          -0.009499999694526196,
+          0.0
+        ],
+        "max": [
+          0.007000000216066837,
+          0.009499999694526196,
+          0.02500000037252903
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.007000000216066837,
+          0.0,
+          -0.009499999694526196
+        ],
+        "max": [
+          0.007000000216066837,
+          0.02500000037252903,
+          0.009499999694526196
+        ]
+      },
+      "materials": [
+        {
+          "name": "merchant-neutral-cart_Warm_Neutral_Plastic",
+          "baseColorLinearRgba": [
+            0.4000000059604645,
+            0.3799999952316284,
+            0.2800000011920929,
+            1.0
+          ],
+          "roughness": 0.3700000047683716,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "0b10ce1a72b95a869078dede793d5c9449d61929e5f3c77c45bca562f256aeb2",
+      "blendSha256": "9020210d4e51ac9a2240ff1c85d00c1569644c869b83b75ca675df98809b2511",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [],
+  "limitations": [
+    "仅有一张斜前方照片；没有比例尺，背面、底面、另一侧货物和真实尺寸未知。",
+    "保留圆软帽/头巾、长脸与鼻、长外衣、垂下握把手的双臂、分开双靴、双轮货车和桶袋卷状货物轮廓；小脸部、衣褶和货物细节均为参数化近似。",
+    "估算包围盒为 X 宽 14、Y 深 19、Z 高 25 mm；后方货车需要较长占地，该尺寸不是实测或用户确认值。",
+    "照片呈米灰中性色，曝光与白平衡未知；采用近似米灰塑料，不追加玩家颜色或未知彩绘。",
+    "原照可见轮子、侧栏板与货物，轮辐、底面车轴及背侧货物按闭合可导入结构补齐，不声称扫描、摄影测量或精确还原。",
+    "闭合子壳合并为一个材质网格，壳之间存在重叠而未布尔融合；不作为打印模型。",
+    "这是商人实体棋子，独立于贸易进步卡中的商人卡；Unity 正式灯光、拾取、碰撞、相邻遮挡与用户外观确认由主任务另验。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "25a7e08f0876723ff6275ed37f5c8f2135a6d6683a569747666ef27ea9576401",
+    "game-camera.png": "ae43c06d02c57d872cacdbc5ab257feb3f2a6c43679d2befc071d34d03e028e9",
+    "side.png": "b6d5ab67419d32de599f61b0d2c0c660b7f60a2a3866f748092eaa0fa031d1be",
+    "top.png": "2a075e4db6d3174143fc7a909d637c9f20b658fa73b904ddb971195fb41ae3ee"
+  }
+}

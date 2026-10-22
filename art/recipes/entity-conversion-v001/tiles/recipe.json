@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "typeId": "tiles",
+  "label": "六种剩余原照片地图板块",
+  "seed": 20261009,
+  "scaleStatus": "estimated; 68.58921198 × 79.2 × 8 mm, radius 39.6 mm; not physically measured or user-approved",
+  "limitations": [
+    "仅用原照片像素进行六三角 affine 六角校正；插画、印刷标识、失焦、曝光与表面噪点保留，没有 AI 重绘或颜色替换。",
+    "原照片平顶六边形按对应顶点映射到30度起点尖顶六角；整体相位约逆时针30度，校正后的纹理与米制网格显式UV一一对应。",
+    "六三角 affine 是按人工读取顶点分片映射，并非精确镜头标定；径向三角交界的局部插值变化、圆角裁切与极少边界背景仍可能可见。",
+    "输出为有估算厚度的印刷板块实际封闭网格，并非立体草地、山体、沙丘或海面景观。",
+    "背面、实际厚度和毫米尺寸未知；背面仅中性材质，不能称原版还原。森林旧样板保留，本类型不重做。"
+  ],
+  "references": [
+    {"originalPath": "assets/references/inbox/地图板块/草地.jpg", "sha256": "1133266b670cc97b46d27bc8f1a7eb7e1ab41e23fb065f35fb4e0aeaacfae2cf", "role": "pasture printed top; flat-top photo; unknown back"},
+    {"originalPath": "assets/references/inbox/地图板块/海洋.jpg", "sha256": "310cdeaaa1c1367b0a0e982f91951109bb2b5c818d7676066f3f6d3c8367dd10", "role": "sea printed top; flat-top photo; unknown back"},
+    {"originalPath": "assets/references/inbox/地图板块/金矿.jpg", "sha256": "288a67240785b5d5b9372d2173199ed8d8837f5cf70d585a242cb60c8498b44e", "role": "gold printed top; flat-top photo; unknown back"},
+    {"originalPath": "assets/references/inbox/地图板块/沙漠.jpg", "sha256": "d9d63fa835f74b8962a691bd408f782fc8794616aa3d92519820e3f4aad9123d", "role": "desert printed top; flat-top photo; unknown back"},
+    {"originalPath": "assets/references/inbox/地图板块/小麦.jpg", "sha256": "fb70c010424a66bc28e38bfc3ef18104664195de03ab10b6ce5fdf0337a6f5d3", "role": "fields printed top; flat-top photo; unknown back"},
+    {"originalPath": "assets/references/inbox/地图板块/砖块.jpg", "sha256": "ad9244724ceb65a987b240e2e9336dffb931b91f29d2bd8aaa58487d0e7cd2c1", "role": "hills printed top; flat-top photo; unknown back"}
+  ],
+  "textureJobs": [
+    {"source": "assets/references/inbox/地图板块/草地.jpg", "output": "art/source/entity-conversion-v001/tiles/textures/tile-pasture-top.png", "hex": [[1448,655],[1144,217],[624,221],[337,677],[611,1187],[1206,1161]], "size": [1024,1024], "rotation": 0, "orientation": "source R/UR/UL/L/LL/LR maps to destination RU/T/LU/LL/B/RL, approximately 30 degrees counterclockwise"},
+    {"source": "assets/references/inbox/地图板块/海洋.jpg", "output": "art/source/entity-conversion-v001/tiles/textures/tile-sea-top.png", "hex": [[1365,636],[1064,201],[538,195],[234,672],[544,1197],[1151,1144]], "size": [1024,1024], "rotation": 0, "orientation": "source R/UR/UL/L/LL/LR maps to destination RU/T/LU/LL/B/RL, approximately 30 degrees counterclockwise"},
+    {"source": "assets/references/inbox/地图板块/金矿.jpg", "output": "art/source/entity-conversion-v001/tiles/textures/tile-gold-top.png", "hex": [[1437,660],[1153,234],[655,228],[365,647],[611,1142],[1196,1147]], "size": [1024,1024], "rotation": 0, "orientation": "source R/UR/UL/L/LL/LR maps to destination RU/T/LU/LL/B/RL, approximately 30 degrees counterclockwise"},
+    {"source": "assets/references/inbox/地图板块/沙漠.jpg", "output": "art/source/entity-conversion-v001/tiles/textures/tile-desert-top.png", "hex": [[1450,655],[1146,204],[606,187],[294,653],[594,1200],[1220,1176]], "size": [1024,1024], "rotation": 0, "orientation": "source R/UR/UL/L/LL/LR maps to destination RU/T/LU/LL/B/RL, approximately 30 degrees counterclockwise"},
+    {"source": "assets/references/inbox/地图板块/小麦.jpg", "output": "art/source/entity-conversion-v001/tiles/textures/tile-fields-top.png", "hex": [[1470,704],[1191,269],[675,261],[387,700],[635,1202],[1217,1207]], "size": [1024,1024], "rotation": 0, "orientation": "source R/UR/UL/L/LL/LR maps to destination RU/T/LU/LL/B/RL, approximately 30 degrees counterclockwise"},
+    {"source": "assets/references/inbox/地图板块/砖块.jpg", "output": "art/source/entity-conversion-v001/tiles/textures/tile-hills-top.png", "hex": [[1425,674],[1125,230],[598,229],[305,697],[592,1216],[1196,1187]], "size": [1024,1024], "rotation": 0, "orientation": "source R/UR/UL/L/LL/LR maps to destination RU/T/LU/LL/B/RL, approximately 30 degrees counterclockwise"}
+  ],
+  "assets": [
+    {"id": "tile-pasture", "label": "草地印刷板块", "kind": "tile", "dimensionsMm": [68.58921198,79.2,8], "frontTexture": "art/source/entity-conversion-v001/tiles/textures/tile-pasture-top.png", "backTexture": null, "frontUv": [[0.9330127,0.75],[0.5,1],[0.0669873,0.75],[0.0669873,0.25],[0.5,0],[0.9330127,0.25]]},
+    {"id": "tile-sea", "label": "海洋印刷板块", "kind": "tile", "dimensionsMm": [68.58921198,79.2,8], "frontTexture": "art/source/entity-conversion-v001/tiles/textures/tile-sea-top.png", "backTexture": null, "frontUv": [[0.9330127,0.75],[0.5,1],[0.0669873,0.75],[0.0669873,0.25],[0.5,0],[0.9330127,0.25]]},
+    {"id": "tile-gold", "label": "金矿印刷板块", "kind": "tile", "dimensionsMm": [68.58921198,79.2,8], "frontTexture": "art/source/entity-conversion-v001/tiles/textures/tile-gold-top.png", "backTexture": null, "frontUv": [[0.9330127,0.75],[0.5,1],[0.0669873,0.75],[0.0669873,0.25],[0.5,0],[0.9330127,0.25]]},
+    {"id": "tile-desert", "label": "沙漠印刷板块", "kind": "tile", "dimensionsMm": [68.58921198,79.2,8], "frontTexture": "art/source/entity-conversion-v001/tiles/textures/tile-desert-top.png", "backTexture": null, "frontUv": [[0.9330127,0.75],[0.5,1],[0.0669873,0.75],[0.0669873,0.25],[0.5,0],[0.9330127,0.25]]},
+    {"id": "tile-fields", "label": "小麦印刷板块", "kind": "tile", "dimensionsMm": [68.58921198,79.2,8], "frontTexture": "art/source/entity-conversion-v001/tiles/textures/tile-fields-top.png", "backTexture": null, "frontUv": [[0.9330127,0.75],[0.5,1],[0.0669873,0.75],[0.0669873,0.25],[0.5,0],[0.9330127,0.25]]},
+    {"id": "tile-hills", "label": "砖块印刷板块", "kind": "tile", "dimensionsMm": [68.58921198,79.2,8], "frontTexture": "art/source/entity-conversion-v001/tiles/textures/tile-hills-top.png", "backTexture": null, "frontUv": [[0.9330127,0.75],[0.5,1],[0.0669873,0.75],[0.0669873,0.25],[0.5,0],[0.9330127,0.25]]}
+  ]
+}

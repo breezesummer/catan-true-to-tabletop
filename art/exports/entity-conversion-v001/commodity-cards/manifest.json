@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "commodity-cards",
+  "label": "三种商品牌正面照片转化",
+  "recipePath": "art/recipes/entity-conversion-v001/commodity-cards/recipe.json",
+  "recipeSha256": "4e12ec83d7a6af80d1ae66cf02c72a5f414fda999f54022b74ad22b200092336",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimated; 54 × 80 × 0.3 mm, not physically measured or user-approved",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/商品牌/布匹.jpg",
+      "sha256": "19a3b7d05fed239a580430dcf8944c7ea35e074ec0884c609819e107c7395e8e",
+      "role": "cloth commodity front; upright original photo, no back reference"
+    },
+    {
+      "originalPath": "assets/references/inbox/商品牌/纸张.jpg",
+      "sha256": "ef81a32d3d33f5eb7833ce0ef4c957ecafac945deb8a9f40614e05edb718b95f",
+      "role": "paper commodity front; upright original photo, no back reference"
+    },
+    {
+      "originalPath": "assets/references/inbox/商品牌/银币.jpg",
+      "sha256": "9111063c9b5e664a56b9da7de8e5cfdc2be9e93cf6e41da78df189afaff05a4f",
+      "role": "coin commodity front; upright original photo, no back reference"
+    }
+  ],
+  "assets": [
+    {
+      "id": "commodity-cloth",
+      "label": "布匹商品牌",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "68cb45a2c68478eef8619bf2279c82a42be7c077c5c9697080837c4be91d2784",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "commodity-cloth_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "commodity-cloth_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "commodity-cloth-front.png"
+        },
+        {
+          "name": "commodity-cloth_UnseenBackNeutral",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.6100000143051147,
+            0.49000000953674316,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "ab270c282b65211a9b1156adf16d2e0760d053eb1449479c2a363f34aa6c83ce",
+      "blendSha256": "ffcb4eea9d2e2cdff3d98acad0e79b0c5a5ea996146a7678b2a98ed0ae9c0d85",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "commodity-paper",
+      "label": "纸张商品牌",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "1e459c88281f119d1e1b4470d02a4ae2d21ae45159f39869f7cbfbf570a9ec59",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "commodity-paper_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "commodity-paper_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "commodity-paper-front.png"
+        },
+        {
+          "name": "commodity-paper_UnseenBackNeutral",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.6100000143051147,
+            0.49000000953674316,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "ad8ed872ad3361e52a3505a56508891c662012198d7bdddaed8c03228f6743f4",
+      "blendSha256": "4fea0cfb9e75d538cdd923a11f96a052241fc08456b48a935521b9baa2a03a58",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "commodity-coin",
+      "label": "银币商品牌",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "c54abdb074ef8989d78c12c31f6bd3d5838db5e9dbcb574d150b716d549c735f",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "commodity-coin_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "commodity-coin_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "commodity-coin-front.png"
+        },
+        {
+          "name": "commodity-coin_UnseenBackNeutral",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.6100000143051147,
+            0.49000000953674316,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "2e084d03ab4bfd2b0846db46f55d670edba4d9528183df28264086ded0624b78",
+      "blendSha256": "7038a9bb1ed57ac631e8a79f3fb91f7597125edca81e709e16cbae4d3b0d11a8",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/commodity-cloth-front.png",
+      "sha256": "ed07cc11cd869005494625dcb7fa7e65d36c0065fb24f04f666f5bf7d77b2d6d"
+    },
+    {
+      "path": "textures/commodity-coin-front.png",
+      "sha256": "641becaf72a1a84688dd8a0ecfb32d51252aab93747daf69055bb4929a2bda9f"
+    },
+    {
+      "path": "textures/commodity-paper-front.png",
+      "sha256": "14f782fc68e7c2736315a08e0ab0a01c64e3272747a682eabbd1222a36870ecc"
+    }
+  ],
+  "limitations": [
+    "忠实保留原照片插画、印刷、曝光、失焦、保护套反光与纸面纹理；没有 AI、OCR、补字、重绘、去反光、锐化或颜色替换。",
+    "四角为人工读取卡片外直边延长线交点，圆角外保留少量背景；工作网格为薄盒体，未还原圆角。",
+    "未提供可明确归属的商品牌背面照片；backTexture 为 null，底面仅为标记未知的中性材质，不复用资源牌背面。",
+    "实物版本、实测尺寸、纸面材质与正反面配准仍未知。",
+    "银币照片仅作为已有 Coin 商品的视觉资源映射，不修改规则定义。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "68bc29668e5b91489df62c13f53f7a2b82209e2442948c795193e272401a7698",
+    "game-camera.png": "d58a1566eafd609890e91cae3759eaf3ef70c48296dcead9a5b49e1aa5da691d",
+    "side.png": "a2a7af56c0bae944043150be25ef79398ed759f6ae2103dc48d9321bb19c3300",
+    "top.png": "6617152b527af544936731bd87dcab984ef2effd0eea5c3a36ad414d620c9dbb"
+  }
+}

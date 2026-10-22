@@ -1,0 +1,66 @@
+﻿[
+    {
+        "path":  "src/Catan.AI/bin/Release/netstandard2.1/Catan.AI.dll",
+        "sha256":  "5e84c142c1dc8af5f6c4d99ba54dc1e2c7c4a2bae4cb8d9a436d86264aca279b"
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/bin/Release/net10.0/Catan.AI.dll",
+        "sha256":  "5e84c142c1dc8af5f6c4d99ba54dc1e2c7c4a2bae4cb8d9a436d86264aca279b"
+    },
+    {
+        "path":  "Unity/Catan/Assets/Plugins/Catan.AI.dll",
+        "sha256":  "5e84c142c1dc8af5f6c4d99ba54dc1e2c7c4a2bae4cb8d9a436d86264aca279b"
+    },
+    {
+        "path":  ".local/m6-ai-v002/Builds/Windows/CatanM6_Data/Managed/Catan.AI.dll",
+        "sha256":  "5e84c142c1dc8af5f6c4d99ba54dc1e2c7c4a2bae4cb8d9a436d86264aca279b"
+    },
+    {
+        "path":  "Unity/Catan/Assets/Plugins/Catan.Core.dll",
+        "sha256":  "11d9f64d1ac3dc98d17e97b634495c9535939fd2444fe565ad2bc49a0c61e0bc"
+    },
+    {
+        "path":  ".local/m6-ai-v002/Builds/Windows/CatanM6.exe",
+        "sha256":  "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+        "path":  "tools/validation/Export-AiStrategyEvidence.ps1",
+        "sha256":  "d4c5d4f5ef2f9e625317bf9bb4d373f0f242ac210f01d0acf185e52352f8b791"
+    },
+    {
+        "path":  "src/Catan.AI/AiHeuristics.cs",
+        "sha256":  "dea1e9b5ee6a62b6ff2494a342b09d2a9ad67fb12a845596a8454c1f5e8b0f5b"
+    },
+    {
+        "path":  "src/Catan.AI/BaseGameAi.cs",
+        "sha256":  "bb22afdd0e40a2dae6c51b85ca802d9aca895c0e5db092b10045e1ab3992dd86"
+    },
+    {
+        "path":  "src/Catan.AI/CitiesKnightsAi.cs",
+        "sha256":  "ca8c940538acd3071235fa335eade001c3e0d1e0503d755a69493366f93e5503"
+    },
+    {
+        "path":  "src/Catan.AI/CombinedAi.cs",
+        "sha256":  "8e7c322d11eaa623bbc5c2308bf90efc1846bae8bab0abc73b4e6c95b4fe8ecb"
+    },
+    {
+        "path":  "src/Catan.AI/SeafarersAi.cs",
+        "sha256":  "b0f3cc24d7df0468c490dec63a1743e2a6fe88a5eff4996bd08d4f02ed80bbbf"
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M6CitiesStrategyTests.cs",
+        "sha256":  "becd59b62b02a689a934c63db3ed05e3e081f9902157e8dbfc39ceed18566b92"
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M6CombinedStrategyTests.cs",
+        "sha256":  "ca8e8a0c216625db42dfc36d677dc957d4c9829b05282d5b1317a061377b1242"
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M6SeafaringStrategyTests.cs",
+        "sha256":  "91fd9ae3b6da3b116e786753640f80749f7256ee5a2e19dc9a24e5426999b21f"
+    },
+    {
+        "path":  "tests/Catan.Rules.Tests/M6SetupStrategyTests.cs",
+        "sha256":  "e5dfbf0e295a243829d5347803d1fcc1fc3fb4ea78e63f4e81120c8574eedf97"
+    }
+]

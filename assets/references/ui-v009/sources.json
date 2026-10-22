@@ -1,0 +1,21 @@
+{
+  "version": "ui-v009",
+  "date": "2026-10-14",
+  "note": "原始参考仅作布局数据；未加工或覆盖用户原件。",
+  "references": [
+    {
+      "file": "new-ui-before.png",
+      "source": "C:/Users/BREEZE~1/AppData/Local/Temp/codex-clipboard-d342e5c9-ab61-4997-b2f6-228b44c9aeae.png",
+      "purpose": "用户提供的待修复布局截图",
+      "sha256": "23DACE66D30EBEF06AD225A17010D2388A601995CF83844EBEF50091C49290A8",
+      "originalPreserved": true
+    },
+    {
+      "file": "previous-ui-reference.png",
+      "source": "C:/Users/BREEZE~1/AppData/Local/Temp/codex-clipboard-b7b5e9b1-3673-42fe-81a9-95d9bc0fd1f1.png",
+      "purpose": "用户提供的原布局参考截图",
+      "sha256": "12CEC224F187F0DF16FEB202C297CA89B6E200481965047BEBAC70E6505B75B0",
+      "originalPreserved": true
+    }
+  ]
+}

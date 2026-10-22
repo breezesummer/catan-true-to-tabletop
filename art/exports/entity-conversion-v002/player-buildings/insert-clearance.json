@@ -1,0 +1,174 @@
+{
+  "status": "passed",
+  "assets": [
+    {
+      "id": "city-with-wall-orange",
+      "status": "passed",
+      "meshObjects": 2,
+      "bothOriginsZero": true,
+      "standaloneGeometryUvUnchangedInAssembly": true,
+      "bodyWallColourMatches": true,
+      "wallClosedShells": 99,
+      "wallHeightMm": 4.999999888241291,
+      "minimumHoleDiameterMm": 18.594396872413544,
+      "bodyDiameterBelowWallTopMm": 18.000000987958714,
+      "minimumRadialClearanceMm": 0.2971979422274149,
+      "sourceFiles": [
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-wall-orange.blend",
+          "sha256": "7780d1e982f21beab7606d784ef9aa225798709cd711521aaff26704df1ababd"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-orange.blend",
+          "sha256": "bf3512ee8cab45baf88233ae7438da984f409e284aba9342c966db6cd73e251f"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-with-wall-orange.blend",
+          "sha256": "73acb1f36ba9df46ca5a642958cd2ee4644ff6c809b2e816814d20face5d6a0d"
+        }
+      ]
+    },
+    {
+      "id": "metropolis-with-wall-orange",
+      "status": "passed",
+      "meshObjects": 2,
+      "bothOriginsZero": true,
+      "standaloneGeometryUvUnchangedInAssembly": true,
+      "bodyWallColourMatches": true,
+      "wallClosedShells": 99,
+      "wallHeightMm": 4.999999888241291,
+      "minimumHoleDiameterMm": 18.594396872413544,
+      "bodyDiameterBelowWallTopMm": 18.000000763313437,
+      "minimumRadialClearanceMm": 0.2971980545500522,
+      "sourceFiles": [
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-wall-orange.blend",
+          "sha256": "7780d1e982f21beab7606d784ef9aa225798709cd711521aaff26704df1ababd"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/metropolis-orange.blend",
+          "sha256": "5841cdd06348d34905370bf87b9f5ed0110fbc30ffaf6729c91c367f5bd1e84b"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/metropolis-with-wall-orange.blend",
+          "sha256": "41855475a6f8ccc1073740c76fc95fb9a615d300593fece2d5f4e4fb858091fe"
+        }
+      ]
+    },
+    {
+      "id": "city-with-wall-beige",
+      "status": "passed",
+      "meshObjects": 2,
+      "bothOriginsZero": true,
+      "standaloneGeometryUvUnchangedInAssembly": true,
+      "bodyWallColourMatches": true,
+      "wallClosedShells": 99,
+      "wallHeightMm": 4.999999888241291,
+      "minimumHoleDiameterMm": 18.594396872413544,
+      "bodyDiameterBelowWallTopMm": 18.000000987958714,
+      "minimumRadialClearanceMm": 0.2971979422274149,
+      "sourceFiles": [
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-wall-beige.blend",
+          "sha256": "3fd2fe45baf9d74e01cd3485edae8c3bae80797b40c60404a490539fb3ba9956"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-beige.blend",
+          "sha256": "92d87dd2aebc3fe11437c5f9f8d799ec142c47860d8924c53ad324dfe42c05ee"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-with-wall-beige.blend",
+          "sha256": "bf6e1d3cd30f1cc6cabf88e876a58c5c1de670c10d3cb74270f376b3af5d3433"
+        }
+      ]
+    },
+    {
+      "id": "metropolis-with-wall-beige",
+      "status": "passed",
+      "meshObjects": 2,
+      "bothOriginsZero": true,
+      "standaloneGeometryUvUnchangedInAssembly": true,
+      "bodyWallColourMatches": true,
+      "wallClosedShells": 99,
+      "wallHeightMm": 4.999999888241291,
+      "minimumHoleDiameterMm": 18.594396872413544,
+      "bodyDiameterBelowWallTopMm": 18.000000763313437,
+      "minimumRadialClearanceMm": 0.2971980545500522,
+      "sourceFiles": [
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-wall-beige.blend",
+          "sha256": "3fd2fe45baf9d74e01cd3485edae8c3bae80797b40c60404a490539fb3ba9956"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/metropolis-beige.blend",
+          "sha256": "5d728de379df9821ef3ad4766c696cb6d5211e0cd91ca8a8df78914f254222b8"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/metropolis-with-wall-beige.blend",
+          "sha256": "7f93ea032b12f8a7bdf1d9ca30e19f4627da3bc1b6a8d15bde7169a0b9e4a386"
+        }
+      ]
+    },
+    {
+      "id": "city-with-wall-blue",
+      "status": "passed",
+      "meshObjects": 2,
+      "bothOriginsZero": true,
+      "standaloneGeometryUvUnchangedInAssembly": true,
+      "bodyWallColourMatches": true,
+      "wallClosedShells": 99,
+      "wallHeightMm": 4.999999888241291,
+      "minimumHoleDiameterMm": 18.594396872413544,
+      "bodyDiameterBelowWallTopMm": 18.000000987958714,
+      "minimumRadialClearanceMm": 0.2971979422274149,
+      "sourceFiles": [
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-wall-blue.blend",
+          "sha256": "aea8cb67e5de70ce69d74e38cc9de3d11bfd55b3a82b534dc4b23ab4c8d025ef"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-blue.blend",
+          "sha256": "1fc97bf36ddfdc592f928c6f85404240867c7626a1fe44b872e26005f3fe4385"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-with-wall-blue.blend",
+          "sha256": "22b60a7c4dd6058b8706bd9064cbcc161f0d693a353d31bfed6981486a17ebd0"
+        }
+      ]
+    },
+    {
+      "id": "metropolis-with-wall-blue",
+      "status": "passed",
+      "meshObjects": 2,
+      "bothOriginsZero": true,
+      "standaloneGeometryUvUnchangedInAssembly": true,
+      "bodyWallColourMatches": true,
+      "wallClosedShells": 99,
+      "wallHeightMm": 4.999999888241291,
+      "minimumHoleDiameterMm": 18.594396872413544,
+      "bodyDiameterBelowWallTopMm": 18.000000763313437,
+      "minimumRadialClearanceMm": 0.2971980545500522,
+      "sourceFiles": [
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/city-wall-blue.blend",
+          "sha256": "aea8cb67e5de70ce69d74e38cc9de3d11bfd55b3a82b534dc4b23ab4c8d025ef"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/metropolis-blue.blend",
+          "sha256": "fef18e04445a0014aa32ab134c6cfb5072088827fabb8f46c481337780da2d2c"
+        },
+        {
+          "path": "art/source/entity-conversion-v002/player-buildings/metropolis-with-wall-blue.blend",
+          "sha256": "88194ee2075c78c830c42b2f476a6bfa5ee2ff3d617b1479f655fc4c538a522c"
+        }
+      ]
+    }
+  ],
+  "auditScriptSha256": "4154a668961806ee35f0da3b81a74b2e937f89e5249f21f227aedbd618b8b081",
+  "method": "minimum XY distance to every source wall edge; maximum body vertex radius below wall top; direct geometry/UV comparison with separate parts",
+  "limitations": [
+    "Estimated geometry, not measured physical insert clearance.",
+    "Centred, stationary source transforms only; Unity runtime input/animation is separate.",
+    "Closed intersecting shells within each sculpture, without Boolean union."
+  ]
+}

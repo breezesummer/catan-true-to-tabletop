@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "typeId": "city-wall",
+  "label": "城墙（红色组合照片参考）",
+  "seed": 20261009,
+  "scaleStatus": "estimate-not-measured",
+  "limitations": [
+    "两张斜侧组合照片只显示装入城市或大都会后的外围城墙，独立城墙顶视、内壁、底面和实际尺寸未知。",
+    "参数化实际网格按可见环形墙体、台阶、上沿、圆形小塔和墙垛近似；非摄影测量或扫描复原。",
+    "外径24 mm、内径18.6 mm、总高5 mm均为估算，中央通孔用于容纳已有18 mm城市底座，未实测插装间隙。",
+    "八座圆形小塔和32个主墙垛为重复布局推断；照片被建筑遮挡的后部和具体墙垛数量尚未确认。",
+    "本资产只包含独立城墙，不包含城市或大都会插入件；组合照片中的其余几何由对应类型独立制作。",
+    "红色塑料材质为原照照明下的近似，不代表实物色值或用户已确认的最终外观。"
+  ],
+  "references": [
+    {"originalPath": "assets/references/inbox/建筑/红色城市+城墙.jpg", "sha256": "95f6e7670b469534b0a1e05932c63ef56810bdfde6c7a19e5f161c4500ea7a14", "role": "city-in-wall-visible-ring-towers-crenellations"},
+    {"originalPath": "assets/references/inbox/建筑/红色大都会+城墙.jpg", "sha256": "d6c31093b29977114f68f4047bc0dccae4e602e408c605c226898a2c7943c4a9", "role": "metropolis-in-wall-confirm-visible-ring-ledge-and-towers"},
+    {"originalPath": "assets/references/inbox/建筑/红色城市.jpg", "sha256": "b40d7dfa1b75ad0adbed6bf463c26d3061bdf726837f0570f045195d3b43c993", "role": "extra-comparison-reference-for-separate-city-base-and-wall-clearance"}
+  ],
+  "assets": [
+    {"id": "city-wall-red", "label": "红色独立城墙", "kind": "custom", "dimensionsMm": [24,24,5], "customBuilder": "art/recipes/entity-conversion-v001/city-wall/builder.py", "builderArgs": {"color": [0.57,0.009,0.020], "innerDiameterMm": 18.6}}
+  ]
+}

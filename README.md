@@ -1,41 +1,75 @@
-# 卡坦岛 PC 项目
+# 卡坦岛之三国争霸
 
-单人主导、AI 执行代码与美术生产的 3D 收藏版桌游项目。目标包含基础版、航海家、城市与骑士及双扩展组合，尽可能还原实体桌游的观察、拿取、摆放和交易体验。
+一款以实体桌游体验为目标的 3D 卡坦岛游戏，包含资源生产、交易、道路与聚落建设、海上探索，以及城市发展与骑士防御。项目强调在同一张桌面上观察地图、拿取棋子、摆放建筑和操作卡牌，逐步呈现立体地形收藏版的质感。
 
-用户提供实体组件参考并进行玩法与视觉验收。先逐步完成本地规则，随后交付单人 AI 对战和好友联机。每个规则阶段都应能独立本地试玩。
+项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本标识为**内测版1.7.1**；各可玩构建的实际版本与验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
 
-M0 项目启动阶段已于 2026 年 10 月 8 日完成。M1 本地交互切片已实现，正式 Unity 工程位于 `Unity/Catan`，Windows 试玩程序位于 `.local/m1/Builds/Windows/CatanM1.exe`。纯规则测试、Unity 兼容编译、真实 Windows 进程中的保存恢复和山地网格重建已有证据；阶段正式退出仍需交互与用户试玩验收，详见 [M1 验收记录](docs/M1_ACCEPTANCE.md)。M0 环境验证工程保留在 `.local/environment`。
+## 玩法与内容
 
-启动 M1：
+| 模式       | 内容范围                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------- |
+| 基础版     | 3–4 人，资源生产、建造、港口与玩家交易、发展卡、强盗、最长道路及最大骑士军队               |
+| 航海家     | 船、海盗、金矿、探索与九种剧本                                                              |
+| 城市与骑士 | 商品、城市设施、骑士、蛮族、发展卡、城墙及大都会                                            |
+| 双扩展组合 | 已支持“驶向新海岸”“穿越沙漠”的 3–4 人配置，具体范围见[组合兼容表](docs/M5_SCENARIOS.md) |
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M1.ps1
-```
+单人模式可选择一个人类席位，其余由本地 AI 操作，支持暂停和保存恢复。好友联机包含局域网与在线大厅，提供权威房间、加入、同步、断线恢复及服务器保存；当前在线地址为 `175.178.212.142:47771`，新客户端首次进入在线游戏时自动连接。
 
-操作和固定流程见 [M1 试玩说明](docs/M1_PLAYTEST.md)。这不是完整基础版；强盗、发展卡、港口、城市、胜利判定、AI 和联机尚未实现。
+## 平台与体验
 
-入口文档：
+- **Windows**：鼠标键盘操作，Unity 桌面客户端。
+- **Android**：同一 Unity 工程的横屏触控版本，目标为 Android 8.0 及以上、64 位 ARM64 手机；与 PC 共用规则、当前 AI、资产和完整桌面 UI。
+- **桌面表现**：实体照片来源的板块与卡面、三维玩家组件、手牌操作、交易界面、骰子统计、历史记录、菜单与音效。
 
-- [项目约定](docs/PROJECT_BRIEF.md)：已确认目标、工作默认值、首个版本的验收标准。
-- [开发路线](docs/ROADMAP.md)：分阶段交付、退出条件和当前任务。
-- [美术生产规范](docs/ART_PIPELINE.md)：实物采集、AI 生产、导入和复现要求。
-- [开发环境](docs/ENVIRONMENT.md)：本机检查结果与工具链配置顺序。
-- [M0 验收记录](docs/M0_ACCEPTANCE.md)：退出条件、实际验证与 M1 移交。
-- [M1 验收记录](docs/M1_ACCEPTANCE.md)：实际测试证据、交付内容和待验项。
-- [M1 架构](docs/M1_ARCHITECTURE.md)：规则核心、权限边界和存档版本。
-- [M1 山地样板](docs/M1_ART.md)：源网格、导出清单、四视图和干净目录重建。
-- [规则来源基线](docs/RULES_BASELINE.md)：三份官方 2025 规则的版本、来源和文件校验值。
-- [参考与尺度基线](docs/REFERENCE_BASELINE.md)：估算尺寸与实体参考后补清单。
-- [v0.1 验收流程](docs/acceptance/V0_1_ACCEPTANCE.md)：固定开局、行动、状态账本与非法操作检查。
-- [参考素材目录](assets/references/README.md)：素材存放与登记方法。
+基础版、两个扩展、已支持组合及本地 AI 已有工程验收记录。用户完整对局、最终美术、安卓真机、真实多设备及长期性能继续逐项验证，具体状态以[开发路线](docs/ROADMAP.md)及各验收文档为准。
 
-`D:\Development` 下每个开发工具各用一个目录，Unity Hub 和 Editor 同属 `Unity` 目录。项目缓存、日志、临时文件、编辑器配置及环境安装下载放在本仓库 `.local/development`；验证工程和构建产物放在 `.local/environment`。启动项目专用开发终端或 VS Code：
+## 开始试玩
+
+在仓库根目录执行统一 Windows 启动脚本：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Start-Dev.ps1 -Tool Shell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Start-Dev.ps1 -Tool Code
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1
 ```
 
-用户已确认先用官方 2025 规则和明确标注的估算尺寸完成 M0，实体参考后补；实体版本、照片和实测尺寸仍未知。M1 已实现纯规则库、稳定格边点数据、本地交互与权威存档，并制作首件山地样板。用户尚未确认试玩和美术；按项目约定，本次不提前修改 `docs/ROADMAP.md` 的阶段进度，实际实施状态以 M1 验收记录为准。
+脚本选择当前默认可玩构建。操作方式见[M6 试玩说明](docs/M6_PLAYTEST.md)，联机连接与房间使用见[M7 使用说明](docs/M7_IMPLEMENTATION.md)。PC 与 Android 下载入口及验证范围见[内测版1.6发布记录](docs/RELEASE_BETA_1_6.md)。
 
-阶段顺序：M0 启动 → M1 本地交互切片 → M2 基础版完整 → M3 航海家 → M4 城市与骑士 → M5 双扩展组合 → M6 AI 对手 → M7 好友联机 → M8 完整美术与发布验证。
+本地程序、APK 和分享包保存在 `game version`，按二级版本归档，不随源码仓库分发；历史构建路径及适用版本统一查阅[开发日志](The%20Farmer%27s%20Log.md)。本地缺少程序时，先按[开发环境](docs/ENVIRONMENT.md)配置固定工具链，再运行构建脚本：
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-M7.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-Android.ps1
+```
+
+macOS 开发入口为 `tools/development/Start-Dev.command`，打开 Unity 使用 `Start-Unity.command`；Windows 与 macOS 的构建、签名配置和验证入口见[分系统构建说明](docs/CROSS_PLATFORM_BUILD.md)。
+
+## 工程结构
+
+| 目录                                                                       | 用途                                   |
+| -------------------------------------------------------------------------- | -------------------------------------- |
+| `Unity/Catan`                                                            | Unity 客户端、场景、UI 与运行资产      |
+| `src/Catan.Core`                                                         | 独立于 Unity 的纯 C# 规则核心          |
+| `src/Catan.AI`                                                           | 本地 AI 策略                           |
+| `src/Catan.Network.Contracts`、`src/Catan.Rooms`、`src/Catan.Server` | 联机协议、权威房间与服务端             |
+| `tests`                                                                  | 规则、AI、界面辅助逻辑、音效与联机验证 |
+| `assets/references`                                                      | 原始实体参考、规则来源与索引           |
+| `art`                                                                    | 版本化美术源文件、配方与导出结果       |
+| `tools/development`                                                      | 环境、构建、启动和验证脚本             |
+| `docs`                                                                   | 项目约定、设计说明、阶段验收与验证记录 |
+
+客户端使用 Unity `6000.3.25f1` 与 URP `17.3.0`，规则核心以 `.NET Standard 2.1` 为兼容面，独立开发工具链固定 `.NET SDK 10.0.401`。规则采用稳定的 Tile／Vertex／Edge ID；本地玩家、AI 和远程玩家共用指令验证入口，AI 只读取自身有权查看的 `PlayerView`。
+
+## 项目文档
+
+- [项目约定](docs/PROJECT_BRIEF.md)：已确认目标、工作默认值与协作方式。
+- [开发路线](docs/ROADMAP.md)：阶段目标、退出条件与当前状态。
+- [开发日志](The%20Farmer%27s%20Log.md)：时间轴、每轮改动、发布入口与实际验证。
+- [开发环境](docs/ENVIRONMENT.md)：工具链、环境配置与开发入口。
+- [分系统构建](docs/CROSS_PLATFORM_BUILD.md)：Windows／macOS 启动、双端打包和 Android 签名迁移。
+- [游戏百科](docs/GAME_ENCYCLOPEDIA.md)：发展卡实体名称、牌面描述与照片来源。
+- [本地规则索引](assets/references/rules/README.md)：规则原件与查询入口。
+- [美术生产规范](docs/ART_PIPELINE.md)：参考采集、资产制作、导入和复现。
+- [豪华典藏版ultra主题实施方案](docs/ULTRA_THEME_IMPLEMENTATION_PLAN.md)：真实桌游与 ultra 双主题、三维资产、环境动态及分步验收。
+- [AI 2.0 补丁](docs/AI_PATCH_2_0.md)：当前 AI 策略、交易限制和专用信息权限。
+- [本地 AI 验收](docs/M6_ACCEPTANCE.md)：AI、规则与独立完整对局证据。
+- [联机验收](docs/M7_ACCEPTANCE.md)：本机与公网已验证范围、后续待验事项。
+- [云端连接与部署](docs/M7_SERVER.md)：在线地址、服务管理与公网验收入口。

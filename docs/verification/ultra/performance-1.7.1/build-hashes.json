@@ -1,0 +1,42 @@
+[
+  {
+    "构建": "普通",
+    "文件": "Catan1.7.1.exe",
+    "sha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+  },
+  {
+    "构建": "普通",
+    "文件": "Catan1.7.1_Data/Managed/Assembly-CSharp.dll",
+    "sha256": "9ee2c28aa432e4f0d391fe5448b124d742567c192c8b62779575c012785b4f6d"
+  },
+  {
+    "构建": "普通",
+    "文件": "Catan1.7.1_Data/Managed/Catan.Core.dll",
+    "sha256": "7dcbcc15c491db813dbeb9e061d918f52d5336690404ab86cf62d3023aec61da"
+  },
+  {
+    "构建": "普通",
+    "文件": "Catan1.7.1_Data/Managed/Catan.AI.dll",
+    "sha256": "ca7224b40202f94b6450eb697c0cc73008f125941344453daf01770c13eda452"
+  },
+  {
+    "构建": "开发诊断",
+    "文件": "Catan1.7.1.exe",
+    "sha256": "b9fc30bb05ca93a042831974149a681d656963e3e612ecafd9ae826759d739ad"
+  },
+  {
+    "构建": "开发诊断",
+    "文件": "Catan1.7.1_Data/Managed/Assembly-CSharp.dll",
+    "sha256": "30aa90e2afa5f69daeba8ac8d7befd2466877044e47d8070b38da5858c5c3fc4"
+  },
+  {
+    "构建": "开发诊断",
+    "文件": "Catan1.7.1_Data/Managed/Catan.Core.dll",
+    "sha256": "7dcbcc15c491db813dbeb9e061d918f52d5336690404ab86cf62d3023aec61da"
+  },
+  {
+    "构建": "开发诊断",
+    "文件": "Catan1.7.1_Data/Managed/Catan.AI.dll",
+    "sha256": "ca7224b40202f94b6450eb697c0cc73008f125941344453daf01770c13eda452"
+  }
+]

@@ -1,0 +1,232 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Catan.Core;
+using UnityEngine;
+using C4=Catan.Core.M4;
+using Commodity=Catan.Core.M4.Commodity;
+using CommodityBag=Catan.Core.M4.CommodityBag;
+
+// 只在显式 --interaction-verify 下运行隔离显示夹具。不会读取或覆盖玩家的常规存档。
+public sealed partial class InteractionPresentationVerification:MonoBehaviour
+{
+    M6App app;
+    string output,stage;
+    int checks,images;
+    RenderTexture capture;
+    RenderTexture previousTarget;
+    string captureName;
+    bool began;
+    TabletopScene table;
+    static readonly BindingFlags Private=BindingFlags.Instance|BindingFlags.NonPublic;
+    void Require(bool value,string message){checks++;if(!value)throw new InvalidOperationException(message);}
+    IEnumerator Start()
+    {
+        var args=Environment.GetCommandLineArgs();bool feedback=args.Contains("--feedback-verify");bool cards=args.Contains("--card-player-verify"),polish=args.Contains("--table-polish-verify");int flag=Array.IndexOf(args,feedback?"--feedback-verify":polish?"--table-polish-verify":cards?"--card-player-verify":"--interaction-verify");if(flag<0)yield break;
+        output=Path.GetFullPath(args[flag+1]);
+        if(!output.StartsWith(Path.GetFullPath(".local")+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)){Application.Quit(1);yield break;}
+        Directory.CreateDirectory(output);app=GetComponent<M6App>();
+        if(feedback)Debug.Log("CATAN_FEEDBACK_START");
+        gameObject.AddComponent<InteractionCaptureBegin>().Owner=this;gameObject.AddComponent<InteractionCaptureEnd>().Owner=this;
+        if(cards||polish)while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
+        yield return null;var run=feedback?VerifyFeedback():polish?VerifyTablePolish():cards?VerifyCardPlayers():args.Contains("--resource-layout-review")?VerifyResourceLayouts():Verify();
+        run=FlattenVerification(run);
+        while(true)
+        {
+            object next;
+            try{if(!run.MoveNext())break;next=run.Current;}
+            catch(Exception ex){Debug.LogError("CATAN_INTERACTION_VERIFY_FAILED: "+stage+" / "+ex);Application.Quit(1);yield break;}
+            yield return next;
+        }
+        File.WriteAllText(Path.Combine(output,"result.json"),"{\"状态\":\"通过\",\"断言数\":"+checks+",\"界面图数\":"+images+"}");
+        Debug.Log("CATAN_INTERACTION_VERIFY_OK: checks="+checks+"; images="+images);Application.Quit(0);
+    }
+    static IEnumerator FlattenVerification(IEnumerator root)
+    {
+        var stack=new System.Collections.Generic.Stack<IEnumerator>();stack.Push(root);
+        while(stack.Count>0){var top=stack.Peek();if(!top.MoveNext()){stack.Pop();continue;}if(top.Current is IEnumerator nested)stack.Push(nested);else yield return top.Current;}
+    }
+    IEnumerator VerifyResourceLayouts()
+    {
+        stage="丰收资源牌布局";app.StartGame("base","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+        var basic=GetComponent<M2App>();var host=basic.VerificationHost;
+        var session=(Catan.Core.M2.BaseGameSession)typeof(M2LocalGameHost).GetField("session",Private).GetValue(host);
+        var state=session.GetAuthoritativeStateForTesting();state.ActivePlayerId="P1";state.Phase=Catan.Core.M2.GamePhase.Action;state.SetupPlacementIndex=8;state.Turn=9;state.PendingDecision=null;
+        state.Players[0].DevelopmentCards=new[]{new Catan.Core.M2.DevelopmentCard{Kind=Catan.Core.M2.DevelopmentCardKind.YearOfPlenty,BoughtTurn=1}};
+        var deck=state.DevelopmentDeck.ToList();deck.Remove(Catan.Core.M2.DevelopmentCardKind.YearOfPlenty);state.DevelopmentDeck=deck.ToArray();
+        typeof(Catan.Core.M2.BaseGameSession).GetField("state",Private).SetValue(session,state);session.AssertInvariants();basic.M6Refresh();
+        table=basic.VerificationBoard.TableScene;yield return null;yield return new WaitForEndOfFrame();
+        basic.VerificationOperationSnapshot.PrepareCard(new OperationHandCard{Id=((int)Catan.Core.M2.DevelopmentCardKind.YearOfPlenty)+":0",Name="丰收"});
+        yield return Capture("丰收牌面选择");yield return new WaitForSecondsRealtime(40);
+        stage="水渠单种资源布局";app.StartGame("cities-knights","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+        var city=GetComponent<M4App>();var citySession=(C4.CitiesKnightsGameSession)typeof(M4LocalGameHost).GetField("session",Private).GetValue(city.VerificationHost);
+        var cityState=citySession.GetAuthoritativeStateForTesting();cityState.ActivePlayerId="P1";cityState.Phase=C4.GamePhase.PendingChoice;cityState.SetupPlacementIndex=8;cityState.Turn=9;
+        cityState.PendingDecision=new C4.PendingDecision{Kind="Aqueduct",PlayerId="P1",ReturnPhase=C4.GamePhase.Action};cityState.DecisionReturnPhase=C4.GamePhase.Action;
+        typeof(C4.CitiesKnightsGameSession).GetField("state",Private).SetValue(citySession,cityState);citySession.AssertInvariants();city.M6Refresh();
+        table=city.VerificationBoard.TableScene;yield return null;yield return Capture("水渠单种资源选择");yield return new WaitForSecondsRealtime(40);
+        Require(app.Ready,"资源布局检查意外退出对局");app.ReturnToMainMenu();
+    }
+    IEnumerator Verify()
+    {
+        yield return VerifyTradeCardSizing();
+        yield return VerifyPointerMenus();
+        stage="城市骑士公开夹具";
+        app.StartGame("cities-knights","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+        var city=GetComponent<M4App>();var host=city.VerificationHost;
+        var session=(C4.CitiesKnightsGameSession)typeof(M4LocalGameHost).GetField("session",Private).GetValue(host);
+        var state=session.GetAuthoritativeStateForTesting();var board=city.M6View.Board;
+        var e1=board.Edges[0];string a=e1.Vertices[0],b=e1.Vertices[1];
+        var e2=board.Edges.First(e=>e.Id!=e1.Id&&e.Vertices.Contains(b));string c=e2.Vertices.First(v=>v!=b);
+        string site=board.Tiles.First(t=>t.Resource=="wheat").Vertices.First(v=>v!=a&&v!=b&&v!=c);
+        state.ActivePlayerId="P1";state.Turn=9;state.Phase=C4.GamePhase.Action;state.SetupPlacementIndex=8;state.PendingDecision=null;
+        state.Settlements=new[]{Piece(site)};state.Roads=new[]{Piece(e1.Id),Piece(e2.Id)};
+        state.Knights=new[]{new C4.Knight{PlayerId="P1",LocationId=a,Level=1,Active=true}};
+        state.Players[0].Resources=new ResourceBag{Wool=3,Wheat=4,Ore=5};
+        state.Players[0].ProgressCards=new[]{C4.ProgressCardKind.Irrigation};
+        foreach(var player in state.Players)
+        {player.Pieces.Roads=15-state.Roads.Count(r=>r.PlayerId==player.Id);player.Pieces.Settlements=5-state.Settlements.Count(s=>s.PlayerId==player.Id);}
+        foreach(Resource resource in Enum.GetValues(typeof(Resource)))state.Bank[resource]=19-state.Players.Sum(p=>p.Resources[resource]);
+        foreach(var deck in state.ProgressDecks)deck.Cards=deck.Cards.Where(card=>card!=C4.ProgressCardKind.Irrigation).Concat(deck.Track==C4.ProgressCatalog.Track(C4.ProgressCardKind.Irrigation)?Enumerable.Repeat(C4.ProgressCardKind.Irrigation,C4.ProgressCatalog.Count(C4.ProgressCardKind.Irrigation)-1):Array.Empty<C4.ProgressCardKind>()).ToArray();
+        typeof(C4.CitiesKnightsGameSession).GetField("state",Private).SetValue(session,state);session.AssertInvariants();city.M6Refresh();
+        table=city.VerificationBoard.TableScene;yield return null;yield return new WaitForEndOfFrame();
+        stage="城市替换";Require(city.Submit(Command(C4.CommandKind.BuildCity,site)).Success,"升级城市失败");
+        yield return null;yield return new WaitForEndOfFrame();
+        Require(app.VerificationReplacementOldCount==1,"城市升级没有保留旧模型退场");Require(app.VerificationBuildHiddenRenderers>0,"城市目标提前显现");
+        string authority=host.ExportSave();yield return Capture("01-城市替换");yield return Settle();Require(authority==host.ExportSave(),"城市动画改变权威状态");
+        stage="骑士升级";Require(city.Submit(Command(C4.CommandKind.PromoteKnight,a)).Success,"晋升失败");
+        yield return null;yield return new WaitForEndOfFrame();Require(app.VerificationReplacementOldCount==1,"骑士升级缺少替换");yield return Capture("02-骑士替换");yield return Settle();
+        stage="骑士沿路移动";var move=Command(C4.CommandKind.MoveKnight,c);move.SourceId=a;Require(city.Submit(move).Success,"移动失败");
+        yield return null;yield return new WaitForEndOfFrame();Require(app.VerificationMovementWaypoints==3,"移动没有经过道路拐点");
+        authority=host.ExportSave();yield return new WaitForSecondsRealtime(.33f);
+        Require(app.VerificationMovementPosition.y>city.VerificationBoard.Position(a).y,"移动棋子没有浮起");yield return Capture("03-沿路移动");yield return Settle();Require(authority==host.ExportSave(),"移动动画改变权威状态");
+        stage="发展卡先展示后效果";int before=city.M6View.OwnResources.Wheat;
+        var play=Command(C4.CommandKind.PlayProgressCard);play.ProgressCard=C4.ProgressCardKind.Irrigation;
+        Require(city.Submit(play).Success,"出牌失败");Require(app.CardPresentationBusy,"没有出牌公告");
+        string committed=host.ExportSave();Require(city.Submit(Command(C4.CommandKind.EndTurn))==null&&committed==host.ExportSave(),"出牌展示期间仍然能提交后续命令");
+        Require(host.View("P1").OwnResources.Wheat>before&&city.M6View.OwnResources.Wheat==before,"规则效果与展示快照没有分离");
+        authority=host.ExportSave();yield return new WaitForSecondsRealtime(.65f);
+        Require(city.M6View.OwnResources.Wheat==before,"卡片退场前提前播放效果");yield return Capture("04-出牌公告");yield return Settle();
+        Require(city.M6View.OwnResources.Wheat>before&&authority==host.ExportSave(),"退场后没有衔接效果或动画改写规则");
+        stage="银行点牌数量";yield return new WaitForEndOfFrame();city.VerificationOperationDock.OpenTrade();yield return Capture("05a-银行点牌数量");
+        if(Environment.GetCommandLineArgs().Contains("--resource-card-review"))yield return new WaitForSecondsRealtime(45);
+        city.VerificationOperationDock.Reset();
+        stage="交易发起";yield return new WaitForEndOfFrame();city.VerificationOperationDock.OpenTrade("P2");yield return Capture("05-发起交易");if(Environment.GetCommandLineArgs().Contains("--resource-card-review"))yield return new WaitForSecondsRealtime(45);city.VerificationOperationDock.Reset();
+        stage="接收交易请求布局";
+        app.StartGame("cities-knights","heading-for-new-shores",4,"P2",true);yield return null;yield return null;
+        city=GetComponent<M4App>();host=city.VerificationHost;
+        session=(C4.CitiesKnightsGameSession)typeof(M4LocalGameHost).GetField("session",Private).GetValue(host);state=session.GetAuthoritativeStateForTesting();
+        state.ActivePlayerId="P1";state.Phase=C4.GamePhase.Action;state.SetupPlacementIndex=8;state.Turn=9;state.PendingDecision=null;state.Players[0].Resources.Wood=1;state.Bank.Wood=18;
+        // 接收者须有支付能力，否则真实规则会自动拒绝请求，无法展示回应窗口。
+        state.Players[1].Resources.Wool=2;state.Bank.Wool=17;
+        typeof(C4.CitiesKnightsGameSession).GetField("state",Private).SetValue(session,state);session.AssertInvariants();
+        var offer=Command(C4.CommandKind.ProposeTrade);offer.OtherPlayerId="P2";offer.Give=new ResourceBag{Wood=1};offer.Receive=new ResourceBag{Wool=2};
+        Require(host.Submit(offer).Success,"报价夹具失败");city.M6Refresh();table=city.VerificationBoard.TableScene;
+        yield return null;yield return new WaitForEndOfFrame();
+        var sides=OperationOfferPerspective.For(city.VerificationOperationSnapshot);Require(sides.OwnGive[2]==2&&sides.OtherGive[0]==1,"收到交易的两侧颠倒");yield return Capture("06-接收交易请求");
+        stage="金矿五资源";app.StartGame("seafarers","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+        var sea=GetComponent<M3App>();var seaSession=(Catan.Core.M3.SeafarersGameSession)typeof(M3LocalGameHost).GetField("session",Private).GetValue(sea.VerificationHost);
+        var seaState=seaSession.GetAuthoritativeStateForTesting();seaState.ActivePlayerId="P1";seaState.Phase=Catan.Core.M3.GamePhase.GoldChoice;seaState.SetupPlacementIndex=8;seaState.Turn=9;seaState.PendingDecision=null;
+        seaState.GoldClaims=new[]{new Catan.Core.M3.GoldClaim{PlayerId="P1",Amount=2}};seaState.GoldReturnPhase=Catan.Core.M3.GamePhase.Action;
+        seaState.PendingDecision=new Catan.Core.M3.PendingDecision{Kind="Gold",PlayerId="P1",ReturnPhase=Catan.Core.M3.GamePhase.Action};
+        typeof(Catan.Core.M3.SeafarersGameSession).GetField("state",Private).SetValue(seaSession,seaState);seaSession.AssertInvariants();sea.M6Refresh();table=sea.VerificationBoard.TableScene;
+        yield return null;yield return Capture("07-金矿五资源");
+        if(Environment.GetCommandLineArgs().Contains("--interaction-review")||Environment.GetCommandLineArgs().Contains("--resource-card-review"))yield return new WaitForSecondsRealtime(45);
+        stage="保存退出与重新加载";app.StartGame("base","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+        string saved=app.ExportEnvelope(),path=Path.Combine(output,"隔离保存.json");app.MenuReviewSavePath=path;app.SaveAndReturnToMainMenu();
+        Require(app.MenuVisible&&!app.Ready,"保存后仍保留可继续的当前对局");Require(File.ReadAllText(path)==saved,"保存内容不一致");
+        app.ReadSave(path);yield return null;yield return null;Require(app.Ready&&app.ExportEnvelope()==saved,"退出后不能独立读档");
+        string blocker=Path.Combine(output,"目录阻断");File.WriteAllText(blocker,"测试");app.MenuReviewSavePath=Path.Combine(blocker,"失败.json");app.SaveAndReturnToMainMenu();
+        Require(app.Ready&&!app.MenuVisible,"保存失败却丢弃当前游戏");app.MenuReviewSavePath=null;app.ReturnToMainMenu();Require(!app.Ready&&app.MenuVisible,"返回主菜单未清理对局");
+    }
+    IEnumerator VerifyTradeCardSizing()
+    {
+        stage="交易资源牌自适应";app.StartGame("cities-knights","heading-for-new-shores",4,"P2",true);yield return null;yield return null;
+        var game=GetComponent<M4App>();var host=game.VerificationHost;
+        var session=(C4.CitiesKnightsGameSession)typeof(M4LocalGameHost).GetField("session",Private).GetValue(host);
+        var state=session.GetAuthoritativeStateForTesting();state.ActivePlayerId="P1";state.Phase=C4.GamePhase.Action;state.Turn=9;state.SetupPlacementIndex=8;state.PendingDecision=null;
+        for(int p=0;p<2;p++)
+        {
+            state.Players[p].Resources=new ResourceBag{Wood=6,Brick=6,Wool=6,Wheat=6,Ore=6};
+            state.Players[p].Commodities=new CommodityBag{Cloth=3,Coin=3,Paper=3};
+        }
+        foreach(Resource r in Enum.GetValues(typeof(Resource)))state.Bank[r]=19-state.Players.Sum(p=>p.Resources[r]);
+        foreach(Commodity c in Enum.GetValues(typeof(Commodity)))state.CommodityBank[c]=12-state.Players.Sum(p=>p.Commodities[c]);
+        session.GetType().GetField("state",Private).SetValue(session,state);session.AssertInvariants();game.M6Refresh();table=game.VerificationBoard.TableScene;yield return null;
+        foreach(int count in new[]{1,3,5,7})
+        {
+            stage="交易请求资源种类 "+count;
+            var offer=Command(C4.CommandKind.ProposeTrade);offer.PlayerId="P1";offer.OtherPlayerId="P2";
+            offer.Give=new ResourceBag();offer.Receive=new ResourceBag();offer.GiveCommodities=new CommodityBag();offer.ReceiveCommodities=new CommodityBag();
+            for(int good=0;good<count;good++){if(good<5)offer.Give[(Resource)good]=1;else offer.GiveCommodities[(Commodity)(good-5)]=1;}
+            offer.ReceiveCommodities.Paper=1;
+            Require(host.Submit(offer).Success,"自适应交易报价夹具失败");game.M6Refresh();yield return null;yield return null;
+            string before=host.ExportSave();yield return Capture("交易资源-"+count+"种请求");
+            Require(before==host.ExportSave(),"交易资源排版改变了权威局面");
+            var cancel=Command(C4.CommandKind.CancelTrade);cancel.PlayerId="P1";Require(host.Submit(cancel).Success,"自适应交易报价无法撤回");game.M6Refresh();
+        }
+        foreach(int count in new[]{1,8})
+        {
+            stage="交易资源点击与排版 "+count;
+            state=session.GetAuthoritativeStateForTesting();state.ActivePlayerId="P2";
+            state.Players[1].Resources=count==1?new ResourceBag{Wood=4}:new ResourceBag{Wood=4,Brick=4,Wool=4,Wheat=4,Ore=4};
+            state.Players[1].Commodities=count==1?new CommodityBag():new CommodityBag{Cloth=3,Coin=3,Paper=3};
+            foreach(Resource r in Enum.GetValues(typeof(Resource)))state.Bank[r]=19-state.Players.Sum(p=>p.Resources[r]);
+            foreach(Commodity c in Enum.GetValues(typeof(Commodity)))state.CommodityBank[c]=12-state.Players.Sum(p=>p.Commodities[c]);
+            session.GetType().GetField("state",Private).SetValue(session,state);session.AssertInvariants();game.M6Refresh();yield return null;yield return null;
+            var dock=game.VerificationOperationDock;dock.Reset();dock.OpenTrade();yield return null;
+            var snapshot=game.VerificationOperationSnapshot;var goods=OperationPanelOptions.PaymentGoods(snapshot);
+            Require(goods.Length==count,"付出侧没有按可用资源展示");
+            var area=new Rect(286,326,386,218);var receiveArea=new Rect(768,326,386,218);
+            var give=(int[])typeof(OperationDock).GetField("give",Private).GetValue(dock);var receive=(int[])typeof(OperationDock).GetField("receive",Private).GetValue(dock);
+            var first=OperationTradeCardLayout.Arrange(count,area.width,area.height)[0];var ore=OperationTradeCardLayout.Arrange(8,receiveArea.width,receiveArea.height)[4];
+            string before=host.ExportSave();
+            yield return PolishGui(()=>{
+                var saved=Event.current;
+                var draw=typeof(OperationDock).GetMethod("DrawTradeBag",Private);
+                try
+                {
+                    for(int click=0;click<4;click++)
+                    {
+                        Event.current=new Event{type=EventType.MouseDown,button=0,mousePosition=new Vector2(area.x+first.X+first.Width/2,area.y+first.Y+first.Height/2)};
+                        draw.Invoke(dock,new object[]{snapshot,area,give,true,true});
+                    }
+                    Event.current=new Event{type=EventType.MouseDown,button=0,mousePosition=new Vector2(receiveArea.x+ore.X+ore.Width/2,receiveArea.y+ore.Y+ore.Height/2)};
+                    draw.Invoke(dock,new object[]{snapshot,receiveArea,receive,false,true});
+                }
+                finally{Event.current=saved;}
+            });
+            Require(give[0]==4&&give.Skip(1).Sum()==0&&receive[4]==1&&receive.Sum()==1,"缩放后的资源牌点击命中不正确");
+            Require(before==host.ExportSave(),"调整交易草稿改变权威局面");
+            yield return Capture(count==1?"交易资源-单种付出放大":"交易资源-八种选择收缩");dock.Reset();session.AssertInvariants();
+        }
+    }
+    static PiecePlacement Piece(string location)=>new PiecePlacement{PlayerId="P1",LocationId=location};
+    static C4.Command Command(C4.CommandKind kind,string target=null)=>new C4.Command{Id=Guid.NewGuid().ToString("N"),PlayerId="P1",Kind=kind,TargetId=target};
+    IEnumerator Settle(){double deadline=Time.unscaledTimeAsDouble+8;while(app.TablePresentationBlocked&&Time.unscaledTimeAsDouble<deadline)yield return null;Require(!app.TablePresentationBlocked,"动画未在期限内结束");yield return new WaitForEndOfFrame();}
+    IEnumerator Capture(string name)
+    {
+        yield return new WaitForEndOfFrame();captureName=name;capture=new RenderTexture(1440,900,24,RenderTextureFormat.ARGB32);capture.Create();table.RenderComposite(capture);
+        double deadline=Time.unscaledTimeAsDouble+2;while(capture!=null&&Time.unscaledTimeAsDouble<deadline)yield return null;
+        if(capture!=null){capture.Release();Destroy(capture);capture=null;Debug.LogWarning("CATAN_INTERACTION_GUI_UNAVAILABLE: "+name);}
+    }
+    internal void BeginCapture(){if(capture==null||Event.current.type!=EventType.Repaint)return;previousTarget=RenderTexture.active;Graphics.SetRenderTarget(capture);began=true;}
+    internal void EndCapture()
+    {
+        if(!began||capture==null||Event.current.type!=EventType.Repaint)return;
+        RenderTexture.active=capture;var pixels=new Texture2D(1440,900,TextureFormat.RGB24,false);pixels.ReadPixels(new Rect(0,0,1440,900),0,0);pixels.Apply();
+        File.WriteAllBytes(Path.Combine(output,captureName+".png"),pixels.EncodeToPNG());images++;
+        RenderTexture.active=previousTarget;began=false;Destroy(pixels);capture.Release();Destroy(capture);capture=null;
+    }
+}
+public sealed class InteractionCaptureBegin:MonoBehaviour
+{
+    internal InteractionPresentationVerification Owner;
+    void OnGUI(){GUI.depth=30000;Owner?.BeginCapture();}
+}
+public sealed class InteractionCaptureEnd:MonoBehaviour
+{
+    internal InteractionPresentationVerification Owner;
+    void OnGUI(){GUI.depth=-30000;Owner?.EndCapture();}
+}

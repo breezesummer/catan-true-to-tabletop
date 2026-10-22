@@ -1,6 +1,18 @@
-# Dot-source this script: . .\tools\development\Enter-DevEnvironment.ps1
+﻿# Dot-source this script: . .\tools\development\Enter-DevEnvironment.ps1
 $ErrorActionPreference = 'Stop'
+if ([Environment]::OSVersion.Platform -ne [PlatformID]::Win32NT) {
+    throw '此环境入口用于 Windows；macOS 请使用 tools/development/Start-Dev.command 或 Build-Game.command。'
+}
 $toolchain = Get-Content (Join-Path $PSScriptRoot 'toolchain.json') -Raw | ConvertFrom-Json
+if ($env:CATAN_DEVELOPMENT_ROOT) {
+    $toolchain.developmentRoot = $env:CATAN_DEVELOPMENT_ROOT
+    $toolchain.dotnet = Join-Path $toolchain.developmentRoot 'dotnet/dotnet.exe'
+    $toolchain.unity = Join-Path $toolchain.developmentRoot "Unity/$($toolchain.unityEditor)/Editor/Unity.exe"
+    $toolchain.hub = Join-Path $toolchain.developmentRoot 'Unity/Hub/Unity Hub.exe'
+    $toolchain.blenderExecutable = Join-Path $toolchain.developmentRoot "Blender/blender-$($toolchain.blender)-windows-x64/blender.exe"
+    $toolchain.code = Join-Path $toolchain.developmentRoot 'Microsoft VS Code/bin/code.cmd'
+    $toolchain.codeExtensions = Join-Path $toolchain.developmentRoot 'Microsoft VS Code/Extensions'
+}
 $devRoot = $toolchain.developmentRoot
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $projectLocalRoot = Join-Path $projectRoot '.local\development'

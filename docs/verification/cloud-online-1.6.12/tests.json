@@ -1,0 +1,12 @@
+{
+  "server": {
+    "passed": 51,
+    "failed": 0,
+    "total": 51
+  },
+  "network": {
+    "passed": 115,
+    "failed": 0,
+    "total": 115
+  }
+}

@@ -1,0 +1,449 @@
+{
+  "status": "passed",
+  "typeId": "city-improvements",
+  "assets": [
+    {
+      "id": "improvement-science-1",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-science-2",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-science-3",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-science-4",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-science-5",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-politics-1",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-politics-2",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-politics-3",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-politics-4",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-politics-5",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-trade-1",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-trade-2",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-trade-3",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-trade-4",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "improvement-trade-5",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.03999999910593033,
+        0.03999999910593033,
+        0.0010000065655400014
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "guidance-upgrade",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.18000000715255737,
+        0.07999999821186066,
+        0.0010000130835825516
+      ],
+      "allMaterialSlotsUsed": true
+    },
+    {
+      "id": "guidance-max",
+      "meshObjects": 1,
+      "triangles": 12,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.18000000715255737,
+        0.07999999821186066,
+        0.0010000130835825516
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/guidance-max-front.png",
+      "width": 2304,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/guidance-upgrade-front.png",
+      "width": 2304,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-politics-1-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-politics-1-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-politics-2-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-politics-2-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-politics-3-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-politics-3-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-politics-4-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-politics-4-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-politics-5-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-politics-5-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-science-1-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-science-1-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-science-2-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-science-2-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-science-3-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-science-3-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-science-4-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-science-4-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-science-5-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-science-5-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-trade-1-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-trade-1-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-trade-2-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-trade-2-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-trade-3-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-trade-3-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-trade-4-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-trade-4-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-trade-5-back.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    },
+    {
+      "path": "textures/improvement-trade-5-front.png",
+      "width": 1024,
+      "height": 1024,
+      "verified": true
+    }
+  ],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

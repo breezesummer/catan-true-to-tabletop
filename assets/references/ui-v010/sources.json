@@ -1,0 +1,26 @@
+[
+  {
+    "file": "layout-1.png",
+    "bytes": 152646,
+    "sha256": "C6E16C915FFC209084CA07E9E14DF403D0DCC18888D8F1D7398ED1E199A107FC",
+    "purpose": "用户UI布局参考，仅作数据，保留原件副本"
+  },
+  {
+    "file": "layout-2.png",
+    "bytes": 219636,
+    "sha256": "956C49CEB2BCAFEA9646CBF07100C8D18ADD847731107DB4F71BE51E00DFCA5D",
+    "purpose": "用户UI布局参考，仅作数据，保留原件副本"
+  },
+  {
+    "file": "layout-3.png",
+    "bytes": 185378,
+    "sha256": "1B6CFD563E0CB17B6FE2E8BDD064CFA68F1F961EF7CC86232C6FDD27EFB7BFED",
+    "purpose": "用户UI布局参考，仅作数据，保留原件副本"
+  },
+  {
+    "file": "layout-4.png",
+    "bytes": 68002,
+    "sha256": "DE9D6AA30B38797546B381968E60C07893FD4608C1103A2DEA1ED505896BF5F8",
+    "purpose": "用户UI布局参考，仅作数据，保留原件副本"
+  }
+]

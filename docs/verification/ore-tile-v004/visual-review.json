@@ -1,0 +1,32 @@
+{
+  "reviewedAtUtc": "2026-10-11T03:37:41Z",
+  "status": "passed",
+  "method": "Direct visual inspection of existing rendered PNGs",
+  "inspected": [
+    "art/source/entity-conversion-v004/ore-tile/textures/tile-ore-top.png",
+    "art/previews/entity-conversion-v004/ore-tile/game-camera.png",
+    "art/previews/entity-conversion-v004/ore-tile/side.png",
+    "art/previews/entity-conversion-v004/ore-tile/top.png",
+    "art/previews/entity-conversion-v004/ore-tile/crowded-vertex.png",
+    "docs/verification/ore-tile-v004/base/game-camera.png",
+    "docs/verification/ore-tile-v004/base/top.png",
+    "docs/verification/ore-tile-v004/seafarers/game-camera.png",
+    "docs/verification/ore-tile-v004/seafarers/top.png",
+    "docs/verification/ore-tile-v004/cities-knights/game-camera.png",
+    "docs/verification/ore-tile-v004/cities-knights/top.png",
+    "docs/verification/ore-tile-v004/combined/game-camera.png",
+    "docs/verification/ore-tile-v004/combined/top.png"
+  ],
+  "findings": [
+    "The cropped physical resource-card illustration appears on the flat hex top.",
+    "The old raised mountain silhouette is absent in all four renderer fixtures.",
+    "The tile thickness and top surface match the other flat board tiles.",
+    "The resource-card illustration is a derivative, not an original photograph of a mountain hex tile."
+  ],
+  "notCovered": [
+    "User visual approval",
+    "Physical measurements and unknown reverse face",
+    "Long-session performance",
+    "Full rule-suite rerun (presentation-only change)"
+  ]
+}

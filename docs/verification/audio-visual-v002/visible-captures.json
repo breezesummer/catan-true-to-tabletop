@@ -1,0 +1,134 @@
+{
+  "date": "2026-10-18",
+  "buildVersion": "1.6.3",
+  "resolution": [
+    1440,
+    900
+  ],
+  "captureRoot": ".local/Catan1.6.3-AudioVisual/audio-visual-verification",
+  "retainedRoot": "captures",
+  "count": 19,
+  "themeFrameDifferences": [
+    63992,
+    232638,
+    151798,
+    24904,
+    97273
+  ],
+  "files": [
+    {
+      "file": "theme-0-a.png",
+      "bytes": 2397187,
+      "sha256": "1cd99d5115918b022c4cf28f8900ed11be68973ac645bbaac2dbb00d7b0a4f63",
+      "retainedInRepository": true
+    },
+    {
+      "file": "theme-0-b.png",
+      "bytes": 2396523,
+      "sha256": "53df0f50600b23ac704eae76616707c606af9313f6cc4258e5f1c9dce66b335d",
+      "retainedInRepository": false
+    },
+    {
+      "file": "theme-1-a.png",
+      "bytes": 2483717,
+      "sha256": "93bb68b49ba3986d5bf86c2908779cdc19a5e53e799419d817055822e25b6da5",
+      "retainedInRepository": false
+    },
+    {
+      "file": "theme-1-b.png",
+      "bytes": 2483159,
+      "sha256": "9517ad4c1acd79c3b3712c0b99e258f4a542da2369fbf5813f6a18992f9b9dcd",
+      "retainedInRepository": false
+    },
+    {
+      "file": "theme-2-a.png",
+      "bytes": 2463513,
+      "sha256": "bf64fce49b04864e04bf4847d2e2b67e91ca378c23c01bd7998fd2f5b9190872",
+      "retainedInRepository": false
+    },
+    {
+      "file": "theme-2-b.png",
+      "bytes": 2463629,
+      "sha256": "7f72be581811ee1cf5ce4ff7818981318a64bc7d1ed671433752d1cf23a64b2b",
+      "retainedInRepository": false
+    },
+    {
+      "file": "theme-3-a.png",
+      "bytes": 2239733,
+      "sha256": "44c06a63845de43ee40ede0f8182b03d4b61ed17eb325dfbf640b1ab22b3e9e2",
+      "retainedInRepository": true
+    },
+    {
+      "file": "theme-3-b.png",
+      "bytes": 2239822,
+      "sha256": "e58b34b789ae52233a5b18858e09b6f9057e54a0aa728bb1ccae05d9784e0fc4",
+      "retainedInRepository": false
+    },
+    {
+      "file": "theme-4-a.png",
+      "bytes": 1751277,
+      "sha256": "7bfbdf89dd93b4cb29daa567bf1831398c99c1dc27b21b98b4da2940302b7eef",
+      "retainedInRepository": false
+    },
+    {
+      "file": "theme-4-b.png",
+      "bytes": 1751737,
+      "sha256": "0766e7e80b02a6733398f209204a44580bee3dbba7fa913406ec3781c988a701",
+      "retainedInRepository": false
+    },
+    {
+      "file": "settings-sound.png",
+      "bytes": 856458,
+      "sha256": "a5754ede0f203df5b70d60fb377ce32dc3b4a5cc5b9ccbf3f11b3292f795e924",
+      "retainedInRepository": true
+    },
+    {
+      "file": "settings-appearance.png",
+      "bytes": 782979,
+      "sha256": "5db968d52de09daaece38b7032cca34154dca19e81d392e29fb2485eeb010456",
+      "retainedInRepository": false
+    },
+    {
+      "file": "settings-landscapes.png",
+      "bytes": 1217438,
+      "sha256": "3756de858147807fa7e2b506932b75f8ee67935bcee6d69fcda240c0e78ae2a2",
+      "retainedInRepository": true
+    },
+    {
+      "file": "rule-covers.png",
+      "bytes": 867894,
+      "sha256": "a4cf7ab96250b3a256b9a081b3ed2f156539c5d5617ae5b0cc7303aa767e8a95",
+      "retainedInRepository": false
+    },
+    {
+      "file": "maps-0.png",
+      "bytes": 858903,
+      "sha256": "87d7a63cad12b539b7c97b171efe01ab27e85bc79b2eef1c534294288f7342b5",
+      "retainedInRepository": false
+    },
+    {
+      "file": "maps-1.png",
+      "bytes": 987052,
+      "sha256": "0318e26e161d42bbde99090c9b160712bb5f4600152baf0e94fdc04a224f7456",
+      "retainedInRepository": true
+    },
+    {
+      "file": "maps-2.png",
+      "bytes": 868347,
+      "sha256": "90f03f2695c63095177b2ca4d20224dc5fe6e59e46f098525aa45f0a362f4b1b",
+      "retainedInRepository": false
+    },
+    {
+      "file": "maps-3.png",
+      "bytes": 881610,
+      "sha256": "a00e8ad1dbef217c04f445b4b250df5ca5263599ca9b78b14089704e11bb73c9",
+      "retainedInRepository": false
+    },
+    {
+      "file": "network-map-preview.png",
+      "bytes": 870172,
+      "sha256": "1729d34b2513039f5987d2d51082dc69de920472d60c8d0a69d0973da69a63b7",
+      "retainedInRepository": true
+    }
+  ]
+}

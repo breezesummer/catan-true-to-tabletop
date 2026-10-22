@@ -1,0 +1,787 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v005",
+  "typeId": "tabletop-markers",
+  "label": "六种实体港口、点数共同背面与卡坦分标记",
+  "recipePath": "art/recipes/entity-conversion-v005/tabletop-markers/recipe.json",
+  "recipeSha256": "06020a60dc4bd4bdcc8ca9df2fe443acfcfc71b1f40da7e4437eac18688c36a1",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v005/tabletop-markers/builder.py",
+      "sha256": "53a9183d7efd0f59144530a0d18db4713d8a814a8cbd3fb14f8b0679fcf9429f"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261014,
+  "units": "metres",
+  "scaleStatus": "全部尺寸为估算，未取得尺量或用户尺度验收",
+  "references": [
+    {
+      "id": "physical-port-generic-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/3：1港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/3：1港口.jpg",
+      "sha256": "f21928fc7253b2f190e09baf520fdec6ec890c406353d4477c1b9d690f84cee5",
+      "role": "3:1 通用港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ]
+    },
+    {
+      "id": "physical-port-wood-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/木头港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/木头港口.jpg",
+      "sha256": "0026a73c325b42ff5e8ecde4d8869cd4214bb4f4ac0651e82a89469e0a1eabdb",
+      "role": "2:1 木头港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ]
+    },
+    {
+      "id": "physical-port-brick-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/砖港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/砖港口.jpg",
+      "sha256": "2664f4f3f010413d5c831d42c4c13d5a9e9c0f8814187b58024a86e190d36ba1",
+      "role": "2:1 砖港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ]
+    },
+    {
+      "id": "physical-port-wool-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/羊毛港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/羊毛港口.jpg",
+      "sha256": "3236659d17e0ac7eb660168d432cfacc1491a2fb95c7e620a29fb454b9ba6f30",
+      "role": "2:1 羊毛港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ]
+    },
+    {
+      "id": "physical-port-wheat-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/小麦港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/小麦港口.jpg",
+      "sha256": "009dbd9f9c64015fa447020f00ef552529eec5e967b426c55b20fdface36601b",
+      "role": "2:1 小麦港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ]
+    },
+    {
+      "id": "physical-port-ore-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/ports/矿石港口.jpg",
+      "inboxPath": "assets/references/inbox/未分类/矿石港口.jpg",
+      "sha256": "899399de2f9b89eba93de4759d5df484e9e8bd8b3bf7dde7f7e05f4dacc23e64",
+      "role": "2:1 矿石港口原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ]
+    },
+    {
+      "id": "physical-number-token-back-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/tokens/点数背面.jpg",
+      "inboxPath": "assets/references/inbox/未分类/点数背面.jpg",
+      "sha256": "5c2b450eb5ddc06a1e2ce8ec0d68df34cb17010d5259701e22f562aff3d9955c",
+      "role": "点数牌共同船图案背面原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ]
+    },
+    {
+      "id": "physical-catan-victory-marker-001",
+      "originalPath": "assets/references/archives/tabletop-markers-v005/tokens/卡坦分标记.jpg",
+      "inboxPath": "assets/references/inbox/未分类/卡坦分标记.jpg",
+      "sha256": "359a8fb83d3c0a8d8f21555e0e1704b65a58dad575eb7ed12fec0071efbfa954",
+      "role": "卡坦胜利分标记原照片；非规则文字来源",
+      "pixelSize": [
+        4096,
+        3072
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "port-generic",
+      "label": "3:1 通用港口",
+      "kind": "custom",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "meshObjects": 1,
+      "triangles": 616,
+      "geometrySha256": "739e6dfd8847eaeedbc3cd1210a5de87173986a20b6c2e1dd94a970cf21ac2ee",
+      "blenderBounds": {
+        "min": [
+          -0.02199999988079071,
+          -0.017000000923871994,
+          0.0
+        ],
+        "max": [
+          0.02199999988079071,
+          0.017000000923871994,
+          0.001500000013038516
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.02199999988079071,
+          0.0,
+          -0.017000000923871994
+        ],
+        "max": [
+          0.02199999988079071,
+          0.001500000013038516,
+          0.017000000923871994
+        ]
+      },
+      "materials": [
+        {
+          "name": "port-generic_OriginalPhoto",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": "port-generic-front.png"
+        },
+        {
+          "name": "port-generic_PaperCoreEstimated",
+          "baseColorLinearRgba": [
+            0.5299999713897705,
+            0.44999998807907104,
+            0.33000001311302185,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        },
+        {
+          "name": "port-generic_UnseenSurfaceNeutral",
+          "baseColorLinearRgba": [
+            0.6200000047683716,
+            0.5699999928474426,
+            0.4699999988079071,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "33578058e404b07a200bca88a13373d659716ddd6e55d789ffa20e6c88369df6",
+      "blendSha256": "b3b8b47dffe32b3c8c9672cc1d247599f777865c7da0d0faa2cfb148a0529251",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "port-wood",
+      "label": "2:1 木头港口",
+      "kind": "custom",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "meshObjects": 1,
+      "triangles": 536,
+      "geometrySha256": "40f7b2d228bc6a3d33d79d9e73671092ba666d39b5b56b4f5c8a728bd91a3125",
+      "blenderBounds": {
+        "min": [
+          -0.02199999988079071,
+          -0.017000000923871994,
+          0.0
+        ],
+        "max": [
+          0.02199999988079071,
+          0.017000000923871994,
+          0.001500000013038516
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.02199999988079071,
+          0.0,
+          -0.017000000923871994
+        ],
+        "max": [
+          0.02199999988079071,
+          0.001500000013038516,
+          0.017000000923871994
+        ]
+      },
+      "materials": [
+        {
+          "name": "port-wood_OriginalPhoto",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": "port-wood-front.png"
+        },
+        {
+          "name": "port-wood_PaperCoreEstimated",
+          "baseColorLinearRgba": [
+            0.5299999713897705,
+            0.44999998807907104,
+            0.33000001311302185,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        },
+        {
+          "name": "port-wood_UnseenSurfaceNeutral",
+          "baseColorLinearRgba": [
+            0.6200000047683716,
+            0.5699999928474426,
+            0.4699999988079071,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "4e336e76f78baefbcef3668b2651e00c2237c5418743692c278eb95b8df326b0",
+      "blendSha256": "f88e9093c2d1dda5c21db57b6cafcd0f01f6f8b192285b3d73326ad8b7ff8f45",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "port-brick",
+      "label": "2:1 砖港口",
+      "kind": "custom",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "meshObjects": 1,
+      "triangles": 664,
+      "geometrySha256": "718eb671e6e2ba2dba233408ab568a397179a8f6c7daa5f229d03e57d2d15e0d",
+      "blenderBounds": {
+        "min": [
+          -0.02199999988079071,
+          -0.017000000923871994,
+          0.0
+        ],
+        "max": [
+          0.02199999988079071,
+          0.017000000923871994,
+          0.001500000013038516
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.02199999988079071,
+          0.0,
+          -0.017000000923871994
+        ],
+        "max": [
+          0.02199999988079071,
+          0.001500000013038516,
+          0.017000000923871994
+        ]
+      },
+      "materials": [
+        {
+          "name": "port-brick_OriginalPhoto",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": "port-brick-front.png"
+        },
+        {
+          "name": "port-brick_PaperCoreEstimated",
+          "baseColorLinearRgba": [
+            0.5299999713897705,
+            0.44999998807907104,
+            0.33000001311302185,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        },
+        {
+          "name": "port-brick_UnseenSurfaceNeutral",
+          "baseColorLinearRgba": [
+            0.6200000047683716,
+            0.5699999928474426,
+            0.4699999988079071,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "569676efa539a3daf67ba3a582503e0541296af6dbf96abda71422a2dd896c9f",
+      "blendSha256": "76580ac8e0b6f9f436b115fa1024fe75e410e7c6fdbfa5091425983aab5e02fa",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "port-wool",
+      "label": "2:1 羊毛港口",
+      "kind": "custom",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "meshObjects": 1,
+      "triangles": 624,
+      "geometrySha256": "cbce407333fe4e7532c80676cc724326cdde0c8a10e9195f294bc1f329a1b902",
+      "blenderBounds": {
+        "min": [
+          -0.02199999988079071,
+          -0.017000000923871994,
+          0.0
+        ],
+        "max": [
+          0.02199999988079071,
+          0.017000000923871994,
+          0.001500000013038516
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.02199999988079071,
+          0.0,
+          -0.017000000923871994
+        ],
+        "max": [
+          0.02199999988079071,
+          0.001500000013038516,
+          0.017000000923871994
+        ]
+      },
+      "materials": [
+        {
+          "name": "port-wool_OriginalPhoto",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": "port-wool-front.png"
+        },
+        {
+          "name": "port-wool_PaperCoreEstimated",
+          "baseColorLinearRgba": [
+            0.5299999713897705,
+            0.44999998807907104,
+            0.33000001311302185,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        },
+        {
+          "name": "port-wool_UnseenSurfaceNeutral",
+          "baseColorLinearRgba": [
+            0.6200000047683716,
+            0.5699999928474426,
+            0.4699999988079071,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "e3044b85f7640687e305592614212ea8545211060297ff0cafdc950bea3a89eb",
+      "blendSha256": "39119f1f6859389d069b981b6935a74cff4a62e88c44fb439652cd7f064161e6",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "port-wheat",
+      "label": "2:1 小麦港口",
+      "kind": "custom",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "meshObjects": 1,
+      "triangles": 604,
+      "geometrySha256": "8ea324ccbf494f514ca4d8b82a6bba67e1d5407542cce0b936dec858801b5948",
+      "blenderBounds": {
+        "min": [
+          -0.02199999988079071,
+          -0.017000000923871994,
+          0.0
+        ],
+        "max": [
+          0.02199999988079071,
+          0.017000000923871994,
+          0.001500000013038516
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.02199999988079071,
+          0.0,
+          -0.017000000923871994
+        ],
+        "max": [
+          0.02199999988079071,
+          0.001500000013038516,
+          0.017000000923871994
+        ]
+      },
+      "materials": [
+        {
+          "name": "port-wheat_OriginalPhoto",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": "port-wheat-front.png"
+        },
+        {
+          "name": "port-wheat_PaperCoreEstimated",
+          "baseColorLinearRgba": [
+            0.5299999713897705,
+            0.44999998807907104,
+            0.33000001311302185,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        },
+        {
+          "name": "port-wheat_UnseenSurfaceNeutral",
+          "baseColorLinearRgba": [
+            0.6200000047683716,
+            0.5699999928474426,
+            0.4699999988079071,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "c1e46b68df156bc1ed3ed4b43d3ee8759c98d44842e4c0bae9df3e18c6a1f863",
+      "blendSha256": "c7c958beb5cc65927d1d7be1891c47ddc73c999e369bf122c65322f7a1dddad1",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "port-ore",
+      "label": "2:1 矿石港口",
+      "kind": "custom",
+      "dimensionsMm": [
+        44,
+        34,
+        1.5
+      ],
+      "meshObjects": 1,
+      "triangles": 656,
+      "geometrySha256": "fe4c060582dfd41d9aa56a358da0eed1af4b8e98b22ceda04ed27e8281506db1",
+      "blenderBounds": {
+        "min": [
+          -0.02199999988079071,
+          -0.017000000923871994,
+          0.0
+        ],
+        "max": [
+          0.02199999988079071,
+          0.017000000923871994,
+          0.001500000013038516
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.02199999988079071,
+          0.0,
+          -0.017000000923871994
+        ],
+        "max": [
+          0.02199999988079071,
+          0.001500000013038516,
+          0.017000000923871994
+        ]
+      },
+      "materials": [
+        {
+          "name": "port-ore_OriginalPhoto",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": "port-ore-front.png"
+        },
+        {
+          "name": "port-ore_PaperCoreEstimated",
+          "baseColorLinearRgba": [
+            0.5299999713897705,
+            0.44999998807907104,
+            0.33000001311302185,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        },
+        {
+          "name": "port-ore_UnseenSurfaceNeutral",
+          "baseColorLinearRgba": [
+            0.6200000047683716,
+            0.5699999928474426,
+            0.4699999988079071,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "024466b931c5adcb5ede3162249e389f83276cf276945501156ac2997f9ca2a7",
+      "blendSha256": "23256e1b27b73b9de74dbdc01e92f9b98a0c7a5abd71396b26725b8484fc504a",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "number-token-back",
+      "label": "点数牌共同船图案背面",
+      "kind": "custom",
+      "dimensionsMm": [
+        21,
+        21,
+        0.45
+      ],
+      "meshObjects": 1,
+      "triangles": 252,
+      "geometrySha256": "5c9b96481f80ed531bc5c9d9bffb4702199f18eb9967f3280b87513a8135f279",
+      "blenderBounds": {
+        "min": [
+          -0.010499999858438969,
+          -0.010499999858438969,
+          0.0
+        ],
+        "max": [
+          0.010499999858438969,
+          0.010499999858438969,
+          0.00044999999227002263
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.010499999858438969,
+          0.0,
+          -0.010499999858438969
+        ],
+        "max": [
+          0.010499999858438969,
+          0.00044999999227002263,
+          0.010499999858438969
+        ]
+      },
+      "materials": [
+        {
+          "name": "number-token-back_OriginalPhoto",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": "number-token-back.png"
+        },
+        {
+          "name": "number-token-back_PaperCoreEstimated",
+          "baseColorLinearRgba": [
+            0.5299999713897705,
+            0.44999998807907104,
+            0.33000001311302185,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        },
+        {
+          "name": "number-token-back_UnseenSurfaceNeutral",
+          "baseColorLinearRgba": [
+            0.6200000047683716,
+            0.5699999928474426,
+            0.4699999988079071,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "960b27c6f06f467257e9876552b8939cbe3678bf04695e9b477063da55170f24",
+      "blendSha256": "808a504c265494d0343b5a00cbe2ca755c7311f96270ecfeae55c3eaab630b1f",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "catan-victory-marker",
+      "label": "卡坦胜利分标记",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        1.5
+      ],
+      "meshObjects": 1,
+      "triangles": 252,
+      "geometrySha256": "bb3184dbf04b71f4ec2264a11b3c6fbc8facc7eeb668f0c7802423b86fe4e61c",
+      "blenderBounds": {
+        "min": [
+          -0.008999999612569809,
+          -0.008999999612569809,
+          0.0
+        ],
+        "max": [
+          0.008999999612569809,
+          0.008999999612569809,
+          0.001500000013038516
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.008999999612569809,
+          0.0,
+          -0.008999999612569809
+        ],
+        "max": [
+          0.008999999612569809,
+          0.001500000013038516,
+          0.008999999612569809
+        ]
+      },
+      "materials": [
+        {
+          "name": "catan-victory-marker_OriginalPhoto",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": "catan-victory-marker.png"
+        },
+        {
+          "name": "catan-victory-marker_PaperCoreEstimated",
+          "baseColorLinearRgba": [
+            0.5299999713897705,
+            0.44999998807907104,
+            0.33000001311302185,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        },
+        {
+          "name": "catan-victory-marker_UnseenSurfaceNeutral",
+          "baseColorLinearRgba": [
+            0.6200000047683716,
+            0.5699999928474426,
+            0.4699999988079071,
+            1.0
+          ],
+          "roughness": 0.8999999761581421,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "a759640ebc3b1c9d776d6b1394730706831af2d030841c8afd8256df495c7730",
+      "blendSha256": "8948602eb3a1aca505b081fc67e90f3ff8755846627f6f2a0317669044186069",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/catan-victory-marker.png",
+      "sha256": "86bab122c814ebdb21f6a07b8abb1c4a92f4b39e7125b2bcd0dbcde3df09200d"
+    },
+    {
+      "path": "textures/number-token-back.png",
+      "sha256": "a7c2c785daee6f22c93d887bea80d979545f62f4f4c17e99b345b3999f028cb5"
+    },
+    {
+      "path": "textures/port-brick-front.png",
+      "sha256": "a519401fb16cf3c02c6ae5fbf0e098ed0fc048fc1abd618792457e878064aeb1"
+    },
+    {
+      "path": "textures/port-generic-front.png",
+      "sha256": "9199f746a3c35863f51cc3b29e9b8cccb6153f7215450cd64832f0bd9ec1dbcc"
+    },
+    {
+      "path": "textures/port-ore-front.png",
+      "sha256": "87c757b126664d8a3209e8d5841b3edf46f397c102637d3a453cdca784539f2d"
+    },
+    {
+      "path": "textures/port-wheat-front.png",
+      "sha256": "4a5cf6430c7ba89648e2f7a577864a9e9689d67b4d567901de3c8f14dab6fb2e"
+    },
+    {
+      "path": "textures/port-wood-front.png",
+      "sha256": "488ddebc7c400a74dd276141f274e9e503d42a7a71d04ab93ae77372bf925828"
+    },
+    {
+      "path": "textures/port-wool-front.png",
+      "sha256": "dac9c6355b3bf9e071d8d79f8bcaf29bb25d90aba4e0351fc25ce018d95b8e07"
+    }
+  ],
+  "limitations": [
+    "六港口为保留原像素插画的异形闭合厚纸板，并非港口立体景观。",
+    "照片无尺，港口 44×34×1.5 mm、点数圆片 21×21×0.45 mm、分标记 18×18×1.5 mm 全部估算。",
+    "背面与纸芯细节未知；未见面使用中性材料，不捏造另一面图案。",
+    "港口轮廓来自色差外边界，底边校平后按估算长宽归一；并非精确光学标定。",
+    "点数背面只供现有规则数字牌共用，不从照片推断数字或改变规则。",
+    "四视图是 Blender 类型陈列；实际相邻节点、Unity 拾取与最终用户外观另验。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "a4d0c1aa18b6ad7f4d139f648f123dbf0b156dce14397a89eeba49085eecd624",
+    "game-camera.png": "37608e31e374f6dda6103372aa5284f09ad0557935688f24302740ca67459d40",
+    "side.png": "cd08f6b1bce8671d247188da76c90ce219f2c7c69929e391009c2df7703770e8",
+    "top.png": "d0e16ff1161e23283275d5433f989b243a85af5b9ab14234fc6e803eff0e65cd"
+  }
+}

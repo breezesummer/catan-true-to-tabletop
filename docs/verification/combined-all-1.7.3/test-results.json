@@ -1,0 +1,1062 @@
+[
+  {
+    "file": "tests/Catan.Rules.Tests/TestResults/combined-all.trx",
+    "counters": "<Counters total=\"36\" executed=\"36\" passed=\"33\" failed=\"3\" error=\"0\" timeout=\"0\" aborted=\"0\" inconclusive=\"0\" passedButRunAborted=\"0\" notRunnable=\"0\" notExecuted=\"0\" disconnected=\"0\" warning=\"0\" completed=\"0\" inProgress=\"0\" pending=\"0\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" />",
+    "results": [
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"forgotten-tribe\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"wonders-of-catan\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"through-the-desert\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"wonders-of-catan\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"new-world\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"forgotten-tribe\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"heading-for-new-shores\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"pirate-islands\", seats: 3, seed: 2027)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"four-islands\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"new-world\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"new-world\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"forgotten-tribe\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"through-the-desert\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"wonders-of-catan\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"fog-islands\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"fog-islands\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"heading-for-new-shores\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"four-islands\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"heading-for-new-shores\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"pirate-islands\", seats: 4, seed: 97)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"four-islands\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"through-the-desert\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"fog-islands\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"through-the-desert\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"pirate-islands\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"heading-for-new-shores\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"new-world\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"wonders-of-catan\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"four-islands\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"fog-islands\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"pirate-islands\", seats: 4, seed: 2027)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"forgotten-tribe\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      }
+    ]
+  },
+  {
+    "file": "tests/Catan.Rules.Tests/TestResults/combined-special-final.trx",
+    "counters": "<Counters total=\"32\" executed=\"32\" passed=\"31\" failed=\"1\" error=\"0\" timeout=\"0\" aborted=\"0\" inconclusive=\"0\" passedButRunAborted=\"0\" notRunnable=\"0\" notExecuted=\"0\" disconnected=\"0\" warning=\"0\" completed=\"0\" inProgress=\"0\" pending=\"0\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" />",
+    "results": [
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"through-the-desert\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"cloth-for-catan\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"heading-for-new-shores\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.FogExplorationConservesTilesAndDoesNotExposeRemainingPool",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"four-islands\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"cloth-for-catan\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"four-islands\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"wonders-of-catan\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"fog-islands\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"new-world\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"new-world\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"pirate-islands\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"forgotten-tribe\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"pirate-islands\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 3, seed: 97)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"forgotten-tribe\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"pirate-islands\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"wonders-of-catan\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.TribeRewardUsesChosenProgressColorAndRejectsInvalidColorWithoutMutation",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.FourthWonderLevelWinsBelowPointThreshold",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"pirate-islands\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.PirateRewardFinishesBeforeSevenDiscardIsCalculated",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.FiveExhaustedVillagesEndGameAndKeepClothSeparateFromCommodities",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"heading-for-new-shores\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.WarshipConversionDeactivatesOneKnightAndIllegalRetryDoesNotChangeState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"fog-islands\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"pirate-islands\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"through-the-desert\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"pirate-islands\", seats: 4)",
+        "outcome": "Passed"
+      }
+    ]
+  },
+  {
+    "file": "tests/Catan.Rules.Tests/TestResults/cloth-final.trx",
+    "counters": "<Counters total=\"4\" executed=\"4\" passed=\"4\" failed=\"0\" error=\"0\" timeout=\"0\" aborted=\"0\" inconclusive=\"0\" passedButRunAborted=\"0\" notRunnable=\"0\" notExecuted=\"0\" disconnected=\"0\" warning=\"0\" completed=\"0\" inProgress=\"0\" pending=\"0\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" />",
+    "results": [
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 4, seed: 2027)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 4, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 3, seed: 97)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.M6FullGameTests.ProductionAiFinishesNormalGameAndResumesPendingSaves(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 3, seed: 2027)",
+        "outcome": "Passed"
+      }
+    ]
+  },
+  {
+    "file": "tests/Catan.Rules.Tests/TestResults/scenario-units-final.trx",
+    "counters": "<Counters total=\"26\" executed=\"26\" passed=\"26\" failed=\"0\" error=\"0\" timeout=\"0\" aborted=\"0\" inconclusive=\"0\" passedButRunAborted=\"0\" notRunnable=\"0\" notExecuted=\"0\" disconnected=\"0\" warning=\"0\" completed=\"0\" inProgress=\"0\" pending=\"0\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" />",
+    "results": [
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"forgotten-tribe\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"through-the-desert\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"cloth-for-catan\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"forgotten-tribe\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"wonders-of-catan\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"heading-for-new-shores\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.WarshipConversionDeactivatesOneKnightAndIllegalRetryDoesNotChangeState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.PirateRewardFinishesBeforeSevenDiscardIsCalculated",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"pirate-islands\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.CombinedGameIncludesBothExpansionPointSourcesWithoutLargestArmy",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"new-world\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.TribeRewardUsesChosenProgressColorAndRejectsInvalidColorWithoutMutation",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"wonders-of-catan\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"new-world\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"fog-islands\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"four-islands\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"four-islands\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"cloth-for-catan\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"fog-islands\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.FiveExhaustedVillagesEndGameAndKeepClothSeparateFromCommodities",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.FourthWonderLevelWinsBelowPointThreshold",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.FogExplorationConservesTilesAndDoesNotExposeRemainingPool",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.TreasonCannotPlaceKnightOnNeutralVillageEvenWithStaleOption",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"pirate-islands\", seats: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"heading-for-new-shores\", seats: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.CombinedAllScenarioTests.AllMapsSetUpResumeAndRejectForeignCommands(id: \"through-the-desert\", seats: 4)",
+        "outcome": "Passed"
+      }
+    ]
+  },
+  {
+    "file": "tests/Catan.Rules.Tests/TestResults/rules-regression.trx",
+    "counters": "<Counters total=\"1176\" executed=\"1176\" passed=\"1152\" failed=\"24\" error=\"0\" timeout=\"0\" aborted=\"0\" inconclusive=\"0\" passedButRunAborted=\"0\" notRunnable=\"0\" notExecuted=\"0\" disconnected=\"0\" warning=\"0\" completed=\"0\" inProgress=\"0\" pending=\"0\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" />",
+    "results": [
+      {
+        "name": "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"锻铁匠\", track: 2)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P1\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"商业港口\", track: 0)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.SabotageDiscardIsOneColoredCountSentenceForEveryViewer",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P2\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: True)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P2\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P2\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: False)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.FreeEngineeringWallIsConstructedAndCardUsesRequestedVerb",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P1\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P2\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Printing, name: \"印刷术\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P1\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.ResourceMonopolyUsesHarvestForEachAffectedPlayer",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P1\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.PersistenceTests.C20SaveSurvivesProcessExitAndNewProcessC21PreservesNextDice",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"ProgressTreasonRemove\", action: \"叛变\", piece: \"己方骑士\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.CombinedGameIncludesBothExpansionPointSourcesWithoutLargestArmy",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Constitution, name: \"宪法\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.DefenderProgressRewardFliesFromTheCorrectTrackWithoutLeakingOpponentCard",
+        "outcome": "Failed"
+      }
+    ]
+  },
+  {
+    "file": ".local/baseline-check/tests/Catan.Rules.Tests/TestResults/baseline.trx",
+    "counters": "<Counters total=\"112\" executed=\"112\" passed=\"92\" failed=\"20\" error=\"0\" timeout=\"0\" aborted=\"0\" inconclusive=\"0\" passedButRunAborted=\"0\" notRunnable=\"0\" notExecuted=\"0\" disconnected=\"0\" warning=\"0\" completed=\"0\" inProgress=\"0\" pending=\"0\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" />",
+    "results": [
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.ExpandedHandsLeaveTheStatusBoxAndEndTurnControlsUncovered(special: False, mixed: True)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.GrowingHandsOverlapWithoutShrinkingOrLeavingTheirScreenRegion(width: 282, center: 409)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.HiddenOperationRetainsCaptionUntilStateChanges",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PillagedCityHasOneCompletedSentence(combined: True, wall: True)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.AutomaticallyRejectedTradeRetainsBothPublicQuoteSides(rules: \"cities\", broadcast: False)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PillagedCityHasOneCompletedSentence(combined: False, wall: False)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.DiceSettleOnThePublicResultIncludingEveryEventFace(eventFace: 1)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(phase: \"SetupSettlement\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.EventDiceDrawsRevealTheNonActiveRecipientBeforeTheyHaveAnAction(combined: True, name: \"Constitution\", randomState: 48)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.CollectionFlightDestinationsStayInsideTheSameReservedHandRegion(mixed: False)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.SmithingPrefersACompletePairIncludingSupplyReleaseOrder",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.SetupBuildingsAreConstructionWithoutDuplicateGainedPieces(piece: \"城市\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.SetupBuildingsAreConstructionWithoutDuplicateGainedPieces(piece: \"村庄\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PillagedCityHasOneCompletedSentence(combined: True, wall: False)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.FacilityCostAndNameAreOneColoredSentence(track: 1, level: 4, name: \"大教堂\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.CollectionFlightDestinationsStayInsideTheSameReservedHandRegion(mixed: True)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.AutomaticallyRejectedTradeRetainsBothPublicQuoteSides(rules: \"combined\", broadcast: True)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.ExpandedHandsLeaveTheStatusBoxAndEndTurnControlsUncovered(special: True, mixed: True)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PrivateProgressDrawOnlyPublishesBackColor(track: 2)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.ANewActionReplacesStalePrompts",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(phase: \"RobberSteal\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.DiceSettleOnThePublicResultIncludingEveryEventFace(eventFace: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.InvalidPieceIndexPreservesExistingSelection(ordinal: -2)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.AMergedNumberSwapKeepsProductionOnTheTileNumberedAtTheTimeOfTheRoll(swapBeforeRoll: False)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.MultipleSleepingKnightsAreOneStatusSentence",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.SevenDiscardIsOneCountSentenceWithoutUsedCards",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.HistoryArrivingBeforeItsNetworkViewCannotShowOrConsumeFutureRollOutcomes(kind: \"PlayProgressCard\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.MergedRollAndKnightRobberMoveUseThePublicRobberPositionAtProductionTime",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.InvalidPieceIndexPreservesExistingSelection(ordinal: 5)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P2\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.AutomaticallyRejectedTradeRetainsBothPublicQuoteSides(rules: \"combined\", broadcast: False)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.HarvestNarrationAndFollowingChoicesWaitForTheActualDiceToSettle",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.PublicSourceProjectionExcludesFogAndKeepsRobberBlockingSeparateFromCardEffects",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.InvalidDevelopmentPurchaseCannotStartAnAnimation",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.FacilityCostAndNameAreOneColoredSentence(track: 2, level: 3, name: \"引水渠\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(phase: \"SetupPort\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"ProgressTreasonPlace\", action: \"安置\", piece: \"替补骑士\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P2\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: True)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(phase: \"PortPlacement\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"锻铁匠\", track: 2)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(phase: \"SetupRoad\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.GrowingHandsOverlapWithoutShrinkingOrLeavingTheirScreenRegion(width: 992, center: 764)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"DisplacedKnight\", action: \"安置\", piece: \"被驱逐的骑士\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PillagedCityHasOneCompletedSentence(combined: False, wall: True)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P1\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EqualResultsStillAnimateNewRollsAndRepaintsDoNotRestartThem",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.NewDevelopmentCardMakesRoomNearArrivalAndNeverAppearsTwice",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(phase: \"RoadBuilding\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.ExpandedHandsLeaveTheStatusBoxAndEndTurnControlsUncovered(special: True, mixed: False)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.AutomaticallyRejectedTradeRetainsBothPublicQuoteSides(rules: \"seafarers\", broadcast: False)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.PickingOneHouseNeverSelectsItsNeighbours",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.AutomaticallyRejectedTradeRetainsBothPublicQuoteSides(rules: \"cities\", broadcast: True)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.FacilityCostAndNameAreOneColoredSentence(track: 0, level: 4, name: \"银行\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"PillageCity\", action: \"降级为村庄\", piece: \"城市\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.MergedRollAndCityUpgradeDoNotApplyTheNewCityYieldToEarlierProduction",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P1\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.AMergedNumberSwapKeepsProductionOnTheTileNumberedAtTheTimeOfTheRoll(swapBeforeRoll: True)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.DiceSettleOnThePublicResultIncludingEveryEventFace(eventFace: 2)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.DiceHandCountsHoldBothCategoriesAndEachSeatUntilSettledAndResetBetweenGames",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P2\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PrivateProgressDrawOnlyPublishesBackColor(track: 0)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(phase: \"RobberMove\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.BankTradeKeepsItsBankOriginEvenWithAMatchingPublicTerrain",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P1\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PrivateProgressDrawOnlyPublishesBackColor(track: 1)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.OrdinaryTurnPromptsRetainTheirOriginalDuration(phase: \"ProductionAwaitRoll\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EmptyBankMarkerWaitsForDiceSettlementAndDoesNotBorrowAnotherResourceCount",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(phase: \"GoldChoice\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.StealingHasOneSentenceForBothPrivateAndRedactedViews",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.EventDiceDrawsRevealTheNonActiveRecipientBeforeTheyHaveAnAction(combined: True, name: \"Printing\", randomState: 2)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.ResourceSelectionReleasesTheIndividualPiece",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.DefenderAwardIncludesOnePoint",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.ResourceMonopolyUsesHarvestForEachAffectedPlayer",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.GrowingHandsOverlapWithoutShrinkingOrLeavingTheirScreenRegion(width: 682, center: 919)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P1\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.FreeEngineeringWallIsConstructedAndCardUsesRequestedVerb",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.ReconnectingASavedViewDoesNotReplayItsOldRoll",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.EventDiceDrawsRevealTheNonActiveRecipientBeforeTheyHaveAnAction(combined: False, name: \"Printing\", randomState: 2)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.ResourceAndCommodityFromTheSameCityStartAtTheirProducingTile",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.OnlyTheMissingUnitsOfARepeatedCostAreRed",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.DefenderProgressRewardFliesFromTheCorrectTrackWithoutLeakingOpponentCard",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.OrdinaryTurnPromptsRetainTheirOriginalDuration(phase: \"Action\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"ProgressTreasonRemove\", action: \"叛变\", piece: \"己方骑士\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.TurnThenRollPromptsEachLastExactlyOneAndAHalfSeconds",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Printing, name: \"印刷术\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.RemovedIncomingSpecialCardCancelsItsFlightWithoutRestoringIt",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"Metropolis\", action: \"大都会\", piece: \"城市\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P2\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Constitution, name: \"宪法\")",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.EventDiceDrawsRevealTheNonActiveRecipientBeforeTheyHaveAnAction(combined: False, name: \"Constitution\", randomState: 48)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.WeddingAndMonopolyMergeBothSidesWithoutFillingUnknownGoods",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(phase: \"Discard\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.InvalidPieceIndexPreservesExistingSelection(ordinal: 100)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.AutomaticallyRejectedTradeRetainsBothPublicQuoteSides(rules: \"base\", broadcast: False)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.BuyingDevelopmentCardAnimatesItsAuthorizedIdentityOnlyForTheOwner",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.HiddenCardsAndBaseVictoryCardsNeverCreateAnAutomaticPublicReveal",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.TwoIncomingKnightsKeepTheirOrderAndArrivalTimesWhenAnOlderKnightIsPlayed",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.AutomaticallyRejectedTradeRetainsBothPublicQuoteSides(rules: \"base\", broadcast: True)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.OrdinaryTurnPromptsRetainTheirOriginalDuration(phase: \"Finished\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.ExpandedHandsLeaveTheStatusBoxAndEndTurnControlsUncovered(special: False, mixed: False)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.DiceSettleOnThePublicResultIncludingEveryEventFace(eventFace: 0)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.EveryAuthoritySelectionPhaseRequiresAContinuingPrompt(phase: \"PendingChoice\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopSpecialCollectionTests.PlayingAnOlderKnightRebindsTheBoughtKnightWithoutLandingItOrRestartingItsFlight",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"商业港口\", track: 0)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.SabotageDiscardIsOneColoredCountSentenceForEveryViewer",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.HistoryNarrativeRegressionTests.AutomaticallyRejectedTradeRetainsBothPublicQuoteSides(rules: \"seafarers\", broadcast: True)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.ASingleHandStaysAtTheFrontCenter",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: False)",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"婚礼\", track: 1)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopPresentationTests.HistoryArrivingBeforeItsNetworkViewCannotShowOrConsumeFutureRollOutcomes(kind: \"RollDice\")",
+        "outcome": "Passed"
+      }
+    ]
+  },
+  {
+    "file": ".local/baseline-check/tests/Catan.Rules.Tests/TestResults/baseline-additional.trx",
+    "counters": "<Counters total=\"18\" executed=\"18\" passed=\"16\" failed=\"2\" error=\"0\" timeout=\"0\" aborted=\"0\" inconclusive=\"0\" passedButRunAborted=\"0\" notRunnable=\"0\" notExecuted=\"0\" disconnected=\"0\" warning=\"0\" completed=\"0\" inProgress=\"0\" pending=\"0\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" />",
+    "results": [
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.UnknownSeatDoesNotBorrowCurrentPlayersScore",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.CombinedGameIncludesBothExpansionPointSourcesWithoutLargestArmy",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.NewGameHasNoInventedPoints(mode: 4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.ChangingAnotherPlayersHiddenCardsDoesNotChangeTheirVisibleBreakdown",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.SpecialVictoryConditionsDoNotInventAdditionalVictoryPoints(scenario: \"pirate-islands\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.SeafarersExplainsIslandRewardsAndOnlyCompleteClothPairs(cloth: 1, clothPoints: 0)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.NewGameHasNoInventedPoints(mode: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.SeafarersExplainsIslandRewardsAndOnlyCompleteClothPairs(cloth: 0, clothPoints: 0)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.SpecialVictoryConditionsDoNotInventAdditionalVictoryPoints(scenario: \"wonders-of-catan\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.SeafarersOpponentScoreNeverInfersHiddenCardsFromTotal",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.BaseGameOpponentScoreStaysPublicEvenWhenWinnerTotalIsRevealedByView",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.SeafarersExplainsIslandRewardsAndOnlyCompleteClothPairs(cloth: 5, clothPoints: 2)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+        "outcome": "Failed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.SeafarersExplainsIslandRewardsAndOnlyCompleteClothPairs(cloth: 6, clothPoints: 3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.NewGameHasNoInventedPoints(mode: 2)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.BaseGameExplainsBuildingsBothAwardsAndOwnHiddenCards",
+        "outcome": "Passed"
+      },
+      {
+        "name": "Catan.Rules.Tests.TabletopScoreTests.NewGameHasNoInventedPoints(mode: 5)",
+        "outcome": "Passed"
+      }
+    ]
+  },
+  {
+    "file": "tests/Catan.Network.Tests/TestResults/network-final.trx",
+    "counters": "<Counters total=\"131\" executed=\"131\" passed=\"131\" failed=\"0\" error=\"0\" timeout=\"0\" aborted=\"0\" inconclusive=\"0\" passedButRunAborted=\"0\" notRunnable=\"0\" notExecuted=\"0\" disconnected=\"0\" warning=\"0\" completed=\"0\" inProgress=\"0\" pending=\"0\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" />",
+    "results": []
+  },
+  {
+    "file": "tests/Catan.Rules.Tests/TestResults/targeted-final.trx",
+    "counters": "<Counters total=\"105\" executed=\"105\" passed=\"105\" failed=\"0\" error=\"0\" timeout=\"0\" aborted=\"0\" inconclusive=\"0\" passedButRunAborted=\"0\" notRunnable=\"0\" notExecuted=\"0\" disconnected=\"0\" warning=\"0\" completed=\"0\" inProgress=\"0\" pending=\"0\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" />",
+    "results": []
+  }
+]

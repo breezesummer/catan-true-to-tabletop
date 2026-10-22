@@ -1,0 +1,64 @@
+{
+  "rebuild": "相同语音引擎版本可重新合成；原始合成WAV随配方保留，发行导出以这些原始文件为准",
+  "format": "PCM16 mono 24000 Hz",
+  "version": "audio-v002",
+  "lines": [
+    {
+      "sha256": "f4494eb8015cae86852c29f26cbd6ddc9a7c2aeeb81f4fa16d466f046c6907f0",
+      "text": "听候您的差遣。",
+      "file": "KnightRecruit01",
+      "voice": "Microsoft Kangkang",
+      "language": "zh"
+    },
+    {
+      "sha256": "fc8e5f187893fbc35ca3aab67bde30b69dfc0e1d8f093d1668224e3cfe200679",
+      "text": "悉听遵命！",
+      "file": "KnightRecruit02",
+      "voice": "Microsoft Kangkang",
+      "language": "zh"
+    },
+    {
+      "sha256": "ade8a8657ede11d964ae482f2642b8cdcbd5411061c22cfc797be158999ba95e",
+      "text": "发饷啦！",
+      "file": "KnightActivate01",
+      "voice": "Microsoft Kangkang",
+      "language": "zh"
+    },
+    {
+      "sha256": "48b197a745a0e3b1cbb6c066ec59d029bdb6aa6617cbd5eb0c9d5d53f1aa3d66",
+      "text": "我办事，您放心。",
+      "file": "KnightActivate02",
+      "voice": "Microsoft Kangkang",
+      "language": "zh"
+    },
+    {
+      "sha256": "fd900758f4cb3aa804ff32035da14d8665eee148cdcdbf3d5ba3ac676a485dbd",
+      "text": "As you wish, my lord.",
+      "file": "KnightRecruit01",
+      "voice": "Microsoft Zira Desktop",
+      "language": "en"
+    },
+    {
+      "sha256": "097fdf948701fe4bc67095c9f5f2c37083fd11c64841153f38d834a5117738ec",
+      "text": "At your command, my lord.",
+      "file": "KnightRecruit02",
+      "voice": "Microsoft Zira Desktop",
+      "language": "en"
+    },
+    {
+      "sha256": "e71839aee3ba0e779410e2740f6064218efaaad212af5ed278192c23ea196ee3",
+      "text": "Our wages have arrived!",
+      "file": "KnightActivate01",
+      "voice": "Microsoft Zira Desktop",
+      "language": "en"
+    },
+    {
+      "sha256": "278ecf40308cf8d96e479b6c21a337f19b5b0841e493a6e2ea34f37c4e882bef",
+      "text": "Leave it to me, my lord.",
+      "file": "KnightActivate02",
+      "voice": "Microsoft Zira Desktop",
+      "language": "en"
+    }
+  ],
+  "origin": "本机 Windows System.Speech 离线文字转语音；原创台词；无商业游戏采样"
+}

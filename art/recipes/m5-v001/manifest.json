@@ -1,0 +1,29 @@
+{
+  "version": "m5-runtime-combined-pieces-v001",
+  "kind": "runtime-mesh-placeholders",
+  "source": "Unity/Catan/Assets/Scripts/M5BoardRenderer.cs",
+  "derivedFrom": ["art/recipes/m3-v001", "art/recipes/m4-v001/manifest.json"],
+  "reference": "assets/references/rules/v001/sources.json",
+  "physicalReference": null,
+  "measurementStatus": "estimated-not-user-confirmed",
+  "units": "metres",
+  "unityVersion": "6000.3.25f1",
+  "generator": "Deterministic Unity primitive meshes and C# transforms",
+  "axes": {"up": "+Y", "board": "XZ", "forward": "+Z"},
+  "pivots": {"knight": "base centre at stable Vertex ID", "city": "base centre at stable Vertex ID", "ship": "edge midpoint, estimated 0.008m waterline", "merchant": "tile centre with x=-0.013m offset"},
+  "ship": {"hullWidth": 0.009, "hullHeight": 0.005, "hullLength": 0.024, "parts": ["hull", "mast", "sail"]},
+  "knight": {"baseDiameter": 0.015, "strengthMarkers": "1/2/3 stacked rings", "activeMarker": "gold sphere", "inactiveMarker": "dark sphere"},
+  "wall": {"extent": 0.028, "height": 0.008, "segments": 4},
+  "metropolis": {"crownWidth": 0.027, "crownBaseHeight": 0.027, "trackColors": ["gold", "blue", "green"]},
+  "pirate": {"color": "dark purple", "scale": [0.019, 0.009, 0.025]},
+  "merchant": {"diameter": 0.008, "height": 0.032, "color": "purple"},
+  "rebuild": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/development/Build-M5.ps1 -VerifyPlayer",
+  "limitations": ["Actual mesh primitives, not generated bitmap assets", "Rule identification placeholders; no collector-art approval", "No separate Blender/FBX export of runtime placeholders", "Original official PDF bytes preserved"],
+  "previews": {
+    "default": "docs/verification/m5-2026-10-09/m5-components-default.png",
+    "top": "docs/verification/m5-2026-10-09/m5-components-top.png",
+    "crowded": "docs/verification/m5-2026-10-09/m5-components-crowded.png",
+    "side": "docs/verification/m5-2026-10-09/m5-components-side.png"
+  },
+  "previewScope": "Explicit public geometry sample arrangement including ships and knights; not a legal game position or rules test"
+}

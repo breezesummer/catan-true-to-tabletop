@@ -1,0 +1,80 @@
+{
+  "日期": "2026-10-19",
+  "版本": "1.6.9",
+  "传输": "在线 HTTP/WS，公网 IP，无域名和证书；局域网原模式保留",
+  "服务端及客户端专项": {
+    "通过": 51,
+    "失败": 0
+  },
+  "房间协议回归": {
+    "通过": 115,
+    "失败": 0
+  },
+  "音效展示回归": {
+    "通过": 219,
+    "失败": 0
+  },
+  "构建脚本保护": {
+    "通过": 9,
+    "失败": 0
+  },
+  "Unity图形界面": {
+    "status": "passed",
+    "checks": 32,
+    "renderableCaptures": 14,
+    "realHttpService": true,
+    "unconfiguredAndOfflineDistinct": true,
+    "emptyLobbyOnline": true,
+    "createAndJoin": true,
+    "passwordDialog": true,
+    "serverRestartRecovery": true,
+    "persistedAddress": true,
+    "isolatedData": true
+  },
+  "Android检查": {
+    "版本名": "1.6.9",
+    "版本码": 10609,
+    "最低API": 26,
+    "目标API": 36,
+    "架构": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "网络权限": true,
+    "允许明文网络": true,
+    "调试包": false,
+    "签名v2验证": true,
+    "签名用途": "独立临时测试签名，不能覆盖安装旧内测版",
+    "APK_SHA256": "58353c2198ce35e326410f362588e2dc861560d5ed64581f156b78b5a9bfa5c6"
+  },
+  "产物": {
+    "Windows客户端": {
+      "路径": "game version/1.6/Catan1.6.9-Online-Ip-Lobby-SigningTest/Builds/Windows/Catan1.6.9.exe",
+      "字节": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    "Android安装包": {
+      "路径": "game version/1.6/Catan1.6.9-Online-Ip-Lobby-SigningTest/Builds/Android/Catan1.6.9.apk",
+      "字节": 345989221,
+      "SHA256": "58353c2198ce35e326410f362588e2dc861560d5ed64581f156b78b5a9bfa5c6"
+    },
+    "Windows房间服务": {
+      "路径": "game version/1.6/Catan1.6.9-Online-Ip-Lobby-SigningTest/Builds/Windows/Server/Catan.Server.exe",
+      "字节": 162304,
+      "SHA256": "103aad780562b1bb290c2573d25227e713aa6a8712b0cb71146080d50bcca55f"
+    },
+    "Linux在线服务": {
+      "路径": "game version/1.6/Catan1.6.9-Online-Ip-Lobby-SigningTest/Server/linux-x64/Catan.Server",
+      "字节": 78256,
+      "SHA256": "280af071a2d31aafc0fe0abf0814e237004a7689a43dc2b5c15c6545a1937b7f"
+    }
+  },
+  "未验范围": [
+    "真实云服务器与跨运营商多机",
+    "Windows原生游戏运行",
+    "Android真机",
+    "长期容量与完整用户对局",
+    "原Android签名兼容性"
+  ],
+  "既有工作树说明": "构建包含当前工作树原有的 AI 修改；这些代码不纳入本轮提交，额外规则与 AI 长局全量回归已主动取消，不计入通过项。"
+}

@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-18",
+  "timezone": "Asia/Shanghai",
+  "version": "内测版1.6",
+  "publicReleaseCreated": false,
+  "tests": {
+    "networkPassed": 108,
+    "networkTotal": 108,
+    "serverAndDiscoveryPassed": 23,
+    "serverAndDiscoveryTotal": 23,
+    "unityMenu": {
+      "status": "passed",
+      "checks": 23,
+      "renderableCaptures": 0,
+      "automaticService": true,
+      "discoveryBeforeCreatingRoom": true,
+      "openRoomDirectJoin": true,
+      "passwordDialog": true,
+      "wrongPasswordDiagnostic": true,
+      "joinedRoomLabel": true,
+      "isolatedData": true
+    }
+  },
+  "builds": {
+    "windows": true,
+    "android": true,
+    "androidPackageCheck": "passed",
+    "androidArchitectures": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "androidSignatureV2": true,
+    "windowsPackageEntries": 515
+  },
+  "artifacts": [
+    {
+      "path": ".local/lan-discovery-20261018/CatanM7-Windows-LAN-Fix-20261018.zip",
+      "bytes": 527364695,
+      "sha256": "40b2ac22caa47c18477edbc2b8ad7c9661618e37d6068907207b80aa1acdee2d"
+    },
+    {
+      "path": ".local/lan-discovery-20261018/Builds/Windows/CatanM7.exe",
+      "bytes": 667136,
+      "sha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "path": ".local/lan-discovery-20261018/Builds/Windows/Server/Catan.Server.exe",
+      "bytes": 162304,
+      "sha256": "102cb0270fb48fc49d7e93f69d9f67c3a10b91905dacbfea0c9a58e15b0e5dab"
+    },
+    {
+      "path": ".local/lan-discovery-20261018/Builds/Android/CatanM7.apk",
+      "bytes": 304461595,
+      "sha256": "e250a2ca0aa2ff64fad531fbdab7532684b3bd3a34fb660a19b9232d4303706a"
+    }
+  ],
+  "originalModifiedFilesPreserved": 59,
+  "roadmapChanged": false,
+  "remaining": [
+    "朋友电脑与多台物理设备的局域网复验",
+    "安卓真机发现与加入",
+    "可见窗口视觉检查：隐藏窗口黑帧未计入视觉验收"
+  ]
+}

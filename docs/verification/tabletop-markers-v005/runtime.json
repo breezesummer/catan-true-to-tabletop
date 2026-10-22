@@ -1,0 +1,65 @@
+{
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "四种真实 App 正常开局后检查公开地图；补查被遗忘的部落的公开港礼/航路奖励和迷雾岛屿的隐藏数字。独立公开夹具检查迁移、增删及奖励计数。相机图不含 IMGUI；8 张细节图各含顶视、侧视、游戏角度及翻面。未把程序截图计为用户外观确认。",
+    "checks": 1903,
+    "checkedSourceInstances": 72,
+    "cameraImages": 8,
+    "detailImages": 8,
+    "specialGiftPorts": 6,
+    "specialBonusMarkers": 8,
+    "publicDataOnly": true,
+    "visualsHaveNoColliders": true,
+    "stableIds": true,
+    "outsideCoast": true,
+    "hiddenNumbersSuppressed": true,
+    "rulesSupplyNumberFaces": true,
+    "photographedNumberBack": true,
+    "fullUiPixelsVerified": false,
+    "publicSpecialScenario": true,
+    "publicFogScenario": true,
+    "assets": [
+        "port-generic",
+        "port-wood",
+        "port-brick",
+        "port-wool",
+        "port-wheat",
+        "port-ore",
+        "catan-victory-marker",
+        "number-token-back"
+    ],
+    "modes": [
+        {
+            "mode": "base",
+            "ports": 9,
+            "gifts": 0,
+            "unclaimedVictoryMarkers": 0,
+            "awardedVictoryMarkers": 0,
+            "numberTokens": 18
+        },
+        {
+            "mode": "seafarers",
+            "ports": 9,
+            "gifts": 0,
+            "unclaimedVictoryMarkers": 0,
+            "awardedVictoryMarkers": 0,
+            "numberTokens": 27
+        },
+        {
+            "mode": "cities-knights",
+            "ports": 9,
+            "gifts": 0,
+            "unclaimedVictoryMarkers": 0,
+            "awardedVictoryMarkers": 0,
+            "numberTokens": 18
+        },
+        {
+            "mode": "combined",
+            "ports": 9,
+            "gifts": 0,
+            "unclaimedVictoryMarkers": 0,
+            "awardedVictoryMarkers": 0,
+            "numberTokens": 27
+        }
+    ]
+}

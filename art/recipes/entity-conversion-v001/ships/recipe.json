@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "typeId": "ships",
+  "label": "航海家船棋子（四色实体照片参考）",
+  "seed": 20261009,
+  "scaleStatus": "estimate-not-measured",
+  "limitations": [
+    "四张照片均为单个斜侧视角；背面、底部与实际尺寸未知。",
+    "参数化网格依可见轮廓制作，非摄影测量或扫描复原。",
+    "未见侧面和舱门采用对称/简化浮雕近似，塑料颜色受原照光照与白平衡影响。",
+    "估算尺寸为本地 X 宽 9、Y 长 26、Z 高 28 mm，最终长轴对应 Unity Z。",
+    "底心枢轴位于估算支承面；水线基准估算为底面以上 1.6 mm，尚无实测。"
+  ],
+  "waterlineMm": 1.6,
+  "references": [
+    {"originalPath": "assets/references/inbox/道路/红色船.jpg", "sha256": "6806502e4359ba5a57708b2592d59a6d50ebdd50960fa60feb008f3c99ef8a41", "role": "red-sculpted-ship-silhouette-and-material"},
+    {"originalPath": "assets/references/inbox/道路/蓝色船.jpg", "sha256": "ecf10735f231a6df85cd1cf0022a56abcaaa480912df8dbecad0cc05417afb00", "role": "blue-sculpted-ship-silhouette-and-material"},
+    {"originalPath": "assets/references/inbox/道路/橘色船.jpg", "sha256": "cbc8d96556b54eaaa48e3add32301d9e729261119e44eb0dd15c184c7571fdf1", "role": "orange-sculpted-ship-silhouette-and-material"},
+    {"originalPath": "assets/references/inbox/道路/米色船.jpg", "sha256": "936c676c0d0162ec76b3aed481c0dcf00adb5344e026f35e980a6f1b11f935fa", "role": "ivory-sculpted-ship-silhouette-and-material"}
+  ],
+  "assets": [
+    {"id": "ship-red", "label": "红色船", "kind": "custom", "dimensionsMm": [9,26,28], "customBuilder": "art/recipes/entity-conversion-v001/ships/builder.py", "builderArgs": {"color": [0.55,0.010,0.023]}},
+    {"id": "ship-blue", "label": "蓝色船", "kind": "custom", "dimensionsMm": [9,26,28], "customBuilder": "art/recipes/entity-conversion-v001/ships/builder.py", "builderArgs": {"color": [0.025,0.065,0.14]}},
+    {"id": "ship-orange", "label": "橘色船", "kind": "custom", "dimensionsMm": [9,26,28], "customBuilder": "art/recipes/entity-conversion-v001/ships/builder.py", "builderArgs": {"color": [0.94,0.32,0.025]}},
+    {"id": "ship-ivory", "label": "米色船", "kind": "custom", "dimensionsMm": [9,26,28], "customBuilder": "art/recipes/entity-conversion-v001/ships/builder.py", "builderArgs": {"color": [0.75,0.64,0.40]}}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checks": 10,
+  "protocolRejection": true,
+  "certificatePinMismatch": true,
+  "separateCredentials": 3,
+  "duplicate": true,
+  "commandCollision": true,
+  "seatForgery": true,
+  "unchangedInvalidState": true,
+  "history": true,
+  "https": true,
+  "wss": true
+}

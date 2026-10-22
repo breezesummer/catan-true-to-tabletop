@@ -1,0 +1,9 @@
+{
+  "typeId": "pirate",
+  "operations": [],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "87bf5826e1e5ed0d8888f722ad330e78d69d9c4d57ad614e3d44088ceb660316"
+}

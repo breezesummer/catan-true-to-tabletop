@@ -1,0 +1,72 @@
+{
+  "author": "Brandon Song (wolfwoot)",
+  "license": "CC0-1.0",
+  "url": "https://opengameart.org/content/voice-clip-pack-male-adventurer-rpg",
+  "note": "zh/en 为旧资源槽位名称，界面已改为应答/战呼风格；这些录音不是中文配音。",
+  "lines": [
+    {
+      "language": "zh",
+      "file": "KnightRecruit01",
+      "text": "真人应答",
+      "source": "yes0.wav",
+      "sourceSha256": "cce4e7a43ab9bd5e34d58f568e21e724d8aee6d058d6e3d3372079e3fcc2c113",
+      "sha256": "3549d3dc258619b44ff54fb892ac696fb1b05d7f984ecc5f93716da6e56ac0e8"
+    },
+    {
+      "language": "zh",
+      "file": "KnightRecruit02",
+      "text": "真人应答",
+      "source": "yes1.wav",
+      "sourceSha256": "d6b8192091bfb95caf14cbd385b012263fe764656b0fd471cd2eb64b6afe3007",
+      "sha256": "cb09628fe6947a49987c3b26a125133d40a07bbabb25245a101ffa1c09ef9d43"
+    },
+    {
+      "language": "zh",
+      "file": "KnightActivate01",
+      "text": "真人战呼",
+      "source": "attack0.wav",
+      "sourceSha256": "01f4adfff1d7a5f7be27b6d63041708d8fd01d43d6847f8527b991828bf6382b",
+      "sha256": "1011be0df392b4f9422e18098d95aa329cca587439781deebac516d188138460"
+    },
+    {
+      "language": "zh",
+      "file": "KnightActivate02",
+      "text": "真人战呼",
+      "source": "attack1.wav",
+      "sourceSha256": "18604485719a00414f368a3eedf074666ea7d0751bd4ee6f28f5510fcc3099a4",
+      "sha256": "e18d8bc3200cda3912d7f4985f8d0fb1ccb0f50fe4565600d76083d2e41d2145"
+    },
+    {
+      "language": "en",
+      "file": "KnightRecruit01",
+      "text": "真人应答",
+      "source": "greet0.wav",
+      "sourceSha256": "34b931ceef4055ba5ff776d6c819caa947c66dd914a826047e9eda0569c45518",
+      "sha256": "1f0deeb6693bc2f140770f3f7daad3e3f2cdeeacc7da81765ad6320e05086d03"
+    },
+    {
+      "language": "en",
+      "file": "KnightRecruit02",
+      "text": "真人应答",
+      "source": "victory0.wav",
+      "sourceSha256": "3eec2046486166deb2cad4efbf59f2d3b71c5c0335354f659d7fd473d3fa81c2",
+      "sha256": "0dff039155d0f617b76847a00bd761409891695a973dd1b4ecb88d2378215be2"
+    },
+    {
+      "language": "en",
+      "file": "KnightActivate01",
+      "text": "真人战呼",
+      "source": "attackbig0.wav",
+      "sourceSha256": "93254d118fdfb1dac17e9b76dc7f57ad847654818cd10ba5f8630c5e4a14026a",
+      "sha256": "82e9a7cd3a99a9476cd45e8776cdc93ccc6c3928511ad2d033dbfa9875ea3bc2"
+    },
+    {
+      "language": "en",
+      "file": "KnightActivate02",
+      "text": "真人战呼",
+      "source": "attackbig1.wav",
+      "sourceSha256": "a8c74fc1f04f8619263c85cf8cc32ea264ba9ef5a7122650f4a90339f694bc6b",
+      "sha256": "8e2918f61bc12288ebe567d34d96aa08a305e99ad566c7e498695cf882467bdf"
+    }
+  ]
+}

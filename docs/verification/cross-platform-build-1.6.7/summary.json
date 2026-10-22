@@ -1,0 +1,39 @@
+{
+  "版本": "1.6.7",
+  "构建宿主": "macOS arm64",
+  "Windows客户端构建": "通过",
+  "win-x64自包含房间服务构建": "通过",
+  "Android双架构构建": "通过",
+  "Android签名验证": "v2 通过；独立临时测试签名",
+  "Android版本码": 10607,
+  "Android架构": [
+    "arm64-v8a",
+    "x86_64"
+  ],
+  "Android方向": "sensorLandscape",
+  "AndroidAPI": [
+    26,
+    36
+  ],
+  "脚本保护测试": "9/9 通过",
+  "源文件完整性检查": 1847,
+  "产物": {
+    "game version/1.6/Catan1.6.7-CrossPlatformBuild-SigningTest/Builds/Windows/Catan1.6.7.exe": {
+      "字节数": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    "game version/1.6/Catan1.6.7-CrossPlatformBuild-SigningTest/Builds/Windows/Server/Catan.Server.exe": {
+      "字节数": 162304,
+      "SHA256": "fa69ca2dd94999cd6f811fd92fcb9bf63d03aef5230ff7e2d3eb45430103a56a"
+    },
+    "game version/1.6/Catan1.6.7-CrossPlatformBuild-SigningTest/Builds/Android/Catan1.6.7.apk": {
+      "字节数": 345770969,
+      "SHA256": "f54a5a787d439ba52c69fa46ea80eccb417b8419fa05f1e103c347d1b83f5372"
+    }
+  },
+  "待验": [
+    "Windows原生PowerShell入口及游戏运行",
+    "Android真机安装、触控和实际联机",
+    "原签名导入与钥匙串交互（没有原密钥）"
+  ]
+}

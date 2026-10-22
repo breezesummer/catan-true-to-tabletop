@@ -1,0 +1,22 @@
+{
+  "assetId": "photo-samples-v001",
+  "seed": 20261009,
+  "scaleStatus": "estimated; photos have no ruler; not physically measured",
+  "references": {
+    "wood-front": "assets/references/inbox/资源牌/木头.jpg",
+    "resource-back": "assets/references/inbox/资源牌/资源牌背面.jpg",
+    "forest": "assets/references/inbox/地图板块/森林.jpg",
+    "road": "assets/references/inbox/道路/红色道路.jpg",
+    "village": "assets/references/inbox/建筑/红色村庄.jpg"
+  },
+  "dimensionsMm": {
+    "forest": {"edge": 40, "thickness": 8, "visualGap": 0.4},
+    "road": {"length": 26, "width": 5, "height": 5},
+    "village": {"width": 12, "depth": 12, "height": 16},
+    "card": {"width": 54, "height": 80, "thickness": 0.3}
+  },
+  "unknownFeatures": ["physical dimensions", "village hidden rear elevations", "road underside", "forest underside printing"],
+  "imagePolicy": "Frozen AI-cleaned candidates; illustration details are reinterpreted. Exact original photographs remain unchanged.",
+  "modelPolicy": "Photo-guided parametric reconstruction, not photogrammetry. Flat printed forest retained on a closed 3D tile. Sculpted cobbles and grouped gabled buildings approximate visible photographs.",
+  "export": {"axis_forward": "-Z", "axis_up": "Y", "global_scale": 1, "apply_scale_options": "FBX_SCALE_UNITS"}
+}

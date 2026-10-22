@@ -1,0 +1,873 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v003",
+  "typeId": "progress-politics",
+  "label": "蓝色政治进步卡九种正面与新增原照片共同背面",
+  "recipePath": "art/recipes/entity-conversion-v003/progress-politics/recipe.json",
+  "recipeSha256": "e0681f21ab6ffa6328ad8ee100c3380806a429ae5380d4c43ab84d3c5cf0fa1e",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261010,
+  "units": "metres",
+  "scaleStatus": "estimated; 54 × 80 × 0.3 mm, not physically measured or user-approved",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/外交官.jpg",
+      "sha256": "99a94fe632101f48fd35d09c1574186c8c74da5bccf35e3a67c3ad0e8af8f960",
+      "role": "外交官; upright original-photo front, visual role Diplomacy",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/间谍.jpg",
+      "sha256": "1f0e00204c452d42ff8494aab5b403d683f75237f190b552240ce972ea1710ab",
+      "role": "間諜; upright original-photo front, visual role Espionage",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/指挥官.jpg",
+      "sha256": "929bf6b316911507ae7fe482ce31914ac899571339b2b612adf516170b4abe4c",
+      "role": "指揮官; upright original-photo front, visual role Encouragement",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/权谋.jpg",
+      "sha256": "e45dbea2c62be9da56bb4208b2df6678ca5b77d101ec6c964bafde97716a1159",
+      "role": "權謀; upright original-photo front, visual role Intrigue",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/主教.jpg",
+      "sha256": "bfb60c325097072da02d860d99408f85b5ed1a7f2ab522a31ae58bf149a61cd3",
+      "role": "主教; upright original-photo front, visual role Taxation",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/石碑.jpg",
+      "sha256": "6b1b15e1c252644d40847741214abef3c7625df22a2e2b1fc6ed7c92cf3b7520",
+      "role": "石碑; upright original-photo front, visual role Constitution",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/叛徒.jpg",
+      "sha256": "119668bcf462a92f25912cbc6f014e5cbcece98d44aa5d919606a514911122f9",
+      "role": "叛徒; upright original-photo front, visual role Treason",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/婚礼.jpg",
+      "sha256": "2cbb13cac70476ba44b0a3e1d6eff682ef55e56e754e3e4f6dbb7c480d4f198b",
+      "role": "婚禮; upright original-photo front, visual role Wedding",
+      "pixelSize": [
+        1279,
+        1706
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/破坏者.jpg",
+      "sha256": "289a21b92cf666a44a71a1387c34cbdaed590e07dc0045d0e4f192b4f74ae72a",
+      "role": "破壞者; upright original-photo front, visual role Sabotage",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    },
+    {
+      "originalPath": "assets/references/inbox/发展卡/蓝色发展卡/卡背.jpg",
+      "sha256": "f60c11e4a588f9440b4650a4f6ef0ea65d11edbba98accb30f6fc486b29d542f",
+      "role": "newly supplied blue politics common back; original photograph",
+      "pixelSize": [
+        3072,
+        4096
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "progress-politics-diplomacy",
+      "label": "外交官政治进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "e020bcad342e60b173e72f216313b84881d9d78b9720dbe762b28dc7bcb36154",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-politics-diplomacy_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-politics-diplomacy_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-back-original.png"
+        },
+        {
+          "name": "progress-politics-diplomacy_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-diplomacy-front.png"
+        }
+      ],
+      "fbxSha256": "6a6000b626ff6c632b2dec79b74e4b6e988e945af6dfeb9d8daa82de81ad8a92",
+      "blendSha256": "401374312eed1177e64f17531aa7acc7f76f6c4b0ddc5eb3fd7a047e50b41802",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-politics-espionage",
+      "label": "間諜政治进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "3e6bb8940829de667e58dc9833d874513c19b61d51584205c46958c01a92f4aa",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-politics-espionage_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-politics-espionage_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-back-original.png"
+        },
+        {
+          "name": "progress-politics-espionage_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-espionage-front.png"
+        }
+      ],
+      "fbxSha256": "5666594305e2bf181521277bb6e349c753c7df0b3d92d96ef501e996897ddc6c",
+      "blendSha256": "08a975baad645f240409fe00b4bd0fcd30f59e7b357c6a721ef1839755dfbbe0",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-politics-encouragement",
+      "label": "指揮官政治进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "4dcb5eb4ab711ebd2f9b1ee630ded6183c25db836b4189fa387b0a304c65deed",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-politics-encouragement_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-politics-encouragement_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-back-original.png"
+        },
+        {
+          "name": "progress-politics-encouragement_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-encouragement-front.png"
+        }
+      ],
+      "fbxSha256": "387b0d10ddaf1854c990fdcf04ea870f30641e0d54be56f7f4b3ae477240f84d",
+      "blendSha256": "714f0b3a74f8775920159cd79bdb0c937671be98a3492f27e7a4826dde9dbd03",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-politics-intrigue",
+      "label": "權謀政治进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "11e2ada6028e0cf91e7c0a42cc17a5f5fa1aa04c27248ca505cd09dca4e1fb45",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-politics-intrigue_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-politics-intrigue_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-back-original.png"
+        },
+        {
+          "name": "progress-politics-intrigue_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-intrigue-front.png"
+        }
+      ],
+      "fbxSha256": "1e891a3a4ba14f37b5e57eacc06bd1743336884e3ab6bf8ffadf1f9305581d32",
+      "blendSha256": "d60b985e62cdf5a6aff90221be44d260da163bb8680b00119cb26e2232bf481d",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-politics-taxation",
+      "label": "主教政治进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "cf3273889bcc6cecd5cedb2d4ccb58bf4a45e576342bb0479377e680377f1942",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-politics-taxation_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-politics-taxation_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-back-original.png"
+        },
+        {
+          "name": "progress-politics-taxation_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-taxation-front.png"
+        }
+      ],
+      "fbxSha256": "7e5cda2daec6c61a674fb0e3383ecad5895cf2023d575ea02f0498f0f1ec4546",
+      "blendSha256": "e9a11d4212930d32a1f56cf7dad313f7064259e3693359cb4c3bf5bf2ba19d49",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-politics-constitution",
+      "label": "石碑政治进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "abb9ecc8e73158102f5cdfd88bdc87f5a2780881476a22a5312672f03f7ab9e5",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-politics-constitution_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-politics-constitution_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-back-original.png"
+        },
+        {
+          "name": "progress-politics-constitution_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-constitution-front.png"
+        }
+      ],
+      "fbxSha256": "4a2f6aa5533d4d769be88cd4a625059c7f250189a6477a383f32de74d8be0ef6",
+      "blendSha256": "2edca84633b89f522af6ab2405cdf019bc0c0c6a566d525e837784429b6521ea",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-politics-treason",
+      "label": "叛徒政治进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "7d466f122129d16f5a020d42db43c2903a2d1a9cf6664187690ad9fa47c72b8b",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-politics-treason_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-politics-treason_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-back-original.png"
+        },
+        {
+          "name": "progress-politics-treason_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-treason-front.png"
+        }
+      ],
+      "fbxSha256": "72ab277761d135ab13173a4a7786f484dfbfd38ee69c579a6083eeeeb37f1f9b",
+      "blendSha256": "ad1bbf1b6c047526127772a89456c2579a7fb493fdc7de69ecc82d4ba7421f56",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-politics-wedding",
+      "label": "婚禮政治进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "451cfe8f1a48fa0b810c9aedb2d50e569027f1fb52682c7ebc1b9dff21d07e20",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-politics-wedding_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-politics-wedding_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-back-original.png"
+        },
+        {
+          "name": "progress-politics-wedding_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-wedding-front.png"
+        }
+      ],
+      "fbxSha256": "c697446d9829c0ac23572a05366a142537697d87c587d05dbb913ac4f587ab68",
+      "blendSha256": "a2055532059fd378ff78951ec73f2058b598f43dcd02ed30a166baf94e3fdd15",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "progress-politics-sabotage",
+      "label": "破壞者政治进步卡",
+      "kind": "card",
+      "dimensionsMm": [
+        54,
+        80,
+        0.3
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "7624d999b86c18abfa5c59f7118aa455ca9f5fcb9f760f74e3161ebffbf16fd1",
+      "blenderBounds": {
+        "min": [
+          -0.027000000700354576,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.027000000700354576,
+          0.03999999910593033,
+          0.0003000000142492354
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.027000000700354576,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.027000000700354576,
+          0.0003000000142492354,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "progress-politics-sabotage_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "progress-politics-sabotage_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-back-original.png"
+        },
+        {
+          "name": "progress-politics-sabotage_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "progress-politics-sabotage-front.png"
+        }
+      ],
+      "fbxSha256": "68b0b55610ae93df3b2596d00abae96404c7bf81509de42360a9c7c9aabb5596",
+      "blendSha256": "255c75672c397870edd708b06934d925094d5f6dc1f32a8b5c765b16e277f1c6",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/progress-politics-back-original.png",
+      "sha256": "117b61e2492ce672dc1fbd2ebb51b9bfdb1bb4ab6d1c062ba7e0220de7012068"
+    },
+    {
+      "path": "textures/progress-politics-constitution-front.png",
+      "sha256": "b761686d7f76e9d069cc3d4f3c218e116b5f4fbfd19d47d885783f42fe6d2de7"
+    },
+    {
+      "path": "textures/progress-politics-diplomacy-front.png",
+      "sha256": "5f0557639ed00bd259c4ad185d30fbb2c9b933632b51a182f9b55d5ff82cec79"
+    },
+    {
+      "path": "textures/progress-politics-encouragement-front.png",
+      "sha256": "ce6a01b418983926361529c0800994be6a6ec98186820ae3510afbebce8e5cb6"
+    },
+    {
+      "path": "textures/progress-politics-espionage-front.png",
+      "sha256": "76d61e46f34398d35c02174250c6cfa1234e04848e5431975d7d9d4641c89e16"
+    },
+    {
+      "path": "textures/progress-politics-intrigue-front.png",
+      "sha256": "62c8a90faef224e487e5d30382a944353ed5374745f18fb1be40febd556c05c8"
+    },
+    {
+      "path": "textures/progress-politics-sabotage-front.png",
+      "sha256": "94b654d0b109eb122cd69f3f97278e07b26a542a5deb247663b20bdee3023b73"
+    },
+    {
+      "path": "textures/progress-politics-taxation-front.png",
+      "sha256": "c3f1ff7cd7af2dac3b907e291eb2199318637e46b5c951d57d50ea7bd26697e6"
+    },
+    {
+      "path": "textures/progress-politics-treason-front.png",
+      "sha256": "69370a2c5c6904a9827b3715a514cd46fe89046cda886548c3b2f54fd7801fa4"
+    },
+    {
+      "path": "textures/progress-politics-wedding-front.png",
+      "sha256": "fff47d7d6312eea11ac6aa13226b540dfd989b5c009585c20f21bb11af67200c"
+    }
+  ],
+  "limitations": [
+    "九张正面沿用 v001 原照片几何校正产物，逐字节复制；新版只追加蓝色共同背面。",
+    "新增背面仅按记录四角进行原像素透视校正；保留照片色偏、模糊、照明与保护套反光，不做 AI 重绘、去反光、锐化或颜色替换。",
+    "角点取卡片直边延长线交点，圆角外仍含少量照片背景；闭合薄盒体没有精确复制圆角。",
+    "54 × 80 × 0.3 mm 仍是估算；正背面配准、实测尺寸、原版色值与最终外观尚待用户确认。",
+    "照片中的印刷文字只作美术参考，不修改现有 2025 规则逻辑。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex",
+    "back"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "72ebeb6b8a76a6d0541dcb328a147dbc990331f3af34135869eb3bf4ff50cec7",
+    "game-camera.png": "0181862aea136d994b040a9f2ff9b0ddd7513500011740ee77025590c235a044",
+    "side.png": "5760efe40592badaaafa908956022fadc7dc8348b790ff4a76cadbc6a4b7ec33",
+    "top.png": "a78a6e82ade2deae6d1c1e5e715db434794499820c6b6a9e441547b399cc6bf3",
+    "back.png": "3af7b9c6c4c9b910e9b44240f1d8a0f60c1556eef5683de9b82edfb7ea422356"
+  },
+  "versionWrapper": {
+    "path": "art/recipes/entity-conversion-v003/progress-politics/build.py",
+    "sha256": "73c3f8de4517a09af4c87084f59d3c3bcc6afe7d6226123b7f176ac8eea1720f"
+  }
+}

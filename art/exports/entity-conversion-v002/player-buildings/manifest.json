@@ -1,0 +1,1205 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v002",
+  "typeId": "player-buildings",
+  "label": "三色玩家建筑（18张实体照片参考）",
+  "recipePath": "art/recipes/entity-conversion-v002/player-buildings/recipe.json",
+  "recipeSha256": "6b1eff968585bfd1d049b0146d5ca3f9287bfa37bac2f6e7fffc29e040967900",
+  "scriptPath": "tools/art/entity_pipeline_v002.py",
+  "scriptSha256": "a31c4c43b1d79a4743292b1e5ba4fc74d680f16f3619323d43ec8d4d35f21c87",
+  "customBuilders": [
+    {
+      "path": "art/recipes/entity-conversion-v002/player-buildings/city_builder.py",
+      "sha256": "8ac9724331570016838a841d1224173d3831ab504141d1bca7a60e7acd5d0136"
+    },
+    {
+      "path": "art/recipes/entity-conversion-v002/player-buildings/combination_builder.py",
+      "sha256": "2c952881b535fc821e2d8b812e3054260ed1076e7d997a3dd2a713fb5c97be2b"
+    },
+    {
+      "path": "art/recipes/entity-conversion-v002/player-buildings/metropolis_builder.py",
+      "sha256": "da34bd0546a33ff8c0faa8334f5bb72e4f6959c0f1d228776daebc9998996dd0"
+    },
+    {
+      "path": "art/recipes/entity-conversion-v002/player-buildings/village_builder.py",
+      "sha256": "e84ef71946a6bcc057a6b4c4004c814adfac63abc8004fc1ee59869498145bf7"
+    },
+    {
+      "path": "art/recipes/entity-conversion-v002/player-buildings/wall_builder.py",
+      "sha256": "dd89253382445824847f94a10b044681ac4a262bd185633eb1f657e5c8f1f3e3"
+    }
+  ],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261010,
+  "units": "metres",
+  "scaleStatus": "estimate-not-measured",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色村庄.jpg",
+      "sha256": "58f3a24dac88f3a208592cfc41b8e0fa5fdda80a24618d7dc11a7d8de9f385ed",
+      "role": "orange-village-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色城市.jpg",
+      "sha256": "ff46719d0ec7019d33901faaef21ff0d7142c27123f05144a512772292906674",
+      "role": "orange-city-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色大都会.jpg",
+      "sha256": "1c338281e5a3f141ae618defb867b539e6d3024eb8c2b3037f621d8e67add635",
+      "role": "orange-metropolis-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色城墙.jpg",
+      "sha256": "51af0491994051feea260b8c20eea0b9110bdafc09304170c57dd10a057ad151",
+      "role": "orange-city-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色城市+城墙.jpg",
+      "sha256": "96a5778715b29ff213880279ce7709abc6833dba5c8a3da287f950cf3d5d79eb",
+      "role": "orange-city-with-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/橙色大都会+城墙.jpg",
+      "sha256": "24754321da6c55a76ef98bb81fcfc0aef8e6f7932315ee35b36b26f1e6e3bebd",
+      "role": "orange-metropolis-with-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色村庄.jpg",
+      "sha256": "6968deec805868c5b945b5f1ce67de40f2ff06e6d8469d1c3c495156d227e0ab",
+      "role": "beige-village-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色城市.jpg",
+      "sha256": "80615304d09907e141324a07e46e0affa9abc1f1ad852babb9741af9605c3234",
+      "role": "beige-city-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色大都会.jpg",
+      "sha256": "bc005ac1203b656a8336d0e352fad02744e284404494b255614c7eeacab88364",
+      "role": "beige-metropolis-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色城墙.jpg",
+      "sha256": "e88bc1f01c4a642d277d27e0be28aa57a5c0de379455a598503bf0cb6502fa05",
+      "role": "beige-city-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色城市+城墙.jpg",
+      "sha256": "bfb8ef91f07b8559ee77ff36e8c2766b4b0661d7706ed8d0a0bba49981e562a1",
+      "role": "beige-city-with-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/米色大都会+城墙.jpg",
+      "sha256": "99068ffbafb6ed9fe826a65169db1aec0a0a4c6e68e3148c26503a824dcb3bb9",
+      "role": "beige-metropolis-with-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色村庄.jpg",
+      "sha256": "c84076b79e0b843f3c1cf670b7ec01954cb9e5154249865e8231122f21c3964b",
+      "role": "blue-village-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色城市.jpg",
+      "sha256": "bcd660a7d7cc72193f2676d08ba24c9d4c250e4aa56eed1263e6c3200eb060fd",
+      "role": "blue-city-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色大都会.jpg",
+      "sha256": "6dedf3400ee3281ced4226bc35dfac40333552111ab8838cda73902456d271a7",
+      "role": "blue-metropolis-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色城墙.jpg",
+      "sha256": "5233bb2381c9936984308b705964a0c51e87bfde12e4723e28c81147a7b64267",
+      "role": "blue-city-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色城市+城墙.jpg",
+      "sha256": "8a0399ce0369973994668d25d93d9e515462cae5c98441e4de5234266180e650",
+      "role": "blue-city-with-wall-shape-and-plastic-colour"
+    },
+    {
+      "originalPath": "assets/references/inbox/建筑/蓝色大都会+城墙.jpg",
+      "sha256": "48258eaa4bae2fb068d05366a2b2a60cf7f901e318b29e7b5194fe6d33f74e17",
+      "role": "blue-metropolis-with-wall-shape-and-plastic-colour"
+    }
+  ],
+  "assets": [
+    {
+      "id": "village-orange",
+      "label": "橙色村庄",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        16
+      ],
+      "meshObjects": 1,
+      "triangles": 6996,
+      "geometrySha256": "2219e32b29915f51611c42f2858619e7214107c5b6e850840d9546810cf2fab5",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.01600000075995922
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.01600000075995922,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "village-orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "8800ba9dd779f9ec7553d7849b14efe41db48764c359dfd4f0138b4207e04770",
+      "blendSha256": "bcff60e3794bf61226d609051ce52eb971c56679343a7d5b151f7d2ab6390cf7",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "city-orange",
+      "label": "橙色城市",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        20
+      ],
+      "meshObjects": 1,
+      "triangles": 15448,
+      "geometrySha256": "7fe5257f60324965b6dce1d3dcecf64873d1443d3184157168b7aeefcd087990",
+      "blenderBounds": {
+        "min": [
+          -0.008999999612569809,
+          -0.008999999612569809,
+          0.0
+        ],
+        "max": [
+          0.008999999612569809,
+          0.008999999612569809,
+          0.019999999552965164
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.008999999612569809,
+          0.0,
+          -0.008999999612569809
+        ],
+        "max": [
+          0.008999999612569809,
+          0.019999999552965164,
+          0.008999999612569809
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "45a0cb55cc5ce768e1db875e8e561857318ab15855c1a733998c4921389cec6d",
+      "blendSha256": "bf3512ee8cab45baf88233ae7438da984f409e284aba9342c966db6cd73e251f",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "metropolis-orange",
+      "label": "橙色大都会",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 16604,
+      "geometrySha256": "50f3b01cf376a4bc06be8f6d03d1c83a0883a2787972c30b7f203c5d544021d8",
+      "blenderBounds": {
+        "min": [
+          -0.008999999612569809,
+          -0.008999999612569809,
+          0.0
+        ],
+        "max": [
+          0.008999999612569809,
+          0.008999999612569809,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.008999999612569809,
+          0.0,
+          -0.008999999612569809
+        ],
+        "max": [
+          0.008999999612569809,
+          0.024000000208616257,
+          0.008999999612569809
+        ]
+      },
+      "materials": [
+        {
+          "name": "metropolis-orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "9906dfa652d017ee8e9639ff07effb89bb2880b1fa0f74b4ad9053b0d5222222",
+      "blendSha256": "5841cdd06348d34905370bf87b9f5ed0110fbc30ffaf6729c91c367f5bd1e84b",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "city-wall-orange",
+      "label": "橙色独立城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        5
+      ],
+      "meshObjects": 1,
+      "triangles": 14624,
+      "geometrySha256": "ae39d8b557c48fb479b3080e65a00dbd31ecda09b09c7626148ad34f1bd17d41",
+      "blenderBounds": {
+        "min": [
+          -0.012000000104308128,
+          -0.012000000104308128,
+          0.0
+        ],
+        "max": [
+          0.012000000104308128,
+          0.012000000104308128,
+          0.004999999888241291
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.012000000104308128,
+          0.0,
+          -0.012000000104308128
+        ],
+        "max": [
+          0.012000000104308128,
+          0.004999999888241291,
+          0.012000000104308128
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-wall-orange_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "d58b659cd8345b1d14ab5f25b1cdd222bba7399869fdad513adf7b810f24be6b",
+      "blendSha256": "7780d1e982f21beab7606d784ef9aa225798709cd711521aaff26704df1ababd",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "city-with-wall-orange",
+      "label": "橙色城市+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        20
+      ],
+      "meshObjects": 2,
+      "triangles": 30072,
+      "geometrySha256": "e8393dc96ef5abe6207bab71ab05aa3a654cf08dde2d98d2f7ea31045bd666d0",
+      "blenderBounds": {
+        "min": [
+          -0.012000000104308128,
+          -0.012000000104308128,
+          0.0
+        ],
+        "max": [
+          0.012000000104308128,
+          0.012000000104308128,
+          0.019999999552965164
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.012000000104308128,
+          0.0,
+          -0.012000000104308128
+        ],
+        "max": [
+          0.012000000104308128,
+          0.019999999552965164,
+          0.012000000104308128
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-with-wall-orange-body_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        },
+        {
+          "name": "city-with-wall-orange-wall_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "c0966f25f67f6eabd13bb71fe4d96b48559b560851c05b429dd6a75dbfe9e228",
+      "blendSha256": "73acb1f36ba9df46ca5a642958cd2ee4644ff6c809b2e816814d20face5d6a0d",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "metropolis-with-wall-orange",
+      "label": "橙色大都会+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        24
+      ],
+      "meshObjects": 2,
+      "triangles": 31228,
+      "geometrySha256": "d16ead577e4399c2f97662e8e9731643186c7f8e89cf326ac495b3d2e538238a",
+      "blenderBounds": {
+        "min": [
+          -0.012000000104308128,
+          -0.012000000104308128,
+          0.0
+        ],
+        "max": [
+          0.012000000104308128,
+          0.012000000104308128,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.012000000104308128,
+          0.0,
+          -0.012000000104308128
+        ],
+        "max": [
+          0.012000000104308128,
+          0.024000000208616257,
+          0.012000000104308128
+        ]
+      },
+      "materials": [
+        {
+          "name": "metropolis-with-wall-orange-body_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        },
+        {
+          "name": "metropolis-with-wall-orange-wall_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.949999988079071,
+            0.23000000417232513,
+            0.017999999225139618,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "bbc058eef0f0db2a98eda680d42bb46a27d7e599036104dfaeab6cfcdaec74c7",
+      "blendSha256": "41855475a6f8ccc1073740c76fc95fb9a615d300593fece2d5f4e4fb858091fe",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "village-beige",
+      "label": "米色村庄",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        16
+      ],
+      "meshObjects": 1,
+      "triangles": 6996,
+      "geometrySha256": "2219e32b29915f51611c42f2858619e7214107c5b6e850840d9546810cf2fab5",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.01600000075995922
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.01600000075995922,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "village-beige_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "512f06be2da0e1b81ad7e7072109bde7d05a2cb31ef6e48473ec4e25b2cbe664",
+      "blendSha256": "805770d8e743210f662f346b796a9db540b1367bf46a04ac038bebab4a8952eb",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "city-beige",
+      "label": "米色城市",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        20
+      ],
+      "meshObjects": 1,
+      "triangles": 15448,
+      "geometrySha256": "7fe5257f60324965b6dce1d3dcecf64873d1443d3184157168b7aeefcd087990",
+      "blenderBounds": {
+        "min": [
+          -0.008999999612569809,
+          -0.008999999612569809,
+          0.0
+        ],
+        "max": [
+          0.008999999612569809,
+          0.008999999612569809,
+          0.019999999552965164
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.008999999612569809,
+          0.0,
+          -0.008999999612569809
+        ],
+        "max": [
+          0.008999999612569809,
+          0.019999999552965164,
+          0.008999999612569809
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-beige_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "b8b08f6ca4ff0ca838c4bdccdac1b6d06aafad4ce32e344c57a01146d254caee",
+      "blendSha256": "92d87dd2aebc3fe11437c5f9f8d799ec142c47860d8924c53ad324dfe42c05ee",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "metropolis-beige",
+      "label": "米色大都会",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 16604,
+      "geometrySha256": "50f3b01cf376a4bc06be8f6d03d1c83a0883a2787972c30b7f203c5d544021d8",
+      "blenderBounds": {
+        "min": [
+          -0.008999999612569809,
+          -0.008999999612569809,
+          0.0
+        ],
+        "max": [
+          0.008999999612569809,
+          0.008999999612569809,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.008999999612569809,
+          0.0,
+          -0.008999999612569809
+        ],
+        "max": [
+          0.008999999612569809,
+          0.024000000208616257,
+          0.008999999612569809
+        ]
+      },
+      "materials": [
+        {
+          "name": "metropolis-beige_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "66d93d3c625f61a6f88886d069e31e0564862a564d3d3ae05d4f80bdcf06c301",
+      "blendSha256": "5d728de379df9821ef3ad4766c696cb6d5211e0cd91ca8a8df78914f254222b8",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "city-wall-beige",
+      "label": "米色独立城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        5
+      ],
+      "meshObjects": 1,
+      "triangles": 14624,
+      "geometrySha256": "ae39d8b557c48fb479b3080e65a00dbd31ecda09b09c7626148ad34f1bd17d41",
+      "blenderBounds": {
+        "min": [
+          -0.012000000104308128,
+          -0.012000000104308128,
+          0.0
+        ],
+        "max": [
+          0.012000000104308128,
+          0.012000000104308128,
+          0.004999999888241291
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.012000000104308128,
+          0.0,
+          -0.012000000104308128
+        ],
+        "max": [
+          0.012000000104308128,
+          0.004999999888241291,
+          0.012000000104308128
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-wall-beige_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "aa8ccfcd95309f943794b7a40d0ef285fef848decaece15eb707d3bef2cd3c3f",
+      "blendSha256": "3fd2fe45baf9d74e01cd3485edae8c3bae80797b40c60404a490539fb3ba9956",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "city-with-wall-beige",
+      "label": "米色城市+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        20
+      ],
+      "meshObjects": 2,
+      "triangles": 30072,
+      "geometrySha256": "e8393dc96ef5abe6207bab71ab05aa3a654cf08dde2d98d2f7ea31045bd666d0",
+      "blenderBounds": {
+        "min": [
+          -0.012000000104308128,
+          -0.012000000104308128,
+          0.0
+        ],
+        "max": [
+          0.012000000104308128,
+          0.012000000104308128,
+          0.019999999552965164
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.012000000104308128,
+          0.0,
+          -0.012000000104308128
+        ],
+        "max": [
+          0.012000000104308128,
+          0.019999999552965164,
+          0.012000000104308128
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-with-wall-beige-body_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        },
+        {
+          "name": "city-with-wall-beige-wall_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "86d45cbece0029f066cdc0cb42067533350b215a1ee158485631b579ce291a81",
+      "blendSha256": "bf6e1d3cd30f1cc6cabf88e876a58c5c1de670c10d3cb74270f376b3af5d3433",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "metropolis-with-wall-beige",
+      "label": "米色大都会+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        24
+      ],
+      "meshObjects": 2,
+      "triangles": 31228,
+      "geometrySha256": "d16ead577e4399c2f97662e8e9731643186c7f8e89cf326ac495b3d2e538238a",
+      "blenderBounds": {
+        "min": [
+          -0.012000000104308128,
+          -0.012000000104308128,
+          0.0
+        ],
+        "max": [
+          0.012000000104308128,
+          0.012000000104308128,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.012000000104308128,
+          0.0,
+          -0.012000000104308128
+        ],
+        "max": [
+          0.012000000104308128,
+          0.024000000208616257,
+          0.012000000104308128
+        ]
+      },
+      "materials": [
+        {
+          "name": "metropolis-with-wall-beige-body_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        },
+        {
+          "name": "metropolis-with-wall-beige-wall_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.8199999928474426,
+            0.699999988079071,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "77ec27864c001e1912a982924ba204697d019032757b7ebe1ffd25f706ab11ee",
+      "blendSha256": "7f93ea032b12f8a7bdf1d9ca30e19f4627da3bc1b6a8d15bde7169a0b9e4a386",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "village-blue",
+      "label": "蓝色村庄",
+      "kind": "custom",
+      "dimensionsMm": [
+        12,
+        12,
+        16
+      ],
+      "meshObjects": 1,
+      "triangles": 6996,
+      "geometrySha256": "2219e32b29915f51611c42f2858619e7214107c5b6e850840d9546810cf2fab5",
+      "blenderBounds": {
+        "min": [
+          -0.006000000052154064,
+          -0.006000000052154064,
+          0.0
+        ],
+        "max": [
+          0.006000000052154064,
+          0.006000000052154064,
+          0.01600000075995922
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.006000000052154064,
+          0.0,
+          -0.006000000052154064
+        ],
+        "max": [
+          0.006000000052154064,
+          0.01600000075995922,
+          0.006000000052154064
+        ]
+      },
+      "materials": [
+        {
+          "name": "village-blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "3129fdeaf9d72f5243c10f60de107cd7ef76a25e8220687a3db0d007f4e3e5c5",
+      "blendSha256": "ffd5d59689af66a4896534422a9c689044ae56bcba3d5293cba560b4a4a6da5d",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "city-blue",
+      "label": "蓝色城市",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        20
+      ],
+      "meshObjects": 1,
+      "triangles": 15448,
+      "geometrySha256": "7fe5257f60324965b6dce1d3dcecf64873d1443d3184157168b7aeefcd087990",
+      "blenderBounds": {
+        "min": [
+          -0.008999999612569809,
+          -0.008999999612569809,
+          0.0
+        ],
+        "max": [
+          0.008999999612569809,
+          0.008999999612569809,
+          0.019999999552965164
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.008999999612569809,
+          0.0,
+          -0.008999999612569809
+        ],
+        "max": [
+          0.008999999612569809,
+          0.019999999552965164,
+          0.008999999612569809
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "1edbe3bda2d0a730c77a6bf41da69e934590630812088fd1488d77d747251a24",
+      "blendSha256": "1fc97bf36ddfdc592f928c6f85404240867c7626a1fe44b872e26005f3fe4385",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "metropolis-blue",
+      "label": "蓝色大都会",
+      "kind": "custom",
+      "dimensionsMm": [
+        18,
+        18,
+        24
+      ],
+      "meshObjects": 1,
+      "triangles": 16604,
+      "geometrySha256": "50f3b01cf376a4bc06be8f6d03d1c83a0883a2787972c30b7f203c5d544021d8",
+      "blenderBounds": {
+        "min": [
+          -0.008999999612569809,
+          -0.008999999612569809,
+          0.0
+        ],
+        "max": [
+          0.008999999612569809,
+          0.008999999612569809,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.008999999612569809,
+          0.0,
+          -0.008999999612569809
+        ],
+        "max": [
+          0.008999999612569809,
+          0.024000000208616257,
+          0.008999999612569809
+        ]
+      },
+      "materials": [
+        {
+          "name": "metropolis-blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "25985644163d36b5648dfb4418cf3d39902cfeb1d5fac76271ce9bfa8f71e059",
+      "blendSha256": "fef18e04445a0014aa32ab134c6cfb5072088827fabb8f46c481337780da2d2c",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "city-wall-blue",
+      "label": "蓝色独立城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        5
+      ],
+      "meshObjects": 1,
+      "triangles": 14624,
+      "geometrySha256": "ae39d8b557c48fb479b3080e65a00dbd31ecda09b09c7626148ad34f1bd17d41",
+      "blenderBounds": {
+        "min": [
+          -0.012000000104308128,
+          -0.012000000104308128,
+          0.0
+        ],
+        "max": [
+          0.012000000104308128,
+          0.012000000104308128,
+          0.004999999888241291
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.012000000104308128,
+          0.0,
+          -0.012000000104308128
+        ],
+        "max": [
+          0.012000000104308128,
+          0.004999999888241291,
+          0.012000000104308128
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-wall-blue_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "ef7bda76fd5d3da9011c53ea58319b27ec9fb1646c3ecd6963b729c476c75de4",
+      "blendSha256": "aea8cb67e5de70ce69d74e38cc9de3d11bfd55b3a82b534dc4b23ab4c8d025ef",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "city-with-wall-blue",
+      "label": "蓝色城市+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        20
+      ],
+      "meshObjects": 2,
+      "triangles": 30072,
+      "geometrySha256": "e8393dc96ef5abe6207bab71ab05aa3a654cf08dde2d98d2f7ea31045bd666d0",
+      "blenderBounds": {
+        "min": [
+          -0.012000000104308128,
+          -0.012000000104308128,
+          0.0
+        ],
+        "max": [
+          0.012000000104308128,
+          0.012000000104308128,
+          0.019999999552965164
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.012000000104308128,
+          0.0,
+          -0.012000000104308128
+        ],
+        "max": [
+          0.012000000104308128,
+          0.019999999552965164,
+          0.012000000104308128
+        ]
+      },
+      "materials": [
+        {
+          "name": "city-with-wall-blue-body_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        },
+        {
+          "name": "city-with-wall-blue-wall_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "85a6eb990fd77b233cd71fe5a0c91467eeb0e732e57c1768f6e2493104d47416",
+      "blendSha256": "22b60a7c4dd6058b8706bd9064cbcc161f0d693a353d31bfed6981486a17ebd0",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "metropolis-with-wall-blue",
+      "label": "蓝色大都会+城墙",
+      "kind": "custom",
+      "dimensionsMm": [
+        24,
+        24,
+        24
+      ],
+      "meshObjects": 2,
+      "triangles": 31228,
+      "geometrySha256": "d16ead577e4399c2f97662e8e9731643186c7f8e89cf326ac495b3d2e538238a",
+      "blenderBounds": {
+        "min": [
+          -0.012000000104308128,
+          -0.012000000104308128,
+          0.0
+        ],
+        "max": [
+          0.012000000104308128,
+          0.012000000104308128,
+          0.024000000208616257
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.012000000104308128,
+          0.0,
+          -0.012000000104308128
+        ],
+        "max": [
+          0.012000000104308128,
+          0.024000000208616257,
+          0.012000000104308128
+        ]
+      },
+      "materials": [
+        {
+          "name": "metropolis-with-wall-blue-body_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        },
+        {
+          "name": "metropolis-with-wall-blue-wall_Moulded_Plastic",
+          "baseColorLinearRgba": [
+            0.00800000037997961,
+            0.024000000208616257,
+            0.11999999731779099,
+            1.0
+          ],
+          "roughness": 0.3199999928474426,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "c50d18464b1f7b494276230bcbc3536e28e6504d014fb143d55b215e4100864e",
+      "blendSha256": "88194ee2075c78c830c42b2f476a6bfa5ee2ff3d617b1479f655fc4c538a522c",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [],
+  "limitations": [
+    "18张原照片已通过逐色6图检视表实际查看；没有尺子，真实尺寸、底面和多数背面未知。",
+    "村庄12×12×16、城市18×18×20、大都会18×18×24、城墙24×24×5mm均为沿用开发基线的估算。",
+    "城市、大都会和城墙复用并复制v001参数化几何到新版本；三色照片显示相同实体模具轮廓，不是扫描或摄影测量。",
+    "村庄沿用照片样板的成组屋顶、烟囱、台阶和浮雕布局，新照片可见圆润相邻底座，采用封闭圆底近似。",
+    "独立城墙与两种建筑+城墙组合均为实际3D网格；组合包含两件底心对齐网格，未用整块不透光圆柱填充内孔。",
+    "城墙名义内径18.6mm、八圆塔及32墙垛为估算；背部和内侧被遮挡细节仍按重复布局近似。",
+    "色值为观察原照得到的橙色、暖米色及深蓝色线性RGB候选，受照片曝光/白平衡影响，不是实物测色。",
+    "同材质部件为相交封闭壳，未执行实体布尔并集；可用于游戏渲染，不声明可直接3D打印。",
+    "Unity正式灯光、拥挤节点拾取与用户外观确认由主任务独立验证。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "5c418b75f512b9b0613214fb82db5154d9cae82a377e9e115015eebe9b16f39c",
+    "game-camera.png": "e2d68a03890bc9bd668676c56ef5a8b0dc16a61477b4180821d07a8de1594e69",
+    "side.png": "b52ab532137cbafa8e60e0daeb4b77338cd6ce8c5a6b7a85f8ba79179eeac57b",
+    "top.png": "35e0348b6f5c506e91082c84d3bede45b80081ab269db07e57aedc8b133a1ee5"
+  }
+}

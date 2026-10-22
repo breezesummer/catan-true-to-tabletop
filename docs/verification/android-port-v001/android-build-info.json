@@ -1,0 +1,17 @@
+{
+  "version": "1.4",
+  "packageId": "com.catandevelopment.threekingdoms",
+  "versionCode": 10400,
+  "minApi": 26,
+  "targetApi": 36,
+  "architectures": [
+    "arm64-v8a",
+    "x86_64"
+  ],
+  "graphicsApi": "OpenGLES3",
+  "scriptingBackend": "IL2CPP",
+  "coreAssemblySha256": "5638c0ee99a0fa6cbc67e0e630c12bb45fae1d186ebf7425c3c0977e33fdae8a",
+  "aiAssemblySha256": "c40c4f21d3310b4a0fc6a4e8585952a2c8f7c5901631b8b6979826345a08780a",
+  "signingCertificateSha256": "411d31a2d63eb39c60595c96ff2283556cec04033f6c605484bd940d5f37d6b9",
+  "apkSha256": "c6a694ff087da714a9cd04107846a79b52ee5b190ff0af75ac34ac655094a1e9"
+}

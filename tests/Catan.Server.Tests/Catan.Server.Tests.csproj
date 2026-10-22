@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" PrivateAssets="all" />
+    <ProjectReference Include="../../src/Catan.Server/Catan.Server.csproj" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/M7LanDiscovery.cs" Link="Client/M7LanDiscovery.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/M7LanService.cs" Link="Client/M7LanService.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/M7NetworkErrors.cs" Link="Client/M7NetworkErrors.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/M7RoomEntry.cs" Link="Client/M7RoomEntry.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/M7OnlineEndpoint.cs" Link="Client/M7OnlineEndpoint.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/FrameCost.cs" Link="Client/FrameCost.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/M7Client.cs" Link="Client/M7Client.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/M7VisiblePreview.cs" Link="Client/M7VisiblePreview.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/M7CredentialStore.cs" Link="Client/M7CredentialStore.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/PlayerIdentityModel.cs" Link="Client/PlayerIdentityModel.cs" />
+  </ItemGroup>
+</Project>

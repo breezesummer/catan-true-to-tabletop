@@ -1,0 +1,244 @@
+{
+  "typeId": "tiles",
+  "operations": [
+    {
+      "source": "assets/references/inbox/地图板块/草地.jpg",
+      "sourceSha256": "1133266b670cc97b46d27bc8f1a7eb7e1ab41e23fb065f35fb4e0aeaacfae2cf",
+      "output": "art/source/entity-conversion-v001/tiles/textures/tile-pasture-top.png",
+      "sha256": "8832b7d356ced40dd5fc7352671337c7af3dd00185b1154303a0c6d89a63fed2",
+      "method": "original-pixel six-triangle affine hex correction from recorded corners",
+      "corners": [
+        [
+          1448,
+          655
+        ],
+        [
+          1144,
+          217
+        ],
+        [
+          624,
+          221
+        ],
+        [
+          337,
+          677
+        ],
+        [
+          611,
+          1187
+        ],
+        [
+          1206,
+          1161
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/地图板块/海洋.jpg",
+      "sourceSha256": "310cdeaaa1c1367b0a0e982f91951109bb2b5c818d7676066f3f6d3c8367dd10",
+      "output": "art/source/entity-conversion-v001/tiles/textures/tile-sea-top.png",
+      "sha256": "cfb0372e64752935ad21b9c54e0a61da712d3fabe9fae58f999853cf9c0d787c",
+      "method": "original-pixel six-triangle affine hex correction from recorded corners",
+      "corners": [
+        [
+          1365,
+          636
+        ],
+        [
+          1064,
+          201
+        ],
+        [
+          538,
+          195
+        ],
+        [
+          234,
+          672
+        ],
+        [
+          544,
+          1197
+        ],
+        [
+          1151,
+          1144
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/地图板块/金矿.jpg",
+      "sourceSha256": "288a67240785b5d5b9372d2173199ed8d8837f5cf70d585a242cb60c8498b44e",
+      "output": "art/source/entity-conversion-v001/tiles/textures/tile-gold-top.png",
+      "sha256": "f40f2f67bb85c39b19b0c1e6a29cd3bba1b04be51b6e4f423fbaf41950f4377f",
+      "method": "original-pixel six-triangle affine hex correction from recorded corners",
+      "corners": [
+        [
+          1437,
+          660
+        ],
+        [
+          1153,
+          234
+        ],
+        [
+          655,
+          228
+        ],
+        [
+          365,
+          647
+        ],
+        [
+          611,
+          1142
+        ],
+        [
+          1196,
+          1147
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/地图板块/沙漠.jpg",
+      "sourceSha256": "d9d63fa835f74b8962a691bd408f782fc8794616aa3d92519820e3f4aad9123d",
+      "output": "art/source/entity-conversion-v001/tiles/textures/tile-desert-top.png",
+      "sha256": "195fb3f8bbed38426a31bf1a17bda9caf1cce9b52718d1fd304a9ec9fb8acf30",
+      "method": "original-pixel six-triangle affine hex correction from recorded corners",
+      "corners": [
+        [
+          1450,
+          655
+        ],
+        [
+          1146,
+          204
+        ],
+        [
+          606,
+          187
+        ],
+        [
+          294,
+          653
+        ],
+        [
+          594,
+          1200
+        ],
+        [
+          1220,
+          1176
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/地图板块/小麦.jpg",
+      "sourceSha256": "fb70c010424a66bc28e38bfc3ef18104664195de03ab10b6ce5fdf0337a6f5d3",
+      "output": "art/source/entity-conversion-v001/tiles/textures/tile-fields-top.png",
+      "sha256": "2cff594892e813c1e5c1008c74a8367c9e56c6da49ba08e43ab06787147be9d4",
+      "method": "original-pixel six-triangle affine hex correction from recorded corners",
+      "corners": [
+        [
+          1470,
+          704
+        ],
+        [
+          1191,
+          269
+        ],
+        [
+          675,
+          261
+        ],
+        [
+          387,
+          700
+        ],
+        [
+          635,
+          1202
+        ],
+        [
+          1217,
+          1207
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/地图板块/砖块.jpg",
+      "sourceSha256": "ad9244724ceb65a987b240e2e9336dffb931b91f29d2bd8aaa58487d0e7cd2c1",
+      "output": "art/source/entity-conversion-v001/tiles/textures/tile-hills-top.png",
+      "sha256": "5e7a320c6749b5e84393491301819f47a708ec6f7bb82fb3062f7074287c48f2",
+      "method": "original-pixel six-triangle affine hex correction from recorded corners",
+      "corners": [
+        [
+          1425,
+          674
+        ],
+        [
+          1125,
+          230
+        ],
+        [
+          598,
+          229
+        ],
+        [
+          305,
+          697
+        ],
+        [
+          592,
+          1216
+        ],
+        [
+          1196,
+          1187
+        ]
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    }
+  ],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "f5ace065c33d4256ce1c366f7516f575ba52a96e7fb224d1a23f5590187e40d2"
+}

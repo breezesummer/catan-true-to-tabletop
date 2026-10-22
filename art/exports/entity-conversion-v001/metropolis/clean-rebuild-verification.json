@@ -1,0 +1,32 @@
+{
+  "status": "passed",
+  "typeId": "metropolis",
+  "assets": [
+    {
+      "id": "metropolis-red",
+      "meshObjects": 1,
+      "triangles": 16604,
+      "closedMeshes": true,
+      "uvMeshes": 1,
+      "bottomCentrePivot": true,
+      "blenderDimensionsMetres": [
+        0.017999999225139618,
+        0.017999999225139618,
+        0.0240000016397115
+      ],
+      "allMaterialSlotsUsed": true
+    }
+  ],
+  "textureDependencies": [],
+  "previews": [],
+  "originalReferencesUnchanged": true,
+  "cleanRebuild": {
+    "sameGeometryMaterialsTexturesReferences": true,
+    "referenceRoot": "D:\\Project\\catan-true-to-tabletop\\art"
+  },
+  "notCovered": [
+    "Unity runtime rendering and input",
+    "user visual approval",
+    "physical measurements and unseen surfaces"
+  ]
+}

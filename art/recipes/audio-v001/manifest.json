@@ -1,0 +1,330 @@
+{
+  "sourceSha256": "9cec059fe8958af30f4c7ec6ac11a6a87305cf9f8f0ffa0d217986a829dfbff6",
+  "effects": [
+    {
+      "rms": 0.017135935280809568,
+      "seconds": 0.15,
+      "sha256": "5303e829a71f8bcaa4aeee3fe14813cccbc70e3923e39803c17f46266c46a635",
+      "peak": 0.14627709984779358,
+      "samples": 3600,
+      "file": "UiClick.wav",
+      "cue": "UiClick"
+    },
+    {
+      "rms": 0.013771599280371388,
+      "seconds": 0.2,
+      "sha256": "3929edce8e103645ef02a905d5167ef28fe4f4d84bdaa04d4b4d1de4aa6a03da",
+      "peak": 0.11750756204128265,
+      "samples": 4800,
+      "file": "UiBack.wav",
+      "cue": "UiBack"
+    },
+    {
+      "rms": 0.01502607726064007,
+      "seconds": 1.1,
+      "sha256": "747a70bec6a6303bd090b5fd1dc9786b1af623cd494ef689c182b44dc778d38d",
+      "peak": 0.17333580553531647,
+      "samples": 26400,
+      "file": "CardPick.wav",
+      "cue": "CardPick"
+    },
+    {
+      "rms": 0.017526973643844677,
+      "seconds": 1.1,
+      "sha256": "41d059af857fa77c5f26d90f748ed2626d161232cae129c5a1a3924d2dd64670",
+      "peak": 0.15088751912117004,
+      "samples": 26400,
+      "file": "ResourceCollect.wav",
+      "cue": "ResourceCollect"
+    },
+    {
+      "rms": 0.02775383899122449,
+      "seconds": 0.9,
+      "sha256": "b09e3ecdf08bd45ed1c41a1d47da68517c3fed4113ebd4c82d207892300e0960",
+      "peak": 0.2315540760755539,
+      "samples": 21600,
+      "file": "DiceRoll.wav",
+      "cue": "DiceRoll"
+    },
+    {
+      "rms": 0.01378862594216437,
+      "seconds": 1.1,
+      "sha256": "8156be292da807c01e523b442027fdf1031f4b2803c4631b8c72a16a675a732a",
+      "peak": 0.26289933919906616,
+      "samples": 26400,
+      "file": "RoadBuild.wav",
+      "cue": "RoadBuild"
+    },
+    {
+      "rms": 0.01842750151986246,
+      "seconds": 1.1,
+      "sha256": "96613867c3623a22ce27ad3b3a9a2d2824c64cc95a96a8d4e9e1077354ee667f",
+      "peak": 0.24617412686347961,
+      "samples": 26400,
+      "file": "SettlementBuild.wav",
+      "cue": "SettlementBuild"
+    },
+    {
+      "rms": 0.029927261570535463,
+      "seconds": 1.1,
+      "sha256": "eb6d772560e0829557922e055ec97021f73d34c2b14485b71c8761eda643b001",
+      "peak": 0.4271097183227539,
+      "samples": 26400,
+      "file": "CityBuild.wav",
+      "cue": "CityBuild"
+    },
+    {
+      "rms": 0.029381709214032766,
+      "seconds": 1.1,
+      "sha256": "8f72068d016de3c717b8b96a7432770889c0d38298fee3b0743478a7cfa60aa7",
+      "peak": 0.3616272807121277,
+      "samples": 26400,
+      "file": "WallBuild.wav",
+      "cue": "WallBuild"
+    },
+    {
+      "rms": 0.024590583169898542,
+      "seconds": 1.1,
+      "sha256": "615e418730f49ca39269d5d1733ad60c04b0c0d6e2f63f5916e1989163a5a63e",
+      "peak": 0.23690539598464966,
+      "samples": 26400,
+      "file": "ShipBuild.wav",
+      "cue": "ShipBuild"
+    },
+    {
+      "rms": 0.022693600042579653,
+      "seconds": 1.1,
+      "sha256": "107b75585fb2918f8734bb51cf52f0f40bc02befe5944bb53b9f70cfecd531cd",
+      "peak": 0.13757085800170898,
+      "samples": 26400,
+      "file": "ShipMove.wav",
+      "cue": "ShipMove"
+    },
+    {
+      "rms": 0.016232820469186626,
+      "seconds": 1.1,
+      "sha256": "265cb10ddf6dfad50232bafa40ec5423eca9e9baf095a4da05a0a381c18ccd68",
+      "peak": 0.18488721549510956,
+      "samples": 26400,
+      "file": "PortPlace.wav",
+      "cue": "PortPlace"
+    },
+    {
+      "rms": 0.019326034670538197,
+      "seconds": 1.1,
+      "sha256": "d06af31bcd558e893f276e7263d051669c09849ddb399634203d3b1555463f27",
+      "peak": 0.14398230612277985,
+      "samples": 26400,
+      "file": "TradeOffer.wav",
+      "cue": "TradeOffer"
+    },
+    {
+      "rms": 0.02480587109392567,
+      "seconds": 1.1,
+      "sha256": "382819ff1c762f46871ec1369561e45c6b48a73f09ae946f7249d39d1ae49800",
+      "peak": 0.25131264328956604,
+      "samples": 26400,
+      "file": "TradeComplete.wav",
+      "cue": "TradeComplete"
+    },
+    {
+      "rms": 0.020502291262766502,
+      "seconds": 1.1,
+      "sha256": "edc386cb3e630a290250a079adb716124e7fbef05fd54a1473b867e75c15d4f1",
+      "peak": 0.24322926998138428,
+      "samples": 26400,
+      "file": "CardDraw.wav",
+      "cue": "CardDraw"
+    },
+    {
+      "rms": 0.022888215814547693,
+      "seconds": 1.1,
+      "sha256": "c5f949c6ee2f2c546e9437a1d81b808bcea66a397773d3b1f9f923b17d3fc164",
+      "peak": 0.21125830709934235,
+      "samples": 26400,
+      "file": "CardPlay.wav",
+      "cue": "CardPlay"
+    },
+    {
+      "rms": 0.021006176905129795,
+      "seconds": 1.1,
+      "sha256": "cc4306b9112f5f872abb6f6239dedc1763e4bc5ac41178d939f40f453ed1bd5d",
+      "peak": 0.17471300065517426,
+      "samples": 26400,
+      "file": "RobberMove.wav",
+      "cue": "RobberMove"
+    },
+    {
+      "rms": 0.04966594969496005,
+      "seconds": 1.1499583333333334,
+      "sha256": "7e8e60d87a450824b17032e72e0f35b580bb2e27fc24adbbe92c7e9169b176bf",
+      "peak": 0.20673829317092896,
+      "samples": 27599,
+      "file": "PirateMove.wav",
+      "cue": "PirateMove"
+    },
+    {
+      "rms": 0.01865816621418376,
+      "seconds": 1.1,
+      "sha256": "73325f917d1c893c8eea1a0dbbad614b251d4d64fb305d1fb4f4c84bcbed350f",
+      "peak": 0.23826420307159424,
+      "samples": 26400,
+      "file": "KnightRecruit.wav",
+      "cue": "KnightRecruit"
+    },
+    {
+      "rms": 0.0241840359791598,
+      "seconds": 1.1,
+      "sha256": "b5be2d599a38d47dc4a62db077503c87c19c042ed8096effde89e0810f7a2e59",
+      "peak": 0.17934176325798035,
+      "samples": 26400,
+      "file": "KnightPromote.wav",
+      "cue": "KnightPromote"
+    },
+    {
+      "rms": 0.01763773258703569,
+      "seconds": 1.1,
+      "sha256": "da8557caabaccee3206432021537da990bdcf446c29b3638391642f05ee3bbf0",
+      "peak": 0.21707646548748016,
+      "samples": 26400,
+      "file": "KnightActivate.wav",
+      "cue": "KnightActivate"
+    },
+    {
+      "rms": 0.016841870249551156,
+      "seconds": 1.1,
+      "sha256": "a3e6127e2926390499406c28cfe5052122364020524d7c4d52847286a9c7a88b",
+      "peak": 0.18271392583847046,
+      "samples": 26400,
+      "file": "KnightMove.wav",
+      "cue": "KnightMove"
+    },
+    {
+      "rms": 0.04393612044872071,
+      "seconds": 1.1,
+      "sha256": "41029525cf83f98b21cc1dc801d4fd6456101c39fce1aa6f10d06003acf04d60",
+      "peak": 0.4537733793258667,
+      "samples": 26400,
+      "file": "KnightCombat.wav",
+      "cue": "KnightCombat"
+    },
+    {
+      "rms": 0.029767471939587727,
+      "seconds": 1.1,
+      "sha256": "9b7d05d4c638f1ad4a0746d2084376a06ebbf042fb2444664f19f5d737f7fbcc",
+      "peak": 0.2378147542476654,
+      "samples": 26400,
+      "file": "BarbarianAdvance.wav",
+      "cue": "BarbarianAdvance"
+    },
+    {
+      "rms": 0.06559831682720424,
+      "seconds": 1.8,
+      "sha256": "53f43f0477385879ba107e5ab5693057977eed6fbefa22ac5fa797f09f14297b",
+      "peak": 0.46720653772354126,
+      "samples": 43200,
+      "file": "BarbarianInvasion.wav",
+      "cue": "BarbarianInvasion"
+    },
+    {
+      "rms": 0.07309485990382401,
+      "seconds": 1.25,
+      "sha256": "7547f2f01c04e7f41f4d35abdc81076d9462ecac1c51d2fa85c2db25dd6d34dd",
+      "peak": 0.6993369460105896,
+      "samples": 30000,
+      "file": "BuildingCollapse.wav",
+      "cue": "BuildingCollapse"
+    },
+    {
+      "rms": 0.029657241369918038,
+      "seconds": 1.1,
+      "sha256": "719353eb2ea4ce503ef2330fb8b2c185d344f71dd18196e2ef8093930a2267be",
+      "peak": 0.15624910593032837,
+      "samples": 26400,
+      "file": "FacilityUpgrade.wav",
+      "cue": "FacilityUpgrade"
+    },
+    {
+      "rms": 0.032940166172925445,
+      "seconds": 1.1,
+      "sha256": "171b4ae5c2357040fc877ae2c962b2686333940f5acb334cea4bc5f8d622e42c",
+      "peak": 0.29004570841789246,
+      "samples": 26400,
+      "file": "WonderBuild.wav",
+      "cue": "WonderBuild"
+    },
+    {
+      "rms": 0.014497509863025587,
+      "seconds": 1.1,
+      "sha256": "e74c0be205265bdfdbe3dc064f975c2b1514b3623bd4ac29f998eb0346090d73",
+      "peak": 0.15697500109672546,
+      "samples": 26400,
+      "file": "TurnEnd.wav",
+      "cue": "TurnEnd"
+    },
+    {
+      "rms": 0.027569843624058465,
+      "seconds": 1.1,
+      "sha256": "c36e2953eb5df1f6a910db90a14e0209184c00b31931de96bdf1650c0a65d5ea",
+      "peak": 0.16583111882209778,
+      "samples": 26400,
+      "file": "YourTurn.wav",
+      "cue": "YourTurn"
+    },
+    {
+      "rms": 0.046613388715496286,
+      "seconds": 2.5,
+      "sha256": "45886896d8d65e6297db668e288d9c8d7c96a83d289d9b49c627f7ffda63e26f",
+      "peak": 0.24707333743572235,
+      "samples": 60000,
+      "file": "Victory.wav",
+      "cue": "Victory"
+    },
+    {
+      "rms": 0.009665069280128264,
+      "seconds": 1.1,
+      "sha256": "b3815f28571f51d441dd8a6c76f3f79b5aa05c8a153a332e6add4e44425599d6",
+      "peak": 0.13813631236553192,
+      "samples": 26400,
+      "file": "Decision.wav",
+      "cue": "Decision"
+    },
+    {
+      "rms": 0.008765986321916634,
+      "seconds": 1.1,
+      "sha256": "0fcbd9d465fd171c48816d48f28ab8b306f01e3cdd68bbdaeb5c9af04cbf45f5",
+      "peak": 0.12563343346118927,
+      "samples": 26400,
+      "file": "Error.wav",
+      "cue": "Error"
+    },
+    {
+      "rms": 0.01683521012219888,
+      "seconds": 1.1,
+      "sha256": "d08d89cedcb7ab4468aa81e8a6e2f8a751035b11b4e6afc822879fa3a8964741",
+      "peak": 0.12495437264442444,
+      "samples": 26400,
+      "file": "Save.wav",
+      "cue": "Save"
+    },
+    {
+      "rms": 0.01843515029765292,
+      "seconds": 1.1,
+      "sha256": "09498ed89862010733933de32036fac6b11a1cde4e1dd64fb986f261c513ebe9",
+      "peak": 0.12037821114063263,
+      "samples": 26400,
+      "file": "Network.wav",
+      "cue": "Network"
+    }
+  ],
+  "recipeVersion": "pastoral-tabletop-audio-v001",
+  "ambience": {
+    "sha256": "e19dad59c9bcc9949641d3bae9f7a1f3992788912680b262b980995e33f7d57a",
+    "file": "PastoralAmbience.wav",
+    "seconds": 12.0,
+    "samples": 288000
+  },
+  "format": "PCM16 mono 24000 Hz",
+  "source": "Unity/Catan/Assets/Scripts/TabletopAudioSynth.cs",
+  "origin": "原创确定性程序合成；不使用外部录音或游戏规则随机状态"
+}

@@ -1,0 +1,48 @@
+{
+  "日期": "2026-10-16",
+  "名称": "卡坦岛之三国争霸内测版1.5",
+  "链接": "https://github.com/breezesummer/catan-true-to-tabletop/releases/tag/v1.5.0-beta",
+  "标签": "v1.5.0-beta",
+  "源码提交": "c4bf3e877161864f21de4c94acd39eecc2cf20cd",
+  "状态": "已公开发布",
+  "预发布": true,
+  "发布时间": "2026-10-16 10:16:43 +08:00",
+  "附件": [
+    {
+      "名称": "Android-Installation-and-Touch-Guide.txt",
+      "字节数": 1915,
+      "SHA256": "873f645dfd95950d8f51dca996f14ee2e5850467c2b10520a6ea75a9c3abc388",
+      "下载链接": "https://github.com/breezesummer/catan-true-to-tabletop/releases/download/v1.5.0-beta/Android-Installation-and-Touch-Guide.txt",
+      "状态": "uploaded"
+    },
+    {
+      "名称": "Catan-Three-Kingdoms-Beta-1.5-Android.apk",
+      "字节数": 304097675,
+      "SHA256": "e01290f96cb9087cfe20aebceded6362d1f2250953727e389f75eb5457acf46d",
+      "下载链接": "https://github.com/breezesummer/catan-true-to-tabletop/releases/download/v1.5.0-beta/Catan-Three-Kingdoms-Beta-1.5-Android.apk",
+      "状态": "uploaded"
+    },
+    {
+      "名称": "Catan-Three-Kingdoms-Beta-1.5-Windows-x64.zip",
+      "字节数": 527239835,
+      "SHA256": "88b790fa3d4538fb45cf48c6f7c146c77980f79e0434753cbe907ac2e5be06e6",
+      "下载链接": "https://github.com/breezesummer/catan-true-to-tabletop/releases/download/v1.5.0-beta/Catan-Three-Kingdoms-Beta-1.5-Windows-x64.zip",
+      "状态": "uploaded"
+    },
+    {
+      "名称": "Font-License-OFL.txt",
+      "字节数": 4301,
+      "SHA256": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+      "下载链接": "https://github.com/breezesummer/catan-true-to-tabletop/releases/download/v1.5.0-beta/Font-License-OFL.txt",
+      "状态": "uploaded"
+    },
+    {
+      "名称": "SHA256SUMS.txt",
+      "字节数": 222,
+      "SHA256": "11256b350700bbe4cf561c3dc7c5ecf7c56277360aceb0519d10e406f1b19e71",
+      "下载链接": "https://github.com/breezesummer/catan-true-to-tabletop/releases/download/v1.5.0-beta/SHA256SUMS.txt",
+      "状态": "uploaded"
+    }
+  ],
+  "验证": "全部附件的长度及GitHub返回SHA256与本地文件一致；不重新构建已有二进制产物。"
+}

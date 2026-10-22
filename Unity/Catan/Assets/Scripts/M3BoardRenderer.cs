@@ -1,0 +1,286 @@
+using System.Collections.Generic;
+using System.Linq;
+using Catan.Core;
+using UnityEngine;
+
+public sealed class M3BoardRenderer : MonoBehaviour
+{
+    public Camera BoardCamera { get; private set; }
+    public bool TopView { get; private set; }
+    public float Zoom { get; private set; } = .255f;
+    private Vector3 boardCenter;
+    private float boardRadius = .255f;
+    public static readonly Color[] SeatColors = { new Color(.85f,.24f,.16f), new Color(.23f,.56f,.78f), new Color(.94f,.74f,.3f), new Color(.79f,.79f,.72f) };
+    private readonly Dictionary<string, Vector3> vertices = new Dictionary<string, Vector3>();
+    private readonly Dictionary<string, Vector3> edges = new Dictionary<string, Vector3>();
+    private readonly Dictionary<string, Vector3> tiles = new Dictionary<string, Vector3>();
+    private readonly Dictionary<string, string> terrainTypes = new Dictionary<string, string>();
+    private readonly Dictionary<string, Quaternion> rotations = new Dictionary<string, Quaternion>();
+    private Transform pieces;
+    public Transform CommittedPieces => pieces;
+    public Quaternion PieceRotation(string locationId) => rotations.TryGetValue(locationId,out var rotation)?rotation:Quaternion.Euler(0,180,0);
+    private GameObject feltTable;
+    private TabletopScene tableScene;
+    private TabletopNumberTokens numberTokens;
+    public TabletopScene TableScene => tableScene;
+    public TabletopReferenceMarkers ReferenceMarkers { get; private set; }
+    private GameObject ghost;
+    private TabletopShipSelection selectedShip;
+    private readonly List<GameObject> mountains = new List<GameObject>();
+    private readonly Dictionary<Color, Material> pieceMaterials = new Dictionary<Color, Material>();
+    private readonly List<Material> terrainMaterials = new List<Material>();
+    private readonly List<Mesh> terrainMeshes = new List<Mesh>();
+    public static Color SeatColor(string id) => SeatColors[int.Parse(id.Substring(1)) - 1];
+    public static Material Material(Color color, bool metallic = false)
+    {
+        var m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        m.color = color; m.SetFloat("_Smoothness", .35f); m.SetFloat("_Metallic", metallic ? .45f : .05f); return m;
+    }
+    // Only projected geometry enters this renderer, including unrevealed fog placeholders.
+    public void Initialize(Tile[] boardTiles, Vertex[] boardVertices, Edge[] boardEdges)
+    {
+        BoardCamera = Camera.main;
+        foreach (var v in boardVertices) vertices[v.Id] = new Vector3(v.X * Mathf.Sqrt(3) * .02f, .008f, -v.Y * .02f);
+        float minX=vertices.Values.Min(v=>v.x),maxX=vertices.Values.Max(v=>v.x),minZ=vertices.Values.Min(v=>v.z),maxZ=vertices.Values.Max(v=>v.z);
+        boardCenter=new Vector3((minX+maxX)/2,0,(minZ+maxZ)/2);
+        tiles["frame"]=boardCenter+new Vector3(-(maxX-minX)*.62f,0,0);
+        boardRadius=Mathf.Max(.255f,(maxZ-minZ)*.66f,(maxX-minX)*.53f);
+        Zoom=boardRadius;
+        foreach (var e in boardEdges)
+        {
+            var a = vertices[e.Vertices[0]]; var b = vertices[e.Vertices[1]];
+            edges[e.Id] = (a+b)*.5f; rotations[e.Id] = Quaternion.LookRotation(b-a);
+        }
+        foreach (var tile in boardTiles)
+        {
+            var center = tile.Vertices.Select(v=>vertices[v]).Aggregate(Vector3.zero,(s,v)=>s+v)/6f;
+            center.y = 0;
+            tiles[tile.Id] = center;
+            terrainTypes[tile.Id] = tile.Resource;
+            var obj = EntityBoardAssets.Terrain(tile.Resource, center, transform);
+            if (obj == null)
+            {
+                obj = new GameObject(tile.Id); obj.transform.SetParent(transform); obj.transform.position=center;
+                var mesh=HexMesh();terrainMeshes.Add(mesh);obj.AddComponent<MeshFilter>().sharedMesh=mesh;
+                var material=Material(TerrainColor(tile.Resource));terrainMaterials.Add(material);
+                obj.AddComponent<MeshRenderer>().sharedMaterial=material;
+            }
+            obj.name = tile.Id;
+        }
+        numberTokens=TabletopNumberTokens.Create(transform,boardTiles,tiles);
+        ReferenceMarkers=TabletopReferenceMarkers.Create(transform,boardTiles,vertices,boardEdges);
+        var table = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        feltTable = table;
+        table.name="Felt table"; table.transform.SetParent(transform); table.transform.position=boardCenter+new Vector3(0,-.012f,0);
+        float diameter=Mathf.Max(maxX-minX,maxZ-minZ)*1.35f;
+        table.transform.localScale=new Vector3(diameter,.01f,diameter); var felt=Material(new Color(.055f,.16f,.18f));terrainMaterials.Add(felt);table.GetComponent<Renderer>().sharedMaterial=felt;
+        pieces = new GameObject("Committed pieces").transform; pieces.SetParent(transform);
+        SetCamera(false);
+    }
+    public static Mesh HexMesh()
+    {
+        var verts = new List<Vector3>(); var tris = new List<int>();
+        for(int i=0;i<6;i++)
+        {
+            float a=(30+i*60)*Mathf.Deg2Rad, b=(30+(i+1)*60)*Mathf.Deg2Rad;
+            Vector3 p=new Vector3(Mathf.Cos(a)*.0395f,0,Mathf.Sin(a)*.0395f),q=new Vector3(Mathf.Cos(b)*.0395f,0,Mathf.Sin(b)*.0395f);
+            int k=verts.Count; verts.Add(Vector3.up*.008f); verts.Add(q+Vector3.up*.008f); verts.Add(p+Vector3.up*.008f);
+            verts.Add(p); verts.Add(p+Vector3.up*.008f); verts.Add(q+Vector3.up*.008f); verts.Add(q);
+            tris.AddRange(new[]{k,k+1,k+2,k+3,k+4,k+5,k+3,k+5,k+6});
+        }
+        var mesh=new Mesh {name="Pointy hex 40mm estimate"}; mesh.SetVertices(verts); mesh.SetTriangles(tris,0); mesh.RecalculateNormals(); return mesh;
+    }
+    static Color TerrainColor(string r)
+    {
+        switch(r) { case "wood":return new Color(.16f,.36f,.25f); case "brick":return new Color(.62f,.28f,.18f); case "wool":return new Color(.49f,.62f,.3f); case "wheat":return new Color(.78f,.59f,.25f); case "sea":case "water":return new Color(.07f,.34f,.52f); case "gold":return new Color(.92f,.71f,.15f); case "fog":case "hidden":return new Color(.30f,.34f,.40f); default:return new Color(.68f,.58f,.41f); }
+    }
+    readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
+    public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)
+    {
+        if(numberTokens!=null)numberTokens.Refresh(boardTiles);
+        ClearPreview();
+        pieceCache.Begin("basic",pieces);
+        foreach(var p in settlements)
+        using(var change=pieceCache.Update("settlement:"+p.LocationId,p.PlayerId))
+        {
+            if(!change.Changed)continue;
+            if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
+                Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
+        }
+        foreach(var p in roads)
+        using(var change=pieceCache.Update("road:"+p.LocationId,p.PlayerId))
+            if(change.Changed)Piece(true,p.LocationId,SeatColor(p.PlayerId),pieces);
+        foreach(var p in cities)
+        using(var change=pieceCache.Update("city:"+p.LocationId,p.PlayerId))
+        {
+            if(!change.Changed)continue;
+            if(PlayerComponentAssets.Building("city",p.PlayerId,"City "+p.LocationId,Position(p.LocationId),pieces)!=null)continue;
+            var city=Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces,false);
+            city.name="City "+p.LocationId;
+            city.transform.localScale=new Vector3(.02f,.023f,.015f);
+            city.transform.position=Position(p.LocationId)+Vector3.up*.012f;
+        }
+        if(!string.IsNullOrEmpty(robberTileId))
+        using(var change=pieceCache.Update("robber",robberTileId))
+            if(change.Changed)Robber(robberTileId,new Color(.08f,.075f,.09f),pieces);
+        pieceCache.End();
+    }
+    public void RefreshSeafarers(Catan.Core.M3.ShipPlacement[] ships,string pirateTileId)
+    {
+        pieceCache.Begin("ships",pieces);
+        foreach(var ship in ships)
+        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+ship.IsWarship))
+        {
+            if(!change.Changed)continue;
+            var mesh=Ship(ship.LocationId,SeatColor(ship.PlayerId),pieces);
+            if(ship.IsWarship)
+            {
+                var flag=GameObject.CreatePrimitive(PrimitiveType.Sphere);Destroy(flag.GetComponent<Collider>());
+                flag.name="Warship flag";flag.transform.SetParent(pieces,false);
+                flag.transform.position=Position(ship.LocationId)+Vector3.up*.032f;
+                flag.transform.localScale=new Vector3(.004f,.008f,.003f);
+                var black=new Color(.07f,.06f,.07f);
+                if(!pieceMaterials.TryGetValue(black,out var material)){material=Material(black);pieceMaterials.Add(black,material);}
+                flag.GetComponent<Renderer>().sharedMaterial=material;
+            }
+        }
+        if(!string.IsNullOrEmpty(pirateTileId))
+        using(var change=pieceCache.Update("pirate",pirateTileId))
+        {
+            if(change.Changed)
+            {
+            var marker=Robber(pirateTileId,new Color(.20f,.05f,.25f),pieces,true);
+            marker.name="Pirate "+pirateTileId;
+            }
+        }
+        pieceCache.End();
+    }
+    public void RefreshReferenceMarkers(Catan.Core.M3.PlayerView view)
+    {
+        ReferenceMarkers.Refresh(view.Board.Tiles,view.Board.Ports.Select(p=>new TabletopReferenceMarkers.PortDisplay
+            {Id=p.Id,Vertices=p.Vertices,EdgeId=p.EdgeId,Resource=p.Resource}).ToArray(),
+            view.Board.GiftPorts.Select(p=>new TabletopReferenceMarkers.PortDisplay
+            {Id=p.Id,Vertices=p.Vertices,EdgeId=p.EdgeId,Resource=p.Resource}).ToArray(),view.Board.BonusEdgeIds,
+            view.Players.Select(p=>new TabletopReferenceMarkers.ScoreDisplay{PlayerId=p.Id,Points=p.BonusVictoryPoints}).ToArray(),
+            view.PlayerId,tableScene);
+    }
+    GameObject Ship(string id,Color color,Transform parent)
+    {
+        var asset=EntityBoardAssets.Ship("Ship "+id,color,Position(id),rotations[id],parent);
+        if(asset!=null)return asset;
+        // M3 v001 runtime mesh placeholder, metre scale, midpoint pivot and 8 mm waterline.
+        var hull=Piece(true,id,color,parent,false);hull.name="Ship "+id;
+        hull.transform.localScale=new Vector3(.009f,.005f,.024f);
+        var mast=GameObject.CreatePrimitive(PrimitiveType.Cube);Destroy(mast.GetComponent<Collider>());
+        mast.transform.SetParent(hull.transform,false);mast.transform.localPosition=new Vector3(0,2,0);
+        mast.transform.localScale=new Vector3(.16f,4,.07f);mast.GetComponent<Renderer>().sharedMaterial=hull.GetComponent<Renderer>().sharedMaterial;
+        var sail=GameObject.CreatePrimitive(PrimitiveType.Cube);Destroy(sail.GetComponent<Collider>());
+        sail.transform.SetParent(hull.transform,false);sail.transform.localPosition=new Vector3(0,3,.22f);
+        sail.transform.localScale=new Vector3(.10f,2.2f,.48f);sail.GetComponent<Renderer>().sharedMaterial=hull.GetComponent<Renderer>().sharedMaterial;
+        return hull;
+    }
+    GameObject Robber(string tileId, Color color, Transform parent,bool pirate=false,bool entityModel=true)
+    {
+        var position=Position(tileId);
+        if(tileId=="frame"&&!pirate)position.x=2*boardCenter.x-position.x;
+        if(entityModel)
+        {
+            var bottom=position+new Vector3(.012f,EntityBoardAssets.BoardSurfaceHeight,0);
+            var asset=pirate?EntityBoardAssets.Pirate("Pirate "+tileId,bottom,parent):EntityBoardAssets.Robber("Robber "+tileId,bottom,parent);
+            if(asset!=null)return asset;
+        }
+        var marker=GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        Destroy(marker.GetComponent<Collider>());marker.name="Robber "+tileId;
+        marker.transform.SetParent(parent);marker.transform.position=position+new Vector3(.012f,.035f,0);
+        marker.transform.localScale=pirate?new Vector3(.019f,.009f,.025f):new Vector3(.009f,.018f,.009f);
+        if(!pieceMaterials.TryGetValue(color,out var material)){material=Material(color);pieceMaterials.Add(color,material);}
+        marker.GetComponent<Renderer>().sharedMaterial=material;
+        return marker;
+    }
+    GameObject Piece(bool road,string id,Color color,Transform parent,bool photoSample=true)
+    {
+        if(photoSample)
+        {
+            var sample=PhotoSampleAssets.Piece(road,id,Position(id),road?rotations[id]:Quaternion.identity,color,parent);
+            if(sample!=null)return sample;
+        }
+        var go = GameObject.CreatePrimitive(PrimitiveType.Cube); Destroy(go.GetComponent<Collider>()); go.transform.SetParent(parent);
+        go.name=id; go.transform.position=Position(id)+Vector3.up*(road?.0025f:.006f);
+        go.transform.localScale=road?new Vector3(.005f,.005f,.026f):new Vector3(.012f,.012f,.012f);
+        if(road)go.transform.rotation=rotations[id];
+        if(!pieceMaterials.TryGetValue(color,out var material)) {material=Material(color);pieceMaterials.Add(color,material);}
+        go.GetComponent<Renderer>().sharedMaterial=material;
+        if(!road)
+        {
+            var roof=GameObject.CreatePrimitive(PrimitiveType.Cube); Destroy(roof.GetComponent<Collider>());
+            roof.transform.SetParent(go.transform,false); roof.transform.localPosition=new Vector3(0,.5f,0);
+            roof.transform.localRotation=Quaternion.Euler(0,0,45); roof.transform.localScale=new Vector3(.7f,.7f,.95f);
+            roof.GetComponent<Renderer>().sharedMaterial=go.GetComponent<Renderer>().sharedMaterial;
+        }
+        return go;
+    }
+    public Vector3 Position(string id) => id.StartsWith("V")?vertices[id]:id.StartsWith("E")?edges[id]:tiles[id];
+    public string TerrainResource(string tileId) => terrainTypes[tileId];
+    public Vector2 ScreenPoint(string id)
+    {
+        var p=BoardCamera.WorldToScreenPoint(Position(id)+Vector3.up*.005f); return new Vector2(p.x,Screen.height-p.y);
+    }
+    public Vector2 FrameRobberScreenPoint()
+    {
+        var position=Position("frame");position.x=2*boardCenter.x-position.x;
+        var p=BoardCamera.WorldToScreenPoint(position+Vector3.up*.005f);return new Vector2(p.x,Screen.height-p.y);
+    }
+    public void Preview(string id, bool road, bool legal)
+    {PreviewPiece(id,TabletopPointerPreview.ForCommand(road?"BuildRoad":"BuildSettlement"),"P1",legal);}
+    public void PreviewRobber(string id,bool legal)
+    {PreviewPiece(id,TabletopPointerPreview.ForCommand("MoveRobber"),"P1",legal);}
+    public void PreviewShip(string id,bool legal)
+    {PreviewPiece(id,TabletopPointerPreview.ForCommand("BuildShip"),"P1",legal);}
+    string pointerPreviewKey;
+    public void PreviewPiece(string id,TabletopPointerPreview preview,string seat,bool legal)
+    {
+        string key=id+":"+preview.Kind+":"+preview.Level+":"+preview.Active+":"+seat+":"+legal;
+        if(ghost!=null&&pointerPreviewKey==key)return;
+        ClearPreview();if(string.IsNullOrEmpty(id))return;pointerPreviewKey=key;
+        var rotation=id.StartsWith("E")?rotations[id]:Quaternion.identity;
+        ghost=OperationPieceAssets.PointerPreview(preview,seat,Position(id),rotation,transform,legal);
+    }
+    internal GameObject VerificationPointerPreview=>ghost;
+    public void ClearPreview() { pointerPreviewKey=null;if(ghost!=null){ghost.SetActive(false);Destroy(ghost);} ghost=null; }
+    bool operationLayout;
+    public void SetOperationLayout(bool enabled)
+    {
+        if(operationLayout==enabled)return;
+        operationLayout=enabled;
+        if(numberTokens!=null)numberTokens.gameObject.SetActive(enabled);
+        if(enabled && tableScene==null)
+        {
+            tableScene=TabletopScene.Create(transform,vertices.Values);
+        }
+        if(tableScene!=null)tableScene.SetVisible(enabled);
+        if(feltTable!=null)feltTable.SetActive(!enabled);
+        SetCamera(TopView);
+    }
+    public void SetCamera(bool top)
+    {
+        if(operationLayout && tableScene!=null)
+        {
+            TopView=top; tableScene.Frame(BoardCamera,top,Zoom/boardRadius); return;
+        }
+        TopView=top; BoardCamera.orthographic=true; BoardCamera.orthographicSize=Zoom;
+        BoardCamera.transform.position=boardCenter+(top?new Vector3(0,.85f,-.001f):new Vector3(0,.65f,-.55f));
+        BoardCamera.transform.LookAt(boardCenter+new Vector3(0,.005f,0));
+        BoardCamera.rect=new Rect(.0f,.10f,.74f,.80f);
+    }
+    public void ChangeZoom(float delta) { Zoom=Mathf.Clamp(Zoom+delta,boardRadius*.45f,boardRadius*1.65f); SetCamera(TopView); }
+    public void SetSelectedShip(string edgeId)
+    {
+        if(string.IsNullOrEmpty(edgeId)){if(selectedShip!=null)selectedShip.gameObject.SetActive(false);return;}
+        if(!edges.ContainsKey(edgeId))return;
+        if(selectedShip==null)selectedShip=TabletopShipSelection.Create(transform);
+        selectedShip.Show(Position(edgeId),rotations[edgeId]);
+    }
+    public void ShowTerrain(bool show) { foreach(var m in mountains) m.SetActive(show); }
+    void OnDestroy() {foreach(var m in pieceMaterials.Values)Destroy(m);foreach(var m in terrainMaterials)Destroy(m);foreach(var m in terrainMeshes)Destroy(m);}
+}
+

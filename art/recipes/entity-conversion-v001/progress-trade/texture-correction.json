@@ -1,0 +1,227 @@
+{
+  "typeId": "progress-trade",
+  "operations": [
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/黄色贸易船队.jpg",
+      "sourceSha256": "bc098f34a3c24515909249e53eeacf75b0e0906e88bf28107cd20844044b5c8a",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-merchant-fleet-front.png",
+      "sha256": "eebdfc5502d31cbc55361655fcb38e8ea2587406ab47b3e9a18e542f8a12d513",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          512,
+          649
+        ],
+        [
+          2308,
+          636
+        ],
+        [
+          2353,
+          3416
+        ],
+        [
+          550,
+          3436
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/黄色商港.jpg",
+      "sourceSha256": "ca5b9c536051d00bcffbf660b82ec0f5422e0fe783c7e921ebfd8e811b0e0a52",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-commercial-harbor-front.png",
+      "sha256": "f0723c40bdc5819e4cc7acb296a96695546683b95152a85ab1cafa67f6fd53ca",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          743,
+          741
+        ],
+        [
+          2479,
+          734
+        ],
+        [
+          2513,
+          3393
+        ],
+        [
+          786,
+          3427
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/黄色商人.jpg",
+      "sourceSha256": "6eee74bc121c8c4553cc73662493a34244702751e28f419133826893f519be05",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-merchant-front.png",
+      "sha256": "84005f9abe8e9a8ede1f570e14af41d7f52922a4339a340d8cc3727fd7883a3d",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          716,
+          687
+        ],
+        [
+          2472,
+          687
+        ],
+        [
+          2477,
+          3398
+        ],
+        [
+          739,
+          3395
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/大商家.jpg",
+      "sourceSha256": "84f20acb4ec5b09ca2f2665ae92bd385e142a3a9b9969d5ba862386e1644870f",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-guild-dues-front.png",
+      "sha256": "84fa553383c609e8898798b95b065608f29d087659062ec5f9b78fed0d31824e",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          734,
+          546
+        ],
+        [
+          2686,
+          523
+        ],
+        [
+          2724,
+          3544
+        ],
+        [
+          781,
+          3582
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/垄断资源.jpg",
+      "sourceSha256": "c294aaecc121a8b3c928800815a9fb9a7c53191ab16f2c3fed3f406068221f6b",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-resource-monopoly-front.png",
+      "sha256": "b3e959fca057a1db8fe8b127db64d9862c37cf979283b6c684a47eab38e7fe56",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          225,
+          251
+        ],
+        [
+          1049,
+          200
+        ],
+        [
+          1122,
+          1484
+        ],
+        [
+          301,
+          1513
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/垄断商品.jpg",
+      "sourceSha256": "f82c632e708f3b18fbcbbf659e24cdfbe5cd3820c67570797efcbf98bc45aedc",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-trade-monopoly-front.png",
+      "sha256": "459f1d5db45b51a7b7d58c26f7c8a667e95c009c3ac2e7e302359f7b2e7ddf84",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          208,
+          269
+        ],
+        [
+          960,
+          262
+        ],
+        [
+          978,
+          1425
+        ],
+        [
+          229,
+          1437
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    },
+    {
+      "source": "assets/references/inbox/发展卡/黄色发展卡/黄色发展卡背面.jpg",
+      "sourceSha256": "f788acd3fea19ef3e5538bdcb9ddb7c9e296c4699308c7b7f6bfa706484c8eae",
+      "output": "art/source/entity-conversion-v001/progress-trade/textures/progress-trade-back-original.png",
+      "sha256": "69266d776858bf53855079ab3e1b9e8b2b8a9ba2268716eef9edf9f730aa626e",
+      "method": "original-pixel projective homography from recorded four corners",
+      "corners": [
+        [
+          750,
+          687
+        ],
+        [
+          2367,
+          674
+        ],
+        [
+          2394,
+          3182
+        ],
+        [
+          770,
+          3198
+        ]
+      ],
+      "size": [
+        1024,
+        1536
+      ],
+      "rotation": 0,
+      "limitations": "photo blur, lighting, glare and print text retained"
+    }
+  ],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "c21e3b34ca4d490d090351adde5066a2c1db81e9b036ab1d8f0cdbec246d1329"
+}

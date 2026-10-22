@@ -44,4 +44,6 @@ M0 收口决定（2026-10-08）：用户允许实体参考后补，先使用明�
 
 同一资产的完成条件是源文件、生成配方、导出模型、依赖纹理、清单与预览齐全，且能从干净输出目录重新生成。原始参考和不可复现的源资产需要备份；大量二进制文件录入前确定 Git LFS 或独立备份方式。
 
+当前实体照片批处理见 [美术转化清单](ART_CONVERSION_CHECKLIST.md)。每种类型使用独立配方与子任务，`Build-EntityAssets.ps1` 完成回读和干净目录重建后更新清单。2026-10-09 用户选择原照片忠实校正：记录外边角点，几何重投影原像素并保留源文件校验值，照片文字只作美术参考。Blender 类型总览与 Unity 实际相邻组件视图分别记录，外观确认和游戏节点拾取验收单独保留。
+
 参考：[Blender 4.5 LTS](https://www.blender.org/releases/4-5/)、[Blender 命令行参数](https://docs.blender.org/manual/en/4.1/advanced/command_line/arguments.html)。执行命令和 API 以实际安装版本验证为准。

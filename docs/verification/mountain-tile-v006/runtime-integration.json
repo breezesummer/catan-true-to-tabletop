@@ -1,0 +1,24 @@
+{
+    "status": "passed",
+    "unityVersion": "6000.3.25f1",
+    "checkedSourceInstances": 60,
+    "checkedPoliticalCards": 9,
+    "views": [
+        "base/game-camera",
+        "base/top",
+        "seafarers/game-camera",
+        "seafarers/top",
+        "cities-knights/game-camera",
+        "cities-knights/top",
+        "combined/game-camera",
+        "combined/top"
+    ],
+    "fogHasNoPhotoTexture": true,
+    "visualsHaveNoColliders": true,
+    "metreScale": true,
+    "previewColours": true,
+    "oreUsesMountainTileArt": true,
+    "oreCardUnchanged": true,
+    "oreResource": "EntityAssets/v006/ore-tile/tile-ore",
+    "oreTexture": "EntityAssets/v006/ore-tile/tile-ore-top"
+}

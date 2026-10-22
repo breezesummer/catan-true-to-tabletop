@@ -1,0 +1,13 @@
+﻿{
+    "status":  "passed",
+    "ruleSets":  [
+                     "base",
+                     "seafarers",
+                     "cities-knights",
+                     "combined"
+                 ],
+    "independentProcesses":  2,
+    "saveRestore":  true,
+    "continuedAi":  true,
+    "privateSaves":  ".local/art-integration-v003/m6-smoke"
+}

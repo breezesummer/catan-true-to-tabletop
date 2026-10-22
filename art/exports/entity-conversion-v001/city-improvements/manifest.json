@@ -1,0 +1,1634 @@
+{
+  "schemaVersion": 1,
+  "version": "entity-conversion-v001",
+  "typeId": "city-improvements",
+  "label": "城市设施十五种双面翻板与两种组合提示板",
+  "recipePath": "art/recipes/entity-conversion-v001/city-improvements/recipe.json",
+  "recipeSha256": "10312cbe6afdd66c1332ac647dacbfb445ebb829ca312c45f791f98fb311ad24",
+  "scriptPath": "tools/art/entity_pipeline.py",
+  "scriptSha256": "733cee06dc02433968c899e14e6d87c51204e5ae1c932b0f266e306b4b8a4c64",
+  "customBuilders": [],
+  "blenderVersion": "4.5.14 LTS",
+  "seed": 20261009,
+  "units": "metres",
+  "scaleStatus": "estimated; level panels 40 x 40 x 1 mm; photo guidance boards 180 x 80 x 1 mm; not physically measured or user-approved",
+  "references": [
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色1级修道院反面.jpg",
+      "sha256": "42ff7a13f67186932958144e740e9baabb55852495737c25ed47bf22132543f9",
+      "role": "science level 1 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色1级修道院正面.jpg",
+      "sha256": "a1cd408ec3836e30484a3af3748c11aea5e1d26c9df79a3f7c0024bc6a422eb1",
+      "role": "science level 1 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色2级图书馆反面.jpg",
+      "sha256": "01d0f5995917cccf70c07aac76e48326d89e2e51488821470b2b6ff94ffc74db",
+      "role": "science level 2 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色2级图书馆正面.jpg",
+      "sha256": "c6d8bcf2e273db47d76e5eb8c4aa0994cf7b20df74f6728f8871ce2e602bc0c9",
+      "role": "science level 2 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色3级引水渠反面.jpg",
+      "sha256": "b51b65f5d32dc3b2cbf3fabf8081dd593742a5ec91df0f1e466cb6ec82cf6c60",
+      "role": "science level 3 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色3级引水渠正面.jpg",
+      "sha256": "d98f48c3ff4316861fc65af9f9cdd392309863615e678c673d1c7509c9db7110",
+      "role": "science level 3 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色4级剧院反面.jpg",
+      "sha256": "24bf2d0900e7298534fbf2d3371f01c80c0b8793e2003e6412c8f83262e865ce",
+      "role": "science level 4 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色4级剧院正面.jpg",
+      "sha256": "80240f514813768fa062cbfd4654d5632c13bb727b73a617a294a1a635cecd84",
+      "role": "science level 4 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色5级大学反面.jpg",
+      "sha256": "0f63cbb4d66fe6ebe210ea74de7c5cdb978cb78969131b54f963f0fa2206869e",
+      "role": "science level 5 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/绿色5级大学正面.jpg",
+      "sha256": "9a1da53e73325de91f79e3e62ecc2dd7229794d36062eb2ae41f12a906f62b86",
+      "role": "science level 5 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色1级市政厅反面.jpg",
+      "sha256": "fa16744b0bc7195954b0807061c0b36eca94426492cbe45b9d466c39c0514c6c",
+      "role": "politics level 1 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色1级市政厅正面.jpg",
+      "sha256": "9b50c7580c4259ca9e70d7e7dca3e63bb7278f35b78e72cb55dfc8695e698ce9",
+      "role": "politics level 1 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色2级教堂反面.jpg",
+      "sha256": "00dd4ede6283b5afa2e1c97a9199dde46aacb6530bc4a98e9e792f1d36d55760",
+      "role": "politics level 2 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色2级教堂正面.jpg",
+      "sha256": "028c7fd304662fd71def80ef3716738fe7cdce4d3c2a99042451172f046175e8",
+      "role": "politics level 2 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色3级要塞反面.jpg",
+      "sha256": "b5bb7fa20b123e9778617608758e0f9f787e8332e2ecf8516d982200e70d73e8",
+      "role": "politics level 3 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色3级要塞正面.jpg",
+      "sha256": "2117621f40a921979231681343a62b5106066465572e4fab43f92dbc4ed2b043",
+      "role": "politics level 3 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色4级大教堂反面.jpg",
+      "sha256": "8d7ea0a760c3da54477c604361cd0b45686d6b7134bd37eddbff9aee6f7ae3c8",
+      "role": "politics level 4 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色4级大教堂正面.jpg",
+      "sha256": "975723c52b0916b38f4cfca4003551c8084bf0da98b711e216f0e27c4ee4dade",
+      "role": "politics level 4 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色5级卡坦议会反面.jpg",
+      "sha256": "0b5ba5c628de7ecbdbc75c672eddc2b482743753e58376f6bca37e9224294450",
+      "role": "politics level 5 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/蓝色5级卡坦议会正面.jpg",
+      "sha256": "1f7f6b59e9704eb70cb8e717f006afb948154efea53358a0e4dae15327c5c9d6",
+      "role": "politics level 5 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色1级市场反面.jpg",
+      "sha256": "27f7f2a556c51d77cdd4868e80293907b311f2e7e3c3f773c141486393a11cbb",
+      "role": "trade level 1 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色1级市场正面.jpg",
+      "sha256": "a8450574cd4fa21d43eea6323a2ef97cd440457b9e02a983326ffc8f11f928fd",
+      "role": "trade level 1 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色2级行会反面.jpg",
+      "sha256": "79b507a4d1d444aa161e17e3f6441c898caafc3a3773ec0aa464febffcb7ec53",
+      "role": "trade level 2 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色2级行会正面.jpg",
+      "sha256": "540960fc3e640a4e9615ee3ff291aa42baa110586501566f58c5fe07d309eedd",
+      "role": "trade level 2 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色3级同业公会反面.jpg",
+      "sha256": "5cfca97514cf5fb2257b39a040f072ec9cbcc5255dd8d9978f92c5ab3faff9fd",
+      "role": "trade level 3 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色3级同业公会正面.jpg",
+      "sha256": "1c73f7921f1950a7d06d8f14b4bd3a19dcc012093b69d77861bfbd18d16e449b",
+      "role": "trade level 3 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色4级银行反面.jpg",
+      "sha256": "ed70a9c8410ec6ee604641ad6d88536169c57ba10fa8ef8a33c7462764453701",
+      "role": "trade level 4 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色4级银行正面.jpg",
+      "sha256": "3ab1ed82e1466b12c23aa07223d7feaa1354a0ab2554299f592857502885438a",
+      "role": "trade level 4 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色5级商业中心反面.jpg",
+      "sha256": "47a03876ccca518a456d7a2915bb185b3eec83e8df8d7e51ee8834d4f23ee0f4",
+      "role": "trade level 5 back; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/黄色5级商业中心正面.jpg",
+      "sha256": "cd951c3af7ce30f7c48359706fef7c918f73d7d842fd74fc0d3d1f31f15d5c3b",
+      "role": "trade level 5 front; original print and photo pixels"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/城市设施升级卡.jpg",
+      "sha256": "259f8fea1625d858b8263aeb23be9093dbd9e851a7c6f54fd2d285108d22047b",
+      "role": "assembled three-colour photo board; visible side only"
+    },
+    {
+      "originalPath": "assets/references/inbox/城市设施/城市设施满级卡.jpg",
+      "sha256": "b8d21623a6f7e50aa94ed5175843be9e27b4293d21f0cc87463e4a713bdacc5b",
+      "role": "assembled three-colour photo board; visible side only"
+    }
+  ],
+  "assets": [
+    {
+      "id": "improvement-science-1",
+      "label": "绿色1级修道院",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "2947c70eb6ec451618f46a60057a671805baf2dbb612c8f36f1b003e1ca7f7c4",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-science-1_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-science-1_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-science-1-back.png"
+        },
+        {
+          "name": "improvement-science-1_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-science-1-front.png"
+        }
+      ],
+      "fbxSha256": "17541def67a87bd0a25a919a217b0cd61190f0cc39e6cd894b6e61cbdb07b22d",
+      "blendSha256": "2a9a8f8661bbaabb4002aa3e36d571296de7ee438ae020d30d3a39dffae98c78",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-science-2",
+      "label": "绿色2级圖書館",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "0a31ce10cf95e879da8d650817b3e6fe37b0ebac8d256a4472ee3b7a13556b19",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-science-2_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-science-2_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-science-2-back.png"
+        },
+        {
+          "name": "improvement-science-2_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-science-2-front.png"
+        }
+      ],
+      "fbxSha256": "94edf7754fd066e51591510623991c93634bdee65b8be42a4a46289c7c68da27",
+      "blendSha256": "68a3748742d5d61d361f6dc58748275ee77954a757af895b8001075044150d4c",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-science-3",
+      "label": "绿色3级引水渠",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "c70986aeed268b76b9f33b00cded99abc371a91b43ba895661f31d7d93b4ffbb",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-science-3_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-science-3_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-science-3-back.png"
+        },
+        {
+          "name": "improvement-science-3_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-science-3-front.png"
+        }
+      ],
+      "fbxSha256": "53c3f8156e6ce8b20617de3170cc5af495f3dbdb7f75da839765db2fda8f7b45",
+      "blendSha256": "3adb3d4d99003ce42e107789e1c4e5a32319d01db72a1ff76c86c58b9c6b3bc5",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-science-4",
+      "label": "绿色4级劇場",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "66dcf8dcc23e9f9ea4ab2de8545d499adbefb1fcf71d06cd601d0c2bc0cb6619",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-science-4_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-science-4_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-science-4-back.png"
+        },
+        {
+          "name": "improvement-science-4_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-science-4-front.png"
+        }
+      ],
+      "fbxSha256": "26fcdf274dc743f58443dbc087deb319a4d5832455d0a6a45d33aa74420e0ca3",
+      "blendSha256": "f647725a162004cf081f18f487713dbeac56813e13b643b9f1899f6f337d1132",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-science-5",
+      "label": "绿色5级大學",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "ea0c74442200ffc795fdc9de765aa6900374233611577aa32f79b16ed458488f",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-science-5_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-science-5_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-science-5-back.png"
+        },
+        {
+          "name": "improvement-science-5_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-science-5-front.png"
+        }
+      ],
+      "fbxSha256": "218e8b97693fb2881dd4628fb73ae7ed40a64d2dd765d57f35e1c61c1746b874",
+      "blendSha256": "7cb8608c287436d87f4b8d67eb537db523f70267551d370a5d20ddbc4a2354d6",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-politics-1",
+      "label": "蓝色1级市政廳",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "c139b7eb30e3b8b62548bc677af63daad8b84ed8de0e0301bc6c3215b30e9dbc",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-politics-1_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-politics-1_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-politics-1-back.png"
+        },
+        {
+          "name": "improvement-politics-1_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-politics-1-front.png"
+        }
+      ],
+      "fbxSha256": "bfc1c793e34d25dde448c7cf3d600e8ecdd5f2f7f0c7e4c56e8457122841ca50",
+      "blendSha256": "32a607c301a14154988dc871a10ba2a0d40ebe40c1d4b4eb6859a37cd78f4189",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-politics-2",
+      "label": "蓝色2级教堂",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "45b11eadbf07282034bbc56da278b7b6bcefbb8436a1f5c70b152c525d541ac9",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-politics-2_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-politics-2_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-politics-2-back.png"
+        },
+        {
+          "name": "improvement-politics-2_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-politics-2-front.png"
+        }
+      ],
+      "fbxSha256": "1f9ce8b8370fe171c3576e7e8ad01e25dd65f162c29f566872f74d162a361009",
+      "blendSha256": "54457a001828dcbc2d9d2e92a094577913645ff2528ffb63a9447afa7c023ed8",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-politics-3",
+      "label": "蓝色3级要塞",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "c8c8ae8883833aa7a3e461b687eb661e89e68f908c2899a4656addc903a5d955",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-politics-3_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-politics-3_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-politics-3-back.png"
+        },
+        {
+          "name": "improvement-politics-3_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-politics-3-front.png"
+        }
+      ],
+      "fbxSha256": "a065fc63cc9da24ebe1affb040fe3aa8b32a59e51951b3b6ebff2670cd5fe46a",
+      "blendSha256": "67abc575ade0b2c55d82b82dca4b0fd7b332a075aa2dccf5ff1c33b43b231cb6",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-politics-4",
+      "label": "蓝色4级大教堂",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "d13cbbf3ef40634c91415fc4ac86dc97c00533ddc441faa949fbfed8105bbe71",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-politics-4_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-politics-4_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-politics-4-back.png"
+        },
+        {
+          "name": "improvement-politics-4_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-politics-4-front.png"
+        }
+      ],
+      "fbxSha256": "21757a305396df78ee8ef8488b8d39a9daf6253b56d30b9fb0e4a2310dcad7ce",
+      "blendSha256": "2ade77df7957cf71029f25d4836c2cd31a98170b3796ad5d7bc8d4b4c9ae56fb",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-politics-5",
+      "label": "蓝色5级卡坦議會",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "538d0475cd8cbd6fdbca56b1bec579af6563ca2330ed758f87b8d27d0de12232",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-politics-5_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-politics-5_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-politics-5-back.png"
+        },
+        {
+          "name": "improvement-politics-5_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-politics-5-front.png"
+        }
+      ],
+      "fbxSha256": "b31efe48bb7376bcb26e7828638722cb562be2668b5ee5f682a3113bdff8e020",
+      "blendSha256": "c50ec1f7f4f3e344af47a3115a5feb71f801e604b5e1dcc8105839d829d77f2c",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-trade-1",
+      "label": "黄色1级市場",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "3c60d9bc5a297ca90a29fef7b30d35b323e6cfe8a72f4cd0300f5b6a4a28534b",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-trade-1_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-trade-1_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-trade-1-back.png"
+        },
+        {
+          "name": "improvement-trade-1_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-trade-1-front.png"
+        }
+      ],
+      "fbxSha256": "468ff27d164322b6ef62f0203ac53a7590e4a4b677f78073a6f46188c29095ec",
+      "blendSha256": "35e1ce22e4c799e21782938632d835cc4c62e8c554be8f50be31094c95c0efc5",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-trade-2",
+      "label": "黄色2级行會",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "40861b246a0fa0b9c2182a0f6bf9ae980d608ca6f8213701218385f8dcb88fc8",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-trade-2_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-trade-2_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-trade-2-back.png"
+        },
+        {
+          "name": "improvement-trade-2_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-trade-2-front.png"
+        }
+      ],
+      "fbxSha256": "3d012cbf07b961f7a40e50719dfba1ba7d2afe425a6e0c7ce0ca07887d504751",
+      "blendSha256": "1a47cacca4961e7979cacf5aa5b5ff9a856a862845e9668094e1f0ebe6447d92",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-trade-3",
+      "label": "黄色3级同業公會",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "e18bf65ceb3b2210be50723730b5080480a5c5667fb71bcd90f359112d6c127e",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-trade-3_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-trade-3_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-trade-3-back.png"
+        },
+        {
+          "name": "improvement-trade-3_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-trade-3-front.png"
+        }
+      ],
+      "fbxSha256": "d6425d356d7fdebcf83d7f04b9c4962030d9a04e659e9e401d4a25130c77a62e",
+      "blendSha256": "8a2655cfbb3ff23b459c38000f205f9ff9d6d08083997473a929a69017981000",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-trade-4",
+      "label": "黄色4级銀行",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "19099ffe6128eda3b97ee9b03c4a7acb8b273f18ffcb88b1b87bd7330f56b636",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-trade-4_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-trade-4_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-trade-4-back.png"
+        },
+        {
+          "name": "improvement-trade-4_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-trade-4-front.png"
+        }
+      ],
+      "fbxSha256": "e668ed71214f52db12e79b922cf45f757c2edd7b374eca674789f22d2a234a26",
+      "blendSha256": "5fc4e4c1e80407b151bb50b61d2fb05c6abbd1b0c7750c15ba64a05d3dbd29b9",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "improvement-trade-5",
+      "label": "黄色5级商業中心",
+      "kind": "panel",
+      "dimensionsMm": [
+        40,
+        40,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "f96bffb5e2bfa17cdf59b13ec7fbc5322a872a95f4d065c9ecb0d22a7d298c27",
+      "blenderBounds": {
+        "min": [
+          -0.019999999552965164,
+          -0.019999999552965164,
+          0.0
+        ],
+        "max": [
+          0.019999999552965164,
+          0.019999999552965164,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.019999999552965164,
+          0.0,
+          -0.019999999552965164
+        ],
+        "max": [
+          0.019999999552965164,
+          0.0010000000474974513,
+          0.019999999552965164
+        ]
+      },
+      "materials": [
+        {
+          "name": "improvement-trade-5_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "improvement-trade-5_PhotoBack",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-trade-5-back.png"
+        },
+        {
+          "name": "improvement-trade-5_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "improvement-trade-5-front.png"
+        }
+      ],
+      "fbxSha256": "5eb7be2d675a26788523a45acf1fc648560752de747c64db584219432f7f7dd2",
+      "blendSha256": "4770c93f3d71c1d2140b002440af06f79573aafac9672fc09412dace516a627b",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "photo-backed"
+    },
+    {
+      "id": "guidance-upgrade",
+      "label": "城市设施升级组合提示板",
+      "kind": "panel",
+      "dimensionsMm": [
+        180,
+        80,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "f8b36c8e34e1682ffaeace89f179723b5cb6c24f7d9d263f05f7529352c47f27",
+      "blenderBounds": {
+        "min": [
+          -0.09000000357627869,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.09000000357627869,
+          0.03999999910593033,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.09000000357627869,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.09000000357627869,
+          0.0010000000474974513,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "guidance-upgrade_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "guidance-upgrade_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "guidance-upgrade-front.png"
+        },
+        {
+          "name": "guidance-upgrade_UnseenBackNeutral",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.6100000143051147,
+            0.49000000953674316,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "09f442a91a5a81ed61856e8faaaf53539b1e3a9b9ecd47893b4436bd27b7f0f4",
+      "blendSha256": "55e7b84b34b1a627f5086b43a93b327e427b79e5cdd5c73d51f43148d2faf8d0",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    },
+    {
+      "id": "guidance-max",
+      "label": "城市设施满级组合提示板",
+      "kind": "panel",
+      "dimensionsMm": [
+        180,
+        80,
+        1
+      ],
+      "meshObjects": 1,
+      "triangles": 12,
+      "geometrySha256": "724f241f2c70b33fc673d42bbfa15b48e3ef7bde70de666ef31da180aa7c1a1e",
+      "blenderBounds": {
+        "min": [
+          -0.09000000357627869,
+          -0.03999999910593033,
+          0.0
+        ],
+        "max": [
+          0.09000000357627869,
+          0.03999999910593033,
+          0.0010000000474974513
+        ]
+      },
+      "expectedUnityBounds": {
+        "min": [
+          -0.09000000357627869,
+          0.0,
+          -0.03999999910593033
+        ],
+        "max": [
+          0.09000000357627869,
+          0.0010000000474974513,
+          0.03999999910593033
+        ]
+      },
+      "materials": [
+        {
+          "name": "guidance-max_PaperEdge",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.5799999833106995,
+            0.4300000071525574,
+            1.0
+          ],
+          "roughness": 0.8500000238418579,
+          "texture": null
+        },
+        {
+          "name": "guidance-max_PhotoFront",
+          "baseColorLinearRgba": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": "guidance-max-front.png"
+        },
+        {
+          "name": "guidance-max_UnseenBackNeutral",
+          "baseColorLinearRgba": [
+            0.6600000262260437,
+            0.6100000143051147,
+            0.49000000953674316,
+            1.0
+          ],
+          "roughness": 0.800000011920929,
+          "texture": null
+        }
+      ],
+      "fbxSha256": "2171e1606a6450db0fd779a6a93e5f4a68829d2255deeaf0632a6abcedafdd6b",
+      "blendSha256": "34a11b8d308959cbb189bd6ae38d50c9d4eda3496ee853046e265005c4b89f6c",
+      "pivot": "bottom centre; all mesh origins at (0,0,0)",
+      "backStatus": "unseen; neutral material only"
+    }
+  ],
+  "textureDependencies": [
+    {
+      "path": "textures/guidance-max-front.png",
+      "sha256": "590faabe9af25e69e4f8505a2fd17ee2162072b7a45cce0af5e2ce268c1bb64e"
+    },
+    {
+      "path": "textures/guidance-upgrade-front.png",
+      "sha256": "505b648a215a520a3a58a6be99eb866413540a3ba09dc515d9908c8fbc2f65e4"
+    },
+    {
+      "path": "textures/improvement-politics-1-back.png",
+      "sha256": "d969d6a9f9f6de70badc8f33314e2a86682321d8f6428202a3e70a549578f2f0"
+    },
+    {
+      "path": "textures/improvement-politics-1-front.png",
+      "sha256": "3474bffbb3778d8bfd79d6a4ccfc9a0a9ea517b53cbeec9cde13a93376b715c4"
+    },
+    {
+      "path": "textures/improvement-politics-2-back.png",
+      "sha256": "debddaf1b7e75071f156bc22441a8dc7e10e64d7a75bec268ae94ca34d44f6a8"
+    },
+    {
+      "path": "textures/improvement-politics-2-front.png",
+      "sha256": "8f24c9e2d911d1fd9ff83e9db0a0330484fd7443ba1704412a71e65704df6ee9"
+    },
+    {
+      "path": "textures/improvement-politics-3-back.png",
+      "sha256": "0719a3267d0a598d31419fad5cae87829ad503762f1adc0f0d3dc0fff8049896"
+    },
+    {
+      "path": "textures/improvement-politics-3-front.png",
+      "sha256": "f61f0e5cb905cda2578ebfa84fc4f35d2dcce32b27a446149dd9561b707e6fae"
+    },
+    {
+      "path": "textures/improvement-politics-4-back.png",
+      "sha256": "cf375074e00740e2e81e97a367eb81535235e42194734f173283b629ed0c1634"
+    },
+    {
+      "path": "textures/improvement-politics-4-front.png",
+      "sha256": "b73e94324b6169c8d9a5d534735bdc16a2643413dd915c157a11e65e43597e73"
+    },
+    {
+      "path": "textures/improvement-politics-5-back.png",
+      "sha256": "c844bb2304d4552e2f26c10cc3ed5f06c38c72a06c0defdec81a88b4f8b49299"
+    },
+    {
+      "path": "textures/improvement-politics-5-front.png",
+      "sha256": "63773ce9700b8729afdc28c5bb8b9a1d5c09445eb9942c4a873a1081026cfc34"
+    },
+    {
+      "path": "textures/improvement-science-1-back.png",
+      "sha256": "c89b0c45ab47e3f96b7fd7f61c8e35d8b09562301bed623d811c4f12fb9f99fa"
+    },
+    {
+      "path": "textures/improvement-science-1-front.png",
+      "sha256": "4531c9297bc89147462dc16c592238d20631f25d6c40d18d69bdf9831f2a04c3"
+    },
+    {
+      "path": "textures/improvement-science-2-back.png",
+      "sha256": "bd29a4507200f096fdd4d912748f64033145df8c501155d808ecc45c4f0eecf1"
+    },
+    {
+      "path": "textures/improvement-science-2-front.png",
+      "sha256": "c7448bfdcfb6794ba0db61ffba566956ffe645c88195f38532b36bf4303c8613"
+    },
+    {
+      "path": "textures/improvement-science-3-back.png",
+      "sha256": "e6bdc96c28b45e4126377ddd0d682ce06bf84e9822b2fe662a709060a9389a3f"
+    },
+    {
+      "path": "textures/improvement-science-3-front.png",
+      "sha256": "a04820cb9781aab32db8ace89d15e057eaf68e4d602c8101962665ad3f940a22"
+    },
+    {
+      "path": "textures/improvement-science-4-back.png",
+      "sha256": "347577c79d04947151ceadc3d306142c7466ee55012d719c8a22ef00fadd7095"
+    },
+    {
+      "path": "textures/improvement-science-4-front.png",
+      "sha256": "2487b943a9414800031dfc3392ee52165df94547aee94aab0f091f2181a9fcf7"
+    },
+    {
+      "path": "textures/improvement-science-5-back.png",
+      "sha256": "676b5e824d55b1e4f99673ba6478462be97b2980677b3e3d1df3f7d06391d9b3"
+    },
+    {
+      "path": "textures/improvement-science-5-front.png",
+      "sha256": "3b73c5dfb2072cffea9e627843d0285eb73e77653cfe13f7ce9383e616b79a69"
+    },
+    {
+      "path": "textures/improvement-trade-1-back.png",
+      "sha256": "c507e4d8bce731fda7eb764632ea53556d812ff41b5d102f482bf1ff20f78290"
+    },
+    {
+      "path": "textures/improvement-trade-1-front.png",
+      "sha256": "bec729e02882b2e3d9f7617ed574def8e05ad197de8f3ac8dd892260c8a0de0d"
+    },
+    {
+      "path": "textures/improvement-trade-2-back.png",
+      "sha256": "19c16f9e6b93b7881508a3fad0f556c508244a37a484df999eba801ea5d398e4"
+    },
+    {
+      "path": "textures/improvement-trade-2-front.png",
+      "sha256": "b55baf4a5b00236a805fe04de0747e0332601f2c7d69c1bfd22a6ce842566af1"
+    },
+    {
+      "path": "textures/improvement-trade-3-back.png",
+      "sha256": "37c231e937d6766c9d0d1584aed6f6eab58dba365610d30b546edeac74281e01"
+    },
+    {
+      "path": "textures/improvement-trade-3-front.png",
+      "sha256": "a3a01b84666bd3c905b8b58c501f8daa42bf7dbe93d1831b5b6b9f6bc124b756"
+    },
+    {
+      "path": "textures/improvement-trade-4-back.png",
+      "sha256": "7dac2852f5a84ddea036b19d893e82bcc3678e6b4483c95c4d9f4517be9b64ea"
+    },
+    {
+      "path": "textures/improvement-trade-4-front.png",
+      "sha256": "a30fabbc3b7421e8f0acdae5e2999c30ebf790cd616417a3cc98a0e0e656a005"
+    },
+    {
+      "path": "textures/improvement-trade-5-back.png",
+      "sha256": "58e95f2ef238aafb0c0851bd4861913831dc1cc6229adb9eb9c1a68ef5db8b3b"
+    },
+    {
+      "path": "textures/improvement-trade-5-front.png",
+      "sha256": "c2fafbc709e133aca6073526288972871cf5f776068ffd7b92c159695d9c2c4c"
+    }
+  ],
+  "limitations": [
+    "人工读取原照片四边交点，PIL投影校正原像素；保留原插画、繁体印刷、数字、曝光、模糊和反光，不使用AI重绘、OCR替字、锐化或颜色替换。",
+    "十五等级翻板为近正方形双面薄panel；四角圆角在工作网格中尚未建模，外角可能残留极少桌面像素。",
+    "两张组合提示板贴图只裁取可见组件整体边界；照片内部孔洞、组件间隙和已摆放翻板仍属于原照片像素，不是可操作城市建设控件。",
+    "组合提示板未见底面，使用明确中性材质；其整板拼装厚度、铰链结构、卡槽、真实尺寸与颜色标准均未知。",
+    "照片中的设施题名与旧版规则提示仅作视觉来源；不改变已锁定官方2025规则。",
+    "1024与2304像素导出包含原照片采样放大，不增加真实细节；高分辨率原照片与所有32个源文件保持不变。"
+  ],
+  "exportSettings": {
+    "axisForward": "-Z",
+    "axisUp": "Y",
+    "globalScale": 1,
+    "applyUnitScale": true,
+    "applyScaleOptions": "FBX_SCALE_UNITS",
+    "triangulated": true
+  },
+  "previewsGenerated": true,
+  "previewViews": [
+    "top",
+    "side",
+    "game-camera",
+    "crowded-vertex"
+  ],
+  "previewResolution": [
+    1600,
+    1000
+  ],
+  "previewHashes": {
+    "crowded-vertex.png": "e5359287e0b80397b6a7d96f27bb25fae25bf79ee7aea2726c6c76a6a60e769e",
+    "game-camera.png": "7257008e9f04ee66d7f01cd3bf81dff842c13360bc70b76c61b9001167f71021",
+    "side.png": "8f5482d8ea0929b1b335e750be1991a5e55cdae6e48417a17481083c4101dcc1",
+    "top.png": "b6a510c0e3e6cc9f40b72578874b019fd0fb04c9f81989a93e2a13708e69e0d2"
+  }
+}

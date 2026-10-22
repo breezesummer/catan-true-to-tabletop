@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "referenceSetId": "official-2025-m5-combination-v001",
+  "accessedOn": "2026-10-09",
+  "accessDateTimeZone": "Asia/Shanghai",
+  "precedence": [
+    "catan-cities-knights-2025-en page 12 combination overrides",
+    "2025 Seafarers scenario rules and 2025 Cities & Knights rules",
+    "official web clarification only when consistent with fixed 2025 rulebooks"
+  ],
+  "sources": [
+    {
+      "id": "cities-knights-combinations",
+      "url": "https://www.catan.com/cities-knights",
+      "snapshotPath": "assets/references/rules/m5-v001/originals/cities-knights-combinations.html",
+      "byteLength": 84317,
+      "sha256": "b2d41c61f1401954392550975229802887b2fbe0864cd65e55b89806a7051c0d",
+      "accessedOn": "2026-10-09",
+      "accessDateTimeZone": "Asia/Shanghai",
+      "edition": "live official website; no edition label; supplemental only",
+      "role": "clarification-consistent-with-2025-pdf"
+    },
+    {
+      "id": "cities-knights-faq",
+      "url": "https://www.catan.com/faq/cities-knights",
+      "snapshotPath": "assets/references/rules/m5-v001/originals/cities-knights-faq.html",
+      "byteLength": 152085,
+      "sha256": "92dd4c0e693fc9eb2881288ef4e370c3159317c1a4ceee5aaf7add187e5736ff",
+      "accessedOn": "2026-10-09",
+      "accessDateTimeZone": "Asia/Shanghai",
+      "edition": "live official website; no edition label; supplemental only",
+      "role": "clarification-consistent-with-2025-pdf"
+    },
+    {
+      "id": "seafarers-faq",
+      "url": "https://www.catan.com/faq/seafarers",
+      "snapshotPath": "assets/references/rules/m5-v001/originals/seafarers-faq.html",
+      "byteLength": 49248,
+      "sha256": "32943177a0de0630096a2d46467e1c8f8c84088af2afad54d7cf184996518f4f",
+      "accessedOn": "2026-10-09",
+      "accessDateTimeZone": "Asia/Shanghai",
+      "edition": "live official website; no edition label; supplemental only",
+      "role": "clarification-consistent-with-2025-pdf"
+    },
+    {
+      "id": "catan-cities-knights-2025-en",
+      "baselineManifest": "assets/references/rules/v001/sources.json",
+      "cachePath": ".local/reference-cache/official-2025/v001/catan-cities-knights-2025-en.pdf",
+      "byteLength": 12000564,
+      "sha256": "dac9f01afe9006e3b517aa257363c844eb2a9ff4b6578d3127f5d8d861c9a540",
+      "pdfPageCount": 16,
+      "edition": "2025 / 6th Edition",
+      "role": "combination-normative-source",
+      "m5RelevantPages": [
+        3,
+        5,
+        8,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "id": "catan-seafarers-2025-en",
+      "baselineManifest": "assets/references/rules/v001/sources.json",
+      "cachePath": ".local/reference-cache/official-2025/v001/catan-seafarers-2025-en.pdf",
+      "byteLength": 13769276,
+      "sha256": "a499abe2b613afd618dd3c806790400c7e84adebcc9b9ab19a24fb80dd04b099",
+      "pdfPageCount": 20,
+      "edition": "2025 / 6th Edition",
+      "role": "scenario-and-shipping-source",
+      "m5RelevantPages": [
+        2,
+        3,
+        4,
+        5,
+        10,
+        11
+      ]
+    }
+  ],
+  "scope": [
+    "heading-for-new-shores / 3 and 4 players",
+    "through-the-desert / 3 and 4 players"
+  ],
+  "snapshotPolicy": "Preserve raw downloaded HTML bytes and baseline PDF bytes. Revisions must receive a new versioned path and manifest; do not silently refresh m5-v001. Website FAQ contains legacy names; use only consistent shipping clarifications."
+}

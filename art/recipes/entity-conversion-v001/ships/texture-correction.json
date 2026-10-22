@@ -1,0 +1,9 @@
+{
+  "typeId": "ships",
+  "operations": [],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "e9fcbd15833b12607468ec71ca71382c16955d62822fafae1ddf66a0df54bf74"
+}

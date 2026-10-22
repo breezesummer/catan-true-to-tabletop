@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "checks": 294,
+  "maps": 26,
+  "rules": 4,
+  "fogProtected": true,
+  "sourceCountsChecked": true,
+  "unityRuntimeChecked": false
+}

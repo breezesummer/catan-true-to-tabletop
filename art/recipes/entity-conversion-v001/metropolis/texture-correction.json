@@ -1,0 +1,9 @@
+{
+  "typeId": "metropolis",
+  "operations": [],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "be8a992a2104434f9f0eff245eb71d8df808425d0f46e5519388b4e45a3034b2"
+}

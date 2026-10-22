@@ -1,0 +1,21 @@
+{
+    "RuleSet": "base",
+    "ScenarioId": "base",
+    "Result": "passed",
+    "Stage": "shared player name update",
+    "Transport": "WS 在线同步",
+    "PlayerCount": 3,
+    "Turn": 3,
+    "HumanCommands": 4,
+    "ClientAiCommands": 0,
+    "Revision": 22,
+    "LocalAuthorityAbsent": true,
+    "LocalSaveRejected": true,
+    "ReconnectConfirmed": true,
+    "OwnSeatOnly": true,
+    "RoomSwitchConfirmed": true,
+    "OriginalRoomRestored": true,
+    "LanDiscoveryConfirmed": false,
+    "LanDiscoverySkipped": true,
+    "NameUpdateConfirmed": true
+}

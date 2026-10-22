@@ -1,0 +1,539 @@
+{
+  "source": "Unity/Catan/Assets/Scripts/TabletopAudioSynth.cs",
+  "sourceSha256": "5527138d8ea0660290c7197fd088a4bbe192a2bda66fe50c69d4f5e3c87a5003",
+  "files": [
+    {
+      "caption": "UiClick",
+      "file": "Effects/UiClick.wav",
+      "peak": 0.07314595580101013,
+      "seconds": 0.1,
+      "samples": 2400,
+      "kind": "effect",
+      "rms": 0.009398391224485396,
+      "sha256": "fe6c6e163571cfe0b761acf1df59d584de7657757b1f5a60cc522169b1565255"
+    },
+    {
+      "caption": "UiBack",
+      "file": "Effects/UiBack.wav",
+      "peak": 0.07670081406831741,
+      "seconds": 0.100875,
+      "samples": 2421,
+      "kind": "effect",
+      "rms": 0.01384786829469346,
+      "sha256": "93bdb696f9f7cac11eac951387b85853d36889082b196897956a9a02f3f4928f"
+    },
+    {
+      "caption": "CardPick",
+      "file": "Effects/CardPick.wav",
+      "peak": 0.12507878243923187,
+      "seconds": 0.187375,
+      "samples": 4497,
+      "kind": "effect",
+      "rms": 0.027182844098031147,
+      "sha256": "fb6e3fbb5d4b667cbed4731c40f63e67960dc30085cb8cdee61337d2c30ad3e7"
+    },
+    {
+      "caption": "ResourceCollect",
+      "file": "Effects/ResourceCollect.wav",
+      "peak": 0.10979577898979187,
+      "seconds": 0.64775,
+      "samples": 15546,
+      "kind": "effect",
+      "rms": 0.01720717677804307,
+      "sha256": "b6536cfb14bf0293b93515e0630e29b7fd51acd78703a1f5ccfe986dc6a96207"
+    },
+    {
+      "caption": "DiceRoll",
+      "file": "Effects/DiceRoll.wav",
+      "peak": 0.16722704470157623,
+      "seconds": 0.78675,
+      "samples": 18882,
+      "kind": "effect",
+      "rms": 0.022170394845571272,
+      "sha256": "74531455bb4e2e8d187105f9ddc08ccf25c833effb1eacfd679b7841c5726b5e"
+    },
+    {
+      "caption": "RoadBuild",
+      "file": "Effects/RoadBuild.wav",
+      "peak": 0.19235731661319733,
+      "seconds": 0.20433333333333334,
+      "samples": 4904,
+      "kind": "effect",
+      "rms": 0.022244168194328593,
+      "sha256": "d31480b556e9393aba99c2b924aa46b451d382fffa8e6f7966a4c1584e35834e"
+    },
+    {
+      "caption": "SettlementBuild",
+      "file": "Effects/SettlementBuild.wav",
+      "peak": 0.16170312464237213,
+      "seconds": 0.7785,
+      "samples": 18684,
+      "kind": "effect",
+      "rms": 0.015577210967946778,
+      "sha256": "fee5ede17a50de4c0ba1f30eb023e319eddafc1a8430fdbb65eae827380bbcb6"
+    },
+    {
+      "caption": "CityBuild",
+      "file": "Effects/CityBuild.wav",
+      "peak": 0.26011231541633606,
+      "seconds": 0.8222083333333333,
+      "samples": 19733,
+      "kind": "effect",
+      "rms": 0.022397188524146155,
+      "sha256": "0cb8283c8a6848b628a688ebc7499a240245f85317d77aff385232ead4d4075f"
+    },
+    {
+      "caption": "WallBuild",
+      "file": "Effects/WallBuild.wav",
+      "peak": 0.26101022958755493,
+      "seconds": 0.4119583333333333,
+      "samples": 9887,
+      "kind": "effect",
+      "rms": 0.03032881133803409,
+      "sha256": "f69ffc85e4fe2e700d7e6552bbb6a43a2702031b7ff873c7419ebbdd494fd519"
+    },
+    {
+      "caption": "ShipBuild",
+      "file": "Effects/ShipBuild.wav",
+      "peak": 0.16451618075370789,
+      "seconds": 0.6243333333333333,
+      "samples": 14984,
+      "kind": "effect",
+      "rms": 0.021825615513631057,
+      "sha256": "2a0589b853601604a1f273b2fee9e994a85b05ac92e3d6d712798e11dd58c0bf"
+    },
+    {
+      "caption": "ShipMove",
+      "file": "Effects/ShipMove.wav",
+      "peak": 0.09851642698049545,
+      "seconds": 0.79325,
+      "samples": 19038,
+      "kind": "effect",
+      "rms": 0.015241633277254042,
+      "sha256": "b6d3b3b2e40d4621225d8b6ea5ba5967145c71e4e47422ad756f36447207e50f"
+    },
+    {
+      "caption": "PortPlace",
+      "file": "Effects/PortPlace.wav",
+      "peak": 0.14839300513267517,
+      "seconds": 0.5800833333333333,
+      "samples": 13922,
+      "kind": "effect",
+      "rms": 0.016337902840537787,
+      "sha256": "f93fe7ae68fbe4ca9891676301761b4ad922681be7a580a2f76a4b262fe733ed"
+    },
+    {
+      "caption": "TradeOffer",
+      "file": "Effects/TradeOffer.wav",
+      "peak": 0.14888490736484528,
+      "seconds": 0.47741666666666666,
+      "samples": 11458,
+      "kind": "effect",
+      "rms": 0.02178691230616248,
+      "sha256": "7a8ab08478c9df27f465ce39041dd38f3167ab6cb550d4f23994d2c25cf33ccd"
+    },
+    {
+      "caption": "TradeComplete",
+      "file": "Effects/TradeComplete.wav",
+      "peak": 0.19182465970516205,
+      "seconds": 0.6959583333333333,
+      "samples": 16703,
+      "kind": "effect",
+      "rms": 0.028412342572358397,
+      "sha256": "dfcf85e617f6d283e79ab8e96494198c26358a9e7966cfccef40297f8e5594b2"
+    },
+    {
+      "caption": "CardDraw",
+      "file": "Effects/CardDraw.wav",
+      "peak": 0.17952685058116913,
+      "seconds": 0.354125,
+      "samples": 8499,
+      "kind": "effect",
+      "rms": 0.027148364611872065,
+      "sha256": "7431db8cdfaac5c870613c13e96a71ba41f3d4d6d895fc950752a4ebf9007b0b"
+    },
+    {
+      "caption": "CardPlay",
+      "file": "Effects/CardPlay.wav",
+      "peak": 0.5374729633331299,
+      "seconds": 0.21479166666666666,
+      "samples": 5155,
+      "kind": "effect",
+      "rms": 0.14113404795958726,
+      "sha256": "1e04b24deaa0618df98a7f8afc2432225ceb1314378f99d8c261a483c2463706"
+    },
+    {
+      "caption": "RobberMove",
+      "file": "Effects/RobberMove.wav",
+      "peak": 0.068668432533741,
+      "seconds": 0.314375,
+      "samples": 7545,
+      "kind": "effect",
+      "rms": 0.010704904382872518,
+      "sha256": "83e6be298c713b2aa7287fca4e454c0f46b4a5f328f4b845f270c28b59f03bf9"
+    },
+    {
+      "caption": "PirateMove",
+      "file": "Effects/PirateMove.wav",
+      "peak": 0.1262015402317047,
+      "seconds": 0.9349166666666666,
+      "samples": 22438,
+      "kind": "effect",
+      "rms": 0.030524629582943472,
+      "sha256": "5e72bedcc2f79b8340717971f2ca78e72a6fd0c7b0b7516f60ae768f4325e1ba"
+    },
+    {
+      "caption": "KnightRecruit",
+      "file": "Effects/KnightRecruit.wav",
+      "peak": 0.17188872396945953,
+      "seconds": 0.343375,
+      "samples": 8241,
+      "kind": "effect",
+      "rms": 0.02442682124298185,
+      "sha256": "df5ab0bb146a992943ff843a8e817413464d418bc6fb3feea287395ed5a2fdb7"
+    },
+    {
+      "caption": "KnightPromote",
+      "file": "Effects/KnightPromote.wav",
+      "peak": 0.12956880033016205,
+      "seconds": 0.70925,
+      "samples": 17022,
+      "kind": "effect",
+      "rms": 0.014673988509991727,
+      "sha256": "5bef98554c43ee1d6c264971e6e1fff1567ad8779176efabbeccf08c5aab71b9"
+    },
+    {
+      "caption": "KnightActivate",
+      "file": "Effects/KnightActivate.wav",
+      "peak": 0.16566337645053864,
+      "seconds": 0.3434583333333333,
+      "samples": 8243,
+      "kind": "effect",
+      "rms": 0.023413393897719688,
+      "sha256": "a12be2f19ee2b2451c0c1253e9fadc677599a8a159bf3a005c474b92baaeb401"
+    },
+    {
+      "caption": "KnightMove",
+      "file": "Effects/KnightMove.wav",
+      "peak": 0.07557792216539383,
+      "seconds": 0.9989166666666667,
+      "samples": 23974,
+      "kind": "effect",
+      "rms": 0.006940676121758391,
+      "sha256": "0b57d39d7442c6e6bb64dad3682e910dea426a6c0c8c88d5c6353de8e215f4d1"
+    },
+    {
+      "caption": "KnightCombat",
+      "file": "Effects/KnightCombat.wav",
+      "peak": 0.09026607871055603,
+      "seconds": 1.2547083333333333,
+      "samples": 30113,
+      "kind": "effect",
+      "rms": 0.008691140471304785,
+      "sha256": "aeca7af61591515f73a35dcf91b84441df05cdbef59bcdcde46c931d19f445ca"
+    },
+    {
+      "caption": "BarbarianAdvance",
+      "file": "Effects/BarbarianAdvance.wav",
+      "peak": 0.0648566484451294,
+      "seconds": 0.4059583333333333,
+      "samples": 9743,
+      "kind": "effect",
+      "rms": 0.009051936833997501,
+      "sha256": "e0a146770f7454b9cc56e25a36366b759c3ec5117aed5ab6b300132816cf8f99"
+    },
+    {
+      "caption": "BarbarianInvasion",
+      "file": "Effects/BarbarianInvasion.wav",
+      "peak": 0.20597195625305176,
+      "seconds": 1.8438333333333334,
+      "samples": 44252,
+      "kind": "effect",
+      "rms": 0.014609117913937385,
+      "sha256": "ae340d677f1c6e40de64482f2324302cfea3da3af32778def1c0911d797bda01"
+    },
+    {
+      "caption": "BuildingCollapse",
+      "file": "Effects/BuildingCollapse.wav",
+      "peak": 0.22168198227882385,
+      "seconds": 0.6249583333333333,
+      "samples": 14999,
+      "kind": "effect",
+      "rms": 0.024262817120551044,
+      "sha256": "fa516b5622fc68eda8f64e29a2abc04df4c88f31dedcc99f2a7c8930a7aeefd0"
+    },
+    {
+      "caption": "FacilityUpgrade",
+      "file": "Effects/FacilityUpgrade.wav",
+      "peak": 0.11460910737514496,
+      "seconds": 0.9324583333333333,
+      "samples": 22379,
+      "kind": "effect",
+      "rms": 0.024315366256082036,
+      "sha256": "f7f05566dbfbb73b67f3b167fbb85b95bb24eceb3f960bc2aa7a33cca2d1585b"
+    },
+    {
+      "caption": "WonderBuild",
+      "file": "Effects/WonderBuild.wav",
+      "peak": 0.16186147928237915,
+      "seconds": 0.9099583333333333,
+      "samples": 21839,
+      "kind": "effect",
+      "rms": 0.02626646103441383,
+      "sha256": "493b916562e86d5ddb6ab2b0cf0ca7929528805b794d06b5b34fb7f524b1cf42"
+    },
+    {
+      "caption": "TurnEnd",
+      "file": "Effects/TurnEnd.wav",
+      "peak": 0.10507374256849289,
+      "seconds": 0.577875,
+      "samples": 13869,
+      "kind": "effect",
+      "rms": 0.014811720745495105,
+      "sha256": "df94df3f7c432f89a509a2e791508b60ae56e0137ef60041b2e1f24656b0f37d"
+    },
+    {
+      "caption": "YourTurn",
+      "file": "Effects/YourTurn.wav",
+      "peak": 0.1258413940668106,
+      "seconds": 0.697125,
+      "samples": 16731,
+      "kind": "effect",
+      "rms": 0.02614731915130051,
+      "sha256": "bee60b8eb29d8fd19ac20ed142b911ce0e9baee137c8b98fb6a55e5be288ac5d"
+    },
+    {
+      "caption": "Victory",
+      "file": "Effects/Victory.wav",
+      "peak": 0.2201736569404602,
+      "seconds": 1.7139166666666668,
+      "samples": 41134,
+      "kind": "effect",
+      "rms": 0.0410166402302397,
+      "sha256": "e0a58d4698194480a3975c98a87d1476958f847fd1495d734e3e18e5d8258480"
+    },
+    {
+      "caption": "Decision",
+      "file": "Effects/Decision.wav",
+      "peak": 0.08828787505626678,
+      "seconds": 0.5120833333333333,
+      "samples": 12290,
+      "kind": "effect",
+      "rms": 0.010632905707668228,
+      "sha256": "e24706c2b09acd8327f9284432eb27863e1b6a57eee1b532ec31d880ea48ef72"
+    },
+    {
+      "caption": "Error",
+      "file": "Effects/Error.wav",
+      "peak": 0.0934470072388649,
+      "seconds": 0.18483333333333332,
+      "samples": 4436,
+      "kind": "effect",
+      "rms": 0.013810411669609078,
+      "sha256": "b293b98e3a8b4f06ce5b23ccfac8e6d806d0548981f7568febfb596efc49d2bd"
+    },
+    {
+      "caption": "Save",
+      "file": "Effects/Save.wav",
+      "peak": 0.0994415134191513,
+      "seconds": 0.6394166666666666,
+      "samples": 15346,
+      "kind": "effect",
+      "rms": 0.01666954842308169,
+      "sha256": "ff04db083510b74140c4cc99c098571113ebfce872ce221ca902523470386dbd"
+    },
+    {
+      "caption": "Network",
+      "file": "Effects/Network.wav",
+      "peak": 0.09348118305206299,
+      "seconds": 0.6242916666666667,
+      "samples": 14983,
+      "kind": "effect",
+      "rms": 0.018353396330421455,
+      "sha256": "51622f8eb3526aecc274645269c15cb0cc096c2cce1f1723e80e957c303bbf7b"
+    },
+    {
+      "caption": "TradeUpgrade",
+      "file": "Effects/TradeUpgrade.wav",
+      "peak": 0.09444709122180939,
+      "seconds": 0.691125,
+      "samples": 16587,
+      "kind": "effect",
+      "rms": 0.015618766378824268,
+      "sha256": "b89e6aba5d7482ca80eb371c4ca140a4e17ed8965bb6e0735ff0615a8636f581"
+    },
+    {
+      "caption": "PoliticsUpgrade",
+      "file": "Effects/PoliticsUpgrade.wav",
+      "peak": 0.09705552458763123,
+      "seconds": 0.6865,
+      "samples": 16476,
+      "kind": "effect",
+      "rms": 0.014787263138198873,
+      "sha256": "0441ff2a83a0847f2844ef9c7e0d2ce507fc0168ca745271df4f67bdb67a8f6f"
+    },
+    {
+      "caption": "ScienceUpgrade",
+      "file": "Effects/ScienceUpgrade.wav",
+      "peak": 0.11538699269294739,
+      "seconds": 0.7545833333333334,
+      "samples": 18110,
+      "kind": "effect",
+      "rms": 0.016027803470702373,
+      "sha256": "00f1b66f95f5d8d7166b80e48930b2f333788b9c3ba54a70dffdac9562005a6a"
+    },
+    {
+      "caption": "BarbarianSail",
+      "file": "Effects/BarbarianSail.wav",
+      "peak": 0.1467171162366867,
+      "seconds": 2.113583333333333,
+      "samples": 50726,
+      "kind": "effect",
+      "rms": 0.026987152761914813,
+      "sha256": "23272f5de652b57900188d2d2baa3ef14c8d2cdb53e83a8d2d4465257a7455ad"
+    },
+    {
+      "caption": "晨光港湾：海浪与海鸟",
+      "file": "Ambience/Theme0.wav",
+      "peak": 0.1273307204246521,
+      "seconds": 12.0,
+      "samples": 288000,
+      "kind": "ambience",
+      "rms": 0.023073739869382902,
+      "sha256": "ba1b908c3e08f205ede8a178f93b1c2c08838c6e6209f641c5915cce7622a208"
+    },
+    {
+      "caption": "金色麦田：微风与田鸟",
+      "file": "Ambience/Theme1.wav",
+      "peak": 0.13055482506752014,
+      "seconds": 12.0,
+      "samples": 288000,
+      "kind": "ambience",
+      "rms": 0.02119084801407425,
+      "sha256": "b12aa31f4102cf10d5ffa26e1ceccb21a81c30e6c06848565ef887a9adb9564c"
+    },
+    {
+      "caption": "林间溪谷：溪流与林鸟",
+      "file": "Ambience/Theme2.wav",
+      "peak": 0.18297730386257172,
+      "seconds": 12.0,
+      "samples": 288000,
+      "kind": "ambience",
+      "rms": 0.04280832217676116,
+      "sha256": "5ebd14ec4db24a6b34b2d71768668f8c58068e5b0007bed948e20231fd4a6eab"
+    },
+    {
+      "caption": "雪山城堡：山间风声",
+      "file": "Ambience/Theme3.wav",
+      "peak": 0.18326643109321594,
+      "seconds": 12.0,
+      "samples": 288000,
+      "kind": "ambience",
+      "rms": 0.031114677827808454,
+      "sha256": "0f29a4312fd495ded5b183145f86b7a42b3ad1d463781c4b03feb246f00e243d"
+    },
+    {
+      "caption": "月夜灯港：夜风与虫鸣",
+      "file": "Ambience/Theme4.wav",
+      "peak": 0.067965067923069,
+      "seconds": 12.0,
+      "samples": 288000,
+      "kind": "ambience",
+      "rms": 0.013494102859227442,
+      "sha256": "ed7a5e19fb0809bffa779601ffabdd71dea896503da3e00fb9c9b3b1c3e8cd98"
+    },
+    {
+      "caption": "原创循环配乐：海风归途",
+      "file": "Music/SeaBreezeHome.wav",
+      "peak": 0.20241719484329224,
+      "seconds": 53.333333333333336,
+      "samples": 1280000,
+      "kind": "music",
+      "rms": 0.05381289289132223,
+      "sha256": "8c1f1b596925b0da4ec786fd941904294047ac5482210e6924d32a4c36a3a8bb"
+    },
+    {
+      "caption": "真人应答",
+      "file": "Voices/zh/KnightRecruit01.wav",
+      "peak": 0.6499999761581421,
+      "seconds": 0.7022916666666666,
+      "samples": 16855,
+      "kind": "voice",
+      "rms": 0.09662106926230668,
+      "sha256": "defd0ae92d676d6263f5606998040e34f9290b4355cd9598d607739ab6ecf3bf"
+    },
+    {
+      "caption": "真人应答",
+      "file": "Voices/zh/KnightRecruit02.wav",
+      "peak": 0.6499999761581421,
+      "seconds": 0.513875,
+      "samples": 12333,
+      "kind": "voice",
+      "rms": 0.1266653475870711,
+      "sha256": "ef74042cd7fc4f66fde5f253e81db7d2f2b28b743b09dd7e8fe7546e01ee7f5b"
+    },
+    {
+      "caption": "真人战呼",
+      "file": "Voices/zh/KnightActivate01.wav",
+      "peak": 0.6499999761581421,
+      "seconds": 0.37804166666666666,
+      "samples": 9073,
+      "kind": "voice",
+      "rms": 0.11173048904682342,
+      "sha256": "9ad5cd0f3668c4503e347f3f2b67b8314f109b6e35852a49d8d72fac2e926020"
+    },
+    {
+      "caption": "真人战呼",
+      "file": "Voices/zh/KnightActivate02.wav",
+      "peak": 0.6499999761581421,
+      "seconds": 0.45941666666666664,
+      "samples": 11026,
+      "kind": "voice",
+      "rms": 0.10324266639933029,
+      "sha256": "8f380c3890636c9fafe005313bc6ae0ec94b27c133fd2723aebdb57cc4bed7c7"
+    },
+    {
+      "caption": "真人应答",
+      "file": "Voices/en/KnightRecruit01.wav",
+      "peak": 0.6499999761581421,
+      "seconds": 0.56525,
+      "samples": 13566,
+      "kind": "voice",
+      "rms": 0.08959522215846849,
+      "sha256": "842942ce656f2a927df14c34fa8483dc33369967115fdbce578a132e2fb22cfc"
+    },
+    {
+      "caption": "真人应答",
+      "file": "Voices/en/KnightRecruit02.wav",
+      "peak": 0.6499999761581421,
+      "seconds": 1.3104166666666666,
+      "samples": 31450,
+      "kind": "voice",
+      "rms": 0.08315599284359823,
+      "sha256": "2848ec1727d48df11f9816d443a306c29be26645d21693bd338abc0de593b8ae"
+    },
+    {
+      "caption": "真人战呼",
+      "file": "Voices/en/KnightActivate01.wav",
+      "peak": 0.6499999761581421,
+      "seconds": 1.2582916666666666,
+      "samples": 30199,
+      "kind": "voice",
+      "rms": 0.07339840246497707,
+      "sha256": "44022602af4e5f3c4bb5102b2685fc90876817c0fdee584d855a482d66316314"
+    },
+    {
+      "caption": "真人战呼",
+      "file": "Voices/en/KnightActivate02.wav",
+      "peak": 0.6499999761581421,
+      "seconds": 0.996375,
+      "samples": 23913,
+      "kind": "voice",
+      "rms": 0.10909472403053981,
+      "sha256": "3735224f414e5afd5785568667bf706989ac865b80c2434beebdd361bdc6054a"
+    }
+  ],
+  "origin": "原创柔和拟音与配乐；Brandon Song 的 CC0 真人短应答与战呼，授权见 assets/references/audio/adventurer-v001/README.md",
+  "recipeVersion": "pastoral-tabletop-audio-v003",
+  "format": "PCM16 mono 24000 Hz"
+}

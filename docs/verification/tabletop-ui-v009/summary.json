@@ -1,0 +1,72 @@
+{
+  "version": "ui-v009",
+  "date": "2026-10-14",
+  "release": "卡坦岛之三国争霸内测版1.1",
+  "scope": "M6 显示布局迭代；规则和AI不变；M7/M8未推进",
+  "tests": {
+    "passed": 761,
+    "failed": 0,
+    "skipped": 0,
+    "fullAiGames": 52
+  },
+  "unity": {
+    "version": "6000.3.25f1",
+    "buildPassed": true,
+    "finalBuildSeconds": 15.9,
+    "coreAndAiRoundtripPassed": true
+  },
+  "persistence": {
+    "independentProcesses": 2,
+    "ruleSets": 4,
+    "savePassed": true,
+    "loadPassed": true
+  },
+  "headless": {
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。",
+    "configurations": 28,
+    "checks": 20048,
+    "cameraImages": 0,
+    "guiAttempts": 0,
+    "guiImagesWithChanges": 0,
+    "graphics": false,
+    "fullUiPixelsVerified": false
+  },
+  "graphics": {
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。",
+    "configurations": 28,
+    "checks": 20057,
+    "cameraImages": 8,
+    "guiAttempts": 8,
+    "guiImagesWithChanges": 0,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+  },
+  "windowChecks": [
+    "1920×1080城市骑士实际窗口中央大棋盘及四角布局",
+    "滚轮共同缩放，备件和设施跟随；底部手牌固定",
+    "Esc打开/关闭居中菜单，银行交易浮窗Esc先关闭、再次打开菜单",
+    "菜单切换俯视，实体仍置于共同桌面",
+    "双扩展新局实际横船、三面城墙分离、四方玩家和镜像库存",
+    "F8完整界面截图仅保存在.local验收目录"
+  ],
+  "limits": [
+    "完整IMGUI像素自动验收仍为false，实际窗口检查单独记录",
+    "未进行所有分辨率人工外观、用户本人完整对局和长期性能验收",
+    "未重新人工跑完整设施升级或全部进步卡流程"
+  ],
+  "executable": ".local/m6-ui-v009/Builds/Windows/CatanM6.exe",
+  "archive": ".local/m6-ui-v009/release/卡坦岛之三国争霸内测版1.1.zip",
+  "sha256": {
+    "exe": "3070E580E019576B9AFCDEB4FEC18D03CEBC119F6AE84D597412905C749AD653",
+    "presentation": "F785318F5D2E9F794027D8B56049B52F89816A3FAAB461FE38DABD44CC273D72",
+    "zip": "83C8A9AD82C927E88362A89E36054869F0C15F163F9FFD7C13F243BFFD1D36A7"
+  },
+  "publication": {
+    "commit": "0b66f61a19eadbf3a8e9e188e68c603790d38afe",
+    "wechat": "2026-10-14 00:33 已核对卡坦项目督察组：报告等待标记消失，414.5 MB压缩包已显示普通ZIP图标，无上传字样或暂停进度图标，输入框清空。"
+  }
+}

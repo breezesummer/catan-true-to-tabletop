@@ -1,0 +1,9 @@
+{
+  "typeId": "robber",
+  "operations": [],
+  "pythonVersion": "3.12.14",
+  "pillowVersion": "12.3.0",
+  "numpyVersion": "2.3.5",
+  "scriptSha256": "bc20c1d357a9acbed2dc5c9e4a8dce2fa6060430ddce9da7594af2ed2c1717b3",
+  "recipeSha256": "58f31ada38f95703fe883daa199f7516df295e735ebd3accc271e424b0addba5"
+}

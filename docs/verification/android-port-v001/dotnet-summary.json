@@ -1,0 +1,14 @@
+[
+  {
+    "suite": "android-baseline.trx",
+    "total": 815,
+    "passed": 815,
+    "failed": 0
+  },
+  {
+    "suite": "android-touch-layout.trx",
+    "total": 30,
+    "passed": 30,
+    "failed": 0
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "rules-final",
+    "total": 955,
+    "passed": 955,
+    "failed": 0
+  },
+  {
+    "name": "full-games",
+    "total": 52,
+    "passed": 52,
+    "failed": 0
+  },
+  {
+    "name": "audio",
+    "total": 217,
+    "passed": 217,
+    "failed": 0
+  },
+  {
+    "name": "network",
+    "total": 108,
+    "passed": 108,
+    "failed": 0
+  },
+  {
+    "name": "server",
+    "total": 23,
+    "passed": 23,
+    "failed": 0
+  }
+]

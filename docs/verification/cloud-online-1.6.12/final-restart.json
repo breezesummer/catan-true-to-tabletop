@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "games": [
+    {
+      "finished": true,
+      "rules": "base",
+      "revision": 432,
+      "revisionDidNotRegress": true,
+      "originalFinishedRevision": 429
+    },
+    {
+      "finished": true,
+      "rules": "seafarers",
+      "revision": 519,
+      "revisionDidNotRegress": true,
+      "originalFinishedRevision": 517
+    },
+    {
+      "finished": true,
+      "rules": "cities-knights",
+      "revision": 483,
+      "revisionDidNotRegress": true,
+      "originalFinishedRevision": 480
+    },
+    {
+      "finished": true,
+      "rules": "combined",
+      "revision": 293,
+      "revisionDidNotRegress": true,
+      "originalFinishedRevision": 291
+    }
+  ],
+  "restoredFinishedGames": 4,
+  "publicRoomCount": 0,
+  "privateBackupArchiveReadable": true
+}

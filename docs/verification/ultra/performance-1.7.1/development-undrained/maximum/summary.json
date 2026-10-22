@@ -1,0 +1,26 @@
+{
+"schema":"ultra-baseline-performance-v2","scenario":"maximum","theme":"真实桌游","device":{
+    "build": "1.7.1",
+    "unity": "6000.3.25f1",
+    "os": "Windows 11  (10.0.26200)",
+    "cpu": "Intel(R) Core(TM) i5-14600KF",
+    "gpu": "AMD Radeon RX 9070 XT",
+    "graphicsApi": "Direct3D11",
+    "graphicsDriver": "Direct3D 11.0 [level 11.1]",
+    "quality": "Ultra",
+    "pipeline": "TabletopPipeline-v005",
+    "launchMode": "窗口启动方式见launch.json；focusedFrames记录实际焦点；固定路线自动测量",
+    "cpuThreads": 20,
+    "systemMemoryMb": 32594,
+    "gpuMemoryMb": 16304,
+    "width": 1920,
+    "height": 1080,
+    "targetFrameRate": 60,
+    "vSyncCount": 1,
+    "msaa": 4,
+    "renderScale": 1.0,
+    "shadowDistance": 4.0,
+    "developmentBuild": true,
+    "frameTimingFeatureEnabled": true,
+    "runInBackground": true
+},"sampleSeconds":15.006729,"warmupSeconds":8,"sampleCount":2022,"focusedFrames":2022,"renderedFrames":2023,"sceneCensus":{"activeRenderers":119,"activeMaterialSlots":303,"distinctActiveMaterials":206,"residentMaterials":265,"residentTextures":140,"residentMeshes":83,"residentTextureRuntimeBytes":670582607,"note":"采样开始前枚举；纹理/网格含Unity与UI当前驻留资源；RuntimeMemorySize不是显存精确占用。"},"authorityUnchanged":true,"route":"v1：0%-25%全桌斜视到高角；25%-50%到0.55近景；50%-75%右移0.8近景半高；75%-100%回全桌。四段SmoothStep，相机在公开棋盘中心拟合；采样不执行UI输入。","frameMs":{"validSamples":2022,"p50":7.056,"p95":8.5997,"p99":9.329,"max":12.1045},"cpuMs":{"validSamples":2022,"p50":7.0614,"p95":8.6193,"p99":9.3183,"max":12.0851},"gpuMs":{"validSamples":2022,"p50":6.07744,"p95":7.57132,"p99":8.31016,"max":11.16336},"cpuTimingCoverage":1,"gpuTimingCoverage":1,"frameTimingNote":"CPU/GPU只记FrameTimingManager返回的正数和不同时间戳；无有效样本时分位数为null。其采样可能延后一帧，不能代替GPU profiler。","spikesOver50Ms":0,"gcRecorderAvailable":true,"renderCountersAvailable":true,"gcCollections":[806,806,806],"gcAllocatedBytesTotal":1012248778,"allocatedPeakBytes":124073988,"reservedPeakBytes":283889664,"monoUsedPeakBytes":17104896,"allocatedStartBytes":123580700,"allocatedEndBytes":123959628,"processWorkingSetStartBytes":0,"processWorkingSetEndBytes":0,"drawCalls":{"validSamples":2022,"p50":1535,"p95":1535,"p99":1535,"max":1535},"batches":{"validSamples":2022,"p50":1535,"p95":1535,"p99":1535,"max":1535},"triangles":{"validSamples":2022,"p50":491409,"p95":491409,"p99":491409,"max":491409},"limitations":"暂停规则和AI的短时固定镜头基线；不是对局CPU、热稳定、30分钟持续运行或Android性能验收。截图在预热前独立采集，只有棋盘相机画面；未包含IMGUI。ProfilerRecorder和内存计数器存在观测开销。"}
