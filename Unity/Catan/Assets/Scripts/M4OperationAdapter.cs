@@ -205,6 +205,7 @@ public sealed partial class M4App
     {
         if(DirectProgressActive)return draft!=null&&draft.Kind==CommandKind.PlayProgressCard?status:TabletopSelectionPrompt.Decision(view.PendingDecision.Kind);
         if(FreeRoadPlacementActive)return TabletopRoadPlacement.Instruction(view.PendingDecision?.Kind=="ProgressRoads"?view.PendingDecision.Amount:view.PendingDecision?.RemainingRoads??2,ai.HistoryEntries);
+        if(view.Phase==GamePhase.ThreeKingdoms)return view.ThreeKingdoms?.PendingDecision==null?"请在上方推进三国阶段":"请在上方完成私密选将";
         if(view.Phase==GamePhase.Finished)return view.WinnerPlayerId+" 获胜";
         if(pickField=="source")return "请选择要行动的己方骑士";
         if(pickField!="")return draft?.Kind==CommandKind.MoveRobber?"请选择强盗要前往的新地块":"请选择地图上的合法目标";

@@ -49,19 +49,18 @@ public sealed partial class M6App
         if(tablePausePage==1){DrawTablePauseSettings();return;}
         var panel=new Rect(440,100,560,700);
         TablePauseHeading(panel,"山 海 之 间  ·  一 桌 好 时 光","游戏菜单","卡坦岛之三国争霸 · "+ReleaseVersion);
-        string[] entries=NetworkGame?new[]{"继续游戏","保存游戏","游戏设置","游戏百科","重新开始","返回主菜单"}:
-            new[]{"继续游戏","保存游戏","游戏设置","游戏百科","返回主菜单"};
+        string[] entries={"继续游戏","保存游戏","游戏设置","游戏百科","重新开始","返回主菜单"};
         for(int i=0;i<entries.Length;i++)
         {
             bool restart=NetworkGame&&i==4;
-            if(!PastoralMenuUI.Button(new Rect(526,302+i*(NetworkGame?62:75),388,58),entries[i],!restart||Network.CanRestartRoom,true))continue;
+            if(!PastoralMenuUI.Button(new Rect(526,302+i*62,388,58),entries[i],!restart||Network.CanRestartRoom,true))continue;
             switch(i)
             {
                 case 0:CloseTablePauseMenu(true);break;
                 case 1:SaveGame();tablePauseFeedback=Notice;break;
                 case 2:tablePausePage=1;tablePauseFeedback="";GUI.FocusControl(null);break;
                 case 3:encyclopediaOpen=true;break;
-                case 4:if(NetworkGame){Network.RestartRoom();tablePauseFeedback="正在重新生成地图与行动顺序…";}else ReturnToMainMenu();break;
+                case 4:if(NetworkGame){Network.RestartRoom();tablePauseFeedback="正在重新生成地图与行动顺序…";}else RestartLocalGame();break;
                 case 5:ReturnToMainMenu();break;
             }
         }

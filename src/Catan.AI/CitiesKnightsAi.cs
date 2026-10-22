@@ -23,16 +23,21 @@ public sealed class CitiesKnightsAi
     {
         if (view == null) throw new ArgumentNullException(nameof(view));
         if (view.Phase == GamePhase.Finished) throw new InvalidOperationException("The game has finished.");
-        var actor = view.TradeOffer != null ? view.TradeOffer.NextResponder(view.PlayerId) : view.PendingDecision?.PlayerId ?? view.ActivePlayerId;
+        var actor = view.ThreeKingdoms?.PendingDecision?.PlayerId ?? (view.TradeOffer != null ? view.TradeOffer.NextResponder(view.PlayerId) : view.PendingDecision?.PlayerId ?? view.ActivePlayerId);
         var canDiscard = view.Phase == GamePhase.Discard && view.Discards.Any(d => d.PlayerId == view.PlayerId);
         if (view.Phase == GamePhase.Discard ? !canDiscard : actor != view.PlayerId) throw new InvalidOperationException("This seat has no pending action.");
-        return Copy(Choose(view));
+        var command = Copy(Choose(view));
+        if (view.ThreeKingdoms != null) command.WindowId = view.ThreeKingdoms.WindowId;
+        return command;
     }
     private Command Choose(PlayerView view)
     {
         Command Make(CommandKind kind, string target = null) => new() { PlayerId = view.PlayerId, Kind = kind, TargetId = target! };
+        // 骨架没有技能收益：只推进强制选将和阶段，不主动反复隐退。
+        var legal = (view.LegalActions ?? Array.Empty<Command>()).Where(c => c.Kind != CommandKind.RetireGeneral).ToList();
+        var generalChoice = legal.FirstOrDefault(c => c.Kind == CommandKind.ChooseGenerals || c.Kind == CommandKind.DeployGeneral || c.Kind == CommandKind.AdvanceThreeKingdomsPhase);
+        if (generalChoice != null) return generalChoice;
         if (view.TradeOffer != null) return RespondToTrade(view);
-        var legal = (view.LegalActions ?? Array.Empty<Command>()).ToList();
         if (view.Phase == GamePhase.SetupSettlement)
             return Make(CommandKind.SetupSettlement, view.LegalVertexIds.OrderByDescending(v => SetupValue(view, v)).ThenBy(v => v).First());
         if (view.Phase == GamePhase.SetupRoad)
@@ -470,6 +475,7 @@ public sealed class CitiesKnightsAi
     private static Command Copy(Command c) => new Command
     {
         PlayerId=c.PlayerId, Kind=c.Kind, TargetId=c.TargetId, OtherPlayerId=c.OtherPlayerId,
+        GeneralIds=c.GeneralIds?.ToArray(), DecisionId=c.DecisionId, WindowId=c.WindowId,
         GiveResource=c.GiveResource, ReceiveResource=c.ReceiveResource, GiveAmount=c.GiveAmount, ReceiveAmount=c.ReceiveAmount,
         Give=c.Give?.Copy(), Receive=c.Receive?.Copy(), Resources=c.Resources?.Copy(), Resource=c.Resource,
         SourceId=c.SourceId, Track=c.Track, Commodity=c.Commodity, Commodities=c.Commodities?.Copy(),

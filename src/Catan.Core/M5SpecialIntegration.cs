@@ -29,7 +29,7 @@ namespace Catan.Core.M5
             }
         }
         private Port[] CurrentPorts(GameState s) => s.Special==null?ports:s.Special.Ports.Select(p=>new Port {Id=p.Id,Vertices=p.Vertices.ToArray(),Resource=p.Resource}).ToArray();
-        private void Apply(GameState s,Command c)
+        private void ApplyBaseRules(GameState s,Command c)
         {
             if(s.Special==null){ApplyCore(s,c);return;}
             var before=s.Roads.Select(r=>r.LocationId).Concat(s.Ships.Select(r=>r.LocationId)).ToArray();

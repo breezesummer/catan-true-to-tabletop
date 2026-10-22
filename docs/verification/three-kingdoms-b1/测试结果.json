@@ -1,0 +1,164 @@
+{
+  "日期": "2026-10-22",
+  "范围": "B1 开发骨架；54 张武将可轮换，97 个技能全部未启用；未发布游戏包",
+  "新增独立验收": {
+    "状态": "通过",
+    "总数": 51,
+    "通过": 51,
+    "失败": 0,
+    "证据": ".local/three-kingdoms-b1/b1-final.trx",
+    "说明": "最终手动深复制及合法动作早拒绝优化后的产品代码；随后只新增旧五参工厂包装，不改变三国执行路径。",
+    "城市骑士及九图开局配置": 20,
+    "九图三四人配置": 18,
+    "保存恢复": "每个开局候选／拟登场待决与初始摆放步骤；完整局四种选将轮换待决、六阶段和实际遇到的原模式待决；暂挂他人待决后的每步换将。",
+    "权限和状态": "非法命令零变化、预览零变化、同命令幂等、过期窗口拒绝、公共及 AI 视图隐私、秘密置换非干扰、嵌套集合深复制、武将唯一实体、旧存档冻结样本。",
+    "总运行时间": "2 分 45 秒"
+  },
+  "完整三国骨架对局": {
+    "状态": "通过",
+    "总局数": 4,
+    "合法命令总数": 3538,
+    "初始种子": 97,
+    "明细": [
+      {
+        "模式": "城市与骑士",
+        "地图": "基础地图",
+        "人数": 3,
+        "合法命令": 876,
+        "获胜轮": 28
+      },
+      {
+        "模式": "城市与骑士",
+        "地图": "基础地图",
+        "人数": 4,
+        "合法命令": 1054,
+        "获胜轮": 23
+      },
+      {
+        "模式": "双扩展组合",
+        "地图": "驶向新海岸",
+        "人数": 3,
+        "合法命令": 759,
+        "获胜轮": 24
+      },
+      {
+        "模式": "双扩展组合",
+        "地图": "驶向新海岸",
+        "人数": 4,
+        "合法命令": 849,
+        "获胜轮": 21
+      }
+    ],
+    "边界": "跳过、翻面及额外回合只由公共生命周期独立测试驱动；B1 产品没有未实现技能入口。",
+    "四局测试累计耗时秒": 142.76
+  },
+  "最终补测": {
+    "状态": "通过",
+    "总数": 23,
+    "通过": 23,
+    "失败": 0,
+    "证据": ".local/three-kingdoms-b1/b1-postfix.trx",
+    "组成": "13 项生命周期（含完整手动深复制）、4 项旧固定地图工厂兼容、4 项隐私与复制、2 项暂挂他人真实待决换将。"
+  },
+  "旧存档": {
+    "状态": "通过",
+    "冻结样本": 4,
+    "来源": "B1 改动前编译产物生成，城市骑士／组合各三人四人，每局24条真实产品AI命令。",
+    "测试文件": "tests/Catan.Rules.Tests/ThreeKingdomsLegacySaves.cs",
+    "检查": "原存档逐字相同，旧命令指纹可重放；关闭三国重新执行24条命令得到相同原存档，继续下一动作结果相同。"
+  },
+  "原模式快速回归": {
+    "总数": 1217,
+    "初次通过": 1191,
+    "初次失败": 26,
+    "证据": ".local/three-kingdoms-b1/b1-regression-quick.trx",
+    "新增失败及处理": "4 项旧固定地图测试用反射调用旧五参 CreateForVersion，新增参数导致参数数目不匹配；已恢复五参包装，新六参入口独立命名，4项最终补测通过。",
+    "保留基线失败数": 22,
+    "与改动前失败名单匹配": true,
+    "既有失败精确名单": [
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"锻铁匠\", track: 2)",
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"商业港口\", track: 0)",
+      "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.FreeEngineeringWallIsConstructedAndCardUsesRequestedVerb",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Constitution, name: \"宪法\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Printing, name: \"印刷术\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.ResourceMonopolyUsesHarvestForEachAffectedPlayer",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.SabotageDiscardIsOneColoredCountSentenceForEveryViewer",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: False)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: True)",
+      "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"ProgressTreasonRemove\", action: \"叛变\", piece: \"己方骑士\")",
+      "Catan.Rules.Tests.TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat",
+      "Catan.Rules.Tests.TabletopSpecialCollectionTests.DefenderProgressRewardFliesFromTheCorrectTrackWithoutLeakingOpponentCard"
+    ]
+  },
+  "独立进程存档测试": {
+    "状态": "通过",
+    "通过": 1,
+    "失败": 0,
+    "证据": ".local/three-kingdoms-b1/b1-process-postfix.trx",
+    "基线环境修复证据": ".local/three-kingdoms-b1/baseline-process-env-fixed.trx",
+    "环境说明": "系统 dotnet 没有 SDK；主测试使用 D:/Development/dotnet/dotnet.exe，子进程还须设置 PATH 和 DOTNET_ROOT。第一次基线该项失败，设置后旧编译产物复测通过。独立 artifacts-path 改变输出布局，该测试硬编码默认 bin 路径，因此将新编译 SaveProbe 完整输出复制到其要求的构建目录再测，未改产品或原测试源码。"
+  },
+  "改动前全量基线": {
+    "状态": "已完成；存在既有失败及一项已复测排除的环境失败",
+    "证据": ".local/three-kingdoms-b1/b1-baseline.trx",
+    "日志": ".local/three-kingdoms-b1/baseline.log",
+    "当前已观察失败": 23,
+    "已确认产品既有失败": 22,
+    "另一个环境失败": "独立进程存档测试，配置工具链后已通过。",
+    "总数": 1279,
+    "通过": 1256,
+    "失败": 23,
+    "持续时间": "17 分 29 秒"
+  },
+  "改动后原模式完整局回归": {
+    "状态": "通过",
+    "计划实例数": 108,
+    "证据": ".local/three-kingdoms-b1/b1-regression-fullgames.trx",
+    "日志": ".local/three-kingdoms-b1/regression-fullgames.log",
+    "总数": 108,
+    "通过": 108,
+    "失败": 0,
+    "持续时间": "16 分 29 秒"
+  },
+  "运行说明": "Windows 的正在运行 testhost 会锁住输出 DLL；使用各自 .local/three-kingdoms-b1/build-* 输出避免覆盖基线。优化前完整B1运行主动停止并由优化后51项完整运行替代，不将被停止的结果计入通过。",
+  "网络协议回归": {
+    "状态": "通过",
+    "总数": 134,
+    "通过": 134,
+    "失败": 0,
+    "证据": ".local/three-kingdoms-b1/b1-network-final.trx"
+  },
+  "服务器回归": {
+    "状态": "通过",
+    "总数": 53,
+    "通过": 53,
+    "失败": 0,
+    "证据": ".local/three-kingdoms-b1/b1-server-final.trx"
+  },
+  "冻结源码视图补测": {
+    "状态": "通过",
+    "总数": 47,
+    "通过": 47,
+    "失败": 0,
+    "证据": ".local/three-kingdoms-b1/b1-frozen-focused.trx",
+    "说明": "最终取消重复合法动作过滤后，全部47项非完整局B1重跑通过；状态执行未变。"
+  },
+  "合并后的规则验收": {
+    "总数": 1330,
+    "通过": 1308,
+    "失败": 22,
+    "失败均为既有断言": true,
+    "说明": "按完整测试名称合并互补筛选与定点修复复测，后续复测覆盖旧结果；不是声称单次全量全绿。包含原1279项及新增51项。",
+    "剩余限制": "22 项既有牌名与展示断言在改动前后均失败，未纳入本轮修复范围。"
+  }
+}

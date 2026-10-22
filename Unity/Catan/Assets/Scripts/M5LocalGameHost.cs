@@ -12,7 +12,7 @@ public sealed class M5LocalGameHost
         NewGame("heading-for-new-shores", players);
     }
     public void NewGame(string scenarioId, int players = 4) => NewGame(scenarioId, players, unchecked((uint)Guid.NewGuid().GetHashCode()));
-    public void NewGame(string scenarioId, int players, uint seed, int? targetVictoryPoints = null) { session = CombinedGameSession.Create(scenarioId, players, seed, targetVictoryPoints); }
+    public void NewGame(string scenarioId, int players, uint seed, int? targetVictoryPoints = null, bool threeKingdoms = false) { session = CombinedGameSession.Create(scenarioId, players, seed, targetVictoryPoints, threeKingdoms); }
     public PlayerView View(string seat) => session.GetPlayerView(seat);
     internal PlayerView AiView(string seat) => session.GetAiPlayerView(seat);
     public Catan.Core.GameHistoryEntry[] History(string seat, long afterSequence = 0) => session.GetHistory(seat, afterSequence);

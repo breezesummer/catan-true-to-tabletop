@@ -14,7 +14,7 @@ public sealed class M4LocalGameHost
         NewGame(players);
     }
     public void NewGame(int players = 4) => NewGame(players, unchecked((uint)Guid.NewGuid().GetHashCode()));
-    public void NewGame(int players, uint seed, int? targetVictoryPoints = null) { session = CitiesKnightsGameSession.Create(topology, players, seed, targetVictoryPoints); }
+    public void NewGame(int players, uint seed, int? targetVictoryPoints = null, bool threeKingdoms = false) { session = CitiesKnightsGameSession.Create(topology, players, seed, targetVictoryPoints, threeKingdoms); }
     public PlayerView View(string seat) => session.GetPlayerView(seat);
     internal PlayerView AiView(string seat) => session.GetAiPlayerView(seat);
     public Catan.Core.GameHistoryEntry[] History(string seat, long afterSequence = 0) => session.GetHistory(seat, afterSequence);

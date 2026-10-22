@@ -35,7 +35,7 @@ public sealed partial class M4App : MonoBehaviour
         Application.targetFrameRate=60;ai=GetComponent<M6App>();
         if(ai!=null&&ai.NetworkGame){font=MobileTabletop.LoadFont();ai.ConnectNetwork(this);return;}
         host=new M4LocalGameHost(ai==null?4:ai.PlayerCount);
-        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints);
+        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints,ai.ThreeKingdoms);
 
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         var initial=host.View(ai==null?"P1":ai.HumanSeat);nextSeat=initial.ActivePlayerId;Refresh(initial);
@@ -53,6 +53,7 @@ public sealed partial class M4App : MonoBehaviour
     }
     public static string Actor(PlayerView v)
     {
+        if(v.ThreeKingdoms?.PendingDecision!=null)return v.ThreeKingdoms.PendingDecision.PlayerId;
         if(v.TradeOffer!=null)return v.TradeOffer.NextResponder(v.PlayerId);
         if(v.Discards.Length>0)return v.Discards[0].PlayerId;
         return v.PendingDecision!=null&&!string.IsNullOrEmpty(v.PendingDecision.PlayerId)?v.PendingDecision.PlayerId:v.ActivePlayerId;
@@ -67,9 +68,10 @@ public sealed partial class M4App : MonoBehaviour
     public CommandResult Submit(Command command)
     {
         if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status=ai.Network.Status;return null;}
-        if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
+        if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!(command.Kind==CommandKind.RetireGeneral&&view?.ThreeKingdoms?.CanRetire==true)&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
         if(ai!=null&&command==draft&&!DockKnightTargetMatches(command.TargetId)){status="请选择低一级的己方骑士晋升。";return null;}
         command.Id=string.IsNullOrEmpty(command.Id)?Guid.NewGuid().ToString("N"):command.Id;
+        if(view?.ThreeKingdoms!=null&&string.IsNullOrEmpty(command.WindowId))command.WindowId=view.ThreeKingdoms.WindowId;
         dock.Reset();CancelOperationDraft();var result=host.Submit(command);status=result.Success?"操作完成。":result.Message;
         if(ai!=null&&result.Success&&ai.PresentPlayedCard(host.History(seat),M6Refresh))return result;
         pickField="";board.ClearPreview();view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);Refresh(view);
@@ -81,7 +83,7 @@ public sealed partial class M4App : MonoBehaviour
         }
         return result;
     }
-    Command New(CommandKind kind,string target=null)=>new Command{Id=Guid.NewGuid().ToString("N"),PlayerId=seat,Kind=kind,TargetId=target,Resources=new ResourceBag(),Commodities=new CommodityBag(),Give=new ResourceBag(),Receive=new ResourceBag(),GiveCommodities=new CommodityBag(),ReceiveCommodities=new CommodityBag(),ChosenDice1=1,ChosenDice2=1};
+    Command New(CommandKind kind,string target=null)=>new Command{Id=Guid.NewGuid().ToString("N"),PlayerId=seat,Kind=kind,TargetId=target,WindowId=view?.ThreeKingdoms?.WindowId,Resources=new ResourceBag(),Commodities=new CommodityBag(),Give=new ResourceBag(),Receive=new ResourceBag(),GiveCommodities=new CommodityBag(),ReceiveCommodities=new CommodityBag(),ChosenDice1=1,ChosenDice2=1};
     void Select(CommandKind kind){draft=New(kind);pickField="";scroll=Vector2.zero;}
     void Refresh(PlayerView v)
     {
@@ -107,7 +109,7 @@ public sealed partial class M4App : MonoBehaviour
         if(board==null)return;
         RefreshTablePrompt();
         if(mapChoice.Active&&Input.GetMouseButtonDown(1)){mapChoice.Clear();return;}
-        if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
+        if(ai!=null&&(ai.TableMenuOpen||ai.ThreeKingdomsPanelBlocksTable)){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         var pointer=MobileTabletop.Pointer;
         bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(MobileTabletop.Logical(pointer));
         bool canMap=ai!=null&&!curtain&&!newGame&&!artOpen&&!ai.TableMenuOpen&&!blocked&&TabletopUI.ContainsMapScreenPoint(pointer);
@@ -200,7 +202,7 @@ public sealed partial class M4App : MonoBehaviour
     void OnGUI()
     {
         using var frameCost=FrameCost.Measure(FrameCost.Stage.Gui);
-        if(host==null&&!NetworkGame)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=MobileTabletop.GuiMatrix;
+        if(host==null&&!NetworkGame)return;if(ai!=null){bool before=GUI.enabled;GUI.enabled=before&&!ai.ThreeKingdomsPanelBlocksTable;DrawOperationLayout();GUI.enabled=before;return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=MobileTabletop.GuiMatrix;
         Panel(new Rect(0,0,1440,125),new Color(.045f,.09f,.10f));
         GUI.Label(new Rect(25,15,640,36),"CATAN  /  城市与骑士",heading);
         GUI.Label(new Rect(25,54,760,25),"M4 · 官方 2025 规则 · 本地 3–4 人 · 13 分获胜",small);
@@ -485,7 +487,7 @@ public sealed partial class M4App : MonoBehaviour
     static string BagText(ResourceBag r,CommodityBag c)=>string.Join(" / ",Enumerable.Range(0,8).Where(i=>(i<5?(r==null?0:r[(Resource)i]):(c==null?0:c[(Commodity)(i-5)]))>0).Select(i=>Goods[i]+" "+(i<5?r[(Resource)i]:c[(Commodity)(i-5)])));
     static string CardName(ProgressCardKind c)=>Cards[(int)c];
     static string EventName(EventDie d)=>d==EventDie.Barbarian?"蛮族船":d==EventDie.Trade?"贸易":d==EventDie.Politics?"政治":"科学";
-    static string PhaseName(GamePhase phase){switch(phase){case GamePhase.SetupSettlement:return "开局建筑";case GamePhase.SetupRoad:return "开局道路";case GamePhase.ProductionAwaitRoll:return "等待掷骰";case GamePhase.Action:return "行动";case GamePhase.Discard:return "弃牌";case GamePhase.RobberMove:return "移动强盗";case GamePhase.RobberSteal:return "偷取";case GamePhase.RoadBuilding:return "免费道路";case GamePhase.Finished:return "已结束";default:return "待决选择";}}
+    static string PhaseName(GamePhase phase){switch(phase){case GamePhase.SetupSettlement:return "开局建筑";case GamePhase.SetupRoad:return "开局道路";case GamePhase.ProductionAwaitRoll:return "等待掷骰";case GamePhase.Action:return "行动";case GamePhase.Discard:return "弃牌";case GamePhase.RobberMove:return "移动强盗";case GamePhase.RobberSteal:return "偷取";case GamePhase.RoadBuilding:return "免费道路";case GamePhase.ThreeKingdoms:return "三国武将阶段";case GamePhase.Finished:return "已结束";default:return "待决选择";}}
     static string DecisionName(string key){switch(key){case "PillageCity":return "选择被劫掠的城市";case "Metropolis":return "放置大都会";case "DefenderProgress":return "防御奖励";case "Aqueduct":return "水渠选资源";case "DisplacedKnight":return "安置被驱离骑士";case "ProgressDiscard":return "发展卡超限";case "ProgressEspionage":return "间谍选牌";case "ProgressGuildDues":return "大商家选牌";case "ProgressRoads":return "免费道路";case "ProgressHarbor":return "商港交商品";case "ProgressTreasonRemove":return "移除自己的骑士";case "ProgressTreasonPlace":return "放置替补骑士";case "ProgressWedding":return "婚礼赠礼";case "ProgressSabotage":return "破坏者弃牌";default:return "按提示完成选择";}}
     static string CommandName(CommandKind kind){switch(kind){case CommandKind.SetupSettlement:return "开局建筑";case CommandKind.SetupRoad:return "开局道路";case CommandKind.BuildRoad:return "建道路";case CommandKind.BuildSettlement:return "建村庄";case CommandKind.BuildCity:return "升级城市";case CommandKind.BuildWall:return "城墙";case CommandKind.ImproveCity:return "城市设施";case CommandKind.RecruitKnight:return "招募骑士";case CommandKind.PromoteKnight:return "晋升骑士";case CommandKind.ActivateKnight:return "激活骑士";case CommandKind.MoveKnight:return "移动骑士";case CommandKind.DisplaceKnight:return "驱离骑士";case CommandKind.ChaseRobber:return "驱逐强盗";case CommandKind.PlayProgressCard:return "发展卡";case CommandKind.BankTrade:return "银行交易";case CommandKind.ProposeTrade:return "玩家交易";case CommandKind.DiscardResources:return "弃牌";case CommandKind.MoveRobber:return "移动强盗";case CommandKind.StealResource:return "选择偷取对象";default:return "完成待决操作";}}
     static string OptionName(string value){ImprovementTrack track;if(Enum.TryParse(value,out track)&&Enum.IsDefined(typeof(ImprovementTrack),track))return Tracks[(int)track];return value;}
@@ -519,6 +521,7 @@ public sealed partial class M4App : MonoBehaviour
     bool NetworkGame=>ai!=null&&ai.NetworkGame;
     M7Preview Preview(Command command)
     {
+        if(view?.ThreeKingdoms!=null&&string.IsNullOrEmpty(command.WindowId))command.WindowId=view.ThreeKingdoms.WindowId;
         if(NetworkGame)return ai.Network.Preview(command);
         var result=host.Preview(command);return new M7Preview(result.Success,result.Message);
     }

@@ -85,7 +85,7 @@ public sealed partial class M6App
     }
     static void ValidateAuthority(SavedGame data)
     {
-        int players;string scenario=data.ScenarioId;
+        int players;string scenario=data.ScenarioId;bool threeKingdoms=false;
         switch(data.RuleSet)
         {
             case "base":
@@ -96,11 +96,11 @@ public sealed partial class M6App
                 var seaView=seaHost.View(data.HumanSeat);players=seaView.Players.Length;scenario=seaView.ScenarioId;break;
             case "cities-knights":
                 var cityHost=new M4LocalGameHost(data.PlayerCount);cityHost.ImportSave(data.Authority);
-                players=cityHost.View(data.HumanSeat).Players.Length;break;
+                var cityView=cityHost.View(data.HumanSeat);players=cityView.Players.Length;threeKingdoms=cityView.ThreeKingdoms!=null;break;
             default:
                 var combinedHost=new M5LocalGameHost(data.PlayerCount);combinedHost.ImportSave(data.Authority);
-                var combinedView=combinedHost.View(data.HumanSeat);players=combinedView.Players.Length;scenario=combinedView.ScenarioId;break;
+                var combinedView=combinedHost.View(data.HumanSeat);players=combinedView.Players.Length;scenario=combinedView.ScenarioId;threeKingdoms=combinedView.ThreeKingdoms!=null;break;
         }
-        if(players!=data.PlayerCount||scenario!=data.ScenarioId)throw new InvalidDataException("M6 configuration does not match authority");
+        if(players!=data.PlayerCount||scenario!=data.ScenarioId||threeKingdoms!=data.ThreeKingdoms)throw new InvalidDataException("本地配置与权威存档不一致。");
     }
 }

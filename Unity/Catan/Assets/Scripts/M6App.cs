@@ -19,6 +19,7 @@ public sealed partial class M6App : MonoBehaviour
         public bool Paused;
         public int AiSpeedLevel=1;
         public bool HasAiSpeed;
+        public bool ThreeKingdoms;
         public string[] PlayerNames;
     }
 
@@ -26,6 +27,7 @@ public sealed partial class M6App : MonoBehaviour
     public string ScenarioId { get; private set; }="heading-for-new-shores";
     public int PlayerCount { get; private set; }=4;
     public int TargetVictoryPoints { get; private set; }=10;
+    public bool ThreeKingdoms { get; private set; }
     public string HumanSeat { get; private set; }="P1";
     public string InitialAuthority { get; private set; }
     public bool Paused { get; private set; }
@@ -58,10 +60,11 @@ public sealed partial class M6App : MonoBehaviour
     internal bool TableOverlayOpen;
     int menuRule,menuScenario,menuPlayers=4,menuHuman,menuAiSpeed=1;
     int? menuVictoryPoints;
+    bool menuThreeKingdoms;
     bool tableMenu, escapeDismissedInteraction;
     public bool TableMenuOpen=>tableMenu;
     public void OpenTableMenu(){if(!Ready)return;ResetTablePauseMenu();tableMenu=true;escapeDismissedInteraction=false;}
-    public bool BlocksTableInput(Vector2 p)=>MenuVisible||TablePresentationBlocked||TableDiceRolling||ClosedTableSelection&&SelectionPromptArea.Contains(p);
+    public bool BlocksTableInput(Vector2 p)=>MenuVisible||TablePresentationBlocked||TableDiceRolling||ThreeKingdomsBlocksInput(p)||ClosedTableSelection&&SelectionPromptArea.Contains(p);
     void ToggleTableCamera()
     {
         var b=FindFirstObjectByType<BoardRenderer>();if(b!=null)b.SetCamera(!b.TopView);
@@ -89,6 +92,7 @@ public sealed partial class M6App : MonoBehaviour
         gameObject.AddComponent<OperationUiVerification>();
         gameObject.AddComponent<TabletopUiVerification>();
         gameObject.AddComponent<CombinedMapVerification>();
+        gameObject.AddComponent<ThreeKingdomsPlayerVerification>();
         gameObject.AddComponent<TabletopV005Review>();
         gameObject.AddComponent<TabletopAiAnimationVerification>();
         if(GetComponent<InteractionPresentationVerification>()==null)gameObject.AddComponent<InteractionPresentationVerification>();
@@ -111,6 +115,7 @@ public sealed partial class M6App : MonoBehaviour
         if(!Ready)return;
         if(encyclopediaOpen){encyclopediaOpen=false;return;}
         if(tableMenu){if(HandleTablePausePageEscape())return;CloseTablePauseMenu();escapeDismissedInteraction=false;return;}
+        if(TryCloseThreeKingdomsPanel())return;
         // 第一遍放回本地草稿；规则要求的待决面板即使自动出现，下一遍仍能打开菜单。
         if(!escapeDismissedInteraction)
         {
@@ -176,15 +181,17 @@ public sealed partial class M6App : MonoBehaviour
         presentation=app;actor=acting;finished=done;decideAndSubmit=step;save=export;refresh=update;close=dispose;visible=show;
         InitialAuthority=null;refresh();nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);
     }
-    public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null,int? aiSpeedLevel=null)
+    public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null,int? aiSpeedLevel=null,bool threeKingdoms=false)
     {
         ValidateConfiguration(rules,scenario,players,human);
+        if(threeKingdoms&&(rules!="cities-knights"&&rules!="combined"||networkEntering))throw new InvalidDataException("三国争霸 B1 开发骨架仅支持本地城市与骑士或双扩展组合。");
         if(!networkEntering&&Network!=null&&(Network.Playing||Network.Busy||Network.RoomId!=null||Network.EnrollmentPending))Network.EndSession();
         int target=Catan.Core.VictoryPointSettings.Resolve(targetVictoryPoints,DefaultVictoryPoints(rules,scenario,players),MaximumVictoryPoints(rules,scenario));
         if(close!=null)close();
         else if(presentation!=null){presentation.enabled=false;Destroy(presentation);}
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
+        ThreeKingdoms=threeKingdoms;ResetThreeKingdomsPanel();
         ResetCardPresentation();ResetPlayerIdentity();
         TargetVictoryPoints=target;AiSpeedLevel=TabletopAiSpeed.Clamp(aiSpeedLevel??AiSpeedLevel);ResetBuildPresentation();
         networkMenu=false;menuPendingAction=null;tableMenu=false;encyclopediaOpen=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你使用 "+ColorLabel(human)+" 建筑。行动顺序由开局掷骰决定。";
@@ -207,7 +214,7 @@ public sealed partial class M6App : MonoBehaviour
     {
         if(NetworkGame)throw new InvalidOperationException("联机存档保存在服务器，客户端不能导出权威存档。");
         if(!Ready)throw new InvalidOperationException("No game to save");
-        return JsonUtility.ToJson(new SavedGame{RuleSet=RuleSet,ScenarioId=ScenarioId,PlayerCount=PlayerCount,HumanSeat=HumanSeat,Paused=Paused,AiSpeedLevel=AiSpeedLevel,HasAiSpeed=true,PlayerNames=localPlayerNames.ToArray(),Authority=save()},true);
+        return JsonUtility.ToJson(new SavedGame{RuleSet=RuleSet,ScenarioId=ScenarioId,PlayerCount=PlayerCount,HumanSeat=HumanSeat,Paused=Paused,AiSpeedLevel=AiSpeedLevel,HasAiSpeed=true,ThreeKingdoms=ThreeKingdoms,PlayerNames=localPlayerNames.ToArray(),Authority=save()},true);
     }
     public void WriteSave(string path)
     {
@@ -249,7 +256,7 @@ public sealed partial class M6App : MonoBehaviour
         if(data==null||data.Version!=1||string.IsNullOrEmpty(data.Authority))throw new InvalidDataException("Unsupported M6 save");
         ValidateConfiguration(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat);
         ValidateAuthority(data); // Finish parsing before closing the current game.
-        StartGame(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat,data.Paused,data.Authority,aiSpeedLevel:data.HasAiSpeed?data.AiSpeedLevel:1);
+        StartGame(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat,data.Paused,data.Authority,aiSpeedLevel:data.HasAiSpeed?data.AiSpeedLevel:1,threeKingdoms:data.ThreeKingdoms);
         if(data.PlayerNames!=null&&data.PlayerNames.Length==data.PlayerCount)localPlayerNames=data.PlayerNames.Select(PlayerIdentityModel.NormalizeName).ToArray();
         Notice="已恢复局面、玩家姓名和颜色配置。";
     }
@@ -260,6 +267,7 @@ public sealed partial class M6App : MonoBehaviour
         menuRule=Array.IndexOf(RuleIds,RuleSet);menuPlayers=PlayerCount;menuHuman=int.Parse(HumanSeat.Substring(1))-1;
         var ids=ScenarioIds();menuScenario=Math.Max(0,Array.IndexOf(ids,ScenarioId));
         menuVictoryPoints=TargetVictoryPoints;menuAiSpeed=AiSpeedLevel;
+        menuThreeKingdoms=ThreeKingdoms;
     }
     public void SaveAndReturnToMainMenu()
     {
@@ -327,6 +335,7 @@ public sealed partial class M6App : MonoBehaviour
             }
         }
         if(!MenuVisible&&!tableMenu)DrawPlayedCard();
+        if(!MenuVisible&&!tableMenu&&!TablePresentationBlocked)DrawThreeKingdoms();
         GUI.matrix=Matrix4x4.identity;
     }
 }

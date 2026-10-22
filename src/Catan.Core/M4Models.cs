@@ -4,8 +4,8 @@ using System.Runtime.Serialization;
 
 namespace Catan.Core.M4
 {
-    public enum CommandKind { SetupSettlement, SetupRoad, RollDice, BuildRoad, BuildSettlement, BuildCity, BankTrade, ProposeTrade, AcceptTrade, RejectTrade, CancelTrade, BuyDevelopmentCard, PlayKnight, PlayRoadBuilding, PlaceFreeRoad, FinishRoadBuilding, PlayYearOfPlenty, PlayMonopoly, DiscardResources, MoveRobber, StealResource, EndTurn, DeclareVictory, BuildWall, ImproveCity, RecruitKnight, PromoteKnight, ActivateKnight, MoveKnight, DisplaceKnight, ChaseRobber, ResolveChoice, PlayProgressCard, ResolveProgressChoice, DiscardProgressCard, CommercialHarborOffer }
-    public enum GamePhase { SetupSettlement, SetupRoad, ProductionAwaitRoll, Action, Discard, RobberMove, RobberSteal, RoadBuilding, Finished, PendingChoice }
+    public enum CommandKind { SetupSettlement, SetupRoad, RollDice, BuildRoad, BuildSettlement, BuildCity, BankTrade, ProposeTrade, AcceptTrade, RejectTrade, CancelTrade, BuyDevelopmentCard, PlayKnight, PlayRoadBuilding, PlaceFreeRoad, FinishRoadBuilding, PlayYearOfPlenty, PlayMonopoly, DiscardResources, MoveRobber, StealResource, EndTurn, DeclareVictory, BuildWall, ImproveCity, RecruitKnight, PromoteKnight, ActivateKnight, MoveKnight, DisplaceKnight, ChaseRobber, ResolveChoice, PlayProgressCard, ResolveProgressChoice, DiscardProgressCard, CommercialHarborOffer, ChooseGenerals, DeployGeneral, RetireGeneral, AdvanceThreeKingdomsPhase }
+    public enum GamePhase { SetupSettlement, SetupRoad, ProductionAwaitRoll, Action, Discard, RobberMove, RobberSteal, RoadBuilding, Finished, PendingChoice, ThreeKingdoms }
     public enum DevelopmentCardKind { Knight, RoadBuilding, YearOfPlenty, Monopoly, VictoryPoint }
 
     [DataContract] public sealed partial class Command
@@ -144,7 +144,9 @@ namespace Catan.Core.M4
         {
             var lightweight = (GameState)MemberwiseClone();
             lightweight.ProcessedCommands = Array.Empty<ProcessedCommand>(); lightweight.Events = Array.Empty<GameEvent>();
+            lightweight.ThreeKingdoms = null;
             var copy = Json.Copy(lightweight);
+            copy.ThreeKingdoms = Catan.Core.ThreeKingdoms.ThreeKingdomsEngine.Clone(ThreeKingdoms);
             copy.ProcessedCommands = ProcessedCommands; copy.Events = Events;
             return copy;
         }

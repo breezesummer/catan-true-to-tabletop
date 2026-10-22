@@ -11,6 +11,7 @@ namespace Catan.Core.M5
             // state graph directly, preserving exactly the same authority values.
             var copy=(GameState)MemberwiseClone();
             copy.Special=Special?.CopyForTransaction();
+            copy.ThreeKingdoms=Catan.Core.ThreeKingdoms.ThreeKingdomsEngine.Clone(ThreeKingdoms);
             copy.Random=new RandomState {AlgorithmId=Random.AlgorithmId,State=Random.State,Draws=Random.Draws};
             copy.Players=Players.Select(p=>p.CopyForTransaction()).ToArray();
             copy.Bank=Bank.Copy();copy.CommodityBank=CommodityBank.Copy();

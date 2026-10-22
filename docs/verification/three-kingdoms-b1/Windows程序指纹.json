@@ -1,0 +1,18 @@
+[
+  {
+    "文件": "Catan2.0.1.exe",
+    "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+  },
+  {
+    "文件": "Catan2.0.1_Data/Managed/Catan.Core.dll",
+    "SHA256": "db6e78f2bdb4658232edced0b897244e53665c763f4fb9fadaf4e1326fc782ab"
+  },
+  {
+    "文件": "Catan2.0.1_Data/Managed/Catan.AI.dll",
+    "SHA256": "eb90ab33918262907c1ba2a0cac1fb7a30b9a518e811506312f23c2a2c13a7b2"
+  },
+  {
+    "文件": "Catan2.0.1_Data/Managed/Assembly-CSharp.dll",
+    "SHA256": "95781a9ca429cb8bc7aad3809f852857ebc7f0e2fa283e5d1ba7f2faae4a7d46"
+  }
+]

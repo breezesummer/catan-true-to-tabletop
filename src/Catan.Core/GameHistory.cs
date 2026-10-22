@@ -102,6 +102,7 @@ namespace Catan.Core
             var newPieces = after.Pieces.ToDictionary(p => p.Key, p => p);
             foreach (var piece in before.Pieces.Where(p => !newPieces.ContainsKey(p.Key))) AddPiece(groups, piece, -1);
             foreach (var piece in after.Pieces.Where(p => !oldPieces.ContainsKey(p.Key))) AddPiece(groups, piece, 1);
+            if (action.PublicGeneralChanges.Length > 0) groups.Add(new Group { Details = action.PublicGeneralChanges });
             if (action.Kind == "ProposeTrade")
             {
                 for (int i = 0; i < 8; i++)
@@ -155,7 +156,8 @@ namespace Catan.Core
             {"PlacePort","安置港口"},{"ClaimWonder","认领奇迹"},{"BuildWonder","建造奇迹"},{"AttackFortress","攻击海盗要塞"},{"ChooseInvasionRoute","选择海盗路线"},
             {"BuildWall","建造城墙"},{"ImproveCity","升级城市设施"},{"RecruitKnight","招募骑士"},{"PromoteKnight","晋升骑士"},{"ActivateKnight","激活骑士"},
             {"MoveKnight","移动骑士"},{"DisplaceKnight","驱逐骑士"},{"ChaseRobber","骑士驱赶强盗"},{"ChasePirate","骑士驱赶海盗"},{"DiscardProgressCard","弃置发展卡"},{"CommercialHarborOffer","使用商港"},
-            {"ResolveChoice","完成选择"},{"ResolveProgressChoice","完成发展卡选择"}
+            {"ResolveChoice","完成选择"},{"ResolveProgressChoice","完成发展卡选择"},
+            {"ChooseGenerals","完成私密选将"},{"DeployGeneral","确认武将登场选择"},{"RetireGeneral","隐退并开始轮换"},{"AdvanceThreeKingdomsPhase","完成三国阶段"}
         };
         private static readonly Dictionary<string, string> PendingNames = new Dictionary<string, string>
         {
@@ -181,6 +183,7 @@ namespace Catan.Core
     internal sealed class HistoryAction
     {
         internal string PlayerId, OtherPlayerId, Kind, PublicTarget, Card, PendingKind;
+        internal GameHistoryChange[] PublicGeneralChanges = Array.Empty<GameHistoryChange>();
     }
     internal sealed class HistoryPlayer
     {

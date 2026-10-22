@@ -78,7 +78,17 @@ namespace Catan.Network.Contracts
             else if (type == typeof(bool)) { node.SetAttributeValue("type", "boolean"); node.Value = (bool)value ? "true" : "false"; }
             else if (type.IsEnum || type.IsPrimitive || type == typeof(decimal)) { node.SetAttributeValue("type", "number"); node.Value = type.IsEnum ? Convert.ToInt64(value).ToString(CultureInfo.InvariantCulture) : Convert.ToString(value, CultureInfo.InvariantCulture); }
             else if (type.IsArray) { node.SetAttributeValue("type", "array"); foreach (var item in (Array)value) node.Add(Encode("item", item, type.GetElementType(), depth + 1)); }
-            else { node.SetAttributeValue("type", "object"); foreach (var member in GetLayout(type).Members) node.Add(Encode(Name(member), Get(member, value), MemberType(member), depth + 1)); }
+            else
+            {
+                node.SetAttributeValue("type", "object");
+                foreach (var member in GetLayout(type).Members)
+                {
+                    var memberValue = Get(member, value);
+                    // 可选扩展关闭时省略空字段，保持既有协议3客户端的严格字段布局。
+                    if (memberValue == null && member.GetCustomAttribute<DataMemberAttribute>()?.EmitDefaultValue == false) continue;
+                    node.Add(Encode(Name(member), memberValue, MemberType(member), depth + 1));
+                }
+            }
             return node;
         }
         private static object Decode(XElement node, Type type, int depth)
