@@ -75,7 +75,7 @@ namespace Catan.Core.M5
             {
                 Require(s.ActivePlayerId == p.Id, "NotActivePlayer", "请由当前玩家操作。"); ActionPhase(s);
                 var target = OtherProgressPlayer(s, p, c.OtherPlayerId);
-                Require(s.CommercialHarborPlayers.Contains(target.Id), "HarborAlreadyUsed", "本回合未获得对该玩家的商业港口交换额度。");
+                Require(s.CommercialHarborPlayers.Contains(target.Id), "HarborAlreadyUsed", "本回合未获得对该玩家的商港交换额度。");
                 Require(Enum.IsDefined(typeof(Resource), c.Resource) && p.Resources[c.Resource] > 0, "InsufficientResources", "必须选择自己持有的资源。");
                 var used = Array.IndexOf(s.CommercialHarborPlayers, target.Id);
                 s.CommercialHarborPlayers = s.CommercialHarborPlayers.Where((x, i) => i != used).ToArray();
@@ -93,7 +93,7 @@ namespace Catan.Core.M5
             Require(Enum.IsDefined(typeof(ProgressCardKind), c.ProgressCard), "UnknownCard", "未知发展卡。");
             Require(!ProgressCatalog.IsVictoryPoint(c.ProgressCard), "PublicVictoryCard", "胜利点卡抽到时自动公开。");
             if (c.ProgressCard == ProgressCardKind.Alchemy)
-                Require(s.Phase == GamePhase.ProductionAwaitRoll && s.AlchemyDice1 == 0, "WrongPhase", "炼金术必须在本回合掷骰之前使用一次。");
+                Require(s.Phase == GamePhase.ProductionAwaitRoll && s.AlchemyDice1 == 0, "WrongPhase", "炼金术士必须在本回合掷骰之前使用一次。");
             else ActionPhase(s);
             ReturnProgressCard(s, p, c.ProgressCard);
             switch (c.ProgressCard)
@@ -121,12 +121,12 @@ namespace Catan.Core.M5
                     s.CommercialHarborPlayers = s.CommercialHarborPlayers.Concat(s.Players.Where(x => x.Id != p.Id).Select(x => x.Id)).ToArray(); break;
                 case ProgressCardKind.GuildDues:
                     var rich = OtherProgressPlayer(s, p, c.OtherPlayerId);
-                    Require(VictoryPoints(s, rich.Id, true) > VictoryPoints(s, p.Id, true), "NotMoreVictoryPoints", "行会会费只能选择胜利点比你高的玩家。");
+                    Require(VictoryPoints(s, rich.Id, true) > VictoryPoints(s, p.Id, true), "NotMoreVictoryPoints", "大商家只能选择胜利点比你高的玩家。");
                     if (ProgressHandSize(rich) > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressGuildDues", PlayerId = p.Id, OtherPlayerId = rich.Id, Amount = Math.Min(2, ProgressHandSize(rich)) });
                     break;
                 case ProgressCardKind.Merchant:
                     var merchantTile = s.Tiles.FirstOrDefault(t => t.Id == c.TargetId);
-                    Require(merchantTile != null && merchantTile.Resource != "sea" && merchantTile.Resource != "gold" && Buildings(s).Any(b => b.PlayerId == p.Id && merchantTile.Vertices.Contains(b.LocationId)), "InvalidMerchantHex", "商人必须放在你建筑相邻的陆地上。");
+                    Require(merchantTile != null && IsLand(merchantTile) && merchantTile.Resource != "gold" && Buildings(s).Any(b => b.PlayerId == p.Id && merchantTile.Vertices.Contains(b.LocationId)), "InvalidMerchantHex", "商人必须放在你建筑相邻的陆地上。");
                     s.MerchantPlayerId = p.Id; s.MerchantTileId = merchantTile.Id; break;
                 case ProgressCardKind.MerchantFleet:
                     if (c.ChooseCommodity) { Require(Enum.IsDefined(typeof(Commodity), c.Commodity), "InvalidCommodity", "商品类型错误。"); s.MerchantFleetCommodities = s.MerchantFleetCommodities.Union(new[] { c.Commodity }).ToArray(); }
@@ -193,7 +193,7 @@ namespace Catan.Core.M5
                 case "ProgressRoads":
                     if (!c.Decline)
                     {
-                        Require(!(d.RoadsOnly&&c.BuildShip)&&!(d.ShipsOnly&&!c.BuildShip),"WrongRouteType","外交移除后须重建同种棋子。");
+                        Require(!(d.RoadsOnly&&c.BuildShip)&&!(d.ShipsOnly&&!c.BuildShip),"WrongRouteType","外交官移除后须重建同种棋子。");
                         if(c.BuildShip) {ValidateShip(s,p,c.TargetId,null);PlaceShip(s,p,c.TargetId);} else {ValidateRoad(s,p,c.TargetId,null);PlaceRoad(s,p,c.TargetId);} d.Amount--;
                         if(d.Amount>0&&(d.RoadsOnly?HasLegalRoad(s,p):d.ShipsOnly?HasLegalShip(s,p):HasLegalRoute(s,p)))return;
                     }
@@ -228,7 +228,7 @@ namespace Catan.Core.M5
                 case "ProgressTreasonPlace":
                     if (!c.Decline)
                     {
-                        Require(d.Options.Contains(c.TargetId) && c.KnightLevel >= 1 && c.KnightLevel <= d.KnightLevel && s.Knights.Count(k => k.PlayerId == p.Id && k.Level == c.KnightLevel) < 2, "InvalidTreasonReplacement", "请选择可用等级及合法空顶点。");
+                        Require(d.Options.Contains(c.TargetId) && !Occupied(s,c.TargetId) && c.KnightLevel >= 1 && c.KnightLevel <= d.KnightLevel && s.Knights.Count(k => k.PlayerId == p.Id && k.Level == c.KnightLevel) < 2, "InvalidTreasonReplacement", "请选择可用等级及合法空顶点。");
                         s.Knights = Append(s.Knights, new Knight { PlayerId = p.Id, LocationId = c.TargetId, Level = c.KnightLevel, Active = d.KnightActive, ActivatedTurn = d.KnightActive ? s.Turn : -1, PromotedTurn = -1, ActedTurn = -1 });
                     }
                     break;
@@ -280,8 +280,7 @@ namespace Catan.Core.M5
         }
         private string[] ProgressKnightPlaces(GameState s, string player)
         {
-            var occupied = Buildings(s).Select(b => b.LocationId).Concat(s.Knights.Select(k => k.LocationId)).ToArray();
-            return OwnRouteEdges(s,player).SelectMany(e=>e.Vertices).Distinct().Where(v => !occupied.Contains(v)).ToArray();
+                        return OwnRouteEdges(s,player).SelectMany(e=>e.Vertices).Distinct().Where(v => !Occupied(s,v)).ToArray();
         }
         private bool ProgressRoadIsOpen(GameState s, PiecePlacement road)
         {
@@ -293,7 +292,7 @@ namespace Catan.Core.M5
         private void ProgressTaxation(GameState s, PlayerState p, string tileId)
         {
             var tile = s.Tiles.FirstOrDefault(t => t.Id == tileId);
-            Require(s.FirstBarbarianAttack && tile != null && tile.Resource != "sea" && tile.Id != s.RobberTileId, "InvalidTaxation", "首轮蛮族攻击后才能将强盗移至另一个陆地。");
+            Require(s.FirstBarbarianAttack && seafaring.Id != "pirate-islands" && tile != null && IsLand(tile) && !seafaring.ForbiddenRobberTileIds.Contains(tileId) && tile.Id != s.RobberTileId, "InvalidTaxation", "首轮蛮族攻击后才能将强盗移至另一个陆地。");
             s.RobberTileId = tile.Id;
             var victims = Buildings(s).Where(b => b.PlayerId != p.Id && tile.Vertices.Contains(b.LocationId)).Select(b => b.PlayerId).Distinct().ToArray();
             foreach (var id in victims)

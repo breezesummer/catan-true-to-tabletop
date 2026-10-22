@@ -9,8 +9,8 @@ public static class TabletopRoadPlacement
     public static string Instruction(int remaining,GameHistoryEntry[] history=null)
     {
         var entries=history??Array.Empty<GameHistoryEntry>();
-        int start=Array.FindLastIndex(entries,e=>e.Kind=="PlayRoadBuilding"||e.Kind=="PlayProgressCard"&&(e.Action=="使用「道路建设」"||e.Action=="使用「外交」"));
-        int total=start>=0&&entries[start].Action=="使用「外交」"?1:2;
+        int start=Array.FindLastIndex(entries,e=>e.Kind=="PlayRoadBuilding"||e.Kind=="PlayProgressCard"&&(e.Action=="使用「道路建设」"||e.Action=="使用「外交官」"));
+        int total=start>=0&&entries[start].Action=="使用「外交官」"?1:2;
         int placed=start<0?total-remaining:entries.Skip(start+1).Sum(e=>e.Kind=="PlaceFreeRoad"||e.Kind=="PlaceFreeShip"?1:e.Kind=="ResolveProgressChoice"?(e.Changes??Array.Empty<GameHistoryChange>()).Where(c=>c.Category=="piece"&&c.Amount>0&&(c.Name=="道路"||c.Name=="船")).Sum(c=>c.Amount):0);
         return "请在地图上点击合法位置新建道路 "+Mathf.Clamp(placed,0,total)+"/"+total;
     }

@@ -41,7 +41,7 @@ public sealed class TabletopDicePresentation
     public GameHistoryEntry[] VisibleHistory(GameHistoryEntry[] entries,double now)
     {
         var known=KnownHistory(entries);
-        // 资源、商品及进步牌的公开收获叙述一同等骰子停止；权威历史始终原样保留。
+        // 资源、商品及发展卡的公开收获叙述一同等骰子停止；权威历史始终原样保留。
         return IsRolling(now)?known.Where(e=>e!=null&&e.Sequence<Sequence).ToArray():known;
     }
 }

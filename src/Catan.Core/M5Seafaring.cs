@@ -29,16 +29,17 @@ namespace Catan.Core.M5
                 case CommandKind.MoveShip:
                     ActionPhase(s);ValidateMoveSource(s,p,c.SourceId);
                     Require(c.SourceId!=c.TargetId,"SameEdge","船须移动到另一条边。");
+                    var moved=s.Ships.Single(x=>x.LocationId==c.SourceId);
                     s.Ships=s.Ships.Where(x=>x.LocationId!=c.SourceId).ToArray();p.ShipsRemaining++;
-                    ValidateShip(s,p,c.TargetId,null);PlaceShip(s,p,c.TargetId);s.ShipMovedThisTurn=true;return true;
+                    ValidateShip(s,p,c.TargetId,null);PlaceShip(s,p,c.TargetId);s.Ships.Last().IsWarship=moved.IsWarship;s.ShipMovedThisTurn=true;return true;
                 case CommandKind.MovePirate:
-                    Require(s.FirstBarbarianAttack&&s.Phase==GamePhase.RobberMove&&s.PendingDecision!=null&&s.PendingDecision.Token!="robber-only","WrongPhase","当前不能移动海盗。");
+                    Require(s.FirstBarbarianAttack&&seafaring.Id!="pirate-islands"&&seafaring.InitialPirateTileId!=null&&(seafaring.Id!="cloth-for-catan"||s.Special.Villages.Any(v=>v.TradingPlayerIds.Contains(p.Id)))&&s.Phase==GamePhase.RobberMove&&s.PendingDecision!=null&&s.PendingDecision.Token!="robber-only","WrongPhase","当前不能移动海盗。");
                     Require(c.TargetId!=s.PirateTileId&&(c.TargetId=="frame"||s.Tiles.Any(t=>t.Id==c.TargetId&&t.Resource=="sea")),"InvalidPirateTile","海盗须移动至另一海格或边框。");
                     s.PirateTileId=c.TargetId;s.PendingDecision.Token="pirate";s.PendingDecision.EligibleVictimIds=PirateVictims(s,p.Id,c.TargetId);
                     if(s.PendingDecision.EligibleVictimIds.Length==0)FinishDecision(s);else {s.PendingDecision.Kind="Steal";s.Phase=GamePhase.RobberSteal;}return true;
                 case CommandKind.ChasePirate:
                     ActionPhase(s);var knight=OwnKnight(s,p,c.TargetId);
-                    Require(s.FirstBarbarianAttack&&knight.Active&&knight.ActivatedTurn!=s.Turn,"KnightCannotAct","只有此前激活的骑士可以驱逐已进场的海盗。");
+                    Require(s.FirstBarbarianAttack&&seafaring.Id!="pirate-islands"&&(seafaring.Id!="cloth-for-catan"||s.Special.Villages.Any(v=>v.TradingPlayerIds.Contains(p.Id)))&&knight.Active&&knight.ActivatedTurn!=s.Turn,"KnightCannotAct","只有此前激活的骑士可以驱逐已进场的海盗。");
                     Require(s.Tiles.Any(t=>t.Id==s.PirateTileId&&t.Vertices.Contains(c.TargetId)),"KnightNotAtPirate","骑士须在海盗所在海格旁。");
                     knight.Active=false;knight.ActedTurn=s.Turn;s.PendingDecision=new PendingDecision {Kind="Pirate",PlayerId=p.Id,Token="pirate-only",ReturnPhase=GamePhase.Action};s.Phase=GamePhase.RobberMove;return true;
                 default:return false;
@@ -51,17 +52,18 @@ namespace Catan.Core.M5
             Require(p.ShipsRemaining>0,"NoShips","船库存不足。");
             Require(!s.Roads.Any(r=>r.LocationId==edge)&&!s.Ships.Any(r=>r.LocationId==edge),"OccupiedEdge","此边已有道路或船。");
             Require(SeaEdge(s,edge),"ShipOnLand","船只能放在海边。");Require(!PirateBlocks(s,edge),"PirateBlocksShip","海盗封锁此边。");
+            if(seafaring.Id=="pirate-islands")ValidatePirateRoute(s,p,edge);
             if(anchor!=null)Require(location.Vertices.Contains(anchor),"ShipNotAtAnchor","开局船须连接刚放置的建筑。");
             else Require(location.Vertices.Any(v=>Buildings(s).Any(b=>b.PlayerId==p.Id&&b.LocationId==v)||!Blocked(s,p.Id,v)&&s.Ships.Any(x=>x.PlayerId==p.Id&&EdgeAt(x.LocationId).Vertices.Contains(v))),"DisconnectedShip","船须连接己方建筑或船；路船转换须经己方建筑。");
         }
-        private static void PlaceShip(GameState s,PlayerState p,string edge)
+        private void PlaceShip(GameState s,PlayerState p,string edge)
         {
-            s.Ships=Append(s.Ships,new ShipPlacement {LocationId=edge,PlayerId=p.Id,BuiltTurn=s.Turn});p.ShipsRemaining--;
+            s.Ships=Append(s.Ships,new ShipPlacement {LocationId=edge,PlayerId=p.Id,BuiltTurn=s.Turn,IsInvasionRoute=seafaring.Id=="pirate-islands"&&IsInvasionExtension(s,p.Id,edge)});p.ShipsRemaining--;
         }
         private bool ShipIsOpen(GameState s,ShipPlacement ship)
         {
             var edge=EdgeAt(ship.LocationId);
-            var anchors=new HashSet<string>(Buildings(s).Where(b=>b.PlayerId==ship.PlayerId).Select(b=>b.LocationId).Concat(s.Knights.Where(k=>k.PlayerId==ship.PlayerId).Select(k=>k.LocationId)));
+            var anchors=new HashSet<string>(Buildings(s).Where(b=>b.PlayerId==ship.PlayerId).Select(b=>b.LocationId).Concat(s.Knights.Where(k=>k.PlayerId==ship.PlayerId).Select(k=>k.LocationId)).Concat(s.Special?.Villages.Select(v=>v.VertexId)??Array.Empty<string>()));
             var routes=s.Ships.Where(x=>x.PlayerId==ship.PlayerId).Select(x=>EdgeAt(x.LocationId)).ToArray();
             if(edge.Vertices.Any(v=>!anchors.Contains(v)&&!routes.Any(e=>e.Id!=edge.Id&&e.Vertices.Contains(v))))return true;
 
@@ -140,6 +142,7 @@ namespace Catan.Core.M5
         {
             var land=s.Tiles.Where(t=>IsLand(t)&&t.Vertices.Contains(vertex)).ToArray();
             Require(land.Length>0,"SeaSettlement","村庄必须邻接陆地。");
+            if(s.Special!=null)ValidateSpecialSettlement(s,p,vertex,setup);
             if(setup)Require(land.Any(t=>seafaring.StartingTileIds.Contains(t.Id)),"InvalidStartingRegion","开局只能在主岛指定区域放置。");
         }
         private void RecordRegion(GameState s,PlayerState p,string vertex,bool setup)
@@ -154,8 +157,8 @@ namespace Catan.Core.M5
         private void AdvanceSetup(GameState s)
         {
             s.PendingDecision=null;s.SetupPlacementIndex++;
-            if(s.SetupPlacementIndex==s.Players.Length*2) {s.ActivePlayerId=s.Players[s.StartingPlayerIndex].Id;s.Turn=1;s.Phase=GamePhase.ProductionAwaitRoll;}
-            else {int offset=s.SetupPlacementIndex<s.Players.Length?s.SetupPlacementIndex:2*s.Players.Length-s.SetupPlacementIndex-1;s.ActivePlayerId=s.Players[(s.StartingPlayerIndex+offset)%s.Players.Length].Id;s.Phase=GamePhase.SetupSettlement;}
+            if(s.SetupPlacementIndex==s.Players.Length*seafaring.SetupRounds) {s.ActivePlayerId=s.Players[s.StartingPlayerIndex].Id;s.Turn=1;s.Phase=GamePhase.ProductionAwaitRoll;}
+            else {int round=s.SetupPlacementIndex/s.Players.Length,index=s.SetupPlacementIndex%s.Players.Length;int offset=round%2==0?index:s.Players.Length-index-1;s.ActivePlayerId=s.Players[(s.StartingPlayerIndex+offset)%s.Players.Length].Id;s.Phase=GamePhase.SetupSettlement;}
         }
         private void GrantStartingResources(GameState s,PlayerState p,string vertex)
         {
@@ -163,11 +166,13 @@ namespace Catan.Core.M5
             // receives one RESOURCE per adjacent hex, never commodities.
             foreach(var tile in s.Tiles.Where(t=>t.Vertices.Contains(vertex)))
             {
-                if(Resources.Any(r=>ResourceName(r)==tile.Resource)) {var r=ParseResource(tile.Resource);if(s.Bank[r]>0)Transfer(s.Bank,p.Resources,r,1);}
+                if(tile.Resource=="gold")AddGold(s,p.Id,1);
+                else if(Resources.Any(r=>ResourceName(r)==tile.Resource)) {var r=ParseResource(tile.Resource);if(s.Bank[r]>0)Transfer(s.Bank,p.Resources,r,1);}
             }
         }
         private void PopulateSeafaringView(PlayerState own,PlayerView view)
         {
+            PopulateSpecialView(view);
             view.ScenarioId=seafaring.Id;view.ScenarioName=seafaring.Name;view.TargetVictoryPoints=state.TargetVictoryPoints.Value;
             view.Board.Ships=Json.Copy(state.Ships);view.Board.PirateTileId=state.PirateTileId;view.ShipMovedThisTurn=state.ShipMovedThisTurn;
             foreach(var pub in view.Players) {var p=state.Players.Single(x=>x.Id==pub.Id);pub.ShipsRemaining=p.ShipsRemaining;pub.BonusVictoryPoints=p.BonusVictoryPoints;}
@@ -193,6 +198,7 @@ namespace Catan.Core.M5
             if(s.ActivePlayerId!=p.Id)yield break;
             if(s.Phase==GamePhase.RobberMove)
             {
+                foreach(var tile in s.Tiles.Where(IsLand))yield return new Command {PlayerId=p.Id,Kind=CommandKind.MoveRobber,TargetId=tile.Id};
                 foreach(var tile in s.Tiles.Where(t=>t.Resource=="sea"))yield return new Command {PlayerId=p.Id,Kind=CommandKind.MovePirate,TargetId=tile.Id};
                 yield return new Command {PlayerId=p.Id,Kind=CommandKind.MovePirate,TargetId="frame"};
             }
@@ -214,11 +220,11 @@ namespace Catan.Core.M5
             {
                 Check(p.ShipsRemaining>=0&&p.ShipsRemaining+s.Ships.Count(x=>x.PlayerId==p.Id)==15,"Ship conservation failed.");
                 Check(p.HomeRegions!=null&&p.SettledRegions!=null&&p.HomeRegions.Distinct().Count()==p.HomeRegions.Length&&p.SettledRegions.Distinct().Count()==p.SettledRegions.Length&&p.HomeRegions.All(p.SettledRegions.Contains)&&p.SettledRegions.All(id=>seafaring.Regions.Any(r=>r.Id==id)),"Invalid settlement regions.");
-                Check(p.BonusVictoryPoints==p.SettledRegions.Count(id=>!p.HomeRegions.Contains(id))*seafaring.IslandBonusPoints,"Invalid region bonus.");
+                Check(seafaring.Id=="forgotten-tribe" ? p.BonusVictoryPoints>=0 : p.BonusVictoryPoints==p.SettledRegions.Count(id=>!p.HomeRegions.Contains(id))*seafaring.IslandBonusPoints,"Invalid region bonus.");
             }
-            Check(!s.FirstBarbarianAttack?s.PirateTileId==null:s.PirateTileId=="frame"||s.Tiles.Any(t=>t.Id==s.PirateTileId&&t.Resource=="sea")||s.PirateTileId==null&&s.BarbarianPosition==7,"Invalid pirate location.");
+            Check(!s.FirstBarbarianAttack?s.PirateTileId==null:s.PirateTileId=="frame"||s.Tiles.Any(t=>t.Id==s.PirateTileId&&t.Resource=="sea")||s.PirateTileId==null&&(s.BarbarianPosition==7||seafaring.InitialPirateTileId==null||seafaring.Id=="pirate-islands"&&s.Special.Fortresses.All(f=>f.Strength==0)),"Invalid pirate location.");
             var choices=s.DecisionQueue.Concat(s.PendingDecision==null?Array.Empty<PendingDecision>():new[]{s.PendingDecision});
-            foreach(var d in choices.Where(d=>d.Kind=="Gold"))Check(d.Amount>0&&d.Amount<=3*(s.Cities.Length*2+s.Settlements.Length),"Invalid gold claim.");
+            foreach(var d in choices.Where(d=>d.Kind=="Gold"))Check(d.Amount>0&&d.Amount<=Math.Max(1,3*(s.Cities.Length*2+s.Settlements.Length)),"Invalid gold claim.");
         }
     }
 }

@@ -75,6 +75,7 @@ public sealed partial class M6App
 
     void LateUpdate()
     {
+        using var frameCost=FrameCost.Measure(FrameCost.Stage.BuildAnimation);
         if(SystemInfo.graphicsDeviceType==UnityEngine.Rendering.GraphicsDeviceType.Null)return;
         if(!Ready||presentation==null||!presentation.enabled||MenuVisible)return;
         object view=null;int turn=0;string active=null;TabletopBuildPiece[] pieces=null;
@@ -82,7 +83,7 @@ public sealed partial class M6App
         if(presentation is M2App basic&&basic.M6View!=null)
         {
             var v=basic.M6View;view=v;turn=v.Turn;active=v.ActivePlayerId;
-            movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads;movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).ToArray();
+            if(!ReferenceEquals(buildView,view)){movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads;movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).ToArray();}
             var b=basic.VerificationBoard;
             if(b!=null){board=b.CommittedPieces;camera=b.BoardCamera;table=b.TableScene;position=b.Position;}
             if(!ReferenceEquals(buildView,view))pieces=PublicPieces(v.Board.Settlements,v.Board.Roads,v.Board.Cities).ToArray();
@@ -90,7 +91,7 @@ public sealed partial class M6App
         else if(presentation is M3App sailing&&sailing.M6View!=null)
         {
             var v=sailing.M6View;view=v;turn=v.Turn;active=v.ActivePlayerId;
-            movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads.Concat(v.Board.Ships.Select(p=>new PiecePlacement{PlayerId=p.PlayerId,LocationId=p.LocationId})).ToArray();movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).ToArray();
+            if(!ReferenceEquals(buildView,view)){movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads.Concat(v.Board.Ships.Select(p=>new PiecePlacement{PlayerId=p.PlayerId,LocationId=p.LocationId})).ToArray();movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).ToArray();}
             var b=sailing.VerificationBoard;if(b!=null){board=b.CommittedPieces;camera=b.BoardCamera;table=b.TableScene;position=b.Position;}
             if(!ReferenceEquals(buildView,view))pieces=PublicPieces(v.Board.Settlements,v.Board.Roads,v.Board.Cities)
                 .Concat(v.Board.Ships.Select(p=>new TabletopBuildPiece{Kind="ship",PlayerId=p.PlayerId,LocationId=p.LocationId})).ToArray();
@@ -98,7 +99,7 @@ public sealed partial class M6App
         else if(presentation is M4App cities&&cities.M6View!=null)
         {
             var v=cities.M6View;view=v;turn=v.Turn;active=v.ActivePlayerId;
-            movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads;movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).Concat(v.Board.Knights.Select(k=>new PiecePlacement{PlayerId=k.PlayerId,LocationId=k.LocationId})).ToArray();
+            if(!ReferenceEquals(buildView,view)){movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads;movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).Concat(v.Board.Knights.Select(k=>new PiecePlacement{PlayerId=k.PlayerId,LocationId=k.LocationId})).ToArray();}
             var b=cities.VerificationBoard;if(b!=null){board=b.CommittedPieces;camera=b.BoardCamera;table=b.TableScene;position=b.Position;}
             if(!ReferenceEquals(buildView,view))pieces=ExpandedPieces(PublicPieces(v.Board.Settlements,v.Board.Roads,v.Board.Cities),
                 v.Board.Walls.Select(p=>p.LocationId),v.Board.Metropolises.Select(p=>p.LocationId))
@@ -107,7 +108,7 @@ public sealed partial class M6App
         else if(presentation is M5App combined&&combined.M6View!=null)
         {
             var v=combined.M6View;view=v;turn=v.Turn;active=v.ActivePlayerId;
-            movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads.Concat(v.Board.Ships.Select(p=>new PiecePlacement{PlayerId=p.PlayerId,LocationId=p.LocationId})).ToArray();movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).Concat(v.Board.Knights.Select(k=>new PiecePlacement{PlayerId=k.PlayerId,LocationId=k.LocationId})).ToArray();
+            if(!ReferenceEquals(buildView,view)){movementEdges=v.Board.Edges;movementRoutes=v.Board.Roads.Concat(v.Board.Ships.Select(p=>new PiecePlacement{PlayerId=p.PlayerId,LocationId=p.LocationId})).ToArray();movementBuildings=v.Board.Settlements.Concat(v.Board.Cities).Concat(v.Board.Knights.Select(k=>new PiecePlacement{PlayerId=k.PlayerId,LocationId=k.LocationId})).ToArray();}
             var b=combined.VerificationBoard;if(b!=null){board=b.CommittedPieces;camera=b.BoardCamera;table=b.TableScene;position=b.Position;}
             if(!ReferenceEquals(buildView,view))pieces=ExpandedPieces(PublicPieces(v.Board.Settlements,v.Board.Roads,v.Board.Cities),
                 v.Board.Walls.Select(p=>p.LocationId),v.Board.Metropolises.Select(p=>p.LocationId))

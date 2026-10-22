@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -42,7 +43,20 @@ namespace Catan.Network.Contracts
             var messages = new[] { typeof(NetworkRequest), typeof(NetworkResponse), typeof(RoomSettings), typeof(CreateRoomPayload), typeof(JoinRoomPayload), typeof(SeatPayload), typeof(NamePayload), typeof(ReadyPayload), typeof(HistoryPayload), typeof(RoomSummary), typeof(SeatSummary) };
             if (!messages.Contains(element) && !Roots.Contains(element.FullName)) throw new SerializationException("不允许传输此对象类型。");
         }
-        private static IEnumerable<MemberInfo> Members(Type type)
+        // 类型布局不可变；避免每个地块、边和历史项重复反射及构造查找表。
+        private sealed class Layout
+        {
+            public readonly MemberInfo[] Members;
+            public readonly Dictionary<string, MemberInfo> ByName;
+            public Layout(Type type)
+            {
+                Members = DiscoverMembers(type).ToArray();
+                ByName = Members.ToDictionary(Name, StringComparer.Ordinal);
+            }
+        }
+        private static readonly ConcurrentDictionary<Type, Layout> Layouts = new ConcurrentDictionary<Type, Layout>();
+        private static Layout GetLayout(Type type) => Layouts.GetOrAdd(type, t => new Layout(t));
+        private static IEnumerable<MemberInfo> DiscoverMembers(Type type)
         {
             bool contract = type.IsDefined(typeof(DataContractAttribute), false);
             return type.GetMembers(BindingFlags.Public | BindingFlags.Instance).Where(m =>
@@ -64,7 +78,7 @@ namespace Catan.Network.Contracts
             else if (type == typeof(bool)) { node.SetAttributeValue("type", "boolean"); node.Value = (bool)value ? "true" : "false"; }
             else if (type.IsEnum || type.IsPrimitive || type == typeof(decimal)) { node.SetAttributeValue("type", "number"); node.Value = type.IsEnum ? Convert.ToInt64(value).ToString(CultureInfo.InvariantCulture) : Convert.ToString(value, CultureInfo.InvariantCulture); }
             else if (type.IsArray) { node.SetAttributeValue("type", "array"); foreach (var item in (Array)value) node.Add(Encode("item", item, type.GetElementType(), depth + 1)); }
-            else { node.SetAttributeValue("type", "object"); foreach (var member in Members(type)) node.Add(Encode(Name(member), Get(member, value), MemberType(member), depth + 1)); }
+            else { node.SetAttributeValue("type", "object"); foreach (var member in GetLayout(type).Members) node.Add(Encode(Name(member), Get(member, value), MemberType(member), depth + 1)); }
             return node;
         }
         private static object Decode(XElement node, Type type, int depth)
@@ -81,7 +95,7 @@ namespace Catan.Network.Contracts
             if (type.IsArray) { var children = node.Elements().ToArray(); var values = Array.CreateInstance(type.GetElementType(), children.Length); for (int i = 0; i < children.Length; i++) values.SetValue(Decode(children[i], type.GetElementType(), depth + 1), i); return values; }
             if ((string)node.Attribute("type") != "object") throw new SerializationException("需要对象。");
             var instance = Activator.CreateInstance(type);
-            var members = Members(type).ToDictionary(Name, StringComparer.Ordinal);
+            var members = GetLayout(type).ByName;
             var found = new HashSet<string>(StringComparer.Ordinal);
             foreach (var child in node.Elements())
             {

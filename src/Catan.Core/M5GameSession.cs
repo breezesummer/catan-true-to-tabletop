@@ -9,6 +9,7 @@ namespace Catan.Core.M5
     public sealed partial class CombinedGameSession
     {
         public const string RulesVersion = "catan-seafarers-cities-knights-2025-en-v1";
+        public const string AllScenarioVersion = "m5-combined-all-2025-v003";
         public const string ScenarioVersion = "m5-combined-variable-2025-v002";
         internal const string LegacyScenarioVersion = "m5-combined-official-2025-v001";
         public const int SaveFormatVersion = 5;
@@ -51,7 +52,7 @@ namespace Catan.Core.M5
             var state = new GameState
             {
                 SaveFormatVersion = SaveFormatVersion, RulesVersion = RulesVersion, ScenarioId = scenarioId, ScenarioVersion = seafaring.Version,
-                ScenarioContentHash = Json.Hash(Json.Write(seafaring)), InitialSeed = seed, Random = random, TargetVictoryPoints = VictoryPointSettings.Resolve(targetVictoryPoints, 16),
+                ScenarioContentHash = Json.Hash(Json.Write(seafaring)), InitialSeed = seed, Random = random, TargetVictoryPoints = VictoryPointSettings.Resolve(targetVictoryPoints, seafaring.TargetVictoryPoints),
                 Players = Enumerable.Range(1, playerCount).Select(i => new PlayerState { Id = "P" + i, Resources = new ResourceBag(), Pieces = new PieceSupply { Roads = 15, Settlements = 5, Cities = 4 } }).ToArray(),
                 Bank = new ResourceBag { Wood = 19, Brick = 19, Wool = 19, Wheat = 19, Ore = 19 },
                 Phase = GamePhase.SetupSettlement, ActivePlayerId = "P" + (start + 1), StartingPlayerIndex = start,
@@ -59,6 +60,7 @@ namespace Catan.Core.M5
             };
             var session = new CombinedGameSession(scenario, ports, seafaring, state);
             session.InitializeProgress(state);
+            session.InitializeSpecial(state);
             session.AssertInvariants(state);
             return session;
         }
@@ -151,7 +153,7 @@ namespace Catan.Core.M5
                     OwnVictoryPoints = VictoryPoints(state, playerId, true), TargetVictoryPoints = state.TargetVictoryPoints.Value, DevelopmentCardPlayedThisTurn = state.DevelopmentCardPlayedThisTurn, DevelopmentDeckCount = state.DevelopmentDeck.Length,
                     Bank = state.Bank.Copy(), Players = state.Players.Select(p => new PublicPlayer { Id = p.Id, ResourceCount = HandCount(p), DevelopmentCardCount = p.DevelopmentCards.Length,
                         PlayedKnights = p.PlayedKnights, Pieces = p.Pieces.Copy(), VictoryPoints = VictoryPoints(state, p.Id, state.WinnerPlayerId == p.Id), LongestRoadLength = LongestRoad(state, p.Id) }).ToArray(),
-                    Board = new BoardView { Tiles = Json.Copy(state.Tiles), Vertices = Json.Copy(scenario.Topology.Vertices), Edges = Json.Copy(scenario.Topology.Edges), Ports = Json.Copy(ports),
+                    Board = new BoardView { Tiles = Json.Copy(state.Tiles), Vertices = Json.Copy(scenario.Topology.Vertices), Edges = Json.Copy(scenario.Topology.Edges), Ports = Json.Copy(CurrentPorts(state)),
                         Settlements = Json.Copy(state.Settlements), Cities = Json.Copy(state.Cities), Roads = Json.Copy(state.Roads), RobberTileId = state.RobberTileId },
                     LegalVertexIds = vertices, LegalCityVertexIds = cities, LegalEdgeIds = edges, LongestRoadPlayerId = state.LongestRoadPlayerId, LargestArmyPlayerId = state.LargestArmyPlayerId,
                     WinnerPlayerId = state.WinnerPlayerId, LastDice1 = state.LastDice1, LastDice2 = state.LastDice2, Events = Json.Copy(state.Events),
@@ -177,7 +179,7 @@ namespace Catan.Core.M5
             GameState saved;
             try { saved = Json.Read<GameState>(save); }
             catch (Exception ex) when (ex is System.Runtime.Serialization.SerializationException || ex is ArgumentException || ex is System.Xml.XmlException) { throw new InvalidDataException("Invalid save JSON.", ex); }
-            if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != RulesVersion || (saved.ScenarioVersion != ScenarioVersion && saved.ScenarioVersion != LegacyScenarioVersion) || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
+            if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != RulesVersion || (saved.ScenarioVersion != ScenarioVersion && saved.ScenarioVersion != LegacyScenarioVersion && saved.ScenarioVersion != AllScenarioVersion) || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
                 throw new InvalidDataException("Unsupported or malformed save.");
             saved.TargetVictoryPoints = saved.TargetVictoryPoints ?? 16;
             if (!VictoryPointSettings.IsValid(saved.TargetVictoryPoints)) throw new InvalidDataException("存档中的胜利分数无效。");
@@ -201,7 +203,7 @@ namespace Catan.Core.M5
             return session;
         }
 
-        private void Apply(GameState s, Command c)
+        private void ApplyCore(GameState s, Command c)
         {
             var p = s.Players.FirstOrDefault(x => x.Id == c.PlayerId); Require(p != null, "UnknownPlayer", "未知席位。");
             Require(s.Phase != GamePhase.Finished, "GameFinished", "对局已经结束。");
@@ -215,22 +217,20 @@ namespace Catan.Core.M5
             if (ApplyProgressCommand(s, p, c)) return;
             if (c.Kind == CommandKind.ResolveChoice || c.Kind == CommandKind.ChooseGoldResources) { ResolveChoice(s,p,c); return; }
             Require(s.ActivePlayerId == c.PlayerId, "NotActivePlayer", "请由当前回合的玩家操作。");
-            if (ApplySeafaring(s,p,c)) return;
+            if (ApplySpecial(s,p,c) || ApplySeafaring(s,p,c)) return;
             switch (c.Kind)
             {
                 case CommandKind.SetupSettlement:
                     Require(s.Phase == GamePhase.SetupSettlement, "WrongPhase", "当前不能摆放开局村庄。");
                     ValidateSettlement(s, p, c.TargetId, true);
-                    if (s.SetupPlacementIndex < s.Players.Length) PlaceSettlement(s,p,c.TargetId);
+                    if (s.SetupPlacementIndex / s.Players.Length != 1) PlaceSettlement(s,p,c.TargetId);
                     else { s.Cities=Append(s.Cities,Placement(c.TargetId,p.Id)); p.Pieces.Cities--; }
                     RecordRegion(s,p,c.TargetId,true);
                     s.PendingDecision = new PendingDecision { Kind = "SetupRoad", PlayerId = p.Id, AnchorVertexId = c.TargetId }; s.Phase = GamePhase.SetupRoad;
-                    if (s.SetupPlacementIndex >= s.Players.Length) GrantStartingResources(s,p,c.TargetId); break;
+                    if (s.SetupPlacementIndex >= s.Players.Length * (seafaring.SetupRounds - 1)) GrantStartingResources(s,p,c.TargetId); break;
                 case CommandKind.SetupRoad:
                     Require(s.Phase == GamePhase.SetupRoad && s.PendingDecision != null, "WrongPhase", "请先摆放开局村庄。");
-                    ValidateRoad(s, p, c.TargetId, s.PendingDecision.AnchorVertexId); PlaceRoad(s, p, c.TargetId); s.PendingDecision = null; s.SetupPlacementIndex++;
-                    if (s.SetupPlacementIndex == s.Players.Length * 2) { s.ActivePlayerId = s.Players[s.StartingPlayerIndex].Id; s.Turn = 1; s.Phase = GamePhase.ProductionAwaitRoll; }
-                    else { var offset = s.SetupPlacementIndex < s.Players.Length ? s.SetupPlacementIndex : 2 * s.Players.Length - s.SetupPlacementIndex - 1; s.ActivePlayerId = s.Players[(s.StartingPlayerIndex + offset) % s.Players.Length].Id; s.Phase = GamePhase.SetupSettlement; }
+                    ValidateRoad(s, p, c.TargetId, s.PendingDecision.AnchorVertexId); PlaceRoad(s, p, c.TargetId); AdvanceSetup(s);
                     break;
                 case CommandKind.RollDice:
                     Require(s.Phase == GamePhase.ProductionAwaitRoll, "WrongPhase", "当前不能掷骰。");
@@ -245,7 +245,7 @@ namespace Catan.Core.M5
                     ActionPhase(s); BankTrade(s,p,c); break;
                 case CommandKind.MoveRobber:
                     Require(s.Phase == GamePhase.RobberMove && s.PendingDecision != null, "WrongPhase", "当前不需要移动强盗。");
-                    var destination = scenario.Topology.Tiles.FirstOrDefault(x => x.Id == c.TargetId); Require(s.FirstBarbarianAttack && destination != null && IsLand(destination) && destination.Id != s.RobberTileId && s.PendingDecision.Token != "pirate-only", "InvalidRobberTile", "强盗必须移动到另一地块。");
+                    var destination = s.Tiles.FirstOrDefault(x => x.Id == c.TargetId); Require(s.FirstBarbarianAttack && destination != null && IsLand(destination) && destination.Id != s.RobberTileId && s.PendingDecision.Token != "pirate-only" && seafaring.Id != "pirate-islands" && !seafaring.ForbiddenRobberTileIds.Contains(c.TargetId), "InvalidRobberTile", "强盗必须移动到另一地块。");
                     s.RobberTileId = destination.Id; s.PendingDecision.Token = "robber";
                     s.PendingDecision.EligibleVictimIds = Buildings(s).Where(b => b.PlayerId != p.Id && destination.Vertices.Contains(b.LocationId)).Select(b => b.PlayerId).Distinct().OrderBy(x => x).ToArray();
                     if (s.PendingDecision.EligibleVictimIds.Length == 0) FinishDecision(s); else { s.PendingDecision.Kind = "Steal"; s.Phase = GamePhase.RobberSteal; } break;
@@ -255,7 +255,7 @@ namespace Catan.Core.M5
                     StealHandCard(s,p,victim);
                     FinishDecision(s); break;
                 case CommandKind.EndTurn:
-                    ActionPhase(s); Require(p.ProgressCards.Length<=4,"ProgressHandLimit","结束回合前须将进步牌减至四张。"); ClearProgressTurn(s); s.ShipMovedThisTurn = false; s.ActivePlayerId = s.Players[(Array.FindIndex(s.Players, x => x.Id == p.Id) + 1) % s.Players.Length].Id; s.Turn++; s.Phase = GamePhase.ProductionAwaitRoll; break;
+                    ActionPhase(s); EndSpecialTurn(s,p); break;
                 case CommandKind.BuildWall: ActionPhase(s); BuildWall(s,p,c.TargetId); break;
                 case CommandKind.ImproveCity: ActionPhase(s); BuildImprovement(s,p,c.Track); break;
                 case CommandKind.RecruitKnight: ActionPhase(s); RecruitKnight(s,p,c.TargetId); break;
@@ -264,7 +264,7 @@ namespace Catan.Core.M5
                 case CommandKind.MoveKnight: case CommandKind.DisplaceKnight: ActionPhase(s); MoveKnight(s,p,c); break;
                 case CommandKind.ChaseRobber: ActionPhase(s); ChaseRobber(s,p,c.TargetId); break;
                 case CommandKind.DeclareVictory:
-                    Require(s.Turn > 0 && VictoryPoints(s, p.Id, true) >= s.TargetVictoryPoints.Value, "InsufficientPoints", "尚未达到 " + s.TargetVictoryPoints.Value + " 分。"); break;
+                    Require(s.Turn > 0 && HasScenarioVictory(s,p.Id), "InsufficientPoints", "尚未达到 " + s.TargetVictoryPoints.Value + " 分。"); break;
                 default: throw new RuleException("WrongPhase", "当前没有可处理的此类决定。");
             }
         }
@@ -362,7 +362,7 @@ namespace Catan.Core.M5
         }
         private int TradeRate(GameState s, string player, Resource resource)
         {
-            var owned = ports.Where(port => Buildings(s).Any(b => b.PlayerId == player && port.Vertices.Contains(b.LocationId))).ToArray();
+            var owned = CurrentPorts(s).Where(port => Buildings(s).Any(b => b.PlayerId == player && port.Vertices.Contains(b.LocationId))).ToArray();
             int rate=owned.Any(p => p.Resource == resource) ? 2 : owned.Any(p => p.Resource == null) ? 3 : 4;
             return Math.Min(rate,ProgressTradeRate(s,s.Players.Single(p=>p.Id==player),resource,null));
         }
@@ -387,7 +387,7 @@ namespace Catan.Core.M5
         }
         private void RecalculateAwards(GameState s)
         {
-            s.LongestRoadPlayerId = Award(s.Players.Select(p => p.Id).ToArray(), s.Players.Select(p => LongestRoad(s, p.Id)).ToArray(), 5, s.LongestRoadPlayerId);
+            s.LongestRoadPlayerId = !seafaring.UseLongestRoute ? null : Award(s.Players.Select(p => p.Id).ToArray(), s.Players.Select(p => LongestRoad(s, p.Id)).ToArray(), 5, s.LongestRoadPlayerId);
             s.LargestArmyPlayerId = null;
         }
         private static string Award(string[] ids, int[] values, int threshold, string previous)
@@ -398,11 +398,11 @@ namespace Catan.Core.M5
         private static int VictoryPoints(GameState s, string player, bool includeHidden)
         {
             return s.Settlements.Count(b => b.PlayerId == player) + 2 * s.Cities.Count(b => b.PlayerId == player) + (s.LongestRoadPlayerId == player ? 2 : 0)
-                + s.Players.Single(p=>p.Id==player).BonusVictoryPoints + 2*s.Metropolises.Count(m=>m.PlayerId==player)+s.Players.Single(p=>p.Id==player).DefenderPoints+s.Players.Single(p=>p.Id==player).ProgressVictoryCards.Length+(s.MerchantPlayerId==player?1:0);
+                + s.Players.Single(p=>p.Id==player).Cloth / 2 + s.Players.Single(p=>p.Id==player).BonusVictoryPoints + 2*s.Metropolises.Count(m=>m.PlayerId==player)+s.Players.Single(p=>p.Id==player).DefenderPoints+s.Players.Single(p=>p.Id==player).ProgressVictoryCards.Length+(s.MerchantPlayerId==player?1:0);
         }
-        private static void CheckVictory(GameState s)
+        private void CheckVictory(GameState s)
         {
-            if (s.Turn > 0 && VictoryPoints(s, s.ActivePlayerId, true) >= s.TargetVictoryPoints.Value) { s.WinnerPlayerId = s.ActivePlayerId; s.Phase = GamePhase.Finished; s.PendingDecision = null; s.DecisionQueue=Array.Empty<PendingDecision>();s.ProductionPending=false;s.Discards = Array.Empty<DiscardRequirement>(); s.TradeOffer = null; }
+            if (s.Turn > 0 && HasScenarioVictory(s,s.ActivePlayerId)) FinishSpecialGame(s,new[]{s.ActivePlayerId});
         }
 
         private void AssertInvariants(GameState s)
@@ -410,7 +410,7 @@ namespace Catan.Core.M5
             Check(VictoryPointSettings.IsValid(s.TargetVictoryPoints), "胜利分数无效。");
             void Check(bool valid, string message) { if (!valid) throw new InvalidDataException(message); }
             Check(s.SaveFormatVersion == SaveFormatVersion && s.RulesVersion == RulesVersion && s.ScenarioVersion == scenario.Version, "Invalid version identity.");
-            Check(Enum.IsDefined(typeof(GamePhase), s.Phase) && s.Turn >= 0 && s.SetupPlacementIndex >= 0 && s.SetupPlacementIndex <= s.Players.Length * 2, "Invalid phase/turn.");
+            Check(Enum.IsDefined(typeof(GamePhase), s.Phase) && s.Turn >= 0 && s.SetupPlacementIndex >= 0 && s.SetupPlacementIndex <= s.Players.Length * seafaring.SetupRounds, "Invalid phase/turn.");
             Check(s.Players.Length == 3 || s.Players.Length == 4, "Invalid player count.");
             Check(s.Players.Select(p => p.Id).Distinct().Count() == s.Players.Length && s.Players.Any(p => p.Id == s.ActivePlayerId), "Invalid player identities.");
             Check(ValidBag(s.Bank) && s.Players.All(p => ValidBag(p.Resources)), "Invalid resource counts.");
@@ -425,26 +425,26 @@ namespace Catan.Core.M5
             foreach (var p in s.Players)
             {
                 Check(p.Pieces.Roads >= 0 && p.Pieces.Roads + s.Roads.Count(r => r.PlayerId == p.Id) == 15, "Road conservation failed.");
-                Check(p.Pieces.Settlements >= 0 && p.Pieces.Settlements + s.Settlements.Count(b => b.PlayerId == p.Id) - s.DowngradedCities.Count(b=>b.PlayerId==p.Id) == 5, "Settlement conservation failed.");
+                Check(p.Pieces.Settlements >= 0 && p.Pieces.Settlements + (s.Special?.Fortresses.Count(f=>f.PlayerId==p.Id&&f.Strength>0)??0) + s.Settlements.Count(b => b.PlayerId == p.Id) - s.DowngradedCities.Count(b=>b.PlayerId==p.Id) == 5, "Settlement conservation failed.");
                 Check(p.Pieces.Cities >= 0 && p.Pieces.Cities + s.Cities.Count(b => b.PlayerId == p.Id) + s.DowngradedCities.Count(b=>b.PlayerId==p.Id) == 4, "City conservation failed.");
                 Check(p.PlayedKnights >= 0 && p.DevelopmentCards.All(c => Enum.IsDefined(typeof(DevelopmentCardKind), c.Kind) && c.BoughtTurn > 0 && c.BoughtTurn <= s.Turn), "Invalid development card age/type.");
             }
             Check(s.DevelopmentDeck.Length==0 && s.PlayedDevelopmentCards.Length==0 && s.Players.All(p=>p.DevelopmentCards.Length==0&&p.PlayedKnights==0) && s.LargestArmyPlayerId==null, "Base development cards/army are excluded.");
-            ValidateExpansion(s); ValidateProgress(s); ValidateSeafaring(s);
+            ValidateExpansion(s); ValidateProgress(s); ValidateSeafaring(s); ValidateSpecial(s);
             Check(s.Random.State != 0 && s.Random.Draws >= 0 && s.Random.AlgorithmId == "xorshift32-rejection-v1", "Invalid random state.");
-            Check(s.FirstBarbarianAttack ? scenario.Topology.Tiles.Any(t => t.Id == s.RobberTileId && IsLand(t)) : s.RobberTileId==null, "Invalid robber location.");
-            Check((s.Phase == GamePhase.SetupRoad || s.Phase == GamePhase.Discard || s.Phase == GamePhase.RobberMove || s.Phase == GamePhase.RobberSteal || s.Phase == GamePhase.RoadBuilding || s.Phase == GamePhase.PendingChoice) == (s.PendingDecision != null), "Invalid pending decision.");
+            Check(!s.FirstBarbarianAttack ? s.RobberTileId==null : seafaring.Id=="pirate-islands" ? s.RobberTileId==null : s.RobberTileId=="frame"&&seafaring.Id=="new-world" || s.Tiles.Any(t => t.Id == s.RobberTileId && IsLand(t)), "Invalid robber location.");
+            Check((s.Phase == GamePhase.SetupPort || s.Phase == GamePhase.PortPlacement || s.Phase == GamePhase.SetupRoad || s.Phase == GamePhase.Discard || s.Phase == GamePhase.RobberMove || s.Phase == GamePhase.RobberSteal || s.Phase == GamePhase.RoadBuilding || s.Phase == GamePhase.PendingChoice) == (s.PendingDecision != null), "Invalid pending decision.");
             Check((s.Phase == GamePhase.Discard) == (s.Discards.Length > 0), "Discard phase mismatch.");
             Check(s.Discards.Select(d => d.PlayerId).Distinct().Count() == s.Discards.Length && s.Discards.All(d => d.Amount > 0 && s.Players.Any(p => p.Id == d.PlayerId && HandCount(p) / 2 == d.Amount)), "Invalid discard obligation.");
             if (s.PendingDecision != null)
             {
                 Check(s.Phase==GamePhase.PendingChoice?s.Players.Any(p=>p.Id==s.PendingDecision.PlayerId):s.PendingDecision.PlayerId == s.ActivePlayerId, "Pending actor mismatch.");
                 if (s.Phase == GamePhase.SetupRoad) Check(s.PendingDecision.Kind == "SetupRoad" && Buildings(s).Any(b => b.PlayerId == s.ActivePlayerId && b.LocationId == s.PendingDecision.AnchorVertexId), "Invalid setup road anchor.");
-                else if(s.Phase!=GamePhase.PendingChoice) Check(s.PendingDecision.ReturnPhase == GamePhase.Action || s.PendingDecision.ReturnPhase == GamePhase.ProductionAwaitRoll, "Invalid decision return phase.");
+                else if(s.Phase!=GamePhase.PendingChoice&&s.Phase!=GamePhase.SetupPort) Check(s.PendingDecision.ReturnPhase == GamePhase.Action || s.PendingDecision.ReturnPhase == GamePhase.ProductionAwaitRoll, "Invalid decision return phase.");
                 if (s.Phase == GamePhase.RoadBuilding) Check(s.PendingDecision.RemainingRoads >= 1 && s.PendingDecision.RemainingRoads <= 2, "Invalid free road allowance.");
                 if (s.Phase == GamePhase.RobberSteal)
                 {
-                    var victims = s.PendingDecision.Token == "pirate" ? PirateVictims(s,s.ActivePlayerId,s.PirateTileId) : Buildings(s).Where(b => b.PlayerId != s.ActivePlayerId && s.Tiles.Single(t=>t.Id==s.RobberTileId).Vertices.Contains(b.LocationId)).Select(b => b.PlayerId).Distinct().OrderBy(x => x).ToArray();
+                    var victims = s.PendingDecision.Token == "any" ? s.Players.Where(p=>p.Id!=s.ActivePlayerId).Select(p=>p.Id).ToArray() : s.PendingDecision.Token == "pirate" ? PirateVictims(s,s.ActivePlayerId,s.PirateTileId) : Buildings(s).Where(b => b.PlayerId != s.ActivePlayerId && s.Tiles.Single(t=>t.Id==s.RobberTileId).Vertices.Contains(b.LocationId)).Select(b => b.PlayerId).Distinct().OrderBy(x => x).ToArray();
                     Check(victims.Length > 0 && victims.SequenceEqual(s.PendingDecision.EligibleVictimIds), "Invalid robber victim selection.");
                 }
             }
@@ -464,10 +464,10 @@ namespace Catan.Core.M5
                 Check(ValidBag(offer.Give) && ValidBag(offer.Receive) && offer.Give.Total+offer.GiveCommodities.Total > 0 && offer.Receive.Total+offer.ReceiveCommodities.Total > 0 && !Resources.Any(r => offer.Give[r] > 0 && offer.Receive[r] > 0), "Invalid trade bags.");
             }
             var roadLengths = s.Players.Select(p => LongestRoad(s, p.Id)).ToArray();
-            Check(ValidAward(s.Players.Select(p => p.Id).ToArray(), roadLengths, 5, s.LongestRoadPlayerId), "Invalid longest road holder.");
+            Check(!seafaring.UseLongestRoute ? s.LongestRoadPlayerId==null : ValidAward(s.Players.Select(p => p.Id).ToArray(), roadLengths, 5, s.LongestRoadPlayerId), "Invalid longest road holder.");
             Check(ValidAward(s.Players.Select(p => p.Id).ToArray(), s.Players.Select(p => p.PlayedKnights).ToArray(), 3, s.LargestArmyPlayerId), "Invalid largest army holder.");
             Check((s.Phase == GamePhase.Finished) == (s.WinnerPlayerId != null), "Winner phase mismatch.");
-            if (s.WinnerPlayerId != null) Check(s.WinnerPlayerId == s.ActivePlayerId && VictoryPoints(s, s.WinnerPlayerId, true) >= s.TargetVictoryPoints.Value, "Invalid winner.");
+            if (s.WinnerPlayerId != null) Check(s.Special!=null&&s.Special.Villages.Count(v=>v.Cloth==0)>=5 || s.WinnerPlayerId == s.ActivePlayerId && HasScenarioVictory(s,s.WinnerPlayerId), "Invalid winner.");
             Check(s.Events.Length == s.ProcessedCommands.Length && s.EventSequence == s.Events.Length, "Invalid event ledger length.");
         }
         private static bool ValidAward(string[] ids, int[] scores, int threshold, string holder)

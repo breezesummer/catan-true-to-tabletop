@@ -27,8 +27,8 @@ namespace Catan.Core.M5
                 Check(s.BarbarianPosition==7&&s.BarbarianAttackStrength>=s.Cities.Length&&s.BarbarianAttackStrength<=s.Cities.Length+s.Players.Length&&s.BarbarianDefenseStrength==s.Knights.Where(k=>k.Active).Sum(k=>k.Level),"蛮族战斗快照与结算状态不符。");
             Check(s.DecisionQueue.All(d=>d!=null&&s.Players.Any(p=>p.Id==d.PlayerId)),"Invalid decision queue.");
             Check(s.Tiles.Length==scenario.Topology.Tiles.Length&&s.Tiles.Select(t=>t.Id).Distinct().Count()==s.Tiles.Length,"Invalid board tiles.");
-            foreach(var tile in s.Tiles) {var original=scenario.Topology.Tiles.Single(t=>t.Id==tile.Id);Check(tile.Resource==original.Resource&&tile.Q==original.Q&&tile.R==original.R&&tile.Vertices.SequenceEqual(original.Vertices),"Immutable topology changed.");}
-            Check(s.Tiles.Select(t=>t.Number??0).OrderBy(n=>n).SequenceEqual(scenario.Topology.Tiles.Select(t=>t.Number??0).OrderBy(n=>n)),"Number-disc conservation failed.");
+            foreach(var tile in s.Tiles) {var original=scenario.Topology.Tiles.Single(t=>t.Id==tile.Id);Check((original.Resource=="fog"||tile.Resource==original.Resource)&&tile.Q==original.Q&&tile.R==original.R&&tile.Vertices.SequenceEqual(original.Vertices),"Immutable topology changed.");}
+            Check(s.Tiles.Select(t=>t.Number??0).Where(n=>n!=0).Concat(s.Special?.HiddenNumbers??Array.Empty<int>()).OrderBy(n=>n).SequenceEqual(scenario.Topology.Tiles.Select(t=>t.Number??0).Where(n=>n!=0).Concat(seafaring.HiddenNumbers).OrderBy(n=>n)),"Number-disc conservation failed.");
         }
     }
 }

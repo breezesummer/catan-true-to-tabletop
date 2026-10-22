@@ -10,6 +10,7 @@ namespace Catan.Core.M5
             // for each target is expensive in Unity/Mono; detach the complete mutable
             // state graph directly, preserving exactly the same authority values.
             var copy=(GameState)MemberwiseClone();
+            copy.Special=Special?.CopyForTransaction();
             copy.Random=new RandomState {AlgorithmId=Random.AlgorithmId,State=Random.State,Draws=Random.Draws};
             copy.Players=Players.Select(p=>p.CopyForTransaction()).ToArray();
             copy.Bank=Bank.Copy();copy.CommodityBank=CommodityBank.Copy();
@@ -17,7 +18,7 @@ namespace Catan.Core.M5
             copy.Walls=CopyPlacements(Walls);copy.DowngradedCities=CopyPlacements(DowngradedCities);
             copy.Knights=Knights.Select(CopyKnight).ToArray();
             copy.Metropolises=Metropolises.Select(m=>new Metropolis {Track=m.Track,PlayerId=m.PlayerId,LocationId=m.LocationId}).ToArray();
-            copy.Ships=Ships.Select(s=>new ShipPlacement {LocationId=s.LocationId,PlayerId=s.PlayerId,BuiltTurn=s.BuiltTurn}).ToArray();
+            copy.Ships=Ships.Select(s=>new ShipPlacement {LocationId=s.LocationId,PlayerId=s.PlayerId,BuiltTurn=s.BuiltTurn,IsWarship=s.IsWarship,IsInvasionRoute=s.IsInvasionRoute}).ToArray();
             copy.PendingDecision=PendingDecision?.CopyForTransaction();
             copy.DecisionQueue=DecisionQueue.Select(d=>d.CopyForTransaction()).ToArray();
             copy.Discards=Discards.Select(d=>new DiscardRequirement {PlayerId=d.PlayerId,Amount=d.Amount}).ToArray();

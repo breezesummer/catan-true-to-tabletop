@@ -2,7 +2,7 @@ using System;
 
 namespace Catan.Core
 {
-    /// <summary>仅供本机或权威端 AI 决策的对手手牌投影；不包含具体发展卡、进步卡或牌库。</summary>
+    /// <summary>仅供本机或权威端 AI 决策的对手手牌投影；不包含具体基础发展卡、三色发展卡或牌库。</summary>
     public sealed class OpponentHandView
     {
         public string PlayerId { get; internal set; }

@@ -100,11 +100,11 @@ namespace Catan.Core.M4
                 case "Metropolis":
                     Require(d.Options.Contains(c.TargetId)&&s.Cities.Any(x=>x.PlayerId==p.Id&&x.LocationId==c.TargetId)&&!s.Metropolises.Any(m=>m.LocationId==c.TargetId),"InvalidCity","请选择没有大都会的己方城市。");
                     s.Metropolises=s.Metropolises.Where(m=>m.Track!=d.Track).ToArray(); s.Metropolises=Append(s.Metropolises,new Metropolis {Track=d.Track,PlayerId=p.Id,LocationId=c.TargetId}); break;
-                case "DefenderProgress": Require(Enum.IsDefined(typeof(ImprovementTrack),c.Track),"InvalidTrack","请选择进步牌牌堆。"); DrawProgressCard(s,p,c.Track); break;
+                case "DefenderProgress": Require(Enum.IsDefined(typeof(ImprovementTrack),c.Track),"InvalidTrack","请选择发展卡牌堆。"); DrawProgressCard(s,p,c.Track); break;
                 case "DisplacedKnight":
                     Require(d.Options.Contains(c.TargetId)&&!Occupied(s,c.TargetId),"InvalidKnightDestination","请选择合法的骑士撤退位置。");
                     d.DisplacedKnight.LocationId=c.TargetId; s.Knights=Append(s.Knights,d.DisplacedKnight); break;
-                default: throw new RuleException("WrongDecision","当前选择需要对应进步牌操作。");
+                default: throw new RuleException("WrongDecision","当前选择需要对应发展卡操作。");
             }
             CheckVictory(s);if(s.Phase!=GamePhase.Finished) ContinueDecisions(s);
         }

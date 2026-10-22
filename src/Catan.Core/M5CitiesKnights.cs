@@ -26,12 +26,13 @@ namespace Catan.Core.M5
             {
                 var next=s.DecisionQueue[0];s.DecisionQueue=s.DecisionQueue.Skip(1).ToArray();
                 if(next.Kind=="ProgressDraw") {DrawProgressCard(s,s.Players.Single(p=>p.Id==next.PlayerId),next.Track);CheckVictory(s);if(s.Phase==GamePhase.Finished)return;continue;}
-                if(next.Kind=="BarbarianReturnHome") {foreach(var knight in s.Knights)knight.Active=false;s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;if(s.PirateTileId==null)s.PirateTileId=seafaring.InitialPirateTileId;continue;}
+                if(next.Kind=="BarbarianReturnHome") {foreach(var knight in s.Knights)knight.Active=false;s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;if(s.PirateTileId==null&&(seafaring.Id!="pirate-islands"||s.Special.Fortresses.Any(f=>f.Strength>0)))s.PirateTileId=seafaring.InitialPirateTileId;continue;}
                 if(next.Kind=="Aqueduct"&&s.Bank.Total==0)continue;
                 s.PendingDecision=next;s.Phase=GamePhase.PendingChoice;return;
             }
             if(s.ProductionPending) { s.ProductionPending=false; ResolveProduction(s); return; }
             s.Phase=s.DecisionReturnPhase;
+            if(s.Special?.ResumeDecision!=null){s.PendingDecision=s.Special.ResumeDecision;s.Phase=s.Special.ResumePhase;s.Special.ResumeDecision=null;}
         }
         private void RollCitiesKnights(GameState s)
         {
@@ -47,6 +48,13 @@ namespace Catan.Core.M5
         }
         private void ResolveProduction(GameState s)
         {
+            if(s.Special!=null&&!s.Special.PirateProductionResolved)
+            {
+                s.Special.PirateProductionResolved=true;
+                SpecialProduction(s);
+                if(s.DecisionQueue.Length>0){s.ProductionPending=true;s.DecisionReturnPhase=GamePhase.Action;ContinueDecisions(s);return;}
+            }
+            if(s.Special!=null)s.Special.PirateProductionResolved=false;
             int total=s.LastDice1+s.LastDice2;
             if(total==7)
             {
@@ -107,11 +115,12 @@ namespace Catan.Core.M5
                 case "Metropolis":
                     Require(d.Options.Contains(c.TargetId)&&s.Cities.Any(x=>x.PlayerId==p.Id&&x.LocationId==c.TargetId)&&!s.Metropolises.Any(m=>m.LocationId==c.TargetId),"InvalidCity","请选择没有大都会的己方城市。");
                     s.Metropolises=s.Metropolises.Where(m=>m.Track!=d.Track).ToArray(); s.Metropolises=Append(s.Metropolises,new Metropolis {Track=d.Track,PlayerId=p.Id,LocationId=c.TargetId}); break;
-                case "DefenderProgress": Require(Enum.IsDefined(typeof(ImprovementTrack),c.Track),"InvalidTrack","请选择进步牌牌堆。"); DrawProgressCard(s,p,c.Track); break;
+                case "TribeProgress":
+                case "DefenderProgress": Require(Enum.IsDefined(typeof(ImprovementTrack),c.Track),"InvalidTrack","请选择发展卡牌堆。"); DrawProgressCard(s,p,c.Track); break;
                 case "DisplacedKnight":
                     Require(d.Options.Contains(c.TargetId)&&!Occupied(s,c.TargetId),"InvalidKnightDestination","请选择合法的骑士撤退位置。");
                     d.DisplacedKnight.LocationId=c.TargetId; s.Knights=Append(s.Knights,d.DisplacedKnight); break;
-                default: throw new RuleException("WrongDecision","当前选择需要对应进步牌操作。");
+                default: throw new RuleException("WrongDecision","当前选择需要对应发展卡操作。");
             }
             CheckVictory(s);if(s.Phase!=GamePhase.Finished) ContinueDecisions(s);
         }
@@ -142,7 +151,7 @@ namespace Catan.Core.M5
             Transfer(p.Commodities,s.CommodityBank,(Commodity)(int)track,Math.Max(0,level-discount)); p.Improvements[(int)track]=level;
             if(acquire) {QueueDecision(s,new PendingDecision {Kind="Metropolis",PlayerId=p.Id,Track=track,Options=cities}); ContinueDecisions(s);}
         }
-        private bool Occupied(GameState s,string vertex) => Buildings(s).Any(b=>b.LocationId==vertex)||s.Knights.Any(k=>k.LocationId==vertex);
+        private bool Occupied(GameState s,string vertex) => Buildings(s).Any(b=>b.LocationId==vertex)||s.Knights.Any(k=>k.LocationId==vertex)||(s.Special!=null&&(s.Special.Villages.Any(v=>v.VertexId==vertex)||s.Special.Fortresses.Any(f=>f.Strength>0&&f.VertexId==vertex)));
         private bool Blocked(GameState s,string player,string vertex) => Buildings(s).Any(b=>b.PlayerId!=player&&b.LocationId==vertex)||s.Knights.Any(k=>k.PlayerId!=player&&k.LocationId==vertex);
         private void RecruitKnight(GameState s,PlayerState p,string target)
         {
@@ -212,7 +221,7 @@ namespace Catan.Core.M5
             Require((c.GiveIsCommodity?Enum.IsDefined(typeof(Commodity),c.GiveCommodity):Enum.IsDefined(typeof(Resource),c.GiveResource))&&(c.ReceiveIsCommodity?Enum.IsDefined(typeof(Commodity),c.ReceiveCommodity):Enum.IsDefined(typeof(Resource),c.ReceiveResource)),"InvalidTrade","请选择有效资源或商品。");
             Require(c.GiveIsCommodity!=c.ReceiveIsCommodity||(c.GiveIsCommodity?c.GiveCommodity!=c.ReceiveCommodity:c.GiveResource!=c.ReceiveResource),"InvalidTrade","请选择不同的交换牌。");
             int rate=c.GiveIsCommodity?CommodityTradeRate(s,p.Id,c.GiveCommodity):TradeRate(s,p.Id,c.GiveResource);
-            bool generic=ports.Any(port=>port.Resource==null&&Buildings(s).Any(b=>b.PlayerId==p.Id&&port.Vertices.Contains(b.LocationId)));
+            bool generic=CurrentPorts(s).Any(port=>port.Resource==null&&Buildings(s).Any(b=>b.PlayerId==p.Id&&port.Vertices.Contains(b.LocationId)));
             Require(c.ReceiveAmount>0&&c.ReceiveAmount<=19&&c.GiveAmount>0&&c.GiveAmount<=19&&(c.GiveAmount==4*c.ReceiveAmount||c.GiveAmount==rate*c.ReceiveAmount||generic&&c.GiveAmount==3*c.ReceiveAmount),"InvalidRatio","交换比例无效。");
             if(c.GiveIsCommodity)Transfer(p.Commodities,s.CommodityBank,c.GiveCommodity,c.GiveAmount);else Transfer(p.Resources,s.Bank,c.GiveResource,c.GiveAmount);
             if(c.ReceiveIsCommodity)Transfer(s.CommodityBank,p.Commodities,c.ReceiveCommodity,c.ReceiveAmount);else Transfer(s.Bank,p.Resources,c.ReceiveResource,c.ReceiveAmount);
@@ -220,7 +229,7 @@ namespace Catan.Core.M5
         public int GetCommodityTradeRate(string playerId,Commodity commodity) {lock(gate) {if(!state.Players.Any(p=>p.Id==playerId)||!Enum.IsDefined(typeof(Commodity),commodity))throw new ArgumentException("Invalid player/commodity.");return CommodityTradeRate(state,playerId,commodity);}}
         private int CommodityTradeRate(GameState s,string player,Commodity commodity)
         {
-            var p=s.Players.Single(x=>x.Id==player);int rate=p.Improvements[(int)ImprovementTrack.Trade]>=3?2:ports.Any(port=>port.Resource==null&&Buildings(s).Any(b=>b.PlayerId==player&&port.Vertices.Contains(b.LocationId)))?3:4;
+            var p=s.Players.Single(x=>x.Id==player);int rate=p.Improvements[(int)ImprovementTrack.Trade]>=3?2:CurrentPorts(s).Any(port=>port.Resource==null&&Buildings(s).Any(b=>b.PlayerId==player&&port.Vertices.Contains(b.LocationId)))?3:4;
             return Math.Min(rate,ProgressTradeRate(s,p,null,commodity));
         }
         private IEnumerable<Command> LegalExpansionActions(string player)
@@ -246,6 +255,7 @@ namespace Catan.Core.M5
                 }
             }
             candidates.AddRange(ProgressCandidates(state,state.Players.Single(p=>p.Id==player)));
+            candidates.AddRange(SpecialCandidates(state,state.Players.Single(p=>p.Id==player)));
             candidates.AddRange(SeafaringCandidates(state,state.Players.Single(p=>p.Id==player)));
             return candidates.Where(IsLegal);
         }

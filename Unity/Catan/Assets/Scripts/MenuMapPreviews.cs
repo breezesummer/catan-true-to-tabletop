@@ -15,7 +15,7 @@ public static class MenuMapPreviews
         int rule = Mathf.Clamp(ruleIndex, 0, 3);
         string id = rule == 0 || rule == 2 ? "standard" : scenarioId;
         if (string.IsNullOrEmpty(id)) return null;
-        return Load(Rules[rule] + "-" + id + "-" + (playerCount == 3 ? "3" : "4"));
+        return Load(Rules[rule] + "-" + id + "-" + (playerCount == 3 ? "3" : "4")) ?? (rule==3?Load("seafarers-"+id+"-"+(playerCount==3?"3":"4")):null);
     }
 
     public static string ScenarioCaption(int ruleIndex, string scenarioId, int playerCount)

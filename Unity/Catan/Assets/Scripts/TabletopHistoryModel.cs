@@ -19,10 +19,8 @@ public static class TabletopHistoryModel
     static bool Goods(GameHistoryChange c) => c.Category == "goods" || c.Category == "resource-count";
     public static int CardTrack(string name)
     {
-        string[] science={"炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","道路建设","锻铁匠","锻造"};
-        string[] trade={"商业港口","行会征费","商人","商船队","资源垄断","商品垄断"};
-        string[] politics={"外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"};
-        return science.Contains(name)?2:trade.Contains(name)?0:politics.Contains(name)?1:-1;
+        int index=Array.IndexOf(DevelopmentCardText.Names,name);
+        return index<0?-1:index<10?2:index<16?0:1;
     }
     // 中文名称对应当前实体建设板；等级和能力仍沿用规则书第 8 页。
     public static string FacilityName(int track,int level)
@@ -39,7 +37,7 @@ public static class TabletopHistoryModel
         string action=(entry.Action??"").Replace("打出", "使用").Replace("使用了","使用");
         if(entry.Kind=="ProposeTrade")return new[]{new TabletopHistoryLine{Player=entry.PlayerId,Prefix="提出交易：",Quote=true,
             Cards=changes.Where(c=>c.Category=="offer"&&c.Amount<0).ToArray(),ReceivedCards=changes.Where(c=>c.Category=="offer"&&c.Amount>0).ToArray()}};
-        if(entry.Kind=="BankTrade"||entry.Kind=="AcceptTrade"||action=="完成商业港口交换")
+        if(entry.Kind=="BankTrade"||entry.Kind=="AcceptTrade"||action=="完成商港交换")
         {
             var exchanged=changes.Where(Goods).ToArray();
             var given=exchanged.Where(c=>c.PlayerId==entry.PlayerId&&c.Amount<0).ToArray();
@@ -50,8 +48,8 @@ public static class TabletopHistoryModel
         }
         bool steal=entry.Kind=="StealResource"||entry.Kind=="StealCloth"||action=="结算间谍";
         bool wedding=action=="交出婚礼礼物";
-        bool transfer=steal||wedding||action=="结算行会征费"||entry.Kind=="PlayMonopoly"||entry.Kind=="PlayProgressCard"&&
-            new[]{"资源垄断","商品垄断","征税"}.Any(action.Contains);
+        bool transfer=steal||wedding||action=="结算大商家"||entry.Kind=="PlayMonopoly"||entry.Kind=="PlayProgressCard"&&
+            new[]{"垄断资源","垄断商品","主教"}.Any(action.Contains);
         if(transfer)
         {
             var moved=changes.Where(c=>Goods(c)||steal&&c.Category=="progress"||entry.Kind=="StealCloth"&&c.Category=="count").ToArray();
@@ -61,7 +59,7 @@ public static class TabletopHistoryModel
                 foreach(var giver in moved.Where(c=>c.Amount<0&&c.PlayerId!=receiver).GroupBy(c=>c.PlayerId))
                 {
                     var cards=giver.Select(c=>{consumed.Add(c);return c;}).ToArray();
-                    result.Add(new TabletopHistoryLine{Player=receiver,Prefix=wedding?"收取了":steal||action=="结算行会征费"?"偷取了":"收获",Partner=giver.Key,
+                    result.Add(new TabletopHistoryLine{Player=receiver,Prefix=wedding?"收取了":steal||action=="结算大商家"?"偷取了":"收获",Partner=giver.Key,
                         PartnerAction=wedding?"交出的婚礼礼物：":steal?" "+cards.Sum(c=>Math.Abs(c.Amount))+"张"+(cards.Any(c=>c.Category=="progress")?"发展卡":entry.Kind=="StealCloth"?"布匹":"手牌"):"的手牌：",
                         Cards=steal?Array.Empty<GameHistoryChange>():cards});
                 }
@@ -69,11 +67,11 @@ public static class TabletopHistoryModel
             }
         }
         bool paid=changes.Any(c=>Goods(c)&&c.Amount<0&&c.PlayerId==entry.PlayerId);
-        bool medicineUpgrade=entry.Kind=="PlayProgressCard"&&action=="使用「医学」"&&changes.Any(c=>c.Category=="piece"&&c.Name=="城市"&&c.Amount>0&&c.PlayerId==entry.PlayerId);
+        bool medicineUpgrade=entry.Kind=="PlayProgressCard"&&action=="使用「药物」"&&changes.Any(c=>c.Category=="piece"&&c.Name=="城市"&&c.Amount>0&&c.PlayerId==entry.PlayerId);
         bool build=paid&&(medicineUpgrade||entry.Kind.StartsWith("Build")||new[]{"RecruitKnight","PromoteKnight","ActivateKnight","ImproveCity","BuyDevelopmentCard"}.Contains(entry.Kind));
         bool facility=changes.Any(c=>c.Category=="status"&&c.Amount>0&&(c.Name??"").Contains("改良"));
         bool setup=entry.Kind=="SetupSettlement"||entry.Kind=="SetupRoad"||entry.Kind=="SetupShip";
-        bool discard=entry.Kind=="DiscardResources"||action=="弃置破坏要求的手牌";
+        bool discard=entry.Kind=="DiscardResources"||action=="弃置破坏者要求的手牌";
         bool pillage=false;
         foreach(var city in changes.Where(c=>c.Category=="piece"&&c.Name=="城市"&&c.Amount<0))
         {
@@ -87,8 +85,8 @@ public static class TabletopHistoryModel
         {
             foreach(var group in changes.Where(c=>Goods(c)&&c.Amount<0).GroupBy(c=>c.PlayerId))
             {
-                bool sabotage=action=="弃置破坏要求的手牌";
-                result.Add(new TabletopHistoryLine{Player=group.Key,Prefix=(sabotage?"因「破坏」":"因掷出7")+"弃置了"+group.Sum(c=>-c.Amount)+"张手牌",Emphasis=sabotage?"破坏":null,Track=sabotage?1:-1});
+                bool sabotage=action=="弃置破坏者要求的手牌";
+                result.Add(new TabletopHistoryLine{Player=group.Key,Prefix=(sabotage?"因「破坏者」":"因掷出7")+"弃置了"+group.Sum(c=>-c.Amount)+"张手牌",Emphasis=sabotage?"破坏者":null,Track=sabotage?1:-1});
                 foreach(var c in group)consumed.Add(c);
             }
         }
@@ -136,7 +134,7 @@ public static class TabletopHistoryModel
             if(c.Category=="piece"&&(build||action.Contains(c.Name)))continue;
             if(c.Amount<0&&(c.Category=="progress"||c.Category=="development")&&action.Contains(c.Name))continue;
             bool card=c.Category=="progress"||c.Category=="development";
-            bool victory=c.Category=="defender"||c.Category=="progress"&&new[]{"宪法","石碑","印刷术"}.Contains(c.Name);
+            bool victory=c.Category=="defender"||c.Category=="progress"&&new[]{"石碑","石碑","印刷厂"}.Contains(c.Name);
             string verb=c.Amount>0?(c.Category=="piece"&&c.Name=="城墙"?"建造了":"收获"):"失去了";
             result.Add(new TabletopHistoryLine{Player=c.PlayerId,Prefix=verb+c.Name+(victory?"（1分）":"")+(Math.Abs(c.Amount)>1?" ×"+Math.Abs(c.Amount):""),Emphasis=card?c.Name:null,
                 Track=card?(c.CardTrack>=0?c.CardTrack:CardTrack(c.Name)>=0?CardTrack(c.Name):3):-1});

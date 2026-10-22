@@ -4,17 +4,18 @@ using System.Runtime.Serialization;
 
 namespace Catan.Core.M5
 {
-    /// <summary>The two recommended 2025 Cities & Knights combinations. Other M3 scenarios are deliberately not implied supported.</summary>
+    /// <summary>九张航海家地图共用的组合入口；专属机制与项目变体由会话执行。</summary>
     public static partial class CombinedScenarios
     {
-        public static string[] Ids => new[] { "heading-for-new-shores", "through-the-desert" };
+        public static string[] Ids => M3.SeafarersScenarios.Ids;
         public static M3.SeafarersScenario Create(string id, int playerCount)
         {
             if (!Ids.Contains(id)) throw new ArgumentException("Unsupported Cities & Knights / Seafarers combination.", nameof(id));
             var scenario = M3.SeafarersScenarios.Create(id, playerCount);
-            scenario.TargetVictoryPoints = 16;
+            scenario.TargetVictoryPoints += 2;
             scenario.Version = CombinedGameSession.LegacyScenarioVersion;
             scenario.Description = "2025 城市与骑士推荐组合；16 分获胜，保留每个异乡地区首次定居的 2 分奖励。";
+            if (id != "heading-for-new-shores" && id != "through-the-desert") scenario.Description = "保留航海家专属机制的城市骑士组合；部落奖励与战舰升级采用项目变体。";
             scenario.Name += " · 城市与骑士";
             return scenario;
         }
@@ -24,6 +25,8 @@ namespace Catan.Core.M5
         [DataMember(Order=1)] public string LocationId { get; set; }
         [DataMember(Order=2)] public string PlayerId { get; set; }
         [DataMember(Order=3)] public int BuiltTurn { get; set; }
+        [DataMember(Order=4, EmitDefaultValue=false)] public bool IsWarship { get; set; }
+        [DataMember(Order=5, EmitDefaultValue=false)] public bool IsInvasionRoute { get; set; }
     }
     public sealed partial class Command
     {

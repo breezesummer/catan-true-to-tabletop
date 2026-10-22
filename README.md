@@ -2,7 +2,7 @@
 
 一款以实体桌游体验为目标的 3D 卡坦岛游戏，包含资源生产、交易、道路与聚落建设、海上探索，以及城市发展与骑士防御。项目强调在同一张桌面上观察地图、拿取棋子、摆放建筑和操作卡牌，逐步呈现立体地形收藏版的质感。
 
-项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本标识为**内测版1.6.14**；各可玩构建的实际版本与验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
+项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本标识为**内测版1.7.1**；各可玩构建的实际版本与验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
 
 ## 玩法与内容
 
@@ -65,8 +65,10 @@ macOS 开发入口为 `tools/development/Start-Dev.command`，打开 Unity 使�
 - [开发日志](The%20Farmer%27s%20Log.md)：时间轴、每轮改动、发布入口与实际验证。
 - [开发环境](docs/ENVIRONMENT.md)：工具链、环境配置与开发入口。
 - [分系统构建](docs/CROSS_PLATFORM_BUILD.md)：Windows／macOS 启动、双端打包和 Android 签名迁移。
+- [游戏百科](docs/GAME_ENCYCLOPEDIA.md)：发展卡实体名称、牌面描述与照片来源。
 - [本地规则索引](assets/references/rules/README.md)：规则原件与查询入口。
 - [美术生产规范](docs/ART_PIPELINE.md)：参考采集、资产制作、导入和复现。
+- [豪华典藏版ultra主题实施方案](docs/ULTRA_THEME_IMPLEMENTATION_PLAN.md)：真实桌游与 ultra 双主题、三维资产、环境动态及分步验收。
 - [AI 2.0 补丁](docs/AI_PATCH_2_0.md)：当前 AI 策略、交易限制和专用信息权限。
 - [本地 AI 验收](docs/M6_ACCEPTANCE.md)：AI、规则与独立完整对局证据。
 - [联机验收](docs/M7_ACCEPTANCE.md)：本机与公网已验证范围、后续待验事项。

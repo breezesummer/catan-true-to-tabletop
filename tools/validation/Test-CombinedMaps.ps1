@@ -1,12 +1,13 @@
 param([string]$BuildRoot='.local/m6-map-refresh-v001', [string]$LegacyDirectory='', [switch]$Graphics)
 $ErrorActionPreference='Stop'
 $mapRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
-$mapPlayer=Join-Path $mapRepo "$BuildRoot/Builds/Windows/CatanM6.exe"
+$mapStem="Catan"+(& (Join-Path $PSScriptRoot "../development/Get-GameVersion.ps1"))
+$mapPlayer=Join-Path $mapRepo "$BuildRoot/Builds/Windows/$mapStem.exe"
 $mapMode=if($Graphics){'graphics'}else{'headless'}
 $mapOutput=Join-Path $mapRepo "$BuildRoot/map-verification/$mapMode"
 New-Item -ItemType Directory -Force -Path $mapOutput | Out-Null
 $mapLog=Join-Path $mapOutput 'player.log'
-$mapArgs=@('-batchmode','-screen-fullscreen','0','--combined-map-verify',('"'+$mapOutput+'"'),'-logFile',('"'+$mapLog+'"'))
+$mapArgs=@('-screen-fullscreen','0','--combined-map-verify',('"'+$mapOutput+'"'),'-logFile',('"'+$mapLog+'"'))
 if($Graphics){$mapArgs+='-force-d3d11'}else{$mapArgs+='-nographics'}
 if($LegacyDirectory){$mapArgs+=@('--combined-map-legacy',('"'+[IO.Path]::GetFullPath((Join-Path $mapRepo $LegacyDirectory))+'"'))}
 $mapProcess=Start-Process -FilePath $mapPlayer -ArgumentList $mapArgs -WindowStyle Hidden -PassThru

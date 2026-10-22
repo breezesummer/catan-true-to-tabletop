@@ -32,7 +32,7 @@ namespace Catan.Core
         public int Amount { get; internal set; }
         public string Name { get; internal set; }
         public string LocationId { get; internal set; }
-        // 进步卡牌背颜色属于公开信息；-1 表示没有轨道，不包含隐藏卡牌身份。
+        // 发展卡牌背颜色属于公开信息；-1 表示没有轨道，不包含隐藏卡牌身份。
         public int CardTrack { get; internal set; } = -1;
         public bool IsPrivate { get; internal set; }
         internal GameHistoryChange Copy() => (GameHistoryChange)MemberwiseClone();
@@ -136,7 +136,7 @@ namespace Catan.Core
                 bool visible = isPublic || played;
                 groups.Add(new Group
                 {
-                    Details = new[] { new GameHistoryChange { PlayerId = player, Category = category, Amount = c.Count, Name = CardName(c.Card), IsPrivate = !visible,
+                    Details = new[] { new GameHistoryChange { PlayerId = player, Category = category, Amount = c.Count, Name = CardName(c.Card, category == "progress"), IsPrivate = !visible,
                         CardTrack = category == "progress" && Enum.TryParse(c.Card, out M4.ProgressCardKind progress) && Enum.IsDefined(typeof(M4.ProgressCardKind), progress) ? (int)M4.ProgressCatalog.Track(progress) : -1 } },
                     Viewers = visible ? null : action.Kind == "ResolveProgressChoice" && action.PendingKind == "ProgressEspionage" ? new[] { action.PlayerId, counterpart, player } : new[] { player }
                 });
@@ -154,27 +154,28 @@ namespace Catan.Core
             {"MoveShip","移动船"},{"MovePirate","移动海盗"},{"ChooseGoldResources","领取金矿资源"},{"StealCloth","偷取布匹"},
             {"PlacePort","安置港口"},{"ClaimWonder","认领奇迹"},{"BuildWonder","建造奇迹"},{"AttackFortress","攻击海盗要塞"},{"ChooseInvasionRoute","选择海盗路线"},
             {"BuildWall","建造城墙"},{"ImproveCity","升级城市设施"},{"RecruitKnight","招募骑士"},{"PromoteKnight","晋升骑士"},{"ActivateKnight","激活骑士"},
-            {"MoveKnight","移动骑士"},{"DisplaceKnight","驱逐骑士"},{"ChaseRobber","骑士驱赶强盗"},{"ChasePirate","骑士驱赶海盗"},{"DiscardProgressCard","弃置发展卡"},{"CommercialHarborOffer","使用商业港口"},
+            {"MoveKnight","移动骑士"},{"DisplaceKnight","驱逐骑士"},{"ChaseRobber","骑士驱赶强盗"},{"ChasePirate","骑士驱赶海盗"},{"DiscardProgressCard","弃置发展卡"},{"CommercialHarborOffer","使用商港"},
             {"ResolveChoice","完成选择"},{"ResolveProgressChoice","完成发展卡选择"}
         };
         private static readonly Dictionary<string, string> PendingNames = new Dictionary<string, string>
         {
-            {"ProgressRoads","选择免费道路／船"},{"ProgressGuildDues","结算行会征费"},{"ProgressEspionage","结算间谍"},{"ProgressHarbor","完成商业港口交换"},
-            {"ProgressWedding","交出婚礼礼物"},{"ProgressSabotage","弃置破坏要求的手牌"},{"ProgressTreasonRemove","移除被叛变的骑士"},{"ProgressTreasonPlace","安置叛变骑士"},
+            {"ProgressRoads","选择免费道路／船"},{"ProgressGuildDues","结算大商家"},{"ProgressEspionage","结算间谍"},{"ProgressHarbor","完成商港交换"},
+            {"ProgressWedding","交出婚礼礼物"},{"ProgressSabotage","弃置破坏者要求的手牌"},{"ProgressTreasonRemove","移除被叛徒的骑士"},{"ProgressTreasonPlace","安置叛徒骑士"},
             {"ProgressDraw","抽取发展卡"},{"ProgressDiscard","弃置超额发展卡"},{"DefenderProgress","领取保卫奖励"},{"Aqueduct","领取水渠资源"},
             {"PillageCity","选择降级城市"},{"DisplacedKnight","安置被驱逐的骑士"},{"Metropolis","安置大都会"}
         };
         private static string ActionName(HistoryAction action, string pending)
         {
-            if (action.Kind == "PlayProgressCard") return "使用「" + CardName(action.Card) + "」";
+            if (action.Kind == "PlayProgressCard") return "使用「" + CardName(action.Card, true) + "」";
             if ((action.Kind == "ResolveChoice" || action.Kind == "ResolveProgressChoice") && pending != null && PendingNames.TryGetValue(pending, out var choice)) return choice;
             return Names.TryGetValue(action.Kind, out var name) ? name : "完成操作";
         }
-        internal static string CardName(string card)
+        internal static string CardName(string card, bool progress = false)
         {
-            string[] ids = {"Knight","RoadBuilding","YearOfPlenty","Monopoly","VictoryPoint","Alchemy","Crane","Engineering","Invention","Irrigation","Medicine","Mining","Printing","Smithing","CommercialHarbor","GuildDues","Merchant","MerchantFleet","ResourceMonopoly","TradeMonopoly","Diplomacy","Espionage","Encouragement","Intrigue","Taxation","Constitution","Treason","Wedding","Sabotage"};
-            string[] names = {"骑士","道路建设","丰收","垄断","胜利点","炼金术","起重机","工程学","发明","灌溉","医学","采矿","印刷术","锻铁匠","商业港口","行会征费","商人","商船队","资源垄断","商品垄断","外交","间谍","鼓舞","谋略","征税","宪法","叛变","婚礼","破坏"};
-            int index = Array.IndexOf(ids, card); return index >= 0 ? names[index] : "卡牌";
+            if (progress) return DevelopmentCardText.Name(card);
+            string[] ids = {"Knight","RoadBuilding","YearOfPlenty","Monopoly","VictoryPoint"};
+            string[] names = {"骑士","道路建设","丰收","垄断","胜利点"};
+            int index = Array.IndexOf(ids, card); return index >= 0 ? names[index] : "发展卡";
         }
     }
     internal sealed class HistoryAction

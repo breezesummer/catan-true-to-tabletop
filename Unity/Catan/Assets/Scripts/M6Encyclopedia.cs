@@ -8,7 +8,7 @@ public sealed partial class M6App
     void DrawEncyclopedia()
     {
         DrawTablePauseBackdrop();
-        TablePauseHeading(new Rect(180,50,1080,800),"翻 开 岛 屿 的 故 事","游戏百科 · 发展卡","随时查阅卡牌效果，再从容回到牌桌。" );
+        TablePauseHeading(new Rect(180,50,1080,800),"翻 开 岛 屿 的 故 事","游戏百科 · 发展卡","三色发展卡名称与描述以实体卡牌面为准（繁体转简体）。" );
         for(int i=0;i<2;i++)if(PastoralMenuUI.Button(new Rect(212+i*513,250,501,40),i==0?"基础版 / 航海家":"城市与骑士 / 组合",true,false,encyclopediaCategory==i))
         {encyclopediaCategory=i;encyclopediaScroll=Vector2.zero;}
         string[] names=encyclopediaCategory==0?new[]{"骑士","道路建设","丰收","垄断","胜利点"}:M5App.Cards;
@@ -23,7 +23,7 @@ public sealed partial class M6App
         }
         GUI.EndScrollView();
         PastoralMenuUI.ScrollIndicator(viewport,contentHeight,encyclopediaScroll.y);
-        PastoralMenuUI.Label(new Rect(230,700,980,50),encyclopediaCategory==0?"基础发展卡：新买的卡本回合不能使用；每回合最多使用一张（胜利点卡除外）。":"发展卡：通常在自己回合行动阶段使用；炼金术在掷骰前使用。只有超过四张时才可弃置。",13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+        PastoralMenuUI.Label(new Rect(230,700,980,50),encyclopediaCategory==0?"基础发展卡：新买的卡本回合不能使用；每回合最多使用一张（胜利点卡除外）。":"发展卡：通常在自己回合行动阶段使用；炼金术士在掷骰前使用；印刷厂、石碑须即时公开。只有超过四张时才可弃置。",13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
         if(PastoralMenuUI.Button(new Rect(526,775,388,48),"返回游戏菜单",true,true))encyclopediaOpen=false;
     }
 }
