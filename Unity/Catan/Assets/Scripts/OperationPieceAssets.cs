@@ -29,7 +29,7 @@ public static class OperationPieceAssets
         else if (icon.Contains("city")) kind = "city";
         else if (icon.Contains("settlement") || icon.Contains("village")) kind = "settlement";
         else return null;
-        string path = Root + kind + "-" + colour;
+        string path = kind=="settlement" ? "ThreeKingdoms/v001/thumbnail-"+colour : Root + kind + "-" + colour;
         if (!Textures.TryGetValue(path, out var texture))
         {
             texture = Resources.Load<Texture2D>(path);
@@ -65,7 +65,13 @@ public static class OperationPieceAssets
             instance.GetComponent<Renderer>().sharedMaterial=PointerMaterial;
         }
         var block=new MaterialPropertyBlock();block.SetColor("_BaseColor",colour);block.SetColor("_Color",colour);
-        foreach(var renderer in instance.GetComponentsInChildren<Renderer>())renderer.SetPropertyBlock(block);
+        foreach(var renderer in instance.GetComponentsInChildren<Renderer>())
+        {
+            if(preview.Kind!="settlement"){renderer.SetPropertyBlock(block);continue;}
+            for(int i=0;i<renderer.sharedMaterials.Length;i++)
+                if(renderer.sharedMaterials[i]==null || !renderer.sharedMaterials[i].name.StartsWith("Village_Seat"))
+                    renderer.SetPropertyBlock(block,i);
+        }
         foreach(var collider in instance.GetComponentsInChildren<Collider>())Object.Destroy(collider);
         return instance;
     }

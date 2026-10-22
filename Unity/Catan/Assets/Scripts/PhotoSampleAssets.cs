@@ -23,6 +23,11 @@ public static class PhotoSampleAssets
     }
     public static GameObject Piece(bool road, string label, Vector3 bottom, Quaternion rotation, Color color, Transform parent)
     {
+        if(!road && PlayerComponentAssets.ColourKey(color)!=null)
+        {
+            int index=System.Array.IndexOf(BoardRenderer.SeatColors,color);
+            return PlayerComponentAssets.Building("village","P"+(index+1),label,bottom,parent);
+        }
         var model = Model(road ? "road" : "village");
         if (model == null) return null;
         var instance = Object.Instantiate(model, bottom, rotation, parent);

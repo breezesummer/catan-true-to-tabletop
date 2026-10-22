@@ -113,10 +113,10 @@ public sealed class PlayerComponentVerification : MonoBehaviour
                     var level=row>=5?(row-5)/2+1:0;var active=row>=5&&row%2==0;
                     // Expected resources are written independently of the asset selector.
                     var resources=new List<string>();
-                    if(seat==0)
+                    if(row==0)resources.Add("ThreeKingdoms/v001/tk-village-"+colour);
+                    else if(seat==0)
                     {
-                        if(row==0)resources.Add("PhotoSamples/v001/village");
-                        else if(row<3)resources.Add("EntityAssets/v001/city/city-red");
+                        if(row<3)resources.Add("EntityAssets/v001/city/city-red");
                         else if(row<5)resources.Add("EntityAssets/v001/metropolis/metropolis-red");
                         else resources.Add("EntityAssets/v001/knights/knight-level-"+level+(active?"-active":"-resting"));
                         if(row==2||row==4)resources.Add("EntityAssets/v001/city-wall/city-wall-red");
@@ -160,8 +160,8 @@ public sealed class PlayerComponentVerification : MonoBehaviour
                 else if(mode=="seafarers")root.GetComponent<M3BoardRenderer>().Preview(fixture.Vertices[0].Id,false,true);
                 else if(mode=="cities-knights")root.GetComponent<M4BoardRenderer>().Preview(fixture.Vertices[0].Id,false,true);
                 else root.GetComponent<M5BoardRenderer>().Preview(fixture.Vertices[0].Id,false,true);
-                var ghost=root.transform.Cast<Transform>().Last(t=>t.name.Contains(fixture.Vertices[0].Id));
-                var property=new MaterialPropertyBlock();ghost.GetComponentInChildren<Renderer>().GetPropertyBlock(property);
+                var ghost=root.transform.Cast<Transform>().Last(t=>t.name.StartsWith("鼠标预览"));
+                var property=new MaterialPropertyBlock();ghost.GetComponentInChildren<Renderer>().GetPropertyBlock(property,0);
                 Require(property.GetColor("_BaseColor")==new Color(.3f,1f,.75f),"Legal preview colour changed "+mode);
                 if(mode=="base")root.GetComponent<BoardRenderer>().ClearPreview();
                 else if(mode=="seafarers")root.GetComponent<M3BoardRenderer>().ClearPreview();

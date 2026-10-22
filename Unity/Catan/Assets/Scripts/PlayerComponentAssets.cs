@@ -15,7 +15,9 @@ public static class PlayerComponentAssets
         if(ColourKey(playerId)==null)return null;
         if(!Plastics.TryGetValue(playerId,out var material))
         {
-            var model=Model(BuildingResource("village",playerId));
+            // 其他棋子继续使用原塑料色；三国村庄有独立共享材质和归属色带。
+            var key=ColourKey(playerId);
+            var model=Model(key=="red"?"PhotoSamples/v001/village":Root+"player-buildings/village-"+key);
             material=model?.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials).FirstOrDefault(m=>m!=null&&m.name.Contains("Plastic"));
             if(material!=null)Plastics[playerId]=material;
         }
@@ -66,6 +68,7 @@ public static class PlayerComponentAssets
     {
         var colour = ColourKey(playerId);
         if (colour == null) return null;
+        if (type == "village") return "ThreeKingdoms/v001/tk-village-" + colour;
         if (colour != "red") return Root + "player-buildings/" + type + "-" + colour;
         switch (type)
         {
