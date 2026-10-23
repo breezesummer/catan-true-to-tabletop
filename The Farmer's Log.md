@@ -804,3 +804,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Start-De
 - 优化后局域网/公网首轮动画样本最长间隔分别 27.670ms / 32.880ms，最终 Windows 公网复测 13.212ms。隐藏窗口未执行正常 OnGUI，不能将这些样本当成可见窗口/GPU/手机帧率保证；后台分配与 GC、首次入桌及切房峰值仍需区别对待。
 - 252 项自动测试、四规则实际公网联机（28 条本席指令）、四规则三速度八次建造动画状态检查通过。Windows 和 Android 构建覆盖至 `game version/1.7/Catan1.7.0-Ultra-Baseline`；APK 1.7.0/10700、ARM64+x86_64、v2 签名及开发数据排除验证通过。未进行手机性能实测。
 - 保留最近五个内测版本，清理 1.6.11。路线图阶段退出条件不变。数值原始样本、复现脚本及限制见 [联机帧耗时记录](docs/verification/network-frame-profile-1.7.0/README.md)。
+
+## 2026-10-23 — B201高民居单体建模验证
+
+- 选择已完成四图的B201村庄后侧高民居，通过Blender MCP完成石基、墙壳、木构、真实门窗与室内、曲面分节瓦顶和脊饰；整栋5976 tris，导出合并5个材质网格。
+- 内置ImageGen生成四象限图集，保留提示词；完成8个外观视角、布线、室内与GLB回读渲染。非流形边、退化三角形、精确重复面和UV越界均0；GLB和FBX回读5976 tris、38.853×32.915×34.882毫米（估算尺寸）。
+- 修复瓦底重合端面、地板共面、檐口合缝和GLB乘色丢失。细密瓦纹、石基风化和翘头曲率有低模简化；严格像素美术定调及Unity/Android表现未验收，不宣称成品十项全部通过。未接入游戏、未发布，版本仍2.0.1。
+- 源文件、GLB、FBX、贴图、参考快照与可重建配方已保存；详见[逐项验收记录](docs/verification/three-kingdoms-pieces/B201-v001/验收记录.md)。

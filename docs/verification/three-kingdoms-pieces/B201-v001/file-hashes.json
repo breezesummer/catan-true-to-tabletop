@@ -1,0 +1,122 @@
+[
+  {
+    "文件": "art/recipes/three-kingdoms-pieces/B201-v001/build.py",
+    "字节": 12681,
+    "SHA256": "d9c1be77fe92f18c4f95faaede63b6751995b530666f1bb1c8b9923438e0938c"
+  },
+  {
+    "文件": "art/recipes/three-kingdoms-pieces/B201-v001/detail_checks.py",
+    "字节": 2821,
+    "SHA256": "122abe63a5376c2b94f8557369c82f1a3d596027ca99c9d49988acfbdb61cd89"
+  },
+  {
+    "文件": "art/recipes/three-kingdoms-pieces/B201-v001/verify_export.py",
+    "字节": 6925,
+    "SHA256": "119f60bbb0f19b60d604e4bf999182a3099d6cdfe4f2eed89b891fb60ed753c5"
+  },
+  {
+    "文件": "art/recipes/three-kingdoms-pieces/B201-v001/材质提示词.md",
+    "字节": 1539,
+    "SHA256": "6e8c5709f9eb35ffb80e6eae5202a59dc9b4ddf9a33d51367c045ba19b40cb74"
+  },
+  {
+    "文件": "art/recipes/three-kingdoms-pieces/B201-v001/references/B201_front.png",
+    "字节": 2302245,
+    "SHA256": "ff3bb17e9b9eaec10b27db2345ef67d68433bbc39b77084574b3ccdf2515f9f5"
+  },
+  {
+    "文件": "art/recipes/three-kingdoms-pieces/B201-v001/references/B201_original.png",
+    "字节": 2295273,
+    "SHA256": "d97b3239d3b0e26def08fad3cef5666cf626a38c8173d6ed0fce57efe80c0f1c"
+  },
+  {
+    "文件": "art/recipes/three-kingdoms-pieces/B201-v001/references/B201_right.png",
+    "字节": 2177980,
+    "SHA256": "7eb994bdbb3f7c046280801f5e03d33e8026b596e4acc37ee87b3d683c0d74de"
+  },
+  {
+    "文件": "art/recipes/three-kingdoms-pieces/B201-v001/references/B201_top.png",
+    "字节": 2080494,
+    "SHA256": "36a21f5b2aff150a94209619a2fb546952ae99b6bb152396bef65ef9869cede2"
+  },
+  {
+    "文件": "art/source/three-kingdoms-pieces/B201-v001/B201.blend",
+    "字节": 3981043,
+    "SHA256": "86ac441f4b5e3ef189697247b2be0940910aee1511364efca8711bc232283da5"
+  },
+  {
+    "文件": "art/exports/three-kingdoms-pieces/B201-v001/B201.fbx",
+    "字节": 4106044,
+    "SHA256": "f7d256cebffc7b474c52d8cd98b8a1f23b3f8906c7eecad1aa291f93f3de8246"
+  },
+  {
+    "文件": "art/exports/three-kingdoms-pieces/B201-v001/B201.glb",
+    "字节": 4287744,
+    "SHA256": "7350cb0ea482d8b541dc6d85e7fce5dee83d3af4578a864b1dd9317abe434a3a"
+  },
+  {
+    "文件": "art/exports/three-kingdoms-pieces/B201-v001/material-atlas.png",
+    "字节": 3866529,
+    "SHA256": "0e545459c87e2e380c7fb1d6a971077b5989ddf01f187cf55ec87c4e7a51324a"
+  },
+  {
+    "文件": "art/exports/three-kingdoms-pieces/B201-v001/triangles-initial.json",
+    "字节": 5056,
+    "SHA256": "1b09a95221e0324bddcc24b7df94f5c5bea0b731ef76bc1b647d750948dd7628"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/back.png",
+    "字节": 1008342,
+    "SHA256": "3ab6ebd4cee1015b7c1a2ac8d2d39f38bc7877450118efb7383771d94f73e3b1"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/front.png",
+    "字节": 993906,
+    "SHA256": "cbdcffc27d0db498a797ec7e5f28b0ba0584a5eab510c5bbf81e13f603c0aae5"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/glb-roundtrip.png",
+    "字节": 1301701,
+    "SHA256": "cbcafe5db7d7908ac564863af027883ad9ffe96482f8bc5a9c2f19902e21ca53"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/hero.png",
+    "字节": 1302718,
+    "SHA256": "3c5b78b629b5a3642e4bf8faf2e57bd16ffa2b9df728622933804155e02156c5"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/interior-check.png",
+    "字节": 1816786,
+    "SHA256": "694a38180be1fde1b43047f55d8c46d6eee3e99f776a83c22e370aeb6e50bddf"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/left.png",
+    "字节": 828318,
+    "SHA256": "26d355256cbda434c3fdf4cec224b4d371b8ff0782e1bd9e28bf935487d380fa"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/low-angle.png",
+    "字节": 1182991,
+    "SHA256": "81e311d040c56f2a2f957830e3d6be03b3f65b9946735f34bb6814d48207796c"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/rear-three-quarter.png",
+    "字节": 1296494,
+    "SHA256": "12eb5b60309491d41c0d795c2b1d45a2e18860e57ec19f4380aa924fae25b4cc"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/right.png",
+    "字节": 790506,
+    "SHA256": "f184b683127dac45adce230d92d375a209c62b6e587efd10a27b90fc0eebb670"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/top.png",
+    "字节": 1076311,
+    "SHA256": "44117d1f6590b550d045cc47c9f9c6aa5e6d5fc5a17555b964260de5164b6d3b"
+  },
+  {
+    "文件": "art/previews/three-kingdoms-pieces/B201-v001/wireframe.png",
+    "字节": 1011809,
+    "SHA256": "8cdd823a602b78d609bc33b1ce48ca3bd4981c6050dcda4b7aae1519a1a3fec5"
+  }
+]
