@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "serverClientTests": 71,
+  "serverClientPassed": 71,
+  "roomProtocolTests": 141,
+  "roomProtocolPassed": 141,
+  "summaryToolTests": 3,
+  "summaryToolPassed": 3,
+  "unitySourceFiles": 1919,
+  "validDiagnosticEvents": 1938,
+  "diagnosticFiles": 5,
+  "invalidDiagnosticLines": 0,
+  "droppedDiagnosticEvents": 0,
+  "clientDiagnosticWriteFailures": 0,
+  "windowsBuilt": true,
+  "linuxX64Built": true,
+  "cloudDeployed": false,
+  "androidValidated": false,
+  "note": "本机测试与隐藏窗口程序验证，不代表四台PC、公网长局或可见窗口帧率验收。"
+}

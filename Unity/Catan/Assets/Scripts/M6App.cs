@@ -100,6 +100,7 @@ public sealed partial class M6App : MonoBehaviour
     }
     void Update()
     {
+        TickNetworkDiagnostics();
         using var frameCost=FrameCost.Measure(FrameCost.Stage.GameUpdate);
         UpdateCardPresentation();
         if(MobileTabletop.Enabled)_=MobileTabletop.TouchDragged;
@@ -234,8 +235,9 @@ public sealed partial class M6App : MonoBehaviour
         else File.Move(temporary,path);
     }
     bool CanAutoSave => !NetworkGame&&Application.platform==RuntimePlatform.Android&&Ready&&!GetComponent<MobileVerification>().VerificationActive&&!Environment.GetCommandLineArgs().Any(arg=>arg.IndexOf("verify",StringComparison.OrdinalIgnoreCase)>=0);
-    void OnApplicationPause(bool paused){if(paused&&CanAutoSave)SaveGame();}
-    void OnApplicationQuit(){if(CanAutoSave)SaveGame();}
+    void OnApplicationFocus(bool focused){NetworkApplicationFocus(focused);}
+    void OnApplicationPause(bool paused){NetworkApplicationPause(paused);if(paused&&CanAutoSave)SaveGame();}
+    void OnApplicationQuit(){StopNetworkDiagnostics();if(CanAutoSave)SaveGame();}
     public void SaveGame(){if(NetworkGame){Notice="每条已确认操作均由服务器自动保存；重启后使用原席位重连。";ShowTablePrompt("服务器自动保存");return;}try{WriteSave(SavePath);Notice="已保存权威局面、待决、随机状态、人类席位和 AI 暂停设置。";ShowTablePrompt("游戏已保存");}catch(Exception ex){Notice="保存失败（"+ex.GetType().Name+"），请检查存档目录。";ShowTablePrompt("保存失败");}}
     public void LoadGame()
     {

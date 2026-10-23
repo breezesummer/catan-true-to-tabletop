@@ -33,6 +33,7 @@ public sealed partial class M6App
     }
     void InitializeNetwork()
     {
+        InitializeNetworkDiagnostics();
         // 显式验收入口使用独立配置，不读取玩家保存的服务器地址。
         if(!OnlineReviewMode)
         {
@@ -54,6 +55,7 @@ public sealed partial class M6App
     }
     void ApplyNetworkView()
     {
+        using var applyCost=FrameCost.Measure(FrameCost.Stage.PresentationApply);
         if(Network.Room==null||!Network.Room.Started||string.IsNullOrEmpty(Network.SeatId))return;
         if(!NetworkGame||networkPresentedGame!=Network.Room.GameNumber)
         {
@@ -527,5 +529,5 @@ public sealed partial class M6App
         networkRoomName=room.Name;networkListed=room.Listed;
         for(int i=0;i<networkAi.Length;i++)networkAi[i]=room.Seats.Any(s=>s.SeatId=="P"+(i+1)&&s.IsAi);
     }
-    void OnDestroy(){lanService.Dispose();}
+    void OnDestroy(){StopNetworkDiagnostics();lanService.Dispose();}
 }

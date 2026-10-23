@@ -16,6 +16,60 @@ namespace Catan.Server.Tests;
 public sealed class RoomSwitchTransportTests
 {
     [Fact]
+    public async Task ClosingOldWebSocketDoesNotTakeControlFromHttpFallbackOrReplacementSocket()
+    {
+        var clock = DateTimeOffset.UtcNow;
+        using var rooms = new RoomDirectory(new MemoryStorage(), Scenario(), new RoomDirectoryOptions { Clock = () => clock });
+        var transport = new NetworkTransport(rooms, new ServerOptions());
+        var firstClosed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var builder = WebApplication.CreateBuilder(); builder.Logging.ClearProviders(); builder.WebHost.UseUrls("http://127.0.0.1:0");
+        await using var app = builder.Build(); app.UseWebSockets();
+        app.Map("/ws", async context => { try { await transport.WebSocketAsync(context); } finally { firstClosed.TrySetResult(); } });
+        app.MapPost("/api/request", transport.HttpAsync);
+        await app.StartAsync();
+        var address = app.Services.GetRequiredService<IServer>().Features.Get<IServerAddressesFeature>()!.Addresses.Single();
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+        try
+        {
+            NetworkResponse host;
+            using (var original = new ClientWebSocket())
+            {
+                await original.ConnectAsync(new Uri(address.Replace("http://", "ws://") + "/ws"), deadline.Token);
+                var create = Create("切换传输保持控制");
+                create.Payload = WireJson.Serialize(new CreateRoomPayload { Settings = new RoomSettings { PlayerCount = 3, AiSeats = ["P2", "P3"] } });
+                host = await Exchange(original, create, deadline.Token);
+                var ready = await Exchange(original, Bound("Ready", host, host.Credential, WireJson.Serialize(new ReadyPayload { Ready = true })), deadline.Token);
+                var started = await Exchange(original, Bound("Start", ready, host.Credential), deadline.Token);
+                Assert.True(started.HumanControlAvailable);
+                await original.CloseAsync(WebSocketCloseStatus.NormalClosure, "传输测试", deadline.Token);
+            }
+            await firstClosed.Task.WaitAsync(deadline.Token);
+            using var http = new HttpClient();
+            clock = clock.AddSeconds(30);
+            using var response = await http.PostAsync(address + "/api/request", new StringContent(WireJson.Serialize(Bound("Get", host, host.Credential)), Encoding.UTF8, "application/json"), deadline.Token);
+            var fallback = WireJson.Deserialize<NetworkResponse>(await response.Content.ReadAsStringAsync(deadline.Token));
+            Assert.True(fallback.Success); Assert.True(fallback.HumanControlAvailable);
+            Assert.False(fallback.Room.Seats.Single(s => s.SeatId == host.SeatId).ControlledByAi);
+            using var replacement = new ClientWebSocket();
+            await replacement.ConnectAsync(new Uri(address.Replace("http://", "ws://") + "/ws"), deadline.Token);
+            var resumed = await Exchange(replacement, Bound("Get", host, host.Credential), deadline.Token);
+            Assert.True(resumed.HumanControlAvailable);
+            Assert.Equal(host.ConnectionId, resumed.ConnectionId);
+            await replacement.CloseAsync(WebSocketCloseStatus.NormalClosure, "验证完成", deadline.Token);
+            clock = clock.AddSeconds(46);
+            await rooms.TickAiAsync();
+            Assert.Empty(rooms.ListPublicRooms());
+        }
+        finally { await app.StopAsync(deadline.Token); }
+    }
+
+    private static NetworkRequest Bound(string operation, NetworkResponse response, string credential, string? payload = null) => new()
+    {
+        Operation = operation, RoomId = response.RoomId, ConnectionId = response.ConnectionId, Credential = credential,
+        ExpectedRevision = response.Revision, Payload = payload
+    };
+
+    [Fact]
     public async Task BoundWebSocketCanDescribeJoinCreateAndReconnectAnotherRoomWithoutLeaving()
     {
         using var rooms = new RoomDirectory(new MemoryStorage(), Scenario());

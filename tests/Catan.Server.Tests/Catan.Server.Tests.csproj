@@ -18,6 +18,7 @@
     <Compile Include="../../Unity/Catan/Assets/Scripts/M7OnlineEndpoint.cs" Link="Client/M7OnlineEndpoint.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/FrameCost.cs" Link="Client/FrameCost.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/M7Client.cs" Link="Client/M7Client.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/M7CommunicationLog.cs" Link="Client/M7CommunicationLog.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/M7VisiblePreview.cs" Link="Client/M7VisiblePreview.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/M7CredentialStore.cs" Link="Client/M7CredentialStore.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/PlayerIdentityModel.cs" Link="Client/PlayerIdentityModel.cs" />

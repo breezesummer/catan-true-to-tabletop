@@ -214,6 +214,151 @@ public sealed class OnlineClientTests
     }
 
     [Fact]
+    public async Task SocketHeartbeatKeepsRunningWithoutUnityFramesAndUsesTenSecondSpacing()
+    {
+        var first=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var second=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var arrivals=new System.Collections.Concurrent.ConcurrentQueue<DateTime>();
+        await using var app=Server("http://127.0.0.1:0",_=>Task.FromResult(List()));
+        app.UseWebSockets();app.Map("/ws",async context=>
+        {
+            using var socket=await context.WebSockets.AcceptWebSocketAsync();var bytes=new byte[16384];
+            try
+            {
+                while(!context.RequestAborted.IsCancellationRequested)
+                {
+                    var read=await socket.ReceiveAsync(bytes,context.RequestAborted);
+                    if(read.MessageType==WebSocketMessageType.Close)break;
+                    var request=WireJson.Deserialize<NetworkRequest>(Encoding.UTF8.GetString(bytes,0,read.Count));
+                    arrivals.Enqueue(DateTime.UtcNow);
+                    await socket.SendAsync(Encoding.UTF8.GetBytes(WireJson.Serialize(new NetworkResponse{RequestId=request.RequestId,Success=true})),WebSocketMessageType.Text,true,context.RequestAborted);
+                    if(arrivals.Count==1)first.TrySetResult();if(arrivals.Count>=2)second.TrySetResult();
+                }
+            }
+            catch(Exception) { }
+        });
+        await app.StartAsync();var client=Client();
+        try
+        {
+            client.ConfigureEndpoint(Address(app),"");Method("StartSocket").Invoke(client,null);
+            // 不调用Tick：接收解析和下一次保活都不能依赖暂停的Unity帧。
+            await first.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            await second.Task.WaitAsync(TimeSpan.FromSeconds(15));
+            var times=arrivals.ToArray();Assert.Equal(2,times.Length);Assert.True((times[1]-times[0]).TotalSeconds>=9);
+        }
+        finally{client.EndSession();}
+    }
+
+    [Fact]
+    public async Task UnrelatedPushesDoNotHideAMissingHeartbeatAcknowledgement()
+    {
+        var closed=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        await using var app=Server("http://127.0.0.1:0",_=>Task.FromResult(List()));
+        app.UseWebSockets();app.Map("/ws",async context=>
+        {
+            using var socket=await context.WebSockets.AcceptWebSocketAsync();var bytes=new byte[16384];
+            try
+            {
+                await socket.ReceiveAsync(bytes,context.RequestAborted);
+                var payload=Encoding.UTF8.GetBytes(WireJson.Serialize(new NetworkResponse{Success=true,RequestId="different-request"}));
+                while(!context.RequestAborted.IsCancellationRequested)
+                {await socket.SendAsync(payload,WebSocketMessageType.Text,true,context.RequestAborted);await Task.Delay(100,context.RequestAborted);}
+            }
+            catch(Exception){closed.TrySetResult();}
+        });
+        await app.StartAsync();var client=Client();
+        try
+        {
+            client.ConfigureEndpoint(Address(app),"");Method("StartSocket").Invoke(client,null);
+            await closed.Task.WaitAsync(TimeSpan.FromSeconds(18));
+            var socket=(ClientWebSocket)Field("socket").GetValue(client)!;Assert.NotEqual(WebSocketState.Open,socket.State);
+        }
+        finally{client.EndSession();}
+    }
+
+    [Fact]
+    public async Task FailedSocketFallsBackToHttpAndAutomaticallyRestoresPushWithSameSeatConnection()
+    {
+        int sockets=0;var operations=new System.Collections.Concurrent.ConcurrentQueue<string>();
+        NetworkResponse State(string? request=null)=>new(){Success=true,RequestId=request,RoomId="room",ConnectionId="same-connection",SeatId="p1",Room=new RoomSummary{RoomId="room",RuleSet="base"}};
+        await using var app=Server("http://127.0.0.1:0",async context=>
+        {
+            using var reader=new StreamReader(context.Request.Body);var request=WireJson.Deserialize<NetworkRequest>(await reader.ReadToEndAsync());operations.Enqueue(request.Operation);return State(request.RequestId);
+        });
+        app.UseWebSockets();app.Map("/ws",async context=>
+        {
+            using var socket=await context.WebSockets.AcceptWebSocketAsync();int number=Interlocked.Increment(ref sockets);var bytes=new byte[16384];
+            try
+            {
+                var read=await socket.ReceiveAsync(bytes,context.RequestAborted);
+                if(number==1){socket.Abort();return;}
+                var request=WireJson.Deserialize<NetworkRequest>(Encoding.UTF8.GetString(bytes,0,read.Count));
+                await socket.SendAsync(Encoding.UTF8.GetBytes(WireJson.Serialize(State(request.RequestId))),WebSocketMessageType.Text,true,context.RequestAborted);
+                await socket.ReceiveAsync(bytes,context.RequestAborted);
+            }
+            catch(Exception) { }
+        });
+        await app.StartAsync();var client=Client();
+        try
+        {
+            client.ConfigureEndpoint(Address(app),"");Method("Apply").Invoke(client,new object[]{State(),true,false});client.Playing=true;
+            int epoch=(int)Field("connectionEpoch").GetValue(client)!;Method("StartSocket").Invoke(client,null);
+            await PumpUntil(client,()=>operations.Contains("Get")&&client.TransportMode.Contains("HTTP"));
+            await PumpUntil(client,()=>sockets>=2&&client.TransportMode=="WS 在线同步");
+            Assert.True(client.Connected);Assert.Equal(epoch,Field("connectionEpoch").GetValue(client));
+            Assert.Equal("same-connection",Field("connectionId").GetValue(client));Assert.DoesNotContain("Reconnect",operations);
+        }
+        finally{client.EndSession();}
+    }
+
+    [Fact]
+    public async Task HttpReconnectReplacesAnInFlightSocketHandshakeWithoutApplyingOldIdentityRejection()
+    {
+        var oldEntered=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var releaseOld=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var newIdentity=new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously);
+        int sockets=0;
+        NetworkResponse State(string connection,string? request=null)=>new(){Success=true,RequestId=request,RoomId="room",Credential="private-test-credential",ConnectionId=connection,SeatId="p1",Room=new RoomSummary{RoomId="room",RuleSet="base"}};
+        await using var app=Server("http://127.0.0.1:0",async context=>
+        {
+            using var reader=new StreamReader(context.Request.Body);var request=WireJson.Deserialize<NetworkRequest>(await reader.ReadToEndAsync());
+            return State("new-connection",request.RequestId);
+        });
+        app.UseWebSockets();app.Map("/ws",async context=>
+        {
+            int number=Interlocked.Increment(ref sockets);
+            try
+            {
+                // 第一次 WS 握手仍挂起时，HTTP Reconnect 会改变 connectionId。
+                if(number==1){oldEntered.TrySetResult();await releaseOld.Task.WaitAsync(context.RequestAborted);}
+                using var socket=await context.WebSockets.AcceptWebSocketAsync();var bytes=new byte[16384];
+                var read=await socket.ReceiveAsync(bytes,context.RequestAborted);
+                var request=WireJson.Deserialize<NetworkRequest>(Encoding.UTF8.GetString(bytes,0,read.Count));
+                var response=request.ConnectionId=="new-connection"?State("new-connection",request.RequestId):new NetworkResponse{RequestId=request.RequestId,Code="ConnectionSuperseded",Success=false};
+                await socket.SendAsync(Encoding.UTF8.GetBytes(WireJson.Serialize(response)),WebSocketMessageType.Text,true,context.RequestAborted);
+                if(number>1)newIdentity.TrySetResult(request.ConnectionId);
+                await socket.ReceiveAsync(bytes,context.RequestAborted);
+            }
+            catch(Exception) { }
+        });
+        await app.StartAsync();var client=Client();
+        try
+        {
+            client.ConfigureEndpoint(Address(app),"");Method("Apply").Invoke(client,new object[]{State("old-connection"),true,false});client.Playing=true;
+            Field("nextSyncAt").SetValue(client,float.MaxValue);Method("StartSocket").Invoke(client,null);
+            await oldEntered.Task.WaitAsync(TimeSpan.FromSeconds(5));Assert.True((bool)Field("socketStarting").GetValue(client)!);
+            client.Reconnect();
+            await PumpUntil(client,()=>!client.Busy&&Field("connectionId").GetValue(client)?.ToString()=="new-connection");
+            // 旧握手尚未释放，新的 WS 必须已经启动，不能等旧连接的12秒超时。
+            await PumpUntil(client,()=>newIdentity.Task.IsCompleted&&client.TransportMode=="WS 在线同步");
+            Assert.Equal("new-connection",await newIdentity.Task);Assert.Equal(2,sockets);
+            releaseOld.TrySetResult();await Task.Delay(100);Tick(client);
+            Assert.True(client.Connected);Assert.False(client.ControlLost);Assert.Equal("new-connection",Field("connectionId").GetValue(client));
+        }
+        finally{releaseOld.TrySetResult();client.EndSession();}
+    }
+
+    [Fact]
     public void LanStillRequiresHttpsWithItsPinnedCertificate()
     {
         var client=Client();

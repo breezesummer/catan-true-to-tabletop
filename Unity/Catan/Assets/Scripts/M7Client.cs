@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Catan.Core;
 using Catan.Network.Contracts;
 using UnityEngine;
+using Stopwatch=System.Diagnostics.Stopwatch;
 
 // Network state is applied only in Update. Neither an authority nor an AI exists in this client.
 public sealed class M7Client : MonoBehaviour
@@ -57,8 +58,13 @@ public sealed class M7Client : MonoBehaviour
     CancellationTokenSource lifetime;
     ClientWebSocket socket;
     int generation,connectionEpoch,matchEpoch;
-    bool historyBusy,historyDirty,previewBusy,socketConnected,syncBusy,commandSending;
-    int commandEpoch;
+    bool historyBusy,historyDirty,previewBusy,socketConnected,socketStarting,syncBusy,commandSending;
+    long socketRevision;
+    double currentQueueWaitMs;
+    float nextQueueDiagnosticAt,nextSocketAt,socketRetryDelay=2;
+    internal static readonly TimeSpan SocketHeartbeatInterval=TimeSpan.FromSeconds(10);
+    internal static readonly TimeSpan SocketResponseTimeout=TimeSpan.FromSeconds(12);
+    int commandEpoch,socketEpoch;
     float retryAt,nextPreviewAt,nextSyncAt,nextCommandRetry,nextHistoryAt,nextLobbyPollAt,historyRetryDelay=2;
     string rememberedRuleSet;
     bool verification,automaticReconnect=true;
@@ -67,24 +73,43 @@ public sealed class M7Client : MonoBehaviour
     float nextRenameAt;
     public void SetDisplayName(string value){desiredDisplayName=PlayerIdentityModel.NormalizeName(value);nextRenameAt=Time.unscaledTime+.6f;}
 
-    void Awake(){storageDirectory=Path.Combine(Application.persistentDataPath,"m7-client");verification=Environment.GetCommandLineArgs().Contains("--m7-verify");}
+    void Awake()
+    {
+        storageDirectory=Path.Combine(Application.persistentDataPath,"m7-client");verification=Environment.GetCommandLineArgs().Contains("--m7-verify");
+        M7CommunicationLog.Start(Path.Combine(Application.persistentDataPath,"m7-logs"));
+        M7CommunicationLog.Record(new M7CommunicationEvent{Event="client_start",ClientVersion=Application.version,Platform=Application.platform.ToString(),ProtocolVersion=NetworkProtocol.Version,BuildId=typeof(M7Client).Assembly.ManifestModule.ModuleVersionId.ToString("N")});
+        Debug.Log("CATAN_M7_LOG_DIRECTORY "+M7CommunicationLog.DirectoryPath);
+    }
     void Diagnose(string operation,Exception error)
     {
-        if(!verification)return;
-        var details=new List<string>();
-        for(var current=error;current!=null;current=current.InnerException)
-        {
-            string message=current is HttpRequestException||current is AuthenticationException||current is NotSupportedException||current is TypeLoadException||current is InvalidOperationException||current.GetType().FullName=="Mono.Security.Interface.TlsException"?current.Message:"";
-            details.Add(current.GetType().FullName+(message.Length==0?"":": "+message));
-        }
-        Debug.LogWarning("CATAN_M7_TRANSPORT_DIAGNOSTIC "+operation+" "+string.Join(" -> ",details));
+        string code=M7NetworkErrors.Code(error);
+        M7CommunicationLog.Record(new M7CommunicationEvent{Event="transport_error",Operation=operation,RoomId=RoomId,Revision=Revision,Code=code});
+        if(verification)Debug.LogWarning("CATAN_M7_TRANSPORT_DIAGNOSTIC "+operation+" "+code);
     }
+    void EnqueueMain(Action action)
+    {
+        long queued=Stopwatch.GetTimestamp();
+        main.Enqueue(()=>
+        {
+            currentQueueWaitMs=ElapsedMs(queued);
+            try{action();}finally{currentQueueWaitMs=0;}
+        });
+    }
+    static double ElapsedMs(long start)=>(Stopwatch.GetTimestamp()-start)*1000d/Stopwatch.Frequency;
+    static void AbortSocket(ClientWebSocket value){try{value?.Abort();}catch(ObjectDisposedException){}}
     internal void UseCredentialDirectory(string path){if(http!=null)throw new InvalidOperationException("连接后不可切换凭据目录。");storageDirectory=path;}
     internal void EnableVerification(){verification=true;}
     void Update()
     {
         using var frameCost=FrameCost.Measure(FrameCost.Stage.NetworkUpdate);
-        while(main.TryDequeue(out var action))action();
+        // 连接恢复时仍按原顺序应用，但不把积压的全部回调挤在一个渲染帧。
+        long started=Stopwatch.GetTimestamp();int applied=0;
+        while(applied<32&&main.TryDequeue(out var action)){action();applied++;if(ElapsedMs(started)>=4)break;}
+        if(!main.IsEmpty&&Time.unscaledTime>=nextQueueDiagnosticAt)
+        {
+            nextQueueDiagnosticAt=Time.unscaledTime+1;
+            M7CommunicationLog.Record(new M7CommunicationEvent{Event="main_queue_backlog",RoomId=RoomId,Revision=Revision,QueueDepth=main.Count,Count=applied,DurationMs=ElapsedMs(started)});
+        }
         if(Connected&&!Busy&&!CommandPending&&Room!=null&&!string.IsNullOrEmpty(desiredDisplayName)&&Time.unscaledTime>=nextRenameAt)
         {
             nextRenameAt=Time.unscaledTime+2;
@@ -93,6 +118,7 @@ public sealed class M7Client : MonoBehaviour
         if(socketConnected&&(socket==null||socket.State!=WebSocketState.Open))socketConnected=false;
         if(Connected&&!previewBusy&&previewQueue.Count>0&&Time.unscaledTime>=nextPreviewAt){nextPreviewAt=Time.unscaledTime+.12f;SendPreview(previewQueue.Dequeue());}
         if(automaticReconnect&&!socketConnected&&!syncBusy&&!Busy&&http!=null&&connectionId!=null&&Time.unscaledTime>=nextSyncAt){nextSyncAt=Time.unscaledTime+1;PollState();}
+        if(automaticReconnect&&Connected&&!socketConnected&&!socketStarting&&!Busy&&http!=null&&connectionId!=null&&Time.unscaledTime>=nextSocketAt)StartSocket();
         if(automaticReconnect&&Connected&&!Busy&&pendingCommand!=null&&(!commandSending||commandEpoch!=connectionEpoch)&&Time.unscaledTime>=nextCommandRetry)SendPending();
         if(automaticReconnect&&Connected&&historyDirty&&!historyBusy&&Time.unscaledTime>=nextHistoryAt)FetchHistory();
         if(EndpointConfigured&&!Playing&&!Busy&&!EnrollmentPending&&Time.unscaledTime>=nextLobbyPollAt)ListRooms();
@@ -125,6 +151,7 @@ public sealed class M7Client : MonoBehaviour
             return actual.Scheme=="https"&&actual.Authority==uri.Authority&&certificate!=null&&CertificateMatches(certificate.GetRawCertData(),normalized);
         };
         http=new HttpClient(handler){Timeout=TimeSpan.FromSeconds(15)};
+        M7CommunicationLog.Record(new M7CommunicationEvent{Event="endpoint_configured",Transport=normalized.Length>0?"HTTPS":"HTTP"});
         LobbyConnectionState=M7LobbyConnectionState.Connecting;nextLobbyPollAt=Time.unscaledTime+5;
         LastError="";Status=normalized.Length>0?"已配置局域网主机，将在请求时建立加密连接。":"正在连接在线大厅。";
         if(restoreIdentity)LoadIdentity();
@@ -145,10 +172,10 @@ public sealed class M7Client : MonoBehaviour
         Busy=true;LastError="";int current=generation;
         try
         {
-            var response=await Send(new NetworkRequest{Operation="Describe",RoomId=id,RequestId=Guid.NewGuid().ToString("N")},lifetime.Token);
-            main.Enqueue(()=>{if(current!=generation)return;Busy=false;MarkLobbyResponse(response);if(!response.Success||response.Room==null){LastError="读取房间信息失败 ["+response.Code+"]："+(response.Message??"没有找到该房间。");return;}found(response.Room);});
+            var response=await Send(new NetworkRequest{Operation="Describe",RoomId=id,RequestId=Guid.NewGuid().ToString("N")},lifetime.Token).ConfigureAwait(false);
+            EnqueueMain(()=>{if(current!=generation)return;Busy=false;MarkLobbyResponse(response);if(!response.Success||response.Room==null){LastError="读取房间信息失败 ["+response.Code+"]："+(response.Message??"没有找到该房间。");return;}found(response.Room);});
         }
-        catch(Exception ex){main.Enqueue(()=>{if(current==generation){Busy=false;MarkLobbyOffline();LastError=M7NetworkErrors.Describe("读取房间信息",ex);}});}
+        catch(Exception ex){EnqueueMain(()=>{if(current==generation){Busy=false;MarkLobbyOffline();LastError=M7NetworkErrors.Describe("读取房间信息",ex);}});}
     }
     public void Create(RoomSettings settings,string name,string password){SetDisplayName(name);ChangeRoom(null,()=>{rememberedRuleSet=settings.RuleSet;Request("Create",new CreateRoomPayload{Settings=settings,DisplayName=name,Password=password});});}
     // 离开旧桌的回执或网络故障不能阻止玩家加入另一桌；各桌恢复身份单独保留。
@@ -169,10 +196,10 @@ public sealed class M7Client : MonoBehaviour
         Busy=true;automaticReconnect=false;int current=generation;
         if(leave!=null)
         {
-            try{using(var timeout=CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token)){timeout.CancelAfter(TimeSpan.FromSeconds(2));await Send(leave,timeout.Token);}}
+            try{using(var timeout=CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token)){timeout.CancelAfter(TimeSpan.FromSeconds(2));await Send(leave,timeout.Token).ConfigureAwait(false);}}
             catch(Exception){/* 旧服务不可达时，连接超时后由服务端清理空房。 */}
         }
-        main.Enqueue(()=>{if(current!=generation)return;Busy=false;automaticReconnect=true;next();});
+        EnqueueMain(()=>{if(current!=generation)return;Busy=false;automaticReconnect=true;next();});
     }
     public void Join(string id,string name,string password)
     {
@@ -187,8 +214,8 @@ public sealed class M7Client : MonoBehaviour
         int current=generation;Busy=true;
         try
         {
-            var response=await Send(new NetworkRequest{Operation="Describe",RoomId=id,RequestId=Guid.NewGuid().ToString("N")},lifetime.Token);
-            main.Enqueue(()=>
+            var response=await Send(new NetworkRequest{Operation="Describe",RoomId=id,RequestId=Guid.NewGuid().ToString("N")},lifetime.Token).ConfigureAwait(false);
+            EnqueueMain(()=>
             {
                 if(current!=generation)return;Busy=false;
                 MarkLobbyResponse(response);
@@ -200,7 +227,7 @@ public sealed class M7Client : MonoBehaviour
                 else Request("Join",payload);
             });
         }
-        catch(Exception ex){main.Enqueue(()=>{if(current==generation){Busy=false;MarkLobbyOffline();LastError=Status=M7NetworkErrors.Describe("读取房间信息",ex);}});}
+        catch(Exception ex){EnqueueMain(()=>{if(current==generation){Busy=false;MarkLobbyOffline();LastError=Status=M7NetworkErrors.Describe("读取房间信息",ex);}});}
     }
     public void SelectSeat(string seat)=>Request("Seat",new SeatPayload{SeatId=seat});
     public void RetryEnrollment(){if(pendingEnrollment==null){Status="没有待确认的创建或加入请求。";return;}Request(pendingEnrollment.Operation);}
@@ -241,8 +268,8 @@ public sealed class M7Client : MonoBehaviour
         int current=generation,epoch=connectionEpoch;var request=pendingCommand;request.Credential=credential;request.ConnectionId=connectionId;
         try
         {
-            var response=await Send(request,lifetime.Token);
-            main.Enqueue(()=>
+            var response=await Send(request,lifetime.Token).ConfigureAwait(false);
+            EnqueueMain(()=>
             {
                 if(current!=generation||epoch!=connectionEpoch||!ReferenceEquals(pendingCommand,request))return;
                 commandSending=false;
@@ -253,7 +280,7 @@ public sealed class M7Client : MonoBehaviour
                 CommandFeedback?.Invoke(Status);
             });
         }
-        catch(Exception ex){main.Enqueue(()=>{if(current==generation&&epoch==connectionEpoch&&ReferenceEquals(pendingCommand,request)){commandSending=false;Diagnose("Command",ex);LastError=M7NetworkErrors.Describe("确认操作",ex);Disconnected(LastError+" 操作结果待确认，重连后核对原命令。");}});}
+        catch(Exception ex){EnqueueMain(()=>{if(current==generation&&epoch==connectionEpoch&&ReferenceEquals(pendingCommand,request)){commandSending=false;Diagnose("Command",ex);LastError=M7NetworkErrors.Describe("确认操作",ex);Disconnected(LastError+" 操作结果待确认，重连后核对原命令。");}});}
     }
     public M7Preview Preview(object command)
     {
@@ -273,10 +300,10 @@ public sealed class M7Client : MonoBehaviour
         try
         {
             var request=Envelope("Preview",item.Value);request.CommandId=Guid.NewGuid().ToString("N");
-            var response=await Send(request,lifetime.Token);
-            main.Enqueue(()=>{if(current!=generation)return;previewBusy=false;previewPending.Remove(item.Key);if(revision==Revision){previews[item.Key]=new M7Preview(response.Success,response.Message);PreviewChanged?.Invoke();}});
+            var response=await Send(request,lifetime.Token).ConfigureAwait(false);
+            EnqueueMain(()=>{if(current!=generation)return;previewBusy=false;previewPending.Remove(item.Key);if(revision==Revision){previews[item.Key]=new M7Preview(response.Success,response.Message);PreviewChanged?.Invoke();}});
         }
-        catch(Exception){main.Enqueue(()=>{if(current==generation){previewBusy=false;previewPending.Remove(item.Key);}});}
+        catch(Exception){EnqueueMain(()=>{if(current==generation){previewBusy=false;previewPending.Remove(item.Key);}});}
     }
     async void Request(string operation,object payload=null)
     {
@@ -298,8 +325,8 @@ public sealed class M7Client : MonoBehaviour
                     pendingEnrollment=request;
                 }
             }
-            var response=await Send(request,lifetime.Token);
-            main.Enqueue(()=>
+            var response=await Send(request,lifetime.Token).ConfigureAwait(false);
+            EnqueueMain(()=>
             {
                 if(current!=generation)return;Busy=false;
                 if(epoch!=connectionEpoch&&operation!="List")return;
@@ -322,7 +349,7 @@ public sealed class M7Client : MonoBehaviour
                 if(!response.Success&&operation=="Join"&&string.IsNullOrEmpty(credential))RoomId=null;
             });
         }
-        catch(Exception ex){main.Enqueue(()=>{if(current!=generation)return;Busy=false;if(epoch!=connectionEpoch&&operation!="List")return;Diagnose(operation,ex);LastError=M7NetworkErrors.Describe(OperationLabel(operation),ex);Disconnected(LastError+(RoomId!=null||EnrollmentPending?" 正在等待重连。":" 请重新搜索或重试。"));});}
+        catch(Exception ex){EnqueueMain(()=>{if(current!=generation)return;Busy=false;if(epoch!=connectionEpoch&&operation!="List")return;Diagnose(operation,ex);LastError=M7NetworkErrors.Describe(OperationLabel(operation),ex);Disconnected(LastError+(RoomId!=null||EnrollmentPending?" 正在等待重连。":" 请重新搜索或重试。"));});}
     }
     static string OperationLabel(string operation)
     {
@@ -330,31 +357,52 @@ public sealed class M7Client : MonoBehaviour
     }
     async Task<NetworkResponse> Send(NetworkRequest request,CancellationToken cancel)
     {
+        long started=Stopwatch.GetTimestamp();
+        var client=http;string endpoint=Endpoint;
+        string transport=string.IsNullOrEmpty(Fingerprint)?"HTTP":"HTTPS";
         string body=WireJson.Serialize(request);
-        if(Encoding.UTF8.GetByteCount(body)>NetworkProtocol.MaximumRequestBytes)throw new InvalidOperationException("请求过大。");
-        using(var content=new StringContent(body,Encoding.UTF8,"application/json"))
-        using(var response=await http.PostAsync(Endpoint+"/api/request",content,cancel))
+        int requestBytes=Encoding.UTF8.GetByteCount(body);
+        if(requestBytes>NetworkProtocol.MaximumRequestBytes)throw new InvalidOperationException("请求过大。");
+        M7CommunicationLog.Record(new M7CommunicationEvent{Event="request_send",Transport=transport,Operation=request.Operation,RequestId=request.RequestId,CommandId=request.CommandId,RoomId=request.RoomId,Revision=request.ExpectedRevision,Bytes=requestBytes});
+        // ResponseHeadersRead 避免 HttpClient 先把超大正文无界缓冲；后续收包/解码不占用 Unity 帧。
+        // 响应正文仍有同一 15 秒截止时间，不能只给等待响应头设置超时。
+        using(var timeout=CancellationTokenSource.CreateLinkedTokenSource(cancel))
+        try
         {
-            M7NetworkErrors.RequireHttp(response.StatusCode);
-            if(response.Content.Headers.ContentLength>NetworkProtocol.MaximumResponseBytes)throw new M7NetworkFailure("RESPONSE_SIZE","服务响应超过大小限制。");
-            using(var stream=await response.Content.ReadAsStreamAsync())using(var bytes=new MemoryStream())
+            timeout.CancelAfter(TimeSpan.FromSeconds(15));
+            using(var message=new HttpRequestMessage(HttpMethod.Post,endpoint+"/api/request"))
             {
-                var buffer=new byte[8192];int count;
-                while((count=await stream.ReadAsync(buffer,0,buffer.Length,cancel))>0){if(bytes.Length+count>NetworkProtocol.MaximumResponseBytes)throw new M7NetworkFailure("RESPONSE_SIZE","服务响应超过大小限制。");bytes.Write(buffer,0,count);}
-                NetworkResponse result;
-                // 只移交独立字节副本；完成后仍回到 Unity 上下文，由原有代次检查和 Update 应用。
-                var payload=bytes.ToArray();
-                try{result=await Task.Run(()=>FrameCost.Decode<NetworkResponse>(Encoding.UTF8.GetString(payload),FrameCost.Stage.ResponseDecode),cancel);}
-                catch(Exception){throw new M7NetworkFailure("RESPONSE_FORMAT","服务响应格式无效，请确认双方游戏版本一致。");}
-                if(result==null)throw new M7NetworkFailure("RESPONSE_FORMAT","服务返回空响应。");
-                if(result.ProtocolVersion!=NetworkProtocol.Version)throw new M7NetworkFailure("PROTOCOL","联机协议不兼容，请所有玩家更新至同一版本。");
-                return result;
+                message.Content=new StringContent(body,Encoding.UTF8,"application/json");
+                using(var response=await client.SendAsync(message,HttpCompletionOption.ResponseHeadersRead,timeout.Token).ConfigureAwait(false))
+                {
+                    M7NetworkErrors.RequireHttp(response.StatusCode);
+                    if(response.Content.Headers.ContentLength>NetworkProtocol.MaximumResponseBytes)throw new M7NetworkFailure("RESPONSE_SIZE","服务响应超过大小限制。");
+                    using(var stream=await response.Content.ReadAsStreamAsync().ConfigureAwait(false))using(var bytes=new MemoryStream())
+                    {
+                        var buffer=new byte[8192];int count;
+                        while((count=await stream.ReadAsync(buffer,0,buffer.Length,timeout.Token).ConfigureAwait(false))>0)
+                        {if(bytes.Length+count>NetworkProtocol.MaximumResponseBytes)throw new M7NetworkFailure("RESPONSE_SIZE","服务响应超过大小限制。");bytes.Write(buffer,0,count);}
+                        NetworkResponse result;var payload=bytes.ToArray();long decode=Stopwatch.GetTimestamp();
+                        try{result=await Task.Run(()=>FrameCost.Decode<NetworkResponse>(Encoding.UTF8.GetString(payload),FrameCost.Stage.ResponseDecode),timeout.Token).ConfigureAwait(false);}
+                        catch(OperationCanceledException){throw;}
+                        catch(Exception){throw new M7NetworkFailure("RESPONSE_FORMAT","服务响应格式无效，请确认双方游戏版本一致。");}
+                        if(result==null)throw new M7NetworkFailure("RESPONSE_FORMAT","服务返回空响应。");
+                        if(result.ProtocolVersion!=NetworkProtocol.Version)throw new M7NetworkFailure("PROTOCOL","联机协议不兼容，请所有玩家更新至同一版本。");
+                        M7CommunicationLog.Record(new M7CommunicationEvent{Event="response_received",Transport=transport,Operation=request.Operation,RequestId=request.RequestId,CommandId=request.CommandId,RoomId=result.RoomId??request.RoomId,Revision=result.Revision,Code=result.Code,Status=result.Success?"ok":"rejected",DurationMs=ElapsedMs(started),DecodeMs=ElapsedMs(decode),Bytes=payload.Length});
+                        return result;
+                    }
+                }
             }
+        }
+        catch(Exception ex)
+        {
+            M7CommunicationLog.Record(new M7CommunicationEvent{Event="request_failed",Transport=transport,Operation=request.Operation,RequestId=request.RequestId,CommandId=request.CommandId,RoomId=request.RoomId,Revision=request.ExpectedRevision,DurationMs=ElapsedMs(started),Code=cancel.IsCancellationRequested?"SESSION_CANCELLED":M7NetworkErrors.Code(ex)});throw;
         }
     }
     void Apply(NetworkResponse response,bool handshake=false,bool roomList=false)
     {
         using var frameCost=FrameCost.Measure(FrameCost.Stage.NetworkApply);
+        using var diagnostic=new ResponseApplication(this,response);
         if(response.ProtocolVersion!=NetworkProtocol.Version){Disconnected("联机协议不兼容，请更新客户端。");return;}
         MarkLobbyResponse(response);
         Status=response.Message??(response.Success?"已连接。":"请求被拒绝。");
@@ -404,6 +452,7 @@ public sealed class M7Client : MonoBehaviour
             if(changed){decodedView=null;previews.Clear();previewQueue.Clear();previewPending.Clear();ViewChanged?.Invoke();historyDirty=true;FetchHistory();}
         }
         else if(response.Room!=null&&!stale)Revision=Math.Max(Revision,response.Revision);
+        Interlocked.Exchange(ref socketRevision,Revision);
         if(response.Code=="ConnectionSuperseded"||response.Code=="Unauthorized")
         {
             automaticReconnect=false;Connected=false;
@@ -413,15 +462,21 @@ public sealed class M7Client : MonoBehaviour
         // even when the acknowledgement carries the same revision as the push.
         PreviewChanged?.Invoke();
     }
+    readonly struct ResponseApplication:IDisposable
+    {
+        readonly M7Client client;readonly NetworkResponse response;readonly long start;
+        internal ResponseApplication(M7Client client,NetworkResponse response){this.client=client;this.response=response;start=Stopwatch.GetTimestamp();}
+        public void Dispose()=>M7CommunicationLog.Record(new M7CommunicationEvent{Event="response_apply",RequestId=response.RequestId,RoomId=response.RoomId??client.RoomId,Revision=response.Revision,DurationMs=ElapsedMs(start),QueueWaitMs=client.currentQueueWaitMs,QueueDepth=client.main.Count,Code=response.Code});
+    }
     async void FetchHistory()
     {
         if(historyBusy||!historyDirty||!automaticReconnect||!Connected||http==null||RoomId==null||Time.unscaledTime<nextHistoryAt)return;
         historyBusy=true;historyDirty=false;int current=generation,epoch=connectionEpoch,match=matchEpoch;long requestedRevision=Revision;
         try
         {
-            var response=await Send(Envelope("History",WireJson.Serialize(new HistoryPayload{AfterSequence=historyCursor,Limit=100})),lifetime.Token);
-            var entries=string.IsNullOrEmpty(response.HistoryJson)?Array.Empty<GameHistoryEntry>():FrameCost.Decode<GameHistoryEntry[]>(response.HistoryJson,FrameCost.Stage.HistoryDecode);
-            main.Enqueue(()=>
+            var response=await Send(Envelope("History",WireJson.Serialize(new HistoryPayload{AfterSequence=historyCursor,Limit=100})),lifetime.Token).ConfigureAwait(false);
+            var entries=string.IsNullOrEmpty(response.HistoryJson)?Array.Empty<GameHistoryEntry>():await Task.Run(()=>FrameCost.Decode<GameHistoryEntry[]>(response.HistoryJson,FrameCost.Stage.HistoryDecode)).ConfigureAwait(false);
+            EnqueueMain(()=>
             {
                 if(current!=generation||match!=matchEpoch)return;historyBusy=false;
                 if(epoch!=connectionEpoch||!response.Success){RetryHistory();return;}
@@ -431,7 +486,7 @@ public sealed class M7Client : MonoBehaviour
                 if(historyDirty)FetchHistory();
             });
         }
-        catch(Exception){main.Enqueue(()=>{if(current==generation&&match==matchEpoch){historyBusy=false;RetryHistory();}});}
+        catch(Exception){EnqueueMain(()=>{if(current==generation&&match==matchEpoch){historyBusy=false;RetryHistory();}});}
     }
     void MergeHistory(GameHistoryEntry[] entries)
     {
@@ -446,52 +501,95 @@ public sealed class M7Client : MonoBehaviour
         syncBusy=true;int current=generation,epoch=connectionEpoch;
         try
         {
-            var response=await Send(Envelope("Get"),lifetime.Token);
-            main.Enqueue(()=>{if(current!=generation)return;syncBusy=false;if(epoch!=connectionEpoch)return;TransportMode=PollTransportLabel;Apply(response);});
+            var response=await Send(Envelope("Get"),lifetime.Token).ConfigureAwait(false);
+            EnqueueMain(()=>{if(current!=generation)return;syncBusy=false;if(epoch!=connectionEpoch)return;if(!socketConnected)TransportMode=PollTransportLabel;Apply(response);});
         }
-        catch(Exception ex){main.Enqueue(()=>{if(current!=generation)return;syncBusy=false;if(epoch==connectionEpoch){Diagnose("HttpsSync",ex);LastError=M7NetworkErrors.Describe("同步对局",ex);Disconnected(LastError+" 原席位与待决保留，正在重连。");}});}
+        catch(Exception ex){EnqueueMain(()=>{if(current!=generation)return;syncBusy=false;if(epoch==connectionEpoch){Diagnose("HttpsSync",ex);LastError=M7NetworkErrors.Describe("同步对局",ex);Disconnected(LastError+" 原席位与待决保留，正在重连。");}});}
     }
     async void StartSocket()
     {
-        socketConnected=false;socket?.Abort();socket?.Dispose();var ws=new ClientWebSocket();socket=ws;
-        int current=generation;var cancel=lifetime.Token;
+        // 同一身份只保留一次建连；HTTP 重连已轮换身份时必须立即废弃旧建连。
+        if(lifetime==null||socketStarting&&socketEpoch==connectionEpoch)return;
+        socketStarting=true;socketConnected=false;AbortSocket(socket);socket?.Dispose();var ws=new ClientWebSocket();socket=ws;
+        int current=generation,epoch=connectionEpoch;socketEpoch=epoch;var sessionCancel=lifetime.Token;
+        // 在 Unity 线程捕获本次连接身份，后台心跳不等待 Update，即使帧卡顿也不会停止保活。
+        var identity=Envelope("Get");var endpoint=M7OnlineEndpoint.WebSocketUri(Endpoint);
+        string transport=string.IsNullOrEmpty(Fingerprint)?"WS":"WSS";
+        var receipts=new ConcurrentDictionary<string,SocketReceipt>();
+        var socketLifetime=CancellationTokenSource.CreateLinkedTokenSource(sessionCancel);var cancel=socketLifetime.Token;
+        Task heartbeat=null;long started=Stopwatch.GetTimestamp();
         if(!string.IsNullOrEmpty(Fingerprint)){string pin=Fingerprint;ws.Options.RemoteCertificateValidationCallback=(sender,certificate,chain,errors)=>certificate!=null&&CertificateMatches(certificate.GetRawCertData(),pin);}
         ws.Options.KeepAliveInterval=TimeSpan.FromSeconds(15);
+        M7CommunicationLog.Record(new M7CommunicationEvent{Event="socket_connect_start",Transport=transport,RoomId=identity.RoomId});
         try
         {
-            await ws.ConnectAsync(M7OnlineEndpoint.WebSocketUri(Endpoint),cancel);
-            main.Enqueue(()=>{if(current==generation&&socket==ws){socketConnected=true;TransportMode=Fingerprint.Length>0?"WSS 局域网加密同步":"WS 在线同步";}});
-            var heartbeat=SocketHeartbeat(ws,current,cancel);
+            using(var deadline=CancellationTokenSource.CreateLinkedTokenSource(cancel))
+            {deadline.CancelAfter(SocketResponseTimeout);await ws.ConnectAsync(endpoint,deadline.Token).ConfigureAwait(false);}
+            M7CommunicationLog.Record(new M7CommunicationEvent{Event="socket_connected",Transport=transport,RoomId=identity.RoomId,DurationMs=ElapsedMs(started)});
+            EnqueueMain(()=>{if(current==generation&&epoch==connectionEpoch&&socket==ws){socketStarting=false;socketConnected=true;TransportMode=transport=="WSS"?"WSS 局域网加密同步":"WS 在线同步";}});
+            heartbeat=SocketHeartbeat(ws,identity,receipts,transport,cancel);
             var buffer=new byte[16384];
             while(!cancel.IsCancellationRequested&&ws.State==WebSocketState.Open)
             {
                 using(var message=new MemoryStream())
                 {
                     WebSocketReceiveResult result;
-                    do{result=await ws.ReceiveAsync(new ArraySegment<byte>(buffer),cancel);if(result.MessageType==WebSocketMessageType.Close)throw new IOException("连接关闭。");if(result.MessageType!=WebSocketMessageType.Text||message.Length+result.Count>NetworkProtocol.MaximumResponseBytes)throw new IOException("无效消息。");message.Write(buffer,0,result.Count);}while(!result.EndOfMessage);
+                    do{result=await ws.ReceiveAsync(new ArraySegment<byte>(buffer),cancel).ConfigureAwait(false);if(result.MessageType==WebSocketMessageType.Close)throw new IOException("连接关闭。");if(result.MessageType!=WebSocketMessageType.Text||message.Length+result.Count>NetworkProtocol.MaximumResponseBytes)throw new IOException("无效消息。");message.Write(buffer,0,result.Count);}while(!result.EndOfMessage);
                     var payload=message.ToArray();
                     // 等待当前消息解析完成才继续接收，避免同一连接的快照被并行解析打乱。
-                    var response=await Task.Run(()=>FrameCost.Decode<NetworkResponse>(Encoding.UTF8.GetString(payload),FrameCost.Stage.ResponseDecode),cancel);
-                    main.Enqueue(()=>{if(current==generation&&socket==ws)Apply(response);});
+                    long decode=Stopwatch.GetTimestamp();
+                    var response=await Task.Run(()=>FrameCost.Decode<NetworkResponse>(Encoding.UTF8.GetString(payload),FrameCost.Stage.ResponseDecode),cancel).ConfigureAwait(false);
+                    if(response==null||response.ProtocolVersion!=NetworkProtocol.Version)throw new M7NetworkFailure("PROTOCOL","联机协议不兼容。");
+                    double duration=0;
+                    if(response.RequestId!=null&&receipts.TryRemove(response.RequestId,out var receipt)){duration=ElapsedMs(receipt.Started);receipt.Received.TrySetResult(true);}
+                    M7CommunicationLog.Record(new M7CommunicationEvent{Event="response_received",Transport=transport,Operation=duration>0?"Get":"Push",RequestId=response.RequestId,RoomId=response.RoomId??identity.RoomId,Revision=response.Revision,Code=response.Code,Status=response.Success?"ok":"rejected",Bytes=payload.Length,DecodeMs=ElapsedMs(decode),DurationMs=duration});
+                    EnqueueMain(()=>{if(current==generation&&epoch==connectionEpoch&&socket==ws){socketRetryDelay=2;Apply(response);}});
                 }
             }
-            await heartbeat;
         }
-        catch(Exception ex){main.Enqueue(()=>{if(current==generation&&socket==ws){Diagnose("WebSocket",ex);socketConnected=false;TransportMode=PollTransportLabel;Status=Fingerprint.Length>0?"局域网实时同步暂不可用，正在使用同一证书校验的 HTTPS 持续同步。":"实时同步暂不可用，正在通过 HTTP 持续同步。";nextSyncAt=0;}});}
-        finally{ws.Abort();main.Enqueue(()=>{if(current==generation&&socket==ws){socketConnected=false;nextSyncAt=0;}});}
+        catch(Exception ex)
+        {
+            M7CommunicationLog.Record(new M7CommunicationEvent{Event="socket_closed",Transport=transport,RoomId=identity.RoomId,DurationMs=ElapsedMs(started),Code=sessionCancel.IsCancellationRequested?"SESSION_CANCELLED":M7NetworkErrors.Code(ex)});
+            EnqueueMain(()=>{if(current==generation&&epoch==connectionEpoch&&socket==ws){socketConnected=false;TransportMode=PollTransportLabel;Status=transport=="WSS"?"局域网实时同步暂不可用，正在使用同一证书校验的 HTTPS 持续同步。":"实时同步暂不可用，正在通过 HTTP 持续同步。";}});
+        }
+        finally
+        {
+            socketLifetime.Cancel();AbortSocket(ws);
+            if(heartbeat!=null)try{await heartbeat.ConfigureAwait(false);}catch(Exception){}
+            socketLifetime.Dispose();
+            EnqueueMain(()=>{if(current==generation&&epoch==connectionEpoch&&socket==ws){socketStarting=false;socketConnected=false;nextSyncAt=0;nextSocketAt=Time.unscaledTime+socketRetryDelay;socketRetryDelay=Math.Min(30,socketRetryDelay*2);}});
+        }
     }
-    async Task SocketHeartbeat(ClientWebSocket ws,int current,CancellationToken cancel)
+    sealed class SocketReceipt
+    {
+        internal readonly long Started=Stopwatch.GetTimestamp();
+        internal readonly TaskCompletionSource<bool> Received=new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+    }
+    async Task SocketHeartbeat(ClientWebSocket ws,NetworkRequest identity,ConcurrentDictionary<string,SocketReceipt> receipts,string transport,CancellationToken cancel)
     {
         try
         {
-            while(current==generation&&!cancel.IsCancellationRequested&&ws.State==WebSocketState.Open)
+            while(!cancel.IsCancellationRequested&&ws.State==WebSocketState.Open)
             {
-                // Envelope reads are marshalled through Update so seat credentials never race a reconnect.
-                var source=new TaskCompletionSource<string>();main.Enqueue(()=>{if(current==generation)source.TrySetResult(WireJson.Serialize(Envelope("Get")));else source.TrySetCanceled();});
-                var text=await source.Task;var bytes=Encoding.UTF8.GetBytes(text);await ws.SendAsync(new ArraySegment<byte>(bytes),WebSocketMessageType.Text,true,cancel);await Task.Delay(1000,cancel);
+                var request=new NetworkRequest{Operation="Get",RequestId=Guid.NewGuid().ToString("N"),RoomId=identity.RoomId,Credential=identity.Credential,ConnectionId=identity.ConnectionId,RuleSet=identity.RuleSet,ExpectedRulesVersion=identity.ExpectedRulesVersion,ExpectedScenarioVersion=identity.ExpectedScenarioVersion,ExpectedRevision=Interlocked.Read(ref socketRevision)};
+                var receipt=new SocketReceipt();receipts[request.RequestId]=receipt;
+                var bytes=Encoding.UTF8.GetBytes(WireJson.Serialize(request));
+                M7CommunicationLog.Record(new M7CommunicationEvent{Event="request_send",Transport=transport,Operation="Get",RequestId=request.RequestId,RoomId=request.RoomId,Revision=request.ExpectedRevision,Bytes=bytes.Length});
+                using(var deadline=CancellationTokenSource.CreateLinkedTokenSource(cancel))
+                {
+                    deadline.CancelAfter(SocketResponseTimeout);
+                    await ws.SendAsync(new ArraySegment<byte>(bytes),WebSocketMessageType.Text,true,deadline.Token).ConfigureAwait(false);
+                    // 只把本次请求编号的回执视为成功；其它推送不能掩盖单向半断连接。
+                    using(deadline.Token.Register(()=>receipt.Received.TrySetCanceled()))await receipt.Received.Task.ConfigureAwait(false);
+                }
+                await Task.Delay(SocketHeartbeatInterval,cancel).ConfigureAwait(false);
             }
         }
-        catch(Exception){ws.Abort();}
+        catch(Exception ex)
+        {
+            if(!cancel.IsCancellationRequested)M7CommunicationLog.Record(new M7CommunicationEvent{Event="heartbeat_failed",Transport=transport,Operation="Get",RoomId=identity.RoomId,RequestId=receipts.Keys.FirstOrDefault(),Code=M7NetworkErrors.Code(ex)});
+            AbortSocket(ws);
+        }
     }
     string PollTransportLabel=>string.IsNullOrEmpty(Fingerprint)?"HTTP 在线同步（每秒）":"HTTPS 局域网加密同步（每秒）";
     void MarkLobbyResponse(NetworkResponse response)
@@ -500,7 +598,11 @@ public sealed class M7Client : MonoBehaviour
         LobbyConnectionState=M7LobbyConnectionState.Online;
     }
     void MarkLobbyOffline(){LobbyConnectionState=M7LobbyConnectionState.Offline;Rooms=Array.Empty<RoomSummary>();nextLobbyPollAt=Time.unscaledTime+5;}
-    void Disconnected(string message){Connected=false;MarkLobbyOffline();if(automaticReconnect)Status=message;retryAt=Time.unscaledTime+3;PreviewChanged?.Invoke();}
+    void Disconnected(string message)
+    {
+        M7CommunicationLog.Record(new M7CommunicationEvent{Event="connection_lost",RoomId=RoomId,Revision=Revision,CommandId=pendingCommand?.CommandId,Code=automaticReconnect?"reconnect_scheduled":"control_lost"});
+        Connected=false;MarkLobbyOffline();if(automaticReconnect)Status=message;retryAt=Time.unscaledTime+3;PreviewChanged?.Invoke();
+    }
     string IdentityPath
     {
         get{return CredentialPath(Endpoint??"");}
@@ -575,10 +677,15 @@ public sealed class M7Client : MonoBehaviour
     public void EndSession()
     {
         bool hadGame=Playing;LastError="";
-        generation++;connectionEpoch++;lifetime?.Cancel();socket?.Abort();socket?.Dispose();socket=null;http?.Dispose();http=null;lifetime?.Dispose();lifetime=null;
+        if(http!=null)M7CommunicationLog.Record(new M7CommunicationEvent{Event="endpoint_session_end",RoomId=RoomId,Revision=Revision});
+        generation++;connectionEpoch++;lifetime?.Cancel();AbortSocket(socket);socket?.Dispose();socket=null;http?.Dispose();http=null;lifetime?.Dispose();lifetime=null;
+        socketStarting=false;nextSocketAt=0;socketRetryDelay=2;Interlocked.Exchange(ref socketRevision,-1);
         LobbyConnectionState=M7LobbyConnectionState.Unconfigured;nextLobbyPollAt=0;
         Playing=false;Connected=false;Busy=false;HumanControlAvailable=false;automaticReconnect=true;socketConnected=syncBusy=commandSending=false;TransportMode="未连接";Room=null;Rooms=Array.Empty<RoomSummary>();RoomId=SeatId=credential=connectionId=viewJson=rememberedRuleSet=null;decodedView=null;Revision=-1;History=Array.Empty<GameHistoryEntry>();historyCursor=0;pendingCommand=pendingEnrollment=null;reconnectJoinFallback=null;historyBusy=historyDirty=previewBusy=false;nextHistoryAt=0;historyRetryDelay=2;previews.Clear();previewPending.Clear();previewQueue.Clear();
         if(hadGame)SessionEnded?.Invoke();
     }
+    void OnApplicationPause(bool paused)=>M7CommunicationLog.Record(new M7CommunicationEvent{Event="application_pause",RoomId=RoomId,Revision=Revision,Status=paused?"paused":"resumed"});
+    void OnApplicationFocus(bool focused)=>M7CommunicationLog.Record(new M7CommunicationEvent{Event="application_focus",RoomId=RoomId,Revision=Revision,Status=focused?"focused":"background"});
+    void OnApplicationQuit(){M7CommunicationLog.Record(new M7CommunicationEvent{Event="application_quit",RoomId=RoomId,Revision=Revision});M7CommunicationLog.Flush();}
     void OnDestroy(){EndSession();}
 }

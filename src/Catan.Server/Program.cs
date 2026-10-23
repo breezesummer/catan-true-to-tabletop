@@ -10,9 +10,10 @@ try
     var options = ServerOptions.Parse(args);
     startupPort=options.Port;startupStage="PRIVATE_FILES";
     using var privateFiles = new PrivateServerFiles(options);
+    await using var diagnostics = new CommunicationDiagnostics(Path.Combine(options.DataDirectory, "diagnostics"));
     startupStage="ROOMS";
     var scenarioFile = Path.Combine(AppContext.BaseDirectory, "base-scenario.json");
-    using var rooms = new RoomDirectory(Path.Combine(options.DataDirectory, "rooms"), File.ReadAllText(scenarioFile));
+    using var rooms = new RoomDirectory(Path.Combine(options.DataDirectory, "rooms"), File.ReadAllText(scenarioFile), new RoomDirectoryOptions { Diagnostics = diagnostics.RecordRoom });
     startupStage="LISTEN";
     var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = Array.Empty<string>(), ContentRootPath = AppContext.BaseDirectory });
     // 默认关闭框架请求日志，禁止请求、令牌、口令和异常中的权威内容进入公开日志。
@@ -34,6 +35,7 @@ try
     });
     builder.Services.AddSingleton(options);
     builder.Services.AddSingleton(rooms);
+    builder.Services.AddSingleton(diagnostics);
     builder.Services.AddSingleton<NetworkTransport>();
     builder.Services.AddHostedService<RoomAiService>();
     object Advertisement(int roomCount) => new

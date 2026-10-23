@@ -9,6 +9,7 @@ namespace UnityEngine
         internal static RuntimePlatform platform=RuntimePlatform.Android;
         internal static string dataPath="";
         internal static string persistentDataPath=Path.GetTempPath();
+        internal static string version="2.0.1-test";
         internal static void Quit(int code) { }
     }
     internal static class JsonUtility

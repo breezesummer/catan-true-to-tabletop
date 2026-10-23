@@ -8,6 +8,18 @@ using System.Threading.Tasks;
 // 仅展示受控说明与错误码，异常原文可能含凭据、请求或私有路径。
 internal static class M7NetworkErrors
 {
+    // 用于通信诊断；只返回受控类型与数值，不包含可能含敏感资料的异常 Message。
+    internal static string Code(Exception error)
+    {
+        for(var current=error;current!=null;current=current.InnerException)
+        {
+            if(current is M7NetworkFailure known)return known.Code;
+            if(current is AuthenticationException||current.GetType().FullName=="Mono.Security.Interface.TlsException")return "TLS";
+            if(current is SocketException socket)return "Socket_"+socket.NativeErrorCode;
+            if(current is OperationCanceledException||current is TimeoutException)return "TIMEOUT_OR_CANCELLED";
+        }
+        return error is HttpRequestException?"HTTP":error is IOException?"IO":error.GetType().Name;
+    }
     internal static string Describe(string stage,Exception error)
     {
         for(var current=error;current!=null;current=current.InnerException)

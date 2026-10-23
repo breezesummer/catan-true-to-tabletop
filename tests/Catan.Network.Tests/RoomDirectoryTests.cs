@@ -10,6 +10,79 @@ namespace Catan.Network.Tests;
 public sealed class RoomDirectoryTests
 {
     [Fact]
+    public async Task ServerGeneratedPushDoesNotKeepAnAbsentClientAlive()
+    {
+        var clock = DateTimeOffset.UtcNow;
+        using var f = new Fixture(new RoomDirectoryOptions { Clock = () => clock, ConnectionTimeout = TimeSpan.FromSeconds(45) });
+        var host = f.Create();
+        for (var seconds = 1; seconds <= 46; seconds++)
+        {
+            clock = clock.AddSeconds(1);
+            var push = f.Directory.Handle(Fixture.Request("Get", host), observedClientActivity: false);
+            if (seconds < 45) Assert.True(push.Room.Seats.Single(s => s.SeatId == host.SeatId).Connected);
+            await f.Directory.TickAiAsync();
+        }
+        Assert.Empty(f.Directory.ListPublicRooms());
+        Assert.Equal("RoomNotFound", f.Directory.Handle(Fixture.Request("Get", host)).Code);
+    }
+
+    [Fact]
+    public void ClientHeartbeatsKeepSeatAliveWhilePushOnlyReadsPresence()
+    {
+        var clock = DateTimeOffset.UtcNow;
+        using var f = new Fixture(new RoomDirectoryOptions { Clock = () => clock, ConnectionTimeout = TimeSpan.FromSeconds(45) });
+        var host = f.Create();
+        for (var seconds = 1; seconds <= 120; seconds++)
+        {
+            clock = clock.AddSeconds(1);
+            if (seconds % 10 == 0) Assert.True(f.Directory.Handle(Fixture.Request("Get", host)).Success);
+            var push = f.Directory.Handle(Fixture.Request("Get", host), observedClientActivity: false);
+            Assert.True(push.Room.Seats.Single(s => s.SeatId == host.SeatId).Connected);
+        }
+        Assert.Single(f.Directory.ListPublicRooms());
+    }
+
+    [Fact]
+    public void RoomDiagnosticsMeasureLocksAndPersistenceWithoutChangingResults()
+    {
+        var entries = new List<RoomDiagnostic>();
+        using var f = new Fixture(new RoomDirectoryOptions { Diagnostics = entries.Add });
+        var host = f.Create();
+        var request = Fixture.Request("Ready", host);
+        request.RequestId = Guid.NewGuid().ToString("N");
+        request.Payload = WireJson.Serialize(new ReadyPayload { Ready = true });
+        Assert.True(f.Directory.Handle(request).Success);
+        Assert.Contains(entries, e => e.Event == "room.storage" && e.Success && e.Bytes > 0);
+        var handled = Assert.Single(entries, e => e.Event == "room.handle" && e.RequestId == request.RequestId);
+        Assert.Equal(host.RoomId, handled.RoomId);
+        Assert.Equal("Ready", handled.Operation);
+        Assert.True(handled.WaitMs >= 0);
+        Assert.True(handled.ElapsedMs >= handled.WaitMs);
+    }
+
+    [Fact]
+    public async Task MissingClientStillHandsControlToAiAfterGraceWhileOthersKeepPlaying()
+    {
+        var clock = DateTimeOffset.UtcNow;
+        using var f = new Fixture(new RoomDirectoryOptions { Clock = () => clock, ConnectionTimeout = TimeSpan.FromSeconds(45) });
+        var clients = f.StartHumans();
+        var missing = clients[0];
+        for (var seconds = 1; seconds <= 46; seconds++)
+        {
+            clock = clock.AddSeconds(1);
+            if (seconds % 10 == 0)
+                foreach (var other in clients.Skip(1)) Assert.True(f.Directory.Handle(Fixture.Request("Get", other)).Success);
+            f.Directory.Handle(Fixture.Request("Get", missing), observedClientActivity: false);
+            await f.Directory.TickAiAsync();
+        }
+        var snapshot = f.Directory.Handle(Fixture.Request("Get", clients[1]));
+        Assert.True(snapshot.Success);
+        var seat = snapshot.Room.Seats.Single(s => s.SeatId == missing.SeatId);
+        Assert.False(seat.Connected); Assert.True(seat.ControlledByAi);
+        Assert.Single(f.Directory.ListPublicRooms());
+    }
+
+    [Fact]
     public void RecentPresentationHistoryMatchesSeatProjectionAndSurvivesDuplicateCommands()
     {
         using var f=new Fixture();var clients=f.StartHumans();

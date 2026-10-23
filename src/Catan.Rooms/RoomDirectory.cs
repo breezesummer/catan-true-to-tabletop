@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Diagnostics;
 using System.Text;
 using Catan.Core;
 using Catan.Network.Contracts;
@@ -12,6 +13,7 @@ public sealed class RoomDirectoryOptions
     public int MaximumRooms { get; set; } = 128;
     public int MaximumCommittedCommands { get; set; } = 100000;
     public Func<DateTimeOffset> Clock { get; set; } = () => DateTimeOffset.UtcNow;
+    public Action<RoomDiagnostic> Diagnostics { get; set; }
 }
 
 /// <summary>服务端权威房间入口；每个房间严格顺序执行，提交后才发布可见结果。</summary>
@@ -42,7 +44,7 @@ public sealed class RoomDirectory : IDisposable
         }
         catch { storage.Dispose(); throw new InvalidDataException("房间存档无法验证；原文件已保留，请检查版本和备份。"); }
     }
-    public NetworkResponse Handle(NetworkRequest request)
+    public NetworkResponse Handle(NetworkRequest request, bool observedClientActivity = true)
     {
         if (request == null) return Reject("InvalidRequest", "请求不能为空。");
         NetworkResponse response;
@@ -56,7 +58,7 @@ public sealed class RoomDirectory : IDisposable
             {
                 Room room;
                 lock (directoryGate) rooms.TryGetValue(request.RoomId ?? "", out room);
-                response = room == null ? Reject("RoomNotFound", "没有找到该房间。") : room.Handle(request);
+                response = room == null ? Reject("RoomNotFound", "没有找到该房间。") : room.Handle(request, observedClientActivity);
             }
         }
         catch (Exception ex) when (ex is ArgumentException || ex is System.Runtime.Serialization.SerializationException || ex is System.Xml.XmlException || ex is FormatException || ex is OverflowException || ex is NullReferenceException)
@@ -96,6 +98,11 @@ public sealed class RoomDirectory : IDisposable
             { rooms.Remove(pair.Key); TryDeleteRoom(pair.Key); }
     }
     public void Dispose() => storage.Dispose();
+    private void Trace(RoomDiagnostic diagnostic)
+    {
+        try { options.Diagnostics?.Invoke(diagnostic); }
+        catch { /* 诊断失败不得改变房间结果。 */ }
+    }
     private NetworkResponse Create(NetworkRequest request)
     {
         var payload = WireJson.Deserialize<CreateRoomPayload>(request.Payload ?? "{}");
@@ -215,6 +222,15 @@ public sealed class RoomDirectory : IDisposable
         private readonly Dictionary<string, DateTimeOffset> lastSeen = new(StringComparer.Ordinal);
         private readonly Dictionary<string, DateTimeOffset> disconnectedSince = new(StringComparer.Ordinal);
         private bool paused;
+        private NetworkRequest diagnosticRequest;
+        private void Trace(string eventName, long started, bool success = true, double? waitMs = null, long? bytes = null, string exceptionType = null) =>
+            owner.Trace(new RoomDiagnostic
+            {
+                Event = eventName, RoomId = state.RoomId, RequestId = diagnosticRequest?.RequestId,
+                CommandId = diagnosticRequest?.CommandId, Operation = diagnosticRequest?.Operation,
+                Revision = state.Revision, Success = success, ElapsedMs = Stopwatch.GetElapsedTime(started).TotalMilliseconds,
+                WaitMs = waitMs, Bytes = bytes, ExceptionType = exceptionType
+            });
         internal Room(RoomDirectory owner, SavedRoom state)
         {
             this.owner = owner; this.state = state;
@@ -273,10 +289,12 @@ public sealed class RoomDirectory : IDisposable
                 if(projectionRevision!=state.Revision){projections.Clear();projectionRevision=state.Revision;}
                 if(!projections.TryGetValue(seat.SeatId,out var projection))
                 {
+                    var projectionStarted = Stopwatch.GetTimestamp();
                     var history=game.History(seat.SeatId,0);
                     int first=Math.Max(0,history.Length-64);
                     projection=(game.ViewJson(seat.SeatId),WireJson.Serialize(history.Skip(first).ToArray()),first==0?0:history[first-1].Sequence);
                     projections.Add(seat.SeatId,projection);
+                    Trace("room.projection", projectionStarted, bytes: Encoding.UTF8.GetByteCount(projection.View) + Encoding.UTF8.GetByteCount(projection.History));
                 }
                 response.ViewJson=projection.View;
                 response.PresentationHistoryAfterSequence=projection.After;
@@ -284,9 +302,13 @@ public sealed class RoomDirectory : IDisposable
             }
             return response;
         }
-        internal NetworkResponse Handle(NetworkRequest request)
+        internal NetworkResponse Handle(NetworkRequest request, bool observedClientActivity = true)
         {
-            lock (gate)
+            var started = Stopwatch.GetTimestamp();
+            Monitor.Enter(gate);
+            var waited = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
+            diagnosticRequest = request;
+            try
             {
                 if (state.Closed) return Reject("RoomClosed", "房间已销毁，请创建或加入其他房间。");
                 if (request.Operation == "Describe") return new NetworkResponse { Success = true, RoomId = state.RoomId, RuleSet = state.Settings.RuleSet, Revision = state.Revision, Room = PublicSummary() };
@@ -298,13 +320,13 @@ public sealed class RoomDirectory : IDisposable
                 if (state.Closed) return Reject("RoomClosed", "该大厅房间已结束，请加入其他房间或重新创建。");
                 if (request.Operation == "Reconnect") return Reconnect(seat);
                 if (string.IsNullOrEmpty(request.ConnectionId) || !SameSecret(seat.ConnectionId, request.ConnectionId)) return Reject("ConnectionSuperseded", "该席位已由新连接接管，请重新连接。");
-                if (game != null && !Connected(seat))
+                if (observedClientActivity && game != null && !Connected(seat))
                 {
                     var before = PrivateJson.Copy(state);
                     seat.ControlledByAi = true; seat.RejoinAfterTurnKey = game.TurnKey; state.Revision++;
                     if (!Commit(before)) return Reject("PersistenceFailed", "重连状态保存失败，请稍后重新连接。");
                 }
-                lastSeen[seat.ConnectionId] = owner.options.Clock(); disconnectedSince.Remove(seat.SeatId);
+                if (observedClientActivity) { lastSeen[seat.ConnectionId] = owner.options.Clock(); disconnectedSince.Remove(seat.SeatId); }
                 if (request.Operation == "Get") return Snapshot(seat);
                 if (request.Operation == "History")
                 {
@@ -326,6 +348,12 @@ public sealed class RoomDirectory : IDisposable
                 if (paused) return Snapshot(seat, "RoomPaused", "保存失败后房间已暂停，请管理员恢复保存或重启服务。", false);
                 if (request.ExpectedRevision != state.Revision) return Snapshot(seat, "StaleRevision", "房间已更新，请根据最新局面重试。", false);
                 return ChangeRoom(request, seat);
+            }
+            finally
+            {
+                Trace("room.handle", started, waitMs: waited);
+                diagnosticRequest = null;
+                Monitor.Exit(gate);
             }
         }
         private NetworkResponse Join(NetworkRequest request)
@@ -462,9 +490,19 @@ public sealed class RoomDirectory : IDisposable
         private void ResetReady() { foreach (var seat in state.Seats) seat.Ready = false; }
         private bool Commit(SavedRoom before)
         {
-            try { owner.storage.Commit(state.RoomId, PrivateJson.Write(state)); return true; }
+            var started = Stopwatch.GetTimestamp();
+            try
+            {
+                var document = PrivateJson.Write(state);
+                var storageStarted = Stopwatch.GetTimestamp();
+                owner.storage.Commit(state.RoomId, document);
+                Trace("room.storage", storageStarted, bytes: Encoding.UTF8.GetByteCount(document));
+                Trace("room.commit", started);
+                return true;
+            }
             catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
             {
+                Trace("room.commit", started, false, exceptionType: ex.GetType().Name);
                 state = before; game = before.GameSave == null ? null : RuleRoomGame.Load(before.Settings.RuleSet, before.GameSave, owner.baseScenario); paused = true; return false;
             }
         }
