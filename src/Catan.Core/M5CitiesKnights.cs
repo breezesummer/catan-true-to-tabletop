@@ -25,6 +25,7 @@ namespace Catan.Core.M5
             while(s.DecisionQueue.Length>0)
             {
                 var next=s.DecisionQueue[0];s.DecisionQueue=s.DecisionQueue.Skip(1).ToArray();
+                if(B3PendingImmune(s,next))continue;
                 if(next.Kind=="ProgressDraw") {DrawProgressCard(s,s.Players.Single(p=>p.Id==next.PlayerId),next.Track);CheckVictory(s);if(s.Phase==GamePhase.Finished)return;continue;}
                 if(next.Kind=="BarbarianReturnHome") {foreach(var knight in s.Knights)knight.Active=false;s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;if(s.PirateTileId==null&&(seafaring.Id!="pirate-islands"||s.Special.Fortresses.Any(f=>f.Strength>0)))s.PirateTileId=seafaring.InitialPirateTileId;continue;}
                 if(next.Kind=="Aqueduct"&&s.Bank.Total==0)continue;
@@ -40,6 +41,10 @@ namespace Catan.Core.M5
             s.LastDice2=s.AlchemyDice2>0?s.AlchemyDice2:Draw(s.Random,6)+1;
             s.AlchemyDice1=0;s.AlchemyDice2=0;
             int eventRoll=Draw(s.Random,6); s.LastEventDie=eventRoll<3?EventDie.Barbarian:(EventDie)(eventRoll-2);
+            CommitCitiesKnightsDice(s);
+        }
+        private void CommitCitiesKnightsDice(GameState s)
+        {
             s.ProductionPending=true; s.DecisionReturnPhase=GamePhase.Action;
             if(s.LastEventDie==EventDie.Barbarian) { s.BarbarianPosition++; if(s.BarbarianPosition==7) BarbarianAttack(s); }
             else EnqueueEventProgress(s,(ImprovementTrack)((int)s.LastEventDie-1),s.LastDice1);
@@ -52,6 +57,9 @@ namespace Catan.Core.M5
             {
                 s.Special.PirateProductionResolved=true;
                 SpecialProduction(s);
+                // 海盗弃牌的连营／落英等先结清，再锁定数字 7 的弃牌量或建立普通产出。
+                if(B3(s)&&Catan.Core.ThreeKingdoms.B2SkillEngine.HasPending(s.ThreeKingdoms))
+                {s.ProductionPending=true;s.DecisionReturnPhase=GamePhase.Action;s.Phase=GamePhase.Action;return;}
                 if(s.DecisionQueue.Length>0){s.ProductionPending=true;s.DecisionReturnPhase=GamePhase.Action;ContinueDecisions(s);return;}
             }
             if(s.Special!=null)s.Special.PirateProductionResolved=false;
@@ -91,7 +99,7 @@ namespace Catan.Core.M5
                 if(vulnerable.Length>0)
                 {
                     int weakest=vulnerable.Min(p=>strength[p.Id]);
-                    foreach(var p in vulnerable.Where(p=>strength[p.Id]==weakest))
+                    foreach(var p in vulnerable.Where(p=>strength[p.Id]==weakest&&!B3Immune(s,p.Id)))
                         QueueDecision(s,new PendingDecision {Kind="PillageCity",PlayerId=p.Id,Options=s.Cities.Where(c=>c.PlayerId==p.Id&&!s.Metropolises.Any(m=>m.LocationId==c.LocationId)).Select(c=>c.LocationId).ToArray()});
                 }
             }
@@ -101,6 +109,7 @@ namespace Catan.Core.M5
         {
             Require(s.Phase==GamePhase.PendingChoice&&s.PendingDecision!=null&&s.PendingDecision.PlayerId==p.Id,"NotDecisionOwner","请由待决选择所属玩家操作。");
             var d=s.PendingDecision;
+            if(B3PendingImmune(s,d)) { ContinueDecisions(s); return; }
             Require(c.Kind!=CommandKind.ChooseGoldResources||d.Kind=="Gold","WrongDecision","当前不是金矿选择。");
             switch(d.Kind)
             {
@@ -181,12 +190,13 @@ namespace Catan.Core.M5
             var knight=OwnKnight(s,p,c.SourceId); Require(knight.Active&&knight.ActivatedTurn!=s.Turn,"KnightCannotAct","只有此前激活的骑士可以行动。");
             Require(ReachableKnightVertices(s,p.Id,c.SourceId).Contains(c.TargetId),"DisconnectedKnight","骑士必须沿连续的己方道路移动。");
             if(c.Kind==CommandKind.MoveKnight) Require(!Occupied(s,c.TargetId),"OccupiedVertex","骑士需要空顶点。");
-            else {var defender=s.Knights.FirstOrDefault(k=>k.LocationId==c.TargetId&&k.PlayerId!=p.Id);Require(defender!=null&&defender.Level<knight.Level,"CannotDisplace","只能驱逐较弱的对方骑士。");knight.LocationId=c.TargetId;DisplaceForProgress(s,defender);}
+            else {var defender=s.Knights.FirstOrDefault(k=>k.LocationId==c.TargetId&&k.PlayerId!=p.Id);Require(defender!=null&&defender.Level<knight.Level,"CannotDisplace","只能驱逐较弱的对方骑士。");if(B3Immune(s,defender.PlayerId)){knight.Active=false;knight.ActedTurn=s.Turn;return;}knight.LocationId=c.TargetId;DisplaceForProgress(s,defender);}
             knight.LocationId=c.TargetId;knight.Active=false;knight.ActedTurn=s.Turn;
             if(s.DecisionQueue.Length>0) ContinueDecisions(s);
         }
         private void DisplaceForProgress(GameState s,Knight knight)
         {
+            if(B3Immune(s,knight.PlayerId))return;
             var options=ReachableKnightVertices(s,knight.PlayerId,knight.LocationId).Where(v=>!Occupied(s,v)).OrderBy(v=>v).ToArray();
             s.Knights=s.Knights.Where(k=>k!=knight).ToArray();
             if(options.Length>0) QueueDecision(s,new PendingDecision {Kind="DisplacedKnight",PlayerId=knight.PlayerId,AnchorVertexId=knight.LocationId,DisplacedKnight=knight,Options=options});
@@ -199,7 +209,7 @@ namespace Catan.Core.M5
         }
         private void StealHandCard(GameState s,PlayerState p,PlayerState victim)
         {
-            if(B2Protected(s,victim.Id)||HandCount(victim)==0)return;int index=Draw(s.Random,HandCount(victim));
+            if(B2Protected(s,victim.Id)||B3Immune(s,victim.Id)||HandCount(victim)==0)return;int index=Draw(s.Random,HandCount(victim));
             foreach(var r in Resources) {if(index<victim.Resources[r]) {Transfer(victim.Resources,p.Resources,r,1);return;}index-=victim.Resources[r];}
             foreach(var r in Commodities) {if(index<victim.Commodities[r]) {Transfer(victim.Commodities,p.Commodities,r,1);return;}index-=victim.Commodities[r];}
         }

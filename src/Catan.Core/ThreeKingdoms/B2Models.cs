@@ -124,6 +124,8 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=11)] public int HarvestStage { get; set; }
         [DataMember(Order=12)] public B2SkillFrame[] AfterGoldFrames { get; set; } = Array.Empty<B2SkillFrame>();
         [DataMember(Order=13)] public int ProcessedSkippedCount { get; set; }
+        // 仅 B3 实际退牌时分配；旧 B2 存档不增加非空字段。
+        [DataMember(Order=14, EmitDefaultValue=false)] public B3ReturnedCards[] ReturnedCards { get; set; }
     }
     [DataContract] public sealed class B2HandChange
     {

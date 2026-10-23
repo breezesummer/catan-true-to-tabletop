@@ -123,8 +123,8 @@ public sealed partial class M6App
             }
             if(menuRule>=2)
             {
-                if(PastoralMenuUI.Button(new Rect(498,628,816,38),(menuThreeKingdoms?"已开启":"已关闭")+" · 三国争霸 B2（仅本地，11 张完整武将）",true,false,menuThreeKingdoms))menuThreeKingdoms=!menuThreeKingdoms;
-                PastoralMenuUI.Label(new Rect(498,675,816,24),"54 将用于验证选将、轮换和 3 轮寿命；完整技能与联机尚未开放。",13,PastoralMenuUI.Muted);
+                if(PastoralMenuUI.Button(new Rect(498,628,816,38),(menuThreeKingdoms?"已开启":"已关闭")+" · 三国争霸 B3（仅本地，16 张完整武将）",true,false,menuThreeKingdoms))menuThreeKingdoms=!menuThreeKingdoms;
+                PastoralMenuUI.Label(new Rect(498,675,816,24),"已开放 16 将、25 技能，保留选将、轮换和 3 轮寿命；三国联机尚未开放。",13,PastoralMenuUI.Muted);
             }
             else PastoralMenuUI.Label(new Rect(498,645,816,36),"每种玩法都保留完整的独立规则；接下来选择本局地图。",14,PastoralMenuUI.Muted);
         }
@@ -133,7 +133,7 @@ public sealed partial class M6App
         PastoralMenuUI.Fill(new Rect(495,714,838,1),new Color(.48f,.54f,.42f,.20f));
         var ids=ScenarioIds();menuScenario=Mathf.Clamp(menuScenario,0,ids.Length-1);
         string map=menuRule==0?"标准岛屿":menuRule==2?"标准城邦":ScenarioName(ids[menuScenario]);
-        PastoralMenuUI.Label(new Rect(497,737,510,26),RuleNames[menuRule]+"  /  "+map+(menuRule>=2&&menuThreeKingdoms?" · 三国 B2":""),16,null,true);
+        PastoralMenuUI.Label(new Rect(497,737,510,26),RuleNames[menuRule]+"  /  "+map+(menuRule>=2&&menuThreeKingdoms?" · 三国 B3":""),16,null,true);
         PastoralMenuUI.Label(new Rect(497,774,500,23),menuPlayers+" 人同桌  ·  你的建筑 "+PlayerIdentityModel.ColorNames[menuHuman]+"  ·  "+(menuVictoryPoints??DefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers))+" 分获胜",13,PastoralMenuUI.Muted);
         if(menuSetupStep>0&&PastoralMenuUI.Button(new Rect(1000,751,104,46),"上一步"))menuSetupStep--;
         if(PastoralMenuUI.Button(new Rect(1117,751,216,46),menuSetupStep==2?"启程 · 开始游戏":"下一步   →",true,true))

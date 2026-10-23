@@ -100,6 +100,7 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=22)] public string[] GeneralDrawOrder { get; set; } = Array.Empty<string>();
         [DataMember(Order=23)] public string[] SeatPlayerIds { get; set; } = Array.Empty<string>();
         [DataMember(Order=24)] public B2SkillState Skills { get; set; } = new B2SkillState();
+        [DataMember(Order=25, EmitDefaultValue=false)] public B3DiceState Dice { get; set; }
     }
     [DataContract] public sealed class ThreeKingdomsPlayerView
     {

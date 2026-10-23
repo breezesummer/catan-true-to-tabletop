@@ -11,6 +11,7 @@ namespace Catan.Core.M5
         {
             ThreeKingdomsEngine.RefreshWindow(s.ThreeKingdoms);
             B2SkillEngine.RefreshDecision(s.ThreeKingdoms);
+            B3DiceEngine.RefreshDecision(s.ThreeKingdoms);
         }
         private void ApplyB2(GameState s, Command c)
         {
@@ -23,6 +24,7 @@ namespace Catan.Core.M5
                 if (c.Kind == CommandKind.ChooseGenerals)
                 {
                     ThreeKingdomsEngine.ChooseGenerals(tk, c.PlayerId, c.GeneralIds, c.DecisionId, c.WindowId, n => Draw(s.Random, n));
+                    if (B3(s)) { B2SkillEngine.RefreshDecision(tk); B3DiceEngine.RefreshDecision(tk); }
                     return;
                 }
                 if (c.Kind == CommandKind.DeployGeneral)
@@ -38,19 +40,21 @@ namespace Catan.Core.M5
                         CheckB2Capacity(s);
                     }
                     if (tk.PendingDecision == null) FinishB2Work(s);
+                    if (B3(s)) { B2SkillEngine.RefreshDecision(tk); B3DiceEngine.RefreshDecision(tk); }
                     return;
                 }
                 Require(tk.PendingDecision == null, "GeneralDecisionPending", "请先完成当前武将选择。");
                 if (c.Kind == CommandKind.RetireGeneral)
                 {
                     ThreeKingdomsEngine.RetireGeneral(tk, c.PlayerId, c.WindowId, n => Draw(s.Random, n));
-                    B2SkillEngine.RefreshDecision(tk); return;
+                    B2SkillEngine.RefreshDecision(tk); if (B3(s)) { FinishB2Work(s); RefreshB2(s); } return;
                 }
                 if (c.Kind == CommandKind.UseGeneralSkill)
                 {
                     Require(c.SkillCommand != null, "MissingSkill", "请选择技能操作。");
-                    Require(tk.Skills.PendingDecision != null || (s.PendingDecision == null && s.TradeOffer == null), "PendingResolution", "请先完成当前牌或交易响应。");
-                    B2SkillEngine.Resolve(host, c.PlayerId, c.SkillCommand);
+                    Require(tk.Skills.PendingDecision != null || tk.Dice?.PendingDecision != null || (s.PendingDecision == null && s.TradeOffer == null), "PendingResolution", "请先完成当前牌或交易响应。");
+                    if (tk.Skills.PendingDecision == null && tk.Dice?.PendingDecision != null) B3DiceEngine.Resolve(host, c.PlayerId, c.SkillCommand);
+                    else B2SkillEngine.Resolve(host, c.PlayerId, c.SkillCommand);
                     FinishB2Work(s);
                     RefreshB2(s); return;
                 }
@@ -92,7 +96,17 @@ namespace Catan.Core.M5
                     B2SkillEngine.OnEnd(host, "end-" + tk.Clock.TurnInstanceId);
                     FinishB2Work(s); RefreshB2(s); return;
                 }
-                if (c.Kind == CommandKind.RollDice) s.ThreeKingdomsDiceRecipients = Array.Empty<string>();
+                if (c.Kind == CommandKind.RollDice)
+                {
+                    s.ThreeKingdomsDiceRecipients = Array.Empty<string>();
+                    if (B3(s))
+                    {
+                        Require(s.ActivePlayerId == c.PlayerId && s.Phase == GamePhase.ProductionAwaitRoll && s.PendingDecision == null && s.TradeOffer == null, "WrongPhase", "当前不能掷骰。");
+                        B3DiceEngine.BeginRoll(host, c.PlayerId, "dice-" + tk.Clock.TurnInstanceId, s.AlchemyDice1, s.AlchemyDice2);
+                        s.AlchemyDice1 = 0; s.AlchemyDice2 = 0;
+                        FinishB2Work(s); RefreshB2(s); return;
+                    }
+                }
                 // 合法性预检在隔离副本执行，不消耗权威随机或费用；目标响应先于主体。
                 var targets = B2TargetPlayers(s, c);
                 if (targets.Length > 0)
@@ -114,12 +128,16 @@ namespace Catan.Core.M5
             var skipped = tk.Clock.SkippedOpportunityPlayerIds.Skip(tk.Skills.ProcessedSkippedCount).ToArray();
             tk.Skills.ProcessedSkippedCount = tk.Clock.SkippedOpportunityPlayerIds.Length;
             B2SkillEngine.OnOpportunityStart(CardHost(s), tk.Clock.OpportunityId, tk.Clock.ActivePlayerId, skipped);
+            if (B3(s)) B3DiceEngine.BeginTurn(CardHost(s));
             CheckB2Capacity(s);
         }
         private void FinishB2Work(GameState s)
         {
             if (s.Phase == GamePhase.Finished) return;
             var tk = s.ThreeKingdoms; var host = CardHost(s);
+            ResumeB3PirateProduction(s);
+            FinishB3Dice(s);
+            ResumeB3SpecialContinuation(s);
             if (!B2Busy(s) && s.ThreeKingdomsDeferredCommand != null)
             {
                 var deferred = s.ThreeKingdomsDeferredCommand; s.ThreeKingdomsDeferredCommand = null;
@@ -129,12 +147,12 @@ namespace Catan.Core.M5
             {
                 ThreeKingdomsEngine.BeginNormalTurns(tk); B2StartOpportunity(s);
             }
-            if (tk.Clock.Phase == ThreeKingdomsPhase.Roll && s.Phase == GamePhase.Action && s.PendingDecision == null && s.DecisionQueue.Length == 0)
+            if ((!B3(s) || !B2Busy(s) && !s.ProductionPending) && tk.Clock.Phase == ThreeKingdomsPhase.Roll && s.Phase == GamePhase.Action && s.PendingDecision == null && s.DecisionQueue.Length == 0)
             {
                 // 在产出预留完成之前，骰后技能不得抢走其他席位的主分配。
                 ThreeKingdomsEngine.MarkDrawPhase(tk);
                 BeginB2Harvest(s);
-                B2SkillEngine.OnDiceResolved(host, "dice-" + tk.Clock.TurnInstanceId, s.LastEventDie == EventDie.Barbarian, s.ThreeKingdomsDiceRecipients ?? Array.Empty<string>());
+                B2SkillEngine.OnDiceResolved(host, "dice-" + tk.Clock.TurnInstanceId, s.LastEventDie == EventDie.Barbarian, s.ThreeKingdomsDiceRecipients ?? Array.Empty<string>(), !B3(s) || tk.Dice?.Roll?.Result?.ActualRoll == true);
             }
             if (!B2Busy(s) && s.PendingDecision == null && s.DecisionQueue.Length == 0 && s.ThreeKingdomsProgressUse != null)
             {
@@ -142,7 +160,16 @@ namespace Catan.Core.M5
                 if (tk.Generals.Any(g => g.Region == GeneralRegion.Active && g.TenureId == use[2])) B2SkillEngine.OnProgressUsed(host, use[0], use[1]);
             }
             B2SkillEngine.Pump(host);
+            if (ResumeB3PirateProduction(s)) { FinishB2Work(s); return; }
             CheckB2Capacity(s);
+        }
+
+        private bool ResumeB3PirateProduction(GameState s)
+        {
+            if (!B3(s) || !s.ProductionPending || s.Special?.PirateProductionResolved != true || s.ThreeKingdoms.PendingDecision != null || B2Busy(s) || s.PendingDecision != null) return false;
+            ContinueDecisions(s);
+            NormalizeSpecialSeven(s);
+            return true;
         }
 
         private void ApplyB2Native(GameState s, Command c)
@@ -151,10 +178,15 @@ namespace Catan.Core.M5
             var offer = s.TradeOffer;
             var pending = s.PendingDecision;
             var buildings = B2Buildings(s);
+            Require(!B3(s) || c.Kind != CommandKind.PlayProgressCard || c.ProgressCard != ProgressCardKind.Alchemy || s.ThreeKingdoms.Dice?.FixedResult == null, "FixedDiceLocked", "直谏已固定本回合骰局，不能再使用炼金术士。");
             ApplyBaseRules(s, c);
+            var payments = s.ThreeKingdomsNativePayments ?? Array.Empty<B3NativePayment>();
+            // Pay 已以真实前后手牌发出失牌事件；这里只记录命令其余步骤，避免同一费用重复入账。
+            var remainingBefore = before.ToDictionary(x => x.Key, x => Enumerable.Range(0, 8)
+                .Select(i => x.Value[i] - payments.Where(p => p.PlayerId == x.Key).Sum(p => p.Cards[i])).ToArray());
             var changes = s.Players.Select(p => {
                 int[] after = host.GetHand(p.Id);
-                int lost = Enumerable.Range(0, 8).Sum(i => Math.Max(0, before[p.Id][i] - after[i]));
+                int lost = Enumerable.Range(0, 8).Sum(i => Math.Max(0, remainingBefore[p.Id][i] - after[i]));
                 int given = 0;
                 if (c.Kind == CommandKind.AcceptTrade && offer != null)
                 {
@@ -163,12 +195,22 @@ namespace Catan.Core.M5
                     lost = Math.Max(lost, given);
                 }
                 if (c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressWedding" && p.Id == c.PlayerId) given = lost;
-                return new B2HandChange { PlayerId = p.Id, BeforeCount = before[p.Id].Sum(), AfterCount = after.Sum(), LostCount = lost, GivenCount = given };
+                return new B2HandChange { PlayerId = p.Id, BeforeCount = remainingBefore[p.Id].Sum(), AfterCount = after.Sum(), LostCount = lost, GivenCount = given };
             }).ToArray();
             if (c.Kind == CommandKind.DiscardResources || c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressSabotage")
             {
-                var returned = Enumerable.Range(0, 8).Select(i => i < 5 ? (c.Resources ?? new ResourceBag())[(Resource)i] : (c.Commodities ?? new CommodityBag())[(Commodity)(i - 5)]).ToArray();
-                B2SkillEngine.HoldReturnedCards(host, returned);
+                var returned = B3(s) ? Enumerable.Range(0, 8).Select(i => Math.Max(0, before[c.PlayerId][i] - host.GetHand(c.PlayerId)[i])).ToArray() :
+                    Enumerable.Range(0, 8).Select(i => i < 5 ? (c.Resources ?? new ResourceBag())[(Resource)i] : (c.Commodities ?? new CommodityBag())[(Commodity)(i - 5)]).ToArray();
+                if (B3(s)) B2SkillEngine.HoldReturnedCards(host, c.PlayerId, c.Kind == CommandKind.DiscardResources ? "seven-discard" : "discard", c.Kind == CommandKind.DiscardResources ? "dice-" + s.ThreeKingdoms.Clock.TurnInstanceId : c.Id, returned);
+                else B2SkillEngine.HoldReturnedCards(host, returned);
+            }
+            if (B3(s))
+            {
+                if (IsB3BankPayment(c, pending) && !payments.Any(p => p.PlayerId == c.PlayerId))
+                {
+                    int[] returned = Enumerable.Range(0, 8).Select(i => Math.Max(0, before[c.PlayerId][i] - host.GetHand(c.PlayerId)[i])).ToArray();
+                    B2SkillEngine.HoldReturnedCards(host, c.PlayerId, "payment", c.Id, returned);
+                }
             }
             // 商港的资源给付与商品选择属于同一次交换；整笔完成后再判空手及交牌计数。
             if (c.Kind == CommandKind.CommercialHarborOffer && s.PendingDecision?.Kind == "ProgressHarbor")
@@ -184,10 +226,13 @@ namespace Catan.Core.M5
                 changes = changes.Where(change => !exchange.Any(x => x.PlayerId == change.PlayerId)).Concat(exchange).ToArray();
             }
             B2SkillEngine.OnCardsMoved(host, "native-" + c.Id, changes);
+            if (B3(s) && c.Kind == CommandKind.DiscardResources && s.Discards.Length == 0)
+                B2SkillEngine.CompleteSevenDiscard(host, "dice-" + s.ThreeKingdoms.Clock.TurnInstanceId);
             if (s.ThreeKingdoms.Clock.Phase == ThreeKingdomsPhase.Play && IsB2Construction(c, pending))
                 foreach (var entry in B2Buildings(s).Where(x => !buildings.ContainsKey(x.Key)))
                     B2SkillEngine.OnBuilt(host, "build-" + c.Id + "-" + entry.Key, entry.Value.Item1, entry.Value.Item2);
             if (c.Kind == CommandKind.PlayProgressCard) s.ThreeKingdomsProgressUse = new[] { "progress-" + c.Id, c.PlayerId, s.ThreeKingdoms.Generals.Single(g => g.Region == GeneralRegion.Active && g.OwnerPlayerId == c.PlayerId).TenureId };
+            s.ThreeKingdomsNativePayments = null;
         }
         private static bool IsB2Construction(Command c, PendingDecision pending) => c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.BuildCity || c.Kind == CommandKind.BuildWall || c.Kind == CommandKind.PlaceFreeRoad || c.Kind == CommandKind.BuildShip || c.Kind == CommandKind.PlaceFreeShip || c.Kind == CommandKind.PlayProgressCard && (c.ProgressCard == ProgressCardKind.Medicine || c.ProgressCard == ProgressCardKind.Engineering) || c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressRoads" && !c.Decline;
         private Dictionary<string, Tuple<string, string>> B2Buildings(GameState s)
@@ -226,6 +271,9 @@ namespace Catan.Core.M5
             var tk = ThreeKingdomsEngine.Project(state.ThreeKingdoms, view.PlayerId);
             view.ThreeKingdoms = tk;
             B2SkillEngine.Project(CardHost(state), tk, view.PlayerId);
+            if (B3(state) && state.ThreeKingdoms.Skills.PendingDecision == null) B3DiceEngine.Project(CardHost(state), tk, view.PlayerId);
+            // 换将会暂挂原技能帧；产品视图只开放最上层生命周期决策。
+            if (B3(state) && tk.PendingDecision != null) { tk.SkillDecision = null; tk.SkillActions = Array.Empty<B2SkillAction>(); }
             if (tk.SkillDecision == null && (state.PendingDecision != null || state.TradeOffer != null)) tk.SkillActions = Array.Empty<B2SkillAction>();
             if (state.Phase == GamePhase.Finished) { tk.CanRetire = false; tk.SkillActions = Array.Empty<B2SkillAction>(); tk.Clock.Phase = ThreeKingdomsPhase.Finished; return; }
             bool overlay = tk.PendingDecision != null || tk.SkillDecision != null || (state.PendingDecision == null && (tk.Clock.Phase == ThreeKingdomsPhase.Preparation || tk.Clock.Phase == ThreeKingdomsPhase.Judgment || tk.Clock.Phase == ThreeKingdomsPhase.Draw || tk.Clock.Phase == ThreeKingdomsPhase.End || tk.Clock.Phase == ThreeKingdomsPhase.RoundEnd));

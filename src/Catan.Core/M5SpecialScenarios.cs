@@ -144,7 +144,7 @@ private void AttackFortress(GameState s, PlayerState p)
                 f.Strength--;
                 if (f.Strength == 0) { s.Settlements = Append(s.Settlements, Placement(f.VertexId, p.Id)); if (s.Special.Fortresses.All(x => x.Strength == 0)) s.PirateTileId = null; }
             }
-            else
+            else if(!B3Immune(s,p.Id))
             {
                 var loss = ships.Reverse().Take(power == die ? 1 : 2).Select(x => x.LocationId).ToArray();
                 s.Ships = s.Ships.Where(x => !loss.Contains(x.LocationId)).ToArray(); p.ShipsRemaining += loss.Length;

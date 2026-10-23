@@ -87,7 +87,7 @@ public sealed partial class M6App
         PastoralMenuUI.Panel(ThreeKingdomsPanel);
         PastoralMenuUI.Label(new Rect(265,211,850,32),ownChoice?ThreeKingdomsDecisionCaption(pending):ownSkill?view.SkillDecision.Title:"武将与技能",25,null,true);
         if(PastoralMenuUI.Button(new Rect(1127,210,48,34),"收起"))threeKingdomsPanelOpen=false;
-        PastoralMenuUI.Label(new Rect(265,252,910,28),view.SkillsEnabled?"B2 · 11 张完整武将 · 仅本地 · 每轮末当前登场将寿命减 1":"旧 B1 存档 · 武将技能未启用 · 每轮末当前登场将寿命减 1",14,PastoralMenuUI.Muted);
+        PastoralMenuUI.Label(new Rect(265,252,910,28),view.SkillsEnabled?view.PackageLabel+" · 仅本地 · 每轮末寿命减 1":"旧 B1 存档 · 武将技能未启用 · 每轮末当前登场将寿命减 1",14,PastoralMenuUI.Muted);
         if(ownChoice)DrawGeneralChoices(view,pending);
         else
         {

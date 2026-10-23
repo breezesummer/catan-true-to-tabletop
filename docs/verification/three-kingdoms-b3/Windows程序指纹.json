@@ -1,0 +1,64 @@
+{
+  "构建工具": "Unity 6000.3.25f1",
+  "版本": "内测版2.0.1",
+  "程序集": [
+    {
+      "程序集": "Catan.Core",
+      "三处完全一致": true,
+      "文件": [
+        {
+          "文件": "src/Catan.Core/bin/Release/netstandard2.1/Catan.Core.dll",
+          "SHA256": "f49f051e2a0f61569e97a89c6ff6efa9a4de8e0814bdeaf28a24e537fbdc761c"
+        },
+        {
+          "文件": "Unity/Catan/Assets/Plugins/Catan.Core.dll",
+          "SHA256": "f49f051e2a0f61569e97a89c6ff6efa9a4de8e0814bdeaf28a24e537fbdc761c"
+        },
+        {
+          "文件": "game version/2.0/Catan2.0.1-Three-Kingdoms-B3/Builds/Windows/Catan2.0.1_Data/Managed/Catan.Core.dll",
+          "SHA256": "f49f051e2a0f61569e97a89c6ff6efa9a4de8e0814bdeaf28a24e537fbdc761c"
+        }
+      ]
+    },
+    {
+      "程序集": "Catan.AI",
+      "三处完全一致": true,
+      "文件": [
+        {
+          "文件": "src/Catan.AI/bin/Release/netstandard2.1/Catan.AI.dll",
+          "SHA256": "653c8ba343ec8466ffe5b27df2dc4bce457191e1e295fd45780c1636cb38b5b7"
+        },
+        {
+          "文件": "Unity/Catan/Assets/Plugins/Catan.AI.dll",
+          "SHA256": "653c8ba343ec8466ffe5b27df2dc4bce457191e1e295fd45780c1636cb38b5b7"
+        },
+        {
+          "文件": "game version/2.0/Catan2.0.1-Three-Kingdoms-B3/Builds/Windows/Catan2.0.1_Data/Managed/Catan.AI.dll",
+          "SHA256": "653c8ba343ec8466ffe5b27df2dc4bce457191e1e295fd45780c1636cb38b5b7"
+        }
+      ]
+    },
+    {
+      "程序集": "Catan.Network.Contracts",
+      "三处完全一致": true,
+      "文件": [
+        {
+          "文件": "src/Catan.Network.Contracts/bin/Release/netstandard2.1/Catan.Network.Contracts.dll",
+          "SHA256": "4176b093849f38572cdfe72b0e357c94c31497f788182883f0af0c39bf9fd02e"
+        },
+        {
+          "文件": "Unity/Catan/Assets/Plugins/Catan.Network.Contracts.dll",
+          "SHA256": "4176b093849f38572cdfe72b0e357c94c31497f788182883f0af0c39bf9fd02e"
+        },
+        {
+          "文件": "game version/2.0/Catan2.0.1-Three-Kingdoms-B3/Builds/Windows/Catan2.0.1_Data/Managed/Catan.Network.Contracts.dll",
+          "SHA256": "4176b093849f38572cdfe72b0e357c94c31497f788182883f0af0c39bf9fd02e"
+        }
+      ]
+    }
+  ],
+  "程序": {
+    "文件": "game version/2.0/Catan2.0.1-Three-Kingdoms-B3/Builds/Windows/Catan2.0.1.exe",
+    "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+  }
+}

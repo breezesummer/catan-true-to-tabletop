@@ -15,6 +15,8 @@ namespace Catan.Core.M5
             copy.ThreeKingdomsDeferredCommand=ThreeKingdomsDeferredCommand==null?null:Json.Copy(ThreeKingdomsDeferredCommand);
             copy.ThreeKingdomsDiceRecipients=ThreeKingdomsDiceRecipients?.ToArray();
             copy.ThreeKingdomsProgressUse=ThreeKingdomsProgressUse?.ToArray();
+            copy.ThreeKingdomsNativePayments=ThreeKingdomsNativePayments?.Select(p=>p.Copy()).ToArray();
+            copy.ThreeKingdomsSpecialContinuation=ThreeKingdomsSpecialContinuation?.Copy();
             copy.ThreeKingdomsExchange=ThreeKingdomsExchange?.Select(x=>new ThreeKingdoms.B2HandChange {PlayerId=x.PlayerId,BeforeCount=x.BeforeCount,AfterCount=x.AfterCount,LostCount=x.LostCount,GivenCount=x.GivenCount}).ToArray();
             copy.Random=new RandomState {AlgorithmId=Random.AlgorithmId,State=Random.State,Draws=Random.Draws};
             copy.Players=Players.Select(p=>p.CopyForTransaction()).ToArray();

@@ -29,6 +29,9 @@ namespace Catan.AI
                 }
                 switch (c.Option)
                 {
+                    // 尚未建立地块收益评估时保留真实牌和限定次数；允许人工完整操作。
+                    case "modify": return -200;
+                    case "fixed": return -200;
                     case "skip": return -100;
                     case "done": return -10;
                     case "pass": return 0;

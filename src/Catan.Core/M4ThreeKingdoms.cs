@@ -27,12 +27,13 @@ namespace Catan.Core.M4
         public const string ThreeKingdomsRulesVersion = "catan-cities-knights-three-kingdoms-b1-v1";
 
         public const string ThreeKingdomsB2RulesVersion = "catan-cities-knights-three-kingdoms-b2-v1";
+        public const string ThreeKingdomsB3RulesVersion = "catan-cities-knights-three-kingdoms-b3-v1";
 
-        private void InitializeThreeKingdoms(GameState s, bool skillsEnabled)
+        private void InitializeThreeKingdoms(GameState s, bool skillsEnabled, string packageVersion = null)
         {
-            s.RulesVersion = skillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
+            s.RulesVersion = skillsEnabled ? (packageVersion == GeneralCatalog.B2PackageVersion ? ThreeKingdomsB2RulesVersion : ThreeKingdomsB3RulesVersion) : ThreeKingdomsRulesVersion;
             var seats = Enumerable.Range(0, s.Players.Length).Select(i => s.Players[(s.StartingPlayerIndex + i) % s.Players.Length].Id).ToArray();
-            s.ThreeKingdoms = ThreeKingdomsEngine.Create(seats, s.InitialSeed, maximum => Draw(s.Random, maximum), skillsEnabled);
+            s.ThreeKingdoms = ThreeKingdomsEngine.Create(seats, s.InitialSeed, maximum => Draw(s.Random, maximum), skillsEnabled, packageVersion);
         }
 
         // 原规则待决保持原位：换将子树不会覆盖费用、弃牌义务、交易或剧本恢复位置。
@@ -155,8 +156,9 @@ namespace Catan.Core.M4
 
         private void ValidateThreeKingdoms(GameState s)
         {
+            if (s.ThreeKingdomsNativePayments != null) throw new InvalidDataException("原生支付快照未在命令结尾清理。");
             if (s.ThreeKingdoms == null) return;
-            var issues = ThreeKingdomsEngine.Validate(s.ThreeKingdoms);
+            var issues = ThreeKingdomsEngine.Validate(s.ThreeKingdoms).Concat(B3DiceEngine.Validate(s.ThreeKingdoms)).ToArray();
             if(B2(s)) issues = issues.Concat(B2SkillEngine.Validate(CardHost(s))).ToArray();
             if (issues.Length > 0) throw new InvalidDataException(string.Join("；", issues));
             var exchange = s.ThreeKingdomsExchange;

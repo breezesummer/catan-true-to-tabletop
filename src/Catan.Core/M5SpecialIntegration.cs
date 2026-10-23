@@ -35,11 +35,20 @@ namespace Catan.Core.M5
             var before=s.Roads.Select(r=>r.LocationId).Concat(s.Ships.Select(r=>r.LocationId)).ToArray();
             ApplyCore(s,c);
             if(s.Special==null||s.Phase==GamePhase.Finished)return;
-            if(seafaring.Id=="pirate-islands"&&s.Phase==GamePhase.RobberMove){s.PendingDecision.Kind="Steal";s.PendingDecision.Token="any";s.PendingDecision.EligibleVictimIds=s.Players.Where(p=>p.Id!=s.ActivePlayerId).Select(p=>p.Id).ToArray();s.Phase=GamePhase.RobberSteal;}
-            int queued=s.DecisionQueue.Length;
-            foreach(var edge in s.Roads.Select(r=>r.LocationId).Concat(s.Ships.Select(r=>r.LocationId)).Except(before).ToArray()) {
-                Discover(s,c.PlayerId,edge);
-                if(s.Ships.Any(r=>r.PlayerId==c.PlayerId&&r.LocationId==edge))CollectSpecialGifts(s,c.PlayerId,edge);
+            var added=s.Roads.Select(r=>r.LocationId).Concat(s.Ships.Select(r=>r.LocationId)).Except(before).ToArray();
+            if(B3(s)&&B2Busy(s)&&added.Length>0) {
+                // 建造已经提交；成本反应先完成，探索／部落奖励的原步骤随后恢复，不能重跑建造。
+                s.ThreeKingdomsSpecialContinuation=new ThreeKingdoms.B3SpecialContinuation {PlayerId=c.PlayerId,NewEdgeIds=added};
+                return;
+            }
+            CompleteSpecialChanges(s,c.PlayerId,added);
+        }
+        private void CompleteSpecialChanges(GameState s,string playerId,string[] addedEdges)
+        {
+            NormalizeSpecialSeven(s);
+            foreach(var edge in addedEdges) {
+                Discover(s,playerId,edge);
+                if(s.Ships.Any(r=>r.PlayerId==playerId&&r.LocationId==edge))CollectSpecialGifts(s,playerId,edge);
             }
             ConnectVillages(s);
             if(s.DecisionQueue.Length>0&&s.Phase!=GamePhase.PendingChoice&&s.PendingDecision!=null){s.Special.ResumeDecision=s.PendingDecision;s.Special.ResumePhase=s.Phase;s.PendingDecision=null;}
@@ -47,6 +56,15 @@ namespace Catan.Core.M5
             if((s.Phase==GamePhase.Action||s.Phase==GamePhase.ProductionAwaitRoll)&&LegalPortEdges(s,s.ActivePlayerId).Length>0) {
                 s.Special.PortReturnDecision=s.PendingDecision;
                 s.PendingDecision=new PendingDecision {Kind="Port",PlayerId=s.ActivePlayerId,ReturnPhase=s.Phase};s.Phase=GamePhase.PortPlacement;
+            }
+        }
+        private void NormalizeSpecialSeven(GameState s)
+        {
+            // 海盗群岛的七点直接选择任意其他玩家；候选骰局提交也必须通过此入口。
+            if(s.Special!=null&&seafaring.Id=="pirate-islands"&&s.Phase==GamePhase.RobberMove) {
+                s.PendingDecision.Kind="Steal";s.PendingDecision.Token="any";
+                s.PendingDecision.EligibleVictimIds=s.Players.Where(p=>p.Id!=s.ActivePlayerId).Select(p=>p.Id).ToArray();
+                s.Phase=GamePhase.RobberSteal;
             }
         }
         private void AddGold(GameState s,string player,int amount)
@@ -83,7 +101,7 @@ namespace Catan.Core.M5
                     s.Special.HeldPorts=s.Special.HeldPorts.Where(h=>h!=held).ToArray();s.Phase=s.PendingDecision.ReturnPhase;s.PendingDecision=s.Special.PortReturnDecision;s.Special.PortReturnDecision=null;return true;
                 case CommandKind.StealCloth:
                     Require(s.Phase==GamePhase.RobberSteal&&s.PendingDecision.Token=="pirate"&&seafaring.Id=="cloth-for-catan"&&s.PendingDecision.EligibleVictimIds.Contains(c.OtherPlayerId),"InvalidVictim","请选择海盗旁有布匹的船主。");
-                    var victim=s.Players.Single(x=>x.Id==c.OtherPlayerId);Require(victim.Cloth>0,"NoCloth","对方没有布匹。");victim.Cloth--;p.Cloth++;FinishDecision(s);return true;
+                    var victim=s.Players.Single(x=>x.Id==c.OtherPlayerId);Require(victim.Cloth>0,"NoCloth","对方没有布匹。");if(!B3Immune(s,victim.Id)){victim.Cloth--;p.Cloth++;}FinishDecision(s);return true;
                 case CommandKind.ClaimWonder:
                     ActionPhase(s);var wonder=seafaring.Wonders.FirstOrDefault(w=>w.Id==c.TargetId);
                     Require(wonder!=null&&p.WonderId==null&&!s.Players.Any(x=>x.WonderId==c.TargetId),"UnavailableWonder","奇观已被认领或不可用。");
@@ -132,12 +150,18 @@ namespace Catan.Core.M5
                 s.PirateTileId=seafaring.PiratePath[(Array.IndexOf(seafaring.PiratePath,s.PirateTileId)+power)%seafaring.PiratePath.Length];
                 var tile=s.Tiles.Single(t=>t.Id==s.PirateTileId);
                 foreach(var p in TurnOrder(s).Where(p=>Buildings(s).Any(b=>b.PlayerId==p.Id&&tile.Vertices.Contains(b.LocationId)))) {
+                    var beforePirateLoss=B3(s)?CardHost(s).GetHand(p.Id):null;
                     int fleet=s.Ships.Count(x=>x.PlayerId==p.Id&&x.IsWarship);
                     if(fleet>power)AddGold(s,p.Id,1);
-                    else if(fleet<power&&!B2Protected(s,p.Id))for(int i=0;i<1+s.Cities.Count(c=>c.PlayerId==p.Id)&&HandCount(p)>0;i++) {
+                    else if(fleet<power&&!B2Protected(s,p.Id)&&!B3Immune(s,p.Id))for(int i=0;i<1+s.Cities.Count(c=>c.PlayerId==p.Id)&&HandCount(p)>0;i++) {
                         int index=Draw(s.Random,HandCount(p));bool removed=false;
                         foreach(var r in Resources){if(index<p.Resources[r]){Transfer(p.Resources,s.Bank,r,1);removed=true;break;}index-=p.Resources[r];}
                         if(!removed)foreach(var r in Commodities){if(index<p.Commodities[r]){Transfer(p.Commodities,s.CommodityBank,r,1);break;}index-=p.Commodities[r];}
+                    }
+                    if(beforePirateLoss!=null) {
+                        var afterPirateLoss=CardHost(s).GetHand(p.Id);
+                        var returned=Enumerable.Range(0,8).Select(i=>Math.Max(0,beforePirateLoss[i]-afterPirateLoss[i])).ToArray();
+                        Catan.Core.ThreeKingdoms.B2SkillEngine.HoldReturnedCards(CardHost(s),p.Id,"discard","dice-"+s.ThreeKingdoms.Clock.TurnInstanceId+"-pirate",returned);
                     }
                 }
             }

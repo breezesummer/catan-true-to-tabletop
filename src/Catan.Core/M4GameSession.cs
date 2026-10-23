@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Catan.Core.ThreeKingdoms;
 
 namespace Catan.Core.M4
 {
@@ -27,7 +28,7 @@ namespace Catan.Core.M4
         private static readonly Resource[] Resources = (Resource[])Enum.GetValues(typeof(Resource));
         private CitiesKnightsGameSession(Scenario scenario, Port[] ports, GameState state) { this.scenario = scenario; this.ports = ports; this.state = state; }
 
-        public static CitiesKnightsGameSession Create(string topologyScenarioJson, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null, bool threeKingdoms = false, bool threeKingdomsSkills = true)
+        public static CitiesKnightsGameSession Create(string topologyScenarioJson, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null, bool threeKingdoms = false, bool threeKingdomsSkills = true, string threeKingdomsPackageVersion = null)
         {
             if (playerCount != 3 && playerCount != 4) throw new ArgumentOutOfRangeException(nameof(playerCount), "基础版支持 3 或 4 人。");
             // Reuse the registered immutable topology, not the M1 controlled random sequence or rules.
@@ -56,7 +57,7 @@ namespace Catan.Core.M4
             };
             var session = new CitiesKnightsGameSession(scenario, ports, state);
             session.InitializeProgress(state);
-            if (threeKingdoms) session.InitializeThreeKingdoms(state, threeKingdomsSkills);
+            if (threeKingdoms) session.InitializeThreeKingdoms(state, threeKingdomsSkills, threeKingdomsPackageVersion);
             session.AssertInvariants(state);
             return session;
         }
@@ -78,17 +79,17 @@ namespace Catan.Core.M4
                 RecalculateAwards(next);
                 CheckVictory(next);
                 if (next.Phase == GamePhase.Finished && next.ThreeKingdoms != null) Catan.Core.ThreeKingdoms.ThreeKingdomsEngine.Finish(next.ThreeKingdoms);
-                var ev = new GameEvent { Sequence = ++next.EventSequence, CommandId = command.Id, Kind = command.Kind.ToString(), PlayerId = command.PlayerId,
+                var ev = new GameEvent { Sequence = ++next.EventSequence, CommandId = command.Id, Kind = B3HistoryKind(state, next, command), PlayerId = IsB3DiceCommit(state, next) ? next.ThreeKingdoms.Clock.ActivePlayerId : command.PlayerId,
                     TargetId = PublicTarget(command), OtherPlayerId = command.Kind == CommandKind.ProposeTrade || command.Kind == CommandKind.StealResource ? command.OtherPlayerId : null, Message = PublicMessage(command) };
-                if (command.Kind == CommandKind.RollDice) { ev.Dice1 = next.LastDice1; ev.Dice2 = next.LastDice2; ev.Message = command.PlayerId + " 掷出 " + ev.Dice1 + "+" + ev.Dice2 + "。"; }
+                if (ev.Kind == "RollDice") { ev.Dice1 = next.LastDice1; ev.Dice2 = next.LastDice2; ev.Message = ev.PlayerId + " 掷出 " + ev.Dice1 + "+" + ev.Dice2 + "。"; }
                 var receipt = new[] { ev };
                 next.Events = Append(next.Events, ev);
                 next.ProcessedCommands = Append(next.ProcessedCommands, new ProcessedCommand { CommandId = command.Id, Fingerprint = fingerprint, Command = command, Events = receipt, InteractionRevision = !legacyInteractionReplay && (command.Kind == CommandKind.ProposeTrade || command.Kind == CommandKind.DiscardProgressCard) ? 1 : 0 });
                 AssertInvariants(next);
                 history.RecordAction(GameHistoryCapture.From(state), GameHistoryCapture.From(next), new HistoryAction
                 {
-                    PlayerId = command.PlayerId, OtherPlayerId = string.IsNullOrEmpty(command.OtherPlayerId) ? null : command.OtherPlayerId,
-                    Kind = command.Kind.ToString(), PublicTarget = PublicTarget(command), PendingKind = state.PendingDecision?.Kind, PublicGeneralChanges = PublicGeneralChanges(state, next),
+                    PlayerId = ev.PlayerId, OtherPlayerId = string.IsNullOrEmpty(command.OtherPlayerId) ? null : command.OtherPlayerId,
+                    Kind = ev.Kind, PublicTarget = PublicTarget(command), PendingKind = state.PendingDecision?.Kind, PublicGeneralChanges = PublicGeneralChanges(state, next),
                     Card = command.Kind == CommandKind.PlayProgressCard ? command.ProgressCard.ToString() : null
                 });
                 state = next;
@@ -167,7 +168,15 @@ namespace Catan.Core.M4
                 return view;
             }
         }
-        private bool IsLegal(Command c) { if (state.ThreeKingdoms != null && c.Kind < CommandKind.ChooseGenerals && !ThreeKingdomsAllowsBaseCommand(state)) return false; StampThreeKingdomsWindow(c); try { Apply(state.CopyForTransaction(), c); return true; } catch (RuleException) { return false; } }
+        private bool IsLegal(Command c)
+        {
+            if (state.ThreeKingdoms != null && c.Kind < CommandKind.ChooseGenerals && !ThreeKingdomsAllowsBaseCommand(state)) return false;
+            StampThreeKingdomsWindow(c);
+            // 合法动作枚举尚无命令 ID；费用批次仍须有来源，临时身份仅存在于隔离探针。
+            var probe = c;
+            if (B3(state) && string.IsNullOrEmpty(c.Id)) { probe = Json.Copy(c); probe.Id = "tk-legality-preview-" + state.EventSequence; }
+            try { Apply(state.CopyForTransaction(), probe); return true; } catch (RuleException) { return false; }
+        }
         public string Save() { lock (gate) return Json.Write(state); }
         public GameState GetAuthoritativeStateForTesting() { lock (gate) return Json.Copy(state); }
         public void AssertInvariants() { lock (gate) AssertInvariants(state); }
@@ -178,9 +187,11 @@ namespace Catan.Core.M4
             catch (Exception ex) when (ex is System.Runtime.Serialization.SerializationException || ex is ArgumentException || ex is System.Xml.XmlException) { throw new InvalidDataException("Invalid save JSON.", ex); }
             if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != ThreeKingdomsVersionFor(saved.ThreeKingdoms) || saved.ScenarioVersion != ScenarioVersion || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
                 throw new InvalidDataException("Unsupported or malformed save.");
+            if (saved.ThreeKingdoms != null && !Catan.Core.ThreeKingdoms.ThreeKingdomsEngine.HasSupportedPackage(saved.ThreeKingdoms))
+                throw new InvalidDataException("三国规则版本或武将包不兼容。");
             saved.TargetVictoryPoints = saved.TargetVictoryPoints ?? 13;
             if (!VictoryPointSettings.IsValid(saved.TargetVictoryPoints)) throw new InvalidDataException("存档中的胜利分数无效。");
-            var session = Create(topologyScenarioJson, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints, saved.ThreeKingdoms != null, saved.ThreeKingdoms?.SkillsEnabled == true);
+            var session = Create(topologyScenarioJson, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints, saved.ThreeKingdoms != null, saved.ThreeKingdoms?.SkillsEnabled == true, saved.ThreeKingdoms?.PackageVersion);
             foreach (var record in saved.ProcessedCommands)
             {
                 if (record == null || record.Command == null) throw new InvalidDataException("Malformed command history.");
@@ -579,7 +590,16 @@ namespace Catan.Core.M4
         private static bool Covers(ResourceBag source, ResourceBag amount) { return Resources.All(r => source[r] >= amount[r]); }
         private static void Transfer(ResourceBag from, ResourceBag to, Resource resource, int count) { Require(count >= 0 && from[resource] >= count, "InsufficientResources", "资源不足。"); from[resource] -= count; to[resource] += count; }
         private static void TransferBag(ResourceBag from, ResourceBag to, ResourceBag amount) { foreach (var r in Resources) Transfer(from, to, r, amount[r]); }
-        private static void Pay(GameState s, PlayerState p, ResourceBag cost) { Require(Covers(p.Resources, cost), "InsufficientResources", "建造所需资源不足。"); TransferBag(p.Resources, s.Bank, cost); }
+        private void Pay(GameState s, PlayerState p, ResourceBag cost)
+        {
+            int before = p.Resources.Total + p.Commodities.Total;
+            Require(Covers(p.Resources, cost), "InsufficientResources", "建造所需资源不足。"); TransferBag(p.Resources, s.Bank, cost);
+            if (B3(s) && cost.Total > 0)
+            {
+                // 实体费用先离开可抽供应；同次行动后续奖励不能拿回已进入截获区的牌。
+                RecordB3NativePayment(s, p, cost, before);
+            }
+        }
         private static string ResourceName(Resource resource) { return resource.ToString().ToLowerInvariant(); }
         private static Resource ParseResource(string resource) { return (Resource)Enum.Parse(typeof(Resource), resource, true); }
     }

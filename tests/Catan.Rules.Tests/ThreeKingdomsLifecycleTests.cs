@@ -172,14 +172,14 @@ public sealed class ThreeKingdomsLifecycleTests
     }
 
     [Fact]
-    public void CatalogPreservesAll54DefinitionsAnd97SkillsWithOnlyElevenCompleteB2GeneralsEnabled()
+    public void CatalogPreservesAll54DefinitionsAnd97SkillsWithSixteenCompleteB3GeneralsEnabled()
     {
         Assert.Equal(54, GeneralCatalog.Definitions.Length);
         Assert.Equal(97, GeneralCatalog.Definitions.Sum(g => g.Skills.Length));
         Assert.Equal(Enumerable.Range(1, 54).Select(i => "tk-g" + i.ToString("D2")), GeneralCatalog.Definitions.Select(g => g.Id));
-        string[] enabled = { "tk-g01", "tk-g06", "tk-g09", "tk-g12", "tk-g15", "tk-g22", "tk-g23", "tk-g28", "tk-g33", "tk-g37", "tk-g43" };
+        string[] enabled = { "tk-g01", "tk-g06", "tk-g09", "tk-g12", "tk-g13", "tk-g15", "tk-g19", "tk-g21", "tk-g22", "tk-g23", "tk-g28", "tk-g29", "tk-g30", "tk-g33", "tk-g37", "tk-g43" };
         Assert.Equal(enabled, GeneralCatalog.EnabledDefinitions.Select(g => g.Id));
-        Assert.Equal(15, GeneralCatalog.EnabledDefinitions.Sum(g => g.Skills.Length));
+        Assert.Equal(25, GeneralCatalog.EnabledDefinitions.Sum(g => g.Skills.Length));
         Assert.All(GeneralCatalog.Definitions, g => { Assert.Equal(enabled.Contains(g.Id), g.SkillsEnabled); Assert.NotEmpty(g.SourceHash); Assert.All(g.Skills, s => Assert.Equal(g.SkillsEnabled, s.Enabled)); });
         Assert.NotEqual(GeneralCatalog.Get("tk-g08").Id, GeneralCatalog.Get("tk-g17").Id);
         Assert.Contains("骨架", GeneralCatalog.PackageLabel);

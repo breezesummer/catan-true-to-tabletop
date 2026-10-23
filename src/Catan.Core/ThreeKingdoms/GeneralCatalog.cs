@@ -26,7 +26,7 @@ namespace Catan.Core.ThreeKingdoms
         internal GeneralDefinition(string id,string name,string title,string faction,string text,string hash,SkillDefinition[] values)
         { Id=id; Name=name; Title=title; Faction=faction; OriginalText=text; SourceHash=hash; skills=values; }
     }
-    // 来源：B0 原始资料指纹与百科原文；保留 B1 骨架身份，B2 另以完整启用名单和独立哈希管理。
+    // 来源：B0 原始资料指纹与百科原文；保留 B1/B2 身份，B3 以完整启用名单和独立哈希管理。
     public static class GeneralCatalog
     {
         public const string RulesVersion = "three-kingdoms-b1-v1";
@@ -35,8 +35,13 @@ namespace Catan.Core.ThreeKingdoms
         public const string B2RulesVersion = "three-kingdoms-b2-v1";
         public const string B2PackageVersion = "three-kingdoms-card-flow-11-v1";
         public const string B2PackageLabel = "三国争霸 B2（11将完整技能包）";
+        public const string B3RulesVersion = "three-kingdoms-b3-v1";
+        public const string B3PackageVersion = "three-kingdoms-dice-time-16-v1";
+        public const string B3PackageLabel = "三国争霸 B3（16将完整技能包）";
         private static readonly string[] enabledIds = { "tk-g01", "tk-g06", "tk-g09", "tk-g12", "tk-g15", "tk-g22", "tk-g23", "tk-g28", "tk-g33", "tk-g37", "tk-g43" };
-        public static bool IsEnabled(string id) => enabledIds.Contains(id);
+        private static readonly string[] b3Ids = { "tk-g13", "tk-g19", "tk-g21", "tk-g29", "tk-g30" };
+        public static bool IsEnabled(string id) => enabledIds.Contains(id) || b3Ids.Contains(id);
+        public static bool IsB2Enabled(string id) => enabledIds.Contains(id);
         private static readonly GeneralDefinition[] items = new[]
         {
             new GeneralDefinition("tk-g01","张辽","登锋陷阵","魏","### 01．张辽｜登锋陷阵（魏）\n\n**突袭**\n\n任意回合的摸牌阶段开始时，你可以少摸x张牌并获得x名玩家各一张手牌。（x不能大于本回合的摸牌数）","b0e7234fbc3b98c04073176b973d837d5230c84996898d1e9461ff93f99a7971",new[] { new SkillDefinition("tk-g01-s1","突袭","任意回合的摸牌阶段开始时，你可以少摸x张牌并获得x名玩家各一张手牌。（x不能大于本回合的摸牌数）") }),
@@ -96,7 +101,9 @@ namespace Catan.Core.ThreeKingdoms
         };
         public static GeneralDefinition[] Definitions => (GeneralDefinition[])items.Clone();
         public static GeneralDefinition[] EnabledDefinitions => items.Where(g => IsEnabled(g.Id)).ToArray();
-        public static string B2ContentHash { get; } = Json.Hash(B2RulesVersion + "\n" + B2PackageVersion + "\n" + string.Join("\n", items.Where(g => IsEnabled(g.Id)).Select(x => x.Id + ":" + x.SourceHash + ":skills-enabled-b2-v1")));
+        public static GeneralDefinition[] B2Definitions => items.Where(g => IsB2Enabled(g.Id)).ToArray();
+        public static string B2ContentHash { get; } = Json.Hash(B2RulesVersion + "\n" + B2PackageVersion + "\n" + string.Join("\n", items.Where(g => IsB2Enabled(g.Id)).Select(x => x.Id + ":" + x.SourceHash + ":skills-enabled-b2-v1")));
+        public static string B3ContentHash { get; } = Json.Hash(B3RulesVersion + "\n" + B3PackageVersion + "\n" + string.Join("\n", items.Where(g => IsEnabled(g.Id)).Select(x => x.Id + ":" + x.SourceHash + ":skills-enabled-b3-v1")));
         public static string ContentHash { get; } = Json.Hash(RulesVersion + "\n" + PackageVersion + "\n" + string.Join("\n", items.Select(x => x.Id + ":" + x.SourceHash + ":skills-disabled")));
         public static GeneralDefinition Get(string id) => items.FirstOrDefault(x => x.Id == id);
     }

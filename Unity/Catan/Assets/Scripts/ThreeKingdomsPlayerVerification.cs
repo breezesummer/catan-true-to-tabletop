@@ -12,7 +12,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
 {
     [Serializable] sealed class Result
     {
-        public string status,unity,note;
+        public string status,unity,note,packageVersion;
         public int configurations,saveRoundtrips,retirements,restarts,images,guiImagesWithChanges,skillChoices;
         public bool graphics,fullUiPixelsVerified;
     }
@@ -64,6 +64,8 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             app.StartGame(mode,"heading-for-new-shores",players,"P1",true,threeKingdoms:true);
             yield return null;yield return null;
             Require(app.Ready&&app.ThreeKingdoms&&app.Paused&&View!=null,"三国开关没有进入本地权威局面。");
+            Require(View.SkillsEnabled&&View.PackageVersion==GeneralCatalog.B3PackageVersion&&GeneralCatalog.EnabledDefinitions.Length==16,"新局没有使用完整 B3 十六将包。");
+            result.packageVersion=View.PackageVersion;
             int budget=0;
             while(View.PendingDecision?.PlayerId!=app.HumanSeat)
             {Require(++budget<20,"开局轮到人类前未完成自动选将。");Advance();yield return null;}
@@ -89,6 +91,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             stage=prefix+" 准备阶段";
             string stageBefore=SaveAndRestore(prefix+"-阶段");yield return null;yield return null;AssertRestored(stageBefore);
             Require(View.Players.All(p=>p.ActiveGeneralId!=null&&p.RemainingLife==3)&&View.Players.All(p=>p.HiddenCount==1),"首轮公开武将与暗置数量不正确。");
+            Require(View.PoolCount==16-players*2,"正常选将没有保留 B3 十六将实体总数。");
             app.VerificationOpenThreeKingdomsPanel();yield return null;
             if(result.graphics){BeginCapture(prefix+"-public-life.png");for(int frame=0;target!=null&&frame<12;frame++)yield return null;EndCapture();}
             for(int repeat=0;repeat<2;repeat++)

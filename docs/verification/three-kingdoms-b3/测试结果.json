@@ -1,0 +1,186 @@
+{
+  "完成日期": "2026-10-23",
+  "时区": "Asia/Shanghai",
+  "游戏版本": "内测版2.0.1",
+  "状态": "B3工程退出条件通过；本地开发包，未正式发布",
+  "正常包": {
+    "武将数": 16,
+    "技能数": 25,
+    "新增武将": [
+      "司马懿",
+      "诸葛亮",
+      "张昭张弘",
+      "曹丕",
+      "曹植"
+    ],
+    "隔离将数": 38,
+    "武将规则版本": "three-kingdoms-b3-v1",
+    "包版本": "three-kingdoms-dice-time-16-v1",
+    "包内容SHA256": "dca67aa2f5670fc938c9fe2d43a5e89f37dea989c855a7db4f40b6c740d49f8a"
+  },
+  "三国统一检查": {
+    "去重总数": 366,
+    "通过": 366,
+    "B3去重数": 155,
+    "B1与B2回归数": 211,
+    "B3分类": [
+      {
+        "测试类": "ThreeKingdomsB3DiceIntegrationTests",
+        "总数": 18,
+        "通过": 18
+      },
+      {
+        "测试类": "ThreeKingdomsB3DiceTests",
+        "总数": 34,
+        "通过": 34
+      },
+      {
+        "测试类": "ThreeKingdomsB3ImmunityTests",
+        "总数": 26,
+        "通过": 26
+      },
+      {
+        "测试类": "ThreeKingdomsB3ReviewTests",
+        "总数": 16,
+        "通过": 16
+      },
+      {
+        "测试类": "ThreeKingdomsB3SessionTests",
+        "总数": 26,
+        "通过": 26
+      },
+      {
+        "测试类": "ThreeKingdomsB3TimeIntegrationTests",
+        "总数": 9,
+        "通过": 9
+      },
+      {
+        "测试类": "ThreeKingdomsB3TimeTests",
+        "总数": 26,
+        "通过": 26
+      }
+    ],
+    "证据": [
+      {
+        "文件": ".local/verification/three-kingdoms-b3/three-kingdoms-final.trx",
+        "SHA256": "a266943306ab7b3df9aad3936cf760dd6ebbf0e2b72656e3786f60638cd6302f",
+        "总数": 360,
+        "通过": 360,
+        "失败": 0,
+        "开始": "2026-10-23T12:59:52.2486955+08:00",
+        "结束": "2026-10-23T13:02:39.0814395+08:00"
+      },
+      {
+        "文件": ".local/verification/three-kingdoms-b3/b3-full-games-final.trx",
+        "SHA256": "030c2393b2f9afcb973bd6bcbb0ef929a5c5e999af449a991262adb929227936",
+        "总数": 4,
+        "通过": 4,
+        "失败": 0,
+        "开始": "2026-10-23T12:58:54.8041342+08:00",
+        "结束": "2026-10-23T13:01:23.3769290+08:00"
+      },
+      {
+        "文件": ".local/verification/three-kingdoms-b3/b3-replacement-final.trx",
+        "SHA256": "821819f5dcb969146941b4ea2f43e910350946d12fd81baef607ee00caf98f69",
+        "总数": 74,
+        "通过": 74,
+        "失败": 0,
+        "开始": "2026-10-23T13:06:50.1059079+08:00",
+        "结束": "2026-10-23T13:06:57.5717327+08:00"
+      }
+    ]
+  },
+  "完整B3对局": {
+    "局数": 4,
+    "种子": 97,
+    "合法命令总数": 3144,
+    "结果": [
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB3SessionTests.ProductAiCompletesNormalB3GameAndReplaysEveryDistinctSkillDecision(rules: \"cities\", seats: 3)",
+        "结果": "Passed",
+        "耗时": "00:00:32.9996794",
+        "实际输出": "B3 cities/3 人：正常胜利，694 命令，16 轮；11 将实际登场；技能待决恢复 技能:发动据守/optional，技能:发动连破/optional，技能:发动镇骨/optional，技能:奋音：选牌/card，技能:鬼才/dice-modify，技能:集智：选牌/card，技能:据守：选牌/card，技能:连破：选牌/card，技能:涉猎：摸牌替代/harvest，技能:涉猎：选择不同资源/shelie，技能:突袭：摸牌替代/harvest，技能:镇骨：选择目标/target，技能:直谏/dice-fixed"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB3SessionTests.ProductAiCompletesNormalB3GameAndReplaysEveryDistinctSkillDecision(rules: \"cities\", seats: 4)",
+        "结果": "Passed",
+        "耗时": "00:00:34.0826053",
+        "实际输出": "B3 cities/4 人：正常胜利，779 命令，16 轮；13 将实际登场；技能待决恢复 技能:发动据守/optional，技能:发动连破/optional，技能:发动镇骨/optional，技能:观星/dice-observe，技能:观星/dice-select，技能:鬼才/dice-modify，技能:据守：选牌/card，技能:连破：选牌/card，技能:落英：收取木头/luoying，技能:涉猎：摸牌替代/harvest，技能:涉猎：选择不同资源/shelie，技能:颂威：选牌/card，技能:突袭：摸牌替代/harvest，技能:镇骨：选择目标/target，技能:直谏/dice-fixed"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB3SessionTests.ProductAiCompletesNormalB3GameAndReplaysEveryDistinctSkillDecision(rules: \"combined\", seats: 3)",
+        "结果": "Passed",
+        "耗时": "00:01:00.4102111",
+        "实际输出": "B3 combined/3 人：正常胜利，1083 命令，26 轮；13 将实际登场；技能待决恢复 技能:发动据守/optional，技能:发动连破/optional，技能:发动镇骨/optional，技能:观星/dice-observe，技能:观星/dice-select，技能:鬼才/dice-modify，技能:金矿：选择资源/gold，技能:据守：选牌/card，技能:连破：选牌/card，技能:连营：选牌/card，技能:落英：收取木头/luoying，技能:摸牌：选牌/card，技能:涉猎：摸牌替代/harvest，技能:涉猎：选择不同资源/shelie，技能:颂威：选牌/card，技能:突袭：摸牌替代/harvest，技能:镇骨：选择目标/target，技能:直谏/dice-fixed"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB3SessionTests.ProductAiCompletesNormalB3GameAndReplaysEveryDistinctSkillDecision(rules: \"combined\", seats: 4)",
+        "结果": "Passed",
+        "耗时": "00:00:19.1358837",
+        "实际输出": "B3 combined/4 人：正常胜利，588 命令，10 轮；11 将实际登场；技能待决恢复 技能:发动据守/optional，技能:发动连破/optional，技能:发动镇骨/optional，技能:观星/dice-observe，技能:观星/dice-select，技能:鬼才/dice-modify，技能:据守：选牌/card，技能:连破：选牌/card，技能:连营：选牌/card，技能:落英：收取木头/luoying，技能:涉猎：摸牌替代/harvest，技能:涉猎：选择不同资源/shelie，技能:突袭：摸牌替代/harvest，技能:镇骨：选择目标/target"
+      }
+    ]
+  },
+  "旧模式快速回归": {
+    "证据": {
+      "文件": ".local/verification/three-kingdoms-b3/original-modes-fast.trx",
+      "SHA256": "7cab9d3ab134edf2c138e4a2743703e5032ae78fbd6150ea57101b938d5b1170",
+      "总数": 1171,
+      "通过": 1149,
+      "失败": 22,
+      "开始": "2026-10-23T12:48:05.7221851+08:00",
+      "结束": "2026-10-23T12:48:48.0752217+08:00"
+    },
+    "与B2既有失败逐项相同": true,
+    "既有失败精确名单": [
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"锻铁匠\", track: 2)",
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"商业港口\", track: 0)",
+      "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.FreeEngineeringWallIsConstructedAndCardUsesRequestedVerb",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Constitution, name: \"宪法\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Printing, name: \"印刷术\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.ResourceMonopolyUsesHarvestForEachAffectedPlayer",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.SabotageDiscardIsOneColoredCountSentenceForEveryViewer",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: False)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: True)",
+      "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"ProgressTreasonRemove\", action: \"叛变\", piece: \"己方骑士\")",
+      "Catan.Rules.Tests.TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat",
+      "Catan.Rules.Tests.TabletopSpecialCollectionTests.DefenderProgressRewardFliesFromTheCorrectTrackWithoutLeakingOpponentCard"
+    ]
+  },
+  "最后组合受影响路径": {
+    "文件": ".local/verification/three-kingdoms-b3/combined-paths-final.trx",
+    "SHA256": "13391af079c31ff8a98a906f45d3ca49552bd99bad56320b8d2f9e97d67acfd0",
+    "总数": 85,
+    "通过": 85,
+    "失败": 0,
+    "开始": "2026-10-23T13:00:50.8441927+08:00",
+    "结束": "2026-10-23T13:01:00.2753799+08:00"
+  },
+  "网络协议权限回归": {
+    "文件": ".local/verification/three-kingdoms-b3/network-final.trx",
+    "SHA256": "04844f823b126bbd529d27502783b812659f7642c40a2e00e4ee9c0ff745dc68",
+    "总数": 141,
+    "通过": 141,
+    "失败": 0,
+    "开始": "2026-10-23T12:50:25.1388850+08:00",
+    "结束": "2026-10-23T12:50:35.5006509+08:00"
+  },
+  "验证边界": [
+    "20种开局配置含城市骑士与九图组合各三／四人；4个正常完整局为城市骑士与驶向新海岸各三／四人。",
+    "原生固定局面中的权威状态序列化恢复不等同完整指令重放；正常开局、骰子选择、换将与完整局另以公开Load重放。",
+    "判定、比大小、重掷仅完成独立基础；后批判定来源与观察接续未启用。",
+    "四完整局完成后仅修复生命周期待决覆盖骰子待决的产品投影与挂起窗口标识，单独补真实会话重放和Windows验证；无理由重复完整局。",
+    "旧模式108完整局未在本轮重复运行；本轮1171项快速回归及最后85项组合受影响路径已记录。",
+    "三国联机仍关闭；没有像素、鼠标、Android真机、四真人联机或用户整局试玩验收。"
+  ]
+}

@@ -326,8 +326,8 @@ internal sealed class ThreeKingdomsTestGame(string rules, object session)
         }
     }
     internal static string Json(object? value) => value == null ? "null" : JsonSerializer.Serialize(value, value.GetType());
-    internal static ThreeKingdomsTestGame Create(string rules, string map = "heading-for-new-shores", int seats = 4, bool enabled = true, bool skills = false) => new(rules,
-        rules == "cities" ? (object)M4.CitiesKnightsGameSession.Create(AcceptanceFixture.Json, seats, 97, threeKingdoms: enabled, threeKingdomsSkills: skills) : M5.CombinedGameSession.Create(map, seats, 97, threeKingdoms: enabled, threeKingdomsSkills: skills));
+    internal static ThreeKingdomsTestGame Create(string rules, string map = "heading-for-new-shores", int seats = 4, bool enabled = true, bool skills = false, string packageVersion = GeneralCatalog.B2PackageVersion) => new(rules,
+        rules == "cities" ? (object)M4.CitiesKnightsGameSession.Create(AcceptanceFixture.Json, seats, 97, threeKingdoms: enabled, threeKingdomsSkills: skills, threeKingdomsPackageVersion: skills ? packageVersion : null) : M5.CombinedGameSession.Create(map, seats, 97, threeKingdoms: enabled, threeKingdomsSkills: skills, threeKingdomsPackageVersion: skills ? packageVersion : null));
     internal static ThreeKingdomsTestGame Load(string rules, string save) => new(rules,
         rules == "cities" ? (object)M4.CitiesKnightsGameSession.Load(AcceptanceFixture.Json, save) : M5.CombinedGameSession.Load(save));
 }

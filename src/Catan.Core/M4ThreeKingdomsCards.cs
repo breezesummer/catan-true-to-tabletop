@@ -15,14 +15,15 @@ namespace Catan.Core.M4
     }
     public sealed partial class CitiesKnightsGameSession
     {
+        private static bool B3(GameState s) => s.ThreeKingdoms?.RulesVersion == GeneralCatalog.B3RulesVersion;
         private static bool B2(GameState s) => s.ThreeKingdoms?.SkillsEnabled == true;
         private B2Host CardHost(GameState s) => new B2Host(this, s);
         private static bool B2Protected(GameState s, string player) => B2(s) && B2SkillEngine.IsProtected(s.ThreeKingdoms, player);
         private static bool B2DrawBlocked(GameState s, string player) => B2(s) && B2SkillEngine.IsDrawBlocked(s.ThreeKingdoms, player);
         private static bool B2Unlimited(GameState s, string player) => B2(s) && s.ThreeKingdoms.Generals.Any(g => g.Region == GeneralRegion.Active && g.OwnerPlayerId == player && g.GeneralId == "tk-g33");
         private static int B2Escrow(GameState s, int card) => B2(s) ? B2SkillEngine.EscrowCards(s.ThreeKingdoms)[card] : 0;
-        private static bool B2Busy(GameState s) => B2(s) && B2SkillEngine.HasPending(s.ThreeKingdoms);
-        private static string ThreeKingdomsVersionFor(ThreeKingdomsState tk) => tk == null ? RulesVersion : tk.SkillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
+        private static bool B2Busy(GameState s) => B2(s) && (B2SkillEngine.HasPending(s.ThreeKingdoms) || B3DiceEngine.HasPending(s.ThreeKingdoms));
+        private static string ThreeKingdomsVersionFor(ThreeKingdomsState tk) => tk == null ? RulesVersion : tk.RulesVersion == GeneralCatalog.B3RulesVersion ? ThreeKingdomsB3RulesVersion : tk.SkillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
 
         private sealed class B2Host : IThreeKingdomsCardHost
         {

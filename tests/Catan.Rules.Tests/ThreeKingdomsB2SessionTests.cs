@@ -24,7 +24,7 @@ public sealed class ThreeKingdomsB2SessionTests(ITestOutputHelper output)
         Assert.True(game.Tk().SkillsEnabled);
         Assert.Equal(GeneralCatalog.B2PackageVersion, game.Tk().PackageVersion);
         Assert.Equal(GeneralCatalog.B2ContentHash, game.Tk().PackageContentHash);
-        string[] expected = GeneralCatalog.EnabledDefinitions.Select(g => g.Id).Order().ToArray();
+        string[] expected = GeneralCatalog.B2Definitions.Select(g => g.Id).Order().ToArray();
         Assert.Equal(11, expected.Length);
         Assert.Equal(expected, game.Authority().Generals.Select(g => g.GeneralId).Order());
         int seat = 0;

@@ -13,7 +13,7 @@ public sealed class ThreeKingdomsB2IntegrationTests
         return M4CoreHarness.Fixture(s =>
         {
             s.RulesVersion = M4.CitiesKnightsGameSession.ThreeKingdomsB2RulesVersion;
-            var tk = ThreeKingdomsEngine.Create(new[] { "P1", "P2", "P3", "P4" }, 42, _ => 0, true);
+            var tk = ThreeKingdomsEngine.Create(new[] { "P1", "P2", "P3", "P4" }, 42, _ => 0, true, GeneralCatalog.B2PackageVersion);
             while (!tk.OpeningComplete)
             {
                 var d = tk.PendingDecision;
