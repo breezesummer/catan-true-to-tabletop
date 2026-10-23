@@ -49,12 +49,13 @@ namespace Catan.Core.M4
             int total=s.LastDice1+s.LastDice2;
             if(total==7)
             {
-                s.Discards=TurnOrder(s).Where(p=>HandCount(p)>7+2*s.Walls.Count(w=>w.PlayerId==p.Id)).Select(p=>new DiscardRequirement {PlayerId=p.Id,Amount=HandCount(p)/2}).ToArray();
+                s.Discards=TurnOrder(s).Where(p=>!B2Protected(s,p.Id)&&HandCount(p)>7+2*s.Walls.Count(w=>w.PlayerId==p.Id)).Select(p=>new DiscardRequirement {PlayerId=p.Id,Amount=HandCount(p)/2}).ToArray();
                 if(s.Discards.Length>0) { s.PendingDecision=new PendingDecision {Kind="Robber",PlayerId=s.ActivePlayerId,ReturnPhase=GamePhase.Action}; s.Phase=GamePhase.Discard; }
                 else if(s.FirstBarbarianAttack) { s.PendingDecision=new PendingDecision {Kind="Robber",PlayerId=s.ActivePlayerId,ReturnPhase=GamePhase.Action}; s.Phase=GamePhase.RobberMove; }
                 else s.Phase=GamePhase.Action;
                 return;
             }
+            if(B2(s)) { s.Phase=GamePhase.Action; return; }
             var before=s.Players.ToDictionary(p=>p.Id,HandCount); Produce(s,total); s.Phase=GamePhase.Action;
             foreach(var p in TurnOrder(s).Where(p=>p.Improvements[(int)ImprovementTrack.Science]>=3&&HandCount(p)==before[p.Id]))
                 if(s.Bank.Total>0) QueueDecision(s,new PendingDecision {Kind="Aqueduct",PlayerId=p.Id,ReturnPhase=GamePhase.Action});
@@ -182,7 +183,7 @@ namespace Catan.Core.M4
         }
         private void StealHandCard(GameState s,PlayerState p,PlayerState victim)
         {
-            if(HandCount(victim)==0)return;int index=Draw(s.Random,HandCount(victim));
+            if(B2Protected(s,victim.Id)||HandCount(victim)==0)return;int index=Draw(s.Random,HandCount(victim));
             foreach(var r in Resources) {if(index<victim.Resources[r]) {Transfer(victim.Resources,p.Resources,r,1);return;}index-=victim.Resources[r];}
             foreach(var r in Commodities) {if(index<victim.Commodities[r]) {Transfer(victim.Commodities,p.Commodities,r,1);return;}index-=victim.Commodities[r];}
         }

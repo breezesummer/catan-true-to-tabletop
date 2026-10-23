@@ -311,7 +311,7 @@ internal sealed class ThreeKingdomsTestGame(string rules, object session)
     internal dynamic Decide()
     {
         dynamic publicView = View();
-        string actor = publicView.ThreeKingdoms?.PendingDecision?.PlayerId ?? M6Game.Actor(publicView);
+        string actor = publicView.ThreeKingdoms?.PendingDecision?.PlayerId ?? publicView.ThreeKingdoms?.SkillDecision?.PlayerId ?? M6Game.Actor(publicView);
         dynamic command = rules == "cities" ? (object)new CitiesKnightsAi().Decide((M4.PlayerView)AiView(actor)) : new CombinedAi().Decide((M5.PlayerView)AiView(actor));
         command.Id = NextId(); return command;
     }
@@ -326,8 +326,8 @@ internal sealed class ThreeKingdomsTestGame(string rules, object session)
         }
     }
     internal static string Json(object? value) => value == null ? "null" : JsonSerializer.Serialize(value, value.GetType());
-    internal static ThreeKingdomsTestGame Create(string rules, string map = "heading-for-new-shores", int seats = 4, bool enabled = true) => new(rules,
-        rules == "cities" ? (object)M4.CitiesKnightsGameSession.Create(AcceptanceFixture.Json, seats, 97, threeKingdoms: enabled) : M5.CombinedGameSession.Create(map, seats, 97, threeKingdoms: enabled));
+    internal static ThreeKingdomsTestGame Create(string rules, string map = "heading-for-new-shores", int seats = 4, bool enabled = true, bool skills = false) => new(rules,
+        rules == "cities" ? (object)M4.CitiesKnightsGameSession.Create(AcceptanceFixture.Json, seats, 97, threeKingdoms: enabled, threeKingdomsSkills: skills) : M5.CombinedGameSession.Create(map, seats, 97, threeKingdoms: enabled, threeKingdomsSkills: skills));
     internal static ThreeKingdomsTestGame Load(string rules, string save) => new(rules,
         rules == "cities" ? (object)M4.CitiesKnightsGameSession.Load(AcceptanceFixture.Json, save) : M5.CombinedGameSession.Load(save));
 }

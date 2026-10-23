@@ -51,7 +51,7 @@ namespace Catan.Core.M5
         }
         private void AddGold(GameState s,string player,int amount)
         {
-            if(amount>0)QueueDecision(s,new PendingDecision {Kind="Gold",PlayerId=player,Amount=amount,ReturnPhase=s.Phase});
+            if(amount>0&&!B2DrawBlocked(s,player))QueueDecision(s,new PendingDecision {Kind="Gold",PlayerId=player,Amount=amount,ReturnPhase=s.Phase});
         }
         private void CollectSpecialGifts(GameState s,string player,string edge)
         {
@@ -105,7 +105,7 @@ namespace Catan.Core.M5
         }
         private void EndSpecialTurn(GameState s,PlayerState p)
         {
-            Require(p.ProgressCards.Length<=4,"ProgressHandLimit","结束回合前须将进步卡减至四张。");
+            Require((B2Unlimited(s,p.Id)||B2Protected(s,p.Id)||p.ProgressCards.Length<=4),"ProgressHandLimit","结束回合前须将进步卡减至四张。");
             if(seafaring.Id=="pirate-islands"&&CanAttackFortress(s,p.Id)){AttackFortress(s,p);CheckVictory(s);if(s.Phase==GamePhase.Finished)return;}
             if(s.Special!=null&&s.Special.Villages.Count(v=>v.Cloth==0)>=5) {
                 int best=s.Players.Max(x=>VictoryPoints(s,x.Id,true));var leaders=s.Players.Where(x=>VictoryPoints(s,x.Id,true)==best).ToArray();int cloth=leaders.Max(x=>x.Cloth);
@@ -134,7 +134,7 @@ namespace Catan.Core.M5
                 foreach(var p in TurnOrder(s).Where(p=>Buildings(s).Any(b=>b.PlayerId==p.Id&&tile.Vertices.Contains(b.LocationId)))) {
                     int fleet=s.Ships.Count(x=>x.PlayerId==p.Id&&x.IsWarship);
                     if(fleet>power)AddGold(s,p.Id,1);
-                    else if(fleet<power)for(int i=0;i<1+s.Cities.Count(c=>c.PlayerId==p.Id)&&HandCount(p)>0;i++) {
+                    else if(fleet<power&&!B2Protected(s,p.Id))for(int i=0;i<1+s.Cities.Count(c=>c.PlayerId==p.Id)&&HandCount(p)>0;i++) {
                         int index=Draw(s.Random,HandCount(p));bool removed=false;
                         foreach(var r in Resources){if(index<p.Resources[r]){Transfer(p.Resources,s.Bank,r,1);removed=true;break;}index-=p.Resources[r];}
                         if(!removed)foreach(var r in Commodities){if(index<p.Commodities[r]){Transfer(p.Commodities,s.CommodityBank,r,1);break;}index-=p.Commodities[r];}

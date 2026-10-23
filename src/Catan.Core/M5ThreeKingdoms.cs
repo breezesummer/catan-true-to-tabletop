@@ -12,6 +12,7 @@ namespace Catan.Core.M5
         [DataMember(Order=300, EmitDefaultValue=false)] public string[] GeneralIds { get; set; }
         [DataMember(Order=301, EmitDefaultValue=false)] public string DecisionId { get; set; }
         [DataMember(Order=302, EmitDefaultValue=false)] public string WindowId { get; set; }
+        [DataMember(Order=303, EmitDefaultValue=false)] public B2SkillCommand SkillCommand { get; set; }
     }
     public sealed partial class GameState
     {
@@ -25,17 +26,20 @@ namespace Catan.Core.M5
     {
         public const string ThreeKingdomsRulesVersion = "catan-seafarers-cities-knights-three-kingdoms-b1-v1";
 
-        private void InitializeThreeKingdoms(GameState s)
+        public const string ThreeKingdomsB2RulesVersion = "catan-seafarers-cities-knights-three-kingdoms-b2-v1";
+
+        private void InitializeThreeKingdoms(GameState s, bool skillsEnabled)
         {
-            s.RulesVersion = ThreeKingdomsRulesVersion;
+            s.RulesVersion = skillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
             var seats = Enumerable.Range(0, s.Players.Length).Select(i => s.Players[(s.StartingPlayerIndex + i) % s.Players.Length].Id).ToArray();
-            s.ThreeKingdoms = ThreeKingdomsEngine.Create(seats, s.InitialSeed, maximum => Draw(s.Random, maximum));
+            s.ThreeKingdoms = ThreeKingdomsEngine.Create(seats, s.InitialSeed, maximum => Draw(s.Random, maximum), skillsEnabled);
         }
 
         // 原规则待决保持原位：换将子树不会覆盖费用、弃牌义务、交易或剧本恢复位置。
         private void Apply(GameState s, Command c)
         {
             var tk = s.ThreeKingdoms;
+            if (B2(s)) { ApplyB2(s, c); return; }
             if (tk == null)
             {
                 Require(c.Kind < CommandKind.ChooseGenerals, "ExpansionDisabled", "本局未开启三国争霸开发骨架。");
@@ -84,7 +88,7 @@ namespace Catan.Core.M5
                     }
                     return;
                 }
-                Require(tk.Clock.Phase == ThreeKingdomsPhase.InitialPlacement || tk.Clock.Phase == ThreeKingdomsPhase.Roll || tk.Clock.Phase == ThreeKingdomsPhase.Play || (tk.Clock.Phase == ThreeKingdomsPhase.Preparation && s.PendingDecision != null),
+                Require(tk.Clock.Phase == ThreeKingdomsPhase.InitialPlacement || tk.Clock.Phase == ThreeKingdomsPhase.Roll || tk.Clock.Phase == ThreeKingdomsPhase.Play || ((B2(s) || tk.Clock.Phase == ThreeKingdomsPhase.Preparation) && s.PendingDecision != null),
                     "ThreeKingdomsPhase", "请先确认当前三国阶段。");
                 if (c.Kind == CommandKind.EndTurn || c.Kind == CommandKind.AttackFortress)
                 {
@@ -108,7 +112,7 @@ namespace Catan.Core.M5
         private static bool ThreeKingdomsAllowsBaseCommand(GameState s)
         {
             var tk = s.ThreeKingdoms;
-            return tk == null || tk.PendingDecision == null && (tk.Clock.Phase == ThreeKingdomsPhase.InitialPlacement || tk.Clock.Phase == ThreeKingdomsPhase.Roll || tk.Clock.Phase == ThreeKingdomsPhase.Play || tk.Clock.Phase == ThreeKingdomsPhase.Preparation && s.PendingDecision != null);
+            return tk == null || !B2Busy(s) && tk.PendingDecision == null && (tk.Clock.Phase == ThreeKingdomsPhase.InitialPlacement || tk.Clock.Phase == ThreeKingdomsPhase.Roll || tk.Clock.Phase == ThreeKingdomsPhase.Play || (B2(s) || tk.Clock.Phase == ThreeKingdomsPhase.Preparation) && s.PendingDecision != null);
         }
 
         private void StampThreeKingdomsWindow(Command command)
@@ -119,6 +123,7 @@ namespace Catan.Core.M5
         private void PopulateThreeKingdomsView(PlayerView view)
         {
             if (state.ThreeKingdoms == null) return;
+            if (B2(state)) { PopulateB2View(view); return; }
             var tk = ThreeKingdomsEngine.Project(state.ThreeKingdoms, view.PlayerId);
             view.ThreeKingdoms = tk;
             if (state.Phase == GamePhase.Finished) { tk.CanRetire = false; tk.Clock.Phase = ThreeKingdomsPhase.Finished; return; }
@@ -149,11 +154,17 @@ namespace Catan.Core.M5
             view.LegalActions = view.LegalActions.Concat(actions.Where(IsLegal)).ToArray();
         }
 
-        private static void ValidateThreeKingdoms(GameState s)
+        private void ValidateThreeKingdoms(GameState s)
         {
             if (s.ThreeKingdoms == null) return;
             var issues = ThreeKingdomsEngine.Validate(s.ThreeKingdoms);
+            if(B2(s)) issues = issues.Concat(B2SkillEngine.Validate(CardHost(s))).ToArray();
             if (issues.Length > 0) throw new InvalidDataException(string.Join("；", issues));
+            var exchange = s.ThreeKingdomsExchange;
+            if (exchange != null && (!B2(s) || exchange.Length != 2 || exchange.Any(x => x == null || x.BeforeCount < 1 || x.LostCount != 1 || x.GivenCount != 1) ||
+                exchange.Select(x => x.PlayerId).Distinct().Count() != 2 || exchange.Any(x => !s.Players.Any(p => p.Id == x.PlayerId)) ||
+                s.PendingDecision?.Kind != "ProgressHarbor" || !exchange.Any(x => x.PlayerId == s.PendingDecision.PlayerId) || !exchange.Any(x => x.PlayerId == s.PendingDecision.OtherPlayerId)))
+                throw new InvalidDataException("商港交换的未完成牌流记录无效。");
             if (!s.ThreeKingdoms.SeatPlayerIds.OrderBy(x => x).SequenceEqual(s.Players.Select(p => p.Id).OrderBy(x => x)))
                 throw new InvalidDataException("三国固定座位与游戏席位不一致。");
         }

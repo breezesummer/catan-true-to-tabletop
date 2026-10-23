@@ -51,7 +51,7 @@ internal sealed class RuleRoomGame
         string json = session switch { M2.BaseGameSession s => s.Save(), M3.SeafarersGameSession s => s.Save(), M4.CitiesKnightsGameSession s => s.Save(), M5.CombinedGameSession s => s.Save(), _ => throw new InvalidOperationException() };
         using var document = System.Text.Json.JsonDocument.Parse(json);
         if (document.RootElement.TryGetProperty("ThreeKingdoms", out var threeKingdoms) && threeKingdoms.ValueKind != System.Text.Json.JsonValueKind.Null)
-            throw new InvalidDataException("三国争霸 B1 开发骨架仅支持本地对局，尚未启用联机武将包协商。");
+            throw new InvalidDataException("三国争霸扩展目前仅支持本地对局，尚未启用联机武将包版本与内容哈希协商。");
         finished = document.RootElement.TryGetProperty("WinnerPlayerId", out var winner) && winner.ValueKind == System.Text.Json.JsonValueKind.String && !string.IsNullOrEmpty(winner.GetString());
         CommandCount = document.RootElement.GetProperty("ProcessedCommands").GetArrayLength();
         ActivePlayerId = document.RootElement.GetProperty("ActivePlayerId").GetString();

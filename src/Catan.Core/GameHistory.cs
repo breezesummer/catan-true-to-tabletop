@@ -157,7 +157,7 @@ namespace Catan.Core
             {"BuildWall","建造城墙"},{"ImproveCity","升级城市设施"},{"RecruitKnight","招募骑士"},{"PromoteKnight","晋升骑士"},{"ActivateKnight","激活骑士"},
             {"MoveKnight","移动骑士"},{"DisplaceKnight","驱逐骑士"},{"ChaseRobber","骑士驱赶强盗"},{"ChasePirate","骑士驱赶海盗"},{"DiscardProgressCard","弃置发展卡"},{"CommercialHarborOffer","使用商港"},
             {"ResolveChoice","完成选择"},{"ResolveProgressChoice","完成发展卡选择"},
-            {"ChooseGenerals","完成私密选将"},{"DeployGeneral","确认武将登场选择"},{"RetireGeneral","隐退并开始轮换"},{"AdvanceThreeKingdomsPhase","完成三国阶段"}
+            {"ChooseGenerals","完成私密选将"},{"DeployGeneral","确认武将登场选择"},{"RetireGeneral","隐退并开始轮换"},{"AdvanceThreeKingdomsPhase","完成三国阶段"},{"UseGeneralSkill","完成武将技能选择"}
         };
         private static readonly Dictionary<string, string> PendingNames = new Dictionary<string, string>
         {

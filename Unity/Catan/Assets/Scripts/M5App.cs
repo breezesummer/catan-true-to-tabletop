@@ -63,6 +63,7 @@ public sealed partial class M5App : MonoBehaviour
     public static string Actor(PlayerView v)
     {
         if(v.ThreeKingdoms?.PendingDecision!=null)return v.ThreeKingdoms.PendingDecision.PlayerId;
+        if(v.ThreeKingdoms?.SkillDecision!=null)return v.ThreeKingdoms.SkillDecision.PlayerId;
         if(v.TradeOffer!=null)return v.TradeOffer.NextResponder(v.PlayerId);
         if(v.Discards.Length>0)return v.Discards[0].PlayerId;
         return v.PendingDecision!=null&&!string.IsNullOrEmpty(v.PendingDecision.PlayerId)?v.PendingDecision.PlayerId:v.ActivePlayerId;
@@ -77,7 +78,7 @@ public sealed partial class M5App : MonoBehaviour
     public CommandResult Submit(Command command)
     {
         if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status=ai.Network.Status;return null;}
-        if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!(command.Kind==CommandKind.RetireGeneral&&view?.ThreeKingdoms?.CanRetire==true)&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
+        if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!(command.Kind==CommandKind.UseGeneralSkill&&view?.ThreeKingdoms?.SkillActions?.Length>0&&!ai.TableDiceRolling)&&!(command.Kind==CommandKind.RetireGeneral&&view?.ThreeKingdoms?.CanRetire==true)&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
         if(ai!=null&&command==draft&&!DockKnightTargetMatches(command.TargetId)){status="请选择低一级的己方骑士晋升。";return null;}
         command.Id=string.IsNullOrEmpty(command.Id)?Guid.NewGuid().ToString("N"):command.Id;
         if(view?.ThreeKingdoms!=null&&string.IsNullOrEmpty(command.WindowId))command.WindowId=view.ThreeKingdoms.WindowId;

@@ -23,9 +23,9 @@ public sealed class CitiesKnightsAi
     {
         if (view == null) throw new ArgumentNullException(nameof(view));
         if (view.Phase == GamePhase.Finished) throw new InvalidOperationException("The game has finished.");
-        var actor = view.ThreeKingdoms?.PendingDecision?.PlayerId ?? (view.TradeOffer != null ? view.TradeOffer.NextResponder(view.PlayerId) : view.PendingDecision?.PlayerId ?? view.ActivePlayerId);
+        var actor = view.ThreeKingdoms?.PendingDecision?.PlayerId ?? view.ThreeKingdoms?.SkillDecision?.PlayerId ?? (view.TradeOffer != null ? view.TradeOffer.NextResponder(view.PlayerId) : view.PendingDecision?.PlayerId ?? view.ActivePlayerId);
         var canDiscard = view.Phase == GamePhase.Discard && view.Discards.Any(d => d.PlayerId == view.PlayerId);
-        if (view.Phase == GamePhase.Discard ? !canDiscard : actor != view.PlayerId) throw new InvalidOperationException("This seat has no pending action.");
+        if (view.ThreeKingdoms?.PendingDecision != null || view.ThreeKingdoms?.SkillDecision != null ? actor != view.PlayerId : view.Phase == GamePhase.Discard ? !canDiscard : actor != view.PlayerId) throw new InvalidOperationException("This seat has no pending action.");
         var command = Copy(Choose(view));
         if (view.ThreeKingdoms != null) command.WindowId = view.ThreeKingdoms.WindowId;
         return command;
@@ -33,9 +33,15 @@ public sealed class CitiesKnightsAi
     private Command Choose(PlayerView view)
     {
         Command Make(CommandKind kind, string target = null) => new() { PlayerId = view.PlayerId, Kind = kind, TargetId = target! };
-        // 骨架没有技能收益：只推进强制选将和阶段，不主动反复隐退。
+        // 优先完成强制选将与技能待决；主动隐退保留给玩家，不作循环刷取策略。
         var legal = (view.LegalActions ?? Array.Empty<Command>()).Where(c => c.Kind != CommandKind.RetireGeneral).ToList();
         var generalChoice = legal.FirstOrDefault(c => c.Kind == CommandKind.ChooseGenerals || c.Kind == CommandKind.DeployGeneral || c.Kind == CommandKind.AdvanceThreeKingdomsPhase);
+        if (view.ThreeKingdoms?.SkillDecision != null)
+        {
+            var skill = ChooseGeneralSkill(view, ResourceGoal(view, Expansion(view)), CommodityGoal(view));
+            if (skill != null) return skill;
+            throw new InvalidOperationException("武将技能待决没有可用合法动作。");
+        }
         if (generalChoice != null) return generalChoice;
         if (view.TradeOffer != null) return RespondToTrade(view);
         if (view.Phase == GamePhase.SetupSettlement)
@@ -135,6 +141,7 @@ public sealed class CitiesKnightsAi
             var road = legal.FirstOrDefault(c => c.Kind == CommandKind.BuildRoad && c.TargetId == expansion.Value.path[0]);
             if (road != null) return road;
         }
+        var activeSkill = ChooseGeneralSkill(view, desired, commodityGoal); if (activeSkill != null) return activeSkill;
         var proposal = ProposeTrade(view, desired); if (proposal != null) return proposal;
         foreach (var need in Resources.Where(r => view.OwnResources[r] < desired[r] && view.Bank[r] > 0).Select(r => (resource: r, commodity: (Commodity?)null))
             .Concat(Commodities.Where(c => view.OwnCommodities[c] < commodityGoal[c] && view.CommodityBank[c] > 0).Select(c => (resource: default(Resource), commodity: (Commodity?)c))))
@@ -471,11 +478,20 @@ public sealed class CitiesKnightsAi
             default: return 0;
         }
     }
+    private static Command ChooseGeneralSkill(PlayerView view, ResourceBag goal, CommodityBag commodityGoal)
+    {
+        var selected = ThreeKingdomsAi.Choose(view.ThreeKingdoms,
+            Resources.Select(r => view.OwnResources[r]).Concat(Commodities.Select(c => view.OwnCommodities[c])).ToArray(),
+            Resources.Select(r => goal[r]).Concat(Commodities.Select(c => commodityGoal[c])).ToArray(),
+            id => view.Players.Where(p => p.Id == id).Select(p => p.ResourceCount + p.CommodityCount).FirstOrDefault());
+        return selected == null ? null : new Command { PlayerId = view.PlayerId, Kind = CommandKind.UseGeneralSkill,
+            SkillCommand = selected, DecisionId = selected.DecisionId, WindowId = view.ThreeKingdoms.WindowId };
+    }
     // Detach every mutable command field before returning a projected legal action.
     private static Command Copy(Command c) => new Command
     {
         PlayerId=c.PlayerId, Kind=c.Kind, TargetId=c.TargetId, OtherPlayerId=c.OtherPlayerId,
-        GeneralIds=c.GeneralIds?.ToArray(), DecisionId=c.DecisionId, WindowId=c.WindowId,
+        GeneralIds=c.GeneralIds?.ToArray(), DecisionId=c.DecisionId, WindowId=c.WindowId, SkillCommand=ThreeKingdomsAi.Copy(c.SkillCommand),
         GiveResource=c.GiveResource, ReceiveResource=c.ReceiveResource, GiveAmount=c.GiveAmount, ReceiveAmount=c.ReceiveAmount,
         Give=c.Give?.Copy(), Receive=c.Receive?.Copy(), Resources=c.Resources?.Copy(), Resource=c.Resource,
         SourceId=c.SourceId, Track=c.Track, Commodity=c.Commodity, Commodities=c.Commodities?.Copy(),

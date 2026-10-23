@@ -1,0 +1,14 @@
+{
+    "status": "通过",
+    "unity": "6000.3.25f1",
+    "note": "实际 Windows 本地入口覆盖 M4/M5 各 3/4 人、选将/登场/阶段/轮换/技能选择读档及本地重开。截图为游戏相机与 IMGUI 离屏合成，须人工查看；不代表真机或用户试玩验收。",
+    "configurations": 4,
+    "saveRoundtrips": 36,
+    "retirements": 8,
+    "restarts": 4,
+    "images": 0,
+    "guiImagesWithChanges": 0,
+    "skillChoices": 4,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+}

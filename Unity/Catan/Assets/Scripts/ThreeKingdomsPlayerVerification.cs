@@ -13,7 +13,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
     [Serializable] sealed class Result
     {
         public string status,unity,note;
-        public int configurations,saveRoundtrips,retirements,restarts,images,guiImagesWithChanges;
+        public int configurations,saveRoundtrips,retirements,restarts,images,guiImagesWithChanges,skillChoices;
         public bool graphics,fullUiPixelsVerified;
     }
     M6App app;
@@ -50,9 +50,9 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             yield return next;
         }
         result.status="通过";result.unity=Application.unityVersion;
-        result.note="实际 Windows 本地入口覆盖 M4/M5 各 3/4 人、选将/登场/阶段/轮换读档及本地重开。截图为游戏相机与 IMGUI 离屏合成，须人工查看；不代表真机或用户试玩验收。";
+        result.note="实际 Windows 本地入口覆盖 M4/M5 各 3/4 人、选将/登场/阶段/轮换/技能选择读档及本地重开。截图为游戏相机与 IMGUI 离屏合成，须人工查看；不代表真机或用户试玩验收。";
         File.WriteAllText(Path.Combine(directory,"result.json"),JsonUtility.ToJson(result,true));
-        Debug.Log("CATAN_THREE_KINGDOMS_PLAYER_OK: 4 种本地配置；私密选将；阶段与轮换恢复；重复隐退；保留开关重开。");
+        Debug.Log("CATAN_THREE_KINGDOMS_PLAYER_OK: 4 种本地配置；私密选将；阶段/轮换/技能恢复；重复隐退；保留开关重开。");
         Application.Quit(0);
     }
     IEnumerator Verify()
@@ -103,6 +103,19 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
                 }
                 Require(View.Clock.Phase==ThreeKingdomsPhase.Preparation&&View.CanRetire,"轮换没有返回原准备阶段或错误限制重复隐退。");
             }
+            stage=prefix+" 技能选择";budget=0;
+            while(!app.IsHumanTurn||View.SkillActions==null||View.SkillActions.Length==0)
+            {
+                Require(++budget<1500,"正常对局未在预算内出现人类技能选项。");
+                while(app.TableDiceRolling||app.TablePresentationBlocked)yield return null;
+                Advance();yield return null;
+            }
+            string skillBefore=SaveAndRestore(prefix+"-技能");yield return null;yield return null;AssertRestored(skillBefore);
+            app.VerificationOpenThreeKingdomsPanel();yield return null;
+            if(result.graphics){BeginCapture(prefix+"-skill.png");for(int frame=0;target!=null&&frame<12;frame++)yield return null;EndCapture();}
+            string priorSkill=app.ExportEnvelope();app.VerificationChooseGeneralSkill(0);yield return null;
+            Require(app.ExportEnvelope()!=priorSkill,"界面技能按钮没有提交真实合法动作。");result.skillChoices++;
+            string skillAfter=SaveAndRestore(prefix+"-技能提交后");yield return null;yield return null;AssertRestored(skillAfter);CheckPrivacy();
             stage=prefix+" 本地重开";app.RestartLocalGame();yield return null;yield return null;
             Require(app.ThreeKingdoms&&app.PlayerCount==players&&app.RuleSet==mode&&View.Clock.Phase==ThreeKingdomsPhase.OpeningSelection,"本地重开丢失三国配置。");result.restarts++;
             result.configurations++;
@@ -117,6 +130,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
     {
         Require(View.Players.Where(p=>p.PlayerId!=app.HumanSeat).All(p=>p.HiddenGeneralIds.Length==0),"产品视图出现对手暗置身份。");
         if(View.PendingDecision!=null&&View.PendingDecision.PlayerId!=app.HumanSeat)Require(View.PendingDecision.CandidateIds.Length==0,"产品视图出现对手候选。");
+        if(View.SkillDecision!=null&&View.SkillDecision.PlayerId!=app.HumanSeat)Require(View.SkillActions.Length==0,"产品视图出现其他玩家的技能私密选项。");
     }
     void Advance()
     {

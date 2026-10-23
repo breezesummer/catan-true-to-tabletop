@@ -10,7 +10,7 @@ namespace Catan.Core.M5
         {
             void Check(bool valid,string message) {if(!valid)throw new InvalidDataException(message);}
             Check(ValidBag(s.CommodityBank)&&s.Players.All(p=>ValidBag(p.Commodities)),"Invalid commodity bag.");
-            foreach(var c in Commodities) Check(s.CommodityBank[c]+s.Players.Sum(p=>p.Commodities[c])==12,"Commodity conservation: "+c);
+            foreach(var c in Commodities) Check(s.CommodityBank[c]+s.Players.Sum(p=>p.Commodities[c])+B2Escrow(s,5+(int)c)==12,"Commodity conservation: "+c);
             Check(s.Players.All(p=>p.Improvements!=null&&p.Improvements.Length==3&&p.Improvements.All(i=>i>=0&&i<=5)&&p.DefenderPoints>=0),"Invalid improvements or defender points.");
             Check(s.Knights.Select(k=>k.LocationId).Distinct().Count()==s.Knights.Length,"Duplicate knight location.");
             foreach(var k in s.Knights) Check(s.Players.Any(p=>p.Id==k.PlayerId)&&scenario.Topology.Vertices.Any(v=>v.Id==k.LocationId)&&!Buildings(s).Any(b=>b.LocationId==k.LocationId)&&k.Level>=1&&k.Level<=3&&k.ActivatedTurn<=s.Turn&&k.PromotedTurn<=s.Turn&&k.ActedTurn<=s.Turn,"Invalid knight.");

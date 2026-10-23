@@ -12,6 +12,10 @@ namespace Catan.Core.M5
             var copy=(GameState)MemberwiseClone();
             copy.Special=Special?.CopyForTransaction();
             copy.ThreeKingdoms=Catan.Core.ThreeKingdoms.ThreeKingdomsEngine.Clone(ThreeKingdoms);
+            copy.ThreeKingdomsDeferredCommand=ThreeKingdomsDeferredCommand==null?null:Json.Copy(ThreeKingdomsDeferredCommand);
+            copy.ThreeKingdomsDiceRecipients=ThreeKingdomsDiceRecipients?.ToArray();
+            copy.ThreeKingdomsProgressUse=ThreeKingdomsProgressUse?.ToArray();
+            copy.ThreeKingdomsExchange=ThreeKingdomsExchange?.Select(x=>new ThreeKingdoms.B2HandChange {PlayerId=x.PlayerId,BeforeCount=x.BeforeCount,AfterCount=x.AfterCount,LostCount=x.LostCount,GivenCount=x.GivenCount}).ToArray();
             copy.Random=new RandomState {AlgorithmId=Random.AlgorithmId,State=Random.State,Draws=Random.Draws};
             copy.Players=Players.Select(p=>p.CopyForTransaction()).ToArray();
             copy.Bank=Bank.Copy();copy.CommodityBank=CommodityBank.Copy();

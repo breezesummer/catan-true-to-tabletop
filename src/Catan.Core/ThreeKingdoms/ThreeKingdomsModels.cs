@@ -99,6 +99,7 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=21)] public string RandomAlgorithmId { get; set; } = "xorshift32-rejection-v1";
         [DataMember(Order=22)] public string[] GeneralDrawOrder { get; set; } = Array.Empty<string>();
         [DataMember(Order=23)] public string[] SeatPlayerIds { get; set; } = Array.Empty<string>();
+        [DataMember(Order=24)] public B2SkillState Skills { get; set; } = new B2SkillState();
     }
     [DataContract] public sealed class ThreeKingdomsPlayerView
     {
@@ -124,5 +125,9 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=9)] public int PoolCount { get; set; }
         [DataMember(Order=10)] public bool OpeningComplete { get; set; }
         [DataMember(Order=11)] public bool CanRetire { get; set; }
+        [DataMember(Order=12)] public B2SkillDecision SkillDecision { get; set; }
+        [DataMember(Order=13)] public B2SkillAction[] SkillActions { get; set; } = Array.Empty<B2SkillAction>();
+        [DataMember(Order=14)] public int[] RevealedSkillCards { get; set; } = new int[8];
+        [DataMember(Order=15)] public string[] SkillStatus { get; set; } = Array.Empty<string>();
     }
 }

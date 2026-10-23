@@ -30,13 +30,13 @@ namespace Catan.Core.M5
         private static readonly Resource[] Resources = (Resource[])Enum.GetValues(typeof(Resource));
         private CombinedGameSession(Scenario scenario, Port[] ports, M3.SeafarersScenario seafaring, GameState state) { this.scenario = scenario; this.ports = ports; this.seafaring = seafaring; this.state = state; }
 
-        public static CombinedGameSession Create(string scenarioId, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null, bool threeKingdoms = false)
-            => CreateForVersionWithThreeKingdoms(scenarioId, playerCount, seed, targetVictoryPoints, ScenarioVersion, threeKingdoms);
+        public static CombinedGameSession Create(string scenarioId, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null, bool threeKingdoms = false, bool threeKingdomsSkills = true)
+            => CreateForVersionWithThreeKingdoms(scenarioId, playerCount, seed, targetVictoryPoints, ScenarioVersion, threeKingdoms, threeKingdomsSkills);
 
         private static CombinedGameSession CreateForVersion(string scenarioId, int playerCount, uint seed, int? targetVictoryPoints, string scenarioVersion)
             => CreateForVersionWithThreeKingdoms(scenarioId, playerCount, seed, targetVictoryPoints, scenarioVersion, false);
 
-        private static CombinedGameSession CreateForVersionWithThreeKingdoms(string scenarioId, int playerCount, uint seed, int? targetVictoryPoints, string scenarioVersion, bool threeKingdoms)
+        private static CombinedGameSession CreateForVersionWithThreeKingdoms(string scenarioId, int playerCount, uint seed, int? targetVictoryPoints, string scenarioVersion, bool threeKingdoms, bool threeKingdomsSkills = true)
         {
             if (playerCount != 3 && playerCount != 4) throw new ArgumentOutOfRangeException(nameof(playerCount), "双扩展组合支持 3 或 4 人。");
             var seafaring = scenarioVersion == LegacyScenarioVersion ? CombinedScenarios.Create(scenarioId, playerCount) : CombinedScenarios.CreateSeeded(scenarioId, playerCount, seed);
@@ -64,7 +64,7 @@ namespace Catan.Core.M5
             var session = new CombinedGameSession(scenario, ports, seafaring, state);
             session.InitializeProgress(state);
             session.InitializeSpecial(state);
-            if (threeKingdoms) session.InitializeThreeKingdoms(state);
+            if (threeKingdoms) session.InitializeThreeKingdoms(state, threeKingdomsSkills);
             session.AssertInvariants(state);
             return session;
         }
@@ -185,11 +185,11 @@ namespace Catan.Core.M5
             GameState saved;
             try { saved = Json.Read<GameState>(save); }
             catch (Exception ex) when (ex is System.Runtime.Serialization.SerializationException || ex is ArgumentException || ex is System.Xml.XmlException) { throw new InvalidDataException("Invalid save JSON.", ex); }
-            if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != (saved.ThreeKingdoms == null ? RulesVersion : ThreeKingdomsRulesVersion) || (saved.ScenarioVersion != ScenarioVersion && saved.ScenarioVersion != LegacyScenarioVersion && saved.ScenarioVersion != AllScenarioVersion) || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
+            if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != ThreeKingdomsVersionFor(saved.ThreeKingdoms) || (saved.ScenarioVersion != ScenarioVersion && saved.ScenarioVersion != LegacyScenarioVersion && saved.ScenarioVersion != AllScenarioVersion) || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
                 throw new InvalidDataException("Unsupported or malformed save.");
             saved.TargetVictoryPoints = saved.TargetVictoryPoints ?? 16;
             if (!VictoryPointSettings.IsValid(saved.TargetVictoryPoints)) throw new InvalidDataException("存档中的胜利分数无效。");
-            var session = CreateForVersionWithThreeKingdoms(saved.ScenarioId, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints, saved.ScenarioVersion, saved.ThreeKingdoms != null);
+            var session = CreateForVersionWithThreeKingdoms(saved.ScenarioId, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints, saved.ScenarioVersion, saved.ThreeKingdoms != null, saved.ThreeKingdoms?.SkillsEnabled == true);
             foreach (var record in saved.ProcessedCommands)
             {
                 if (record == null || record.Command == null) throw new InvalidDataException("Malformed command history.");
@@ -416,12 +416,12 @@ namespace Catan.Core.M5
             ValidateThreeKingdoms(s);
             Check(VictoryPointSettings.IsValid(s.TargetVictoryPoints), "胜利分数无效。");
             void Check(bool valid, string message) { if (!valid) throw new InvalidDataException(message); }
-            Check(s.SaveFormatVersion == SaveFormatVersion && s.RulesVersion == (s.ThreeKingdoms == null ? RulesVersion : ThreeKingdomsRulesVersion) && s.ScenarioVersion == scenario.Version, "Invalid version identity.");
+            Check(s.SaveFormatVersion == SaveFormatVersion && s.RulesVersion == ThreeKingdomsVersionFor(s.ThreeKingdoms) && s.ScenarioVersion == scenario.Version, "Invalid version identity.");
             Check(Enum.IsDefined(typeof(GamePhase), s.Phase) && s.Turn >= 0 && s.SetupPlacementIndex >= 0 && s.SetupPlacementIndex <= s.Players.Length * seafaring.SetupRounds, "Invalid phase/turn.");
             Check(s.Players.Length == 3 || s.Players.Length == 4, "Invalid player count.");
             Check(s.Players.Select(p => p.Id).Distinct().Count() == s.Players.Length && s.Players.Any(p => p.Id == s.ActivePlayerId), "Invalid player identities.");
             Check(ValidBag(s.Bank) && s.Players.All(p => ValidBag(p.Resources)), "Invalid resource counts.");
-            foreach (var r in Resources) Check(s.Bank[r] + s.Players.Sum(p => p.Resources[r]) == 19, "Resource conservation failed: " + r);
+            foreach (var r in Resources) Check(s.Bank[r] + s.Players.Sum(p => p.Resources[r]) + B2Escrow(s,(int)r) == 19, "Resource conservation failed: " + r);
             Check(s.Roads.Select(r => r.LocationId).Distinct().Count() == s.Roads.Length && Buildings(s).Select(b => b.LocationId).Distinct().Count() == Buildings(s).Count(), "Duplicate placement.");
             foreach (var road in s.Roads) Check(s.Players.Any(p => p.Id == road.PlayerId) && scenario.Topology.Edges.Any(e => e.Id == road.LocationId), "Invalid road.");
             foreach (var building in Buildings(s))
@@ -442,7 +442,7 @@ namespace Catan.Core.M5
             Check(!s.FirstBarbarianAttack ? s.RobberTileId==null : seafaring.Id=="pirate-islands" ? s.RobberTileId==null : s.RobberTileId=="frame"&&seafaring.Id=="new-world" || s.Tiles.Any(t => t.Id == s.RobberTileId && IsLand(t)), "Invalid robber location.");
             Check((s.Phase == GamePhase.SetupPort || s.Phase == GamePhase.PortPlacement || s.Phase == GamePhase.SetupRoad || s.Phase == GamePhase.Discard || s.Phase == GamePhase.RobberMove || s.Phase == GamePhase.RobberSteal || s.Phase == GamePhase.RoadBuilding || s.Phase == GamePhase.PendingChoice) == (s.PendingDecision != null), "Invalid pending decision.");
             Check((s.Phase == GamePhase.Discard) == (s.Discards.Length > 0), "Discard phase mismatch.");
-            Check(s.Discards.Select(d => d.PlayerId).Distinct().Count() == s.Discards.Length && s.Discards.All(d => d.Amount > 0 && s.Players.Any(p => p.Id == d.PlayerId && HandCount(p) / 2 == d.Amount)), "Invalid discard obligation.");
+            Check(s.Discards.Select(d => d.PlayerId).Distinct().Count() == s.Discards.Length && s.Discards.All(d => d.Amount > 0 && s.Players.Any(p => p.Id == d.PlayerId && (B2(s) || HandCount(p) / 2 == d.Amount))), "Invalid discard obligation.");
             if (s.PendingDecision != null)
             {
                 Check(s.Phase==GamePhase.PendingChoice?s.Players.Any(p=>p.Id==s.PendingDecision.PlayerId):s.PendingDecision.PlayerId == s.ActivePlayerId, "Pending actor mismatch.");
@@ -497,6 +497,8 @@ namespace Catan.Core.M5
         {
             if (c == null || string.IsNullOrWhiteSpace(c.Id) || c.Id.Length > 128 || string.IsNullOrWhiteSpace(c.PlayerId) || c.PlayerId.Length > 128 || (c.TargetId != null && c.TargetId.Length > 128) || (c.OtherPlayerId != null && c.OtherPlayerId.Length > 128)) return Reject("InvalidCommand", "指令缺少有效标识。");
             if ((c.GeneralIds != null && (c.GeneralIds.Length > 5 || c.GeneralIds.Any(id => id == null || id.Length > 128))) || (c.DecisionId != null && c.DecisionId.Length > 128) || (c.WindowId != null && c.WindowId.Length > 128)) return Reject("InvalidCommand", "三国指令字段无效。");
+            var skill = c.SkillCommand;
+            if (skill != null && (skill.Counts == null || skill.Counts.Length != 8 || skill.Counts.Any(n => n < 0 || n > 19) || skill.TargetPlayerIds == null || skill.TargetPlayerIds.Length > 3 || skill.TargetPlayerIds.Any(id => id == null || id.Length > 128) || skill.TileIds == null || skill.TileIds.Length > 2 || skill.TileIds.Any(id => id == null || id.Length > 128) || new[] { skill.SkillId, skill.Option, skill.ProgressCardId, skill.DecisionId, skill.WindowId }.Any(value => value != null && value.Length > 128))) return Reject("InvalidCommand", "技能指令字段无效。");
             if (!Enum.IsDefined(typeof(CommandKind), c.Kind)) return Reject("UnsupportedCommand", "不支持此操作。");
             return null;
         }
@@ -513,6 +515,7 @@ namespace Catan.Core.M5
                 case CommandKind.DeployGeneral: return c.PlayerId + " 确认武将登场选择。";
                 case CommandKind.RetireGeneral: return c.PlayerId + " 发起武将轮换。";
                 case CommandKind.AdvanceThreeKingdomsPhase: return c.PlayerId + " 完成当前阶段。";
+                case CommandKind.UseGeneralSkill: return c.PlayerId + " 完成武将技能选择。";
                 case CommandKind.BuyDevelopmentCard: return c.PlayerId + " 购买了一张发展牌。";
                 case CommandKind.DiscardResources: return c.PlayerId + " 完成弃牌。";
                 case CommandKind.StealResource: return c.PlayerId + " 完成强盗偷取。";
