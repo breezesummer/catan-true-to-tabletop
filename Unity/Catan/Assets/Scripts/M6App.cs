@@ -185,7 +185,7 @@ public sealed partial class M6App : MonoBehaviour
     public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null,int? aiSpeedLevel=null,bool threeKingdoms=false)
     {
         ValidateConfiguration(rules,scenario,players,human);
-        if(threeKingdoms&&(rules!="cities-knights"&&rules!="combined"||networkEntering))throw new InvalidDataException("三国争霸 B1 开发骨架仅支持本地城市与骑士或双扩展组合。");
+        if(threeKingdoms&&rules!="cities-knights"&&rules!="combined")throw new InvalidDataException("三国争霸支持城市与骑士或双扩展组合。");
         if(!networkEntering&&Network!=null&&(Network.Playing||Network.Busy||Network.RoomId!=null||Network.EnrollmentPending))Network.EndSession();
         int target=Catan.Core.VictoryPointSettings.Resolve(targetVictoryPoints,DefaultVictoryPoints(rules,scenario,players),MaximumVictoryPoints(rules,scenario));
         if(close!=null)close();

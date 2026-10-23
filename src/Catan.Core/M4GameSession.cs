@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -160,6 +160,7 @@ namespace Catan.Core.M4
                     DefenderStrength = state.BarbarianDefenseStrength ?? state.Knights.Where(k => k.Active).Sum(k => k.Level),
                     BarbarianStrength = state.BarbarianAttackStrength ?? state.Cities.Length
                 };
+                if(view.TradeOffer!=null) { view.TradeOffer.B4RealGive=null;view.TradeOffer.B4ConversionPayment=false;view.TradeOffer.B4DeclarationHistoryEventId=null; }
                 view.Board.Knights = Json.Copy(state.Knights); view.Board.Walls = Json.Copy(state.Walls); view.Board.Metropolises = Json.Copy(state.Metropolises);
                 foreach (var pub in view.Players) { var actual = state.Players.Single(p => p.Id == pub.Id); pub.CommodityCount = 0; pub.Improvements = actual.Improvements.ToArray(); pub.DefenderPoints = actual.DefenderPoints; pub.WallSupply = 3-state.Walls.Count(w=>w.PlayerId==pub.Id); pub.KnightSupply = Enumerable.Range(1,3).Select(n=>2-state.Knights.Count(k=>k.PlayerId==pub.Id&&k.Level==n)-(state.PendingDecision?.DisplacedKnight is Knight displaced&&displaced.PlayerId==pub.Id&&displaced.Level==n?1:0)-state.DecisionQueue.Count(d=>d.DisplacedKnight!=null&&d.DisplacedKnight.PlayerId==pub.Id&&d.DisplacedKnight.Level==n)).ToArray(); }
                 PopulateProgressView(state, own, view);
@@ -334,9 +335,28 @@ namespace Catan.Core.M4
             bool broadcast = c.OtherPlayerId == TradeOffer.AllPlayers;
             Require(broadcast ? s.ActivePlayerId == p.Id : s.Players.Any(x => x.Id == c.OtherPlayerId) && c.OtherPlayerId != p.Id && (s.ActivePlayerId == p.Id || s.ActivePlayerId == c.OtherPlayerId), "InvalidTradePartner", "仅当前回合玩家能向所有人报价；定向交易必须包含当前回合玩家。");
             var give=c.Give??new ResourceBag();var receive=c.Receive??new ResourceBag();var gc=c.GiveCommodities??new CommodityBag();var rc=c.ReceiveCommodities??new CommodityBag();
+            int[] realGive=null;
+            if(B4(s)&&s.B4DeclaredPayment!=null)
+            {
+                Require(ValidateDeclarationTrade(s,c,s.B4DeclaredPayment),"InvalidDeclaration","报价真实牌与声明不一致。");
+                realGive=Enumerable.Range(0,8).Select(r=>Enumerable.Range(0,8).Sum(u=>s.B4DeclaredPayment[r*8+u])).ToArray();
+                var uses=Enumerable.Range(0,8).Select(u=>Enumerable.Range(0,8).Sum(r=>s.B4DeclaredPayment[r*8+u])).ToArray();
+                give=new ResourceBag();gc=new CommodityBag();
+                for(int i=0;i<5;i++)give[(Resource)i]=uses[i];
+                for(int i=0;i<3;i++)gc[(Commodity)i]=uses[i+5];
+                Require(Enumerable.Range(0,8).All(i=>CardHost(s).GetHand(p.Id)[i]>=realGive[i]),"InsufficientResources","没有足够真实牌提出此报价。");
+                s.B4DeclaredPaymentConsumed=true;
+            }
+            bool conversionPayment=B4(s)&&c.PaymentCards!=null&&s.B4DeclaredPayment==null;
+            if(conversionPayment)
+            {
+                var needs=Enumerable.Range(0,8).Select(i=>i<5?give[(Resource)i]:gc[(Commodity)(i-5)]).ToArray();
+                Require(B4PaymentAllocator.Allocate(s.ThreeKingdoms,p.Id,CardHost(s).GetHand(p.Id),needs,c.PaymentCards)!=null,"InvalidPayment","真实手牌不能满足报价用途。");
+                realGive=(int[])c.PaymentCards.Clone();
+            }
             Require(ValidBag(give)&&ValidBag(receive)&&ValidBag(gc)&&ValidBag(rc)&&give.Total+gc.Total>0&&receive.Total+rc.Total>0&&!Resources.Any(r=>give[r]>0&&receive[r]>0)&&!Commodities.Any(r=>gc[r]>0&&rc[r]>0), "InvalidTrade", "双方均须交换不同种类的手牌。");
-            Require(Covers(p.Resources,give)&&Covers(p.Commodities,gc), "InsufficientResources", "没有足够手牌提出此报价。");
-            s.TradeOffer = new TradeOffer { ProposerId = p.Id, OtherPlayerId = c.OtherPlayerId, Give = give.Copy(), Receive = receive.Copy(), GiveCommodities=gc.Copy(),ReceiveCommodities=rc.Copy(), RecipientPlayerIds = broadcast ? s.Players.Where(x => x.Id != p.Id).Select(x => x.Id).ToArray() : null };
+            Require(realGive!=null||Covers(p.Resources,give)&&Covers(p.Commodities,gc), "InsufficientResources", "没有足够手牌提出此报价。");
+            s.TradeOffer = new TradeOffer { B4DeclarationHistoryEventId=s.B4DeclarationHistoryEventId, B4RealGive=realGive, B4ConversionPayment=conversionPayment, ProposerId = p.Id, OtherPlayerId = c.OtherPlayerId, Give = give.Copy(), Receive = receive.Copy(), GiveCommodities=gc.Copy(),ReceiveCommodities=rc.Copy(), RecipientPlayerIds = broadcast ? s.Players.Where(x => x.Id != p.Id).Select(x => x.Id).ToArray() : null };
             if (legacyInteractionReplay) return;
             // 无力支付的接收者立即以普通拒绝处理，不公开缺少的牌种或数量。
             var unavailable = s.Players.Where(x => x.Id != p.Id && (broadcast || x.Id == c.OtherPlayerId) &&
@@ -344,7 +364,7 @@ namespace Catan.Core.M4
             if (broadcast) s.TradeOffer.RejectedPlayerIds = unavailable;
             if (broadcast ? s.TradeOffer.PendingRecipientIds.Length == 0 : unavailable.Length > 0) s.TradeOffer = null;
         }
-        private static void ResolveTrade(GameState s, PlayerState p, Command c)
+        private void ResolveTrade(GameState s, PlayerState p, Command c)
         {
             var offer = s.TradeOffer;
             if (c.Kind == CommandKind.CancelTrade) { Require(p.Id == offer.ProposerId, "NotProposer", "仅报价者能取消报价。"); s.TradeOffer = null; return; }
@@ -360,8 +380,33 @@ namespace Catan.Core.M4
                 return;
             }
             var proposer = s.Players.Single(x => x.Id == offer.ProposerId);
-            Require(Covers(proposer.Resources,offer.Give)&&Covers(p.Resources,offer.Receive)&&Covers(proposer.Commodities,offer.GiveCommodities)&&Covers(p.Commodities,offer.ReceiveCommodities), "InsufficientResources", "双方手牌不足以完成这笔交易。");
-            TransferBag(proposer.Resources, p.Resources, offer.Give); TransferBag(p.Resources, proposer.Resources, offer.Receive);TransferBag(proposer.Commodities,p.Commodities,offer.GiveCommodities);TransferBag(p.Commodities,proposer.Commodities,offer.ReceiveCommodities); s.TradeOffer = null;
+            var give=offer.Give;var gc=offer.GiveCommodities;
+            if(offer.B4RealGive!=null)
+            {
+                give=new ResourceBag();gc=new CommodityBag();
+                for(int i=0;i<5;i++)give[(Resource)i]=offer.B4RealGive[i];
+                for(int i=0;i<3;i++)gc[(Commodity)i]=offer.B4RealGive[i+5];
+            }
+            Require(Covers(proposer.Resources,give)&&Covers(p.Resources,offer.Receive)&&Covers(proposer.Commodities,gc)&&Covers(p.Commodities,offer.ReceiveCommodities), "InsufficientResources", "双方手牌不足以完成这笔交易。");
+            if(B4(s))
+            {
+                Require(!B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,proposer.Id)&&!B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,p.Id),"HandLossForbidden","本次出牌阶段不能失去牌。");
+                if(offer.B4ConversionPayment)
+                {
+                    var needs=Enumerable.Range(0,8).Select(i=>i<5?offer.Give[(Resource)i]:offer.GiveCommodities[(Commodity)(i-5)]).ToArray();
+                    var matrix=B4PaymentAllocator.Allocate(s.ThreeKingdoms,proposer.Id,CardHost(s).GetHand(proposer.Id),needs,offer.B4RealGive);
+                    Require(matrix!=null,"InvalidPayment","报价的转换用途已失效。");
+                    var historyIds=new List<string>();
+                    for(int real=0;real<8;real++)for(int use=0;use<8;use++)if(real!=use&&matrix[real*8+use]>0)
+                    {
+                        // 该编号会投影给所有席位；仅用批内序号标识转换。
+                        var id="trade-conversion-"+c.Id+":conversion-"+historyIds.Count;
+                        B2SkillEngine.CommitCardConversion(CardHost(s),id,proposer.Id,real,use);historyIds.Add(id);
+                    }
+                    s.B4TradeConversionHistoryIds=historyIds.ToArray();
+                }
+            }
+            TransferBag(proposer.Resources, p.Resources, give); TransferBag(p.Resources, proposer.Resources, offer.Receive);TransferBag(proposer.Commodities,p.Commodities,gc);TransferBag(p.Commodities,proposer.Commodities,offer.ReceiveCommodities); s.TradeOffer = null;
         }
         public int GetBankTradeRate(string playerId, Resource resource)
         {
@@ -407,6 +452,7 @@ namespace Catan.Core.M4
         }
         private static void CheckVictory(GameState s)
         {
+            if(B4(s)&&(B2Busy(s)||s.ThreeKingdomsProgressResolutions?.Length>0||s.ThreeKingdomsVirtualUse!=null))return;
             if (s.Turn > 0 && VictoryPoints(s, s.ActivePlayerId, true) >= s.TargetVictoryPoints.Value) { s.WinnerPlayerId = s.ActivePlayerId; s.Phase = GamePhase.Finished; s.PendingDecision = null; s.DecisionQueue=Array.Empty<PendingDecision>();s.ProductionPending=false;s.Discards = Array.Empty<DiscardRequirement>(); s.TradeOffer = null; }
         }
 
@@ -592,6 +638,7 @@ namespace Catan.Core.M4
         private static void TransferBag(ResourceBag from, ResourceBag to, ResourceBag amount) { foreach (var r in Resources) Transfer(from, to, r, amount[r]); }
         private void Pay(GameState s, PlayerState p, ResourceBag cost)
         {
+            if (B4(s)) { PayB4(s,p,cost); return; }
             int before = p.Resources.Total + p.Commodities.Total;
             Require(Covers(p.Resources, cost), "InsufficientResources", "建造所需资源不足。"); TransferBag(p.Resources, s.Bank, cost);
             if (B3(s) && cost.Total > 0)

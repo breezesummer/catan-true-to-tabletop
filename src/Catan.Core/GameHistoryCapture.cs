@@ -50,9 +50,11 @@ namespace Catan.Core
         {
             // 报价可能在所有接收者自动拒绝后立即清空；已确认指令仍保存完整公开报价。
             var proposal = s.ProcessedCommands.LastOrDefault()?.Command;
-            if (proposal?.Kind != M4.CommandKind.ProposeTrade) proposal = null;
+            if (proposal?.Kind != M4.CommandKind.ProposeTrade || proposal.DeclaredRealTypes!=null) proposal = null;
             return new HistorySnapshot
             {
+                Skills = ThreeKingdoms.B4SkillHistoryEngine.Clone(s.ThreeKingdoms?.SkillHistory),
+                OfferProposerId=s.TradeOffer?.ProposerId, PrivateOffer=s.TradeOffer?.B4RealGive!=null,
                 Turn = s.Turn, Sequence = s.EventSequence, Dice1 = s.LastDice1, Dice2 = s.LastDice2,
                 PendingKind = s.PendingDecision?.Kind, OtherPlayerId = s.PendingDecision?.OtherPlayerId ?? s.TradeOffer?.ProposerId,
                 OfferGive = Goods(s.TradeOffer?.Give ?? proposal?.Give, s.TradeOffer?.GiveCommodities.Cloth ?? proposal?.GiveCommodities?.Cloth ?? 0, s.TradeOffer?.GiveCommodities.Coin ?? proposal?.GiveCommodities?.Coin ?? 0, s.TradeOffer?.GiveCommodities.Paper ?? proposal?.GiveCommodities?.Paper ?? 0),
@@ -74,9 +76,11 @@ namespace Catan.Core
         {
             // 报价可能在所有接收者自动拒绝后立即清空；已确认指令仍保存完整公开报价。
             var proposal = s.ProcessedCommands.LastOrDefault()?.Command;
-            if (proposal?.Kind != M5.CommandKind.ProposeTrade) proposal = null;
+            if (proposal?.Kind != M5.CommandKind.ProposeTrade || proposal.DeclaredRealTypes!=null) proposal = null;
             return new HistorySnapshot
             {
+                Skills = ThreeKingdoms.B4SkillHistoryEngine.Clone(s.ThreeKingdoms?.SkillHistory),
+                OfferProposerId=s.TradeOffer?.ProposerId, PrivateOffer=s.TradeOffer?.B4RealGive!=null,
                 Turn = s.Turn, Sequence = s.EventSequence, Dice1 = s.LastDice1, Dice2 = s.LastDice2,
                 PendingKind = s.PendingDecision?.Kind, OtherPlayerId = s.PendingDecision?.OtherPlayerId ?? s.TradeOffer?.ProposerId,
                 OfferGive = Goods(s.TradeOffer?.Give ?? proposal?.Give, s.TradeOffer?.GiveCommodities.Cloth ?? proposal?.GiveCommodities?.Cloth ?? 0, s.TradeOffer?.GiveCommodities.Coin ?? proposal?.GiveCommodities?.Coin ?? 0, s.TradeOffer?.GiveCommodities.Paper ?? proposal?.GiveCommodities?.Paper ?? 0),

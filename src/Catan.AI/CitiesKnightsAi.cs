@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Catan.Core;
@@ -157,7 +157,7 @@ public sealed class CitiesKnightsAi
                 trade.ReceiveResource = need.resource; trade.ReceiveIsCommodity = need.commodity.HasValue; trade.ReceiveCommodity = need.commodity.GetValueOrDefault(); return trade;
             }
         }
-        if (view.OwnProgressCards.Length > 4) { var discard = Make(CommandKind.DiscardProgressCard); discard.ProgressCard = view.OwnProgressCards.OrderBy(CardValue).First(); return discard; }
+        if (view.ThreeKingdoms?.HandLossForbidden != true && view.OwnProgressCards.Length > 4) { var discard = Make(CommandKind.DiscardProgressCard); discard.ProgressCard = view.OwnProgressCards.OrderBy(CardValue).First(); return discard; }
         return Make(CommandKind.EndTurn);
     }
 
@@ -492,6 +492,8 @@ public sealed class CitiesKnightsAi
     {
         PlayerId=c.PlayerId, Kind=c.Kind, TargetId=c.TargetId, OtherPlayerId=c.OtherPlayerId,
         GeneralIds=c.GeneralIds?.ToArray(), DecisionId=c.DecisionId, WindowId=c.WindowId, SkillCommand=ThreeKingdomsAi.Copy(c.SkillCommand),
+        PaymentCards=c.PaymentCards?.ToArray(),GiveEffectiveCardType=c.GiveEffectiveCardType,RetireAtPhase=c.RetireAtPhase,CancelRetirementIntent=c.CancelRetirementIntent,
+        DeclaredRealTypes=c.DeclaredRealTypes?.ToArray(),DeclaredEffectiveTypes=c.DeclaredEffectiveTypes?.ToArray(),
         GiveResource=c.GiveResource, ReceiveResource=c.ReceiveResource, GiveAmount=c.GiveAmount, ReceiveAmount=c.ReceiveAmount,
         Give=c.Give?.Copy(), Receive=c.Receive?.Copy(), Resources=c.Resources?.Copy(), Resource=c.Resource,
         SourceId=c.SourceId, Track=c.Track, Commodity=c.Commodity, Commodities=c.Commodities?.Copy(),
@@ -504,6 +506,7 @@ public sealed class CitiesKnightsAi
 
     private static Command RespondToTrade(PlayerView view)
     {
+        if(view.ThreeKingdoms?.HandLossForbidden==true) return new Command {PlayerId=view.PlayerId,Kind=view.TradeOffer.ProposerId==view.PlayerId?CommandKind.CancelTrade:CommandKind.RejectTrade};
         var offer = view.TradeOffer;
         var gives = offer.GiveCommodities ?? new CommodityBag();
         var costs = offer.ReceiveCommodities ?? new CommodityBag();
@@ -519,6 +522,8 @@ public sealed class CitiesKnightsAi
     }
     private static int Rate(PlayerView view, Resource? resource, Commodity? commodity)
     {
+        if(view.ThreeKingdoms?.HandLossForbidden==true)return int.MaxValue;
+        if(view.ThreeKingdoms?.BankTradeRates?.Length==8)return view.ThreeKingdoms.BankTradeRates[commodity.HasValue?5+(int)commodity.Value:(int)resource.Value];
         var ports = view.Board.Ports.Where(p => Buildings(view).Any(b => b.PlayerId == view.PlayerId && p.Vertices.Contains(b.LocationId))).ToArray();
         if (resource.HasValue && (ports.Any(p => p.Resource == resource.Value) || view.MerchantFleetResources.Contains(resource.Value)
             || view.MerchantPlayerId == view.PlayerId && view.Board.Tiles.Any(t => t.Id == view.MerchantTileId && t.Resource == resource.Value.ToString().ToLowerInvariant()))) return 2;
@@ -529,6 +534,7 @@ public sealed class CitiesKnightsAi
     // One voluntary offer per turn. Public receipts survive save/load, so no hidden AI memory is needed.
     private static Command ProposeTrade(PlayerView view, ResourceBag goal)
     {
+        if(view.ThreeKingdoms?.HandLossForbidden==true)return null;
         var since = view.Events.LastOrDefault(e => e.Kind == "EndTurn")?.Sequence ?? 0;
         if (view.Events.Any(e => e.Sequence > since && e.PlayerId == view.PlayerId && e.Kind == "ProposeTrade")) return null;
         var needs = Resources.Where(r => view.OwnResources[r] < goal[r]).OrderBy(r => view.OwnResources[r] - goal[r]).ToArray();

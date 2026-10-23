@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Diagnostics;
 using System.Text;
 using Catan.Core;
+using Catan.Core.ThreeKingdoms;
 using Catan.Network.Contracts;
 
 namespace Catan.Rooms;
@@ -110,7 +111,7 @@ public sealed class RoomDirectory : IDisposable
         ValidateName(payload.DisplayName);
         if ((payload.Password?.Length ?? 0) > 128) return Reject("InvalidPassword", "房间密码过长。");
         var versions = RuleRoomGame.Versions(payload.Settings.RuleSet);
-        if (!VersionsMatch(request, versions.Rules, versions.Scenario)) return Reject("VersionMismatch", "规则或场景版本不同，请更新至同一版本。");
+        if (!VersionsMatch(request, versions.Rules, versions.Scenario) || !GeneralVersionsMatch(request,payload.Settings)) return Reject("VersionMismatch", "规则、场景或武将包版本不同，请更新至同一版本。");
         var managerSeat = SeatIds(payload.Settings.PlayerCount).FirstOrDefault(id => !payload.Settings.AiSeats.Contains(id));
         if (managerSeat == null) return Reject("SeatOccupied", "请至少保留一个人类席位给房主。");
         var enrollment = EnrollmentIntent.Parse(request, payload);
@@ -151,6 +152,12 @@ public sealed class RoomDirectory : IDisposable
         return (string.IsNullOrEmpty(r.ExpectedRulesVersion) || r.ExpectedRulesVersion == rules) && (string.IsNullOrEmpty(r.ExpectedScenarioVersion) || r.ExpectedScenarioVersion == scenario);
     }
     private static void ValidateName(string name) { if (string.IsNullOrWhiteSpace(name) || name.Length > 40 || name.Any(char.IsControl)) throw new ArgumentException("名称无效。"); }
+    private static bool GeneralVersionsMatch(NetworkRequest request,RoomSettings settings)
+    {
+        bool handshake=request.Operation=="Create"||request.Operation=="Join"||request.Operation=="Reconnect";
+        if(!handshake&&request.ExpectedThreeKingdomsPackageVersion==null&&request.ExpectedThreeKingdomsContentHash==null)return true;
+        return request.ExpectedThreeKingdomsPackageVersion==settings.ThreeKingdomsPackageVersion&&request.ExpectedThreeKingdomsContentHash==settings.ThreeKingdomsContentHash;
+    }
     private static void ValidateSettings(RoomSettings s)
     {
         if (s == null || s.PlayerCount != 3 && s.PlayerCount != 4) throw new ArgumentException("人数无效。");
@@ -160,6 +167,9 @@ public sealed class RoomDirectory : IDisposable
         else if (s.RuleSet == "seafarers" ? !Catan.Core.M3.SeafarersScenarios.Ids.Contains(s.ScenarioId) : !Catan.Core.M5.CombinedScenarios.Ids.Contains(s.ScenarioId)) throw new ArgumentException("剧本无效。");
         if (s.TargetVictoryPoints.HasValue && !VictoryPointSettings.IsValid(s.TargetVictoryPoints, s.RuleSet=="seafarers"?VictoryPointSettings.MaximumForScenario(s.ScenarioId):VictoryPointSettings.Maximum)) throw new ArgumentException("胜利分数无效。");
         if (s.AiSeats == null || s.AiSeats.Distinct().Count() != s.AiSeats.Length || s.AiSeats.Any(id => !SeatIds(s.PlayerCount).Contains(id))) throw new ArgumentException("AI 席位无效。");
+        if(s.ThreeKingdomsPackageVersion!=null||s.ThreeKingdomsContentHash!=null)
+            if((s.RuleSet!="cities-knights"&&s.RuleSet!="combined")||s.ThreeKingdomsPackageVersion!=GeneralCatalog.B4PackageVersion||s.ThreeKingdomsContentHash!=GeneralCatalog.B4ContentHash)
+                throw new ArgumentException("三国争霸需要完整且匹配的 B4 武将包与城市骑士规则。");
     }
     private static IEnumerable<string> SeatIds(int count) => Enumerable.Range(1, count).Select(i => "P" + i);
     private static readonly string[] AiNames = { "哈基米", "吃白饭的大肥鲸", "糖包", "我是奶龙" };
@@ -199,7 +209,8 @@ public sealed class RoomDirectory : IDisposable
                 Id = request.EnrollmentId, Credential = request.EnrollmentCredential, CredentialHash = PrivateJson.Hash(request.EnrollmentCredential), Operation = request.Operation,
                 // payload 可能包含房间口令；不能把低熵口令变成可离线快速枚举的额外 SHA-256 校验值。
                 // 客户端高熵恢复凭据只以 hash 保存，HMAC 密钥本身不落盘。
-                Fingerprint = Convert.ToHexString(HMACSHA256.HashData(Convert.FromHexString(request.EnrollmentCredential), Encoding.UTF8.GetBytes(request.Operation + "\n" + (request.Operation == "Join" ? request.RoomId : "") + "\n" + request.ExpectedRulesVersion + "\n" + request.ExpectedScenarioVersion + "\n" + WireJson.SerializeObject(payload))))
+                Fingerprint = Convert.ToHexString(HMACSHA256.HashData(Convert.FromHexString(request.EnrollmentCredential), Encoding.UTF8.GetBytes(request.Operation + "\n" + (request.Operation == "Join" ? request.RoomId : "") + "\n" + request.ExpectedRulesVersion + "\n" + request.ExpectedScenarioVersion + "\n" + WireJson.SerializeObject(payload) +
+                    (request.ExpectedThreeKingdomsPackageVersion==null&&request.ExpectedThreeKingdomsContentHash==null?"":"\n"+request.ExpectedThreeKingdomsPackageVersion+"\n"+request.ExpectedThreeKingdomsContentHash))))
             };
         }
     }
@@ -235,7 +246,7 @@ public sealed class RoomDirectory : IDisposable
         {
             this.owner = owner; this.state = state;
             foreach (var seat in state.Seats) disconnectedSince[seat.SeatId] = owner.options.Clock();
-            if (state.GameSave != null) { game = RuleRoomGame.Load(state.Settings.RuleSet, state.GameSave, owner.baseScenario); game.Save(); }
+            if (state.GameSave != null) { game = RuleRoomGame.Load(state.Settings.RuleSet, state.GameSave, owner.baseScenario); game.Save(); if(!game.MatchesGeneralPackage(state.Settings))throw new InvalidDataException("房间设置与权威武将包不一致。"); }
         }
         private bool Connected(SavedSeat seat) => seat.ConnectionId != null && lastSeen.TryGetValue(seat.ConnectionId, out var seen) && owner.options.Clock() - seen < owner.options.ConnectionTimeout;
         internal bool Closed { get { lock (gate) return state.Closed; } }
@@ -248,6 +259,7 @@ public sealed class RoomDirectory : IDisposable
         {
             RoomId = state.RoomId, Name = state.Settings.Name, RuleSet = state.Settings.RuleSet, ScenarioId = state.Settings.ScenarioId,
             RulesVersion = state.RulesVersion, ScenarioVersion = state.ScenarioVersion, PlayerCount = state.Settings.PlayerCount,
+            ThreeKingdomsPackageVersion=state.Settings.ThreeKingdomsPackageVersion,ThreeKingdomsContentHash=state.Settings.ThreeKingdomsContentHash,
             OccupiedSeats = state.Seats.Count + state.Settings.AiSeats.Length, TargetVictoryPoints = state.Settings.TargetVictoryPoints,
             HasPassword = state.PasswordHash != null, Listed = state.Settings.Listed && !state.Closed && !(game?.Finished ?? false) && state.Seats.Any(Connected), Started = game != null, Finished = game?.Finished ?? false,
             Paused = paused, ManagerSeatId = state.ManagerSeatId, Revision = state.Revision, GameNumber = state.GameNumber,
@@ -313,7 +325,7 @@ public sealed class RoomDirectory : IDisposable
                 if (state.Closed) return Reject("RoomClosed", "房间已销毁，请创建或加入其他房间。");
                 if (request.Operation == "Describe") return new NetworkResponse { Success = true, RoomId = state.RoomId, RuleSet = state.Settings.RuleSet, Revision = state.Revision, Room = PublicSummary() };
                 if (request.Operation == "Join") return Join(request);
-                if (!VersionsMatch(request, state.RulesVersion, state.ScenarioVersion)) return Reject("VersionMismatch", "规则或场景版本不同，请更新至同一版本。");
+                if (!VersionsMatch(request, state.RulesVersion, state.ScenarioVersion)||!GeneralVersionsMatch(request,state.Settings)) return Reject("VersionMismatch", "规则、场景或武将包版本不同，请更新至同一版本。");
                 var hash = string.IsNullOrEmpty(request.Credential) ? null : PrivateJson.Hash(request.Credential);
                 var seat = state.Seats.SingleOrDefault(s => SameSecret(s.CredentialHash, hash));
                 if (seat == null || seat.CredentialExpiresAtUtc <= owner.options.Clock()) return Reject("Unauthorized", "席位凭据无效或已到期。");
@@ -334,6 +346,7 @@ public sealed class RoomDirectory : IDisposable
                     if (query.AfterSequence < 0 || query.Limit < 1 || query.Limit > 200) return Snapshot(seat, "InvalidHistory", "历史分页范围无效。", false);
                     var history = game?.History(seat.SeatId, query.AfterSequence) ?? Array.Empty<GameHistoryEntry>();
                     var page = history.Take(query.Limit).ToArray();
+                    if(page.Length>0)page=history.TakeWhile(e=>e.Sequence<=page[page.Length-1].Sequence).ToArray();
                     var response = Snapshot(seat); response.ViewJson = null; response.HistoryJson = WireJson.Serialize(page); response.HistoryCursor = page.LastOrDefault()?.Sequence ?? query.AfterSequence; response.HasMoreHistory = history.Length > page.Length; return response;
                 }
                 if (request.Operation == "Command" || request.Operation == "Preview") return Command(request, seat);
@@ -362,7 +375,7 @@ public sealed class RoomDirectory : IDisposable
             var enrollment = EnrollmentIntent.Parse(request, payload);
             if (enrollment != null && HasEnrollment(enrollment)) return ReplayEnrollment(enrollment);
             if (state.Closed) return Reject("RoomClosed", "该大厅房间已结束，请加入其他房间或重新创建。");
-            if (!VersionsMatch(request, state.RulesVersion, state.ScenarioVersion)) return Reject("VersionMismatch", "规则或场景版本不同，请更新至同一版本。");
+            if (!VersionsMatch(request, state.RulesVersion, state.ScenarioVersion)||!GeneralVersionsMatch(request,state.Settings)) return Reject("VersionMismatch", "规则、场景或武将包版本不同，请更新至同一版本。");
             if (paused) return Reject("RoomPaused", "房间正在等待恢复保存。");
             if (game != null) return Reject("GameStarted", "对局已开始；原玩家请使用凭据重连。");
             if ((payload.Password?.Length ?? 0) > 128 || state.PasswordHash != null && !SameSecret(state.PasswordHash, PasswordHash(payload.Password ?? "", state.PasswordSalt))) return Reject("InvalidPassword", "房间密码不正确。");
@@ -384,6 +397,8 @@ public sealed class RoomDirectory : IDisposable
             if (game != null && !Connected(before.Seats.Single(s => s.SeatId == seat.SeatId)))
             {
                 seat.ControlledByAi = true; seat.RejoinAfterTurnKey = game.TurnKey; state.Revision++;
+                // 同时选将没有当前行动回合；仍有效的个人待决可在重连锁内安全交回本人。
+                if(game.HasIndependentSelection(seat.SeatId)){seat.ControlledByAi=false;seat.RejoinAfterTurnKey=null;}
             }
             if (!Commit(before)) return Reject("PersistenceFailed", "连接接管保存失败，请稍后重试。");
             if (old != null) lastSeen.Remove(old); lastSeen[seat.ConnectionId] = owner.options.Clock(); disconnectedSince.Remove(seat.SeatId); return Snapshot(seat);
@@ -407,7 +422,7 @@ public sealed class RoomDirectory : IDisposable
             if (seat.ControlledByAi) return Snapshot(seat, "AiTakeover", "AI 正在接管，重连后将在下一次自己的行动回合恢复操作。", false);
             if (!preview && game.CommandCount >= owner.options.MaximumCommittedCommands) return Snapshot(seat, "CommandLimit", "本房间已达到可恢复的命令上限，最后保存局面已保留。", false);
             if (paused) return Snapshot(seat, "RoomPaused", "保存失败后房间已暂停，请管理员恢复保存。", false);
-            if (request.ExpectedRevision != state.Revision) return Snapshot(seat, "StaleRevision", "局面已更新，请根据最新局面重新决定。", false);
+            if (request.ExpectedRevision != state.Revision && !(request.ExpectedRevision<state.Revision&&game.HasIndependentSelectionToken(command))) return Snapshot(seat, "StaleRevision", "局面已更新，请根据最新局面重新决定。", false);
             if (preview) { var check = game.Execute(command, true); return Snapshot(seat, check.Code, check.Message, check.Success); }
             if (state.Receipts.Count >= 100000) return Snapshot(seat, "CommandLimit", "本房间已达到保存命令上限。", false);
             var before = PrivateJson.Copy(state); var result = game.Execute(command, false);
@@ -581,7 +596,8 @@ public sealed class RoomDirectory : IDisposable
                 }
                 if (paused || game == null || game.Finished) return false;
                 if (game.CommandCount >= owner.options.MaximumCommittedCommands) return false;
-                var actor = game.Actor(); if (!state.Settings.AiSeats.Contains(actor) && !state.Seats.Any(s => s.SeatId == actor && s.ControlledByAi)) return false;
+                bool AiSeat(string player)=>state.Settings.AiSeats.Contains(player)||state.Seats.Any(s=>s.SeatId==player&&s.ControlledByAi);
+                var actor = game.Actor(AiSeat); if (!AiSeat(actor)) return false;
                 var command = game.Decide(actor); command.GetType().GetProperty("Id").SetValue(command, "ai-" + Guid.NewGuid().ToString("N"));
                 var before = PrivateJson.Copy(state); var result = game.Execute(command, false);
                 if (!result.Success) { paused = true; return false; }

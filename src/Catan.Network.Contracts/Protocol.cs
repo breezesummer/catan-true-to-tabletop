@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Serialization;
 
 namespace Catan.Network.Contracts
 {
@@ -44,6 +45,8 @@ namespace Catan.Network.Contracts
         public string RuleSet;
         public string ExpectedRulesVersion;
         public string ExpectedScenarioVersion;
+        [DataMember(EmitDefaultValue=false)] public string ExpectedThreeKingdomsPackageVersion;
+        [DataMember(EmitDefaultValue=false)] public string ExpectedThreeKingdomsContentHash;
         // Create / Join 首次发送前由客户端生成并安全保存；重试必须保持编号、凭据和内容相同。
         public string EnrollmentId;
         public string EnrollmentCredential;
@@ -86,6 +89,8 @@ namespace Catan.Network.Contracts
         public int? TargetVictoryPoints;
         public bool Listed = true;
         public string[] AiSeats = Array.Empty<string>();
+        [DataMember(EmitDefaultValue=false)] public string ThreeKingdomsPackageVersion;
+        [DataMember(EmitDefaultValue=false)] public string ThreeKingdomsContentHash;
         // 掉线由 AI 托管，重连在下一自身行动回合接回；权威存档保留。
     }
     public sealed class CreateRoomPayload
@@ -107,6 +112,8 @@ namespace Catan.Network.Contracts
         public string ScenarioId;
         public string RulesVersion;
         public string ScenarioVersion;
+        [DataMember(EmitDefaultValue=false)] public string ThreeKingdomsPackageVersion;
+        [DataMember(EmitDefaultValue=false)] public string ThreeKingdomsContentHash;
         public int PlayerCount;
         public int OccupiedSeats;
         public int? TargetVictoryPoints;

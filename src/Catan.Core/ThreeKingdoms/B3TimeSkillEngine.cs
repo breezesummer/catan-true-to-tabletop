@@ -8,7 +8,7 @@ namespace Catan.Core.ThreeKingdoms
     public static partial class B2SkillEngine
     {
         private static readonly string[] ReturnCauses = { "seven-discard", "discard", "payment", "play" };
-        private static bool B3Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && s.RulesVersion == GeneralCatalog.B3RulesVersion;
+        private static bool B3Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && (s.RulesVersion == GeneralCatalog.B3RulesVersion || s.RulesVersion == GeneralCatalog.B4RulesVersion);
         private static B3ReturnedCards[] Returned(ThreeKingdomsState s) => s?.Skills?.ReturnedCards ?? Array.Empty<B3ReturnedCards>();
 
         /// <summary>宿主已把真实牌移入银行后调用；七点全部弃完前只保留牌，不产生技能待决。</summary>
@@ -112,7 +112,7 @@ namespace Catan.Core.ThreeKingdoms
             {
                 var cards = new int[8];
                 foreach (var batch in Returned(s).Where(r => r.EventId == f.SourceEventId)) { Add(cards, batch.Cards); Array.Clear(batch.Cards, 0, 8); }
-                Remove(s, f); Gain(host, f.PlayerId, cards); return true;
+                Remove(s, f); Gain(host, f.PlayerId, cards, f.SkillId, f.Id); return true;
             }
             if (f.Kind == "luoying")
             {
@@ -159,10 +159,11 @@ namespace Catan.Core.ThreeKingdoms
             if (c.Option == "skip") { Remove(host.State, f); return true; }
             Require(c.Option == "luoying" && Valid(c.Counts) && c.Counts.Skip(1).Sum() == 0 && c.Counts[0] >= 1 && c.Counts[0] <= AvailableLuoying(host, f), "落英数量、来源或额度无效。");
             var count = c.Counts[0]; var remaining = count;
+            if (B4Enabled(host.State)) B4SkillHistoryEngine.Begin(host.State, f.Id, f.PlayerId, f.SkillId, f.TenureId, f.SourceEventId);
             foreach (var batch in Returned(host.State).Where(r => r.EventId == f.SourceEventId && r.PlayerId == f.Targets[0]))
             { var take = Math.Min(remaining, batch.Cards[0]); batch.Cards[0] -= take; remaining -= take; }
             Counter(Active(host.State, f.PlayerId), "luoying:" + f.Targets[0], host.State.Clock.TurnInstanceId).Value += count;
-            Remove(host.State, f); Gain(host, f.PlayerId, c.Counts); return true;
+            Remove(host.State, f); Gain(host, f.PlayerId, c.Counts, f.SkillId, f.Id); return true;
         }
 
         private static void AddTimeActions(IThreeKingdomsCardHost host, GeneralInstance g, List<B2SkillAction> actions)

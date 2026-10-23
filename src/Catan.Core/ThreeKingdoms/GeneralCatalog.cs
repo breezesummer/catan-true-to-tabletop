@@ -38,9 +38,15 @@ namespace Catan.Core.ThreeKingdoms
         public const string B3RulesVersion = "three-kingdoms-b3-v1";
         public const string B3PackageVersion = "three-kingdoms-dice-time-16-v1";
         public const string B3PackageLabel = "三国争霸 B3（16将完整技能包）";
+        public const string B4RulesVersion = "three-kingdoms-b4-v1";
+        public const string B4PackageVersion = "three-kingdoms-response-effects-v1";
+        public const string B4PackageLabel = "三国争霸 B4（同时选将与双库）";
         private static readonly string[] enabledIds = { "tk-g01", "tk-g06", "tk-g09", "tk-g12", "tk-g15", "tk-g22", "tk-g23", "tk-g28", "tk-g33", "tk-g37", "tk-g43" };
         private static readonly string[] b3Ids = { "tk-g13", "tk-g19", "tk-g21", "tk-g29", "tk-g30" };
+        // 只在整将全部技能落地后加入，未完成定义不得用于满足正常开局门槛。
+        private static readonly string[] b4Ids = { "tk-g05", "tk-g07", "tk-g08", "tk-g14", "tk-g26", "tk-g34", "tk-g39", "tk-g40", "tk-g41", "tk-g42", "tk-g44", "tk-g45", "tk-g49", "tk-g52" };
         public static bool IsEnabled(string id) => enabledIds.Contains(id) || b3Ids.Contains(id);
+        public static bool IsB4Enabled(string id) => IsEnabled(id) || b4Ids.Contains(id);
         public static bool IsB2Enabled(string id) => enabledIds.Contains(id);
         private static readonly GeneralDefinition[] items = new[]
         {
@@ -102,6 +108,8 @@ namespace Catan.Core.ThreeKingdoms
         public static GeneralDefinition[] Definitions => (GeneralDefinition[])items.Clone();
         public static GeneralDefinition[] EnabledDefinitions => items.Where(g => IsEnabled(g.Id)).ToArray();
         public static GeneralDefinition[] B2Definitions => items.Where(g => IsB2Enabled(g.Id)).ToArray();
+        public static GeneralDefinition[] B4Definitions => items.Where(g => IsB4Enabled(g.Id)).ToArray();
+        public static string B4ContentHash { get; } = Json.Hash(B4RulesVersion + "\n" + B4PackageVersion + "\n" + string.Join("\n", items.Where(g => IsB4Enabled(g.Id)).Select(x => x.Id + ":" + x.SourceHash + ":skills-enabled-b4-v1")));
         public static string B2ContentHash { get; } = Json.Hash(B2RulesVersion + "\n" + B2PackageVersion + "\n" + string.Join("\n", items.Where(g => IsB2Enabled(g.Id)).Select(x => x.Id + ":" + x.SourceHash + ":skills-enabled-b2-v1")));
         public static string B3ContentHash { get; } = Json.Hash(B3RulesVersion + "\n" + B3PackageVersion + "\n" + string.Join("\n", items.Where(g => IsEnabled(g.Id)).Select(x => x.Id + ":" + x.SourceHash + ":skills-enabled-b3-v1")));
         public static string ContentHash { get; } = Json.Hash(RulesVersion + "\n" + PackageVersion + "\n" + string.Join("\n", items.Select(x => x.Id + ":" + x.SourceHash + ":skills-disabled")));

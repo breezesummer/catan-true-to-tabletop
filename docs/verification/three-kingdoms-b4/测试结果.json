@@ -1,0 +1,605 @@
+{
+  "完成日期": "2026-10-23",
+  "时区": "Asia/Shanghai",
+  "游戏版本": "内测版2.0.1",
+  "状态": "B4规则与会话验收通过；本地开发包，未正式发布；最终产物指纹待主代理补齐",
+  "正常包": {
+    "武将数": 30,
+    "技能数": 51,
+    "新增武将": [
+      "大乔",
+      "于吉",
+      "神甘宁",
+      "曹操",
+      "阚泽",
+      "荀攸",
+      "荀彧",
+      "蒋干",
+      "杜预",
+      "赵云",
+      "甄姬",
+      "刘琦",
+      "邓艾",
+      "马良"
+    ],
+    "隔离将数": 24,
+    "武将规则版本": "three-kingdoms-b4-v1",
+    "包版本": "three-kingdoms-response-effects-v1",
+    "包内容SHA256": "ee04cdbae1d524f536545eec0cb72b25e5806bc7c1f3ac29e8c24e5e09684164"
+  },
+  "三国统一检查": {
+    "统计口径": "完整用例名按Ordinal区分大小写去重；按测试启动/代码补测顺序应用统一检查、最终完整局、最后专项、最后隐私修复，同名只计一次。完整局耗时较长，不按结束时间把较早编译的代码误认为较新代码。",
+    "去重总数": 558,
+    "通过": 558,
+    "失败": 0,
+    "证据": [
+      {
+        "文件": ".local/test-results/b4/b4-three-kingdoms-all.trx",
+        "SHA256": "0506441c0e6241458b8bde8bb0b33562f35569e828889f074ec22a706a6232cf",
+        "总数": 513,
+        "通过": 506,
+        "失败": 7,
+        "开始": "2026-10-23T15:56:01.3464516+08:00",
+        "结束": "2026-10-23T16:12:27.1316571+08:00"
+      },
+      {
+        "文件": ".local/test-results/b4/b4-final.trx",
+        "SHA256": "7ebd1cecbfffb91598562a4dc35427d3706e65b38b422b82a02e8199fe9d110a",
+        "总数": 188,
+        "通过": 188,
+        "失败": 0,
+        "开始": "2026-10-23T16:14:28.539555+08:00",
+        "结束": "2026-10-23T16:34:20.432878+08:00"
+      },
+      {
+        "文件": ".local/test-results/b4/b4-last-specialized.trx",
+        "SHA256": "9a0075d0f76cee9847861defc89492a9f338d4771b1c3d71464e6a7b7523a8ac",
+        "总数": 168,
+        "通过": 168,
+        "失败": 0,
+        "开始": "2026-10-23T16:19:19.2576508+08:00",
+        "结束": "2026-10-23T16:20:31.4089905+08:00"
+      },
+      {
+        "文件": ".local/verification/b4-ui-history/b4-conversion-privacy.trx",
+        "SHA256": "0121140ff45dd9bcedced9aaf975a8873eeb8e1bc9209425951df1a43d8417e6",
+        "总数": 97,
+        "通过": 97,
+        "失败": 0,
+        "开始": "2026-10-23T16:30:37.8416542+08:00",
+        "结束": "2026-10-23T16:31:44.1416215+08:00"
+      }
+    ],
+    "最后专项分类": [
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4AutomationTests",
+        "总数": 5,
+        "通过": 5
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4HistoryTests",
+        "总数": 21,
+        "通过": 21
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4LifecycleTests",
+        "总数": 15,
+        "通过": 15
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4ResponseIntegrationTests",
+        "总数": 46,
+        "通过": 46
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4ResponseTests",
+        "总数": 25,
+        "通过": 25
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4SkillsIntegrationTests",
+        "总数": 26,
+        "通过": 26
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4SkillsTests",
+        "总数": 30,
+        "通过": 30
+      }
+    ],
+    "最后完整局状态": "20个正常完整局全部通过",
+    "最后完整局预期文件": ".local/test-results/b4/b4-final.trx",
+    "三国B4去重数": 192,
+    "B1至B3回归数": 366,
+    "失败精确名单": [],
+    "最终B4分类": [
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4AutomationTests",
+        "总数": 5,
+        "通过": 5
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4HistoryTests",
+        "总数": 21,
+        "通过": 21
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4LifecycleTests",
+        "总数": 15,
+        "通过": 15
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4ResponseIntegrationTests",
+        "总数": 48,
+        "通过": 48
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4ResponseTests",
+        "总数": 25,
+        "通过": 25
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests",
+        "总数": 20,
+        "通过": 20
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4SkillsIntegrationTests",
+        "总数": 28,
+        "通过": 28
+      },
+      {
+        "测试类": "Catan.Rules.Tests.ThreeKingdomsB4SkillsTests",
+        "总数": 30,
+        "通过": 30
+      }
+    ]
+  },
+  "完整B4对局": {
+    "状态": "20个配置全部正常胜利并通过公开Save/Load精确重放",
+    "预期局数": 20,
+    "正常包武将数": 30,
+    "种子": 97,
+    "使用默认胜利目标": true,
+    "使用产品AI": true,
+    "覆盖": "城市与骑士及九张双扩展地图，各三人与四人",
+    "是否手工推进阶段": false,
+    "恢复方法": "首次出现的技能/骰子/选将待决以公开Save/Load完整重放，最终存档再精确重放；每条命令验证不变量",
+    "结果": [
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"cities\", map: \"base\", seats: 3)",
+        "玩法": "cities",
+        "地图": "base",
+        "人数": 3,
+        "结果": "Passed",
+        "耗时": "00:00:32.6284869",
+        "合法命令": 372,
+        "正常轮数": 14,
+        "实际登场将数": 15,
+        "首次待决恢复类型数": 42,
+        "实际输出": "B4 cities/base/3人：372条命令，14轮，15将登场，42类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"cities\", map: \"base\", seats: 4)",
+        "玩法": "cities",
+        "地图": "base",
+        "人数": 4,
+        "结果": "Passed",
+        "耗时": "00:02:25.3346356",
+        "合法命令": 643,
+        "正常轮数": 16,
+        "实际登场将数": 23,
+        "首次待决恢复类型数": 51,
+        "实际输出": "B4 cities/base/4人：643条命令，16轮，23将登场，51类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"cloth-for-catan\", seats: 3)",
+        "玩法": "combined",
+        "地图": "cloth-for-catan",
+        "人数": 3,
+        "结果": "Passed",
+        "耗时": "00:01:49.2855883",
+        "合法命令": 495,
+        "正常轮数": 20,
+        "实际登场将数": 21,
+        "首次待决恢复类型数": 48,
+        "实际输出": "B4 combined/cloth-for-catan/3人：495条命令，20轮，21将登场，48类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"cloth-for-catan\", seats: 4)",
+        "玩法": "combined",
+        "地图": "cloth-for-catan",
+        "人数": 4,
+        "结果": "Passed",
+        "耗时": "00:00:39.7190222",
+        "合法命令": 531,
+        "正常轮数": 17,
+        "实际登场将数": 23,
+        "首次待决恢复类型数": 50,
+        "实际输出": "B4 combined/cloth-for-catan/4人：531条命令，17轮，23将登场，50类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"fog-islands\", seats: 3)",
+        "玩法": "combined",
+        "地图": "fog-islands",
+        "人数": 3,
+        "结果": "Passed",
+        "耗时": "00:00:20.2034306",
+        "合法命令": 496,
+        "正常轮数": 19,
+        "实际登场将数": 21,
+        "首次待决恢复类型数": 46,
+        "实际输出": "B4 combined/fog-islands/3人：496条命令，19轮，21将登场，46类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"fog-islands\", seats: 4)",
+        "玩法": "combined",
+        "地图": "fog-islands",
+        "人数": 4,
+        "结果": "Passed",
+        "耗时": "00:00:22.4144946",
+        "合法命令": 457,
+        "正常轮数": 12,
+        "实际登场将数": 16,
+        "首次待决恢复类型数": 34,
+        "实际输出": "B4 combined/fog-islands/4人：457条命令，12轮，16将登场，34类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"forgotten-tribe\", seats: 3)",
+        "玩法": "combined",
+        "地图": "forgotten-tribe",
+        "人数": 3,
+        "结果": "Passed",
+        "耗时": "00:01:24.2401660",
+        "合法命令": 710,
+        "正常轮数": 26,
+        "实际登场将数": 26,
+        "首次待决恢复类型数": 55,
+        "实际输出": "B4 combined/forgotten-tribe/3人：710条命令，26轮，26将登场，55类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"forgotten-tribe\", seats: 4)",
+        "玩法": "combined",
+        "地图": "forgotten-tribe",
+        "人数": 4,
+        "结果": "Passed",
+        "耗时": "00:02:05.9787533",
+        "合法命令": 1008,
+        "正常轮数": 29,
+        "实际登场将数": 25,
+        "首次待决恢复类型数": 59,
+        "实际输出": "B4 combined/forgotten-tribe/4人：1008条命令，29轮，25将登场，59类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"four-islands\", seats: 3)",
+        "玩法": "combined",
+        "地图": "four-islands",
+        "人数": 3,
+        "结果": "Passed",
+        "耗时": "00:00:47.7550462",
+        "合法命令": 753,
+        "正常轮数": 26,
+        "实际登场将数": 26,
+        "首次待决恢复类型数": 52,
+        "实际输出": "B4 combined/four-islands/3人：753条命令，26轮，26将登场，52类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"four-islands\", seats: 4)",
+        "玩法": "combined",
+        "地图": "four-islands",
+        "人数": 4,
+        "结果": "Passed",
+        "耗时": "00:00:43.7876965",
+        "合法命令": 703,
+        "正常轮数": 18,
+        "实际登场将数": 23,
+        "首次待决恢复类型数": 50,
+        "实际输出": "B4 combined/four-islands/4人：703条命令，18轮，23将登场，50类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"heading-for-new-shores\", seats: 3)",
+        "玩法": "combined",
+        "地图": "heading-for-new-shores",
+        "人数": 3,
+        "结果": "Passed",
+        "耗时": "00:00:29.4945054",
+        "合法命令": 544,
+        "正常轮数": 19,
+        "实际登场将数": 21,
+        "首次待决恢复类型数": 46,
+        "实际输出": "B4 combined/heading-for-new-shores/3人：544条命令，19轮，21将登场，46类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"heading-for-new-shores\", seats: 4)",
+        "玩法": "combined",
+        "地图": "heading-for-new-shores",
+        "人数": 4,
+        "结果": "Passed",
+        "耗时": "00:00:27.1641299",
+        "合法命令": 711,
+        "正常轮数": 19,
+        "实际登场将数": 23,
+        "首次待决恢复类型数": 43,
+        "实际输出": "B4 combined/heading-for-new-shores/4人：711条命令，19轮，23将登场，43类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"new-world\", seats: 3)",
+        "玩法": "combined",
+        "地图": "new-world",
+        "人数": 3,
+        "结果": "Passed",
+        "耗时": "00:00:14.7056398",
+        "合法命令": 325,
+        "正常轮数": 16,
+        "实际登场将数": 18,
+        "首次待决恢复类型数": 29,
+        "实际输出": "B4 combined/new-world/3人：325条命令，16轮，18将登场，29类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"new-world\", seats: 4)",
+        "玩法": "combined",
+        "地图": "new-world",
+        "人数": 4,
+        "结果": "Passed",
+        "耗时": "00:00:23.7480246",
+        "合法命令": 599,
+        "正常轮数": 12,
+        "实际登场将数": 16,
+        "首次待决恢复类型数": 42,
+        "实际输出": "B4 combined/new-world/4人：599条命令，12轮，16将登场，42类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"pirate-islands\", seats: 3)",
+        "玩法": "combined",
+        "地图": "pirate-islands",
+        "人数": 3,
+        "结果": "Passed",
+        "耗时": "00:01:48.0381887",
+        "合法命令": 738,
+        "正常轮数": 28,
+        "实际登场将数": 26,
+        "首次待决恢复类型数": 57,
+        "实际输出": "B4 combined/pirate-islands/3人：738条命令，28轮，26将登场，57类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"pirate-islands\", seats: 4)",
+        "玩法": "combined",
+        "地图": "pirate-islands",
+        "人数": 4,
+        "结果": "Passed",
+        "耗时": "00:01:43.9022287",
+        "合法命令": 933,
+        "正常轮数": 22,
+        "实际登场将数": 26,
+        "首次待决恢复类型数": 62,
+        "实际输出": "B4 combined/pirate-islands/4人：933条命令，22轮，26将登场，62类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"through-the-desert\", seats: 3)",
+        "玩法": "combined",
+        "地图": "through-the-desert",
+        "人数": 3,
+        "结果": "Passed",
+        "耗时": "00:00:31.8541420",
+        "合法命令": 407,
+        "正常轮数": 16,
+        "实际登场将数": 18,
+        "首次待决恢复类型数": 40,
+        "实际输出": "B4 combined/through-the-desert/3人：407条命令，16轮，18将登场，40类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"through-the-desert\", seats: 4)",
+        "玩法": "combined",
+        "地图": "through-the-desert",
+        "人数": 4,
+        "结果": "Passed",
+        "耗时": "00:00:19.8193797",
+        "合法命令": 606,
+        "正常轮数": 12,
+        "实际登场将数": 16,
+        "首次待决恢复类型数": 40,
+        "实际输出": "B4 combined/through-the-desert/4人：606条命令，12轮，16将登场，40类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"wonders-of-catan\", seats: 3)",
+        "玩法": "combined",
+        "地图": "wonders-of-catan",
+        "人数": 3,
+        "结果": "Passed",
+        "耗时": "00:00:20.0626063",
+        "合法命令": 458,
+        "正常轮数": 17,
+        "实际登场将数": 18,
+        "首次待决恢复类型数": 40,
+        "实际输出": "B4 combined/wonders-of-catan/3人：458条命令，17轮，18将登场，40类待决恢复。"
+      },
+      {
+        "用例": "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"wonders-of-catan\", seats: 4)",
+        "玩法": "combined",
+        "地图": "wonders-of-catan",
+        "人数": 4,
+        "结果": "Passed",
+        "耗时": "00:02:19.3803144",
+        "合法命令": 1005,
+        "正常轮数": 28,
+        "实际登场将数": 26,
+        "首次待决恢复类型数": 61,
+        "实际输出": "B4 combined/wonders-of-catan/4人：1005条命令，28轮，26将登场，61类待决恢复。"
+      }
+    ],
+    "局数": 20,
+    "证据": {
+      "文件": ".local/test-results/b4/b4-final.trx",
+      "SHA256": "7ebd1cecbfffb91598562a4dc35427d3706e65b38b422b82a02e8199fe9d110a",
+      "总数": 188,
+      "通过": 188,
+      "失败": 0,
+      "开始": "2026-10-23T16:14:28.539555+08:00",
+      "结束": "2026-10-23T16:34:20.432878+08:00"
+    },
+    "合法命令总数": 12494.0,
+    "正常轮数范围": [
+      12.0,
+      29.0
+    ]
+  },
+  "旧模式快速回归": {
+    "证据": {
+      "文件": ".local/test-results/b4/b4-original-modes.trx",
+      "SHA256": "3fbbc785835182eaeb2fe471a29d1f6816c39a8176652d042fd0e1cdedb52fdc",
+      "总数": 1171,
+      "通过": 1149,
+      "失败": 22,
+      "开始": "2026-10-23T16:10:03.1243872+08:00",
+      "结束": "2026-10-23T16:10:53.349194+08:00"
+    },
+    "基线文件": "docs/verification/three-kingdoms-b3/测试结果.json",
+    "基线SHA256": "b82ad6960b9a33ea98d39803b20df9bcf0511aaf10e5b90a0fd719f54d6d9d81",
+    "比较方式": "完整用例名区分大小写的集合比较",
+    "与B3既有失败逐项相同": true,
+    "新增失败": [],
+    "既有失败精确名单": [
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"锻铁匠\", track: 2)",
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"商业港口\", track: 0)",
+      "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.FreeEngineeringWallIsConstructedAndCardUsesRequestedVerb",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Constitution, name: \"宪法\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Printing, name: \"印刷术\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.ResourceMonopolyUsesHarvestForEachAffectedPlayer",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.SabotageDiscardIsOneColoredCountSentenceForEveryViewer",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: False)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: True)",
+      "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"ProgressTreasonRemove\", action: \"叛变\", piece: \"己方骑士\")",
+      "Catan.Rules.Tests.TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat",
+      "Catan.Rules.Tests.TabletopSpecialCollectionTests.DefenderProgressRewardFliesFromTheCorrectTrackWithoutLeakingOpponentCard"
+    ]
+  },
+  "网络协议权限回归": {
+    "文件": ".local/verification/b4-ui-history/b4-network.trx",
+    "SHA256": "52fbd1f3dd681784accd9f61af83da2197f306092f82b0a9489a862998391f0e",
+    "总数": 153,
+    "通过": 153,
+    "失败": 0,
+    "开始": "2026-10-23T16:12:35.1060438+08:00",
+    "结束": "2026-10-23T16:12:46.4253667+08:00"
+  },
+  "本地HTTP与WebSocket客户端回归": {
+    "文件": ".local/verification/b4-ui-history/b4-server-client.trx",
+    "SHA256": "77f8916de50ec4e434ba53622ac685fb9f88a1594c0c9bfe77f502a5997aa01a",
+    "总数": 71,
+    "通过": 71,
+    "失败": 0,
+    "开始": "2026-10-23T16:14:29.8544023+08:00",
+    "结束": "2026-10-23T16:15:16.6478999+08:00"
+  },
+  "Windows实际自动Player": {
+    "证据文件": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/verification/result.json",
+    "SHA256": "8ba26494bf194a59c096dcc1509c75651329be9ce939bcfdfb7d253e8acf7f57",
+    "结果": "通过",
+    "Unity版本": "6000.3.25f1",
+    "武将包": "three-kingdoms-response-effects-v1",
+    "配置数": 4,
+    "保存恢复次数": 36,
+    "主动隐退次数": 8,
+    "本地重开次数": 4,
+    "技能选择次数": 4,
+    "启用图形": true,
+    "截图数量": 0,
+    "有GUI变化截图数量": 0,
+    "完整界面像素已验收": false,
+    "说明": "实际Windows程序的自动验证入口；不是人工鼠标、触控或真人整局。原result说明提及截图生成，但实际images=0，不记为截图证据。",
+    "产物范围": "最终历史ID及菜单文案修复前的自动运行；最终程序另有构建和菜单鼠标复验，详见构建指纹.json。"
+  },
+  "构建": {
+    "Android": {
+      "状态": "最终ARM64 APK增量构建及签名验证成功（109.3秒）",
+      "日志": ".local/test-results/b4/android-build-final.log",
+      "日志SHA256": "b4ab56a2f41709f989de18d473b0c16d3bd496c6f214514b5c8c87f8f558c494",
+      "输出": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/Builds/Android/Catan2.0.1.apk",
+      "真机": "没有可用设备，未运行",
+      "最后增量日志": ".local/test-results/b4/android-build-final.log",
+      "产物SHA256": "219cbc116dc7abbbb4467230ea5a1fe52f41ed4cf7f248fb0c0f3d321c0f33df"
+    },
+    "Windows": {
+      "状态": "最终增量构建成功，客户端及随包服务已生成",
+      "日志": ".local/test-results/b4/windows-build-final.log",
+      "日志SHA256": "be3378c96954d4af9518ad22a8975731add11af3c97f3e410378d35e0e496fcf",
+      "输出": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/Builds/Windows/Catan2.0.1.exe",
+      "产物SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    }
+  },
+  "中间运行结果": [
+    {
+      "证据": {
+        "文件": ".local/test-results/b4/b4-complete-sessions.trx",
+        "SHA256": "ba560efd020f5278cb7e5995fce8ca0ddbe41d8ec377b39399c49dc26e0691c9",
+        "总数": 20,
+        "通过": 7,
+        "失败": 13,
+        "开始": "2026-10-23T15:43:59.7052319+08:00",
+        "结束": "2026-10-23T15:50:12.1392378+08:00"
+      },
+      "说明": "首轮正常完整局7通过、13失败；属于修复过程，不能计作最终20局通过。"
+    },
+    {
+      "证据": {
+        "文件": ".local/test-results/b4/b4-three-kingdoms-all.trx",
+        "SHA256": "0506441c0e6241458b8bde8bb0b33562f35569e828889f074ec22a706a6232cf",
+        "总数": 513,
+        "通过": 506,
+        "失败": 7,
+        "开始": "2026-10-23T15:56:01.3464516+08:00",
+        "结束": "2026-10-23T16:12:27.1316571+08:00"
+      },
+      "失败精确名单": [
+        "Catan.Rules.Tests.ThreeKingdomsB4ResponseIntegrationTests.CancellingGuhuoPlayerOfferReleasesReservedCardWithoutDiscard(mode: \"cities\")",
+        "Catan.Rules.Tests.ThreeKingdomsB4ResponseIntegrationTests.CancellingGuhuoPlayerOfferReleasesReservedCardWithoutDiscard(mode: \"combined\")",
+        "Catan.Rules.Tests.ThreeKingdomsB4ResponseIntegrationTests.GuhuoPlayerOfferHidesRealPaymentAndRestoredAcceptanceTransfersPhysicalCard(mode: \"cities\")",
+        "Catan.Rules.Tests.ThreeKingdomsB4ResponseIntegrationTests.GuhuoPlayerOfferHidesRealPaymentAndRestoredAcceptanceTransfersPhysicalCard(mode: \"combined\")",
+        "Catan.Rules.Tests.ThreeKingdomsB4ResponseIntegrationTests.TuntianAfterNativeOutOfTurnTradeJudgesOnceAndObservesQinqin(mode: \"cities\")",
+        "Catan.Rules.Tests.ThreeKingdomsB4ResponseIntegrationTests.TuntianAfterNativeOutOfTurnTradeJudgesOnceAndObservesQinqin(mode: \"combined\")",
+        "Catan.Rules.Tests.ThreeKingdomsB4SessionTests.ProductAiFinishesNormalThirtyGeneralGameWithoutManualPhases(rules: \"combined\", map: \"forgotten-tribe\", seats: 4)"
+      ],
+      "说明": "统一检查原有6项交易/随机夹具断言及1项遗忘部落4人完整局失败，已分别由最后专项/隐私补测与最终20局同名案例通过覆盖。"
+    }
+  ],
+  "验证边界": [
+    "旧模式1171项快速回归保留22项与B3完全相同的既有失败；不写成旧模式全绿。",
+    "固定宿主局面的权威状态序列化只验证格式与续步，不冒充正常历史重放。",
+    "最后完整局TRX共188项全部通过，其中20个正常局全部获胜；完整局启动后完成的局部历史与隐私修复由专项97项验证，不将较早编译的完整局冒称最终每行代码的重跑。",
+    "网络153及HTTP/WebSocket71为本地自动测试，不等于外网多人实测。",
+    "Windows自动Player通过且0截图、完整像素未验收；另有实际Windows鼠标操作检查仅覆盖菜单与开局选将局部流程，无独立PNG，不能写成完整UI或用户试玩通过。",
+    "Android仅构建与签名验证；没有Android真机运行证据。",
+    "本轮未运行外网多人和真人长局，不改变M7/M8产品验收状态。",
+    "本目录只包含公开统计、证据路径和指纹，不提交权威存档、checkpoint、隐藏候选、手牌或随机状态。",
+    "Windows与Android最终增量构建均成功，产物及最后构建日志指纹已记录；未正式发布。"
+  ],
+  "Windows鼠标操作检查": {
+    "结果": "已通过所列局部流程，未作完整UI验收",
+    "来源": "本轮主代理实际Windows鼠标操作、实时屏幕截图及观察报告；未另存PNG",
+    "已观察": [
+      "主菜单启用三国四人配置",
+      "本席4张私密候选中选择2张",
+      "从保留2张中选择1张登场，统一公开屏障完成"
+    ],
+    "菜单文案": "最终Windows程序重开并进入城市与骑士向导，主代理目视确认三国争霸B4（30张完整武将）及30将51技能、同时选将与自动阶段、本地及联机说明；复验通过，无独立PNG",
+    "胜利目标": "城市与骑士默认13分保持原规则；13/17在三国规则中指三人/四人同时选将的实体门槛，不是胜利分数",
+    "未覆盖": [
+      "完整界面像素审查",
+      "Android触控",
+      "真人长局",
+      "用户整局试玩"
+    ]
+  },
+  "构建指纹记录": "构建指纹.json",
+  "Windows交互观察记录": "Windows交互观察.md"
+}

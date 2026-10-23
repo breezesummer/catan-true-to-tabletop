@@ -63,7 +63,8 @@ namespace Catan.AI
         {
             SkillId = command.SkillId, Option = command.Option, TargetPlayerIds = command.TargetPlayerIds?.ToArray(),
             Counts = command.Counts?.ToArray(), TileIds = command.TileIds?.ToArray(), ProgressCardId = command.ProgressCardId,
-            DecisionId = command.DecisionId, WindowId = command.WindowId, CardType = command.CardType
+            DecisionId = command.DecisionId, WindowId = command.WindowId, CardType = command.CardType,
+            EffectiveCardType = command.EffectiveCardType, SecondaryCounts = command.SecondaryCounts?.ToArray(), ProgressCardIds = command.ProgressCardIds?.ToArray()
         };
     }
 }

@@ -45,11 +45,20 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=7)] public string DecisionId { get; set; }
         [DataMember(Order=8)] public string WindowId { get; set; }
         [DataMember(Order=9)] public int CardType { get; set; } = -1;
+        [DataMember(Order=10, EmitDefaultValue=false)] public int[] SecondaryCounts { get; set; }
+        [DataMember(Order=11, EmitDefaultValue=false)] public string[] ProgressCardIds { get; set; }
+        [DataMember(Order=12, EmitDefaultValue=false)] public int? EffectiveCardType { get; set; }
     }
     [DataContract] public sealed class B2SkillAction
     {
         [DataMember(Order=1)] public string Label { get; set; }
         [DataMember(Order=2)] public B2SkillCommand Command { get; set; }
+        [DataMember(Order=3, EmitDefaultValue=false)] public int? RealCardType { get; set; }
+        [DataMember(Order=4, EmitDefaultValue=false)] public int? EffectiveCardType { get; set; }
+        [DataMember(Order=5, EmitDefaultValue=false)] public string CardSelectionKind { get; set; }
+        [DataMember(Order=6, EmitDefaultValue=false)] public int? AvailableCount { get; set; }
+        [DataMember(Order=7, EmitDefaultValue=false)] public string VirtualCardId { get; set; }
+        [DataMember(Order=8, EmitDefaultValue=false)] public int? ResultCardType { get; set; }
     }
     [DataContract] public sealed class B2SkillDecision
     {
@@ -78,6 +87,8 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=13)] public string SourceEventId { get; set; }
         [DataMember(Order=14)] public int[] SelectedCards { get; set; } = new int[8];
         [DataMember(Order=15)] public bool Started { get; set; }
+        [DataMember(Order=16, EmitDefaultValue=false)] public B4SkillPayload B4 { get; set; }
+        [DataMember(Order=17, EmitDefaultValue=false)] public bool B4OrderChosen { get; set; }
     }
     [DataContract] public sealed class B2TimedEffect
     {
@@ -87,6 +98,7 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=4)] public string TargetPlayerId { get; set; }
         [DataMember(Order=5)] public long OpportunityId { get; set; }
         [DataMember(Order=6)] public long CreatedTurnId { get; set; }
+        [DataMember(Order=7, EmitDefaultValue=false)] public string SourceTenureId { get; set; }
     }
     [DataContract] public sealed class B2PlayerLedger
     {
@@ -135,5 +147,10 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=4)] public int LostCount { get; set; }
         // 仅交给其他玩家的数量；支付银行、被偷和弃置均为零。
         [DataMember(Order=5)] public int GivenCount { get; set; }
+        [DataMember(Order=6, EmitDefaultValue=false)] public int[] LostCards { get; set; }
+        [DataMember(Order=7, EmitDefaultValue=false)] public int[] GainedCards { get; set; }
+        [DataMember(Order=8, EmitDefaultValue=false)] public string SourcePlayerId { get; set; }
+        [DataMember(Order=9, EmitDefaultValue=false)] public string SourceSkillId { get; set; }
+        [DataMember(Order=10, EmitDefaultValue=false)] public int LostProgressCount { get; set; }
     }
 }

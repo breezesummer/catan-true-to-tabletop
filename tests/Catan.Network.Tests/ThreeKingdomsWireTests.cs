@@ -16,7 +16,7 @@ public sealed class ThreeKingdomsWireTests
         var view = WireJson.Serialize(game.GetPlayerView("P1"));
         var command = WireJson.Serialize(new M4.Command { Id = "old", PlayerId = "P1", Kind = M4.CommandKind.RollDice });
         Assert.DoesNotContain("ThreeKingdoms", view);
-        foreach (var name in new[] { "GeneralIds", "DecisionId", "WindowId", "SkillCommand" }) Assert.DoesNotContain(name, command);
+        foreach (var name in new[] { "GeneralIds", "DecisionId", "WindowId", "SkillCommand", "PaymentCards", "GiveEffectiveCardType", "CancelRetirementIntent", "RetireAtPhase" }) Assert.DoesNotContain(name, command);
         Assert.Equal(view, WireJson.Serialize(WireJson.Deserialize<M5.PlayerView>(view)));
     }
 
@@ -25,7 +25,7 @@ public sealed class ThreeKingdomsWireTests
     [InlineData(true)]
     public void PrivateCandidateIdsOnlyReachTheirOwnerAndAiHasNoExtraGeneralPermission(bool skills)
     {
-        var game = M5.CombinedGameSession.Create("heading-for-new-shores", 4, 419, threeKingdoms: true, threeKingdomsSkills: skills);
+        var game = M5.CombinedGameSession.Create("heading-for-new-shores", 4, 419, threeKingdoms: true, threeKingdomsSkills: skills,threeKingdomsPackageVersion:skills?GeneralCatalog.B3PackageVersion:GeneralCatalog.PackageVersion);
         var authority = game.GetAuthoritativeStateForTesting();
         var owner = authority.ThreeKingdoms.PendingDecision.PlayerId;
         foreach (var player in authority.Players)
@@ -78,7 +78,7 @@ public sealed class ThreeKingdomsWireTests
     [Fact]
     public void NormalSkillChoiceOnlyPublishesActionsToDecisionOwnerAndResumesIdentically()
     {
-        var game = M5.CombinedGameSession.Create("heading-for-new-shores", 4, 419, threeKingdoms: true);
+        var game = M5.CombinedGameSession.Create("heading-for-new-shores", 4, 419, threeKingdoms: true,threeKingdomsPackageVersion:GeneralCatalog.B3PackageVersion);
         var policy = new CombinedAi();
         for (int step = 0; step < 512; step++)
         {

@@ -69,7 +69,8 @@ public sealed partial class M4App : MonoBehaviour
     public CommandResult Submit(Command command)
     {
         if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status=ai.Network.Status;return null;}
-        if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!(command.Kind==CommandKind.UseGeneralSkill&&view?.ThreeKingdoms?.SkillActions?.Length>0&&!ai.TableDiceRolling)&&!(command.Kind==CommandKind.RetireGeneral&&view?.ThreeKingdoms?.CanRetire==true)&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
+        bool ownGeneralChoice=(command.Kind==CommandKind.ChooseGenerals||command.Kind==CommandKind.DeployGeneral)&&view?.ThreeKingdoms?.PendingDecision?.PlayerId==command.PlayerId;
+        if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!ownGeneralChoice&&!(command.Kind==CommandKind.UseGeneralSkill&&view?.ThreeKingdoms?.SkillActions?.Length>0&&!ai.TableDiceRolling)&&!(command.Kind==CommandKind.RetireGeneral&&view?.ThreeKingdoms?.CanRetire==true)&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
         if(ai!=null&&command==draft&&!DockKnightTargetMatches(command.TargetId)){status="请选择低一级的己方骑士晋升。";return null;}
         command.Id=string.IsNullOrEmpty(command.Id)?Guid.NewGuid().ToString("N"):command.Id;
         if(view?.ThreeKingdoms!=null&&string.IsNullOrEmpty(command.WindowId))command.WindowId=view.ThreeKingdoms.WindowId;
@@ -377,6 +378,7 @@ public sealed partial class M4App : MonoBehaviour
     {
         GUILayout.Space(6);if(ai==null)Text("当前选择 · "+CommandName(draft.Kind));
         var k=draft.Kind;var pending=view.PendingDecision==null?"":view.PendingDecision.Kind;
+        if(view.ThreeKingdoms?.HandLossForbidden==true&&(k==CommandKind.BankTrade||k==CommandKind.ProposeTrade)){ModernOperationUI.Info("国色效果期间不能交出手牌进行交易。",true);return;}
         bool card=k==CommandKind.PlayProgressCard;bool resourceReady=true;
         if(card&&ai==null){Text(CardName(draft.ProgressCard));Text(CardHelp[(int)draft.ProgressCard],true);if(view.OwnProgressCards.Contains(draft.ProgressCard))ProgressFace(draft.ProgressCard,CardName(draft.ProgressCard));}
         if(k==CommandKind.ImproveCity&&ai!=null&&operationFacilityLocked)Text("设施轨道："+Tracks[(int)draft.Track]);
@@ -417,9 +419,10 @@ public sealed partial class M4App : MonoBehaviour
             draft.GiveIsCommodity=give>=5;if(give<5)draft.GiveResource=(Resource)give;else draft.GiveCommodity=(Commodity)(give-5);
             draft.ReceiveIsCommodity=receive>=5;if(receive<5)draft.ReceiveResource=(Resource)receive;else draft.ReceiveCommodity=(Commodity)(receive-5);
             draft.GiveAmount=draft.Give.Total+draft.GiveCommodities.Total;draft.ReceiveAmount=draft.Receive.Total+draft.ReceiveCommodities.Total;
-            Text("当前最优比例 "+TradeRate(give)+" : 1",true);
+            if(!ThreeKingdomsPaymentUI.CanDeclare(view.ThreeKingdoms,seat))draft.GiveEffectiveCardType=ThreeKingdomsPaymentUI.TradeUse(view.ThreeKingdoms,give,draft.GiveEffectiveCardType);
+            Text("当前最优比例 "+TradeRate(draft.GiveEffectiveCardType??give)+" : 1",true);
         }
-        if(k==CommandKind.ProposeTrade){Bag("付出",draft.Give,draft.GiveCommodities);Bag("换取",draft.Receive,draft.ReceiveCommodities);}
+        if(k==CommandKind.ProposeTrade){Bag(ThreeKingdomsPaymentUI.CanDeclare(view.ThreeKingdoms,seat)?"实际付出":"报价付出用途",draft.Give,draft.GiveCommodities);Bag("换取",draft.Receive,draft.ReceiveCommodities);}
         if(k==CommandKind.DiscardResources||pending=="ProgressGuildDues"||pending=="ProgressWedding"||pending=="ProgressSabotage")
         {
             if(view.PrivateTargetResources!=null)Text("允许查看的对手手牌："+BagText(view.PrivateTargetResources,view.PrivateTargetCommodities));
@@ -442,6 +445,14 @@ public sealed partial class M4App : MonoBehaviour
         {
             var cards=view.OwnProgressCards.Distinct().ToArray();if(cards.Length>0){var selected=cards[Cycle("发展卡",Math.Max(0,Array.IndexOf(cards,draft.ProgressCard)),cards.Select(CardName).ToArray())];draft.ProgressCard=selected;draft.SelectedProgressCard=selected;}
         }
+        int paymentTotal=k==CommandKind.BuildRoad?2:k==CommandKind.BuildSettlement?4:k==CommandKind.BuildCity?5:k==CommandKind.BuildWall?2:k==CommandKind.RecruitKnight||k==CommandKind.PromoteKnight?2:k==CommandKind.ActivateKnight?1:k==CommandKind.ImproveCity?view.OwnImprovements[(int)draft.Track]+1:k==CommandKind.ProposeTrade&&!ThreeKingdomsPaymentUI.CanDeclare(view.ThreeKingdoms,seat)?draft.Give.Total+draft.GiveCommodities.Total:0;
+        if(paymentTotal>0)draft.PaymentCards=ThreeKingdomsPaymentUI.Payment(view.ThreeKingdoms,seat,draft.PaymentCards,new[]{view.OwnResources.Wood,view.OwnResources.Brick,view.OwnResources.Wool,view.OwnResources.Wheat,view.OwnResources.Ore,view.OwnCommodities.Cloth,view.OwnCommodities.Coin,view.OwnCommodities.Paper},paymentTotal);
+        var declarationReal=draft.DeclaredRealTypes;var declarationUses=draft.DeclaredEffectiveTypes;
+        int[] declarationCards=paymentTotal>0?draft.PaymentCards:k==CommandKind.BankTrade||k==CommandKind.ProposeTrade?Enumerable.Range(0,8).Select(i=>i<5?draft.Give[(Resource)i]:draft.GiveCommodities[(Commodity)(i-5)]).ToArray():null;
+        ThreeKingdomsPaymentUI.Declaration(view.ThreeKingdoms,seat,declarationCards,ref declarationReal,ref declarationUses);
+        draft.DeclaredRealTypes=declarationReal;draft.DeclaredEffectiveTypes=declarationUses;
+        if(k==CommandKind.BankTrade&&ThreeKingdomsPaymentUI.CanDeclare(view.ThreeKingdoms,seat)&&declarationUses==null)draft.GiveEffectiveCardType=null;
+        if(k==CommandKind.BankTrade&&declarationUses?.Length>0&&declarationUses.Distinct().Count()==1)draft.GiveEffectiveCardType=declarationUses[0];
         if(TabletopCardInput.Changed)GUIUtility.ExitGUI();
         if(!resourceReady){ModernOperationUI.Info("请点选一种资源或商品。",true);return;}
         GUILayout.Space(8);
@@ -479,6 +490,7 @@ public sealed partial class M4App : MonoBehaviour
     }
     int TradeRate(int good)
     {
+        if(view.ThreeKingdoms?.BankTradeRates?.Length==8&&good>=0&&good<8)return view.ThreeKingdoms.BankTradeRates[good];
         int rate=4;var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(x=>x.PlayerId==seat).Select(x=>x.LocationId).ToArray();
         foreach(var port in view.Board.Ports.Where(p=>p.Vertices.Any(locations.Contains)))if(!port.Resource.HasValue)rate=Math.Min(rate,3);else if(good<5&&(int)port.Resource.Value==good)rate=2;
         var own=view.Players.First(p=>p.Id==seat);if(good>=5&&(own.Improvements[0]>=3||view.MerchantFleetCommodities.Contains((Commodity)(good-5))))rate=2;

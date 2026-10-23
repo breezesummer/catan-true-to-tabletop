@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Runtime.Serialization;
 
 namespace Catan.Core.ThreeKingdoms
 {
     public enum ThreeKingdomsPhase { OpeningSelection, InitialPlacement, Preparation, Judgment, Roll, Draw, Play, End, RoundEnd, Finished }
     public enum ThreeKingdomsDecisionKind { SelectOpening, DeployOpening, SelectReplacement, DeployReplacement }
-    public enum GeneralRegion { Pool, Candidate, ReservedDeployment, Active, Hidden, Retained }
+    public enum GeneralRegion { Pool, Candidate, ReservedDeployment, Active, Hidden, Retained, Retired }
 
     [DataContract] public sealed class GeneralCounter
     {
@@ -101,6 +101,14 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=23)] public string[] SeatPlayerIds { get; set; } = Array.Empty<string>();
         [DataMember(Order=24)] public B2SkillState Skills { get; set; } = new B2SkillState();
         [DataMember(Order=25, EmitDefaultValue=false)] public B3DiceState Dice { get; set; }
+        // 旧包继续使用单一 PendingDecision；B4 的每位选择者持有独立且稳定的令牌。
+        [DataMember(Order=26, EmitDefaultValue=false)] public ThreeKingdomsDecision[] PendingDecisions { get; set; }
+        [DataMember(Order=27, EmitDefaultValue=false)] public string SelectionBatchId { get; set; }
+        [DataMember(Order=28, EmitDefaultValue=false)] public string[] SelectionBatchPlayerIds { get; set; }
+        [DataMember(Order=29, EmitDefaultValue=false)] public long RetirementRecycleCount { get; set; }
+        [DataMember(Order=30, EmitDefaultValue=false)] public B4SkillHistoryEvent[] SkillHistory { get; set; }
+        [DataMember(Order=31, EmitDefaultValue=false)] public B4ResponseState Response { get; set; }
+        [DataMember(Order=40, EmitDefaultValue=false)] public B4AutomationState Automation { get; set; }
     }
     [DataContract] public sealed class ThreeKingdomsPlayerView
     {
@@ -130,5 +138,11 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=13)] public B2SkillAction[] SkillActions { get; set; } = Array.Empty<B2SkillAction>();
         [DataMember(Order=14)] public int[] RevealedSkillCards { get; set; } = new int[8];
         [DataMember(Order=15)] public string[] SkillStatus { get; set; } = Array.Empty<string>();
+        [DataMember(Order=16, EmitDefaultValue=false)] public int RetiredCount { get; set; }
+        [DataMember(Order=17, EmitDefaultValue=false)] public string[] WaitingSelectionPlayerIds { get; set; }
+        [DataMember(Order=18, EmitDefaultValue=false)] public B4SkillHistoryView[] SkillHistory { get; set; }
+        [DataMember(Order=19, EmitDefaultValue=false)] public int[][] EffectiveCardTypes { get; set; }
+        [DataMember(Order=20, EmitDefaultValue=false)] public bool HandLossForbidden { get; set; }
+        [DataMember(Order=21, EmitDefaultValue=false)] public int[] BankTradeRates { get; set; }
     }
 }

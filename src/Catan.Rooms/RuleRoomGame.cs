@@ -1,5 +1,6 @@
 using Catan.AI;
 using Catan.Core;
+using Catan.Core.ThreeKingdoms;
 using Catan.Network.Contracts;
 using M2 = Catan.Core.M2;
 using M3 = Catan.Core.M3;
@@ -35,8 +36,8 @@ internal sealed class RuleRoomGame
         {
             "base" => M2.BaseGameSession.Create(baseJson, settings.PlayerCount, seed, settings.TargetVictoryPoints),
             "seafarers" => M3.SeafarersGameSession.Create(settings.ScenarioId, settings.PlayerCount, seed, settings.TargetVictoryPoints),
-            "cities-knights" => M4.CitiesKnightsGameSession.Create(baseJson, settings.PlayerCount, seed, settings.TargetVictoryPoints),
-            "combined" => M5.CombinedGameSession.Create(settings.ScenarioId, settings.PlayerCount, seed, settings.TargetVictoryPoints),
+            "cities-knights" => M4.CitiesKnightsGameSession.Create(baseJson, settings.PlayerCount, seed, settings.TargetVictoryPoints,threeKingdoms:settings.ThreeKingdomsPackageVersion!=null,threeKingdomsPackageVersion:settings.ThreeKingdomsPackageVersion),
+            "combined" => M5.CombinedGameSession.Create(settings.ScenarioId, settings.PlayerCount, seed, settings.TargetVictoryPoints,threeKingdoms:settings.ThreeKingdomsPackageVersion!=null,threeKingdomsPackageVersion:settings.ThreeKingdomsPackageVersion),
             _ => throw new ArgumentException("未知规则包。")
         });
     }
@@ -50,8 +51,9 @@ internal sealed class RuleRoomGame
     {
         string json = session switch { M2.BaseGameSession s => s.Save(), M3.SeafarersGameSession s => s.Save(), M4.CitiesKnightsGameSession s => s.Save(), M5.CombinedGameSession s => s.Save(), _ => throw new InvalidOperationException() };
         using var document = System.Text.Json.JsonDocument.Parse(json);
-        if (document.RootElement.TryGetProperty("ThreeKingdoms", out var threeKingdoms) && threeKingdoms.ValueKind != System.Text.Json.JsonValueKind.Null)
-            throw new InvalidDataException("三国争霸扩展目前仅支持本地对局，尚未启用联机武将包版本与内容哈希协商。");
+        if (document.RootElement.TryGetProperty("ThreeKingdoms", out var threeKingdoms) && threeKingdoms.ValueKind != System.Text.Json.JsonValueKind.Null &&
+            (threeKingdoms.GetProperty("PackageVersion").GetString()!=GeneralCatalog.B4PackageVersion || threeKingdoms.GetProperty("PackageContentHash").GetString()!=GeneralCatalog.B4ContentHash))
+            throw new InvalidDataException("三国争霸联机需要完整且匹配的 B4 武将包。");
         finished = document.RootElement.TryGetProperty("WinnerPlayerId", out var winner) && winner.ValueKind == System.Text.Json.JsonValueKind.String && !string.IsNullOrEmpty(winner.GetString());
         CommandCount = document.RootElement.GetProperty("ProcessedCommands").GetArrayLength();
         ActivePlayerId = document.RootElement.GetProperty("ActivePlayerId").GetString();
@@ -79,6 +81,8 @@ internal sealed class RuleRoomGame
         var truncated = Array.CreateInstance(elementType, retained.Length);
         for (int i = 0; i < retained.Length; i++) truncated.SetValue(retained[i], i);
         eventsProperty.SetValue(view, truncated);
+        var tk=view is M4.PlayerView city?city.ThreeKingdoms:view is M5.PlayerView combined?combined.ThreeKingdoms:null;
+        if(tk?.SkillHistory?.Length>64)tk.SkillHistory=tk.SkillHistory.Skip(tk.SkillHistory.Length-64).ToArray();
         return WireJson.SerializeObject(view);
     }
     internal GameHistoryEntry[] History(string seat, long after) => session switch { M2.BaseGameSession s => s.GetHistory(seat, after), M3.SeafarersGameSession s => s.GetHistory(seat, after), M4.CitiesKnightsGameSession s => s.GetHistory(seat, after), M5.CombinedGameSession s => s.GetHistory(seat, after), _ => throw new InvalidOperationException() };
@@ -105,6 +109,18 @@ internal sealed class RuleRoomGame
         return ((bool)result.Success, (string)result.ErrorCode, (string)result.Message);
     }
     internal bool Finished => finished;
+    internal bool HasIndependentSelection(string seat)
+    {
+        var projection=View(seat);
+        var tk=projection is M4.PlayerView city?city.ThreeKingdoms:projection is M5.PlayerView combined?combined.ThreeKingdoms:null;
+        return tk?.PackageVersion==GeneralCatalog.B4PackageVersion&&tk.PendingDecision?.PlayerId==seat;
+    }
+    internal bool MatchesGeneralPackage(RoomSettings settings)
+    {
+        var projection=View("P1");
+        var tk=projection is M4.PlayerView city?city.ThreeKingdoms:projection is M5.PlayerView combined?combined.ThreeKingdoms:null;
+        return tk?.PackageVersion==settings.ThreeKingdomsPackageVersion&&tk?.PackageContentHash==settings.ThreeKingdomsContentHash;
+    }
     private object AiView(string seat) => session switch { M2.BaseGameSession s => s.GetAiPlayerView(seat), M3.SeafarersGameSession s => s.GetAiPlayerView(seat), M4.CitiesKnightsGameSession s => s.GetAiPlayerView(seat), M5.CombinedGameSession s => s.GetAiPlayerView(seat), _ => throw new InvalidOperationException() };
     internal object Decide(string seat) => AiView(seat) switch
     {
@@ -112,9 +128,27 @@ internal sealed class RuleRoomGame
         M4.PlayerView v => new CitiesKnightsAi().Decide(v), M5.PlayerView v => new CombinedAi().Decide(v),
         _ => throw new InvalidOperationException()
     };
-    internal string Actor()
+    internal bool HasIndependentSelectionToken(object command)
+    {
+        string player,decision,window;bool choice;
+        if(command is M4.Command city){player=city.PlayerId;decision=city.DecisionId;window=city.WindowId;choice=city.Kind==M4.CommandKind.ChooseGenerals||city.Kind==M4.CommandKind.DeployGeneral;}
+        else if(command is M5.Command combined){player=combined.PlayerId;decision=combined.DecisionId;window=combined.WindowId;choice=combined.Kind==M5.CommandKind.ChooseGenerals||combined.Kind==M5.CommandKind.DeployGeneral;}
+        else return false;
+        if(!choice)return false;
+        var projection=View(player);var tk=projection is M4.PlayerView cityView?cityView.ThreeKingdoms:((M5.PlayerView)projection).ThreeKingdoms;
+        return tk?.PackageVersion==GeneralCatalog.B4PackageVersion&&tk.PendingDecision?.PlayerId==player&&
+            tk.PendingDecision.DecisionId==decision&&tk.PendingDecision.WindowId==window;
+    }
+    internal string Actor(Func<string,bool> eligible=null)
     {
         dynamic view = View("P1");
+        if(ruleSet=="cities-knights"||ruleSet=="combined")
+        {
+            ThreeKingdomsView tk=view.ThreeKingdoms;
+            if(tk?.WaitingSelectionPlayerIds?.Length>0)return tk.WaitingSelectionPlayerIds.FirstOrDefault(p=>eligible==null||eligible(p))??tk.WaitingSelectionPlayerIds[0];
+            if(tk?.PendingDecision!=null)return tk.PendingDecision.PlayerId;
+            if(tk?.SkillDecision!=null)return tk.SkillDecision.PlayerId;
+        }
         if (view.TradeOffer != null) return view.TradeOffer.NextResponder();
         if (view.Phase.ToString() == "Discard") return view.Discards[0].PlayerId;
         if (view.Phase.ToString() == "GoldChoice") return view.GoldClaims[0].PlayerId;

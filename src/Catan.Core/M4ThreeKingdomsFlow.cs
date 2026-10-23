@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Catan.Core.ThreeKingdoms;
@@ -18,7 +18,7 @@ namespace Catan.Core.M4
             var tk = s.ThreeKingdoms; var host = CardHost(s);
             Require(s.Phase != GamePhase.Finished, "GameFinished", "对局已经结束。");
             Require(s.Players.Any(p => p.Id == c.PlayerId), "UnknownPlayer", "未知席位。");
-            Require(c.WindowId == tk.WindowId, "StaleWindow", "操作窗口已更新，请重新选择。");
+            Require(c.WindowId == (B4(s) && (c.Kind == CommandKind.ChooseGenerals || c.Kind == CommandKind.DeployGeneral) ? ThreeKingdomsEngine.GetPendingDecision(tk, c.PlayerId)?.WindowId : tk.WindowId), "StaleWindow", "操作窗口已更新，请重新选择。");
             try
             {
                 if (c.Kind == CommandKind.ChooseGenerals)
@@ -107,6 +107,8 @@ namespace Catan.Core.M4
                         FinishB2Work(s); RefreshB2(s); return;
                     }
                 }
+                Require(!B4(s)||c.Kind!=CommandKind.PlayProgressCard||!B2SkillEngine.IsB4HandLossForbidden(tk,c.PlayerId),"HandLossForbidden","本出牌阶段不能使用发展牌。");
+                Require(!B3(s)||c.Kind!=CommandKind.PlayProgressCard||c.ProgressCard!=ProgressCardKind.Alchemy||tk.Dice?.FixedResult==null,"FixedDiceLocked","直谏已固定本回合骰局，不能再使用炼金术士。");
                 // 合法性预检在隔离副本执行，不消耗权威随机或费用；目标响应先于主体。
                 var targets = B2TargetPlayers(s, c);
                 if (targets.Length > 0)
@@ -136,10 +138,12 @@ namespace Catan.Core.M4
             if (s.Phase == GamePhase.Finished) return;
             var tk = s.ThreeKingdoms; var host = CardHost(s);
             FinishB3Dice(s);
+            ResumeB4Declaration(s);
             if (!B2Busy(s) && s.ThreeKingdomsDeferredCommand != null)
             {
                 var deferred = s.ThreeKingdomsDeferredCommand; s.ThreeKingdomsDeferredCommand = null;
-                ApplyB2Native(s, deferred);
+                bool virtualCard = s.ThreeKingdomsDeferredVirtual; s.ThreeKingdomsDeferredVirtual = false;
+                ApplyB2Native(s, deferred, virtualCard, virtualCard && tk.Clock.Phase == ThreeKingdomsPhase.Preparation);
             }
             if (tk.Clock.Phase == ThreeKingdomsPhase.InitialPlacement && s.Turn > 0 && s.Phase == GamePhase.ProductionAwaitRoll && s.PendingDecision == null)
             {
@@ -157,22 +161,30 @@ namespace Catan.Core.M4
                 var use = s.ThreeKingdomsProgressUse; s.ThreeKingdomsProgressUse = null;
                 if (tk.Generals.Any(g => g.Region == GeneralRegion.Active && g.TenureId == use[2])) B2SkillEngine.OnProgressUsed(host, use[0], use[1]);
             }
+            B2SkillEngine.CompleteB4CardConversions(host);
             B2SkillEngine.Pump(host);
+            FinishB4Progress(s);
+            FinishB4Virtual(s);
             CheckB2Capacity(s);
         }
 
-        private void ApplyB2Native(GameState s, Command c)
+        private void ApplyB2Native(GameState s, Command c, bool virtualCard = false, bool virtualPrepare = false)
         {
             var host = CardHost(s); var before = s.Players.ToDictionary(p => p.Id, p => host.GetHand(p.Id));
+            var outerSkillDelta=s.B4SkillHandDelta; var nestedSkillDelta=B4(s)?s.Players.ToDictionary(p=>p.Id,p=>new int[8]):null; s.B4SkillHandDelta=nestedSkillDelta;
             var offer = s.TradeOffer;
             var pending = s.PendingDecision;
             var buildings = B2Buildings(s);
+            Require(!B4(s)||c.Kind!=CommandKind.BuildSettlement||!B2SkillEngine.IsB4SettlementForbidden(s.ThreeKingdoms,c.PlayerId),"SettlementForbidden","劫营期间不能建设村庄。");
+            Require(!B4(s)||c.Kind!=CommandKind.PlayProgressCard||!B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,c.PlayerId),"HandLossForbidden","本出牌阶段不能使用发展牌。");
             Require(!B3(s) || c.Kind != CommandKind.PlayProgressCard || c.ProgressCard != ProgressCardKind.Alchemy || s.ThreeKingdoms.Dice?.FixedResult == null, "FixedDiceLocked", "直谏已固定本回合骰局，不能再使用炼金术士。");
-            ApplyBaseRules(s, c);
+            s.B4PaymentSelection = c.PaymentCards;
+            try { if (virtualCard) ApplyProgressCommand(s,s.Players.Single(p=>p.Id==c.PlayerId),c,true,virtualPrepare); else ApplyBaseRules(s,c); }
+            finally { s.B4PaymentSelection = null; }
             var payments = s.ThreeKingdomsNativePayments ?? Array.Empty<B3NativePayment>();
             // Pay 已以真实前后手牌发出失牌事件；这里只记录命令其余步骤，避免同一费用重复入账。
             var remainingBefore = before.ToDictionary(x => x.Key, x => Enumerable.Range(0, 8)
-                .Select(i => x.Value[i] - payments.Where(p => p.PlayerId == x.Key).Sum(p => p.Cards[i])).ToArray());
+                .Select(i => B4(s) ? x.Value[i]+nestedSkillDelta[x.Key][i] : x.Value[i] - payments.Where(p => p.PlayerId == x.Key).Sum(p => p.Cards[i])).ToArray());
             var changes = s.Players.Select(p => {
                 int[] after = host.GetHand(p.Id);
                 int lost = Enumerable.Range(0, 8).Sum(i => Math.Max(0, remainingBefore[p.Id][i] - after[i]));
@@ -183,8 +195,20 @@ namespace Catan.Core.M4
                     else if (p.Id == c.PlayerId) given = offer.Receive.Total + offer.ReceiveCommodities.Total;
                     lost = Math.Max(lost, given);
                 }
+                int[] lostCards=B4(s)?Enumerable.Range(0,8).Select(i=>Math.Max(0,remainingBefore[p.Id][i]-after[i])).ToArray():null;
+                int[] gainedCards=B4(s)?Enumerable.Range(0,8).Select(i=>Math.Max(0,after[i]-remainingBefore[p.Id][i])).ToArray():null;
+                if(B4(s)&&c.Kind==CommandKind.AcceptTrade&&offer!=null&&(p.Id==offer.ProposerId||p.Id==c.PlayerId))
+                {
+                    var sent=offer.B4RealGive??Enumerable.Range(0,8).Select(i=>i<5?offer.Give[(Resource)i]:offer.GiveCommodities[(Commodity)(i-5)]).ToArray();
+                    var requested=Enumerable.Range(0,8).Select(i=>i<5?offer.Receive[(Resource)i]:offer.ReceiveCommodities[(Commodity)(i-5)]).ToArray();
+                    lostCards=(p.Id==offer.ProposerId?sent:requested).ToArray();gainedCards=(p.Id==offer.ProposerId?requested:sent).ToArray();
+                }
                 if (c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressWedding" && p.Id == c.PlayerId) given = lost;
-                return new B2HandChange { PlayerId = p.Id, BeforeCount = remainingBefore[p.Id].Sum(), AfterCount = after.Sum(), LostCount = lost, GivenCount = given };
+                return new B2HandChange { PlayerId = p.Id, BeforeCount = remainingBefore[p.Id].Sum(), AfterCount = after.Sum(), LostCount = lost, GivenCount = given,
+                    LostCards = lostCards,
+                    GainedCards = gainedCards,
+                    LostProgressCount = B4(s)&&!virtualCard&&p.Id==c.PlayerId&&(c.Kind==CommandKind.PlayProgressCard||c.Kind==CommandKind.DiscardProgressCard)?1:0,
+                    SourcePlayerId = B4(s)&&given>0&&offer!=null?(p.Id==offer.ProposerId?c.PlayerId:offer.ProposerId):null };
             }).ToArray();
             if (c.Kind == CommandKind.DiscardResources || c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressSabotage")
             {
@@ -215,6 +239,13 @@ namespace Catan.Core.M4
                 changes = changes.Where(change => !exchange.Any(x => x.PlayerId == change.PlayerId)).Concat(exchange).ToArray();
             }
             B2SkillEngine.OnCardsMoved(host, "native-" + c.Id, changes);
+            if(B4(s)&&c.Kind==CommandKind.AcceptTrade&&s.B4TradeConversionHistoryIds!=null)
+            {
+                foreach(var eventId in s.B4TradeConversionHistoryIds)B4SkillHistoryEngine.LinkCardFlow(s.ThreeKingdoms,eventId,"native-"+c.Id,changes);
+                s.B4TradeConversionHistoryIds=null;
+            }
+            if(B4(s)&&c.Kind==CommandKind.AcceptTrade&&offer?.B4DeclarationHistoryEventId!=null)
+                B4SkillHistoryEngine.LinkCardFlow(s.ThreeKingdoms,offer.B4DeclarationHistoryEventId,"native-"+c.Id,changes);
             if (B3(s) && c.Kind == CommandKind.DiscardResources && s.Discards.Length == 0)
                 B2SkillEngine.CompleteSevenDiscard(host, "dice-" + s.ThreeKingdoms.Clock.TurnInstanceId);
             if (s.ThreeKingdoms.Clock.Phase == ThreeKingdomsPhase.Play && IsB2Construction(c, pending))
@@ -222,6 +253,8 @@ namespace Catan.Core.M4
                     B2SkillEngine.OnBuilt(host, "build-" + c.Id + "-" + entry.Key, entry.Value.Item1, entry.Value.Item2);
             if (c.Kind == CommandKind.PlayProgressCard) s.ThreeKingdomsProgressUse = new[] { "progress-" + c.Id, c.PlayerId, s.ThreeKingdoms.Generals.Single(g => g.Region == GeneralRegion.Active && g.OwnerPlayerId == c.PlayerId).TenureId };
             s.ThreeKingdomsNativePayments = null;
+            s.B4SkillHandDelta=outerSkillDelta;
+            if(outerSkillDelta!=null) foreach(var player in s.Players) {var after=host.GetHand(player.Id);for(int i=0;i<8;i++)outerSkillDelta[player.Id][i]+=after[i]-before[player.Id][i];}
         }
         private static bool IsB2Construction(Command c, PendingDecision pending) => c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.BuildCity || c.Kind == CommandKind.BuildWall || c.Kind == CommandKind.PlaceFreeRoad || c.Kind == CommandKind.PlayProgressCard && (c.ProgressCard == ProgressCardKind.Medicine || c.ProgressCard == ProgressCardKind.Engineering) || c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressRoads" && !c.Decline;
         private Dictionary<string, Tuple<string, string>> B2Buildings(GameState s)
@@ -259,13 +292,19 @@ namespace Catan.Core.M4
         {
             var tk = ThreeKingdomsEngine.Project(state.ThreeKingdoms, view.PlayerId);
             view.ThreeKingdoms = tk;
+            if(B4(state))
+            {
+                tk.HandLossForbidden=B2SkillEngine.IsB4HandLossForbidden(state.ThreeKingdoms,view.PlayerId);
+                tk.BankTradeRates=Enumerable.Range(0,8).Select(i=>i<5?TradeRate(state,view.PlayerId,(Resource)i):CommodityTradeRate(state,view.PlayerId,(Commodity)(i-5))).ToArray();
+            }
             B2SkillEngine.Project(CardHost(state), tk, view.PlayerId);
             if (B3(state) && state.ThreeKingdoms.Skills.PendingDecision == null) B3DiceEngine.Project(CardHost(state), tk, view.PlayerId);
+            ProjectB4Automation(view, tk);
             // 换将会暂挂原技能帧；产品视图只开放最上层生命周期决策。
             if (B3(state) && tk.PendingDecision != null) { tk.SkillDecision = null; tk.SkillActions = Array.Empty<B2SkillAction>(); }
             if (tk.SkillDecision == null && (state.PendingDecision != null || state.TradeOffer != null)) tk.SkillActions = Array.Empty<B2SkillAction>();
             if (state.Phase == GamePhase.Finished) { tk.CanRetire = false; tk.SkillActions = Array.Empty<B2SkillAction>(); tk.Clock.Phase = ThreeKingdomsPhase.Finished; return; }
-            bool overlay = tk.PendingDecision != null || tk.SkillDecision != null || (state.PendingDecision == null && (tk.Clock.Phase == ThreeKingdomsPhase.Preparation || tk.Clock.Phase == ThreeKingdomsPhase.Judgment || tk.Clock.Phase == ThreeKingdomsPhase.Draw || tk.Clock.Phase == ThreeKingdomsPhase.End || tk.Clock.Phase == ThreeKingdomsPhase.RoundEnd));
+            bool overlay = tk.PendingDecision != null || (B4(state) && state.ThreeKingdoms.PendingDecision != null) || tk.SkillDecision != null || (state.PendingDecision == null && (tk.Clock.Phase == ThreeKingdomsPhase.Preparation || tk.Clock.Phase == ThreeKingdomsPhase.Judgment || tk.Clock.Phase == ThreeKingdomsPhase.Draw || tk.Clock.Phase == ThreeKingdomsPhase.End || tk.Clock.Phase == ThreeKingdomsPhase.RoundEnd));
             if (overlay)
             {
                 view.Phase = GamePhase.ThreeKingdoms;
@@ -288,13 +327,14 @@ namespace Catan.Core.M4
             }
             else if (d == null)
             {
-                if (tk.SkillDecision == null && overlay && state.PendingDecision == null && tk.Clock.ActivePlayerId == view.PlayerId) actions.Add(Make(CommandKind.AdvanceThreeKingdomsPhase));
+                if (!B4(state) && tk.SkillDecision == null && overlay && state.PendingDecision == null && tk.Clock.ActivePlayerId == view.PlayerId) actions.Add(Make(CommandKind.AdvanceThreeKingdomsPhase));
                 foreach (var skill in tk.SkillActions ?? Array.Empty<B2SkillAction>())
                 {
                     var action = Make(CommandKind.UseGeneralSkill); action.SkillCommand = Json.Copy(skill.Command); actions.Add(action);
                 }
             }
             if (tk.CanRetire) actions.Add(Make(CommandKind.RetireGeneral));
+            actions.AddRange(B4RetirementActions(view.PlayerId));
             view.LegalActions = view.LegalActions.Concat(actions.Where(IsLegal)).ToArray();
         }
     }

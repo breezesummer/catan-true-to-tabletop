@@ -176,6 +176,7 @@ namespace Catan.Core.ThreeKingdoms
                     (d.Kind != "raid-revalidate" || c.Counts.Sum() <= a.ForgoneCards.Sum()) &&
                     c.TargetPlayerIds.Length == c.Counts.Sum() && c.TargetPlayerIds.Distinct().Count() == c.TargetPlayerIds.Length && c.TargetPlayerIds.All(t => RaidTargets(host, f.PlayerId).Contains(t)), "突袭额度、少领牌或目标无效。");
                 a.ForgoneCards = Copy(c.Counts); a.Targets = (string[])c.TargetPlayerIds.Clone(); a.ReplacementKind = "raid"; a.ChoiceComplete = true;
+                if (B4Enabled(s)) B4SkillHistoryEngine.Begin(s, "harvest:" + s.Skills.HarvestTurnId + ":" + f.TenureId, f.PlayerId, f.SkillId, f.TenureId, f.Id);
                 if (d.Kind == "raid-revalidate")
                 { f.Step = 1; foreach (var target in a.Targets.Reverse()) Target(host, f.Id, f.PlayerId, target); }
                 else Remove(s, f);
@@ -184,6 +185,7 @@ namespace Catan.Core.ThreeKingdoms
             if (c.Option == "shelie")
             {
                 Require(a.GeneralId == "tk-g28" && d.Kind == "harvest", "当前不可发动涉猎。");
+                if (B4Enabled(s)) B4SkillHistoryEngine.Begin(s, f.Id, f.PlayerId, f.SkillId, f.TenureId, f.Id);
                 host.AddBank(a.Cards); a.Cards = new int[8]; a.ReplacementKind = "shelie";
                 f.Kind = "shelie"; f.Cards = TakeRandom(host, f.PlayerId, 4); s.Skills.RevealedCards = Copy(f.Cards); return;
             }
@@ -192,6 +194,7 @@ namespace Catan.Core.ThreeKingdoms
                 Require(a.GeneralId == "tk-g37" && d.Kind == "harvest" && c.TileIds != null && c.TileIds.Length == 2 && c.TileIds.Distinct().Count() == 2, "天妒需要两个不同的合法地块。");
                 var pair = TilePairs(host, f.PlayerId).FirstOrDefault(p => p.Select(t => t.TileId).OrderBy(t => t, StringComparer.Ordinal).SequenceEqual(c.TileIds.OrderBy(t => t, StringComparer.Ordinal)));
                 Require(pair != null, "天妒地块不具生产资格或数字合计不符。");
+                if (B4Enabled(s)) B4SkillHistoryEngine.Begin(s, f.Id, f.PlayerId, f.SkillId, f.TenureId, f.Id);
                 f.Tiles = pair.OrderBy(t => t.TileId, StringComparer.Ordinal).Select(t => new B2HarvestTile { TileId = t.TileId, Number = t.Number, AllowedCardTypes = (int[])t.AllowedCardTypes.Clone() }).ToArray();
                 host.AddBank(a.Cards); a.Cards = new int[8]; a.ReplacementKind = "tiandu"; f.Kind = "tiandu"; f.Step = 0; return;
             }
@@ -213,12 +216,13 @@ namespace Catan.Core.ThreeKingdoms
                 var hand = host.GetHand(target); var before = hand.Sum(); var random = host.DrawRandom(before); var type = 0;
                 for (; type < 8; type++) { if (random < hand[type]) break; random -= hand[type]; }
                 var card = One(type); host.RemoveHand(target, card); Add(gain, card);
-                changes.Add(Change(target, before, before - 1, 1, 0));
+                var loss = Change(target, before, before - 1, 1, 0); if (B4Enabled(s)) loss.LostCards = Copy(card); changes.Add(loss);
             }
             host.AddBank(a.ForgoneCards); host.AddHand(f.PlayerId, gain);
-            changes.Add(Change(f.PlayerId, ownBefore, host.GetHand(f.PlayerId).Sum(), 0, 0));
+            var received = Change(f.PlayerId, ownBefore, host.GetHand(f.PlayerId).Sum(), 0, 0); if (B4Enabled(s)) { received.GainedCards = Copy(gain); received.SourcePlayerId = a.Targets.FirstOrDefault(); } changes.Add(received);
             a.Cards = new int[8]; a.ForgoneCards = new int[8]; a.Completed = true; a.ActuallyReceived = gain.Sum(); Remove(s, f);
             RecordCards(host, f.Id + ":atomic", changes.ToArray());
+            if (B4Enabled(s)) B4SkillHistoryEngine.Complete(s, "harvest:" + s.Skills.HarvestTurnId + ":" + f.TenureId, "突袭实际获得 " + gain.Sum() + " 张手牌", new[] { f.Id + ":atomic" });
         }
 
         private static string[] RaidTargets(IThreeKingdomsCardHost host, string source) => host.State.SeatPlayerIds.Where(p => p != source && host.GetHand(p).Sum() > 0 && !IsProtected(host.State, p)).ToArray();

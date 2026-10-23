@@ -71,6 +71,7 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=19)] public string ObserverTenure { get; set; }
         [DataMember(Order=20)] public B3DiceModification[] Modifications { get; set; } = Array.Empty<B3DiceModification>();
         [DataMember(Order=21)] public long TurnInstanceId { get; set; }
+        [DataMember(Order=22, EmitDefaultValue=false)] public int LuoshenRewardedAttempt { get; set; }
     }
 
     [DataContract] public sealed class B3DiceState

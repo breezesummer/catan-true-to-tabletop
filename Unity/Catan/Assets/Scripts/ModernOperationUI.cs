@@ -109,10 +109,13 @@ public static class ModernOperationUI
         for(int i=0;i<count;i++)
         {
             float cell=area.width/columns;var face=new Rect(area.x+(i%columns)*cell+(cell-cardWidth)/2,area.y+(i/columns)*row,cardWidth,height);
-            EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(i));
+            bool old=GUI.enabled;GUI.enabled=old&&limits[i]>0&&(selected[i]>0||System.Linq.Enumerable.Sum(selected)<totalLimit);
+            var color=GUI.color;if(!GUI.enabled)GUI.color=new Color(color.r,color.g,color.b,.35f);
+            EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(i));GUI.color=color;
             Label(new Rect(area.x+(i%columns)*cell,face.yMax,cell,27),GoodNames[i]+" × "+selected[i],Center);
             int delta=TabletopCardInput.Delta(face);
             if(delta!=0)error=OperationCardQuantity.Change(selected,i,delta,limits[i],totalLimit,singleKind);
+            GUI.enabled=old;
         }
         return error;
     }

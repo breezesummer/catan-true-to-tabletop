@@ -289,7 +289,8 @@ internal sealed class ThreeKingdomsTestGame(string rules, object session)
         string before = Save();
         var copy = Load(rules, before);
         Assert.Equal(before, copy.Save());
-        Assert.True((bool)Preview(c).Success); Assert.Equal(before, Save());
+        dynamic preview = Preview(c);
+        Assert.True((bool)preview.Success, $"{rules}/{c.Kind}/{c.PlayerId} 预览: {preview.ErrorCode} {preview.Message}"); Assert.Equal(before, Save());
         Accept(c); copy.Accept(c); Assert.Equal(Save(), copy.Save());
     }
     internal void Reject(dynamic c)
@@ -311,7 +312,7 @@ internal sealed class ThreeKingdomsTestGame(string rules, object session)
     internal dynamic Decide()
     {
         dynamic publicView = View();
-        string actor = publicView.ThreeKingdoms?.PendingDecision?.PlayerId ?? publicView.ThreeKingdoms?.SkillDecision?.PlayerId ?? M6Game.Actor(publicView);
+        string actor = publicView.ThreeKingdoms?.PendingDecision?.PlayerId ?? (publicView.ThreeKingdoms?.WaitingSelectionPlayerIds is string[] waiting ? waiting.FirstOrDefault() : null) ?? publicView.ThreeKingdoms?.SkillDecision?.PlayerId ?? M6Game.Actor(publicView);
         dynamic command = rules == "cities" ? (object)new CitiesKnightsAi().Decide((M4.PlayerView)AiView(actor)) : new CombinedAi().Decide((M5.PlayerView)AiView(actor));
         command.Id = NextId(); return command;
     }

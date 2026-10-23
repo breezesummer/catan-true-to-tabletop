@@ -16,6 +16,7 @@ public sealed partial class M6App
     Vector2 threeKingdomsScroll;
     string inspectedGeneral;
     B2SkillCommand threeKingdomsSkillDraft;
+    int threeKingdomsRetirementPhase;
     static readonly string[] ThreeKingdomsCardNames={"木材","砖","羊毛","谷物","矿石","布匹","钱币","纸张"};
     ThreeKingdomsView ThreeKingdomsProjection=>presentation is M4App cities?cities.M6View?.ThreeKingdoms:
         presentation is M5App combined?combined.M6View?.ThreeKingdoms:null;
@@ -62,6 +63,7 @@ public sealed partial class M6App
     void DrawThreeKingdoms()
     {
         var view=ThreeKingdomsProjection;if(view==null)return;
+        bool automatic=view.PackageVersion==GeneralCatalog.B4PackageVersion;
         if(threeKingdomsSkillDraft!=null&&threeKingdomsSkillDraft.WindowId!=view.WindowId)threeKingdomsSkillDraft=null;
         var pending=view.PendingDecision;
         bool ownChoice=pending!=null&&pending.PlayerId==HumanSeat;
@@ -78,16 +80,19 @@ public sealed partial class M6App
         PastoralMenuUI.Label(new Rect(415,110,738,22),view.PackageLabel,14,PastoralMenuUI.Ivory,true);
         string state="第 "+view.Clock.Round+" 轮 · "+ThreeKingdomsPhaseName(view.Clock.Phase);
         if(pending!=null)state+=" · "+(ownChoice?"请完成私密选择":PlayerDisplayName(pending.PlayerId)+" 正在选将");
+        else if(view.WaitingSelectionPlayerIds?.Length>0)state+=" · 等待 "+string.Join("、",view.WaitingSelectionPlayerIds.Select(PlayerDisplayName))+" 选将";
         else if(view.SkillDecision!=null)state+=" · "+(ownSkill?"请完成技能选择":PlayerDisplayName(view.SkillDecision.PlayerId)+" 正在选择");
         PastoralMenuUI.Label(new Rect(415,139,398,24),state,14,PastoralMenuUI.Ivory);
         if(PastoralMenuUI.Button(new Rect(830,131,150,33),ownChoice?"继续私密选将":ownSkill?"继续技能选择":"武将与技能"))threeKingdomsPanelOpen=!threeKingdomsPanelOpen;
-        if(PastoralMenuUI.Button(new Rect(991,131,159,33),"推进当前阶段",ThreeKingdomsAdvanceAvailable&&IsHumanTurn))SubmitThreeKingdoms("AdvanceThreeKingdomsPhase");
+        if(!automatic)
+        {if(PastoralMenuUI.Button(new Rect(991,131,159,33),"推进当前阶段",ThreeKingdomsAdvanceAvailable&&IsHumanTurn))SubmitThreeKingdoms("AdvanceThreeKingdomsPhase");}
+        else PastoralMenuUI.Label(new Rect(991,136,159,28),"阶段自动结算",14,PastoralMenuUI.Muted);
         if(!threeKingdomsPanelOpen)return;
         PastoralMenuUI.Fill(new Rect(0,175,1440,725),new Color(.035f,.08f,.045f,.50f));
         PastoralMenuUI.Panel(ThreeKingdomsPanel);
         PastoralMenuUI.Label(new Rect(265,211,850,32),ownChoice?ThreeKingdomsDecisionCaption(pending):ownSkill?view.SkillDecision.Title:"武将与技能",25,null,true);
         if(PastoralMenuUI.Button(new Rect(1127,210,48,34),"收起"))threeKingdomsPanelOpen=false;
-        PastoralMenuUI.Label(new Rect(265,252,910,28),view.SkillsEnabled?view.PackageLabel+" · 仅本地 · 每轮末寿命减 1":"旧 B1 存档 · 武将技能未启用 · 每轮末当前登场将寿命减 1",14,PastoralMenuUI.Muted);
+        PastoralMenuUI.Label(new Rect(265,252,910,28),view.SkillsEnabled?view.PackageLabel+" · 每轮末寿命减 1":"旧 B1 存档 · 武将技能未启用 · 每轮末当前登场将寿命减 1",14,PastoralMenuUI.Muted);
         if(ownChoice)DrawGeneralChoices(view,pending);
         else
         {
@@ -132,7 +137,7 @@ public sealed partial class M6App
             PastoralMenuUI.Label(new Rect(0,0,875,height),text,14,PastoralMenuUI.Muted);GUI.EndScrollView();
         }
         PastoralMenuUI.Label(new Rect(265,625,550,46),"已选 "+selectedGenerals.Count+" / "+decision.RequiredCount+" 张。点击卡牌可查看原文；收起不会取消待决。",15,PastoralMenuUI.Muted);
-        bool ready=selectedGenerals.Count==decision.RequiredCount&&IsHumanTurn;
+        bool ready=selectedGenerals.Count==decision.RequiredCount&&decision.PlayerId==HumanSeat;
         if(PastoralMenuUI.Button(new Rect(835,625,340,46),"确认选择",ready,true))
         {
             bool select=decision.Kind==ThreeKingdomsDecisionKind.SelectOpening||decision.Kind==ThreeKingdomsDecisionKind.SelectReplacement;
@@ -166,8 +171,9 @@ public sealed partial class M6App
             y+=43;
         }
         GUI.EndScrollView();
-        if(PastoralMenuUI.Button(new Rect(265,625,350,46),"主动隐退当前将",view.CanRetire&&!TableDiceRolling,true))SubmitThreeKingdoms("RetireGeneral");
-        if(PastoralMenuUI.Button(new Rect(835,625,340,46),"完成"+ThreeKingdomsPhaseName(view.Clock.Phase),ThreeKingdomsAdvanceAvailable&&IsHumanTurn,true))SubmitThreeKingdoms("AdvanceThreeKingdomsPhase");
+        if(PastoralMenuUI.Button(new Rect(265,625,view.PackageVersion==GeneralCatalog.B4PackageVersion?245:350,46),"主动隐退当前将",view.CanRetire&&!TableDiceRolling,true))SubmitThreeKingdoms("RetireGeneral");
+        if(view.PackageVersion==GeneralCatalog.B4PackageVersion)DrawScheduledRetirement();
+        if(view.PackageVersion!=GeneralCatalog.B4PackageVersion&&PastoralMenuUI.Button(new Rect(835,625,340,46),"完成"+ThreeKingdomsPhaseName(view.Clock.Phase),ThreeKingdomsAdvanceAvailable&&IsHumanTurn,true))SubmitThreeKingdoms("AdvanceThreeKingdomsPhase");
     }
     void DrawGeneralSkillActions(ThreeKingdomsView view,bool ownSkill)
     {
@@ -176,18 +182,70 @@ public sealed partial class M6App
         string explanation=ownSkill?view.SkillDecision.Description:view.SkillDecision!=null?"等待 "+PlayerDisplayName(view.SkillDecision.PlayerId)+" 完成技能选择。":"选择要发动的技能。按钮列出当前真实可用的目标与费用。";
         if(actions.Length==0&&view.SkillDecision==null)explanation="当前没有可以主动发动的技能。自动技能将在满足条件时结算。";
         string revealed=ThreeKingdomsRevealedCards(view);if(revealed.Length>0)explanation+="\n"+revealed;
+        var selected=actions.FirstOrDefault(a=>a.CardSelectionKind=="select"&&a.Command.Counts?.Any(n=>n>0)==true)?.Command.Counts;
+        if(selected!=null)explanation+="\n已选："+string.Join("、",Enumerable.Range(0,8).Where(i=>selected[i]>0).Select(i=>ThreeKingdomsCardNames[i]+" × "+selected[i]));
         PastoralMenuUI.Label(new Rect(265,337,910,58),explanation,16,PastoralMenuUI.Muted);
-        float rows=Mathf.Ceil(actions.Length/2f);
-        threeKingdomsScroll=GUI.BeginScrollView(new Rect(265,405,910,200),threeKingdomsScroll,new Rect(0,0,884,Mathf.Max(200,rows*60)));
-        for(int i=0;i<actions.Length;i++)
+        var cardActions=actions.Where(a=>B4CardInteraction.ShownCards(a,view.RevealedSkillCards).Any(n=>n>0)||a.ResultCardType.HasValue||a.VirtualCardId!=null||a.Command.Option=="b4-revealed"||a.Command.Option=="b4-hidden").ToArray();
+        var textActions=actions.Except(cardActions).ToArray();
+        float cardHeight=Mathf.Ceil(cardActions.Length/4f)*178,rows=Mathf.Ceil(textActions.Length/2f);
+        threeKingdomsScroll=GUI.BeginScrollView(new Rect(265,405,910,200),threeKingdomsScroll,new Rect(0,0,884,Mathf.Max(200,cardHeight+rows*60)));
+        for(int i=0;i<cardActions.Length;i++)
         {
-            string caption=actions[i].Label;
-            foreach(var player in view.Players)caption=caption.Replace(player.PlayerId,PlayerDisplayName(player.PlayerId));
-            if(actions[i].Command.Option=="tiles")caption="天妒："+string.Join(" ＋ ",actions[i].Command.TileIds.Select(ThreeKingdomsTileName));
-            if(actions[i].Command.Option=="exchange-progress")caption="制衡：同色换抽「"+Catan.Core.DevelopmentCardText.Name(actions[i].Command.ProgressCardId)+"」";
-            if(PastoralMenuUI.Button(new Rect((i%2)*448,(i/2)*60,436,50),caption,!TableDiceRolling&&!TablePresentationBlocked))
+            var action=cardActions[i];var shown=B4CardInteraction.ShownCards(action,view.RevealedSkillCards);var types=Enumerable.Range(0,8).Where(t=>shown[t]>0).ToArray();
+            int type=types.FirstOrDefault();float x=(i%4)*221,y=(i/4)*178;
+            bool enabled=!TableDiceRolling&&!TablePresentationBlocked;bool old=GUI.enabled;GUI.enabled=old&&enabled;
+            Catan.Core.M4.ProgressCardKind virtualKind;bool virtualCard=Enum.TryParse(action.VirtualCardId,out virtualKind);
+            bool hiddenPile=action.Command.Option=="b4-hidden",revealedPile=action.Command.Option=="b4-revealed";
+            int faceCount=types.Length+(virtualCard?1:0)+(action.ResultCardType.HasValue?1:0)+(hiddenPile?1:0);
+            bool clicked=false;float width=Mathf.Min(66,204f/Mathf.Max(1,faceCount));int drawn=0;
+            if(hiddenPile)
             {
-                var command=actions[i].Command;
+                var face=new Rect(x+75,y,66,99);
+                EntityCardAssets.DrawCardFace(face,EntityCardAssets.Texture(EntityCardAssets.Good(0).Back));
+                if(TabletopCardInput.Delta(face)>0)clicked=true;
+            }
+            if(revealedPile&&types.Length==0)clicked=PastoralMenuUI.Button(new Rect(x+20,y+25,176,50),"空亮出堆 · 0张",enabled);
+            for(int card=0;card<types.Length;card++)
+            {
+                var face=new Rect(x+(216-faceCount*width)/2+drawn++*width,y,width,width*1.5f);
+                EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(types[card]));
+                if(TabletopCardInput.Delta(face)>0)clicked=true;
+            }
+            if(virtualCard)
+            {
+                var face=new Rect(x+(216-faceCount*width)/2+drawn++*width,y,width,width*1.5f);
+                EntityCardAssets.DrawCardFace(face,EntityCardAssets.ProgressFront((int)virtualKind));if(TabletopCardInput.Delta(face)>0)clicked=true;
+            }
+            if(action.ResultCardType.HasValue)
+            {
+                var face=new Rect(x+(216-faceCount*width)/2+drawn*width,y,width,width*1.5f);
+                EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(action.ResultCardType.Value));if(TabletopCardInput.Delta(face)>0)clicked=true;
+            }
+            string cardSummary=string.Join("＋",types.Select(t=>ThreeKingdomsCardNames[t]+" × "+shown[t]));
+            if(revealedPile)cardSummary="亮出堆 · "+shown.Sum()+"张";
+            else if(hiddenPile)cardSummary="未亮出堆 · 牌种不可见";
+            if(action.ResultCardType.HasValue)cardSummary+=(cardSummary.Length>0?" → ":"卡效：")+ThreeKingdomsCardNames[action.ResultCardType.Value];
+            PastoralMenuUI.Label(new Rect(x,y+99,216,24),cardSummary,14,null,true,TextAnchor.MiddleCenter);
+            string caption=action.Label;foreach(var player in view.Players)caption=caption.Replace(player.PlayerId,PlayerDisplayName(player.PlayerId));
+            if(action.AvailableCount.HasValue)caption+=" · 可用 "+action.AvailableCount.Value;
+            if(action.EffectiveCardType.HasValue&&action.EffectiveCardType.Value!=type)caption+=" · 视为"+ThreeKingdomsCardNames[action.EffectiveCardType.Value];
+            PastoralMenuUI.Label(new Rect(x+3,y+124,212,48),caption,13,PastoralMenuUI.Muted,false,TextAnchor.UpperCenter);
+            if(clicked)
+            {
+                if(action.Command.Option=="gift"||action.Command.Option=="exchange-hand")threeKingdomsSkillDraft=CopyGeneralSkill(action.Command);
+                else SubmitGeneralSkill(action.Command);
+            }
+            GUI.enabled=old;
+        }
+        for(int i=0;i<textActions.Length;i++)
+        {
+            string caption=textActions[i].Label;
+            foreach(var player in view.Players)caption=caption.Replace(player.PlayerId,PlayerDisplayName(player.PlayerId));
+            if(textActions[i].Command.Option=="tiles")caption="天妒："+string.Join(" ＋ ",textActions[i].Command.TileIds.Select(ThreeKingdomsTileName));
+            if(textActions[i].Command.Option=="exchange-progress")caption="制衡：同色换抽「"+Catan.Core.DevelopmentCardText.Name(textActions[i].Command.ProgressCardId)+"」";
+            if(PastoralMenuUI.Button(new Rect((i%2)*448,cardHeight+(i/2)*60,436,50),caption,!TableDiceRolling&&!TablePresentationBlocked))
+            {
+                var command=textActions[i].Command;
                 if(command.Option=="gift"||command.Option=="exchange-hand")threeKingdomsSkillDraft=CopyGeneralSkill(command);
                 else SubmitGeneralSkill(command);
             }
@@ -214,22 +272,41 @@ public sealed partial class M6App
         if(presentation is M4App cities){var r=cities.M6View.OwnResources;var c=cities.M6View.OwnCommodities;hand=new[]{r.Wood,r.Brick,r.Wool,r.Wheat,r.Ore,c.Cloth,c.Coin,c.Paper};}
         else if(presentation is M5App combined){var r=combined.M6View.OwnResources;var c=combined.M6View.OwnCommodities;hand=new[]{r.Wood,r.Brick,r.Wool,r.Wheat,r.Ore,c.Cloth,c.Coin,c.Paper};}
         else return;
+        var limits=B4CardInteraction.PaymentLimits(ThreeKingdomsProjection.SkillActions,draft,hand);
         int total=draft.Counts.Sum(),limit=gift?hand.Sum():4;
         string title=gift?"仁德：赠给 "+PlayerDisplayName(draft.TargetPlayerIds[0]):"制衡：选择一批 1–4 张手牌";
         PastoralMenuUI.Label(new Rect(265,337,910,48),title+"。已选 "+total+" 张，确认后一次提交。",17,null,true);
         for(int i=0;i<8;i++)
         {
-            float x=265+(i%4)*228,y=399+(i/4)*95;
-            PastoralMenuUI.Label(new Rect(x,y,214,25),ThreeKingdomsCardNames[i]+" · 持有 "+hand[i],15,PastoralMenuUI.Muted);
-            if(PastoralMenuUI.Button(new Rect(x,y+31,50,36),"−",draft.Counts[i]>0))draft.Counts[i]--;
-            PastoralMenuUI.Label(new Rect(x+55,y+35,100,27),draft.Counts[i].ToString(),19,null,true,TextAnchor.MiddleCenter);
-            if(PastoralMenuUI.Button(new Rect(x+164,y+31,50,36),"＋",draft.Counts[i]<hand[i]&&draft.Counts.Sum()<limit))draft.Counts[i]++;
+            float x=265+(i%4)*228,y=389+(i/4)*112;var face=new Rect(x+86,y,56,83);
+            bool old=GUI.enabled;GUI.enabled=old&&limits[i]>0&&!TableDiceRolling&&!TablePresentationBlocked;
+            var color=GUI.color;if(limits[i]==0)GUI.color=new Color(color.r,color.g,color.b,.35f);
+            EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(i));GUI.color=color;
+            int delta=TabletopCardInput.Delta(face);if(delta!=0)B4CardInteraction.Change(draft.Counts,i,delta,limits,limit);GUI.enabled=old;
+            PastoralMenuUI.Label(new Rect(x,y+84,214,25),ThreeKingdomsCardNames[i]+" "+draft.Counts[i]+" / "+limits[i]+(limits[i]==0?" · 不可选":""),14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
         }
-        bool valid=draft.Counts.Sum()>0&&draft.Counts.Sum()<=limit&&Enumerable.Range(0,8).All(i=>draft.Counts[i]<=hand[i]);
+        bool valid=B4CardInteraction.CanSubmit(draft.Counts,limits,limit);
         if(PastoralMenuUI.Button(new Rect(265,625,260,46),"返回，不提交"))threeKingdomsSkillDraft=null;
         if(PastoralMenuUI.Button(new Rect(835,625,340,46),gift?"确认批量赠予":"确认批量弃牌",valid&&!TableDiceRolling&&!TablePresentationBlocked,true)){SubmitGeneralSkill(draft);threeKingdomsSkillDraft=null;}
     }
-    static B2SkillCommand CopyGeneralSkill(B2SkillCommand source)=>new B2SkillCommand{SkillId=source.SkillId,Option=source.Option,TargetPlayerIds=source.TargetPlayerIds?.ToArray(),Counts=source.Counts?.ToArray(),TileIds=source.TileIds?.ToArray(),ProgressCardId=source.ProgressCardId,DecisionId=source.DecisionId,WindowId=source.WindowId,CardType=source.CardType};
+    static B2SkillCommand CopyGeneralSkill(B2SkillCommand source)=>new B2SkillCommand{SkillId=source.SkillId,Option=source.Option,TargetPlayerIds=source.TargetPlayerIds?.ToArray(),Counts=source.Counts?.ToArray(),TileIds=source.TileIds?.ToArray(),ProgressCardId=source.ProgressCardId,DecisionId=source.DecisionId,WindowId=source.WindowId,CardType=source.CardType,EffectiveCardType=source.EffectiveCardType,SecondaryCounts=source.SecondaryCounts?.ToArray(),ProgressCardIds=source.ProgressCardIds?.ToArray()};
+    void DrawScheduledRetirement()
+    {
+        var phases=presentation is M4App cities?cities.M6View.LegalActions.Where(c=>c.RetireAtPhase.HasValue).Select(c=>c.RetireAtPhase.Value).ToArray():
+            presentation is M5App combined?combined.M6View.LegalActions.Where(c=>c.RetireAtPhase.HasValue).Select(c=>c.RetireAtPhase.Value).ToArray():Array.Empty<ThreeKingdomsPhase>();
+        if(phases.Length==0)return;
+        threeKingdomsRetirementPhase%=phases.Length;
+        if(PastoralMenuUI.Button(new Rect(522,625,210,46),"下次"+ThreeKingdomsPhaseName(phases[threeKingdomsRetirementPhase])))threeKingdomsRetirementPhase=(threeKingdomsRetirementPhase+1)%phases.Length;
+        if(PastoralMenuUI.Button(new Rect(744,625,205,46),"预约边界隐退",!TableDiceRolling,true))SubmitRetirementIntent(phases[threeKingdomsRetirementPhase],false);
+        bool cancel=presentation is M4App city?city.M6View.LegalActions.Any(c=>c.CancelRetirementIntent):presentation is M5App combo&&combo.M6View.LegalActions.Any(c=>c.CancelRetirementIntent);
+        if(PastoralMenuUI.Button(new Rect(961,625,214,46),"取消隐退预约",cancel))SubmitRetirementIntent(null,true);
+    }
+    void SubmitRetirementIntent(ThreeKingdomsPhase? phase,bool cancel)
+    {
+        string id=Guid.NewGuid().ToString("N");
+        if(presentation is M4App cities)cities.Submit(new Catan.Core.M4.Command{Id=id,PlayerId=HumanSeat,Kind=Catan.Core.M4.CommandKind.RetireGeneral,RetireAtPhase=phase,CancelRetirementIntent=cancel,WindowId=ThreeKingdomsProjection.WindowId});
+        else if(presentation is M5App combined)combined.Submit(new Catan.Core.M5.Command{Id=id,PlayerId=HumanSeat,Kind=Catan.Core.M5.CommandKind.RetireGeneral,RetireAtPhase=phase,CancelRetirementIntent=cancel,WindowId=ThreeKingdomsProjection.WindowId});
+    }
     void SubmitGeneralSkill(B2SkillCommand source)
     {
         if(source==null)return;

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
+using Catan.Core.ThreeKingdoms;
 
 namespace Catan.Core
 {
@@ -18,6 +20,10 @@ namespace Catan.Core
         public int Dice2 { get; internal set; }
         // 城市与骑士的事件骰使用 Barbarian / Trade / Politics / Science；基础版为空。
         public string EventDie { get; internal set; }
+        [DataMember(EmitDefaultValue=false)] public string SkillEventId { get; internal set; }
+        [DataMember(EmitDefaultValue=false)] public string GeneralId { get; internal set; }
+        [DataMember(EmitDefaultValue=false)] public string SkillId { get; internal set; }
+        [DataMember(EmitDefaultValue=false)] public string GeneralTenureId { get; internal set; }
         public GameHistoryChange[] Changes { get; internal set; } = Array.Empty<GameHistoryChange>();
         public bool Involves(string playerId) => PlayerId == playerId || OtherPlayerId == playerId || Changes.Any(c => c.PlayerId == playerId);
         internal GameHistoryEntry Copy() => (GameHistoryEntry)MemberwiseClone();
@@ -50,13 +56,22 @@ namespace Catan.Core
         {
             internal GameHistoryEntry Entry;
             internal Group[] Groups;
+            internal B4SkillHistoryEvent Skill;
         }
         private readonly List<Record> records = new List<Record>();
+        private readonly Dictionary<string,Record> skillsById = new Dictionary<string,Record>(StringComparer.Ordinal);
         internal GameHistoryEntry[] Project(string viewer, long afterSequence)
         {
-            return records.Where(r => r.Entry.Sequence > afterSequence).Select(r =>
+            return records.Where(r => r.Entry.Sequence > afterSequence).OrderBy(r => r.Entry.Sequence).Select(r =>
             {
                 var entry = r.Entry.Copy();
+                if (r.Skill != null)
+                {
+                    var skill = B4SkillHistoryEngine.Project(r.Skill, viewer);
+                    var general = GeneralCatalog.Get(skill.GeneralId);
+                    entry.Action = general.Name + "发动「" + general.Skills.Single(s => s.Id == skill.SkillId).Name + "」" +
+                        (string.IsNullOrEmpty(skill.Result) ? "" : "：" + skill.Result);
+                }
                 entry.Changes = r.Groups.SelectMany(g =>
                 {
                     if (g.Viewers == null || g.Viewers.Contains(viewer)) return g.Details.Select(d => d.Copy());
@@ -74,10 +89,14 @@ namespace Catan.Core
         internal void RecordAction(HistorySnapshot before, HistorySnapshot after, HistoryAction action)
         {
             var groups = new List<Group>();
-            bool secretGoods = action.Kind == "StealResource" || action.Kind == "DiscardResources" || action.Kind == "ResolveProgressChoice" || action.Card == "Taxation";
+            var previousSkills=(before.Skills??Array.Empty<B4SkillHistoryEvent>()).ToDictionary(e=>e.EventId,StringComparer.Ordinal);
+            bool skillChanged = (after.Skills ?? Array.Empty<B4SkillHistoryEvent>()).Any(e =>
+                !previousSkills.TryGetValue(e.EventId,out var previous)||previous.Complete!=e.Complete||previous.PublicResult!=e.PublicResult);
+            // 同一宿主命令可能同时触发随机摸牌、赠予与公开产出。无明确牌流授权时保守只给牌主真实类型。
+            bool secretGoods = before.PrivateOffer || action.Kind == "UseGeneralSkill" || skillChanged || action.Kind == "StealResource" || action.Kind == "DiscardResources" || action.Kind == "ResolveProgressChoice" || action.Card == "Taxation";
             // 待决目标来自权威待决，不得信任这类指令里未被规则使用的 OtherPlayerId。
             string counterpart = action.Kind == "ResolveProgressChoice" || action.Kind == "ResolveChoice" ? before.OtherPlayerId : action.OtherPlayerId ?? before.OtherPlayerId;
-            bool sharedTransfer = action.Kind == "StealResource" || action.Kind == "ResolveProgressChoice" &&
+            bool sharedTransfer = before.PrivateOffer&&action.Kind=="AcceptTrade" || action.Kind == "StealResource" || action.Kind == "ResolveProgressChoice" &&
                 (before.PendingKind == "ProgressGuildDues" || before.PendingKind == "ProgressWedding" || before.PendingKind == "ProgressHarbor");
             foreach (var player in after.Players)
             {
@@ -103,22 +122,41 @@ namespace Catan.Core
             foreach (var piece in before.Pieces.Where(p => !newPieces.ContainsKey(p.Key))) AddPiece(groups, piece, -1);
             foreach (var piece in after.Pieces.Where(p => !oldPieces.ContainsKey(p.Key))) AddPiece(groups, piece, 1);
             if (action.PublicGeneralChanges.Length > 0) groups.Add(new Group { Details = action.PublicGeneralChanges });
-            if (action.Kind == "ProposeTrade")
+            bool resumedOffer=before.OfferProposerId==null&&after.OfferProposerId!=null&&action.Kind!="ProposeTrade";
+            if (action.Kind == "ProposeTrade"||resumedOffer)
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    if (after.OfferGive[i] > 0) groups.Add(new Group { Details = new[] { new GameHistoryChange { PlayerId = action.PlayerId, Category = "offer", GoodIndex = i, Amount = -after.OfferGive[i], Name = "报价付出：" + GoodNames[i] } } });
-                    if (after.OfferReceive[i] > 0) groups.Add(new Group { Details = new[] { new GameHistoryChange { PlayerId = action.PlayerId, Category = "offer", GoodIndex = i, Amount = after.OfferReceive[i], Name = "报价请求：" + GoodNames[i] } } });
+                    if (after.OfferGive[i] > 0) groups.Add(new Group { Details = new[] { new GameHistoryChange { PlayerId = after.OfferProposerId??action.PlayerId, Category = "offer", GoodIndex = i, Amount = -after.OfferGive[i], Name = "报价付出：" + GoodNames[i] } } });
+                    if (after.OfferReceive[i] > 0) groups.Add(new Group { Details = new[] { new GameHistoryChange { PlayerId = after.OfferProposerId??action.PlayerId, Category = "offer", GoodIndex = i, Amount = after.OfferReceive[i], Name = "报价请求：" + GoodNames[i] } } });
                 }
             }
             var entry = new GameHistoryEntry
             {
-                Sequence = after.Sequence, Turn = before.Turn, PlayerId = action.PlayerId, OtherPlayerId = counterpart,
-                Kind = action.Kind, Action = ActionName(action, before.PendingKind), TargetId = action.PublicTarget,
+                Sequence = after.Sequence, Turn = before.Turn, PlayerId = resumedOffer?after.OfferProposerId:action.PlayerId, OtherPlayerId = counterpart,
+                Kind = resumedOffer?"ProposeTrade":action.Kind, Action = resumedOffer?ActionName(new HistoryAction{Kind="ProposeTrade"},null):ActionName(action, before.PendingKind), TargetId = action.PublicTarget,
                 Dice1 = action.Kind == "RollDice" ? after.Dice1 : 0, Dice2 = action.Kind == "RollDice" ? after.Dice2 : 0,
                 EventDie = action.Kind == "RollDice" ? after.EventDie : null
             };
-            records.Add(new Record { Entry = entry, Groups = groups.ToArray() });
+            if ((action.Kind != "UseGeneralSkill" || groups.Count > 0) && (action.Kind!="ProposeTrade"||after.OfferGive.Any(n=>n>0))) records.Add(new Record { Entry = entry, Groups = groups.ToArray() });
+            foreach (var skill in after.Skills ?? Array.Empty<B4SkillHistoryEvent>())
+            {
+                if (skillsById.TryGetValue(skill.EventId,out var existing))
+                {
+                    if (existing.Skill.Complete != skill.Complete || existing.Skill.PublicResult != skill.PublicResult || existing.Skill.Secrets.Length != skill.Secrets.Length)
+                    {
+                        existing.Entry.Sequence = after.Sequence;
+                        existing.Skill = B4SkillHistoryEngine.Clone(new[] { skill })[0];
+                    }
+                    continue;
+                }
+                // 保存恢复由命令重放重建；同一发动的后续选择只更新原记录，不生成第二条发动。
+                var record=new Record { Skill = B4SkillHistoryEngine.Clone(new[] { skill })[0], Groups = Array.Empty<Group>(),
+                    Entry = new GameHistoryEntry { Sequence=after.Sequence, Turn=before.Turn, PlayerId=skill.PlayerId,
+                        Kind="GeneralSkillActivated", SkillEventId=skill.EventId, GeneralId=skill.GeneralId,
+                        SkillId=skill.SkillId, GeneralTenureId=skill.TenureId } };
+                records.Add(record);skillsById.Add(skill.EventId,record);
+            }
         }
         private static void AddPiece(List<Group> groups, HistoryPiece piece, int amount)
         {
@@ -203,8 +241,11 @@ namespace Catan.Core
         internal int Turn, Dice1, Dice2;
         internal long Sequence;
         internal string EventDie, OtherPlayerId, PendingKind;
+        internal string OfferProposerId;
+        internal bool PrivateOffer;
         internal HistoryPlayer[] Players;
         internal HistoryPiece[] Pieces;
         internal int[] OfferGive, OfferReceive;
+        internal B4SkillHistoryEvent[] Skills;
     }
 }

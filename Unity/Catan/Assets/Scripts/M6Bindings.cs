@@ -43,7 +43,7 @@ public sealed partial class M6App
         TargetVictoryPoints=host.View(HumanSeat).TargetVictoryPoints;
         BindHistory(() => host.History(HumanSeat), () => app.M6View.Events.Length);
         var policy=new CitiesKnightsAi();
-        Bind(app,()=>M4App.Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M4.GamePhase.Finished,player=>
+        Bind(app,()=>ThreeKingdomsSelectionActor(app.M6View.ThreeKingdoms)??M4App.Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M4.GamePhase.Finished,player=>
         {
             var command=policy.Decide(host.AiView(player));
             if(command==null)return "NoDecision";
@@ -59,7 +59,7 @@ public sealed partial class M6App
         TargetVictoryPoints=host.View(HumanSeat).TargetVictoryPoints;
         BindHistory(() => host.History(HumanSeat), () => app.M6View.Events.Length);
         var policy=new CombinedAi();
-        Bind(app,()=>M5App.Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M5.GamePhase.Finished,player=>
+        Bind(app,()=>ThreeKingdomsSelectionActor(app.M6View.ThreeKingdoms)??M5App.Actor(app.M6View),()=>app.M6View.Phase==Catan.Core.M5.GamePhase.Finished,player=>
         {
             var command=policy.Decide(host.AiView(player));
             if(command==null)return "NoDecision";
@@ -70,6 +70,8 @@ public sealed partial class M6App
             return result.Success?null:result.ErrorCode;
         },host.ExportSave,app.M6Refresh,app.M6Close,app.M6Visible);
     }
+    string ThreeKingdomsSelectionActor(Catan.Core.ThreeKingdoms.ThreeKingdomsView view)=>
+        view?.WaitingSelectionPlayerIds?.FirstOrDefault(player=>player!=HumanSeat)??view?.PendingDecision?.PlayerId??view?.WaitingSelectionPlayerIds?.FirstOrDefault();
     static string Actor(Catan.Core.M2.PlayerView view)
     {
         if(view.TradeOffer!=null)return view.TradeOffer.NextResponder(view.PlayerId);

@@ -85,7 +85,11 @@ namespace Catan.Network.Contracts
                 {
                     var memberValue = Get(member, value);
                     // 可选扩展关闭时省略空字段，保持既有协议3客户端的严格字段布局。
-                    if (memberValue == null && member.GetCustomAttribute<DataMemberAttribute>()?.EmitDefaultValue == false) continue;
+                    if (member.GetCustomAttribute<DataMemberAttribute>()?.EmitDefaultValue == false)
+                    {
+                        var memberType=MemberType(member);
+                        if(memberValue==null||memberType.IsValueType&&Nullable.GetUnderlyingType(memberType)==null&&memberValue.Equals(Activator.CreateInstance(memberType)))continue;
+                    }
                     node.Add(Encode(Name(member), memberValue, MemberType(member), depth + 1));
                 }
             }

@@ -15,17 +15,17 @@ namespace Catan.Core.M5
     }
     public sealed partial class CombinedGameSession
     {
-        private static bool B3(GameState s) => s.ThreeKingdoms?.RulesVersion == GeneralCatalog.B3RulesVersion;
+        private static bool B3(GameState s) => s.ThreeKingdoms?.RulesVersion == GeneralCatalog.B3RulesVersion || B4(s);
         private static bool B2(GameState s) => s.ThreeKingdoms?.SkillsEnabled == true;
         private B2Host CardHost(GameState s) => new B2Host(this, s);
-        private static bool B2Protected(GameState s, string player) => B2(s) && B2SkillEngine.IsProtected(s.ThreeKingdoms, player);
+        private static bool B2Protected(GameState s, string player) => B2(s) && (B2SkillEngine.IsProtected(s.ThreeKingdoms, player) || B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,player));
         private static bool B2DrawBlocked(GameState s, string player) => B2(s) && B2SkillEngine.IsDrawBlocked(s.ThreeKingdoms, player);
         private static bool B2Unlimited(GameState s, string player) => B2(s) && s.ThreeKingdoms.Generals.Any(g => g.Region == GeneralRegion.Active && g.OwnerPlayerId == player && g.GeneralId == "tk-g33");
         private static int B2Escrow(GameState s, int card) => B2(s) ? B2SkillEngine.EscrowCards(s.ThreeKingdoms)[card] : 0;
         private static bool B2Busy(GameState s) => B2(s) && (B2SkillEngine.HasPending(s.ThreeKingdoms) || B3DiceEngine.HasPending(s.ThreeKingdoms));
-        private static string ThreeKingdomsVersionFor(ThreeKingdomsState tk) => tk == null ? RulesVersion : tk.RulesVersion == GeneralCatalog.B3RulesVersion ? ThreeKingdomsB3RulesVersion : tk.SkillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
+        private static string ThreeKingdomsVersionFor(ThreeKingdomsState tk) => tk == null ? RulesVersion : tk.RulesVersion == GeneralCatalog.B4RulesVersion ? ThreeKingdomsB4RulesVersion : tk.RulesVersion == GeneralCatalog.B3RulesVersion ? ThreeKingdomsB3RulesVersion : tk.SkillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
 
-        private sealed class B2Host : IThreeKingdomsCardHost
+        private sealed partial class B2Host : IThreeKingdomsCardHost
         {
             private readonly CombinedGameSession session;
             private readonly GameState game;
@@ -41,8 +41,9 @@ namespace Catan.Core.M5
                 for (int i = 0; i < 8; i++) { if (i < 5) resources[(Resource)i] += cards[i] * sign; else commodities[(Commodity)(i - 5)] += cards[i] * sign; }
                 Require(ValidBag(resources) && ValidBag(commodities), "InsufficientCards", "牌的实际供应不足。");
             }
-            public void RemoveHand(string playerId, int[] cards) { var p = game.Players.Single(x => x.Id == playerId); Change(p.Resources, p.Commodities, cards, -1); }
-            public void AddHand(string playerId, int[] cards) { var p = game.Players.Single(x => x.Id == playerId); Change(p.Resources, p.Commodities, cards, 1); }
+            public void RemoveHand(string playerId, int[] cards) { var p = game.Players.Single(x => x.Id == playerId); Change(p.Resources, p.Commodities, cards, -1); TrackHand(playerId,cards,-1); }
+            public void AddHand(string playerId, int[] cards) { var p = game.Players.Single(x => x.Id == playerId); Change(p.Resources, p.Commodities, cards, 1); TrackHand(playerId,cards,1); }
+            private void TrackHand(string player,int[] cards,int sign) { if(game.B4SkillHandDelta!=null) for(int i=0;i<8;i++)game.B4SkillHandDelta[player][i]+=cards[i]*sign; }
             public void RemoveBank(int[] cards) => Change(game.Bank, game.CommodityBank, cards, -1);
             public void AddBank(int[] cards) => Change(game.Bank, game.CommodityBank, cards, 1);
             public int DrawRandom(int exclusiveMaximum) => Draw(game.Random, exclusiveMaximum);
@@ -62,7 +63,7 @@ namespace Catan.Core.M5
                 if (deck.Cards.Length == 0) return null;
                 var card = deck.Cards[0]; deck.Cards = deck.Cards.Skip(1).ToArray();
                 var p = game.Players.Single(x => x.Id == playerId);
-                if (ProgressCatalog.IsVictoryPoint(card)) p.ProgressVictoryCards = Append(p.ProgressVictoryCards, card);
+                if (ProgressCatalog.IsVictoryPoint(card)) { p.ProgressVictoryCards = Append(p.ProgressVictoryCards, card); QueueB4Progress(game,p.Id,card,null); }
                 else p.ProgressCards = Append(p.ProgressCards, card);
                 return Card(card);
             }

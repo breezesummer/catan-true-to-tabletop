@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Catan.Core.ThreeKingdoms;
 
 namespace Catan.Core.M5
 {
@@ -32,7 +33,7 @@ namespace Catan.Core.M5
             var deck = s.ProgressDecks.Single(d => d.Track == track);
             if (deck.Cards.Length == 0) return;
             var card = deck.Cards[0]; deck.Cards = deck.Cards.Skip(1).ToArray();
-            if (ProgressCatalog.IsVictoryPoint(card)) p.ProgressVictoryCards = Append(p.ProgressVictoryCards, card);
+            if (ProgressCatalog.IsVictoryPoint(card)) { p.ProgressVictoryCards = Append(p.ProgressVictoryCards, card); QueueB4Progress(s,p.Id,card,null); }
             else p.ProgressCards = Append(p.ProgressCards, card);
             if (B2(s) && s.ThreeKingdoms.Clock.Phase == Catan.Core.ThreeKingdoms.ThreeKingdomsPhase.Roll) s.ThreeKingdomsDiceRecipients = (s.ThreeKingdomsDiceRecipients ?? Array.Empty<string>()).Union(new[] { p.Id }).ToArray();
             if (!B2Unlimited(s,p.Id) && !B2Protected(s,p.Id) && p.Id != s.ActivePlayerId && p.ProgressCards.Length > 4 &&
@@ -41,16 +42,17 @@ namespace Catan.Core.M5
                 s.DecisionQueue = new[] { new PendingDecision { Kind = "ProgressDiscard", PlayerId = p.Id } }.Concat(s.DecisionQueue).ToArray();
         }
 
-        private static void ReturnProgressCard(GameState s, PlayerState p, ProgressCardKind card)
+        private static void ReturnProgressCard(GameState s, PlayerState p, ProgressCardKind card, bool played = false, string eventId = null)
         {
             var index = Array.IndexOf(p.ProgressCards, card);
             Require(index >= 0, "NoProgressCard", "你没有这张发展卡。");
             p.ProgressCards = p.ProgressCards.Where((x, i) => i != index).ToArray();
+            if (B4(s) && played) { QueueB4Progress(s,p.Id,card,eventId); return; }
             var deck = s.ProgressDecks.Single(d => d.Track == ProgressCatalog.Track(card));
             deck.Cards = Append(deck.Cards, card);
         }
 
-        private bool ApplyProgressCommand(GameState s, PlayerState p, Command c)
+        private bool ApplyProgressCommand(GameState s, PlayerState p, Command c, bool virtualCard = false, bool virtualPrepare = false)
         {
             if(c.Kind==CommandKind.PlaceFreeShip||c.Kind==CommandKind.PlaceFreeRoad)
             {
@@ -75,6 +77,7 @@ namespace Catan.Core.M5
             }
             if (c.Kind == CommandKind.CommercialHarborOffer)
             {
+                Require(!B4(s)||!Catan.Core.ThreeKingdoms.B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,p.Id),"HandLossForbidden","本出牌阶段不能交出商港费用。");
                 Require(s.ActivePlayerId == p.Id, "NotActivePlayer", "请由当前玩家操作。"); ActionPhase(s);
                 var target = OtherProgressPlayer(s, p, c.OtherPlayerId);
                 Require(s.CommercialHarborPlayers.Contains(target.Id), "HarborAlreadyUsed", "本回合未获得对该玩家的商港交换额度。");
@@ -96,8 +99,9 @@ namespace Catan.Core.M5
             Require(!ProgressCatalog.IsVictoryPoint(c.ProgressCard), "PublicVictoryCard", "胜利点卡抽到时自动公开。");
             if (c.ProgressCard == ProgressCardKind.Alchemy)
                 Require(s.Phase == GamePhase.ProductionAwaitRoll && s.AlchemyDice1 == 0, "WrongPhase", "炼金术士必须在本回合掷骰之前使用一次。");
-            else ActionPhase(s);
-            ReturnProgressCard(s, p, c.ProgressCard);
+            else if (!virtualPrepare) ActionPhase(s);
+            if (!virtualCard) ReturnProgressCard(s, p, c.ProgressCard, true, c.Id);
+            else QueueB4Progress(s,p.Id,null,c.Id,true);
             switch (c.ProgressCard)
             {
                 case ProgressCardKind.Alchemy:
@@ -326,6 +330,7 @@ namespace Catan.Core.M5
         }
         private static int ProgressTradeRate(GameState s, PlayerState p, Resource? resource, Commodity? commodity)
         {
+            if (B4(s) && Catan.Core.ThreeKingdoms.B2SkillEngine.WenjiTradeRatio(s.ThreeKingdoms,p.Id,resource.HasValue?(int)resource.Value:5+(int)commodity.Value)==2) return 2;
             if (p.Id == s.ActivePlayerId && ((resource.HasValue && s.MerchantFleetResources.Contains(resource.Value)) || (commodity.HasValue && s.MerchantFleetCommodities.Contains(commodity.Value)))) return 2;
             if (resource.HasValue && s.MerchantPlayerId == p.Id && s.Tiles.Any(t => t.Id == s.MerchantTileId && t.Resource == ResourceName(resource.Value))) return 2;
             return 4;
@@ -353,7 +358,7 @@ namespace Catan.Core.M5
         private static void ValidateProgress(GameState s)
         {
             if (s.ProgressDecks == null || s.ProgressDecks.Length != 3 || s.ProgressDecks.Select(d => d.Track).Distinct().Count() != 3) throw new InvalidOperationException("Invalid progress decks.");
-            var cards = s.ProgressDecks.SelectMany(d => d.Cards).Concat(s.Players.SelectMany(p => p.ProgressCards)).Concat(s.Players.SelectMany(p => p.ProgressVictoryCards)).Concat((s.ThreeKingdoms?.Skills?.Frames ?? Array.Empty<Catan.Core.ThreeKingdoms.B2SkillFrame>()).Where(f => f.ProgressCard != null).Select(f => (ProgressCardKind)Enum.Parse(typeof(ProgressCardKind), f.ProgressCard.Id))).ToArray();
+            var cards = s.ProgressDecks.SelectMany(d => d.Cards).Concat(s.Players.SelectMany(p => p.ProgressCards)).Concat(s.Players.SelectMany(p => p.ProgressVictoryCards)).Concat((s.ThreeKingdoms?.Skills?.Frames ?? Array.Empty<Catan.Core.ThreeKingdoms.B2SkillFrame>()).Where(f => f.ProgressCard != null && !f.Kind.StartsWith("response-",StringComparison.Ordinal)).Select(f => (ProgressCardKind)Enum.Parse(typeof(ProgressCardKind), f.ProgressCard.Id))).Concat((s.ThreeKingdomsProgressResolutions??Array.Empty<B4ProgressResolution>()).Where(x=>!x.Virtual&&!x.Captured&&x.Card?.PublicPoint==false).Select(x=>(ProgressCardKind)Enum.Parse(typeof(ProgressCardKind),x.Card.Id))).ToArray();
             if (cards.Length != 54) throw new InvalidOperationException("Progress-card conservation violated.");
             foreach (ProgressCardKind card in Enum.GetValues(typeof(ProgressCardKind))) if (cards.Count(c => c == card) != ProgressCatalog.Count(card)) throw new InvalidOperationException("Invalid progress-card supply: " + card);
             if (s.Players.Any(p => p.ProgressCards.Any(ProgressCatalog.IsVictoryPoint) || p.ProgressVictoryCards.Any(c => !ProgressCatalog.IsVictoryPoint(c))) || s.ProgressDecks.Any(d => d.Cards.Any(c => ProgressCatalog.Track(c) != d.Track))) throw new InvalidOperationException("Invalid progress-card zone.");

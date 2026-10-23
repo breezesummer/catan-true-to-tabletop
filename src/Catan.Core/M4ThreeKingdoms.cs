@@ -31,7 +31,8 @@ namespace Catan.Core.M4
 
         private void InitializeThreeKingdoms(GameState s, bool skillsEnabled, string packageVersion = null)
         {
-            s.RulesVersion = skillsEnabled ? (packageVersion == GeneralCatalog.B2PackageVersion ? ThreeKingdomsB2RulesVersion : ThreeKingdomsB3RulesVersion) : ThreeKingdomsRulesVersion;
+            if (skillsEnabled && packageVersion == null) packageVersion = GeneralCatalog.B4PackageVersion;
+            s.RulesVersion = skillsEnabled ? (packageVersion == GeneralCatalog.B4PackageVersion ? ThreeKingdomsB4RulesVersion : packageVersion == GeneralCatalog.B2PackageVersion ? ThreeKingdomsB2RulesVersion : ThreeKingdomsB3RulesVersion) : ThreeKingdomsRulesVersion;
             var seats = Enumerable.Range(0, s.Players.Length).Select(i => s.Players[(s.StartingPlayerIndex + i) % s.Players.Length].Id).ToArray();
             s.ThreeKingdoms = ThreeKingdomsEngine.Create(seats, s.InitialSeed, maximum => Draw(s.Random, maximum), skillsEnabled, packageVersion);
         }
@@ -40,6 +41,7 @@ namespace Catan.Core.M4
         private void Apply(GameState s, Command c)
         {
             var tk = s.ThreeKingdoms;
+            if (B4(s)) { ApplyB4(s, c); return; }
             if (B2(s)) { ApplyB2(s, c); return; }
             if (tk == null)
             {
@@ -112,7 +114,7 @@ namespace Catan.Core.M4
         private static bool ThreeKingdomsAllowsBaseCommand(GameState s)
         {
             var tk = s.ThreeKingdoms;
-            return tk == null || !B2Busy(s) && tk.PendingDecision == null && (tk.Clock.Phase == ThreeKingdomsPhase.InitialPlacement || tk.Clock.Phase == ThreeKingdomsPhase.Roll || tk.Clock.Phase == ThreeKingdomsPhase.Play || (B2(s) || tk.Clock.Phase == ThreeKingdomsPhase.Preparation) && s.PendingDecision != null);
+            return tk == null || !B2Busy(s) && tk.Automation?.PendingDecision == null && tk.PendingDecision == null && (tk.Clock.Phase == ThreeKingdomsPhase.InitialPlacement || tk.Clock.Phase == ThreeKingdomsPhase.Roll || tk.Clock.Phase == ThreeKingdomsPhase.Play || (B2(s) || tk.Clock.Phase == ThreeKingdomsPhase.Preparation) && s.PendingDecision != null);
         }
 
         private void StampThreeKingdomsWindow(Command command)

@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Catan.Core.ThreeKingdoms;
 
 namespace Catan.Core.M5
@@ -16,6 +16,12 @@ namespace Catan.Core.M5
         private static bool B3PendingImmune(GameState s, PendingDecision decision)
         {
             if (decision == null) return false;
+            if(B4(s))
+            {
+                var losing=decision.Kind=="ProgressHarbor"||decision.Kind=="ProgressWedding"||decision.Kind=="ProgressSabotage"?decision.PlayerId:
+                    decision.Kind=="ProgressEspionage"||decision.Kind=="ProgressGuildDues"?decision.OtherPlayerId:null;
+                if(losing!=null&&B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,losing)) return true;
+            }
             switch (decision.Kind)
             {
                 case "PillageCity":

@@ -5,7 +5,7 @@ using System.Linq;
 namespace Catan.Core.ThreeKingdoms
 {
     /// <summary>纯规则生命周期。宿主以同一事务提交本状态及传入的权威随机流。</summary>
-    public static class ThreeKingdomsEngine
+    public static partial class ThreeKingdomsEngine
     {
         public static ThreeKingdomsState Create(string[] seatPlayerIds, uint initialSeed, Func<int, int> draw, bool skillsEnabled = false, string packageVersion = null)
         {
@@ -13,23 +13,25 @@ namespace Catan.Core.ThreeKingdoms
                 && seatPlayerIds.All(x => !string.IsNullOrWhiteSpace(x)) && seatPlayerIds.Distinct().Count() == seatPlayerIds.Length,
                 "三国开发骨架需要三个或四个不同席位。");
             Require(draw != null, "缺少权威随机流。");
+            bool b4 = skillsEnabled && packageVersion == GeneralCatalog.B4PackageVersion;
             bool b3 = skillsEnabled && packageVersion != GeneralCatalog.B2PackageVersion;
             Require(packageVersion == null || packageVersion == GeneralCatalog.PackageVersion && !skillsEnabled ||
-                skillsEnabled && (packageVersion == GeneralCatalog.B2PackageVersion || packageVersion == GeneralCatalog.B3PackageVersion), "不支持的三国武将包。");
+                skillsEnabled && (packageVersion == GeneralCatalog.B2PackageVersion || packageVersion == GeneralCatalog.B3PackageVersion || b4), "不支持的三国武将包。");
             var state = new ThreeKingdomsState
             {
-                RulesVersion = b3 ? GeneralCatalog.B3RulesVersion : skillsEnabled ? GeneralCatalog.B2RulesVersion : GeneralCatalog.RulesVersion,
-                PackageVersion = b3 ? GeneralCatalog.B3PackageVersion : skillsEnabled ? GeneralCatalog.B2PackageVersion : GeneralCatalog.PackageVersion,
-                PackageContentHash = b3 ? GeneralCatalog.B3ContentHash : skillsEnabled ? GeneralCatalog.B2ContentHash : GeneralCatalog.ContentHash,
+                RulesVersion = b4 ? GeneralCatalog.B4RulesVersion : b3 ? GeneralCatalog.B3RulesVersion : skillsEnabled ? GeneralCatalog.B2RulesVersion : GeneralCatalog.RulesVersion,
+                PackageVersion = b4 ? GeneralCatalog.B4PackageVersion : b3 ? GeneralCatalog.B3PackageVersion : skillsEnabled ? GeneralCatalog.B2PackageVersion : GeneralCatalog.PackageVersion,
+                PackageContentHash = b4 ? GeneralCatalog.B4ContentHash : b3 ? GeneralCatalog.B3ContentHash : skillsEnabled ? GeneralCatalog.B2ContentHash : GeneralCatalog.ContentHash,
                 SkillsEnabled = skillsEnabled, InitialSeed = initialSeed, Skills = skillsEnabled ? new B2SkillState() : null,
                 SeatPlayerIds = (string[])seatPlayerIds.Clone(),
                 Players = seatPlayerIds.Select(id => new ThreeKingdomsPlayer { PlayerId = id }).ToArray(),
-                Generals = (b3 ? GeneralCatalog.EnabledDefinitions : skillsEnabled ? GeneralCatalog.B2Definitions : GeneralCatalog.Definitions).Select(g => new GeneralInstance
+                Generals = (b4 ? GeneralCatalog.B4Definitions : b3 ? GeneralCatalog.EnabledDefinitions : skillsEnabled ? GeneralCatalog.B2Definitions : GeneralCatalog.Definitions).Select(g => new GeneralInstance
                     { GeneralId = g.Id, InstanceId = "tk-card-" + g.Id.Substring(4), Region = GeneralRegion.Pool }).ToArray(),
                 Clock = new ThreeKingdomsClock { Phase = ThreeKingdomsPhase.OpeningSelection, ActivePlayerId = seatPlayerIds[0] }
             };
-            Require(state.Generals.Length >= 2 * (seatPlayerIds.Length - 1) + 5, "将包不足以完成正常串行选将。");
-            DealOpening(state, draw);
+            RequireOpeningPoolSize(state.Generals.Length, seatPlayerIds.Length, b4);
+            if (b4) BeginOpeningBatch(state, draw);
+            else DealOpening(state, draw);
             return state;
         }
 
@@ -66,7 +68,11 @@ namespace Catan.Core.ThreeKingdoms
                 }).ToArray(),
                 ProcessedTriggerIds = CopyArray(state.ProcessedTriggerIds), InitialSeed = state.InitialSeed,
                 RandomAlgorithmId = state.RandomAlgorithmId, GeneralDrawOrder = CopyArray(state.GeneralDrawOrder),
-                SeatPlayerIds = CopyArray(state.SeatPlayerIds), Dice = B3DiceEngine.Clone(state.Dice)
+                SeatPlayerIds = CopyArray(state.SeatPlayerIds), Dice = B3DiceEngine.Clone(state.Dice),
+                PendingDecisions = state.PendingDecisions?.Select(CopyDecision).ToArray(), SelectionBatchId = state.SelectionBatchId,
+                SelectionBatchPlayerIds = CopyArray(state.SelectionBatchPlayerIds), RetirementRecycleCount = state.RetirementRecycleCount,
+                SkillHistory = B4SkillHistoryEngine.Clone(state.SkillHistory), Automation = B4AutomationEngine.Clone(state.Automation),
+                Response = B2SkillEngine.CloneB4Response(state.Response)
             };
         }
 
@@ -88,6 +94,7 @@ namespace Catan.Core.ThreeKingdoms
         public static void ChooseGenerals(ThreeKingdomsState state, string playerId, string[] generalIds,
             string decisionId, string windowId, Func<int, int> draw)
         {
+            if (UsesB4Lifecycle(state)) { ChooseBatchGenerals(state, playerId, generalIds, decisionId, windowId); return; }
             var pending = RequireDecision(state, playerId, decisionId, windowId);
             Require(pending.Kind == ThreeKingdomsDecisionKind.SelectOpening || pending.Kind == ThreeKingdomsDecisionKind.SelectReplacement,
                 "当前需要选择登场武将。");
@@ -109,6 +116,7 @@ namespace Catan.Core.ThreeKingdoms
         public static void DeployGeneral(ThreeKingdomsState state, string playerId, string generalId,
             string decisionId, string windowId, Func<int, int> draw)
         {
+            if (UsesB4Lifecycle(state)) { DeployBatchGeneral(state, playerId, generalId, decisionId, windowId, draw); return; }
             Require(draw != null, "缺少权威随机流。");
             var pending = RequireDecision(state, playerId, decisionId, windowId);
             Require(pending.Kind == ThreeKingdomsDecisionKind.DeployOpening || pending.Kind == ThreeKingdomsDecisionKind.DeployReplacement,
@@ -208,6 +216,7 @@ namespace Catan.Core.ThreeKingdoms
         {
             if (state == null) return;
             state.PendingDecision = null;
+            if (UsesB4Lifecycle(state)) { state.PendingDecisions = Array.Empty<ThreeKingdomsDecision>(); state.Automation=null; }
             SetPhase(state, ThreeKingdomsPhase.Finished);
         }
 
@@ -215,7 +224,7 @@ namespace Catan.Core.ThreeKingdoms
         {
             if (state == null) return;
             state.WindowId = NewId(state, "window");
-            if (state.PendingDecision != null)
+            if (state.PendingDecision != null && !UsesB4Lifecycle(state))
             {
                 state.PendingDecision.WindowId = state.WindowId;
                 state.PendingDecision.DecisionId = NewId(state, "decision");
@@ -225,7 +234,7 @@ namespace Catan.Core.ThreeKingdoms
         public static ThreeKingdomsView Project(ThreeKingdomsState state, string viewerId)
         {
             if (state == null) return null;
-            var decision = CopyDecision(state.PendingDecision);
+            var decision = CopyDecision(UsesB4Lifecycle(state) ? GetPendingDecision(state, viewerId) : state.PendingDecision);
             if (decision != null && decision.PlayerId != viewerId)
             {
                 decision.CandidateIds = Array.Empty<string>();
@@ -235,10 +244,13 @@ namespace Catan.Core.ThreeKingdoms
             return new ThreeKingdomsView
             {
                 PackageVersion = state.PackageVersion, PackageContentHash = state.PackageContentHash,
-                PackageLabel = state.RulesVersion == GeneralCatalog.B3RulesVersion ? GeneralCatalog.B3PackageLabel : state.SkillsEnabled ? GeneralCatalog.B2PackageLabel : GeneralCatalog.PackageLabel,
-                SkillsEnabled = state.SkillsEnabled, WindowId = state.WindowId,
+                PackageLabel = UsesB4Lifecycle(state) ? GeneralCatalog.B4PackageLabel : state.RulesVersion == GeneralCatalog.B3RulesVersion ? GeneralCatalog.B3PackageLabel : state.SkillsEnabled ? GeneralCatalog.B2PackageLabel : GeneralCatalog.PackageLabel,
+                SkillsEnabled = state.SkillsEnabled, WindowId = decision?.WindowId ?? state.WindowId,
                 Clock = CopyClock(state.Clock), PendingDecision = decision, OpeningComplete = state.OpeningComplete,
                 PoolCount = state.Generals.Count(g => g.Region == GeneralRegion.Pool),
+                RetiredCount = state.Generals.Count(g => g.Region == GeneralRegion.Retired),
+                WaitingSelectionPlayerIds = UsesB4Lifecycle(state) ? (state.PendingDecisions ?? Array.Empty<ThreeKingdomsDecision>()).Select(d => d.PlayerId).ToArray() : null,
+                SkillHistory = B4SkillHistoryEngine.Project(state, viewerId),
                 CanRetire = state.OpeningComplete && state.Clock.Round > 0 && state.Clock.ActivePlayerId == viewerId
                     && state.PendingDecision == null && !state.ReplacementInProgress
                     && state.Clock.Phase != ThreeKingdomsPhase.RoundEnd && state.Clock.Phase != ThreeKingdomsPhase.Finished,
@@ -286,6 +298,7 @@ namespace Catan.Core.ThreeKingdoms
 
         private static void StartReplacement(ThreeKingdomsState state, string playerId, Func<int, int> draw)
         {
+            if (UsesB4Lifecycle(state)) { BeginReplacementBatch(state, new[] { playerId }, draw); return; }
             var previous = Owned(state, playerId, GeneralRegion.Active).Single();
             state.ReplacementInProgress = true;
             state.ReplacementReturnPhase = state.Clock.Phase;
@@ -317,6 +330,7 @@ namespace Catan.Core.ThreeKingdoms
             general.EnteredRound = enteredRound;
             general.LastLifeDecrementRound = 0;
             general.Counters = Array.Empty<GeneralCounter>();
+            B2SkillEngine.OnB4GeneralActivated(state, general);
         }
 
         private static void ReturnToPool(GeneralInstance general)
@@ -334,7 +348,7 @@ namespace Catan.Core.ThreeKingdoms
         {
             state.Clock.ActivePlayerId = playerId;
             state.Clock.OpportunityId++;
-            if (state.RulesVersion == GeneralCatalog.B3RulesVersion && !state.Clock.IsExtraTurn)
+            if ((state.RulesVersion == GeneralCatalog.B3RulesVersion || UsesB4Lifecycle(state)) && !state.Clock.IsExtraTurn)
                 B2SkillEngine.ResetNormalOpportunity(state, playerId);
             var player = state.Players.Single(p => p.PlayerId == playerId);
             if (player.FaceDown)
@@ -350,7 +364,7 @@ namespace Catan.Core.ThreeKingdoms
 
         private static void ConsumeOpportunity(ThreeKingdomsState state, Func<int, int> draw)
         {
-            if (state.RulesVersion == GeneralCatalog.B3RulesVersion && state.Dice != null)
+            if ((state.RulesVersion == GeneralCatalog.B3RulesVersion || UsesB4Lifecycle(state)) && state.Dice != null)
                 state.Dice.FixedResult = null;
             if (state.Clock.IsExtraTurn) state.Clock.ExtraOpportunitiesConsumed++;
             else state.Clock.NormalOpportunitiesConsumed++;
@@ -386,6 +400,13 @@ namespace Catan.Core.ThreeKingdoms
         {
             if (state.ExpiredPlayerQueue.Length > 0)
             {
+                if (UsesB4Lifecycle(state))
+                {
+                    var players = state.ExpiredPlayerQueue;
+                    state.ExpiredPlayerQueue = Array.Empty<string>();
+                    BeginReplacementBatch(state, players, draw);
+                    return;
+                }
                 var playerId = state.ExpiredPlayerQueue[0];
                 state.ExpiredPlayerQueue = state.ExpiredPlayerQueue.Skip(1).ToArray();
                 StartReplacement(state, playerId, draw);
@@ -414,6 +435,14 @@ namespace Catan.Core.ThreeKingdoms
             Require(!string.IsNullOrEmpty(windowId) && state.WindowId == windowId, "此操作窗口已经过期。");
         private static ThreeKingdomsDecision RequireDecision(ThreeKingdomsState state, string playerId, string decisionId, string windowId)
         {
+            if (UsesB4Lifecycle(state))
+            {
+                var own = GetPendingDecision(state, playerId);
+                Require(own != null, "当前不是你的武将选择。");
+                Require(!string.IsNullOrEmpty(windowId) && own.WindowId == windowId, "此操作窗口已经过期。");
+                Require(!string.IsNullOrEmpty(decisionId) && own.DecisionId == decisionId, "此选择已经过期。");
+                return own;
+            }
             Require(state?.PendingDecision != null && state.PendingDecision.PlayerId == playerId, "当前不是你的武将选择。");
             RequireWindow(state, windowId);
             Require(!string.IsNullOrEmpty(decisionId) && state.PendingDecision.DecisionId == decisionId, "此选择已经过期。");
@@ -424,6 +453,8 @@ namespace Catan.Core.ThreeKingdoms
         public static bool HasSupportedPackage(ThreeKingdomsState state)
         {
             if (state == null) return true;
+            if (UsesB4Lifecycle(state)) return state.SkillsEnabled && state.PackageVersion == GeneralCatalog.B4PackageVersion
+                && state.PackageContentHash == GeneralCatalog.B4ContentHash;
             bool b3 = state.SkillsEnabled && state.RulesVersion == GeneralCatalog.B3RulesVersion;
             return state.RulesVersion == (b3 ? GeneralCatalog.B3RulesVersion : state.SkillsEnabled ? GeneralCatalog.B2RulesVersion : GeneralCatalog.RulesVersion)
                 && state.PackageVersion == (b3 ? GeneralCatalog.B3PackageVersion : state.SkillsEnabled ? GeneralCatalog.B2PackageVersion : GeneralCatalog.PackageVersion)
@@ -434,6 +465,7 @@ namespace Catan.Core.ThreeKingdoms
         {
             var errors = new List<string>();
             if (state == null) return errors.ToArray();
+            bool b4 = UsesB4Lifecycle(state);
             bool b3 = state.SkillsEnabled && state.RulesVersion == GeneralCatalog.B3RulesVersion;
             if (!HasSupportedPackage(state))
                 errors.Add("三国规则版本或开发包内容不一致。");
@@ -441,13 +473,14 @@ namespace Catan.Core.ThreeKingdoms
                 || state.EffectFrames == null || state.ExpiredPlayerQueue == null || state.RoundEndTenureSnapshot == null
                 || state.GeneralDrawOrder == null || state.ProcessedTriggerIds == null)
                 return new[] { "三国存档缺少必需状态。" };
+            errors.AddRange(B4AutomationEngine.Validate(state));
             if ((state.SeatPlayerIds.Length != 3 && state.SeatPlayerIds.Length != 4) || state.SeatPlayerIds.Any(string.IsNullOrWhiteSpace)
                 || state.SeatPlayerIds.Distinct().Count() != state.SeatPlayerIds.Length
                 || state.Players.Length != state.SeatPlayerIds.Length || state.Players.Any(p => p == null || !state.SeatPlayerIds.Contains(p.PlayerId))
                 || state.Players.Select(p => p?.PlayerId).Distinct().Count() != state.Players.Length)
                 errors.Add("三国固定座位或玩家身份不合法。");
-            if (state.Generals.Length != (b3 ? GeneralCatalog.EnabledDefinitions.Length : state.SkillsEnabled ? GeneralCatalog.B2Definitions.Length : GeneralCatalog.Definitions.Length)
-                || state.Generals.Any(g => g == null || state.SkillsEnabled && !(b3 ? GeneralCatalog.IsEnabled(g.GeneralId) : GeneralCatalog.IsB2Enabled(g.GeneralId)))
+            if (state.Generals.Length != (b4 ? GeneralCatalog.B4Definitions.Length : b3 ? GeneralCatalog.EnabledDefinitions.Length : state.SkillsEnabled ? GeneralCatalog.B2Definitions.Length : GeneralCatalog.Definitions.Length)
+                || state.Generals.Any(g => g == null || state.SkillsEnabled && !(b4 ? GeneralCatalog.IsB4Enabled(g.GeneralId) : b3 ? GeneralCatalog.IsEnabled(g.GeneralId) : GeneralCatalog.IsB2Enabled(g.GeneralId)))
                 || state.Generals.Select(g => g?.GeneralId).Distinct().Count() != state.Generals.Length
                 || state.Generals.Select(g => g?.InstanceId).Distinct().Count() != state.Generals.Length)
                 return errors.Concat(new[] { "武将实体缺失或重复。" }).ToArray();
@@ -455,7 +488,7 @@ namespace Catan.Core.ThreeKingdoms
             {
                 if (GeneralCatalog.Get(general.GeneralId) == null || general.InstanceId != "tk-card-" + general.GeneralId.Substring(4)
                     || !Enum.IsDefined(typeof(GeneralRegion), general.Region)) errors.Add("武将实体或所在区域无效。");
-                if (general.Region == GeneralRegion.Pool ? general.OwnerPlayerId != null : !state.SeatPlayerIds.Contains(general.OwnerPlayerId))
+                if (general.Region == GeneralRegion.Pool || b4 && general.Region == GeneralRegion.Retired ? general.OwnerPlayerId != null : !state.SeatPlayerIds.Contains(general.OwnerPlayerId))
                     errors.Add("武将归属无效。");
                 if (general.Region == GeneralRegion.Active)
                 {
@@ -470,7 +503,8 @@ namespace Catan.Core.ThreeKingdoms
                     || (general.Region != GeneralRegion.Active && general.Counters.Length != 0)) errors.Add("武将任次计数无效。");
                 if (general.Region == GeneralRegion.Active && general.LastLifeDecrementRound > 0
                     && general.LastLifeDecrementRound < general.EnteredRound) errors.Add("武将寿命扣减早于本任次登场。");
-                if (state.OpeningComplete && general.Region == GeneralRegion.ReservedDeployment) errors.Add("开局公开完成后仍残留拟登场武将。");
+                if (state.OpeningComplete && general.Region == GeneralRegion.ReservedDeployment && !(b4 && state.ReplacementInProgress)) errors.Add("开局公开完成后仍残留拟登场武将。");
+                if (!b4 && general.Region == GeneralRegion.Retired) errors.Add("旧包不能使用独立隐退库。");
             }
             if (state.Generals.Where(g => g.Region == GeneralRegion.Active).Select(g => g.TenureId).Distinct().Count()
                 != state.Generals.Count(g => g.Region == GeneralRegion.Active)) errors.Add("在场任次重复。");
@@ -480,10 +514,11 @@ namespace Catan.Core.ThreeKingdoms
                 var hiddenCount = Owned(state, playerId, GeneralRegion.Hidden).Count();
                 var reservedCount = Owned(state, playerId, GeneralRegion.ReservedDeployment).Count();
                 if (activeCount > 1 || reservedCount > 1 || hiddenCount + activeCount + reservedCount > 2) errors.Add("武将库超过生命周期允许数量。");
-                if (state.OpeningComplete && activeCount != (state.ReplacementInProgress && state.ReplacementPlayerId == playerId ? 0 : 1))
+                if (state.OpeningComplete && activeCount != (state.ReplacementInProgress && (b4 ? state.SelectionBatchPlayerIds?.Contains(playerId) == true : state.ReplacementPlayerId == playerId) ? 0 : 1))
                     errors.Add("正常局缺少在场武将。");
             }
-            if (state.PendingDecision != null)
+            if (b4) errors.AddRange(ValidateB4Batch(state));
+            else if (state.PendingDecision != null)
             {
                 var pending = state.PendingDecision;
                 if (!Enum.IsDefined(typeof(ThreeKingdomsDecisionKind), pending.Kind) || !state.SeatPlayerIds.Contains(pending.PlayerId) || string.IsNullOrWhiteSpace(pending.DecisionId)
@@ -499,10 +534,10 @@ namespace Catan.Core.ThreeKingdoms
                 }
             }
             else if (state.Generals.Any(g => g.Region == GeneralRegion.Candidate)) errors.Add("候选区缺少对应待决。");
-            if (state.ReplacementInProgress != (state.PendingDecision != null &&
+            if (!b4 && state.ReplacementInProgress != (state.PendingDecision != null &&
                 (state.PendingDecision.Kind == ThreeKingdomsDecisionKind.SelectReplacement || state.PendingDecision.Kind == ThreeKingdomsDecisionKind.DeployReplacement)))
                 errors.Add("武将轮换待决不完整。");
-            if (state.ReplacementInProgress && (state.ReplacementPlayerId != state.PendingDecision?.PlayerId
+            if (!b4 && state.ReplacementInProgress && (state.ReplacementPlayerId != state.PendingDecision?.PlayerId
                 || state.EffectFrames.Count(f => f != null && f.SkillId == "tk-lifecycle-replacement") != 1))
                 errors.Add("武将轮换缺少对应父子效果步骤。");
             if (state.EffectFrames.Any(f => f == null || string.IsNullOrWhiteSpace(f.EffectId) || f.Step < 0
@@ -513,7 +548,7 @@ namespace Catan.Core.ThreeKingdoms
                 || (state.OpeningComplete && state.OpeningSeatCursor != state.SeatPlayerIds.Length)
                 || (!state.OpeningComplete && (state.Clock.Phase != ThreeKingdomsPhase.OpeningSelection || state.Clock.Round != 0
                     || state.OpeningSeatCursor >= state.SeatPlayerIds.Length || state.PendingDecision == null
-                    || state.PendingDecision.PlayerId != state.SeatPlayerIds[state.OpeningSeatCursor])))
+                    || !b4 && state.PendingDecision.PlayerId != state.SeatPlayerIds[state.OpeningSeatCursor])))
                 errors.Add("开局串行选择顺序或阶段不一致。");
             if (state.Clock.ExtraTurnQueue == null || state.Clock.SkippedOpportunityPlayerIds == null || state.Clock.ExtraTurnQueue.Any(id => !state.SeatPlayerIds.Contains(id))
                 || state.Clock.NormalSeatCursor < 0 || state.Clock.NormalSeatCursor > state.SeatPlayerIds.Length

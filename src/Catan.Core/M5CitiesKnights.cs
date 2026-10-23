@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Catan.Core.ThreeKingdoms;
 
 namespace Catan.Core.M5
 {
@@ -66,7 +67,7 @@ namespace Catan.Core.M5
             int total=s.LastDice1+s.LastDice2;
             if(total==7)
             {
-                s.Discards=TurnOrder(s).Where(p=>!B2Protected(s,p.Id)&&HandCount(p)>7+2*s.Walls.Count(w=>w.PlayerId==p.Id)).Select(p=>new DiscardRequirement {PlayerId=p.Id,Amount=HandCount(p)/2}).ToArray();
+                s.Discards=TurnOrder(s).Where(p=>!B2Protected(s,p.Id)&&HandCount(p)>(B4(s)?CardHost(s).GetHandLimit(p.Id):7+2*s.Walls.Count(w=>w.PlayerId==p.Id))).Select(p=>new DiscardRequirement {PlayerId=p.Id,Amount=HandCount(p)/2}).ToArray();
                 if(s.Discards.Length>0) { s.PendingDecision=new PendingDecision {Kind="Robber",PlayerId=s.ActivePlayerId,ReturnPhase=GamePhase.Action}; s.Phase=GamePhase.Discard; }
                 else if(s.FirstBarbarianAttack) { s.PendingDecision=new PendingDecision {Kind="Robber",PlayerId=s.ActivePlayerId,ReturnPhase=GamePhase.Action}; s.Phase=GamePhase.RobberMove; }
                 else s.Phase=GamePhase.Action;
@@ -158,7 +159,10 @@ namespace Catan.Core.M5
             bool acquire=level>=4&&(holder==null||holder.PlayerId!=p.Id&&s.Players.Single(x=>x.Id==holder.PlayerId).Improvements[(int)track]<level);
             var cities=s.Cities.Where(c=>c.PlayerId==p.Id&&!s.Metropolises.Any(m=>m.LocationId==c.LocationId)).Select(c=>c.LocationId).ToArray();
             Require(!acquire||cities.Length>0,"NoMetropolisCity","取得大都会必须有一座可用城市。");
-            Transfer(p.Commodities,s.CommodityBank,(Commodity)(int)track,Math.Max(0,level-discount)); p.Improvements[(int)track]=level;
+            int cost=Math.Max(0,level-discount);
+            if(B2SkillEngine.B4Enabled(s.ThreeKingdoms)) {var needs=new int[8];needs[5+(int)track]=cost;PayB4(s,p,needs);}
+            else Transfer(p.Commodities,s.CommodityBank,(Commodity)(int)track,cost);
+            p.Improvements[(int)track]=level;
             if(acquire) {QueueDecision(s,new PendingDecision {Kind="Metropolis",PlayerId=p.Id,Track=track,Options=cities}); ContinueDecisions(s);}
         }
         private bool Occupied(GameState s,string vertex) => Buildings(s).Any(b=>b.LocationId==vertex)||s.Knights.Any(k=>k.LocationId==vertex)||(s.Special!=null&&(s.Special.Villages.Any(v=>v.VertexId==vertex)||s.Special.Fortresses.Any(f=>f.Strength>0&&f.VertexId==vertex)));
@@ -215,6 +219,7 @@ namespace Catan.Core.M5
         }
         private void BankTrade(GameState s,PlayerState p,Command c)
         {
+            if(B4(s)) { BankTradeB4(s,p,c); return; }
             if(c.Receive!=null&&Resources.Any(resource=>c.Receive[resource]!=0)||c.ReceiveCommodities!=null&&Commodities.Any(commodity=>c.ReceiveCommodities[commodity]!=0))
             {
                 var resources=c.Receive??new ResourceBag();var commodities=c.ReceiveCommodities??new CommodityBag();

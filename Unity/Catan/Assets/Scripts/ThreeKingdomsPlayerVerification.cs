@@ -64,7 +64,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             app.StartGame(mode,"heading-for-new-shores",players,"P1",true,threeKingdoms:true);
             yield return null;yield return null;
             Require(app.Ready&&app.ThreeKingdoms&&app.Paused&&View!=null,"三国开关没有进入本地权威局面。");
-            Require(View.SkillsEnabled&&View.PackageVersion==GeneralCatalog.B3PackageVersion&&GeneralCatalog.EnabledDefinitions.Length==16,"新局没有使用完整 B3 十六将包。");
+            Require(View.SkillsEnabled&&View.PackageVersion==GeneralCatalog.B4PackageVersion&&GeneralCatalog.B4Definitions.Length==30,"新局没有使用完整 B4 三十将包。");
             result.packageVersion=View.PackageVersion;
             int budget=0;
             while(View.PendingDecision?.PlayerId!=app.HumanSeat)
@@ -82,21 +82,21 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
                 Advance();yield return null;
             }
             budget=0;
-            while(View.Clock.Phase!=ThreeKingdomsPhase.Preparation||View.Clock.ActivePlayerId!=app.HumanSeat)
+            while(View.Clock.Phase!=ThreeKingdomsPhase.Play||View.Clock.ActivePlayerId!=app.HumanSeat)
             {
                 Require(++budget<800,"初始摆放或阶段自动推进未在预算内完成。");
                 while(app.TableDiceRolling||app.TablePresentationBlocked)yield return null;
                 Advance();yield return null;
             }
-            stage=prefix+" 准备阶段";
+            stage=prefix+" 出牌阶段";
             string stageBefore=SaveAndRestore(prefix+"-阶段");yield return null;yield return null;AssertRestored(stageBefore);
             Require(View.Players.All(p=>p.ActiveGeneralId!=null&&p.RemainingLife==3)&&View.Players.All(p=>p.HiddenCount==1),"首轮公开武将与暗置数量不正确。");
-            Require(View.PoolCount==16-players*2,"正常选将没有保留 B3 十六将实体总数。");
+            Require(View.PoolCount==30-players*2,"正常选将没有保留 B4 三十将实体总数。");
             app.VerificationOpenThreeKingdomsPanel();yield return null;
             if(result.graphics){BeginCapture(prefix+"-public-life.png");for(int frame=0;target!=null&&frame<12;frame++)yield return null;EndCapture();}
             for(int repeat=0;repeat<2;repeat++)
             {
-                stage=prefix+" 隐退 "+repeat;Require(View.CanRetire,"准备阶段没有合法隐退入口。");Retire();yield return null;result.retirements++;
+                stage=prefix+" 隐退 "+repeat;Require(View.CanRetire,"出牌阶段没有合法隐退入口。");Retire();yield return null;result.retirements++;
                 foreach(string checkpoint in new[]{"补将","轮换登场"})
                 {
                     string before=SaveAndRestore(prefix+"-"+repeat+"-"+checkpoint);yield return null;yield return null;AssertRestored(before);CheckPrivacy();
@@ -104,7 +104,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
                     {app.VerificationOpenThreeKingdomsPanel();yield return null;BeginCapture(prefix+"-replacement.png");for(int frame=0;target!=null&&frame<12;frame++)yield return null;EndCapture();}
                     Advance();yield return null;
                 }
-                Require(View.Clock.Phase==ThreeKingdomsPhase.Preparation&&View.CanRetire,"轮换没有返回原准备阶段或错误限制重复隐退。");
+                Require(View.Clock.Phase==ThreeKingdomsPhase.Play&&View.CanRetire,"轮换没有返回原出牌阶段或错误限制重复隐退。");
             }
             stage=prefix+" 技能选择";budget=0;
             while(!app.IsHumanTurn||View.SkillActions==null||View.SkillActions.Length==0)
@@ -137,7 +137,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
     }
     void Advance()
     {
-        if(app.IsHumanTurn)
+        if(app.IsHumanTurn||View.PendingDecision?.PlayerId==app.HumanSeat)
         {
             if(app.RuleSet=="cities-knights")
             {var command=cityPolicy.Decide(City.M6View);command.Id=Guid.NewGuid().ToString("N");Require(City.Submit(command)?.Success==true,"人类城市骑士入口拒绝合法命令。");}

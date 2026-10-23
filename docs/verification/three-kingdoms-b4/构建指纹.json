@@ -1,0 +1,76 @@
+{
+  "记录日期": "2026-10-23",
+  "游戏版本": "内测版2.0.1",
+  "正式发布": false,
+  "云端部署": false,
+  "Windows": "最终源码构建成功，最终菜单鼠标复验通过；自动Player四配置结果来自最终历史ID和菜单文案修复之前的构建，分别记录，不冒充同一产物运行。",
+  "Android": "最终源码ARM64开发包构建及签名验证成功；adb未连接设备，未执行真机运行。",
+  "证据": [
+    {
+      "路径": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/Builds/Windows/Catan2.0.1.exe",
+      "字节": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+      "修改时间": "2026-10-23T16:15:12.405219+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/Builds/Windows/Catan2.0.1_Data/Managed/Assembly-CSharp.dll",
+      "字节": 1235968,
+      "SHA256": "d0e5064f396d318dbbfb496f308228498f0431a683effa46efedcbec187dc369",
+      "修改时间": "2026-10-23T16:34:16.654260+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/Builds/Windows/Catan2.0.1_Data/Managed/Catan.Core.dll",
+      "字节": 1075712,
+      "SHA256": "aac6160b1a9970d3756f98cf68b395a1a3c5e8123f82b8e09483fe03e69d9c60",
+      "修改时间": "2026-10-23T16:32:49.288472+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/Builds/Windows/Catan2.0.1_Data/Managed/Catan.AI.dll",
+      "字节": 215552,
+      "SHA256": "75ee844bfe4c80e3820ae5f0bf5de6d5867fe33c83bfe29132bbfdd77f171028",
+      "修改时间": "2026-10-23T16:32:49.353128+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/Builds/Windows/Catan2.0.1_Data/Managed/Catan.Network.Contracts.dll",
+      "字节": 14848,
+      "SHA256": "c159f594b5866a0d57e1c83b039f930ada7b0208d0f874c82bfd4d186a0bd6e6",
+      "修改时间": "2026-10-23T16:15:13.029761+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/Builds/Windows/Server/Catan.Server.exe",
+      "字节": 162304,
+      "SHA256": "115c4af6ec400ed385489c4e7dccc0300445ab6dd2a52b989f7cef2808b7574b",
+      "修改时间": "2026-10-23T16:33:04.672882+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/Builds/Android/Catan2.0.1.apk",
+      "字节": 329578549,
+      "SHA256": "219cbc116dc7abbbb4467230ea5a1fe52f41ed4cf7f248fb0c0f3d321c0f33df",
+      "修改时间": "2026-10-23T16:36:48.567619+08:00"
+    },
+    {
+      "路径": ".local/test-results/b4/windows-build-final.log",
+      "字节": 2672,
+      "SHA256": "be3378c96954d4af9518ad22a8975731add11af3c97f3e410378d35e0e496fcf",
+      "修改时间": "2026-10-23T16:34:24.851324+08:00"
+    },
+    {
+      "路径": ".local/test-results/b4/android-build-final.log",
+      "字节": 1172,
+      "SHA256": "b4ab56a2f41709f989de18d473b0c16d3bd496c6f214514b5c8c87f8f558c494",
+      "修改时间": "2026-10-23T16:36:54.655875+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/verification/result.json",
+      "字节": 571,
+      "SHA256": "8ba26494bf194a59c096dcc1509c75651329be9ce939bcfdfb7d253e8acf7f57",
+      "修改时间": "2026-10-23T16:24:16.020443+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.1-Three-Kingdoms-B4/logs/player-b4.log",
+      "字节": 1893,
+      "SHA256": "7fb0d2637820bea6282eb8add9c946cde8cd5f7e655a3503c266f623cbd790ed",
+      "修改时间": "2026-10-23T16:24:16.314360+08:00"
+    }
+  ]
+}
