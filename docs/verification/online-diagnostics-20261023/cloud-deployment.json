@@ -1,0 +1,39 @@
+{
+  "deployedUtc": "2026-10-23T03:58:40Z",
+  "sourceCommit": "792e71db3e761b4b17ab3e584e5429ed2c1ba1c2",
+  "embeddedAssemblyRevision": "9b6754dbe990470ee4243f9dd84f35e29bb9e016",
+  "pdbSourceFilesMatched": 73,
+  "archiveSha256": "23ed00d9ca4640fb3cd9e41deb7259a4e115be4409a136dbc8f8509e75c4bb47",
+  "previousRelease": "/opt/catan-server/releases/1.6.16-performance-20261021",
+  "backup": "/var/backups/catan-m7/20261023T035839Z-before-792e71d.tar.gz",
+  "switchSeconds": 1,
+  "note": "使用提交前构建且已验证的同源补丁；程序保留旧版，私有存档已停服备份。",
+  "statusAfterValidation": {
+    "checkedUtc": "2026-10-23T04:06:18.184042+00:00",
+    "release": "/opt/catan-server/releases/2.0.1-diagnostics-20261023-792e71d",
+    "service": {
+      "NRestarts": "0",
+      "ExecMainStartTimestamp": "Fri 2026-10-23 11:58:39 CST",
+      "ActiveState": "active"
+    },
+    "health": {
+      "status": "ok",
+      "protocolVersion": 3,
+      "serverName": "卡坦岛之三国争霸",
+      "transport": "http",
+      "httpPort": 47771,
+      "httpsPort": 0,
+      "certificateFingerprint": ""
+    },
+    "persistedRoomFiles": 0,
+    "backupExists": true,
+    "backupMode": "0o600",
+    "dataDirectoryMode": "0o700",
+    "diagnosticsDirectoryMode": "0o700"
+  },
+  "publicHealthChecks": [
+    "http://175.178.212.142:47771/health",
+    "http://breezesummer.cloud:47771/health"
+  ],
+  "publicHealthChecksPassed": true
+}

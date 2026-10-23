@@ -2,7 +2,7 @@
 
 ## 启用与日志位置
 
-包含本功能的新客户端及服务端默认记录诊断日志，无需传入采样参数。旧的 2.0.1 游戏包和旧云端程序不会因源码更新自动获得日志；同版本号的包以本轮独立构建目录和日志中的会话信息区分。
+包含本功能的新客户端及服务端默认记录诊断日志，无需传入采样参数。云端已于 2026-10-23 11:58:40（北京时间）更新此补丁。旧的 2.0.1 游戏包仍可连接，但不会自动获得客户端日志、10 秒心跳和后台解析优化；四名玩家应分别运行 `game version/2.0/Catan2.0.1-Online-Diagnostics/Builds/Windows/Catan2.0.1.exe`。同版本号的包以独立构建目录和日志中的会话信息区分。
 
 - Windows 客户端：本轮实际构建为 `%USERPROFILE%\AppData\LocalLow\CatanDevelopment\Catan2_0_1\m7-logs`。部分历史构建的产品目录使用 `Catan2.0.1`；以 `Player.log` 中的 `CATAN_M7_LOG_DIRECTORY` 为准，收集脚本会自动查找所有 `Catan*` 版本目录。
 - Android 客户端：`Application.persistentDataPath/m7-logs`，位于应用外部文件目录。设备文件访问方式取决于 Android 版本与调试授权。

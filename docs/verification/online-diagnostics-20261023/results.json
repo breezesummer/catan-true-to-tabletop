@@ -15,7 +15,11 @@
   "clientDiagnosticWriteFailures": 0,
   "windowsBuilt": true,
   "linuxX64Built": true,
-  "cloudDeployed": false,
+  "cloudDeployed": true,
   "androidValidated": false,
-  "note": "本机测试与隐藏窗口程序验证，不代表四台PC、公网长局或可见窗口帧率验收。"
+  "note": "本机测试与单台PC隐藏窗口公网程序验证，不代表四台PC真人长局或可见窗口帧率验收；公网程序强制D3D11，不能证明D3D12动画问题已消失。",
+  "cloudClientConfigurationsPassed": 8,
+  "cloudSmokeChecksPassed": 12,
+  "cloudDiagnosticEvents": 3315,
+  "cloudCorrelatedRequestEvents": 7
 }

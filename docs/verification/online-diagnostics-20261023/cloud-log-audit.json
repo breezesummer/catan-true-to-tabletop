@@ -1,0 +1,36 @@
+{
+  "checkedUtc": "2026-10-23T04:04:59.870541+00:00",
+  "files": 1,
+  "events": 3315,
+  "invalidLines": 0,
+  "unexpectedFields": 0,
+  "unredactedConnectionIds": 0,
+  "filesReadableByOthers": 0,
+  "correlatedRequestEvents": 7,
+  "maximumDroppedEvents": 0,
+  "socketFailureTypes": [
+    {
+      "code": "WebSocket:ConnectionClosedPrematurely",
+      "exceptionType": "WebSocketException",
+      "count": 20
+    }
+  ],
+  "eventCounts": {
+    "diagnostics.started": 1,
+    "request.received": 445,
+    "request.dispatched": 560,
+    "http.completed": 381,
+    "room.handle": 533,
+    "socket.opened": 25,
+    "room.storage": 302,
+    "room.commit": 302,
+    "room.projection": 220,
+    "response.queued": 168,
+    "response.sent": 167,
+    "socket.failure": 20,
+    "socket.closed": 25,
+    "rooms.ai_tick": 165,
+    "push.superseded": 1
+  },
+  "note": "日志包含20条提前关闭记录；验证有主动重连、切房和退出，不宣称零网络错误，也不直接计作自然掉线。"
+}
