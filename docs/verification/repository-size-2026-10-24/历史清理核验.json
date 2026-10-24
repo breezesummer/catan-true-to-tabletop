@@ -1,0 +1,260 @@
+{
+  "结果": "通过",
+  "备份路径": "D:\\Project\\catan-true-to-tabletop\\.local\\repository-history-backup-20261024",
+  "备份字节数": 1875851289,
+  "备份SHA256": "f4dac64be378c148c27ee02f069de7293b0a49de7025e31ff38e1d87dcb97815",
+  "历史清理路径数": 1329,
+  "分支数": 11,
+  "标签数": 2,
+  "清理后独立Git对象字节数": 969922498,
+  "分支标签映射": {
+    "refs/heads/codex/ai-strategy-v002": {
+      "before": "d94cf8c17ff07f24916dad51977fc2d49682e544",
+      "protectedBefore": {
+        "Unity": "d9ebdf69de85419221fece4ffa89c1f1158ac8fd",
+        "src": "21f84965ff5364bb1fb44c243fd92bdce67cfdd7",
+        "tests": "49535bcf8e3497834b467525d365b51cb95150f2",
+        "tools": "ebcc563f92ca36d518cbfd03028344cef313a4ca",
+        "assets/references/rules": "90d25e576ccd7f11ef0232b7af73c2f50dbaf51b"
+      },
+      "after": "9822d41bc7000b2dd9d9dae9879526c9125fb957",
+      "protectedAfter": {
+        "Unity": "d9ebdf69de85419221fece4ffa89c1f1158ac8fd",
+        "src": "21f84965ff5364bb1fb44c243fd92bdce67cfdd7",
+        "tests": "49535bcf8e3497834b467525d365b51cb95150f2",
+        "tools": "ebcc563f92ca36d518cbfd03028344cef313a4ca",
+        "assets/references/rules": "90d25e576ccd7f11ef0232b7af73c2f50dbaf51b"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/heads/codex/ai2-strategy-patch": {
+      "before": "0383c77a638bae33b736094dcaa385c71dac9b49",
+      "protectedBefore": {
+        "Unity": "38abcf282bd19cf14c068ae7dc188e7562933af1",
+        "src": "6f94123cea21c6c39ace4658aae04d78787dcf20",
+        "tests": "d689f1e65bbae33ffcc72cf9bb06a5a3744e99ec",
+        "tools": "377e7149add069ccb435b648905746b9876c2ec1",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "after": "6a55385b94015838b8526239a2eed85d82ebb869",
+      "protectedAfter": {
+        "Unity": "38abcf282bd19cf14c068ae7dc188e7562933af1",
+        "src": "6f94123cea21c6c39ace4658aae04d78787dcf20",
+        "tests": "d689f1e65bbae33ffcc72cf9bb06a5a3744e99ec",
+        "tools": "377e7149add069ccb435b648905746b9876c2ec1",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/heads/codex/combined-all-scenarios": {
+      "before": "d4e781d19511b3064f9de24df88ad565a42060be",
+      "protectedBefore": {
+        "Unity": "cc272f7b6e4a848288305e43e433d1dcec107b40",
+        "src": "e691e05f8edd21291b3da926eacbaaf36fda6b48",
+        "tests": "dc2159e538ee7078fe81d0509504fd21add8545e",
+        "tools": "4aeae6d10d7b5e886f248248c8b735e8020e8f9d",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "after": "1a5263e267dc6e7787dfca16ae6566256c705c31",
+      "protectedAfter": {
+        "Unity": "cc272f7b6e4a848288305e43e433d1dcec107b40",
+        "src": "e691e05f8edd21291b3da926eacbaaf36fda6b48",
+        "tests": "dc2159e538ee7078fe81d0509504fd21add8545e",
+        "tools": "4aeae6d10d7b5e886f248248c8b735e8020e8f9d",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/heads/codex/pastoral-menu-audio-v001": {
+      "before": "bd27da6201b88496337f050456725b5d40c5d8e0",
+      "protectedBefore": {
+        "Unity": "e935505484cdcf8cf38181da6d9d2a970b1588c0",
+        "src": "16c48ea25789a2214a7c4a32305951ba53b4124a",
+        "tests": "d32813f4a41141ce8de42d84260246cef4a39b37",
+        "tools": "89859dec08b667eadd13e8916bab0b1b79194f64",
+        "assets/references/rules": "90d25e576ccd7f11ef0232b7af73c2f50dbaf51b"
+      },
+      "after": "a38b24c9b7bb95c8065044c10ac009a5e68806e2",
+      "protectedAfter": {
+        "Unity": "e935505484cdcf8cf38181da6d9d2a970b1588c0",
+        "src": "16c48ea25789a2214a7c4a32305951ba53b4124a",
+        "tests": "d32813f4a41141ce8de42d84260246cef4a39b37",
+        "tools": "89859dec08b667eadd13e8916bab0b1b79194f64",
+        "assets/references/rules": "90d25e576ccd7f11ef0232b7af73c2f50dbaf51b"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/heads/codex/tabletop-ui-v006": {
+      "before": "66b4e8b19ebb75162ac284f3d0605ba7278b6f71",
+      "protectedBefore": {
+        "Unity": "6bdc5cc0a885f01f32b1295b35f3278796f51ba8",
+        "src": "16bab2e2fbbdec42c0b5b4e2e3d1e294e9361a27",
+        "tests": "79a3931cd1c23fb90365ea25b908897b9390aba4",
+        "tools": "c67574f92b1e164a49c55b61271cf5efb2ce5f09",
+        "assets/references/rules": "90d25e576ccd7f11ef0232b7af73c2f50dbaf51b"
+      },
+      "after": "fd96ca01d22b704d5af1a9e1770582f5eefcfa04",
+      "protectedAfter": {
+        "Unity": "6bdc5cc0a885f01f32b1295b35f3278796f51ba8",
+        "src": "16bab2e2fbbdec42c0b5b4e2e3d1e294e9361a27",
+        "tests": "79a3931cd1c23fb90365ea25b908897b9390aba4",
+        "tools": "c67574f92b1e164a49c55b61271cf5efb2ce5f09",
+        "assets/references/rules": "90d25e576ccd7f11ef0232b7af73c2f50dbaf51b"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/heads/codex/ui-feedback-v012": {
+      "before": "228999ceb89af8d78c630e2d34dda3085058c876",
+      "protectedBefore": {
+        "Unity": "2c7d89450133b4bf33b0eb0f3a82c0e50d341ee4",
+        "src": "16c48ea25789a2214a7c4a32305951ba53b4124a",
+        "tests": "a33b0cc0165400fdbde4a6bffeb3af05e79da276",
+        "tools": "f3eb2a7099381f21b14b6299977a59752065bcad",
+        "assets/references/rules": "90d25e576ccd7f11ef0232b7af73c2f50dbaf51b"
+      },
+      "after": "43780afbd25e4eedaaa4d84cd55393f8a9c04210",
+      "protectedAfter": {
+        "Unity": "2c7d89450133b4bf33b0eb0f3a82c0e50d341ee4",
+        "src": "16c48ea25789a2214a7c4a32305951ba53b4124a",
+        "tests": "a33b0cc0165400fdbde4a6bffeb3af05e79da276",
+        "tools": "f3eb2a7099381f21b14b6299977a59752065bcad",
+        "assets/references/rules": "90d25e576ccd7f11ef0232b7af73c2f50dbaf51b"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/heads/codex/ultra-u0-1.7.0": {
+      "before": "b22b0b7a810b4c9d0700a02a7769891512cde414",
+      "protectedBefore": {
+        "Unity": "f4d061ff80223485b0f541228cb82591a9ef526b",
+        "src": "76691aabff3d8a2266087b11985eb156d0bc0f94",
+        "tests": "39c07717f83f3b3c43332f4bb2575ec24e383834",
+        "tools": "eece69d400ad28d5a38c89cfe058d88698b5e471",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "after": "d36c0edce47fe58c7ab10b28040c01e9f083fcb7",
+      "protectedAfter": {
+        "Unity": "f4d061ff80223485b0f541228cb82591a9ef526b",
+        "src": "76691aabff3d8a2266087b11985eb156d0bc0f94",
+        "tests": "39c07717f83f3b3c43332f4bb2575ec24e383834",
+        "tools": "eece69d400ad28d5a38c89cfe058d88698b5e471",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/heads/codex/ultra-u0-baseline": {
+      "before": "ad0941101ab03d1480500ed5170f415ebb31c984",
+      "protectedBefore": {
+        "Unity": "0f3e15add1bf8489b0805ccbdd26b53840d2daea",
+        "src": "e30e593107448797cbce8be128d9d68fadf1cc31",
+        "tests": "58b1b10319e112f4e5da79f4ecb6cc70d85f8ce8",
+        "tools": "367a565b297e62ecd4a4ee3e3ecae86b07664556",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "after": "e145f66c5fa58382d646747433691807d4e216ed",
+      "protectedAfter": {
+        "Unity": "0f3e15add1bf8489b0805ccbdd26b53840d2daea",
+        "src": "e30e593107448797cbce8be128d9d68fadf1cc31",
+        "tests": "58b1b10319e112f4e5da79f4ecb6cc70d85f8ce8",
+        "tools": "367a565b297e62ecd4a4ee3e3ecae86b07664556",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/heads/dev-1.0": {
+      "before": "c3f0f28414c0537488d1d871fee5fbb07180917f",
+      "protectedBefore": {
+        "Unity": "cc272f7b6e4a848288305e43e433d1dcec107b40",
+        "src": "e691e05f8edd21291b3da926eacbaaf36fda6b48",
+        "tests": "dc2159e538ee7078fe81d0509504fd21add8545e",
+        "tools": "4aeae6d10d7b5e886f248248c8b735e8020e8f9d",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "after": "1f210e401176016127cf33f1a88f3c78b6daa579",
+      "protectedAfter": {
+        "Unity": "cc272f7b6e4a848288305e43e433d1dcec107b40",
+        "src": "e691e05f8edd21291b3da926eacbaaf36fda6b48",
+        "tests": "dc2159e538ee7078fe81d0509504fd21add8545e",
+        "tools": "4aeae6d10d7b5e886f248248c8b735e8020e8f9d",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/heads/dev-2.0": {
+      "before": "c69b0527182b02eb79606479983e27164d398dc5",
+      "protectedBefore": {
+        "Unity": "db4eb1934f7aa043302894990d00aff7120692a3",
+        "src": "694d20085cb198aea79206727fae1ac180835ed8",
+        "tests": "5f83dd4ce704a6190e3b9f51fdd4102060e4e39c",
+        "tools": "f22592bcf2f0a926f8fc670e65559c92ffb3cbaa",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "after": "17e7530f03e178976bf8997bd53bf5c346bda574",
+      "protectedAfter": {
+        "Unity": "db4eb1934f7aa043302894990d00aff7120692a3",
+        "src": "694d20085cb198aea79206727fae1ac180835ed8",
+        "tests": "5f83dd4ce704a6190e3b9f51fdd4102060e4e39c",
+        "tools": "f22592bcf2f0a926f8fc670e65559c92ffb3cbaa",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/heads/main": {
+      "before": "fc19d937d44eee2075ef88a663d5d074141e180e",
+      "protectedBefore": {
+        "Unity": "cc272f7b6e4a848288305e43e433d1dcec107b40",
+        "src": "e691e05f8edd21291b3da926eacbaaf36fda6b48",
+        "tests": "dc2159e538ee7078fe81d0509504fd21add8545e",
+        "tools": "4aeae6d10d7b5e886f248248c8b735e8020e8f9d",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "after": "606897ce61e6342937bf786ccaa91c8558b14a2b",
+      "protectedAfter": {
+        "Unity": "cc272f7b6e4a848288305e43e433d1dcec107b40",
+        "src": "e691e05f8edd21291b3da926eacbaaf36fda6b48",
+        "tests": "dc2159e538ee7078fe81d0509504fd21add8545e",
+        "tools": "4aeae6d10d7b5e886f248248c8b735e8020e8f9d",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/tags/v1.5.0-beta": {
+      "before": "d91633fdf4c6beb65b13af2788eefe10c9cb5dc6",
+      "protectedBefore": {
+        "Unity": "acc863e2ae1967b7b6e0f467424a3c3ebf600898",
+        "src": "16c48ea25789a2214a7c4a32305951ba53b4124a",
+        "tests": "d32813f4a41141ce8de42d84260246cef4a39b37",
+        "tools": "a9731cabea86cb7fb2fc47605bbcc0888144f896",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "after": "dcedba192d2e9d9f02e4f095f57bed554c8e51c1",
+      "protectedAfter": {
+        "Unity": "acc863e2ae1967b7b6e0f467424a3c3ebf600898",
+        "src": "16c48ea25789a2214a7c4a32305951ba53b4124a",
+        "tests": "d32813f4a41141ce8de42d84260246cef4a39b37",
+        "tools": "a9731cabea86cb7fb2fc47605bbcc0888144f896",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "protectedUnchanged": true
+    },
+    "refs/tags/v1.6.0-beta": {
+      "before": "adec765b0fc3e7b4f53418dd514ddd9878e7fa1e",
+      "protectedBefore": {
+        "Unity": "8050b5d4994b064dbf4c7d35459ef42a24b37ca6",
+        "src": "2e14458a40d7c4773bbf5152fb5e7361ac4e0588",
+        "tests": "53e159be07809acf013973b42c91a52dd0f85565",
+        "tools": "df26712c9278511753fb5d6b74a9b9818bd2b8df",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "after": "774875e118ca1f2bfea7815237345ca221185075",
+      "protectedAfter": {
+        "Unity": "8050b5d4994b064dbf4c7d35459ef42a24b37ca6",
+        "src": "2e14458a40d7c4773bbf5152fb5e7361ac4e0588",
+        "tests": "53e159be07809acf013973b42c91a52dd0f85565",
+        "tools": "df26712c9278511753fb5d6b74a9b9818bd2b8df",
+        "assets/references/rules": "5219bebbe97ccefeeebff80a0c964dac2e169e45"
+      },
+      "protectedUnchanged": true
+    }
+  },
+  "错误": []
+}
