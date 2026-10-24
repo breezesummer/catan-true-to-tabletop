@@ -37,7 +37,7 @@ node_modules/
 .env.*
 !.env.example
 
-# Blender recovery files; source .blend files remain tracked
+# Blender 恢复备份；制作源文件按下方本地素材规则管理
 *.blend1
 *.blend2
 
@@ -51,7 +51,7 @@ art/exports/photo-samples-v*/textures/
 art/previews/entity-conversion-v*/
 art/previews/photo-samples-v*/
 
-# 操作系统与编辑器临时文件；截图及版本化验证报告仍保存
+# 操作系统与编辑器临时文件；验证摘要继续入库，截图按下方规则留在本地
 .DS_Store
 Thumbs.db
 Desktop.ini
@@ -72,9 +72,38 @@ Desktop.ini
 # 根目录临时生图提示词；正式提示词保存在对应资产目录
 /b302_original_prompt.txt
 
-# 美术资料保留本地；已有已跟踪文件不受忽略规则影响
+# 美术制作目录保留本地；已提交的脚本、配方和清单继续维护
 /art/concepts/
 /art/exports/
 /art/source/
 /art/previews/
 /docs/卡坦岛之三国争霸设计表.xlsx
+# 配方中的参考图、原始照片与音频资料保留本地
+/art/**/*.png
+/art/**/*.jpg
+/art/**/*.jpeg
+/art/**/*.webp
+/art/**/*.gif
+/art/**/*.wav
+/art/**/*.mp3
+/art/**/*.ogg
+/art/**/*.blend
+/art/**/*.fbx
+/art/**/*.glb
+/art/**/*.gltf
+/assets/references/**/*.png
+/assets/references/**/*.jpg
+/assets/references/**/*.jpeg
+/assets/references/**/*.wav
+/assets/references/**/*.mp3
+/assets/references/**/*.ogg
+/assets/references/**/*.zip
+
+# 文档截图、美术概念原稿和可重新产生的原始诊断输出保留本地
+/docs/**/*.png
+/docs/**/*.jpg
+/docs/**/*.jpeg
+/docs/**/*.docx
+/docs/verification/**/*.log
+/docs/verification/**/*.trx
+/docs/verification/**/*.gz

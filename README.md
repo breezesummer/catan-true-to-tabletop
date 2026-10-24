@@ -64,6 +64,7 @@ macOS 开发入口为 `tools/development/Start-Dev.command`，打开 Unity 使�
 - [开发路线](docs/ROADMAP.md)：阶段目标、退出条件与当前状态。
 - [开发日志](The%20Farmer%27s%20Log.md)：时间轴、每轮改动、发布入口与实际验证。
 - [开发环境](docs/ENVIRONMENT.md)：工具链、环境配置与开发入口。
+- [仓库存储与本地资料](docs/REPOSITORY_STORAGE.md)：代码与运行资源的入库范围、美术资料和验证原件的本地保存方式。
 - [分系统构建](docs/CROSS_PLATFORM_BUILD.md)：Windows／macOS 启动、双端打包和 Android 签名迁移。
 - [游戏百科](docs/GAME_ENCYCLOPEDIA.md)：发展卡实体名称、牌面描述与照片来源。
 - [三国争霸游戏百科](docs/三国争霸游戏百科.md)：三国扩展玩法、54张武将原文、确认记录与逐将疑问。

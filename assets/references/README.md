@@ -1,5 +1,7 @@
 # 参考素材
 
+2026-10-24：照片原件、归档副本和音频／界面参考保留本地，来源清单、规则快照与文本记录继续入库。新机器进行美术复建或原件校验前需恢复本地素材；详见[仓库存储与本地资料](../../docs/REPOSITORY_STORAGE.md)。下文保留各批历史采集与校验事实。
+
 将用户提供的原始照片、扫描件和现成模型放在 inbox 中。保留原始文件名与内容；派生处理另存版本，并在 manifest.json 中登记用途。收到文件后再为每个来源分配稳定编号。
 
 manifest.json 已登记第一批五份样板来源。每项素材填写 id、originalPath、kind、edition、referenceRole、measuredDimensionsMm、estimatedDimensionsMm、mustPreserve 和 notes。没有测量的数据使用 null；实测与估算不能混填。其余原始照片先保留在 inbox，后续生产时再分配来源编号。

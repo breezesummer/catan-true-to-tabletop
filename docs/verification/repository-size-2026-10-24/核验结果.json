@@ -1,0 +1,36 @@
+{
+  "结果": "通过",
+  "原件保留并逐字节核对": 1150,
+  "忽略规则覆盖": 1150,
+  "当前跟踪文件数": 3454,
+  "当前跟踪字节数": 369191622,
+  "当前跟踪MiB": 352.09,
+  "保护目录": {
+    "Unity": {
+      "before": "db4eb1934f7aa043302894990d00aff7120692a3",
+      "after": "db4eb1934f7aa043302894990d00aff7120692a3",
+      "unchanged": true
+    },
+    "src": {
+      "before": "694d20085cb198aea79206727fae1ac180835ed8",
+      "after": "694d20085cb198aea79206727fae1ac180835ed8",
+      "unchanged": true
+    },
+    "tests": {
+      "before": "5f83dd4ce704a6190e3b9f51fdd4102060e4e39c",
+      "after": "5f83dd4ce704a6190e3b9f51fdd4102060e4e39c",
+      "unchanged": true
+    },
+    "tools": {
+      "before": "f22592bcf2f0a926f8fc670e65559c92ffb3cbaa",
+      "after": "f22592bcf2f0a926f8fc670e65559c92ffb3cbaa",
+      "unchanged": true
+    },
+    "assets/references/rules": {
+      "before": "5219bebbe97ccefeeebff80a0c964dac2e169e45",
+      "after": "5219bebbe97ccefeeebff80a0c964dac2e169e45",
+      "unchanged": true
+    }
+  },
+  "错误": []
+}
