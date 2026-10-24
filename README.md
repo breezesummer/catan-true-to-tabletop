@@ -66,8 +66,11 @@ macOS 开发入口为 `tools/development/Start-Dev.command`，打开 Unity 使�
 - [开发环境](docs/ENVIRONMENT.md)：工具链、环境配置与开发入口。
 - [分系统构建](docs/CROSS_PLATFORM_BUILD.md)：Windows／macOS 启动、双端打包和 Android 签名迁移。
 - [游戏百科](docs/GAME_ENCYCLOPEDIA.md)：发展卡实体名称、牌面描述与照片来源。
+- [三国争霸游戏百科](docs/三国争霸游戏百科.md)：三国扩展玩法、54张武将原文、确认记录与逐将疑问。
+- [三国争霸扩展实现方案](docs/三国争霸扩展实现方案.md)：新增机制、现有工程接入、分批实现与验收计划。
 - [本地规则索引](assets/references/rules/README.md)：规则原件与查询入口。
 - [美术生产规范](docs/ART_PIPELINE.md)：参考采集、资产制作、导入和复现。
+- [三国风格棋子制作流程](docs/三国风格棋子制作流程.md)：造型、组件与状态、参考多视图、建模材质、预算及游戏内验收。
 - [豪华典藏版ultra主题实施方案](docs/ULTRA_THEME_IMPLEMENTATION_PLAN.md)：真实桌游与 ultra 双主题、三维资产、环境动态及分步验收。
 - [AI 2.0 补丁](docs/AI_PATCH_2_0.md)：当前 AI 策略、交易限制和专用信息权限。
 - [本地 AI 验收](docs/M6_ACCEPTANCE.md)：AI、规则与独立完整对局证据。

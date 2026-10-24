@@ -68,3 +68,13 @@ Desktop.ini
 
 # 本地可玩版本与构建验证产物
 /game version/
+
+# 根目录临时生图提示词；正式提示词保存在对应资产目录
+/b302_original_prompt.txt
+
+# 美术资料保留本地；已有已跟踪文件不受忽略规则影响
+/art/concepts/
+/art/exports/
+/art/source/
+/art/previews/
+/docs/卡坦岛之三国争霸设计表.xlsx
