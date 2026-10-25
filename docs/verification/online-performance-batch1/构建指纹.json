@@ -1,0 +1,56 @@
+{
+  "日期": "2026-10-25",
+  "游戏版本": "内测版2.0.2",
+  "基线源码": "6f0e47d1",
+  "候选构建源码": "504afe9e",
+  "正式发布": false,
+  "云端部署": false,
+  "前台验收": false,
+  "证据": [
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B5/Builds/Windows/Catan2.0.2_Data/Managed/Assembly-CSharp.dll",
+      "字节": 1242624,
+      "SHA256": "878f216cdcfd58ce795c520a588a5a1b7df8efe381dc0cd33a19f24b2a897ea9"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch1/Builds/Windows/Catan2.0.2.exe",
+      "字节": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch1/Builds/Windows/Catan2.0.2_Data/Managed/Assembly-CSharp.dll",
+      "字节": 1264640,
+      "SHA256": "df347f5d11556abe3596e7c0ad359971bab7f9e93278e1d52d49d5f5b3fb82f2"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch1/Builds/Windows/Catan2.0.2_Data/Managed/Catan.Network.Contracts.dll",
+      "字节": 17920,
+      "SHA256": "f457af3d5b06cb3dfc6b883edc6cd35c6a80ea2b5230ad744dcdde49d42a961f"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch1/Builds/Windows/Catan2.0.2_Data/Managed/Catan.Core.dll",
+      "字节": 1298944,
+      "SHA256": "e573430b86b218aa93746fd7175f1b9a16eb7bbc4ebe407f47f28f39f4ecfc85"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch1/Builds/Windows/Catan2.0.2_Data/Managed/Catan.AI.dll",
+      "字节": 215552,
+      "SHA256": "c59d07abf0442511fbd2c11dbd905e70c8e0b8c764ccdac3a2bd27e52b092518"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch1/Builds/Windows/Server/Catan.Server.dll",
+      "字节": 80384,
+      "SHA256": "eccd840c6288e45a7ed57d441812c13234f3f08570ee7dcaa5934871eb761263"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch1/Builds/Android/Catan2.0.2.apk",
+      "字节": 329877465,
+      "SHA256": "69c048910c84c9e58742ba23186bbd60cff6dbae747073706df42a47986829d1"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch1/Builds/Android/build-info.json",
+      "字节": 651,
+      "SHA256": "598c816e8fd58ab14689bcb61b84605ade4587e329e0a28c811b09aeafe9000f"
+    }
+  ]
+}

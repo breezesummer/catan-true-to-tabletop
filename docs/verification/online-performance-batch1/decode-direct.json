@@ -1,0 +1,114 @@
+{
+  "scope": "\u540C\u673A .NET 10\uFF1A\u5916\u5C42\u56DE\u590D\u3001\u5E2D\u4F4D\u89C6\u56FE\u4E0E\u5B8C\u6574\u5FC5\u8981\u5386\u53F2\u89E3\u6790\uFF1B\u7EAF\u89E3\u6790\u4E0D\u542B\u7F51\u7EDC\u3001Unity\u5E27\u7387\u53CA\u89E3\u7801\u8C03\u5EA6\u3002\u51B7\u6837\u672C\u4EC5\u4E3A\u672C\u8FDB\u7A0B\u9996\u6B21\u5904\u7406\u5404\u6863\uFF0C\u7C7B\u578B\u53EF\u80FD\u5DF2\u9884\u70ED\u3002",
+  "decoder": "direct-json",
+  "runtime": ".NET 10.0.12",
+  "os": "Microsoft Windows 10.0.26200",
+  "processors": 20,
+  "assemblySha256": "F8B38B3B572F8EFBA061331E60711D6774D76CF0DA7AFA834874E707570A81CB",
+  "reports": [
+    {
+      "targetBytes": 10240,
+      "bytes": 10520,
+      "sha256": "7AC338F609CA64F1E55F228115D10EA1E4137C99E6A08C36CE9F72D432335E2A",
+      "historyEntries": 28,
+      "cold": {
+        "Ms": 1.3722,
+        "Bytes": 174968
+      },
+      "serial": {
+        "count": 30,
+        "p50Ms": 0.2353,
+        "p95Ms": 0.3734,
+        "p99Ms": 0.4141,
+        "maxMs": 0.4141,
+        "meanAllocatedBytes": 142736
+      },
+      "concurrentFour": {
+        "count": 120,
+        "p50Ms": 0.5056,
+        "p95Ms": 1.7658,
+        "p99Ms": 2.5694,
+        "maxMs": 2.5917,
+        "meanAllocatedBytes": 142736
+      }
+    },
+    {
+      "targetBytes": 71680,
+      "bytes": 71737,
+      "sha256": "062507392A04F21CF0A9F4F5AF7CFE1867E46CEFDFF49DCBD2AE7DDCF56C3289",
+      "historyEntries": 134,
+      "cold": {
+        "Ms": 4.0697,
+        "Bytes": 1082672
+      },
+      "serial": {
+        "count": 30,
+        "p50Ms": 1.2265,
+        "p95Ms": 1.6834,
+        "p99Ms": 2.3864,
+        "maxMs": 2.3864,
+        "meanAllocatedBytes": 908669.8666666667
+      },
+      "concurrentFour": {
+        "count": 120,
+        "p50Ms": 3.38,
+        "p95Ms": 4.0484,
+        "p99Ms": 5.9506,
+        "maxMs": 6.4144,
+        "meanAllocatedBytes": 908688.9333333333
+      }
+    },
+    {
+      "targetBytes": 256000,
+      "bytes": 256208,
+      "sha256": "71ED390F275727CED06B915131F3B331E12B4DD545B4447BEDE11D0FC100386C",
+      "historyEntries": 645,
+      "cold": {
+        "Ms": 4.2771,
+        "Bytes": 3150736
+      },
+      "serial": {
+        "count": 10,
+        "p50Ms": 4.055,
+        "p95Ms": 6.3304,
+        "p99Ms": 6.3304,
+        "maxMs": 6.3304,
+        "meanAllocatedBytes": 3151014.4
+      },
+      "concurrentFour": {
+        "count": 4,
+        "p50Ms": 13.4784,
+        "p95Ms": 13.5389,
+        "p99Ms": 13.5389,
+        "maxMs": 13.5389,
+        "meanAllocatedBytes": 3153192
+      }
+    },
+    {
+      "targetBytes": 1048576,
+      "bytes": 1048634,
+      "sha256": "B97B01235F073A38DFCE8847FC435B4892B0C5EFB84BCFF729F88F9437FC712A",
+      "historyEntries": 2835,
+      "cold": {
+        "Ms": 24.622,
+        "Bytes": 12753912
+      },
+      "serial": {
+        "count": 3,
+        "p50Ms": 22.9541,
+        "p95Ms": 23.7438,
+        "p99Ms": 23.7438,
+        "maxMs": 23.7438,
+        "meanAllocatedBytes": 12753912
+      },
+      "concurrentFour": {
+        "count": 4,
+        "p50Ms": 34.6679,
+        "p95Ms": 40.8837,
+        "p99Ms": 40.8837,
+        "maxMs": 40.8837,
+        "meanAllocatedBytes": 12760088
+      }
+    }
+  ]
+}

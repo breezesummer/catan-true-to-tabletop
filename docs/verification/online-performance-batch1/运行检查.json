@@ -1,0 +1,443 @@
+{
+  "日期": "2026-10-25",
+  "程序检查": [
+    {
+      "范围": "player-local",
+      "RuleSet": "base",
+      "ScenarioId": "base",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 3,
+      "Turn": 3,
+      "HumanCommands": 5,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-local",
+      "RuleSet": "cities-knights",
+      "ScenarioId": "base",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 3,
+      "Turn": 3,
+      "HumanCommands": 4,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-local",
+      "RuleSet": "combined",
+      "ScenarioId": "through-the-desert",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 4,
+      "Turn": 3,
+      "HumanCommands": 7,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-local",
+      "RuleSet": "seafarers",
+      "ScenarioId": "new-world",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 4,
+      "Turn": 3,
+      "HumanCommands": 11,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-cloud",
+      "RuleSet": "base",
+      "ScenarioId": "base",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 3,
+      "Turn": 3,
+      "HumanCommands": 11,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-cloud",
+      "RuleSet": "cities-knights",
+      "ScenarioId": "base",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 3,
+      "Turn": 3,
+      "HumanCommands": 10,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-cloud",
+      "RuleSet": "combined",
+      "ScenarioId": "through-the-desert",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 4,
+      "Turn": 3,
+      "HumanCommands": 5,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-cloud",
+      "RuleSet": "seafarers",
+      "ScenarioId": "new-world",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 4,
+      "Turn": 3,
+      "HumanCommands": 7,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-legacy",
+      "RuleSet": "base",
+      "ScenarioId": "base",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 3,
+      "Turn": 3,
+      "HumanCommands": 7,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-legacy",
+      "RuleSet": "cities-knights",
+      "ScenarioId": "base",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 3,
+      "Turn": 3,
+      "HumanCommands": 10,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-legacy",
+      "RuleSet": "combined",
+      "ScenarioId": "through-the-desert",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 4,
+      "Turn": 3,
+      "HumanCommands": 5,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-legacy",
+      "RuleSet": "seafarers",
+      "ScenarioId": "new-world",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 4,
+      "Turn": 3,
+      "HumanCommands": 13,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "android-local",
+      "RuleSet": "combined",
+      "ScenarioId": "through-the-desert",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 4,
+      "Turn": 3,
+      "HumanCommands": 8,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "player-recovery",
+      "RuleSet": "combined",
+      "ScenarioId": "through-the-desert",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 4,
+      "Turn": 3,
+      "HumanCommands": 7,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    },
+    {
+      "范围": "android-recovery",
+      "RuleSet": "combined",
+      "ScenarioId": "through-the-desert",
+      "Result": "passed",
+      "Transport": "WS 在线同步",
+      "PlayerCount": 4,
+      "Turn": 3,
+      "HumanCommands": 4,
+      "ClientAiCommands": 0,
+      "LocalAuthorityAbsent": true,
+      "LocalSaveRejected": true,
+      "ReconnectConfirmed": true,
+      "OwnSeatOnly": true,
+      "RoomSwitchConfirmed": true,
+      "OriginalRoomClosed": true,
+      "NameUpdateConfirmed": true
+    }
+  ],
+  "后台诊断": [
+    {
+      "平台": "Android",
+      "范围": "功能程序后台运行；含首次与恢复，不作为前台帧率或稳态目标验收。本机与云端样本合并，不据此比较网络单程延迟。",
+      "完整后台解析毫秒": {
+        "样本数": 131,
+        "P50": 6.357,
+        "P95": 60.598,
+        "P99": 106.168,
+        "最大值": 123.014
+      },
+      "后台排队毫秒": {
+        "样本数": 131,
+        "P50": 0.096,
+        "P95": 0.722,
+        "P99": 1.939,
+        "最大值": 3.089
+      },
+      "至少10KB回复解析毫秒": {
+        "样本数": 56,
+        "P50": 31.981,
+        "P95": 98.979,
+        "P99": 123.014,
+        "最大值": 123.014
+      },
+      "至少10KB回复字节": {
+        "样本数": 56,
+        "P50": 30142.0,
+        "P95": 43703.0,
+        "P99": 47597.0,
+        "最大值": 47597.0
+      },
+      "主线程数据应用毫秒": {
+        "样本数": 87,
+        "P50": 0.068,
+        "P95": 10.807,
+        "P99": 35.296,
+        "最大值": 35.296
+      },
+      "主线程排队毫秒": {
+        "样本数": 87,
+        "P50": 122.942,
+        "P95": 1757.178,
+        "P99": 4558.711,
+        "最大值": 4558.711
+      },
+      "有分配计数的解析样本": 0,
+      "最慢解析": [
+        {
+          "operation": "Start",
+          "bytes": 25137,
+          "durationMs": 123.014,
+          "queueWaitMs": 0.176
+        },
+        {
+          "operation": "Start",
+          "bytes": 24618,
+          "durationMs": 106.168,
+          "queueWaitMs": 0.128
+        },
+        {
+          "operation": "Push",
+          "bytes": 25112,
+          "durationMs": 98.979,
+          "queueWaitMs": 0.204
+        },
+        {
+          "operation": "Get",
+          "bytes": 28903,
+          "durationMs": 79.95,
+          "queueWaitMs": 0.198
+        },
+        {
+          "operation": "Push",
+          "bytes": 42591,
+          "durationMs": 76.85,
+          "queueWaitMs": 1.248
+        }
+      ]
+    },
+    {
+      "平台": "WindowsPlayer",
+      "范围": "功能程序后台运行；含首次与恢复，不作为前台帧率或稳态目标验收。本机与云端样本合并，不据此比较网络单程延迟。",
+      "完整后台解析毫秒": {
+        "样本数": 493,
+        "P50": 0.997,
+        "P95": 4.973,
+        "P99": 8.653,
+        "最大值": 12.708
+      },
+      "后台排队毫秒": {
+        "样本数": 493,
+        "P50": 0.012,
+        "P95": 0.023,
+        "P99": 0.62,
+        "最大值": 0.898
+      },
+      "至少10KB回复解析毫秒": {
+        "样本数": 221,
+        "P50": 3.261,
+        "P95": 5.602,
+        "P99": 9.987,
+        "最大值": 12.708
+      },
+      "至少10KB回复字节": {
+        "样本数": 221,
+        "P50": 26014.0,
+        "P95": 42618.0,
+        "P99": 44715.0,
+        "最大值": 44934.0
+      },
+      "主线程数据应用毫秒": {
+        "样本数": 284,
+        "P50": 0.222,
+        "P95": 1.076,
+        "P99": 2.968,
+        "最大值": 3.162
+      },
+      "主线程排队毫秒": {
+        "样本数": 284,
+        "P50": 0.087,
+        "P95": 23.99,
+        "P99": 239.494,
+        "最大值": 760.102
+      },
+      "有分配计数的解析样本": 0,
+      "最慢解析": [
+        {
+          "operation": "Start",
+          "bytes": 24618,
+          "durationMs": 12.708,
+          "queueWaitMs": 0.006
+        },
+        {
+          "operation": "Start",
+          "bytes": 23051,
+          "durationMs": 10.083,
+          "queueWaitMs": 0.01
+        },
+        {
+          "operation": "Start",
+          "bytes": 24630,
+          "durationMs": 9.987,
+          "queueWaitMs": 0.015
+        },
+        {
+          "operation": "Start",
+          "bytes": 23051,
+          "durationMs": 8.682,
+          "queueWaitMs": 0.011
+        },
+        {
+          "operation": "Start",
+          "bytes": 24630,
+          "durationMs": 8.653,
+          "queueWaitMs": 0.014
+        }
+      ]
+    }
+  ],
+  "客户端构建GUID": [
+    "10f4e491501747229a6fadf08360d5a2",
+    "1ba2159f27ee45cf87a309b6a1a60b51",
+    "23e39ffadc334dc386a9f4f590d0c379",
+    "dfad69f9f007447c8a29ebf64a68bc06"
+  ],
+  "前台流畅性验收": false,
+  "前台说明": "窗口激活失败后按用户要求停止前台对照；中止的原始采样保留，不计入通过。"
+}

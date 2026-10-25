@@ -1,0 +1,51 @@
+[
+  {
+    "报告": "network-final.trx",
+    "总计": 182,
+    "通过": 182,
+    "失败": 0,
+    "失败用例": []
+  },
+  {
+    "报告": "server-final.trx",
+    "总计": 81,
+    "通过": 81,
+    "失败": 0,
+    "失败用例": []
+  },
+  {
+    "报告": "presentation-p3.trx",
+    "总计": 147,
+    "通过": 147,
+    "失败": 0,
+    "失败用例": []
+  },
+  {
+    "报告": "client-safety-final.trx",
+    "总计": 15,
+    "通过": 15,
+    "失败": 0,
+    "失败用例": []
+  },
+  {
+    "报告": "presentation-recovery.trx",
+    "总计": 180,
+    "通过": 169,
+    "失败": 11,
+    "失败用例": [
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: False)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: True)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P1\")"
+    ],
+    "全部属于B5已有失败": true,
+    "新增失败": []
+  }
+]
