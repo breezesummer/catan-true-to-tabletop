@@ -11,6 +11,59 @@ public sealed class OnlinePerformanceTests
     static MethodInfo Method(string name)=>typeof(M7Client).GetMethod(name,BindingFlags.Instance|BindingFlags.NonPublic)!;
     static FieldInfo Field(string name)=>typeof(M7Client).GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!;
     static GameHistoryEntry Entry(string json)=>WireJson.Deserialize<GameHistoryEntry>(json);
+    [Theory]
+    [InlineData(false)][InlineData(true)]
+    public async Task ReceiptAndStateMayArriveInEitherOrderButMissingEventsKeepTheCommandPending(bool stateFirst)
+    {
+        var client=new M7Client();Field("connectionId").SetValue(client,"连接1");Field("automaticReconnect").SetValue(client,false);
+        var decoder=(M7ResponseDecoder)Field("responseDecoder").GetValue(client)!;
+        async Task State(long revision,bool includeHistory)
+        {
+            var response=new NetworkResponse{Success=true,RoomId="room",Revision=revision,HumanControlAvailable=true,Room=new RoomSummary{Started=true,GameNumber=1,RuleSet="base"},RuleSet="base",ViewJson="{\"PlayerId\":\"P1\",\"Events\":[{\"Sequence\":"+revision+"}]}",PresentationHistoryJson=includeHistory?"[{\"Sequence\":"+revision+"}]":null};
+            response=await decoder.Decode(Encoding.UTF8.GetBytes(WireJson.Serialize(response)),"base","Get","state",CancellationToken.None);
+            Method("Apply").Invoke(client,new object[]{response,false,false});
+        }
+        try
+        {
+            await State(1,true);Assert.True(client.CanInteract);
+            Field("pendingCommand").SetValue(client,new NetworkRequest{CommandId="唯一编号"});
+            if(stateFirst)await State(2,true);
+            var receipt=new NetworkResponse{Success=true,Revision=2,CommittedRevision=2,RoomId="room",HumanControlAvailable=true,Room=new RoomSummary{Started=true,GameNumber=1,RuleSet="base"}};
+            Field("pendingReceipt").SetValue(client,receipt);Method("Apply").Invoke(client,new object[]{receipt,false,false});
+            if(!stateFirst)
+            {
+                Assert.True(client.CommandPending);Assert.False(client.CanInteract);await State(2,false);
+                Assert.True(client.CommandPending);Assert.False(client.CanInteract);
+                Method("MergeHistory").Invoke(client,new object[]{new[]{Entry("{\"Sequence\":2}")}});
+            }
+            Assert.False(client.CommandPending);Assert.True(client.CanInteract);
+        }
+        finally{client.EndSession();}
+    }
+    [Fact]
+    public async Task OldServerFallbackKeepsTheOriginalCommandIdentity()
+    {
+        var client=new M7Client();client.ConfigureEndpoint("http://127.0.0.1:47771","");
+        var seen=new List<NetworkRequest>();
+        var handler=new FallbackHandler(seen);
+        ((HttpClient)Field("http").GetValue(client)!).Dispose();Field("http").SetValue(client,new HttpClient(handler));
+        try
+        {
+            var request=new NetworkRequest{Operation="CommandReceipt",CommandId="同一命令",RequestId="同一请求",Payload="{}"};
+            var response=await (Task<NetworkResponse>)Method("Send").Invoke(client,new object[]{request,CancellationToken.None})!;
+            Assert.True(response.Success);Assert.Equal(new[]{"CommandReceipt","Command"},seen.Select(r=>r.Operation));Assert.All(seen,r=>Assert.Equal("同一命令",r.CommandId));
+        }
+        finally{client.EndSession();}
+    }
+    sealed class FallbackHandler(List<NetworkRequest> seen):HttpMessageHandler
+    {
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage message,CancellationToken cancellationToken)
+        {
+            var request=WireJson.Deserialize<NetworkRequest>(await message.Content!.ReadAsStringAsync(cancellationToken));seen.Add(request);
+            var response=new NetworkResponse{Success=request.Operation=="Command",Code=request.Operation=="Command"?null:"UnknownOperation",RequestId=request.RequestId};
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK){Content=new StringContent(WireJson.Serialize(response))};
+        }
+    }
 
     [Fact]
     public void HistoryPreservesMultiEventOrderUpdatesContentAndDoesNotInvalidateOnDuplicates()

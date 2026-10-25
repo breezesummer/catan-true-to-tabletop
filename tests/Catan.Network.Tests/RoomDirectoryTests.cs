@@ -10,6 +10,55 @@ namespace Catan.Network.Tests;
 public sealed class RoomDirectoryTests
 {
     [Fact]
+    public void CompactRepliesKeepLegacyShapeAndRemoveUnusedSnapshotsWithoutRepeatingCommands()
+    {
+        using var f=new Fixture();
+        var host=f.Create(seats:4);Assert.Equal(NetworkProtocol.CompactRepliesCode,host.Code);
+        var clients=new[]{host,f.Join(host),f.Join(host),f.Join(host)};
+        foreach(var c in clients)Assert.True(f.Send(c,"Ready",new ReadyPayload{Ready=true}).Success);
+        Assert.True(f.Send(host,"Start").Success);
+        var actor=f.Actor(clients);var view=WireJson.Deserialize<M2.PlayerView>(actor.ViewJson);
+        var command=new M2.Command{Id="compact-唯一命令",PlayerId=actor.SeatId,Kind=M2.CommandKind.SetupSettlement,TargetId=view.LegalVertexIds[0]};
+        var request=f.Command(actor,command);request.Operation="Preview";
+        long legacyBytes=0,compactBytes=0;
+        void Compare(NetworkRequest query,string compactOperation,bool history=false)
+        {
+            var legacy=f.Directory.Handle(query);query.Operation=compactOperation;var compact=f.Directory.Handle(query);
+            Assert.Equal(legacy.Success,compact.Success);Assert.Equal(legacy.Code,compact.Code);Assert.Equal(legacy.Revision,compact.Revision);
+            Assert.Null(compact.ViewJson);Assert.Null(compact.PresentationHistoryJson);
+            if(history)Assert.Equal(legacy.HistoryJson,compact.HistoryJson);
+            int oldSize=System.Text.Encoding.UTF8.GetByteCount(WireJson.Serialize(legacy)),newSize=System.Text.Encoding.UTF8.GetByteCount(WireJson.Serialize(compact));
+            legacyBytes+=oldSize;compactBytes+=newSize;
+            if(!history)Assert.InRange(newSize,1,2048);
+        }
+        for(int i=0;i<30;i++){request.Operation="Preview";Compare(request,"PreviewCompact");}
+        request.Operation="CommandReceipt";var receipt=f.Directory.Handle(request);Assert.True(receipt.Success);Assert.Null(receipt.ViewJson);
+        var duplicate=f.Directory.Handle(request);Assert.True(duplicate.IsDuplicate);Assert.Equal(receipt.CommittedRevision,duplicate.CommittedRevision);
+        request.Operation="Command";var legacyRetry=f.Directory.Handle(request);Assert.True(legacyRetry.IsDuplicate);Assert.NotNull(legacyRetry.ViewJson);
+        Assert.Single(WireJson.Deserialize<M2.PlayerView>(legacyRetry.ViewJson).Board.Settlements);
+        for(int i=0;i<30;i++)
+        {
+            var query=Fixture.Request("History",actor);query.Payload=WireJson.Serialize(new HistoryPayload{AfterSequence=0,Limit=1});
+            Compare(query,"HistoryCompact",true);
+        }
+        foreach(var c in clients)for(int i=0;i<10;i++)Compare(Fixture.Request("Get",c),"Heartbeat");
+        double reduction=1-compactBytes/(double)legacyBytes;Assert.True(reduction>.5);
+        string? output=Environment.GetEnvironmentVariable("CATAN_COMPACT_MEASUREMENT_OUTPUT");
+        if(output!=null){Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output))!);File.WriteAllText(output,System.Text.Json.JsonSerializer.Serialize(new{scope="同一四席基础局：30次预览、30次历史页、四席各10次心跳；两种既有字段形状对照，不含公网网卡流量",legacyBytes,compactBytes,reduction},new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));}
+        request.Operation="PreviewCompact";Assert.Equal("StaleRevision",f.Directory.Handle(request).Code);
+    }
+    [Fact]
+    public void CompactHeartbeatRenewsPresenceAndCannotBypassIdentity()
+    {
+        var clock=DateTimeOffset.UtcNow;
+        using var f=new Fixture(new RoomDirectoryOptions{Clock=()=>clock,ConnectionTimeout=TimeSpan.FromSeconds(45)});
+        var host=f.Create();
+        for(int i=0;i<12;i++){clock=clock.AddSeconds(10);Assert.True(f.Directory.Handle(Fixture.Request("Heartbeat",host)).Success);}
+        var query=Fixture.Request("Heartbeat",host);query.Credential="错误凭据";Assert.Equal("Unauthorized",f.Directory.Handle(query).Code);
+        query=Fixture.Request("Heartbeat",host);query.ConnectionId="旧连接";Assert.Equal("ConnectionSuperseded",f.Directory.Handle(query).Code);
+        Assert.NotNull(f.Directory.Handle(Fixture.Request("Get",host)).Room);
+    }
+    [Fact]
     public async Task ServerGeneratedPushDoesNotKeepAnAbsentClientAlive()
     {
         var clock = DateTimeOffset.UtcNow;

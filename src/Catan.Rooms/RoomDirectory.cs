@@ -64,6 +64,7 @@ public sealed class RoomDirectory : IDisposable
         }
         catch (Exception ex) when (ex is ArgumentException || ex is System.Runtime.Serialization.SerializationException || ex is System.Xml.XmlException || ex is FormatException || ex is OverflowException || ex is NullReferenceException)
         { response = Reject("InvalidRequest", "请求字段无效，请刷新后重试。"); }
+        if(response.Success&&response.Code==null&&(request.Operation=="List"||request.Operation=="Create"||request.Operation=="Join"||request.Operation=="Reconnect"))response.Code=NetworkProtocol.CompactRepliesCode;
         response.RequestId = request.RequestId;
         RemoveClosedRooms();
         return response;
@@ -295,7 +296,8 @@ public sealed class RoomDirectory : IDisposable
         private NetworkResponse Snapshot(SavedSeat seat, string code = null, string message = "已同步。", bool success = true, string credential = null)
         {
             var response=new NetworkResponse { Success = success, Code = code, Message = message, RoomId = state.RoomId, Revision = state.Revision, CommittedRevision = state.Revision, SeatId = seat?.SeatId, HumanControlAvailable = seat != null && !state.Closed && (game == null || !seat.ControlledByAi && Connected(seat)), RuleSet = state.Settings.RuleSet, Room = PublicSummary(), Credential = credential, ConnectionId = seat?.ConnectionId, CredentialExpiresAtUtc = seat?.CredentialExpiresAtUtc.ToString("O") };
-            if(seat!=null&&game!=null)
+            bool compact=diagnosticRequest?.Operation is "PreviewCompact" or "HistoryCompact" or "Heartbeat" or "CommandReceipt";
+            if(seat!=null&&game!=null&&!compact)
             {
                 // 仍在房间锁内验证身份和控制权；只复用同一修订、同一席位的不可变投影。
                 if(projectionRevision!=state.Revision){projections.Clear();projectionRevision=state.Revision;}
@@ -339,8 +341,8 @@ public sealed class RoomDirectory : IDisposable
                     if (!Commit(before)) return Reject("PersistenceFailed", "重连状态保存失败，请稍后重新连接。");
                 }
                 if (observedClientActivity) { lastSeen[seat.ConnectionId] = owner.options.Clock(); disconnectedSince.Remove(seat.SeatId); }
-                if (request.Operation == "Get") return Snapshot(seat);
-                if (request.Operation == "History")
+                if (request.Operation == "Get"||request.Operation=="Heartbeat") return Snapshot(seat);
+                if (request.Operation == "History"||request.Operation=="HistoryCompact")
                 {
                     var query = WireJson.Deserialize<HistoryPayload>(request.Payload ?? "{}");
                     if (query.AfterSequence < 0 || query.Limit < 1 || query.Limit > 200) return Snapshot(seat, "InvalidHistory", "历史分页范围无效。", false);
@@ -349,7 +351,7 @@ public sealed class RoomDirectory : IDisposable
                     if(page.Length>0)page=history.TakeWhile(e=>e.Sequence<=page[page.Length-1].Sequence).ToArray();
                     var response = Snapshot(seat); response.ViewJson = null; response.HistoryJson = WireJson.Serialize(page); response.HistoryCursor = page.LastOrDefault()?.Sequence ?? query.AfterSequence; response.HasMoreHistory = history.Length > page.Length; return response;
                 }
-                if (request.Operation == "Command" || request.Operation == "Preview") return Command(request, seat);
+                if (request.Operation == "Command" || request.Operation == "Preview" || request.Operation=="CommandReceipt" || request.Operation=="PreviewCompact") return Command(request, seat);
                 if (request.Operation == "Recover")
                 {
                     if (seat.SeatId != state.ManagerSeatId) return Snapshot(seat, "ManagerRequired", "只有管理员可以恢复保存。", false);
@@ -406,7 +408,7 @@ public sealed class RoomDirectory : IDisposable
         private NetworkResponse Command(NetworkRequest request, SavedSeat seat)
         {
             if (game == null) return Snapshot(seat, "NotStarted", "对局尚未开始。", false);
-            bool preview = request.Operation == "Preview";
+            bool preview = request.Operation == "Preview"||request.Operation=="PreviewCompact";
             if ((request.RuleSet == "cities" ? "cities-knights" : request.RuleSet) != state.Settings.RuleSet) return Snapshot(seat, "RuleSetMismatch", "命令规则包不匹配。", false);
             if (string.IsNullOrWhiteSpace(request.CommandId) || request.CommandId.Length > 128 || request.CommandId.Any(char.IsControl)) return Snapshot(seat, "InvalidCommandId", "命令标识无效。", false);
             object command;
