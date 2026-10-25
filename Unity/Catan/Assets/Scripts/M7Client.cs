@@ -68,6 +68,7 @@ public sealed class M7Client : MonoBehaviour
     long historyCursor;
     HttpClient http;
     CancellationTokenSource lifetime;
+    CancellationToken sessionCancellation;
     ClientWebSocket socket;
     int generation,connectionEpoch,matchEpoch;
     bool historyBusy,historyDirty,previewBusy,socketConnected,socketStarting,syncBusy,commandSending;
@@ -107,7 +108,7 @@ public sealed class M7Client : MonoBehaviour
     }
     async Task EnqueueMain(Action action)
     {
-        int current=generation;var cancel=lifetime?.Token??CancellationToken.None;
+        int current=generation;var cancel=sessionCancellation;
         try{await mainAdmission.WaitAsync(cancel).ConfigureAwait(false);}catch(OperationCanceledException){return;}
         try
         {
@@ -175,6 +176,7 @@ public sealed class M7Client : MonoBehaviour
         if(normalized.Length>0&&(uri.Scheme!="https"||!string.IsNullOrEmpty(uri.UserInfo)||uri.AbsolutePath!="/"||!string.IsNullOrEmpty(uri.Query)||!string.IsNullOrEmpty(uri.Fragment)))throw new M7NetworkFailure("ADDRESS","局域网主机须使用发现结果中的 HTTPS 地址和证书标识，请重新搜索。");
         EndSession();Endpoint=uri.GetLeftPart(UriPartial.Authority);Fingerprint=normalized;
         lifetime=new CancellationTokenSource();
+        sessionCancellation=lifetime.Token;
         var handler=new HttpClientHandler{AllowAutoRedirect=false,UseProxy=false};
         if(normalized.Length>0)handler.ServerCertificateCustomValidationCallback=(request,certificate,chain,errors)=>
         {
@@ -432,6 +434,7 @@ public sealed class M7Client : MonoBehaviour
                         M7CommunicationLog.Record(new M7CommunicationEvent{Event="response_body",Operation=request.Operation,RequestId=request.RequestId,RoomId=request.RoomId,Bytes=payload.Length,MonoTicks=decode,DurationMs=ElapsedMs(started)});
                         try{result=await responseDecoder.Decode(payload,request.RuleSet,request.Operation,request.RequestId,timeout.Token).ConfigureAwait(false);}
                         catch(OperationCanceledException){throw;}
+                        catch(M7NetworkFailure){throw;}
                         catch(Exception){throw new M7NetworkFailure("RESPONSE_FORMAT","服务响应格式无效，请确认双方游戏版本一致。");}
                         if(result==null)throw new M7NetworkFailure("RESPONSE_FORMAT","服务返回空响应。");
                         if(result.ProtocolVersion!=NetworkProtocol.Version)throw new M7NetworkFailure("PROTOCOL","联机协议不兼容，请所有玩家更新至同一版本。");
@@ -761,7 +764,7 @@ public sealed class M7Client : MonoBehaviour
     {
         bool hadGame=Playing;LastError="";
         if(http!=null)M7CommunicationLog.Record(new M7CommunicationEvent{Event="endpoint_session_end",RoomId=RoomId,Revision=Revision});
-        generation++;connectionEpoch++;lifetime?.Cancel();AbortSocket(socket);socket?.Dispose();socket=null;http?.Dispose();http=null;lifetime?.Dispose();lifetime=null;
+        generation++;connectionEpoch++;sessionCancellation=new CancellationToken(true);lifetime?.Cancel();AbortSocket(socket);socket?.Dispose();socket=null;http?.Dispose();http=null;lifetime?.Dispose();lifetime=null;
         while(main.TryDequeue(out _))mainSlots.Release();
         viewRevision=-1;requiredHistorySequence=0;compactReplies=false;pendingReceipt=null;PresentationPending=false;
         displayStarted=0;

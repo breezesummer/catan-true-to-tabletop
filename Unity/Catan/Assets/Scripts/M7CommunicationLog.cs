@@ -29,7 +29,7 @@ internal static class M7CommunicationLog
         lock(gate)
         {
             if(writer!=null)return;
-            writer=new M7CommunicationWriter(directory);
+            try{writer=new M7CommunicationWriter(directory);}catch(Exception){return;}
             Record(new M7CommunicationEvent{Event="session_start",Code="schema_1"});
         }
     }

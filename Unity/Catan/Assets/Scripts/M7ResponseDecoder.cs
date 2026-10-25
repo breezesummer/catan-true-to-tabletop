@@ -38,7 +38,7 @@ internal sealed class M7ResponseDecoder
             return await Task.Run(()=>
             {
                 cancel.ThrowIfCancellationRequested();
-                long started=Stopwatch.GetTimestamp(),allocated=GC.GetAllocatedBytesForCurrentThread();
+                long started=Stopwatch.GetTimestamp(),allocated=Allocated();
                 var response=Read<NetworkResponse>(Encoding.UTF8.GetString(payload),FrameCost.Stage.ResponseDecode);
                 if(response==null||response.ProtocolVersion!=NetworkProtocol.Version)throw new M7NetworkFailure("PROTOCOL","联机协议不兼容。");
                 string rule=response.RuleSet??response.Room?.RuleSet??rules;
@@ -61,7 +61,8 @@ internal sealed class M7ResponseDecoder
                 var presentation=response.PresentationHistoryJson==null?Array.Empty<GameHistoryEntry>():Read<GameHistoryEntry[]>(response.PresentationHistoryJson,FrameCost.Stage.HistoryDecode);
                 var history=response.HistoryJson==null?Array.Empty<GameHistoryEntry>():Read<GameHistoryEntry[]>(response.HistoryJson,FrameCost.Stage.HistoryDecode);
                 prepared.Add(response,new M7PreparedResponse(view,presentation??Array.Empty<GameHistoryEntry>(),history??Array.Empty<GameHistoryEntry>()));
-                M7CommunicationLog.Record(new M7CommunicationEvent{Event="response_decode",Operation=operation,RequestId=response.RequestId??requestId,RoomId=response.RoomId,Revision=response.Revision,Bytes=payload.Length,QueueDepth=depth,QueueWaitMs=Ms(queued,started),DurationMs=Ms(started,Stopwatch.GetTimestamp()),AllocatedBytes=GC.GetAllocatedBytesForCurrentThread()-allocated,WorkerThreads=ActiveWorkers(),MonoTicks=started});
+                cancel.ThrowIfCancellationRequested();
+                M7CommunicationLog.Record(new M7CommunicationEvent{Event="response_decode",Operation=operation,RequestId=response.RequestId??requestId,RoomId=response.RoomId,Revision=response.Revision,Bytes=payload.Length,QueueDepth=depth,QueueWaitMs=Ms(queued,started),DurationMs=Ms(started,Stopwatch.GetTimestamp()),AllocatedBytes=Math.Max(0,Allocated()-allocated),WorkerThreads=ActiveWorkers(),MonoTicks=started});
                 return response;
             },cancel).ConfigureAwait(false);
         }
@@ -72,6 +73,7 @@ internal sealed class M7ResponseDecoder
         }
     }
     T Read<T>(string json,FrameCost.Stage stage){using(FrameCost.Measure(stage))return Legacy?WireJson.DeserializeLegacy<T>(json):WireJson.Deserialize<T>(json);}
-    static int ActiveWorkers(){ThreadPool.GetMaxThreads(out int maximum,out _);ThreadPool.GetAvailableThreads(out int available,out _);return maximum-available;}
+    static long Allocated(){try{return GC.GetAllocatedBytesForCurrentThread();}catch(NotSupportedException){return 0;}}
+    static int ActiveWorkers(){try{ThreadPool.GetMaxThreads(out int maximum,out _);ThreadPool.GetAvailableThreads(out int available,out _);return maximum-available;}catch(NotSupportedException){return 0;}}
     static double Ms(long start,long end)=>(end-start)*1000d/Stopwatch.Frequency;
 }
