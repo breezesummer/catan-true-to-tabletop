@@ -11,6 +11,7 @@ public sealed partial class M6App
     M7LanService lanService=new M7LanService();
     bool networkMenu,networkEntering,networkLan=true,networkWorking;
     int networkPresentedGame=-1;
+    bool networkViewDirty;
     string networkAddress="https://127.0.0.1:47771",networkPin="",networkRoomId="",networkPassword="",networkRoomName="卡坦好友房间",networkMessage="";
     bool networkListed=true;
     readonly bool[] networkAi={false,false,false,false};
@@ -54,6 +55,14 @@ public sealed partial class M6App
         };
     }
     void ApplyNetworkView()
+    {networkViewDirty=true;Network.PresentationPending=true;}
+    void FlushPendingNetworkView()
+    {
+        if(!networkViewDirty)return;
+        networkViewDirty=false;
+        try{FlushNetworkView();}finally{if(Network!=null)Network.PresentationPending=false;}
+    }
+    void FlushNetworkView()
     {
         using var applyCost=FrameCost.Measure(FrameCost.Stage.PresentationApply);
         if(Network.Room==null||!Network.Room.Started||string.IsNullOrEmpty(Network.SeatId))return;
@@ -86,6 +95,7 @@ public sealed partial class M6App
     void OpenNetworkMenu(){networkMenu=true;MenuVisible=true;if(presentation!=null)presentation.enabled=false;visible?.Invoke(false);}
     void CloseNetworkPresentation()
     {
+        networkViewDirty=false;
         networkPresentedGame=-1;
         close?.Invoke();presentation=null;actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;MenuVisible=true;tableMenu=false;networkMenu=true;
     }

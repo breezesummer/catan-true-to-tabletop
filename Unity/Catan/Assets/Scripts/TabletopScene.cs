@@ -193,11 +193,13 @@ public sealed class TabletopScene : MonoBehaviour
         if(!plane.Raycast(previous,out float previousDistance)||!plane.Raycast(current,out float currentDistance))return;
         var movement=previous.GetPoint(previousDistance)-current.GetPoint(currentDistance);
         movement.y=0;
-        panOffset+=movement;
+        var before=panOffset;panOffset+=movement;
         // 可浏览整幅地图，但不会把棋盘永久拖离可回到的范围。
         float limit=baseSize*2;
         panOffset.x=Mathf.Clamp(panOffset.x,-limit,limit);panOffset.z=Mathf.Clamp(panOffset.z,-limit,limit);
-        IsPanning=true;ApplyCamera();
+        IsPanning=true;
+        // 平移不改变拟合、投影或安全区，直接移动相机，避免每个输入重新扫描地图。
+        boardCamera.transform.position+=panOffset-before;
     }
     public void EndPan() => IsPanning=false;
     public void ResetPan()

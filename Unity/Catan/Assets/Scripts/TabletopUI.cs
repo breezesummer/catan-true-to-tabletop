@@ -24,6 +24,22 @@ public sealed partial class TabletopUI
     TabletopScene table;
     public void BindTable(TabletopScene scene) { table=scene; }
     GUIStyle text, small, center, title, button;
+    readonly Dictionary<string,GUIStyle> styles=new Dictionary<string,GUIStyle>();
+    readonly GUIContent measuringContent=new GUIContent();
+    GUIContent Content(string value){measuringContent.text=value;return measuringContent;}
+    GUIStyle Style(string key,GUIStyle basis,int size,FontStyle? weight=null,TextAnchor alignment=TextAnchor.MiddleCenter,bool wrap=true)
+    {
+        if(!styles.TryGetValue(key,out var value))styles[key]=value=new GUIStyle(basis);
+        value.font=basis.font;value.fontSize=size;value.fontStyle=weight??basis.fontStyle;value.alignment=alignment;value.wordWrap=wrap;
+        value.normal.textColor=basis.normal.textColor;return value;
+    }
+    GUIStyle NameStyle(string key,GUIStyle basis,string player,int size,TextAnchor alignment=TextAnchor.MiddleCenter)
+    {
+        var value=Style(key+player,basis,size,FontStyle.Bold,alignment);value.richText=false;
+        if(PlayerIdentityModel.IsPlayerId(player))value.normal.textColor=BoardRenderer.SeatColor(player.ToUpperInvariant());
+        return value;
+    }
+    static readonly Rect[] baseDiceRects={new Rect(43,192,43,43),new Rect(112,192,43,43)},expansionDiceRects={new Rect(43,204,39,39),new Rect(113,205,39,39),new Rect(79,164,39,39)};
     Vector2 scroll;
     bool contextVisible;
     public bool ContextVisible=>contextVisible;
@@ -145,8 +161,7 @@ public sealed partial class TabletopUI
         bool expansion=dice.Event.HasValue;
         var trayRect=new Rect(15,149,178,128);hits.Add(trayRect);
         table.Objects.Tray("dice-tray",trayRect,ModernOperationUI.Surface,StrategyHudArt.Gold);
-        var diceRects=expansion?new[]{new Rect(43,204,39,39),new Rect(113,205,39,39),new Rect(79,164,39,39)}
-            :new[]{new Rect(43,192,43,43),new Rect(112,192,43,43)};
+        var diceRects=expansion?expansionDiceRects:baseDiceRects;
         bool enabled=GUI.enabled;
         for(int i=0;i<diceRects.Length;i++)
         {
@@ -168,8 +183,8 @@ public sealed partial class TabletopUI
         bool resumeOperation=OperationWindows.Hidden||OperationWindows.Closed&&(operations?.RequiresSelection==true||operations?.Discard!=null);
         if(resumeOperation){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
         StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
-        var turnStyle=new GUIStyle(title){fontSize=21,wordWrap=true};turnStyle.normal.textColor=turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
-        while(turnStyle.fontSize>11&&turnStyle.CalcHeight(new GUIContent(turnCaption),EndTurnRect.width-40)>60)turnStyle.fontSize--;
+        var turnStyle=Style("turn-action",title,21);turnStyle.normal.textColor=turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
+        while(turnStyle.fontSize>11&&turnStyle.CalcHeight(Content(turnCaption),EndTurnRect.width-40)>60)turnStyle.fontSize--;
         GUI.Label(new Rect(EndTurnRect.x+20,EndTurnRect.y+35,EndTurnRect.width-40,60),turnCaption,turnStyle);
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
         if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(resumeOperation)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(cardCaption!=null)ConfirmCardAction();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
@@ -180,20 +195,19 @@ public sealed partial class TabletopUI
     {
         var r=TurnBannerRect;hits.Add(r);
         StrategyHudArt.Plaque(r,ModernOperationUI.Background,StrategyHudArt.Gold);
-        var turnStyle=new GUIStyle(center){fontSize=27,fontStyle=FontStyle.Bold};turnStyle.normal.textColor=StrategyHudArt.Gold;
+        var turnStyle=Style("turn-number",center,27,FontStyle.Bold);turnStyle.normal.textColor=StrategyHudArt.Gold;
         GUI.Label(new Rect(r.x+16,r.y+10,64,35),turn.ToString("D2"),turnStyle);
-        var caption=new GUIStyle(center){fontSize=10,fontStyle=FontStyle.Bold};caption.normal.textColor=ModernOperationUI.Muted;
+        var caption=Style("turn-caption",center,10,FontStyle.Bold);caption.normal.textColor=ModernOperationUI.Muted;
         GUI.Label(new Rect(r.x+16,r.y+46,64,20),"回  合",caption);
         Fill(new Rect(r.x+91,r.y+17,1,r.height-34),new Color(StrategyHudArt.Gold.r,StrategyHudArt.Gold.g,StrategyHudArt.Gold.b,.40f));
         var portrait=new Rect(r.x+109,r.y+12,56,56);
         StrategyHudArt.Disc(portrait,BoardRenderer.SeatColor(actor)*.62f,true);
         StrategyHudArt.Avatar(new Rect(portrait.x+6,portrait.y+6,portrait.width-12,portrait.height-12),actor);
-        var actorStyle=new GUIStyle(title){fontSize=19,alignment=TextAnchor.MiddleLeft,wordWrap=false};
-        actorStyle=M6App.PlayerNameStyle(actorStyle,actor);
+        var actorStyle=NameStyle("actor",title,actor,19,TextAnchor.MiddleLeft);actorStyle.wordWrap=false;
         string actorName=M6App.PlayerLabel(actor)+(actor==seat?" · 你":"");
-        actorStyle.fontSize=Mathf.Min(19,Mathf.Max(10,Mathf.FloorToInt(19*193/Mathf.Max(193,actorStyle.CalcSize(new GUIContent(actorName)).x))));
+        actorStyle.fontSize=Mathf.Min(19,Mathf.Max(10,Mathf.FloorToInt(19*193/Mathf.Max(193,actorStyle.CalcSize(Content(actorName)).x))));
         GUI.Label(new Rect(r.x+181,r.y+15,193,27),actorName,actorStyle);
-        var phaseStyle=new GUIStyle(small){fontSize=12,alignment=TextAnchor.MiddleLeft,wordWrap=false};phaseStyle.normal.textColor=ModernOperationUI.Muted;
+        var phaseStyle=Style("phase",small,12,alignment:TextAnchor.MiddleLeft,wrap:false);phaseStyle.normal.textColor=ModernOperationUI.Muted;
         GUI.Label(new Rect(r.x+181,r.y+45,193,21),phase,phaseStyle);
         // 两端共用铭牌作为菜单入口；触屏无需键盘 Esc，也不另做一套导航栏。
         if(GUI.Button(r,GUIContent.none,GUIStyle.none)&&!MobileTabletop.TouchDragged)
@@ -212,7 +226,7 @@ public sealed partial class TabletopUI
             StrategyHudArt.Icon(new Rect(r.x+14,r.y+13,42,43),i);
             int level=i<2?0:own?.Improvements!=null&&own.Improvements.Length>i-2?own.Improvements[i-2]:0;
             var marker=new Rect(r.center.x-11,r.yMax-7,22,22);TabletopUI.Token(marker,new Color(.045f,.055f,.05f));
-            var levelStyle=new GUIStyle(center){fontSize=12,fontStyle=FontStyle.Bold};levelStyle.normal.textColor=StrategyHudArt.Gold;
+            var levelStyle=Style("level",center,12,FontStyle.Bold);levelStyle.normal.textColor=StrategyHudArt.Gold;
             GUI.Label(marker,i<2?"•":level.ToString(),levelStyle);
             bool prior=GUI.enabled;GUI.enabled=prior&&available;
             if(GUI.Button(r,GUIContent.none,GUIStyle.none)){if(i<2)trade?.Invoke(i==0?null:"");else facility?.Invoke(i-2);}GUI.enabled=prior;
@@ -236,7 +250,7 @@ public sealed partial class TabletopUI
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
             StrategyHudArt.Avatar(new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
-            GUI.Label(new Rect(x+4,70,width-8,24),M6App.PlayerLabel(player.Id),M6App.PlayerNameStyle(new GUIStyle(center){fontSize=10,fontStyle=FontStyle.Bold,wordWrap=true},player.Id));
+            GUI.Label(new Rect(x+4,70,width-8,24),M6App.PlayerLabel(player.Id),NameStyle("player",center,player.Id,10));
             int points=player.Score==null?player.Points:player.Id==own?player.Score.Total:player.Score.PublicPoints;
             int resources=displayedHandCounts.Observe(operations?.Scope,player.Id,false,player.Resources,DiceRolling);
             int cards=displayedHandCounts.Observe(operations?.Scope,player.Id,true,player.Cards,DiceRolling);
@@ -251,7 +265,7 @@ public sealed partial class TabletopUI
                 if(row==0)StrategyHudArt.VictoryIcon(icon);
                 else if(row<4)StrategyHudArt.Icon(icon,row+1);
                 else StrategyHudArt.HandCardIcon(icon,row==5);
-                var valueStyle=new GUIStyle(center){fontSize=12,fontStyle=FontStyle.Bold,alignment=TextAnchor.MiddleRight};
+                var valueStyle=Style("value",center,12,FontStyle.Bold,TextAnchor.MiddleRight);
                 valueStyle.normal.textColor=row==0?StrategyHudArt.Gold:row==1?new Color(1,.8f,.3f):row==2?new Color(.48f,.77f,1):row==3?new Color(.55f,.9f,.52f):ModernOperationUI.TextColor;
                 string value=values[row].ToString();
                 if(row>=4)
@@ -272,7 +286,7 @@ public sealed partial class TabletopUI
         if(hoveredPlayerHint==null||contextVisible||!GUI.enabled)return;
         var tooltip=new Rect(Mathf.Clamp(playerHintAnchor.center.x-142,16,1140),203,284,hoveredPlayerHint.Contains("\n")?58:32);
         ModernOperationUI.Panel(tooltip);hits.Add(tooltip);
-        var tip=new GUIStyle(small){fontSize=12,alignment=TextAnchor.MiddleLeft};
+        var tip=Style("hint",small,12,alignment:TextAnchor.MiddleLeft);
         GUI.Label(new Rect(tooltip.x+10,tooltip.y+5,tooltip.width-20,tooltip.height-10),hoveredPlayerHint,tip);
     }
     internal static Rect PlayerAvatarRect(int index,int count)

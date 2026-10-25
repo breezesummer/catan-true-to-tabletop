@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 // 照片卡面只负责显示，不决定卡牌效果或查看权限。
@@ -9,6 +11,8 @@ public static class EntityCardAssets
     const string Root = "EntityAssets/v001/";
     static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
     static Texture2D paperLight;
+    static readonly Card[] goodCards=new Card[8],progressCards=new Card[25],improvementCards=new Card[30],guidanceCards=new Card[2];
+    static readonly Card defenderCard=new Card("defender",Root+"defender-card/defender-card-front");
     static readonly string[] GoodIds = { "wood", "brick", "wool", "grain", "ore", "cloth", "coin", "paper" };
     static readonly string[] TrackIds = { "trade", "politics", "science" };
     // Ordered to match the stable M4/M5 ProgressCardKind values, not the printed photo text.
@@ -37,30 +41,56 @@ public static class EntityCardAssets
     public static Card Good(int index)
     {
         if (index < 0 || index >= GoodIds.Length) throw new ArgumentOutOfRangeException(nameof(index));
-        if (index == 0) return new Card("wood", "PhotoSamples/v001/wood-front", "PhotoSamples/v001/resource-back");
+        if(goodCards[index]!=null)return goodCards[index];
+        if (index == 0) return goodCards[index]=new Card("wood", "PhotoSamples/v001/wood-front", "PhotoSamples/v001/resource-back");
         string type = index < 5 ? "resource" : "commodity";
-        return new Card(GoodIds[index], Root + type + "-cards/" + type + "-" + GoodIds[index] + "-front", index < 5 ? Root + "resource-cards/resource-back-original" : null);
+        return goodCards[index]=new Card(GoodIds[index], Root + type + "-cards/" + type + "-" + GoodIds[index] + "-front", index < 5 ? Root + "resource-cards/resource-back-original" : null);
     }
     public static Card Progress(int index)
     {
         if (index < 0 || index >= ProgressIds.Length) throw new ArgumentOutOfRangeException(nameof(index));
+        if(progressCards[index]!=null)return progressCards[index];
         string track = index < 10 ? "science" : index < 16 ? "trade" : "politics";
         string folder = "progress-" + track + "/", id = "progress-" + track + "-" + ProgressIds[index];
         string back = track == "politics" ? "EntityAssets/v003/progress-politics/progress-politics-back-original" : Root + folder + "progress-" + track + "-back-original";
-        return new Card(id, Root + folder + id + "-front", back);
+        return progressCards[index]=new Card(id, Root + folder + id + "-front", back);
     }
     public static Card Improvement(int track, int level, bool built)
     {
         if (track < 0 || track >= TrackIds.Length || level < 1 || level > 5) throw new ArgumentOutOfRangeException();
+        int key=(track*5+level-1)*2+(built?1:0);if(improvementCards[key]!=null)return improvementCards[key];
         string id = "improvement-" + TrackIds[track] + "-" + level;
-        return new Card(id, Root + "city-improvements/" + id + "-front", Root + "city-improvements/" + id + "-back", !built);
+        return improvementCards[key]=new Card(id, Root + "city-improvements/" + id + "-front", Root + "city-improvements/" + id + "-back", !built);
     }
     public static Card Guidance(bool maximum)
     {
         string id = maximum ? "guidance-max" : "guidance-upgrade";
-        return new Card(id, Root + "city-improvements/" + id + "-front");
+        int key=maximum?1:0;return guidanceCards[key]??(guidanceCards[key]=new Card(id, Root + "city-improvements/" + id + "-front"));
     }
-    public static Card Defender => new Card("defender", Root + "defender-card/defender-card-front");
+    public static Card Defender => defenderCard;
+    public static IEnumerator Prewarm(string rules)
+    {
+        bool cities=rules=="cities-knights"||rules=="cities"||rules=="combined";
+        var paths=new List<string>();
+        for(int good=0;good<(cities?8:5);good++){paths.Add(Good(good).Front);paths.Add(Good(good).Back);}
+        if(cities)
+        {
+            paths.Add(Defender.Front);
+            for(int card=0;card<25;card++){paths.Add(Progress(card).Front);paths.Add(Progress(card).Back);}
+        }
+        const long budget=64*1024*1024;long loaded=0;
+        foreach(string path in paths.Where(p=>!string.IsNullOrEmpty(p)).Distinct())
+        {
+            if(Textures.TryGetValue(path,out var existing)&&existing!=null)continue;
+            if(loaded>=budget)yield break;
+            var request=Resources.LoadAsync<Texture2D>(path);yield return request;
+            var texture=request.asset as Texture2D;if(texture==null)continue;
+            // 每帧至多接收一张，只保留预算内的预热引用；正常获准展示仍可按需加载。
+            long size=UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(texture);
+            if(loaded+size>budget)yield break;
+            Textures[path]=texture;loaded+=size;
+        }
+    }
     public static Texture2D ResourceFront(string resource)
     {
         resource = (resource ?? "").ToLowerInvariant();

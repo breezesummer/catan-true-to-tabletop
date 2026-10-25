@@ -14,6 +14,9 @@ public sealed class TabletopDicePresentation
     public double SettlesAt => started + Duration;
     bool initialized;
     double started = double.NegativeInfinity;
+    GameHistoryEntry[] knownInput,knownOutput,visibleInput,visibleOutput;
+    long knownSequence=-1,visibleSequence=-1;
+    bool visibleRolling;
     public void Observe(long rollSequence, int first, int second, int? eventDie, double now)
     {
         // 首次连接视图（含读档）直接显示已确认结果；相同点数的新掷骰仍会启动动画。
@@ -34,14 +37,19 @@ public sealed class TabletopDicePresentation
     public GameHistoryEntry[] KnownHistory(GameHistoryEntry[] entries)
     {
         entries=entries??Array.Empty<GameHistoryEntry>();
+        if(ReferenceEquals(knownInput,entries)&&knownSequence==Sequence)return knownOutput;
+        knownInput=entries;knownSequence=Sequence;
         // 联机历史可以早于对应 PlayerView 到达；先保留水位，等公开骰子实际开始展示。
         long future=entries.Where(e=>IsRoll(e)&&e.Sequence>Sequence).Select(e=>e.Sequence).DefaultIfEmpty(long.MaxValue).Min();
-        return future==long.MaxValue?entries:entries.Where(e=>e!=null&&e.Sequence<future).ToArray();
+        return knownOutput=future==long.MaxValue?entries:entries.Where(e=>e!=null&&e.Sequence<future).ToArray();
     }
     public GameHistoryEntry[] VisibleHistory(GameHistoryEntry[] entries,double now)
     {
         var known=KnownHistory(entries);
+        bool rolling=IsRolling(now);
+        if(ReferenceEquals(visibleInput,known)&&visibleSequence==Sequence&&visibleRolling==rolling)return visibleOutput;
+        visibleInput=known;visibleSequence=Sequence;visibleRolling=rolling;
         // 资源、商品及发展卡的公开收获叙述一同等骰子停止；权威历史始终原样保留。
-        return IsRolling(now)?known.Where(e=>e!=null&&e.Sequence<Sequence).ToArray():known;
+        return visibleOutput=rolling?known.Where(e=>e!=null&&e.Sequence<Sequence).ToArray():known;
     }
 }

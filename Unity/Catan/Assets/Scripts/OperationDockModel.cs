@@ -8,10 +8,14 @@ public sealed class OperationSnapshot
 {
     public string Scope, Revision, Status, Phase, Seat;
     public long PublicSequence=long.MaxValue;
+    Catan.Core.GameHistoryEntry[] historyInput,historyOutput;
+    long historyWatermark=-1;
     public Catan.Core.GameHistoryEntry[] PresentedHistory(Catan.Core.GameHistoryEntry[] entries)
     {
         entries=entries??Array.Empty<Catan.Core.GameHistoryEntry>();
-        return entries.Length==0||entries.All(e=>e.Sequence<=PublicSequence)?entries:entries.Where(e=>e.Sequence<=PublicSequence).ToArray();
+        if(ReferenceEquals(historyInput,entries)&&historyWatermark==PublicSequence)return historyOutput;
+        historyInput=entries;historyWatermark=PublicSequence;
+        return historyOutput=entries.Length==0||entries.All(e=>e.Sequence<=PublicSequence)?entries:entries.Where(e=>e.Sequence<=PublicSequence).ToArray();
     }
     public bool CanTrade, CanInteract, RequiresSelection;
     public int[] Goods = new int[8], Bank = new int[8], Rates = new int[8];
@@ -119,7 +123,9 @@ public sealed class OperationSelection
         scope = snapshot == null ? null : snapshot.Scope;
         revision = snapshot == null ? null : snapshot.Revision;
         seat = snapshot == null ? null : snapshot.Seat;
-        goods = snapshot == null ? null : (int[])snapshot.Goods.Clone();
+        if(snapshot==null)goods=null;
+        else if(goods==null)goods=(int[])snapshot.Goods.Clone();
+        else Array.Copy(snapshot.Goods,goods,goods.Length);
         for (int i = 0; i < 8; i++) Selected[i] = Math.Min(Selected[i], snapshot == null ? 0 : snapshot.Goods[i]);
     }
     public void Clear()

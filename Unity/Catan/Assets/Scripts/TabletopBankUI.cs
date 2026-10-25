@@ -137,6 +137,7 @@ public sealed class TabletopBankUI
     }
     public void DrawFlights(bool ownHandVisible=true)
     {
+        if(timeline.RecoveryUntil>Time.unscaledTimeAsDouble)ModernOperationUI.Label(new Rect(480,680,480,28),"已恢复当前手牌与棋盘",ModernOperationUI.Center);
         if(current==null||Event.current.type!=EventType.Repaint)return;
         double now=Time.unscaledTimeAsDouble;
         var active=timeline.Active(now);

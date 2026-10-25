@@ -16,6 +16,7 @@
     <Compile Include="../../Unity/Catan/Assets/Scripts/OperationDockModel.cs" Link="Presentation/OperationDockModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/OperationWindowState.cs" Link="Presentation/OperationWindowState.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopHistoryModel.cs" Link="Presentation/TabletopHistoryModel.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopHistoryLayout.cs" Link="Presentation/TabletopHistoryLayout.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopSmithingSelection.cs" Link="Presentation/TabletopSmithingSelection.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopPointerPreview.cs" Link="Presentation/TabletopPointerPreview.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/PlayerIdentityModel.cs" Link="Presentation/PlayerIdentityModel.cs" />

@@ -182,38 +182,48 @@ public sealed class TabletopCollectionTimeline
     TabletopCollectionTile[] observedTiles;
     int lastRoll;
     bool productionPending;
+    Catan.Core.GameHistoryEntry[] observedEntries;
+    readonly System.Collections.Generic.Dictionary<string,Catan.Core.GameHistoryEntry> consumed=new System.Collections.Generic.Dictionary<string,Catan.Core.GameHistoryEntry>();
+    public double RecoveryUntil { get; private set; }=double.NegativeInfinity;
+    static string EventKey(Catan.Core.GameHistoryEntry entry)=>entry.SkillEventId==null?"command:"+entry.Sequence:"skill:"+entry.SkillEventId;
     public double OutcomesReadyAt { get; private set; } = double.NegativeInfinity;
     public void Observe(string playerScope,Catan.Core.GameHistoryEntry[] entries,double now,TabletopCollectionTile[] tiles=null,double? outcomesReadyAt=null)
     {
         OutcomesReadyAt=outcomesReadyAt??double.NegativeInfinity;
         entries=entries??Array.Empty<Catan.Core.GameHistoryEntry>();
+        if(initialized&&scope==playerScope&&ReferenceEquals(observedEntries,entries))
+        {flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);return;}
+        observedEntries=entries;
         long latest=entries.Length==0?0:entries.Max(e=>e.Sequence);
         if(!initialized||scope!=playerScope||latest<sequence)
         {
             // 首次绑定、换局和读档均只接收当前历史基线，不能重播旧的收牌。
             flights.Clear();orders.Clear();specialOrders.Clear();handChanges.Clear();initialized=true;scope=playerScope;sequence=latest;
+            consumed.Clear();foreach(var entry in entries)consumed[EventKey(entry)]=entry;RecoveryUntil=double.NegativeInfinity;
             observedTiles=tiles==null?null:CopyTiles(tiles);
             var roll=entries.OrderBy(e=>e.Sequence).LastOrDefault(e=>e.Dice1>0);lastRoll=roll==null?0:roll.Dice1+roll.Dice2;
             productionPending=roll!=null&&lastRoll!=7&&!entries.Where(e=>e.Sequence>=roll.Sequence).Any(e=>e.Kind=="EndTurn"||e.Changes.Any(c=>c.Category=="goods"&&c.Amount>0));return;
         }
-        if(latest==sequence){flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);return;}
-        var updates=entries.Where(e=>e.Sequence>sequence).OrderBy(e=>e.Sequence).ToArray();
+        var updates=entries.Where(e=>e.Sequence>sequence||e.SkillEventId!=null&&(!consumed.TryGetValue(EventKey(e),out var old)||!ReferenceEquals(old,e))).OrderBy(e=>e.Sequence).ToArray();
+        if(updates.Length==0){flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);return;}
         var sourceTiles=CopyTiles(observedTiles??tiles??Array.Empty<TabletopCollectionTile>());
         int inventions=updates.Count(e=>e.Action=="使用「发明家」");bool numbersReliable=true;
         foreach(var entry in updates)
         {
+            var entryChanges=DeltaChanges(entry);
             // 动画统一对齐真实骰子落定时间；历史迟到时不能再从零重复等待一次掷骰。
             double collectionStart=Math.Max(now,outcomesReadyAt??(entry.Dice1>0?now+TabletopDicePresentation.Duration:now));
             ReplayPublicBoard(entry,sourceTiles,tiles,inventions,ref numbersReliable);
             if(entry.Dice1>0){lastRoll=entry.Dice1+entry.Dice2;productionPending=lastRoll!=7;}
             if(entry.Kind=="EndTurn")productionPending=false;
             // GetHistory 已按观看者权限投影；仅有具体资源索引的变化能改变该手牌显示队列。
-            foreach(var change in (entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>()).Where(c=>c.Category=="goods"&&c.GoodIndex>=0&&c.GoodIndex<8&&c.PlayerId!=null))
+            foreach(var change in entryChanges.Where(c=>c.Category=="goods"&&c.GoodIndex>=0&&c.GoodIndex<8&&c.PlayerId!=null))
             {
                 if(!handChanges.TryGetValue(change.PlayerId,out var pending))handChanges[change.PlayerId]=pending=new System.Collections.Generic.List<TabletopHandChange>();
+                if(pending.Count>=512){pending.Clear();RecoveryUntil=now+3;}
                 pending.Add(new TabletopHandChange{Good=change.GoodIndex,Amount=change.Amount});
             }
-            var changes=(entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>()).Where(c=>c.Category=="goods"&&!c.IsPrivate&&c.GoodIndex>=0&&c.GoodIndex<8).ToArray();
+            var changes=entryChanges.Where(c=>c.Category=="goods"&&!c.IsPrivate&&c.GoodIndex>=0&&c.GoodIndex<8).ToArray();
             bool production=entry.Dice1>0||productionPending&&(entry.Kind=="ResolveChoice"&&entry.Action!="领取水渠资源"||entry.Kind=="DiscardProgressCard"||entry.Kind=="ChooseGoldResources");
             int ordinal=0;
             foreach(var group in changes.GroupBy(c=>c.GoodIndex))
@@ -224,7 +234,7 @@ public sealed class TabletopCollectionTimeline
                 {
                     int amount=Math.Min(fromBank,gain.Amount);fromBank-=amount;
                     var origins=Origins(entry,gain.PlayerId,gain.GoodIndex,production,production&&!numbersReliable?Array.Empty<TabletopCollectionTile>():sourceTiles);
-                    for(int i=0;i<amount;i++)flights.Add(new TabletopCollectionFlight {
+                    for(int i=0;i<Math.Min(257,amount);i++)flights.Add(new TabletopCollectionFlight {
                         Player=gain.PlayerId,Good=gain.GoodIndex,SourceTileId=origins.ElementAtOrDefault(i),Started=collectionStart+Math.Min(.55,ordinal++*.06)
                     });
                 }
@@ -241,25 +251,47 @@ public sealed class TabletopCollectionTimeline
                     for(int donor=0;donor<donors.Length&&needed>0;donor++)
                     {
                         int amount=Math.Min(needed,remaining[donor]);needed-=amount;remaining[donor]-=amount;
-                        for(int i=0;i<amount;i++)flights.Add(new TabletopCollectionFlight{
+                        for(int i=0;i<Math.Min(257,amount);i++)flights.Add(new TabletopCollectionFlight{
                             Player=gain.PlayerId,Good=gain.GoodIndex,SourcePlayerId=donors[donor].PlayerId,Started=collectionStart+Math.Min(.55,ordinal++*.06)});
                     }
                 }
             }
             if(production&&changes.Any(c=>c.Amount>0))productionPending=false;
-            var cardChanges=(entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>()).Where(c=>c.Category=="development"||c.Category=="progress").ToArray();
+            var cardChanges=entryChanges.Where(c=>c.Category=="development"||c.Category=="progress").ToArray();
             foreach(var gain in cardChanges.Where(c=>c.Amount>0&&!(c.Category=="progress"&&!c.IsPrivate&&TabletopCardReveal.IsVictory(c.Name))))
             {
                 int art=gain.Category=="progress"?ProgressIndex(gain.Name):-1;
                 var source=cardChanges.FirstOrDefault(c=>c.Category==gain.Category&&c.Amount<0&&c.Name==gain.Name);
-                for(int i=0;i<gain.Amount;i++)flights.Add(new TabletopCollectionFlight{
+                for(int i=0;i<Math.Min(257,gain.Amount);i++)flights.Add(new TabletopCollectionFlight{
                     Player=gain.PlayerId,Good=-1,Category=gain.Category,CardName=gain.Name,ProgressIndex=art,
                     Track=art>=0?(art<10?2:art<16?0:1):entry.EventDie=="Science"?2:entry.EventDie=="Trade"?0:entry.EventDie=="Politics"?1:-1,
                     SourcePlayerId=source?.PlayerId,Started=collectionStart+Math.Min(.55,ordinal++*.06)});
             }
+            if(flights.Count>256){flights.Clear();RecoveryUntil=now+3;}
         }
         observedTiles=tiles==null?sourceTiles:CopyTiles(tiles);
         sequence=latest;flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);
+    }
+    sealed class CollectionChange
+    {
+        internal Catan.Core.GameHistoryChange Source;
+        internal int Amount;
+        internal string PlayerId=>Source.PlayerId;
+        internal string Category=>Source.Category;
+        internal int GoodIndex=>Source.GoodIndex;
+        internal string Name=>Source.Name;
+        internal bool IsPrivate=>Source.IsPrivate;
+    }
+    CollectionChange[] DeltaChanges(Catan.Core.GameHistoryEntry entry)
+    {
+        consumed.TryGetValue(EventKey(entry),out var previous);consumed[EventKey(entry)]=entry;
+        var current=entry.Changes??Array.Empty<Catan.Core.GameHistoryChange>();
+        if(previous==null)return current.Select(c=>new CollectionChange{Source=c,Amount=c.Amount}).ToArray();
+        var old=previous.Changes??Array.Empty<Catan.Core.GameHistoryChange>();
+        // 同一发动补写结果，只消费授权变化的差额；已播放的收牌不能再次入队。
+        return current.Concat(old).GroupBy(c=>(c.PlayerId,c.Category,c.GoodIndex,c.Name,c.LocationId,c.CardTrack,c.IsPrivate))
+            .Select(g=>new CollectionChange{Source=g.First(),Amount=current.Where(c=>(c.PlayerId,c.Category,c.GoodIndex,c.Name,c.LocationId,c.CardTrack,c.IsPrivate)==g.Key).Sum(c=>c.Amount)-old.Where(c=>(c.PlayerId,c.Category,c.GoodIndex,c.Name,c.LocationId,c.CardTrack,c.IsPrivate)==g.Key).Sum(c=>c.Amount)})
+            .Where(c=>c.Amount!=0).ToArray();
     }
     static TabletopCollectionTile[] CopyTiles(TabletopCollectionTile[] tiles)
     {

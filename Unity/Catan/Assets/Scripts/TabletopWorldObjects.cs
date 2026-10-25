@@ -50,8 +50,12 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         public int DieFace=-1;
         public Mesh[] OwnedMeshes;
         public Vector3 OriginalScale;
+        public Quaternion OriginalRotation;
+        public MeshRenderer Front;
     }
     readonly Dictionary<string, Item> items = new Dictionary<string, Item>();
+    readonly List<Item> recycled=new List<Item>();
+    const int PoolCapacity=64;
     readonly Dictionary<string, Material> faceMaterials = new Dictionary<string, Material>();
     readonly Dictionary<int, Texture2D> diceTextures = new Dictionary<int, Texture2D>();
     readonly List<Mesh> meshes = new List<Mesh>();
@@ -66,15 +70,16 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         scene=owner;
         // 在开局时准备有限骰面与资源贴图，避免首次动画中同步生成或加载。
         for(int die=0;die<3;die++)for(int face=die==2?0:1;face<=(die==2?3:6);face++)DieTexture(die,face);
-        for(int good=0;good<8;good++)EntityCardAssets.ResourceOrCommodityFront(good);
-        EntityCardAssets.Texture(EntityCardAssets.Defender.Front);
+        var app=FindFirstObjectByType<M6App>();string rules=app==null?"base":app.RuleSet;
+        for(int good=0;good<(rules=="combined"||rules=="cities-knights"?8:5);good++)EntityCardAssets.ResourceOrCommodityFront(good);
+        StartCoroutine(EntityCardAssets.Prewarm(rules));
     }
     public void Begin(string name) { group = name + "/"; generation++; }
     public void End()
     {
         foreach (var key in items.Keys.Where(k => k.StartsWith(group) && items[k].Generation != generation).ToArray())
         {
-            Release(items[key]); items.Remove(key);
+            Recycle(items[key]); items.Remove(key);
         }
     }
     void Release(Item item)
@@ -84,18 +89,30 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         {meshes.Remove(mesh);Destroy(mesh);}
         Destroy(item.Object);
     }
+    void Recycle(Item item)
+    {
+        item.Object.SetActive(false);
+        if(recycled.Count>=PoolCapacity){Release(item);return;}
+        item.Object.transform.localScale=item.OriginalScale;item.Object.transform.rotation=item.OriginalRotation;
+        item.DieFace=-1;recycled.Add(item);
+    }
     Item Get(string key, string signature, Func<GameObject> create)
     {
         key = group + key;
         if (items.TryGetValue(key, out var prior) && prior.Signature != signature)
-        { Release(prior); items.Remove(key); }
+        { Recycle(prior); items.Remove(key); }
         if (!items.TryGetValue(key, out var item))
+        {
+            for(int i=recycled.Count-1;i>=0;i--)if(recycled[i].Signature==signature)
+            {item=recycled[i];recycled.RemoveAt(i);item.Object.name=key;items.Add(key,item);break;}
+        }
+        if(item==null)
         {
             int firstOwnedMesh=meshes.Count;
             var obj = create(); obj.name = key; obj.transform.SetParent(transform, true);
             TabletopScene.SetHudLayer(obj.transform);
             foreach (var collider in obj.GetComponentsInChildren<Collider>()) { collider.enabled = false; Destroy(collider); }
-            item = new Item { Object = obj, OriginalScale=obj.transform.localScale, Signature = signature, Hit = new Hit { Scene = scene, Root = obj.transform }, OwnedMeshes=meshes.Skip(firstOwnedMesh).ToArray() };
+            item = new Item { Object = obj, OriginalScale=obj.transform.localScale, OriginalRotation=obj.transform.rotation, Front=obj.GetComponentsInChildren<MeshRenderer>().LastOrDefault(), Signature = signature, Hit = new Hit { Scene = scene, Root = obj.transform }, OwnedMeshes=meshes.Skip(firstOwnedMesh).ToArray() };
             items.Add(key, item);
         }
         item.Generation = generation; item.Object.SetActive(true); return item;
@@ -283,7 +300,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     {
         var item = Get(key, size.ToString("F6")+":"+thickness+":"+radiusRatio, () => Panel(size,thickness,radiusRatio));
         item.Object.transform.position = position;
-        item.Object.GetComponentsInChildren<MeshRenderer>().Last().sharedMaterial = Face(texture, uv, Color.white);
+        var face=Face(texture, uv, Color.white);if(item.Front.sharedMaterial!=face)item.Front.sharedMaterial=face;
         item.Hit.Size = size;item.Hit.Thickness=thickness; item.Hit.Renderers = null; return item.Hit;
     }
     public Hit Facility(string key, Rect layout, int track, int level)
