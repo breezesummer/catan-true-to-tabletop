@@ -34,11 +34,19 @@ public sealed partial class M6App
     // 指令已在规则层完成；显示旧快照至卡牌退场，再统一刷新并衔接现有飞牌／棋盘效果。
     internal bool PresentPlayedCard(GameHistoryEntry[] history,Action applyView)
     {
-        foreach(var reveal in cardReveals.Observe(history))
+        var incoming=cardReveals.Observe(history);bool wasEmpty=playedCards.Count==0;
+        int recovered=TabletopCardRevealBacklog.Append(playedCards,incoming);
+        if(recovered>0)
         {
-            if(playedCards.Count==0)cardStarted=Time.unscaledTimeAsDouble+(reveal.Roll!=null?TabletopDicePresentation.Duration:0);
+            afterPlayedCards=null;CardPresentationRoll=null;
+            ShowTablePrompt("已同步 "+recovered+" 次较早的出牌结果");
+            M7CommunicationLog.Record(new M7CommunicationEvent{Component="presentation",Event="presentation_recovery",Code="card_reveals",Count=recovered,RoomId=Network?.RoomId,Revision=Network?.Revision??-1});
+            return false;
+        }
+        foreach(var reveal in incoming)
+        {
+            if(wasEmpty){cardStarted=Time.unscaledTimeAsDouble+(reveal.Roll!=null?TabletopDicePresentation.Duration:0);wasEmpty=false;}
             if(reveal.Roll!=null)CardPresentationRoll=reveal.Roll;
-            playedCards.Enqueue(reveal);
         }
         if(!CardPresentationBusy)return false;
         afterPlayedCards=applyView;return true;

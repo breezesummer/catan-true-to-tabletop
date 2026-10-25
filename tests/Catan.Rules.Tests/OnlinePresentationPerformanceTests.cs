@@ -5,6 +5,23 @@ namespace Catan.Rules.Tests;
 
 public sealed class OnlinePresentationPerformanceTests
 {
+    [Fact]
+    public void CardRevealBacklogIsBoundedAndRecoveredHistoryDoesNotReplay()
+    {
+        var history=Enumerable.Range(1,6).Select(n=>Data<GameHistoryEntry>(new{Sequence=(long)n,Kind="PlayKnight",PlayerId="P1",Action="使用「骑士」"})).ToArray();
+        var timeline=new TabletopCardRevealTimeline();var queue=new Queue<TabletopCardReveal>();
+        Assert.Equal(6,TabletopCardRevealBacklog.Append(queue,timeline.Observe(history)));Assert.Empty(queue);
+        Assert.Empty(timeline.Observe(history));Assert.Equal(6,timeline.Sequence);
+        Assert.Equal(0,TabletopCardRevealBacklog.Append(queue,new[]{new TabletopCardReveal()}));Assert.Single(queue);
+    }
+    [Fact]
+    public void CardRevealSkillReplacementAddsOnlyNewPublicVictoryResults()
+    {
+        GameHistoryEntry Skill(int amount)=>Data<GameHistoryEntry>(new{Sequence=1L,SkillEventId="same",Changes=new[]{Data<GameHistoryChange>(new{Category="progress",Name="印刷厂",PlayerId="P1",Amount=amount})}});
+        var timeline=new TabletopCardRevealTimeline();Assert.Single(timeline.Observe(new[]{Skill(1)}));
+        Assert.Single(timeline.Observe(new[]{Skill(2)}));Assert.Empty(timeline.Observe(new[]{Skill(2)}));
+        timeline.Reset(1);Assert.Empty(timeline.Observe(new[]{Skill(2)}));
+    }
     static T Data<T>(object fields) where T:new()
     {var value=new T();foreach(var property in fields.GetType().GetProperties())typeof(T).GetProperty(property.Name)!.SetValue(value,property.GetValue(fields));return value;}
     static GameHistoryEntry Entry(int sequence,string? action=null,int dice1=0,int dice2=0,string? skill=null,int amount=0)=>Data<GameHistoryEntry>(new{Sequence=(long)sequence,Action=action,Dice1=dice1,Dice2=dice2,SkillEventId=skill,Changes=amount==0?Array.Empty<GameHistoryChange>():new[]{Data<GameHistoryChange>(new{Category="goods",GoodIndex=0,PlayerId="P1",Amount=amount})}});
