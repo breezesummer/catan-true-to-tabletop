@@ -82,6 +82,15 @@ public sealed class TabletopPromptSequence
 }
 public static class TabletopSelectionPrompt
 {
+    public static bool IsDirectMapDecision(string kind)
+    {
+        switch(kind)
+        {
+            case "PillageCity": case "Metropolis": case "B5MetropolisRelocate":
+            case "DisplacedKnight": case "ProgressTreasonRemove": case "ProgressTreasonPlace": return true;
+            default: return false;
+        }
+    }
     // 四种规则包共用的权威选择阶段；普通行动和等待掷骰仍使用短暂提示。
     public static bool RequiredPhase(string phase)
     {
@@ -99,6 +108,7 @@ public static class TabletopSelectionPrompt
         {
             case "PillageCity": return "请选择要降级为村庄的城市";
             case "Metropolis": return "请选择要安置大都会的城市";
+            case "B5MetropolisRelocate": return "请由城市所有者点选另一座合法己方城市，迁移大都会后继续结算";
             case "DisplacedKnight": return "请选择合法位置安置被驱逐的骑士";
             case "ProgressTreasonRemove": return "你受到「叛徒」影响，请选择要移除的己方骑士";
             case "ProgressTreasonPlace": return "请选择合法位置安置替补骑士";

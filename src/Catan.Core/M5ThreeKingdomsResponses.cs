@@ -65,12 +65,13 @@ namespace Catan.Core.M5
         }
         private B4TokenMove[] B4TokenMoves(GameState s,string player)
         {
-            if(!s.FirstBarbarianAttack||s.ActivePlayerId!=player||s.PendingDecision!=null)return Array.Empty<B4TokenMove>();
+            bool huoshou=B5(s)&&s.ThreeKingdoms.Skills.Frames.Any(f=>f.Kind=="b5m-huoshou-move"&&f.PlayerId==player);
+            if(!s.FirstBarbarianAttack||s.ActivePlayerId!=player&&!huoshou||s.PendingDecision!=null)return Array.Empty<B4TokenMove>();
             var candidates=s.Tiles.Where(t=>t.Resource!="sea"&&t.Id!=s.RobberTileId).Select(t=>new B4TokenMove {OptionId="robber:"+t.Id,Label="移动强盗至 "+t.Id,TokenKind="robber",TileId=t.Id})
                 .Concat(s.Tiles.Where(t=>t.Resource=="sea"&&t.Id!=s.PirateTileId).Select(t=>new B4TokenMove {OptionId="pirate:"+t.Id,Label="移动海盗至 "+t.Id,TokenKind="pirate",TileId=t.Id}))
                 .Concat(s.PirateTileId=="frame"?Array.Empty<B4TokenMove>():new[]{new B4TokenMove {OptionId="pirate:frame",Label="移动海盗至边框",TokenKind="pirate",TileId="frame"}});
             return candidates.Where(move=>{
-                var probe=s.CopyForTransaction();probe.PendingDecision=new PendingDecision {Kind="Robber",PlayerId=player,ReturnPhase=GamePhase.Action};probe.Phase=GamePhase.RobberMove;
+                var probe=s.CopyForTransaction();if(huoshou)probe.ThreeKingdoms.Board.TokenController=player;probe.PendingDecision=new PendingDecision {Kind="Robber",PlayerId=player,ReturnPhase=GamePhase.Action};probe.Phase=GamePhase.RobberMove;
                 try {ApplyBaseRules(probe,new Command {Id="liuli-probe",PlayerId=player,Kind=move.TokenKind=="pirate"?CommandKind.MovePirate:CommandKind.MoveRobber,TargetId=move.TileId});return true;}
                 catch(RuleException){return false;}
             }).ToArray();
@@ -78,6 +79,7 @@ namespace Catan.Core.M5
         private void B4MoveToken(GameState s,string player,B4TokenMove move)
         {
             Require(B4TokenMoves(s,player).Any(x=>x.OptionId==move.OptionId&&x.TileId==move.TileId),"InvalidRobberTile","该移动目标不合法。");
+            if(B5(s)&&s.ThreeKingdoms.Skills.Frames.Any(f=>f.Kind=="b5m-huoshou-move"&&f.PlayerId==player))B5Board(s).TokenController=player;
             s.PendingDecision=new PendingDecision {Kind="Robber",PlayerId=player,ReturnPhase=GamePhase.Action};s.Phase=GamePhase.RobberMove;
             ApplyB2Native(s,new Command {Id="liuli-"+s.ThreeKingdoms.NextId++,PlayerId=player,Kind=move.TokenKind=="pirate"?CommandKind.MovePirate:CommandKind.MoveRobber,TargetId=move.TileId});
         }
@@ -85,10 +87,11 @@ namespace Catan.Core.M5
         {
             if(total==7||B2DrawBlocked(s,player))return;
             var host=CardHost(s);var before=host.GetHand(player);var cards=new int[8];int gold=0;
-            foreach(var tile in s.Tiles.Where(t=>t.Number==total&&t.Id!=s.RobberTileId&&t.Resource!="sea"&&t.Resource!="desert"))
+            foreach(var tile in s.Tiles.Where(t=>t.Number==total&&(t.Id!=s.RobberTileId||B2SkillEngine.B5DoubleHarvest(s.ThreeKingdoms,player,t.Id))&&t.Resource!="sea"&&t.Resource!="desert"))
             {
-                int settlements=s.Settlements.Count(b=>b.PlayerId==player&&tile.Vertices.Contains(b.LocationId));
+                int settlements=s.Settlements.Count(b=>b.PlayerId==player&&B5Working(s,"Settlement",b.LocationId)&&tile.Vertices.Contains(b.LocationId));
                 int cities=s.Cities.Count(b=>b.PlayerId==player&&tile.Vertices.Contains(b.LocationId));
+                if(B2SkillEngine.B5DoubleHarvest(s.ThreeKingdoms,player,tile.Id)){settlements*=2;cities*=2;}
                 if(tile.Resource=="gold") {gold+=settlements+2*cities;continue;}
                 int resource=Array.FindIndex(Resources,r=>ResourceName(r)==tile.Resource);if(resource<0)continue;
                 cards[resource]+=settlements+(resource==1||resource==3?2:1)*cities;

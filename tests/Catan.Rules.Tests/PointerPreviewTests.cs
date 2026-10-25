@@ -54,6 +54,7 @@ public sealed class PointerPreviewTests
     [InlineData("ProgressTreasonPlace","knight")]
     [InlineData("ProgressTreasonRemove","knight")]
     [InlineData("Metropolis","metropolis")]
+    [InlineData("B5MetropolisRelocate","metropolis")]
     [InlineData("PillageCity","target")]
     public void ForcedMapChoicesUsePublicPieceIdentity(string decision,string expected)
     {

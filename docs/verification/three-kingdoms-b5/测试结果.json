@@ -1,0 +1,366 @@
+{
+  "日期": "2026-10-25",
+  "版本": "内测版2.0.2",
+  "正式发布": false,
+  "云端部署": false,
+  "三国": {
+    "总数": 616,
+    "通过": 616,
+    "失败": 0,
+    "B5专项": 168,
+    "来源": [
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-final-rules.trx",
+        "SHA256": "b3fb3377b091655ce69b516a1c09a700b9f963151e79c0269f89194ad8f29c59",
+        "总数": 592,
+        "通过": 592,
+        "失败": 0,
+        "开始": "2026-10-25T14:38:15.0968079+08:00",
+        "结束": "2026-10-25T14:39:22.3937446+08:00"
+      },
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-complete-games-1.trx",
+        "SHA256": "67b1d026763bbd47c8cabdb323b4d9cfd25f52b6f300ab162c7b6e71221d0af0",
+        "总数": 6,
+        "通过": 5,
+        "失败": 1,
+        "开始": "2026-10-25T14:39:08.8882741+08:00",
+        "结束": "2026-10-25T14:43:37.7752562+08:00"
+      },
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-complete-games-2.trx",
+        "SHA256": "968c7f0301bcfff998e3eacc9e9e96966432fb39cd892a3aa166bef04e1ae86b",
+        "总数": 4,
+        "通过": 4,
+        "失败": 0,
+        "开始": "2026-10-25T14:39:08.9284761+08:00",
+        "结束": "2026-10-25T14:41:52.3256135+08:00"
+      },
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-complete-games-4.trx",
+        "SHA256": "1973328b87bb4762be3d747031394d92918cdb51772b62a3a951115998d55f28",
+        "总数": 4,
+        "通过": 4,
+        "失败": 0,
+        "开始": "2026-10-25T14:39:08.9445950+08:00",
+        "结束": "2026-10-25T14:42:02.6979575+08:00"
+      },
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-fog-repaired.trx",
+        "SHA256": "8dc04ab5ab6ad2085609d4a1db26d3c2a9eb2dd76b19057cb1be50d6ccbbc866",
+        "总数": 38,
+        "通过": 38,
+        "失败": 0,
+        "开始": "2026-10-25T14:47:19.0658307+08:00",
+        "结束": "2026-10-25T14:48:20.2845700+08:00"
+      },
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-fortress-loss.trx",
+        "SHA256": "f8ccfcf5b0ee92650352aee47d278051c28d91ab1da26258ace2233f13cb9f60",
+        "总数": 1,
+        "通过": 1,
+        "失败": 0,
+        "开始": "2026-10-25T14:48:54.4133577+08:00",
+        "结束": "2026-10-25T14:48:55.3237001+08:00"
+      },
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-last-map-0.trx",
+        "SHA256": "33cac09b481e94761e67d42c59156b74bcf76db644cfc33775aa1e26fab47f8c",
+        "总数": 2,
+        "通过": 2,
+        "失败": 0,
+        "开始": "2026-10-25T14:51:02.9733048+08:00",
+        "结束": "2026-10-25T14:53:12.2537306+08:00"
+      },
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-last-map-1.trx",
+        "SHA256": "81674e8a769ee897f6e76f6f6fd11700da471e0e71f36df33f902d32447e5642",
+        "总数": 2,
+        "通过": 2,
+        "失败": 0,
+        "开始": "2026-10-25T14:51:02.9733011+08:00",
+        "结束": "2026-10-25T14:55:57.9848772+08:00"
+      },
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-last-map-2.trx",
+        "SHA256": "0402e1db33fbe94feda930afa42318ae157de452751cc95c75fb3a42d78bd032",
+        "总数": 2,
+        "通过": 2,
+        "失败": 0,
+        "开始": "2026-10-25T14:51:03.0191712+08:00",
+        "结束": "2026-10-25T14:56:12.5264390+08:00"
+      }
+    ]
+  },
+  "正常完整局": {
+    "总数": 20,
+    "命令总数": 10669.0,
+    "配置": [
+      {
+        "玩法": "combined",
+        "地图": "fog-islands",
+        "人数": 4,
+        "命令": 788,
+        "轮数": 19,
+        "登场将数": 28,
+        "恢复类型": 78
+      },
+      {
+        "玩法": "combined",
+        "地图": "four-islands",
+        "人数": 3,
+        "命令": 396,
+        "轮数": 19,
+        "登场将数": 21,
+        "恢复类型": 46
+      },
+      {
+        "玩法": "cities",
+        "地图": "base",
+        "人数": 4,
+        "命令": 623,
+        "轮数": 18,
+        "登场将数": 24,
+        "恢复类型": 56
+      },
+      {
+        "玩法": "combined",
+        "地图": "four-islands",
+        "人数": 4,
+        "命令": 507,
+        "轮数": 14,
+        "登场将数": 20,
+        "恢复类型": 43
+      },
+      {
+        "玩法": "combined",
+        "地图": "fog-islands",
+        "人数": 3,
+        "命令": 492,
+        "轮数": 26,
+        "登场将数": 27,
+        "恢复类型": 63
+      },
+      {
+        "玩法": "cities",
+        "地图": "base",
+        "人数": 3,
+        "命令": 406,
+        "轮数": 19,
+        "登场将数": 21,
+        "恢复类型": 33
+      },
+      {
+        "玩法": "combined",
+        "地图": "heading-for-new-shores",
+        "人数": 4,
+        "命令": 411,
+        "轮数": 12,
+        "登场将数": 16,
+        "恢复类型": 30
+      },
+      {
+        "玩法": "combined",
+        "地图": "through-the-desert",
+        "人数": 3,
+        "命令": 542,
+        "轮数": 25,
+        "登场将数": 27,
+        "恢复类型": 61
+      },
+      {
+        "玩法": "combined",
+        "地图": "through-the-desert",
+        "人数": 4,
+        "命令": 379,
+        "轮数": 11,
+        "登场将数": 16,
+        "恢复类型": 36
+      },
+      {
+        "玩法": "combined",
+        "地图": "heading-for-new-shores",
+        "人数": 3,
+        "命令": 476,
+        "轮数": 21,
+        "登场将数": 21,
+        "恢复类型": 44
+      },
+      {
+        "玩法": "combined",
+        "地图": "new-world",
+        "人数": 4,
+        "命令": 629,
+        "轮数": 13,
+        "登场将数": 20,
+        "恢复类型": 50
+      },
+      {
+        "玩法": "combined",
+        "地图": "wonders-of-catan",
+        "人数": 3,
+        "命令": 251,
+        "轮数": 13,
+        "登场将数": 15,
+        "恢复类型": 30
+      },
+      {
+        "玩法": "combined",
+        "地图": "wonders-of-catan",
+        "人数": 4,
+        "命令": 473,
+        "轮数": 13,
+        "登场将数": 20,
+        "恢复类型": 41
+      },
+      {
+        "玩法": "combined",
+        "地图": "new-world",
+        "人数": 3,
+        "命令": 482,
+        "轮数": 22,
+        "登场将数": 24,
+        "恢复类型": 56
+      },
+      {
+        "玩法": "combined",
+        "地图": "cloth-for-catan",
+        "人数": 3,
+        "命令": 379,
+        "轮数": 18,
+        "登场将数": 18,
+        "恢复类型": 28
+      },
+      {
+        "玩法": "combined",
+        "地图": "cloth-for-catan",
+        "人数": 4,
+        "命令": 445,
+        "轮数": 14,
+        "登场将数": 20,
+        "恢复类型": 46
+      },
+      {
+        "玩法": "combined",
+        "地图": "forgotten-tribe",
+        "人数": 3,
+        "命令": 763,
+        "轮数": 29,
+        "登场将数": 30,
+        "恢复类型": 69
+      },
+      {
+        "玩法": "combined",
+        "地图": "forgotten-tribe",
+        "人数": 4,
+        "命令": 686,
+        "轮数": 20,
+        "登场将数": 28,
+        "恢复类型": 68
+      },
+      {
+        "玩法": "combined",
+        "地图": "pirate-islands",
+        "人数": 4,
+        "命令": 824,
+        "轮数": 21,
+        "登场将数": 28,
+        "恢复类型": 72
+      },
+      {
+        "玩法": "combined",
+        "地图": "pirate-islands",
+        "人数": 3,
+        "命令": 717,
+        "轮数": 30,
+        "登场将数": 30,
+        "恢复类型": 67
+      }
+    ]
+  },
+  "原模式": {
+    "来源": {
+      "路径": ".local/verification/three-kingdoms-b5/b5-native-final.trx",
+      "SHA256": "0fb1696426716f3410263a58f16a3b3c82c69505354131ce2712ad35d480db94",
+      "总数": 1175,
+      "通过": 1153,
+      "失败": 22,
+      "开始": "2026-10-25T14:36:36.3109819+08:00",
+      "结束": "2026-10-25T14:37:15.8640342+08:00"
+    },
+    "与B4失败名单一致": true,
+    "既有失败": [
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.ResourceMonopolyUsesHarvestForEachAffectedPlayer",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat",
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"商业港口\", track: 0)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: False)",
+      "Catan.Rules.Tests.TabletopSpecialCollectionTests.DefenderProgressRewardFliesFromTheCorrectTrackWithoutLeakingOpponentCard",
+      "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.SabotageDiscardIsOneColoredCountSentenceForEveryViewer",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"锻铁匠\", track: 2)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: True)",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Printing, name: \"印刷术\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Constitution, name: \"宪法\")",
+      "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"ProgressTreasonRemove\", action: \"叛变\", piece: \"己方骑士\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.FreeEngineeringWallIsConstructedAndCardUsesRequestedVerb"
+    ]
+  },
+  "网络": {
+    "总数": 159,
+    "通过": 159,
+    "来源": [
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-network-all.trx",
+        "SHA256": "d66820cc6eda10937fd58bff9b10861abef3a14e20178290dc65b383ba2fbda7",
+        "总数": 159,
+        "通过": 158,
+        "失败": 1,
+        "开始": "2026-10-25T14:22:25.8079036+08:00",
+        "结束": "2026-10-25T14:22:40.9537778+08:00"
+      },
+      {
+        "路径": ".local/verification/three-kingdoms-b5/b5-network-trade-responder.trx",
+        "SHA256": "0c15432aa0604b1b3d83beaa2a1d75c5ae43ed9562fd884f73e3fdcff0396891",
+        "总数": 2,
+        "通过": 2,
+        "失败": 0,
+        "开始": "2026-10-25T14:28:49.0477647+08:00",
+        "结束": "2026-10-25T14:28:53.5790757+08:00"
+      }
+    ]
+  },
+  "服务客户端": {
+    "路径": ".local/verification/three-kingdoms-b5/b5-server-client.trx",
+    "SHA256": "ee614b194f5405ffce7e8281ae82b991202edf772274087da21a3000ee24e5b7",
+    "总数": 72,
+    "通过": 72,
+    "失败": 0,
+    "开始": "2026-10-25T14:21:37.4352846+08:00",
+    "结束": "2026-10-25T14:22:26.9210262+08:00"
+  },
+  "Windows实际程序": {
+    "status": "通过",
+    "unity": "6000.3.25f1",
+    "note": "实际 Windows 本地入口覆盖 M4/M5 各 3/4 人、选将/登场/阶段/轮换/技能选择读档及本地重开。截图为游戏相机与 IMGUI 离屏合成，须人工查看；不代表真机或用户试玩验收。",
+    "packageVersion": "three-kingdoms-board-state-49-v1",
+    "configurations": 4,
+    "saveRoundtrips": 36,
+    "retirements": 12,
+    "restarts": 4,
+    "images": 0,
+    "guiImagesWithChanges": 0,
+    "skillChoices": 4,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+  },
+  "证据说明": "修复后按受影响路径复验并按区分大小写的完整用例名去重；历史失败和中止TRX不作为通过。完整UI像素、Android真机、外网多人和用户试玩尚未验收。"
+}

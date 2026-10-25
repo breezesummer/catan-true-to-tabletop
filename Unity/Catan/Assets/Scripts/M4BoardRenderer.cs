@@ -110,10 +110,12 @@ public sealed class M4BoardRenderer : MonoBehaviour
     }
     public void Refresh(PlayerView view)
     {
+        threeKingdomsPieces.Restore();
         RefreshReferenceMarkers(view);
         if(numberTokens!=null)numberTokens.Refresh(view.Board.Tiles);
         RefreshProjectedPieces(view.Board.Settlements,view.Board.Roads,view.Board.Cities,view.Board.RobberTileId,
             view.Board.Walls,view.Board.Knights,view.Board.Metropolises,view.MerchantTileId,view.BarbarianPosition);
+        threeKingdomsPieces.Apply(pieces,view.ThreeKingdoms?.BoardAssets);
     }
     public void RefreshReferenceMarkers(PlayerView view)
     {
@@ -239,6 +241,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
         barbarianShip=barbarianTrack==null?null:EntityBoardAssets.BarbarianShip(position,barbarianTrack.transform,publicMarkers);
     }
     readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
+    readonly ThreeKingdomsBoardPresentation threeKingdomsPieces=new ThreeKingdomsBoardPresentation();
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId)
     {
         ClearPreview();

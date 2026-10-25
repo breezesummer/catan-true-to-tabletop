@@ -118,6 +118,7 @@ public sealed class M5BoardRenderer : MonoBehaviour
     }
     public void Refresh(PlayerView view)
     {
+        threeKingdomsPieces.Restore();
         foreach(var tile in view.Board.Tiles.Where(t=>terrainTypes[t.Id]!=t.Resource))
         {
             var old=transform.Find(tile.Id);if(old!=null)Destroy(old.gameObject);
@@ -129,6 +130,7 @@ public sealed class M5BoardRenderer : MonoBehaviour
         if(numberTokens!=null)numberTokens.Refresh(view.Board.Tiles);
         RefreshProjectedPieces(view.Board.Settlements,view.Board.Roads,view.Board.Cities,view.Board.RobberTileId,
             view.Board.Walls,view.Board.Knights,view.Board.Metropolises,view.MerchantTileId,view.Board.Ships,view.Board.PirateTileId,view.BarbarianPosition);
+        threeKingdomsPieces.Apply(pieces,view.ThreeKingdoms?.BoardAssets);
     }
     public void RefreshReferenceMarkers(PlayerView view)
     {
@@ -295,6 +297,7 @@ public sealed class M5BoardRenderer : MonoBehaviour
         barbarianShip=barbarianTrack==null?null:EntityBoardAssets.BarbarianShip(position,barbarianTrack.transform,publicMarkers);
     }
     readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
+    readonly ThreeKingdomsBoardPresentation threeKingdomsPieces=new ThreeKingdomsBoardPresentation();
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId)
     {
         ClearPreview();

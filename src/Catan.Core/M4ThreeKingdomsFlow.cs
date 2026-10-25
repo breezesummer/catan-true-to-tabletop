@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Catan.Core.ThreeKingdoms;
@@ -91,7 +91,7 @@ namespace Catan.Core.M4
                 {
                     Require(tk.Clock.Phase == ThreeKingdomsPhase.Play && s.ActivePlayerId == c.PlayerId && !nativePending, "WrongPhase", "当前不能结束出牌阶段。");
 
-                    Require(B2Unlimited(s, c.PlayerId) || B2Protected(s, c.PlayerId) || s.Players.Single(p => p.Id == c.PlayerId).ProgressCards.Length <= 4, "ProgressHandLimit", "结束出牌阶段前须将发展卡减至四张。");
+                    Require(B2Unlimited(s, c.PlayerId) || B2Protected(s, c.PlayerId) || s.Players.Single(p => p.Id == c.PlayerId).ProgressCards.Length <= B5ProgressLimit(s,c.PlayerId), "ProgressHandLimit", "结束出牌阶段前须将发展卡减至当前上限。");
                     ThreeKingdomsEngine.AdvancePhase(tk, c.PlayerId, c.WindowId);
                     B2SkillEngine.OnEnd(host, "end-" + tk.Clock.TurnInstanceId);
                     FinishB2Work(s); RefreshB2(s); return;
@@ -114,7 +114,7 @@ namespace Catan.Core.M4
                 if (targets.Length > 0)
                 {
                     var validation = s.CopyForTransaction(); ApplyBaseRules(validation, c);
-                    foreach (var target in targets) B2SkillEngine.OnTargeted(host, c.Id, c.PlayerId, target, c.Kind == CommandKind.CommercialHarborOffer ? "CommercialHarbor" : c.ProgressCard.ToString());
+                    foreach (var target in targets) { B2SkillEngine.OnTargeted(host, c.Id, c.PlayerId, target, c.Kind == CommandKind.CommercialHarborOffer ? "CommercialHarbor" : c.ProgressCard.ToString()); B5ProgressTargeted(s,c,target); }
                     if (B2Busy(s)) { s.ThreeKingdomsDeferredCommand = Json.Copy(c); RefreshB2(s); return; }
                 }
                 ApplyB2Native(s, c);
@@ -175,6 +175,10 @@ namespace Catan.Core.M4
             var offer = s.TradeOffer;
             var pending = s.PendingDecision;
             var buildings = B2Buildings(s);
+            var boardAssets = B5(s) ? host.GetBoardAssets() : null;
+            var progressBefore = B5(s) ? s.Players.ToDictionary(p=>p.Id,p=>p.ProgressCards.ToArray()) : null;
+            var tilesBefore = B5(s) ? s.Tiles.ToDictionary(t=>t.Id,t=>t.Resource+":"+t.Number) : null;
+            B5ValidateNative(s, c);
             Require(!B4(s)||c.Kind!=CommandKind.BuildSettlement||!B2SkillEngine.IsB4SettlementForbidden(s.ThreeKingdoms,c.PlayerId),"SettlementForbidden","劫营期间不能建设村庄。");
             Require(!B4(s)||c.Kind!=CommandKind.PlayProgressCard||!B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,c.PlayerId),"HandLossForbidden","本出牌阶段不能使用发展牌。");
             Require(!B3(s) || c.Kind != CommandKind.PlayProgressCard || c.ProgressCard != ProgressCardKind.Alchemy || s.ThreeKingdoms.Dice?.FixedResult == null, "FixedDiceLocked", "直谏已固定本回合骰局，不能再使用炼金术士。");
@@ -207,7 +211,7 @@ namespace Catan.Core.M4
                 return new B2HandChange { PlayerId = p.Id, BeforeCount = remainingBefore[p.Id].Sum(), AfterCount = after.Sum(), LostCount = lost, GivenCount = given,
                     LostCards = lostCards,
                     GainedCards = gainedCards,
-                    LostProgressCount = B4(s)&&!virtualCard&&p.Id==c.PlayerId&&(c.Kind==CommandKind.PlayProgressCard||c.Kind==CommandKind.DiscardProgressCard)?1:0,
+                    LostProgressCount = B5(s)?Math.Max(0,progressBefore[p.Id].Length-p.ProgressCards.Length):B4(s)&&!virtualCard&&p.Id==c.PlayerId&&(c.Kind==CommandKind.PlayProgressCard||c.Kind==CommandKind.DiscardProgressCard)?1:0,
                     SourcePlayerId = B4(s)&&given>0&&offer!=null?(p.Id==offer.ProposerId?c.PlayerId:offer.ProposerId):null };
             }).ToArray();
             if (c.Kind == CommandKind.DiscardResources || c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressSabotage")
@@ -239,6 +243,7 @@ namespace Catan.Core.M4
                 changes = changes.Where(change => !exchange.Any(x => x.PlayerId == change.PlayerId)).Concat(exchange).ToArray();
             }
             B2SkillEngine.OnCardsMoved(host, "native-" + c.Id, changes);
+            if(B5(s)&&c.Kind==CommandKind.StealResource)B2SkillEngine.OnB5RaidResolved(host,"raid-"+c.Id,false,false,changes.Any(x=>x.LostCount>0),s.RobberTileId);
             if(B4(s)&&c.Kind==CommandKind.AcceptTrade&&s.B4TradeConversionHistoryIds!=null)
             {
                 foreach(var eventId in s.B4TradeConversionHistoryIds)B4SkillHistoryEngine.LinkCardFlow(s.ThreeKingdoms,eventId,"native-"+c.Id,changes);
@@ -252,6 +257,10 @@ namespace Catan.Core.M4
                 foreach (var entry in B2Buildings(s).Where(x => !buildings.ContainsKey(x.Key)))
                     B2SkillEngine.OnBuilt(host, "build-" + c.Id + "-" + entry.Key, entry.Value.Item1, entry.Value.Item2);
             if (c.Kind == CommandKind.PlayProgressCard) s.ThreeKingdomsProgressUse = new[] { "progress-" + c.Id, c.PlayerId, s.ThreeKingdoms.Generals.Single(g => g.Region == GeneralRegion.Active && g.OwnerPlayerId == c.PlayerId).TenureId };
+            B5RecordNativeConstruction(s, c, boardAssets, payments);
+            B5ReportProgressChanges(s,c,before,boardAssets,progressBefore,tilesBefore);
+            if (B5(s) && c.Kind == CommandKind.PlayProgressCard)
+                B2SkillEngine.OnCivilPaid(host, c.Id, c.PlayerId, Array.Empty<int>(), c.ProgressCard.ToString());
             s.ThreeKingdomsNativePayments = null;
             s.B4SkillHandDelta=outerSkillDelta;
             if(outerSkillDelta!=null) foreach(var player in s.Players) {var after=host.GetHand(player.Id);for(int i=0;i<8;i++)outerSkillDelta[player.Id][i]+=after[i]-before[player.Id][i];}
@@ -280,11 +289,12 @@ namespace Catan.Core.M4
             }
             if (c.ProgressCard == ProgressCardKind.Wedding || c.ProgressCard == ProgressCardKind.Sabotage)
                 return ProgressTurnOrder(s).Where(p => p.Id != c.PlayerId && (c.ProgressCard == ProgressCardKind.Wedding ? VictoryPoints(s, p.Id, true) > VictoryPoints(s, c.PlayerId, true) : VictoryPoints(s, p.Id, true) >= VictoryPoints(s, c.PlayerId, true))).Select(p => p.Id).ToArray();
-            if (c.ProgressCard == ProgressCardKind.ResourceMonopoly || c.ProgressCard == ProgressCardKind.TradeMonopoly)
+            if (c.ProgressCard == ProgressCardKind.ResourceMonopoly || c.ProgressCard == ProgressCardKind.TradeMonopoly || B5(s)&&c.ProgressCard==ProgressCardKind.CommercialHarbor)
                 return ProgressTurnOrder(s).Where(p => p.Id != c.PlayerId).Select(p => p.Id).ToArray();
             if (c.ProgressCard == ProgressCardKind.Taxation) return Buildings(s).Where(b => b.PlayerId != c.PlayerId && s.Tiles.Any(t => t.Id == c.TargetId && t.Vertices.Contains(b.LocationId))).Select(b => b.PlayerId).Distinct().ToArray();
-            if (c.ProgressCard == ProgressCardKind.Diplomacy) return s.Roads.Where(r => r.LocationId == c.TargetId && r.PlayerId != c.PlayerId).Select(r => r.PlayerId).ToArray();
+            if (c.ProgressCard == ProgressCardKind.Diplomacy) return s.Roads.Where(r => r.LocationId == c.TargetId && (B5(s)||r.PlayerId != c.PlayerId)).Select(r => r.PlayerId).ToArray();
             if (c.ProgressCard == ProgressCardKind.Intrigue) return s.Knights.Where(k => k.LocationId == c.TargetId && k.PlayerId != c.PlayerId).Select(k => k.PlayerId).ToArray();
+            if (B5(s)) return new[] { c.PlayerId };
             return Array.Empty<string>();
         }
 
@@ -298,6 +308,7 @@ namespace Catan.Core.M4
                 tk.BankTradeRates=Enumerable.Range(0,8).Select(i=>i<5?TradeRate(state,view.PlayerId,(Resource)i):CommodityTradeRate(state,view.PlayerId,(Commodity)(i-5))).ToArray();
             }
             B2SkillEngine.Project(CardHost(state), tk, view.PlayerId);
+            if(B5(state))tk.BoardAssets=CardHost(state).GetBoardAssets().Where(a=>a.Damaged||a.Kind=="Knight"&&a.Level!=a.EffectiveLevel).ToArray();
             if (B3(state) && state.ThreeKingdoms.Skills.PendingDecision == null) B3DiceEngine.Project(CardHost(state), tk, view.PlayerId);
             ProjectB4Automation(view, tk);
             // 换将会暂挂原技能帧；产品视图只开放最上层生命周期决策。

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -157,7 +157,7 @@ namespace Catan.Core.M4
                     WinnerPlayerId = state.WinnerPlayerId, LastDice1 = state.LastDice1, LastDice2 = state.LastDice2, Events = Json.Copy(state.Events),
                     OwnCommodities = own.Commodities.Copy(), OwnImprovements = own.Improvements.ToArray(), CommodityBank = state.CommodityBank.Copy(),
                     BarbarianPosition = state.BarbarianPosition, FirstBarbarianAttack = state.FirstBarbarianAttack, LastEventDie = state.LastEventDie,
-                    DefenderStrength = state.BarbarianDefenseStrength ?? state.Knights.Where(k => k.Active).Sum(k => k.Level),
+                    DefenderStrength = state.BarbarianDefenseStrength ?? state.Knights.Where(k => k.Active || B5(state)&&B2SkillEngine.B5AlwaysActiveKnights(state.ThreeKingdoms,k.PlayerId)).Sum(k => B5KnightLevel(state,k)),
                     BarbarianStrength = state.BarbarianAttackStrength ?? state.Cities.Length
                 };
                 if(view.TradeOffer!=null) { view.TradeOffer.B4RealGive=null;view.TradeOffer.B4ConversionPayment=false;view.TradeOffer.B4DeclarationHistoryEventId=null; }
@@ -225,7 +225,7 @@ namespace Catan.Core.M4
             if (c.Kind == CommandKind.ProposeTrade) { ProposeTrade(s, p, c); return; }
             if (ApplyProgressCommand(s, p, c)) return;
             if (c.Kind == CommandKind.ResolveChoice) { ResolveChoice(s,p,c); return; }
-            Require(s.ActivePlayerId == c.PlayerId, "NotActivePlayer", "请由当前回合的玩家操作。");
+            Require(s.ActivePlayerId == c.PlayerId || B5(s)&&B5Board(s).TokenController==c.PlayerId&&(c.Kind==CommandKind.MoveRobber||c.Kind==CommandKind.StealResource), "NotActivePlayer", "请由当前回合的玩家操作。");
             switch (c.Kind)
             {
                 case CommandKind.SetupSettlement:
@@ -254,18 +254,18 @@ namespace Catan.Core.M4
                 case CommandKind.BankTrade:
                     ActionPhase(s); BankTrade(s,p,c); break;
                 case CommandKind.MoveRobber:
-                    Require(s.Phase == GamePhase.RobberMove && s.PendingDecision != null, "WrongPhase", "当前不需要移动强盗。");
+                    Require(s.Phase == GamePhase.RobberMove && s.PendingDecision != null && (!B5(s)||s.PendingDecision.PlayerId==p.Id), "WrongPhase", "当前不需要移动强盗。");
                     var destination = scenario.Topology.Tiles.FirstOrDefault(x => x.Id == c.TargetId); Require(destination != null && destination.Id != s.RobberTileId, "InvalidRobberTile", "强盗必须移动到另一地块。");
-                    s.RobberTileId = destination.Id;
+                    s.RobberTileId = destination.Id; B2SkillEngine.OnB5RobberMoved(s.ThreeKingdoms,destination.Id);
                     s.PendingDecision.EligibleVictimIds = Buildings(s).Where(b => b.PlayerId != p.Id && destination.Vertices.Contains(b.LocationId)).Select(b => b.PlayerId).Distinct().OrderBy(x => x).ToArray();
                     if (s.PendingDecision.EligibleVictimIds.Length == 0) FinishDecision(s); else { s.PendingDecision.Kind = "Steal"; s.Phase = GamePhase.RobberSteal; } break;
                 case CommandKind.StealResource:
-                    Require(s.Phase == GamePhase.RobberSteal && s.PendingDecision != null && s.PendingDecision.EligibleVictimIds.Contains(c.OtherPlayerId), "InvalidVictim", "请选择强盗旁的另一位玩家。");
+                    Require(s.Phase == GamePhase.RobberSteal && s.PendingDecision != null && (!B5(s)||s.PendingDecision.PlayerId==p.Id) && s.PendingDecision.EligibleVictimIds.Contains(c.OtherPlayerId), "InvalidVictim", "请选择强盗旁的另一位玩家。");
                     var victim = s.Players.Single(x => x.Id == c.OtherPlayerId);
                     StealHandCard(s,p,victim);
                     FinishDecision(s); break;
                 case CommandKind.EndTurn:
-                    ActionPhase(s); Require((B2Unlimited(s,p.Id)||B2Protected(s,p.Id)||p.ProgressCards.Length<=4),"ProgressHandLimit","结束回合前须将发展卡减至四张。"); ClearProgressTurn(s); s.ActivePlayerId = s.Players[(Array.FindIndex(s.Players, x => x.Id == p.Id) + 1) % s.Players.Length].Id; s.Turn++; s.Phase = GamePhase.ProductionAwaitRoll; break;
+                    ActionPhase(s); Require((B2Unlimited(s,p.Id)||B2Protected(s,p.Id)||p.ProgressCards.Length<=B5ProgressLimit(s,p.Id)),"ProgressHandLimit","结束回合前须将发展卡减至当前上限。"); ClearProgressTurn(s); s.ActivePlayerId = s.Players[(Array.FindIndex(s.Players, x => x.Id == p.Id) + 1) % s.Players.Length].Id; s.Turn++; s.Phase = GamePhase.ProductionAwaitRoll; break;
                 case CommandKind.BuildWall: ActionPhase(s); BuildWall(s,p,c.TargetId); break;
                 case CommandKind.ImproveCity: ActionPhase(s); BuildImprovement(s,p,c.Track); break;
                 case CommandKind.RecruitKnight: ActionPhase(s); RecruitKnight(s,p,c.TargetId); break;
@@ -281,19 +281,21 @@ namespace Catan.Core.M4
 
         private void ValidateSettlement(GameState s, PlayerState p, string vertex, bool setup)
         {
+            if(!setup)B5ValidateNative(s,new Command{PlayerId=p.Id,Kind=CommandKind.BuildSettlement,TargetId=vertex});
             Require(scenario.Topology.Vertices.Any(v => v.Id == vertex), "UnknownVertex", "请选择有效顶点。");
             Require(p.Pieces.Settlements > 0, "NoSettlements", "村庄库存不足。");
             Require(!Occupied(s,vertex), "OccupiedVertex", "这个顶点已有建筑或骑士。");
             Require(!scenario.Topology.Edges.Where(e => e.Vertices.Contains(vertex)).Any(e => Buildings(s).Any(b => e.Vertices.Contains(b.LocationId))), "DistanceRule", "村庄之间必须至少间隔两条边。");
-            if (!setup) Require(s.Roads.Any(r => r.PlayerId == p.Id && EdgeAt(r.LocationId).Vertices.Contains(vertex)), "DisconnectedSettlement", "村庄必须连接自己的道路。");
+            if (!setup) Require(s.Roads.Any(r => r.PlayerId == p.Id && B5Working(s,"Road",r.LocationId) && EdgeAt(r.LocationId).Vertices.Contains(vertex)), "DisconnectedSettlement", "村庄必须连接自己的道路。");
         }
         private void ValidateRoad(GameState s, PlayerState p, string edge, string anchor)
         {
+            if(anchor==null)B5ValidateNative(s,new Command{PlayerId=p.Id,Kind=CommandKind.BuildRoad,TargetId=edge});
             var location = scenario.Topology.Edges.FirstOrDefault(e => e.Id == edge); Require(location != null, "UnknownEdge", "请选择有效道路边。");
             Require(p.Pieces.Roads > 0, "NoRoads", "道路库存不足。"); Require(!s.Roads.Any(r => r.LocationId == edge), "OccupiedEdge", "这条边已有道路。");
             if (anchor != null) Require(location.Vertices.Contains(anchor), "RoadNotAtAnchor", "开局道路必须连接刚放置的村庄。");
             else Require(location.Vertices.Any(v => Buildings(s).Any(b => b.LocationId == v && b.PlayerId == p.Id) ||
-                (!Blocked(s,p.Id,v) && s.Roads.Any(r => r.PlayerId == p.Id && EdgeAt(r.LocationId).Vertices.Contains(v)))), "DisconnectedRoad", "道路必须连接己方建筑或未被对方建筑与骑士截断的道路。");
+                (!Blocked(s,p.Id,v) && s.Roads.Any(r => r.PlayerId == p.Id && B5Working(s,"Road",r.LocationId) && EdgeAt(r.LocationId).Vertices.Contains(v)))), "DisconnectedRoad", "道路必须连接己方建筑或未被对方建筑与骑士截断的道路。");
         }
         private bool HasLegalRoad(GameState s, PlayerState p)
         {
@@ -301,7 +303,7 @@ namespace Catan.Core.M4
         }
         private static void PlaceSettlement(GameState s, PlayerState p, string vertex) { s.Settlements = Append(s.Settlements, Placement(vertex, p.Id)); p.Pieces.Settlements--; }
         private static void PlaceRoad(GameState s, PlayerState p, string edge) { s.Roads = Append(s.Roads, Placement(edge, p.Id)); p.Pieces.Roads--; }
-        private static void FinishDecision(GameState s) { s.Phase = s.PendingDecision.ReturnPhase; s.PendingDecision = null; }
+        private static void FinishDecision(GameState s) { s.Phase = s.PendingDecision.ReturnPhase; s.PendingDecision = null;if(B5(s))B5Board(s).TokenController=null; }
         private void Produce(GameState s, int total)
         {
             foreach (var resource in Resources)
@@ -420,7 +422,7 @@ namespace Catan.Core.M4
         }
         private int LongestRoad(GameState s, string playerId)
         {
-            var roads = s.Roads.Where(r => r.PlayerId == playerId).Select(r => EdgeAt(r.LocationId)).ToArray();
+            var roads = s.Roads.Where(r => r.PlayerId == playerId && B5Working(s,"Road",r.LocationId)).Select(r => EdgeAt(r.LocationId)).ToArray();
             var blocked = new HashSet<string>(Buildings(s).Where(b => b.PlayerId != playerId).Select(b => b.LocationId).Concat(s.Knights.Where(k=>k.PlayerId!=playerId).Select(k=>k.LocationId)));
             var used = new HashSet<string>();
             int Walk(string vertex, bool arrived)
@@ -447,8 +449,8 @@ namespace Catan.Core.M4
         }
         private static int VictoryPoints(GameState s, string player, bool includeHidden)
         {
-            return s.Settlements.Count(b => b.PlayerId == player) + 2 * s.Cities.Count(b => b.PlayerId == player) + (s.LongestRoadPlayerId == player ? 2 : 0)
-                + 2*s.Metropolises.Count(m=>m.PlayerId==player)+s.Players.Single(p=>p.Id==player).DefenderPoints+s.Players.Single(p=>p.Id==player).ProgressVictoryCards.Length+(s.MerchantPlayerId==player?1:0);
+            return Math.Max(0,B5BoardRules.Score(s.ThreeKingdoms,player)+(B5(s)?B2SkillEngine.B5MilitaryScoreAdjustment(s.ThreeKingdoms,player):0)+s.Settlements.Count(b => b.PlayerId == player && B5Working(s,"Settlement",b.LocationId)) + 2 * s.Cities.Count(b => b.PlayerId == player) + (s.LongestRoadPlayerId == player ? 2 : 0)
+                + 2*s.Metropolises.Count(m=>m.PlayerId==player)+s.Players.Single(p=>p.Id==player).DefenderPoints+s.Players.Single(p=>p.Id==player).ProgressVictoryCards.Length+(s.MerchantPlayerId==player?1:0));
         }
         private static void CheckVictory(GameState s)
         {
@@ -490,14 +492,14 @@ namespace Catan.Core.M4
             Check(s.Discards.Select(d => d.PlayerId).Distinct().Count() == s.Discards.Length && s.Discards.All(d => d.Amount > 0 && s.Players.Any(p => p.Id == d.PlayerId && (B2(s) || HandCount(p) / 2 == d.Amount))), "Invalid discard obligation.");
             if (s.PendingDecision != null)
             {
-                Check(s.Phase==GamePhase.PendingChoice?s.Players.Any(p=>p.Id==s.PendingDecision.PlayerId):s.PendingDecision.PlayerId == s.ActivePlayerId, "Pending actor mismatch.");
+                Check(s.Phase==GamePhase.PendingChoice?s.Players.Any(p=>p.Id==s.PendingDecision.PlayerId):s.PendingDecision.PlayerId == s.ActivePlayerId || B5(s)&&B5Board(s).TokenController==s.PendingDecision.PlayerId, "Pending actor mismatch.");
                 if (s.Phase == GamePhase.SetupRoad) Check(s.PendingDecision.Kind == "SetupRoad" && Buildings(s).Any(b => b.PlayerId == s.ActivePlayerId && b.LocationId == s.PendingDecision.AnchorVertexId), "Invalid setup road anchor.");
                 else if(s.Phase!=GamePhase.PendingChoice) Check(s.PendingDecision.ReturnPhase == GamePhase.Action || s.PendingDecision.ReturnPhase == GamePhase.ProductionAwaitRoll, "Invalid decision return phase.");
                 if (s.Phase == GamePhase.RoadBuilding) Check(s.PendingDecision.RemainingRoads >= 1 && s.PendingDecision.RemainingRoads <= 2, "Invalid free road allowance.");
                 if (s.Phase == GamePhase.RobberSteal)
                 {
                     var tile = scenario.Topology.Tiles.Single(t => t.Id == s.RobberTileId);
-                    var victims = Buildings(s).Where(b => b.PlayerId != s.ActivePlayerId && tile.Vertices.Contains(b.LocationId)).Select(b => b.PlayerId).Distinct().OrderBy(x => x).ToArray();
+                    var victims = Buildings(s).Where(b => b.PlayerId != (B5(s)&&B5Board(s).TokenController!=null?B5Board(s).TokenController:s.ActivePlayerId) && tile.Vertices.Contains(b.LocationId)).Select(b => b.PlayerId).Distinct().OrderBy(x => x).ToArray();
                     Check(victims.Length > 0 && victims.SequenceEqual(s.PendingDecision.EligibleVictimIds), "Invalid robber victim selection.");
                 }
             }

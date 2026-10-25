@@ -98,7 +98,7 @@ public sealed class ThreeKingdomsB4RoomTests
             if(own==null)
             {
                 dynamic view=rules=="combined"?(object)WireJson.Deserialize<M5.PlayerView>(snapshots[0].ViewJson):WireJson.Deserialize<M4.PlayerView>(snapshots[0].ViewJson);
-                string actor=view.Discards.Length>0?view.Discards[0].PlayerId:view.PendingDecision?.PlayerId??view.ActivePlayerId;
+                string actor=view.Discards.Length>0?view.Discards[0].PlayerId:view.TradeOffer?.NextResponder()??view.PendingDecision?.PlayerId??view.ActivePlayerId;
                 own=snapshots.Single(s=>s.SeatId==actor);
             }
             var command=f.Decide(own);
@@ -131,18 +131,21 @@ public sealed class ThreeKingdomsB4RoomTests
         public void Delete(string id)=>Documents.Remove(id);
         public void Dispose(){}
     }
-    private sealed class Fixture:IDisposable
+    internal sealed class Fixture:IDisposable
     {
         readonly MemoryStorage storage=new();readonly string rules;readonly string scenario=File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"scenario.json"));
+        readonly string packageVersion;readonly string packageHash;
         public RoomDirectory Directory;public NetworkResponse[] Clients;
         public readonly List<NetworkRequest> JoinRequests=new();
         public string GameSave=>JsonDocument.Parse(storage.Documents.Values.Single()).RootElement.GetProperty("GameSave").GetString()!;
-        public Fixture(string rules,int count,string[]? ai=null)
+        public Fixture(string rules,int count,string[]? ai=null,string? package=null)
         {
+            packageVersion=package??GeneralCatalog.B4PackageVersion;
+            packageHash=packageVersion==GeneralCatalog.B5PackageVersion?GeneralCatalog.B5ContentHash:GeneralCatalog.B4ContentHash;
             this.rules=rules;Directory=new RoomDirectory(storage,scenario);
             var create=Request("Create",null);create.Payload=WireJson.Serialize(new CreateRoomPayload { Settings=new RoomSettings { RuleSet=rules,
                 ScenarioId=rules=="combined"?"heading-for-new-shores":"base",PlayerCount=count,AiSeats=ai??[],
-                ThreeKingdomsPackageVersion=GeneralCatalog.B4PackageVersion,ThreeKingdomsContentHash=GeneralCatalog.B4ContentHash }});
+                ThreeKingdomsPackageVersion=packageVersion,ThreeKingdomsContentHash=packageHash }});
             var owner=Directory.Handle(create);Assert.True(owner.Success,owner.Code+":"+owner.Message);
             var clients=new List<NetworkResponse>{owner};
             for(int i=1;i<count-(ai?.Length??0);i++){var join=Request("Join",owner);join.Payload=WireJson.Serialize(new JoinRoomPayload());join.EnrollmentId=Guid.NewGuid().ToString("N");join.EnrollmentCredential=Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));JoinRequests.Add(join);var joined=Directory.Handle(join);Assert.True(joined.Success,joined.Message);joined.Credential=join.EnrollmentCredential;clients.Add(joined);}
@@ -152,7 +155,7 @@ public sealed class ThreeKingdomsB4RoomTests
         }
         public NetworkRequest Request(string operation,NetworkResponse? client)=>new(){Operation=operation,RoomId=client?.RoomId,Credential=client?.Credential,ConnectionId=client?.ConnectionId,
             RuleSet=rules,ExpectedRevision=client?.Revision??0,ExpectedRulesVersion=NetworkProtocol.RulesVersion(rules),ExpectedScenarioVersion=NetworkProtocol.ScenarioVersion(rules),
-            ExpectedThreeKingdomsPackageVersion=GeneralCatalog.B4PackageVersion,ExpectedThreeKingdomsContentHash=GeneralCatalog.B4ContentHash};
+            ExpectedThreeKingdomsPackageVersion=packageVersion,ExpectedThreeKingdomsContentHash=packageHash};
         public NetworkResponse Snapshot(NetworkResponse client){var response=Directory.Handle(Request("Get",client));response.Credential=client.Credential;return response;}
         public ThreeKingdomsView Tk(NetworkResponse response)=>rules=="combined"?WireJson.Deserialize<M5.PlayerView>(response.ViewJson).ThreeKingdoms:WireJson.Deserialize<M4.PlayerView>(response.ViewJson).ThreeKingdoms;
         public object Decide(NetworkResponse response)

@@ -16,6 +16,8 @@ namespace Catan.AI
             {
                 if (!required)
                 {
+                    // 可支付的修复恢复既有资产，完成后该合法动作消失，不构成循环。
+                    if (c.Option == "b5-repair") return 15;
                     // 仁德不限次是规则；本策略暂不主动赠牌，避免无限赠予循环。
                     if (c.Option == "gift" || c.Option == "exchange-progress") return double.NegativeInfinity;
                     if (c.Option == "discard") return hand.Sum() == 1 ? 15 : double.NegativeInfinity;

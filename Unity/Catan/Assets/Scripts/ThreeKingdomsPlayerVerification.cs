@@ -64,7 +64,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             app.StartGame(mode,"heading-for-new-shores",players,"P1",true,threeKingdoms:true);
             yield return null;yield return null;
             Require(app.Ready&&app.ThreeKingdoms&&app.Paused&&View!=null,"三国开关没有进入本地权威局面。");
-            Require(View.SkillsEnabled&&View.PackageVersion==GeneralCatalog.B4PackageVersion&&GeneralCatalog.B4Definitions.Length==30,"新局没有使用完整 B4 三十将包。");
+            Require(View.SkillsEnabled&&View.PackageVersion==GeneralCatalog.B5PackageVersion&&GeneralCatalog.B5Definitions.Length==49,"新局没有使用完整 B5 四十九将包。");
             result.packageVersion=View.PackageVersion;
             int budget=0;
             while(View.PendingDecision?.PlayerId!=app.HumanSeat)
@@ -91,7 +91,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             stage=prefix+" 出牌阶段";
             string stageBefore=SaveAndRestore(prefix+"-阶段");yield return null;yield return null;AssertRestored(stageBefore);
             Require(View.Players.All(p=>p.ActiveGeneralId!=null&&p.RemainingLife==3)&&View.Players.All(p=>p.HiddenCount==1),"首轮公开武将与暗置数量不正确。");
-            Require(View.PoolCount==30-players*2,"正常选将没有保留 B4 三十将实体总数。");
+            Require(View.PoolCount==49-players*2,"正常选将没有保留 B5 四十九将实体总数。");
             app.VerificationOpenThreeKingdomsPanel();yield return null;
             if(result.graphics){BeginCapture(prefix+"-public-life.png");for(int frame=0;target!=null&&frame<12;frame++)yield return null;EndCapture();}
             for(int repeat=0;repeat<2;repeat++)
@@ -106,12 +106,16 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
                 }
                 Require(View.Clock.Phase==ThreeKingdomsPhase.Play&&View.CanRetire,"轮换没有返回原出牌阶段或错误限制重复隐退。");
             }
-            stage=prefix+" 技能选择";budget=0;
+            stage=prefix+" 技能选择";budget=0;int skillSearchRetirements=0;
             while(!app.IsHumanTurn||View.SkillActions==null||View.SkillActions.Length==0)
             {
                 Require(++budget<1500,"正常对局未在预算内出现人类技能选项。");
                 while(app.TableDiceRolling||app.TablePresentationBlocked)yield return null;
-                Advance();yield return null;
+                // 正常候选可能连续出现纯被动武将；使用产品允许的轮换查找可操作技能，避免为一次按钮验证跑完整局。
+                if(View.CanRetire&&View.Clock.ActivePlayerId==app.HumanSeat&&View.SkillDecision==null&&View.PendingDecision==null&&skillSearchRetirements<12)
+                {Retire();skillSearchRetirements++;result.retirements++;}
+                else Advance();
+                yield return null;
             }
             string skillBefore=SaveAndRestore(prefix+"-技能");yield return null;yield return null;AssertRestored(skillBefore);
             app.VerificationOpenThreeKingdomsPanel();yield return null;

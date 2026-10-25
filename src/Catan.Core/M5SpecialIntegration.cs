@@ -123,7 +123,7 @@ namespace Catan.Core.M5
         }
         private void EndSpecialTurn(GameState s,PlayerState p)
         {
-            Require((B2Unlimited(s,p.Id)||B2Protected(s,p.Id)||p.ProgressCards.Length<=4),"ProgressHandLimit","结束回合前须将进步卡减至四张。");
+            Require((B2Unlimited(s,p.Id)||B2Protected(s,p.Id)||p.ProgressCards.Length<=B5ProgressLimit(s,p.Id)),"ProgressHandLimit","结束回合前须将进步卡减至当前上限。");
             if(seafaring.Id=="pirate-islands"&&CanAttackFortress(s,p.Id)){AttackFortress(s,p);CheckVictory(s);if(s.Phase==GamePhase.Finished)return;}
             if(s.Special!=null&&s.Special.Villages.Count(v=>v.Cloth==0)>=5) {
                 int best=s.Players.Max(x=>VictoryPoints(s,x.Id,true));var leaders=s.Players.Where(x=>VictoryPoints(s,x.Id,true)==best).ToArray();int cloth=leaders.Max(x=>x.Cloth);
@@ -144,26 +144,27 @@ namespace Catan.Core.M5
         private void SpecialProduction(GameState s)
         {
             if(s.Special==null)return;
-            int total=s.LastDice1+s.LastDice2;
+            int total=B5FinalDiceTotal(s);
             if(seafaring.Id=="pirate-islands"&&s.FirstBarbarianAttack&&s.PirateTileId!=null) {
-                int power=Math.Min(s.LastDice1,s.LastDice2);s.Special.LastPirateStrength=power;
+                bool b5RaidLoss=false;int power=Math.Min(s.LastDice1,s.LastDice2);s.Special.LastPirateStrength=power;
                 s.PirateTileId=seafaring.PiratePath[(Array.IndexOf(seafaring.PiratePath,s.PirateTileId)+power)%seafaring.PiratePath.Length];
                 var tile=s.Tiles.Single(t=>t.Id==s.PirateTileId);
                 foreach(var p in TurnOrder(s).Where(p=>Buildings(s).Any(b=>b.PlayerId==p.Id&&tile.Vertices.Contains(b.LocationId)))) {
                     var beforePirateLoss=B3(s)?CardHost(s).GetHand(p.Id):null;
-                    int fleet=s.Ships.Count(x=>x.PlayerId==p.Id&&x.IsWarship);
+                    int fleet=s.Ships.Count(x=>x.PlayerId==p.Id&&x.IsWarship&&B5Working(s,"Ship",x.LocationId));
                     if(fleet>power)AddGold(s,p.Id,1);
-                    else if(fleet<power&&!B2Protected(s,p.Id)&&!B3Immune(s,p.Id))for(int i=0;i<1+s.Cities.Count(c=>c.PlayerId==p.Id)&&HandCount(p)>0;i++) {
+                    else if(fleet<power&&!B2Protected(s,p.Id)&&!B3Immune(s,p.Id)&&!Catan.Core.ThreeKingdoms.B2SkillEngine.B5RobberPirateImmune(s.ThreeKingdoms,p.Id))for(int i=0;i<1+s.Cities.Count(c=>c.PlayerId==p.Id)&&HandCount(p)>0;i++) {
                         int index=Draw(s.Random,HandCount(p));bool removed=false;
                         foreach(var r in Resources){if(index<p.Resources[r]){Transfer(p.Resources,s.Bank,r,1);removed=true;break;}index-=p.Resources[r];}
                         if(!removed)foreach(var r in Commodities){if(index<p.Commodities[r]){Transfer(p.Commodities,s.CommodityBank,r,1);break;}index-=p.Commodities[r];}
                     }
                     if(beforePirateLoss!=null) {
                         var afterPirateLoss=CardHost(s).GetHand(p.Id);
-                        var returned=Enumerable.Range(0,8).Select(i=>Math.Max(0,beforePirateLoss[i]-afterPirateLoss[i])).ToArray();
+                        var returned=Enumerable.Range(0,8).Select(i=>Math.Max(0,beforePirateLoss[i]-afterPirateLoss[i])).ToArray();b5RaidLoss|=returned.Sum()>0;
                         Catan.Core.ThreeKingdoms.B2SkillEngine.HoldReturnedCards(CardHost(s),p.Id,"discard","dice-"+s.ThreeKingdoms.Clock.TurnInstanceId+"-pirate",returned);
                     }
                 }
+                if(B5(s))Catan.Core.ThreeKingdoms.B2SkillEngine.OnB5RaidResolved(CardHost(s),"pirate-islands-"+s.ThreeKingdoms.Clock.TurnInstanceId,false,false,b5RaidLoss,null);
             }
             if(total==7)return;
             foreach(var v in s.Special.Villages.Where(v=>v.Number==total&&v.Cloth>0))foreach(var p in TurnOrder(s).Where(p=>v.TradingPlayerIds.Contains(p.Id))) {

@@ -16,6 +16,12 @@ namespace Catan.Core.M4
         private static bool B3PendingImmune(GameState s, PendingDecision decision)
         {
             if (decision == null) return false;
+            if(B5(s))
+            {
+                var target=decision.Kind=="ProgressEspionage"||decision.Kind=="ProgressGuildDues"?decision.OtherPlayerId:
+                    decision.Kind=="ProgressWedding"||decision.Kind=="ProgressSabotage"||decision.Kind=="ProgressTreasonRemove"?decision.PlayerId:null;
+                if(target!=null&&B5ProgressImmune(s,target))return true;
+            }
             if(B4(s))
             {
                 var losing=decision.Kind=="ProgressHarbor"||decision.Kind=="ProgressWedding"||decision.Kind=="ProgressSabotage"?decision.PlayerId:

@@ -11,6 +11,7 @@ namespace Catan.Core.ThreeKingdoms
             var command=action?.Command;
             if(command?.Option=="b4-revealed"&&revealedCards?.Length==8)return (int[])revealedCards.Clone();
             if(command?.Option=="raid"&&command.Counts?.Length==8)return (int[])command.Counts.Clone();
+            if(command?.Option=="b5-repair"&&command.Counts?.Length==8)return (int[])command.Counts.Clone();
             var cards=new int[8];int type=RealCardType(action);
             if(type>=0&&type<8)cards[type]=action?.CardSelectionKind=="select"?1:Math.Max(1,command?.Counts?.ElementAtOrDefault(type)??0);
             return cards;

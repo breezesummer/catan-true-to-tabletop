@@ -24,7 +24,7 @@ namespace Catan.Core.ThreeKingdoms
     // 只管理主动技能的首次提示与可保存的换将意图，强制/事件技能仍使用原效果队列。
     public static class B4AutomationEngine
     {
-        public static bool Enabled(ThreeKingdomsState s) => s?.RulesVersion == GeneralCatalog.B4RulesVersion;
+        public static bool Enabled(ThreeKingdomsState s) => ThreeKingdomsEngine.UsesB4Lifecycle(s);
         public static B4AutomationState Clone(B4AutomationState a) => a == null ? null : new B4AutomationState {
             TurnId = a.TurnId, Asked = (string[])a.Asked.Clone(), PendingSkillId = a.PendingSkillId,
             PendingTenureId = a.PendingTenureId, Accepted = a.Accepted,
@@ -57,7 +57,7 @@ namespace Catan.Core.ThreeKingdoms
             var action=(view.SkillActions??Array.Empty<B2SkillAction>()).FirstOrDefault(x => !string.IsNullOrEmpty(x.Command.SkillId) &&
                 !a.Asked.Contains(Key(s,general.TenureId,x.Command.SkillId)));
             if (action==null) return false;
-            var skill=GeneralCatalog.Get(general.GeneralId).Skills.First(x => x.Id==action.Command.SkillId);
+            var skill=GeneralCatalog.Definitions.SelectMany(g=>g.Skills).First(x => x.Id==action.Command.SkillId);
             a.PendingSkillId=skill.Id; a.PendingTenureId=general.TenureId;
             a.PendingDecision=new B2SkillDecision { PlayerId=owner,DecisionId=Id(s),WindowId=s.WindowId,
                 Kind="automation-offer",Title="是否发动"+skill.Name,Description="发动后选择目标或费用；放弃本次提示后仍可从技能入口发动。" };

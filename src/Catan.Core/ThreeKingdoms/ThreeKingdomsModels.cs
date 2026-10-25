@@ -109,6 +109,9 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=30, EmitDefaultValue=false)] public B4SkillHistoryEvent[] SkillHistory { get; set; }
         [DataMember(Order=31, EmitDefaultValue=false)] public B4ResponseState Response { get; set; }
         [DataMember(Order=40, EmitDefaultValue=false)] public B4AutomationState Automation { get; set; }
+        [DataMember(Order=41, EmitDefaultValue=false)] public B5BoardState Board { get; set; }
+        [DataMember(Order=42, EmitDefaultValue=false)] public B5MilitaryState Military { get; set; }
+        [DataMember(Order=43, EmitDefaultValue=false)] public B5CivilState CivilB5 { get; set; }
     }
     [DataContract] public sealed class ThreeKingdomsPlayerView
     {
@@ -144,5 +147,8 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=19, EmitDefaultValue=false)] public int[][] EffectiveCardTypes { get; set; }
         [DataMember(Order=20, EmitDefaultValue=false)] public bool HandLossForbidden { get; set; }
         [DataMember(Order=21, EmitDefaultValue=false)] public int[] BankTradeRates { get; set; }
+        [DataMember(Order=22, EmitDefaultValue=false)] public B5RevealedHand[] MilitaryHands { get; set; }
+        [DataMember(Order=23, EmitDefaultValue=false)] public int? ProgressHandLimit { get; set; }
+        [DataMember(Order=24, EmitDefaultValue=false)] public B5BoardAsset[] BoardAssets { get; set; }
     }
 }

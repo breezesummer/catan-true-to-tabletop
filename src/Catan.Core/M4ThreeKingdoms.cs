@@ -31,8 +31,8 @@ namespace Catan.Core.M4
 
         private void InitializeThreeKingdoms(GameState s, bool skillsEnabled, string packageVersion = null)
         {
-            if (skillsEnabled && packageVersion == null) packageVersion = GeneralCatalog.B4PackageVersion;
-            s.RulesVersion = skillsEnabled ? (packageVersion == GeneralCatalog.B4PackageVersion ? ThreeKingdomsB4RulesVersion : packageVersion == GeneralCatalog.B2PackageVersion ? ThreeKingdomsB2RulesVersion : ThreeKingdomsB3RulesVersion) : ThreeKingdomsRulesVersion;
+            if (skillsEnabled && packageVersion == null) packageVersion = GeneralCatalog.B5PackageVersion;
+            s.RulesVersion = skillsEnabled ? (packageVersion == GeneralCatalog.B5PackageVersion ? ThreeKingdomsB5RulesVersion : packageVersion == GeneralCatalog.B4PackageVersion ? ThreeKingdomsB4RulesVersion : packageVersion == GeneralCatalog.B2PackageVersion ? ThreeKingdomsB2RulesVersion : ThreeKingdomsB3RulesVersion) : ThreeKingdomsRulesVersion;
             var seats = Enumerable.Range(0, s.Players.Length).Select(i => s.Players[(s.StartingPlayerIndex + i) % s.Players.Length].Id).ToArray();
             s.ThreeKingdoms = ThreeKingdomsEngine.Create(seats, s.InitialSeed, maximum => Draw(s.Random, maximum), skillsEnabled, packageVersion);
         }
@@ -96,7 +96,7 @@ namespace Catan.Core.M4
                 if (c.Kind == CommandKind.EndTurn)
                 {
                     Require(tk.Clock.Phase == ThreeKingdomsPhase.Play && s.ActivePlayerId == c.PlayerId && s.PendingDecision == null && s.TradeOffer == null, "WrongPhase", "当前不能结束出牌阶段。");
-                    Require(s.Players.Single(p => p.Id == c.PlayerId).ProgressCards.Length <= 4, "ProgressHandLimit", "结束出牌阶段前须将发展卡减至四张。");
+                    Require(s.Players.Single(p => p.Id == c.PlayerId).ProgressCards.Length <= B5ProgressLimit(s,c.PlayerId), "ProgressHandLimit", "结束出牌阶段前须将发展卡减至当前上限。");
                     ThreeKingdomsEngine.AdvancePhase(tk, c.PlayerId, c.WindowId);
                     return;
                 }

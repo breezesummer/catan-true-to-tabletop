@@ -63,7 +63,7 @@ public sealed partial class M6App
     void DrawThreeKingdoms()
     {
         var view=ThreeKingdomsProjection;if(view==null)return;
-        bool automatic=view.PackageVersion==GeneralCatalog.B4PackageVersion;
+        bool automatic=GeneralCatalog.IsAutomaticPackage(view.PackageVersion);
         if(threeKingdomsSkillDraft!=null&&threeKingdomsSkillDraft.WindowId!=view.WindowId)threeKingdomsSkillDraft=null;
         var pending=view.PendingDecision;
         bool ownChoice=pending!=null&&pending.PlayerId==HumanSeat;
@@ -147,6 +147,12 @@ public sealed partial class M6App
     void DrawGeneralLibrary(ThreeKingdomsView view)
     {
         var statuses=view.SkillStatus??Array.Empty<string>();
+        if(view.BoardAssets!=null)statuses=statuses.Concat(view.BoardAssets.Where(a=>a.Damaged||a.Kind=="Knight"&&a.Level!=a.EffectiveLevel)
+            .Select(a=>PlayerDisplayName(a.PlayerId)+"："+ThreeKingdomsBoardPresentation.Describe(a))).ToArray();
+        if(view.ProgressHandLimit.HasValue)statuses=statuses.Concat(new[]{"你的发展牌上限："+view.ProgressHandLimit.Value+" 张。常规修复入口位于可用技能。"}).ToArray();
+        foreach(var hand in view.MilitaryHands??Array.Empty<B5RevealedHand>())
+            statuses=statuses.Concat(new[]{(hand.Public?"持续明牌 · ":"本次私密查看 · ")+PlayerDisplayName(hand.PlayerId)+"："+
+                string.Join("、",Enumerable.Range(0,8).Where(i=>hand.Cards[i]>0).Select(i=>ThreeKingdomsCardNames[i]+" × "+hand.Cards[i]))}).ToArray();
         string revealed=ThreeKingdomsRevealedCards(view);if(revealed.Length>0)statuses=statuses.Concat(new[]{revealed}).ToArray();
         float statusHeight=statuses.Length==0?0:36+statuses.Length*24;
         float contentHeight=statusHeight+view.Players.Sum(player=>105+(string.IsNullOrEmpty(player.ActiveGeneralId)?0:GeneralCatalog.Get(player.ActiveGeneralId).Skills.Sum(skill=>60+Mathf.CeilToInt(skill.OriginalText.Length/52f)*21)));
@@ -171,9 +177,9 @@ public sealed partial class M6App
             y+=43;
         }
         GUI.EndScrollView();
-        if(PastoralMenuUI.Button(new Rect(265,625,view.PackageVersion==GeneralCatalog.B4PackageVersion?245:350,46),"主动隐退当前将",view.CanRetire&&!TableDiceRolling,true))SubmitThreeKingdoms("RetireGeneral");
-        if(view.PackageVersion==GeneralCatalog.B4PackageVersion)DrawScheduledRetirement();
-        if(view.PackageVersion!=GeneralCatalog.B4PackageVersion&&PastoralMenuUI.Button(new Rect(835,625,340,46),"完成"+ThreeKingdomsPhaseName(view.Clock.Phase),ThreeKingdomsAdvanceAvailable&&IsHumanTurn,true))SubmitThreeKingdoms("AdvanceThreeKingdomsPhase");
+        if(PastoralMenuUI.Button(new Rect(265,625,GeneralCatalog.IsAutomaticPackage(view.PackageVersion)?245:350,46),"主动隐退当前将",view.CanRetire&&!TableDiceRolling,true))SubmitThreeKingdoms("RetireGeneral");
+        if(GeneralCatalog.IsAutomaticPackage(view.PackageVersion))DrawScheduledRetirement();
+        if(!GeneralCatalog.IsAutomaticPackage(view.PackageVersion)&&PastoralMenuUI.Button(new Rect(835,625,340,46),"完成"+ThreeKingdomsPhaseName(view.Clock.Phase),ThreeKingdomsAdvanceAvailable&&IsHumanTurn,true))SubmitThreeKingdoms("AdvanceThreeKingdomsPhase");
     }
     void DrawGeneralSkillActions(ThreeKingdomsView view,bool ownSkill)
     {

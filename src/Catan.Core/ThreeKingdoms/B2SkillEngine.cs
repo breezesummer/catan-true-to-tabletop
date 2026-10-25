@@ -11,7 +11,7 @@ namespace Catan.Core.ThreeKingdoms
         public static bool HasPending(ThreeKingdomsState state) => state?.SkillsEnabled == true &&
             (state.Skills.PendingDecision != null || state.Skills.Frames.Length > 0 || state.Skills.HarvestActive);
         public static bool IsDrawBlocked(ThreeKingdomsState state, string playerId) => state?.SkillsEnabled == true &&
-            state.Skills.TimedEffects.Any(e => e.Kind == "draw-block" && e.PlayerId == playerId);
+            (state.Skills.TimedEffects.Any(e => e.Kind == "draw-block" && e.PlayerId == playerId) || CivilDrawBlocked(state, playerId));
         public static bool IsProtected(ThreeKingdomsState state, string playerId) => state?.SkillsEnabled == true &&
             state.Skills.TimedEffects.Any(e => e.Kind == "protection" && e.PlayerId == playerId && e.OpportunityId == state.Clock.OpportunityId);
         public static bool HasUnlimitedProgress(ThreeKingdomsState state, string playerId) => Active(state, playerId)?.GeneralId == "tk-g33";
@@ -21,7 +21,7 @@ namespace Catan.Core.ThreeKingdoms
         public static void RefreshDecision(ThreeKingdomsState state)
         { var d = state?.Skills?.PendingDecision; if (d != null && d.WindowId != state.WindowId) { d.WindowId = state.WindowId; d.DecisionId = Id(state, "skill-decision"); } }
         public static B2ProgressCard[] EscrowProgressCards(ThreeKingdomsState state) => state?.Skills?.Frames
-            .Concat(state.Response?.SuspendedFrames ?? Array.Empty<B2SkillFrame>()).Where(f => f.ProgressCard != null && f.Kind != "response-jianxiong")
+            .Concat(state.Response?.SuspendedFrames ?? Array.Empty<B2SkillFrame>()).Concat(state.Military?.SuspendedFrames ?? Array.Empty<B2SkillFrame>()).Where(f => f.ProgressCard != null && f.Kind != "response-jianxiong")
             .Select(f => f.ProgressCard).ToArray() ?? Array.Empty<B2ProgressCard>();
         public static void HoldReturnedCards(IThreeKingdomsCardHost host, int[] cards)
         { if (!Enabled(host) || cards.Sum() == 0) return; host.RemoveBank(cards); Append(host.State, new B2SkillFrame { Id = Id(host.State, "settlement"), Kind = "discard", Cards = Copy(cards) }); }
@@ -32,6 +32,7 @@ namespace Catan.Core.ThreeKingdoms
             var d = state.PendingDecision;
             return new B2SkillState
             {
+                SuppressPump = state.SuppressPump,
                 PendingDecision = d == null ? null : new B2SkillDecision { PlayerId = d.PlayerId, DecisionId = d.DecisionId, WindowId = d.WindowId, Title = d.Title, Description = d.Description, Kind = d.Kind, FrameId = d.FrameId },
                 Frames = state.Frames.Select(CloneFrame).ToArray(),
                 TimedEffects = state.TimedEffects.Select(e => new B2TimedEffect { Id = e.Id, Kind = e.Kind, PlayerId = e.PlayerId, TargetPlayerId = e.TargetPlayerId, OpportunityId = e.OpportunityId, CreatedTurnId = e.CreatedTurnId, SourceTenureId = e.SourceTenureId }).ToArray(),
@@ -49,7 +50,8 @@ namespace Catan.Core.ThreeKingdoms
         private static B2SkillFrame CloneFrame(B2SkillFrame f) => new B2SkillFrame { Id = f.Id, SkillId = f.SkillId, PlayerId = f.PlayerId, TenureId = f.TenureId, Kind = f.Kind, Step = f.Step,
             Remaining = f.Remaining, Cards = Copy(f.Cards), Targets = (string[])f.Targets.Clone(), ProgressCard = f.ProgressCard == null ? null : new B2ProgressCard { Id = f.ProgressCard.Id, Color = f.ProgressCard.Color, PublicPoint = f.ProgressCard.PublicPoint },
             Tiles = f.Tiles.Select(t => new B2HarvestTile { TileId = t.TileId, Number = t.Number, AllowedCardTypes = (int[])t.AllowedCardTypes.Clone() }).ToArray(),
-            Optional = f.Optional, SourceEventId = f.SourceEventId, SelectedCards = Copy(f.SelectedCards), Started = f.Started, B4 = CloneB4Payload(f.B4), B4OrderChosen = f.B4OrderChosen };
+            Optional = f.Optional, SourceEventId = f.SourceEventId, SelectedCards = Copy(f.SelectedCards), Started = f.Started, B4 = CloneB4Payload(f.B4), B4OrderChosen = f.B4OrderChosen,
+            CivilB5 = CloneB5CivilPayload(f.CivilB5) };
 
         public static void Project(IThreeKingdomsCardHost host, ThreeKingdomsView view, string viewerId)
         {
@@ -68,6 +70,9 @@ namespace Catan.Core.ThreeKingdoms
                 (e.Kind == "draw-block" ? "据守禁摸至下次行动机会" : e.Kind == "protection" ? "克己保护（行动机会 " + e.OpportunityId + "）" : "镇骨等待 " + e.TargetPlayerId + " 出牌"))
                 .Concat(state.Generals.Where(g => g.Region == GeneralRegion.Active).SelectMany(g => g.Counters.Select(c =>
                     g.OwnerPlayerId + "：" + CounterLabel(c.Key) + " " + c.Value))).ToArray();
+            ProjectB5Military(host, view, viewerId);
+            ProjectCivilB5(host, view, viewerId);
+            if (B5Enabled(state)) view.ProgressHandLimit = HasUnlimitedProgress(state, viewerId) ? (int?)null : 4 + B5ProgressLimitBonus(state, viewerId);
         }
 
         private static string CounterLabel(string key) => key == "rende" ? "仁德累计余数" : key == "zhiheng-hand" ? "制衡手牌已用" :
@@ -105,6 +110,7 @@ namespace Catan.Core.ThreeKingdoms
                 }
             }
             Prepend(s, frames);
+            OnCivilCardsMoved(host, batchId, changes);
         }
 
         public static void OnBuilt(IThreeKingdomsCardHost host, string eventId, string playerId, string buildingType)
@@ -141,12 +147,15 @@ namespace Catan.Core.ThreeKingdoms
             var active = Active(s, s.Clock.ActivePlayerId);
             if (!B3Enabled(s) && active?.GeneralId == "tk-g06") { var f = Frame(s, active, "tk-g06-s1", "jushou", 4, eventId); f.Optional = true; Append(s, f); }
             if (!B3Enabled(s) && active?.GeneralId == "tk-g09") { var f = Frame(s, active, "tk-g09-s1", "zhenggu", 0, eventId); f.Optional = true; Append(s, f); }
+            OnB5MilitaryEnd(host, eventId);
+            OnCivilEnd(host, eventId);
             Pump(host);
         }
 
         public static void OnPlayStart(IThreeKingdomsCardHost host, string eventId, string playerId)
         {
             if (!Enabled(host)) return; var s = host.State; if (!Mark(s, "play:" + eventId)) return;
+            OnCivilPlayStart(host, eventId, playerId);
             foreach (var e in s.Skills.TimedEffects.Where(x => x.Kind == "zhenggu" && x.TargetPlayerId == playerId).ToArray())
             {
                 Append(s, new B2SkillFrame { Id = Id(s, "frame"), Kind = "zhenggu-later", PlayerId = e.PlayerId, SkillId = "tk-g09-s1", Targets = new[] { playerId } });
@@ -159,6 +168,8 @@ namespace Catan.Core.ThreeKingdoms
         {
             if (!Enabled(host)) return; var s = host.State;
             OnB4OpportunityStart(host, opportunityId, playerId);
+            OnB5MilitaryOpportunityStart(host, opportunityId, playerId, skippedPlayerIds);
+            OnB5MilitaryTurnStart(host, "turn-start-" + s.Clock.TurnInstanceId, playerId);
             var begun = new HashSet<string>(skippedPlayerIds ?? Array.Empty<string>()) { playerId };
             s.Skills.TimedEffects = s.Skills.TimedEffects.Where(e => !(e.Kind == "draw-block" && begun.Contains(e.PlayerId)) &&
                 !(e.Kind == "protection" && e.OpportunityId < opportunityId)).ToArray();
@@ -175,6 +186,7 @@ namespace Catan.Core.ThreeKingdoms
         private static void Target(IThreeKingdomsCardHost host, string useId, string sourcePlayerId, string targetPlayerId)
         {
             var s = host.State;
+            OnCivilTargeted(host, useId, sourcePlayerId, targetPlayerId, null);
             if (sourcePlayerId == targetPlayerId || !Mark(s, "target:" + useId + ":" + targetPlayerId)) return;
             var g = Active(s, targetPlayerId);
             if (g?.GeneralId == "tk-g37") Prepend(s, new[] { Frame(s, g, "tk-g37-s2", "resource", 1, useId) });
@@ -210,12 +222,12 @@ namespace Catan.Core.ThreeKingdoms
 
         public static void Pump(IThreeKingdomsCardHost host)
         {
-            if (!Enabled(host) || host.State.PendingDecision != null) return;
+            if (!Enabled(host) || host.State.PendingDecision != null || host.State.Skills.SuppressPump) return;
             var s = host.State;
             if (s.Skills.PendingDecision != null)
             {
                 var pendingFrame = s.Skills.Frames.Single(f => f.Id == s.Skills.PendingDecision.FrameId);
-                if ((pendingFrame.Optional || s.Skills.PendingDecision.Kind == "harvest" || s.Skills.PendingDecision.Kind == "luoying") && !IsB4ResidualOptional(s,pendingFrame) && Active(s, pendingFrame.PlayerId)?.TenureId != pendingFrame.TenureId)
+                if ((pendingFrame.Optional || s.Skills.PendingDecision.Kind == "harvest" || s.Skills.PendingDecision.Kind == "luoying") && !IsB4ResidualOptional(s,pendingFrame) && !CivilResidualOptional(s,pendingFrame) && Active(s, pendingFrame.PlayerId)?.TenureId != pendingFrame.TenureId)
                 {
                     if (s.Skills.PendingDecision.Kind == "harvest") Allocation(s, pendingFrame.PlayerId).ChoiceComplete = true;
                     Remove(s, pendingFrame); s.Skills.PendingDecision = null;
@@ -237,7 +249,7 @@ namespace Catan.Core.ThreeKingdoms
                 if (TryB4Order(s, frame)) return;
                 if (frame.Optional)
                 {
-                    if (!IsB4ResidualOptional(s,frame) && Active(s, frame.PlayerId)?.TenureId != frame.TenureId) { Remove(s, frame); continue; }
+                    if (!IsB4ResidualOptional(s,frame) && !CivilResidualOptional(s,frame) && Active(s, frame.PlayerId)?.TenureId != frame.TenureId) { Remove(s, frame); continue; }
                     Decide(s, frame, "optional", "发动" + Name(frame.SkillId), "可选择发动或放弃。"); return;
                 }
                 if (!frame.Started && frame.TenureId != null && frame.Kind != "harvest" && frame.Kind != "claim" && frame.Kind != "raid" && frame.Kind != "gold" && Active(s, frame.PlayerId)?.TenureId != frame.TenureId)
@@ -252,6 +264,8 @@ namespace Catan.Core.ThreeKingdoms
         private static bool ProcessFrame(IThreeKingdomsCardHost host, B2SkillFrame f)
         {
             var s = host.State;
+            if (ProcessB5MilitaryFrame(host, f, out var militaryWaiting)) return militaryWaiting;
+            if (ProcessCivilFrame(host, f, out var civilWaiting)) return civilWaiting;
             if (ProcessB4Frame(host, f, out var b4Waiting)) return b4Waiting;
             if (ProcessTimeFrame(host, f, out var waiting)) return waiting;
             if (new[] { "resource", "mixed", "commodity", "lianying", "jushou" }.Contains(f.Kind))
@@ -333,7 +347,7 @@ namespace Catan.Core.ThreeKingdoms
                     foreach (var p in s.SeatPlayerIds.Where(p => p != playerId)) { var a = Action(s, f.SkillId, "target", "选择 " + p, d); a.Command.TargetPlayerIds = new[] { p }; result.Add(a); }
                 else if (d.Kind == "color")
                     foreach (var color in Enumerable.Range(0, 3).Where(c => host.GetProgressDeckCount(c) > 0)) { var a = Action(s, f.SkillId, "color", new[] { "黄色贸易", "蓝色政治", "绿色科学" }[color], d); a.Command.CardType = color; result.Add(a); }
-                else if (!AddB4DecisionActions(host, f, d, result) && !AddTimeDecisionActions(host, f, d, result)) AddHarvestActions(host, f, d, result);
+                else if (!AddB5MilitaryDecisionActions(host,f,d,result) && !AddCivilDecisionActions(host,f,d,result) && !AddB4DecisionActions(host, f, d, result) && !AddTimeDecisionActions(host, f, d, result)) AddHarvestActions(host, f, d, result);
                 return AnnotateB4Actions(host, result);
             }
             if (s.Skills.Frames.Length != 0 || !s.OpeningComplete || s.Clock.Round == 0 || s.ReplacementInProgress) return result.ToArray();
@@ -342,6 +356,17 @@ namespace Catan.Core.ThreeKingdoms
             var hand = host.GetHand(playerId);
             AddTimeActions(host, g, result);
             AddB4Actions(host, g, result);
+            AddB5MilitaryActions(host, g, result);
+            AddCivilActions(host, g, result);
+            if (B5Enabled(s) && ownTurn && s.Clock.Phase == ThreeKingdomsPhase.Play && host is IThreeKingdomsB5Host board)
+                foreach (var option in board.GetBoardOptions(playerId, "repair-own"))
+                {
+                    var a = Action(s, null, "b5-repair", option.Label+"；费用用途："+string.Join("、",Enumerable.Range(0,8).Where(t=>option.Cost[t]>0).Select(t=>CardNames[t]+"×"+option.Cost[t])));
+                    a.Command.ProgressCardId = option.Id;
+                    var matrix=B4PaymentAllocator.Allocate(s,playerId,hand,option.Cost);
+                    a.Command.Counts=Enumerable.Range(0,8).Select(t=>Enumerable.Range(0,8).Sum(u=>matrix[t*8+u])).ToArray();
+                    a.CardSelectionKind="payment";result.Add(a);
+                }
             if (g.GeneralId == "tk-g15" && ownTurn && s.Clock.Phase != ThreeKingdomsPhase.RoundEnd && s.Clock.Phase != ThreeKingdomsPhase.Finished)
                 foreach (var target in s.SeatPlayerIds.Where(p => p != playerId)) foreach (var t in Enumerable.Range(0, 8).Where(t => hand[t] > 0))
                 { var a = Action(s, "tk-g15-s1", "gift", "仁德：给 " + target + " " + CardNames[t]); a.Command.TargetPlayerIds = new[] { target }; a.Command.Counts[t] = 1; result.Add(a); }
@@ -388,7 +413,7 @@ namespace Catan.Core.ThreeKingdoms
                     Require(command.Option == "color" && command.CardType >= 0 && command.CardType < 3 && host.GetProgressDeckCount(command.CardType) > 0 && !IsDrawBlocked(s, playerId), "该发展牌颜色不可领取。");
                     Remove(s, f); host.DrawProgress(playerId, command.CardType);
                 }
-                else if (!ResolveB4Decision(host, f, d, command) && !ResolveTimeDecision(host, f, d, command)) ResolveHarvest(host, f, d, command);
+                else if (!ResolveB5MilitaryDecision(host,f,d,command) && !ResolveCivilDecision(host,f,d,command) && !ResolveB4Decision(host, f, d, command) && !ResolveTimeDecision(host, f, d, command)) ResolveHarvest(host, f, d, command);
                 s.Skills.PendingDecision = null;
             }
             else ResolveActive(host, playerId, command);
@@ -401,6 +426,15 @@ namespace Catan.Core.ThreeKingdoms
             var g = Active(s, playerId); Require(g != null, "没有在场武将。");
             Require(!B4Enabled(s) || !new[] { "gift", "discard", "exchange-hand", "exchange-progress" }.Contains(c.Option) || !IsB4HandLossForbidden(s, playerId), "本次出牌阶段禁止失去手牌或发展牌。");
             var own = s.Clock.ActivePlayerId == playerId; var play = s.Clock.Phase == ThreeKingdomsPhase.Play;
+            if (c.Option == "b5-repair")
+            {
+                Require(B5Enabled(s) && own && play && host is IThreeKingdomsB5Host && c.SkillId == null, "当前不能修复建筑。");
+                var board = (IThreeKingdomsB5Host)host;
+                var option = board.GetBoardOptions(playerId,"repair-own").SingleOrDefault(o=>o.Id==c.ProgressCardId);
+                Require(option != null, "修复目标、费用或库存已经变化。"); board.ApplyBoardOption(playerId,option); return;
+            }
+            if (ResolveB5MilitaryActive(host, g, c)) return;
+            if (ResolveCivilActive(host, g, c)) return;
             if (ResolveTimeActive(host, g, c)) return;
             if (ResolveB4Active(host, g, c)) return;
             if (c.Option == "gift")
@@ -444,6 +478,8 @@ namespace Catan.Core.ThreeKingdoms
             if (s.ProcessedSkippedCount < 0 || s.ProcessedSkippedCount > host.State.Clock.SkippedOpportunityPlayerIds.Length) errors.Add("技能跳过机会游标无效。");
             if (Returned(host.State).Any(r => r == null || !Valid(r.Cards) || !host.State.SeatPlayerIds.Contains(r.PlayerId) || string.IsNullOrEmpty(r.EventId) || !ReturnCauses.Contains(r.Cause))) errors.Add("弃牌临时区来源或实体牌无效。");
             errors.AddRange(ValidateB4Response(host));
+            errors.AddRange(ValidateB5Military(host.State));
+            errors.AddRange(ValidateCivil(host.State));
             return errors.ToArray();
         }
 
@@ -451,7 +487,7 @@ namespace Catan.Core.ThreeKingdoms
         {
             var cards = new int[8]; if (state?.Skills == null) return cards;
             foreach (var h in state.Skills.Harvest.Where(h => !h.Completed)) Add(cards, h.Cards);
-            foreach (var f in state.Skills.Frames.Concat(state.Response?.SuspendedFrames ?? Array.Empty<B2SkillFrame>()).Where(f => f.Kind != "gift" && f.Kind != "raid" && f.Kind != "harvest")) { Add(cards, f.Cards); Add(cards, f.SelectedCards); }
+            foreach (var f in state.Skills.Frames.Concat(state.Response?.SuspendedFrames ?? Array.Empty<B2SkillFrame>()).Concat(state.Military?.SuspendedFrames ?? Array.Empty<B2SkillFrame>()).Where(f => f.Kind != "gift" && f.Kind != "raid" && f.Kind != "harvest")) { Add(cards, f.Cards); Add(cards, f.SelectedCards); }
             foreach (var r in Returned(state)) Add(cards, r.Cards);
             return cards;
         }

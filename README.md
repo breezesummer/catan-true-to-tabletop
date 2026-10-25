@@ -69,6 +69,7 @@ macOS 开发入口为 `tools/development/Start-Dev.command`，打开 Unity 使�
 - [游戏百科](docs/GAME_ENCYCLOPEDIA.md)：发展卡实体名称、牌面描述与照片来源。
 - [三国争霸游戏百科](docs/三国争霸游戏百科.md)：三国扩展玩法、54张武将原文、确认记录与逐将疑问。
 - [三国争霸扩展实现方案](docs/三国争霸扩展实现方案.md)：新增机制、现有工程接入、分批实现与验收计划。
+- [B5规则合同](docs/three-kingdoms/B5规则定稿.md)、[实现说明](docs/three-kingdoms/B5实现说明.md)与[验收记录](docs/verification/three-kingdoms-b5/验收记录.md)：49将棋盘状态包的规则、实现和证据入口。
 - [本地规则索引](assets/references/rules/README.md)：规则原件与查询入口。
 - [美术生产规范](docs/ART_PIPELINE.md)：参考采集、资产制作、导入和复现。
 - [三国风格棋子制作流程](docs/三国风格棋子制作流程.md)：造型、组件与状态、参考多视图、建模材质、预算及游戏内验收。

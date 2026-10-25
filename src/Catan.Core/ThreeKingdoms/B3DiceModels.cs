@@ -45,7 +45,8 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=8)] public bool NumericActualRoll { get; set; }
         [DataMember(Order=9)] public bool EventActualRoll { get; set; }
         [DataMember(Order=10)] public int Attempt { get; set; }
-        public int Total => Red + White;
+        [DataMember(Order=11, EmitDefaultValue=false)] public int TotalModifier { get; set; }
+        public int Total => Red + White + TotalModifier;
     }
 
     [DataContract] public sealed class B3DiceRoll
@@ -72,6 +73,7 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=20)] public B3DiceModification[] Modifications { get; set; } = Array.Empty<B3DiceModification>();
         [DataMember(Order=21)] public long TurnInstanceId { get; set; }
         [DataMember(Order=22, EmitDefaultValue=false)] public int LuoshenRewardedAttempt { get; set; }
+        [DataMember(Order=23, EmitDefaultValue=false)] public int TotalModifier { get; set; }
     }
 
     [DataContract] public sealed class B3DiceState

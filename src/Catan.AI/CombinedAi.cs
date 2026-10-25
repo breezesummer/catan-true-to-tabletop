@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Catan.Core;
@@ -216,7 +216,7 @@ public sealed partial class CombinedAi
                 trade.ReceiveResource = need.resource; trade.ReceiveIsCommodity = need.commodity.HasValue; trade.ReceiveCommodity = need.commodity.GetValueOrDefault(); return trade;
             }
         }
-        if (view.ThreeKingdoms?.HandLossForbidden != true && view.OwnProgressCards.Length > 4) { var discard = Make(CommandKind.DiscardProgressCard); discard.ProgressCard = view.OwnProgressCards.OrderBy(CardValue).First(); return discard; }
+        if (view.ThreeKingdoms?.HandLossForbidden != true && view.OwnProgressCards.Length > (view.ThreeKingdoms?.ProgressHandLimit ?? 4)) { var discard = Make(CommandKind.DiscardProgressCard); discard.ProgressCard = view.OwnProgressCards.OrderBy(CardValue).First(); return discard; }
         return Make(CommandKind.EndTurn);
     }
 

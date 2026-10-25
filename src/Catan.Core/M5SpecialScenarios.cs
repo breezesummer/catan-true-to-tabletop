@@ -148,6 +148,7 @@ private void AttackFortress(GameState s, PlayerState p)
             {
                 var loss = ships.Reverse().Take(power == die ? 1 : 2).Select(x => x.LocationId).ToArray();
                 s.Ships = s.Ships.Where(x => !loss.Contains(x.LocationId)).ToArray(); p.ShipsRemaining += loss.Length;
+                foreach(var location in loss)B5ForgetAsset(s,"Ship",location);
             }
         }
 } }

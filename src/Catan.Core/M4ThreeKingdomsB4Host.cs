@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -23,7 +23,7 @@ namespace Catan.Core.M4
     {
         private sealed partial class B2Host : IThreeKingdomsB4Host, IThreeKingdomsB4VirtualCostHost
         {
-            public int GetHandLimit(string playerId) => Math.Max(0,7+2*game.Walls.Count(w=>w.PlayerId==playerId)-B2SkillEngine.B4HandLimitPenalty(game.ThreeKingdoms,playerId));
+            public int GetHandLimit(string playerId) => Math.Max(0,7+2*game.Walls.Count(w=>w.PlayerId==playerId)-B2SkillEngine.B4HandLimitPenalty(game.ThreeKingdoms,playerId)+B2SkillEngine.B5HandLimitBonus(game.ThreeKingdoms,playerId));
             public B4VirtualUse[] GetVirtualProgressUses(string playerId,string timing) => session.B4VirtualUses(game,playerId,timing);
             public void UseVirtualProgress(string playerId,B4VirtualUse use) => session.B4UseVirtual(game,playerId,use);
             public bool CanUseVirtualProgressAfterPayment(string playerId,B4VirtualUse use,int[] consumedCards)
@@ -32,7 +32,7 @@ namespace Catan.Core.M4
                 var currentHand=GetHand(playerId);if(Enumerable.Range(0,8).Any(i=>currentHand[i]<consumedCards[i]))return false;
                 // 用途已由 GetVirtualProgressUses 预检；只有药物与起重机会另外支付手牌。
                 if(use.CardId!="Medicine"&&use.CardId!="Crane")return true;
-                var probe=game.CopyForTransaction();var host=session.CardHost(probe);
+                var probe=game.CopyForTransaction();probe.ThreeKingdoms.Skills.SuppressPump=true;var host=session.CardHost(probe);
                 host.RemoveHand(playerId,consumedCards);host.AddBank(consumedCards);
                 var general=probe.ThreeKingdoms.Generals.FirstOrDefault(g=>g.Region==GeneralRegion.Active&&g.OwnerPlayerId==playerId);
                 if(general?.GeneralId=="tk-g41") { general.Counters=general.Counters.Where(c=>c.Key!="miewu"&&c.Key!="wuku").Concat(new[]{new GeneralCounter{Key="miewu",TurnInstanceId=probe.ThreeKingdoms.Clock.TurnInstanceId,Value=1},new GeneralCounter{Key="wuku",Value=0}}).ToArray(); }
@@ -43,7 +43,7 @@ namespace Catan.Core.M4
         private B4VirtualUse[] B4VirtualUses(GameState s,string player,string timing)
         {
             if(!B4(s)||s.ActivePlayerId!=player||s.PendingDecision!=null||s.TradeOffer!=null) return Array.Empty<B4VirtualUse>();
-            var probe=s.CopyForTransaction(); var owner=probe.Players.Single(p=>p.Id==player);
+            var probe=s.CopyForTransaction();probe.ThreeKingdoms.Skills.SuppressPump=true;var owner=probe.Players.Single(p=>p.Id==player);
             owner.ProgressCards=((ProgressCardKind[])Enum.GetValues(typeof(ProgressCardKind))).Where(c=>!ProgressCatalog.IsVictoryPoint(c)).ToArray();
             // 只在隔离副本枚举用途；真身、牌库及权威随机完全不变。
             if((timing=="prepare"||timing=="start")) probe.Phase=GamePhase.ProductionAwaitRoll;
@@ -92,6 +92,10 @@ namespace Catan.Core.M4
                     for(int first=0;first<tiles.Length;first++)for(int second=first+1;second<tiles.Length;second++)
                     {var c=Json.Copy(candidate);c.SourceId=tiles[first].Id;c.TargetId=tiles[second].Id;yield return c;}
                 }
+                else if(B5(s))
+                {
+                    foreach(var ids in ProgressSmithingTargets(s,owner)){var c=Json.Copy(candidate);c.TargetIds=ids;yield return c;}
+                }
                 else
                 {
                     var knights=s.Knights.Where(k=>k.PlayerId==owner.Id).ToArray();
@@ -128,7 +132,7 @@ namespace Catan.Core.M4
             ApplyProgressCommand(validation,validation.Players.Single(p=>p.Id==player),c,true,prepare);
             c.Id="virtual-"+s.ThreeKingdoms.NextId++;
             s.ThreeKingdomsVirtualUse=Json.Copy(use);
-            foreach(var target in B2TargetPlayers(s,c)) B2SkillEngine.OnTargeted(CardHost(s),c.Id,player,target,c.ProgressCard.ToString());
+            foreach(var target in B2TargetPlayers(s,c)) { B2SkillEngine.OnTargeted(CardHost(s),c.Id,player,target,c.ProgressCard.ToString()); B5ProgressTargeted(s,c,target); }
             if(B2Busy(s)) { s.ThreeKingdomsDeferredCommand=c;s.ThreeKingdomsDeferredVirtual=true; }
             else ApplyB2Native(s,c,true,prepare);
         }
@@ -142,6 +146,7 @@ namespace Catan.Core.M4
         { PayB4(s,p,Enumerable.Range(0,8).Select(i=>i<5?cost[(Resource)i]:0).ToArray()); }
         private void PayB4(GameState s,PlayerState p,int[] needs)
         {
+            if(B5(s)&&s.B5FreeConstruction)return;
             if(s.B4DeclaredPayment!=null) { PayB4Declared(s,p,needs); return; }
             Require(!B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,p.Id),"HandLossForbidden","本次出牌阶段不能失去牌。");
             var host=CardHost(s);var before=host.GetHand(p.Id);
@@ -162,6 +167,7 @@ namespace Catan.Core.M4
             B2SkillEngine.HoldReturnedCards(host,p.Id,"payment",eventId,paid);
             var changes=new[]{new B2HandChange {PlayerId=p.Id,BeforeCount=before.Sum(),AfterCount=payment.AfterCount,LostCount=paid.Sum(),LostCards=paid}};
             B2SkillEngine.OnCardsMoved(host,eventId,changes);
+            B2SkillEngine.OnCivilPaid(host,eventId,p.Id,Enumerable.Range(0,8).Where(t=>needs[t]>0).ToArray());
             foreach(var conversionId in conversionHistoryIds)
                 B4SkillHistoryEngine.LinkCardFlow(s.ThreeKingdoms,conversionId,eventId,changes);
         }

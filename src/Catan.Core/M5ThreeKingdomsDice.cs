@@ -12,6 +12,7 @@ namespace Catan.Core.M5
             if (!B3(s) || s.ThreeKingdoms.PendingDecision != null || B2SkillEngine.HasPending(s.ThreeKingdoms)) return;
             var host = CardHost(s);
             B3DiceEngine.Pump(host);
+            if (B2SkillEngine.ResumeB5Comparison(host)) return;
             if (B2SkillEngine.ResumeB4Judgment(host)) return;
             var result = B3DiceEngine.TakeFinal(host);
             if (result == null) return;
@@ -19,6 +20,7 @@ namespace Catan.Core.M5
                 throw new InvalidOperationException("判定须返回来源技能，不能作为正式生产结算。");
             var before = s.Players.ToDictionary(p => p.Id, p => host.GetHand(p.Id));
             s.LastDice1 = result.Red; s.LastDice2 = result.White;
+            if(B5(s))s.ThreeKingdoms.Board.LastFormalTotal=result.Total;
             s.LastEventDie = result.EventFace <= 3 ? EventDie.Barbarian : (EventDie)(result.EventFace - 3);
             CommitCitiesKnightsDice(s);
             NormalizeSpecialSeven(s);

@@ -34,7 +34,7 @@ public sealed class TabletopPointerPreview
             case "Merchant": kind="merchant";break;
             case "Diplomacy": kind="road";break;
             case "Smithing": case "Intrigue": case "Treason": case "DisplacedKnight": case "ProgressTreasonRemove": case "ProgressTreasonPlace": kind="knight";break;
-            case "Metropolis": kind="metropolis";break;
+            case "Metropolis": case "B5MetropolisRelocate": kind="metropolis";break;
             // 税收、发明家及劫掠只选择已有目标，不应伪装成拿起强盗或新建村庄。
             default: kind="target";break;
         }

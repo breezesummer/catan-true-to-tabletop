@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Catan.Core.ThreeKingdoms;
@@ -36,7 +36,7 @@ namespace Catan.Core.M4
             if (ProgressCatalog.IsVictoryPoint(card)) { p.ProgressVictoryCards = Append(p.ProgressVictoryCards, card); QueueB4Progress(s,p.Id,card,null); }
             else p.ProgressCards = Append(p.ProgressCards, card);
             if (B2(s) && s.ThreeKingdoms.Clock.Phase == Catan.Core.ThreeKingdoms.ThreeKingdomsPhase.Roll) s.ThreeKingdomsDiceRecipients = (s.ThreeKingdomsDiceRecipients ?? Array.Empty<string>()).Union(new[] { p.Id }).ToArray();
-            if (!B2Unlimited(s,p.Id) && !B2Protected(s,p.Id) && p.Id != s.ActivePlayerId && p.ProgressCards.Length > 4 &&
+            if (!B2Unlimited(s,p.Id) && !B2Protected(s,p.Id) && p.Id != s.ActivePlayerId && p.ProgressCards.Length > B5ProgressLimit(s,p.Id) &&
                 !(s.PendingDecision != null && s.PendingDecision.Kind == "ProgressDiscard" && s.PendingDecision.PlayerId == p.Id) &&
                 !s.DecisionQueue.Any(d => d.Kind == "ProgressDiscard" && d.PlayerId == p.Id))
                 s.DecisionQueue = new[] { new PendingDecision { Kind = "ProgressDiscard", PlayerId = p.Id } }.Concat(s.DecisionQueue).ToArray();
@@ -63,10 +63,10 @@ namespace Catan.Core.M4
                 var pending = s.PendingDecision;
                 var forced = s.Phase == GamePhase.PendingChoice && pending != null && pending.Kind == "ProgressDiscard" && pending.PlayerId == p.Id;
                 Require(forced || (s.Phase == GamePhase.Action && s.ActivePlayerId == p.Id && pending == null), "WrongPhase", "当前不能弃发展卡。");
-                Require(!B2Protected(s,p.Id) && !B2Unlimited(s,p.Id) && (legacyInteractionReplay || p.ProgressCards.Length > 4), "NoDiscardRequired", "发展卡未超过四张，不能弃置。");
+                Require(!B2Protected(s,p.Id) && !B2Unlimited(s,p.Id) && (legacyInteractionReplay || p.ProgressCards.Length > B5ProgressLimit(s,p.Id)), "NoDiscardRequired", "发展卡未超过当前上限，不能弃置。");
                 Require(!ProgressCatalog.IsVictoryPoint(c.ProgressCard), "PublicVictoryCard", "胜利点卡不能丢弃。");
                 ReturnProgressCard(s, p, c.ProgressCard);
-                if (forced && p.ProgressCards.Length <= 4) { s.PendingDecision = null; ContinueDecisions(s); }
+                if (forced && p.ProgressCards.Length <= B5ProgressLimit(s,p.Id)) { s.PendingDecision = null; ContinueDecisions(s); }
                 return true;
             }
             if (c.Kind == CommandKind.CommercialHarborOffer)
@@ -78,7 +78,7 @@ namespace Catan.Core.M4
                 Require(Enum.IsDefined(typeof(Resource), c.Resource) && p.Resources[c.Resource] > 0, "InsufficientResources", "必须选择自己持有的资源。");
                 var used = Array.IndexOf(s.CommercialHarborPlayers, target.Id);
                 s.CommercialHarborPlayers = s.CommercialHarborPlayers.Where((x, i) => i != used).ToArray();
-                if (target.Commodities.Total > 0 && !B2Protected(s,target.Id))
+                if (target.Commodities.Total > 0 && !B2Protected(s,target.Id) && (!B5(s)||!B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,target.Id)))
                 {
                     Transfer(p.Resources, target.Resources, c.Resource, 1);
                     QueueDecision(s, new PendingDecision { Kind = "ProgressHarbor", PlayerId = target.Id, OtherPlayerId = p.Id, Amount = 1 });
@@ -95,7 +95,8 @@ namespace Catan.Core.M4
                 Require(s.Phase == GamePhase.ProductionAwaitRoll && s.AlchemyDice1 == 0, "WrongPhase", "炼金术士必须在本回合掷骰之前使用一次。");
             else if (!virtualPrepare) ActionPhase(s);
             if (!virtualCard) ReturnProgressCard(s, p, c.ProgressCard, true, c.Id);
-            else QueueB4Progress(s,p.Id,null,c.Id,true);
+            else QueueB4Progress(s,p.Id,B5(s)?(ProgressCardKind?)c.ProgressCard:null,c.Id,true);
+            if(c.ProgressCard==ProgressCardKind.Encouragement && B5ProgressImmune(s,p.Id,c.ProgressCard,c.Id))return true;
             switch (c.ProgressCard)
             {
                 case ProgressCardKind.Alchemy:
@@ -111,18 +112,18 @@ namespace Catan.Core.M4
                     var number = tileA.Number; tileA.Number = tileB.Number; tileB.Number = number; break;
                 case ProgressCardKind.Irrigation: ProgressHarvest(s, p, Resource.Wheat); break;
                 case ProgressCardKind.Mining: ProgressHarvest(s, p, Resource.Ore); break;
-                case ProgressCardKind.RoadBuilding: BeginProgressRoads(s, p, 2); break;
+                case ProgressCardKind.RoadBuilding: BeginProgressRoads(s, p, 2*B5ProgressFactor(s,p.Id,p.Id)); break;
                 case ProgressCardKind.Smithing:
                     var targets = c.TargetIds ?? Array.Empty<string>();
-                    Require(targets.Length <= 2 && targets.Distinct().Count() == targets.Length, "InvalidSmithing", "至多晋升两个不同骑士。");
-                    foreach (var target in targets) ProgressPromote(s, p, target);
+                    Require(targets.Length <= 2*B5ProgressFactor(s,p.Id,p.Id) && targets.Distinct().Count() == targets.Length, "InvalidSmithing", "晋升不同骑士的数量超过本次允许额度。");
+                    foreach (var target in B5(s)?targets.OrderByDescending(id=>s.Knights.FirstOrDefault(k=>k.LocationId==id)?.Level??0).ThenBy(id=>id,StringComparer.Ordinal).ToArray():targets) ProgressPromote(s, p, target);
                     break;
                 case ProgressCardKind.CommercialHarbor:
-                    s.CommercialHarborPlayers = s.CommercialHarborPlayers.Concat(s.Players.Where(x => x.Id != p.Id).Select(x => x.Id)).ToArray(); break;
+                    s.CommercialHarborPlayers = s.CommercialHarborPlayers.Concat(s.Players.Where(x => x.Id != p.Id).SelectMany(x => Enumerable.Repeat(x.Id,B5ProgressFactor(s,p.Id,x.Id)))).ToArray(); break;
                 case ProgressCardKind.GuildDues:
                     var rich = OtherProgressPlayer(s, p, c.OtherPlayerId);
                     Require(VictoryPoints(s, rich.Id, true) > VictoryPoints(s, p.Id, true), "NotMoreVictoryPoints", "大商家只能选择胜利点比你高的玩家。");
-                    if (!B2Protected(s,rich.Id) && !B3Immune(s,rich.Id) && ProgressHandSize(rich) > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressGuildDues", PlayerId = p.Id, OtherPlayerId = rich.Id, Amount = Math.Min(2, ProgressHandSize(rich)) });
+                    if (!B2Protected(s,rich.Id) && !B3Immune(s,rich.Id) && !B5ProgressImmune(s,rich.Id) && ProgressHandSize(rich) > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressGuildDues", PlayerId = p.Id, OtherPlayerId = rich.Id, Amount = Math.Min(2*B5ProgressFactor(s,p.Id,rich.Id), ProgressHandSize(rich)) });
                     break;
                 case ProgressCardKind.Merchant:
                     var merchantTile = s.Tiles.FirstOrDefault(t => t.Id == c.TargetId);
@@ -134,22 +135,23 @@ namespace Catan.Core.M4
                     break;
                 case ProgressCardKind.ResourceMonopoly:
                     Require(Enum.IsDefined(typeof(Resource), c.Resource), "InvalidResource", "资源类型错误。");
-                    foreach (var other in s.Players.Where(x => x.Id != p.Id && !B2Protected(s,x.Id) && !B3Immune(s,x.Id))) Transfer(other.Resources, p.Resources, c.Resource, Math.Min(2, other.Resources[c.Resource]));
+                    foreach (var other in s.Players.Where(x => x.Id != p.Id && !B2Protected(s,x.Id) && !B3Immune(s,x.Id) && !B5ProgressImmune(s,x.Id))) Transfer(other.Resources, p.Resources, c.Resource, Math.Min(2*B5ProgressFactor(s,p.Id,other.Id), other.Resources[c.Resource]));
                     break;
                 case ProgressCardKind.TradeMonopoly:
                     Require(Enum.IsDefined(typeof(Commodity), c.Commodity), "InvalidCommodity", "商品类型错误。");
-                    foreach (var other in s.Players.Where(x => x.Id != p.Id && !B2Protected(s,x.Id) && !B3Immune(s,x.Id))) ProgressCommodityTransfer(other.Commodities, p.Commodities, c.Commodity, Math.Min(1, other.Commodities[c.Commodity]));
+                    foreach (var other in s.Players.Where(x => x.Id != p.Id && !B2Protected(s,x.Id) && !B3Immune(s,x.Id) && !B5ProgressImmune(s,x.Id))) ProgressCommodityTransfer(other.Commodities, p.Commodities, c.Commodity, Math.Min(B5ProgressFactor(s,p.Id,other.Id), other.Commodities[c.Commodity]));
                     break;
                 case ProgressCardKind.Diplomacy:
                     var road = s.Roads.FirstOrDefault(r => r.LocationId == c.TargetId);
                     Require(road != null && ProgressRoadIsOpen(s, road), "RoadNotOpen", "只能移除开放端道路。");
-                    if (road.PlayerId != p.Id && B3Immune(s,road.PlayerId)) break;
+                    if (road.PlayerId != p.Id && B3Immune(s,road.PlayerId)||B5ProgressImmune(s,road.PlayerId)) break;
                     s.Roads = s.Roads.Where(r => r != road).ToArray(); s.Players.Single(x => x.Id == road.PlayerId).Pieces.Roads++;
+                    B5ForgetAsset(s,"Road",road.LocationId);
                     if (road.PlayerId == p.Id) BeginProgressRoads(s, p, 1);
                     break;
                 case ProgressCardKind.Espionage:
                     var spied = OtherProgressPlayer(s, p, c.OtherPlayerId);
-                    if (!B2Protected(s,spied.Id) && !B3Immune(s,spied.Id) && spied.ProgressCards.Length > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressEspionage", PlayerId = p.Id, OtherPlayerId = spied.Id });
+                    if (!B2Protected(s,spied.Id) && !B3Immune(s,spied.Id) && !B5ProgressImmune(s,spied.Id) && spied.ProgressCards.Length > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressEspionage", PlayerId = p.Id, OtherPlayerId = spied.Id, Amount = B5(s)?Math.Min(B5ProgressFactor(s,p.Id,spied.Id),spied.ProgressCards.Length):0 });
                     break;
                 case ProgressCardKind.Encouragement:
                     foreach (var knight in s.Knights.Where(k => k.PlayerId == p.Id && !k.Active)) { knight.Active = true; knight.ActivatedTurn = s.Turn; }
@@ -157,21 +159,21 @@ namespace Catan.Core.M4
                 case ProgressCardKind.Intrigue:
                     var intruded = s.Knights.FirstOrDefault(k => k.LocationId == c.TargetId && k.PlayerId != p.Id);
                     Require(intruded != null && s.Roads.Any(r => r.PlayerId == p.Id && EdgeAt(r.LocationId).Vertices.Contains(intruded.LocationId)), "InvalidIntrigue", "被驱逐骑士必须在你的道路相邻顶点。");
-                    DisplaceForProgress(s, intruded); break;
+                    if(!B5ProgressImmune(s,intruded.PlayerId))DisplaceForProgress(s, intruded); break;
                 case ProgressCardKind.Taxation: ProgressTaxation(s, p, c.TargetId); break;
                 case ProgressCardKind.Treason:
                     var betrayed = OtherProgressPlayer(s, p, c.OtherPlayerId);
                     var knightOptions = s.Knights.Where(k => k.PlayerId == betrayed.Id).Select(k => k.LocationId).ToArray();
-                    if (!B3Immune(s,betrayed.Id) && knightOptions.Length > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressTreasonRemove", PlayerId = betrayed.Id, OtherPlayerId = p.Id, Options = knightOptions });
+                    if (!B3Immune(s,betrayed.Id) && !B5ProgressImmune(s,betrayed.Id) && knightOptions.Length > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressTreasonRemove", PlayerId = betrayed.Id, OtherPlayerId = p.Id, Options = knightOptions });
                     break;
                 case ProgressCardKind.Wedding:
                 case ProgressCardKind.Sabotage:
                     var score = VictoryPoints(s, p.Id, true);
-                    foreach (var other in ProgressTurnOrder(s).Where(x => x.Id != p.Id && !B2Protected(s,x.Id) && !B3Immune(s,x.Id)))
+                    foreach (var other in ProgressTurnOrder(s).Where(x => x.Id != p.Id && !B2Protected(s,x.Id) && !B3Immune(s,x.Id) && !B5ProgressImmune(s,x.Id)))
                     {
                         var otherScore = VictoryPoints(s, other.Id, true);
                         var wedding = c.ProgressCard == ProgressCardKind.Wedding;
-                        var amount = wedding ? Math.Min(2, ProgressHandSize(other)) : ProgressHandSize(other) / 2;
+                        var amount = Math.Min(ProgressHandSize(other),(wedding ? 2 : ProgressHandSize(other)/2)*B5ProgressFactor(s,p.Id,other.Id));
                         if (amount > 0 && (wedding ? otherScore > score : otherScore >= score))
                             QueueDecision(s, new PendingDecision { Kind = wedding ? "ProgressWedding" : "ProgressSabotage", PlayerId = other.Id, OtherPlayerId = p.Id, Amount = amount });
                     }
@@ -209,6 +211,7 @@ namespace Catan.Core.M4
                         Require(index >= 0 && !ProgressCatalog.IsVictoryPoint(c.SelectedProgressCard), "NoProgressCard", "只能选择对方手中的发展卡。");
                         other.ProgressCards = other.ProgressCards.Where((x, i) => i != index).ToArray();
                         p.ProgressCards = Append(p.ProgressCards, c.SelectedProgressCard);
+                        if(B5(s)&&--d.Amount>0&&other.ProgressCards.Length>0)return;
                     }
                     break;
                 case "ProgressWedding": ProgressTransferSelection(p, s.Players.Single(x => x.Id == d.OtherPlayerId), null, c, d.Amount); break;
@@ -239,7 +242,7 @@ namespace Catan.Core.M4
         {
             if(B2DrawBlocked(s,p.Id)) return;
             var sites = Buildings(s).Where(b => b.PlayerId == p.Id).Select(b => b.LocationId).ToArray();
-            var amount = 2 * s.Tiles.Count(t => t.Resource == ResourceName(resource) && t.Vertices.Any(sites.Contains));
+            var amount = 2 * s.Tiles.Count(t => t.Resource == ResourceName(resource) && t.Vertices.Any(sites.Contains))*B5ProgressFactor(s,p.Id,p.Id);
             Transfer(s.Bank, p.Resources, resource, Math.Min(amount, s.Bank[resource]));
         }
         private void BeginProgressRoads(GameState s, PlayerState p, int count)
@@ -268,6 +271,17 @@ namespace Catan.Core.M4
             TransferBag(from.Resources, to == null ? bank.Bank : to.Resources, resources);
             foreach (Commodity type in Enum.GetValues(typeof(Commodity))) ProgressCommodityTransfer(from.Commodities, to == null ? bank.CommodityBank : to.Commodities, type, commodities[type]);
         }
+        private IEnumerable<string[]> ProgressSmithingTargets(GameState s,PlayerState p)
+        {
+            // 每席至多六枚实体骑士；按高等级优先晋升，释放下一等级的库存。
+            var knights=s.Knights.Where(k=>k.PlayerId==p.Id).OrderByDescending(k=>k.Level).ThenBy(k=>k.LocationId,StringComparer.Ordinal).Select(k=>k.LocationId).ToArray();
+            int limit=2*B5ProgressFactor(s,p.Id,p.Id);
+            for(int mask=1;mask<(1<<knights.Length);mask++)
+            {
+                var targets=knights.Where((_,index)=>(mask&(1<<index))!=0).ToArray();
+                if(targets.Length<=limit)yield return targets;
+            }
+        }
         private void ProgressPromote(GameState s, PlayerState p, string location)
         {
             var knight = s.Knights.FirstOrDefault(k => k.PlayerId == p.Id && k.LocationId == location);
@@ -293,11 +307,16 @@ namespace Catan.Core.M4
             var tile = s.Tiles.FirstOrDefault(t => t.Id == tileId);
             Require(s.FirstBarbarianAttack && tile != null && tile.Resource != "sea" && tile.Id != s.RobberTileId, "InvalidTaxation", "首轮蛮族攻击后才能将强盗移至另一个陆地。");
             s.RobberTileId = tile.Id;
+            if(B5(s))Catan.Core.ThreeKingdoms.B2SkillEngine.OnB5RobberMoved(s.ThreeKingdoms,tile.Id);
+            bool b5CardsLost=false;
             var victims = Buildings(s).Where(b => b.PlayerId != p.Id && tile.Vertices.Contains(b.LocationId)).Select(b => b.PlayerId).Distinct().ToArray();
             foreach (var id in victims)
             {
                 var victim = s.Players.Single(x => x.Id == id); var total = ProgressHandSize(victim);
-                if (total == 0 || B2Protected(s,victim.Id) || B3Immune(s,victim.Id)) continue;
+                if (total == 0 || B2Protected(s,victim.Id) || B3Immune(s,victim.Id) || B5ProgressImmune(s,victim.Id) || Catan.Core.ThreeKingdoms.B2SkillEngine.B5RobberPirateImmune(s.ThreeKingdoms,victim.Id)) continue;
+                for(int draw=0;draw<B5ProgressFactor(s,p.Id,victim.Id)&&ProgressHandSize(victim)>0;draw++)
+                {
+                total=ProgressHandSize(victim); b5CardsLost=true;
                 var selected = Draw(s.Random, total); var done = false;
                 foreach (var resource in Resources)
                 {
@@ -310,7 +329,9 @@ namespace Catan.Core.M4
                     if (selected < victim.Commodities[type]) { ProgressCommodityTransfer(victim.Commodities, p.Commodities, type, 1); break; }
                     selected -= victim.Commodities[type];
                 }
+                }
             }
+            if(B5(s))Catan.Core.ThreeKingdoms.B2SkillEngine.OnB5RaidResolved(CardHost(s),"bishop-"+B5ProgressContext(s)?.EventId,false,false,b5CardsLost,tile.Id);
         }
 
         private static void ClearProgressTurn(GameState s)
@@ -411,7 +432,8 @@ namespace Catan.Core.M4
                         var tiles = s.Tiles.Where(t => SwappableNumber(t.Number)).ToArray();
                         if (tiles.Length > 1) { var c = play(); c.SourceId = tiles[0].Id; c.TargetId = tiles[1].Id; yield return c; } break;
                     case ProgressCardKind.Smithing:
-                        foreach (var k in s.Knights.Where(k => k.PlayerId == p.Id)) { var c = play(); c.TargetIds = new[] { k.LocationId }; yield return c; } break;
+                        if(B5(s)) {foreach(var ids in ProgressSmithingTargets(s,p)){var c=play();c.TargetIds=ids;yield return c;}}
+                        else foreach (var k in s.Knights.Where(k => k.PlayerId == p.Id)) { var c = play(); c.TargetIds = new[] { k.LocationId }; yield return c; } break;
                     case ProgressCardKind.GuildDues: case ProgressCardKind.Espionage: case ProgressCardKind.Treason:
                         foreach (var other in s.Players.Where(x => x.Id != p.Id)) { var c = play(); c.OtherPlayerId = other.Id; yield return c; } break;
                     case ProgressCardKind.Merchant: case ProgressCardKind.Taxation:

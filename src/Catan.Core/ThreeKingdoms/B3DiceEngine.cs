@@ -8,7 +8,7 @@ namespace Catan.Core.ThreeKingdoms
     public static class B3DiceEngine
     {
         private static readonly string[] CardNames = { "木", "砖", "羊", "麦", "矿", "布", "币", "纸" };
-        private static bool Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && (s.RulesVersion == GeneralCatalog.B3RulesVersion || s.RulesVersion == GeneralCatalog.B4RulesVersion);
+        private static bool Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && (s.RulesVersion == GeneralCatalog.B3RulesVersion || s.RulesVersion == GeneralCatalog.B4RulesVersion || s.RulesVersion == GeneralCatalog.B5RulesVersion);
         public static bool HasPending(ThreeKingdomsState s) => Enabled(s) && s.Dice != null &&
             (s.Dice.StartWindowOpen || s.Dice.PendingDecision != null || (s.Dice.Roll != null && !s.Dice.Roll.Submitted));
 
@@ -20,7 +20,7 @@ namespace Catan.Core.ThreeKingdoms
             if (dice.OpenedTurnId == s.Clock.TurnInstanceId) return;
             Require(!HasPending(s), "上一次骰子选择尚未完成。");
             dice.OpenedTurnId = s.Clock.TurnInstanceId; dice.FixedResult = null;
-            var owners = Order(s).Select(p => Active(s, p)).Where(g => g?.GeneralId == "tk-g21" && Used(g) < 3).ToArray();
+            var owners = Order(s).Select(p => Active(s, p)).Where(g => CanFix(s,g)).ToArray();
             dice.FixedResponders = owners.Select(g => g.OwnerPlayerId).ToArray();
             dice.FixedResponderTenures = owners.Select(g => g.TenureId).ToArray();
             dice.FixedResponderCursor = 0; dice.StartWindowOpen = owners.Length > 0; Pump(host);
@@ -67,7 +67,8 @@ namespace Catan.Core.ThreeKingdoms
             var s = host.State; var g = Active(s, playerId);
             var observe = purpose == B3DicePurpose.Formal && g?.GeneralId == "tk-g19";
             s.Dice.Roll = new B3DiceRoll { EventId = eventId, PlayerId = playerId, Purpose = purpose, FixedRed = fixedRed, FixedWhite = fixedWhite,
-                ObserverTenure = observe ? g.TenureId : null, Stage = observe ? "observe" : "rolling", TurnInstanceId = s.Clock.TurnInstanceId };
+                ObserverTenure = observe ? g.TenureId : null, Stage = observe ? "observe" : "rolling", TurnInstanceId = s.Clock.TurnInstanceId,
+                TotalModifier = B2SkillEngine.B5DiceModifier(s,playerId,fixedRed==0) };
             Pump(host);
         }
 
@@ -111,7 +112,7 @@ namespace Catan.Core.ThreeKingdoms
             if (dice.PendingDecision != null)
             {
                 var d = dice.PendingDecision; var g = Active(s, d.PlayerId);
-                if (d.Kind == "dice-fixed" && (g?.TenureId != dice.FixedResponderTenures[dice.FixedResponderCursor] || g.GeneralId != "tk-g21" || Used(g) >= 3))
+                if (d.Kind == "dice-fixed" && (g?.TenureId != dice.FixedResponderTenures[dice.FixedResponderCursor] || !CanFix(s,g)))
                 { dice.PendingDecision = null; dice.FixedResponderCursor++; }
                 else if (d.Kind == "dice-observe" && g?.TenureId != dice.Roll.ObserverTenure)
                 { dice.PendingDecision = null; dice.Roll.Stage = "rolling"; }
@@ -126,9 +127,9 @@ namespace Catan.Core.ThreeKingdoms
                 {
                     if (dice.FixedResponderCursor >= dice.FixedResponders.Length) { dice.StartWindowOpen = false; return; }
                     var player = dice.FixedResponders[dice.FixedResponderCursor]; var general = Active(s, player);
-                    if (general?.GeneralId != "tk-g21" || general.TenureId != dice.FixedResponderTenures[dice.FixedResponderCursor] || Used(general) >= 3)
+                    if (!CanFix(s,general) || general.TenureId != dice.FixedResponderTenures[dice.FixedResponderCursor])
                     { dice.FixedResponderCursor++; continue; }
-                    SetDecision(s, player, "dice-fixed", "直谏", "可指定本回合为任意事件颜色的 7；选择红骰后白骰补足 7。"); return;
+                    SetDecision(s, player, "dice-fixed", general.GeneralId=="tk-g20"?"祸首":"直谏", general.GeneralId=="tk-g20"?"可指定本回合为黑色 7 并立即正式入侵；本回合不再投掷。":"可指定本回合为任意事件颜色的 7；选择红骰后白骰补足 7。"); return;
                 }
                 var r = dice.Roll; if (r == null || r.Submitted) return; if (r.Stage == "ready") { OpenLuoshen(host); return; }
                 if (r.Stage == "observe")
@@ -173,7 +174,8 @@ namespace Catan.Core.ThreeKingdoms
                 Red = r.FixedRed != 0 ? r.FixedRed : candidates[r.SelectedIndices[0]].Red,
                 White = r.FixedWhite != 0 ? r.FixedWhite : candidates[r.SelectedIndices[1]].White,
                 EventFace = r.Purpose == B3DicePurpose.Formal ? candidates[r.SelectedIndices[2]].EventFace : 0,
-                NumericActualRoll = r.FixedRed == 0, ActualRoll = r.FixedRed == 0, EventActualRoll = r.Purpose == B3DicePurpose.Formal };
+                NumericActualRoll = r.FixedRed == 0, ActualRoll = r.FixedRed == 0, EventActualRoll = r.Purpose == B3DicePurpose.Formal,
+                TotalModifier = r.FixedRed == 0 ? r.TotalModifier : 0 };
             r.Stage = "ready";
         }
 
@@ -194,10 +196,11 @@ namespace Catan.Core.ThreeKingdoms
             if (d.Kind == "dice-fixed")
             {
                 var g = Active(s, playerId);
-                if (g?.GeneralId != "tk-g21" || g.TenureId != dice.FixedResponderTenures[dice.FixedResponderCursor] || Used(g) >= 3) return actions.ToArray();
-                actions.Add(Action(s, "tk-g21-s2", "skip", "放弃直谏"));
-                foreach (var face in new[] { 1, 4, 5, 6 }) for (var red = 1; red <= 6; red++)
-                { var a = Action(s, "tk-g21-s2", "fixed", "直谏：" + EventName(face) + " 7（红 " + red + "，白 " + (7 - red) + "）"); a.Command.CardType = face; a.Command.Counts[0] = red; actions.Add(a); }
+                if (!CanFix(s,g) || g.TenureId != dice.FixedResponderTenures[dice.FixedResponderCursor]) return actions.ToArray();
+                bool huoshou=g.GeneralId=="tk-g20";string skill=huoshou?"tk-g20-s1":"tk-g21-s2",name=huoshou?"祸首":"直谏";
+                actions.Add(Action(s,skill,"skip","放弃"+name));
+                foreach (var face in huoshou?new[]{1}:new[] { 1, 4, 5, 6 }) for (var red = 1; red <= 6; red++)
+                { var a = Action(s, skill, "fixed", name+"：" + EventName(face) + " 7（红 " + red + "，白 " + (7 - red) + "）"); a.Command.CardType = face; a.Command.Counts[0] = red; actions.Add(a); }
             }
             else if (d.Kind == "dice-observe")
             {
@@ -233,12 +236,14 @@ namespace Catan.Core.ThreeKingdoms
                 if (command.Option == "skip") dice.FixedResponderCursor++;
                 else
                 {
-                    var g = Active(s, playerId); var counter = g.Counters.SingleOrDefault(c => c.Key == "zhijian");
-                    if (counter == null) { counter = new GeneralCounter { Key = "zhijian" }; g.Counters = g.Counters.Concat(new[] { counter }).ToArray(); }
-                    counter.Value++;
-                    RecordHistory(s, "fixed:" + s.Clock.TurnInstanceId + ":" + g.TenureId, playerId, "tk-g21-s2", "指定本回合为 " + EventName(command.CardType) + " 7");
+                    var g = Active(s, playerId);bool huoshou=g.GeneralId=="tk-g20";
+                    if(!huoshou){var counter = g.Counters.SingleOrDefault(c => c.Key == "zhijian");
+                        if (counter == null) { counter = new GeneralCounter { Key = "zhijian" }; g.Counters = g.Counters.Concat(new[] { counter }).ToArray(); } counter.Value++;}
+                    string eventId="fixed:" + s.Clock.TurnInstanceId + ":" + g.TenureId;
+                    RecordHistory(s,eventId,playerId,huoshou?"tk-g20-s1":"tk-g21-s2","指定本回合为 " + EventName(command.CardType) + " 7"+(huoshou?"并立即正式入侵":""));
                     dice.FixedResult = new B3DiceResult { PlayerId = s.Clock.ActivePlayerId, Purpose = B3DicePurpose.Formal, Red = command.Counts[0], White = 7 - command.Counts[0], EventFace = command.CardType };
                     dice.StartWindowOpen = false;
+                    if(huoshou){dice.PendingDecision=null;B2SkillEngine.CommitB5Huoshou(host,playerId,eventId);}
                 }
             }
             else if (d.Kind == "dice-observe") { r.CandidateCount = command.Option == "observe" ? 2 : 1; r.Stage = "rolling"; if (command.Option == "observe") RecordHistory(s, r.EventId + ":observe", playerId, "tk-g19-s1", "为每颗骰子生成两个候选"); }
@@ -286,6 +291,7 @@ namespace Catan.Core.ThreeKingdoms
         private static void Pass(B3DiceRoll r) { r.ConsecutivePasses++; if (r.Responders.Length > 0) r.ResponderCursor = (r.ResponderCursor + 1) % r.Responders.Length; }
         private static bool Die(int value) => value >= 1 && value <= 6;
         private static int Used(GeneralInstance g) => g.Counters.FirstOrDefault(c => c.Key == "zhijian")?.Value ?? 0;
+        private static bool CanFix(ThreeKingdomsState s,GeneralInstance g) => g!=null&&(g.GeneralId=="tk-g21"&&Used(g)<3||B2SkillEngine.B5Enabled(s)&&g.GeneralId=="tk-g20"&&(g.Counters.FirstOrDefault(c=>c.Key=="huoshou")?.Value??0)==0);
         private static GeneralInstance Active(ThreeKingdomsState s, string playerId) => s.Generals.SingleOrDefault(g => g.OwnerPlayerId == playerId && g.Region == GeneralRegion.Active);
         private static IEnumerable<string> Order(ThreeKingdomsState s) { var start = Array.IndexOf(s.SeatPlayerIds, s.Clock.ActivePlayerId); if (start < 0) start = 0; return Enumerable.Range(0, s.SeatPlayerIds.Length).Select(i => s.SeatPlayerIds[(start + i) % s.SeatPlayerIds.Length]); }
         private static string EventName(int face) => face <= 3 ? "黑色" : face == 4 ? "贸易" : face == 5 ? "政治" : "科学";
@@ -309,7 +315,7 @@ namespace Catan.Core.ThreeKingdoms
             bool Player(string p) => p != null && s.SeatPlayerIds.Contains(p);
             bool Result(B3DiceResult result, B3DicePurpose purpose) => result != null && result.Purpose == purpose && Die(result.Red) && Die(result.White) &&
                 (purpose == B3DicePurpose.Formal ? Die(result.EventFace) : result.EventFace == 0) && result.NumericActualRoll == result.ActualRoll &&
-                (!result.EventActualRoll || purpose == B3DicePurpose.Formal);
+                (!result.EventActualRoll || purpose == B3DicePurpose.Formal) && (result.TotalModifier == 0 || result.TotalModifier == 3 && B2SkillEngine.B5Enabled(s) && result.NumericActualRoll);
             Check(d.OpenedTurnId >= -1 && d.OpenedTurnId <= s.Clock.TurnInstanceId && d.FormalRollTurnId >= -1 && d.FormalRollTurnId <= s.Clock.TurnInstanceId, "骰子回合标识超出当前时钟。");
             if (d.FixedResponders == null || d.FixedResponderTenures == null) return new[] { "直谏响应名单缺失。" };
             Check(d.FixedResponders.Length == d.FixedResponderTenures.Length && d.FixedResponders.All(Player) && d.FixedResponders.Distinct().Count() == d.FixedResponders.Length &&
@@ -328,6 +334,7 @@ namespace Catan.Core.ThreeKingdoms
                 Check(r.Attempt >= 1 && (r.CandidateCount == 1 || r.CandidateCount == 2) && r.CandidateCursor >= 0 && r.CandidateCursor <= r.CandidateCount && r.ChoiceCursor >= 0 && r.ChoiceCursor <= 3, "骰局尝试或候选游标无效。");
                 Check(r.LuoshenRewardedAttempt >= 0 && r.LuoshenRewardedAttempt <= r.Attempt && (B2SkillEngine.B4Enabled(s) || r.LuoshenRewardedAttempt == 0), "洛神奖励尝试号或规则版本无效。");
                 Check(r.FixedRed == 0 && r.FixedWhite == 0 || Die(r.FixedRed) && Die(r.FixedWhite), "固定数字骰面无效。");
+                Check(r.TotalModifier==0 || r.TotalModifier==3 && B2SkillEngine.B5Enabled(s) && r.FixedRed==0,"投掷合计修正不符合B5乡害合同。");
                 if (r.Candidates == null || r.SelectedIndices == null || r.Responders == null || r.ResponderTenures == null || r.Modifications == null)
                 { errors.Add("骰局候选、选择或修改记录缺失。"); return errors.ToArray(); }
                 Check(r.SelectedIndices.Length == 3 && r.SelectedIndices.All(i => i >= -1 && i < r.CandidateCount), "逐颗候选选择索引无效。");
@@ -348,6 +355,7 @@ namespace Catan.Core.ThreeKingdoms
                 {
                     Check(Result(r.Result, r.Purpose) && r.Result.EventId == r.EventId && r.Result.PlayerId == r.PlayerId && r.Modifications.All(m => m.Applied), "最终骰局结果不完整或费用子链未完成。");
                     Check(r.Result == null || r.Result.NumericActualRoll == (r.FixedRed == 0), "最终骰局的真实数字投掷资格不一致。");
+                    Check(r.Result == null || r.Result.TotalModifier == r.TotalModifier,"最终骰局的乡害修正与本次尝试不一致。");
                     if (r.Result != null && r.Result.NumericActualRoll)
                         Check(r.Result.Attempt == r.Attempt && r.Candidates.Count(c => c.Attempt == r.Attempt) == r.CandidateCount && r.SelectedIndices.All(i => i >= 0), "最终真实骰局没有完整候选选择。");
                     if (r.Result != null && r.Candidates.Length > 0 && r.SelectedIndices.Length == 3)
@@ -377,7 +385,7 @@ namespace Catan.Core.ThreeKingdoms
         }
 
         private static B3DiceResult CopyResult(B3DiceResult r) => r == null ? null : new B3DiceResult { EventId = r.EventId, PlayerId = r.PlayerId, Purpose = r.Purpose,
-            Red = r.Red, White = r.White, EventFace = r.EventFace, ActualRoll = r.ActualRoll, NumericActualRoll = r.NumericActualRoll, EventActualRoll = r.EventActualRoll, Attempt = r.Attempt };
+            Red = r.Red, White = r.White, EventFace = r.EventFace, ActualRoll = r.ActualRoll, NumericActualRoll = r.NumericActualRoll, EventActualRoll = r.EventActualRoll, Attempt = r.Attempt, TotalModifier=r.TotalModifier };
         public static B3DiceState Clone(B3DiceState d)
         {
             if (d == null) return null; var r = d.Roll; var p = d.PendingDecision;
@@ -388,7 +396,7 @@ namespace Catan.Core.ThreeKingdoms
                 Roll = r == null ? null : new B3DiceRoll { EventId = r.EventId, PlayerId = r.PlayerId, Purpose = r.Purpose, Stage = r.Stage, Attempt = r.Attempt,
                     CandidateCount = r.CandidateCount, CandidateCursor = r.CandidateCursor, SelectedIndices = (int[])r.SelectedIndices.Clone(), ChoiceCursor = r.ChoiceCursor,
                     FixedRed = r.FixedRed, FixedWhite = r.FixedWhite, Responders = (string[])r.Responders.Clone(), ResponderTenures = (string[])r.ResponderTenures.Clone(),
-                    ResponderCursor = r.ResponderCursor, ConsecutivePasses = r.ConsecutivePasses, Result = CopyResult(r.Result), Submitted = r.Submitted, ObserverTenure = r.ObserverTenure, TurnInstanceId = r.TurnInstanceId, LuoshenRewardedAttempt = r.LuoshenRewardedAttempt,
+                    ResponderCursor = r.ResponderCursor, ConsecutivePasses = r.ConsecutivePasses, Result = CopyResult(r.Result), Submitted = r.Submitted, ObserverTenure = r.ObserverTenure, TurnInstanceId = r.TurnInstanceId, LuoshenRewardedAttempt = r.LuoshenRewardedAttempt, TotalModifier=r.TotalModifier,
                     Modifications = r.Modifications.Select(m => new B3DiceModification { PlayerId = m.PlayerId, TenureId = m.TenureId, PaymentEventId = m.PaymentEventId,
                         Attempt = m.Attempt, CandidateIndex = m.CandidateIndex, DieIndex = m.DieIndex, CardType = m.CardType, TileId = m.TileId, Before = m.Before, After = m.After, Applied = m.Applied }).ToArray(),
                     Candidates = r.Candidates.Select(c => new B3DiceCandidate { Attempt = c.Attempt, Index = c.Index, OriginalRed = c.OriginalRed, OriginalWhite = c.OriginalWhite,

@@ -8,7 +8,7 @@ namespace Catan.Core.ThreeKingdoms
     public static partial class B2SkillEngine
     {
         private static readonly string[] ReturnCauses = { "seven-discard", "discard", "payment", "play" };
-        private static bool B3Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && (s.RulesVersion == GeneralCatalog.B3RulesVersion || s.RulesVersion == GeneralCatalog.B4RulesVersion);
+        private static bool B3Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && (s.RulesVersion == GeneralCatalog.B3RulesVersion || ThreeKingdomsEngine.UsesB4Lifecycle(s));
         private static B3ReturnedCards[] Returned(ThreeKingdomsState s) => s?.Skills?.ReturnedCards ?? Array.Empty<B3ReturnedCards>();
 
         /// <summary>宿主已把真实牌移入银行后调用；七点全部弃完前只保留牌，不产生技能待决。</summary>

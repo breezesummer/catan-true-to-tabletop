@@ -52,8 +52,8 @@ internal sealed class RuleRoomGame
         string json = session switch { M2.BaseGameSession s => s.Save(), M3.SeafarersGameSession s => s.Save(), M4.CitiesKnightsGameSession s => s.Save(), M5.CombinedGameSession s => s.Save(), _ => throw new InvalidOperationException() };
         using var document = System.Text.Json.JsonDocument.Parse(json);
         if (document.RootElement.TryGetProperty("ThreeKingdoms", out var threeKingdoms) && threeKingdoms.ValueKind != System.Text.Json.JsonValueKind.Null &&
-            (threeKingdoms.GetProperty("PackageVersion").GetString()!=GeneralCatalog.B4PackageVersion || threeKingdoms.GetProperty("PackageContentHash").GetString()!=GeneralCatalog.B4ContentHash))
-            throw new InvalidDataException("三国争霸联机需要完整且匹配的 B4 武将包。");
+            !GeneralCatalog.IsNetworkPackage(threeKingdoms.GetProperty("PackageVersion").GetString(),threeKingdoms.GetProperty("PackageContentHash").GetString()))
+            throw new InvalidDataException("三国争霸联机需要完整且匹配的 B4／B5 武将包。");
         finished = document.RootElement.TryGetProperty("WinnerPlayerId", out var winner) && winner.ValueKind == System.Text.Json.JsonValueKind.String && !string.IsNullOrEmpty(winner.GetString());
         CommandCount = document.RootElement.GetProperty("ProcessedCommands").GetArrayLength();
         ActivePlayerId = document.RootElement.GetProperty("ActivePlayerId").GetString();
@@ -113,7 +113,7 @@ internal sealed class RuleRoomGame
     {
         var projection=View(seat);
         var tk=projection is M4.PlayerView city?city.ThreeKingdoms:projection is M5.PlayerView combined?combined.ThreeKingdoms:null;
-        return tk?.PackageVersion==GeneralCatalog.B4PackageVersion&&tk.PendingDecision?.PlayerId==seat;
+        return GeneralCatalog.IsAutomaticPackage(tk?.PackageVersion)&&tk.PendingDecision?.PlayerId==seat;
     }
     internal bool MatchesGeneralPackage(RoomSettings settings)
     {
@@ -136,7 +136,7 @@ internal sealed class RuleRoomGame
         else return false;
         if(!choice)return false;
         var projection=View(player);var tk=projection is M4.PlayerView cityView?cityView.ThreeKingdoms:((M5.PlayerView)projection).ThreeKingdoms;
-        return tk?.PackageVersion==GeneralCatalog.B4PackageVersion&&tk.PendingDecision?.PlayerId==player&&
+        return GeneralCatalog.IsAutomaticPackage(tk?.PackageVersion)&&tk.PendingDecision?.PlayerId==player&&
             tk.PendingDecision.DecisionId==decision&&tk.PendingDecision.WindowId==window;
     }
     internal string Actor(Func<string,bool> eligible=null)

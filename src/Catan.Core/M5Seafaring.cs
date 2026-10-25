@@ -13,7 +13,7 @@ namespace Catan.Core.M5
             var edge = EdgeAt(id);
             return s.Tiles.Where(t => edge.Vertices.All(t.Vertices.Contains));
         }
-        private IEnumerable<Edge> OwnRouteEdges(GameState s,string player) => s.Roads.Where(r=>r.PlayerId==player).Select(r=>EdgeAt(r.LocationId)).Concat(s.Ships.Where(r=>r.PlayerId==player).Select(r=>EdgeAt(r.LocationId)));
+        private IEnumerable<Edge> OwnRouteEdges(GameState s,string player) => s.Roads.Where(r=>r.PlayerId==player&&B5Working(s,"Road",r.LocationId)).Select(r=>EdgeAt(r.LocationId)).Concat(s.Ships.Where(r=>r.PlayerId==player&&B5Working(s,"Ship",r.LocationId)).Select(r=>EdgeAt(r.LocationId)));
         private bool SeaEdge(GameState s,string edge) { var tiles=EdgeTiles(s,edge).ToArray();return tiles.Length==1||tiles.Any(t=>!IsLand(t)); }
         private bool PirateBlocks(GameState s,string edge) => s.PirateTileId!=null&&EdgeTiles(s,edge).Any(t=>t.Id==s.PirateTileId);
 
@@ -33,28 +33,29 @@ namespace Catan.Core.M5
                     s.Ships=s.Ships.Where(x=>x.LocationId!=c.SourceId).ToArray();p.ShipsRemaining++;
                     ValidateShip(s,p,c.TargetId,null);PlaceShip(s,p,c.TargetId);s.Ships.Last().IsWarship=moved.IsWarship;s.ShipMovedThisTurn=true;return true;
                 case CommandKind.MovePirate:
-                    Require(s.FirstBarbarianAttack&&seafaring.Id!="pirate-islands"&&seafaring.InitialPirateTileId!=null&&(seafaring.Id!="cloth-for-catan"||s.Special.Villages.Any(v=>v.TradingPlayerIds.Contains(p.Id)))&&s.Phase==GamePhase.RobberMove&&s.PendingDecision!=null&&s.PendingDecision.Token!="robber-only","WrongPhase","当前不能移动海盗。");
+                    Require(s.FirstBarbarianAttack&&seafaring.Id!="pirate-islands"&&seafaring.InitialPirateTileId!=null&&(seafaring.Id!="cloth-for-catan"||s.Special.Villages.Any(v=>v.TradingPlayerIds.Contains(p.Id)))&&s.Phase==GamePhase.RobberMove&&s.PendingDecision!=null&&(!B5(s)||s.PendingDecision.PlayerId==p.Id)&&s.PendingDecision.Token!="robber-only","WrongPhase","当前不能移动海盗。");
                     Require(c.TargetId!=s.PirateTileId&&(c.TargetId=="frame"||s.Tiles.Any(t=>t.Id==c.TargetId&&t.Resource=="sea")),"InvalidPirateTile","海盗须移动至另一海格或边框。");
                     s.PirateTileId=c.TargetId;s.PendingDecision.Token="pirate";s.PendingDecision.EligibleVictimIds=PirateVictims(s,p.Id,c.TargetId);
                     if(s.PendingDecision.EligibleVictimIds.Length==0)FinishDecision(s);else {s.PendingDecision.Kind="Steal";s.Phase=GamePhase.RobberSteal;}return true;
                 case CommandKind.ChasePirate:
                     ActionPhase(s);var knight=OwnKnight(s,p,c.TargetId);
-                    Require(s.FirstBarbarianAttack&&seafaring.Id!="pirate-islands"&&(seafaring.Id!="cloth-for-catan"||s.Special.Villages.Any(v=>v.TradingPlayerIds.Contains(p.Id)))&&knight.Active&&knight.ActivatedTurn!=s.Turn,"KnightCannotAct","只有此前激活的骑士可以驱逐已进场的海盗。");
+                    Require(s.FirstBarbarianAttack&&seafaring.Id!="pirate-islands"&&(seafaring.Id!="cloth-for-catan"||s.Special.Villages.Any(v=>v.TradingPlayerIds.Contains(p.Id)))&&B5KnightCanAct(s,knight),"KnightCannotAct","只有此前激活的骑士可以驱逐已进场的海盗。");
                     Require(s.Tiles.Any(t=>t.Id==s.PirateTileId&&t.Vertices.Contains(c.TargetId)),"KnightNotAtPirate","骑士须在海盗所在海格旁。");
-                    knight.Active=false;knight.ActedTurn=s.Turn;s.PendingDecision=new PendingDecision {Kind="Pirate",PlayerId=p.Id,Token="pirate-only",ReturnPhase=GamePhase.Action};s.Phase=GamePhase.RobberMove;return true;
+                    B5Exhaust(s,knight);s.PendingDecision=new PendingDecision {Kind="Pirate",PlayerId=p.Id,Token="pirate-only",ReturnPhase=GamePhase.Action};s.Phase=GamePhase.RobberMove;return true;
                 default:return false;
             }
         }
         private string[] PirateVictims(GameState s,string player,string tile) => tile=="frame"?Array.Empty<string>():s.Ships.Where(x=>x.PlayerId!=player&&EdgeTiles(s,x.LocationId).Any(t=>t.Id==tile)).Select(x=>x.PlayerId).Distinct().OrderBy(x=>x).ToArray();
         private void ValidateShip(GameState s,PlayerState p,string edge,string anchor)
         {
+            if(anchor==null)B5ValidateNative(s,new Command{PlayerId=p.Id,Kind=CommandKind.BuildShip,TargetId=edge});
             var location=scenario.Topology.Edges.FirstOrDefault(e=>e.Id==edge);Require(location!=null,"UnknownEdge","请选择有效边。");
             Require(p.ShipsRemaining>0,"NoShips","船库存不足。");
             Require(!s.Roads.Any(r=>r.LocationId==edge)&&!s.Ships.Any(r=>r.LocationId==edge),"OccupiedEdge","此边已有道路或船。");
             Require(SeaEdge(s,edge),"ShipOnLand","船只能放在海边。");Require(!PirateBlocks(s,edge),"PirateBlocksShip","海盗封锁此边。");
             if(seafaring.Id=="pirate-islands")ValidatePirateRoute(s,p,edge);
             if(anchor!=null)Require(location.Vertices.Contains(anchor),"ShipNotAtAnchor","开局船须连接刚放置的建筑。");
-            else Require(location.Vertices.Any(v=>Buildings(s).Any(b=>b.PlayerId==p.Id&&b.LocationId==v)||!Blocked(s,p.Id,v)&&s.Ships.Any(x=>x.PlayerId==p.Id&&EdgeAt(x.LocationId).Vertices.Contains(v))),"DisconnectedShip","船须连接己方建筑或船；路船转换须经己方建筑。");
+            else Require(location.Vertices.Any(v=>Buildings(s).Any(b=>b.PlayerId==p.Id&&b.LocationId==v)||!Blocked(s,p.Id,v)&&s.Ships.Any(x=>x.PlayerId==p.Id&&B5Working(s,"Ship",x.LocationId)&&EdgeAt(x.LocationId).Vertices.Contains(v))),"DisconnectedShip","船须连接己方建筑或船；路船转换须经己方建筑。");
         }
         private void PlaceShip(GameState s,PlayerState p,string edge)
         {
@@ -64,7 +65,7 @@ namespace Catan.Core.M5
         {
             var edge=EdgeAt(ship.LocationId);
             var anchors=new HashSet<string>(Buildings(s).Where(b=>b.PlayerId==ship.PlayerId).Select(b=>b.LocationId).Concat(s.Knights.Where(k=>k.PlayerId==ship.PlayerId).Select(k=>k.LocationId)).Concat(s.Special?.Villages.Select(v=>v.VertexId)??Array.Empty<string>()));
-            var routes=s.Ships.Where(x=>x.PlayerId==ship.PlayerId).Select(x=>EdgeAt(x.LocationId)).ToArray();
+            var routes=s.Ships.Where(x=>x.PlayerId==ship.PlayerId&&B5Working(s,"Ship",x.LocationId)).Select(x=>EdgeAt(x.LocationId)).ToArray();
             if(edge.Vertices.Any(v=>!anchors.Contains(v)&&!routes.Any(e=>e.Id!=edge.Id&&e.Vertices.Contains(v))))return true;
 
             // Official Seafarers FAQ loop exceptions: a ring returning to the same
@@ -105,7 +106,7 @@ namespace Catan.Core.M5
         private void ValidateMoveSource(GameState s,PlayerState p,string edge)
         {
             var ship=s.Ships.FirstOrDefault(x=>x.LocationId==edge&&x.PlayerId==p.Id);Require(ship!=null,"NotOwnShip","请选择己方船。");
-            Require(!s.ShipMovedThisTurn,"ShipAlreadyMoved","每回合只能移动一艘船。");Require(ship.BuiltTurn<s.Turn,"NewShip","本回合新船不能移动。");
+            Require(B5Working(s,"Ship",edge),"DamagedShip","横置船须先修复。");Require(!s.ShipMovedThisTurn,"ShipAlreadyMoved","每回合只能移动一艘船。");Require(ship.BuiltTurn<s.Turn,"NewShip","本回合新船不能移动。");
             Require(!PirateBlocks(s,edge),"PirateBlocksShip","海盗旁的船不能移动。");Require(ShipIsOpen(s,ship),"ClosedRoute","只能移动开放航线末端的船。");
             Require(!RemovalDisconnectsKnight(s,p.Id,edge),"KnightDisconnected","不能使己方骑士脱离道路或船的连接。");
         }

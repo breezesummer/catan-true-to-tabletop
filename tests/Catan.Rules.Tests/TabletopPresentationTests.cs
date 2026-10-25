@@ -65,10 +65,12 @@ public sealed class TabletopPresentationTests
     [InlineData("ProgressTreasonPlace","安置","替补骑士")]
     [InlineData("DisplacedKnight","安置","被驱逐的骑士")]
     [InlineData("Metropolis","大都会","城市")]
+    [InlineData("B5MetropolisRelocate","迁移大都会","己方城市")]
     public void UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(string kind,string action,string piece)
     {
         var sequence=new TabletopPromptSequence();
         string instruction=TabletopSelectionPrompt.Decision(kind);
+        Assert.True(TabletopSelectionPrompt.IsDirectMapDecision(kind));
         Assert.Contains(action,instruction);Assert.Contains(piece,instruction);
         sequence.RequireSelection(instruction);
         sequence.Show(10,"你的回合",instruction);

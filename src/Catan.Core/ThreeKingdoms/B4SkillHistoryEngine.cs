@@ -43,7 +43,7 @@ namespace Catan.Core.ThreeKingdoms
         public static void Begin(ThreeKingdomsState state, string eventId, string playerId, string skillId,
             string tenureId = null, string sourceEventId = null, string publicResult = null)
         {
-            if (state?.PackageVersion != GeneralCatalog.B4PackageVersion || string.IsNullOrEmpty(skillId)) return;
+            if (!GeneralCatalog.IsAutomaticPackage(state?.PackageVersion) || string.IsNullOrEmpty(skillId)) return;
             if (string.IsNullOrEmpty(eventId) || !state.SeatPlayerIds.Contains(playerId)) throw new InvalidOperationException("技能历史缺少合法事件或玩家。");
             var history = state.SkillHistory ?? Array.Empty<B4SkillHistoryEvent>();
             var previous = history.FirstOrDefault(e => e.EventId == eventId || (e.FrameIds??Array.Empty<string>()).Contains(eventId));
@@ -92,7 +92,7 @@ namespace Catan.Core.ThreeKingdoms
         // 只按命令明确携带的帧ID/后缀匹配，绝不把最近一次同技能误当作来源。
         internal static void LinkFrameCardFlow(ThreeKingdomsState state,string flowId,B2HandChange[] changes)
         {
-            if(state?.PackageVersion!=GeneralCatalog.B4PackageVersion)return;
+            if(!GeneralCatalog.IsAutomaticPackage(state?.PackageVersion))return;
             var source=state.Skills?.Frames.FirstOrDefault(f=>f.Started&&f.SkillId!=null&&(flowId==f.Id||flowId.StartsWith(f.Id+":",StringComparison.Ordinal)));
             if(source!=null)Begin(state,source.Id,source.B4?.OwnerPlayerId??source.PlayerId,source.SkillId,source.TenureId,source.SourceEventId);
             LinkCardFlow(state,flowId,flowId,changes);

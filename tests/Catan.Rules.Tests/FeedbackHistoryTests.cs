@@ -58,11 +58,28 @@ public sealed class FeedbackHistoryTests
     {var line=Assert.Single(TabletopHistoryModel.Lines(Entry("PlayProgressCard","使用「"+name+"」",Change("P1","progress",name,-1))));Assert.Equal("使用「"+name+"」",line.Prefix);Assert.Equal(name,line.Emphasis);Assert.Equal(track,line.Track);Assert.Equal(-1,TabletopHistoryModel.CardTrack("发展卡"));}
     [Fact] public void HiddenOperationRetainsCaptionUntilStateChanges()
     {var window=new OperationWindowState();window.Sync("P1","1");window.Hide("婚礼赠礼");window.Sync("P1","1");Assert.True(window.Hidden);Assert.Equal("婚礼赠礼",window.Caption);window.Open();Assert.False(window.Hidden);window.Hide("金矿");window.Sync("P1","2");Assert.False(window.Hidden);Assert.Null(window.Caption);}
-    [Fact] public void SmithingPrefersACompletePairIncludingSupplyReleaseOrder()
+    [Fact] public void SmithingKeepsConfirmablePrefixesIncludingSupplyReleaseOrder()
     {
         var plans=TabletopSmithingSelection.Plans(["弱","强"],ids=>ids.SequenceEqual(new[]{"强","弱"})||ids.SequenceEqual(new[]{"强"}));
-        Assert.Equal(new[]{"强","弱"},Assert.Single(plans));
+        Assert.Equal(2,plans.Length);Assert.Equal(new[]{"强"},TabletopSmithingSelection.NextTargets(plans,[]));
+        Assert.Equal(new[]{"弱"},TabletopSmithingSelection.NextTargets(plans,["强"]));Assert.True(TabletopSmithingSelection.CanConfirm(plans,["强"]));
+        Assert.True(TabletopSmithingSelection.CanConfirm(plans,["强","弱"]));Assert.False(TabletopSmithingSelection.CanConfirm(plans,["弱","强"]));
         plans=TabletopSmithingSelection.Plans(["一","二"],ids=>ids.SequenceEqual(new[]{"一"}));Assert.Equal(new[]{"一"},Assert.Single(plans));
         Assert.Empty(TabletopSmithingSelection.Plans(["一"],_=>false));
+    }
+    [Fact] public void SmithingDoubleEffectAllowsEveryLegalPrefixThroughFourWithoutDuplicates()
+    {
+        string[] order=["强一","弱一","强二","弱二"];int previews=0;
+        var plans=TabletopSmithingSelection.Plans(["弱一","弱二","强一","强二","强二"],ids=>{previews++;return ids.SequenceEqual(order.Take(ids.Length));},4);
+        Assert.Equal(4,plans.Length);Assert.InRange(previews,4,10);
+        for(int count=1;count<=4;count++)Assert.True(TabletopSmithingSelection.CanConfirm(plans,order.Take(count).ToArray()));
+        Assert.Equal(new[]{"强二"},TabletopSmithingSelection.NextTargets(plans,["强一","弱一"]));Assert.Empty(TabletopSmithingSelection.NextTargets(plans,order));
+        Assert.False(TabletopSmithingSelection.CanConfirm(plans,["强一","弱一","强一"]));
+    }
+    [Fact] public void SmithingOrdinaryPackageStillStopsAtTwoAndNeverOffersInvalidContinuation()
+    {
+        var plans=TabletopSmithingSelection.Plans(["一","二","三","四"],ids=>!ids.Contains("四"));
+        Assert.All(plans,plan=>Assert.InRange(plan.Length,1,2));Assert.Empty(TabletopSmithingSelection.NextTargets(plans,["一","二"]));
+        Assert.DoesNotContain("四",TabletopSmithingSelection.NextTargets(plans,[]));Assert.False(TabletopSmithingSelection.CanConfirm(plans,[]));
     }
 }

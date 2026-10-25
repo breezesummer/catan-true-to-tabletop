@@ -1,0 +1,63 @@
+{
+  "日期": "2026-10-25",
+  "Unity": "6000.3.25f1",
+  "游戏版本": "内测版2.0.2",
+  "正式发布": false,
+  "云端部署": false,
+  "证据": [
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B5/Builds/Windows/Catan2.0.2.exe",
+      "字节": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653",
+      "修改时间": "2026-10-25T14:33:38.2125231+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B5/Builds/Windows/Catan2.0.2_Data/Managed/Assembly-CSharp.dll",
+      "字节": 1242624,
+      "SHA256": "878f216cdcfd58ce795c520a588a5a1b7df8efe381dc0cd33a19f24b2a897ea9",
+      "修改时间": "2026-10-25T14:51:37.7949538+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B5/Builds/Windows/Catan2.0.2_Data/Managed/Catan.Core.dll",
+      "字节": 1298944,
+      "SHA256": "e9d987177ca280cdc634c9417ebd54efc32139054c254bb78fd112c2dec00d28",
+      "修改时间": "2026-10-25T14:51:38.3160375+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B5/Builds/Windows/Catan2.0.2_Data/Managed/Catan.AI.dll",
+      "字节": 215552,
+      "SHA256": "c61120ea81094f0803c1a4e4eac1d0a64cbecdf204ecad44cec167365b27aee1",
+      "修改时间": "2026-10-25T14:51:38.3547151+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B5/Builds/Windows/Server/Catan.Core.dll",
+      "字节": 1298944,
+      "SHA256": "e9d987177ca280cdc634c9417ebd54efc32139054c254bb78fd112c2dec00d28",
+      "修改时间": "2026-10-25T14:47:15.9927978+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B5/Builds/Android/Catan2.0.2.apk",
+      "字节": 354824461,
+      "SHA256": "df01ea860cda1ff8654a143543970802677a362b59d21590aae23f1620dc9911",
+      "修改时间": "2026-10-25T14:55:57.6670826+08:00"
+    },
+    {
+      "路径": ".local/verification/three-kingdoms-b5/player-delivery/result.json",
+      "字节": 570,
+      "SHA256": "cdf414b5db027cd4f0491339a659f2deaeb16162505bfd0d1e713713d64b84e0",
+      "修改时间": "2026-10-25T14:55:36.3327014+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B5/logs/unity-build.log",
+      "字节": 564642,
+      "SHA256": "e9aa84a73891e79a5db8508afabae7fdb090a1690c76191958ee2b5903bad6ba",
+      "修改时间": "2026-10-25T14:51:46.3923782+08:00"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B5/logs/unity-android-build.log",
+      "字节": 700536,
+      "SHA256": "a649e720d0f4cc59c14d9b948f418ed076190a7965ecfc70ea2a6203d2a42d0c",
+      "修改时间": "2026-10-25T14:56:02.8948663+08:00"
+    }
+  ]
+}

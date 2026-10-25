@@ -79,6 +79,7 @@ namespace Catan.Core.M4
             B2SkillEngine.HoldReturnedCards(host,p.Id,"payment",id,realCards);
             var changes=new[]{new B2HandChange {PlayerId=p.Id,BeforeCount=before.Sum(),AfterCount=before.Sum()-realCards.Sum(),LostCount=realCards.Sum(),LostCards=realCards,SourceSkillId="tk-g07-s1"}};
             B2SkillEngine.OnCardsMoved(host,id,changes);
+            B2SkillEngine.OnCivilPaid(host,id,p.Id,Enumerable.Range(0,8).Where(t=>needs[t]>0).ToArray());
             if(s.B4DeclarationHistoryEventId!=null)B4SkillHistoryEngine.LinkCardFlow(s.ThreeKingdoms,s.B4DeclarationHistoryEventId,id,changes);
         }
     }

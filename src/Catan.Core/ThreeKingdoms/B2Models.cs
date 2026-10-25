@@ -89,6 +89,7 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=15)] public bool Started { get; set; }
         [DataMember(Order=16, EmitDefaultValue=false)] public B4SkillPayload B4 { get; set; }
         [DataMember(Order=17, EmitDefaultValue=false)] public bool B4OrderChosen { get; set; }
+        [DataMember(Order=18, EmitDefaultValue=false)] public B5CivilPayload CivilB5 { get; set; }
     }
     [DataContract] public sealed class B2TimedEffect
     {
@@ -123,6 +124,8 @@ namespace Catan.Core.ThreeKingdoms
     }
     [DataContract] public sealed class B2SkillState
     {
+        // 仅隔离的虚拟用途预检副本使用；保留帧和限制用于计算，但不重入真实技能续体。
+        [IgnoreDataMember] internal bool SuppressPump { get; set; }
         [DataMember(Order=1)] public B2SkillDecision PendingDecision { get; set; }
         [DataMember(Order=2)] public B2SkillFrame[] Frames { get; set; } = Array.Empty<B2SkillFrame>();
         [DataMember(Order=3)] public B2TimedEffect[] TimedEffects { get; set; } = Array.Empty<B2TimedEffect>();

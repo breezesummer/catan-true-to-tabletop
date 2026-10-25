@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Catan.Core;
+using Catan.Core.ThreeKingdoms;
 using Catan.Core.M5;
 using UnityEngine;
 using Command = Catan.Core.M5.Command;
@@ -9,20 +10,48 @@ using CommandKind = Catan.Core.M5.CommandKind;
 public sealed partial class M5App
 {
     object smithingView;
+    object smithingDraft;
     string[][] smithingPlans;
+    string[] smithingSelected=Array.Empty<string>();
     string[][] SmithingPlans()
     {
         if(!ReferenceEquals(smithingView,view))
         {
             smithingView=view;
+            int maxTargets=view.ThreeKingdoms?.PackageVersion==GeneralCatalog.B5PackageVersion&&view.ThreeKingdoms.Players.Any(p=>p.PlayerId==seat&&p.ActiveGeneralId=="tk-g32")?4:2;
             smithingPlans=TabletopSmithingSelection.Plans(view.Board.Knights.Where(k=>k.PlayerId==seat).Select(k=>k.LocationId).ToArray(),ids=>
-            {var c=New(CommandKind.PlayProgressCard);c.ProgressCard=ProgressCardKind.Smithing;c.TargetIds=ids;return Preview(c).Success;});
+            {var c=New(CommandKind.PlayProgressCard);c.ProgressCard=ProgressCardKind.Smithing;c.TargetIds=ids;return Preview(c).Success;},maxTargets);
         }
+        if(!ReferenceEquals(smithingDraft,draft)||!TabletopSmithingSelection.CanConfirm(smithingPlans,smithingSelected))
+        {smithingDraft=draft;smithingSelected=Array.Empty<string>();}
         return smithingPlans;
+    }
+    Command SmithingTarget(string target)
+    {
+        var plans=SmithingPlans();
+        var selected=smithingSelected.Contains(target)?smithingSelected:smithingSelected.Concat(new[]{target}).ToArray();
+        if(!TabletopSmithingSelection.CanConfirm(plans,selected))return null;
+        var command=New(CommandKind.PlayProgressCard);command.ProgressCard=ProgressCardKind.Smithing;command.TargetIds=selected;return command;
+    }
+    void ChooseSmithingTarget(string target,Command command)
+    {
+        smithingSelected=(string[])command.TargetIds.Clone();
+        bool more=TabletopSmithingSelection.NextTargets(smithingPlans,smithingSelected).Length>0;
+        var choices=more?new[]{"确认晋升这 "+smithingSelected.Length+" 名骑士","继续点选骑士","重新选择"}:new[]{"确认晋升这 "+smithingSelected.Length+" 名骑士","重新选择"};
+        var selectedDraft=draft;
+        status="已选 "+smithingSelected.Length+" 名骑士；可以确认晋升"+(more?"或继续点选。":"。");ai.ShowTablePrompt(status);
+        mapChoice.Open(board.ScreenPoint(target),"锻造：确认晋升数量",choices,index=>
+        {
+            if(!ReferenceEquals(draft,selectedDraft))return;
+            if(index==0){Submit(command);return;}
+            if(more&&index==1)status="已选 "+smithingSelected.Length+" 名骑士，请点选下一名；再次点选已选骑士可确认。";
+            else{smithingSelected=Array.Empty<string>();status="请点选第一名可晋升骑士。";}
+            ai.ShowTablePrompt(status);
+        });
     }
     bool DirectProgressActive => view!=null && (draft!=null && draft.Kind==CommandKind.PlayProgressCard &&
         new[]{ProgressCardKind.Engineering,ProgressCardKind.Medicine,ProgressCardKind.Invention,ProgressCardKind.Smithing,ProgressCardKind.Merchant,ProgressCardKind.Diplomacy,ProgressCardKind.Intrigue,ProgressCardKind.Taxation,ProgressCardKind.Treason}.Contains(draft.ProgressCard)
-        || view.PendingDecision!=null && view.PendingDecision.PlayerId==seat && new[]{"PillageCity","Metropolis","DisplacedKnight","ProgressTreasonRemove","ProgressTreasonPlace"}.Contains(view.PendingDecision.Kind)
+        || view.PendingDecision!=null && view.PendingDecision.PlayerId==seat && TabletopSelectionPrompt.IsDirectMapDecision(view.PendingDecision.Kind)
         && view.LegalActions.Any(c=>!c.Decline&&!string.IsNullOrEmpty(c.TargetId)));
     Command DirectDecisionCommand(Command candidate)
     {
@@ -35,7 +64,7 @@ public sealed partial class M5App
     void BeginDirectProgress()
     {
         if(!DirectProgressActive)return;
-        status=draft.ProgressCard==ProgressCardKind.Treason?"点选对手的骑士以选择该玩家；由对手决定移除哪名骑士。":"请直接点选地图上的目标；右键或 Esc 取消。";
+        status=draft.ProgressCard==ProgressCardKind.Treason?"点选对手的骑士以选择该玩家；由对手决定移除哪名骑士。":draft.ProgressCard==ProgressCardKind.Smithing?"点选可晋升骑士；每次可确认当前数量，或继续选择下一名。":"请直接点选地图上的目标；右键或 Esc 取消。";
         ai.ShowTablePrompt(status);
     }
     void PreviewDirectTarget(string target,string card,Command command,bool legal)
@@ -74,11 +103,9 @@ public sealed partial class M5App
         }
         if(card&&kind==ProgressCardKind.Smithing)
         {
-            var plan=SmithingPlans().FirstOrDefault(ids=>ids.Contains(target)&&(string.IsNullOrEmpty(draft.SourceId)||target!=draft.SourceId&&ids.Contains(draft.SourceId)));
-            command=plan==null?null:New(CommandKind.PlayProgressCard);
-            if(command!=null){command.ProgressCard=kind;command.TargetIds=plan;}
+            command=SmithingTarget(target);
         }
-        bool valid=command!=null&&Preview(command).Success;
+        bool valid=command!=null&&(card&&kind==ProgressCardKind.Smithing||Preview(command).Success);
         PreviewDirectTarget(target,card?kind.ToString():null,command,valid);
         if(!click)return;
         if(!valid){ai.ShowTablePrompt("此目标不符合卡牌效果，请选择其他目标。");return;}
@@ -87,9 +114,9 @@ public sealed partial class M5App
             var options=view.LegalActions.Where(c=>!c.Decline&&c.TargetId==target).Select(DirectDecisionCommand).ToArray();
             mapChoice.Open(board.ScreenPoint(target),"选择安置骑士等级",options.Select(c=>c.KnightLevel+" 级骑士").ToArray(),i=>Submit(options[i]));return;
         }
-        if(card&&kind==ProgressCardKind.Smithing&&command.TargetIds.Length==2&&string.IsNullOrEmpty(draft.SourceId))
+        if(card&&kind==ProgressCardKind.Smithing)
         {
-            draft.SourceId=target;status="已选第一名骑士，请点选第二名可晋升骑士。";ai.ShowTablePrompt(status);return;
+            ChooseSmithingTarget(target,command);return;
         }
         Submit(command);
     }

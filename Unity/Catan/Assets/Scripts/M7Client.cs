@@ -226,7 +226,7 @@ public sealed class M7Client : MonoBehaviour
                 MarkLobbyResponse(response);
                 var info=response.Room;if(!response.Success||info==null){Status=response.Message??"没有找到该房间。";return;}
                 if(info.RulesVersion!=NetworkProtocol.RulesVersion(info.RuleSet)||info.ScenarioVersion!=NetworkProtocol.ScenarioVersion(info.RuleSet)){Status="房间规则或场景版本不兼容，请更新客户端。";return;}
-                if(info.ThreeKingdomsPackageVersion!=null&&(info.ThreeKingdomsPackageVersion!=GeneralCatalog.B4PackageVersion||info.ThreeKingdomsContentHash!=GeneralCatalog.B4ContentHash)){Status="房间武将包版本或内容不一致，请更新客户端。";return;}
+                if(info.ThreeKingdomsPackageVersion!=null&&!GeneralCatalog.IsNetworkPackage(info.ThreeKingdomsPackageVersion,info.ThreeKingdomsContentHash)){Status="房间武将包版本或内容不一致，请更新客户端。";return;}
                 rememberedRuleSet=info.RuleSet;rememberedGeneralPackage=info.ThreeKingdomsPackageVersion;rememberedGeneralHash=info.ThreeKingdomsContentHash;RoomId=id;
                 var payload=new JoinRoomPayload{DisplayName=name,Password=password};
                 if(TryLoadRoomIdentity(id)){reconnectJoinFallback=payload;Reconnect();}

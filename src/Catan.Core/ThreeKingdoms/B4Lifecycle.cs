@@ -6,7 +6,7 @@ namespace Catan.Core.ThreeKingdoms
 {
     public static partial class ThreeKingdomsEngine
     {
-        public static bool UsesB4Lifecycle(ThreeKingdomsState state) => state?.RulesVersion == GeneralCatalog.B4RulesVersion;
+        public static bool UsesB4Lifecycle(ThreeKingdomsState state) => state?.RulesVersion == GeneralCatalog.B4RulesVersion || state?.RulesVersion == GeneralCatalog.B5RulesVersion;
 
         /// <summary>选将命令必须以本席令牌验证；他人的提交不会使此令牌过期。</summary>
         public static ThreeKingdomsDecision GetPendingDecision(ThreeKingdomsState state, string playerId) =>
@@ -136,8 +136,12 @@ namespace Catan.Core.ThreeKingdoms
                     TurnInstanceId = state.Clock.TurnInstanceId, PhaseId = state.Clock.PhaseId, ReturnWindowId = state.WindowId
                 } }).ToArray();
                 B2SkillEngine.OnB4GeneralRetired(state, previous);
+                B2SkillEngine.OnB5MilitaryGeneralRetired(state, previous);
+                B2SkillEngine.OnCivilGeneralRetired(state, previous);
+                bool retain = state.RulesVersion == GeneralCatalog.B5RulesVersion && new[] { "tk-g18", "tk-g24", "tk-g35" }.Contains(previous.GeneralId);
                 ReturnToPool(previous);
-                previous.Region = GeneralRegion.Retired;
+                previous.Region = retain ? GeneralRegion.Retained : GeneralRegion.Retired;
+                if (retain) previous.OwnerPlayerId = playerId;
             }
             foreach (var playerId in state.SelectionBatchPlayerIds)
             {

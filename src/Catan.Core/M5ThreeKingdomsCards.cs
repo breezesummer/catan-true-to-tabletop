@@ -22,8 +22,8 @@ namespace Catan.Core.M5
         private static bool B2DrawBlocked(GameState s, string player) => B2(s) && B2SkillEngine.IsDrawBlocked(s.ThreeKingdoms, player);
         private static bool B2Unlimited(GameState s, string player) => B2(s) && s.ThreeKingdoms.Generals.Any(g => g.Region == GeneralRegion.Active && g.OwnerPlayerId == player && g.GeneralId == "tk-g33");
         private static int B2Escrow(GameState s, int card) => B2(s) ? B2SkillEngine.EscrowCards(s.ThreeKingdoms)[card] : 0;
-        private static bool B2Busy(GameState s) => B2(s) && (B2SkillEngine.HasPending(s.ThreeKingdoms) || B3DiceEngine.HasPending(s.ThreeKingdoms));
-        private static string ThreeKingdomsVersionFor(ThreeKingdomsState tk) => tk == null ? RulesVersion : tk.RulesVersion == GeneralCatalog.B4RulesVersion ? ThreeKingdomsB4RulesVersion : tk.RulesVersion == GeneralCatalog.B3RulesVersion ? ThreeKingdomsB3RulesVersion : tk.SkillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
+        private static bool B2Busy(GameState s) => B2(s) && (B2SkillEngine.HasPending(s.ThreeKingdoms) || B3DiceEngine.HasPending(s.ThreeKingdoms) || B2SkillEngine.HasB5Comparison(s.ThreeKingdoms));
+        private static string ThreeKingdomsVersionFor(ThreeKingdomsState tk) => tk == null ? RulesVersion : tk.RulesVersion == GeneralCatalog.B5RulesVersion ? ThreeKingdomsB5RulesVersion : tk.RulesVersion == GeneralCatalog.B4RulesVersion ? ThreeKingdomsB4RulesVersion : tk.RulesVersion == GeneralCatalog.B3RulesVersion ? ThreeKingdomsB3RulesVersion : tk.SkillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
 
         private sealed partial class B2Host : IThreeKingdomsCardHost
         {
@@ -31,7 +31,7 @@ namespace Catan.Core.M5
             private readonly GameState game;
             public B2Host(CombinedGameSession session, GameState game) { this.session = session; this.game = game; }
             public ThreeKingdomsState State => game.ThreeKingdoms;
-            public int FinalDiceTotal => game.LastDice1 + game.LastDice2;
+            public int FinalDiceTotal => B5FinalDiceTotal(game);
             public int[] GetHand(string playerId) { var p = game.Players.Single(x => x.Id == playerId); return Cards(p.Resources, p.Commodities); }
             public int[] GetBank() => Cards(game.Bank, game.CommodityBank);
             private static int[] Cards(ResourceBag resources, CommodityBag commodities) => Enumerable.Range(0, 8).Select(i => i < 5 ? resources[(Resource)i] : commodities[(Commodity)(i - 5)]).ToArray();
@@ -75,10 +75,10 @@ namespace Catan.Core.M5
             public B2HarvestTile[] GetHarvestTiles(string playerId)
             {
                 var tiles = new List<B2HarvestTile>();
-                foreach (var tile in game.Tiles.Where(t => t.Number.HasValue && t.Id != game.RobberTileId))
+                foreach (var tile in game.Tiles.Where(t => t.Number.HasValue && (t.Id != game.RobberTileId || B2SkillEngine.B5DoubleHarvest(game.ThreeKingdoms,playerId,t.Id))))
                 {
                     bool city = game.Cities.Any(b => b.PlayerId == playerId && tile.Vertices.Contains(b.LocationId));
-                    if (!city && !game.Settlements.Any(b => b.PlayerId == playerId && tile.Vertices.Contains(b.LocationId))) continue;
+                    if (!city && !game.Settlements.Any(b => b.PlayerId == playerId && B5Working(game,"Settlement",b.LocationId) && tile.Vertices.Contains(b.LocationId))) continue;
                     var resource = Resources.FirstOrDefault(r => ResourceName(r) == tile.Resource);
                     int[] choices;
                     if (tile.Resource == "gold") choices = Enumerable.Range(0, 5).ToArray();
@@ -113,15 +113,13 @@ namespace Catan.Core.M5
                     int card = type;
                     Resource resource = card < 5 ? (Resource)card : card == 5 ? Resource.Wool : card == 6 ? Resource.Ore : Resource.Wood;
                     var claims = allocations.Where(a => !B2DrawBlocked(s, a.PlayerId)).Select(a => new {
-                        Allocation = a, Amount = s.Tiles.Where(t => t.Number == total && t.Id != s.RobberTileId && t.Resource == ResourceName(resource)).Sum(t =>
-                            (card < 5 ? s.Settlements.Count(b => b.PlayerId == a.PlayerId && t.Vertices.Contains(b.LocationId)) : 0) +
-                            (card < 5 && (resource == Resource.Brick || resource == Resource.Wheat) ? 2 : 1) * s.Cities.Count(b => b.PlayerId == a.PlayerId && t.Vertices.Contains(b.LocationId)))
+                        Allocation = a, Amount = s.Tiles.Where(t => t.Number == total && (t.Id != s.RobberTileId || B2SkillEngine.B5DoubleHarvest(s.ThreeKingdoms,a.PlayerId,t.Id)) && t.Resource == ResourceName(resource)).Sum(t => B5HarvestAmount(s,a.PlayerId,t,card))
                     }).Where(x => x.Amount > 0).ToArray();
                     int supply = host.GetBank()[card];
                     if (supply >= claims.Sum(x => x.Amount)) foreach (var claim in claims) claim.Allocation.Cards[card] = claim.Amount;
                     else if (claims.Length == 1) claims[0].Allocation.Cards[card] = supply;
                 }
-                foreach (var a in allocations.Where(a => !B2DrawBlocked(s, a.PlayerId))) a.GoldCount = s.Tiles.Where(t => t.Resource == "gold" && t.Number == total && t.Id != s.RobberTileId).Sum(t => s.Settlements.Count(b => b.PlayerId == a.PlayerId && t.Vertices.Contains(b.LocationId)) + 2 * s.Cities.Count(b => b.PlayerId == a.PlayerId && t.Vertices.Contains(b.LocationId)));
+                foreach (var a in allocations.Where(a => !B2DrawBlocked(s, a.PlayerId))) a.GoldCount = s.Tiles.Where(t => t.Resource == "gold" && t.Number == total && (t.Id != s.RobberTileId || B2SkillEngine.B5DoubleHarvest(s.ThreeKingdoms,a.PlayerId,t.Id))).Sum(t => (B2SkillEngine.B5DoubleHarvest(s.ThreeKingdoms,a.PlayerId,t.Id)?2:1)*(s.Settlements.Count(b => b.PlayerId == a.PlayerId && B5Working(s,"Settlement",b.LocationId) && t.Vertices.Contains(b.LocationId)) + 2 * s.Cities.Count(b => b.PlayerId == a.PlayerId && t.Vertices.Contains(b.LocationId))));
             }
             B2SkillEngine.BeginHarvest(host, allocations, false);
         }
@@ -132,7 +130,7 @@ namespace Catan.Core.M5
             foreach (var p in TurnOrder(s))
             {
                 bool deferred = s.ThreeKingdoms.Skills.DeferredCapacityPlayers.Contains(p.Id);
-                if (p.ProgressCards.Length <= 4 || B2Unlimited(s, p.Id))
+                if (p.ProgressCards.Length <= B5ProgressLimit(s,p.Id) || B2Unlimited(s, p.Id))
                 {
                     s.ThreeKingdoms.Skills.DeferredCapacityPlayers = s.ThreeKingdoms.Skills.DeferredCapacityPlayers.Where(id => id != p.Id).ToArray();
                     continue;

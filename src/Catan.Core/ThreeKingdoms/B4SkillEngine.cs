@@ -7,7 +7,8 @@ namespace Catan.Core.ThreeKingdoms
     // 百科 W26/W39/W40/W41/W42/W44/W45/W52；只保存实体牌及可重放步骤。
     public static partial class B2SkillEngine
     {
-        public static bool B4Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && s.RulesVersion == GeneralCatalog.B4RulesVersion;
+        public static bool B4Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && ThreeKingdomsEngine.UsesB4Lifecycle(s);
+        public static bool B5Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && s.RulesVersion == GeneralCatalog.B5RulesVersion;
         private static B4SkillPayload CloneB4Payload(B4SkillPayload p) => p == null ? null : new B4SkillPayload { Selection = Copy(p.Selection), OtherSelection = Copy(p.OtherSelection), DeclaredType = p.DeclaredType,
             OwnerPlayerId = p.OwnerPlayerId, LockedTargets = (string[])p.LockedTargets.Clone(), VirtualUse = p.VirtualUse == null ? null : new B4VirtualUse { CardId = p.VirtualUse.CardId, OptionId = p.VirtualUse.OptionId, Label = p.VirtualUse.Label, CardType = p.VirtualUse.CardType, TargetPlayerIds = (string[])p.VirtualUse.TargetPlayerIds.Clone(), PayloadJson = p.VirtualUse.PayloadJson, SourceEventId = p.VirtualUse.SourceEventId, SourceSkillId = p.VirtualUse.SourceSkillId, RewardRandomCount = p.VirtualUse.RewardRandomCount } };
 

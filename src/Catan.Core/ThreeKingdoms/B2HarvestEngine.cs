@@ -24,6 +24,8 @@ namespace Catan.Core.ThreeKingdoms
             Require(Contains(host.GetBank(), total), "普通产出预留超过有限银行供应。");
             host.RemoveBank(total); s.Skills.Harvest = complete; s.Skills.HarvestActive = true;
             s.Skills.HarvestTurnId = s.Clock.TurnInstanceId; s.Skills.HarvestStage = 0;
+            OnCivilHarvestStart(host, "harvest-" + s.Clock.TurnInstanceId);
+            OnB5MilitaryHarvestStart(host, "harvest-" + s.Clock.TurnInstanceId);
             if (pump) Pump(host);
         }
 

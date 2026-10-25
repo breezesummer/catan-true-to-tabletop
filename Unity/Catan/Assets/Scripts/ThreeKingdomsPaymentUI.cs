@@ -7,7 +7,7 @@ using UnityEngine;
 public static class ThreeKingdomsPaymentUI
 {
     static readonly string[] Names={"木材","砖块","羊毛","谷物","矿石","布匹","钱币","纸张"};
-    public static bool CanDeclare(ThreeKingdomsView view,string seat) => view?.PackageVersion==GeneralCatalog.B4PackageVersion&&view.Players.Any(p=>p.PlayerId==seat&&p.ActiveGeneralId=="tk-g07"&&!p.FaceDown);
+    public static bool CanDeclare(ThreeKingdomsView view,string seat) => GeneralCatalog.IsAutomaticPackage(view?.PackageVersion)&&view.Players.Any(p=>p.PlayerId==seat&&p.ActiveGeneralId=="tk-g07"&&!p.FaceDown);
     public static int? TradeUse(ThreeKingdomsView view,int real,int? selected)
     {
         var allowed=view?.EffectiveCardTypes;
