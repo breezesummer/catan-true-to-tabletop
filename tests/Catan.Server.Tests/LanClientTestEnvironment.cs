@@ -10,6 +10,7 @@ namespace UnityEngine
         internal static string dataPath="";
         internal static string persistentDataPath=Path.GetTempPath();
         internal static string version="2.0.1-test";
+        internal static string buildGUID="0123456789abcdef0123456789abcdef";
         internal static void Quit(int code) { }
     }
     internal static class JsonUtility

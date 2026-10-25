@@ -10,6 +10,23 @@ namespace Catan.Server.Tests;
 public sealed class ClientCommunicationDiagnosticsTests
 {
     [Fact]
+    public void StartupDiagnosticUsesUnityBuildIdentity()
+    {
+        M7CommunicationLog.Start(TemporaryDirectory());
+        var client=new M7Client();
+        try
+        {
+            Method("Awake").Invoke(client,null);
+            Assert.True(M7CommunicationLog.Flush(5000));
+            var entries=Directory.GetFiles(M7CommunicationLog.DirectoryPath,"comm-*.jsonl")
+                .SelectMany(ReadSharedLines).Select(line=>JsonSerializer.Deserialize<JsonElement>(line));
+            Assert.Contains(entries,entry=>entry.GetProperty("event").GetString()=="client_start"
+                &&entry.GetProperty("buildId").GetString()==UnityEngine.Application.buildGUID);
+        }
+        finally{client.EndSession();}
+    }
+
+    [Fact]
     public void JsonLinesAreBoundedAndCarryCorrelationWithoutArbitraryPayloadFields()
     {
         string directory=TemporaryDirectory();

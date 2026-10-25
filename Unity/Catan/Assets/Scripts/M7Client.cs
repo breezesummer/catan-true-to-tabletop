@@ -80,7 +80,9 @@ public sealed class M7Client : MonoBehaviour
     {
         storageDirectory=Path.Combine(Application.persistentDataPath,"m7-client");verification=Environment.GetCommandLineArgs().Contains("--m7-verify");
         M7CommunicationLog.Start(Path.Combine(Application.persistentDataPath,"m7-logs"));
-        M7CommunicationLog.Record(new M7CommunicationEvent{Event="client_start",ClientVersion=Application.version,Platform=Application.platform.ToString(),ProtocolVersion=NetworkProtocol.Version,BuildId=typeof(M7Client).Assembly.ManifestModule.ModuleVersionId.ToString("N")});
+        // IL2CPP 不支持 Assembly.ManifestModule；Awake 抛错会使主线程回包处理无法启动。
+        // 使用 Unity 提供的构建标识，诊断初始化须兼容 Mono 和 IL2CPP。
+        M7CommunicationLog.Record(new M7CommunicationEvent{Event="client_start",ClientVersion=Application.version,Platform=Application.platform.ToString(),ProtocolVersion=NetworkProtocol.Version,BuildId=Application.buildGUID});
         Debug.Log("CATAN_M7_LOG_DIRECTORY "+M7CommunicationLog.DirectoryPath);
     }
     void Diagnose(string operation,Exception error)
