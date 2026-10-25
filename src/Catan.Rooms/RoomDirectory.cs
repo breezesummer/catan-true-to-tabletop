@@ -18,7 +18,7 @@ public sealed class RoomDirectoryOptions
 }
 
 /// <summary>服务端权威房间入口；每个房间严格顺序执行，提交后才发布可见结果。</summary>
-public sealed class RoomDirectory : IDisposable
+public sealed partial class RoomDirectory : IDisposable
 {
     private readonly object directoryGate = new();
     private readonly Dictionary<string, Room> rooms = new(StringComparer.Ordinal);
@@ -78,13 +78,13 @@ public sealed class RoomDirectory : IDisposable
     {
         if (string.IsNullOrEmpty(connectionId)) return;
         Room[] copy; lock (directoryGate) copy = rooms.Values.ToArray();
-        foreach (var room in copy) room.Disconnect(connectionId);
+        foreach (var room in copy) { try { room.Disconnect(connectionId); } finally { room.NotifyChanges(); } }
     }
     public Task<int> TickAiAsync(CancellationToken cancellationToken = default)
     {
         Room[] copy; lock (directoryGate) copy = rooms.Values.ToArray();
         int advanced = 0;
-        foreach (var room in copy) { cancellationToken.ThrowIfCancellationRequested(); if (room.TickAi()) advanced++; }
+        foreach (var room in copy) { cancellationToken.ThrowIfCancellationRequested(); try { if (room.TickAi()) advanced++; } finally { room.NotifyChanges(); } }
         RemoveClosedRooms();
         return Task.FromResult(advanced);
     }
@@ -121,7 +121,7 @@ public sealed class RoomDirectory : IDisposable
             if (enrollment != null)
             {
                 var previous = rooms.Values.FirstOrDefault(room => room.HasEnrollment(enrollment));
-                if (previous != null) return previous.ReplayEnrollment(enrollment);
+                if (previous != null) { try { return previous.ReplayEnrollment(enrollment); } finally { previous.NotifyChanges(); } }
             }
             if (rooms.Values.Count(room => room.CountsTowardRoomLimit) >= options.MaximumRooms) return Reject("RoomLimit", "房间数量已达到此服务上限。");
             var credential = enrollment?.Credential ?? PrivateJson.Token();
@@ -234,6 +234,14 @@ public sealed class RoomDirectory : IDisposable
         private readonly Dictionary<string, DateTimeOffset> lastSeen = new(StringComparer.Ordinal);
         private readonly Dictionary<string, DateTimeOffset> disconnectedSince = new(StringComparer.Ordinal);
         private bool paused;
+        private RoomChange pendingChange;
+        internal void NotifyChanges()
+        {
+            // 重入的加入／恢复流程由最外层释放房间锁后通知；这里只唤醒订阅，不发送网络数据。
+            if (Monitor.IsEntered(gate)) return;
+            var change = Interlocked.Exchange(ref pendingChange, null);
+            if (change != null) owner.Publish(change);
+        }
         private NetworkRequest diagnosticRequest;
         private void Trace(string eventName, long started, bool success = true, double? waitMs = null, long? bytes = null, string exceptionType = null) =>
             owner.Trace(new RoomDiagnostic
@@ -355,7 +363,7 @@ public sealed class RoomDirectory : IDisposable
                 if (request.Operation == "Recover")
                 {
                     if (seat.SeatId != state.ManagerSeatId) return Snapshot(seat, "ManagerRequired", "只有管理员可以恢复保存。", false);
-                    try { owner.storage.Commit(state.RoomId, PrivateJson.Write(state)); paused = false; return Snapshot(seat); }
+                    try { owner.storage.Commit(state.RoomId, PrivateJson.Write(state)); paused = false; pendingChange = new(state.RoomId, state.Revision, Stopwatch.GetTimestamp()); return Snapshot(seat); }
                     catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException) { return Snapshot(seat, "PersistenceFailed", "保存仍不可用，房间继续暂停。", false); }
                 }
                 // 主动离开不依赖旧局面修订号，也不能被暂停或其他玩家的行动阻塞。
@@ -369,6 +377,7 @@ public sealed class RoomDirectory : IDisposable
                 Trace("room.handle", started, waitMs: waited);
                 diagnosticRequest = null;
                 Monitor.Exit(gate);
+                NotifyChanges();
             }
         }
         private NetworkResponse Join(NetworkRequest request)
@@ -513,6 +522,8 @@ public sealed class RoomDirectory : IDisposable
                 var document = PrivateJson.Write(state);
                 var storageStarted = Stopwatch.GetTimestamp();
                 owner.storage.Commit(state.RoomId, document);
+                if (state.Revision != before.Revision || paused)
+                    pendingChange = new(state.RoomId, state.Revision, Stopwatch.GetTimestamp());
                 Trace("room.storage", storageStarted, bytes: Encoding.UTF8.GetByteCount(document));
                 Trace("room.commit", started);
                 return true;
@@ -520,7 +531,9 @@ public sealed class RoomDirectory : IDisposable
             catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
             {
                 Trace("room.commit", started, false, exceptionType: ex.GetType().Name);
-                state = before; game = before.GameSave == null ? null : RuleRoomGame.Load(before.Settings.RuleSet, before.GameSave, owner.baseScenario); paused = true; return false;
+                state = before; game = before.GameSave == null ? null : RuleRoomGame.Load(before.Settings.RuleSet, before.GameSave, owner.baseScenario); paused = true;
+                projections.Clear(); projectionRevision = -1;
+                pendingChange = new(state.RoomId, state.Revision, Stopwatch.GetTimestamp()); return false;
             }
         }
         internal void Disconnect(string connectionId)

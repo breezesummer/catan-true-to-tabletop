@@ -74,7 +74,7 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
         var socketId = Guid.NewGuid().ToString("N");
         var started = Stopwatch.GetTimestamp();
         var closure = new CloseReason();
-        var binding = new SocketBinding();
+        using var binding = new SocketBinding(rooms);
         try
         {
             using var socket = await context.WebSockets.AcceptWebSocketAsync();
@@ -190,10 +190,12 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
 
     private async Task PushLoop(SocketBinding binding, string socketId, Action<NetworkResponse, NetworkRequest?, bool, byte[]?> enqueue, CloseReason closure, CancellationToken cancellation)
     {
-        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(750));
         byte[]? previous = null;
-        while (await timer.WaitForNextTickAsync(cancellation))
+        while (!cancellation.IsCancellationRequested)
         {
+            await binding.WaitAsync(cancellation);
+            // 合并同一短窗口内的多次提交；全量投影仍在房间锁内，发送在锁外。
+            await Task.Delay(10, cancellation);
             var request = binding.Read();
             if (request == null) { previous = null; continue; }
             var response = Dispatch(request, "push", socketId);
@@ -203,7 +205,13 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
             // 推送仍经过身份与当前控制权检查，只生成绑定席位的可见视图。
             if (response.Success) response.Code = "Push";
             var encoded = Encoding.UTF8.GetBytes(WireJson.Serialize(response));
-            if (previous == null || !encoded.AsSpan().SequenceEqual(previous)) { enqueue(response, request, true, encoded); previous = encoded; }
+            if (previous == null || !encoded.AsSpan().SequenceEqual(previous))
+            {
+                enqueue(response, request, true, encoded); previous = encoded;
+                var change = binding.Change;
+                if (change != null && change.RoomId == request.RoomId && change.Revision <= response.Revision)
+                    diagnostics?.Record(CommunicationDiagnostics.Request("push.triggered", "ws", socketId, request, response) with { ElapsedMs = Stopwatch.GetElapsedTime(change.CommittedAt).TotalMilliseconds });
+            }
             if (!response.Success) { closure.Set("PushRejected:" + response.Code); return; }
         }
     }
@@ -251,11 +259,29 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
 
     private static NetworkResponse Error(string code, string message, string? requestId = null) => new() { Success = false, Code = code, Message = message, RequestId = requestId };
 
-    private sealed class SocketBinding
+    private sealed class SocketBinding(RoomDirectory rooms) : IDisposable
     {
         private NetworkRequest? current;
+        private IDisposable? subscription;
+        private readonly SemaphoreSlim changed = new(0, 1);
+        private RoomChange? change;
+        public RoomChange? Change => Volatile.Read(ref change);
         public NetworkRequest? Read() => Volatile.Read(ref current);
-        public void Write(NetworkRequest? value) => Volatile.Write(ref current, value);
+        private void Signal(RoomChange? value)
+        {
+            if (value != null) Volatile.Write(ref change, value);
+            try { changed.Release(); } catch (SemaphoreFullException) { } catch (ObjectDisposedException) { }
+        }
+        public void Write(NetworkRequest? value)
+        {
+            subscription?.Dispose();
+            Volatile.Write(ref current, value);
+            subscription = value == null ? null : rooms.Subscribe(value.RoomId, change => Signal(change));
+            // 订阅建立后立即检查，覆盖提交与订阅建立并发的缺口。
+            Signal(null);
+        }
+        public Task<bool> WaitAsync(CancellationToken cancellation) => changed.WaitAsync(TimeSpan.FromMilliseconds(750), cancellation);
+        public void Dispose() { subscription?.Dispose(); changed.Dispose(); }
     }
     private sealed class CloseReason
     {
