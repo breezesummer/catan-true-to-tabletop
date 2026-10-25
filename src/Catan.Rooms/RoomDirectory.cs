@@ -300,7 +300,7 @@ public sealed partial class RoomDirectory : IDisposable
             }
         }
         private long projectionRevision=-1;
-        private readonly Dictionary<string,(string View,string History,long After)> projections=new();
+        private readonly Dictionary<string,(string View,string History,long After,string CompleteHistory)> projections=new();
         private NetworkResponse Snapshot(SavedSeat seat, string code = null, string message = "已同步。", bool success = true, string credential = null)
         {
             var response=new NetworkResponse { Success = success, Code = code, Message = message, RoomId = state.RoomId, Revision = state.Revision, CommittedRevision = state.Revision, SeatId = seat?.SeatId, HumanControlAvailable = seat != null && !state.Closed && (game == null || !seat.ControlledByAi && Connected(seat)), RuleSet = state.Settings.RuleSet, Room = PublicSummary(), Credential = credential, ConnectionId = seat?.ConnectionId, CredentialExpiresAtUtc = seat?.CredentialExpiresAtUtc.ToString("O") };
@@ -314,13 +314,19 @@ public sealed partial class RoomDirectory : IDisposable
                     var projectionStarted = Stopwatch.GetTimestamp();
                     var history=game.History(seat.SeatId,0);
                     int first=Math.Max(0,history.Length-64);
-                    projection=(game.ViewJson(seat.SeatId),WireJson.Serialize(history.Skip(first).ToArray()),first==0?0:history[first-1].Sequence);
+                    projection=(game.ViewJson(seat.SeatId),WireJson.SerializeDirect(history.Skip(first).ToArray()),first==0?0:history[first-1].Sequence,null);
                     projections.Add(seat.SeatId,projection);
                     Trace("room.projection", projectionStarted, bytes: Encoding.UTF8.GetByteCount(projection.View) + Encoding.UTF8.GetByteCount(projection.History));
                 }
                 response.ViewJson=projection.View;
                 response.PresentationHistoryAfterSequence=projection.After;
                 response.PresentationHistoryJson=projection.History;
+                if(diagnosticRequest?.Operation=="Sync")
+                {
+                    if(projection.CompleteHistory==null){projection.CompleteHistory=WireJson.SerializeDirect(game.History(seat.SeatId,0));projections[seat.SeatId]=projection;}
+                    response.PresentationHistoryJson=projection.CompleteHistory;
+                    response.PresentationHistoryAfterSequence=0;
+                }
             }
             return response;
         }
@@ -348,8 +354,14 @@ public sealed partial class RoomDirectory : IDisposable
                     seat.ControlledByAi = true; seat.RejoinAfterTurnKey = game.TurnKey; state.Revision++;
                     if (!Commit(before)) return Reject("PersistenceFailed", "重连状态保存失败，请稍后重新连接。");
                 }
-                if (observedClientActivity) { lastSeen[seat.ConnectionId] = owner.options.Clock(); disconnectedSince.Remove(seat.SeatId); }
+                if (observedClientActivity)
+                {
+                    bool returning = !Connected(seat);
+                    lastSeen[seat.ConnectionId] = owner.options.Clock(); disconnectedSince.Remove(seat.SeatId);
+                    if(returning)pendingChange = new(state.RoomId, state.Revision, Stopwatch.GetTimestamp());
+                }
                 if (request.Operation == "Get"||request.Operation=="Heartbeat") return Snapshot(seat);
+                if(request.Operation=="Sync"){var response=Snapshot(seat);response.Code=NetworkProtocol.FullEventsCode;return response;}
                 if (request.Operation == "History"||request.Operation=="HistoryCompact")
                 {
                     var query = WireJson.Deserialize<HistoryPayload>(request.Payload ?? "{}");
@@ -522,7 +534,7 @@ public sealed partial class RoomDirectory : IDisposable
                 var document = PrivateJson.Write(state);
                 var storageStarted = Stopwatch.GetTimestamp();
                 owner.storage.Commit(state.RoomId, document);
-                if (state.Revision != before.Revision || paused)
+                if (state.Revision != before.Revision || paused || !state.Seats.Select(s => (s.SeatId, s.ConnectionId)).SequenceEqual(before.Seats.Select(s => (s.SeatId, s.ConnectionId))))
                     pendingChange = new(state.RoomId, state.Revision, Stopwatch.GetTimestamp());
                 Trace("room.storage", storageStarted, bytes: Encoding.UTF8.GetByteCount(document));
                 Trace("room.commit", started);
@@ -555,6 +567,7 @@ public sealed partial class RoomDirectory : IDisposable
                     if (next != null) { state.ManagerSeatId = next.SeatId; changed = true; }
                 }
                 if (changed) { state.Revision++; Commit(before); }
+                else pendingChange = new(state.RoomId, state.Revision, Stopwatch.GetTimestamp());
             }
         }
         private bool CanRestoreHumanControl(SavedSeat seat) => game != null && !game.Finished && seat.ControlledByAi && Connected(seat) && seat.RejoinAfterTurnKey != null && seat.RejoinAfterTurnKey != game.TurnKey && game.ActivePlayerId == seat.SeatId;

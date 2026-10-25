@@ -83,7 +83,7 @@ internal sealed class RuleRoomGame
         eventsProperty.SetValue(view, truncated);
         var tk=view is M4.PlayerView city?city.ThreeKingdoms:view is M5.PlayerView combined?combined.ThreeKingdoms:null;
         if(tk?.SkillHistory?.Length>64)tk.SkillHistory=tk.SkillHistory.Skip(tk.SkillHistory.Length-64).ToArray();
-        return WireJson.SerializeObject(view);
+        return WireJson.SerializeObjectDirect(view);
     }
     internal GameHistoryEntry[] History(string seat, long after) => session switch { M2.BaseGameSession s => s.GetHistory(seat, after), M3.SeafarersGameSession s => s.GetHistory(seat, after), M4.CitiesKnightsGameSession s => s.GetHistory(seat, after), M5.CombinedGameSession s => s.GetHistory(seat, after), _ => throw new InvalidOperationException() };
     internal object ParseCommand(string json, string seat, string commandId)

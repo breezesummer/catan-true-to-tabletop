@@ -7,6 +7,17 @@ namespace Catan.Server.Tests;
 public sealed class RoomChangeTests
 {
     [Fact]
+    public void LiveConnectionReplacementAndLobbyDisconnectPublishWithoutArtificialRevision()
+    {
+        using var rooms = new RoomDirectory(new Storage(), "{}");
+        var host = rooms.Handle(new NetworkRequest { Operation = "Create", ExpectedRulesVersion = NetworkProtocol.RulesVersion("base"), ExpectedScenarioVersion = NetworkProtocol.ScenarioVersion("base"), Payload = "{}" });
+        var changes = new List<RoomChange>(); using var subscription = rooms.Subscribe(host.RoomId, changes.Add);
+        var reconnect = Request("Reconnect", host); reconnect.ExpectedRulesVersion = NetworkProtocol.RulesVersion("base"); reconnect.ExpectedScenarioVersion = NetworkProtocol.ScenarioVersion("base");
+        var restored = rooms.Handle(reconnect); Assert.True(restored.Success);
+        Assert.Equal(host.Revision, Assert.Single(changes).Revision);
+        rooms.Disconnect(restored.ConnectionId); Assert.Equal(2, changes.Count); Assert.Equal(host.Revision, changes[1].Revision);
+    }
+    [Fact]
     public void CommittedChangeIsPublishedOutsideRoomLockAndRejectedRequestsDoNotPublish()
     {
         using var storage = new Storage();

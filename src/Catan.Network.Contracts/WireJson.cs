@@ -14,7 +14,7 @@ using System.Xml.Linq;
 namespace Catan.Network.Contracts
 {
     /// <summary>显式类型 JSON，不接受类型名或多态。兼容 Unity 与 internal setter 的可见视图。</summary>
-    public static class WireJson
+    public static partial class WireJson
     {
         private static readonly string[] Roots = { "Catan.Core.M2.Command", "Catan.Core.M3.Command", "Catan.Core.M4.Command", "Catan.Core.M5.Command", "Catan.Core.M2.PlayerView", "Catan.Core.M3.PlayerView", "Catan.Core.M4.PlayerView", "Catan.Core.M5.PlayerView", "Catan.Core.GameHistoryEntry" };
         public static string Serialize<T>(T value) => SerializeObject(value);
@@ -52,7 +52,7 @@ namespace Catan.Network.Contracts
         private static void CheckRoot(Type type)
         {
             var element = type.IsArray ? type.GetElementType() : type;
-            var messages = new[] { typeof(NetworkRequest), typeof(NetworkResponse), typeof(RoomSettings), typeof(CreateRoomPayload), typeof(JoinRoomPayload), typeof(SeatPayload), typeof(NamePayload), typeof(ReadyPayload), typeof(HistoryPayload), typeof(RoomSummary), typeof(SeatSummary) };
+            var messages = new[] { typeof(NetworkRequest), typeof(NetworkResponse), typeof(RoomSettings), typeof(CreateRoomPayload), typeof(JoinRoomPayload), typeof(SeatPayload), typeof(NamePayload), typeof(ReadyPayload), typeof(HistoryPayload), typeof(RoomSummary), typeof(SeatSummary), typeof(SeatStatePacket), typeof(VisibleJsonChange) };
             if (!messages.Contains(element) && !Roots.Contains(element.FullName)) throw new SerializationException("不允许传输此对象类型。");
         }
         // 类型布局不可变；避免每个地块、边和历史项重复反射及构造查找表。
@@ -60,10 +60,17 @@ namespace Catan.Network.Contracts
         {
             public readonly MemberInfo[] Members;
             public readonly Dictionary<string, MemberInfo> ByName;
+            public readonly string[] Names;
+            public readonly Type[] Types;
+            public readonly bool[] OmitDefault;
+            public readonly object[] Defaults;
             public Layout(Type type)
             {
                 Members = DiscoverMembers(type).ToArray();
                 ByName = Members.ToDictionary(Name, StringComparer.Ordinal);
+                Names = Members.Select(Name).ToArray(); Types = Members.Select(MemberType).ToArray();
+                OmitDefault = Members.Select(m => m.GetCustomAttribute<DataMemberAttribute>()?.EmitDefaultValue == false).ToArray();
+                Defaults = Types.Select(t => t.IsValueType ? Activator.CreateInstance(t) : null).ToArray();
             }
         }
         private static readonly ConcurrentDictionary<Type, Layout> Layouts = new ConcurrentDictionary<Type, Layout>();
@@ -131,7 +138,7 @@ namespace Catan.Network.Contracts
             return instance;
         }
         // 不建立 XML/通用 JSON 对象树，也不使用动态代码生成，兼容 Mono、IL2CPP/AOT。
-        private sealed class DirectReader
+        private sealed partial class DirectReader
         {
             readonly string json;
             int at;

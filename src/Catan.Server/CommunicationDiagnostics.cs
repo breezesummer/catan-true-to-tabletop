@@ -90,7 +90,7 @@ public sealed class CommunicationDiagnostics : IAsyncDisposable
         (value.Length is 12 or 32 && value.All(Uri.IsHexDigit)) || Guid.TryParseExact(value, "D", out _) ? value : Fingerprint(value);
     public static string? Fingerprint(string? value) => string.IsNullOrEmpty(value) ? null : "sha256:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value)))[..16];
     public static string? OperationName(string? value) => value == null ? null : value is
-        "List" or "Describe" or "Create" or "Join" or "Reconnect" or "Get" or "History" or "Command" or "Preview" or
+        "List" or "Describe" or "Create" or "Join" or "Reconnect" or "Get" or "Sync" or "History" or "HistoryCompact" or "Heartbeat" or "Command" or "CommandReceipt" or "Preview" or "PreviewCompact" or
         "Rename" or "Ready" or "Seat" or "Configure" or "Start" or "Restart" or "Transfer" or "Leave" or "Revoke" or "Recover" ? value : "Unknown";
 
     private async Task WriteLoop()

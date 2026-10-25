@@ -12,7 +12,8 @@ internal sealed class M7PreparedResponse
 {
     internal readonly object View;
     internal readonly GameHistoryEntry[] Presentation,History;
-    internal M7PreparedResponse(object view,GameHistoryEntry[] presentation,GameHistoryEntry[] history){View=view;Presentation=presentation;History=history;}
+    internal readonly bool ReliableEvents;
+    internal M7PreparedResponse(object view,GameHistoryEntry[] presentation,GameHistoryEntry[] history,bool reliableEvents=false){View=view;Presentation=presentation;History=history;ReliableEvents=reliableEvents;}
 }
 internal sealed class M7ResponseDecoder
 {
@@ -23,7 +24,7 @@ internal sealed class M7ResponseDecoder
     long bytes;
     internal bool Legacy;
     internal bool TryGet(NetworkResponse response,out M7PreparedResponse value)=>prepared.TryGetValue(response,out value);
-    internal async Task<NetworkResponse> Decode(byte[] payload,string rules,string operation,string requestId,CancellationToken cancel)
+    internal async Task<NetworkResponse> Decode(byte[] payload,string rules,string operation,string requestId,CancellationToken cancel,SeatStateReceiver state=null)
     {
         long queued=Stopwatch.GetTimestamp();int depth;
         lock(gate)
@@ -41,6 +42,12 @@ internal sealed class M7ResponseDecoder
                 long started=Stopwatch.GetTimestamp(),allocated=Allocated();
                 var response=Read<NetworkResponse>(Encoding.UTF8.GetString(payload),FrameCost.Stage.ResponseDecode);
                 if(response==null||response.ProtocolVersion!=NetworkProtocol.Version)throw new M7NetworkFailure("PROTOCOL","联机协议不兼容。");
+                SeatStateApplication sync=null;
+                if(response.Code==NetworkProtocol.SeatStateCode)
+                {
+                    if(state==null)throw new M7NetworkFailure("STATE_GAP","同步基准需要恢复。");
+                    sync=state.Prepare(response);response=sync.Response;
+                }
                 string rule=response.RuleSet??response.Room?.RuleSet??rules;
                 object view=null;
                 using(FrameCost.Measure(FrameCost.Stage.ViewDecode))
@@ -60,8 +67,9 @@ internal sealed class M7ResponseDecoder
                 }
                 var presentation=response.PresentationHistoryJson==null?Array.Empty<GameHistoryEntry>():Read<GameHistoryEntry[]>(response.PresentationHistoryJson,FrameCost.Stage.HistoryDecode);
                 var history=response.HistoryJson==null?Array.Empty<GameHistoryEntry>():Read<GameHistoryEntry[]>(response.HistoryJson,FrameCost.Stage.HistoryDecode);
-                prepared.Add(response,new M7PreparedResponse(view,presentation??Array.Empty<GameHistoryEntry>(),history??Array.Empty<GameHistoryEntry>()));
                 cancel.ThrowIfCancellationRequested();
+                sync?.Commit();
+                prepared.Add(response,new M7PreparedResponse(view,presentation??Array.Empty<GameHistoryEntry>(),history??Array.Empty<GameHistoryEntry>(),sync!=null||response.Success&&response.Code==NetworkProtocol.FullEventsCode&&response.PresentationHistoryAfterSequence==0));
                 M7CommunicationLog.Record(new M7CommunicationEvent{Event="response_decode",Operation=operation,RequestId=response.RequestId??requestId,RoomId=response.RoomId,Revision=response.Revision,Bytes=payload.Length,QueueDepth=depth,QueueWaitMs=Ms(queued,started),DurationMs=Ms(started,Stopwatch.GetTimestamp()),AllocatedBytes=Math.Max(0,Allocated()-allocated),WorkerThreads=ActiveWorkers(),MonoTicks=started});
                 return response;
             },cancel).ConfigureAwait(false);

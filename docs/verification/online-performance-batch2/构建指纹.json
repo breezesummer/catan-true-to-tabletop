@@ -1,0 +1,146 @@
+{
+  "日期": "2026-10-25",
+  "游戏版本": "内测版2.0.2",
+  "第一批基线": "ce0503e7",
+  "P4提交": "5decf656",
+  "候选源码": "5decf656 加本清单所列工作区源码；最终提交保存相同源码内容",
+  "Unity": "6000.3.25f1",
+  "正式发布": false,
+  "云端部署": false,
+  "前台帧率验收": false,
+  "测量硬件": {
+    "CPU": "Intel(R) Core(TM) i5-14600KF",
+    "物理核心": 14,
+    "逻辑核心": 20,
+    "内存GiB": 31.8,
+    "网络": "同机回环，计应用正文；未整形4Mbps或测网卡",
+    "程序窗口": "1440×900，D3D11隐藏窗口，仅验证功能"
+  },
+  "指纹": [
+    {
+      "路径": "src/Catan.Rooms/RoomChanges.cs",
+      "字节": 1892,
+      "SHA256": "ea6320b7e7ee56aa7527e545c1991aeffe6aa76927f0d1e5a0b887f64b19234c"
+    },
+    {
+      "路径": "src/Catan.Rooms/RoomDirectory.cs",
+      "字节": 51233,
+      "SHA256": "407b18ce2598f91389ec137ab7ada2390f8cfdcb52676cabfdc1a81f549dfd9e"
+    },
+    {
+      "路径": "src/Catan.Rooms/RuleRoomGame.cs",
+      "字节": 12145,
+      "SHA256": "c9c938dc7be528ceb80bae3a222536b03e8fe87f590e863d3ce17df68f3c1df5"
+    },
+    {
+      "路径": "src/Catan.Server/NetworkTransport.cs",
+      "字节": 22506,
+      "SHA256": "e1c2381933750c3cb44d6e4753021a140115f79b018f12e8de2fac732bfb21c3"
+    },
+    {
+      "路径": "src/Catan.Server/SocketOutbox.cs",
+      "字节": 2475,
+      "SHA256": "e1aae1a264bb3c9bb5cc77469fb5c230dc06249feffeb8658d8d09f9aa6ef023"
+    },
+    {
+      "路径": "src/Catan.Server/CommunicationDiagnostics.cs",
+      "字节": 7900,
+      "SHA256": "55bd82fa060d3c57f6af67dcdf5ec657b3f0bc0b5c27c2cd29c2ec00bb73b4e3"
+    },
+    {
+      "路径": "src/Catan.Network.Contracts/Protocol.cs",
+      "字节": 6482,
+      "SHA256": "1c8f5f77fe13ead7305829668b1fba66b07d7e98f7650db08cf17c7b48689ad5"
+    },
+    {
+      "路径": "src/Catan.Network.Contracts/WireJson.cs",
+      "字节": 17400,
+      "SHA256": "e6d6ad7337f5629193162e1c85ec2d6f48bdbf305a650be4fe2912e6885b23a0"
+    },
+    {
+      "路径": "src/Catan.Network.Contracts/WireJsonWriter.cs",
+      "字节": 2766,
+      "SHA256": "e1e79a15cf6d5a315e1466c7ac8f762733dfb2b2a926d16b4dfceb23d3d13f6b"
+    },
+    {
+      "路径": "src/Catan.Network.Contracts/VisibleJsonDelta.cs",
+      "字节": 10205,
+      "SHA256": "a5f7d77ee42f0af8205bb5f3cc21fe55dfb8b3211abba1a6e3a49617c6b50968"
+    },
+    {
+      "路径": "src/Catan.Network.Contracts/SeatStateSync.cs",
+      "字节": 9847,
+      "SHA256": "ff24ca0fb19c7e4e1a8396ca8b03f3a6e79866dfa631eebd04d970212d1206b4"
+    },
+    {
+      "路径": "Unity/Catan/Assets/Scripts/M7Client.cs",
+      "字节": 61280,
+      "SHA256": "a9526961a42d49b75e187f85a69a635789fb177251282e900d09ddda530271ca"
+    },
+    {
+      "路径": "Unity/Catan/Assets/Scripts/M7ResponseDecoder.cs",
+      "字节": 5610,
+      "SHA256": "e71a58144a3cbb0caabd499dcc4a349899b0d026cbbba33aed2f71daf3e5cafd"
+    },
+    {
+      "路径": "Unity/Catan/Assets/link.xml",
+      "字节": 1638,
+      "SHA256": "24d63735a184ff55576819eb882f33642b12c57647dbb8c5c89c295ed2b48ca4"
+    },
+    {
+      "路径": "tools/validation/OnlinePerformanceServer/Program.cs",
+      "字节": 2214,
+      "SHA256": "b1a2562243335469225fc468287a800edfd251b9a5cb219df33cf6ade6ad035b"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch2/Builds/Windows/Catan2.0.2.exe",
+      "字节": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch2/Builds/Windows/Catan2.0.2_Data/Managed/Assembly-CSharp.dll",
+      "字节": 1267200,
+      "SHA256": "09492d73d9e17388b81cd06532e9bfee9df954394d2c88800c9bf08a84e3162a"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch2/Builds/Windows/Server/Catan.Server.dll",
+      "字节": 84480,
+      "SHA256": "ff04d92cb1143bb56326632073926d338fcf5c7de230267ba5a29ec173516cdf"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch2/Builds/Android/Catan2.0.2.apk",
+      "字节": 329947337,
+      "SHA256": "af54eb75013df4d532580e9d631ad7f9871a49785e0d1847a8bc7f103fbdc199"
+    },
+    {
+      "路径": "Unity/Catan/Assets/Plugins/Catan.Network.Contracts.dll",
+      "字节": 32256,
+      "SHA256": "a202ac5955452fae7fcc1fa134907ad3743f3baa8da73072e018afbfd0c21ab0"
+    },
+    {
+      "路径": "Unity/Catan/Assets/Plugins/Catan.Core.dll",
+      "字节": 1298944,
+      "SHA256": "dcadc4b06282c9590ef53cc502470714f1f72bd3a4fc241fe166aa759ba41ab7"
+    },
+    {
+      "路径": "Unity/Catan/Assets/Plugins/Catan.AI.dll",
+      "字节": 215552,
+      "SHA256": "24c5b492a57f1e86193e4c510cee3a1aeece58bfe8538b6dbd6b8f4aaf30ea50"
+    },
+    {
+      "路径": "tools/validation/OnlinePerformanceServer/bin/Debug/net10.0/Catan.Server.dll",
+      "字节": 91648,
+      "SHA256": "a65faf12c621f42079fa70c8ab4d70b4910257a7b8db5f96cd98b625f1c5bb79"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch1/Builds/Windows/Server/Catan.Server.dll",
+      "字节": 80384,
+      "SHA256": "eccd840c6288e45a7ed57d441812c13234f3f08570ee7dcaa5934871eb761263"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Online-Performance-Batch1/Builds/Windows/Catan2.0.2_Data/Managed/Assembly-CSharp.dll",
+      "字节": 1264640,
+      "SHA256": "df347f5d11556abe3596e7c0ad359971bab7f9e93278e1d52d49d5f5b3fb82f2"
+    }
+  ]
+}

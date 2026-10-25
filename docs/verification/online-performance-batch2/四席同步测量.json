@@ -1,0 +1,37 @@
+{
+  "scope": "单机回环同一四席组合桌40条动作，两组各四条真实WS分别观察全量和增量；含相同命令回执正文；不含TCP头、网卡出口、4Mbps整形或四设备帧率；保存接口为空存储，仅测字节与提交后调度，不测磁盘",
+  "commands": 40,
+  "legacyBytes": 6249196,
+  "deltaBytes": 752097,
+  "reduction": 0.8796489980471087,
+  "initialLegacyBytes": 197822,
+  "initialDeltaBytes": 135425,
+  "mixedObservationCommitToQueue": {
+    "samples": 320,
+    "p50": 34.8239,
+    "p95": 56.7279,
+    "p99": 61.7246,
+    "maximum": 62.0226
+  },
+  "actionToDeltaArrival": {
+    "samples": 160,
+    "p50": 46.8675,
+    "p95": 72.7572,
+    "p99": 119.7747,
+    "maximum": 119.992
+  },
+  "fourStreamsCommitToQueue": {
+    "samples": 120,
+    "p50": 38.8912,
+    "p95": 63.2939,
+    "p99": 64.3286,
+    "maximum": 64.5138
+  },
+  "fourStreamsActionToArrival": {
+    "samples": 120,
+    "p50": 47.7114,
+    "p95": 76.1723,
+    "p99": 82.4277,
+    "maximum": 82.6764
+  }
+}

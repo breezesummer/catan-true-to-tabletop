@@ -8,6 +8,9 @@ namespace Catan.Network.Contracts
         public const int Version = 3;
         // 沿用协议3的字段布局，通过成功握手的既有 Code 协商轻量操作；旧客户端继续使用原操作。
         public const string CompactRepliesCode = "CompactRepliesV1";
+        // 只有主动请求 Sync 的连接才接收此内层格式；协议3旧客户端的字段布局不变。
+        public const string SeatStateCode = "SeatStateV1";
+        public const string FullEventsCode = "SeatStateSnapshotV1";
         public const int MaximumRequestBytes = 65536;
         public const int MaximumResponseBytes = 4194304;
         public static string RulesVersion(string ruleSet)
@@ -56,6 +59,7 @@ namespace Catan.Network.Contracts
     }
     public sealed class NetworkResponse
     {
+        public NetworkResponse Copy() => (NetworkResponse)MemberwiseClone();
         public int ProtocolVersion = NetworkProtocol.Version;
         public string RequestId;
         public bool Success;

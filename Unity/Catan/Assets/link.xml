@@ -1,6 +1,8 @@
 <linker>
   <!-- 权威保存与 PlayerView 深拷贝使用 DataContractJsonSerializer；保留反射访问的 DTO、构造器和访问器。 -->
   <assembly fullname="Catan.Core" preserve="all" />
+  <!-- 协商的席位增量 DTO 和字段映射同样通过反射读取，保留 IL2CPP/AOT 所需成员。 -->
+  <assembly fullname="Catan.Network.Contracts" preserve="all" />
   <assembly fullname="System.Runtime.Serialization" preserve="all" ignoreIfMissing="1" />
   <assembly fullname="System.Runtime.Serialization.Json" preserve="all" ignoreIfMissing="1" />
   <!-- CreatePrimitive 的原生组件通过 PrimitiveType 动态创建，IL2CPP 无法从泛型 Collider 引用推导具体类型。

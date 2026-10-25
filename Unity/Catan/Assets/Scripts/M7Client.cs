@@ -38,7 +38,11 @@ public sealed class M7Client : MonoBehaviour
     long viewRevision=-1;
     volatile bool compactReplies;
     bool legacyReplies;
+    bool legacySync,legacySyncRequested,syncRecovery;
+    bool recoverEventStream,recoveryHistoryPaging;
+    volatile bool stateSyncConnected;
     long requiredHistorySequence;
+    long reliableHistoryRevision=-1;
     internal bool PresentationPending;
     NetworkResponse pendingReceipt;
     public bool Playing { get; internal set; }
@@ -48,7 +52,7 @@ public sealed class M7Client : MonoBehaviour
     public bool EnrollmentPending=>pendingEnrollment!=null;
     public bool ControlLost=>!automaticReconnect;
     public bool HumanControlAvailable { get; private set; }
-    public bool CanInteract=>Connected&&HumanControlAvailable&&!CommandPending&&!Busy&&!PresentationPending&&(Room?.Started!=true||viewRevision>=Revision&&historyBuffer.LastSequence>=requiredHistorySequence);
+    public bool CanInteract=>Connected&&HumanControlAvailable&&!CommandPending&&!Busy&&!PresentationPending&&!syncRecovery&&(Room?.Started!=true||viewRevision>=Revision&&historyBuffer.LastSequence>=requiredHistorySequence);
     public string TransportMode { get; private set; }="未连接";
     public event Action ViewChanged;
     public event Action PreviewChanged;
@@ -93,6 +97,7 @@ public sealed class M7Client : MonoBehaviour
     {
         responseDecoder.Legacy=Environment.GetCommandLineArgs().Contains("--m7-legacy-decoder");
         legacyReplies=Environment.GetCommandLineArgs().Contains("--m7-legacy-replies");
+        legacySync=legacySyncRequested=Environment.GetCommandLineArgs().Contains("--m7-full-state");
         storageDirectory=Path.Combine(Application.persistentDataPath,"m7-client");verification=Environment.GetCommandLineArgs().Contains("--m7-verify");
         M7CommunicationLog.Start(Path.Combine(Application.persistentDataPath,"m7-logs"));
         // IL2CPP 不支持 Assembly.ManifestModule；Awake 抛错会使主线程回包处理无法启动。
@@ -151,7 +156,7 @@ public sealed class M7Client : MonoBehaviour
         }
         if(socketConnected&&(socket==null||socket.State!=WebSocketState.Open))socketConnected=false;
         if(Connected&&!previewBusy&&previewQueue.Count>0&&Time.unscaledTime>=nextPreviewAt){nextPreviewAt=Time.unscaledTime+.12f;SendPreview(previewQueue.Dequeue());}
-        if(automaticReconnect&&(!socketConnected||Room?.Started==true&&viewRevision<Revision)&&!syncBusy&&!Busy&&http!=null&&connectionId!=null&&Time.unscaledTime>=nextSyncAt){nextSyncAt=Time.unscaledTime+1;PollState();}
+        if(automaticReconnect&&(!socketConnected||recoverEventStream||Room?.Started==true&&viewRevision<Revision)&&!syncBusy&&!Busy&&http!=null&&connectionId!=null&&Time.unscaledTime>=nextSyncAt){nextSyncAt=Time.unscaledTime+1;PollState();}
         if(automaticReconnect&&Connected&&!socketConnected&&!socketStarting&&!Busy&&http!=null&&connectionId!=null&&Time.unscaledTime>=nextSocketAt)StartSocket();
         if(automaticReconnect&&Connected&&!Busy&&pendingCommand!=null&&pendingReceipt==null&&(!commandSending||commandEpoch!=connectionEpoch)&&Time.unscaledTime>=nextCommandRetry)SendPending();
         if(automaticReconnect&&Connected&&historyDirty&&!historyBusy&&Time.unscaledTime>=nextHistoryAt)FetchHistory();
@@ -323,7 +328,7 @@ public sealed class M7Client : MonoBehaviour
                     else pendingCommand=null;
                 }
                 Apply(response);
-                if(pendingReceipt!=null)nextSyncAt=0;
+                if(pendingReceipt!=null)nextSyncAt=stateSyncConnected&&socketConnected?Time.unscaledTime+.5f:0;
                 if(response.Code=="ServiceUnavailable")Disconnected("服务暂时无法确认操作，保留原命令编号，重连后核对结果。");
                 CommandFeedback?.Invoke(Status);
             });
@@ -440,7 +445,7 @@ public sealed class M7Client : MonoBehaviour
                         if(result.ProtocolVersion!=NetworkProtocol.Version)throw new M7NetworkFailure("PROTOCOL","联机协议不兼容，请所有玩家更新至同一版本。");
                         M7CommunicationLog.Record(new M7CommunicationEvent{Event="response_received",Transport=transport,Operation=request.Operation,RequestId=request.RequestId,CommandId=request.CommandId,RoomId=result.RoomId??request.RoomId,Revision=result.Revision,Code=result.Code,Status=result.Success?"ok":"rejected",DurationMs=ElapsedMs(started),DecodeMs=ElapsedMs(decode),Bytes=payload.Length});
                         if(result.Code=="UnknownOperation"&&TryLegacyOperation(request))
-                        {compactReplies=false;return await Send(request,cancel).ConfigureAwait(false);}
+                        {if(request.Operation=="Get")legacySync=true;compactReplies=false;return await Send(request,cancel).ConfigureAwait(false);}
                         return result;
                     }
                 }
@@ -458,6 +463,7 @@ public sealed class M7Client : MonoBehaviour
             case "PreviewCompact":request.Operation="Preview";return true;
             case "HistoryCompact":request.Operation="History";return true;
             case "CommandReceipt":request.Operation="Command";return true;
+            case "Sync":request.Operation="Get";return true;
             default:return false;
         }
     }
@@ -488,6 +494,8 @@ public sealed class M7Client : MonoBehaviour
         if(Room!=null&&response.Room!=null&&Room.GameNumber!=response.Room.GameNumber)
         {
             matchEpoch++;historyBuffer.Clear();HistoryRevision++;historyCursor=0;
+            reliableHistoryRevision=-1;
+            recoverEventStream=recoveryHistoryPaging=false;
             historyBusy=false;historyDirty=true;nextHistoryAt=0;historyRetryDelay=2;
             pendingCommand=null;pendingReceipt=null;commandSending=false;decodedView=null;viewJson=null;viewRevision=-1;
             previews.Clear();previewQueue.Clear();previewPending.Clear();previewBusy=false;
@@ -495,6 +503,7 @@ public sealed class M7Client : MonoBehaviour
         if(handshake)
         {
             compactReplies=response.Code==NetworkProtocol.CompactRepliesCode&&!legacyReplies;
+            if(response.Room?.Started==true&&!legacySync&&!legacyReplies){recoverEventStream=true;syncRecovery=true;nextSyncAt=0;}
             connectionEpoch++;
             if(response.Credential!=null)credential=response.Credential;
             if(response.ConnectionId!=null)connectionId=response.ConnectionId;
@@ -507,18 +516,30 @@ public sealed class M7Client : MonoBehaviour
         if(response.Room!=null&&!stale){Room=response.Room;rememberedRuleSet=Room.RuleSet;rememberedGeneralPackage=Room.ThreeKingdomsPackageVersion;rememberedGeneralHash=Room.ThreeKingdomsContentHash;}
         Connected=connectionId!=null&&(response.Success||Connected);
         if(response.Room!=null&&!stale)HumanControlAvailable=response.HumanControlAvailable;
+        if(response.Success&&response.Room!=null&&!response.Room.Started)recoverEventStream=recoveryHistoryPaging=syncRecovery=false;
         if(response.ViewJson!=null&&response.Revision>=viewRevision)
         {
             responseDecoder.TryGet(response,out var prepared);
+            if(recoverEventStream&&legacySync&&prepared?.ReliableEvents!=true)
+            {
+                recoverEventStream=false;recoveryHistoryPaging=true;historyCursor=0;historyDirty=true;nextHistoryAt=0;
+            }
+            if(!recoverEventStream&&!recoveryHistoryPaging)syncRecovery=false;
             bool changed=response.Revision!=viewRevision||viewJson==null;
+            if(prepared?.ReliableEvents==true)
+            {
+                MergeHistory(prepared.Presentation);historyCursor=Math.Max(historyCursor,historyBuffer.LastSequence);historyDirty=false;reliableHistoryRevision=response.Revision;
+                recoverEventStream=recoveryHistoryPaging=syncRecovery=false;
+            }
             // 只有近期记录与已接收记录连续，或首次入桌时才直接采用；长时间掉线仍分页补齐，避免漏播卡牌。
-            if(changed&&response.PresentationHistoryJson!=null&&(viewJson==null||(History.LastOrDefault()?.Sequence??0)>=response.PresentationHistoryAfterSequence))
+            if(changed&&prepared?.ReliableEvents!=true&&response.PresentationHistoryJson!=null&&(viewJson==null||(History.LastOrDefault()?.Sequence??0)>=response.PresentationHistoryAfterSequence))
                 MergeHistory(prepared?.Presentation??FrameCost.Decode<GameHistoryEntry[]>(response.PresentationHistoryJson,FrameCost.Stage.HistoryDecode));
             viewRevision=response.Revision;Revision=Math.Max(Revision,response.Revision);viewJson=response.ViewJson;
-            if(changed){decodedView=prepared?.View;requiredHistorySequence=LastViewEvent(decodedView);displayRequestId=response.RequestId;displayStarted=Stopwatch.GetTimestamp();displayRevision=Revision;previews.Clear();previewQueue.Clear();previewPending.Clear();ViewChanged?.Invoke();historyDirty=true;FetchHistory();}
+            if(changed){decodedView=prepared?.View;requiredHistorySequence=LastViewEvent(decodedView);displayRequestId=response.RequestId;displayStarted=Stopwatch.GetTimestamp();displayRevision=Revision;previews.Clear();previewQueue.Clear();previewPending.Clear();ViewChanged?.Invoke();if(prepared?.ReliableEvents!=true){historyDirty=true;FetchHistory();}}
         }
         else if(response.Room!=null&&!stale)Revision=Math.Max(Revision,response.Revision);
         CompletePendingReceipt();
+        if(recoveryHistoryPaging)FetchHistory();
         Interlocked.Exchange(ref socketRevision,viewRevision);
         if(response.Code=="ConnectionSuperseded"||response.Code=="Unauthorized")
         {
@@ -548,8 +569,11 @@ public sealed class M7Client : MonoBehaviour
                 if(current!=generation||match!=matchEpoch)return;historyBusy=false;
                 if(epoch!=connectionEpoch||!response.Success){RetryHistory();return;}
                 if(response.Room?.GameNumber!=Room?.GameNumber){historyDirty=true;nextHistoryAt=0;return;}
+                // 完整事件流已覆盖该修订，迟到的旧分页不能把技能补写结果回退。
+                if(!recoveryHistoryPaging&&response.Revision<=reliableHistoryRevision){historyDirty=false;return;}
                 MergeHistory(entries);historyCursor=Math.Max(historyCursor,response.HistoryCursor);
                 historyRetryDelay=2;nextHistoryAt=0;historyDirty|=response.HasMoreHistory||Revision>requestedRevision;
+                if(recoveryHistoryPaging&&!response.HasMoreHistory&&response.Revision>=viewRevision){recoveryHistoryPaging=false;syncRecovery=false;}
                 if(historyDirty)FetchHistory();
             });
         }
@@ -579,19 +603,20 @@ public sealed class M7Client : MonoBehaviour
         syncBusy=true;int current=generation,epoch=connectionEpoch;
         try
         {
-            var response=await Send(Envelope("Get"),lifetime.Token).ConfigureAwait(false);
+            var response=await Send(Envelope(recoverEventStream&&!legacySync?"Sync":"Get"),lifetime.Token).ConfigureAwait(false);
             await EnqueueMain(()=>{if(current!=generation)return;syncBusy=false;if(epoch!=connectionEpoch)return;if(!socketConnected)TransportMode=PollTransportLabel;Apply(response);});
         }
-        catch(Exception ex){await EnqueueMain(()=>{if(current!=generation)return;syncBusy=false;if(epoch==connectionEpoch){Diagnose("HttpsSync",ex);LastError=M7NetworkErrors.Describe("同步对局",ex);Disconnected(LastError+" 原席位与待决保留，正在重连。");}});}
+        catch(Exception ex){await EnqueueMain(()=>{if(current!=generation)return;syncBusy=false;if(epoch==connectionEpoch){if(recoverEventStream&&(M7NetworkErrors.Code(ex)=="HTTP 503"||M7NetworkErrors.Code(ex)=="RESPONSE_SIZE")){legacySync=true;nextSyncAt=0;return;}Diagnose("HttpsSync",ex);LastError=M7NetworkErrors.Describe("同步对局",ex);Disconnected(LastError+" 原席位与待决保留，正在重连。");}});}
     }
     async void StartSocket()
     {
         // 同一身份只保留一次建连；HTTP 重连已轮换身份时必须立即废弃旧建连。
         if(lifetime==null||socketStarting&&socketEpoch==connectionEpoch)return;
-        socketStarting=true;socketConnected=false;AbortSocket(socket);socket?.Dispose();var ws=new ClientWebSocket();socket=ws;
+        socketStarting=true;socketConnected=false;stateSyncConnected=false;AbortSocket(socket);socket?.Dispose();var ws=new ClientWebSocket();socket=ws;
         int current=generation,epoch=connectionEpoch;socketEpoch=epoch;var sessionCancel=lifetime.Token;
         // 在 Unity 线程捕获本次连接身份，后台心跳不等待 Update，即使帧卡顿也不会停止保活。
-        var identity=Envelope("Get");if(compactReplies&&!legacyReplies)identity.Operation="Heartbeat";var endpoint=M7OnlineEndpoint.WebSocketUri(Endpoint);
+        var identity=Envelope("Get");if(!legacySync&&!legacyReplies)identity.Operation="Sync";else if(compactReplies&&!legacyReplies)identity.Operation="Heartbeat";var endpoint=M7OnlineEndpoint.WebSocketUri(Endpoint);
+        var stateReceiver=new SeatStateReceiver(identity.RoomId,SeatId,identity.ConnectionId);
         string transport=string.IsNullOrEmpty(Fingerprint)?"WS":"WSS";
         var receipts=new ConcurrentDictionary<string,SocketReceipt>();
         var socketLifetime=CancellationTokenSource.CreateLinkedTokenSource(sessionCancel);var cancel=socketLifetime.Token;
@@ -617,12 +642,19 @@ public sealed class M7Client : MonoBehaviour
                     // 等待当前消息解析完成才继续接收，避免同一连接的快照被并行解析打乱。
                     long decode=Stopwatch.GetTimestamp();
                     M7CommunicationLog.Record(new M7CommunicationEvent{Event="response_body",Operation="Push",RoomId=identity.RoomId,Bytes=payload.Length,MonoTicks=decode});
-                    var response=await responseDecoder.Decode(payload,identity.RuleSet,"Push",null,cancel).ConfigureAwait(false);
+                    var response=await responseDecoder.Decode(payload,identity.RuleSet,"Push",null,cancel,stateReceiver).ConfigureAwait(false);
                     if(response==null||response.ProtocolVersion!=NetworkProtocol.Version)throw new M7NetworkFailure("PROTOCOL","联机协议不兼容。");
+                    if(response.Code=="SyncCapacity"){legacySync=true;throw new M7NetworkFailure("STATE_CAPACITY","同步需要重新取得完整局面。");}
                     double duration=0;
+                    bool fallback=response.Code=="UnknownOperation"&&(identity.Operation=="Sync"||identity.Operation=="Heartbeat");
+                    if(fallback)
+                    {
+                        if(identity.Operation=="Sync")identity.Operation=compactReplies?"Heartbeat":"Get";
+                        else{compactReplies=false;identity.Operation="Get";}
+                    }
+                    else if(identity.Operation=="Sync"&&response.Success&&responseDecoder.TryGet(response,out var prepared)&&prepared.ReliableEvents)stateSyncConnected=true;
                     if(response.RequestId!=null&&receipts.TryRemove(response.RequestId,out var receipt)){duration=ElapsedMs(receipt.Started);receipt.Received.TrySetResult(true);}
-                    if(response.Code=="UnknownOperation"&&identity.Operation=="Heartbeat")
-                    {compactReplies=false;identity.Operation="Get";continue;}
+                    if(fallback)continue;
                     M7CommunicationLog.Record(new M7CommunicationEvent{Event="response_received",Transport=transport,Operation=duration>0?"Get":"Push",RequestId=response.RequestId,RoomId=response.RoomId??identity.RoomId,Revision=response.Revision,Code=response.Code,Status=response.Success?"ok":"rejected",Bytes=payload.Length,DecodeMs=ElapsedMs(decode),DurationMs=duration});
                     await EnqueueMain(()=>{if(current==generation&&epoch==connectionEpoch&&socket==ws){socketRetryDelay=2;Apply(response);}});
                 }
@@ -631,7 +663,8 @@ public sealed class M7Client : MonoBehaviour
         catch(Exception ex)
         {
             M7CommunicationLog.Record(new M7CommunicationEvent{Event="socket_closed",Transport=transport,RoomId=identity.RoomId,DurationMs=ElapsedMs(started),Code=sessionCancel.IsCancellationRequested?"SESSION_CANCELLED":M7NetworkErrors.Code(ex)});
-            await EnqueueMain(()=>{if(current==generation&&epoch==connectionEpoch&&socket==ws){socketConnected=false;TransportMode=PollTransportLabel;Status=transport=="WSS"?"局域网实时同步暂不可用，正在使用同一证书校验的 HTTPS 持续同步。":"实时同步暂不可用，正在通过 HTTP 持续同步。";}});
+            bool needEvents=stateSyncConnected;
+            await EnqueueMain(()=>{if(current==generation&&epoch==connectionEpoch&&socket==ws){recoverEventStream|=needEvents;stateSyncConnected=false;syncRecovery=true;socketConnected=false;nextSyncAt=0;TransportMode=PollTransportLabel;Status=transport=="WSS"?"局域网实时同步暂不可用，正在使用同一证书校验的 HTTPS 持续同步。":"实时同步暂不可用，正在通过 HTTP 持续同步。";}});
         }
         finally
         {
@@ -663,7 +696,7 @@ public sealed class M7Client : MonoBehaviour
                     // 只把本次请求编号的回执视为成功；其它推送不能掩盖单向半断连接。
                     using(deadline.Token.Register(()=>receipt.Received.TrySetCanceled()))await receipt.Received.Task.ConfigureAwait(false);
                 }
-                await Task.Delay(SocketHeartbeatInterval,cancel).ConfigureAwait(false);
+                if(request.Operation==identity.Operation)await Task.Delay(SocketHeartbeatInterval,cancel).ConfigureAwait(false);
             }
         }
         catch(Exception ex)
@@ -767,6 +800,10 @@ public sealed class M7Client : MonoBehaviour
         generation++;connectionEpoch++;sessionCancellation=new CancellationToken(true);lifetime?.Cancel();AbortSocket(socket);socket?.Dispose();socket=null;http?.Dispose();http=null;lifetime?.Dispose();lifetime=null;
         while(main.TryDequeue(out _))mainSlots.Release();
         viewRevision=-1;requiredHistorySequence=0;compactReplies=false;pendingReceipt=null;PresentationPending=false;
+        stateSyncConnected=false;syncRecovery=false;
+        recoverEventStream=recoveryHistoryPaging=false;
+        legacySync=legacySyncRequested;
+        reliableHistoryRevision=-1;
         displayStarted=0;
         socketStarting=false;nextSocketAt=0;socketRetryDelay=2;Interlocked.Exchange(ref socketRevision,-1);
         LobbyConnectionState=M7LobbyConnectionState.Unconfigured;nextLobbyPollAt=0;
