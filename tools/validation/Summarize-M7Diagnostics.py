@@ -42,7 +42,7 @@ def normalize(raw):
                   failed=event.get("success") is False or event.get("status") == "rejected")
     for key in ("expectedRevision", "waitMs", "queueWaitMs", "queueDepth", "decodeMs", "frameMs", "networkApplyMs", "boardRefreshMs",
                 "viewDecodeMs", "guiMs", "gameUpdateMs", "buildAnimationMs", "presentationApplyMs",
-                "historyDecodeMs", "workerDecodeMs", "slowFrames", "gcCollections", "droppedEvents", "writeFailures", "dropped"):
+                "historyDecodeMs", "workerDecodeMs", "slowFrames", "gcCollections", "allocatedBytes", "workerThreads", "monoTicks", "droppedEvents", "writeFailures", "dropped"):
         result[key] = number(event.get(key))
     return result
 
@@ -104,7 +104,7 @@ def summarize(paths, since=None, until=None, request_id=None):
         if event["durationMs"] > 0:
             group["duration"].append(event["durationMs"])
         for name in ("frameMs", "networkApplyMs", "boardRefreshMs", "viewDecodeMs", "guiMs", "gameUpdateMs",
-                     "buildAnimationMs", "presentationApplyMs", "historyDecodeMs", "workerDecodeMs", "waitMs", "queueWaitMs", "queueDepth"):
+                     "buildAnimationMs", "presentationApplyMs", "historyDecodeMs", "workerDecodeMs", "waitMs", "queueWaitMs", "queueDepth", "allocatedBytes", "workerThreads"):
             maxima[name] = max(maxima[name], event[name])
         session = (event["component"], event["session"])
         dropped[session] = max(dropped[session], event["droppedEvents"])

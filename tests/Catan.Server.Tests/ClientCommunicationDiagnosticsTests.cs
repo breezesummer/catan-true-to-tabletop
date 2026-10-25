@@ -65,7 +65,8 @@ public sealed class ClientCommunicationDiagnosticsTests
         var client=new M7Client();client.ConfigureEndpoint("http://127.0.0.1:47771","");
         string requestId=Guid.NewGuid().ToString("N"),commandId=Guid.NewGuid().ToString("N");
         const string credential="绝不能写入日志的恢复凭据",password="绝不能写入日志的房间口令",hand="绝不能写入日志的私密手牌";
-        var response=new NetworkResponse{RequestId=requestId,Success=true,RoomId="room-test",Revision=7,Credential=credential,ViewJson=hand};
+        string visibleJson="{\"PlayerId\":\""+hand+"\"}";
+        var response=new NetworkResponse{RequestId=requestId,Success=true,RoomId="room-test",Revision=7,Credential=credential,RuleSet="base",ViewJson=visibleJson};
         var context=new CountingContext();
         SetHttp(client,new HttpClient(new DelayedResponseHandler(response)));
         try
@@ -76,7 +77,7 @@ public sealed class ClientCommunicationDiagnosticsTests
                 SynchronizationContext.SetSynchronizationContext(context);
                 return (Task<NetworkResponse>)Method("Send").Invoke(client,new object[]{request,CancellationToken.None})!;
             });
-            Assert.Equal(hand,result.ViewJson);Assert.Equal(0,context.Posted);
+            Assert.Equal(visibleJson,result.ViewJson);Assert.Equal(0,context.Posted);
             Assert.True(M7CommunicationLog.Flush(5000));
             string logs=string.Join("\n",Directory.GetFiles(M7CommunicationLog.DirectoryPath!,"comm-*.jsonl").SelectMany(ReadSharedLines));
             Assert.Contains(requestId,logs);Assert.Contains(commandId,logs);Assert.Contains("response_received",logs);
@@ -86,14 +87,16 @@ public sealed class ClientCommunicationDiagnosticsTests
     }
 
     [Fact]
-    public void CallbackBacklogIsAppliedInOrderAcrossFrames()
+    public async Task CallbackBacklogIsAppliedInOrderAcrossFrames()
     {
         var client=new M7Client();var applied=new List<int>();
         try
         {
-            for(int i=0;i<100;i++){int index=i;Method("EnqueueMain").Invoke(client,new object[]{(Action)(()=>applied.Add(index))});}
+            var queued=new List<Task>();
+            for(int i=0;i<100;i++){int index=i;queued.Add((Task)Method("EnqueueMain").Invoke(client,new object[]{(Action)(()=>applied.Add(index))})!);}
             Method("Update").Invoke(client,null);Assert.InRange(applied.Count,1,32);
-            for(int i=0;i<100&&applied.Count<100;i++)Method("Update").Invoke(client,null);
+            for(int i=0;i<100&&applied.Count<100;i++){Method("Update").Invoke(client,null);await Task.Delay(5);}
+            await Task.WhenAll(queued);
             Assert.Equal(Enumerable.Range(0,100),applied);
         }
         finally{client.EndSession();}

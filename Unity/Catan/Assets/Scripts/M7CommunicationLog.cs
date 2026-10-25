@@ -11,7 +11,7 @@ using System.Threading;
 internal sealed class M7CommunicationEvent
 {
     public string Component="client",Event,Transport,Operation,RequestId,CommandId,RoomId,Code,Status,ClientVersion,Platform,BuildId;
-    public long Revision=-1,Bytes,QueueDepth,Count,SlowFrames,GcCollections,ProtocolVersion;
+    public long Revision=-1,Bytes,QueueDepth,Count,SlowFrames,GcCollections,ProtocolVersion,AllocatedBytes,WorkerThreads,MonoTicks;
     public double DurationMs,QueueWaitMs,DecodeMs,FrameMs,NetworkApplyMs,BoardRefreshMs,ViewDecodeMs,GuiMs,GameUpdateMs,BuildAnimationMs,PresentationApplyMs,ResponseDecodeMs,HistoryDecodeMs,WorkerDecodeMs;
     internal DateTime TimestampUtc;
 }
@@ -145,6 +145,7 @@ internal sealed class M7CommunicationWriter:IDisposable
         Number(text,"decodeMs",value.DecodeMs);Number(text,"frameMs",value.FrameMs);Number(text,"networkApplyMs",value.NetworkApplyMs);Number(text,"boardRefreshMs",value.BoardRefreshMs);
         Number(text,"viewDecodeMs",value.ViewDecodeMs);Number(text,"guiMs",value.GuiMs);Number(text,"gameUpdateMs",value.GameUpdateMs);Number(text,"buildAnimationMs",value.BuildAnimationMs);
         Number(text,"presentationApplyMs",value.PresentationApplyMs);Number(text,"responseDecodeMs",value.ResponseDecodeMs);Number(text,"historyDecodeMs",value.HistoryDecodeMs);Number(text,"workerDecodeMs",value.WorkerDecodeMs);
+        Number(text,"allocatedBytes",value.AllocatedBytes);Number(text,"workerThreads",value.WorkerThreads);Number(text,"monoTicks",value.MonoTicks);
         Number(text,"droppedEvents",dropped);Number(text,"writeFailures",failures);return text.Append('}').ToString();
     }
     static void Add(StringBuilder text,string name,string value)
