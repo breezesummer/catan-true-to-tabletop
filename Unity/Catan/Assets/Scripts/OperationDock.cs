@@ -559,15 +559,26 @@ public sealed partial class OperationDock
     {
         var r=face.Shape.Rect;
         var matrix=GUI.matrix;GUIUtility.RotateAroundPivot(face.Shape.Angle,r.center);
-        if(face.Texture!=null)EntityCardAssets.DrawCardFace(r,face.Texture,face.Hover);
+        DrawHandArtwork(face,r);
+        GUI.matrix=matrix;
+    }
+    void DrawHandArtwork(HandFace face,Rect r)
+    {
+        if(face.Texture!=null)
+        {
+            // 纸芯与阴影沿实际卡面轮廓绘制，避免固定槽位纸底露成卡套边框。
+            EntityCardAssets.DrawCardFace(r,face.Texture,face.Hover);
+        }
         else
         {
-            r=EntityCardAssets.FitCardRect(r,TabletopHandLayout.CardWidth/TabletopHandLayout.CardHeight,GUI.matrix);
-            EntityCardAssets.DrawCardPaper(r,new Color(.13f,.22f,.23f),face.Hover);
-            Label(new Rect(r.x+10,r.y+9,r.width-20,20),face.Card.Progress?"发展卡":"发展卡",small);
+            EntityCardAssets.DrawCardPaper(r,Surface,face.Hover);
+            Label(new Rect(r.x+10,r.y+9,r.width-20,20),"发展卡",small);
             Label(new Rect(r.x+11,r.y+36,r.width-22,64),face.Card.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=21});
         }
-        GUI.matrix=matrix;
+        if(face.Selected)
+        {
+            Label(new Rect(r.x+5,r.y+5,24,22),"✓",new GUIStyle(center){normal={textColor=Ink},fontSize=19});
+        }
     }
     void HandleHandInput(OperationSnapshot s)=>ProcessHandInput(s,Event.current);
     internal void ProcessHandInput(OperationSnapshot s,Event e)
