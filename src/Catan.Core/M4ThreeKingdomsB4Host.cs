@@ -178,9 +178,10 @@ namespace Catan.Core.M4
             var receive=new int[8]; bool bulk=c.Receive?.Total>0||c.ReceiveCommodities?.Total>0;
             if(bulk) { Require((c.Receive==null||ValidBag(c.Receive))&&(c.ReceiveCommodities==null||ValidBag(c.ReceiveCommodities)),"InvalidTrade","请求牌数量无效。"); for(int i=0;i<8;i++)receive[i]=i<5?(c.Receive??new ResourceBag())[(Resource)i]:(c.ReceiveCommodities??new CommodityBag())[(Commodity)(i-5)]; }
             else { int type=c.ReceiveIsCommodity?5+(int)c.ReceiveCommodity:(int)c.ReceiveResource;Require(type>=0&&type<8,"InvalidTrade","请求牌种无效。");receive[type]=c.ReceiveAmount; }
+            Require(B2SkillEngine.CanGainCardsB6(s.ThreeKingdoms,p.Id,receive),"GainForbidden","当前不能获得所选牌。 ");
             int count=receive.Sum(); Require(count>0&&count<=19&&receive.All(n=>n>=0)&&receive[effective]==0&&c.GiveAmount>0&&c.GiveAmount<=19,"InvalidTrade","交换数量或牌种无效。");
             int rate=effective<5?TradeRate(s,p.Id,(Resource)effective):CommodityTradeRate(s,p.Id,(Commodity)(effective-5)); int wenji=B2SkillEngine.WenjiTradeRatio(s.ThreeKingdoms,p.Id,real);if(wenji>0)rate=Math.Min(rate,wenji);
-            bool generic=ports.Any(port=>port.Resource==null&&Buildings(s).Any(b=>b.PlayerId==p.Id&&port.Vertices.Contains(b.LocationId)));
+            bool generic=CurrentPortsB6(s).Any(port=>port.Resource==null&&Buildings(s).Any(b=>B6AllianceRules.Allies(s.ThreeKingdoms,p.Id,b.PlayerId)&&port.Vertices.Contains(b.LocationId)));
             Require(c.GiveAmount==4*count||c.GiveAmount==rate*count||generic&&c.GiveAmount==3*count,"InvalidRatio","交换比例无效。");
             var host=CardHost(s);var bank=host.GetBank();Require(Enumerable.Range(0,8).All(i=>bank[i]>=receive[i]),"InsufficientBank","银行没有所需牌。");
             var selected=c.PaymentCards==null?new int[8]:(int[])c.PaymentCards.Clone();if(c.PaymentCards==null)selected[real]=c.GiveAmount;

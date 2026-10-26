@@ -111,7 +111,7 @@ namespace Catan.Core.ThreeKingdoms
             if (f.Kind == "guzheng")
             {
                 var cards = new int[8];
-                foreach (var batch in Returned(s).Where(r => r.EventId == f.SourceEventId)) { Add(cards, batch.Cards); Array.Clear(batch.Cards, 0, 8); }
+                foreach (var batch in Returned(s).Where(r => r.EventId == f.SourceEventId)) for(int type=0;type<8;type++)if(!IsDrawBlocked(s,f.PlayerId)&&CanGainB6(s,f.PlayerId,type)){cards[type]+=batch.Cards[type];batch.Cards[type]=0;}
                 Remove(s, f); Gain(host, f.PlayerId, cards, f.SkillId, f.Id); return true;
             }
             if (f.Kind == "luoying")
@@ -140,7 +140,7 @@ namespace Catan.Core.ThreeKingdoms
         private static int AvailableLuoying(IThreeKingdomsCardHost host, B2SkillFrame f)
         {
             var s = host.State; var g = Active(s, f.PlayerId);
-            if (g?.TenureId != f.TenureId || s.Clock.ActivePlayerId == f.PlayerId) return 0;
+            if (g?.TenureId != f.TenureId || s.Clock.ActivePlayerId == f.PlayerId || !CanGainB6(s,f.PlayerId,0)) return 0;
             return Math.Min(Math.Max(0, 2 - Value(g, "luoying:" + f.Targets[0], s.Clock.TurnInstanceId)),
                 Returned(s).Where(r => r.EventId == f.SourceEventId && r.PlayerId == f.Targets[0]).Sum(r => r.Cards[0]));
         }

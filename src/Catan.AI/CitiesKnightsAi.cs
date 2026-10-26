@@ -28,7 +28,7 @@ public sealed class CitiesKnightsAi
         if (view.ThreeKingdoms?.PendingDecision != null || view.ThreeKingdoms?.SkillDecision != null ? actor != view.PlayerId : view.Phase == GamePhase.Discard ? !canDiscard : actor != view.PlayerId) throw new InvalidOperationException("This seat has no pending action.");
         var command = Copy(Choose(view));
         if (view.ThreeKingdoms != null) command.WindowId = view.ThreeKingdoms.WindowId;
-        return command;
+        return CitiesKnightsGameSession.StampControlB6(view,command);
     }
     private Command Choose(PlayerView view)
     {
@@ -143,8 +143,8 @@ public sealed class CitiesKnightsAi
         }
         var activeSkill = ChooseGeneralSkill(view, desired, commodityGoal); if (activeSkill != null) return activeSkill;
         var proposal = ProposeTrade(view, desired); if (proposal != null) return proposal;
-        foreach (var need in Resources.Where(r => view.OwnResources[r] < desired[r] && view.Bank[r] > 0).Select(r => (resource: r, commodity: (Commodity?)null))
-            .Concat(Commodities.Where(c => view.OwnCommodities[c] < commodityGoal[c] && view.CommodityBank[c] > 0).Select(c => (resource: default(Resource), commodity: (Commodity?)c))))
+        foreach (var need in Resources.Where(r => view.OwnResources[r] < desired[r] && view.Bank[r] > 0 && CanReceive(view,(int)r)).Select(r => (resource: r, commodity: (Commodity?)null))
+            .Concat(Commodities.Where(c => view.OwnCommodities[c] < commodityGoal[c] && view.CommodityBank[c] > 0 && CanReceive(view,5+(int)c)).Select(c => (resource: default(Resource), commodity: (Commodity?)c))))
         {
             foreach (var give in Resources.Where(r => (need.commodity.HasValue || r != need.resource) && view.OwnResources[r] - desired[r] >= Rate(view, r, null)))
             {
@@ -491,7 +491,7 @@ public sealed class CitiesKnightsAi
     private static Command Copy(Command c) => new Command
     {
         PlayerId=c.PlayerId, Kind=c.Kind, TargetId=c.TargetId, OtherPlayerId=c.OtherPlayerId,
-        GeneralIds=c.GeneralIds?.ToArray(), DecisionId=c.DecisionId, WindowId=c.WindowId, SkillCommand=ThreeKingdomsAi.Copy(c.SkillCommand),
+        ActingAsPlayerId=c.ActingAsPlayerId, JiaoziCardType=c.JiaoziCardType, GeneralIds=c.GeneralIds?.ToArray(), DecisionId=c.DecisionId, WindowId=c.WindowId, SkillCommand=ThreeKingdomsAi.Copy(c.SkillCommand),
         PaymentCards=c.PaymentCards?.ToArray(),GiveEffectiveCardType=c.GiveEffectiveCardType,RetireAtPhase=c.RetireAtPhase,CancelRetirementIntent=c.CancelRetirementIntent,
         DeclaredRealTypes=c.DeclaredRealTypes?.ToArray(),DeclaredEffectiveTypes=c.DeclaredEffectiveTypes?.ToArray(),
         GiveResource=c.GiveResource, ReceiveResource=c.ReceiveResource, GiveAmount=c.GiveAmount, ReceiveAmount=c.ReceiveAmount,
@@ -507,6 +507,8 @@ public sealed class CitiesKnightsAi
     private static Command RespondToTrade(PlayerView view)
     {
         if(view.ThreeKingdoms?.HandLossForbidden==true) return new Command {PlayerId=view.PlayerId,Kind=view.TradeOffer.ProposerId==view.PlayerId?CommandKind.CancelTrade:CommandKind.RejectTrade};
+        if(view.ThreeKingdoms?.AllowedTradePartnerPlayerIds!=null&&!(view.LegalActions??Array.Empty<Command>()).Any(c=>c.Kind==CommandKind.AcceptTrade))
+            return new Command {PlayerId=view.PlayerId,Kind=view.TradeOffer.ProposerId==view.PlayerId?CommandKind.CancelTrade:CommandKind.RejectTrade};
         var offer = view.TradeOffer;
         var gives = offer.GiveCommodities ?? new CommodityBag();
         var costs = offer.ReceiveCommodities ?? new CommodityBag();
@@ -532,12 +534,13 @@ public sealed class CitiesKnightsAi
     }
     private static Commodity TrackCommodity(ImprovementTrack track) => track == ImprovementTrack.Science ? Commodity.Paper : track == ImprovementTrack.Trade ? Commodity.Cloth : Commodity.Coin;
     // One voluntary offer per turn. Public receipts survive save/load, so no hidden AI memory is needed.
+    private static bool CanReceive(PlayerView view,int type)=>view.ThreeKingdoms?.BlockedGainCardTypes?.Contains(type)!=true;
     private static Command ProposeTrade(PlayerView view, ResourceBag goal)
     {
         if(view.ThreeKingdoms?.HandLossForbidden==true)return null;
         var since = view.Events.LastOrDefault(e => e.Kind == "EndTurn")?.Sequence ?? 0;
         if (view.Events.Any(e => e.Sequence > since && e.PlayerId == view.PlayerId && e.Kind == "ProposeTrade")) return null;
-        var needs = Resources.Where(r => view.OwnResources[r] < goal[r]).OrderBy(r => view.OwnResources[r] - goal[r]).ToArray();
+        var needs = Resources.Where(r => view.OwnResources[r] < goal[r] && CanReceive(view,(int)r)).OrderBy(r => view.OwnResources[r] - goal[r]).ToArray();
         var surplus = Resources.Where(r => view.OwnResources[r] > goal[r]).OrderByDescending(r => view.OwnResources[r] - goal[r]).ToArray();
         if (needs.Length == 0 || surplus.Length == 0) return null;
         // 只向确实持有所需资源的安全对象报价；近终局交易须带来足够大的自身收益。
@@ -552,6 +555,7 @@ public sealed class CitiesKnightsAi
             if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 1
                 && Resources.All(r => view.OwnResources[r] + receive[r] - give[r] >= goal[r])) benefit += 16;
             var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0
+                && (view.ThreeKingdoms?.AllowedTradePartnerPlayerIds==null||view.ThreeKingdoms.AllowedTradePartnerPlayerIds.Contains(p.Id))
                 && AiOpponentStrategy.CanSupply(view.OpponentHands, p.Id, need)
                 && benefit >= AiOpponentStrategy.TradePenalty(view, p.Id))
                 .OrderBy(p => AiOpponentStrategy.TradePenalty(view, p.Id)).ThenBy(p => p.VictoryPoints)

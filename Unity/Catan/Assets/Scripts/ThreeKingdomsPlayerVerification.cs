@@ -64,7 +64,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             app.StartGame(mode,"heading-for-new-shores",players,"P1",true,threeKingdoms:true);
             yield return null;yield return null;
             Require(app.Ready&&app.ThreeKingdoms&&app.Paused&&View!=null,"三国开关没有进入本地权威局面。");
-            Require(View.SkillsEnabled&&View.PackageVersion==GeneralCatalog.B5DirectPackageVersion&&GeneralCatalog.B5Definitions.Length==49,"新局没有使用完整 B5 四十九将包。");
+            Require(View.SkillsEnabled&&View.PackageVersion==GeneralCatalog.B6PackageVersion&&GeneralCatalog.B6Definitions.Length==54,"新局没有使用完整 B6 五十四将包。");
             result.packageVersion=View.PackageVersion;
             int budget=0;
             while(View.PendingDecision?.PlayerId!=app.HumanSeat)
@@ -91,7 +91,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             stage=prefix+" 出牌阶段";
             string stageBefore=SaveAndRestore(prefix+"-阶段");yield return null;yield return null;AssertRestored(stageBefore);
             Require(View.Players.All(p=>p.ActiveGeneralId!=null&&p.RemainingLife==3)&&View.Players.All(p=>p.HiddenCount==1),"首轮公开武将与暗置数量不正确。");
-            Require(View.PoolCount==49-players*2,"正常选将没有保留 B5 四十九将实体总数。");
+            Require(View.PoolCount==54-players*2,"正常选将没有保留 B6 五十四将实体总数。");
             app.VerificationOpenThreeKingdomsPanel();yield return null;
             if(result.graphics){BeginCapture(prefix+"-public-life.png");for(int frame=0;target!=null&&frame<12;frame++)yield return null;EndCapture();}
             for(int repeat=0;repeat<2;repeat++)
@@ -135,9 +135,10 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
     void AssertRestored(string before){Require(app.ExportEnvelope()==before&&app.ThreeKingdoms,"保存恢复改变了权威状态、阶段或三国配置。");result.saveRoundtrips++;}
     void CheckPrivacy()
     {
-        Require(View.Players.Where(p=>p.PlayerId!=app.HumanSeat).All(p=>p.HiddenGeneralIds.Length==0),"产品视图出现对手暗置身份。");
-        if(View.PendingDecision!=null&&View.PendingDecision.PlayerId!=app.HumanSeat)Require(View.PendingDecision.CandidateIds.Length==0,"产品视图出现对手候选。");
-        if(View.SkillDecision!=null&&View.SkillDecision.PlayerId!=app.HumanSeat)Require(View.SkillActions.Length==0,"产品视图出现其他玩家的技能私密选项。");
+        string asset=app.RuleSet=="cities-knights"?City.M6View.PlayerId:Combined.M6View.PlayerId;
+        Require(View.Players.Where(p=>p.PlayerId!=asset).All(p=>p.HiddenGeneralIds.Length==0),"产品视图出现对手暗置身份。");
+        if(View.PendingDecision!=null&&View.PendingDecision.PlayerId!=asset)Require(View.PendingDecision.CandidateIds.Length==0,"产品视图出现对手候选。");
+        if(View.SkillDecision!=null&&View.SkillDecision.PlayerId!=asset)Require(View.SkillActions.Length==0,"产品视图出现其他玩家的技能私密选项。");
     }
     void Advance()
     {

@@ -28,7 +28,8 @@ namespace Catan.Core.M4
             Check(s.DecisionQueue.All(d=>d!=null&&s.Players.Any(p=>p.Id==d.PlayerId)),"Invalid decision queue.");
             if(B5(s)){Check(s.Players.All(p=>Enumerable.Range(0,3).All(t=>p.Improvements[t]+Catan.Core.ThreeKingdoms.B5BoardRules.Suppressed(s.ThreeKingdoms,p.Id,t)<=5)),"实际科技等级超出供应。");foreach(var d in B5Board(s).Damages)Check(d.Kind=="Road"?s.Roads.Any(x=>x.PlayerId==d.PlayerId&&x.LocationId==d.LocationId):d.Kind=="City"||d.Kind=="Settlement"?s.Settlements.Any(x=>x.PlayerId==d.PlayerId&&x.LocationId==d.LocationId):false,"损害记录缺少对应实体。");}
             Check(s.Tiles.Length==scenario.Topology.Tiles.Length&&s.Tiles.Select(t=>t.Id).Distinct().Count()==s.Tiles.Length,"Invalid board tiles.");
-            foreach(var tile in s.Tiles) {var original=scenario.Topology.Tiles.Single(t=>t.Id==tile.Id);Check(tile.Resource==original.Resource&&tile.Q==original.Q&&tile.R==original.R&&tile.Vertices.SequenceEqual(original.Vertices),"Immutable topology changed.");}
+            foreach(var tile in s.Tiles) {var original=scenario.Topology.Tiles.Single(t=>t.Id==tile.Id);Check((Catan.Core.ThreeKingdoms.B2SkillEngine.B6Enabled(s.ThreeKingdoms)||tile.Resource==original.Resource)&&tile.Q==original.Q&&tile.R==original.R&&tile.Vertices.SequenceEqual(original.Vertices),"Immutable topology changed.");}
+            if(Catan.Core.ThreeKingdoms.B2SkillEngine.B6Enabled(s.ThreeKingdoms))Check(s.Tiles.Select(t=>t.Resource).OrderBy(x=>x).SequenceEqual(scenario.Topology.Tiles.Select(t=>t.Resource).OrderBy(x=>x)),"地形板块数量不守恒。");
             Check(s.Tiles.Select(t=>t.Number??0).OrderBy(n=>n).SequenceEqual(scenario.Topology.Tiles.Select(t=>t.Number??0).OrderBy(n=>n)),"Number-disc conservation failed.");
         }
     }

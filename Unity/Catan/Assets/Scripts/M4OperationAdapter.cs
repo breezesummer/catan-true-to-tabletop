@@ -30,10 +30,11 @@ public sealed partial class M4App
     bool OperationContextVisible=>!directPayment.Active&&!tabletop.OperationHidden&&view!=null&&!DirectProgressActive&&(!FreeRoadPlacementActive||FreeRoadIds.Length==0)&&Operations().Discard==null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding&&view.LegalEdgeIds.Length==0);
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
     static int[] DockGoods(ResourceBag r,CommodityBag c)=>Enumerable.Range(0,8).Select(i=>i<5?r[(Resource)i]:c[(Commodity)(i-5)]).ToArray();
-    bool DockKnightTargetMatches(string target)=>operationKnightLevel<2||draft==null||draft.Kind!=CommandKind.PromoteKnight||view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==target&&k.Level==operationKnightLevel-1);
+    bool SharesAllianceAssetsB6(string owner)=>M6App.SharesAllianceAssetsB6(view.ThreeKingdoms,seat,owner);
+    bool DockKnightTargetMatches(string target)=>operationKnightLevel<2||draft==null||draft.Kind!=CommandKind.PromoteKnight||view.Board.Knights.Any(k=>SharesAllianceAssetsB6(k.PlayerId)&&k.LocationId==target&&k.Level==operationKnightLevel-1);
     int BankTradeRate(int good)
     {
-        if(good>=5)return view.Players.First(p=>p.Id==seat).Improvements[0]>=3||view.MerchantFleetCommodities.Contains((Commodity)(good-5))?2:4;
+        if(good>=5)return view.Players.Where(p=>SharesAllianceAssetsB6(p.Id)).Any(p=>p.Improvements[0]>=3)||view.MerchantFleetCommodities.Contains((Commodity)(good-5))?2:4;
         return view.MerchantFleetResources.Contains((Resource)good)||view.MerchantPlayerId==seat&&view.Board.Tiles.Any(t=>t.Id==view.MerchantTileId&&t.Resource==new[]{"wood","brick","wool","wheat","ore"}[good])?2:4;
     }
     bool DockLegal(CommandKind kind)=>view.LegalActions.Any(c=>c.Kind==kind);
@@ -42,7 +43,7 @@ public sealed partial class M4App
     {
         var source=Operations();
         if(!dock.IsPortTrade||operationPortId==null)return source;
-        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
+        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>SharesAllianceAssetsB6(b.PlayerId)).Select(b=>b.LocationId).ToArray();
         var port=view.Board.Ports.FirstOrDefault(p=>p.Id==operationPortId&&p.Vertices.Any(locations.Contains));
         if(port==null)return source;
         var result=new OperationSnapshot{CanTrade=source.CanTrade,CanInteract=source.CanInteract,GoodCount=source.GoodCount,Goods=source.Goods,Bank=source.Bank,OtherPlayers=source.OtherPlayers,Offer=source.Offer,ValidateTradeDraft=source.ValidateTradeDraft};
@@ -54,10 +55,10 @@ public sealed partial class M4App
         if(!Operations().CanTrade)return false;
         string id=board.ReferenceMarkers.PickPort(mouse,board.BoardCamera);
         if(string.IsNullOrEmpty(id))return false;
-        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
+        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>SharesAllianceAssetsB6(b.PlayerId)).Select(b=>b.LocationId).ToArray();
         var port=view.Board.Ports.FirstOrDefault(p=>p.Id==id);
         if(port==null)return false;
-        if(!port.Vertices.Any(locations.Contains)){status="此港口未连接你的村庄或城市。";ai.ShowTablePrompt(status);return true;}
+        if(!port.Vertices.Any(locations.Contains)){status="此港口未连接本方的村庄或城市。";ai.ShowTablePrompt(status);return true;}
         CancelOperationDraft();
         int? good=port.Resource.HasValue?(int?)((int)port.Resource.Value):null;
         dock.OpenPortTrade(good,good.HasValue?Goods[good.Value]+"港口 · 2:1":"通用港口 · 3:1");
@@ -66,7 +67,7 @@ public sealed partial class M4App
     internal bool VerificationOpenPort(string id)
     {
         if(view==null||!Operations().CanTrade)return false;
-        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
+        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>SharesAllianceAssetsB6(b.PlayerId)).Select(b=>b.LocationId).ToArray();
         var port=view.Board.Ports.FirstOrDefault(p=>p.Id==id&&p.Vertices.Any(locations.Contains));
         if(port==null)return false;
         CancelOperationDraft();dock.OpenPortTrade(port.Resource.HasValue?(int?)((int)port.Resource.Value):null,"港口兑换");operationPortId=id;return true;
@@ -90,8 +91,8 @@ public sealed partial class M4App
             for(int level=2;level<=3;level++)
             {
                 int previousLevel=level-1;
-                bool legal=view.LegalActions.Any(c=>c.Kind==CommandKind.PromoteKnight&&view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==c.TargetId&&k.Level==previousLevel));
-                AddDockBuild(s,CommandKind.PromoteKnight,level==2?"强力骑士":"精锐骑士","knight",own.KnightSupply[level-1],DockCost(wool:1,ore:1),legal,level);
+                bool legal=view.LegalActions.Any(c=>c.Kind==CommandKind.PromoteKnight&&view.Board.Knights.Any(k=>SharesAllianceAssetsB6(k.PlayerId)&&k.LocationId==c.TargetId&&k.Level==previousLevel));
+                AddDockBuild(s,CommandKind.PromoteKnight,level==2?"强力骑士":"精锐骑士","knight",view.Players.Where(p=>SharesAllianceAssetsB6(p.Id)).Sum(p=>p.KnightSupply[level-1]),DockCost(wool:1,ore:1),legal,level);
             }
             for(int track=0;track<3;track++)
             {
@@ -152,7 +153,7 @@ public sealed partial class M4App
     }
     OperationBuild AddDockBuild(OperationSnapshot s,CommandKind kind,string name,string icon,int count,int[] cost,bool legal,int suffix=-1)
     {
-        var build=new OperationBuild{Id=kind.ToString()+(suffix<0?"":":"+suffix),Name=name,Icon=icon,Count=count,Cost=cost,Detail=cost.Sum()==0?"当前阶段免费放置":kind==CommandKind.PromoteKnight?"拿起高一级骑士，放到要晋升的己方骑士上":kind==CommandKind.ImproveCity?"点击翻开下一级设施并支付商品":"拿起棋子，再点击地图上的合法位置放下"};build.ConfigureAvailability(legal,s.Goods,kind!=CommandKind.BuildCity);ConfigureDirectPaymentAvailability(build,legal,suffix);if(icon=="knight")build.Level=suffix;s.Builds.Add(build);return build;
+        var build=new OperationBuild{Id=kind.ToString()+(suffix<0?"":":"+suffix),Name=name,Icon=icon,Count=count,Cost=cost,Detail=cost.Sum()==0?"当前阶段免费放置":kind==CommandKind.PromoteKnight?"拿起高一级骑士，放到要晋升的骑士上；使用该骑士所属玩家的库存":kind==CommandKind.ImproveCity?"点击翻开下一级设施并支付商品":"拿起棋子，再点击地图上的合法位置放下"};build.ConfigureAvailability(legal,s.Goods,kind!=CommandKind.BuildCity);ConfigureDirectPaymentAvailability(build,legal,suffix);if(icon=="knight")build.Level=suffix;s.Builds.Add(build);return build;
     }
     void DrawOperationLayout()
     {
@@ -216,8 +217,8 @@ public sealed partial class M4App
         if(FreeRoadPlacementActive)return TabletopRoadPlacement.Instruction(view.PendingDecision?.Kind=="ProgressRoads"?view.PendingDecision.Amount:view.PendingDecision?.RemainingRoads??2,ai.HistoryEntries);
         if(view.ThreeKingdoms?.SkillDecision!=null)return "请在底部操作条完成武将技能选择";
         if(view.Phase==GamePhase.ThreeKingdoms)return view.ThreeKingdoms?.PendingDecision==null?"请在底部操作条处理三国阶段":"请在底部候选牌带完成私密选将";
-        if(view.Phase==GamePhase.Finished)return view.WinnerPlayerId+" 获胜";
-        if(pickField=="source")return "请选择要行动的己方骑士";
+        if(view.Phase==GamePhase.Finished)return M6App.AllianceVictoryTextB6(view.ThreeKingdoms,view.WinnerPlayerId);
+        if(pickField=="source")return "请选择要行动的骑士";
         if(pickField!="")return draft?.Kind==CommandKind.MoveRobber?"请选择强盗要前往的新地块":"请选择地图上的合法目标";
         if(handOverflowDiscard)return "发展卡超过 4 张，请选择要弃掉的发展卡";
         if(view.Phase==GamePhase.ProductionAwaitRoll)return "请掷骰";
@@ -227,7 +228,7 @@ public sealed partial class M4App
         if(view.Phase==GamePhase.RobberMove)return "请移动强盗";
         if(view.Phase==GamePhase.RobberSteal)return "请选择偷取对象";
         if(view.Phase==GamePhase.PendingChoice)return TabletopSelectionPrompt.Decision(view.PendingDecision?.Kind);
-        if(operationActions&&operationKnightTarget==null)return "请选择地图上的己方骑士，再选择行动";
+        if(operationActions&&operationKnightTarget==null)return "请选择地图上的骑士，再选择行动";
         return "请选择你的行动";
     }
     void DrawOperationControls()
@@ -235,7 +236,7 @@ public sealed partial class M4App
         if(!ai.IsHumanTurn||view.TradeOffer!=null)return;
         if(operationActions)
         {
-            var knight=view.Board.Knights.FirstOrDefault(k=>k.PlayerId==seat&&k.LocationId==operationKnightTarget);
+            var knight=view.Board.Knights.FirstOrDefault(k=>SharesAllianceAssetsB6(k.PlayerId)&&k.LocationId==operationKnightTarget);
             if(knight!=null)
             {
                 Text(new[]{"","基础骑士","强力骑士","精锐骑士"}[knight.Level]+"  ·  "+(knight.Active?"已激活":"未激活"));
@@ -277,13 +278,13 @@ public sealed partial class M4App
             else{draft.TargetId=knight;Submit(draft);GUIUtility.ExitGUI();return;}
         }
         else pickField=source?"source":"target";
-        pickType="V";status=source?"点击骑士，再点击它要前往的位置；右键放回。":"点击要行动的己方骑士。";
+        pickType="V";status=source?"点击骑士，再点击它要前往的位置；右键放回。":"点击要行动的骑士。";
     }
     bool PickTabletopKnight(Vector2 mouse)
     {
         if(view==null||curtain||newGame||artOpen||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null)return false;
         string vertex=Pick("V",mouse);
-        if(vertex==""||!view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==vertex))return false;
+        if(vertex==""||!view.Board.Knights.Any(k=>SharesAllianceAssetsB6(k.PlayerId)&&k.LocationId==vertex))return false;
         dock.Reset();CancelOperationDraft();operationKnightTarget=vertex;operationActions=true;
         var projected=board.ScreenPoint(vertex);tabletop.SetContextAnchor(MobileTabletop.Logical(projected));
         status="选择这名骑士的动作；右键空白处或 Esc 收起。";return true;
@@ -316,7 +317,7 @@ public sealed partial class M4App
     internal void VerificationChooseBuildingUpgrade()=>mapChoice.Choose(0);
     internal bool VerificationSelectKnight(string vertex)
     {
-        if(view==null||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null||!view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==vertex))return false;
+        if(view==null||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null||!view.Board.Knights.Any(k=>SharesAllianceAssetsB6(k.PlayerId)&&k.LocationId==vertex))return false;
         dock.Reset();CancelOperationDraft();operationKnightTarget=vertex;operationActions=true;return true;
     }
     internal string VerificationSelectedKnight=>operationKnightTarget;

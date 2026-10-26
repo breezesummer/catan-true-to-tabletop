@@ -7,6 +7,7 @@ using UnityEngine;
 // 所有候选仅来自本席人类投影。桌面选中只是草稿，确认才进入共同权威入口。
 public sealed partial class M6App
 {
+    string GeneralAssetSeatB6=>presentation is M4App cities?cities.M6View?.PlayerId??HumanSeat:presentation is M5App combined?combined.M6View?.PlayerId??HumanSeat:HumanSeat;
     static readonly Color SkillMuted=new Color(.73f,.75f,.65f);
     static readonly Rect GeneralArea=new Rect(22,714,148,171);
     static readonly Rect SkillsArea=new Rect(180,714,146,171);
@@ -33,14 +34,14 @@ public sealed partial class M6App
     bool ThreeKingdomsAdvanceAvailable=>presentation is M4App cities?
         cities.M6View?.LegalActions.Any(c=>c.Kind==Catan.Core.M4.CommandKind.AdvanceThreeKingdomsPhase)==true:
         presentation is M5App combined&&combined.M6View?.LegalActions.Any(c=>c.Kind==Catan.Core.M5.CommandKind.AdvanceThreeKingdomsPhase)==true;
-    internal bool ThreeKingdomsSkillSelectionActive=>generalSelection.Active||retireDraft||ThreeKingdomsProjection?.PendingDecision?.PlayerId==HumanSeat;
+    internal bool ThreeKingdomsSkillSelectionActive=>generalSelection.Active||retireDraft||ThreeKingdomsProjection?.PendingDecision?.PlayerId==GeneralAssetSeatB6;
     bool NativeGeneralPaymentActive=>presentation is M4App a?a.ThreeKingdomsPaymentActive:presentation is M5App b&&b.ThreeKingdomsPaymentActive;
     internal bool ThreeKingdomsSelectionActive=>ThreeKingdomsSkillSelectionActive||NativeGeneralPaymentActive;
     internal bool ThreeKingdomsPanelBlocksTable=>false;
     bool GeneralCanInteract=>!TableDiceRolling&&!TablePresentationBlocked&&(!NetworkGame||Network.CanInteract);
     bool GeneralCanSubmit=>GeneralCanInteract&&Time.unscaledTimeAsDouble>=generalClickBlockedUntil;
-    internal string ThreeKingdomsPhaseCaption=>ThreeKingdomsProjection==null?null:"第 "+ThreeKingdomsProjection.Clock.Round+" 轮 · "+ThreeKingdomsPhaseName(ThreeKingdomsProjection.Clock.Phase);
-    bool CandidateVisible=>ThreeKingdomsProjection?.PendingDecision?.PlayerId==HumanSeat||generalSelection.Active&&(generalSelection.Options.Length>1||generalSelection.PrivateOptions.Length>0||generalSelection.RequiresBankCards||generalSelection.DiceIndices.Length>0);
+    internal string ThreeKingdomsPhaseCaption=>ThreeKingdomsProjection==null?null:"第 "+ThreeKingdomsProjection.Clock.Round+" 轮 · "+ThreeKingdomsPhaseName(ThreeKingdomsProjection.Clock.Phase)+(GeneralAssetSeatB6!=HumanSeat?" · 代操 "+GeneralAssetSeatB6:"");
+    bool CandidateVisible=>ThreeKingdomsProjection?.PendingDecision?.PlayerId==GeneralAssetSeatB6||generalSelection.Active&&(generalSelection.Options.Length>1||generalSelection.PrivateOptions.Length>0||generalSelection.RequiresBankCards||generalSelection.DiceIndices.Length>0);
     bool BottomGeneralCandidatesVisible=>CandidateVisible&&generalSelection.DiceIndices.Length==0&&!(generalSelection.Contract?.DirectBatch==true&&(generalSelection.Contract.DecisionKind=="b4-reveal"||generalSelection.Contract.DecisionKind=="b4-subset"));
     bool NativeGeneralPaymentContains(Vector2 p)=>presentation is M4App a?a.ThreeKingdomsPaymentContains(p):presentation is M5App b&&b.ThreeKingdomsPaymentContains(p);
     internal bool ThreeKingdomsBlocksInput(Vector2 p)=>ThreeKingdomsProjection!=null&&(GeneralArea.Contains(p)||SkillsArea.Contains(p)||SkillBar.Contains(p)||BottomGeneralCandidatesVisible&&CandidateArea.Contains(p)||SpecialGeneralCandidatesContain(p)||NativeGeneralPaymentContains(p)||generalLibraryOpen&&LibraryArea.Contains(p)||inspectionText!=null&&InspectionRect.Contains(p));
@@ -111,7 +112,7 @@ public sealed partial class M6App
         if(view==null){if(selectionView!=null)ResetThreeKingdomsPanel();return;}
         if(selectionView==view)return;
         selectionView=view;
-        var latest=view.SkillHistory?.LastOrDefault(h=>h.PlayerId==HumanSeat);
+        var latest=view.SkillHistory?.LastOrDefault(h=>h.PlayerId==GeneralAssetSeatB6);
         string eventKey=latest==null?null:latest.EventId+":"+latest.Complete;
         if(eventKey!=observedSkillEvent)
         {
@@ -119,16 +120,16 @@ public sealed partial class M6App
             observedSkillEvent=eventKey;
         }
         observedSkillsInitialized=true;
-        var pending=view.PendingDecision?.PlayerId==HumanSeat?view.PendingDecision:null;
+        var pending=view.PendingDecision?.PlayerId==GeneralAssetSeatB6?view.PendingDecision:null;
         string token=pending?.DecisionId;
         if(token!=threeKingdomsDecision){threeKingdomsDecision=token;selectedGenerals.Clear();generalSubmitting=false;candidateScroll=Vector2.zero;}
         generalSelection.Refresh(view,ThreeKingdomsHand());
         generalSelection.RevalidateProgressCopies(presentation is M4App pc?pc.M6View.OwnProgressCards.Select(c=>c.ToString()).ToArray():presentation is M5App pp?pp.M6View.OwnProgressCards.Select(c=>c.ToString()).ToArray():Array.Empty<string>());
         if(!generalSelection.Active)selectedProgressFaces.Clear();
-        if(view.SkillDecision?.PlayerId==HumanSeat&&!generalSelection.Active)
-            generalSelection.Begin(view,HumanSeat,null,ThreeKingdomsHand());
+        if(view.SkillDecision?.PlayerId==GeneralAssetSeatB6&&!generalSelection.Active)
+            generalSelection.Begin(view,GeneralAssetSeatB6,null,ThreeKingdomsHand());
         if(!view.CanRetire)retireDraft=false;
-        string scope=HumanSeat+"|"+view.WindowId+"|"+view.SkillDecision?.DecisionId+"|"+token;
+        string scope=GeneralAssetSeatB6+"|"+view.WindowId+"|"+view.SkillDecision?.DecisionId+"|"+token;
         if(scope!=inspectionScope){inspectionText=null;inspectionScope=scope;ThreeKingdomsDirectInput.Reset();}
     }
     internal OperationHandSelection ThreeKingdomsHandSelection
@@ -155,14 +156,14 @@ public sealed partial class M6App
     {
         if(!GeneralCanInteract)return;
         if(presentation is M4App a)a.CancelForGeneralSelection();else if(presentation is M5App b)b.CancelForGeneralSelection();
-        retireDraft=false;generalSelection.Begin(ThreeKingdomsProjection,HumanSeat,skill,ThreeKingdomsHand());selectedProgressFaces.Clear();candidateScroll=Vector2.zero;
+        retireDraft=false;generalSelection.Begin(ThreeKingdomsProjection,GeneralAssetSeatB6,skill,ThreeKingdomsHand());selectedProgressFaces.Clear();candidateScroll=Vector2.zero;
     }
     void DrawThreeKingdoms()
     {
         SyncThreeKingdomsSelection();var view=ThreeKingdomsProjection;if(view==null)return;
         PastoralMenuUI.Styles(font);
         DrawGeneralDock(view);DrawGeneralSkills(view);if(!NativeGeneralPaymentActive)DrawGeneralOperationBar(view);
-        if(view.PendingDecision?.PlayerId==HumanSeat)DrawGeneralCandidates(view.PendingDecision);
+        if(view.PendingDecision?.PlayerId==GeneralAssetSeatB6)DrawGeneralCandidates(view.PendingDecision);
         else if(CandidateVisible)DrawSkillCandidates();
         DrawGeneralBoardTargets();
         if(generalLibraryOpen)DrawGeneralLibrary(view);
@@ -170,7 +171,7 @@ public sealed partial class M6App
     }
     void DrawGeneralDock(ThreeKingdomsView view)
     {
-        PastoralMenuUI.Panel(GeneralArea);var own=view.Players.FirstOrDefault(p=>p.PlayerId==HumanSeat);
+        PastoralMenuUI.Panel(GeneralArea);var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
         var general=string.IsNullOrEmpty(own?.ActiveGeneralId)?null:GeneralCatalog.Get(own.ActiveGeneralId);
         PastoralMenuUI.Label(new Rect(30,722,132,29),general?.Name??"武将占位",23,null,true,TextAnchor.MiddleCenter);
         PastoralMenuUI.Label(new Rect(30,754,132,22),general==null?"等待统一登场":general.Faction+" · 寿命 "+own.RemainingLife+" 轮",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
@@ -180,8 +181,8 @@ public sealed partial class M6App
     }
     void DrawGeneralSkills(ThreeKingdomsView view)
     {
-        var own=view.Players.FirstOrDefault(p=>p.PlayerId==HumanSeat);
-        var skills=B45SkillCatalog.AvailableEntries(view,HumanSeat);
+        var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
+        var skills=B45SkillCatalog.AvailableEntries(view,GeneralAssetSeatB6);
         PastoralMenuUI.Round(SkillsArea,new Color(.11f,.15f,.11f,.94f),5);
         skillScroll=GUI.BeginScrollView(SkillsArea,skillScroll,new Rect(0,0,128,Mathf.Max(171,skills.Length*55)));
         for(int i=0;i<skills.Length;i++)
@@ -204,7 +205,7 @@ public sealed partial class M6App
     void DrawGeneralOperationBar(ThreeKingdomsView view)
     {
         PastoralMenuUI.Round(SkillBar,new Color(.11f,.17f,.13f,.97f),5);
-        var pending=view.PendingDecision?.PlayerId==HumanSeat?view.PendingDecision:null;
+        var pending=view.PendingDecision?.PlayerId==GeneralAssetSeatB6?view.PendingDecision:null;
         if(pending!=null)
         {
             string caption=pending.Kind==ThreeKingdomsDecisionKind.SelectOpening?"私密选将":pending.Kind==ThreeKingdomsDecisionKind.SelectReplacement?"补充武将":"选择登场";
@@ -241,11 +242,11 @@ public sealed partial class M6App
         if(view.SkillDecision!=null)state+=" · 等待 "+PlayerDisplayName(view.SkillDecision.PlayerId);
         else if(view.WaitingSelectionPlayerIds?.Length>0)state+=" · 等待 "+string.Join("、",view.WaitingSelectionPlayerIds.Select(PlayerDisplayName));
         else if(view.Clock.Phase==ThreeKingdomsPhase.Play)state+=" · 自由选择建造、卡牌与主动技能";
-        bool ownFreePlay=view.Clock.Phase==ThreeKingdomsPhase.Play&&view.Clock.ActivePlayerId==HumanSeat;
+        bool ownFreePlay=view.Clock.Phase==ThreeKingdomsPhase.Play&&view.Clock.ActivePlayerId==GeneralAssetSeatB6;
         if(Time.unscaledTimeAsDouble<skillFlashUntil&&!string.IsNullOrEmpty(latestSkillResult))state+="\n"+latestSkillResult;
         PastoralMenuUI.Label(ownFreePlay?new Rect(500,661,762,36):new Rect(354,661,700,36),state,16,PastoralMenuUI.Ivory);
         if(!GeneralCatalog.UsesB4Package(view.PackageVersion)&&ThreeKingdomsAdvanceAvailable&&PastoralMenuUI.Button(new Rect(1080,661,182,36),"推进当前阶段",IsHumanTurn&&GeneralCanSubmit))SubmitThreeKingdoms("AdvanceThreeKingdomsPhase");
-        else if(view.Clock.Phase==ThreeKingdomsPhase.Play&&view.Clock.ActivePlayerId==HumanSeat&&PastoralMenuUI.Button(new Rect(354,661,132,36),"结束出牌",GeneralCanSubmit&&IsHumanTurn,true))EndThreeKingdomsPlay();
+        else if(view.Clock.Phase==ThreeKingdomsPhase.Play&&view.Clock.ActivePlayerId==GeneralAssetSeatB6&&PastoralMenuUI.Button(new Rect(354,661,132,36),"结束出牌",GeneralCanSubmit&&IsHumanTurn,true))EndThreeKingdomsPlay();
     }
     void EndThreeKingdomsPlay()
     {if(presentation is M4App a)a.EndThreeKingdomsTurn();else if(presentation is M5App b)b.EndThreeKingdomsTurn();}
@@ -372,7 +373,7 @@ public sealed partial class M6App
         PastoralMenuUI.Panel(LibraryArea);
         PastoralMenuUI.Label(new Rect(32,423,245,26),"武将状态 · 公共库 "+view.PoolCount+" / 隐退 "+view.RetiredCount,14,null,true);
         if(PastoralMenuUI.Button(new Rect(281,422,36,26),"×"))generalLibraryOpen=false;
-        var own=view.Players.FirstOrDefault(p=>p.PlayerId==HumanSeat);
+        var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
         string text="你的暗置："+string.Join("、",own?.HiddenGeneralIds.Select(GeneralName)??Array.Empty<string>())+"\n\n";
         text+=string.Join("\n",view.Players.Select(p=>PlayerDisplayName(p.PlayerId)+"："+GeneralName(p.ActiveGeneralId)+" · "+p.RemainingLife+"轮"));
         if(view.PublicPoolGeneralIds!=null)text+="\n\n公共库："+string.Join("、",view.PublicPoolGeneralIds.Select(GeneralName));
@@ -412,15 +413,15 @@ public sealed partial class M6App
     void SubmitRetirementIntent(ThreeKingdomsPhase? phase,bool cancel)
     {
         if(!GeneralCanSubmit)return;string id=Guid.NewGuid().ToString("N");
-        if(presentation is M4App a)a.Submit(new Catan.Core.M4.Command{Id=id,PlayerId=HumanSeat,Kind=Catan.Core.M4.CommandKind.RetireGeneral,RetireAtPhase=phase,CancelRetirementIntent=cancel,WindowId=ThreeKingdomsProjection.WindowId});
-        else if(presentation is M5App b)b.Submit(new Catan.Core.M5.Command{Id=id,PlayerId=HumanSeat,Kind=Catan.Core.M5.CommandKind.RetireGeneral,RetireAtPhase=phase,CancelRetirementIntent=cancel,WindowId=ThreeKingdomsProjection.WindowId});
+        if(presentation is M4App a)a.Submit(new Catan.Core.M4.Command{Id=id,PlayerId=GeneralAssetSeatB6,Kind=Catan.Core.M4.CommandKind.RetireGeneral,RetireAtPhase=phase,CancelRetirementIntent=cancel,WindowId=ThreeKingdomsProjection.WindowId});
+        else if(presentation is M5App b)b.Submit(new Catan.Core.M5.Command{Id=id,PlayerId=GeneralAssetSeatB6,Kind=Catan.Core.M5.CommandKind.RetireGeneral,RetireAtPhase=phase,CancelRetirementIntent=cancel,WindowId=ThreeKingdomsProjection.WindowId});
     }
     void SubmitGeneralSkill(B2SkillCommand source)
     {
         if(source==null||!GeneralCanSubmit){generalSelection.AcknowledgeFailure();return;}
         var skill=CopyGeneralSkill(source);string id=Guid.NewGuid().ToString("N");bool accepted=false;
-        if(presentation is M4App a){var result=a.Submit(new Catan.Core.M4.Command{Id=id,PlayerId=HumanSeat,Kind=Catan.Core.M4.CommandKind.UseGeneralSkill,SkillCommand=skill,DecisionId=skill.DecisionId,WindowId=skill.WindowId??ThreeKingdomsProjection.WindowId});accepted=result?.Success==true;}
-        else if(presentation is M5App b){var result=b.Submit(new Catan.Core.M5.Command{Id=id,PlayerId=HumanSeat,Kind=Catan.Core.M5.CommandKind.UseGeneralSkill,SkillCommand=skill,DecisionId=skill.DecisionId,WindowId=skill.WindowId??ThreeKingdomsProjection.WindowId});accepted=result?.Success==true;}
+        if(presentation is M4App a){var result=a.Submit(new Catan.Core.M4.Command{Id=id,PlayerId=GeneralAssetSeatB6,Kind=Catan.Core.M4.CommandKind.UseGeneralSkill,SkillCommand=skill,DecisionId=skill.DecisionId,WindowId=skill.WindowId??ThreeKingdomsProjection.WindowId});accepted=result?.Success==true;}
+        else if(presentation is M5App b){var result=b.Submit(new Catan.Core.M5.Command{Id=id,PlayerId=GeneralAssetSeatB6,Kind=Catan.Core.M5.CommandKind.UseGeneralSkill,SkillCommand=skill,DecisionId=skill.DecisionId,WindowId=skill.WindowId??ThreeKingdomsProjection.WindowId});accepted=result?.Success==true;}
         if(accepted||NetworkGame&&Network.CommandPending)generalClickBlockedUntil=Time.unscaledTimeAsDouble+.35;
         if(accepted&&!NetworkGame){generalSelection.Reset();selectionView=null;selectedProgressFaces.Clear();}
         else if(!NetworkGame||!Network.CommandPending)generalSelection.AcknowledgeFailure();
@@ -428,9 +429,9 @@ public sealed partial class M6App
     void SubmitThreeKingdoms(string kind,string[] ids=null)
     {
         var view=ThreeKingdomsProjection;if(view==null||!GeneralCanSubmit){generalSubmitting=false;return;}
-        string decision=view.PendingDecision?.PlayerId==HumanSeat?view.PendingDecision.DecisionId:null;bool accepted=false;
-        if(presentation is M4App a)accepted=a.Submit(new Catan.Core.M4.Command{Id=Guid.NewGuid().ToString("N"),PlayerId=HumanSeat,Kind=(Catan.Core.M4.CommandKind)Enum.Parse(typeof(Catan.Core.M4.CommandKind),kind),GeneralIds=ids??Array.Empty<string>(),DecisionId=decision,WindowId=view.WindowId})?.Success==true;
-        else if(presentation is M5App b)accepted=b.Submit(new Catan.Core.M5.Command{Id=Guid.NewGuid().ToString("N"),PlayerId=HumanSeat,Kind=(Catan.Core.M5.CommandKind)Enum.Parse(typeof(Catan.Core.M5.CommandKind),kind),GeneralIds=ids??Array.Empty<string>(),DecisionId=decision,WindowId=view.WindowId})?.Success==true;
+        string decision=view.PendingDecision?.PlayerId==GeneralAssetSeatB6?view.PendingDecision.DecisionId:null;bool accepted=false;
+        if(presentation is M4App a)accepted=a.Submit(new Catan.Core.M4.Command{Id=Guid.NewGuid().ToString("N"),PlayerId=GeneralAssetSeatB6,Kind=(Catan.Core.M4.CommandKind)Enum.Parse(typeof(Catan.Core.M4.CommandKind),kind),GeneralIds=ids??Array.Empty<string>(),DecisionId=decision,WindowId=view.WindowId})?.Success==true;
+        else if(presentation is M5App b)accepted=b.Submit(new Catan.Core.M5.Command{Id=Guid.NewGuid().ToString("N"),PlayerId=GeneralAssetSeatB6,Kind=(Catan.Core.M5.CommandKind)Enum.Parse(typeof(Catan.Core.M5.CommandKind),kind),GeneralIds=ids??Array.Empty<string>(),DecisionId=decision,WindowId=view.WindowId})?.Success==true;
         if(!NetworkGame||!Network.CommandPending)generalSubmitting=false;
         if(accepted){selectionView=null;generalClickBlockedUntil=Time.unscaledTimeAsDouble+.35;}
     }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Catan.Core.ThreeKingdoms;
 
 namespace Catan.Core.M5
 {
@@ -28,7 +29,7 @@ namespace Catan.Core.M5
                 s.PendingDecision=new PendingDecision {Kind="SetupPort",PlayerId=s.ActivePlayerId};
             }
         }
-        private Port[] CurrentPorts(GameState s) => s.Special==null?ports:s.Special.Ports.Select(p=>new Port {Id=p.Id,Vertices=p.Vertices.ToArray(),Resource=p.Resource}).ToArray();
+        private Port[] CurrentPorts(GameState s) => s.Special==null?(s.B6MapPorts??ports):s.Special.Ports.Select(p=>new Port {Id=p.Id,Vertices=p.Vertices.ToArray(),Resource=p.Resource}).ToArray();
         private void ApplyBaseRules(GameState s,Command c)
         {
             if(s.Special==null){ApplyCore(s,c);return;}
@@ -139,7 +140,14 @@ namespace Catan.Core.M5
         }
         private static void FinishSpecialGame(GameState s,string[] winners)
         {
-            if(s.Special!=null)s.Special.WinnerPlayerIds=winners;s.WinnerPlayerId=winners[0];s.Phase=GamePhase.Finished;s.PendingDecision=null;s.DecisionQueue=Array.Empty<PendingDecision>();s.ProductionPending=false;s.Discards=Array.Empty<DiscardRequirement>();s.TradeOffer=null;
+            string primary=winners[0];
+            if(B6AllianceRules.Enabled(s.ThreeKingdoms))
+            {
+                winners=winners.SelectMany(p=>B6AllianceRules.Members(s.ThreeKingdoms,p)).Distinct().ToArray();
+                B6AllianceRules.RecordVictory(s.ThreeKingdoms,primary);
+                s.ThreeKingdoms.AllianceB6.WinnerPlayerIds=(string[])winners.Clone();
+            }
+            if(s.Special!=null)s.Special.WinnerPlayerIds=winners;s.WinnerPlayerId=primary;s.Phase=GamePhase.Finished;s.PendingDecision=null;s.DecisionQueue=Array.Empty<PendingDecision>();s.ProductionPending=false;s.Discards=Array.Empty<DiscardRequirement>();s.TradeOffer=null;
         }
         private void SpecialProduction(GameState s)
         {
@@ -183,7 +191,7 @@ namespace Catan.Core.M5
             foreach(var w in seafaring.Wonders)foreach(var k in new[]{CommandKind.ClaimWonder,CommandKind.BuildWonder})yield return new Command {PlayerId=p.Id,Kind=k,TargetId=w.Id};
             if(seafaring.Id=="pirate-islands") {
                 foreach(var v in LegalInvasionRoots(s,p.Id))yield return new Command {PlayerId=p.Id,Kind=CommandKind.ChooseInvasionRoute,TargetId=v};
-                foreach(var k in s.Knights.Where(k=>k.PlayerId==p.Id&&k.Active))foreach(var ship in InvasionShips(s,p.Id).Where(x=>!x.IsWarship))yield return new Command {PlayerId=p.Id,Kind=CommandKind.ConvertWarship,SourceId=k.LocationId,TargetId=ship.LocationId};
+                foreach(var k in s.Knights.Where(k=>B6ControlsKnight(s,p.Id,k)&&k.Active))foreach(var ship in InvasionShips(s,p.Id).Where(x=>!x.IsWarship))yield return new Command {PlayerId=p.Id,Kind=CommandKind.ConvertWarship,SourceId=k.LocationId,TargetId=ship.LocationId};
                 yield return new Command {PlayerId=p.Id,Kind=CommandKind.AttackFortress};
             }
         }

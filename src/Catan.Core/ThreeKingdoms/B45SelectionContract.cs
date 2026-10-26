@@ -26,6 +26,16 @@ namespace Catan.Core.ThreeKingdoms
     {
         static B45SkillInfo S(string id,B45SkillKind kind,string timing,string cost,string limit,string surface,string boundary="确认提交后结算，未提交选择可撤销") => new B45SkillInfo {SkillId="tk-"+id,Kind=kind,Timing=timing,Cost=cost,Limit=limit,Surface=surface,CommitBoundary=boundary};
         static readonly B45SkillInfo[] items = {
+            S("g04-s1",B45SkillKind.Triggered,"任意玩家回合开始前","限定机会","每任一次","响应条"),
+            S("g04-s2",B45SkillKind.Triggered,"自己回合结束","无","每次结束事件","银行牌带"),
+            S("g46-s1",B45SkillKind.Active,"自己出牌阶段","交出1张，要求1至2张","每阶段共两次","头像、手牌、声明牌带"),
+            S("g46-s2",B45SkillKind.Passive,"建筑新建或升级支付前","唯一最多加1；唯一最少减1","每次建造","资源牌带"),
+            S("g47-s1",B45SkillKind.Active,"自己出牌阶段","限定机会","每任一次","两个地块"),
+            S("g47-s2",B45SkillKind.Triggered,"自己回合结束","随机均分双方手牌","每次结束事件","头像"),
+            S("g48-s1",B45SkillKind.Active,"自己出牌阶段","限定机会","每任一次","两个头像"),
+            S("g48-s2",B45SkillKind.Active,"自己出牌阶段","查看并取得一张手牌","每阶段一次；牌种与上次不同","头像、私密牌带","提交查看目标即使用本次机会"),
+            S("g50-s1",B45SkillKind.Triggered,"登场时","可协商即时转让条件","每次登场","头像、资源牌带"),
+            S("g50-s2",B45SkillKind.Passive,"登场获得蓝黄牌；对敌发展牌效果翻倍","无","持续","发展牌与说明卡"),
             S("g01-s1",B45SkillKind.Triggered,"摸牌阶段替代","放弃普通产出","每次主分配","头像与候选带"),
             S("g05-s1",B45SkillKind.Active,"自己出牌阶段","1麦","每出牌阶段一次","手牌、地块"),
             S("g05-s2",B45SkillKind.Active,"自己出牌阶段","2砖","每出牌阶段一次","手牌、头像"),
@@ -93,7 +103,7 @@ namespace Catan.Core.ThreeKingdoms
                 ids=ids.Concat((view?.SkillActions??Array.Empty<B2SkillAction>()).Select(a=>a.Command.Option==RepairSkillId?RepairSkillId:a.Command.SkillId).Where(id=>id!=null)).Distinct().ToArray();
             return ids.Select(Get).Where(info=>info!=null).ToArray();
         }
-        public static B45SkillInfo[] All => (B45SkillInfo[])items.Clone();
+        public static B45SkillInfo[] All => items.Where(i=>GeneralCatalog.IsB4Enabled(i.SkillId.Substring(0,6))).ToArray();
         public static B45SkillInfo Get(string skillId) => skillId==RepairSkillId?repair:items.FirstOrDefault(s=>s.SkillId==skillId)??later.FirstOrDefault(s=>s.SkillId==skillId);
     }
 

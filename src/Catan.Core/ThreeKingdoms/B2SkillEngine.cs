@@ -73,6 +73,8 @@ namespace Catan.Core.ThreeKingdoms
                     g.OwnerPlayerId + "：" + CounterLabel(c.Key) + " " + c.Value))).ToArray();
             ProjectB5Military(host, view, viewerId);
             ProjectCivilB5(host, view, viewerId);
+            ProjectAllianceB6(host, view, viewerId);
+            ProjectSeatTradeB6(host, view, viewerId);
             if (B5Enabled(state)) view.ProgressHandLimit = HasUnlimitedProgress(state, viewerId) ? (int?)null : 4 + B5ProgressLimitBonus(state, viewerId);
             B45SkillStatusProjection.Project(host, view, viewerId);
             if(GeneralCatalog.UsesDirectPackage(state.PackageVersion))
@@ -148,12 +150,14 @@ namespace Catan.Core.ThreeKingdoms
                 }
                 AddTimeEndFrames(host, g, eventId);
                 AddB4EndFrames(host, g, eventId);
+                AddMapB6EndFrames(host,g,eventId);
             }
             var active = Active(s, s.Clock.ActivePlayerId);
             if (!B3Enabled(s) && active?.GeneralId == "tk-g06") { var f = Frame(s, active, "tk-g06-s1", "jushou", 4, eventId); f.Optional = true; Append(s, f); }
             if (!B3Enabled(s) && active?.GeneralId == "tk-g09") { var f = Frame(s, active, "tk-g09-s1", "zhenggu", 0, eventId); f.Optional = true; Append(s, f); }
             OnB5MilitaryEnd(host, eventId);
             OnCivilEnd(host, eventId);
+            OnControlB6End(host,eventId);
             Pump(host);
         }
 
@@ -173,15 +177,18 @@ namespace Catan.Core.ThreeKingdoms
         {
             if (!Enabled(host)) return; var s = host.State;
             OnB4OpportunityStart(host, opportunityId, playerId);
+            OnSeatTradeB6OpportunityStart(host,opportunityId,playerId,skippedPlayerIds);
+            OnControlB6OpportunityStart(host,opportunityId,playerId);
             OnB5MilitaryOpportunityStart(host, opportunityId, playerId, skippedPlayerIds);
             OnB5MilitaryTurnStart(host, "turn-start-" + s.Clock.TurnInstanceId, playerId);
             var begun = new HashSet<string>(skippedPlayerIds ?? Array.Empty<string>()) { playerId };
             s.Skills.TimedEffects = s.Skills.TimedEffects.Where(e => !(e.Kind == "draw-block" && begun.Contains(e.PlayerId)) &&
                 !(e.Kind == "protection" && e.OpportunityId < opportunityId)).ToArray();
         }
-        public static void OnOpportunityEnd(IThreeKingdomsCardHost host, long opportunityId, string playerId)
+        public static void OnOpportunityEnd(IThreeKingdomsCardHost host, long opportunityId, string playerId, bool revokeControl = true)
         {
             if (!Enabled(host)) return;
+            if(revokeControl&&B6Enabled(host.State))host.State.ControlB6=null;
             host.State.Skills.TimedEffects = host.State.Skills.TimedEffects.Where(e => !(e.Kind == "protection" && e.OpportunityId <= opportunityId)).ToArray();
         }
 
@@ -269,13 +276,17 @@ namespace Catan.Core.ThreeKingdoms
         private static bool ProcessFrame(IThreeKingdomsCardHost host, B2SkillFrame f)
         {
             var s = host.State;
+            if (ProcessControlB6Frame(host,f)) return false;
+            if (f.Kind.StartsWith("map-",StringComparison.Ordinal)) return ProcessMapB6Frame(host,f);
+            if (ProcessAllianceB6Frame(host,f,out var allianceWaiting)) return allianceWaiting;
+            if (ProcessSeatTradeB6Frame(host,f,out var seatTradeWaiting)) return seatTradeWaiting;
             if (ProcessB5MilitaryFrame(host, f, out var militaryWaiting)) return militaryWaiting;
             if (ProcessCivilFrame(host, f, out var civilWaiting)) return civilWaiting;
             if (ProcessB4Frame(host, f, out var b4Waiting)) return b4Waiting;
             if (ProcessTimeFrame(host, f, out var waiting)) return waiting;
             if (new[] { "resource", "mixed", "commodity", "lianying", "jushou" }.Contains(f.Kind))
             {
-                var types = ChoiceTypes(f).Where(t => host.GetBank()[t] > 0).ToArray();
+                var types = ChoiceTypes(f).Where(t => host.GetBank()[t] > 0 && CanGainB6(s,f.PlayerId,t)).ToArray();
                 if (f.Remaining > 0 && types.Length > 0 && !IsDrawBlocked(s, f.PlayerId))
                 { Decide(s, f, "card", Name(f.SkillId) + "：选牌", "请选择一张可用牌，还需选择 " + f.Remaining + " 张。"); return true; }
                 if (f.Kind == "lianying") Add(f.Cards, TakeRandom(host, f.PlayerId, 1));
@@ -303,6 +314,7 @@ namespace Catan.Core.ThreeKingdoms
             }
             if (f.Kind == "gift")
             {
+                if(!CanGainCardsB6(s,f.Targets[0],f.Cards)){Remove(s,f);return false;}
                 var before = host.GetHand(f.PlayerId).Sum(); var targetBefore = host.GetHand(f.Targets[0]).Sum();
                 Require(Contains(host.GetHand(f.PlayerId), f.Cards), "原赠予费用已不再持有。");
                 host.RemoveHand(f.PlayerId, f.Cards); host.AddHand(f.Targets[0], f.Cards); Remove(s, f);
@@ -349,13 +361,13 @@ namespace Catan.Core.ThreeKingdoms
                 else if (d.Kind == "card")
                 {
                     if (DirectResponses(s)) AddB45BatchCardActions(host, f, f, d, "b45-card-batch", result);
-                    else foreach (var t in ChoiceTypes(f).Where(t => host.GetBank()[t] > 0)) result.Add(CardAction(s, f, d, t));
+                    else foreach (var t in ChoiceTypes(f).Where(t => host.GetBank()[t] > 0 && CanGainB6(s,f.PlayerId,t))) result.Add(CardAction(s, f, d, t));
                 }
                 else if (d.Kind == "target")
                     foreach (var p in s.SeatPlayerIds.Where(p => p != playerId)) { var a = Action(s, f.SkillId, "target", "选择 " + p, d); a.Command.TargetPlayerIds = new[] { p }; result.Add(a); }
                 else if (d.Kind == "color")
                     foreach (var color in Enumerable.Range(0, 3).Where(c => host.GetProgressDeckCount(c) > 0)) { var a = Action(s, f.SkillId, "color", new[] { "黄色贸易", "蓝色政治", "绿色科学" }[color], d); a.Command.CardType = color; result.Add(a); }
-                else if (!AddB5MilitaryDecisionActions(host,f,d,result) && !AddCivilDecisionActions(host,f,d,result) && !AddB4DecisionActions(host, f, d, result) && !AddTimeDecisionActions(host, f, d, result)) AddHarvestActions(host, f, d, result);
+                else if (!AddAllianceB6DecisionActions(host,f,d,result) && !AddMapB6DecisionActions(host,f,d,result) && !AddSeatTradeB6DecisionActions(host,f,d,result) && !AddB5MilitaryDecisionActions(host,f,d,result) && !AddCivilDecisionActions(host,f,d,result) && !AddB4DecisionActions(host, f, d, result) && !AddTimeDecisionActions(host, f, d, result)) AddHarvestActions(host, f, d, result);
                 return AnnotateB4Actions(host, result);
             }
             if (s.Skills.Frames.Length != 0 || !s.OpeningComplete || s.Clock.Round == 0 || s.ReplacementInProgress) return result.ToArray();
@@ -366,6 +378,7 @@ namespace Catan.Core.ThreeKingdoms
             AddB4Actions(host, g, result);
             AddB5MilitaryActions(host, g, result);
             AddCivilActions(host, g, result);
+            AddMapB6Actions(host,g,result);AddSeatTradeB6Actions(host,g,result);
             if (B5Enabled(s) && ownTurn && s.Clock.Phase == ThreeKingdomsPhase.Play && host is IThreeKingdomsB5Host board)
                 foreach (var option in board.GetBoardOptions(playerId, "repair-own"))
                 {
@@ -376,7 +389,7 @@ namespace Catan.Core.ThreeKingdoms
                     a.CardSelectionKind="payment";result.Add(B45SelectionMetadata.WithBoard(a,option));
                 }
             if (g.GeneralId == "tk-g15" && ownTurn && s.Clock.Phase != ThreeKingdomsPhase.RoundEnd && s.Clock.Phase != ThreeKingdomsPhase.Finished)
-                foreach (var target in s.SeatPlayerIds.Where(p => p != playerId)) foreach (var t in Enumerable.Range(0, 8).Where(t => hand[t] > 0))
+                foreach (var target in s.SeatPlayerIds.Where(p => p != playerId && CanVoluntaryExchangeB6(s,playerId,p,1,0))) foreach (var t in Enumerable.Range(0, 8).Where(t => hand[t] > 0 && CanGainB6(s,target,t)))
                 { var a = Action(s, "tk-g15-s1", "gift", "仁德：给 " + target + " " + CardNames[t]); a.Command.TargetPlayerIds = new[] { target }; a.Command.Counts[t] = 1; result.Add(a); }
             if (s.Clock.Phase == ThreeKingdomsPhase.Play && g.GeneralId == "tk-g23" && Value(g, "qianxun", s.Clock.PhaseId) == 0)
                 foreach (var t in Enumerable.Range(0, 8).Where(t => hand[t] > 0)) { var a = Action(s, "tk-g23-s2", "discard", "谦逊：弃" + CardNames[t]); a.Command.Counts[t] = 1; result.Add(a); }
@@ -418,7 +431,7 @@ namespace Catan.Core.ThreeKingdoms
                     }
                     else
                     {
-                        Require(command.Option == "card" && ChoiceTypes(f).Contains(command.CardType) && host.GetBank()[command.CardType] > 0 && !IsDrawBlocked(s, playerId), "无法领取所选牌。");
+                        Require(command.Option == "card" && ChoiceTypes(f).Contains(command.CardType) && CanGainB6(s,playerId,command.CardType) && host.GetBank()[command.CardType] > 0 && !IsDrawBlocked(s, playerId), "无法领取所选牌。");
                         var selected = One(command.CardType); host.RemoveBank(selected); Add(f.Cards, selected); f.Remaining--;
                     }
                 }
@@ -432,7 +445,7 @@ namespace Catan.Core.ThreeKingdoms
                     Require(command.Option == "color" && command.CardType >= 0 && command.CardType < 3 && host.GetProgressDeckCount(command.CardType) > 0 && !IsDrawBlocked(s, playerId), "该发展牌颜色不可领取。");
                     Remove(s, f); host.DrawProgress(playerId, command.CardType);
                 }
-                else if (!ResolveB5MilitaryDecision(host,f,d,command) && !ResolveCivilDecision(host,f,d,command) && !ResolveB4Decision(host, f, d, command) && !ResolveTimeDecision(host, f, d, command)) ResolveHarvest(host, f, d, command);
+                else if (!ResolveAllianceB6Decision(host,f,d,command) && !ResolveMapB6Decision(host,f,d,command) && !ResolveSeatTradeB6Decision(host,f,d,command) && !ResolveB5MilitaryDecision(host,f,d,command) && !ResolveCivilDecision(host,f,d,command) && !ResolveB4Decision(host, f, d, command) && !ResolveTimeDecision(host, f, d, command)) ResolveHarvest(host, f, d, command);
                 s.Skills.PendingDecision = null;
             }
             else ResolveActive(host, playerId, command);
@@ -452,6 +465,7 @@ namespace Catan.Core.ThreeKingdoms
                 var option = board.GetBoardOptions(playerId,"repair-own").SingleOrDefault(o=>o.Id==c.ProgressCardId);
                 Require(option != null, "修复目标、费用或库存已经变化。"); board.ApplyBoardOption(playerId,option); return;
             }
+            if(ResolveMapB6Active(host,g,c)||ResolveSeatTradeB6Active(host,g,c))return;
             if (ResolveB5MilitaryActive(host, g, c)) return;
             if (ResolveCivilActive(host, g, c)) return;
             if (ResolveTimeActive(host, g, c)) return;
@@ -461,6 +475,7 @@ namespace Catan.Core.ThreeKingdoms
                 Require(g.GeneralId == "tk-g15" && c.SkillId == "tk-g15-s1" && own && s.Clock.Phase != ThreeKingdomsPhase.RoundEnd && s.Clock.Phase != ThreeKingdomsPhase.Finished, "当前不能发动仁德。");
                 Require(c.TargetPlayerIds?.Length == 1 && c.TargetPlayerIds[0] != playerId && s.SeatPlayerIds.Contains(c.TargetPlayerIds[0]), "赠予目标无效。");
                 Require(Valid(c.Counts) && c.Counts.Sum() > 0 && Contains(host.GetHand(playerId), c.Counts), "赠予手牌不足或数量无效。");
+                Require(CanVoluntaryExchangeB6(s,playerId,c.TargetPlayerIds[0],c.Counts.Sum(),0) && CanGainCardsB6(s,c.TargetPlayerIds[0],c.Counts),"当前不能赠予这些手牌。");
                 var f = Frame(s, g, c.SkillId, "gift", 0, null); f.Started = true; f.Cards = Copy(c.Counts); f.Targets = (string[])c.TargetPlayerIds.Clone(); Append(s, f); Target(host, f.Id, playerId, f.Targets[0]); return;
             }
             if (c.Option == "discard" || c.Option == "exchange-hand")
@@ -499,6 +514,7 @@ namespace Catan.Core.ThreeKingdoms
             errors.AddRange(ValidateB4Response(host));
             errors.AddRange(ValidateB5Military(host.State));
             errors.AddRange(ValidateCivil(host.State));
+            errors.AddRange(ValidateControlB6(host.State));errors.AddRange(ValidateAllianceB6(host.State));
             return errors.ToArray();
         }
 
@@ -506,7 +522,7 @@ namespace Catan.Core.ThreeKingdoms
         {
             var cards = new int[8]; if (state?.Skills == null) return cards;
             foreach (var h in state.Skills.Harvest.Where(h => !h.Completed)) Add(cards, h.Cards);
-            foreach (var f in state.Skills.Frames.Concat(state.Response?.SuspendedFrames ?? Array.Empty<B2SkillFrame>()).Concat(state.Military?.SuspendedFrames ?? Array.Empty<B2SkillFrame>()).Where(f => f.Kind != "gift" && f.Kind != "raid" && f.Kind != "harvest")) { Add(cards, f.Cards); Add(cards, f.SelectedCards); }
+            foreach (var f in state.Skills.Frames.Concat(state.Response?.SuspendedFrames ?? Array.Empty<B2SkillFrame>()).Concat(state.Military?.SuspendedFrames ?? Array.Empty<B2SkillFrame>()).Where(f => f.Kind != "gift" && f.Kind != "raid" && f.Kind != "harvest" && !f.Kind.StartsWith("alliance-b6-",StringComparison.Ordinal))) { Add(cards, f.Cards); Add(cards, f.SelectedCards); }
             foreach (var r in Returned(state)) Add(cards, r.Cards);
             return cards;
         }
@@ -539,6 +555,7 @@ namespace Catan.Core.ThreeKingdoms
         private static string HistorySource(B2SkillFrame frame) => frame.SkillId==null?frame.SourceEventId:frame.Id;
         private static void Gain(IThreeKingdomsCardHost host, string player, int[] cards, string sourceSkillId = null, string sourceEventId = null)
         {
+            if(B6Enabled(host.State)){cards=Copy(cards);var returned=new int[8];for(int t=0;t<8;t++)if(!CanGainB6(host.State,player,t)){returned[t]=cards[t];cards[t]=0;}if(returned.Sum()>0)host.AddBank(returned);}
             if (cards.Sum() <= 0) return; var before = host.GetHand(player).Sum(); host.AddHand(player, cards);
             if(B4Enabled(host.State))
             {
@@ -547,7 +564,7 @@ namespace Catan.Core.ThreeKingdoms
             }
         }
         private static int[] TakeRandom(IThreeKingdomsCardHost host, string player, int count)
-        { var result = new int[8]; if (IsDrawBlocked(host.State, player)) return result; for (var n = 0; n < count; n++) { var bank = host.GetBank(); var total = bank.Take(5).Sum(); if (total == 0) break; var index = host.DrawRandom(total); for (var t = 0; t < 5; t++) { if (index < bank[t]) { var one = One(t); host.RemoveBank(one); Add(result, one); break; } index -= bank[t]; } } return result; }
+        { var result = new int[8]; if (IsDrawBlocked(host.State, player)) return result; for (var n = 0; n < count; n++) { var bank = host.GetBank(); for(int t=0;t<8;t++)if(!CanGainB6(host.State,player,t))bank[t]=0; var total = bank.Take(5).Sum(); if (total == 0) break; var index = host.DrawRandom(total); for (var t = 0; t < 5; t++) { if (index < bank[t]) { var one = One(t); host.RemoveBank(one); Add(result, one); break; } index -= bank[t]; } } return result; }
         private static string Name(string skill) => skill == "tk-g13-s1" ? "连破" : skill == "tk-g21-s1" ? "固症" : skill == "tk-g29-s1" ? "放逐" : skill == "tk-g29-s2" ? "颂威" : skill == "tk-g30-s1" ? "落英" : skill == "tk-g30-s2" ? "酒诗" : skill == "tk-g01-s1" ? "突袭" : skill == "tk-g06-s1" ? "据守" : skill == "tk-g09-s1" ? "镇骨" : skill == "tk-g12-s1" ? "奋音" : skill == "tk-g15-s1" ? "仁德" : skill == "tk-g22-s1" ? "制衡" : skill == "tk-g23-s1" ? "连营" : skill == "tk-g23-s2" ? "谦逊" : skill == "tk-g28-s1" ? "涉猎" : skill == "tk-g28-s2" ? "克己" : skill == "tk-g37-s1" ? "天妒" : skill == "tk-g37-s2" ? "遗计" : skill == "tk-g33-s1" ? "集智" : skill == "tk-g43-s1" ? "勤政" : GeneralCatalog.Definitions.SelectMany(g => g.Skills).FirstOrDefault(s => s.Id == skill)?.Name ?? "摸牌";
         private static void Require(bool valid, string message) { if (!valid) throw new InvalidOperationException(message); }
     }

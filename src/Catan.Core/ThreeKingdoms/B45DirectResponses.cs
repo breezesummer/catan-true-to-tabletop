@@ -9,7 +9,7 @@ namespace Catan.Core.ThreeKingdoms
     {
         private static bool DirectResponses(ThreeKingdomsState state) => GeneralCatalog.UsesDirectRules(state.RulesVersion);
         private static int BatchChoiceCount(IThreeKingdomsCardHost host, B2SkillFrame frame)
-            => IsDrawBlocked(host.State, frame.PlayerId) ? 0 : Math.Min(frame.Remaining, ChoiceTypes(frame).Sum(t => host.GetBank()[t]));
+            => IsDrawBlocked(host.State, frame.PlayerId) ? 0 : Math.Min(frame.Remaining, ChoiceTypes(frame).Where(t=>CanGainB6(host.State,frame.PlayerId,t)).Sum(t => host.GetBank()[t]));
         private static B2SkillFrame OptionalChoiceFrame(B2SkillFrame frame)
         {
             if (frame.Kind != "lianpo") return frame;
@@ -48,14 +48,14 @@ namespace Catan.Core.ThreeKingdoms
             B2SkillDecision decision, string option, List<B2SkillAction> actions)
         {
             var bank = host.GetBank(); var count = BatchChoiceCount(host, choice);
-            foreach (var type in ChoiceTypes(choice).Where(t => bank[t] > 0))
+            foreach (var type in ChoiceTypes(choice).Where(t => bank[t] > 0 && CanGainB6(host.State,choice.PlayerId,t)))
             {
                 var action = Action(host.State, frame.SkillId, option, "选择" + count + "张银行牌", decision);
                 action.Command.CardType = type; action.RealCardType = type; action.CardSelectionKind = "bank";
                 action.AvailableCount = bank[type]; action.RequiredCardCount = count;
                 // 给AI一个完整合法批次；UI可将整批Counts替换为自己的选择。
                 int remaining = count;
-                foreach (var t in new[] { type }.Concat(ChoiceTypes(choice).Where(t => t != type)))
+                foreach (var t in new[] { type }.Concat(ChoiceTypes(choice).Where(t => t != type && CanGainB6(host.State,choice.PlayerId,t))))
                 { int take = Math.Min(remaining, bank[t]); action.Command.Counts[t] = take; remaining -= take; }
                 actions.Add(action);
             }
@@ -64,7 +64,7 @@ namespace Catan.Core.ThreeKingdoms
         {
             var bank = host.GetBank(); var allowed = ChoiceTypes(frame);
             Require(cards != null && cards.Length == 8 && cards.All(n => n >= 0)
-                && Enumerable.Range(0, 8).All(t => cards[t] <= bank[t] && (cards[t] == 0 || allowed.Contains(t)))
+                && Enumerable.Range(0, 8).All(t => cards[t] <= bank[t] && (cards[t] == 0 || allowed.Contains(t) && CanGainB6(host.State,frame.PlayerId,t)))
                 && cards.Sum() == BatchChoiceCount(host, frame), "银行选牌数量、类型或库存已变化。");
         }
         private static bool ResolveB45Optional(IThreeKingdomsCardHost host, B2SkillFrame frame, B2SkillDecision decision, B2SkillCommand command)

@@ -64,9 +64,10 @@ namespace Catan.Core.M5
                     Require(s.ActivePlayerId == c.PlayerId && s.PendingDecision == null && s.TradeOffer == null && s.DecisionQueue.Length == 0, "PendingResolution", "请先完成当前待决流程。");
                     if (tk.Clock.Phase == ThreeKingdomsPhase.End)
                     {
-                        B2SkillEngine.OnOpportunityEnd(host, tk.Clock.OpportunityId, c.PlayerId);
+                        B2SkillEngine.OnOpportunityEnd(host, tk.Clock.OpportunityId, c.PlayerId,false);
                         CheckB2Capacity(s);
                         if (s.PendingDecision != null) { RefreshB2(s); return; }
+                        if(B2SkillEngine.B6Enabled(tk))tk.ControlB6=null;
                         ApplyBaseRules(s, new Command { PlayerId = c.PlayerId, Kind = CommandKind.EndTurn });
                         if (s.Phase != GamePhase.Finished)
                         {
@@ -110,10 +111,11 @@ namespace Catan.Core.M5
                 Require(!B4(s)||c.Kind!=CommandKind.PlayProgressCard||!B2SkillEngine.IsB4HandLossForbidden(tk,c.PlayerId),"HandLossForbidden","本出牌阶段不能使用发展牌。");
                 Require(!B3(s)||c.Kind!=CommandKind.PlayProgressCard||c.ProgressCard!=ProgressCardKind.Alchemy||tk.Dice?.FixedResult==null,"FixedDiceLocked","直谏已固定本回合骰局，不能再使用炼金术士。");
                 // 合法性预检在隔离副本执行，不消耗权威随机或费用；目标响应先于主体。
+                if (BeginSeatTradeB6Construction(s,c,false,false)) { FinishB2Work(s); RefreshB2(s); return; }
                 var targets = B2TargetPlayers(s, c);
                 if (targets.Length > 0)
                 {
-                    var validation = s.CopyForTransaction(); ApplyBaseRules(validation, c);
+                    var validation = s.CopyForTransaction(); validation.B6ConstructionCardType=c.JiaoziCardType; ApplyBaseRules(validation, c);
                     foreach (var target in targets) { B2SkillEngine.OnTargeted(host, c.Id, c.PlayerId, target, c.Kind == CommandKind.CommercialHarborOffer ? "CommercialHarbor" : c.ProgressCard.ToString()); B5ProgressTargeted(s,c,target); }
                     if (B2Busy(s)) { s.ThreeKingdomsDeferredCommand = Json.Copy(c); RefreshB2(s); return; }
                 }
@@ -167,6 +169,7 @@ namespace Catan.Core.M5
             B2SkillEngine.Pump(host);
             FinishB4Progress(s);
             FinishB4Virtual(s);
+            if(!B2Busy(s)&&s.PendingDecision==null)B6ReturnAllianceKnights(s);
             if (ResumeB3PirateProduction(s)) { FinishB2Work(s); return; }
             CheckB2Capacity(s);
         }
@@ -181,6 +184,7 @@ namespace Catan.Core.M5
 
         private void ApplyB2Native(GameState s, Command c, bool virtualCard = false, bool virtualPrepare = false)
         {
+            if (BeginSeatTradeB6Construction(s,c,virtualCard,virtualPrepare)) return;
             var host = CardHost(s); var before = s.Players.ToDictionary(p => p.Id, p => host.GetHand(p.Id));
             var outerSkillDelta=s.B4SkillHandDelta; var nestedSkillDelta=B4(s)?s.Players.ToDictionary(p=>p.Id,p=>new int[8]):null; s.B4SkillHandDelta=nestedSkillDelta;
             var offer = s.TradeOffer;
@@ -194,8 +198,9 @@ namespace Catan.Core.M5
             Require(!B4(s)||c.Kind!=CommandKind.PlayProgressCard||!B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,c.PlayerId),"HandLossForbidden","本出牌阶段不能使用发展牌。");
             Require(!B3(s) || c.Kind != CommandKind.PlayProgressCard || c.ProgressCard != ProgressCardKind.Alchemy || s.ThreeKingdoms.Dice?.FixedResult == null, "FixedDiceLocked", "直谏已固定本回合骰局，不能再使用炼金术士。");
             s.B4PaymentSelection = c.PaymentCards;
+            var previousB6CostType = s.B6ConstructionCardType; s.B6ConstructionCardType = c.JiaoziCardType;
             try { if (virtualCard) ApplyProgressCommand(s,s.Players.Single(p=>p.Id==c.PlayerId),c,true,virtualPrepare); else ApplyBaseRules(s,c); }
-            finally { s.B4PaymentSelection = null; }
+            finally { s.B4PaymentSelection = null; s.B6ConstructionCardType = previousB6CostType; }
             var payments = s.ThreeKingdomsNativePayments ?? Array.Empty<B3NativePayment>();
             // Pay 已以真实前后手牌发出失牌事件；这里只记录命令其余步骤，避免同一费用重复入账。
             var remainingBefore = before.ToDictionary(x => x.Key, x => Enumerable.Range(0, 8)
@@ -358,6 +363,7 @@ namespace Catan.Core.M5
                     var action = Make(CommandKind.UseGeneralSkill); action.SkillCommand = Json.Copy(skill.Command); actions.Add(action);
                     // 原生虚拟用途及实际弃牌费用已由本次Actions查询预检；逐项完整试执行会反复枚举全用途，形成平方级开销。
                     // 只复用当前视图新生成且已验过费用的虚拟用途；实际Execute仍完整验证，外部命令不能获得这项信任。
+                    if(skill.Command.Option=="map-tamo")validatedVirtualActions.Add(action);
                     bool activeVirtual=tk.SkillDecision==null && state.Phase==GamePhase.Action && (skill.Command.Option=="b4-miewu-progress" || skill.Command.Option=="b4-xiemu");
                     bool responseVirtual=tk.SkillDecision?.PlayerId==view.PlayerId && tk.SkillDecision.DecisionId==skill.Command.DecisionId
                         && (skill.Command.Option=="b45-optional-qice" || skill.Command.Option=="response-qice-use");

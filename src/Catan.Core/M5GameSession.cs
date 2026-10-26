@@ -82,13 +82,14 @@ namespace Catan.Core.M5
                 var prior = state.ProcessedCommands.FirstOrDefault(x => x.CommandId == command.Id);
                 if (prior != null) return PriorResult(prior, fingerprint);
                 var next = state.CopyForTransaction();
-                try { Apply(next, command); }
+                Command effective;
+                try { effective=AuthorizeControlB6(next,command); ValidateB6Trade(next,effective); Apply(next, effective); }
                 catch (RuleException ex) { return Reject(ex.Code, ex.Message); }
                 RecalculateAwards(next);
                 CheckVictory(next);
                 if (next.Phase == GamePhase.Finished && next.ThreeKingdoms != null) Catan.Core.ThreeKingdoms.ThreeKingdomsEngine.Finish(next.ThreeKingdoms);
-                var ev = new GameEvent { Sequence = ++next.EventSequence, CommandId = command.Id, Kind = B3HistoryKind(state, next, command), PlayerId = IsB3DiceCommit(state, next) ? next.ThreeKingdoms.Clock.ActivePlayerId : command.PlayerId,
-                    TargetId = PublicTarget(command), OtherPlayerId = command.Kind == CommandKind.ProposeTrade || command.Kind == CommandKind.StealResource ? command.OtherPlayerId : null, Message = PublicMessage(command) };
+                var ev = new GameEvent { Sequence = ++next.EventSequence, CommandId = command.Id, Kind = B3HistoryKind(state, next, effective), PlayerId = IsB3DiceCommit(state, next) ? next.ThreeKingdoms.Clock.ActivePlayerId : effective.PlayerId,
+                    TargetId = PublicTarget(effective), OtherPlayerId = effective.Kind == CommandKind.ProposeTrade || effective.Kind == CommandKind.StealResource ? effective.OtherPlayerId : null, Message = PublicMessage(effective) };
                 if (ev.Kind == "RollDice") { ev.Dice1 = next.LastDice1; ev.Dice2 = next.LastDice2; ev.Message = ev.PlayerId + " 掷出 " + ev.Dice1 + "+" + ev.Dice2 + "。"; }
                 var receipt = new[] { ev };
                 next.Events = Append(next.Events, ev);
@@ -96,9 +97,9 @@ namespace Catan.Core.M5
                 AssertInvariants(next);
                 history.RecordAction(GameHistoryCapture.From(state), GameHistoryCapture.From(next), new HistoryAction
                 {
-                    PlayerId = ev.PlayerId, OtherPlayerId = string.IsNullOrEmpty(command.OtherPlayerId) ? null : command.OtherPlayerId,
-                    Kind = ev.Kind, PublicTarget = PublicTarget(command), PendingKind = state.PendingDecision?.Kind, PublicGeneralChanges = PublicGeneralChanges(state, next),
-                    Card = command.Kind == CommandKind.PlayProgressCard ? command.ProgressCard.ToString() : null
+                    PlayerId = ev.PlayerId, OtherPlayerId = string.IsNullOrEmpty(effective.OtherPlayerId) ? null : effective.OtherPlayerId,
+                    Kind = ev.Kind, PublicTarget = PublicTarget(effective), PendingKind = state.PendingDecision?.Kind, PublicGeneralChanges = PublicGeneralChanges(state, next),
+                    Card = effective.Kind == CommandKind.PlayProgressCard ? effective.ProgressCard.ToString() : null
                 });
                 state = next;
                 return new CommandResult { Success = true, Message = state.Phase == GamePhase.Finished ? state.WinnerPlayerId + " 获胜！" : "操作已确认。", Events = Json.Copy(receipt), NewEvents = Json.Copy(receipt) };
@@ -112,7 +113,7 @@ namespace Catan.Core.M5
                 var invalid = ValidateEnvelope(command); if (invalid != null) return invalid;
                 var prior = state.ProcessedCommands.FirstOrDefault(x => x.CommandId == command.Id);
                 if (prior != null) return PriorResult(prior, Json.Hash(Json.Write(command)));
-                try { Apply(state.CopyForTransaction(), command); return new CommandResult { Success = true, Message = "合法操作。" }; }
+                try { var probe=state.CopyForTransaction();var effective=AuthorizeControlB6(probe,command);ValidateB6Trade(probe,effective);Apply(probe,effective); return new CommandResult { Success = true, Message = "合法操作。" }; }
                 catch (RuleException ex) { return Reject(ex.Code, ex.Message); }
             }
         }
@@ -123,7 +124,7 @@ namespace Catan.Core.M5
             lock (gate)
             {
                 var view = GetPlayerView(playerId);
-                view.OpponentHands = state.Players.Where(p => p.Id != playerId).Select(p => new OpponentHandView
+                view.OpponentHands = state.Players.Where(p => p.Id != view.PlayerId).Select(p => new OpponentHandView
                 {
                     PlayerId = p.Id, Resources = p.Resources.Copy(), DevelopmentCardCount = p.DevelopmentCards.Length,
                     Commodities = new CommodityHandCounts { Cloth = p.Commodities.Cloth, Coin = p.Commodities.Coin, Paper = p.Commodities.Paper },
@@ -133,7 +134,7 @@ namespace Catan.Core.M5
             }
         }
 
-        public PlayerView GetPlayerView(string playerId)
+        private PlayerView GetAssetViewB6(string playerId)
         {
             lock (gate)
             {
@@ -185,7 +186,7 @@ namespace Catan.Core.M5
             // 合法动作枚举尚无命令 ID；费用批次仍须有来源，临时身份仅存在于隔离探针。
             var probe = c;
             if (B3(state) && string.IsNullOrEmpty(c.Id)) { probe = Json.Copy(c); probe.Id = "tk-legality-preview-" + state.EventSequence; }
-            try { Apply(state.CopyForTransaction(), probe); return true; } catch (RuleException) { return false; }
+            try { var next=state.CopyForTransaction();ValidateB6Trade(next,probe);Apply(next,probe); return true; } catch (RuleException) { return false; }
         }
         public string Save() { lock (gate) return Json.Write(state); }
         public GameState GetAuthoritativeStateForTesting() { lock (gate) return Json.Copy(state); }
@@ -254,9 +255,9 @@ namespace Catan.Core.M5
                     Require(s.Phase == GamePhase.ProductionAwaitRoll, "WrongPhase", "当前不能掷骰。");
                     RollCitiesKnights(s); break;
                 case CommandKind.BuildRoad:
-                    ActionPhase(s); ValidateRoad(s, p, c.TargetId, null); Pay(s, p, new ResourceBag { Wood = 1, Brick = 1 }); PlaceRoad(s, p, c.TargetId); break;
+                    ActionPhase(s); ValidateRoad(s, p, c.TargetId, null); PayB6Construction(s, p, new ResourceBag { Wood = 1, Brick = 1 }, new ResourceBag { Wood = 1, Brick = 1 }); PlaceRoad(s, p, c.TargetId); break;
                 case CommandKind.BuildSettlement:
-                    ActionPhase(s); ValidateSettlement(s, p, c.TargetId, false); Pay(s, p, new ResourceBag { Wood = 1, Brick = 1, Wool = 1, Wheat = 1 }); PlaceSettlement(s, p, c.TargetId); RecordRegion(s,p,c.TargetId,false); break;
+                    ActionPhase(s); ValidateSettlement(s, p, c.TargetId, false); PayB6Construction(s, p, new ResourceBag { Wood = 1, Brick = 1, Wool = 1, Wheat = 1 }, new ResourceBag { Wood = 1, Brick = 1, Wool = 1, Wheat = 1 }); PlaceSettlement(s, p, c.TargetId); RecordRegion(s,p,c.TargetId,false); break;
                 case CommandKind.BuildCity:
                     ActionPhase(s); BuildCity(s,p,c.TargetId); break;
                 case CommandKind.BankTrade:
@@ -344,6 +345,7 @@ namespace Catan.Core.M5
         private void ProposeTrade(GameState s, PlayerState p, Command c)
         {
             ActionPhase(s);
+            ValidateB6Trade(s,c);
             bool broadcast = c.OtherPlayerId == TradeOffer.AllPlayers;
             Require(broadcast ? s.ActivePlayerId == p.Id : s.Players.Any(x => x.Id == c.OtherPlayerId) && c.OtherPlayerId != p.Id && (s.ActivePlayerId == p.Id || s.ActivePlayerId == c.OtherPlayerId), "InvalidTradePartner", "仅当前回合玩家能向所有人报价；定向交易必须包含当前回合玩家。");
             var give=c.Give??new ResourceBag();var receive=c.Receive??new ResourceBag();var gc=c.GiveCommodities??new CommodityBag();var rc=c.ReceiveCommodities??new CommodityBag();
@@ -368,7 +370,7 @@ namespace Catan.Core.M5
             }
             Require(ValidBag(give)&&ValidBag(receive)&&ValidBag(gc)&&ValidBag(rc)&&give.Total+gc.Total>0&&receive.Total+rc.Total>0&&!Resources.Any(r=>give[r]>0&&receive[r]>0)&&!Commodities.Any(r=>gc[r]>0&&rc[r]>0), "InvalidTrade", "双方均须交换不同种类的手牌。");
             Require(realGive!=null||Covers(p.Resources,give)&&Covers(p.Commodities,gc), "InsufficientResources", "没有足够手牌提出此报价。");
-            s.TradeOffer = new TradeOffer { B4DeclarationHistoryEventId=s.B4DeclarationHistoryEventId, B4RealGive=realGive, B4ConversionPayment=conversionPayment, ProposerId = p.Id, OtherPlayerId = c.OtherPlayerId, Give = give.Copy(), Receive = receive.Copy(), GiveCommodities=gc.Copy(),ReceiveCommodities=rc.Copy(), RecipientPlayerIds = broadcast ? s.Players.Where(x => x.Id != p.Id).Select(x => x.Id).ToArray() : null };
+            s.TradeOffer = new TradeOffer { B4DeclarationHistoryEventId=s.B4DeclarationHistoryEventId, B4RealGive=realGive, B4ConversionPayment=conversionPayment, ProposerId = p.Id, OtherPlayerId = c.OtherPlayerId, Give = give.Copy(), Receive = receive.Copy(), GiveCommodities=gc.Copy(),ReceiveCommodities=rc.Copy(), RecipientPlayerIds = broadcast ? s.Players.Where(x => x.Id != p.Id && B2SkillEngine.CanVoluntaryExchangeB6(s.ThreeKingdoms,p.Id,x.Id,give.Total+gc.Total,receive.Total+rc.Total)).Select(x => x.Id).ToArray() : null };
             if (legacyInteractionReplay) return;
             // 无力支付的接收者立即以普通拒绝处理，不公开缺少的牌种或数量。
             var unavailable = s.Players.Where(x => x.Id != p.Id && (broadcast || x.Id == c.OtherPlayerId) &&
@@ -391,6 +393,7 @@ namespace Catan.Core.M5
                 else s.TradeOffer = null;
                 return;
             }
+            ValidateB6Trade(s,c);
             var proposer = s.Players.Single(x => x.Id == offer.ProposerId);
             var give=offer.Give;var gc=offer.GiveCommodities;
             if(offer.B4RealGive!=null)
@@ -399,6 +402,7 @@ namespace Catan.Core.M5
                 for(int i=0;i<5;i++)give[(Resource)i]=offer.B4RealGive[i];
                 for(int i=0;i<3;i++)gc[(Commodity)i]=offer.B4RealGive[i+5];
             }
+            Require(B2SkillEngine.CanGainCardsB6(s.ThreeKingdoms,p.Id,Enumerable.Range(0,8).Select(i=>i<5?give[(Resource)i]:gc[(Commodity)(i-5)]).ToArray()) && B2SkillEngine.CanGainCardsB6(s.ThreeKingdoms,proposer.Id,Enumerable.Range(0,8).Select(i=>i<5?offer.Receive[(Resource)i]:offer.ReceiveCommodities[(Commodity)(i-5)]).ToArray()),"GainForbidden","当前不能交换这些牌。");
             Require(Covers(proposer.Resources,give)&&Covers(p.Resources,offer.Receive)&&Covers(proposer.Commodities,gc)&&Covers(p.Commodities,offer.ReceiveCommodities), "InsufficientResources", "双方手牌不足以完成这笔交易。");
             if(B4(s))
             {
@@ -426,7 +430,7 @@ namespace Catan.Core.M5
         }
         private int TradeRate(GameState s, string player, Resource resource)
         {
-            var owned = CurrentPorts(s).Where(port => Buildings(s).Any(b => b.PlayerId == player && port.Vertices.Contains(b.LocationId))).ToArray();
+            var owned = CurrentPorts(s).Where(port => Buildings(s).Any(b => B6AllianceRules.Allies(s.ThreeKingdoms,player,b.PlayerId) && port.Vertices.Contains(b.LocationId))).ToArray();
             int rate=owned.Any(p => p.Resource == resource) ? 2 : owned.Any(p => p.Resource == null) ? 3 : 4;
             return Math.Min(rate,ProgressTradeRate(s,s.Players.Single(p=>p.Id==player),resource,null));
         }

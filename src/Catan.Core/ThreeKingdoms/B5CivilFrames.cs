@@ -19,7 +19,7 @@ namespace Catan.Core.ThreeKingdoms
             {
                 if(f.Step==0){var a=s.Skills.Harvest.FirstOrDefault(a=>a.PlayerId==owner);if(a!=null){host.AddBank(a.Cards);a.Cards=new int[8];a.GoldCount=0;a.AqueductEligible=false;a.ChoiceComplete=true;a.Completed=true;a.ReplacementKind="hengzheng";}f.Step=1;foreach(var t in f.Targets)Target(host,f.Id,owner,t);return true;}
                 if(f.Step>f.Targets.Length){Remove(s,f);return true;}var target=f.Targets[f.Step++-1];
-                if(!CivilProtected(host,target))B4Transfer(host,target,owner,RandomHand(host,target),f.Id+":take:"+target,f.SkillId);return true;
+                if(!CivilProtected(host,target,owner))B4Transfer(host,target,owner,RandomHand(host,target),f.Id+":take:"+target,f.SkillId);return true;
             }
             if(f.Kind=="civil-fanjian")
             {
@@ -30,14 +30,14 @@ namespace Catan.Core.ThreeKingdoms
                     if(real<0){Remove(s,f);return true;}s.Skills.RevealedCards=Copy(cards);B4SkillHistoryEngine.Complete(s,f.Id,"对方声明"+CardNames[p.Declared]+"，公开取得"+CardNames[real]+(p.Budget==1?"；猜错":"；猜中"));
                     B4Transfer(host,owner,f.Targets[0],cards,f.Id+":give",f.SkillId,true);return true;
                 }
-                if(p.Budget==0||CivilProtected(host,f.Targets[0])||!bh.GetBoardOptions(owner,"damage-road",f.Targets[0]).Any()){Remove(s,f);return true;}
+                if(p.Budget==0||CivilProtected(host,f.Targets[0],owner)||!bh.GetBoardOptions(owner,"damage-road",f.Targets[0]).Any()){Remove(s,f);return true;}
                 f.PlayerId=owner;p.BoardKind="damage-road";p.Argument=f.Targets[0];Decide(s,f,"civil-road","反间：处理目标一条道路","开放道路移除，封闭道路横置。");waiting=true;return true;
             }
             if(f.Kind=="civil-kurou")
             {var current=bh.GetBoardOptions(owner,"kurou").FirstOrDefault(o=>o.Id==p.BoardOption.Id);Remove(s,f);if(current!=null){bh.ApplyBoardOption(owner,current);CivilReward(s,f,"mixed",current.PaidCount);}return true;}
             if(f.Kind.StartsWith("civil-qixi-",StringComparison.Ordinal))
             {
-                Remove(s,f);string target=f.Targets[0];if(CivilProtected(host,target))return true;
+                Remove(s,f);string target=f.Targets[0];if(CivilProtected(host,target,owner))return true;
                 if(f.Kind=="civil-qixi-hand")B4DiscardRandom(host,target,1,f.Id+":discard");
                 if(f.Kind=="civil-qixi-progress")CivilDiscardProgress(host,target,null,f.Id+":discard-progress",true);
                 if(f.Kind=="civil-qixi-tech"){var o=bh.GetBoardOptions(owner,"downgrade-tech",target).FirstOrDefault(o=>o.Id==p.BoardOption.Id);if(o!=null)bh.ApplyBoardOption(owner,o);}return true;
@@ -45,7 +45,7 @@ namespace Catan.Core.ThreeKingdoms
             if(f.Kind=="civil-luanwu")
             {
                 if(f.Step>=f.Targets.Length){Remove(s,f);return true;}var target=f.Targets[f.Step];
-                if(CivilProtected(host,target)){f.Step++;return true;}
+                if(CivilProtected(host,target,owner)){f.Step++;return true;}
                 if(p.BoardKind=="damage-road")
                 {
                     f.PlayerId=owner;p.Argument=target;
@@ -56,6 +56,7 @@ namespace Catan.Core.ThreeKingdoms
             }
             if(f.Kind=="civil-jianshu-duel")
             {
+                if(f.Targets.Any(t=>!B6AllianceRules.CanAttack(s,owner,t))){Remove(s,f);return true;}
                 if(f.Step==0){f.PlayerId=f.Targets[0];if(host.GetHand(f.PlayerId).Sum()==0){Remove(s,f);return true;}Decide(s,f,"civil-subset","间书：暗选手牌","至少选择一张真实手牌，随后声明其中矿石数量。");waiting=true;return true;}
                 if(f.Step==1){f.PlayerId=f.Targets[0];Decide(s,f,"civil-stone-declare","间书：声明矿石数量","所选手牌尚未向对方公开。");waiting=true;return true;}
                 f.PlayerId=f.Targets[1];Decide(s,f,"civil-guess","间书：猜测声明真假","对方选择 "+p.Selection.Sum()+" 张牌，声明矿石 "+p.Declared+" 张。");waiting=true;return true;
@@ -76,7 +77,7 @@ namespace Catan.Core.ThreeKingdoms
             }
             if(f.Kind=="civil-chouce")
             {
-                if(!s.SeatPlayerIds.Any(t=>host.GetHand(t).Sum()>0&&!CivilProtected(host,t)&&!IsB4HandLossForbidden(s,t))){Remove(s,f);return true;}
+                if(!s.SeatPlayerIds.Any(t=>host.GetHand(t).Sum()>0&&!CivilProtected(host,t,owner)&&!IsB4HandLossForbidden(s,t))){Remove(s,f);return true;}
                 if(p.OtherPlayerId==owner)
                 {if(p.Selection.Sum()>=f.Remaining){var cards=Copy(p.Selection);Remove(s,f);B4Discard(host,owner,cards,f.Id+":self");return true;}Decide(s,f,"civil-hand-select","筹策：选择自己的弃牌","请选择实际持有的手牌。");waiting=true;return true;}
                 Decide(s,f,"civil-chouce","筹策：选择弃牌对象","先辅对象弃两张，其他玩家弃一张；他人隐藏牌随机弃置。");waiting=true;return true;
@@ -84,7 +85,7 @@ namespace Catan.Core.ThreeKingdoms
             if(f.Kind=="civil-fencheng")
             {
                 if(f.Step>=f.Targets.Length){Remove(s,f);return true;}f.PlayerId=f.Targets[f.Step];
-                if(CivilProtected(host,f.PlayerId)){CivilNextTarget(f,0);return true;}
+                if(CivilProtected(host,f.PlayerId,owner)){CivilNextTarget(f,0);return true;}
                 if(p.BoardKind=="burn-city")
                 {if(!bh.GetBoardOptions(owner,"burn-city",f.PlayerId).Any()){CivilNextTarget(f,0);return true;}Decide(s,f,"civil-burn","焚城：选择焚毁城市","城市与城墙完整移除；大都会须有合法迁移处。");waiting=true;return true;}
                 if(p.BoardKind=="damage-road")
@@ -97,11 +98,12 @@ namespace Catan.Core.ThreeKingdoms
             {
                 if(p.Declared<0){p.Declared=0;foreach(var target in f.Targets)Target(host,f.Id,owner,target);return true;}
                 if(f.Step>=f.Targets.Length){Remove(s,f);return true;}f.PlayerId=f.Targets[f.Step];
-                if(CivilProtected(host,f.PlayerId)||!bh.GetBoardOptions(owner,"damage-road",f.PlayerId).Any()&&(!host.GetProgressCards(f.PlayerId).Any(c=>!c.PublicPoint)||IsB4HandLossForbidden(s,f.PlayerId))){f.Step++;return true;}
+                if(CivilProtected(host,f.PlayerId,owner)||!bh.GetBoardOptions(owner,"damage-road",f.PlayerId).Any()&&(!host.GetProgressCards(f.PlayerId).Any(c=>!c.PublicPoint)||IsB4HandLossForbidden(s,f.PlayerId))){f.Step++;return true;}
                 Decide(s,f,"civil-juece","绝策：道路或发展牌","自己选择一条道路或一张未使用发展牌。");waiting=true;return true;
             }
             if(f.Kind=="civil-pojun")
             {
+                if(!B6AllianceRules.CanAttack(s,owner,f.Targets[0])){Remove(s,f);return true;}
                 if(p.Budget==0||!Enumerable.Range(0,3).Any(i=>bh.GetImprovements(f.Targets[0])[i]>p.Tracks[i])){CivilCommitPojun(host,f);return true;}
                 Decide(s,f,"civil-pojun","破军：分配扣置科技","三项合计还可扣置 "+p.Budget+" 级，也可立即完成。");waiting=true;return true;
             }
@@ -117,11 +119,11 @@ namespace Catan.Core.ThreeKingdoms
             if(f.Kind=="civil-niepan")
             {if(Active(s,owner)?.TenureId!=f.TenureId){Remove(s,f);return true;}if(p.SelectedIds.Length<2){Decide(s,f,"civil-niepan","涅槃：选择两项科技","各失去最高一层，然后弃尽手牌与未使用发展牌并获得永久一分。");waiting=true;return true;}CivilCommitNiepan(host,f);return true;}
             if(f.Kind=="civil-liegong")
-            {var o=bh.GetBoardOptions(owner,"liegong").FirstOrDefault(x=>x.Id==p.BoardOption.Id);Remove(s,f);if(o!=null&&!CivilProtected(host,o.OtherPlayerId??o.PlayerId))bh.ApplyBoardOption(owner,o);return true;}
+            {var o=bh.GetBoardOptions(owner,"liegong").FirstOrDefault(x=>x.Id==p.BoardOption.Id);Remove(s,f);if(o!=null&&!CivilProtected(host,o.OtherPlayerId??o.PlayerId,owner))bh.ApplyBoardOption(owner,o);return true;}
             if(f.Kind=="civil-liegong-roads")
             {
-                if(f.Step==1){var available=bh.GetBoardOptions(owner,"liegong-road");var selected=p.SelectedIds.Select(id=>available.FirstOrDefault(o=>o.Id==id)).ToArray();Remove(s,f);foreach(var o in selected.Where(o=>o!=null&&!CivilProtected(host,o.OtherPlayerId??o.PlayerId)))bh.ApplyBoardOption(owner,o);return true;}
-                if(bh.GetBoardOptions(owner,"liegong-road").Count(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId))<2){Remove(s,f);return true;}Decide(s,f,"civil-two-roads","烈弓：选择两条道路","两条不同合法道路同时锁定后结算。");waiting=true;return true;
+                if(f.Step==1){var available=bh.GetBoardOptions(owner,"liegong-road");var selected=p.SelectedIds.Select(id=>available.FirstOrDefault(o=>o.Id==id)).ToArray();Remove(s,f);foreach(var o in selected.Where(o=>o!=null&&!CivilProtected(host,o.OtherPlayerId??o.PlayerId,owner)))bh.ApplyBoardOption(owner,o);return true;}
+                if(bh.GetBoardOptions(owner,"liegong-road").Count(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId,owner))<2){Remove(s,f);return true;}Decide(s,f,"civil-two-roads","烈弓：选择两条道路","两条不同合法道路同时锁定后结算。");waiting=true;return true;
             }
             if(f.Kind=="civil-qingnang")
             {var o=bh.GetBoardOptions(owner,"repair").FirstOrDefault(x=>x.Id==p.BoardOption.Id);Remove(s,f);if(o!=null){bh.ApplyBoardOption(owner,o);if((o.OtherPlayerId??o.PlayerId)==owner)CivilReward(s,f,"mixed",1);}return true;}

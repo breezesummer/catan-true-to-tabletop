@@ -16,7 +16,7 @@ namespace Catan.Core.ThreeKingdoms
             var complete = Order(s).Select(id =>
             {
                 var input = allocations.FirstOrDefault(a => a.PlayerId == id); var general = Active(s, id); var blocked = IsDrawBlocked(s, id);
-                return new B2HarvestAllocation { PlayerId = id, Cards = blocked || input == null ? new int[8] : Copy(input.Cards),
+                return new B2HarvestAllocation { PlayerId = id, Cards = blocked || input == null ? new int[8] : input.Cards.Select((n,t)=>CanGainB6(s,id,t)?n:0).ToArray(),
                     GoldCount = blocked ? 0 : input?.GoldCount ?? 0, AqueductEligible = !blocked && input?.AqueductEligible == true,
                     GeneralId = general?.GeneralId, TenureId = general?.TenureId };
             }).ToArray();
@@ -69,7 +69,7 @@ namespace Catan.Core.ThreeKingdoms
             var s = host.State; var a = Allocation(s, f.PlayerId);
             if (f.Kind == "gold")
             {
-                if (a.GoldCount > 0 && host.GetBank().Take(5).Sum() > 0 && !IsDrawBlocked(s, f.PlayerId))
+                if (a.GoldCount > 0 && Enumerable.Range(0,5).Any(t=>CanGainB6(s,f.PlayerId,t)&&host.GetBank()[t]>0) && !IsDrawBlocked(s, f.PlayerId))
                 { Decide(s, f, "gold", "金矿：选择资源", "为主分配预留金矿资源，尚余 " + a.GoldCount + " 张。"); return true; }
                 a.GoldCount = 0; Remove(s, f); return false;
             }
@@ -91,7 +91,7 @@ namespace Catan.Core.ThreeKingdoms
             {
                 if (f.Step >= f.Tiles.Length)
                 { a.Cards = Copy(f.Cards); f.Cards = new int[8]; a.ChoiceComplete = true; Remove(s, f); return false; }
-                var allowed = f.Tiles[f.Step].AllowedCardTypes.Where(t => host.GetBank()[t] > 0).ToArray();
+                var allowed = f.Tiles[f.Step].AllowedCardTypes.Where(t => host.GetBank()[t] > 0 && CanGainB6(host.State,f.PlayerId,t)).ToArray();
                 if (allowed.Length == 0 || IsDrawBlocked(s, f.PlayerId)) { f.Step++; return false; }
                 Decide(s, f, "tiandu-card", "天妒：地块 " + f.Tiles[f.Step].TileId, "按已确认地块的生产资格选择一张可用牌。"); return true;
             }
@@ -124,9 +124,9 @@ namespace Catan.Core.ThreeKingdoms
         {
             var s = host.State; var a = Allocation(s, f.PlayerId);
             if (d.Kind == "gold")
-            { foreach (var t in Enumerable.Range(0, 5).Where(t => host.GetBank()[t] > 0)) result.Add(CardAction(s, f, d, t)); return; }
+            { foreach (var t in Enumerable.Range(0, 5).Where(t => host.GetBank()[t] > 0 && CanGainB6(host.State,f.PlayerId,t))) result.Add(CardAction(s, f, d, t)); return; }
             if (d.Kind == "tiandu-card")
-            { foreach (var t in f.Tiles[f.Step].AllowedCardTypes.Where(t => host.GetBank()[t] > 0)) result.Add(CardAction(s, f, d, t)); return; }
+            { foreach (var t in f.Tiles[f.Step].AllowedCardTypes.Where(t => host.GetBank()[t] > 0 && CanGainB6(host.State,f.PlayerId,t))) result.Add(CardAction(s, f, d, t)); return; }
             if (d.Kind == "shelie")
             {
                 foreach (var t in Enumerable.Range(0, 5).Where(t => f.Cards[t] > 0 && f.SelectedCards[t] == 0)) result.Add(CardAction(s, f, d, t));
@@ -151,12 +151,12 @@ namespace Catan.Core.ThreeKingdoms
             var s = host.State; var a = Allocation(s, f.PlayerId);
             if (d.Kind == "gold")
             {
-                Require(c.Option == "card" && c.CardType >= 0 && c.CardType < 5 && a.GoldCount > 0 && host.GetBank()[c.CardType] > 0 && !IsDrawBlocked(s, f.PlayerId), "金矿资源不可领取。");
+                Require(c.Option == "card" && c.CardType >= 0 && c.CardType < 5 && a.GoldCount > 0 && host.GetBank()[c.CardType] > 0 && CanGainB6(s,f.PlayerId,c.CardType) && !IsDrawBlocked(s, f.PlayerId), "金矿资源不可领取。");
                 var cards = One(c.CardType); host.RemoveBank(cards); Add(a.Cards, cards); a.GoldCount--; return;
             }
             if (d.Kind == "tiandu-card")
             {
-                Require(c.Option == "card" && f.Tiles[f.Step].AllowedCardTypes.Contains(c.CardType) && host.GetBank()[c.CardType] > 0 && !IsDrawBlocked(s, f.PlayerId), "不符合天妒地块生产资格或库存。");
+                Require(c.Option == "card" && f.Tiles[f.Step].AllowedCardTypes.Contains(c.CardType) && host.GetBank()[c.CardType] > 0 && CanGainB6(s,f.PlayerId,c.CardType) && !IsDrawBlocked(s, f.PlayerId), "不符合天妒地块生产资格或库存。");
                 var cards = One(c.CardType); host.RemoveBank(cards); Add(f.Cards, cards); f.Step++; return;
             }
             if (d.Kind == "shelie")
@@ -217,6 +217,7 @@ namespace Catan.Core.ThreeKingdoms
             {
                 var hand = host.GetHand(target); var before = hand.Sum(); var random = host.DrawRandom(before); var type = 0;
                 for (; type < 8; type++) { if (random < hand[type]) break; random -= hand[type]; }
+                if(!CanGainB6(s,f.PlayerId,type)||!B6AllianceRules.CanAttack(s,f.PlayerId,target))continue;
                 var card = One(type); host.RemoveHand(target, card); Add(gain, card);
                 var loss = Change(target, before, before - 1, 1, 0); if (B4Enabled(s)) loss.LostCards = Copy(card); changes.Add(loss);
             }
@@ -227,7 +228,7 @@ namespace Catan.Core.ThreeKingdoms
             if (B4Enabled(s)) B4SkillHistoryEngine.Complete(s, "harvest:" + s.Skills.HarvestTurnId + ":" + f.TenureId, "突袭实际获得 " + gain.Sum() + " 张手牌", new[] { f.Id + ":atomic" });
         }
 
-        private static string[] RaidTargets(IThreeKingdomsCardHost host, string source) => host.State.SeatPlayerIds.Where(p => p != source && host.GetHand(p).Sum() > 0 && !IsProtected(host.State, p)).ToArray();
+        private static string[] RaidTargets(IThreeKingdomsCardHost host, string source) => host.State.SeatPlayerIds.Where(p => p != source && B6AllianceRules.CanAttack(host.State,source,p) && host.GetHand(p).Sum() > 0 && !IsProtected(host.State, p)).ToArray();
         private static IEnumerable<B2HarvestTile[]> TilePairs(IThreeKingdomsCardHost host, string player)
         {
             var tiles = host.GetHarvestTiles(player).Where(t => t != null && t.Number > 0 && t.AllowedCardTypes != null && t.AllowedCardTypes.Length > 0 && t.AllowedCardTypes.All(c => c >= 0 && c < 8)).OrderBy(t => t.TileId, StringComparer.Ordinal).ToArray();

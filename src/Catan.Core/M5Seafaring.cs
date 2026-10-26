@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Catan.Core.ThreeKingdoms;
 
 namespace Catan.Core.M5
 {
@@ -25,7 +26,7 @@ namespace Catan.Core.M5
                     Require(s.Phase==GamePhase.SetupRoad&&s.PendingDecision!=null,"WrongPhase","先放置开局建筑。");
                     ValidateShip(s,p,c.TargetId,s.PendingDecision.AnchorVertexId);PlaceShip(s,p,c.TargetId);AdvanceSetup(s);return true;
                 case CommandKind.BuildShip:
-                    ActionPhase(s);ValidateShip(s,p,c.TargetId,null);Pay(s,p,new ResourceBag {Wood=1,Wool=1});PlaceShip(s,p,c.TargetId);return true;
+                    ActionPhase(s);ValidateShip(s,p,c.TargetId,null);PayB6Construction(s,p,new ResourceBag {Wood=1,Wool=1},new ResourceBag {Wood=1,Wool=1});PlaceShip(s,p,c.TargetId);return true;
                 case CommandKind.MoveShip:
                     ActionPhase(s);ValidateMoveSource(s,p,c.SourceId);
                     Require(c.SourceId!=c.TargetId,"SameEdge","船须移动到另一条边。");
@@ -64,7 +65,7 @@ namespace Catan.Core.M5
         private bool ShipIsOpen(GameState s,ShipPlacement ship)
         {
             var edge=EdgeAt(ship.LocationId);
-            var anchors=new HashSet<string>(Buildings(s).Where(b=>b.PlayerId==ship.PlayerId).Select(b=>b.LocationId).Concat(s.Knights.Where(k=>k.PlayerId==ship.PlayerId).Select(k=>k.LocationId)).Concat(s.Special?.Villages.Select(v=>v.VertexId)??Array.Empty<string>()));
+            var anchors=new HashSet<string>(Buildings(s).Where(b=>b.PlayerId==ship.PlayerId).Select(b=>b.LocationId).Concat(s.Knights.Where(k=>B6ControlsKnight(s,ship.PlayerId,k)).Select(k=>k.LocationId)).Concat(s.Special?.Villages.Select(v=>v.VertexId)??Array.Empty<string>()));
             var routes=s.Ships.Where(x=>x.PlayerId==ship.PlayerId&&B5Working(s,"Ship",x.LocationId)).Select(x=>EdgeAt(x.LocationId)).ToArray();
             if(edge.Vertices.Any(v=>!anchors.Contains(v)&&!routes.Any(e=>e.Id!=edge.Id&&e.Vertices.Contains(v))))return true;
 
@@ -114,10 +115,10 @@ namespace Catan.Core.M5
         {
             // A route may have become separated by an opponent. Only a new loss of the
             // knight's connection is forbidden; moving ships elsewhere remains legal.
-            var edges=OwnRouteEdges(s,player).ToArray();
+            var edges=B6AllianceRules.Members(s.ThreeKingdoms,player).SelectMany(id=>OwnRouteEdges(s,id)).ToArray();
             HashSet<string> Connected(bool remove)
             {
-                var seen=new HashSet<string>(Buildings(s).Where(b=>b.PlayerId==player).Select(b=>b.LocationId));
+                var seen=new HashSet<string>(Buildings(s).Where(b=>B6AllianceRules.Allies(s.ThreeKingdoms,player,b.PlayerId)).Select(b=>b.LocationId));
                 var queue=new Queue<string>(seen);
                 while(queue.Count>0)
                 {
@@ -131,7 +132,7 @@ namespace Catan.Core.M5
                 return seen;
             }
             var before=Connected(false);var after=Connected(true);
-            return s.Knights.Any(k=>k.PlayerId==player&&before.Contains(k.LocationId)&&!after.Contains(k.LocationId));
+            return s.Knights.Any(k=>B6ControlsKnight(s,player,k)&&before.Contains(k.LocationId)&&!after.Contains(k.LocationId));
         }
         private bool HasLegalShip(GameState s,PlayerState p)
         {
@@ -151,7 +152,7 @@ namespace Catan.Core.M5
             foreach(var region in seafaring.Regions.Where(r=>s.Tiles.Any(t=>r.TileIds.Contains(t.Id)&&t.Vertices.Contains(vertex)&&IsLand(t))))
             {
                 if(setup&&!p.HomeRegions.Contains(region.Id))p.HomeRegions=Append(p.HomeRegions,region.Id);
-                if(!setup&&!p.HomeRegions.Contains(region.Id)&&!p.SettledRegions.Contains(region.Id))p.BonusVictoryPoints+=seafaring.IslandBonusPoints;
+                if(!setup&&!p.HomeRegions.Contains(region.Id)&&!p.SettledRegions.Contains(region.Id)) {p.BonusVictoryPoints+=seafaring.IslandBonusPoints;RecordMapB6Landing(s,p.Id,region.Id,vertex);}
                 if(!p.SettledRegions.Contains(region.Id))p.SettledRegions=Append(p.SettledRegions,region.Id);
             }
         }
@@ -168,7 +169,7 @@ namespace Catan.Core.M5
             foreach(var tile in s.Tiles.Where(t=>t.Vertices.Contains(vertex)))
             {
                 if(tile.Resource=="gold")AddGold(s,p.Id,1);
-                else if(Resources.Any(r=>ResourceName(r)==tile.Resource)) {var r=ParseResource(tile.Resource);if(s.Bank[r]>0)Transfer(s.Bank,p.Resources,r,1);}
+                else if(Resources.Any(r=>ResourceName(r)==tile.Resource)) {var r=ParseResource(tile.Resource);if(s.Bank[r]>0&&B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,(int)r))Transfer(s.Bank,p.Resources,r,1);}
             }
         }
         private void PopulateSeafaringView(PlayerState own,PlayerView view)
@@ -190,10 +191,10 @@ namespace Catan.Core.M5
         {
             if(s.Phase==GamePhase.PendingChoice&&s.PendingDecision.PlayerId==p.Id&&s.PendingDecision.Kind=="Gold")
             {
-                int count=Math.Min(s.PendingDecision.Amount,s.Bank.Total);
+                int count=Math.Min(s.PendingDecision.Amount,B6ResourceSupply(s,p.Id));
                 // Include every available single-type selection and one mixed selection.
-                foreach(var r in Resources.Where(r=>s.Bank[r]>=count)) {var bag=new ResourceBag();bag[r]=count;yield return new Command {PlayerId=p.Id,Kind=CommandKind.ResolveChoice,Resources=bag};}
-                var mixed=new ResourceBag();int left=count;foreach(var r in Resources){mixed[r]=Math.Min(left,s.Bank[r]);left-=mixed[r];}
+                foreach(var r in Resources.Where(r=>B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,(int)r)&&s.Bank[r]>=count)) {var bag=new ResourceBag();bag[r]=count;yield return new Command {PlayerId=p.Id,Kind=CommandKind.ResolveChoice,Resources=bag};}
+                var mixed=new ResourceBag();int left=count;foreach(var r in Resources.Where(r=>B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,(int)r))){mixed[r]=Math.Min(left,s.Bank[r]);left-=mixed[r];}
                 yield return new Command {PlayerId=p.Id,Kind=CommandKind.ResolveChoice,Resources=mixed};
             }
             if(s.ActivePlayerId!=p.Id)yield break;
@@ -205,7 +206,7 @@ namespace Catan.Core.M5
             }
             if(s.Phase==GamePhase.Action)
             {
-                foreach(var knight in s.Knights.Where(k=>k.PlayerId==p.Id))yield return new Command {PlayerId=p.Id,Kind=CommandKind.ChasePirate,TargetId=knight.LocationId};
+                foreach(var knight in s.Knights.Where(k=>B6ControlsKnight(s,p.Id,k)))yield return new Command {PlayerId=p.Id,Kind=CommandKind.ChasePirate,TargetId=knight.LocationId};
                 foreach(var edge in scenario.Topology.Edges)yield return new Command {PlayerId=p.Id,Kind=CommandKind.BuildShip,TargetId=edge.Id};
             }
         }
@@ -221,7 +222,7 @@ namespace Catan.Core.M5
             {
                 Check(p.ShipsRemaining>=0&&p.ShipsRemaining+s.Ships.Count(x=>x.PlayerId==p.Id)==15,"Ship conservation failed.");
                 Check(p.HomeRegions!=null&&p.SettledRegions!=null&&p.HomeRegions.Distinct().Count()==p.HomeRegions.Length&&p.SettledRegions.Distinct().Count()==p.SettledRegions.Length&&p.HomeRegions.All(p.SettledRegions.Contains)&&p.SettledRegions.All(id=>seafaring.Regions.Any(r=>r.Id==id)),"Invalid settlement regions.");
-                Check(seafaring.Id=="forgotten-tribe" ? p.BonusVictoryPoints>=0 : p.BonusVictoryPoints==p.SettledRegions.Count(id=>!p.HomeRegions.Contains(id))*seafaring.IslandBonusPoints,"Invalid region bonus.");
+                Check(seafaring.Id=="forgotten-tribe" ? p.BonusVictoryPoints>=0 : p.BonusVictoryPoints==p.SettledRegions.Count(id=>!p.HomeRegions.Contains(id))*seafaring.IslandBonusPoints-RevokedMapB6Points(s,p.Id),"Invalid region bonus.");
             }
             Check(!s.FirstBarbarianAttack?s.PirateTileId==null:s.PirateTileId=="frame"||s.Tiles.Any(t=>t.Id==s.PirateTileId&&t.Resource=="sea")||s.PirateTileId==null&&(s.BarbarianPosition==7||seafaring.InitialPirateTileId==null||seafaring.Id=="pirate-islands"&&s.Special.Fortresses.All(f=>f.Strength==0)),"Invalid pirate location.");
             var choices=s.DecisionQueue.Concat(s.PendingDecision==null?Array.Empty<PendingDecision>():new[]{s.PendingDecision});

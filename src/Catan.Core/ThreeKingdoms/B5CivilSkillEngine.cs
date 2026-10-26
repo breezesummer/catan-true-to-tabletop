@@ -16,7 +16,7 @@ namespace Catan.Core.ThreeKingdoms
         }
         private static string CivilOwner(B2SkillFrame f) => f.CivilB5?.OwnerPlayerId ?? f.PlayerId;
         private static bool CivilReady(IThreeKingdomsCardHost h) => B5Enabled(h?.State) && h is IThreeKingdomsB5Host;
-        private static bool CivilProtected(IThreeKingdomsCardHost h,string p) => IsProtected(h.State,p) || (Active(h.State,p)?.GeneralId=="tk-g19" && h.GetHand(p).Sum()==0);
+        private static bool CivilProtected(IThreeKingdomsCardHost h,string p,string source=null) => source!=null&&!B6AllianceRules.CanAttack(h.State,source,p) || IsProtected(h.State,p) || (Active(h.State,p)?.GeneralId=="tk-g19" && h.GetHand(p).Sum()==0);
         private static void CivilReward(ThreeKingdomsState s,B2SkillFrame f,string kind,int count)
         { if(count>0) Append(s,new B2SkillFrame { Id=Id(s,"civil-reward"),SkillId=f.SkillId,TenureId=f.TenureId,PlayerId=CivilOwner(f),Kind=kind,Remaining=count,Started=true,SourceEventId=f.Id,B4=new B4SkillPayload {OwnerPlayerId=CivilOwner(f)} }); }
         private static B2SkillAction CivilAction(ThreeKingdomsState s,string skill,string option,string label,string target=null,string objectId=null,int type=-1,B2SkillDecision d=null)
@@ -35,15 +35,15 @@ namespace Catan.Core.ThreeKingdoms
             if(s.Clock.ActivePlayerId!=player || s.Clock.Phase!=ThreeKingdomsPhase.Play)return;
             var hand=host.GetHand(player);bool loss=IsB4HandLossForbidden(s,player);
             if(g.GeneralId=="tk-g03"&&!loss&&hand.Sum()>0&&Value(g,"fanjian",s.Clock.PhaseId)==0)
-                foreach(var target in s.SeatPlayerIds.Where(p=>p!=player)) actions.Add(CivilAction(s,"tk-g03-s2","civil-fanjian","反间：令 "+target+" 猜牌",target));
+                foreach(var target in s.SeatPlayerIds.Where(p=>p!=player&&B6AllianceRules.CanAttack(s,player,p))) actions.Add(CivilAction(s,"tk-g03-s2","civil-fanjian","反间：令 "+target+" 猜牌",target));
             if(g.GeneralId=="tk-g11")
             {
                 if(Value(g,"luanwu",0)==0)actions.Add(CivilAction(s,"tk-g11-s2","civil-luanwu","乱武：依次令其他玩家支付两砖或处理道路"));
-                if(Value(g,"jianshu",0)==0){var others=s.SeatPlayerIds.Where(p=>p!=player).ToArray();for(int i=0;i<others.Length;i++)for(int j=i+1;j<others.Length;j++){var a=CivilAction(s,"tk-g11-s3","civil-jianshu","间书：指定 "+others[i]+" 与 "+others[j]);a.Command.TargetPlayerIds=new[]{others[i],others[j]};actions.Add(a);}}
+                if(Value(g,"jianshu",0)==0){var others=s.SeatPlayerIds.Where(p=>p!=player&&B6AllianceRules.CanAttack(s,player,p)).ToArray();for(int i=0;i<others.Length;i++)for(int j=i+1;j<others.Length;j++){var a=CivilAction(s,"tk-g11-s3","civil-jianshu","间书：指定 "+others[i]+" 与 "+others[j]);a.Command.TargetPlayerIds=new[]{others[i],others[j]};actions.Add(a);}}
             }
             if(g.GeneralId=="tk-g16")foreach(var o in bh.GetBoardOptions(player,"kurou"))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,"tk-g16-s1","civil-kurou","苦肉："+o.Label,null,o.Id),o));
             if(g.GeneralId=="tk-g17"&&!loss&&Value(g,"qixi",s.Clock.PhaseId)<3)
-                foreach(var target in s.SeatPlayerIds.Where(p=>p!=player&&!CivilProtected(host,p)))
+                foreach(var target in s.SeatPlayerIds.Where(p=>p!=player&&!CivilProtected(host,p,player)))
                 {
                     if(hand[1]>=1&&host.GetHand(target).Sum()>0&&!IsB4HandLossForbidden(s,target))actions.Add(CivilAction(s,"tk-g17-s1","civil-qixi-hand","奇袭：支付一砖，弃 "+target+" 一张手牌",target));
                     if(hand[1]>=2&&host.GetProgressCards(target).Any(p=>!p.PublicPoint)&&!IsB4HandLossForbidden(s,target))actions.Add(CivilAction(s,"tk-g17-s1","civil-qixi-progress","奇袭：支付两砖，弃 "+target+" 一张发展牌",target));
@@ -56,8 +56,8 @@ namespace Catan.Core.ThreeKingdoms
                 for(int n=1;n<=hand[4];n++){var a=CivilAction(s,"tk-g35-s1","civil-lianhuan","连环：弃 "+n+" 张矿石换随机资源");a.Command.Counts[4]=n;a.RealCardType=4;a.CardSelectionKind="payment";a.AvailableCount=hand[4];actions.Add(a);}
             if(g.GeneralId=="tk-g51"&&g.Counters.Count(c=>c.Key.StartsWith("liegong:",StringComparison.Ordinal)&&c.Value>0)>=7)
             {
-                foreach(var o in bh.GetBoardOptions(player,"liegong").Where(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId)))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,"tk-g51-s1","civil-liegong","烈弓："+o.Label,null,o.Id),o));
-                if(bh.GetBoardOptions(player,"liegong-road").Count(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId))>=2)actions.Add(CivilAction(s,"tk-g51-s1","civil-liegong-roads","烈弓：选择两条不同道路"));
+                foreach(var o in bh.GetBoardOptions(player,"liegong").Where(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId,player)))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,"tk-g51-s1","civil-liegong","烈弓："+o.Label,null,o.Id),o));
+                if(bh.GetBoardOptions(player,"liegong-road").Count(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId,player))>=2)actions.Add(CivilAction(s,"tk-g51-s1","civil-liegong-roads","烈弓：选择两条不同道路"));
             }
             if(g.GeneralId=="tk-g54")
             {

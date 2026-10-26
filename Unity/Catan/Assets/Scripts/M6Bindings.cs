@@ -71,7 +71,7 @@ public sealed partial class M6App
         },host.ExportSave,app.M6Refresh,app.M6Close,app.M6Visible);
     }
     string ThreeKingdomsSelectionActor(Catan.Core.ThreeKingdoms.ThreeKingdomsView view)=>
-        view?.WaitingSelectionPlayerIds?.FirstOrDefault(player=>player!=HumanSeat)??view?.PendingDecision?.PlayerId??view?.WaitingSelectionPlayerIds?.FirstOrDefault();
+        Catan.Core.ThreeKingdoms.B2SkillEngine.ControllerForViewB6(view,view?.WaitingSelectionPlayerIds?.FirstOrDefault(player=>player!=HumanSeat)??view?.PendingDecision?.PlayerId??view?.WaitingSelectionPlayerIds?.FirstOrDefault());
     static string Actor(Catan.Core.M2.PlayerView view)
     {
         if(view.TradeOffer!=null)return view.TradeOffer.NextResponder(view.PlayerId);

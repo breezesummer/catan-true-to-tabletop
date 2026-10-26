@@ -13,13 +13,14 @@ public sealed partial class M4App
     object smithingDraft;
     string[][] smithingPlans;
     string[] smithingSelected=Array.Empty<string>();
+    bool AllianceSmithingB6=>view.ThreeKingdoms?.PackageVersion==GeneralCatalog.B6PackageVersion;
     string[][] SmithingPlans()
     {
         if(!ReferenceEquals(smithingView,view))
         {
             smithingView=view;
             int maxTargets=GeneralCatalog.UsesB5Package(view.ThreeKingdoms?.PackageVersion)&&view.ThreeKingdoms.Players.Any(p=>p.PlayerId==seat&&p.ActiveGeneralId=="tk-g32")?4:2;
-            smithingPlans=TabletopSmithingSelection.Plans(view.Board.Knights.Where(k=>k.PlayerId==seat).Select(k=>k.LocationId).ToArray(),ids=>
+            smithingPlans=AllianceSmithingB6?view.LegalActions.Where(c=>c.Kind==CommandKind.PlayProgressCard&&c.ProgressCard==ProgressCardKind.Smithing&&c.TargetIds?.Length>0).Select(c=>c.TargetIds).ToArray():TabletopSmithingSelection.Plans(view.Board.Knights.Where(k=>SharesAllianceAssetsB6(k.PlayerId)).Select(k=>k.LocationId).ToArray(),ids=>
             {var c=New(CommandKind.PlayProgressCard);c.ProgressCard=ProgressCardKind.Smithing;c.TargetIds=ids;return Preview(c).Success;},maxTargets);
         }
         if(!ReferenceEquals(smithingDraft,draft)||!TabletopSmithingSelection.CanConfirm(smithingPlans,smithingSelected))
@@ -30,13 +31,14 @@ public sealed partial class M4App
     {
         var plans=SmithingPlans();
         var selected=smithingSelected.Contains(target)?smithingSelected:smithingSelected.Concat(new[]{target}).ToArray();
-        if(!TabletopSmithingSelection.CanConfirm(plans,selected))return null;
+        if(AllianceSmithingB6){selected=plans.FirstOrDefault(p=>p.Length==selected.Length&&p.All(selected.Contains));if(selected==null)return null;}
+        else if(!TabletopSmithingSelection.CanConfirm(plans,selected))return null;
         var command=New(CommandKind.PlayProgressCard);command.ProgressCard=ProgressCardKind.Smithing;command.TargetIds=selected;return command;
     }
     void ChooseSmithingTarget(string target,Command command)
     {
         smithingSelected=(string[])command.TargetIds.Clone();
-        bool more=TabletopSmithingSelection.NextTargets(smithingPlans,smithingSelected).Length>0;
+        bool more=AllianceSmithingB6?smithingPlans.Any(p=>p.Length>smithingSelected.Length&&smithingSelected.All(p.Contains)):TabletopSmithingSelection.NextTargets(smithingPlans,smithingSelected).Length>0;
         var choices=more?new[]{"确认晋升这 "+smithingSelected.Length+" 名骑士","继续点选骑士","重新选择"}:new[]{"确认晋升这 "+smithingSelected.Length+" 名骑士","重新选择"};
         var selectedDraft=draft;
         status="已选 "+smithingSelected.Length+" 名骑士；可以确认晋升"+(more?"或继续点选。":"。");ai.ShowTablePrompt(status);

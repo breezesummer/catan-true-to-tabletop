@@ -114,7 +114,7 @@ namespace Catan.Core.ThreeKingdoms
             var hand = host.GetHand(g.OwnerPlayerId); bool lossForbidden = IsB4HandLossForbidden(s, g.OwnerPlayerId);
             foreach (var target in s.SeatPlayerIds.Where(p => p != g.OwnerPlayerId))
             {
-                if (g.GeneralId == "tk-g26" && !lossForbidden && hand.Sum() > 0 && Value(g, "xiashu", s.Clock.PhaseId) == 0) AddB4TargetAction(s, actions, "tk-g26-s1", "b4-xiashu", "下书：交出全部手牌给 " + target, target);
+                if (g.GeneralId == "tk-g26" && !lossForbidden && hand.Sum() > 0 && CanGainCardsB6(s,target,hand) && Value(g, "xiashu", s.Clock.PhaseId) == 0) AddB4TargetAction(s, actions, "tk-g26-s1", "b4-xiashu", "下书：交出全部手牌给 " + target, target);
                 if (g.GeneralId == "tk-g39" && hand.Sum() > 0) AddB4TargetAction(s, actions, "tk-g39-s1", "b4-quhu", "驱虎：声明并令 " + target + " 猜测", target);
                 if (g.GeneralId == "tk-g45" && host.GetHand(target).Sum() > 0 && !IsProtected(s, target) && !IsB4HandLossForbidden(s, target)) AddB4TargetAction(s, actions, "tk-g45-s1", "b4-wenji", "问计：令 " + target + " 交给一张牌", target);
                 if (g.GeneralId == "tk-g40" && Value(g, "daoshu", s.Clock.PhaseId) == 0 && host.GetHand(target).Sum() > 0 && !IsProtected(s, target) && !IsB4HandLossForbidden(s, target))
@@ -203,7 +203,7 @@ namespace Catan.Core.ThreeKingdoms
             }
             if (f.Kind == "b4-jieming")
             {
-                if (f.Remaining > 0 && !IsDrawBlocked(s, f.PlayerId) && host.GetBank().Take(5).Sum() > 0) { Decide(s, f, "card", "节命：自选资源", "还可选择 " + f.Remaining + " 张资源。其余随机领取。"); waiting = true; return true; }
+                if (f.Remaining > 0 && !IsDrawBlocked(s, f.PlayerId) && Enumerable.Range(0,5).Any(t=>CanGainB6(s,f.PlayerId,t)&&host.GetBank()[t]>0)) { Decide(s, f, "card", "节命：自选资源", "还可选择 " + f.Remaining + " 张资源。其余随机领取。"); waiting = true; return true; }
                 Add(f.Cards, TakeRandom(host, f.PlayerId, f.Step)); Remove(s, f); Gain(host, f.PlayerId, f.Cards, f.SkillId, f.Id); return true;
             }
             if (f.Kind == "b4-miewu-progress" || f.Kind == "b4-xiemu")
@@ -215,7 +215,7 @@ namespace Catan.Core.ThreeKingdoms
             }
             if (f.Kind == "b4-xiashu")
             {
-                if (f.Step == 0) { f.Step = 1; B4Transfer(host, f.PlayerId, f.Targets[0], host.GetHand(f.PlayerId), f.Id + ":give", f.SkillId, true); return true; }
+                if (f.Step == 0) {if(!CanGainCardsB6(s,f.Targets[0],host.GetHand(f.PlayerId))){Remove(s,f);return true;} f.Step = 1; B4Transfer(host, f.PlayerId, f.Targets[0], host.GetHand(f.PlayerId), f.Id + ":give", f.SkillId, true); return true; }
                 if (f.Step == 1) { f.PlayerId = f.Targets[0]; Decide(s, f, "b4-reveal", "下书：选择亮出的手牌", "可亮出零张、部分或全部；未亮出的牌仍保密。"); waiting = true; return true; }
                 f.PlayerId = f.B4.OwnerPlayerId; Decide(s, f, "b4-pile", "下书：选择一堆", "选择亮出的手牌或未亮出的手牌。"); waiting = true; return true;
             }
@@ -225,7 +225,7 @@ namespace Catan.Core.ThreeKingdoms
                 if (f.Step == 1) { Decide(s, f, "b4-declare", "驱虎：声明小麦数量", "所选牌尚未公开；声明其中真实小麦的数量。"); waiting = true; return true; }
                 f.PlayerId = f.Targets[0]; Decide(s, f, "b4-guess", "驱虎：猜测声明真假", "对方暗选 " + f.B4.Selection.Sum() + " 张手牌，声明其中有 " + f.B4.DeclaredType + " 张小麦。"); waiting = true; return true;
             }
-            if (f.Kind == "b4-wenji") { f.PlayerId = f.Targets[0]; if (host.GetHand(f.PlayerId).Sum() == 0 || IsProtected(s, f.PlayerId)) { Remove(s, f); return true; } Decide(s, f, "b4-give", "问计：交给一张手牌", "选择一张真实资源或商品交给 " + f.B4.OwnerPlayerId + "。"); waiting = true; return true; }
+            if (f.Kind == "b4-wenji") { f.PlayerId = f.Targets[0]; if (!Enumerable.Range(0,8).Any(t=>host.GetHand(f.PlayerId)[t]>0&&CanGainB6(s,f.B4.OwnerPlayerId,t)) || IsProtected(s, f.PlayerId)) { Remove(s, f); return true; } Decide(s, f, "b4-give", "问计：交给一张手牌", "选择一张真实资源或商品交给 " + f.B4.OwnerPlayerId + "。"); waiting = true; return true; }
             throw new InvalidOperationException("未知 B4 效果帧：" + f.Kind);
         }
         private static bool AddB4DecisionActions(IThreeKingdomsCardHost host, B2SkillFrame f, B2SkillDecision d, List<B2SkillAction> actions)
@@ -242,7 +242,7 @@ namespace Catan.Core.ThreeKingdoms
             else if (d.Kind == "b4-declare") for (var number = 0; number <= f.B4.Selection.Sum(); number++) { var a = Action(s, f.SkillId, "b4-declare", "声明 " + number + " 张小麦", d); a.Command.CardType = number; actions.Add(a); }
             else if (d.Kind == "b4-guess") { actions.Add(Action(s, f.SkillId, "b4-true", "猜声明为真", d)); actions.Add(Action(s, f.SkillId, "b4-false", "猜声明为假", d)); }
             else if (d.Kind == "b4-pile") { actions.Add(Action(s, f.SkillId, "b4-revealed", "获得亮出的 " + f.B4.Selection.Sum() + " 张", d)); actions.Add(Action(s, f.SkillId, "b4-hidden", "获得未亮出的 " + (host.GetHand(f.Targets[0]).Sum() - f.B4.Selection.Sum()) + " 张", d)); }
-            else if (d.Kind == "b4-give") foreach (var type in Enumerable.Range(0, 8).Where(t => host.GetHand(f.PlayerId)[t] > 0)) { var a = Action(s, f.SkillId, "b4-give", "交给" + CardNames[type], d); a.Command.CardType = type; actions.Add(a); }
+            else if (d.Kind == "b4-give") foreach (var type in Enumerable.Range(0, 8).Where(t => host.GetHand(f.PlayerId)[t] > 0&&CanGainB6(s,f.B4.OwnerPlayerId,t))) { var a = Action(s, f.SkillId, "b4-give", "交给" + CardNames[type], d); a.Command.CardType = type; actions.Add(a); }
             return true;
         }
         private static bool ResolveB4Decision(IThreeKingdomsCardHost host, B2SkillFrame f, B2SkillDecision d, B2SkillCommand c)
@@ -301,7 +301,7 @@ namespace Catan.Core.ThreeKingdoms
         }
         private static void B4Transfer(IThreeKingdomsCardHost host, string from, string to, int[] cards, string eventId, string skill, bool given=false)
         {
-            if (cards.Sum() == 0 || IsB4HandLossForbidden(host.State, from)) return; Require(Contains(host.GetHand(from), cards), "转移牌不足。"); int before = host.GetHand(from).Sum(), targetBefore = host.GetHand(to).Sum();
+            if (!CanGainCardsB6(host.State,to,cards) || !given && !B6AllianceRules.CanAttack(host.State,to,from) || cards.Sum() == 0 || IsB4HandLossForbidden(host.State, from)) return; Require(Contains(host.GetHand(from), cards), "转移牌不足。"); int before = host.GetHand(from).Sum(), targetBefore = host.GetHand(to).Sum();
             host.RemoveHand(from, cards); host.AddHand(to, cards);
             RecordCards(host, eventId, new[] { new B2HandChange { PlayerId = from, BeforeCount = before, AfterCount = before - cards.Sum(), LostCount = cards.Sum(), GivenCount = given?cards.Sum():0, LostCards = Copy(cards), SourceSkillId = skill },
                 new B2HandChange { PlayerId = to, BeforeCount = targetBefore, AfterCount = targetBefore + cards.Sum(), GainedCards = Copy(cards), SourcePlayerId = from, SourceSkillId = skill } });

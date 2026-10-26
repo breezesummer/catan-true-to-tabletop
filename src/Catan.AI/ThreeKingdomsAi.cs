@@ -18,6 +18,12 @@ namespace Catan.AI
                 {
                     // 可支付的修复恢复既有资产，完成后该合法动作消失，不构成循环。
                     if (c.Option == "b5-repair") return 15;
+                    if(GeneralCatalog.UsesB6Package(view.PackageVersion))
+                    {
+                        if(c.Option=="seat-jinglue")return 14;
+                        if(c.Option=="seat-fuqi")return 8;
+                        if(c.Option=="map-tamo"||c.Option=="seat-baiyi")return 2;
+                    }
                     // 仁德不限次是规则；本策略暂不主动赠牌，避免无限赠予循环。
                     if (c.Option == "gift" || c.Option == "exchange-progress") return double.NegativeInfinity;
                     if (c.Option == "discard") return hand.Sum() == 1 ? 15 : double.NegativeInfinity;
@@ -40,6 +46,13 @@ namespace Catan.AI
                 switch (c.Option)
                 {
                     // 尚未建立地块收益评估时保留真实牌和限定次数；允许人工完整操作。
+                    case "seat-cancel": return -50;
+                    case "alliance-b6-reject": return -40;
+                    case "alliance-b6-reset": return -50;
+                    case "alliance-b6-offer": return 20;
+                    case "seat-fuqi-submit": return c.SecondaryCounts?.Sum()==2?30:1;
+                    case "seat-jinglue-take":
+                    case "seat-fuqi-request": return c.CardType>=0&&c.CardType<8?Math.Max(0,desired[c.CardType]-hand[c.CardType])*20+6:5;
                     case "modify": return -200;
                     case "fixed": return -200;
                     case "skip": return -100;

@@ -30,6 +30,14 @@ namespace Catan.Core.ThreeKingdoms
                 string specific=null;
                 switch(id)
                 {
+                    case "tk-g04-s1":summary=Remaining(general,"huoxin",0);if(Left(general,"huoxin",0)==0)specific="本任惑心次数已用。";break;
+                    case "tk-g46-s1":summary="剩余 "+Left(general,"fuqi",phase,2)+" / 2";if(Left(general,"fuqi",phase,2)==0)specific="本出牌阶段伏骑次数已用。";break;
+                    case "tk-g46-s2":int adjustment=B2SkillEngine.JiaoziAdjustmentB6(host,viewerId);summary=adjustment>0?"建造费用 +1":adjustment<0?"建造费用 −1":"建造费用不变";break;
+                    case "tk-g47-s1":summary=Remaining(general,"tamo",0);if(Left(general,"tamo",0)==0)specific="本任榻谟次数已用。";break;
+                    case "tk-g48-s1":summary=Remaining(general,"baiyi",0);if(Left(general,"baiyi",0)==0)specific="本任败移次数已用。";break;
+                    case "tk-g48-s2":summary=Remaining(general,"jinglue",phase);if(Left(general,"jinglue",phase)==0)specific="本出牌阶段景略次数已用。";break;
+                    case "tk-g50-s1":summary="盟友 "+(B6AllianceRules.Members(state,viewerId).Length-1)+" / "+(state.SeatPlayerIds.Length/2);break;
+                    case "tk-g50-s2":summary="对敌效果 ×2";break;
                     case "tk-g05-s1":summary=Remaining(general,"liuli",phase);if(Left(general,"liuli",phase)==0)specific="本出牌阶段流离次数已用。";else if(host.GetHand(viewerId)[3]<1)specific="需要1张真实麦子。";break;
                     case "tk-g05-s2":summary=Remaining(general,"guose",phase);if(Left(general,"guose",phase)==0)specific="本出牌阶段国色次数已用。";else if(host.GetHand(viewerId)[1]<2)specific="需要2张真实砖。";break;
                     case "tk-g08-s2":summary=Remaining(general,"poxi",phase);if(Left(general,"poxi",phase)==0)specific="本阶段已提交魄袭目标，次数不会因重选退回。";break;

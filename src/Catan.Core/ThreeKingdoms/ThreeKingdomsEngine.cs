@@ -13,6 +13,7 @@ namespace Catan.Core.ThreeKingdoms
                 && seatPlayerIds.All(x => !string.IsNullOrWhiteSpace(x)) && seatPlayerIds.Distinct().Count() == seatPlayerIds.Length,
                 "三国开发骨架需要三个或四个不同席位。");
             Require(draw != null, "缺少权威随机流。");
+            bool b6 = skillsEnabled && packageVersion == GeneralCatalog.B6PackageVersion;
             bool b5 = skillsEnabled && GeneralCatalog.UsesB5Package(packageVersion);
             bool b5Direct = skillsEnabled && packageVersion == GeneralCatalog.B5DirectPackageVersion;
             bool b4 = skillsEnabled && GeneralCatalog.IsAutomaticPackage(packageVersion);
@@ -22,16 +23,16 @@ namespace Catan.Core.ThreeKingdoms
                 skillsEnabled && (packageVersion == GeneralCatalog.B2PackageVersion || packageVersion == GeneralCatalog.B3PackageVersion || b4), "不支持的三国武将包。");
             var state = new ThreeKingdomsState
             {
-                RulesVersion = b5Direct ? GeneralCatalog.B5DirectRulesVersion : b5 ? GeneralCatalog.B5RulesVersion : b45 ? GeneralCatalog.B45RulesVersion : b4 ? GeneralCatalog.B4RulesVersion : b3 ? GeneralCatalog.B3RulesVersion : skillsEnabled ? GeneralCatalog.B2RulesVersion : GeneralCatalog.RulesVersion,
-                PackageVersion = b5Direct ? GeneralCatalog.B5DirectPackageVersion : b5 ? GeneralCatalog.B5PackageVersion : b45 ? GeneralCatalog.B45PackageVersion : b4 ? GeneralCatalog.B4PackageVersion : b3 ? GeneralCatalog.B3PackageVersion : skillsEnabled ? GeneralCatalog.B2PackageVersion : GeneralCatalog.PackageVersion,
-                PackageContentHash = b5Direct ? GeneralCatalog.B5DirectContentHash : b5 ? GeneralCatalog.B5ContentHash : b45 ? GeneralCatalog.B45ContentHash : b4 ? GeneralCatalog.B4ContentHash : b3 ? GeneralCatalog.B3ContentHash : skillsEnabled ? GeneralCatalog.B2ContentHash : GeneralCatalog.ContentHash,
+                RulesVersion = b6 ? GeneralCatalog.B6RulesVersion : b5Direct ? GeneralCatalog.B5DirectRulesVersion : b5 ? GeneralCatalog.B5RulesVersion : b45 ? GeneralCatalog.B45RulesVersion : b4 ? GeneralCatalog.B4RulesVersion : b3 ? GeneralCatalog.B3RulesVersion : skillsEnabled ? GeneralCatalog.B2RulesVersion : GeneralCatalog.RulesVersion,
+                PackageVersion = b6 ? GeneralCatalog.B6PackageVersion : b5Direct ? GeneralCatalog.B5DirectPackageVersion : b5 ? GeneralCatalog.B5PackageVersion : b45 ? GeneralCatalog.B45PackageVersion : b4 ? GeneralCatalog.B4PackageVersion : b3 ? GeneralCatalog.B3PackageVersion : skillsEnabled ? GeneralCatalog.B2PackageVersion : GeneralCatalog.PackageVersion,
+                PackageContentHash = b6 ? GeneralCatalog.B6ContentHash : b5Direct ? GeneralCatalog.B5DirectContentHash : b5 ? GeneralCatalog.B5ContentHash : b45 ? GeneralCatalog.B45ContentHash : b4 ? GeneralCatalog.B4ContentHash : b3 ? GeneralCatalog.B3ContentHash : skillsEnabled ? GeneralCatalog.B2ContentHash : GeneralCatalog.ContentHash,
                 SkillsEnabled = skillsEnabled, InitialSeed = initialSeed, Skills = skillsEnabled ? new B2SkillState() : null,
                 Board = b5 ? new B5BoardState() : null,
                 Military = b5 ? new B5MilitaryState() : null,
                 CivilB5 = b5 ? new B5CivilState() : null,
                 SeatPlayerIds = (string[])seatPlayerIds.Clone(),
                 Players = seatPlayerIds.Select(id => new ThreeKingdomsPlayer { PlayerId = id }).ToArray(),
-                Generals = (b5 ? GeneralCatalog.B5Definitions : b4 ? GeneralCatalog.B4Definitions : b3 ? GeneralCatalog.EnabledDefinitions : skillsEnabled ? GeneralCatalog.B2Definitions : GeneralCatalog.Definitions).Select(g => new GeneralInstance
+                Generals = (b6 ? GeneralCatalog.B6Definitions : b5 ? GeneralCatalog.B5Definitions : b4 ? GeneralCatalog.B4Definitions : b3 ? GeneralCatalog.EnabledDefinitions : skillsEnabled ? GeneralCatalog.B2Definitions : GeneralCatalog.Definitions).Select(g => new GeneralInstance
                     { GeneralId = g.Id, InstanceId = "tk-card-" + g.Id.Substring(4), Region = GeneralRegion.Pool }).ToArray(),
                 Clock = new ThreeKingdomsClock { Phase = ThreeKingdomsPhase.OpeningSelection, ActivePlayerId = seatPlayerIds[0] }
             };
@@ -81,7 +82,9 @@ namespace Catan.Core.ThreeKingdoms
                 Response = B2SkillEngine.CloneB4Response(state.Response),
                 Board = B2SkillEngine.CloneB5Board(state.Board),
                 Military = B2SkillEngine.CloneB5Military(state.Military),
-                CivilB5 = B2SkillEngine.CloneB5Civil(state.CivilB5)
+                CivilB5 = B2SkillEngine.CloneB5Civil(state.CivilB5),
+                ControlB6 = B2SkillEngine.CloneControlB6(state.ControlB6),
+                AllianceB6 = B2SkillEngine.CloneB6Alliance(state.AllianceB6)
             };
         }
 
@@ -224,7 +227,7 @@ namespace Catan.Core.ThreeKingdoms
         public static void Finish(ThreeKingdomsState state)
         {
             if (state == null) return;
-            state.PendingDecision = null;
+            state.PendingDecision = null; state.ControlB6=null;
             if (UsesB4Lifecycle(state)) { state.PendingDecisions = Array.Empty<ThreeKingdomsDecision>(); state.Automation=null; }
             SetPhase(state, ThreeKingdomsPhase.Finished);
         }
@@ -253,7 +256,7 @@ namespace Catan.Core.ThreeKingdoms
             return new ThreeKingdomsView
             {
                 PackageVersion = state.PackageVersion, PackageContentHash = state.PackageContentHash,
-                PackageLabel = state.RulesVersion == GeneralCatalog.B5DirectRulesVersion ? GeneralCatalog.B5DirectPackageLabel : state.RulesVersion == GeneralCatalog.B5RulesVersion ? GeneralCatalog.B5PackageLabel : state.RulesVersion == GeneralCatalog.B45RulesVersion ? GeneralCatalog.B45PackageLabel : UsesB4Lifecycle(state) ? GeneralCatalog.B4PackageLabel : state.RulesVersion == GeneralCatalog.B3RulesVersion ? GeneralCatalog.B3PackageLabel : state.SkillsEnabled ? GeneralCatalog.B2PackageLabel : GeneralCatalog.PackageLabel,
+                PackageLabel = state.RulesVersion == GeneralCatalog.B6RulesVersion ? GeneralCatalog.B6PackageLabel : state.RulesVersion == GeneralCatalog.B5DirectRulesVersion ? GeneralCatalog.B5DirectPackageLabel : state.RulesVersion == GeneralCatalog.B5RulesVersion ? GeneralCatalog.B5PackageLabel : state.RulesVersion == GeneralCatalog.B45RulesVersion ? GeneralCatalog.B45PackageLabel : UsesB4Lifecycle(state) ? GeneralCatalog.B4PackageLabel : state.RulesVersion == GeneralCatalog.B3RulesVersion ? GeneralCatalog.B3PackageLabel : state.SkillsEnabled ? GeneralCatalog.B2PackageLabel : GeneralCatalog.PackageLabel,
                 SkillsEnabled = state.SkillsEnabled, WindowId = decision?.WindowId ?? state.WindowId,
                 Clock = CopyClock(state.Clock), PendingDecision = decision, OpeningComplete = state.OpeningComplete,
                 PoolCount = state.Generals.Count(g => g.Region == GeneralRegion.Pool),
@@ -343,6 +346,7 @@ namespace Catan.Core.ThreeKingdoms
             general.Counters = Array.Empty<GeneralCounter>();
             B2SkillEngine.OnB4GeneralActivated(state, general);
             B2SkillEngine.OnB5MilitaryGeneralActivated(state, general);
+            B2SkillEngine.OnAllianceB6GeneralActivated(state,general);
             B2SkillEngine.OnCivilGeneralActivated(state, general);
         }
 
@@ -466,6 +470,7 @@ namespace Catan.Core.ThreeKingdoms
         public static bool HasSupportedPackage(ThreeKingdomsState state)
         {
             if (state == null) return true;
+            if (state.RulesVersion == GeneralCatalog.B6RulesVersion) return state.SkillsEnabled && state.PackageVersion == GeneralCatalog.B6PackageVersion && state.PackageContentHash == GeneralCatalog.B6ContentHash;
             if (state.RulesVersion == GeneralCatalog.B5DirectRulesVersion) return state.SkillsEnabled && state.PackageVersion == GeneralCatalog.B5DirectPackageVersion
                 && state.PackageContentHash == GeneralCatalog.B5DirectContentHash;
             if (state.RulesVersion == GeneralCatalog.B5RulesVersion) return state.SkillsEnabled && state.PackageVersion == GeneralCatalog.B5PackageVersion
@@ -485,6 +490,7 @@ namespace Catan.Core.ThreeKingdoms
             var errors = new List<string>();
             if (state == null) return errors.ToArray();
             bool b4 = UsesB4Lifecycle(state);
+            bool b6 = state.RulesVersion == GeneralCatalog.B6RulesVersion;
             bool b5 = GeneralCatalog.UsesB5Rules(state.RulesVersion);
             bool b3 = state.SkillsEnabled && state.RulesVersion == GeneralCatalog.B3RulesVersion;
             if (!HasSupportedPackage(state))
@@ -500,8 +506,8 @@ namespace Catan.Core.ThreeKingdoms
                 || state.Players.Length != state.SeatPlayerIds.Length || state.Players.Any(p => p == null || !state.SeatPlayerIds.Contains(p.PlayerId))
                 || state.Players.Select(p => p?.PlayerId).Distinct().Count() != state.Players.Length)
                 errors.Add("三国固定座位或玩家身份不合法。");
-            if (state.Generals.Length != (b5 ? GeneralCatalog.B5Definitions.Length : b4 ? GeneralCatalog.B4Definitions.Length : b3 ? GeneralCatalog.EnabledDefinitions.Length : state.SkillsEnabled ? GeneralCatalog.B2Definitions.Length : GeneralCatalog.Definitions.Length)
-                || state.Generals.Any(g => g == null || state.SkillsEnabled && !(b5 ? GeneralCatalog.IsB5Enabled(g.GeneralId) : b4 ? GeneralCatalog.IsB4Enabled(g.GeneralId) : b3 ? GeneralCatalog.IsEnabled(g.GeneralId) : GeneralCatalog.IsB2Enabled(g.GeneralId)))
+            if (state.Generals.Length != (b6 ? GeneralCatalog.B6Definitions.Length : b5 ? GeneralCatalog.B5Definitions.Length : b4 ? GeneralCatalog.B4Definitions.Length : b3 ? GeneralCatalog.EnabledDefinitions.Length : state.SkillsEnabled ? GeneralCatalog.B2Definitions.Length : GeneralCatalog.Definitions.Length)
+                || state.Generals.Any(g => g == null || state.SkillsEnabled && !(b6 ? GeneralCatalog.IsB6Enabled(g.GeneralId) : b5 ? GeneralCatalog.IsB5Enabled(g.GeneralId) : b4 ? GeneralCatalog.IsB4Enabled(g.GeneralId) : b3 ? GeneralCatalog.IsEnabled(g.GeneralId) : GeneralCatalog.IsB2Enabled(g.GeneralId)))
                 || state.Generals.Select(g => g?.GeneralId).Distinct().Count() != state.Generals.Length
                 || state.Generals.Select(g => g?.InstanceId).Distinct().Count() != state.Generals.Length)
                 return errors.Concat(new[] { "武将实体缺失或重复。" }).ToArray();

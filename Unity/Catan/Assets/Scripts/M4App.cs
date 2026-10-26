@@ -16,7 +16,9 @@ public sealed partial class M4App : MonoBehaviour
     M4LocalGameHost host;
     PlayerView view;
     M4BoardRenderer board;
-    string seat="P1",nextSeat="P1",status="请确认席位，开始城市与骑士。",layout="",pickField="",pickType="V";
+    string viewerSeat="P1";
+    string seat {get=>view?.ViewerPlayerId!=null?view.PlayerId:viewerSeat;set=>viewerSeat=value;}
+    string nextSeat="P1",status="请确认席位，开始城市与骑士。",layout="",pickField="",pickType="V";
     bool curtain=true,newGame,terrain=true;
     int tab;
     Vector2 scroll;
@@ -51,7 +53,8 @@ public sealed partial class M4App : MonoBehaviour
         button=new GUIStyle(GUI.skin.button){font=font,fontSize=15,wordWrap=true};
         paperLabel=new GUIStyle(label);paperLabel.normal.textColor=new Color(.24f,.12f,.06f);paperSmall=new GUIStyle(paperLabel){fontSize=13};
     }
-    public static string Actor(PlayerView v)
+    public static string Actor(PlayerView v) => Catan.Core.ThreeKingdoms.B2SkillEngine.ControllerForViewB6(v.ThreeKingdoms,AssetActorB6(v));
+    static string AssetActorB6(PlayerView v)
     {
         if(v.ThreeKingdoms?.PendingDecision!=null)return v.ThreeKingdoms.PendingDecision.PlayerId;
         if(v.ThreeKingdoms?.SkillDecision!=null)return v.ThreeKingdoms.SkillDecision.PlayerId;
@@ -65,9 +68,10 @@ public sealed partial class M4App : MonoBehaviour
         dock.Reset();nextSeat=target;curtain=true;view=null;draft=null;pickField="";scroll=Vector2.zero;tab=0;artOpen=false;cardArt.Clear();board.ClearPreview();
         status="手牌与私有选择已遮蔽，请将设备交给 "+target+"。";
     }
-    public void ConfirmSeat(){dock.Reset();seat=nextSeat;curtain=false;view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);Refresh(view);}
+    public void ConfirmSeat(){dock.Reset();seat=nextSeat;curtain=false;view=NetworkGame?ai.Network.View<PlayerView>():host.View(viewerSeat);Refresh(view);}
     public CommandResult Submit(Command command)
     {
+        CitiesKnightsGameSession.StampControlB6(view,command);
         if(TryBeginDirectPayment(command))return null;
         if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status=ai.Network.Status;return null;}
         bool ownGeneralChoice=(command.Kind==CommandKind.ChooseGenerals||command.Kind==CommandKind.DeployGeneral)&&view?.ThreeKingdoms?.PendingDecision?.PlayerId==command.PlayerId;
@@ -76,13 +80,13 @@ public sealed partial class M4App : MonoBehaviour
         command.Id=string.IsNullOrEmpty(command.Id)?Guid.NewGuid().ToString("N"):command.Id;
         if(view?.ThreeKingdoms!=null&&string.IsNullOrEmpty(command.WindowId))command.WindowId=view.ThreeKingdoms.WindowId;
         dock.Reset();CancelOperationDraft();var result=host.Submit(command);status=result.Success?"操作完成。":result.Message;
-        if(ai!=null&&result.Success&&ai.PresentPlayedCard(host.History(seat),M6Refresh))return result;
-        pickField="";board.ClearPreview();view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);Refresh(view);
+        if(ai!=null&&result.Success&&ai.PresentPlayedCard(host.History(viewerSeat),M6Refresh))return result;
+        pickField="";board.ClearPreview();view=NetworkGame?ai.Network.View<PlayerView>():host.View(viewerSeat);Refresh(view);
         if(result.Success)
         {
             draft=null;
             if(view.Phase==GamePhase.Finished)status=view.WinnerPlayerId+" 达到 "+view.TargetVictoryPoints+" 分，本局结束。";
-            else if(ai==null&&Actor(view)!=seat)SwitchSeat(Actor(view));
+            else if(ai==null&&Actor(view)!=viewerSeat)SwitchSeat(Actor(view));
         }
         return result;
     }
@@ -93,7 +97,7 @@ public sealed partial class M4App : MonoBehaviour
         using var frameCost=FrameCost.Measure(FrameCost.Stage.BoardRefresh);
         mapChoice.Clear();
         ai?.ObservePlayerOrder(v.StartingPlayerId,v.Players.Select(p=>p.Id));
-        string next=string.Join("|",v.Board.Tiles.Select(t=>t.Id+":"+t.Resource));
+        string next=string.Join("|",v.Board.Tiles.Select(t=>t.Id+":"+t.Resource+":"+t.Number))+"|"+string.Join("|",v.Board.Ports.Select(p=>p.Id+":"+p.Resource+":"+string.Join(",",p.Vertices)));
         if(board==null||next!=layout)
         {
             bool top=board!=null&&board.TopView;float zoom=board==null?.255f:board.Zoom;
@@ -526,7 +530,7 @@ public sealed partial class M4App : MonoBehaviour
     internal void M6Refresh(){
         if(NetworkGame&&ai.WaitForPresentationHistory(ai.Network.View<PlayerView>()?.Events.LastOrDefault()?.Sequence??0,M6Refresh))return;
         if(ai.PresentPlayedCard(NetworkGame?ai.Network.History:host.History(ai.HumanSeat),M6Refresh))return;
-        dock.Reset();seat=ai.HumanSeat;nextSeat=seat;curtain=false;if(NetworkGame)cardArt.Clear();view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);CancelOperationDraft();Refresh(view);status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，从面前拿起棋子与卡牌，或点击地图上的己方棋子。":ai.WaitingText;}
+        dock.Reset();seat=ai.HumanSeat;nextSeat=viewerSeat;curtain=false;if(NetworkGame)cardArt.Clear();view=NetworkGame?ai.Network.View<PlayerView>():host.View(viewerSeat);CancelOperationDraft();Refresh(view);status=view.Phase==GamePhase.Finished?view.WinnerPlayerId+" 获胜。":ai.IsHumanTurn?"轮到 "+seat+"，从面前拿起棋子与卡牌，或点击地图上的己方棋子。":ai.WaitingText;}
     internal void M6Visible(bool value){if(board!=null)board.gameObject.SetActive(value);}
     internal void M6Close(){enabled=false;if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}Destroy(this);}
     public M4BoardRenderer VerificationBoard=>board;
@@ -541,6 +545,7 @@ public sealed partial class M4App : MonoBehaviour
     M7Preview Preview(Command command)
     {
         if(view?.ThreeKingdoms!=null&&string.IsNullOrEmpty(command.WindowId))command.WindowId=view.ThreeKingdoms.WindowId;
+        CitiesKnightsGameSession.StampControlB6(view,command);
         if(NetworkGame)return ai.Network.Preview(command);
         var result=host.Preview(command);return new M7Preview(result.Success,result.Message);
     }

@@ -27,6 +27,8 @@ namespace Catan.Core.M4
             {
                 var next=s.DecisionQueue[0];s.DecisionQueue=s.DecisionQueue.Skip(1).ToArray();
                 if(B3PendingImmune(s,next))continue;
+                if(next.Kind=="Aqueduct"&&B2SkillEngine.B6Enabled(s.ThreeKingdoms)&&!Resources.Any(r=>s.Bank[r]>0&&B2SkillEngine.CanGainB6(s.ThreeKingdoms,next.PlayerId,(int)r)))continue;
+                if(next.Kind=="DisplacedKnight"&&next.AllianceReturnHome){next.Options=B6AllianceHomeVertices(s,next.PlayerId);if(next.Options.Length==0)continue;}
                 if(next.Kind=="B5InvasionComplete") {B5CompleteInvasion(s,next.AnchorVertexId);continue;}
                 if(next.Kind=="ProgressDraw") {DrawProgressCard(s,s.Players.Single(p=>p.Id==next.PlayerId),next.Track);CheckVictory(s);if(s.Phase==GamePhase.Finished)return;continue;}
                 if(next.Kind=="BarbarianReturnHome") {foreach(var knight in s.Knights)knight.Active=false;s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;continue;}
@@ -64,7 +66,7 @@ namespace Catan.Core.M4
             }
             if(B2(s)) { s.Phase=GamePhase.Action; return; }
             var before=s.Players.ToDictionary(p=>p.Id,HandCount); Produce(s,total); s.Phase=GamePhase.Action;
-            foreach(var p in TurnOrder(s).Where(p=>p.Improvements[(int)ImprovementTrack.Science]>=3&&HandCount(p)==before[p.Id]))
+            foreach(var p in TurnOrder(s).Where(p=>B6Technology(s,p.Id,(int)ImprovementTrack.Science)>=3&&HandCount(p)==before[p.Id]))
                 if(s.Bank.Total>0) QueueDecision(s,new PendingDecision {Kind="Aqueduct",PlayerId=p.Id,ReturnPhase=GamePhase.Action});
             if(s.DecisionQueue.Length>0) ContinueDecisions(s);
         }
@@ -72,7 +74,7 @@ namespace Catan.Core.M4
         {
             if(B5(s)){B5Invasion(s,"formal-invasion-"+s.ThreeKingdoms.Clock.TurnInstanceId,s.Players.Select(p=>p.Id).ToArray(),false);return;}
             s.FirstBarbarianAttack=true;
-            if(s.RobberTileId==null) s.RobberTileId=scenario.Topology.Tiles.Single(t=>t.Resource=="desert").Id;
+            if(s.RobberTileId==null) s.RobberTileId=s.Tiles.Single(t=>t.Resource=="desert").Id;
             var strength=s.Players.ToDictionary(p=>p.Id,p=>s.Knights.Where(k=>k.PlayerId==p.Id&&k.Active).Sum(k=>k.Level));
             s.BarbarianAttackStrength=s.Cities.Length;
             s.BarbarianDefenseStrength=strength.Values.Sum();
@@ -101,7 +103,7 @@ namespace Catan.Core.M4
             if(B3PendingImmune(s,d)) { ContinueDecisions(s); return; }
             switch(d.Kind)
             {
-                case "Aqueduct": Require(Enum.IsDefined(typeof(Resource),c.Resource),"InvalidResource","请选择资源。"); Transfer(s.Bank,p.Resources,c.Resource,1); break;
+                case "Aqueduct": Require(Enum.IsDefined(typeof(Resource),c.Resource),"InvalidResource","请选择资源。"); Require(B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,(int)c.Resource),"GainForbidden","当前不能获得这种牌。"); Transfer(s.Bank,p.Resources,c.Resource,1); break;
                 case "B5MetropolisRelocate": B5ResolveMetropolis(s,p,c,d); break;
                 case "PillageCity":
                     if(B5(s)&&B5BoardRules.CollapseProtected(s.ThreeKingdoms,p.Id))break;
@@ -128,14 +130,14 @@ namespace Catan.Core.M4
             Require(replacement||!s.DowngradedCities.Any(x=>x.PlayerId==p.Id),"RestorePillagedCityFirst","必须先恢复倒置的城市。");
             Require(p.Pieces.Cities>0||replacement,"NoCities","城市库存不足。");
             Require(s.Settlements.Any(x=>x.PlayerId==p.Id&&x.LocationId==target),"NotOwnSettlement","只能升级自己的村庄。");
-            Pay(s,p,new ResourceBag {Wheat=wheat,Ore=ore}); s.Settlements=s.Settlements.Where(x=>x.LocationId!=target).ToArray(); s.Cities=Append(s.Cities,Placement(target,p.Id));
+            if(replacement)Pay(s,p,new ResourceBag {Wheat=wheat,Ore=ore});else PayB6Construction(s,p,new ResourceBag {Wheat=wheat,Ore=ore},new ResourceBag {Wheat=2,Ore=3}); s.Settlements=s.Settlements.Where(x=>x.LocationId!=target).ToArray(); s.Cities=Append(s.Cities,Placement(target,p.Id));
             if(replacement) s.DowngradedCities=s.DowngradedCities.Where(x=>x.LocationId!=target).ToArray(); else {p.Pieces.Cities--;p.Pieces.Settlements++;}
         }
         private void BuildWall(GameState s,PlayerState p,string target,bool free=false)
         {
             Require(s.Walls.Count(w=>w.PlayerId==p.Id)<3,"NoWalls","城墙库存不足。");
             Require(s.Cities.Any(x=>x.PlayerId==p.Id&&x.LocationId==target)&&!s.Walls.Any(w=>w.LocationId==target),"InvalidWallCity","请选择没有城墙的己方城市。");
-            if(!free) Pay(s,p,new ResourceBag {Brick=2}); s.Walls=Append(s.Walls,Placement(target,p.Id));
+            if(!free) PayB6Construction(s,p,new ResourceBag {Brick=2},new ResourceBag {Brick=2}); s.Walls=Append(s.Walls,Placement(target,p.Id));
         }
         private void BuildImprovement(GameState s,PlayerState p,ImprovementTrack track,int discount=0)
         {
@@ -154,7 +156,7 @@ namespace Catan.Core.M4
             if(acquire) {QueueDecision(s,new PendingDecision {Kind="Metropolis",PlayerId=p.Id,Track=track,Options=cities}); ContinueDecisions(s);}
         }
         private bool Occupied(GameState s,string vertex) => Buildings(s).Any(b=>b.LocationId==vertex)||s.Knights.Any(k=>k.LocationId==vertex);
-        private bool Blocked(GameState s,string player,string vertex) => Buildings(s).Any(b=>b.PlayerId!=player&&b.LocationId==vertex)||s.Knights.Any(k=>k.PlayerId!=player&&k.LocationId==vertex);
+        private bool Blocked(GameState s,string player,string vertex) => Buildings(s).Any(b=>!B6AllianceRules.Allies(s.ThreeKingdoms,player,b.PlayerId)&&b.LocationId==vertex)||s.Knights.Any(k=>!B6ControlsKnight(s,player,k)&&k.LocationId==vertex);
         private void RecruitKnight(GameState s,PlayerState p,string target)
         {
             B5ValidateNative(s,new Command{PlayerId=p.Id,Kind=CommandKind.RecruitKnight,TargetId=target});
@@ -163,19 +165,19 @@ namespace Catan.Core.M4
             Require(s.Knights.Count(k=>k.PlayerId==p.Id&&k.Level==1)<2,"NoBasicKnights","基础骑士库存不足。");
             Pay(s,p,new ResourceBag {Wool=1,Ore=1}); s.Knights=Append(s.Knights,new Knight {PlayerId=p.Id,LocationId=target,Level=1,Active=false,ActivatedTurn=B5(s)?s.Turn:0,ActedTurn=B5(s)?-1:0});
         }
-        private Knight OwnKnight(GameState s,PlayerState p,string target) {var knight=s.Knights.FirstOrDefault(k=>k.PlayerId==p.Id&&k.LocationId==target);Require(knight!=null,"NotOwnKnight","请选择己方骑士。");return knight;}
+        private Knight OwnKnight(GameState s,PlayerState p,string target) {var knight=s.Knights.FirstOrDefault(k=>B6ControlsKnight(s,p.Id,k)&&k.LocationId==target);Require(knight!=null,"NotOwnKnight","请选择己方骑士。");return knight;}
         private void PromoteKnight(GameState s,PlayerState p,string target)
         {
             var knight=OwnKnight(s,p,target); Require(knight.Level<3&&knight.PromotedTurn!=s.Turn,"CannotPromote","每位骑士每回合只能晋升一次。");
-            Require(knight.Level<2||p.Improvements[(int)ImprovementTrack.Politics]>=3,"FortressRequired","晋升强大骑士需要三级政治改良。");
-            Require(s.Knights.Count(k=>k.PlayerId==p.Id&&k.Level==knight.Level+1)<2,"NoKnightSupply","晋升等级的骑士库存不足。");
+            Require(knight.Level<2||B6Technology(s,p.Id,(int)ImprovementTrack.Politics)>=3,"FortressRequired","晋升强大骑士需要三级政治改良。");
+            Require(s.Knights.Count(k=>k.PlayerId==knight.PlayerId&&k.Level==knight.Level+1)<2,"NoKnightSupply","晋升等级的骑士库存不足。");
             Pay(s,p,new ResourceBag {Wool=1,Ore=1}); knight.Level++;knight.PromotedTurn=s.Turn;
         }
         private void ActivateKnight(GameState s,PlayerState p,string target) {var knight=OwnKnight(s,p,target);Require(!knight.Active,"AlreadyActive","骑士已经激活。");Pay(s,p,new ResourceBag {Wheat=1});knight.Active=true;knight.ActivatedTurn=s.Turn;}
         private HashSet<string> ReachableKnightVertices(GameState s,string player,string source)
         {
             var seen=new HashSet<string> {source};var queue=new Queue<string>();queue.Enqueue(source);
-            while(queue.Count>0) {var v=queue.Dequeue();foreach(var edge in s.Roads.Where(r=>r.PlayerId==player&&B5Working(s,"Road",r.LocationId)).Select(r=>EdgeAt(r.LocationId)).Where(e=>e.Vertices.Contains(v))) {var next=edge.Vertices.Single(x=>x!=v);if(!seen.Add(next))continue;if(!Blocked(s,player,next))queue.Enqueue(next);}}
+            while(queue.Count>0) {var v=queue.Dequeue();foreach(var edge in s.Roads.Where(r=>B6AllianceRules.Allies(s.ThreeKingdoms,player,r.PlayerId)&&B5Working(s,"Road",r.LocationId)).Select(r=>EdgeAt(r.LocationId)).Where(e=>e.Vertices.Contains(v))) {var next=edge.Vertices.Single(x=>x!=v);if(!seen.Add(next))continue;if(!Blocked(s,player,next))queue.Enqueue(next);}}
             seen.Remove(source);return seen;
         }
         private void MoveKnight(GameState s,PlayerState p,Command c)
@@ -183,7 +185,7 @@ namespace Catan.Core.M4
             var knight=OwnKnight(s,p,c.SourceId); Require(B5KnightCanAct(s,knight),"KnightCannotAct","只有此前激活的骑士可以行动。");
             Require(ReachableKnightVertices(s,p.Id,c.SourceId).Contains(c.TargetId),"DisconnectedKnight","骑士必须沿连续的己方道路移动。");
             if(c.Kind==CommandKind.MoveKnight) Require(!Occupied(s,c.TargetId),"OccupiedVertex","骑士需要空顶点。");
-            else {var defender=s.Knights.FirstOrDefault(k=>k.LocationId==c.TargetId&&k.PlayerId!=p.Id);Require(defender!=null&&(B5KnightLevel(s,defender)<B5KnightLevel(s,knight)||B5(s)&&B2SkillEngine.B5IgnoreKnightDisplacementLevel(s.ThreeKingdoms,p.Id)),"CannotDisplace","只能驱逐较弱的对方骑士。");if(B3Immune(s,defender.PlayerId)){B5Exhaust(s,knight);return;}knight.LocationId=c.TargetId;DisplaceForProgress(s,defender);}
+            else {var defender=s.Knights.FirstOrDefault(k=>k.LocationId==c.TargetId&&k.PlayerId!=p.Id);Require(defender!=null&&B6AllianceRules.CanAttack(s.ThreeKingdoms,p.Id,defender.PlayerId)&&(B5KnightLevel(s,defender)<B5KnightLevel(s,knight)||B5(s)&&B2SkillEngine.B5IgnoreKnightDisplacementLevel(s.ThreeKingdoms,p.Id)),"CannotDisplace","只能驱逐较弱的对方骑士。");if(B3Immune(s,defender.PlayerId)){B5Exhaust(s,knight);return;}knight.LocationId=c.TargetId;DisplaceForProgress(s,defender);}
             knight.LocationId=c.TargetId;B5Exhaust(s,knight);
             if(s.DecisionQueue.Length>0) ContinueDecisions(s);
         }
@@ -202,9 +204,9 @@ namespace Catan.Core.M4
         }
         private void StealHandCard(GameState s,PlayerState p,PlayerState victim)
         {
-            if(B2Protected(s,victim.Id)||B3Immune(s,victim.Id)||B2SkillEngine.B5RobberPirateImmune(s.ThreeKingdoms,victim.Id)||HandCount(victim)==0)return;int index=Draw(s.Random,HandCount(victim));
-            foreach(var r in Resources) {if(index<victim.Resources[r]) {Transfer(victim.Resources,p.Resources,r,1);return;}index-=victim.Resources[r];}
-            foreach(var r in Commodities) {if(index<victim.Commodities[r]) {Transfer(victim.Commodities,p.Commodities,r,1);return;}index-=victim.Commodities[r];}
+            if(!B6AllianceRules.CanAttack(s.ThreeKingdoms,p.Id,victim.Id)||B2Protected(s,victim.Id)||B3Immune(s,victim.Id)||B2SkillEngine.B5RobberPirateImmune(s.ThreeKingdoms,victim.Id)||HandCount(victim)==0)return;int index=Draw(s.Random,HandCount(victim));
+            foreach(var r in Resources) {if(index<victim.Resources[r]) {if(B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,(int)r))Transfer(victim.Resources,p.Resources,r,1);return;}index-=victim.Resources[r];}
+            foreach(var r in Commodities) {if(index<victim.Commodities[r]) {if(B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,5+(int)r))Transfer(victim.Commodities,p.Commodities,r,1);return;}index-=victim.Commodities[r];}
         }
         private void BankTrade(GameState s,PlayerState p,Command c)
         {
@@ -226,7 +228,7 @@ namespace Catan.Core.M4
             Require((c.GiveIsCommodity?Enum.IsDefined(typeof(Commodity),c.GiveCommodity):Enum.IsDefined(typeof(Resource),c.GiveResource))&&(c.ReceiveIsCommodity?Enum.IsDefined(typeof(Commodity),c.ReceiveCommodity):Enum.IsDefined(typeof(Resource),c.ReceiveResource)),"InvalidTrade","请选择有效资源或商品。");
             Require(c.GiveIsCommodity!=c.ReceiveIsCommodity||(c.GiveIsCommodity?c.GiveCommodity!=c.ReceiveCommodity:c.GiveResource!=c.ReceiveResource),"InvalidTrade","请选择不同的交换牌。");
             int rate=c.GiveIsCommodity?CommodityTradeRate(s,p.Id,c.GiveCommodity):TradeRate(s,p.Id,c.GiveResource);
-            bool generic=ports.Any(port=>port.Resource==null&&Buildings(s).Any(b=>b.PlayerId==p.Id&&port.Vertices.Contains(b.LocationId)));
+            bool generic=CurrentPortsB6(s).Any(port=>port.Resource==null&&Buildings(s).Any(b=>b.PlayerId==p.Id&&port.Vertices.Contains(b.LocationId)));
             Require(c.ReceiveAmount>0&&c.ReceiveAmount<=19&&c.GiveAmount>0&&c.GiveAmount<=19&&(c.GiveAmount==4*c.ReceiveAmount||c.GiveAmount==rate*c.ReceiveAmount||generic&&c.GiveAmount==3*c.ReceiveAmount),"InvalidRatio","交换比例无效。");
             if(c.GiveIsCommodity)Transfer(p.Commodities,s.CommodityBank,c.GiveCommodity,c.GiveAmount);else Transfer(p.Resources,s.Bank,c.GiveResource,c.GiveAmount);
             if(c.ReceiveIsCommodity)Transfer(s.CommodityBank,p.Commodities,c.ReceiveCommodity,c.ReceiveAmount);else Transfer(s.Bank,p.Resources,c.ReceiveResource,c.ReceiveAmount);
@@ -234,7 +236,7 @@ namespace Catan.Core.M4
         public int GetCommodityTradeRate(string playerId,Commodity commodity) {lock(gate) {if(!state.Players.Any(p=>p.Id==playerId)||!Enum.IsDefined(typeof(Commodity),commodity))throw new ArgumentException("Invalid player/commodity.");return CommodityTradeRate(state,playerId,commodity);}}
         private int CommodityTradeRate(GameState s,string player,Commodity commodity)
         {
-            var p=s.Players.Single(x=>x.Id==player);int rate=p.Improvements[(int)ImprovementTrack.Trade]>=3?2:ports.Any(port=>port.Resource==null&&Buildings(s).Any(b=>b.PlayerId==player&&port.Vertices.Contains(b.LocationId)))?3:4;
+            var p=s.Players.Single(x=>x.Id==player);int rate=B6Technology(s,p.Id,(int)ImprovementTrack.Trade)>=3?2:CurrentPortsB6(s).Any(port=>port.Resource==null&&Buildings(s).Any(b=>B6AllianceRules.Allies(s.ThreeKingdoms,player,b.PlayerId)&&port.Vertices.Contains(b.LocationId)))?3:4;
             return Math.Min(rate,ProgressTradeRate(s,p,null,commodity));
         }
         private IEnumerable<Command> LegalExpansionActions(string player)
@@ -253,7 +255,7 @@ namespace Catan.Core.M4
                 foreach(var v in scenario.Topology.Vertices)candidates.Add(new Command {PlayerId=player,Kind=CommandKind.RecruitKnight,TargetId=v.Id});
                 foreach(var c in state.Cities.Where(x=>x.PlayerId==player))candidates.Add(new Command {PlayerId=player,Kind=CommandKind.BuildWall,TargetId=c.LocationId});
                 foreach(ImprovementTrack t in Enum.GetValues(typeof(ImprovementTrack)))candidates.Add(new Command {PlayerId=player,Kind=CommandKind.ImproveCity,Track=t});
-                foreach(var k in state.Knights.Where(x=>x.PlayerId==player))
+                foreach(var k in state.Knights.Where(x=>B6ControlsKnight(state,player,x)))
                 {
                     foreach(var kind in new[]{CommandKind.PromoteKnight,CommandKind.ActivateKnight,CommandKind.ChaseRobber})candidates.Add(new Command {PlayerId=player,Kind=kind,TargetId=k.LocationId});
                     if(B5KnightCanAct(state,k))foreach(var v in ReachableKnightVertices(state,player,k.LocationId)) candidates.Add(new Command {PlayerId=player,Kind=state.Knights.Any(x=>x.PlayerId!=player&&x.LocationId==v)?CommandKind.DisplaceKnight:CommandKind.MoveKnight,SourceId=k.LocationId,TargetId=v});

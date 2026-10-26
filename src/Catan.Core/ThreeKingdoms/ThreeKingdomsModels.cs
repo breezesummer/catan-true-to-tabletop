@@ -112,6 +112,8 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=41, EmitDefaultValue=false)] public B5BoardState Board { get; set; }
         [DataMember(Order=42, EmitDefaultValue=false)] public B5MilitaryState Military { get; set; }
         [DataMember(Order=43, EmitDefaultValue=false)] public B5CivilState CivilB5 { get; set; }
+        [DataMember(Order=44, EmitDefaultValue=false)] public B6ControlGrant ControlB6 { get; set; }
+        [DataMember(Order=45, EmitDefaultValue=false)] public B6AllianceState AllianceB6 { get; set; }
     }
     [DataContract] public sealed class ThreeKingdomsPlayerView
     {
@@ -150,6 +152,13 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=22, EmitDefaultValue=false)] public B5RevealedHand[] MilitaryHands { get; set; }
         [DataMember(Order=23, EmitDefaultValue=false)] public int? ProgressHandLimit { get; set; }
         [DataMember(Order=24, EmitDefaultValue=false)] public B5BoardAsset[] BoardAssets { get; set; }
+        [DataMember(Order=60, EmitDefaultValue=false)] public string[] AllianceMembers { get; set; }
+        [DataMember(Order=61, EmitDefaultValue=false)] public string[] AllianceWinnerPlayerIds { get; set; }
+        [DataMember(Order=62, EmitDefaultValue=false)] public B6ControlGrant ControlB6 { get; set; }
+        [DataMember(Order=63, EmitDefaultValue=false)] public string ViewerPlayerId { get; set; }
+        [DataMember(Order=65, EmitDefaultValue=false)] public int[] BlockedGainCardTypes { get; set; }
+        [DataMember(Order=66, EmitDefaultValue=false)] public string[] AllowedTradePartnerPlayerIds { get; set; }
+        [DataMember(Order=67, EmitDefaultValue=false)] public bool RequireEqualPlayerTradeCounts { get; set; }
         [DataMember(Order=25, EmitDefaultValue=false)] public string[] PublicPoolGeneralIds { get; set; }
         [DataMember(Order=26, EmitDefaultValue=false)] public string[] RetiredGeneralIds { get; set; }
         [DataMember(Order=27, EmitDefaultValue=false)] public B45SkillRuntimeStatus[] SkillRuntimeStatus { get; set; }

@@ -313,6 +313,7 @@ internal sealed class ThreeKingdomsTestGame(string rules, object session)
     {
         dynamic publicView = View();
         string actor = publicView.ThreeKingdoms?.PendingDecision?.PlayerId ?? (publicView.ThreeKingdoms?.WaitingSelectionPlayerIds is string[] waiting ? waiting.FirstOrDefault() : null) ?? publicView.ThreeKingdoms?.SkillDecision?.PlayerId ?? M6Game.Actor(publicView);
+        actor = B2SkillEngine.ControllerForViewB6((ThreeKingdomsView)publicView.ThreeKingdoms,actor);
         dynamic command = rules == "cities" ? (object)new CitiesKnightsAi().Decide((M4.PlayerView)AiView(actor)) : new CombinedAi().Decide((M5.PlayerView)AiView(actor));
         command.Id = NextId(); return command;
     }

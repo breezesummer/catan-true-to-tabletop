@@ -11,6 +11,8 @@ namespace Catan.Core.M5
             // state graph directly, preserving exactly the same authority values.
             var copy=(GameState)MemberwiseClone();
             copy.Special=Special?.CopyForTransaction();
+            copy.B6MapPorts=B6MapPorts?.Select(p=>new Port {Id=p.Id,Vertices=p.Vertices.ToArray(),Resource=p.Resource}).ToArray();
+            copy.B6LandingRecords=B6LandingRecords?.Select(r=>r.Copy()).ToArray();
             copy.ThreeKingdoms=Catan.Core.ThreeKingdoms.ThreeKingdomsEngine.Clone(ThreeKingdoms);
             copy.ThreeKingdomsDeferredCommand=ThreeKingdomsDeferredCommand==null?null:Json.Copy(ThreeKingdomsDeferredCommand);
             copy.ThreeKingdomsProgressResolutions=ThreeKingdomsProgressResolutions?.Select(x=>Json.Copy(x)).ToArray();

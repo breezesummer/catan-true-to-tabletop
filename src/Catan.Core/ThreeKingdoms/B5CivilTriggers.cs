@@ -65,7 +65,7 @@ namespace Catan.Core.ThreeKingdoms
             {var f=CivilFrame(s,g,"tk-g25-s1","civil-benghuai",eventId);f.Optional=true;Append(s,f);}
             if(g.GeneralId=="tk-g31")
             {
-                var targets=Order(s).Where(p=>host.GetHand(p).Sum()==0&&!CivilProtected(host,p)).ToArray();
+                var targets=Order(s).Where(p=>host.GetHand(p).Sum()==0&&!CivilProtected(host,p,g.OwnerPlayerId)).ToArray();
                 if(targets.Any(p=>bh.GetBoardOptions(g.OwnerPlayerId,"damage-road",p).Any()||host.GetProgressCards(p).Any(c=>!c.PublicPoint)))
                 {var f=CivilFrame(s,g,"tk-g31-s2","civil-juece",eventId);f.Optional=true;f.Targets=targets;Append(s,f);}
             }
@@ -85,7 +85,7 @@ namespace Catan.Core.ThreeKingdoms
                 var residual=Civil(s).Markers.FirstOrDefault(m=>m.PlayerId==target&&m.Key=="weimu-residual");
                 if(residual!=null)Append(s,new B2SkillFrame {Id=Id(s,"weimu"),Kind="civil-weimu",SkillId="tk-g11-s1",PlayerId=target,TenureId=residual.Value,Optional=true,Started=true,SourceEventId=useId,B4=new B4SkillPayload {OwnerPlayerId=target},CivilB5=new B5CivilPayload {OwnerPlayerId=target,RootEventId=useId}});
             }
-            if(g?.GeneralId=="tk-g32"&&((IThreeKingdomsB5Host)host).GetImprovements(target).Sum()>0)
+            if(g?.GeneralId=="tk-g32"&&B6AllianceRules.CanAttack(s,source,target)&&((IThreeKingdomsB5Host)host).GetImprovements(target).Sum()>0)
             {
                 int limit=host.GetHand(target).Sum()+host.GetProgressCards(target).Count(p=>!p.PublicPoint);
                 if(limit>0){var f=CivilFrame(s,g,"tk-g32-s1","civil-pojun",useId);f.Targets=new[]{target};f.Optional=true;f.CivilB5.Budget=limit;Append(s,f);}

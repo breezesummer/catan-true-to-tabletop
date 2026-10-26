@@ -136,6 +136,7 @@ namespace Catan.Core.ThreeKingdoms
                     TurnInstanceId = state.Clock.TurnInstanceId, PhaseId = state.Clock.PhaseId, ReturnWindowId = state.WindowId
                 } }).ToArray();
                 B2SkillEngine.OnB4GeneralRetired(state, previous);
+                B2SkillEngine.OnAllianceB6GeneralRetired(state,previous);
                 B2SkillEngine.OnB5MilitaryGeneralRetired(state, previous);
                 B2SkillEngine.OnCivilGeneralRetired(state, previous);
                 bool retain = GeneralCatalog.UsesB5Rules(state.RulesVersion) && new[] { "tk-g18", "tk-g24", "tk-g35" }.Contains(previous.GeneralId);

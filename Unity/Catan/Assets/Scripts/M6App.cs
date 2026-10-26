@@ -338,7 +338,7 @@ public sealed partial class M6App : MonoBehaviour
             }
         }
         if(!MenuVisible&&!tableMenu)DrawPlayedCard();
-        if(!MenuVisible&&!tableMenu&&!TablePresentationBlocked)DrawThreeKingdoms();
+        if(!MenuVisible&&!tableMenu&&!TablePresentationBlocked){DrawThreeKingdoms();DrawAllianceVictoryB6();}
         GUI.matrix=Matrix4x4.identity;
     }
 }

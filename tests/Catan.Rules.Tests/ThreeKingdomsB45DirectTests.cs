@@ -292,7 +292,7 @@ public sealed class ThreeKingdomsB45DirectTests
     public void NewDefaultIdentityIsDistinctAndLegacySaveRoundTripsExactly(string mode)
     {
         dynamic normal = mode == "cities" ? (object)M4.CitiesKnightsGameSession.Create(AcceptanceFixture.Json, threeKingdoms: true) : M5.CombinedGameSession.Create("heading-for-new-shores", threeKingdoms: true);
-        Assert.Equal(GeneralCatalog.B5DirectPackageVersion, (string)normal.GetPlayerView("P1").ThreeKingdoms.PackageVersion);
+        Assert.Equal(GeneralCatalog.B6PackageVersion, (string)normal.GetPlayerView("P1").ThreeKingdoms.PackageVersion);
         Assert.NotEqual(GeneralCatalog.B4ContentHash, GeneralCatalog.B45ContentHash);
         foreach (string package in new[] { GeneralCatalog.B4PackageVersion, GeneralCatalog.B45PackageVersion, GeneralCatalog.B5PackageVersion, GeneralCatalog.B5DirectPackageVersion })
         {

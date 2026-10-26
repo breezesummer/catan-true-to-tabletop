@@ -18,7 +18,7 @@ namespace Catan.Core.ThreeKingdoms
             var s=host.State;var p=f.CivilB5;var owner=CivilOwner(f);var bh=(IThreeKingdomsB5Host)host;
             if(d.Kind=="civil-relation")foreach(var target in s.SeatPlayerIds.Where(t=>t!=owner))actions.Add(CivilAction(s,f.SkillId,"civil-relation","选择 "+target,target,null,-1,d));
             else if(d.Kind=="civil-declare-type")for(int t=0;t<8;t++){var a=CivilAction(s,f.SkillId,"civil-declare-type","声明"+CardNames[t],null,null,t,d);a.CardSelectionKind="declare";actions.Add(a);}
-            else if(d.Kind=="civil-road")foreach(var o in bh.GetBoardOptions(owner,p.BoardKind,p.Argument).Where(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId)))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,f.SkillId,"civil-road",o.Label,null,o.Id,-1,d),o));
+            else if(d.Kind=="civil-road")foreach(var o in bh.GetBoardOptions(owner,p.BoardKind,p.Argument).Where(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId,owner)))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,f.SkillId,"civil-road",o.Label,null,o.Id,-1,d),o));
             else if(d.Kind=="civil-luanwu")
             {
                 if(host.GetHand(f.PlayerId)[1]>=2&&!IsB4HandLossForbidden(s,f.PlayerId)){var a=CivilAction(s,f.SkillId,"civil-pay-bricks","支付两张砖",null,null,1,d);a.Command.Counts[1]=2;a.AvailableCount=host.GetHand(f.PlayerId)[1];actions.Add(a);}
@@ -32,7 +32,7 @@ namespace Catan.Core.ThreeKingdoms
             else if(d.Kind=="civil-hand-select")CivilSelectActions(host,f,d,actions,f.Remaining);
             else if(d.Kind=="civil-copy")
             {foreach(var o in bh.GetBoardOptions(owner,p.BoardKind,null,p.Budget))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,f.SkillId,"civil-copy",o.Label,null,o.Id,-1,d),o));actions.Add(CivilAction(s,f.SkillId,"civil-finish-copy","放弃余下免费建设",null,null,-1,d));}
-            else if(d.Kind=="civil-chouce")foreach(var target in s.SeatPlayerIds.Where(t=>host.GetHand(t).Sum()>0&&!CivilProtected(host,t)&&!IsB4HandLossForbidden(s,t)))actions.Add(CivilAction(s,f.SkillId,"civil-chouce","弃置 "+target+" 的手牌",target,null,-1,d));
+            else if(d.Kind=="civil-chouce")foreach(var target in s.SeatPlayerIds.Where(t=>host.GetHand(t).Sum()>0&&!CivilProtected(host,t,owner)&&!IsB4HandLossForbidden(s,t)))actions.Add(CivilAction(s,f.SkillId,"civil-chouce","弃置 "+target+" 的手牌",target,null,-1,d));
             else if(d.Kind=="civil-fencheng")
             {
                 if(host.GetHand(f.PlayerId).Sum()>p.Budget&&!IsB4HandLossForbidden(s,f.PlayerId))actions.Add(CivilAction(s,f.SkillId,"civil-fencheng-hand","选择弃置手牌",null,null,-1,d));
@@ -44,7 +44,7 @@ namespace Catan.Core.ThreeKingdoms
             else if(d.Kind=="civil-two-roads")
             {
                 string kind=f.Kind=="civil-liegong-roads"?"liegong-road":"damage-road";string arg=f.Kind=="civil-liegong-roads"?null:f.PlayerId;
-                foreach(var o in bh.GetBoardOptions(owner,kind,arg).Where(o=>!p.SelectedIds.Contains(o.Id)&&!CivilProtected(host,o.OtherPlayerId??o.PlayerId)))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,f.SkillId,"civil-pick-road",o.Label,null,o.Id,-1,d),o));
+                foreach(var o in bh.GetBoardOptions(owner,kind,arg).Where(o=>!p.SelectedIds.Contains(o.Id)&&!CivilProtected(host,o.OtherPlayerId??o.PlayerId,owner)))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,f.SkillId,"civil-pick-road",o.Label,null,o.Id,-1,d),o));
             }
             else if(d.Kind=="civil-burn")foreach(var o in bh.GetBoardOptions(owner,"burn-city",f.PlayerId))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,f.SkillId,"civil-burn",o.Label,null,o.Id,-1,d),o));
             else if(d.Kind=="civil-juece")

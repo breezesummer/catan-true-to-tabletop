@@ -14,10 +14,11 @@ namespace Catan.Core.M5
             if(!B5(s))return false;
             var context=B5ProgressContext(s);
             int color=card.HasValue?(int)ProgressCatalog.Track(card.Value):context?.Card?.Color??-1;
+            if(context!=null&&!B6AllianceRules.CanAttack(s.ThreeKingdoms,context.PlayerId,player))return true;
             return color==1 && B2SkillEngine.CivilBlueImmune(s.ThreeKingdoms,player,useId??context?.EventId);
         }
         private int B5ProgressFactor(GameState s,string source,string target) =>
-            B5(s)?B2SkillEngine.CivilProgressMultiplier(CardHost(s),source,target):1;
+            B5(s)?B2SkillEngine.CivilProgressMultiplier(CardHost(s),source,target)*B6AllianceRules.ProgressMultiplier(s.ThreeKingdoms,source,target):1;
         private void B5ProgressTargeted(GameState s,Command c,string target)
         {
             if(!B5(s)||c.Kind!=CommandKind.PlayProgressCard)return;
@@ -27,7 +28,7 @@ namespace Catan.Core.M5
         private static bool B5ProgressHasEffectivePart(GameState s,Command c,string target)
         {
             var p=s.Players.Single(x=>x.Id==target);
-            if(B2Protected(s,target)||B3Immune(s,target))return false;
+            if(!B6AllianceRules.CanAttack(s.ThreeKingdoms,c.PlayerId,target)||B2Protected(s,target)||B3Immune(s,target))return false;
             switch(c.ProgressCard)
             {
                 case ProgressCardKind.Espionage:return p.ProgressCards.Length>0&&!B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,target);

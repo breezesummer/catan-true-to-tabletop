@@ -251,7 +251,8 @@ public sealed partial class TabletopUI
         foreach(var id in M6App.OrderedPlayers(seats.Select(p=>p.Id)))
         {
             var player=seats.First(p=>p.Id==id);
-            var panel=new Rect(x,13,width,191);hits.Add(panel);
+            string alliance=ThreeKingdoms?.AlliancePlayerCaptionB6(player.Id);
+            var panel=new Rect(x,13,width,alliance==null?191:211);hits.Add(panel);
             ModernOperationUI.Round(panel,new Color(ModernOperationUI.Background.r,ModernOperationUI.Background.g,ModernOperationUI.Background.b,.68f));
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
@@ -282,6 +283,11 @@ public sealed partial class TabletopUI
                 GUI.Label(new Rect(r.x+28,r.y,r.width-28,18),value,valueStyle);
                 if(row==0)ScoreHover(r,player.Score);
                 else if(r.Contains(Event.current.mousePosition)){hoveredPlayerHint=hints[row];playerHintAnchor=r;}
+            }
+            if(alliance!=null)
+            {
+                var badge=new Rect(x+4,199,width-8,20);GUI.Label(badge,alliance,Style("alliance",center,11,FontStyle.Bold));
+                if(badge.Contains(Event.current.mousePosition)){hoveredPlayerHint=ThreeKingdoms.AlliancePlayerHintB6(player.Id);playerHintAnchor=badge;}
             }
             bool selecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;
             if(ThreeKingdoms!=null)ThreeKingdoms.DrawThreeKingdomsAvatar(player.Id,avatar);

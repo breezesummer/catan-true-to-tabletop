@@ -1,0 +1,348 @@
+{
+  "日期": "2026-10-26",
+  "版本": "内测版2.0.2",
+  "正式发布": false,
+  "云端部署": false,
+  "三国": {
+    "总数": 870,
+    "通过": 870,
+    "未通过": 0
+  },
+  "B6专项": {
+    "总数": 168,
+    "通过": 168,
+    "未通过": 0
+  },
+  "正常完整局": {
+    "配置数": 20,
+    "合法命令总数": 9457.0,
+    "逐局": [
+      {
+        "rules": "cities",
+        "map": "base",
+        "seats": 3,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 575,
+        "round": 27,
+        "generals": 27,
+        "checkpoints": 28,
+        "seconds": 66.0123694,
+        "status": "通过"
+      },
+      {
+        "rules": "cities",
+        "map": "base",
+        "seats": 4,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 392,
+        "round": 13,
+        "generals": 20,
+        "checkpoints": 17,
+        "seconds": 25.9235685,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "cloth-for-catan",
+        "seats": 3,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 380,
+        "round": 18,
+        "generals": 18,
+        "checkpoints": 25,
+        "seconds": 135.2163258,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "cloth-for-catan",
+        "seats": 4,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 480,
+        "round": 16,
+        "generals": 24,
+        "checkpoints": 24,
+        "seconds": 131.6132835,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "fog-islands",
+        "seats": 3,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 277,
+        "round": 14,
+        "generals": 15,
+        "checkpoints": 14,
+        "seconds": 31.5341025,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "fog-islands",
+        "seats": 4,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 696,
+        "round": 20,
+        "generals": 28,
+        "checkpoints": 40,
+        "seconds": 136.9303177,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "forgotten-tribe",
+        "seats": 3,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 515,
+        "round": 28,
+        "generals": 30,
+        "checkpoints": 41,
+        "seconds": 72.2063274,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "forgotten-tribe",
+        "seats": 4,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 442,
+        "round": 18,
+        "generals": 24,
+        "checkpoints": 29,
+        "seconds": 124.0516877,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "four-islands",
+        "seats": 3,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 294,
+        "round": 17,
+        "generals": 18,
+        "checkpoints": 20,
+        "seconds": 32.3743608,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "four-islands",
+        "seats": 4,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 643,
+        "round": 20,
+        "generals": 28,
+        "checkpoints": 30,
+        "seconds": 99.7274054,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "heading-for-new-shores",
+        "seats": 3,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 411,
+        "round": 22,
+        "generals": 24,
+        "checkpoints": 26,
+        "seconds": 57.7450117,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "heading-for-new-shores",
+        "seats": 4,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 434,
+        "round": 13,
+        "generals": 20,
+        "checkpoints": 21,
+        "seconds": 83.8109352,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "new-world",
+        "seats": 3,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 466,
+        "round": 24,
+        "generals": 24,
+        "checkpoints": 28,
+        "seconds": 60.8253209,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "new-world",
+        "seats": 4,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 714,
+        "round": 20,
+        "generals": 28,
+        "checkpoints": 32,
+        "seconds": 164.3780139,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "pirate-islands",
+        "seats": 3,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 487,
+        "round": 21,
+        "generals": 21,
+        "checkpoints": 33,
+        "seconds": 226.0466504,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "pirate-islands",
+        "seats": 4,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 633,
+        "round": 21,
+        "generals": 28,
+        "checkpoints": 33,
+        "seconds": 239.6486641,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "through-the-desert",
+        "seats": 3,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 395,
+        "round": 20,
+        "generals": 21,
+        "checkpoints": 26,
+        "seconds": 54.8322351,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "through-the-desert",
+        "seats": 4,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 569,
+        "round": 20,
+        "generals": 28,
+        "checkpoints": 34,
+        "seconds": 116.5598934,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "wonders-of-catan",
+        "seats": 3,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 260,
+        "round": 14,
+        "generals": 15,
+        "checkpoints": 17,
+        "seconds": 31.6683168,
+        "status": "通过"
+      },
+      {
+        "rules": "combined",
+        "map": "wonders-of-catan",
+        "seats": 4,
+        "package": "three-kingdoms-special-54-v1",
+        "steps": 394,
+        "round": 14,
+        "generals": 20,
+        "checkpoints": 27,
+        "seconds": 71.4705859,
+        "status": "通过"
+      }
+    ]
+  },
+  "网络": {
+    "总数": 246,
+    "通过": 246,
+    "未通过": 0
+  },
+  "服务客户端": {
+    "总数": 99,
+    "通过": 99,
+    "未通过": 0
+  },
+  "原模式": {
+    "总数": 1180,
+    "通过": 1158,
+    "既有失败": [
+      "Catan.Rules.Tests.TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.ResourceMonopolyUsesHarvestForEachAffectedPlayer",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Printing, name: \"印刷术\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Constitution, name: \"宪法\")",
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"锻铁匠\", track: 2)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"ProgressTreasonRemove\", action: \"叛变\", piece: \"己方骑士\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: False)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: True)",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.SabotageDiscardIsOneColoredCountSentenceForEveryViewer",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"商业港口\", track: 0)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.TabletopSpecialCollectionTests.DefenderProgressRewardFliesFromTheCorrectTrackWithoutLeakingOpponentCard",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.FreeEngineeringWallIsConstructedAndCardUsesRequestedVerb"
+    ],
+    "与B5失败名单一致": true
+  },
+  "结果文件": [
+    {
+      "文件": ".local/three-kingdoms-b6/three-kingdoms-regression.trx",
+      "SHA256": "a2a6fcc442e1009021fd1023cb6198eaee0d0b469f80b3422c9e2e87354b77aa"
+    },
+    {
+      "文件": ".local/three-kingdoms-b6/regression-fixes.trx",
+      "SHA256": "3a03bb031d074e7160281cb1904490e524c7b21cf89616b5ce8b8355ff8d0fa7"
+    },
+    {
+      "文件": ".local/three-kingdoms-b6/b6-special-final.trx",
+      "SHA256": "c6e77a61a83adc3b632d57ac76f982bd4cf5af30c6e0b4188b05bb807edbd8ff"
+    },
+    {
+      "文件": ".local/three-kingdoms-b6/b6-fullgames-final-3players.trx",
+      "SHA256": "3651d680131a754f374c591926f40df9a1aaf68978d1fa88f824fd1ffda1afb0"
+    },
+    {
+      "文件": ".local/three-kingdoms-b6/b6-fullgames-final-4players.trx",
+      "SHA256": "f8396913e8b2d9320a7d839efcdb20c189f1b030d2163cbd0425800a537837d4"
+    },
+    {
+      "文件": ".local/three-kingdoms-b6/b6-fullgames-retry-3players.trx",
+      "SHA256": "642c2b78165ba1e9cadedfa575f8ef9267f9b93dc57e5b8e3497fd4249b17f13"
+    },
+    {
+      "文件": ".local/three-kingdoms-b6/b6-fullgames-retry-4players.trx",
+      "SHA256": "41a7e7c0a7f7d37d720590715e57a9fc1ec31116fbe3aea6622810f608f8af5f"
+    },
+    {
+      "文件": ".local/three-kingdoms-b6/network.trx",
+      "SHA256": "99db31f351bba9905cd1f3c7c4102f894ba1ea348644760af2b8f9fe4e6a6af6"
+    },
+    {
+      "文件": ".local/three-kingdoms-b6/b6-network-final.trx",
+      "SHA256": "a2537ba52e858aee03fd96ea280ccfffa7cb6bb6b80bb0e114b2046fd19ae406"
+    },
+    {
+      "文件": ".local/three-kingdoms-b6/server.trx",
+      "SHA256": "dadd26cd647da5c83d1118ca2d162c43687a452f0ad31302cbdc98462aefb01e"
+    },
+    {
+      "文件": ".local/three-kingdoms-b6/original-modes.trx",
+      "SHA256": "4dc94d351bb720594693ed22741bc2a4df096140e7d55a9100ceb3c49151043a"
+    }
+  ],
+  "证据说明": "按完整用例名区分大小写去重，后续针对同一失败的通过覆盖早期结果。主动终止或无TRX的初轮完整局不计通过；两最终批次失败由修复批次覆盖。固定夹具快照恢复与正常完整局Save/Load重放分开记录。"
+}

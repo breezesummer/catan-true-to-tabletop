@@ -84,7 +84,7 @@ public sealed partial class M5App
         var targets=kind==CommandKind.BuildRoad||kind==CommandKind.BuildShip?view.Board.Edges.Select(e=>e.Id):view.Board.Vertices.Select(v=>v.Id);
         foreach(var target in targets)
         {
-            if(kind==CommandKind.PromoteKnight&&suffix>1&&!view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==target&&k.Level==suffix-1))continue;
+            if(kind==CommandKind.PromoteKnight&&suffix>1&&!view.Board.Knights.Any(k=>SharesAllianceAssetsB6(k.PlayerId)&&k.LocationId==target&&k.Level==suffix-1))continue;
             probe.TargetId=target;if(PaymentAwarePreview(probe).Success)return true;
         }
         return false;

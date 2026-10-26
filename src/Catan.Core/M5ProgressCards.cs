@@ -22,7 +22,7 @@ namespace Catan.Core.M5
             for (var i = 0; i < s.Players.Length; i++)
             {
                 var p = s.Players[(start + i) % s.Players.Length];
-                var level = p.Improvements[(int)track];
+                var level = B6Technology(s,p.Id,(int)track);
                 if (level > 0 && redDie <= level + 1) QueueDecision(s, new PendingDecision { Kind = "ProgressDraw", PlayerId = p.Id, Track = track });
             }
         }
@@ -82,6 +82,7 @@ namespace Catan.Core.M5
                 var target = OtherProgressPlayer(s, p, c.OtherPlayerId);
                 Require(s.CommercialHarborPlayers.Contains(target.Id), "HarborAlreadyUsed", "本回合未获得对该玩家的商港交换额度。");
                 Require(Enum.IsDefined(typeof(Resource), c.Resource) && p.Resources[c.Resource] > 0, "InsufficientResources", "必须选择自己持有的资源。");
+                Require(B2SkillEngine.CanGainB6(s.ThreeKingdoms,target.Id,(int)c.Resource)&&(target.Commodities.Total==0||Commodities.Any(t=>target.Commodities[t]>0&&B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,5+(int)t))),"GainForbidden","当前不能交换这些牌。");
                 var used = Array.IndexOf(s.CommercialHarborPlayers, target.Id);
                 s.CommercialHarborPlayers = s.CommercialHarborPlayers.Where((x, i) => i != used).ToArray();
                 if (target.Commodities.Total > 0 && !B2Protected(s,target.Id) && (!B5(s)||!B2SkillEngine.IsB4HandLossForbidden(s.ThreeKingdoms,target.Id)))
@@ -129,7 +130,7 @@ namespace Catan.Core.M5
                 case ProgressCardKind.GuildDues:
                     var rich = OtherProgressPlayer(s, p, c.OtherPlayerId);
                     Require(VictoryPoints(s, rich.Id, true) > VictoryPoints(s, p.Id, true), "NotMoreVictoryPoints", "大商家只能选择胜利点比你高的玩家。");
-                    if (!B2Protected(s,rich.Id) && !B3Immune(s,rich.Id) && !B5ProgressImmune(s,rich.Id) && ProgressHandSize(rich) > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressGuildDues", PlayerId = p.Id, OtherPlayerId = rich.Id, Amount = Math.Min(2*B5ProgressFactor(s,p.Id,rich.Id), ProgressHandSize(rich)) });
+                    if (!B2Protected(s,rich.Id) && !B3Immune(s,rich.Id) && !B5ProgressImmune(s,rich.Id) && B6GainableHandCount(s,rich,p.Id) > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressGuildDues", PlayerId = p.Id, OtherPlayerId = rich.Id, Amount = Math.Min(2*B5ProgressFactor(s,p.Id,rich.Id), B6GainableHandCount(s,rich,p.Id)) });
                     break;
                 case ProgressCardKind.Merchant:
                     var merchantTile = s.Tiles.FirstOrDefault(t => t.Id == c.TargetId);
@@ -140,10 +141,12 @@ namespace Catan.Core.M5
                     else { Require(Enum.IsDefined(typeof(Resource), c.Resource), "InvalidResource", "资源类型错误。"); s.MerchantFleetResources = s.MerchantFleetResources.Union(new[] { c.Resource }).ToArray(); }
                     break;
                 case ProgressCardKind.ResourceMonopoly:
+                    if(!B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,(int)c.Resource))break;
                     Require(Enum.IsDefined(typeof(Resource), c.Resource), "InvalidResource", "资源类型错误。");
                     foreach (var other in s.Players.Where(x => x.Id != p.Id && !B2Protected(s,x.Id) && !B3Immune(s,x.Id) && !B5ProgressImmune(s,x.Id))) Transfer(other.Resources, p.Resources, c.Resource, Math.Min(2*B5ProgressFactor(s,p.Id,other.Id), other.Resources[c.Resource]));
                     break;
                 case ProgressCardKind.TradeMonopoly:
+                    if(!B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,5+(int)c.Commodity))break;
                     Require(Enum.IsDefined(typeof(Commodity), c.Commodity), "InvalidCommodity", "商品类型错误。");
                     foreach (var other in s.Players.Where(x => x.Id != p.Id && !B2Protected(s,x.Id) && !B3Immune(s,x.Id) && !B5ProgressImmune(s,x.Id))) ProgressCommodityTransfer(other.Commodities, p.Commodities, c.Commodity, Math.Min(B5ProgressFactor(s,p.Id,other.Id), other.Commodities[c.Commodity]));
                     break;
@@ -183,7 +186,7 @@ namespace Catan.Core.M5
                     {
                         var otherScore = VictoryPoints(s, other.Id, true);
                         var wedding = c.ProgressCard == ProgressCardKind.Wedding;
-                        var amount = Math.Min(ProgressHandSize(other),(wedding ? 2 : ProgressHandSize(other)/2)*B5ProgressFactor(s,p.Id,other.Id));
+                        var amount = Math.Min(wedding?B6GainableHandCount(s,other,p.Id):ProgressHandSize(other),(wedding ? 2 : ProgressHandSize(other)/2)*B5ProgressFactor(s,p.Id,other.Id));
                         if (amount > 0 && (wedding ? otherScore > score : otherScore >= score))
                             QueueDecision(s, new PendingDecision { Kind = wedding ? "ProgressWedding" : "ProgressSabotage", PlayerId = other.Id, OtherPlayerId = p.Id, Amount = amount });
                     }
@@ -210,10 +213,11 @@ namespace Catan.Core.M5
                     break;
                 case "ProgressHarbor":
                     Require(Enum.IsDefined(typeof(Commodity), c.Commodity), "InvalidCommodity", "商品类型错误。");
+                    Require(B2SkillEngine.CanGainB6(s.ThreeKingdoms,d.OtherPlayerId,5+(int)c.Commodity),"GainForbidden","当前不能获得这种牌。");
                     ProgressCommodityTransfer(p.Commodities, s.Players.Single(x => x.Id == d.OtherPlayerId).Commodities, c.Commodity, 1); break;
                 case "ProgressGuildDues":
                     var rich = s.Players.Single(x => x.Id == d.OtherPlayerId);
-                    ProgressTransferSelection(rich, p, null, c, d.Amount); break;
+                    ProgressTransferSelection(s, rich, p, c, d.Amount); break;
                 case "ProgressEspionage":
                     if (!c.Decline)
                     {
@@ -225,8 +229,8 @@ namespace Catan.Core.M5
                         if(B5(s)&&--d.Amount>0&&other.ProgressCards.Length>0)return;
                     }
                     break;
-                case "ProgressWedding": ProgressTransferSelection(p, s.Players.Single(x => x.Id == d.OtherPlayerId), null, c, d.Amount); break;
-                case "ProgressSabotage": ProgressTransferSelection(p, null, s, c, d.Amount); break;
+                case "ProgressWedding": ProgressTransferSelection(s, p, s.Players.Single(x => x.Id == d.OtherPlayerId), c, d.Amount); break;
+                case "ProgressSabotage": ProgressTransferSelection(s, p, null, c, d.Amount); break;
                 case "ProgressTreasonRemove":
                     var removed = s.Knights.FirstOrDefault(k => k.PlayerId == p.Id && k.LocationId == c.TargetId);
                     Require(removed != null && d.Options.Contains(c.TargetId), "InvalidKnight", "请选择自己的一个骑士。");
@@ -251,7 +255,7 @@ namespace Catan.Core.M5
         private static bool SwappableNumber(int? number) { return number.HasValue && number != 2 && number != 6 && number != 8 && number != 12; }
         private void ProgressHarvest(GameState s, PlayerState p, Resource resource)
         {
-            if(B2DrawBlocked(s,p.Id)) return;
+            if(B2DrawBlocked(s,p.Id)||!B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,(int)resource)) return;
             var sites = Buildings(s).Where(b => b.PlayerId == p.Id).Select(b => b.LocationId).ToArray();
             var amount = 2 * s.Tiles.Count(t => t.Resource == ResourceName(resource) && t.Vertices.Any(sites.Contains))*B5ProgressFactor(s,p.Id,p.Id);
             Transfer(s.Bank, p.Resources, resource, Math.Min(amount, s.Bank[resource]));
@@ -265,6 +269,7 @@ namespace Catan.Core.M5
             var other = s.Players.FirstOrDefault(x => x.Id == id && x.Id != p.Id);
             Require(other != null, "InvalidOtherPlayer", "请选择另一名玩家。"); return other;
         }
+        private static int B6GainableHandCount(GameState s,PlayerState from,string receiver)=>Enumerable.Range(0,8).Where(i=>B2SkillEngine.CanGainB6(s.ThreeKingdoms,receiver,i)).Sum(i=>i<5?from.Resources[(Resource)i]:from.Commodities[(Commodity)(i-5)]);
         private static int ProgressHandSize(PlayerState p) { return p.Resources.Total + p.Commodities.Total; }
         private static IEnumerable<PlayerState> ProgressTurnOrder(GameState s)
         {
@@ -275,30 +280,33 @@ namespace Catan.Core.M5
         {
             Require(count >= 0 && from[type] >= count, "InsufficientCommodities", "商品不足。"); from[type] -= count; to[type] += count;
         }
-        private static void ProgressTransferSelection(PlayerState from, PlayerState to, GameState bank, Command c, int count)
+        private static void ProgressTransferSelection(GameState bank, PlayerState from, PlayerState to, Command c, int count)
         {
             var resources = c.Resources ?? new ResourceBag(); var commodities = c.Commodities ?? new CommodityBag();
             Require(ValidBag(resources) && ((Commodity[])Enum.GetValues(typeof(Commodity))).All(t => commodities[t] >= 0 && commodities[t] <= 12) && resources.Total + commodities.Total == count, "InvalidCardSelection", "必须选择要求数量的资源或商品。");
+            Require(to==null||B2SkillEngine.CanGainCardsB6(bank.ThreeKingdoms,to.Id,Enumerable.Range(0,8).Select(i=>i<5?resources[(Resource)i]:commodities[(Commodity)(i-5)]).ToArray()),"GainForbidden","当前不能获得这些牌。");
             TransferBag(from.Resources, to == null ? bank.Bank : to.Resources, resources);
             foreach (Commodity type in Enum.GetValues(typeof(Commodity))) ProgressCommodityTransfer(from.Commodities, to == null ? bank.CommodityBank : to.Commodities, type, commodities[type]);
         }
         private IEnumerable<string[]> ProgressSmithingTargets(GameState s,PlayerState p)
         {
-            // 每席至多六枚实体骑士；按高等级优先晋升，释放下一等级的库存。
-            var knights=s.Knights.Where(k=>k.PlayerId==p.Id).OrderByDescending(k=>k.Level).ThenBy(k=>k.LocationId,StringComparer.Ordinal).Select(k=>k.LocationId).ToArray();
+            // 联盟骑士仍使用实体身份，组合枚举只扩展到本次允许的目标数。
+            var knights=s.Knights.Where(k=>B6ControlsKnight(s,p.Id,k)&&k.Level<3&&k.PromotedTurn!=s.Turn).OrderByDescending(k=>k.Level).ThenBy(k=>k.LocationId,StringComparer.Ordinal).Select(k=>k.LocationId).ToArray();
             int limit=2*B5ProgressFactor(s,p.Id,p.Id);
-            for(int mask=1;mask<(1<<knights.Length);mask++)
+            IEnumerable<string[]> Choose(int start,List<string> selected)
             {
-                var targets=knights.Where((_,index)=>(mask&(1<<index))!=0).ToArray();
-                if(targets.Length<=limit)yield return targets;
+                if(selected.Count>0)yield return selected.ToArray();
+                if(selected.Count>=limit)yield break;
+                for(int i=start;i<knights.Length;i++){selected.Add(knights[i]);foreach(var group in Choose(i+1,selected))yield return group;selected.RemoveAt(selected.Count-1);}
             }
+            return Choose(0,new List<string>());
         }
         private void ProgressPromote(GameState s, PlayerState p, string location)
         {
-            var knight = s.Knights.FirstOrDefault(k => k.PlayerId == p.Id && k.LocationId == location);
+            var knight = s.Knights.FirstOrDefault(k => B6ControlsKnight(s,p.Id,k) && k.LocationId == location);
             Require(knight != null && knight.Level < 3 && knight.PromotedTurn != s.Turn, "InvalidPromotion", "骑士每回合只能晋升一次。");
-            Require(knight.Level < 2 || p.Improvements[(int)ImprovementTrack.Politics] >= 3, "FortressRequired", "强力骑士晋升需要政治三级改良。");
-            Require(s.Knights.Count(k => k.PlayerId == p.Id && k.Level == knight.Level + 1) < 2, "KnightSupply", "该等级骑士供应不足。");
+            Require(knight.Level < 2 || B6Technology(s,p.Id,(int)ImprovementTrack.Politics) >= 3, "FortressRequired", "强力骑士晋升需要政治三级改良。");
+            Require(s.Knights.Count(k => k.PlayerId == knight.PlayerId && k.Level == knight.Level + 1) < 2, "KnightSupply", "该等级骑士供应不足。");
             knight.Level++; knight.PromotedTurn = s.Turn;
         }
         private string[] ProgressKnightPlaces(GameState s, string player)
@@ -330,13 +338,13 @@ namespace Catan.Core.M5
                 var selected = Draw(s.Random, total); var done = false;
                 foreach (var resource in Resources)
                 {
-                    if (selected < victim.Resources[resource]) { Transfer(victim.Resources, p.Resources, resource, 1); done = true; break; }
+                    if (selected < victim.Resources[resource]) { if(B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,(int)resource))Transfer(victim.Resources, p.Resources, resource, 1); done = true; break; }
                     selected -= victim.Resources[resource];
                 }
                 if (done) continue;
                 foreach (Commodity type in Enum.GetValues(typeof(Commodity)))
                 {
-                    if (selected < victim.Commodities[type]) { ProgressCommodityTransfer(victim.Commodities, p.Commodities, type, 1); break; }
+                    if (selected < victim.Commodities[type]) { if(B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,5+(int)type))ProgressCommodityTransfer(victim.Commodities, p.Commodities, type, 1); break; }
                     selected -= victim.Commodities[type];
                 }
                 }
@@ -420,9 +428,10 @@ namespace Catan.Core.M5
                 if (d.Kind == "ProgressWedding" || d.Kind == "ProgressSabotage" || d.Kind == "ProgressGuildDues")
                 {
                     var owner = d.Kind == "ProgressGuildDues" ? s.Players.Single(x => x.Id == d.OtherPlayerId) : p;
+                    var receiver=d.Kind=="ProgressSabotage"?null:d.Kind=="ProgressGuildDues"?p.Id:d.OtherPlayerId;
                     var c = command(CommandKind.ResolveProgressChoice); c.Resources = new ResourceBag(); c.Commodities = new CommodityBag(); var left = d.Amount;
-                    foreach (var r in Resources) { var take = Math.Min(left, owner.Resources[r]); c.Resources[r] = take; left -= take; }
-                    foreach (Commodity type in Enum.GetValues(typeof(Commodity))) { var take = Math.Min(left, owner.Commodities[type]); c.Commodities[type] = take; left -= take; }
+                    foreach (var r in Resources) { var take = receiver==null||B2SkillEngine.CanGainB6(s.ThreeKingdoms,receiver,(int)r)?Math.Min(left, owner.Resources[r]):0; c.Resources[r] = take; left -= take; }
+                    foreach (Commodity type in Enum.GetValues(typeof(Commodity))) { var take = receiver==null||B2SkillEngine.CanGainB6(s.ThreeKingdoms,receiver,5+(int)type)?Math.Min(left, owner.Commodities[type]):0; c.Commodities[type] = take; left -= take; }
                     yield return c;
                 }
                 yield break;

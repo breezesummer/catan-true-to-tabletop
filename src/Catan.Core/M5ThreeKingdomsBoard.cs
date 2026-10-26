@@ -84,7 +84,7 @@ namespace Catan.Core.M5
             void Add(B5BoardOption o){o.PlayerId=player;o.Kind=kind;o.Argument=argument;o.Budget=budget;o.Id=kind+":"+Json.Hash(Json.Write(o));result.Add(o);}
             if(kind=="deploy-knight")
             {
-                var p=s.Players.Single(x=>x.Id==player);int level=Enumerable.Range(1,p.Improvements[1]>=3?3:2).FirstOrDefault(l=>s.Knights.Count(k=>k.PlayerId==player&&k.Level==l)<2);
+                var p=s.Players.Single(x=>x.Id==player);int level=Enumerable.Range(1,B6Technology(s,player,1)>=3?3:2).FirstOrDefault(l=>s.Knights.Count(k=>k.PlayerId==player&&k.Level==l)<2);
                 if(level>0)foreach(var v in scenario.Topology.Vertices.Where(v=>!Occupied(s,v.Id)&&OwnRouteEdges(s,player).Any(e=>e.Vertices.Contains(v.Id))))Add(new B5BoardOption{TargetId=v.Id,AssetKind="Knight",Level=level,Label="无双：安放"+level+"级骑士 "+v.Id});
             }
             else if(kind=="liyu")
@@ -93,7 +93,7 @@ namespace Catan.Core.M5
                 if(lubu!=null)foreach(var knight in s.Knights.Where(k=>k.PlayerId==lubu&&B5KnightCanAct(s,k)))foreach(var v in scenario.Topology.Vertices.Where(v=>!Occupied(s,v.Id)&&s.Roads.Any(r=>EdgeAt(r.LocationId).Vertices.Contains(v.Id)&&B5Working(s,"Road",r.LocationId))))
                 {
                     var cost=new int[8];cost[3]=B5KnightLevel(s,knight);Add(new B5BoardOption{SourceId=knight.LocationId,TargetId=v.Id,OtherPlayerId=lubu,AssetKind="Knight",Level=cost[3],Cost=cost,Label="利驭：移动至 "+v.Id});
-                    foreach(var enemy in s.Knights.Where(k=>k.PlayerId!=lubu&&B5KnightLevel(s,k)<cost[3]&&scenario.Topology.Edges.Any(e=>e.Vertices.Contains(v.Id)&&e.Vertices.Contains(k.LocationId))))Add(new B5BoardOption{SourceId=knight.LocationId,TargetId=v.Id,OtherPlayerId=lubu,AssetKind="Knight",Level=cost[3],Cost=cost,PayloadJson="kill:"+enemy.LocationId,Label="利驭：移动并击杀 "+enemy.LocationId});
+                    foreach(var enemy in s.Knights.Where(k=>k.PlayerId!=lubu&&B6AllianceRules.CanAttack(s.ThreeKingdoms,player,k.PlayerId)&&B6AllianceRules.CanAttack(s.ThreeKingdoms,lubu,k.PlayerId)&&B5KnightLevel(s,k)<cost[3]&&scenario.Topology.Edges.Any(e=>e.Vertices.Contains(v.Id)&&e.Vertices.Contains(k.LocationId))))Add(new B5BoardOption{SourceId=knight.LocationId,TargetId=v.Id,OtherPlayerId=lubu,AssetKind="Knight",Level=cost[3],Cost=cost,PayloadJson="kill:"+enemy.LocationId,Label="利驭：移动并击杀 "+enemy.LocationId});
                     if(s.FirstBarbarianAttack&&s.Tiles.Any(t=>t.Id==s.RobberTileId&&t.Vertices.Contains(v.Id)))Add(new B5BoardOption{SourceId=knight.LocationId,TargetId=v.Id,OtherPlayerId=lubu,AssetKind="Knight",Level=cost[3],Cost=cost,PayloadJson="chase",Label="利驭：移动并驱赶强盗 "+v.Id});
                 }
             }
@@ -272,7 +272,7 @@ namespace Catan.Core.M5
         {
             var b=B5Board(s);var invasion=b.Invasions.FirstOrDefault(x=>x.EventId==eventId);if(invasion==null)return;
             foreach(var k in s.Knights.Where(k=>invasion.Participants.Contains(k.PlayerId)))k.Active=false;
-            if(!invasion.IsVirtual){s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;if(s.PirateTileId==null&&(seafaring.Id!="pirate-islands"||s.Special.Fortresses.Any(f=>f.Strength>0)))s.PirateTileId=seafaring.InitialPirateTileId;}
+            if(!invasion.IsVirtual){s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;if(s.PirateTileId==null&&(seafaring.Id!="pirate-islands"||s.Special.Fortresses.Any(f=>f.Strength>0)))s.PirateTileId=InitialPirateB6(s);}
             b.Invasions=b.Invasions.Where(x=>x!=invasion).ToArray();B2SkillEngine.OnB5RaidResolved(CardHost(s),eventId,invasion.CityCollapsed,invasion.PointAwarded,false,null);
         }
         private void B5Invasion(GameState s,string eventId,string[] participants,bool virtualAttack)
@@ -280,7 +280,7 @@ namespace Catan.Core.M5
             var b=B5Board(s);if(b.ProcessedInvasions.Contains(eventId))return;Require(participants!=null&&participants.Distinct().Count()==participants.Length&&participants.All(p=>s.Players.Any(x=>x.Id==p)),"InvalidParticipants","入侵参与者无效。");b.ProcessedInvasions=Append(b.ProcessedInvasions,eventId);
             var ids=participants;var strength=ids.ToDictionary(p=>p,p=>s.Knights.Where(k=>k.PlayerId==p&&(k.Active||B2SkillEngine.B5AlwaysActiveKnights(s.ThreeKingdoms,p))).Sum(k=>B5KnightLevel(s,k)));
             int attack=s.Cities.Count(c=>ids.Contains(c.PlayerId)),defense=strength.Values.Sum();bool point=false;
-            if(!virtualAttack){s.BarbarianPosition=7;s.FirstBarbarianAttack=true;if(s.RobberTileId==null)s.RobberTileId=seafaring.InitialRobberTileId;s.BarbarianAttackStrength=attack;s.BarbarianDefenseStrength=defense;}
+            if(!virtualAttack){s.BarbarianPosition=7;s.FirstBarbarianAttack=true;if(s.RobberTileId==null)s.RobberTileId=InitialRobberB6(s);s.BarbarianAttackStrength=attack;s.BarbarianDefenseStrength=defense;}
             if(ids.Length>0&&defense>=attack){int max=strength.Values.Max();var winners=TurnOrder(s).Where(p=>ids.Contains(p.Id)&&strength[p.Id]==max).ToArray();if(winners.Length==1){winners[0].DefenderPoints++;point=true;}else foreach(var p in winners)QueueDecision(s,new PendingDecision{Kind="DefenderProgress",PlayerId=p.Id});}
             else if(ids.Length>0)
             {

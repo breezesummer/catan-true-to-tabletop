@@ -81,7 +81,7 @@ namespace Catan.Core.ThreeKingdoms
             var s=host.State;if(!B5Enabled(s)||!new[]{"Settlement","City","Knight","RecruitKnight","PromoteKnight"}.Contains(assetKind)||!Mark(s,"b5m-built:"+eventId))return;
             foreach(var id in Order(s))
             {
-                var g=Active(s,id);if(g?.GeneralId!="tk-g53"||id==player||host.GetHand(player).Sum()==0||IsB4HandLossForbidden(s,player)||IsProtected(s,player))continue;
+                var g=Active(s,id);if(g?.GeneralId!="tk-g53"||id==player||!B6AllianceRules.CanAttack(s,id,player)||host.GetHand(player).Sum()==0||IsB4HandLossForbidden(s,player)||IsProtected(s,player))continue;
                 var f=MilitaryFrame(s,g,"tk-g53-s1","b5m-tax",eventId);f.PlayerId=player;f.Targets=new[]{id};Append(s,f);
             }
         }
@@ -136,7 +136,7 @@ namespace Catan.Core.ThreeKingdoms
             }
             if(g.GeneralId=="tk-g24"&&Value(g,"yaowu",0)==0&&s.Military?.PermanentYaowuPlayers.Contains(player)!=true)actions.Add(Action(s,"tk-g24-s1","b5m-yaowu","耀武：本局手牌上限加四、发展牌上限加二，并获得受牌影响奖励"));
             if(g.GeneralId=="tk-g53"&&Value(g,"xianghai-tax",0)>=2&&Value(g,"chuhai",s.Clock.PhaseId)==0)
-                foreach(var target in s.SeatPlayerIds.Where(p=>p!=player&&host.GetHand(p).Sum()>0&&!IsProtected(s,p)&&!IsB4HandLossForbidden(s,p)))
+                foreach(var target in s.SeatPlayerIds.Where(p=>p!=player&&B6AllianceRules.CanAttack(s,player,p)&&host.GetHand(p).Sum()>0&&!IsProtected(s,p)&&!IsB4HandLossForbidden(s,p)))
                 {
                     int count=host.GetHand(target).Sum();if(s.SeatPlayerIds.Where(p=>p!=target).All(p=>host.GetHand(p).Sum()>count))continue;
                     var a=Action(s,"tk-g53-s2","b5m-chuhai","除害：与 "+target+" 比大小");a.Command.TargetPlayerIds=new[]{target};actions.Add(a);
@@ -146,6 +146,7 @@ namespace Catan.Core.ThreeKingdoms
             {
                 foreach(var payment in B5LiyuPayments(s,player,hand,option.Cost))
                 {
+                    if(player!=lvbu.OwnerPlayerId&&!CanGainCardsB6(s,lvbu.OwnerPlayerId,payment))continue;
                     string names=string.Join("、",Enumerable.Range(0,8).Where(t=>payment[t]>0).Select(t=>payment[t]+"张"+CardNames[t]));
                     var a=Action(s,"tk-g02-s2","b5m-liyu","利驭：以"+names+"支付"+option.Cost[3]+"张有效麦，"+option.Label);a.Command.ProgressCardId=option.Id;a.Command.Counts=payment;a.Command.TargetPlayerIds=new[]{lvbu.OwnerPlayerId};a.CardSelectionKind="payment";actions.Add(B45SelectionMetadata.WithBoard(a,option));
                 }
@@ -168,6 +169,7 @@ namespace Catan.Core.ThreeKingdoms
             if(c.Option?.StartsWith("b5m-",StringComparison.Ordinal)!=true)return false;
             var s=host.State;var legal=new List<B2SkillAction>();AddB5MilitaryActions(host,g,legal);Require(legal.Any(a=>SameB4Action(a.Command,c)),"军事技能时机、费用、目标或次数无效。");
             var holder=c.Option=="b5m-liyu"?Active(s,c.TargetPlayerIds[0]):g;
+            if(c.Option=="b5m-liyu")Require(g.OwnerPlayerId==holder.OwnerPlayerId||CanGainCardsB6(s,holder.OwnerPlayerId,c.Counts),"利驭收牌类型无效。");
             var f=MilitaryFrame(s,holder,c.SkillId,c.Option,null);f.PlayerId=g.OwnerPlayerId;f.Targets=(string[])c.TargetPlayerIds.Clone();
             if(c.Option=="b5m-liyu")
             {
@@ -178,7 +180,7 @@ namespace Catan.Core.ThreeKingdoms
                 if(g.OwnerPlayerId==holder.OwnerPlayerId)B4Discard(host,g.OwnerPlayerId,c.Counts,f.Id+":cost");else B4Transfer(host,g.OwnerPlayerId,holder.OwnerPlayerId,c.Counts,f.Id+":cost",f.SkillId,true);
                 return true;
             }
-            if(c.Option=="b5m-luanji") { f.Targets=Order(s);Append(s,f);B4Discard(host,g.OwnerPlayerId,c.Counts,f.Id+":cost");return true; }
+            if(c.Option=="b5m-luanji") { f.Targets=Order(s).Where(p=>B6AllianceRules.CanAttack(s,g.OwnerPlayerId,p)).ToArray();Append(s,f);B4Discard(host,g.OwnerPlayerId,c.Counts,f.Id+":cost");return true; }
             if(c.Option=="b5m-wusheng")Counter(g,"wusheng",0).Value=1;
             if(c.Option=="b5m-shanqi")Counter(g,"shanqi",0).Value=1;
             if(c.Option=="b5m-yaowu")Counter(g,"yaowu",0).Value=1;
@@ -209,7 +211,7 @@ namespace Catan.Core.ThreeKingdoms
             if(f.Kind=="b5m-tishen") { int count=Math.Max(0,f.Remaining-host.GetHand(f.PlayerId).Sum());Remove(s,f);Gain(host,f.PlayerId,TakeRandom(host,f.PlayerId,count),f.SkillId,f.Id);return true; }
             if(f.Kind=="b5m-tax")
             {
-                if(host.GetHand(f.PlayerId).Sum()==0||IsProtected(s,f.PlayerId)||IsB4HandLossForbidden(s,f.PlayerId)){Remove(s,f);return true;}
+                if(!B6AllianceRules.CanAttack(s,f.Targets[0],f.PlayerId)||!Enumerable.Range(0,8).Any(t=>host.GetHand(f.PlayerId)[t]>0&&CanGainB6(s,f.Targets[0],t))||IsProtected(s,f.PlayerId)||IsB4HandLossForbidden(s,f.PlayerId)){Remove(s,f);return true;}
                 Decide(s,f,"b5m-tax","乡害：交给周处一张手牌","建造已完成；请选择一张真实资源或商品交给 "+f.Targets[0]+"。");waiting=true;return true;
             }
             if(f.Kind=="b5m-luanji")
@@ -221,7 +223,7 @@ namespace Catan.Core.ThreeKingdoms
                     Decide(s,f,"b5m-luanji-defend","乱击：是否抵御虚拟入侵","打出一张有效矿石后，本次城市、骑士、奖惩全部退出计算；也可参与入侵。");waiting=true;return true;
                 }
                 f.PlayerId=f.B4.OwnerPlayerId;f.Kind="b5m-luanji-reward";
-                var participants=f.Targets.Where((p,index)=>f.B4.OtherSelection[index]==0).ToArray();
+                var participants=f.Targets.Where((p,index)=>f.B4.OtherSelection[index]==0&&B6AllianceRules.CanAttack(s,f.B4.OwnerPlayerId,p)).ToArray();
                 if(participants.Length>0){board.ResolveInvasion(f.Id+":invasion",participants,true);waiting=true;}return true;
             }
             if(f.Kind=="b5m-luanji-reward")
@@ -242,7 +244,7 @@ namespace Catan.Core.ThreeKingdoms
             if(f.Kind=="b5m-chuhai") { SuspendB5Comparison(host,f);waiting=true;return true; }
             if(f.Kind=="b5m-chuhai-choice")
             {
-                if(IsProtected(s,f.Targets[0])||IsB4HandLossForbidden(s,f.Targets[0])||host.GetHand(f.Targets[0]).Sum()==0){Remove(s,f);return true;}
+                if(!B6AllianceRules.CanAttack(s,f.PlayerId,f.Targets[0])||IsProtected(s,f.Targets[0])||IsB4HandLossForbidden(s,f.Targets[0])||host.GetHand(f.Targets[0]).Sum()==0){Remove(s,f);return true;}
                 Decide(s,f,"b5m-chuhai-discard","除害：查看并弃置目标手牌","只有你可以查看目标的真实手牌。弃牌完成后，领取其缺少的资源及商品各一张。");waiting=true;return true;
             }
             if(f.Kind=="b5m-chuhai-reward")
@@ -261,7 +263,7 @@ namespace Catan.Core.ThreeKingdoms
             if(d.Kind=="b5m-tax"||d.Kind=="b5m-chuhai-discard")
             {
                 var owner=d.Kind=="b5m-tax"?f.PlayerId:f.Targets[0];
-                foreach(int t in Enumerable.Range(0,8).Where(t=>host.GetHand(owner)[t]>0))
+                foreach(int t in Enumerable.Range(0,8).Where(t=>host.GetHand(owner)[t]>0&&(d.Kind!="b5m-tax"||CanGainB6(s,f.Targets[0],t))))
                 { var a=Action(s,f.SkillId,d.Kind,(d.Kind=="b5m-tax"?"交出":"弃置目标的")+CardNames[t],d);a.Command.CardType=t;a.RealCardType=t;a.CardSelectionKind="select";a.AvailableCount=host.GetHand(owner)[t];actions.Add(a); }
             }
             if(d.Kind=="b5m-luanji-defend")

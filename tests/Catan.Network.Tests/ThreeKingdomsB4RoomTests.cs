@@ -141,7 +141,7 @@ public sealed class ThreeKingdomsB4RoomTests
         public Fixture(string rules,int count,string[]? ai=null,string? package=null)
         {
             packageVersion=package??GeneralCatalog.B4PackageVersion;
-            packageHash=packageVersion==GeneralCatalog.B5PackageVersion?GeneralCatalog.B5ContentHash:GeneralCatalog.B4ContentHash;
+            packageHash=packageVersion==GeneralCatalog.B6PackageVersion?GeneralCatalog.B6ContentHash:packageVersion==GeneralCatalog.B5PackageVersion?GeneralCatalog.B5ContentHash:GeneralCatalog.B4ContentHash;
             this.rules=rules;Directory=new RoomDirectory(storage,scenario);
             var create=Request("Create",null);create.Payload=WireJson.Serialize(new CreateRoomPayload { Settings=new RoomSettings { RuleSet=rules,
                 ScenarioId=rules=="combined"?"heading-for-new-shores":"base",PlayerCount=count,AiSeats=ai??[],

@@ -17,6 +17,7 @@ internal sealed class RuleRoomGame
     private bool finished;
     internal int CommandCount { get; private set; }
     internal string ActivePlayerId { get; private set; }
+    internal string ActiveControllerPlayerId { get; private set; }
     internal int StartingPlayerIndex { get; private set; }
     // 摆放轮也有独立边界；蛇形折返时同一颜色可连续摆放两轮。
     internal string TurnKey { get; private set; }
@@ -57,6 +58,11 @@ internal sealed class RuleRoomGame
         finished = document.RootElement.TryGetProperty("WinnerPlayerId", out var winner) && winner.ValueKind == System.Text.Json.JsonValueKind.String && !string.IsNullOrEmpty(winner.GetString());
         CommandCount = document.RootElement.GetProperty("ProcessedCommands").GetArrayLength();
         ActivePlayerId = document.RootElement.GetProperty("ActivePlayerId").GetString();
+        ActiveControllerPlayerId = ActivePlayerId;
+        if (document.RootElement.TryGetProperty("ThreeKingdoms", out var controlState) && controlState.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            controlState.TryGetProperty("ControlB6", out var control) && control.ValueKind == System.Text.Json.JsonValueKind.Object &&
+            control.GetProperty("AssetPlayerId").GetString() == ActivePlayerId)
+            ActiveControllerPlayerId = control.GetProperty("ControllerPlayerId").GetString();
         StartingPlayerIndex = document.RootElement.GetProperty("StartingPlayerIndex").GetInt32();
         TurnKey = document.RootElement.GetProperty("Turn").GetInt32() + ":" + document.RootElement.GetProperty("SetupPlacementIndex").GetInt32() + ":" + ActivePlayerId;
         return json;
@@ -130,16 +136,22 @@ internal sealed class RuleRoomGame
     };
     internal bool HasIndependentSelectionToken(object command)
     {
-        string player,decision,window;bool choice;
-        if(command is M4.Command city){player=city.PlayerId;decision=city.DecisionId;window=city.WindowId;choice=city.Kind==M4.CommandKind.ChooseGenerals||city.Kind==M4.CommandKind.DeployGeneral;}
-        else if(command is M5.Command combined){player=combined.PlayerId;decision=combined.DecisionId;window=combined.WindowId;choice=combined.Kind==M5.CommandKind.ChooseGenerals||combined.Kind==M5.CommandKind.DeployGeneral;}
+        string player,asset,decision,window;bool choice;
+        if(command is M4.Command city){player=city.PlayerId;asset=city.ActingAsPlayerId??player;decision=city.DecisionId;window=city.WindowId;choice=city.Kind==M4.CommandKind.ChooseGenerals||city.Kind==M4.CommandKind.DeployGeneral;}
+        else if(command is M5.Command combined){player=combined.PlayerId;asset=combined.ActingAsPlayerId??player;decision=combined.DecisionId;window=combined.WindowId;choice=combined.Kind==M5.CommandKind.ChooseGenerals||combined.Kind==M5.CommandKind.DeployGeneral;}
         else return false;
         if(!choice)return false;
         var projection=View(player);var tk=projection is M4.PlayerView cityView?cityView.ThreeKingdoms:((M5.PlayerView)projection).ThreeKingdoms;
-        return GeneralCatalog.IsAutomaticPackage(tk?.PackageVersion)&&tk.PendingDecision?.PlayerId==player&&
+        return GeneralCatalog.IsAutomaticPackage(tk?.PackageVersion)&&tk.PendingDecision?.PlayerId==asset&&B2SkillEngine.ControllerForViewB6(tk,asset)==player&&
             tk.PendingDecision.DecisionId==decision&&tk.PendingDecision.WindowId==window;
     }
     internal string Actor(Func<string,bool> eligible=null)
+    {
+        var actor=AssetActorB6(eligible);var projection=View("P1");
+        var tk=projection is M4.PlayerView c?c.ThreeKingdoms:projection is M5.PlayerView m?m.ThreeKingdoms:null;
+        return B2SkillEngine.ControllerForViewB6(tk,actor);
+    }
+    private string AssetActorB6(Func<string,bool> eligible=null)
     {
         dynamic view = View("P1");
         if(ruleSet=="cities-knights"||ruleSet=="combined")

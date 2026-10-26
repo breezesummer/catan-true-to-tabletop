@@ -44,6 +44,9 @@ namespace Catan.Core.ThreeKingdoms
         public const string B5RulesVersion = "three-kingdoms-b5-v1";
         public const string B5PackageVersion = "three-kingdoms-board-state-49-v1";
         public const string B5PackageLabel = "三国争霸 B5（49将棋盘状态包）";
+        public const string B6RulesVersion = "three-kingdoms-b6-v1";
+        public const string B6PackageVersion = "three-kingdoms-special-54-v1";
+        public const string B6PackageLabel = "三国争霸（54将完整技能包）";
         public const string B45RulesVersion = "three-kingdoms-b45-v1";
         public const string B45PackageVersion = "three-kingdoms-direct-interaction-v1";
         public const string B45PackageLabel = "三国争霸 B4.5（桌面直接交互）";
@@ -51,10 +54,12 @@ namespace Catan.Core.ThreeKingdoms
         public const string B5DirectRulesVersion = "three-kingdoms-b5-direct-v1";
         public const string B5DirectPackageVersion = "three-kingdoms-board-state-49-direct-v1";
         public const string B5DirectPackageLabel = "三国争霸（49将与桌面直接交互）";
-        public static bool UsesB5Rules(string version) => version == B5RulesVersion || version == B5DirectRulesVersion;
-        public static bool UsesB5Package(string version) => version == B5PackageVersion || version == B5DirectPackageVersion;
-        public static bool UsesDirectRules(string version) => version == B45RulesVersion || version == B5DirectRulesVersion;
-        public static bool UsesDirectPackage(string version) => version == B45PackageVersion || version == B5DirectPackageVersion;
+        public static bool UsesB6Rules(string version) => version == B6RulesVersion;
+        public static bool UsesB6Package(string version) => version == B6PackageVersion;
+        public static bool UsesB5Rules(string version) => version == B6RulesVersion || version == B5RulesVersion || version == B5DirectRulesVersion;
+        public static bool UsesB5Package(string version) => version == B6PackageVersion || version == B5PackageVersion || version == B5DirectPackageVersion;
+        public static bool UsesDirectRules(string version) => version == B6RulesVersion || version == B45RulesVersion || version == B5DirectRulesVersion;
+        public static bool UsesDirectPackage(string version) => version == B6PackageVersion || version == B45PackageVersion || version == B5DirectPackageVersion;
         public static bool UsesB4Rules(string rulesVersion) => rulesVersion == B4RulesVersion || UsesDirectRules(rulesVersion) || UsesB5Rules(rulesVersion);
         public static bool UsesB4Package(string packageVersion) => IsAutomaticPackage(packageVersion);
         public static bool IsSupportedNetworkPackage(string packageVersion, string contentHash) =>
@@ -69,7 +74,8 @@ namespace Catan.Core.ThreeKingdoms
         public static bool IsB5Enabled(string id) => IsB4Enabled(id) || b5Ids.Contains(id);
         public static bool IsAutomaticPackage(string version) => version == B4PackageVersion || UsesDirectPackage(version) || UsesB5Package(version);
         public static bool IsNetworkPackage(string version, string hash) =>
-            version == B4PackageVersion && hash == B4ContentHash || version == B45PackageVersion && hash == B45ContentHash || version == B5PackageVersion && hash == B5ContentHash || version == B5DirectPackageVersion && hash == B5DirectContentHash;
+            version == B6PackageVersion && hash == B6ContentHash || version == B4PackageVersion && hash == B4ContentHash || version == B45PackageVersion && hash == B45ContentHash || version == B5PackageVersion && hash == B5ContentHash || version == B5DirectPackageVersion && hash == B5DirectContentHash;
+        public static bool IsB6Enabled(string id) => IsB5Enabled(id) || new[] { "tk-g04", "tk-g46", "tk-g47", "tk-g48", "tk-g50" }.Contains(id);
         public static bool IsB2Enabled(string id) => enabledIds.Contains(id);
         private static readonly GeneralDefinition[] items = new[]
         {
@@ -133,6 +139,8 @@ namespace Catan.Core.ThreeKingdoms
         public static GeneralDefinition[] B2Definitions => items.Where(g => IsB2Enabled(g.Id)).ToArray();
         public static GeneralDefinition[] B4Definitions => items.Where(g => IsB4Enabled(g.Id)).ToArray();
         public static GeneralDefinition[] B5Definitions => items.Where(g => IsB5Enabled(g.Id)).ToArray();
+        public static GeneralDefinition[] B6Definitions => items.Where(g => IsB6Enabled(g.Id)).ToArray();
+        public static string B6ContentHash { get; } = Json.Hash(B6RulesVersion + "\n" + B6PackageVersion + "\n" + string.Join("\n", items.Select(x => x.Id + ":" + x.SourceHash + ":skills-enabled-b6-v1")));
         public static string B5ContentHash { get; } = Json.Hash(B5RulesVersion + "\n" + B5PackageVersion + "\n" + string.Join("\n", items.Where(g => IsB5Enabled(g.Id)).Select(x => x.Id + ":" + x.SourceHash + ":skills-enabled-b5-v1")));
         public static string B4ContentHash { get; } = Json.Hash(B4RulesVersion + "\n" + B4PackageVersion + "\n" + string.Join("\n", items.Where(g => IsB4Enabled(g.Id)).Select(x => x.Id + ":" + x.SourceHash + ":skills-enabled-b4-v1")));
         public static string B45ContentHash { get; } = Json.Hash(B45RulesVersion + "\n" + B45PackageVersion + "\n" + B4ContentHash + "\nfree-play-active-skills:no-opening-offer;event-responses:preserved-v1");

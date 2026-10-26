@@ -570,7 +570,7 @@ public sealed partial class RoomDirectory : IDisposable
                 else pendingChange = new(state.RoomId, state.Revision, Stopwatch.GetTimestamp());
             }
         }
-        private bool CanRestoreHumanControl(SavedSeat seat) => game != null && !game.Finished && seat.ControlledByAi && Connected(seat) && seat.RejoinAfterTurnKey != null && seat.RejoinAfterTurnKey != game.TurnKey && game.ActivePlayerId == seat.SeatId;
+        private bool CanRestoreHumanControl(SavedSeat seat) => game != null && !game.Finished && seat.ControlledByAi && Connected(seat) && seat.RejoinAfterTurnKey != null && seat.RejoinAfterTurnKey != game.TurnKey && game.ActiveControllerPlayerId == seat.SeatId;
         private bool RestoreHumanControlAtTurnBoundary()
         {
             if (game == null || game.Finished) return false;

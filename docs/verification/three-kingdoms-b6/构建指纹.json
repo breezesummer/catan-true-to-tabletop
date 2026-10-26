@@ -1,0 +1,95 @@
+{
+  "日期": "2026-10-26",
+  "版本": "内测版2.0.2",
+  "Unity": "6000.3.25f1",
+  "开发包": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6",
+  "正式发布": false,
+  "云端部署": false,
+  "Windows实际程序": {
+    "status": "通过",
+    "unity": "6000.3.25f1",
+    "note": "实际 Windows 本地入口覆盖 M4/M5 各 3/4 人、选将/登场/阶段/轮换/技能选择读档及本地重开。截图为游戏相机与 IMGUI 离屏合成，须人工查看；不代表真机或用户试玩验收。",
+    "packageVersion": "three-kingdoms-special-54-v1",
+    "configurations": 4,
+    "saveRoundtrips": 36,
+    "retirements": 9,
+    "restarts": 4,
+    "images": 0,
+    "guiImagesWithChanges": 0,
+    "skillChoices": 4,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+  },
+  "文件": [
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/Builds/Windows/Catan2.0.2.exe",
+      "字节": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/Builds/Windows/Catan2.0.2_Data/Managed/Assembly-CSharp.dll",
+      "字节": 1344512,
+      "SHA256": "bf4db6f86975e0b59d12e0c08978398d7c90dfc4b41505b76ee51fc137dd13a8"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/Builds/Windows/Catan2.0.2_Data/Managed/Catan.Core.dll",
+      "字节": 1439744,
+      "SHA256": "3cfce8d1f883bc68823867d9997e2d3ec03405f4cbca4647af77d157dbb2316e"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/Builds/Windows/Catan2.0.2_Data/Managed/Catan.AI.dll",
+      "字节": 218112,
+      "SHA256": "c79d7d67c12d6bb1d1a43a6485e481bab8ce4c4a26adadf9512268a6144f9b5a"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/Builds/Windows/Server/Catan.Server.exe",
+      "字节": 162304,
+      "SHA256": "e9a5788ba50a37d0e00d727c96c085b987a06f6197c17874bc340c27509ef3f1"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/Builds/Android/Catan2.0.2.apk",
+      "字节": 355535097,
+      "SHA256": "dee007d90318d888e86d4286642a9a49714985d8f2338d74e2e19cb6078d9c35"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/Builds/Android/build-info.json",
+      "字节": 666,
+      "SHA256": "859b0a7a4cf0358098f30293dc206c6c5a3fe13c73842d37e9175df68d5114d8"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/logs/android-apk-signature.txt",
+      "字节": 991,
+      "SHA256": "8836ea1995eaf735ab337124925d55becff4cf2149f3f73e9e528ae43a322079"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/logs/unity-build.log",
+      "字节": 436590,
+      "SHA256": "8159535068b2fe7c5e845ada0d9974de6a84ad7d5f2822ebd388692b49995122"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/logs/unity-android-build.log",
+      "字节": 790400,
+      "SHA256": "7bf41425f1073b265c2ce11cb7e6589d3df02dbe5c99f7c35b544f4d4cd08310"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/logs/player-save.log",
+      "字节": 2362,
+      "SHA256": "2c46a990e982e91e3bb6e5e964cccac8f3a76225806b1c6583d0e3b3d872d61f"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/logs/player-load.log",
+      "字节": 2332,
+      "SHA256": "f361b5234f1c6a54a02c9ab41a35d117eadae77dda775c2c8b8d5d8c2806b136"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/logs/player-three-kingdoms.log",
+      "字节": 1893,
+      "SHA256": "0fbf656585a8a69ec9e7bbe910d9c18c4a73a84acf069e612e3c783791b5a99c"
+    },
+    {
+      "路径": "game version/2.0/Catan2.0.2-Three-Kingdoms-B6/verification/three-kingdoms/result.json",
+      "字节": 565,
+      "SHA256": "c20309feeea88d547e0c3619bf8f3c81f68324c53ae98e6fe8b3a0bfa946686d"
+    }
+  ]
+}
