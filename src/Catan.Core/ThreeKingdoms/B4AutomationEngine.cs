@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -21,7 +21,7 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=7)] public B4RetirementIntent[] RetirementIntents { get; set; } = Array.Empty<B4RetirementIntent>();
     }
 
-    // 只管理主动技能的首次提示与可保存的换将意图，强制/事件技能仍使用原效果队列。
+    // 保留旧包首次提示与各包可保存的换将意图；B4.5自由出牌不生成主动技能询问。
     public static class B4AutomationEngine
     {
         public static bool Enabled(ThreeKingdomsState s) => ThreeKingdomsEngine.UsesB4Lifecycle(s);
@@ -48,7 +48,11 @@ namespace Catan.Core.ThreeKingdoms
         }
         public static bool Offer(IThreeKingdomsCardHost host)
         {
-            var s=host.State; if (!Enabled(s)) return false; Refresh(s); var a=State(s);
+            var s=host.State; if (!Enabled(s)) return false;
+            // 只改变新包的自由出牌入口，真实事件、骰子与回合边界响应由各自的权威待决承接。
+            // 不清除旧包或已保存的询问，也不消耗窗口、次数或随机流。
+            if (GeneralCatalog.UsesDirectRules(s.RulesVersion)) return false;
+            Refresh(s); var a=State(s);
             if (a.PendingDecision != null) return true;
             var owner=s.Clock.ActivePlayerId;
             var general=s.Generals.SingleOrDefault(g => g.Region==GeneralRegion.Active && g.OwnerPlayerId==owner);
@@ -124,6 +128,8 @@ namespace Catan.Core.ThreeKingdoms
                 ||a.RetirementIntents.Select(i=>i.PlayerId).Distinct().Count()!=a.RetirementIntents.Length)
                 return new[]{"自动提示或各席隐退意图无效。"};
             var d=a.PendingDecision;
+            if(GeneralCatalog.UsesDirectRules(s.RulesVersion)&&s.Clock.Phase==ThreeKingdomsPhase.Play&&d!=null)
+                return new[]{"B4.5自由出牌阶段不能保存主动技能首次询问。"};
             if(d!=null&&(string.IsNullOrWhiteSpace(d.DecisionId)||string.IsNullOrWhiteSpace(d.WindowId)
                 ||!s.SeatPlayerIds.Contains(d.PlayerId)||string.IsNullOrWhiteSpace(a.PendingSkillId)
                 ||string.IsNullOrWhiteSpace(a.PendingTenureId))) return new[]{"自动技能询问身份不完整。"};

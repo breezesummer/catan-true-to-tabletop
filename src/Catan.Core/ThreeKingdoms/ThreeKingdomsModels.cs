@@ -150,5 +150,8 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=22, EmitDefaultValue=false)] public B5RevealedHand[] MilitaryHands { get; set; }
         [DataMember(Order=23, EmitDefaultValue=false)] public int? ProgressHandLimit { get; set; }
         [DataMember(Order=24, EmitDefaultValue=false)] public B5BoardAsset[] BoardAssets { get; set; }
+        [DataMember(Order=25, EmitDefaultValue=false)] public string[] PublicPoolGeneralIds { get; set; }
+        [DataMember(Order=26, EmitDefaultValue=false)] public string[] RetiredGeneralIds { get; set; }
+        [DataMember(Order=27, EmitDefaultValue=false)] public B45SkillRuntimeStatus[] SkillRuntimeStatus { get; set; }
     }
 }

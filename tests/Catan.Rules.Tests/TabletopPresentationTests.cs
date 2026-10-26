@@ -200,69 +200,69 @@ public sealed class TabletopPresentationTests
     [Theory]
     [InlineData(282,409)]
     [InlineData(682,919)]
-    [InlineData(992,764)]
-    public void GrowingHandsOverlapWithoutShrinkingOrLeavingTheirScreenRegion(float width,float center)
+    [InlineData(824,754)]
+    public void HandsStartAtTheSameLeftEdgeAndNeverHavePositiveGaps(float width,float center)
     {
         foreach(int count in new[]{1,3,8,20,60,120})
         {
             var first=TabletopHandLayout.Card(0,count,center,width,false);
-            var last=TabletopHandLayout.Card(count-1,count,center,width,false);
-            Assert.True(first.X>=center-width/2-.001f);
-            Assert.True(last.X+TabletopHandLayout.CardWidth<=center+width/2+.001f);
-            Assert.Equal(center,(first.X+last.X+TabletopHandLayout.CardWidth)/2,3);
+            Assert.Equal(center-width/2,first.X,3);
             Assert.Equal(108,TabletopHandLayout.CardWidth);Assert.Equal(151,TabletopHandLayout.CardHeight);
             for(int i=0;i<count;i++)
             {
                 var pose=TabletopHandLayout.Card(i,count,center,width,false);
                 Assert.Equal(0,pose.Angle);Assert.Equal(714,pose.Y);
-                if(i>0)Assert.True(pose.X>TabletopHandLayout.Card(i-1,count,center,width,false).X);
+                if(i>0)
+                {
+                    float step=pose.X-TabletopHandLayout.Card(i-1,count,center,width,false).X;
+                    Assert.InRange(step,TabletopHandLayout.MinimumExposure-.001f,TabletopHandLayout.CardWidth+.001f);
+                    if(count*TabletopHandLayout.CardWidth<=width)Assert.Equal(TabletopHandLayout.CardWidth,step,3);
+                }
                 Assert.Equal(pose.Y-22,TabletopHandLayout.Card(i,count,center,width,true).Y);
             }
-            if(count>width/TabletopHandLayout.CardWidth)
-                Assert.True(TabletopHandLayout.Card(1,count,center,width,false).X-first.X<TabletopHandLayout.CardWidth);
+            float scroll=TabletopHandLayout.MaximumScroll(count,width);
+            var last=TabletopHandLayout.Card(count-1,count,center,width,false,scroll);
+            Assert.True(last.X+TabletopHandLayout.CardWidth<=center+width/2+.001f);
+            if(scroll>0)Assert.Equal(center+width/2,last.X+TabletopHandLayout.CardWidth,3);
         }
     }
     [Fact]
-    public void ASingleHandStaysAtTheFrontCenter()
+    public void ResourceAndSpecialHandsReserveTheSameLeftAlignedArea()
     {
-        Assert.Equal(764,TabletopHandLayout.ResourceCenter(false));Assert.Equal(764,TabletopHandLayout.SpecialCenter(false));
+        Assert.Equal(754,TabletopHandLayout.ResourceCenter(false));Assert.Equal(754,TabletopHandLayout.SpecialCenter(false));
+        Assert.Equal(342,TabletopHandLayout.Card(0,1,754,824,false).X);
         Assert.Equal(TabletopHandLayout.SpecialCenter(true),TabletopHandLayout.ResourceCenter(true));
         Assert.Equal(TabletopHandLayout.SpecialWidth(true),TabletopHandLayout.ResourceWidth(true));
+        Assert.Equal(0,TabletopHandLayout.HoverSpread);
+        Assert.Equal(0,TabletopHandLayout.ContentWidth(0,824));
     }
-
-    [Theory]
-    [InlineData(false,false)]
-    [InlineData(false,true)]
-    [InlineData(true,false)]
-    [InlineData(true,true)]
-    public void ExpandedHandsLeaveTheStatusBoxAndEndTurnControlsUncovered(bool special,bool mixed)
+    [Fact]
+    public void ScrollIsClampedAndEveryCardCanBeReachedWithAClickableStrip()
     {
-        float center=special?TabletopHandLayout.SpecialCenter(mixed):TabletopHandLayout.ResourceCenter(mixed);
-        float width=special?TabletopHandLayout.SpecialWidth(mixed):TabletopHandLayout.ResourceWidth(mixed);
-        foreach(int count in new[]{1,8,20,60,120})
+        const int count=120;const float width=824,center=754;
+        Assert.Equal(0,TabletopHandLayout.ClampScroll(-100,count,width));
+        Assert.Equal(TabletopHandLayout.MaximumScroll(count,width),TabletopHandLayout.ClampScroll(float.MaxValue,count,width));
+        for(int index=0;index<count;index++)
         {
-            var first=TabletopHandLayout.Card(0,count,center,width,false);
-            var last=TabletopHandLayout.Card(count-1,count,center,width,false);
-            // 留出纸影空间；状态框右边为238，取消选择和结束回合从1290开始。
-            Assert.True(first.X-TabletopHandLayout.HoverSpread>=244-.001f);
-            Assert.True(last.X+TabletopHandLayout.CardWidth+TabletopHandLayout.HoverSpread<=1284+.001f);
+            float scroll=TabletopHandLayout.ClampScroll(index*TabletopHandLayout.MinimumExposure,count,width);
+            var pose=TabletopHandLayout.Card(index,count,center,width,false,scroll);
+            Assert.InRange(pose.X,TabletopHandLayout.RestLeft-.001f,TabletopHandLayout.RestRight-TabletopHandLayout.MinimumExposure+.001f);
         }
     }
-
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void CollectionFlightDestinationsStayInsideTheSameReservedHandRegion(bool mixed)
+    public void CollectionAndStaticHandGeometryShareExactPositionsAndScroll(bool mixed)
     {
         float center=TabletopHandLayout.ResourceCenter(mixed),width=TabletopHandLayout.ResourceWidth(mixed);
-        foreach(double arrivingWeight in new[]{.001,.25,.5,1})
+        foreach(int count in new[]{1,5,20,60})
         {
-            var slots=Enumerable.Range(0,60).Select(index=>new TabletopResourceSlot{Good=index%5,Ordinal=index/5,Weight=index==30?arrivingWeight:1}).ToArray();
-            for(int index=0;index<slots.Length;index++)
+            var slots=Enumerable.Range(0,count).Select(index=>new TabletopResourceSlot{Good=index%5,Ordinal=index/5}).ToArray();
+            foreach(float scroll in new[]{0,TabletopHandLayout.MaximumScroll(count,width)})
+            for(int index=0;index<count;index++)
             {
-                var pose=TabletopHandLayout.Resource(slots,index,center,width,false);
-                Assert.True(pose.X>=268-.001f);
-                Assert.True(pose.X+TabletopHandLayout.CardWidth<=1260+.001f);
+                var pose=TabletopHandLayout.Resource(slots,index,center,width,false,scroll);
+                Assert.Equal(TabletopHandLayout.Card(index,count,center,width,false,scroll).X,pose.X,3);
             }
         }
     }

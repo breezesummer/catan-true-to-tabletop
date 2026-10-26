@@ -4,8 +4,13 @@ using UnityEngine;
 public static class TabletopPieceDock
 {
     static Texture2D frame;
-    public static Rect GroupLayout(int pieceCount, int index)
-        => new Rect(22, 836 - (pieceCount - 1 - index) * 58, 112, 52);
+    public static Rect GroupLayout(int pieceCount,int index)
+    {
+        // 双扩展八组库存用两列，保持银行下沿与底部武将框之间的安全空间。
+        int rows=pieceCount>6?(pieceCount+1)/2:pieceCount;
+        int column=rows==0?0:index/rows,row=rows==0?0:index%rows;
+        return new Rect(22+column*122,632-(rows-1-row)*58,112,52);
+    }
     public static Vector2 PiecePosition(Rect group) => new Vector2(group.x + 29, group.y + 26);
     public static Rect ModelArea(Rect group) => new Rect(group.x + 5, group.y + 6, 48, 40);
     public static Rect CountArea(Rect group) => new Rect(group.x + 63, group.y + 8, 43, 36);

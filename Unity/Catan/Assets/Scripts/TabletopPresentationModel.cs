@@ -6,35 +6,30 @@ using System.Linq;
 public static class TabletopHandLayout
 {
     public const float CardWidth = 108, CardHeight = 151, Baseline = 714;
-    public const float HoverSpread = 24;
-    // 左侧状态区止于 238，右侧操作区始于 1290；包含展开后的手牌也必须留在两者之间。
-    const float RestLeft = 268, RestRight = 1260, SpecialRight = 550, MixedResourceLeft = 578;
-    public static TabletopCardPose Card(int index, int count, float center, float width, bool selected)
+    public const float HoverSpread = 0, MinimumExposure = 26;
+    public const float RestLeft = 342, RestRight = 1166;
+    // 卡边相贴；超量只压缩露出宽度，达到可点击下限后横向滚动。
+    public static float Step(double count,float width) => count<=1?0:(float)Math.Min(CardWidth,Math.Max(MinimumExposure,Math.Max(0,width-CardWidth)/(count-1)));
+    public static float ContentWidth(double count,float width) => count<=0?0:CardWidth+(float)Math.Max(0,count-1)*Step(count,width);
+    public static float MaximumScroll(double count,float width) => Math.Max(0,ContentWidth(count,width)-width);
+    public static float ClampScroll(float scroll,double count,float width) => Math.Max(0,Math.Min(scroll,MaximumScroll(count,width)));
+    public static TabletopCardPose Card(int index,int count,float center,float width,bool selected,float scroll=0)
     {
-        // 卡牌始终使用屏幕逻辑像素；空间不足只压缩间距，不缩小卡面或分页。
-        float step = count <= 1 ? 0 : Math.Min(CardWidth + 10, Math.Max(0, width - CardWidth) / (count - 1));
-        return new TabletopCardPose {
-            X = center - (CardWidth + (count - 1) * step) / 2 + index * step,
-            Y = Baseline - (selected ? 22 : 0), Angle = 0
-        };
+        return new TabletopCardPose { X=center-width/2+index*Step(count,width)-ClampScroll(scroll,count,width),
+            Y=Baseline-(selected?22:0),Angle=0 };
     }
     public static int ResourceCapacity(bool hasSpecialCards) => int.MaxValue;
     public static int SpecialCapacity(bool hasResources) => int.MaxValue;
-    // 资源和发展卡共用完整区域；页签选择决定当前显示哪副手牌。
-    public static float ResourceCenter(bool hasSpecialCards) => (RestLeft + RestRight) / 2;
-    public static float ResourceWidth(bool hasSpecialCards) => RestRight - RestLeft;
-    public static float SpecialCenter(bool hasResources) => (RestLeft + RestRight) / 2;
-    public static float SpecialWidth(bool hasResources) => RestRight - RestLeft;
-    public static bool IsObscured(float nextX,float x,float width) => nextX < x+width-.5f;
-    public static TabletopCardPose Resource(TabletopResourceSlot[] slots,int index,float center,float width,bool selected)
+    public static float ResourceCenter(bool hasSpecialCards) => (RestLeft+RestRight)/2;
+    public static float ResourceWidth(bool hasSpecialCards) => RestRight-RestLeft;
+    public static float SpecialCenter(bool hasResources) => (RestLeft+RestRight)/2;
+    public static float SpecialWidth(bool hasResources) => RestRight-RestLeft;
+    public static bool IsObscured(float nextX,float x,float width) => nextX<x+width-.5f;
+    public static TabletopCardPose Resource(TabletopResourceSlot[] slots,int index,float center,float width,bool selected,float scroll=0)
     {
-        // 飞牌落下前才逐渐撑开插槽，已有手牌随之让位；同一插槽同时供飞牌和手牌绘制使用。
         double count=slots.Sum(slot=>slot.Weight),before=slots.Take(index).Sum(slot=>slot.Weight);
-        double step=count<=1?0:Math.Min(CardWidth+10,Math.Max(0,width-CardWidth)/(count-1));
-        return new TabletopCardPose {
-            X=(float)(center-CardWidth/2+(before+slots[index].Weight/2-count/2)*step),
-            Y=Baseline-(selected?22:0),Angle=0
-        };
+        return new TabletopCardPose { X=center-width/2+(float)before*Step(count,width)-ClampScroll(scroll,count,width),
+            Y=Baseline-(selected?22:0),Angle=0 };
     }
 }
 public sealed class TabletopResourceSlot
@@ -172,6 +167,8 @@ public static class TabletopCollectionSources
 // 只消费授权历史。资源转移不伪装成银行流出；发展/发展卡对手只绘制牌背。
 public sealed class TabletopCollectionTimeline
 {
+    // 仅客户端展示位置；飞牌与手牌复用偏移，不进入权威存档。
+    public float ResourceHandScroll,SpecialHandScroll;
     readonly System.Collections.Generic.List<TabletopCollectionFlight> flights = new System.Collections.Generic.List<TabletopCollectionFlight>();
     string scope;
     long sequence;
@@ -198,7 +195,7 @@ public sealed class TabletopCollectionTimeline
         if(!initialized||scope!=playerScope||latest<sequence)
         {
             // 首次绑定、换局和读档均只接收当前历史基线，不能重播旧的收牌。
-            flights.Clear();orders.Clear();specialOrders.Clear();handChanges.Clear();initialized=true;scope=playerScope;sequence=latest;
+            flights.Clear();orders.Clear();specialOrders.Clear();handChanges.Clear();ResourceHandScroll=SpecialHandScroll=0;initialized=true;scope=playerScope;sequence=latest;
             consumed.Clear();foreach(var entry in entries)consumed[EventKey(entry)]=entry;RecoveryUntil=double.NegativeInfinity;
             observedTiles=tiles==null?null:CopyTiles(tiles);
             var roll=entries.OrderBy(e=>e.Sequence).LastOrDefault(e=>e.Dice1>0);lastRoll=roll==null?0:roll.Dice1+roll.Dice2;

@@ -23,11 +23,11 @@ public sealed partial class M4App
     {
         if(ai==null)return false;
         var p=logicalMouse??MobileTabletop.Logical(MobileTabletop.Pointer);
-        return mapChoice.Active||ResourceChoiceVisible||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||OperationContextVisible&&tabletop.CurrentContextRect.Contains(p)||dock.BlocksBoardInput(p);
+        return ThreeKingdomsPaymentContains(p)||mapChoice.Active||ResourceChoiceVisible||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||OperationContextVisible&&tabletop.CurrentContextRect.Contains(p)||dock.BlocksBoardInput(p);
     }
-    void CancelOperationDraft(){mapChoice.Clear();resourceChoiceSelection=new ResourceBag();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null)board.ClearPreview();}
+    void CancelOperationDraft(){CancelThreeKingdomsPayment();mapChoice.Clear();resourceChoiceSelection=new ResourceBag();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null)board.ClearPreview();}
     bool DirectTabletopPlacement=>draft!=null&&(draft.Kind==CommandKind.SetupSettlement||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.BuildSettlement||draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.BuildCity||draft.Kind==CommandKind.BuildWall||draft.Kind==CommandKind.RecruitKnight||draft.Kind==CommandKind.PromoteKnight||draft.Kind==CommandKind.ActivateKnight||draft.Kind==CommandKind.ChaseRobber||draft.Kind==CommandKind.MoveRobber||draft.Kind==CommandKind.PlaceFreeRoad||draft.Kind==CommandKind.MoveKnight||draft.Kind==CommandKind.DisplaceKnight);
-    bool OperationContextVisible=>!tabletop.OperationHidden&&view!=null&&!DirectProgressActive&&(!FreeRoadPlacementActive||FreeRoadIds.Length==0)&&Operations().Discard==null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding&&view.LegalEdgeIds.Length==0);
+    bool OperationContextVisible=>!directPayment.Active&&!tabletop.OperationHidden&&view!=null&&!DirectProgressActive&&(!FreeRoadPlacementActive||FreeRoadIds.Length==0)&&Operations().Discard==null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding&&view.LegalEdgeIds.Length==0);
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
     static int[] DockGoods(ResourceBag r,CommodityBag c)=>Enumerable.Range(0,8).Select(i=>i<5?r[(Resource)i]:c[(Commodity)(i-5)]).ToArray();
     bool DockKnightTargetMatches(string target)=>operationKnightLevel<2||draft==null||draft.Kind!=CommandKind.PromoteKnight||view.Board.Knights.Any(k=>k.PlayerId==seat&&k.LocationId==target&&k.Level==operationKnightLevel-1);
@@ -45,7 +45,7 @@ public sealed partial class M4App
         var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
         var port=view.Board.Ports.FirstOrDefault(p=>p.Id==operationPortId&&p.Vertices.Any(locations.Contains));
         if(port==null)return source;
-        var result=new OperationSnapshot{CanTrade=source.CanTrade,CanInteract=source.CanInteract,GoodCount=source.GoodCount,Goods=source.Goods,Bank=source.Bank,OtherPlayers=source.OtherPlayers,Offer=source.Offer};
+        var result=new OperationSnapshot{CanTrade=source.CanTrade,CanInteract=source.CanInteract,GoodCount=source.GoodCount,Goods=source.Goods,Bank=source.Bank,OtherPlayers=source.OtherPlayers,Offer=source.Offer,ValidateTradeDraft=source.ValidateTradeDraft};
         for(int i=0;i<source.GoodCount;i++)result.Rates[i]=port.Resource.HasValue?((int)port.Resource.Value==i?2:0):3;
         return result;
     }
@@ -110,8 +110,8 @@ public sealed partial class M4App
             s.PrepareBuild=b=>
             {
                 CancelOperationDraft();Select((CommandKind)Enum.Parse(typeof(CommandKind),b.Id.Split(':')[0]));
-                if(b.Track>=0){operationFacilityLocked=true;draft.Track=(ImprovementTrack)b.Track;Submit(draft);}
-                else{operationKnightLevel=b.Id.Contains(":")?int.Parse(b.Id.Split(':')[1]):0;pickField="target";pickType=draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.PlaceFreeRoad?"E":"V";status="已拿起 "+b.Name+"，点击地图上的合法位置放下；右键或 Esc 放回。";}
+                if(b.Track>=0){operationFacilityLocked=true;draft.Track=(ImprovementTrack)b.Track;if(!TryBeginDirectPayment(draft,b.Cost,b.Name))Submit(draft);}
+                else{operationKnightLevel=b.Id.Contains(":")?int.Parse(b.Id.Split(':')[1]):0;TryBeginDirectPayment(draft,b.Cost,b.Name);pickField="target";pickType=draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.PlaceFreeRoad?"E":"V";status="已拿起 "+b.Name+"，点击地图上的合法位置放下；右键或 Esc 放回。";}
             };
             s.PrepareCard=PrepareProgressCard;
             if(view.OwnProgressCards.Length<=4||view.Phase!=GamePhase.Action||view.ActivePlayerId!=seat)handOverflowDiscard=false;
@@ -130,6 +130,7 @@ public sealed partial class M4App
                 }};
             s.Cancel=CancelOperationDraft;
             s.Notify=ai.ShowTablePrompt;
+            if(DirectPaymentAvailable)s.ValidateTradeDraft=t=>ValidatePaymentTrade(s,t);
             s.Trade=t=>
             {
                 string error=OperationSelection.ValidateTrade(TradeValidationSnapshot(),t);if(error!=null)return error;
@@ -140,6 +141,7 @@ public sealed partial class M4App
                     if(g<5)c.GiveResource=(Resource)g;else c.GiveCommodity=(Commodity)(g-5);if(r<5)c.ReceiveResource=(Resource)r;else c.ReceiveCommodity=(Commodity)(r-5);c.GiveAmount=t.Give[g];c.ReceiveAmount=t.Receive.Sum();c.Receive=new ResourceBag();for(int i=0;i<5;i++)c.Receive[(Resource)i]=t.Receive[i];for(int i=5;i<8;i++)c.ReceiveCommodities[(Commodity)(i-5)]=t.Receive[i];
                 }
                 else{c.OtherPlayerId=t.OtherPlayer;for(int i=0;i<8;i++){if(i<5){c.Give[(Resource)i]=t.Give[i];c.Receive[(Resource)i]=t.Receive[i];}else{c.GiveCommodities[(Commodity)(i-5)]=t.Give[i];c.ReceiveCommodities[(Commodity)(i-5)]=t.Receive[i];}}}
+                if(StagePaymentTrade(c,t))return null;
                 var result=Submit(c);return result!=null&&result.Success?null:status;
             };
             s.Respond=choice=>Submit(New(choice=="accept"?CommandKind.AcceptTrade:choice=="reject"?CommandKind.RejectTrade:CommandKind.CancelTrade));operationSnapshot=s;
@@ -150,12 +152,15 @@ public sealed partial class M4App
     }
     OperationBuild AddDockBuild(OperationSnapshot s,CommandKind kind,string name,string icon,int count,int[] cost,bool legal,int suffix=-1)
     {
-        var build=new OperationBuild{Id=kind.ToString()+(suffix<0?"":":"+suffix),Name=name,Icon=icon,Count=count,Cost=cost,Detail=cost.Sum()==0?"当前阶段免费放置":kind==CommandKind.PromoteKnight?"拿起高一级骑士，放到要晋升的己方骑士上":kind==CommandKind.ImproveCity?"点击翻开下一级设施并支付商品":"拿起棋子，再点击地图上的合法位置放下"};build.ConfigureAvailability(legal,s.Goods,kind!=CommandKind.BuildCity);if(icon=="knight")build.Level=suffix;s.Builds.Add(build);return build;
+        var build=new OperationBuild{Id=kind.ToString()+(suffix<0?"":":"+suffix),Name=name,Icon=icon,Count=count,Cost=cost,Detail=cost.Sum()==0?"当前阶段免费放置":kind==CommandKind.PromoteKnight?"拿起高一级骑士，放到要晋升的己方骑士上":kind==CommandKind.ImproveCity?"点击翻开下一级设施并支付商品":"拿起棋子，再点击地图上的合法位置放下"};build.ConfigureAvailability(legal,s.Goods,kind!=CommandKind.BuildCity);ConfigureDirectPaymentAvailability(build,legal,suffix);if(icon=="knight")build.Level=suffix;s.Builds.Add(build);return build;
     }
     void DrawOperationLayout()
     {
         Styles();GUI.matrix=MobileTabletop.GuiMatrix;cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
+        ai.SyncThreeKingdomsSelection();SyncDirectPayment();
+        tabletop.ThreeKingdoms=ai;dock.DirectSelection=directPayment.Active?PaymentHandSelection:ai.ThreeKingdomsHandSelection;
+        dock.InspectGood=ai.InspectThreeKingdomsGood;dock.InspectCard=ai.InspectThreeKingdomsCard;
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
         dock.Windows=tabletop.OperationWindows;mapChoice.Windows=tabletop.OperationWindows;
         bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!ResourceChoiceVisible;GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&tableEnabled&&!dock.BlocksHudInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));
@@ -171,27 +176,31 @@ public sealed partial class M4App
         var displayedOperations=Operations();
         tabletop.Draw(font,seat,Actor(view),PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,
             view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Score=TabletopScoreModel.For(view,p.Id),Resources=p.ResourceCount,Cards=p.ProgressCardCount,ResourceHandLimit=7+2*view.Board.Walls.Count(w=>w.PlayerId==p.Id),SpecialHandLimit=4,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Improvements=p.Improvements}).ToArray(),
-            ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll,ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.PendingDecision==null&&view.TradeOffer==null,
+            ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll,ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.PendingDecision==null&&view.TradeOffer==null&&!directPayment.Active,
             ()=>Submit(New(CommandKind.RollDice)),EndTableTurn,target=>{CancelOperationDraft();dock.OpenTrade(target);},
             ()=>{bool open=!operationActions;dock.Reset();CancelOperationDraft();operationActions=open;},"骑士操作",facility:dock.OpenFacility);
         if(ai.IsHumanTurn&&draft==null&&view.Phase==GamePhase.RobberMove){Select(CommandKind.MoveRobber);pickField="target";pickType="T";status="拿起强盗，点击新的地块放下。";}
         tabletop.SetContextAnchor(operationActions&&operationKnightTarget!=null?(Vector2?)MobileTabletop.Logical(board.ScreenPoint(operationKnightTarget)):null);
         GUI.enabled=tableEnabled&&!mapChoice.Active&&!dock.HasOverlay;
-        if(OperationContextVisible&&!ResourceChoiceVisible)tabletop.DrawContext(operationActions?"骑士行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):draft!=null&&draft.Kind==CommandKind.PlayProgressCard?CardName(draft.ProgressCard):"当前选择",DrawOperationControls);
+        if(!ai.ThreeKingdomsSelectionActive&&OperationContextVisible&&!ResourceChoiceVisible)tabletop.DrawContext(operationActions?"骑士行动":view.PendingDecision!=null?DecisionName(view.PendingDecision.Kind):draft!=null&&draft.Kind==CommandKind.PlayProgressCard?CardName(draft.ProgressCard):"当前选择",DrawOperationControls);
         GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!ai.TableInspectionBlocked&&!ResourceChoiceVisible&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(displayedOperations,font);GUI.enabled=previousEnabled;
         if(ResourceChoiceVisible&&ai.IsHumanTurn&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen)DrawPendingResources();
         tabletop.HandFlightsVisible=dock.ResourceHandVisible;if(!ResourceChoiceVisible&&(tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableInspectionBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
         ai.TableOverlayOpen=mapChoice.Active||dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen||ResourceChoiceVisible;
         if(DirectProgressActive&&view.PendingDecision?.Kind=="ProgressTreasonPlace"&&!mapChoice.Active&&ai.IsHumanTurn&&ModernOperationUI.Button(new Rect(610,196,220,34),"放弃安置替补骑士")){var skip=New(CommandKind.ResolveProgressChoice);skip.Decline=true;Submit(skip);}
         if(!ai.TablePresentationBlocked&&ai.IsHumanTurn)mapChoice.Draw();
+        GUI.enabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen;DrawDirectPayment();GUI.enabled=previousEnabled;
         RefreshTablePrompt();GUI.matrix=Matrix4x4.identity;
     }
     void RefreshTablePrompt()
     {
         if(ai!=null&&view!=null)ai.UpdateTablePrompt(view.Turn,view.Phase.ToString(),view.Phase==GamePhase.ProductionAwaitRoll,TableInstruction(),status,RequiresTableSelection);
     }
+    internal void CancelForGeneralSelection(){dock.Reset();CancelOperationDraft();cardArt.Clear();tabletop.OperationWindows.Clear();}
+    internal void EndThreeKingdomsTurn()=>EndTableTurn();
     void EndTableTurn()
     {
+        if(directPayment.Active){status="请先确认或取消本次支付。";return;}
         if(view.OwnProgressCards.Length>4)
         {
             handOverflowDiscard=true;operationView=null;dock.Reset();CancelOperationDraft();
@@ -200,13 +209,13 @@ public sealed partial class M4App
         }
         Submit(New(CommandKind.EndTurn));
     }
-    bool RequiresTableSelection=>DirectProgressActive||pickField!=""||handOverflowDiscard||operationActions&&operationKnightTarget==null||TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString());
+    bool RequiresTableSelection=>directPayment.Active||DirectProgressActive||pickField!=""||handOverflowDiscard||operationActions&&operationKnightTarget==null||TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString());
     string TableInstruction()
     {
         if(DirectProgressActive)return draft!=null&&draft.Kind==CommandKind.PlayProgressCard?status:TabletopSelectionPrompt.Decision(view.PendingDecision.Kind);
         if(FreeRoadPlacementActive)return TabletopRoadPlacement.Instruction(view.PendingDecision?.Kind=="ProgressRoads"?view.PendingDecision.Amount:view.PendingDecision?.RemainingRoads??2,ai.HistoryEntries);
-        if(view.ThreeKingdoms?.SkillDecision!=null)return "请在上方完成武将技能选择";
-        if(view.Phase==GamePhase.ThreeKingdoms)return view.ThreeKingdoms?.PendingDecision==null?"请在上方推进三国阶段":"请在上方完成私密选将";
+        if(view.ThreeKingdoms?.SkillDecision!=null)return "请在底部操作条完成武将技能选择";
+        if(view.Phase==GamePhase.ThreeKingdoms)return view.ThreeKingdoms?.PendingDecision==null?"请在底部操作条处理三国阶段":"请在底部候选牌带完成私密选将";
         if(view.Phase==GamePhase.Finished)return view.WinnerPlayerId+" 获胜";
         if(pickField=="source")return "请选择要行动的己方骑士";
         if(pickField!="")return draft?.Kind==CommandKind.MoveRobber?"请选择强盗要前往的新地块":"请选择地图上的合法目标";
@@ -256,6 +265,7 @@ public sealed partial class M4App
         bool from=kind==CommandKind.MoveKnight||kind==CommandKind.DisplaceKnight;
         bool knightAction=kind==CommandKind.PromoteKnight||kind==CommandKind.ActivateKnight||from||kind==CommandKind.ChaseRobber;
         bool legal=view.LegalActions.Any(c=>c.Kind==kind&&(!knightAction||operationKnightTarget==null||(from?c.SourceId:c.TargetId)==operationKnightTarget));
+        if(!legal&&DirectPaymentAvailable){var paymentProbe=New(kind,operationKnightTarget);var paymentCost=PaymentCost(paymentProbe);if(paymentCost!=null)legal=operationKnightTarget!=null?PaymentAwarePreview(paymentProbe).Success:PotentialPaymentBuild(kind,paymentCost,0);}
         if(!ModernOperationUI.LayoutButton(text,legal))return;
         string knight=operationKnightTarget;
         CancelOperationDraft();Select(kind);
@@ -298,7 +308,7 @@ public sealed partial class M4App
         if(city&&view.Board.Walls.Any(p=>p.LocationId==vertex)){ai.ShowTablePrompt(status="这座城市已有城墙。");return true;}
         var kind=village?CommandKind.BuildCity:CommandKind.BuildWall;
         mapChoice.Open(board.ScreenPoint(vertex),village?"村庄升级":"城市城墙",new[]{village?"升级城市 · 小麦2 矿石3":"修建城墙 · 砖块2"},i=>{
-            var command=New(kind,vertex);var preview=Preview(command);
+            var command=New(kind,vertex);var preview=PaymentAwarePreview(command);
             if(preview.Success)Submit(command);else ai.ShowTablePrompt(status=preview.Message);
         });return true;
     }

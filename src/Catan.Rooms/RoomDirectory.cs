@@ -170,7 +170,7 @@ public sealed partial class RoomDirectory : IDisposable
         if (s.AiSeats == null || s.AiSeats.Distinct().Count() != s.AiSeats.Length || s.AiSeats.Any(id => !SeatIds(s.PlayerCount).Contains(id))) throw new ArgumentException("AI 席位无效。");
         if(s.ThreeKingdomsPackageVersion!=null||s.ThreeKingdomsContentHash!=null)
             if((s.RuleSet!="cities-knights"&&s.RuleSet!="combined")||!GeneralCatalog.IsNetworkPackage(s.ThreeKingdomsPackageVersion,s.ThreeKingdomsContentHash))
-                throw new ArgumentException("三国争霸需要完整且匹配的 B4／B5 武将包与城市骑士规则。");
+                throw new ArgumentException("三国争霸需要完整且匹配的 B4／B4.5／B5 武将包与城市骑士规则。");
     }
     private static IEnumerable<string> SeatIds(int count) => Enumerable.Range(1, count).Select(i => "P" + i);
     private static readonly string[] AiNames = { "哈基米", "吃白饭的大肥鲸", "糖包", "我是奶龙" };

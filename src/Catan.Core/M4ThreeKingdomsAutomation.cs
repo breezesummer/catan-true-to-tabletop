@@ -14,6 +14,7 @@ namespace Catan.Core.M4
     public sealed partial class CitiesKnightsGameSession
     {
         public const string ThreeKingdomsB4RulesVersion = "catan-cities-knights-three-kingdoms-b4-v1";
+        public const string ThreeKingdomsB45RulesVersion = "catan-cities-knights-three-kingdoms-b45-v1";
         private static bool B4(GameState s) => B4AutomationEngine.Enabled(s.ThreeKingdoms);
         private void ApplyB4(GameState s, Command c)
         {

@@ -147,7 +147,7 @@ namespace Catan.Core.ThreeKingdoms
                 foreach(var payment in B5LiyuPayments(s,player,hand,option.Cost))
                 {
                     string names=string.Join("、",Enumerable.Range(0,8).Where(t=>payment[t]>0).Select(t=>payment[t]+"张"+CardNames[t]));
-                    var a=Action(s,"tk-g02-s2","b5m-liyu","利驭：以"+names+"支付"+option.Cost[3]+"张有效麦，"+option.Label);a.Command.ProgressCardId=option.Id;a.Command.Counts=payment;a.Command.TargetPlayerIds=new[]{lvbu.OwnerPlayerId};a.CardSelectionKind="payment";actions.Add(a);
+                    var a=Action(s,"tk-g02-s2","b5m-liyu","利驭：以"+names+"支付"+option.Cost[3]+"张有效麦，"+option.Label);a.Command.ProgressCardId=option.Id;a.Command.Counts=payment;a.Command.TargetPlayerIds=new[]{lvbu.OwnerPlayerId};a.CardSelectionKind="payment";actions.Add(B45SelectionMetadata.WithBoard(a,option));
                 }
             }
         }
@@ -257,7 +257,7 @@ namespace Catan.Core.ThreeKingdoms
             if(d.Kind?.StartsWith("b5m-",StringComparison.Ordinal)!=true)return false;
             var s=host.State;var board=(IThreeKingdomsB5Host)host;
             if(d.Kind=="b5m-deploy"||d.Kind=="b5m-return")foreach(var option in board.GetBoardOptions(f.PlayerId,d.Kind=="b5m-deploy"?"deploy-knight":"return-knight"))
-            { var a=Action(s,f.SkillId,d.Kind,option.Label,d);a.Command.ProgressCardId=option.Id;actions.Add(a); }
+            { var a=Action(s,f.SkillId,d.Kind,option.Label,d);a.Command.ProgressCardId=option.Id;actions.Add(B45SelectionMetadata.WithBoard(a,option)); }
             if(d.Kind=="b5m-tax"||d.Kind=="b5m-chuhai-discard")
             {
                 var owner=d.Kind=="b5m-tax"?f.PlayerId:f.Targets[0];
@@ -273,7 +273,7 @@ namespace Catan.Core.ThreeKingdoms
             if(d.Kind=="b5m-zaiqi")
             {
                 int flags=f.B4.DeclaredType;
-                if((flags&1)!=0)foreach(var option in board.GetBoardOptions(f.PlayerId,"free-City")){var a=Action(s,f.SkillId,"b5m-zaiqi-city",option.Label,d);a.Command.ProgressCardId=option.Id;actions.Add(a);}
+                if((flags&1)!=0)foreach(var option in board.GetBoardOptions(f.PlayerId,"free-City")){var a=Action(s,f.SkillId,"b5m-zaiqi-city",option.Label,d);a.Command.ProgressCardId=option.Id;actions.Add(B45SelectionMetadata.WithBoard(a,option));}
                 if((flags&2)!=0)actions.Add(Action(s,f.SkillId,"b5m-zaiqi-point","失去一分（总分最低为零）",d));
                 if((flags&4)!=0&&!IsDrawBlocked(s,f.PlayerId)&&host.GetBank().Any(n=>n>0))actions.Add(Action(s,f.SkillId,"b5m-zaiqi-card","选择一张资源或商品",d));
                 if((flags&8)!=0&&f.B4.VirtualUse!=null)actions.Add(Action(s,f.SkillId,"b5m-zaiqi-double","本次强盗所在生产格对自己双倍产出",d));

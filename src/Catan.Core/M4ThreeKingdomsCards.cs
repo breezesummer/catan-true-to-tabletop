@@ -23,7 +23,7 @@ namespace Catan.Core.M4
         private static bool B2Unlimited(GameState s, string player) => B2(s) && s.ThreeKingdoms.Generals.Any(g => g.Region == GeneralRegion.Active && g.OwnerPlayerId == player && g.GeneralId == "tk-g33");
         private static int B2Escrow(GameState s, int card) => B2(s) ? B2SkillEngine.EscrowCards(s.ThreeKingdoms)[card] : 0;
         private static bool B2Busy(GameState s) => B2(s) && (B2SkillEngine.HasPending(s.ThreeKingdoms) || B3DiceEngine.HasPending(s.ThreeKingdoms) || B2SkillEngine.HasB5Comparison(s.ThreeKingdoms));
-        private static string ThreeKingdomsVersionFor(ThreeKingdomsState tk) => tk == null ? RulesVersion : tk.RulesVersion == GeneralCatalog.B5RulesVersion ? ThreeKingdomsB5RulesVersion : tk.RulesVersion == GeneralCatalog.B4RulesVersion ? ThreeKingdomsB4RulesVersion : tk.RulesVersion == GeneralCatalog.B3RulesVersion ? ThreeKingdomsB3RulesVersion : tk.SkillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
+        private static string ThreeKingdomsVersionFor(ThreeKingdomsState tk) => tk == null ? RulesVersion : tk.RulesVersion == GeneralCatalog.B5DirectRulesVersion ? ThreeKingdomsB5DirectRulesVersion : tk.RulesVersion == GeneralCatalog.B5RulesVersion ? ThreeKingdomsB5RulesVersion : tk.RulesVersion == GeneralCatalog.B45RulesVersion ? ThreeKingdomsB45RulesVersion : tk.RulesVersion == GeneralCatalog.B4RulesVersion ? ThreeKingdomsB4RulesVersion : tk.RulesVersion == GeneralCatalog.B3RulesVersion ? ThreeKingdomsB3RulesVersion : tk.SkillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
 
         private sealed partial class B2Host : IThreeKingdomsCardHost
         {

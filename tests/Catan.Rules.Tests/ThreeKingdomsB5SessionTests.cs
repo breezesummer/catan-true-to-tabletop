@@ -9,20 +9,21 @@ public sealed class ThreeKingdomsB5SessionTests(ITestOutputHelper output)
 {
     public static IEnumerable<object[]> Configurations()
     {
+        foreach(string package in new[]{GeneralCatalog.B5PackageVersion,GeneralCatalog.B5DirectPackageVersion})
         foreach(int seats in new[]{3,4})
         {
-            yield return new object[]{"cities","base",seats};
-            foreach(string map in M5.CombinedScenarios.Ids) yield return new object[]{"combined",map,seats};
+            yield return new object[]{"cities","base",seats,package};
+            foreach(string map in M5.CombinedScenarios.Ids) yield return new object[]{"combined",map,seats,package};
         }
     }
     [Theory][MemberData(nameof(Configurations))]
-    public void ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(string rules,string map,int seats)
+    public void ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(string rules,string map,int seats,string package)
     {
-        var game=ThreeKingdomsTestGame.Create(rules,map,seats,skills:true,packageVersion:GeneralCatalog.B5PackageVersion);
+        var game=ThreeKingdomsTestGame.Create(rules,map,seats,skills:true,packageVersion:package);
         var checkpoints=new HashSet<string>();var generals=new HashSet<string>();int steps=0,round=0;
         while(game.View().Phase.ToString()!="Finished"&&steps<18000)
         {
-            var tk=game.Authority();round=Math.Max(round,tk.Clock.Round);
+            var tk=game.Authority();if(package==GeneralCatalog.B5DirectPackageVersion)Assert.Null(tk.Automation?.PendingDecision);round=Math.Max(round,tk.Clock.Round);
             foreach(var g in tk.Generals.Where(g=>g.Region==GeneralRegion.Active))generals.Add(g.GeneralId);
             dynamic command=game.Decide();command.Id="B5整局-"+steps++;
             Assert.NotEqual("AdvanceThreeKingdomsPhase",(string)command.Kind.ToString());
@@ -42,6 +43,6 @@ public sealed class ThreeKingdomsB5SessionTests(ITestOutputHelper output)
         Assert.Equal("Finished",(string)game.View().Phase.ToString());
         Assert.True(round>3);Assert.Equal(49,game.Authority().Generals.Length);
         Assert.Equal(game.Save(),ThreeKingdomsTestGame.Load(rules,game.Save()).Save());
-        output.WriteLine($"B5 {rules}/{map}/{seats}人：{steps}条命令，{round}轮，{generals.Count}将登场，{checkpoints.Count}类待决恢复。");
+        output.WriteLine($"{package} {rules}/{map}/{seats}人：{steps}条命令，{round}轮，{generals.Count}将登场，{checkpoints.Count}类待决恢复。");
     }
 }

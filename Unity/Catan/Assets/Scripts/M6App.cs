@@ -320,7 +320,7 @@ public sealed partial class M6App : MonoBehaviour
             if(!tableMenu&&NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),DisplayPlayerText(Network.Status),small);
             DrawOpeningOrder();
             string prompt=DisplayPlayerText(RoadPlacementPrompt.Length>0?RoadPlacementPrompt:CurrentTablePrompt);
-            if(prompt.Length>0&&!TablePresentationBlocked&&!TableMapChoiceOpen&&(!TableOverlayOpen||HasRequiredTableSelection))
+            if(ThreeKingdomsProjection==null&&prompt.Length>0&&!TablePresentationBlocked&&!TableMapChoiceOpen&&(!TableOverlayOpen||HasRequiredTableSelection))
             {
                 bool primary=prompt=="你的回合"||Finished;
                 var promptStyle=new GUIStyle(title){fontSize=primary?46:26,alignment=TextAnchor.MiddleCenter,wordWrap=true};

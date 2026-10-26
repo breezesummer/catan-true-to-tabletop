@@ -1,0 +1,353 @@
+{
+  "完成日期": "2026-10-24",
+  "游戏版本": "内测版2.0.2",
+  "状态": "规则与联机验收通过；旧模式快速回归保留B4已有22项失败",
+  "包身份": {
+    "包版本": "three-kingdoms-direct-interaction-v1",
+    "规则版本": "three-kingdoms-b45-v1",
+    "兼容": "B1—B4包保留原身份和语义；B4自由出牌首次询问及旧选择命令继续原样重放，新原子批量选项仅B45启用"
+  },
+  "批次结果": {
+    "三国统一回归": {
+      "文件": ".local/development/test-results/b45/b45-three-kingdoms.trx",
+      "SHA256": "36cfacb00dfab42bd96f68011f6f285c296bc43aa5232cea50331072cf25494c",
+      "总数": 595,
+      "通过": 595,
+      "失败": 0,
+      "时间": {
+        "creation": "2026-10-24T11:37:14.0509490+08:00",
+        "queuing": "2026-10-24T11:37:14.0509490+08:00",
+        "start": "2026-10-24T11:37:13.3555130+08:00",
+        "finish": "2026-10-24T11:52:17.2937660+08:00"
+      }
+    },
+    "新直接交互规则追加检查": {
+      "文件": ".local/development/test-results/b45/b45-direct-final.trx",
+      "SHA256": "d63433621bc46267578c1062fe6ec7ed7bb18638b783d0bffe2c3ff975f78a1a",
+      "总数": 31,
+      "通过": 31,
+      "失败": 0,
+      "时间": {
+        "creation": "2026-10-24T12:01:53.9716030+08:00",
+        "queuing": "2026-10-24T12:01:53.9716030+08:00",
+        "start": "2026-10-24T12:01:52.2130710+08:00",
+        "finish": "2026-10-24T12:02:10.6846040+08:00"
+      }
+    },
+    "网络全量": {
+      "文件": ".local/development/test-results/b45/b45-network.trx",
+      "SHA256": "251af9bfb8e3c4e9389faa1eb2e774bd43dd46e0c282492cb7a6adadceeb231d",
+      "总数": 165,
+      "通过": 165,
+      "失败": 0,
+      "时间": {
+        "creation": "2026-10-24T11:37:02.4916520+08:00",
+        "queuing": "2026-10-24T11:37:02.4916520+08:00",
+        "start": "2026-10-24T11:37:01.7601390+08:00",
+        "finish": "2026-10-24T11:37:09.5075320+08:00"
+      }
+    },
+    "B45网络最终检查": {
+      "文件": ".local/development/test-results/b45/b45-network-final.trx",
+      "SHA256": "9d2b616075526c0a4d636bc40d01fc0119b71d35ee98ccddab7c5b523b62435e",
+      "总数": 14,
+      "通过": 14,
+      "失败": 0,
+      "时间": {
+        "creation": "2026-10-24T11:49:21.1461900+08:00",
+        "queuing": "2026-10-24T11:49:21.1461900+08:00",
+        "start": "2026-10-24T11:49:19.0487690+08:00",
+        "finish": "2026-10-24T11:49:38.5083030+08:00"
+      }
+    },
+    "客户端及Server最终检查": {
+      "文件": ".local/development/test-results/b45/b45-server-final.trx",
+      "SHA256": "d172036943f656f2c2fe0032d8834158b8ffde6994a6c4fb4631c4e332c5384e",
+      "总数": 75,
+      "通过": 75,
+      "失败": 0,
+      "时间": {
+        "creation": "2026-10-24T11:53:29.7647010+08:00",
+        "queuing": "2026-10-24T11:53:29.7647010+08:00",
+        "start": "2026-10-24T11:53:28.6166680+08:00",
+        "finish": "2026-10-24T11:54:13.8748300+08:00"
+      }
+    },
+    "旧模式快速回归": {
+      "文件": ".local/development/test-results/b45/b45-original-final.trx",
+      "SHA256": "fcdf4a0ebfb2fe07665bb9ddd3748f9994a75e62a21a43735eb8b78e85f29964",
+      "总数": 1170,
+      "通过": 1148,
+      "失败": 22,
+      "时间": {
+        "creation": "2026-10-24T11:44:21.9006080+08:00",
+        "queuing": "2026-10-24T11:44:21.9006080+08:00",
+        "start": "2026-10-24T11:44:21.0761710+08:00",
+        "finish": "2026-10-24T11:44:55.1714850+08:00"
+      }
+    }
+  },
+  "统计说明": "各批次含重叠用例，不将批次通过数相加当作唯一测试总数。统一回归595项包含下列20个B45完整局和既有三国测试；随后31项直接规则、14项B45网络及75项Server检查覆盖追加修订。",
+  "正常完整局": {
+    "配置数": 20,
+    "通过数": 20,
+    "总命令数": 10149,
+    "条件": "城市骑士与双扩展九图各3/4人，默认胜利目标，seed=97，30将51技正常包，产品AI通过专用PlayerView和统一命令入口；未手工Advance/Roll、未缩短胜利条件、未跳转回合。各步AssertInvariants，各种真实待决首次出现时公开Load后执行相同命令并比较存档，终局Load与原存档完全相等。",
+    "边界": "自然完整局记录每局实际登场将数和恢复类型数，不宣称每局或20局穷尽全部51技能；独立定向规则用例另测正常/非法/预览零变化/隐私/原子提交。局面私密trace及权威checkpoint保存在.local，未复制到公开文档。",
+    "明细": [
+      {
+        "规则": "cities",
+        "场景": "base",
+        "人数": 3,
+        "命令": 619,
+        "轮数": 28,
+        "登场将数": 27,
+        "首次待决恢复种类": 33,
+        "测试耗时": "00:00:39.6445243",
+        "结果": "Passed"
+      },
+      {
+        "规则": "cities",
+        "场景": "base",
+        "人数": 4,
+        "命令": 446,
+        "轮数": 13,
+        "登场将数": 20,
+        "首次待决恢复种类": 25,
+        "测试耗时": "00:00:32.2121447",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "cloth-for-catan",
+        "人数": 3,
+        "命令": 395,
+        "轮数": 20,
+        "登场将数": 21,
+        "首次待决恢复种类": 27,
+        "测试耗时": "00:00:28.2225927",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "cloth-for-catan",
+        "人数": 4,
+        "命令": 435,
+        "轮数": 15,
+        "登场将数": 20,
+        "首次待决恢复种类": 23,
+        "测试耗时": "00:00:40.0671256",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "fog-islands",
+        "人数": 3,
+        "命令": 486,
+        "轮数": 25,
+        "登场将数": 26,
+        "首次待决恢复种类": 31,
+        "测试耗时": "00:00:13.6772932",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "fog-islands",
+        "人数": 4,
+        "命令": 707,
+        "轮数": 22,
+        "登场将数": 26,
+        "首次待决恢复种类": 30,
+        "测试耗时": "00:01:25.6953325",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "forgotten-tribe",
+        "人数": 3,
+        "命令": 422,
+        "轮数": 22,
+        "登场将数": 24,
+        "首次待决恢复种类": 24,
+        "测试耗时": "00:00:37.5747712",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "forgotten-tribe",
+        "人数": 4,
+        "命令": 807,
+        "轮数": 26,
+        "登场将数": 25,
+        "首次待决恢复种类": 28,
+        "测试耗时": "00:00:53.4942958",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "four-islands",
+        "人数": 3,
+        "命令": 431,
+        "轮数": 21,
+        "登场将数": 21,
+        "首次待决恢复种类": 23,
+        "测试耗时": "00:00:10.3987021",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "four-islands",
+        "人数": 4,
+        "命令": 621,
+        "轮数": 20,
+        "登场将数": 23,
+        "首次待决恢复种类": 29,
+        "测试耗时": "00:00:45.4605936",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "heading-for-new-shores",
+        "人数": 3,
+        "命令": 368,
+        "轮数": 17,
+        "登场将数": 18,
+        "首次待决恢复种类": 24,
+        "测试耗时": "00:00:35.5205802",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "heading-for-new-shores",
+        "人数": 4,
+        "命令": 501,
+        "轮数": 16,
+        "登场将数": 24,
+        "首次待决恢复种类": 32,
+        "测试耗时": "00:01:12.6516918",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "new-world",
+        "人数": 3,
+        "命令": 439,
+        "轮数": 22,
+        "登场将数": 24,
+        "首次待决恢复种类": 28,
+        "测试耗时": "00:00:16.7115015",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "new-world",
+        "人数": 4,
+        "命令": 605,
+        "轮数": 18,
+        "登场将数": 23,
+        "首次待决恢复种类": 33,
+        "测试耗时": "00:01:04.1210597",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "pirate-islands",
+        "人数": 3,
+        "命令": 397,
+        "轮数": 21,
+        "登场将数": 21,
+        "首次待决恢复种类": 24,
+        "测试耗时": "00:00:51.3806781",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "pirate-islands",
+        "人数": 4,
+        "命令": 902,
+        "轮数": 26,
+        "登场将数": 25,
+        "首次待决恢复种类": 32,
+        "测试耗时": "00:01:25.0397928",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "through-the-desert",
+        "人数": 3,
+        "命令": 397,
+        "轮数": 18,
+        "登场将数": 18,
+        "首次待决恢复种类": 25,
+        "测试耗时": "00:00:26.5460476",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "through-the-desert",
+        "人数": 4,
+        "命令": 477,
+        "轮数": 14,
+        "登场将数": 20,
+        "首次待决恢复种类": 27,
+        "测试耗时": "00:00:32.3874897",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "wonders-of-catan",
+        "人数": 3,
+        "命令": 353,
+        "轮数": 17,
+        "登场将数": 18,
+        "首次待决恢复种类": 24,
+        "测试耗时": "00:01:37.2900423",
+        "结果": "Passed"
+      },
+      {
+        "规则": "combined",
+        "场景": "wonders-of-catan",
+        "人数": 4,
+        "命令": 341,
+        "轮数": 12,
+        "登场将数": 16,
+        "首次待决恢复种类": 15,
+        "测试耗时": "00:00:35.2510634",
+        "结果": "Passed"
+      }
+    ]
+  },
+  "旧模式基线比较": {
+    "基线文件": "docs/verification/three-kingdoms-b4/测试结果.json",
+    "基线SHA256": "f66bda646fe7254d55578ec1378052ee8d451e70fc4b5d9141504810b3c23727",
+    "比较方式": "逐项比较TRX完整testName排序集合，22项完全相同",
+    "新增失败": [],
+    "既有失败精确名单": [
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"商业港口\", track: 0)",
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"锻铁匠\", track: 2)",
+      "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.FreeEngineeringWallIsConstructedAndCardUsesRequestedVerb",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Constitution, name: \"宪法\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Printing, name: \"印刷术\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.ResourceMonopolyUsesHarvestForEachAffectedPlayer",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.SabotageDiscardIsOneColoredCountSentenceForEveryViewer",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: False)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: True)",
+      "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"ProgressTreasonRemove\", action: \"叛变\", piece: \"己方骑士\")",
+      "Catan.Rules.Tests.TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat",
+      "Catan.Rules.Tests.TabletopSpecialCollectionTests.DefenderProgressRewardFliesFromTheCorrectTrackWithoutLeakingOpponentCard"
+    ],
+    "预期变更": "收牌动画测试从旧居中首牌坐标调整为B4.5要求的左齐锚点，保留飞牌最终落点断言。"
+  },
+  "客户端边界": "新增4个M7Client测试通过真实本地HTTP Describe入口检查B4/B45匹配身份被接受及错误hash被拒绝。macOS单元测试不提供Windows DPAPI/Android KeyStore凭据保管，因此不把此测试说成跨平台入席验证；真实房间加入、重连、命令幂等和私密待决由网络测试覆盖。",
+  "UI与设备边界": "本文件只记录规则、AI、房间与客户端测试。Unity鼠标队列、实际CUA点击、截图、构建与Android设备验收单列，不能以本文件替代。"
+}

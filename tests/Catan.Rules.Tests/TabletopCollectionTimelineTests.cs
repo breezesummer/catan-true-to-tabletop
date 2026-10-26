@@ -213,11 +213,11 @@ public sealed class TabletopCollectionTimelineTests
     }
 
     [Fact]
-    public void ExistingCardsMakeRoomOnlyNearArrivalAndFlightDestinationMatchesFinalHand()
+    public void FirstCardKeepsItsLeftAnchorAndFlightDestinationMatchesFinalHand()
     {
         var (timeline, _)=ExchangeTwoOre();int[] owned=[0,0,0,0,3,0,0,0];
         var early=timeline.HandSlots("P1",owned,5,10.5);
-        Assert.Equal(666,TabletopHandLayout.Resource(early,0,720,1060,false).X);
+        Assert.Equal(190,TabletopHandLayout.Resource(early,0,720,1060,false).X);
         var near=timeline.HandSlots("P1",owned,5,11.11-0.00001);
         var flying=TabletopHandLayout.Resource(near,2,720,1060,false);
         var landed=timeline.HandSlots("P1",owned,5,11.111);

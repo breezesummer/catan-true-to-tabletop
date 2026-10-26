@@ -8,7 +8,7 @@ namespace Catan.Core.ThreeKingdoms
     public static partial class B2SkillEngine
     {
         public static bool B4Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && ThreeKingdomsEngine.UsesB4Lifecycle(s);
-        public static bool B5Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && s.RulesVersion == GeneralCatalog.B5RulesVersion;
+        public static bool B5Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && GeneralCatalog.UsesB5Rules(s.RulesVersion);
         private static B4SkillPayload CloneB4Payload(B4SkillPayload p) => p == null ? null : new B4SkillPayload { Selection = Copy(p.Selection), OtherSelection = Copy(p.OtherSelection), DeclaredType = p.DeclaredType,
             OwnerPlayerId = p.OwnerPlayerId, LockedTargets = (string[])p.LockedTargets.Clone(), VirtualUse = p.VirtualUse == null ? null : new B4VirtualUse { CardId = p.VirtualUse.CardId, OptionId = p.VirtualUse.OptionId, Label = p.VirtualUse.Label, CardType = p.VirtualUse.CardType, TargetPlayerIds = (string[])p.VirtualUse.TargetPlayerIds.Clone(), PayloadJson = p.VirtualUse.PayloadJson, SourceEventId = p.VirtualUse.SourceEventId, SourceSkillId = p.VirtualUse.SourceSkillId, RewardRandomCount = p.VirtualUse.RewardRandomCount } };
 
@@ -255,7 +255,19 @@ namespace Catan.Core.ThreeKingdoms
             }
             if (ResolveResponseDecision(host, f, d, c)) return true;
             if (!d.Kind.StartsWith("b4-", StringComparison.Ordinal)) return false;
-            var s = host.State; var legal = new List<B2SkillAction>(); AddB4DecisionActions(host, f, d, legal); Require(legal.Any(a => SameB4Action(a.Command, c)), "该技能选择无效。");
+            var s = host.State;
+            if (GeneralCatalog.UsesDirectRules(s.RulesVersion) && c.Option == "b45-selected")
+            {
+                Require(d.Kind == "b4-subset" || d.Kind == "b4-reveal", "当前不是批量选牌步骤。");
+                Require(c.Counts != null && c.Counts.Length == 8 && c.Counts.All(n => n >= 0)
+                    && Contains(host.GetHand(f.PlayerId), c.Counts), "所选真实手牌数量无效或已变化。");
+                Require(d.Kind == "b4-reveal" || c.Counts.Sum() > 0, "暗选手牌至少需要一张。");
+                f.B4.Selection = Copy(c.Counts);
+                if (d.Kind == "b4-reveal") { s.Skills.RevealedCards = Copy(f.B4.Selection); f.Step = 2; }
+                else f.Step = 1;
+                return true;
+            }
+            var legal = new List<B2SkillAction>(); AddB4DecisionActions(host, f, d, legal); Require(legal.Any(a => SameB4Action(a.Command, c)), "该技能选择无效。");
             if (c.Option == "b4-select") { f.B4.Selection[c.CardType]++; return true; }
             if (c.Option == "b4-selected") { Require(Contains(host.GetHand(f.PlayerId), f.B4.Selection), "选择的真实手牌已不在手中。"); if (d.Kind == "b4-reveal") { s.Skills.RevealedCards = Copy(f.B4.Selection); f.Step = 2; } else f.Step = 1; return true; }
             if (c.Option == "b4-declare") { f.B4.DeclaredType = c.CardType; f.Step = 2; return true; }

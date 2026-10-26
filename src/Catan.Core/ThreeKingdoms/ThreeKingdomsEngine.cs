@@ -13,16 +13,18 @@ namespace Catan.Core.ThreeKingdoms
                 && seatPlayerIds.All(x => !string.IsNullOrWhiteSpace(x)) && seatPlayerIds.Distinct().Count() == seatPlayerIds.Length,
                 "三国开发骨架需要三个或四个不同席位。");
             Require(draw != null, "缺少权威随机流。");
-            bool b5 = skillsEnabled && packageVersion == GeneralCatalog.B5PackageVersion;
+            bool b5 = skillsEnabled && GeneralCatalog.UsesB5Package(packageVersion);
+            bool b5Direct = skillsEnabled && packageVersion == GeneralCatalog.B5DirectPackageVersion;
             bool b4 = skillsEnabled && GeneralCatalog.IsAutomaticPackage(packageVersion);
+            bool b45 = skillsEnabled && packageVersion == GeneralCatalog.B45PackageVersion;
             bool b3 = skillsEnabled && packageVersion != GeneralCatalog.B2PackageVersion;
             Require(packageVersion == null || packageVersion == GeneralCatalog.PackageVersion && !skillsEnabled ||
                 skillsEnabled && (packageVersion == GeneralCatalog.B2PackageVersion || packageVersion == GeneralCatalog.B3PackageVersion || b4), "不支持的三国武将包。");
             var state = new ThreeKingdomsState
             {
-                RulesVersion = b5 ? GeneralCatalog.B5RulesVersion : b4 ? GeneralCatalog.B4RulesVersion : b3 ? GeneralCatalog.B3RulesVersion : skillsEnabled ? GeneralCatalog.B2RulesVersion : GeneralCatalog.RulesVersion,
-                PackageVersion = b5 ? GeneralCatalog.B5PackageVersion : b4 ? GeneralCatalog.B4PackageVersion : b3 ? GeneralCatalog.B3PackageVersion : skillsEnabled ? GeneralCatalog.B2PackageVersion : GeneralCatalog.PackageVersion,
-                PackageContentHash = b5 ? GeneralCatalog.B5ContentHash : b4 ? GeneralCatalog.B4ContentHash : b3 ? GeneralCatalog.B3ContentHash : skillsEnabled ? GeneralCatalog.B2ContentHash : GeneralCatalog.ContentHash,
+                RulesVersion = b5Direct ? GeneralCatalog.B5DirectRulesVersion : b5 ? GeneralCatalog.B5RulesVersion : b45 ? GeneralCatalog.B45RulesVersion : b4 ? GeneralCatalog.B4RulesVersion : b3 ? GeneralCatalog.B3RulesVersion : skillsEnabled ? GeneralCatalog.B2RulesVersion : GeneralCatalog.RulesVersion,
+                PackageVersion = b5Direct ? GeneralCatalog.B5DirectPackageVersion : b5 ? GeneralCatalog.B5PackageVersion : b45 ? GeneralCatalog.B45PackageVersion : b4 ? GeneralCatalog.B4PackageVersion : b3 ? GeneralCatalog.B3PackageVersion : skillsEnabled ? GeneralCatalog.B2PackageVersion : GeneralCatalog.PackageVersion,
+                PackageContentHash = b5Direct ? GeneralCatalog.B5DirectContentHash : b5 ? GeneralCatalog.B5ContentHash : b45 ? GeneralCatalog.B45ContentHash : b4 ? GeneralCatalog.B4ContentHash : b3 ? GeneralCatalog.B3ContentHash : skillsEnabled ? GeneralCatalog.B2ContentHash : GeneralCatalog.ContentHash,
                 SkillsEnabled = skillsEnabled, InitialSeed = initialSeed, Skills = skillsEnabled ? new B2SkillState() : null,
                 Board = b5 ? new B5BoardState() : null,
                 Military = b5 ? new B5MilitaryState() : null,
@@ -251,11 +253,13 @@ namespace Catan.Core.ThreeKingdoms
             return new ThreeKingdomsView
             {
                 PackageVersion = state.PackageVersion, PackageContentHash = state.PackageContentHash,
-                PackageLabel = state.RulesVersion == GeneralCatalog.B5RulesVersion ? GeneralCatalog.B5PackageLabel : UsesB4Lifecycle(state) ? GeneralCatalog.B4PackageLabel : state.RulesVersion == GeneralCatalog.B3RulesVersion ? GeneralCatalog.B3PackageLabel : state.SkillsEnabled ? GeneralCatalog.B2PackageLabel : GeneralCatalog.PackageLabel,
+                PackageLabel = state.RulesVersion == GeneralCatalog.B5DirectRulesVersion ? GeneralCatalog.B5DirectPackageLabel : state.RulesVersion == GeneralCatalog.B5RulesVersion ? GeneralCatalog.B5PackageLabel : state.RulesVersion == GeneralCatalog.B45RulesVersion ? GeneralCatalog.B45PackageLabel : UsesB4Lifecycle(state) ? GeneralCatalog.B4PackageLabel : state.RulesVersion == GeneralCatalog.B3RulesVersion ? GeneralCatalog.B3PackageLabel : state.SkillsEnabled ? GeneralCatalog.B2PackageLabel : GeneralCatalog.PackageLabel,
                 SkillsEnabled = state.SkillsEnabled, WindowId = decision?.WindowId ?? state.WindowId,
                 Clock = CopyClock(state.Clock), PendingDecision = decision, OpeningComplete = state.OpeningComplete,
                 PoolCount = state.Generals.Count(g => g.Region == GeneralRegion.Pool),
                 RetiredCount = state.Generals.Count(g => g.Region == GeneralRegion.Retired),
+                PublicPoolGeneralIds = GeneralCatalog.UsesDirectRules(state.RulesVersion) ? state.Generals.Where(g => g.Region == GeneralRegion.Pool).Select(g => g.GeneralId).OrderBy(x => x, StringComparer.Ordinal).ToArray() : null,
+                RetiredGeneralIds = GeneralCatalog.UsesDirectRules(state.RulesVersion) ? state.Generals.Where(g => g.Region == GeneralRegion.Retired).Select(g => g.GeneralId).OrderBy(x => x, StringComparer.Ordinal).ToArray() : null,
                 WaitingSelectionPlayerIds = UsesB4Lifecycle(state) ? (state.PendingDecisions ?? Array.Empty<ThreeKingdomsDecision>()).Select(d => d.PlayerId).ToArray() : null,
                 SkillHistory = B4SkillHistoryEngine.Project(state, viewerId),
                 CanRetire = state.OpeningComplete && state.Clock.Round > 0 && state.Clock.ActivePlayerId == viewerId
@@ -462,8 +466,12 @@ namespace Catan.Core.ThreeKingdoms
         public static bool HasSupportedPackage(ThreeKingdomsState state)
         {
             if (state == null) return true;
+            if (state.RulesVersion == GeneralCatalog.B5DirectRulesVersion) return state.SkillsEnabled && state.PackageVersion == GeneralCatalog.B5DirectPackageVersion
+                && state.PackageContentHash == GeneralCatalog.B5DirectContentHash;
             if (state.RulesVersion == GeneralCatalog.B5RulesVersion) return state.SkillsEnabled && state.PackageVersion == GeneralCatalog.B5PackageVersion
                 && state.PackageContentHash == GeneralCatalog.B5ContentHash;
+            if (state.RulesVersion == GeneralCatalog.B45RulesVersion) return state.SkillsEnabled && state.PackageVersion == GeneralCatalog.B45PackageVersion
+                && state.PackageContentHash == GeneralCatalog.B45ContentHash;
             if (UsesB4Lifecycle(state)) return state.SkillsEnabled && state.PackageVersion == GeneralCatalog.B4PackageVersion
                 && state.PackageContentHash == GeneralCatalog.B4ContentHash;
             bool b3 = state.SkillsEnabled && state.RulesVersion == GeneralCatalog.B3RulesVersion;
@@ -477,7 +485,7 @@ namespace Catan.Core.ThreeKingdoms
             var errors = new List<string>();
             if (state == null) return errors.ToArray();
             bool b4 = UsesB4Lifecycle(state);
-            bool b5 = state.RulesVersion == GeneralCatalog.B5RulesVersion;
+            bool b5 = GeneralCatalog.UsesB5Rules(state.RulesVersion);
             bool b3 = state.SkillsEnabled && state.RulesVersion == GeneralCatalog.B3RulesVersion;
             if (!HasSupportedPackage(state))
                 errors.Add("三国规则版本或开发包内容不一致。");

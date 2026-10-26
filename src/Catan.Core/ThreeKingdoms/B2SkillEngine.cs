@@ -65,6 +65,7 @@ namespace Catan.Core.ThreeKingdoms
                 DecisionId = d.PlayerId == viewerId ? d.DecisionId : null, WindowId = d.PlayerId == viewerId ? d.WindowId : null,
                 Kind = d.PlayerId == viewerId ? d.Kind : null, FrameId = d.PlayerId == viewerId ? d.FrameId : null };
             view.SkillActions = Actions(host, viewerId);
+            B45SelectionMetadata.Annotate(host, view.SkillActions, viewerId);
             view.RevealedSkillCards = Copy(state.Skills.RevealedCards);
             view.SkillStatus = state.Skills.TimedEffects.Select(e => e.PlayerId + "：" +
                 (e.Kind == "draw-block" ? "据守禁摸至下次行动机会" : e.Kind == "protection" ? "克己保护（行动机会 " + e.OpportunityId + "）" : "镇骨等待 " + e.TargetPlayerId + " 出牌"))
@@ -73,6 +74,10 @@ namespace Catan.Core.ThreeKingdoms
             ProjectB5Military(host, view, viewerId);
             ProjectCivilB5(host, view, viewerId);
             if (B5Enabled(state)) view.ProgressHandLimit = HasUnlimitedProgress(state, viewerId) ? (int?)null : 4 + B5ProgressLimitBonus(state, viewerId);
+            B45SkillStatusProjection.Project(host, view, viewerId);
+            if(GeneralCatalog.UsesDirectPackage(state.PackageVersion))
+                view.SkillStatus = state.Skills.TimedEffects.Where(e=>e.PlayerId==viewerId).Select(e=>e.Kind=="draw-block"?"据守：禁摸至下次行动机会":e.Kind=="protection"?"克己：当前受保护":"存在尚未结束的技能效果")
+                    .Concat((view.SkillRuntimeStatus??Array.Empty<B45SkillRuntimeStatus>()).Select(x=>(B45SkillCatalog.Get(x.SkillId)?.Name??x.SkillId)+"："+x.Summary)).ToArray();
         }
 
         private static string CounterLabel(string key) => key == "rende" ? "仁德累计余数" : key == "zhiheng-hand" ? "制衡手牌已用" :
@@ -250,7 +255,7 @@ namespace Catan.Core.ThreeKingdoms
                 if (frame.Optional)
                 {
                     if (!IsB4ResidualOptional(s,frame) && !CivilResidualOptional(s,frame) && Active(s, frame.PlayerId)?.TenureId != frame.TenureId) { Remove(s, frame); continue; }
-                    Decide(s, frame, "optional", "发动" + Name(frame.SkillId), "可选择发动或放弃。"); return;
+                    Decide(s, frame, "optional", (DirectResponses(s) ? "响应" : "发动") + Name(frame.SkillId), DirectResponses(s) ? "直接选择本次响应的牌或目标，确认后结算；也可放弃本次。" : "可选择发动或放弃。"); return;
                 }
                 if (!frame.Started && frame.TenureId != null && frame.Kind != "harvest" && frame.Kind != "claim" && frame.Kind != "raid" && frame.Kind != "gold" && Active(s, frame.PlayerId)?.TenureId != frame.TenureId)
                 { Remove(s, frame); continue; }
@@ -340,9 +345,12 @@ namespace Catan.Core.ThreeKingdoms
             {
                 if (d.PlayerId != playerId) return result.ToArray();
                 var f = s.Skills.Frames.Single(x => x.Id == d.FrameId);
-                if (d.Kind == "optional") { result.Add(Action(s, f.SkillId, "accept", "发动", d)); result.Add(Action(s, f.SkillId, "skip", "放弃", d)); }
+                if (d.Kind == "optional") { if (!AddB45OptionalActions(host, f, d, result)) { result.Add(Action(s, f.SkillId, "accept", "发动", d)); result.Add(Action(s, f.SkillId, "skip", "放弃", d)); } }
                 else if (d.Kind == "card")
-                    foreach (var t in ChoiceTypes(f).Where(t => host.GetBank()[t] > 0)) result.Add(CardAction(s, f, d, t));
+                {
+                    if (DirectResponses(s)) AddB45BatchCardActions(host, f, f, d, "b45-card-batch", result);
+                    else foreach (var t in ChoiceTypes(f).Where(t => host.GetBank()[t] > 0)) result.Add(CardAction(s, f, d, t));
+                }
                 else if (d.Kind == "target")
                     foreach (var p in s.SeatPlayerIds.Where(p => p != playerId)) { var a = Action(s, f.SkillId, "target", "选择 " + p, d); a.Command.TargetPlayerIds = new[] { p }; result.Add(a); }
                 else if (d.Kind == "color")
@@ -365,7 +373,7 @@ namespace Catan.Core.ThreeKingdoms
                     a.Command.ProgressCardId = option.Id;
                     var matrix=B4PaymentAllocator.Allocate(s,playerId,hand,option.Cost);
                     a.Command.Counts=Enumerable.Range(0,8).Select(t=>Enumerable.Range(0,8).Sum(u=>matrix[t*8+u])).ToArray();
-                    a.CardSelectionKind="payment";result.Add(a);
+                    a.CardSelectionKind="payment";result.Add(B45SelectionMetadata.WithBoard(a,option));
                 }
             if (g.GeneralId == "tk-g15" && ownTurn && s.Clock.Phase != ThreeKingdomsPhase.RoundEnd && s.Clock.Phase != ThreeKingdomsPhase.Finished)
                 foreach (var target in s.SeatPlayerIds.Where(p => p != playerId)) foreach (var t in Enumerable.Range(0, 8).Where(t => hand[t] > 0))
@@ -395,13 +403,24 @@ namespace Catan.Core.ThreeKingdoms
                 var f = s.Skills.Frames.Single(x => x.Id == d.FrameId); Require(command.SkillId == f.SkillId, "技能身份不匹配。");
                 if (d.Kind == "optional")
                 {
-                    Require(command.Option == "accept" || command.Option == "skip", "无效的发动选择。");
-                    if (command.Option == "skip") Remove(s, f); else { ValidateTimeOptional(host, f); f.Optional = false; f.Started = true; }
+                    if (!ResolveB45Optional(host, f, d, command))
+                    {
+                        Require(command.Option == "accept" || command.Option == "skip", "无效的发动选择。");
+                        if (command.Option == "skip") Remove(s, f); else { ValidateTimeOptional(host, f); f.Optional = false; f.Started = true; }
+                    }
                 }
                 else if (d.Kind == "card")
                 {
-                    Require(command.Option == "card" && ChoiceTypes(f).Contains(command.CardType) && host.GetBank()[command.CardType] > 0 && !IsDrawBlocked(s, playerId), "无法领取所选牌。");
-                    var selected = One(command.CardType); host.RemoveBank(selected); Add(f.Cards, selected); f.Remaining--;
+                    if (DirectResponses(s) && command.Option == "b45-card-batch")
+                    {
+                        ValidateB45BatchCards(host, f, command.Counts);
+                        host.RemoveBank(command.Counts); Add(f.Cards, command.Counts); f.Remaining -= command.Counts.Sum();
+                    }
+                    else
+                    {
+                        Require(command.Option == "card" && ChoiceTypes(f).Contains(command.CardType) && host.GetBank()[command.CardType] > 0 && !IsDrawBlocked(s, playerId), "无法领取所选牌。");
+                        var selected = One(command.CardType); host.RemoveBank(selected); Add(f.Cards, selected); f.Remaining--;
+                    }
                 }
                 else if (d.Kind == "target")
                 {

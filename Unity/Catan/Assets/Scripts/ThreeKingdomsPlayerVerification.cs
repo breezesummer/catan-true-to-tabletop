@@ -64,7 +64,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             app.StartGame(mode,"heading-for-new-shores",players,"P1",true,threeKingdoms:true);
             yield return null;yield return null;
             Require(app.Ready&&app.ThreeKingdoms&&app.Paused&&View!=null,"三国开关没有进入本地权威局面。");
-            Require(View.SkillsEnabled&&View.PackageVersion==GeneralCatalog.B5PackageVersion&&GeneralCatalog.B5Definitions.Length==49,"新局没有使用完整 B5 四十九将包。");
+            Require(View.SkillsEnabled&&View.PackageVersion==GeneralCatalog.B5DirectPackageVersion&&GeneralCatalog.B5Definitions.Length==49,"新局没有使用完整 B5 四十九将包。");
             result.packageVersion=View.PackageVersion;
             int budget=0;
             while(View.PendingDecision?.PlayerId!=app.HumanSeat)

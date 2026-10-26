@@ -31,8 +31,8 @@ namespace Catan.Core.M4
 
         private void InitializeThreeKingdoms(GameState s, bool skillsEnabled, string packageVersion = null)
         {
-            if (skillsEnabled && packageVersion == null) packageVersion = GeneralCatalog.B5PackageVersion;
-            s.RulesVersion = skillsEnabled ? (packageVersion == GeneralCatalog.B5PackageVersion ? ThreeKingdomsB5RulesVersion : packageVersion == GeneralCatalog.B4PackageVersion ? ThreeKingdomsB4RulesVersion : packageVersion == GeneralCatalog.B2PackageVersion ? ThreeKingdomsB2RulesVersion : ThreeKingdomsB3RulesVersion) : ThreeKingdomsRulesVersion;
+            if (skillsEnabled && packageVersion == null) packageVersion = GeneralCatalog.B5DirectPackageVersion;
+            s.RulesVersion = skillsEnabled ? (packageVersion == GeneralCatalog.B5DirectPackageVersion ? ThreeKingdomsB5DirectRulesVersion : packageVersion == GeneralCatalog.B5PackageVersion ? ThreeKingdomsB5RulesVersion : packageVersion == GeneralCatalog.B45PackageVersion ? ThreeKingdomsB45RulesVersion : packageVersion == GeneralCatalog.B4PackageVersion ? ThreeKingdomsB4RulesVersion : packageVersion == GeneralCatalog.B2PackageVersion ? ThreeKingdomsB2RulesVersion : ThreeKingdomsB3RulesVersion) : ThreeKingdomsRulesVersion;
             var seats = Enumerable.Range(0, s.Players.Length).Select(i => s.Players[(s.StartingPlayerIndex + i) % s.Players.Length].Id).ToArray();
             s.ThreeKingdoms = ThreeKingdomsEngine.Create(seats, s.InitialSeed, maximum => Draw(s.Random, maximum), skillsEnabled, packageVersion);
         }

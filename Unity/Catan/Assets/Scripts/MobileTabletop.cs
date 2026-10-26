@@ -3,6 +3,10 @@ using UnityEngine;
 // 只适配触控、安全区与字体；手机和 PC 共用完整桌面 UI，不按平台切换布局。
 public static class MobileTabletop
 {
+#if UNITY_EDITOR
+    // 仅图形编辑器验收覆盖安全区域；三维HUD与IMGUI读取同一视口。
+    internal static Rect? VerificationSafeArea;
+#endif
     static readonly bool desktopPreview=System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"-catan-mobile-ui")>=0;
     static int gestureFrame=-1;
     static Vector2 touchStart;
@@ -28,6 +32,9 @@ public static class MobileTabletop
         get
         {
             var safe=Enabled?Screen.safeArea:new Rect(0,0,Screen.width,Screen.height);
+#if UNITY_EDITOR
+            if(VerificationSafeArea.HasValue)safe=VerificationSafeArea.Value;
+#endif
             return MobileViewport.Fit(Screen.width,Screen.height,safe.x,safe.y,safe.width,safe.height);
         }
     }

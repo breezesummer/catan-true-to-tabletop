@@ -59,6 +59,12 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=6, EmitDefaultValue=false)] public int? AvailableCount { get; set; }
         [DataMember(Order=7, EmitDefaultValue=false)] public string VirtualCardId { get; set; }
         [DataMember(Order=8, EmitDefaultValue=false)] public int? ResultCardType { get; set; }
+        [DataMember(Order=9, EmitDefaultValue=false)] public string[] SelectionPlayerIds { get; set; }
+        [DataMember(Order=15, EmitDefaultValue=false)] public int[] SelectionCost { get; set; }
+        [DataMember(Order=10, EmitDefaultValue=false)] public string[] SelectionBoardIds { get; set; }
+        [DataMember(Order=11, EmitDefaultValue=false)] public int? RequiredCardCount { get; set; }
+        [DataMember(Order=12, EmitDefaultValue=false)] public int? SelectionDiceIndex { get; set; }
+        [DataMember(Order=13, EmitDefaultValue=false)] public int? SelectionDiceValue { get; set; }
     }
     [DataContract] public sealed class B2SkillDecision
     {

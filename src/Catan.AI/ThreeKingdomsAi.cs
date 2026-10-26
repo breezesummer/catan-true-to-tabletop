@@ -27,6 +27,14 @@ namespace Catan.AI
                         return counts.Length == 8 && Enumerable.Range(0, 8).All(i => counts[i] <= Math.Max(0, hand[i] - desired[i]))
                             ? counts.Sum() : double.NegativeInfinity;
                     }
+                    // B4.5没有首次询问；AI同样从合法投影主动选择有限次数的技能。
+                    // 不为无限次赠牌、驱虎或未知效果构造自动循环。
+                    if (GeneralCatalog.UsesDirectPackage(view.PackageVersion))
+                    {
+                        if (c.Option == "b4-jieming") return 20;
+                        if (c.Option == "response-jixi") return 12;
+                        if (c.Option == "b4-daoshu") return c.CardType >= 0 && c.CardType < 8 ? Math.Max(0, desired[c.CardType] - hand[c.CardType]) + 4 : 1;
+                    }
                     return double.NegativeInfinity;
                 }
                 switch (c.Option)

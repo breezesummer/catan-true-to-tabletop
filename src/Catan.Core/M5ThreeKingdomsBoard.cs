@@ -12,6 +12,7 @@ namespace Catan.Core.M5
     }
     public sealed partial class CombinedGameSession
     {
+        public const string ThreeKingdomsB5DirectRulesVersion = "combined-three-kingdoms-b5-direct-v1";
         public const string ThreeKingdomsB5RulesVersion = "combined-three-kingdoms-b5-v1";
         private static bool B5(GameState s) => B5BoardRules.Enabled(s.ThreeKingdoms);
         private static B5BoardState B5Board(GameState s) => s.ThreeKingdoms.Board ?? (s.ThreeKingdoms.Board = new B5BoardState());

@@ -8,7 +8,7 @@ namespace Catan.Core.ThreeKingdoms
     public static class B3DiceEngine
     {
         private static readonly string[] CardNames = { "木", "砖", "羊", "麦", "矿", "布", "币", "纸" };
-        private static bool Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && (s.RulesVersion == GeneralCatalog.B3RulesVersion || s.RulesVersion == GeneralCatalog.B4RulesVersion || s.RulesVersion == GeneralCatalog.B5RulesVersion);
+        private static bool Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && (s.RulesVersion == GeneralCatalog.B3RulesVersion || GeneralCatalog.UsesB4Rules(s.RulesVersion));
         public static bool HasPending(ThreeKingdomsState s) => Enabled(s) && s.Dice != null &&
             (s.Dice.StartWindowOpen || s.Dice.PendingDecision != null || (s.Dice.Roll != null && !s.Dice.Roll.Submitted));
 
@@ -276,6 +276,7 @@ namespace Catan.Core.ThreeKingdoms
             if (!Enabled(host.State) || !HasPending(host.State) || B2SkillEngine.HasPending(host.State)) return;
             var d = host.State.Dice.PendingDecision;
             view.SkillActions = Actions(host, viewerId);
+            B45SelectionMetadata.AnnotateDice(host, view.SkillActions);
             view.SkillDecision = d == null ? null : new B2SkillDecision { PlayerId = d.PlayerId, Title = d.Title,
                 Description = d.PlayerId == viewerId ? d.Description : "等待该玩家完成骰子选择。", DecisionId = d.PlayerId == viewerId ? d.DecisionId : null,
                 WindowId = d.PlayerId == viewerId ? d.WindowId : null, Kind = d.PlayerId == viewerId ? d.Kind : null };

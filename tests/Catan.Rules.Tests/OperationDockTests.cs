@@ -589,4 +589,26 @@ public sealed class OperationDockTests
     {
         Assert.False(string.IsNullOrWhiteSpace(OperationSelection.ValidateTrade(snapshot, trade)));
     }
+    [Fact]
+    public void B45HandLongPressAndSwipeCannotAlsoSelectOnRelease()
+    {
+        var gesture=new OperationHandGesture();
+        gesture.Begin(100,100,0);Assert.False(gesture.Inspect(.49));Assert.True(gesture.Inspect(.5));
+        Assert.False(gesture.Inspect(.8));Assert.False(gesture.Release(true));
+        gesture.Begin(100,100,1);gesture.Move(125,100,18);Assert.True(gesture.Moved);
+        Assert.False(gesture.Inspect(2));Assert.False(gesture.Release(true));
+        gesture.Begin(100,100,3);gesture.Move(102,101,18);Assert.True(gesture.Release(true));
+        gesture.Begin(100,100,4);Assert.False(gesture.Release(false));
+        gesture.Begin(100,100,5);gesture.Cancel();Assert.False(gesture.Release(true));
+    }
+    [Fact]
+    public void B45HandBridgeRequiresActiveAuthorizedCandidateAndPreservesIdentity()
+    {
+        var selection=new OperationHandSelection{CanSelectGood=(good,ordinal)=>good==3&&ordinal==2,CanSelectCard=id=>id=="progress:17"};
+        Assert.False(selection.GoodAllowed(3,2));Assert.False(selection.CardAllowed("progress:17"));
+        selection.Active=true;Assert.True(selection.GoodAllowed(3,2));Assert.False(selection.GoodAllowed(3,1));
+        Assert.True(selection.CardAllowed("progress:17"));Assert.False(selection.CardAllowed("progress:18"));
+        var order=new TabletopSpecialHandOrder();order.Sync(new[]{"progress:17","progress:18"});order.Sort(new[]{"progress:18","progress:17"});
+        Assert.True(selection.CardAllowed(order.Sync(new[]{"progress:17","progress:18"})[1]));
+    }
 }

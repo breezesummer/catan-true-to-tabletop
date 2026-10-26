@@ -41,13 +41,13 @@ namespace Catan.Core.ThreeKingdoms
                 if(Value(g,"luanwu",0)==0)actions.Add(CivilAction(s,"tk-g11-s2","civil-luanwu","乱武：依次令其他玩家支付两砖或处理道路"));
                 if(Value(g,"jianshu",0)==0){var others=s.SeatPlayerIds.Where(p=>p!=player).ToArray();for(int i=0;i<others.Length;i++)for(int j=i+1;j<others.Length;j++){var a=CivilAction(s,"tk-g11-s3","civil-jianshu","间书：指定 "+others[i]+" 与 "+others[j]);a.Command.TargetPlayerIds=new[]{others[i],others[j]};actions.Add(a);}}
             }
-            if(g.GeneralId=="tk-g16")foreach(var o in bh.GetBoardOptions(player,"kurou"))actions.Add(CivilAction(s,"tk-g16-s1","civil-kurou","苦肉："+o.Label,null,o.Id));
+            if(g.GeneralId=="tk-g16")foreach(var o in bh.GetBoardOptions(player,"kurou"))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,"tk-g16-s1","civil-kurou","苦肉："+o.Label,null,o.Id),o));
             if(g.GeneralId=="tk-g17"&&!loss&&Value(g,"qixi",s.Clock.PhaseId)<3)
                 foreach(var target in s.SeatPlayerIds.Where(p=>p!=player&&!CivilProtected(host,p)))
                 {
                     if(hand[1]>=1&&host.GetHand(target).Sum()>0&&!IsB4HandLossForbidden(s,target))actions.Add(CivilAction(s,"tk-g17-s1","civil-qixi-hand","奇袭：支付一砖，弃 "+target+" 一张手牌",target));
                     if(hand[1]>=2&&host.GetProgressCards(target).Any(p=>!p.PublicPoint)&&!IsB4HandLossForbidden(s,target))actions.Add(CivilAction(s,"tk-g17-s1","civil-qixi-progress","奇袭：支付两砖，弃 "+target+" 一张发展牌",target));
-                    foreach(var o in bh.GetBoardOptions(player,"downgrade-tech",target).Where(o=>o.Level>0&&hand[1]>=o.Level))actions.Add(CivilAction(s,"tk-g17-s1","civil-qixi-tech","奇袭：支付 "+o.Level+" 砖，"+o.Label,target,o.Id));
+                    foreach(var o in bh.GetBoardOptions(player,"downgrade-tech",target).Where(o=>o.Level>0&&hand[1]>=o.Level))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,"tk-g17-s1","civil-qixi-tech","奇袭：支付 "+o.Level+" 砖，"+o.Label,target,o.Id),o));
                 }
             if(g.GeneralId=="tk-g31"&&Value(g,"fencheng",0)==0)
                 foreach(var p in s.SeatPlayerIds)actions.Add(CivilAction(s,"tk-g31-s1","civil-fencheng","焚城：从 "+p+" 开始",p));
@@ -56,7 +56,7 @@ namespace Catan.Core.ThreeKingdoms
                 for(int n=1;n<=hand[4];n++){var a=CivilAction(s,"tk-g35-s1","civil-lianhuan","连环：弃 "+n+" 张矿石换随机资源");a.Command.Counts[4]=n;a.RealCardType=4;a.CardSelectionKind="payment";a.AvailableCount=hand[4];actions.Add(a);}
             if(g.GeneralId=="tk-g51"&&g.Counters.Count(c=>c.Key.StartsWith("liegong:",StringComparison.Ordinal)&&c.Value>0)>=7)
             {
-                foreach(var o in bh.GetBoardOptions(player,"liegong").Where(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId)))actions.Add(CivilAction(s,"tk-g51-s1","civil-liegong","烈弓："+o.Label,null,o.Id));
+                foreach(var o in bh.GetBoardOptions(player,"liegong").Where(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId)))actions.Add(B45SelectionMetadata.WithBoard(CivilAction(s,"tk-g51-s1","civil-liegong","烈弓："+o.Label,null,o.Id),o));
                 if(bh.GetBoardOptions(player,"liegong-road").Count(o=>!CivilProtected(host,o.OtherPlayerId??o.PlayerId))>=2)actions.Add(CivilAction(s,"tk-g51-s1","civil-liegong-roads","烈弓：选择两条不同道路"));
             }
             if(g.GeneralId=="tk-g54")
@@ -64,7 +64,7 @@ namespace Catan.Core.ThreeKingdoms
                 if(Value(g,"chujia",0)==0)actions.Add(CivilAction(s,"tk-g54-s2","civil-chujia","除痂：本局村庄与城市不会倒塌"));
                 if(!loss&&Value(g,"qingnang",s.Clock.PhaseId)==0)
                     foreach(var o in bh.GetBoardOptions(player,"repair"))foreach(int real in Enumerable.Range(0,8).Where(t=>hand[t]>0))foreach(int effective in EffectiveCardTypes(s,player,real))
-                    {var a=CivilAction(s,"tk-g54-s1","civil-qingnang","青囊：弃"+CardNames[real]+"，"+o.Label,null,o.Id,real);a.Command.EffectiveCardType=effective;a.EffectiveCardType=effective;actions.Add(a);}
+                    {var a=CivilAction(s,"tk-g54-s1","civil-qingnang","青囊：弃"+CardNames[real]+"，"+o.Label,null,o.Id,real);a.Command.EffectiveCardType=effective;a.EffectiveCardType=effective;actions.Add(B45SelectionMetadata.WithBoard(a,o));}
             }
         }
         private static bool ResolveCivilActive(IThreeKingdomsCardHost host,GeneralInstance g,B2SkillCommand c)

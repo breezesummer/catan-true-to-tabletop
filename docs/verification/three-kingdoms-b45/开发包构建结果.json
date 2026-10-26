@@ -1,0 +1,2631 @@
+{
+  "版本": "2.0.2",
+  "分支": "dev-2.0（工作区未提交）",
+  "构建目录": "game version/2.0/Catan2.0.2-Direct-Interaction-SigningTest",
+  "构建结果": {
+    "游戏版本": "2.0.2",
+    "构建宿主": "macOS",
+    "目标": "all",
+    "测试签名": true,
+    "完成时间": "2026-10-24T12:38:12.234583+08:00",
+    "运行验收": "本次仅验证构建与签名；Windows 运行和 Android 真机另行验证。"
+  },
+  "Android": {
+    "version": "2.0.2",
+    "packageId": "com.catandevelopment.threekingdoms",
+    "versionCode": 20002,
+    "minApi": 26,
+    "targetApi": 36,
+    "architectures": [
+      "arm64-v8a",
+      "x86_64"
+    ],
+    "graphicsApi": "OpenGLES3",
+    "scriptingBackend": "IL2CPP",
+    "ui": "shared-pc-tabletop",
+    "coreAssemblySha256": "57cdacd6a946907f02dbab9d39b026ce61d9904b716e04527a6174bc2b535673",
+    "aiAssemblySha256": "fa10ee2753a9062fafdf8b6cedece82510f5de210eac154e7f0031309ee8d1d5",
+    "signingCertificateSha256": "51fc0e5fc0713772987db42ee73893e9baba5de128505752365453b9597666c6",
+    "apkSha256": "f9f489ed268be7503179d7e64ecb9e351ec507d952834f8cce69aeaf597011c8",
+    "signingPurpose": "build-verification-only"
+  },
+  "双端规则与AI程序集一致": true,
+  "首次Android失败": "沿用缓存时CardPick音频导入校验失败；保留失败日志，空缓存重建后完整校验通过。",
+  "文件": [
+    {
+      "文件": "Builds/Android/Catan2.0.2.apk",
+      "字节": 354585805,
+      "SHA256": "f9f489ed268be7503179d7e64ecb9e351ec507d952834f8cce69aeaf597011c8"
+    },
+    {
+      "文件": "Builds/Android/Catan2.0.2_BurstDebugInformation_DoNotShip/tempburstlibs/arm64-v8a/lib_burst_generated.txt",
+      "字节": 84235,
+      "SHA256": "cb33278fe048ff5948a58b053194d67dfd32963bfd9e3359dc3bd8164259f7d7"
+    },
+    {
+      "文件": "Builds/Android/Catan2.0.2_BurstDebugInformation_DoNotShip/tempburstlibs/x86_64/lib_burst_generated.txt",
+      "字节": 84214,
+      "SHA256": "5ce7e517832f659c26a740cd37065072b313ff0e184bfb4fa0236a4ced784337"
+    },
+    {
+      "文件": "Builds/Android/build-info.json",
+      "字节": 695,
+      "SHA256": "0cecc3bf476d380463af236cbfaaac80906a4d8026bd98a4afdae4dbc1481f2f"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2.exe",
+      "字节": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_BurstDebugInformation_DoNotShip/Data/Plugins/x86_64/lib_burst_generated.txt",
+      "字节": 193662,
+      "SHA256": "9cceee8fc772174b608c87dafdd07579343257d0c5ea0ee3e8a279d1ac7f15e0"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Assembly-CSharp.dll",
+      "字节": 1307136,
+      "SHA256": "4771557f5dd2127f1772fa52001a92d551ac216785e1fce47c68f3c8242cc4ff"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Catan.AI.dll",
+      "字节": 216064,
+      "SHA256": "fa10ee2753a9062fafdf8b6cedece82510f5de210eac154e7f0031309ee8d1d5"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Catan.Core.dll",
+      "字节": 1106432,
+      "SHA256": "57cdacd6a946907f02dbab9d39b026ce61d9904b716e04527a6174bc2b535673"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Catan.Network.Contracts.dll",
+      "字节": 14848,
+      "SHA256": "c228766de8b37dd25eef68492e08bf33d3e6c3bc83272fb4e6d471d88ae34b24"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Mono.Security.dll",
+      "字节": 241152,
+      "SHA256": "82df31404def10ffd69c09e3a8c454e76552f3a37675d1b7b8c743cfd3d1af6f"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.ComponentModel.Composition.dll",
+      "字节": 257024,
+      "SHA256": "9373a420101d4c674b9f74bce93a45c58ddb3548c130d9b65ab87235d0a4ed30"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Configuration.dll",
+      "字节": 124928,
+      "SHA256": "d3acb14b8ebaf7482d2d3e26e8c04685299e2b471a513a30508bd0cab8336354"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Core.dll",
+      "字节": 1113088,
+      "SHA256": "ebf140bf5f8d49ccac20c14935625b0ae0a46c30aa4f90b2808f3b9678822470"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Data.DataSetExtensions.dll",
+      "字节": 29696,
+      "SHA256": "79a01061129709358567a9254684ba52ba66371e01e0354e7fa4852a9f62e59f"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Data.dll",
+      "字节": 2125312,
+      "SHA256": "5d0807269bfcf112aa844951232ef105bbb642abb1e14c2e78dd70fb9245e98a"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Drawing.dll",
+      "字节": 489984,
+      "SHA256": "76dca8fbe098c285b03de79369f9f2aa141dec44de99ebcc0478c7e762024204"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.EnterpriseServices.dll",
+      "字节": 44544,
+      "SHA256": "d8a3d6c1929ec028793ff07df92781c03ebb38c63005d4c12c35e3116d04fcaf"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.IO.Compression.FileSystem.dll",
+      "字节": 18432,
+      "SHA256": "40ef91246d44d6c4d8a1505e1210b0c54963a12938ba0458959bb064d62f36f4"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.IO.Compression.dll",
+      "字节": 114688,
+      "SHA256": "7370dc2d3a6f02dbda1a69ca596f2ae96fc464809b3bbca6071fc1fc1edfbb2d"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Net.Http.dll",
+      "字节": 122880,
+      "SHA256": "c46d5b5dc68af8ce1b34e8ace4372b157e2e85ab63d6b5eea938ca71dc7fb064"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Numerics.dll",
+      "字节": 119296,
+      "SHA256": "74f6771aedd33262470e8e653fc0f4e04a659bcdadbeb44b2f8826fba7053f77"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Runtime.Serialization.dll",
+      "字节": 934400,
+      "SHA256": "2aa92fb930200ddb3c9c3ffaaff39bd6cdc6d689f19614f6c3b84a15060800f0"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Runtime.dll",
+      "字节": 12288,
+      "SHA256": "e0a7334b7ba419aaab6bd3bb6992d693e689341a9178172c9bf99c2aa6a085bd"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Security.dll",
+      "字节": 320000,
+      "SHA256": "95a29120e164e5bdb7ff5dcb2cb4641e5ea0aca7c1ad0854b0e9b2b0ff5abe2d"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.ServiceModel.Internals.dll",
+      "字节": 215040,
+      "SHA256": "6738a31088136d38a50354371feb83a4fd1558acca2a5f8b165c34a859e08c47"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Transactions.dll",
+      "字节": 35328,
+      "SHA256": "cfac784408e3b7da6c6e94ec04c162c6d902372fab19353c02aeda3464ce185f"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Xml.Linq.dll",
+      "字节": 136704,
+      "SHA256": "ed219710472b837fddf45cc73c912e04b4d6b8ca833ea074ec1f73bc00157b05"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.Xml.dll",
+      "字节": 3160064,
+      "SHA256": "f90799a0c38f3d45e390f9768ab467bf681a052e1b807f4c59fabef5f7edaffa"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/System.dll",
+      "字节": 2641920,
+      "SHA256": "9e8a5190797e35428b1ae9bce6d47d39a1dbc3e974f14239e44678913dc6194a"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.Burst.Unsafe.dll",
+      "字节": 5632,
+      "SHA256": "9d9c1ff52411decbee5d9f0d1cd61ebeaa222077aa77a52101ea3debafae98e2"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.Burst.dll",
+      "字节": 296960,
+      "SHA256": "d058fca087f9a4c8057de745d5b3a8a4bb48e9740d41a777f8763cd3af80a15c"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.Collections.LowLevel.ILSupport.dll",
+      "字节": 5120,
+      "SHA256": "ff50383f807f9692e4913b97e47d86fefcb8faa33d6d48cd3e3fd6fc7ffb448d"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.Collections.dll",
+      "字节": 432128,
+      "SHA256": "d1d52da7aa5722da4202ef67069fddfb633cab5294f83d3195acb22d23bded58"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.InternalAPIEngineBridge.004.dll",
+      "字节": 4096,
+      "SHA256": "b84eb3d69535a3e7642fc529b4ca0044d7cb04e10b679f31eda59f423d04241d"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.Mathematics.dll",
+      "字节": 737280,
+      "SHA256": "13f00df94ccc4ff6b791c3328ec24c191a249a278a397798cf48620e254001db"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.RenderPipeline.Universal.ShaderLibrary.dll",
+      "字节": 7680,
+      "SHA256": "7dbe1ff6514de5e494c39f8ba50b1dc93e37bb85fe72b88716e7f358ded52d35"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.RenderPipelines.Core.Runtime.Shared.dll",
+      "字节": 4608,
+      "SHA256": "e0b5525513620b3bda17eed4378b714629ddd3554c28f680abd5360e455ad81e"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.RenderPipelines.Core.Runtime.dll",
+      "字节": 1127936,
+      "SHA256": "4094f6f76435df302a8e4ddab130a360868dfc42eb8f5f3c416071d07c481f2d"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.RenderPipelines.Core.ShaderLibrary.dll",
+      "字节": 3584,
+      "SHA256": "487c9b162928ac6f41c9f1f8ec815343edf2e0348777d75a1e6cf219a7ae9872"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.RenderPipelines.GPUDriven.Runtime.dll",
+      "字节": 220160,
+      "SHA256": "086626b7d4446c27510bc088ae942b657d59ba3d8f44d68fdb1ee053972ba8da"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll",
+      "字节": 3584,
+      "SHA256": "c56a2817af974ed7105b5eafb2c3886d75b2001bc50ce2959fc5761ab44d3fe5"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.RenderPipelines.Universal.2D.Runtime.dll",
+      "字节": 216064,
+      "SHA256": "6795d8b60ced003edc1dd26a3dd5d52f9951742895ac8df1abd1f65fc4366b60"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.RenderPipelines.Universal.Config.Runtime.dll",
+      "字节": 4096,
+      "SHA256": "c4fdd026fa8b6706e6a2bff47a21a3057cda1f7fee968d292e9c33749619a83f"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.RenderPipelines.Universal.Runtime.dll",
+      "字节": 699392,
+      "SHA256": "78c32fbf1ee25a984cd0203015bc804ade4d5f0c3ada5aae047b5c2ceee36d9e"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.RenderPipelines.Universal.Shaders.dll",
+      "字节": 3584,
+      "SHA256": "9670a2178623f2839be4b7073c19dde818bb31a5ad357104f7d4ee851fcad631"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.TextMeshPro.dll",
+      "字节": 436736,
+      "SHA256": "6cd8823bd827fdc58ada535e35a493db9f3a721cf6a3ece80e859e66abcf4bba"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/Unity.UnifiedRayTracing.Runtime.dll",
+      "字节": 88576,
+      "SHA256": "13dc761c803776a88b4a6c0d2ac1ec96b8a2373c3e3bc1250498801b79c69666"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.AIModule.dll",
+      "字节": 77232,
+      "SHA256": "bfd77673e8375b9dbfe40d87bbe9c862756dfb55204199335cc656047269087c"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.AMDModule.dll",
+      "字节": 21928,
+      "SHA256": "ba0aff5bc872c12ad28910648dda93ba0819c8d21bb0875555f83d54786aa2e5"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.ARModule.dll",
+      "字节": 25512,
+      "SHA256": "ca14560f1babc465677c6402ae50df08e24d1b82ec3d65b030d34f7c042ac700"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.AccessibilityModule.dll",
+      "字节": 51112,
+      "SHA256": "6f1cf81e05dae2cdc12879f36ebc10528c4748e4350a6e0d5bd1f7b324e29c4f"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.AdaptivePerformanceModule.dll",
+      "字节": 125360,
+      "SHA256": "4093d92a25a73337d3af601e8b600094652f0e10ea434a5f3220c5e7cd031405"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.AndroidJNIModule.dll",
+      "字节": 121776,
+      "SHA256": "10488feef0b9c49ddbbaef9e8334ea28dd11bd012c0ff9f66f0fe0d1856dfb0b"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.AnimationModule.dll",
+      "字节": 225200,
+      "SHA256": "bcf3685b1c0c26787c11060022cafe7bc07b7ba2f462ed8a1d9217d2e69bb962"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.AssetBundleModule.dll",
+      "字节": 41896,
+      "SHA256": "22c8aad951e7b9a1f2d01bf7e11e468b9bcef761e63329034b56a5dfc3e2642d"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.AudioModule.dll",
+      "字节": 142760,
+      "SHA256": "02fdd7ba741b956968addd15f158719362bc0dab1ff6de5ea040b950120d8c06"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.ClothModule.dll",
+      "字节": 36272,
+      "SHA256": "6f9f8b08d43a78b2dd42d056cd5fdd0b1d810a8fcc62b2be20c69cac3c80dc61"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.ClusterInputModule.dll",
+      "字节": 28072,
+      "SHA256": "7b2ccf54b94b707a7f0b3139be7a7715b02095de5c067b677a62db7ecf4d1028"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.ClusterRendererModule.dll",
+      "字节": 26536,
+      "SHA256": "4e916bfe9295fc0b2309975347f2afc8c9a463c1c0a3998a0e556af7c6fe5512"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.ContentLoadModule.dll",
+      "字节": 32688,
+      "SHA256": "52755ffdbafc033b8a8852cf0c438e56804f6510182d05e6f01b2c4ae33369fa"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.CoreModule.dll",
+      "字节": 1985960,
+      "SHA256": "9f5141e8dd6c34b82bb03f151e6f0773129f55a7a2e816fe1e31e549737f4a71"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.CrashReportingModule.dll",
+      "字节": 26536,
+      "SHA256": "cfa0dec00bbd83f20338fccb798a21e51609710b6da663a7e0a65db7f815206e"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.DSPGraphModule.dll",
+      "字节": 31664,
+      "SHA256": "adb3ccc3f0f286fde45966825403628cddd699c50f21f0b1f7963fb15df70bab"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.DirectorModule.dll",
+      "字节": 41896,
+      "SHA256": "ae6aedab02ce4b6b54fdf3e3a534e10385421f97a013cb6e89002c8e4196623d"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.GIModule.dll",
+      "字节": 24488,
+      "SHA256": "82ece4b5f8754718920f170e5315750f7e9e9230b9745244606b45ed925f70b1"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.GameCenterModule.dll",
+      "字节": 46000,
+      "SHA256": "2e0e3ea555b0bb2ef3b8a4018bb184b98c68521243c5c14c58b4e01443720e9f"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.GraphicsStateCollectionSerializerModule.dll",
+      "字节": 14248,
+      "SHA256": "eff16cbd65b7429a07ae0ca99d82be386db9530737e881aaa6f54db74698c8aa"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.GridModule.dll",
+      "字节": 30640,
+      "SHA256": "93a7a1cc2d30b78867afde6d95730d5ea1cf78f4423cb3616e9a0eb0b9197360"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.HierarchyCoreModule.dll",
+      "字节": 109488,
+      "SHA256": "858bfd1efb2fafaf4ffdd9493c6e5263ff6cb4660f44ed2aad78c328e56dfa1f"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.HierarchyModule.dll",
+      "字节": 102320,
+      "SHA256": "e3dbf5559b4c4750e35f7c2abded8fb41b5fc13756997a9345f442f59bb94edb"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.HotReloadModule.dll",
+      "字节": 24488,
+      "SHA256": "a5b03928e808d2c2d90be6036dd11c4a8d3f4138b062656c19095eb950dbb88b"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.IMGUIModule.dll",
+      "字节": 214448,
+      "SHA256": "32c68f4fff2f9d5918323c66f08fd6a6f51b31d9d72dbd4dc8b2b59237c89cb7"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.IdentifiersModule.dll",
+      "字节": 16808,
+      "SHA256": "f517e4042af0a46eb38a2c11dc3b4f64eb866597969921c177b99e06c2f1a10d"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.ImageConversionModule.dll",
+      "字节": 31152,
+      "SHA256": "7d4f34875058cfd2259960bae2077be6761d382c0c1d2183fe8b12dc57f5fcb9"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.InputForUIModule.dll",
+      "字节": 57776,
+      "SHA256": "48fbd7049b785d02b81df6f7bcc370883052edea365aa9da3dd59fd3c69e17cd"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.InputLegacyModule.dll",
+      "字节": 45488,
+      "SHA256": "438877c35972e395fe24a1d15ef8605e2b1d971232b8d52c55091946c7889027"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.InputModule.dll",
+      "字节": 28592,
+      "SHA256": "2ce6bf203759134cc65f4be3e6cfde6bcf5ba166dab9b1068fad8e1aff489327"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.InsightsModule.dll",
+      "字节": 14256,
+      "SHA256": "5d2ee24494000c673ce892dd398f248d4ed51f6b5ea21fcbaa083b2f67b92090"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.JSONSerializeModule.dll",
+      "字节": 27056,
+      "SHA256": "08c89e611bb81e0d4315468d1c23562b40d59f4b479d549c6a97cf80ee01044a"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.LocalizationModule.dll",
+      "字节": 27048,
+      "SHA256": "a34a90cec3a649585ba68a12c0faf141b0624c5c2b7ea3720186c937a539f61e"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.MarshallingModule.dll",
+      "字节": 83880,
+      "SHA256": "6babb60eae89f3d1ade0a2b501063c560530aeedfd06ed1bc8d30e99d91fbfe8"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.MultiplayerModule.dll",
+      "字节": 17832,
+      "SHA256": "476354eb35c1cbd777c967eac4c42321d58f47cf4bd9163de553f45a295cb640"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.NVIDIAModule.dll",
+      "字节": 40880,
+      "SHA256": "89746ddbf40b2bd208d3fa052fd6e12bf4e71406cd0eb20ac3a70a1a5ee19c7a"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.ParticleSystemModule.dll",
+      "字节": 171952,
+      "SHA256": "106663a51b42d63ed661ba5b140f5712143b2fc8036d11c97c88a2b58c6cb694"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.PerformanceReportingModule.dll",
+      "字节": 25008,
+      "SHA256": "5f90ecd446b7ac2fdebd2037d5afc8649b26a492f166037a688f2ee87c98a08f"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.Physics2DModule.dll",
+      "字节": 586672,
+      "SHA256": "3d3235f1e531dcc241315227f0d23ea5c64ea97a2e3bac5e90be39fd93c3d3dc"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.PhysicsBackendPhysXModule.dll",
+      "字节": 14248,
+      "SHA256": "06f2bd9db50020622daf782db57b7323e499e08021f26c703b5d8617f297d761"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.PhysicsModule.dll",
+      "字节": 183720,
+      "SHA256": "69449b49645e412905addb2058758ecc1b731d9344f454c210b486e6b6b267ce"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.PropertiesModule.dll",
+      "字节": 134064,
+      "SHA256": "5a874b51fe386506fe69c9ee59e72b39e2f7de2dd6ce51bb36a35048ec8dffc0"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.RenderAs2DModule.dll",
+      "字节": 25512,
+      "SHA256": "f47dc88c2b076a13f66bd333466871d84505a2047a7ba9de208f3eab5c56d657"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll",
+      "字节": 24496,
+      "SHA256": "eb32176384e1c5b2519d97ebc434b2965559cacc017779d20f78dd823eab47b1"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.ScreenCaptureModule.dll",
+      "字节": 26544,
+      "SHA256": "e79237323bf494f0b7ffb312767b524b6ba05657443cdfcbee16d57e90f74c97"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.ShaderRuntimeModule.dll",
+      "字节": 25520,
+      "SHA256": "8cb9be008c81192fa401a815753e927e50333e707cfe5f076c6a1bf37b638bba"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.ShaderVariantAnalyticsModule.dll",
+      "字节": 24496,
+      "SHA256": "f712ac6d73e55846cada26d93dbb233356a51487b203e8face19b1c56084ce13"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.SharedInternalsModule.dll",
+      "字节": 38312,
+      "SHA256": "5280a4e04628a90df183d7d06e576fa7d4875cb26958bf6695dfad584dac50d7"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.SpriteMaskModule.dll",
+      "字节": 28584,
+      "SHA256": "22bcf62b39964faff66acccc7210174e2c3b653297517dff42cc7ae031191f23"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.SpriteShapeModule.dll",
+      "字节": 32688,
+      "SHA256": "24dd5faa4e09321603f9b121281c283e86ecfc566e4a1d5e346da05d8583ab6a"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.StreamingModule.dll",
+      "字节": 26032,
+      "SHA256": "8346cf3fd1a30ecd74b70f8ef2e5fc4ed5f872d6806382948fcf96312fdec7cf"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.SubstanceModule.dll",
+      "字节": 29104,
+      "SHA256": "60525d79b9c67561f73e6ec28fc9acadac100141e27193d5ae6063f97c5e9f13"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.SubsystemsModule.dll",
+      "字节": 41896,
+      "SHA256": "76bc7ff82e40d2173809760a9796a9211692c4b67e87e6afdfe2ad2615c4d04a"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.TLSModule.dll",
+      "字节": 32168,
+      "SHA256": "6f588a524d92fa0b80bb27d70d563c78a9c7033a4d1c061e92c70e34789688dd"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.TerrainModule.dll",
+      "字节": 134056,
+      "SHA256": "450b52731db19619e2f5ee4459dd5806af11f47f1e5b3fda4643dd7594774112"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.TerrainPhysicsModule.dll",
+      "字节": 25512,
+      "SHA256": "2534e373c7eae56437d1a6522bf9a66d89a58d129bea79137fe2e793c6dd98f5"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.TextCoreFontEngineModule.dll",
+      "字节": 91560,
+      "SHA256": "3150cdc6e66f995833333eb40cc5823800e3dc89026078b12408549a77d70193"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.TextCoreTextEngineModule.dll",
+      "字节": 334760,
+      "SHA256": "71aef37035fa1cef816a1c012d3867df58032c540570956876147847e940395e"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.TextRenderingModule.dll",
+      "字节": 39336,
+      "SHA256": "939efb1afbb1164fa7e4889c283175cb5df12e5165526e745748227ad122a17e"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.TilemapModule.dll",
+      "字节": 58792,
+      "SHA256": "31a6602a4cb06c890121b104b61eaf594b12820d5cab5a2b52d19b235538e761"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UI.dll",
+      "字节": 240640,
+      "SHA256": "5c28f8d4b0a62789546794d9ff25204251fdc7c314420a0230fb662c286304c8"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UIElementsModule.dll",
+      "字节": 2452904,
+      "SHA256": "457d5fed14283986093aff2e018d4e14aa623c3ac21e50eed9b72884c4070d90"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UIModule.dll",
+      "字节": 50088,
+      "SHA256": "c1371370e9bcbbff39929f8582a1f089a5171eabb03b5f8ba9f87deaee28fc85"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UmbraModule.dll",
+      "字节": 24496,
+      "SHA256": "a953a1f5b7387abc0ba4ff1569b85cdb03da1eae87a8f865bf475eaaa4865dca"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UnityAnalyticsCommonModule.dll",
+      "字节": 35760,
+      "SHA256": "6bd6cded7374476c190a6717491e83b3f6c6fda0249362ea50d213d07ba55968"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UnityAnalyticsModule.dll",
+      "字节": 60840,
+      "SHA256": "f15560029bf8864121f636b848e0fa12e210478d80e08e31fa642875defb822d"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UnityConnectModule.dll",
+      "字节": 27568,
+      "SHA256": "a849884a4dd02f6abb733b2d9f5d80ec8790d54caa52782a7b9d231d82b89093"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UnityConsentModule.dll",
+      "字节": 16304,
+      "SHA256": "400dac88b326b2ca4d56fc596eb547ca7dead2a805254d17363ded61656ce172"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UnityCurlModule.dll",
+      "字节": 26024,
+      "SHA256": "78f943dcdcf9d87af61c0c3bac2d1ee9b3f79dd6a7eaef77a936d5c767f3b2cc"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UnityWebRequestAssetBundleModule.dll",
+      "字节": 28584,
+      "SHA256": "9ef1ec6f7ed38b12d54317cefb15b68bba71364f043b96cd245172d8e0a8f6ea"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UnityWebRequestAudioModule.dll",
+      "字节": 28592,
+      "SHA256": "969db83a3315a421b54a588575f6ee217bee0d42c2df468a9c5f1fe8a406e88c"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UnityWebRequestModule.dll",
+      "字节": 70056,
+      "SHA256": "ea42e7a2842ba8d84f3578d9ee14df0644b9e21fe86fd0211010b5507de18a1e"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UnityWebRequestTextureModule.dll",
+      "字节": 27568,
+      "SHA256": "12d6c724f26a3bc3497d3632ac5af434d6681ffad7aeb9e3adf4a326f7989bd0"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.UnityWebRequestWWWModule.dll",
+      "字节": 36784,
+      "SHA256": "e3a346e7bfa559072d74cdd91baa3caa52227cf3acb3eb61edcf80d039a33c92"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.VFXModule.dll",
+      "字节": 78256,
+      "SHA256": "20fb0e54ea97e9c4f01c28031958b81258018d3d0ac0fc4c3b0c9ea4c100bc5a"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.VRModule.dll",
+      "字节": 31664,
+      "SHA256": "abf634b2a5a8a792196afaa3a35067f85f99847f923939faf1eb1739210db86a"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.VectorGraphicsModule.dll",
+      "字节": 252840,
+      "SHA256": "619302708f35460a7d1a798357cd345b7c05c6d2d246043fc49507be6dd75a70"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.VehiclesModule.dll",
+      "字节": 31664,
+      "SHA256": "28d6f5e646a355d9bb9e5fd49fd9d53e2b59612804bf9a2c91ab0e637d55fe61"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.VideoModule.dll",
+      "字节": 49072,
+      "SHA256": "b2e4904d12e73724f18458ca4a6a6bb6183442a6466cc6799cc21312680cc798"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.VirtualTexturingModule.dll",
+      "字节": 42928,
+      "SHA256": "e906a2a2b3c2b8036a058fbe57c26204530a3a149958d6eb34136651c2cc16b5"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.WindModule.dll",
+      "字节": 26544,
+      "SHA256": "d052ddff4e734b1ac7b33c3ee7e2e4acd87a19a18c8e87fd1011b4968d01af84"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.XRModule.dll",
+      "字节": 88496,
+      "SHA256": "4e5415493a11e22d4ba70d29f24430cc243f42ed5b5b3bd1f3482c2282abaed5"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/UnityEngine.dll",
+      "字节": 197544,
+      "SHA256": "2f3b62a8e929949fce922811700777d1dbbea8541a1aff93a0273e885f3bf5c8"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/mscorlib.dll",
+      "字节": 4632064,
+      "SHA256": "194417662b72e9fdc29df44aa07fb693a9cf2194d84e327231f3eeff1104ae0f"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Managed/netstandard.dll",
+      "字节": 90112,
+      "SHA256": "6ae62e082dc494a2433984177f60ca4db5fae69b1f360a8b33754172b310b8c5"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Plugins/x86_64/lib_burst_generated.dll",
+      "字节": 446464,
+      "SHA256": "21448cce1d0daa7eb04065c72fe5c964129b8333d60a735b738c3234fe1e8d3d"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Resources/unity default resources",
+      "字节": 5883716,
+      "SHA256": "32b58bdb9cf090212b46a8ca7436dcdae89e4ef43e9d55a835233c21d1347734"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/Resources/unity_builtin_extra",
+      "字节": 397720,
+      "SHA256": "dc93f1e3fd8da4b29f300741d8da5ddd12a3b0e08bda94c4dad3d7ddf2610746"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/RuntimeInitializeOnLoads.json",
+      "字节": 3098,
+      "SHA256": "3fb8d9f00cf6b080a53fb5c1b885241a4d997281232f5986a47dd8f4b5b94599"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/ScriptingAssemblies.json",
+      "字节": 4034,
+      "SHA256": "c0a2f0d64bb4a5d5d7c66e49515374c12573b18e4ba06290096b69f616fa772e"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/app.info",
+      "字节": 27,
+      "SHA256": "fd307bbd05d9ada56c102f2b899b9e50b69c771cb7386abc99158e8b79c41db3"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/boot.config",
+      "字节": 156,
+      "SHA256": "04be8f71d4a096f3ab2cd82225690bd5391dd531e5d3807b59c5dfa8c245f093"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/globalgamemanagers",
+      "字节": 250756,
+      "SHA256": "0fbcbca7b6ae3d19c532de91acb17693b611d3ed47f111f0486d3cd6ff18d7fc"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/globalgamemanagers.assets",
+      "字节": 465220,
+      "SHA256": "b7e3e88a62615d173932ce1ac030e5864a9ec2d619584b6da633a4b907f33002"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/globalgamemanagers.assets.resS",
+      "字节": 3275488,
+      "SHA256": "7c8f8811af123955811662bf92d0c48510d2727cc14296d18d3f709d20c950e7"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/level0",
+      "字节": 2896,
+      "SHA256": "41273e865f2c661f353d15f91321c61a2ce4f430d3e268570cdcba78c3d49ffd"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/resources.assets",
+      "字节": 144295192,
+      "SHA256": "79d8f1881942bab13122d10d0eecc6161cfae7fc6f72d3f38c479fd483496dcf"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/resources.assets.resS",
+      "字节": 699534464,
+      "SHA256": "daa0bd057e8a399a6e1aff632e459296c34ff2805940332a5fcac276d4580cff"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/resources.resource",
+      "字节": 15446656,
+      "SHA256": "60175c7d903a6f9ea24b3075528e499e3ea973c6cc094d4e72eb287da8102897"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/sharedassets0.assets",
+      "字节": 7984,
+      "SHA256": "2e4ea44654bd2c8e8e3776ad23314a2205672a76b219c401268b64507605caff"
+    },
+    {
+      "文件": "Builds/Windows/Catan2.0.2_Data/sharedassets0.assets.resS",
+      "字节": 524288,
+      "SHA256": "cf6e38a0de541c99451ad50a963447203651aaa30fa33fd5cc99a6ca12e0c968"
+    },
+    {
+      "文件": "Builds/Windows/D3D12/D3D12Core.dll",
+      "字节": 4725304,
+      "SHA256": "625bd40005b1c3708695d5256ecf230d278e6b8edba5a88af70f3d91324f3052"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/EmbedRuntime/MonoPosixHelper.dll",
+      "字节": 611240,
+      "SHA256": "7f94544ce4de8b184823965fc0fea9ebf2b9ca4ac6056764dec67ce9589f4104"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/EmbedRuntime/mono-2.0-bdwgc.dll",
+      "字节": 7828904,
+      "SHA256": "d5f7dd6aa2f367a220a6c61a6e85afade4db7730139779bcd869bcdf69fa1d79"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/2.0/Browsers/Compat.browser",
+      "字节": 1605,
+      "SHA256": "8a1082057ac5681dcd4e9c227ed7fb8eb42ac1618963b5de3b65739dd77e2741"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/2.0/DefaultWsdlHelpGenerator.aspx",
+      "字节": 60575,
+      "SHA256": "751861040b69ea63a3827507b7c8da9c7f549dc181c1c8af4b7ca78cc97d710a"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/2.0/machine.config",
+      "字节": 29066,
+      "SHA256": "e91782a27fa39fc6c1d6ee8b08529f5d35052310d0006034b878eb04b8f2af30"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/2.0/settings.map",
+      "字节": 2622,
+      "SHA256": "49c6160f9d54af4270a3b4e997fc4a8301f79b9e2070118fa46ddbcbbc44f9a2"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/2.0/web.config",
+      "字节": 11635,
+      "SHA256": "cf2b54339e069b9e42f7d6795eecbf562c50c1011f4ca8f65f578fe52d97ff92"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/4.0/Browsers/Compat.browser",
+      "字节": 1605,
+      "SHA256": "8a1082057ac5681dcd4e9c227ed7fb8eb42ac1618963b5de3b65739dd77e2741"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/4.0/DefaultWsdlHelpGenerator.aspx",
+      "字节": 60575,
+      "SHA256": "751861040b69ea63a3827507b7c8da9c7f549dc181c1c8af4b7ca78cc97d710a"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/4.0/machine.config",
+      "字节": 33598,
+      "SHA256": "e60aec2c5115d65b3acb3c55ea21576dbd770f579166c017125571e46ae560ed"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/4.0/settings.map",
+      "字节": 2622,
+      "SHA256": "ce1db1ad8a9512073164e3eccdc193f7eda036e1a9733caec4635de21b2865c8"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/4.0/web.config",
+      "字节": 18802,
+      "SHA256": "e38bb8cc68fe5b4edecdfd288d094b9e8ced7629039b2a347682aba0d8bd7492"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/4.5/Browsers/Compat.browser",
+      "字节": 1605,
+      "SHA256": "8a1082057ac5681dcd4e9c227ed7fb8eb42ac1618963b5de3b65739dd77e2741"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/4.5/DefaultWsdlHelpGenerator.aspx",
+      "字节": 60575,
+      "SHA256": "751861040b69ea63a3827507b7c8da9c7f549dc181c1c8af4b7ca78cc97d710a"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/4.5/machine.config",
+      "字节": 34056,
+      "SHA256": "ee950004b576fb28dc85f4b0435ed04bf96612de2e8b53be84d07afe85a0de6c"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/4.5/settings.map",
+      "字节": 2622,
+      "SHA256": "ce1db1ad8a9512073164e3eccdc193f7eda036e1a9733caec4635de21b2865c8"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/4.5/web.config",
+      "字节": 18811,
+      "SHA256": "c4cbddd4fd9347b58cc5a72b36dc4ba1ad2bb699e65869d05cd3fb9865f0d824"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/browscap.ini",
+      "字节": 311984,
+      "SHA256": "4ddd50f31fb968f30bedefc253a46dc3f2890192d05cdaa9e0a64a056eee807e"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/config",
+      "字节": 3815,
+      "SHA256": "5776169973a26a387b8b3e5c0f2301a7ab9a6dd7c7d3efa22a96abc47fbf8662"
+    },
+    {
+      "文件": "Builds/Windows/MonoBleedingEdge/etc/mono/mconfig/config.xml",
+      "字节": 25817,
+      "SHA256": "0c56e34c69124510fa8c19e7b4c2ca6c1c4ff460ae19f798dd0ca035809e396d"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.AI.dll",
+      "字节": 216064,
+      "SHA256": "fa10ee2753a9062fafdf8b6cedece82510f5de210eac154e7f0031309ee8d1d5"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.AI.pdb",
+      "字节": 63344,
+      "SHA256": "7250499d53ece6f30ebdd4c03b5564c8e75fdd4460c854cb7f7b7545f35a4579"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Core.dll",
+      "字节": 1106432,
+      "SHA256": "57cdacd6a946907f02dbab9d39b026ce61d9904b716e04527a6174bc2b535673"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Core.pdb",
+      "字节": 311980,
+      "SHA256": "f4e87e7bd6a78f80ff5d5d68e0ad811cc823d702a6071e9e35bf6cdc9483d1c3"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Network.Contracts.dll",
+      "字节": 14848,
+      "SHA256": "c228766de8b37dd25eef68492e08bf33d3e6c3bc83272fb4e6d471d88ae34b24"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Network.Contracts.pdb",
+      "字节": 11180,
+      "SHA256": "1e6c7ffbf88de8f506b172b5e01863cde3ab11ec97d7eafeffa8bb2225d6d024"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Rooms.dll",
+      "字节": 65536,
+      "SHA256": "132ced77c323070e3e67bbca5d947c2ae246da0c1d3c1267dd3404499c0d9acc"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Rooms.pdb",
+      "字节": 26668,
+      "SHA256": "907ac02a33534ecdabc1485c7c2fa4b7fcfc765f8eacff69d0b49076e587ab02"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Server.deps.json",
+      "字节": 51600,
+      "SHA256": "727c78eded09765be01240381e604f7f46365f446804373f38870ccc0f8139b5"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Server.dll",
+      "字节": 80384,
+      "SHA256": "62b6080f60e115c4ab775817a52bcd606b71ff1e08bc577be2a5067f437dfb62"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Server.exe",
+      "字节": 162304,
+      "SHA256": "b8b93b2dee4ba5bb1c5bd29074e8f95436f0ba6fcde295d58fab313b0592db5a"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Server.pdb",
+      "字节": 35024,
+      "SHA256": "a388d27708c18d542a741007ee5d4be3cae7c74d2b63c6ce81bef7028cf47999"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Server.runtimeconfig.json",
+      "字节": 482,
+      "SHA256": "15e2ef49b1c67d56e1044995037d209bbcd0d3567f4eb050b03e1a57d29b4f31"
+    },
+    {
+      "文件": "Builds/Windows/Server/Catan.Server.staticwebassets.endpoints.json",
+      "字节": 53,
+      "SHA256": "c1686417e8d5c31bba969f12b6f3d2b35e6609adb5ca42f212261a3a02771aac"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Antiforgery.dll",
+      "字节": 120616,
+      "SHA256": "f417fe903c5fef3ad36cc6e9d73e5e4b9fbcb1bb855c7490aed7de60316419f0"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Authentication.Abstractions.dll",
+      "字节": 67408,
+      "SHA256": "62bfde62231404dc637ce47d5cec6deee338824efffa03a8dde907d8d049ad60"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Authentication.BearerToken.dll",
+      "字节": 71504,
+      "SHA256": "02ff8274770af515792d3cc5b129092787d9ba3b2d999ba187be9971b2b82eaa"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Authentication.Cookies.dll",
+      "字节": 116520,
+      "SHA256": "76bda5478425897628c1a29a22a82056fa13b6cd756a47389de9cda4fcf59a36"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Authentication.Core.dll",
+      "字节": 116520,
+      "SHA256": "874392660a182a29ad1b5a22e9639293ac327ee9f5e989b8f5d9c87b7cd845f5"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Authentication.OAuth.dll",
+      "字节": 100136,
+      "SHA256": "736a5cbde674eae6973cfb12ec02d5bdbeddfeb9fd6fa4f544a8da495563e77a"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Authentication.dll",
+      "字节": 153384,
+      "SHA256": "73104deede0ab682e457e393832a9ed0fe25153349c974961f5a370f2ae2ad14"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Authorization.Policy.dll",
+      "字节": 75600,
+      "SHA256": "4a32fa113253f5d6e999ee96a59e2d147cf712c6a3cab29622f7adcb3da64f40"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Authorization.dll",
+      "字节": 116520,
+      "SHA256": "b41d6f875d0b1a99179fa65a1c5f92b2d2066047e681706b65906c2dbc23f413"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Components.Authorization.dll",
+      "字节": 63312,
+      "SHA256": "650717382403fe55378ee0062f40b5d9b093daaea4c398cdfac92b3ef2bc669d"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Components.Endpoints.dll",
+      "字节": 706384,
+      "SHA256": "6484fdff68008ed2841a6b9f769c6fdb31aee77734131907007e6d601e3795bc"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Components.Forms.dll",
+      "字节": 104232,
+      "SHA256": "d722a16bf0053741129ec60697b0b7502a178e0d01ccbe98c252046b189e18eb"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Components.Server.dll",
+      "字节": 927528,
+      "SHA256": "47bf8fb986982ac477ca6b4782d1ffd11a9c83294fce9fd9cd4e1d70b53120b7"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Components.Web.dll",
+      "字节": 423720,
+      "SHA256": "c7bfc2c74881b23586c743b7c9963a7bd69906b6d79d52525f2b3ac2fed382db"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Components.dll",
+      "字节": 952104,
+      "SHA256": "2030bb3a0d8d8fb76084ad4dbc3e31f372078d8111dd1fec6ae9c0ce23c583d7"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Connections.Abstractions.dll",
+      "字节": 71464,
+      "SHA256": "50e62c202b6eef678f763d0a96588a1ae4f8040594c06e9934992518bea63eb1"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.CookiePolicy.dll",
+      "字节": 55080,
+      "SHA256": "ae4ad095bc6d74b4441c06c17d7b59ad21efb540f84452a15eaa6dc8d8ba82f3"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Cors.dll",
+      "字节": 91944,
+      "SHA256": "9fb130ef9b9ea9101a2dec73bdc518add30a1d8e7d8a5d6d2596a6e18e7ec1b8"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Cryptography.Internal.dll",
+      "字节": 108328,
+      "SHA256": "c9502c62d7f045da855d64acecabd0dd079869ec6323384468b831e33b13df82"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll",
+      "字节": 46888,
+      "SHA256": "35beb19fa0106cd99f884fd80fb972cc3cbd02a8cef67b3cb1bb67c61a765e29"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.DataProtection.Abstractions.dll",
+      "字节": 50984,
+      "SHA256": "3ee8801c29a292734945b38dcdb8a2e4483a5bbe4f74545093830ab55c843c0e"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.DataProtection.Extensions.dll",
+      "字节": 46928,
+      "SHA256": "a66d9b8ef346ef2652200f81a3565154c3bba1875d5f9ffc9fa15d4ae1c36cbb"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.DataProtection.dll",
+      "字节": 456488,
+      "SHA256": "913e251bcea27044f76c39be087f03721346a13d44dcf4a1dc34a19c22ae28fe"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Diagnostics.Abstractions.dll",
+      "字节": 34640,
+      "SHA256": "979242dcd88eeed2d08743cfb8af8fa9fa352033d3475079d7fd49f095fadd1b"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Diagnostics.HealthChecks.dll",
+      "字节": 50984,
+      "SHA256": "4f2af7ac899a7721425746ff8ffb08e91eedb6d9de67c779d2220597dc4844c2"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Diagnostics.dll",
+      "字节": 464680,
+      "SHA256": "de3248d54fee1e2873b3a2571a4b08b36c60805bb6eef976199b34ce636c9639"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.HostFiltering.dll",
+      "字节": 51024,
+      "SHA256": "f611ece92c3026f3a4c1d18024c0fa704db9718946c441003535bcd5e3dc1b74"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Hosting.Abstractions.dll",
+      "字节": 46928,
+      "SHA256": "50eea9716964d7dfd8b30a286fe577da612cf567eceacf11e248f01d85a7333f"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Hosting.Server.Abstractions.dll",
+      "字节": 26408,
+      "SHA256": "9778d4dfe9956524d4bbc229d52e1de81cdca5f1dfed8a666ff8edbf9941f20f"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Hosting.dll",
+      "字节": 477008,
+      "SHA256": "917814acfe6637034ad97a7ec6e5716385f9a662b82d7561017dcc410ba31630"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Html.Abstractions.dll",
+      "字节": 42792,
+      "SHA256": "b5387e43b43e7873261cc2ce686a6f921bb198d2f3ddb3fb3a851ce9930ad9e8"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Http.Abstractions.dll",
+      "字节": 325416,
+      "SHA256": "1fae7aa024a039a404141ec7846a016e271fd9b8bc53960cb1b17a33ffbc1a89"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Http.Connections.Common.dll",
+      "字节": 55080,
+      "SHA256": "c29ea49777f9e881ad7a8fd675e960d9f95f24c31b08a58272c11ed0a5c677c8"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Http.Connections.dll",
+      "字节": 321320,
+      "SHA256": "602b709781f61ea25d2f4632b0f2c77283f500b443e9ea311f1336bc97822268"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Http.Extensions.dll",
+      "字节": 739112,
+      "SHA256": "76a2df901a0031491e8c1e663729117081f165578e7b4617f2a20eaf092d6808"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Http.Features.dll",
+      "字节": 71504,
+      "SHA256": "d3714725c1f38d791d93c4ce23296747051e6dfdb3ceea453b32408116390d2f"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Http.Results.dll",
+      "字节": 280360,
+      "SHA256": "3465398233e090aac6842bdb9272c836f4aaa39048444280ef05fa71362c9e92"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Http.dll",
+      "字节": 300840,
+      "SHA256": "32f6a181eb790eae12d0bbb0d31db74c4abe5841c16f7a1040e8f64ee96fd103"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.HttpLogging.dll",
+      "字节": 202536,
+      "SHA256": "36fd6ac22f38cad83cde2141794bcb6f72b40c1d273a807b8f0e3aca15721304"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.HttpOverrides.dll",
+      "字节": 87848,
+      "SHA256": "52312857bc3ff2dbb4df1a006dcfa0c3c2a4302887a24e6f889d5ffe24a5a3a0"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.HttpsPolicy.dll",
+      "字节": 50984,
+      "SHA256": "110145daee3b763c2141cb4ed299722c23f83db7f22c34fac3b0222e0d1d2928"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Identity.dll",
+      "字节": 1001256,
+      "SHA256": "911cd530e60fcc80750985e259bde733b59c6198733b24e43a6752b6481738cc"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Localization.Routing.dll",
+      "字节": 30504,
+      "SHA256": "4e3d6145e6169a165388800b13aa0a9d656f666c73d4326f47f882817f05c4e4"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Localization.dll",
+      "字节": 67368,
+      "SHA256": "b2582393a0b4885dead8d8cd3a92149355fbcbf2960c7895bb49bfc2f4f59482"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Metadata.dll",
+      "字节": 16208,
+      "SHA256": "99c572500931b719c44a38a8b9bdc7c67cc85d6d3426737f20d4b3b3496d82f3"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.Abstractions.dll",
+      "字节": 268072,
+      "SHA256": "f53787e278fdd13e7755214f3d24082f4b8a9313e72f4a0966ed9ea7a18b1457"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.ApiExplorer.dll",
+      "字节": 137000,
+      "SHA256": "4807ac9cf2783691dc0d0773a8ee8c3e677af291927f6127ab3995fe73c1741e"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.Core.dll",
+      "字节": 1931088,
+      "SHA256": "1356da94b4d872025f64fd7e788e3065bf149a9edb920c892e331cad3dbaa4b6"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.Cors.dll",
+      "字节": 50984,
+      "SHA256": "88d6633b8bc7bffa3d0bacceb608d10fe972a52d0c494a4ef7d9fadeaf97eafd"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.DataAnnotations.dll",
+      "字节": 104272,
+      "SHA256": "bb03c333a404d742626ba11cb32039857c694139ba638a9e9ea713b6559eee9a"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.Formatters.Json.dll",
+      "字节": 15656,
+      "SHA256": "ff5737b57d2aa0962d7f5ab18b03707da7d6bcdb047c85fe567d35f7e0935444"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.Formatters.Xml.dll",
+      "字节": 116560,
+      "SHA256": "73f876621a230e2bc76c0611f45e921fd75e89ccdde7f63a46cd017b7efa8f45"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.Localization.dll",
+      "字节": 50984,
+      "SHA256": "817e6d5a8337e686cc4277176a1902d638fa6ee1958880b71eaa1a0b36d75173"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.Razor.dll",
+      "字节": 239400,
+      "SHA256": "f34e1ebb50fd360586d0ef28af06429df4eea42f8ab7ca1a04ba3a082cbd5478"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.RazorPages.dll",
+      "字节": 448296,
+      "SHA256": "521e78b18bb474a3b6cb6ccabd6b48fdfc94048bf87c1555f427571dc9b0d353"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.TagHelpers.dll",
+      "字节": 284456,
+      "SHA256": "dc3f1bb01059cc9096259943a1c7ccd72b9298fadb3a81390dd76830f173b737"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.ViewFeatures.dll",
+      "字节": 726864,
+      "SHA256": "4da923fa312615a49de69d655dff3b8227ed76116c42d02d33b28dca8b84cc03"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Mvc.dll",
+      "字节": 42832,
+      "SHA256": "a6c2e38221b2ee6f09adfc561613ef4370fdb46502720c695660c42a5671de9c"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.OutputCaching.dll",
+      "字节": 251728,
+      "SHA256": "88c8dc020aa6741157855a83187bd85bf782c8dc1d6294b65d908b3850f6a8ff"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.RateLimiting.dll",
+      "字节": 108368,
+      "SHA256": "92c6c0cf45bef5578c18dcfdc804b9a942efc2e360ec4182c97e75b2ecfff282"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Razor.Runtime.dll",
+      "字节": 75600,
+      "SHA256": "4f0eb5dfcc89ab1169a87a86f6379f0370907e6ebdea0de3e700aa68b9a0eec2"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Razor.dll",
+      "字节": 67368,
+      "SHA256": "1c7d05cf15cdd03879131a5769861c2632faef8b47861e78ccdeebcd9060afdd"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.RequestDecompression.dll",
+      "字节": 51024,
+      "SHA256": "82473fd2a7c27ab0e2f589697547386c582d2169258281a0d0edec65eb7c3c81"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.ResponseCaching.Abstractions.dll",
+      "字节": 16168,
+      "SHA256": "2f470d29afd6a575555150ef5bdc532d6c6a3f07b337b812878a1bed66ec5ec9"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.ResponseCaching.dll",
+      "字节": 149328,
+      "SHA256": "9d373290ed9025e7cff722a49adad7f7b0e9eb16325e42100e4a79f3dc64d82d"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.ResponseCompression.dll",
+      "字节": 79656,
+      "SHA256": "a6e64b82f82310844430d0d932270df7eefb4f32638a70aaf7ed8cbddf87c3af"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Rewrite.dll",
+      "字节": 214864,
+      "SHA256": "89d48414bfd147027f0826e47b2ff28927464c59e37806c32249b7c3a4c90d46"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Routing.Abstractions.dll",
+      "字节": 59176,
+      "SHA256": "ea601c608e0e51ba51136f7755af4eb6b47099cd1c41710faae2f8b096b63194"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Routing.dll",
+      "字节": 861992,
+      "SHA256": "69c76fd9e5cac492d689bc0aad3ae3de047ee4f0c4261f43446d53e8e14fcb16"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Server.HttpSys.dll",
+      "字节": 816936,
+      "SHA256": "402f2c60646e1145f45aaad978674eb141a6875c91d474b431c4339d554250fd"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Server.IIS.dll",
+      "字节": 673576,
+      "SHA256": "00299f6b4354341aa069aa993993be017296c4196d7b2211b822b73558f6e5f1"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Server.IISIntegration.dll",
+      "字节": 50984,
+      "SHA256": "e0d3536a9033a48b7d0c4c8695e838c4e7c618eac6436ff454070f5a74296c40"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Server.Kestrel.Core.dll",
+      "字节": 2344744,
+      "SHA256": "62b5ab79f5f896235e4068039450a15a7bcdb5bb4eb73f2f6bdf5a787d4cc239"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Server.Kestrel.Transport.NamedPipes.dll",
+      "字节": 157480,
+      "SHA256": "7ad9ac5286296e71f63d139dc2c4cffd66577874f21aaf0cadf0320ae7a03771"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Server.Kestrel.Transport.Quic.dll",
+      "字节": 247632,
+      "SHA256": "6a6919a866b014e392b18bb0f1bf26ae9ed51a063c77ed584a06cf4a2ab591de"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.dll",
+      "字节": 137000,
+      "SHA256": "14bb84ef188ffa3d9a40799b04eda941184ab89bc001ef59c03debd8922ed139"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Server.Kestrel.dll",
+      "字节": 34600,
+      "SHA256": "f0de796d9d6b05c0f3ce877c2288f836a3f1dd5b5a374babc2af3deda73e94b7"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.Session.dll",
+      "字节": 87848,
+      "SHA256": "9bdb8bfd19aa2483a758840036cc96cca263e506fbb84ccbcd8e1783e15b140e"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.SignalR.Common.dll",
+      "字节": 87848,
+      "SHA256": "5cb4b0d29df4d1162de0a4fa3164cc930f221e7c7fb68f4f35efd40bffa45088"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.SignalR.Core.dll",
+      "字节": 530256,
+      "SHA256": "2f059fa8c083f86dc97c91ebaa35cb0cc9ca71fca952255a9e6e622fd6469121"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.SignalR.Protocols.Json.dll",
+      "字节": 83792,
+      "SHA256": "0d603d40218129a45f6dab1b50f019bdaa345d2ebd4acd2a93fc2d0f32769d94"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.SignalR.dll",
+      "字节": 38696,
+      "SHA256": "d004216961d6f695344dfb797c494008f75371d5ea95a6f928f8c6be910ca0f7"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.StaticAssets.dll",
+      "字节": 194384,
+      "SHA256": "1effdbf6f5f1be2cff2f22e62bc967c1d02b565ef585ed10f893a9660bb2b4a3"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.StaticFiles.dll",
+      "字节": 161616,
+      "SHA256": "8a1d25ea401eb4d608732667afd5a88987c4366660d9fda1b07a980c222db069"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.WebSockets.dll",
+      "字节": 79656,
+      "SHA256": "9223f23711bab429cb4a09f2bedf1845acf44d963279235774782cfb6ae20340"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.WebUtilities.dll",
+      "字节": 251688,
+      "SHA256": "ee33396c44e552d8623c15e79bb033fdb63281597222575624256fd90213c7cd"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.AspNetCore.dll",
+      "字节": 116520,
+      "SHA256": "3bfd8a9ad4aa79e4cf809fab1cf133e0ceb43c89e80dc6eff47405f27cbf779f"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.CSharp.dll",
+      "字节": 980776,
+      "SHA256": "2000912f2fc52e0c64ed893d79f4e7b143502540fb7170b5ae5fcea7099ba431"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.DiaSymReader.Native.amd64.dll",
+      "字节": 2377016,
+      "SHA256": "70e4b89978ce57ef87b28f4921f3140c383b04aa96e7f3bdb3c4ebb898fd8a72"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Caching.Abstractions.dll",
+      "字节": 75560,
+      "SHA256": "d6c5e46c7c43834235abbbcb9767756f8e210f0fcc4b92137c57a2aa83b81b2e"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Caching.Memory.dll",
+      "字节": 100136,
+      "SHA256": "50df53585dac029895a6d50a32212424aafbae87b9cc20ac0af5338677492983"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.Abstractions.dll",
+      "字节": 46888,
+      "SHA256": "63a89b1becd68c2f5051df9c042b46bdf41fba72393bb1ef29b52b701b155c31"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.Binder.dll",
+      "字节": 87848,
+      "SHA256": "26064491ae0cfb2dad631e672f6307a1a6659faeab3275b16b3f2b029841389e"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.CommandLine.dll",
+      "字节": 46928,
+      "SHA256": "df0e50837bac953ea298507e4e251b64130abaee8a7d2b045810cb66c56aaeef"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.EnvironmentVariables.dll",
+      "字节": 42832,
+      "SHA256": "f44e7a938bb4417e29925aa15dc121ac714157384819bc22e75f7af2e2779230"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.FileExtensions.dll",
+      "字节": 50984,
+      "SHA256": "07b4726e83356d65ddc922ea4cf10da10b90dc8c074b845483786e840b47c17d"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.Ini.dll",
+      "字节": 46888,
+      "SHA256": "2bc0d603201d4ede980d15a4d817233f7fa7edc6109b2f8448203d0a0b4c5d3e"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.Json.dll",
+      "字节": 50984,
+      "SHA256": "49b6f5405bd45624edd3dd1286e82ccf7265eb5ed3befaa38902194395eff743"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.KeyPerFile.dll",
+      "字节": 38736,
+      "SHA256": "1ac08e16c3fa84c1e3f9328eb2b150ce3bb93e17be423bfb89f10511623e5694"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.UserSecrets.dll",
+      "字节": 46888,
+      "SHA256": "c41b46a33b97ecb715d9294763e335e65f277bd5217ff3a1222633313fc4e2d1"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.Xml.dll",
+      "字节": 63272,
+      "SHA256": "8ffe68c3bb20c06ea4fc4ff329662398e7c0222dd47a4c550d2d4329dde9e64c"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Configuration.dll",
+      "字节": 91944,
+      "SHA256": "b8fb3cee77f703ab623826f5585a9acecfbbd186b98e1912353784b0aa994fb6"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+      "字节": 141096,
+      "SHA256": "0e2feec8beaa131967d1f0d70684500183227d1ef58c617b8fadb793c3387e93"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.DependencyInjection.dll",
+      "字节": 227152,
+      "SHA256": "6424c0b19a1cef1977db79eee164dcaeb3cba6abdaa583d6f5ff6413f7f7244a"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Diagnostics.Abstractions.dll",
+      "字节": 50984,
+      "SHA256": "d99f6143691e8a409b4857bd65829189465c71ad7ef5dff0e63a36c9f8fae002"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll",
+      "字节": 42792,
+      "SHA256": "3df995e75029f967a5fc9b30523c0655fc70682495a2cb08e15a7aaaaee5a6af"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Diagnostics.HealthChecks.dll",
+      "字节": 108328,
+      "SHA256": "1277a4a2879f8b7537f25e986fb6806c6cc074c07dbcbe98dacd0c02280478c6"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Diagnostics.dll",
+      "字节": 71464,
+      "SHA256": "f2da53517fbd33cf08738dc8a439a3ba662b394fd8328d73107da635bc446f30"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Features.dll",
+      "字节": 46928,
+      "SHA256": "9a37af53f48d4cbcafd3de646c60cdc5d142a95b49de1f82aade1a919c4aecff"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.FileProviders.Abstractions.dll",
+      "字节": 38696,
+      "SHA256": "f39acfb26fe3c3c977283e5efda4f0406418d58f446cfc0d4b1a843777a10651"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.FileProviders.Composite.dll",
+      "字节": 34640,
+      "SHA256": "121741c7d06cfb30476e5b35c51e253cc52a5a8eb8df491b966b952abdf8cd57"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.FileProviders.Embedded.dll",
+      "字节": 71504,
+      "SHA256": "e38f74e6126b082fa2f245bf80e9d6c64e682db9e51ab612d09e20b855f18b0f"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.FileProviders.Physical.dll",
+      "字节": 91944,
+      "SHA256": "79d43cd4ac4df4c45bb6d3af3cfa5d4c9218008430122af685cb3877e8737208"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.FileSystemGlobbing.dll",
+      "字节": 100176,
+      "SHA256": "8bfc34ee24e50eff81e18e6880bc55bc20c9efad1a2ee73bad2dc433c70f5e8a"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Hosting.Abstractions.dll",
+      "字节": 79656,
+      "SHA256": "95f5e2e5ab0a8fc6c4fd35f1db331b7aa2852ab2cc7ca148be72320289bfedda"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Hosting.dll",
+      "字节": 149328,
+      "SHA256": "22eb6edfc401db5d4ec30783474a913b7c39de13a76a6607128980c50b6cd521"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Http.dll",
+      "字节": 198440,
+      "SHA256": "2cd8cf43d2b12b0c167e35fc6218945537f484899607279af8de23147755b695"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Identity.Core.dll",
+      "字节": 538408,
+      "SHA256": "86028b37a48d38cf87df6fa92768764a4e972f895f17dfeec4096222287bca88"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Identity.Stores.dll",
+      "字节": 87888,
+      "SHA256": "49315ad7f19d094cd53ede89877f18e7debc35237b9894afc039bd33c47617be"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Localization.Abstractions.dll",
+      "字节": 34600,
+      "SHA256": "5d5e96ef35d1fa9da098ce574eb6af3b1ea7e83dddee0a729322746be1e2b90b"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Localization.dll",
+      "字节": 59176,
+      "SHA256": "25822ccfe462e514879dbc62d7025a78efe4e28ac39c017bcb07902bb3830e49"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Logging.Abstractions.dll",
+      "字节": 153424,
+      "SHA256": "90c41d68d297e54c4def3cfd38eb620513a744ab01131840ea3e2634cf973be3"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Logging.Configuration.dll",
+      "字节": 46888,
+      "SHA256": "c4df0fd6bce42c6293a8fc59c16d21a98e64f90a2f13523cc3b82cfd42ef968c"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Logging.Console.dll",
+      "字节": 165712,
+      "SHA256": "f2a8843474f346cd3d076d352345a6372f199ca11fdb863bdbb246c87bcc9068"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Logging.Debug.dll",
+      "字节": 34640,
+      "SHA256": "4a261451703385f107746d051041270f46b2fd4272b5b1bc3e98b01677660658"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Logging.EventLog.dll",
+      "字节": 46928,
+      "SHA256": "21fa039f689683993894c73c35a1611ed64d46bdcaffae86d8273e0c7a30a0a8"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Logging.EventSource.dll",
+      "字节": 63312,
+      "SHA256": "5372914940d40ebb0e05dffc31011901be5a961fddf7e3d6bee4a3a7f6bd285f"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Logging.TraceSource.dll",
+      "字节": 38696,
+      "SHA256": "258f9eb2f7e0c7fc21d6a3f8ee87d78d109e1984476eb1f2b4f215f6c4a83ece"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Logging.dll",
+      "字节": 100176,
+      "SHA256": "afd93f320e217561e674f8c6d44ce1f0846d6ae2f26c0263f6b662476d4b570c"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.ObjectPool.dll",
+      "字节": 42792,
+      "SHA256": "e02787c8fb6a7d9dd4e302c4d7f25f5a5c887c3b65f2d356098d473547c5df82"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Options.ConfigurationExtensions.dll",
+      "字节": 38736,
+      "SHA256": "1bcd901dbe6c5a148f42f6e1865a8bce598d24e87bd38f62e5a6108454d9a541"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Options.DataAnnotations.dll",
+      "字节": 38696,
+      "SHA256": "6235cae954e81e89f87352be1c9455e0d818e0327a4c19e7b56f3eae43e60e61"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Options.dll",
+      "字节": 141096,
+      "SHA256": "02a3cad0e05023f129c0717ba99d171ac524bf5f7c955863e17e3f7441107567"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Primitives.dll",
+      "字节": 83752,
+      "SHA256": "5b40af41b1b354f88e64e5b04619f70aaefe693ff377ac0bb9bc7f70c4018cc1"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.Validation.dll",
+      "字节": 87848,
+      "SHA256": "96952ba9f4618bbe6998e0fe76c6dd28d24b835fecb83c579c2c42e648a1048e"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Extensions.WebEncoders.dll",
+      "字节": 38696,
+      "SHA256": "461ba0dde4de891204588ba5e4ed9174a499366dc93e8a78a04f74d45290b4c2"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.JSInterop.dll",
+      "字节": 169768,
+      "SHA256": "6a283855c4e5e60c7ec9c81e3cad6201178fc232cc0d8dc022ca643d7a9c4138"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Net.Http.Headers.dll",
+      "字节": 218920,
+      "SHA256": "7b836d9e11acc47222d28cd02a54101f43464b047d84978d157d2d932b97a8e9"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.VisualBasic.Core.dll",
+      "字节": 1193768,
+      "SHA256": "2666b24eb6e295476b44abd057ea250fd5957db9c1c7adee6a223a747ddfe3d2"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.VisualBasic.dll",
+      "字节": 17192,
+      "SHA256": "e192508adde6a758138a5a8e28998dccb64e7f45eaf30d8ab3564f87749028b1"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Win32.Primitives.dll",
+      "字节": 15656,
+      "SHA256": "6c21472b0ae2f9b484a97614fad5485a22f18f9f19ee1adb9ceb3ed8ddb072d7"
+    },
+    {
+      "文件": "Builds/Windows/Server/Microsoft.Win32.Registry.dll",
+      "字节": 116520,
+      "SHA256": "76849cfde4369f3ae93e28261fe5e1010dbf1332f7da95c98543cba9b03961c0"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.AppContext.dll",
+      "字节": 15144,
+      "SHA256": "d9dd9fa44e019f27172d6b2662e2b6038f48c270912ac8aae53d4d909da7e9be"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Buffers.dll",
+      "字节": 15144,
+      "SHA256": "a1a35f5524e2f831d08ca55f702fbddcb8c6dfecd264f0f563d81a1c8b8280bd"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Collections.Concurrent.dll",
+      "字节": 231248,
+      "SHA256": "082f4bc0da1141eb65111b6da633d75624adfb7bb067d7ee90c5622c8b30885b"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Collections.Immutable.dll",
+      "字节": 976680,
+      "SHA256": "b527dd7b2beb82c22aa39787298cbeb33f3eac9eb9b83a0f0271353421db28db"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Collections.NonGeneric.dll",
+      "字节": 104232,
+      "SHA256": "aa4d5216d066c91cb489f63c6cbfcaf1f47b6e74e070db45639d3460454fc60b"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Collections.Specialized.dll",
+      "字节": 104272,
+      "SHA256": "e31af1f866e880844e027be59f545b9a6b34108e0b0680ebe3fbc19a53070819"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Collections.dll",
+      "字节": 296744,
+      "SHA256": "df6f2037eabee28100184e92f7536427ba2f086c1110629804d466b124bc4d54"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.ComponentModel.Annotations.dll",
+      "字节": 198480,
+      "SHA256": "e3be2d35d81e6475c64110cfc099895b71df22c8b46a18c2d7c76a913b8ba903"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.ComponentModel.DataAnnotations.dll",
+      "字节": 16720,
+      "SHA256": "d40e8c7062e6b9ce11ba83eab3d26be0eec8066b99970ea88b8e87fb75f411bd"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.ComponentModel.EventBasedAsync.dll",
+      "字节": 46888,
+      "SHA256": "cc84fe814ef5e58271d83193e328f8ec220efd4696d90af9a7c4690c10451495"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.ComponentModel.Primitives.dll",
+      "字节": 79656,
+      "SHA256": "1e2451184c287409ea25acde3c90f25950bf34d16458a6e52a94ca4292434f62"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.ComponentModel.TypeConverter.dll",
+      "字节": 767784,
+      "SHA256": "10dae312a6697718f8ce3dfcdb17d6ae4b74687c765d74d50de8a8e69e08f5e7"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.ComponentModel.dll",
+      "字节": 30544,
+      "SHA256": "e3b6f75864ee944898540937c1f300e04f44a1b2729516f0bbf948589a8b14b2"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Configuration.dll",
+      "字节": 19240,
+      "SHA256": "3952a72e1f18774f16952b46c20e80ed2bc601a06eca01f33fa924c738022a9c"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Console.dll",
+      "字节": 169808,
+      "SHA256": "3b85daf02a3d9ed99b84bb1c639fe8b1ced46d8d157fa56f525f6b8c5be43b3e"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Core.dll",
+      "字节": 23336,
+      "SHA256": "ac23faf1b37fa49f1b117baad951a65609e799a6e669a6df06d3552677e0c086"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Data.Common.dll",
+      "字节": 2770728,
+      "SHA256": "66bdd62047ee460e2ce2c33d15dd1173ac97997b2745864a905179594f821acc"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Data.DataSetExtensions.dll",
+      "字节": 15656,
+      "SHA256": "aeeae0755c8c7f6747765cdf82fa43182e320e97f2035e3a0a19f21905e6c113"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Data.dll",
+      "字节": 25424,
+      "SHA256": "49f52958a2a6e461d0fd7a47e54a199eb263c69ecfcc0fc684b73b5918ebf466"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.Contracts.dll",
+      "字节": 16208,
+      "SHA256": "6c05cacd9b61b08ae75f2d783cc402b0b5fc848e3d68c29c10b93897cc083e8b"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.Debug.dll",
+      "字节": 15656,
+      "SHA256": "8b160ffe7518588bf64e13c01c6dcb2ef504d64f38bbf0f198d31e7b698db92c"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.DiagnosticSource.dll",
+      "字节": 501544,
+      "SHA256": "6267c1bd1bdf2bdd4b5748b885b0adcda10f18697adfea8488a19a009ad44fdb"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.EventLog.Messages.dll",
+      "字节": 800552,
+      "SHA256": "8f3def30d41d85e2bd87b2d2e7542d49d625f0b4d96a6dc9b03e0f49bd59b8ef"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.EventLog.dll",
+      "字节": 366416,
+      "SHA256": "56ea02ef5732bcbee7520349da873387419e711bd49943b2d139d5d2656ee339"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.FileVersionInfo.dll",
+      "字节": 46928,
+      "SHA256": "e94f158142e93834dec3100bde3313935517d549ff36c65819a06d3104dec427"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.Process.dll",
+      "字节": 329552,
+      "SHA256": "51a57fbe918f8b68930c090792b718fc0850ea12da869d50b97a3796af29a740"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.StackTrace.dll",
+      "字节": 46888,
+      "SHA256": "8f6397c1e2ba9b8b8bfa317962151b5035049ce8d6b3575e5027a0d0eeacc797"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.TextWriterTraceListener.dll",
+      "字节": 67368,
+      "SHA256": "1bf165cee916a854e1150f489e4348ce94755359d5fcdcc0bc2bbbe6a7102bdd"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.Tools.dll",
+      "字节": 15144,
+      "SHA256": "841c5e2b6c171fa9aaff0fc6295f3fbc93dc5dcab44118b62f1c942bb674aff2"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.TraceSource.dll",
+      "字节": 141096,
+      "SHA256": "8445c7f1bbaae6cffde60e2c9a8753faaa5100255fbe31d0a1927d9d9bb7f194"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Diagnostics.Tracing.dll",
+      "字节": 16208,
+      "SHA256": "9563d5eec35f94d13a5e62eaa9535dbe0e9ea474f055da132fb8af46b0b01263"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Drawing.Primitives.dll",
+      "字节": 132944,
+      "SHA256": "17585b32ca91bac8ccff2ef1c6ddf62ee9ea5efc552928c3a9d1b868394246e9"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Drawing.dll",
+      "字节": 20304,
+      "SHA256": "585a8da9952d715f8de7a7b1879b59d68ff8608b92f6ed1c5f0e1d251180d3c6"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Dynamic.Runtime.dll",
+      "字节": 16168,
+      "SHA256": "c0eac30c791db8c1a2b50b61c50d029f4ddd0eadfdd35433745001688a3e7466"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Formats.Asn1.dll",
+      "字节": 239440,
+      "SHA256": "a163fe5f96d1689f1bc1ac531b38c3aba95792ac7dd52231d325d658947fbcfd"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Formats.Cbor.dll",
+      "字节": 173864,
+      "SHA256": "87f7dbd2311b552a380f8e093689f35cf9cc79eb50a4cdd3c122079ac9abc3e6"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Formats.Tar.dll",
+      "字节": 272168,
+      "SHA256": "44c9984f269a158915195fd32007f22c3bb692dcfeb933cda8ea45a3ac6cd1ce"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Globalization.Calendars.dll",
+      "字节": 15656,
+      "SHA256": "e0f3f3f6e4acc7b6755782fed5cb075ecf70beee4fc5d404579ae99bc0883ef2"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Globalization.Extensions.dll",
+      "字节": 15144,
+      "SHA256": "be0390557cc72078a7217cf94fd44b9ab66aa30838c00a92aa78c62469c44aa0"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Globalization.dll",
+      "字节": 15696,
+      "SHA256": "66902cffd057673b4b77aa68faf80d33ffa4c94510e61db2a067943cc53b7702"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.Compression.Brotli.dll",
+      "字节": 83752,
+      "SHA256": "0a59a95787ee15784d73079fdd5dc555b78659a6c560b6cbbf0d7452e638df89"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.Compression.FileSystem.dll",
+      "字节": 15184,
+      "SHA256": "4aeec2c0189f73ba8122f05c0d759008ddae1a8873b167cc8a558d53f2af80e1"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.Compression.Native.dll",
+      "字节": 937256,
+      "SHA256": "4d174b78aa8b3516c7e3cec0355dfe9ae570894055c377d2e5565d077a9a7a1e"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.Compression.ZipFile.dll",
+      "字节": 100176,
+      "SHA256": "2da76eb281740be485b5637da8c60fe0ce12bc2848d1a1a81ce144fa74313e18"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.Compression.dll",
+      "字节": 419624,
+      "SHA256": "c942747f84b730887090f5e0cf86d164c0ee402e524dce2750e06a6df48513fb"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.FileSystem.AccessControl.dll",
+      "字节": 104232,
+      "SHA256": "f7f9ed6cdab35274711e9345266784ec332ae8040db184d141c70e7941fbbec5"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.FileSystem.DriveInfo.dll",
+      "字节": 55120,
+      "SHA256": "0a7f3dd2fb6147a3fc046aeac8501d764effe5a3d8cfa56d2b244aa50b874b98"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.FileSystem.Primitives.dll",
+      "字节": 15144,
+      "SHA256": "d3b21b8b38e48c6b4d1cb5cfe9adfe4abad7b3353601febd3c7e4027f9ef9c6b"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.FileSystem.Watcher.dll",
+      "字节": 87848,
+      "SHA256": "8ab1704e4bd171056ec5a11e886d5199d05a641c6d0233c53d4766bf30328dd3"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.FileSystem.dll",
+      "字节": 15656,
+      "SHA256": "c251f33b29382c47b773d907463edd9fe978a06e39efd5670ef3b3b1d4f8c2b7"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.IsolatedStorage.dll",
+      "字节": 87848,
+      "SHA256": "2272a8bde18ed0e7c9e54ece9b849b9be76c90b978909d2b2fc94cf0ccbce427"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.MemoryMappedFiles.dll",
+      "字节": 83752,
+      "SHA256": "6e8b281ecb2f0f5e7aad3980f61d8812caa6b37884737f542f95410a76663e0e"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.Pipelines.dll",
+      "字节": 190248,
+      "SHA256": "ee9f0fd6c659f50799afd103c6ed9c5e408967e28dfa059bddf4b0a3fd2557dd"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.Pipes.AccessControl.dll",
+      "字节": 15656,
+      "SHA256": "1102f25a6e88f2fae81e4cd3628d8ef826f847b9c9b6a4d32ff8b37e0300da35"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.Pipes.dll",
+      "字节": 165712,
+      "SHA256": "3804f9992861122e60990b0765d0b50b33cdc2e4d89d26d9dbf8641d1d0134a2"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.UnmanagedMemoryStream.dll",
+      "字节": 15696,
+      "SHA256": "ad6a5f859589e1951103a00f45566da079cf87bd8b03f0c6ad985a6f39f19c5a"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.IO.dll",
+      "字节": 15656,
+      "SHA256": "388400ccb189b819d6ec5f1ef70710a39641d93ed5b870fc9324866b75dfb78b"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Linq.AsyncEnumerable.dll",
+      "字节": 1292072,
+      "SHA256": "925208e8ac40ac3f7b988aba6ccbbb58adac38ad1876a7d97ee137be6c21a653"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Linq.Expressions.dll",
+      "字节": 3639080,
+      "SHA256": "8830f4a6a6982f53cfbb54f992858ee36b4994a6ff6e6078c39627e77bef282f"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Linq.Parallel.dll",
+      "字节": 775976,
+      "SHA256": "aa6068e3d8f6b2e492cc63dcaad6b02942edbae445cb2b88c24f1850b25c49f5"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Linq.Queryable.dll",
+      "字节": 182056,
+      "SHA256": "b3b3a9c1b87a51dacd46a3f9ec392c5d05e449152d44d6bd495df0994350e2fa"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Linq.dll",
+      "字节": 698192,
+      "SHA256": "284d38945b6e92e847129bd28af458b19818d0f2181f79882888ab2003f4c519"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Memory.dll",
+      "字节": 161576,
+      "SHA256": "f8f9d38efd6b0de30954d6bf1f353e9617bfb36d3d245c013a3b12be9f6bd88a"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.Http.Json.dll",
+      "字节": 128848,
+      "SHA256": "a9fe81ba3c048f9977e0099800eefd570a49be723c555725da57ba797c92b4e0"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.Http.dll",
+      "字节": 1746768,
+      "SHA256": "b98ed0cb80dd54c33fc049f33af5448710752155bbd5cc8cbcd932e01f066801"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.HttpListener.dll",
+      "字节": 534312,
+      "SHA256": "3dfe11fb30c5f84c911d9562be6c2037113cd8976ef2def3550ac415ae58955b"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.Mail.dll",
+      "字节": 481064,
+      "SHA256": "b585a55ee67c80d7f02a84d50d626d279c7aa77fd3e38206b434bd20c181eedc"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.NameResolution.dll",
+      "字节": 124712,
+      "SHA256": "e786c0940f5322f0ad6e8e34e7b582e5b050df0fb2230329325307e61bfd994c"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.NetworkInformation.dll",
+      "字节": 157520,
+      "SHA256": "7e8791833eb2d0aea77b119fed3cab8bf501f6a553155cc1c4e5b1c02f65593b"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.Ping.dll",
+      "字节": 91984,
+      "SHA256": "06bb307343db955a312634d00ba5e097cf5168a901284437592c28d780804e33"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.Primitives.dll",
+      "字节": 210728,
+      "SHA256": "4dbb41a178ef013a898327152eccd146228dd2eb83859b9bb36078333b41f0f1"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.Quic.dll",
+      "字节": 358224,
+      "SHA256": "af5b52cdee62d014af677c411530a3fde5c1c368adecb8f83dcfe9246e8bbe73"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.Requests.dll",
+      "字节": 374568,
+      "SHA256": "ed82d9d0b7942b2b02c5744a4591fbe2316879618adfc5660c9f111f814155f2"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.Security.dll",
+      "字节": 665424,
+      "SHA256": "a78bd713e807729f15b0e085c67fd6cbfefa85736a2618512d4ff1212759eba5"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.ServerSentEvents.dll",
+      "字节": 83752,
+      "SHA256": "c0b1944020d0e5688b90fba9f29209e367674e29d2020f700c302994d5417eda"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.ServicePoint.dll",
+      "字节": 15144,
+      "SHA256": "84fa83cd96e62fda02991b8a8e99fa1c7b3ac08807b04f7486a896cfe6b4a760"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.Sockets.dll",
+      "字节": 530216,
+      "SHA256": "645c56d637ce15976998119e50722a911315682ce141b4aab98874ce1b063f3a"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.WebClient.dll",
+      "字节": 165672,
+      "SHA256": "defa7bbf90c77ed01d6add53f678e4adfbcf97f3b1152affec06e652d327f1a2"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.WebHeaderCollection.dll",
+      "字节": 63312,
+      "SHA256": "74d66f776b4c15936a7b887f47ceb8bf277dbe82e71a78dd3ea5d02502b081e7"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.WebProxy.dll",
+      "字节": 42832,
+      "SHA256": "408e3daabb3f42b4f1b72a1e1def38f12ba58eb9d23dca620086819cf7484195"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.WebSockets.Client.dll",
+      "字节": 104232,
+      "SHA256": "f308a69b9ee1ac982f53d1d94374f4972a7e3c700742901ff7c2bbfb570019d2"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.WebSockets.dll",
+      "字节": 243496,
+      "SHA256": "c014a074d408c71011e26eac69be85003a852cfe115e8608bb5d4fd70536eb2e"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Net.dll",
+      "字节": 17192,
+      "SHA256": "481b38c912f8779b3510cd00f079e45096ea22b6defdaab66780d5ac3ae6986a"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Numerics.Vectors.dll",
+      "字节": 15656,
+      "SHA256": "a9a980ee33ed0c798a5e1960c4557521f465ac9e0987dfd2c3049d53b1f2fa5a"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Numerics.dll",
+      "字节": 15184,
+      "SHA256": "35adc9360421b3b7a3d50399cb2c651c160158d7e8c302907acbce5f61f4a4f7"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.ObjectModel.dll",
+      "字节": 79656,
+      "SHA256": "2179bb19f335b4fcacd0994ad2ccfdac6840deff09c7889debfe9dbb5b88a3e6"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Private.CoreLib.dll",
+      "字节": 16033576,
+      "SHA256": "1125acc8106c43fc8bad2d203c4c4485df6182d292846c2fff415c1040c54678"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Private.DataContractSerialization.dll",
+      "字节": 2062120,
+      "SHA256": "8c07a5333c4e938cad8ac8f24b5965121bc0622442a352cbe81c58f17c2349a8"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Private.Uri.dll",
+      "字节": 255824,
+      "SHA256": "b15c84d2120e1ec9612c66ba59bc3d7e67d841e2bce7b7d0478cb212537539b4"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Private.Xml.Linq.dll",
+      "字节": 390952,
+      "SHA256": "c832b73de9783e6929ca5ff4863fc313e13ef7cfb5965c52587c4f77f6e037a7"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Private.Xml.dll",
+      "字节": 7788328,
+      "SHA256": "d71e72a7a9de324352edd281a46466b51bd0bdd2831b1573f8d3bae8bd2dd4a6"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Reflection.DispatchProxy.dll",
+      "字节": 75600,
+      "SHA256": "bf93a361c0bba8497889c9f7713add5968ba39394f9e6bda27e86294c6c43560"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Reflection.Emit.ILGeneration.dll",
+      "字节": 15656,
+      "SHA256": "6b42ddd05b0ca1c7342d73ea9f401fe588044215d65c67b756deb780f0894a26"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Reflection.Emit.Lightweight.dll",
+      "字节": 15656,
+      "SHA256": "d2724a2b7b46146877ec1f6e400c49ea05f84bdd31f3bba52ae139ee68a4f779"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Reflection.Emit.dll",
+      "字节": 309032,
+      "SHA256": "09059981bbeea0fdc5df589be5d7e3937d57e22bec4d78ceb492c587926fc238"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Reflection.Extensions.dll",
+      "字节": 15144,
+      "SHA256": "ceb1b81e1eb488d87bd43d16dc54450b2a78e0b653c44c988aae2a20abc162bc"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Reflection.Metadata.dll",
+      "字节": 1156904,
+      "SHA256": "82973e772017944a0548e445f30757595d95fe99e1f5c4a446df8c4db04b1c18"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Reflection.Primitives.dll",
+      "字节": 15656,
+      "SHA256": "c2bbd885d03da5e880667c228ac1f56a5f3a72ea37d43f010ada000adc33da28"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Reflection.TypeExtensions.dll",
+      "字节": 42792,
+      "SHA256": "7cac73ed746ce05a4a2f1e61dd52d41322ecc6ba84cfec463380f49487031459"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Reflection.dll",
+      "字节": 16168,
+      "SHA256": "95059346d6271dd6d0322cc321e5fb8cceab662f550c67aee7615059e41739bb"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Resources.Reader.dll",
+      "字节": 15144,
+      "SHA256": "20bdb5d302b5e28f6042c9f281cfa3ae2f2358544cc40783052fe5abf6aa859b"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Resources.ResourceManager.dll",
+      "字节": 15696,
+      "SHA256": "f709eb5cf16e26679782784c428825019785fcc7085562092425d4999bece03d"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Resources.Writer.dll",
+      "字节": 50984,
+      "SHA256": "684836486b9ba2817efa3099118860d259fd16db0c4c0533d42cad8c6c165b62"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.CompilerServices.Unsafe.dll",
+      "字节": 15184,
+      "SHA256": "6e685ec0477b21a688cd38bfcafc673888cdf186c99df3c96fab352e96d6fdc8"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.CompilerServices.VisualC.dll",
+      "字节": 30504,
+      "SHA256": "5fd85d3d7b47a921bdf48bf938c6615a49a4a3d493e1ea199f1b997c709618f4"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.Extensions.dll",
+      "字节": 17704,
+      "SHA256": "3d7b517d4fd89ee58c53e0f642cc9be42e7a8669b51a85e861dafe118067cbfd"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.Handles.dll",
+      "字节": 15656,
+      "SHA256": "985457a3e6a67e96a445ee0fb69b2d58bcdadc4c964253fb63e2d5061a36b050"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.InteropServices.JavaScript.dll",
+      "字节": 50984,
+      "SHA256": "5ba32bcde2d72362db2d6e02763ece79fa35bc878b50493e956ce594307e997f"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.InteropServices.RuntimeInformation.dll",
+      "字节": 15656,
+      "SHA256": "c26d9f94329422bd000f28f6c65fdc162bf9397a6d29e418a189d4ca49c5c3ec"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.InteropServices.dll",
+      "字节": 112464,
+      "SHA256": "e5eb1679f3579c9141e2bb9dbdce62624a623f38d299805cc1de07bacd21841f"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.Intrinsics.dll",
+      "字节": 17192,
+      "SHA256": "b07694ec91f3a200acf0f8b37c6ce5fcf05126a9198ae156d839fa5ca8439dc5"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.Loader.dll",
+      "字节": 15656,
+      "SHA256": "9b9b2a4f0358d9146e76178ddb87d019be380c78baa7dac853493d45df089f03"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.Numerics.dll",
+      "字节": 354128,
+      "SHA256": "8ac94fb810c092a9297a903762e79a75ae07d7229d0721540c391f86d3d5d220"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.Serialization.Formatters.dll",
+      "字节": 124712,
+      "SHA256": "5e8e957c6b7a63132555ede5bcf5fe6a59934c83300e28074ec6e9845ecdd17f"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.Serialization.Json.dll",
+      "字节": 15656,
+      "SHA256": "2fd71e3545dab4fc89b3fe54d13a1142f26a0cf187ebe375b3f7fa210fcb2596"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.Serialization.Primitives.dll",
+      "字节": 38696,
+      "SHA256": "f96093940e64d8eead98c86de9773d3c9d12c2b033bc6b1312ac88398303fdf3"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.Serialization.Xml.dll",
+      "字节": 16680,
+      "SHA256": "eedb66ea2cd1a26cc45a46d6631209ccbec959af82208872a93b3ae52f189222"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.Serialization.dll",
+      "字节": 17192,
+      "SHA256": "d565fc261ca98cbd14833821f777860291e8a0f775de7aee91778a9f6647f6f4"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Runtime.dll",
+      "字节": 44840,
+      "SHA256": "76be53624f64b23d0249dfa0bbe85390086de7c44bfd490642ea86c6faaf44af"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.AccessControl.dll",
+      "字节": 227112,
+      "SHA256": "cdc304f9ddb32023adb8db8953e56711c9b64462e4341d0b62e87ccd19dc7b10"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Claims.dll",
+      "字节": 100176,
+      "SHA256": "c53c8a7e95d8296f951872fdd2e6334d11c20bffd4322f1a088773bf9dcaa3c2"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Cryptography.Algorithms.dll",
+      "字节": 17232,
+      "SHA256": "eb99ae7dbe058a1b015aba6769ce1f65155b7ff51ff9a7203fcf6d7cdea5fef7"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Cryptography.Cng.dll",
+      "字节": 16168,
+      "SHA256": "7319f97896d92a7d0729cf28dc6c4d1f797c1520b656ee01a780eec726ec2c16"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Cryptography.Csp.dll",
+      "字节": 16208,
+      "SHA256": "4002af141e9cb29875b677841adf64a9681e5672c2595492dcbc161460d4e121"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Cryptography.Encoding.dll",
+      "字节": 15656,
+      "SHA256": "994494aec7760f40fade2264aa7c13eebae36360f0b1399a7134bb19c9d58fda"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Cryptography.OpenSsl.dll",
+      "字节": 15656,
+      "SHA256": "1a8902bbad1b577a98bec62a8472105dc1e9a253e390f69fbe3d167e93206968"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Cryptography.Pkcs.dll",
+      "字节": 771880,
+      "SHA256": "5d537dc5a92c4624e030bb5a453849287076e8bc9011ed77c007e3d2e089880d"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Cryptography.Primitives.dll",
+      "字节": 15656,
+      "SHA256": "194cccea9354bb248e44c954b5373f9069163f8f21524b3ee4b3185fe436bc15"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Cryptography.X509Certificates.dll",
+      "字节": 16680,
+      "SHA256": "7439c3b90bc2ee49a9275b28ed29052b4d48b45999ac1b7d25593033b1bb8dd6"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Cryptography.Xml.dll",
+      "字节": 452392,
+      "SHA256": "6737fe63f658f394e49309df96f1b650ebf87723c20d0ab28e0d2cc52363cd2c"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Cryptography.dll",
+      "字节": 2549544,
+      "SHA256": "e0a839a540e47343b53a936b32d91599a3470005228d50fd0b896f8bbdcc65b0"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Principal.Windows.dll",
+      "字节": 178000,
+      "SHA256": "2311a3f92971de918943573dfb66e04e25c1d543663951eb24e8eb1a0dcd4251"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.Principal.dll",
+      "字节": 15144,
+      "SHA256": "1d3e351058be3a33214b23b308fe57f78cd6fd4d8fad448fc84cbbe7376129f9"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.SecureString.dll",
+      "字节": 15696,
+      "SHA256": "73aac97072b7deefa4de9647bf822162224f1452ad467841b989ff89d4d94595"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Security.dll",
+      "字节": 18256,
+      "SHA256": "d8efd304765e859369698efef9b3ca707defa8e142721fe5605d7a2de7d38375"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.ServiceModel.Web.dll",
+      "字节": 16680,
+      "SHA256": "ce91013ee3a9a9d69a85e258f7749e6ece488295d7cb66f7c1079f2e8678fc5e"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.ServiceProcess.dll",
+      "字节": 15696,
+      "SHA256": "63fc498c9d04e3c4345dfdb8016ad0639d54562dd7d8c707c072792c854df944"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Text.Encoding.CodePages.dll",
+      "字节": 862032,
+      "SHA256": "226e216e33c94ef7594bdffe670ba4dc5907151c113cb41ac9e9d570227e1765"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Text.Encoding.Extensions.dll",
+      "字节": 15656,
+      "SHA256": "8f51b9535db64fe027a40d6076200b1a6b0889bf05f62bb8e68c3eb083c7f113"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Text.Encoding.dll",
+      "字节": 15696,
+      "SHA256": "5e347db6b4f9b2746d50e1ac85be2d9cc7dc4038fde98ac4295bc7030c83cda9"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Text.Encodings.Web.dll",
+      "字节": 124752,
+      "SHA256": "d20431f20d992e71a4e82e5f25c822474e2f4097d8527972d3d78ea1f26e47c3"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Text.Json.dll",
+      "字节": 1890128,
+      "SHA256": "fa99f413be21ed5f484a09093fe5f0beba7de3062cf9cc9f847dbf8108dba55a"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Text.RegularExpressions.dll",
+      "字节": 1034064,
+      "SHA256": "060bcc88a688e687ff1404b83b5fb5cf17e19ec57f33d5b8a48ab494da83c134"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.AccessControl.dll",
+      "字节": 75560,
+      "SHA256": "66d618b5522b3e4f7a3c7f2bd872fc378fa6f9bbdca3636854eb1a8cb948e631"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.Channels.dll",
+      "字节": 157480,
+      "SHA256": "afc5deb3c32b3f64bced2025d0b01b316d41b691ebc6ccb1a2ec445ad4c15e39"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.Overlapped.dll",
+      "字节": 15696,
+      "SHA256": "89fde15f8e520c4bcbc6cbfdceba2baed8670cdf52399a4cd7a21c6efb276c1a"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.RateLimiting.dll",
+      "字节": 165712,
+      "SHA256": "6dc24a23d99818b2cb2dfb8a1bcf1fab64ff6f4f48b0532bdd633fc22ee9284f"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.Tasks.Dataflow.dll",
+      "字节": 472872,
+      "SHA256": "a895b0c73d3a1afc4d89c1d9e445ed447af12864c25aad2c4cb7398ff50aa934"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.Tasks.Extensions.dll",
+      "字节": 15696,
+      "SHA256": "f148e3a1414b7c2763ae21529ad79ad759f7cfd3c885256b64b0d2209dec2613"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.Tasks.Parallel.dll",
+      "字节": 132904,
+      "SHA256": "6fa359bdbebb56be96339f244ed41658afcead5e010074da470df1115d1e7699"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.Tasks.dll",
+      "字节": 16680,
+      "SHA256": "f80b21f7dae04377b73945456cabe25e2ab1f4b564095aed546c2aa571644567"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.Thread.dll",
+      "字节": 15696,
+      "SHA256": "ce71949bb1ea67b686e799128582015ebf8758f1107e59e43f342ece3f662930"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.ThreadPool.dll",
+      "字节": 15656,
+      "SHA256": "58fbc6c4b9c72087152fd0f0670a527098c00b0c19ba8d0979d3ca5ce07c6936"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.Timer.dll",
+      "字节": 15144,
+      "SHA256": "9e4620846572f49aeb476aa99405071b4bbd0df4323e4e232787ed73642b1ee5"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Threading.dll",
+      "字节": 83792,
+      "SHA256": "6c32ed1bf8067e4169e8feddd15e6489b89d19d1c7aae1520a551b57745d0a60"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Transactions.Local.dll",
+      "字节": 640808,
+      "SHA256": "8d0283a311a16333ffb6f966d9765e4d8b866777ad99291a93b30db349a15bc4"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Transactions.dll",
+      "字节": 16720,
+      "SHA256": "56abfca0350c111d077b3d86a2469ea3da4fccc1871f7c51a8b4fdb664bb0ede"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.ValueTuple.dll",
+      "字节": 15696,
+      "SHA256": "07a5347f6a597e5e0d72109efa1a525697e8c3f74fb0029005500f8ebbf9187a"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Web.HttpUtility.dll",
+      "字节": 63272,
+      "SHA256": "2cedef51b0a2c2b84240583339ecf2422c650e3388aa46f3494160b93b673887"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Web.dll",
+      "字节": 15144,
+      "SHA256": "bc260b3db247ad9a6e4a82a275da85c3691a41272cc745cb7eaefcf1f31cc817"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Windows.dll",
+      "字节": 15696,
+      "SHA256": "716eee98ceee87d38f0b301224462f8442aa793f4b1b9c3ffac315753320ab37"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Xml.Linq.dll",
+      "字节": 15696,
+      "SHA256": "ae04903b25717fa4695e7e63489091f0d461e791e0bd264c6c85250d668f540d"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Xml.ReaderWriter.dll",
+      "字节": 21840,
+      "SHA256": "8e48fed4d12bcffff01e8059caafb564697275797d2f5ec6823fdd82b87fe938"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Xml.Serialization.dll",
+      "字节": 16208,
+      "SHA256": "489694401c60905cb6dca8ef0bf738cb609cd45b337126a01c825b913086ba43"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Xml.XDocument.dll",
+      "字节": 15696,
+      "SHA256": "3ff858607de5146051498a7124ef983bea280d86e165f993516c6c26af81cfb5"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Xml.XPath.XDocument.dll",
+      "字节": 30504,
+      "SHA256": "5bcd27a7e93515b745993f6dda51391033883cb8a1a8a2e3dad5caed3548f0da"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Xml.XPath.dll",
+      "字节": 15656,
+      "SHA256": "c817b11c58d95fa942fbc62a4cfa8219e16dafa5641eb004cb2be424028ed5d8"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Xml.XmlDocument.dll",
+      "字节": 15656,
+      "SHA256": "a50b9b3a03596e36e73e7a7d54f4d018e8dcfaa7fe79e8cf900af8838ef3ec36"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Xml.XmlSerializer.dll",
+      "字节": 17744,
+      "SHA256": "0b7d057c2b5b2272e8d4096a755edfd96f3cf03ab9aaa3fef54b462bf48d517e"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.Xml.dll",
+      "字节": 23376,
+      "SHA256": "277a84ba155fe7808a514f32694a8157ec9f0eeeef00ef9643e5250004054ff0"
+    },
+    {
+      "文件": "Builds/Windows/Server/System.dll",
+      "字节": 50472,
+      "SHA256": "ef135f0bda0c41e142fdbd67b93e5aa7911916cb250f7df302f4151a3bbfa380"
+    },
+    {
+      "文件": "Builds/Windows/Server/WindowsBase.dll",
+      "字节": 16208,
+      "SHA256": "0ec46a38f29a234b9a4d0ae9364c8322f661a47c831c5b948f2787b7ca12dbbd"
+    },
+    {
+      "文件": "Builds/Windows/Server/aspnetcorev2_inprocess.dll",
+      "字节": 392488,
+      "SHA256": "3a0131399a65dd63d50f325b62dfdb891ddacc80a1a9180897af159651fcb5a5"
+    },
+    {
+      "文件": "Builds/Windows/Server/base-scenario.json",
+      "字节": 31614,
+      "SHA256": "b5289b97f4070386842bde828db3e6dbddb744f0877dfaded733a72ffc37dc5c"
+    },
+    {
+      "文件": "Builds/Windows/Server/clretwrc.dll",
+      "字节": 317736,
+      "SHA256": "7a2186201c87bbc597a1b8b26facd88e68f03be4c4a4211fd65cc6595c72e45b"
+    },
+    {
+      "文件": "Builds/Windows/Server/clrgc.dll",
+      "字节": 674088,
+      "SHA256": "65e2f97d263824bfb9f75f92e66ebd22229aaf3a5faddef9345811d856c8840e"
+    },
+    {
+      "文件": "Builds/Windows/Server/clrgcexp.dll",
+      "字节": 711464,
+      "SHA256": "23a8050ec68542989b6da6cc906a90faf8a14e6416fd2871a260b781b1c374ae"
+    },
+    {
+      "文件": "Builds/Windows/Server/clrjit.dll",
+      "字节": 2092328,
+      "SHA256": "0749d8fc8e944d0576e1bb47120f87add8f875e5cd8968995633063fc79256f6"
+    },
+    {
+      "文件": "Builds/Windows/Server/coreclr.dll",
+      "字节": 4614992,
+      "SHA256": "128aee8c62a673d64739e585e3876b61133571cec83a46240a62581d5465639b"
+    },
+    {
+      "文件": "Builds/Windows/Server/createdump.exe",
+      "字节": 71552,
+      "SHA256": "315307159925d33eb604186a512901d080ecfc4cd8b8198030a7d398c6af2b0b"
+    },
+    {
+      "文件": "Builds/Windows/Server/hostfxr.dll",
+      "字节": 379688,
+      "SHA256": "838591885c5396fb0588a3aedc2f3e841d3afc67570868b1bce615264005a44c"
+    },
+    {
+      "文件": "Builds/Windows/Server/hostpolicy.dll",
+      "字节": 378664,
+      "SHA256": "e92a2e71eeeaf7c574e905935b3e3724ef29bade44317659dbe06f505e99dbe0"
+    },
+    {
+      "文件": "Builds/Windows/Server/mscordaccore.dll",
+      "字节": 1356640,
+      "SHA256": "86c29a7b945525135de16c3dcb71e3b8517848c459cbb21395b352d4e6bba09c"
+    },
+    {
+      "文件": "Builds/Windows/Server/mscordaccore_amd64_amd64_10.0.1226.42308.dll",
+      "字节": 1356640,
+      "SHA256": "86c29a7b945525135de16c3dcb71e3b8517848c459cbb21395b352d4e6bba09c"
+    },
+    {
+      "文件": "Builds/Windows/Server/mscordbi.dll",
+      "字节": 1237888,
+      "SHA256": "753e92805f3886221f56dcfc07191ad7ee44235bf689db0490bdf777f25e9175"
+    },
+    {
+      "文件": "Builds/Windows/Server/mscorlib.dll",
+      "字节": 59728,
+      "SHA256": "b698595367a7d4fa57ccacab73751fde0bb8f2415345c62cdfe7ced890da2c0c"
+    },
+    {
+      "文件": "Builds/Windows/Server/mscorrc.dll",
+      "字节": 133968,
+      "SHA256": "f0d8c7491d4659a4c5a4c00615255a60e05634f311162c2775a51e03c070c9e0"
+    },
+    {
+      "文件": "Builds/Windows/Server/msquic.dll",
+      "字节": 536344,
+      "SHA256": "b7158d427b01c70483bb3d80c5211e387dd98e9471c8a70e4484d449de9157e8"
+    },
+    {
+      "文件": "Builds/Windows/Server/netstandard.dll",
+      "字节": 100648,
+      "SHA256": "3dc81dbc9dacd28261632c94410859eda24c2db50cd6c14309cbb2a434b50c57"
+    },
+    {
+      "文件": "Builds/Windows/Server/web.config",
+      "字节": 469,
+      "SHA256": "c7a0563a6d953fe28bf8818e45f8ed842c35bfefdedf6fe248d2b044b7380e67"
+    },
+    {
+      "文件": "Builds/Windows/Server/服务启动说明.md",
+      "字节": 12032,
+      "SHA256": "bf14d2c94972b66298162adcc0f86768cd75e18b0ca73b6805002b54dc4195ae"
+    },
+    {
+      "文件": "Builds/Windows/UnityCrashHandler64.exe",
+      "字节": 1669552,
+      "SHA256": "e259a8df190b5993aefa91d61ad608566185dede3f9c8ce284188f6f068cd84b"
+    },
+    {
+      "文件": "Builds/Windows/UnityPlayer.dll",
+      "字节": 36824488,
+      "SHA256": "7e362b4c6ecee6fb493b1872cda5a5a0caf44f3b131b3c4bad132f0d1309f436"
+    }
+  ]
+}

@@ -372,6 +372,44 @@ public sealed class OnlineClientTests
         finally {client.EndSession();}
     }
 
+    [Theory]
+    [InlineData(Catan.Core.ThreeKingdoms.GeneralCatalog.B4PackageVersion,true)]
+    [InlineData(Catan.Core.ThreeKingdoms.GeneralCatalog.B45PackageVersion,true)]
+    [InlineData(Catan.Core.ThreeKingdoms.GeneralCatalog.B4PackageVersion,false)]
+    [InlineData(Catan.Core.ThreeKingdoms.GeneralCatalog.B45PackageVersion,false)]
+    [InlineData(Catan.Core.ThreeKingdoms.GeneralCatalog.B5PackageVersion,true)]
+    [InlineData(Catan.Core.ThreeKingdoms.GeneralCatalog.B5PackageVersion,false)]
+    [InlineData(Catan.Core.ThreeKingdoms.GeneralCatalog.B5DirectPackageVersion,true)]
+    [InlineData(Catan.Core.ThreeKingdoms.GeneralCatalog.B5DirectPackageVersion,false)]
+    public async Task JoinDescriptionAcceptsMatchingB4AndB45PackagesAndRejectsWrongHashes(string package,bool matching)
+    {
+        string hash=package==Catan.Core.ThreeKingdoms.GeneralCatalog.B5DirectPackageVersion?Catan.Core.ThreeKingdoms.GeneralCatalog.B5DirectContentHash:package==Catan.Core.ThreeKingdoms.GeneralCatalog.B5PackageVersion?Catan.Core.ThreeKingdoms.GeneralCatalog.B5ContentHash:package==Catan.Core.ThreeKingdoms.GeneralCatalog.B45PackageVersion?Catan.Core.ThreeKingdoms.GeneralCatalog.B45ContentHash:Catan.Core.ThreeKingdoms.GeneralCatalog.B4ContentHash;
+        if(!matching)hash="错误内容哈希";
+        NetworkRequest? joined=null;
+        await using var server=Server("http://127.0.0.1:0",async context=>
+        {
+            var request=WireJson.Deserialize<NetworkRequest>(await new StreamReader(context.Request.Body).ReadToEndAsync());
+            if(request.Operation=="Describe")return new NetworkResponse{Success=true,Room=new RoomSummary{RoomId="B45COMPAT",RuleSet="combined",RulesVersion=NetworkProtocol.RulesVersion("combined"),ScenarioVersion=NetworkProtocol.ScenarioVersion("combined"),ThreeKingdomsPackageVersion=package,ThreeKingdomsContentHash=hash}};
+            if(request.Operation=="Join")joined=request;
+            return new NetworkResponse{Success=false,Code="InvalidRequest",Message="测试服务已接收握手"};
+        });
+        await server.StartAsync();var client=Client();
+        try
+        {
+            client.ConfigureEndpoint(Address(server),"");client.Join("B45COMPAT","测试玩家","");
+            try{await PumpUntil(client,()=>Field("rememberedGeneralPackage").GetValue(client) is string||client.Status.Contains("内容不一致"));}
+            catch(OperationCanceledException){throw new InvalidOperationException("客户端握手未完成："+client.Status+" / "+client.LastError);}
+            if(matching)
+            {
+                Assert.Equal(package,Field("rememberedGeneralPackage").GetValue(client));Assert.Equal(hash,Field("rememberedGeneralHash").GetValue(client));
+                // macOS单元测试没有Windows/Android安全凭据保管；此例验证真实Describe入口的包协商，房间入席另由网络测试覆盖。
+                if(joined!=null){Assert.Equal(package,joined.ExpectedThreeKingdomsPackageVersion);Assert.Equal(hash,joined.ExpectedThreeKingdomsContentHash);}
+            }
+            else {Assert.Null(joined);Assert.Contains("内容不一致",client.Status);}
+        }
+        finally {client.EndSession();}
+    }
+
     static M7Client Client()
     {
         var client=new M7Client();client.UseCredentialDirectory(Path.Combine(Path.GetTempPath(),"catan-online-client-tests",Guid.NewGuid().ToString("N")));return client;

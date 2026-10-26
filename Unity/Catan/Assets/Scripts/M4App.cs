@@ -68,6 +68,7 @@ public sealed partial class M4App : MonoBehaviour
     public void ConfirmSeat(){dock.Reset();seat=nextSeat;curtain=false;view=NetworkGame?ai.Network.View<PlayerView>():host.View(seat);Refresh(view);}
     public CommandResult Submit(Command command)
     {
+        if(TryBeginDirectPayment(command))return null;
         if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status=ai.Network.Status;return null;}
         bool ownGeneralChoice=(command.Kind==CommandKind.ChooseGenerals||command.Kind==CommandKind.DeployGeneral)&&view?.ThreeKingdoms?.PendingDecision?.PlayerId==command.PlayerId;
         if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!ownGeneralChoice&&!(command.Kind==CommandKind.UseGeneralSkill&&view?.ThreeKingdoms?.SkillActions?.Length>0&&!ai.TableDiceRolling)&&!(command.Kind==CommandKind.RetireGeneral&&view?.ThreeKingdoms?.CanRetire==true)&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
@@ -115,10 +116,15 @@ public sealed partial class M4App : MonoBehaviour
         var pointer=MobileTabletop.Pointer;
         bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(MobileTabletop.Logical(pointer));
         bool canMap=ai!=null&&!curtain&&!newGame&&!artOpen&&!ai.TableMenuOpen&&!blocked&&TabletopUI.ContainsMapScreenPoint(pointer);
-        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,tabletop.OperationHidden||draft==null&&!operationActions);
+        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,ai.ThreeKingdomsSelectionActive||tabletop.OperationHidden||draft==null&&!operationActions);
         if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
         if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
+        if(ai!=null&&ai.ThreeKingdomsSelectionActive&&!ThreeKingdomsPaymentActive)
+        {
+            if(!blocked&&Input.mouseScrollDelta.y!=0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
+            board.ClearPreview();return;
+        }
         if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)&&!blocked&&(ai!=null||pointer.x<Screen.width*.70f))
         {
             bool knightMenu=ai!=null&&Input.GetMouseButtonDown(1)&&!blocked&&PickTabletopContext(pointer);
@@ -140,7 +146,7 @@ public sealed partial class M4App : MonoBehaviour
         if(target!="")
         {
             bool valid=ai==null||!DirectTabletopPlacement||pickField!="source"||view.LegalActions.Any(c=>c.Kind==draft.Kind&&c.SourceId==target);
-            if(pickField=="target") {string old=draft.TargetId;draft.TargetId=target;valid=Preview(draft).Success&&(ai==null||DockKnightTargetMatches(target));draft.TargetId=old;}
+            if(pickField=="target") {string old=draft.TargetId;draft.TargetId=target;valid=PaymentAwarePreview(draft).Success&&(ai==null||DockKnightTargetMatches(target));draft.TargetId=old;}
             PreviewOperationTarget(target,valid);
             if((ai!=null?boardClick:Input.GetMouseButtonDown(0))||buildReleased)
             {
@@ -153,7 +159,7 @@ public sealed partial class M4App : MonoBehaviour
                         draft.SourceId=target;pickField="target";board.ClearPreview();status="已拿起棋子，点击合法目的位置放下。";return;
                     }
                     if(!valid){status="这个位置不能放下当前棋子，请选择其他位置；右键放回。";return;}
-                    draft.TargetId=target;Submit(draft);return;
+                    draft.TargetId=target;if(!TryStagePaymentTarget(draft))Submit(draft);return;
                 }
                 if(pickField=="source")draft.SourceId=target;else draft.TargetId=target;
                 pickField="";board.ClearPreview();status=ai!=null?"目标已选中，请在操作面板确认。":"已选择 "+target+"；检查面板后确认。";

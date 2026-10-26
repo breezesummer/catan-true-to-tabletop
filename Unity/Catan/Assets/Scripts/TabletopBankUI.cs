@@ -39,7 +39,7 @@ public sealed class TabletopBankUI
         for(int index=0;index<slots.Length;index++)
         {
             if(slots[index].Flight==null)continue;
-            var pose=TabletopHandLayout.Resource(slots,index,TabletopHandLayout.ResourceCenter(false),TabletopHandLayout.ResourceWidth(false),false);
+            var pose=TabletopHandLayout.Resource(slots,index,TabletopHandLayout.ResourceCenter(false),TabletopHandLayout.ResourceWidth(false),false,timeline.ResourceHandScroll);
             ownDestinations[slots[index].Flight]=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);ownSlotIndices[slots[index].Flight]=index;
         }
         BindSpecialDestinations(snapshot);
@@ -99,7 +99,7 @@ public sealed class TabletopBankUI
         for(int index=0;index<slots.Length;index++)
         {
             if(slots[index].Flight==null)continue;
-            var pose=TabletopHandLayout.Resource(slots,index,center,width,false);
+            var pose=TabletopHandLayout.Resource(slots,index,center,width,false,timeline.ResourceHandScroll);
             ownDestinations[slots[index].Flight]=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);
             ownSlotIndices[slots[index].Flight]=index;
         }
@@ -117,7 +117,7 @@ public sealed class TabletopBankUI
         for(int index=0;index<slots.Length;index++)
         {
             var flight=slots[index].Flight;if(flight==null)continue;
-            var pose=TabletopHandLayout.Resource(slots,index,TabletopHandLayout.SpecialCenter(false),TabletopHandLayout.SpecialWidth(false),false);
+            var pose=TabletopHandLayout.Resource(slots,index,TabletopHandLayout.SpecialCenter(false),TabletopHandLayout.SpecialWidth(false),false,timeline.SpecialHandScroll);
             ownDestinations[flight]=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);ownSlotIndices[flight]=index;
         }
     }
@@ -163,9 +163,11 @@ public sealed class TabletopBankUI
         Rect end;
         if(own)
         {
-            if(flight.IsSpecial==resourceHandVisible||!ownDestinations.TryGetValue(flight,out end))end=new Rect(168,flight.IsSpecial?773:729,25,35);
+            if(flight.IsSpecial==resourceHandVisible||!ownDestinations.TryGetValue(flight,out end))end=new Rect(1190,flight.IsSpecial?781:731,25,35);
         }
         else if(!destinations.TryGetValue(flight.Player,out end))return;
+        // 滚动到屏幕外的落点收至对应页签，防止飞牌穿过技能区或右侧控制。
+        if(own&&(end.x<TabletopHandLayout.RestLeft||end.xMax>TabletopHandLayout.RestRight))end=new Rect(1190,flight.IsSpecial?781:731,25,35);
         float t=(float)flight.Progress(now),ease=t*t*(3-2*t),remaining=1-ease;
         // 银行上方起飞，接近手牌时减速落入各自插槽；起止速度为零，不再先生成一张手牌。
         var control1=start.center+new Vector2(105,-78);

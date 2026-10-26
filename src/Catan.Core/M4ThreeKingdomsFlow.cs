@@ -314,6 +314,7 @@ namespace Catan.Core.M4
             // 换将会暂挂原技能帧；产品视图只开放最上层生命周期决策。
             if (B3(state) && tk.PendingDecision != null) { tk.SkillDecision = null; tk.SkillActions = Array.Empty<B2SkillAction>(); }
             if (tk.SkillDecision == null && (state.PendingDecision != null || state.TradeOffer != null)) tk.SkillActions = Array.Empty<B2SkillAction>();
+            B45SkillStatusProjection.Project(CardHost(state), tk, view.PlayerId);
             if (state.Phase == GamePhase.Finished) { tk.CanRetire = false; tk.SkillActions = Array.Empty<B2SkillAction>(); tk.Clock.Phase = ThreeKingdomsPhase.Finished; return; }
             bool overlay = tk.PendingDecision != null || (B4(state) && state.ThreeKingdoms.PendingDecision != null) || tk.SkillDecision != null || (state.PendingDecision == null && (tk.Clock.Phase == ThreeKingdomsPhase.Preparation || tk.Clock.Phase == ThreeKingdomsPhase.Judgment || tk.Clock.Phase == ThreeKingdomsPhase.Draw || tk.Clock.Phase == ThreeKingdomsPhase.End || tk.Clock.Phase == ThreeKingdomsPhase.RoundEnd));
             if (overlay)
@@ -325,6 +326,7 @@ namespace Catan.Core.M4
                 view.LegalActions = Array.Empty<Command>();
             }
             var actions = new List<Command>();
+            var validatedVirtualActions = new HashSet<Command>();
             Command Make(CommandKind kind, string[] ids = null) => new Command { Kind = kind, PlayerId = view.PlayerId, GeneralIds = ids, WindowId = tk.WindowId, DecisionId = tk.PendingDecision?.DecisionId };
             var d = tk.PendingDecision;
             if (d != null && d.PlayerId == view.PlayerId)
@@ -342,11 +344,18 @@ namespace Catan.Core.M4
                 foreach (var skill in tk.SkillActions ?? Array.Empty<B2SkillAction>())
                 {
                     var action = Make(CommandKind.UseGeneralSkill); action.SkillCommand = Json.Copy(skill.Command); actions.Add(action);
+                    // 原生虚拟用途及实际弃牌费用已由本次Actions查询预检；逐项完整试执行会反复枚举全用途，形成平方级开销。
+                    // 只复用当前视图新生成且已验过费用的虚拟用途；实际Execute仍完整验证，外部命令不能获得这项信任。
+                    bool activeVirtual=tk.SkillDecision==null && state.Phase==GamePhase.Action && (skill.Command.Option=="b4-miewu-progress" || skill.Command.Option=="b4-xiemu");
+                    bool responseVirtual=tk.SkillDecision?.PlayerId==view.PlayerId && tk.SkillDecision.DecisionId==skill.Command.DecisionId
+                        && (skill.Command.Option=="b45-optional-qice" || skill.Command.Option=="response-qice-use");
+                    if(GeneralCatalog.UsesDirectRules(state.ThreeKingdoms.RulesVersion) && state.ActivePlayerId==view.PlayerId
+                        && tk.PendingDecision==null && state.PendingDecision==null && state.TradeOffer==null && (activeVirtual||responseVirtual))validatedVirtualActions.Add(action);
                 }
             }
             if (tk.CanRetire) actions.Add(Make(CommandKind.RetireGeneral));
             actions.AddRange(B4RetirementActions(view.PlayerId));
-            view.LegalActions = view.LegalActions.Concat(actions.Where(IsLegal)).ToArray();
+            view.LegalActions = view.LegalActions.Concat(actions.Where(a=>validatedVirtualActions.Contains(a)||IsLegal(a))).ToArray();
         }
     }
 }

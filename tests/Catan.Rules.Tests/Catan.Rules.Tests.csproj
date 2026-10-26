@@ -13,6 +13,8 @@
     <ProjectReference Include="../../src/Catan.Core/Catan.Core.csproj" />
     <ProjectReference Include="../../src/Catan.AI/Catan.AI.csproj" />
     <ProjectReference Include="../Catan.SaveProbe/Catan.SaveProbe.csproj" ReferenceOutputAssembly="false" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/ThreeKingdomsPaymentContext.cs" Link="Presentation/ThreeKingdomsPaymentContext.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/ThreeKingdomsSelectionContext.cs" Link="Presentation/ThreeKingdomsSelectionContext.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/OperationDockModel.cs" Link="Presentation/OperationDockModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/OperationWindowState.cs" Link="Presentation/OperationWindowState.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopHistoryModel.cs" Link="Presentation/TabletopHistoryModel.cs" />

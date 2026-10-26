@@ -1,0 +1,136 @@
+{
+  "验证日期": "2026-10-24",
+  "结论": "五项技能输入和普通支付组装、单次提交通过；普通支付地图鼠标命中尚待Windows/Android验收。",
+  "运行方式": "Unity 6000.3.25f1 图形编辑器，真实M6场景，1440×900 GameView；测试只通过显式Editor入口启用。",
+  "命令": "-executeMethod B45InteractionEditorVerification.Run --b45-interaction-verify <项目>/.local/development/test-results/b45/interaction-ui-9 --b45-keep-open --b45-allow-target-fixture",
+  "实际结果": {
+    "状态": "通过",
+    "说明": "Unity真实M6界面指定局面验收，局面仅测试注入；技能五项及支付选牌、用途、确认通过Unity原生GameView输入队列注入鼠标移动/按下/松手事件完成（编辑器输入模拟，非物理鼠标），断言读取权威结果。支付地图目标方式单独记录，允许显式参数启用夹具定位但绝不计作鼠标命中通过；不作为正常完整局、Android真机或用户试玩证据。",
+    "诊断": "EditorPaused=False, focused=GameView, appFocused=True, frame=1346, timeScale=1, cityEnabled=True, board=True, menu=False, samePresentation=True",
+    "支付目标方式": "仅地图目标使用夹具调用TryStagePaymentTarget；地图鼠标命中留待Windows/Android验收",
+    "断言数": 69,
+    "鼠标点击": 36,
+    "模态窗口次数": 0,
+    "场景": [
+      "仁德取消与单次提交",
+      "制衡直接选牌",
+      "国色费用与头像",
+      "魄袭私密边界与批量确认",
+      "被动左击与右击说明",
+      "龙胆普通造路的实体支付"
+    ],
+    "截图": [
+      "仁德-直接选牌与头像.png",
+      "仁德-一次确认后的桌面.png",
+      "制衡-两张实体牌草稿.png",
+      "国色-双砖与目标头像.png",
+      "魄袭-本人牌与授权目标牌分区.png",
+      "被动-右键说明与无左击入口.png",
+      "龙胆-两张实体砖与普通造路用途.png",
+      "龙胆-普通支付后真实道路.png"
+    ]
+  },
+  "覆盖说明": {
+    "五项技能": "仁德选牌与头像、取消零变更/单次确认/重复点击不结束回合；制衡实体多选；国色双砖与头像；魄袭先授权私密查看再本人牌/目标牌一次确认；纯被动左击无入口、右击显示说明。全部经GameView原生鼠标移动/按下/松手事件，未直接调用草稿Toggle或Submit。",
+    "普通支付": "赵云两张实体砖，分别明确选择木材/砖块用途，草稿阶段存档全等；地图目标使用显式夹具调用真实TryStagePaymentTarget；GUI确认后真实扣两砖、落一条道路，库存15变14。目标夹具不是鼠标命中证据。",
+    "权限与模态": "测试所见均来自当前席位产品投影；魄袭目标牌在合法私密查看后显示。此轮模态窗口次数为0。",
+    "输入限制证据": "第8轮Editor未暂停、GameView已聚焦、组件启用、presentation实例相同；原生旧Input收到down/up，但mousePosition落在1440×900外。第9轮补MouseMove仍未同步。未为此修改产品坐标/点击判定。",
+    "实际桌面补充": "父代理另用CUA实际桌面输入完成魄袭四牌确认、银行奖励及右键说明，见桌面鼠标记录.md。",
+    "验证边界": "指定测试局面，不冒充正常完整局、公开存档恢复、Windows实机、Android真机或用户试玩。20场正常完整局与真实SaveLoad/联机结果另见规则与会话测试结果.json。"
+  },
+  "原始失败保留": [
+    {
+      "轮次": 5,
+      "原始结果": ".local/development/test-results/b45/interaction-ui-5/result.json",
+      "SHA256": "6a38dd0ff196ea14f57b163d5d73a63be9e41b3076227a42210f5aab849375e2",
+      "原始状态": "失败",
+      "已完成场景": [
+        "仁德取消与单次提交",
+        "制衡直接选牌",
+        "国色费用与头像",
+        "魄袭私密边界与批量确认",
+        "被动左击与右击说明"
+      ],
+      "说明": "前五项51断言通过，支付测试夹具的村庄库存未扣除导致不变量校验失败，已修复夹具。"
+    },
+    {
+      "轮次": 6,
+      "原始结果": ".local/development/test-results/b45/interaction-ui-6/result.json",
+      "SHA256": "bd131bfa2f7cffca612bd4f8ffa5551e145a8755a6506293415056f024db9758",
+      "原始状态": "失败",
+      "已完成场景": [
+        "仁德取消与单次提交",
+        "制衡直接选牌",
+        "国色费用与头像",
+        "魄袭私密边界与批量确认",
+        "被动左击与右击说明"
+      ],
+      "说明": "五项技能与支付GUI选牌/用途可执行；地图旧Input坐标与输入队列不同步，目标未选中，不能声称普通支付地图鼠标命中通过。"
+    },
+    {
+      "轮次": 7,
+      "原始结果": ".local/development/test-results/b45/interaction-ui-7/result.json",
+      "SHA256": "e5d7dd1555803d03e50f661491f40138d7e8e5eb5a46a5f6cbf931727ec5f9e4",
+      "原始状态": "失败",
+      "已完成场景": [],
+      "说明": "五项技能与支付GUI选牌/用途可执行；地图旧Input坐标与输入队列不同步，目标未选中，不能声称普通支付地图鼠标命中通过。"
+    },
+    {
+      "轮次": 8,
+      "原始结果": ".local/development/test-results/b45/interaction-ui-8/result.json",
+      "SHA256": "9113337643559b2b898b930d1b5167156d1a08a7366f42056766a4bd482fcf7c",
+      "原始状态": "失败",
+      "已完成场景": [],
+      "说明": "五项技能与支付GUI选牌/用途可执行；地图旧Input坐标与输入队列不同步，目标未选中，不能声称普通支付地图鼠标命中通过。"
+    }
+  ],
+  "交付证据": [
+    {
+      "文件": "docs/verification/three-kingdoms-b45/交互点击/验证结果.json",
+      "SHA256": "041a64743a82db32295f8480d0ffe88bad3632b22f8f760d330508e9eec94985",
+      "字节数": 1523
+    },
+    {
+      "文件": "docs/verification/three-kingdoms-b45/交互点击/仁德-直接选牌与头像.png",
+      "SHA256": "20892fcd4dab72ae08205c35ff2c15de3edb175cbe2013749daf61fa13086e87",
+      "字节数": 1170869
+    },
+    {
+      "文件": "docs/verification/three-kingdoms-b45/交互点击/仁德-一次确认后的桌面.png",
+      "SHA256": "20449276e223f7f0c24e0afe4d88270a3f5cdc6fe3af73fd8f7f17b934f247be",
+      "字节数": 1160537
+    },
+    {
+      "文件": "docs/verification/three-kingdoms-b45/交互点击/制衡-两张实体牌草稿.png",
+      "SHA256": "498bfc20cf89c24a501a70b2544fdb2f110efcb75fba5f76d7fe1c27e09da88e",
+      "字节数": 1111673
+    },
+    {
+      "文件": "docs/verification/three-kingdoms-b45/交互点击/国色-双砖与目标头像.png",
+      "SHA256": "b9418bf59ac8c996073d439e860224f722f77695ef1cca72bf65283dd133a146",
+      "字节数": 1096226
+    },
+    {
+      "文件": "docs/verification/three-kingdoms-b45/交互点击/魄袭-本人牌与授权目标牌分区.png",
+      "SHA256": "e6cd67f63102de36cc52b341c13b9545d501444689a3524e6659640d48c58190",
+      "字节数": 1013631
+    },
+    {
+      "文件": "docs/verification/three-kingdoms-b45/交互点击/被动-右键说明与无左击入口.png",
+      "SHA256": "56d84017e99bbe64ab81a364ea3b82222f7ee73430015b2ffacedcfe35c58f23",
+      "字节数": 1108909
+    },
+    {
+      "文件": "docs/verification/three-kingdoms-b45/交互点击/龙胆-两张实体砖与普通造路用途.png",
+      "SHA256": "4cfb59dcd079bd83e80ebb21b71ff738b44f811afc959f9f88d9dc1c8a0c62fa",
+      "字节数": 1087512
+    },
+    {
+      "文件": "docs/verification/three-kingdoms-b45/交互点击/龙胆-普通支付后真实道路.png",
+      "SHA256": "87cd21c057e19fb4d052a48a6b438cf7cc137377a869fa6920fd7212ecd29114",
+      "字节数": 1099504
+    }
+  ],
+  "原始日志": ".local/development/logs/b45-interaction-ui-9.log",
+  "日志SHA256": "c6bfc61cd15a9e5dec57ac78ae7619b53f33c25c88b8b3e805eac91b10344d61"
+}

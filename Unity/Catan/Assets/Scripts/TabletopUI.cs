@@ -22,6 +22,7 @@ public sealed partial class TabletopUI
     internal Rect[] VerificationHudRects => hits.ToArray();
     readonly List<TabletopWorldObjects.Hit> worldHits = new List<TabletopWorldObjects.Hit>();
     TabletopScene table;
+    internal M6App ThreeKingdoms;
     public void BindTable(TabletopScene scene) { table=scene; }
     GUIStyle text, small, center, title, button;
     readonly Dictionary<string,GUIStyle> styles=new Dictionary<string,GUIStyle>();
@@ -153,9 +154,13 @@ public sealed partial class TabletopUI
         bool tableEnabled=GUI.enabled;
         if(Event.current.type!=EventType.Repaint&&BlocksOverlayInput(Event.current.mousePosition))GUI.enabled=false;
         contextVisible=false;
+        bool skillSelecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;
+        GUI.enabled=tableEnabled&&!skillSelecting;
         DrawTopButtons(seats.FirstOrDefault(p=>p.Id==seat),trade,facility);
+        GUI.enabled=tableEnabled;
         DrawPlayers(seats,seat,actor,trade);
-        DrawTurnBanner(seat,actor,phase,turn);
+        DrawTurnBanner(seat,actor,ThreeKingdoms?.ThreeKingdomsPhaseCaption??phase,turn);
+        if(skillSelecting){canRoll=false;canEnd=false;}
         defense.Draw();
         bank.ObserveHud(operations,bankHistory,seats);
         bool expansion=dice.Event.HasValue;
@@ -182,6 +187,7 @@ public sealed partial class TabletopUI
         // 必选窗口被 Esc 或叉号关闭后，回合按钮仍须提供恢复入口。
         bool resumeOperation=OperationWindows.Hidden||OperationWindows.Closed&&(operations?.RequiresSelection==true||operations?.Discard!=null);
         if(resumeOperation){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
+        if(skillSelecting){turnCaption="完成底部选择";turnEnabled=false;}
         StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
         var turnStyle=Style("turn-action",title,21);turnStyle.normal.textColor=turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
         while(turnStyle.fontSize>11&&turnStyle.CalcHeight(Content(turnCaption),EndTurnRect.width-40)>60)turnStyle.fontSize--;
@@ -277,7 +283,9 @@ public sealed partial class TabletopUI
                 if(row==0)ScoreHover(r,player.Score);
                 else if(r.Contains(Event.current.mousePosition)){hoveredPlayerHint=hints[row];playerHintAnchor=r;}
             }
-            if(player.Id!=own&&GUI.Button(avatar,GUIContent.none,GUIStyle.none))trade?.Invoke(player.Id);
+            bool selecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;
+            if(ThreeKingdoms!=null)ThreeKingdoms.DrawThreeKingdomsAvatar(player.Id,avatar);
+            if(!selecting&&player.Id!=own&&GUI.Button(avatar,GUIContent.none,GUIStyle.none)&&!MobileTabletop.TouchDragged)trade?.Invoke(player.Id);
             x+=width+5;
         }
     }

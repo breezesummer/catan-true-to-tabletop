@@ -1,0 +1,250 @@
+{
+  "日期": "2026-10-26",
+  "版本": "内测版2.0.2",
+  "分支": "dev-2.0",
+  "远端整合基线": "e710582c3378d0ef90254d775c02286a2d742c68",
+  "正式发布": false,
+  "云端部署": false,
+  "三国": {
+    "总数": 722,
+    "通过": 722,
+    "失败": 0
+  },
+  "全部规则": {
+    "总数": 1902,
+    "通过": 1880,
+    "失败": 22,
+    "与B5既有失败名单完全一致": true,
+    "新增失败": [],
+    "既有失败": [
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"商业港口\", track: 0)",
+      "Catan.Rules.Tests.FeedbackHistoryTests.PlayedProgressCardUsesAuthorizedTrackColor(name: \"锻铁匠\", track: 2)",
+      "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.FreeEngineeringWallIsConstructedAndCardUsesRequestedVerb",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Constitution, name: \"宪法\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.PublicVictoryProgressCardIncludesOnePoint(card: Printing, name: \"印刷术\")",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.ResourceMonopolyUsesHarvestForEachAffectedPlayer",
+      "Catan.Rules.Tests.HistoryNarrativeRegressionTests.SabotageDiscardIsOneColoredCountSentenceForEveryViewer",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: False, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Constitution\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P1\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.DrawingEitherVictoryCardImmediatelyScoresRevealsAndAnimatesEvenWithAFullHand(combined: True, card: \"Printing\", owner: \"P2\")",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: False)",
+      "Catan.Rules.Tests.ProgressVictoryPresentationTests.VictoryCardRevealKeepsHarvestQueuedUntilItsNewViewAppliesAfterTheDice(combined: True)",
+      "Catan.Rules.Tests.TabletopPresentationTests.UnresolvedPieceChoicesRemainVisibleUntilTheDecisionChanges(kind: \"ProgressTreasonRemove\", action: \"叛变\", piece: \"己方骑士\")",
+      "Catan.Rules.Tests.TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat",
+      "Catan.Rules.Tests.TabletopSpecialCollectionTests.DefenderProgressRewardFliesFromTheCorrectTrackWithoutLeakingOpponentCard"
+    ],
+    "检查范围": "三国非整局、20个新整合包完整局及原模式快速回归；不重复计入往轮完整局。",
+    "来源": [
+      {
+        "原始路径": ".local/b45-dev-integration/results/native-final.trx",
+        "SHA256": "6b311e60a28547aecb18cc5ebb8294c73a7b55cb038653e30397f08e223f2cda",
+        "总数": 1180,
+        "通过": 1158,
+        "失败": 22
+      },
+      {
+        "原始路径": ".local/b45-dev-integration/results/three-kingdoms-postfix.trx",
+        "SHA256": "f3d1d392551dd37a8c06c3f6e81eba9785a5df76c6fbd1acbc46eac6e2c6d1d8",
+        "总数": 702,
+        "通过": 702,
+        "失败": 0
+      },
+      {
+        "原始路径": ".local/b45-dev-integration/results/integration-games-1.trx",
+        "SHA256": "ba2cf835fe7bd79407e93ed1990b79fb3f8bb2b12fac2cce396ccd62dde1e456",
+        "总数": 4,
+        "通过": 4,
+        "失败": 0
+      },
+      {
+        "原始路径": ".local/b45-dev-integration/results/integration-games-2.trx",
+        "SHA256": "6c7e1ca8f5b58f469037e871fad88841338aaa552cd1ab87cf9c54120ca04d2c",
+        "总数": 6,
+        "通过": 6,
+        "失败": 0
+      },
+      {
+        "原始路径": ".local/b45-dev-integration/results/integration-games-3.trx",
+        "SHA256": "c873a1ba242ec70b2922e5d00defeba8b791ff0e0191cdc81116d533245c8609",
+        "总数": 4,
+        "通过": 4,
+        "失败": 0
+      },
+      {
+        "原始路径": ".local/b45-dev-integration/results/integration-games-4.trx",
+        "SHA256": "11cdf57847e9dd7e53d0eec48e0464f443cc5452fd85d69d5a928e58ebf22437",
+        "总数": 6,
+        "通过": 6,
+        "失败": 0
+      }
+    ]
+  },
+  "整合包正常完整局": {
+    "总数": 20,
+    "通过": 20,
+    "配置": [
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"cities\", map: \"base\", seats: 3, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:01:26.9392529",
+        "输出": "three-kingdoms-board-state-49-direct-v1 cities/base/3人：593条命令，29轮，30将登场，30类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"cities\", map: \"base\", seats: 4, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:01:11.5896150",
+        "输出": "three-kingdoms-board-state-49-direct-v1 cities/base/4人：501条命令，16轮，24将登场，26类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"heading-for-new-shores\", seats: 3, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:01:32.6930231",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/heading-for-new-shores/3人：477条命令，23轮，24将登场，29类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"heading-for-new-shores\", seats: 4, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:01:44.7702263",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/heading-for-new-shores/4人：386条命令，13轮，20将登场，20类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"fog-islands\", seats: 4, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:02:08.7113594",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/fog-islands/4人：516条命令，17轮，24将登场，35类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"through-the-desert\", seats: 3, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:00:39.2227597",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/through-the-desert/3人：255条命令，13轮，15将登场，17类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"fog-islands\", seats: 3, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:01:04.5164825",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/fog-islands/3人：397条命令，23轮，24将登场，27类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"four-islands\", seats: 3, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:01:29.2607138",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/four-islands/3人：554条命令，25轮，27将登场，33类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"four-islands\", seats: 4, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:00:50.0141177",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/four-islands/4人：418条命令，16轮，24将登场，31类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"through-the-desert\", seats: 4, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:01:32.3989122",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/through-the-desert/4人：394条命令，14轮，20将登场，32类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"cloth-for-catan\", seats: 4, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:01:36.2753644",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/cloth-for-catan/4人：457条命令，19轮，28将登场，24类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"forgotten-tribe\", seats: 3, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:05:18.4297499",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/forgotten-tribe/3人：504条命令，26轮，27将登场，28类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"forgotten-tribe\", seats: 4, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:02:47.7110693",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/forgotten-tribe/4人：492条命令，20轮，28将登场，33类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"cloth-for-catan\", seats: 3, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:02:12.3677411",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/cloth-for-catan/3人：419条命令，21轮，21将登场，23类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"new-world\", seats: 3, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:01:08.5341312",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/new-world/3人：378条命令，20轮，21将登场，25类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"new-world\", seats: 4, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:00:52.8133359",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/new-world/4人：413条命令，13轮，20将登场，17类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"pirate-islands\", seats: 4, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:03:33.2259063",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/pirate-islands/4人：621条命令，23轮，32将登场，39类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"pirate-islands\", seats: 3, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:05:49.8145596",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/pirate-islands/3人：538条命令，25轮，27将登场，29类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"wonders-of-catan\", seats: 4, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:00:34.3499689",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/wonders-of-catan/4人：335条命令，11轮，16将登场，24类待决恢复。"
+      },
+      {
+        "名称": "Catan.Rules.Tests.ThreeKingdomsB5SessionTests.ProductAiFinishesNormalFortyNineGeneralGameWithoutManualPhases(rules: \"combined\", map: \"wonders-of-catan\", seats: 3, package: \"three-kingdoms-board-state-49-direct-v1\")",
+        "状态": "Passed",
+        "耗时": "00:01:21.7204146",
+        "输出": "three-kingdoms-board-state-49-direct-v1 combined/wonders-of-catan/3人：456条命令，22轮，24将登场，29类待决恢复。"
+      }
+    ]
+  },
+  "网络": {
+    "原始路径": ".local/b45-dev-integration/results/network-latest.trx",
+    "SHA256": "94a187c2ae28ec944eb730eaa216b5e53467b4af84fcafb56c9f80336c2bad96",
+    "总数": 240,
+    "通过": 240,
+    "失败": 0
+  },
+  "服务客户端": {
+    "原始路径": ".local/b45-dev-integration/results/server-latest.trx",
+    "SHA256": "6b7215f1a11b135cfce7b4e99c88e06b3fba49cb01d70cdfdd5c2c864c111ba2",
+    "总数": 99,
+    "通过": 99,
+    "失败": 0
+  },
+  "Unity程序集": {
+    "Catan.Network.Contracts.dll": "6e0a505ddf922e36f91ceb412ee2b943d88283d4dcc381b1dfc34cff3bae9691",
+    "Catan.Core.dll": "90693f80ae18fe5212a7d9dad40470ab3e6ace197456e49ae7532d6d97c3be3f",
+    "Catan.AI.dll": "351daabfa6403d93af76cc5078c2a606ae3c5981093b15fc8d0252527d689dbb"
+  },
+  "Unity编译": {
+    "结果": "通过",
+    "日志": ".local/b45-dev-integration/unity-compile-latest.log",
+    "SHA256": "b232ebca0085d49cf88072c8fee4b10e33af8a8b05fd82e91b51ae3b8c8b1028"
+  },
+  "界面": {
+    "手牌组件": "合并后手牌组件验证.json",
+    "直接交互": "合并后直接交互验证.json",
+    "地图目标": "仅夹具定位通过，原生地图输入仍待真机验收"
+  },
+  "失败诊断与复验": [
+    "首轮全量测试中发现杜预虚拟用途在视图生成时重复完整试执行，导致显著卡顿；保存局面和运行栈定位后复用同次已验证候选，执行阶段校验不变，新增四组独立回归。",
+    "新增测试初版对青囊可声明用途数量的假设不正确，已改用真实合法动作验证所选牌与用途；不修改规则迁就测试。",
+    "完整界面首轮地图命中未完成；第二轮鼠标事件等待不稳定；加强每次事件至少等待三个真实渲染帧后复验，地图目标仍显式夹具定位。"
+  ],
+  "原始证据说明": "截图、日志和TRX仅存本地，不纳入仓库。整合前源码与素材恢复清单位于.local/b45-dev-integration。"
+}

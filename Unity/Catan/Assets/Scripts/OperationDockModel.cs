@@ -33,7 +33,36 @@ public sealed class OperationSnapshot
     public Action Cancel;
     public Action<string> Notify;
     public Func<OperationTrade, string> Trade;
+    // 特殊支付先进入本地用途草稿，适配层完整校验真实牌与交易对象，最终仍由规则预览裁定。
+    public Func<OperationTrade, string> ValidateTradeDraft;
     public Action<string> Respond;
+}
+// 技能草稿桥接只持有本人投影派生的回调，不持有权威状态；序号只是同种牌的展示位置。
+public sealed class OperationHandSelection
+{
+    public bool Active;
+    public Func<int,int,bool> CanSelectGood,IsGoodSelected;
+    public Action<int,int> SelectGood;
+    public Func<string,bool> CanSelectCard,IsCardSelected;
+    public Action<string> SelectCard;
+    public Func<int> SelectedGoods,SelectedCards;
+    public string Reason;
+    public bool GoodAllowed(int good,int ordinal) => Active&&CanSelectGood?.Invoke(good,ordinal)==true;
+    public bool CardAllowed(string id) => Active&&CanSelectCard?.Invoke(id)==true;
+}
+// 点击、滑动和长按互斥；长按松手不会补发一次点击。
+public sealed class OperationHandGesture
+{
+    public bool Pressed {get;private set;}
+    public bool Moved {get;private set;}
+    public bool Inspected {get;private set;}
+    double started;
+    float x,y;
+    public void Begin(float px,float py,double now) {Pressed=true;Moved=Inspected=false;x=px;y=py;started=now;}
+    public void Move(float px,float py,float threshold) {if(Pressed&&((px-x)*(px-x)+(py-y)*(py-y)>threshold*threshold))Moved=true;}
+    public bool Inspect(double now) {if(!Pressed||Moved||Inspected||now-started<.5)return false;Inspected=true;return true;}
+    public bool Release(bool overOriginal) {bool click=Pressed&&!Moved&&!Inspected&&overOriginal;Cancel();return click;}
+    public void Cancel() {Pressed=Moved=Inspected=false;}
 }
 // 只描述当前观看者自己的强制交牌；最终合法性仍由规则入口验证。
 public sealed class OperationDiscard
@@ -177,6 +206,7 @@ public sealed class OperationSelection
     }
     public static string ValidateTrade(OperationSnapshot snapshot, OperationTrade trade)
     {
+        if(snapshot?.ValidateTradeDraft!=null)return snapshot.ValidateTradeDraft(trade);
         if (snapshot == null || !snapshot.CanTrade || !snapshot.CanInteract || snapshot.Offer != null) return "当前阶段不能发起交易";
         if (trade == null || trade.Give == null || trade.Receive == null || trade.Give.Length != 8 || trade.Receive.Length != 8) return "交易内容无效";
         if (trade.Give.Any(n => n < 0) || trade.Receive.Any(n => n < 0)) return "数量不能为负数";

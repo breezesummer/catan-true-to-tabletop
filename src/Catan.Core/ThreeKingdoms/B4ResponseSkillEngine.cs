@@ -243,7 +243,19 @@ namespace Catan.Core.ThreeKingdoms
         {var a=Action(s,f.SkillId,option,label,d);a.Command.TargetPlayerIds=new[]{target};list.Add(a);}
         private static bool ResolveResponseDecision(IThreeKingdomsCardHost host,B2SkillFrame f,B2SkillDecision d,B2SkillCommand c)
         {
-            if(!d.Kind.StartsWith("response-",StringComparison.Ordinal))return false;var s=host.State;var legal=new List<B2SkillAction>();AddResponseDecisionActions(host,f,d,legal);Require(legal.Any(a=>SameB4Action(a.Command,c)),"无效的响应选择。");
+            if(!d.Kind.StartsWith("response-",StringComparison.Ordinal))return false;var s=host.State;
+            if(GeneralCatalog.UsesDirectRules(s.RulesVersion)&&c.Option=="b45-poxi-confirm")
+            {
+                Require(d.Kind=="response-poxi-select", "当前不是魄袭选牌步骤。");
+                Require(c.Counts!=null&&c.Counts.Length==8&&c.SecondaryCounts!=null&&c.SecondaryCounts.Length==8
+                    &&c.Counts.All(n=>n>=0&&n<=1)&&c.SecondaryCounts.All(n=>n>=0&&n<=1)
+                    &&Enumerable.Range(0,8).All(t=>c.Counts[t]+c.SecondaryCounts[t]<=1)
+                    &&c.Counts.Sum()+c.SecondaryCounts.Sum()==4, "魄袭必须选择四种不同的真实牌，各一张。");
+                Require(Contains(host.GetHand(f.PlayerId),c.Counts)&&Contains(host.GetHand(f.Targets[0]),c.SecondaryCounts), "魄袭所选牌已变化。");
+                f.B4.Selection=Copy(c.Counts);f.B4.OtherSelection=Copy(c.SecondaryCounts);
+                f.Step=1;CommitPoxiDiscard(host,f);return true;
+            }
+            var legal=new List<B2SkillAction>();AddResponseDecisionActions(host,f,d,legal);Require(legal.Any(a=>SameB4Action(a.Command,c)),"无效的响应选择。");
             if(d.Kind=="response-jieying-target"){B4SkillHistoryEngine.Complete(s,f.Id,"指定 "+c.TargetPlayerIds[0]+" 为劫营目标");Remove(s,f);AddTimed(s,"response-jieying-pending",f.PlayerId,c.TargetPlayerIds[0],0);return true;}
             if(d.Kind=="response-qice-use")
             {

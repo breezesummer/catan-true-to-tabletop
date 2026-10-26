@@ -53,7 +53,7 @@ internal sealed class RuleRoomGame
         using var document = System.Text.Json.JsonDocument.Parse(json);
         if (document.RootElement.TryGetProperty("ThreeKingdoms", out var threeKingdoms) && threeKingdoms.ValueKind != System.Text.Json.JsonValueKind.Null &&
             !GeneralCatalog.IsNetworkPackage(threeKingdoms.GetProperty("PackageVersion").GetString(),threeKingdoms.GetProperty("PackageContentHash").GetString()))
-            throw new InvalidDataException("三国争霸联机需要完整且匹配的 B4／B5 武将包。");
+            throw new InvalidDataException("三国争霸联机需要完整且匹配的 B4／B4.5／B5 武将包。");
         finished = document.RootElement.TryGetProperty("WinnerPlayerId", out var winner) && winner.ValueKind == System.Text.Json.JsonValueKind.String && !string.IsNullOrEmpty(winner.GetString());
         CommandCount = document.RootElement.GetProperty("ProcessedCommands").GetArrayLength();
         ActivePlayerId = document.RootElement.GetProperty("ActivePlayerId").GetString();

@@ -18,7 +18,7 @@ public sealed partial class M5App
         if(!ReferenceEquals(smithingView,view))
         {
             smithingView=view;
-            int maxTargets=view.ThreeKingdoms?.PackageVersion==GeneralCatalog.B5PackageVersion&&view.ThreeKingdoms.Players.Any(p=>p.PlayerId==seat&&p.ActiveGeneralId=="tk-g32")?4:2;
+            int maxTargets=GeneralCatalog.UsesB5Package(view.ThreeKingdoms?.PackageVersion)&&view.ThreeKingdoms.Players.Any(p=>p.PlayerId==seat&&p.ActiveGeneralId=="tk-g32")?4:2;
             smithingPlans=TabletopSmithingSelection.Plans(view.Board.Knights.Where(k=>k.PlayerId==seat).Select(k=>k.LocationId).ToArray(),ids=>
             {var c=New(CommandKind.PlayProgressCard);c.ProgressCard=ProgressCardKind.Smithing;c.TargetIds=ids;return Preview(c).Success;},maxTargets);
         }

@@ -44,7 +44,7 @@ public sealed partial class M6App
         networkOnlineDraft=menuOnlineAddress;
         Network=gameObject.AddComponent<M7Client>();Network.ViewChanged+=ApplyNetworkView;
         Network.SessionEnded+=CloseNetworkPresentation;
-        Network.CommandFeedback+=message=>{Notice=message;ShowTablePrompt(message);};
+        Network.CommandFeedback+=message=>{Notice=message;ShowTablePrompt(message);generalSelection.Reset();generalSubmitting=false;selectionView=null;};
         Network.PreviewChanged+=()=>
         {
             // A late preview updates hover colours and cached action availability without cancelling drafts.
@@ -99,7 +99,7 @@ public sealed partial class M6App
         networkPresentedGame=-1;
         close?.Invoke();presentation=null;actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;MenuVisible=true;tableMenu=false;networkMenu=true;
     }
-    RoomSettings NetworkSettings()=>new RoomSettings{Name=networkRoomName,RuleSet=RuleIds[menuRule],ScenarioId=menuRule==0||menuRule==2?"base":ScenarioIds()[Mathf.Clamp(menuScenario,0,ScenarioIds().Length-1)],PlayerCount=menuPlayers,TargetVictoryPoints=menuVictoryPoints,Listed=networkListed,AiSeats=Enumerable.Range(0,menuPlayers).Where(i=>networkAi[i]).Select(i=>"P"+(i+1)).ToArray(),ThreeKingdomsPackageVersion=menuThreeKingdoms&&(menuRule==2||menuRule==3)?Catan.Core.ThreeKingdoms.GeneralCatalog.B5PackageVersion:null,ThreeKingdomsContentHash=menuThreeKingdoms&&(menuRule==2||menuRule==3)?Catan.Core.ThreeKingdoms.GeneralCatalog.B5ContentHash:null};
+    RoomSettings NetworkSettings()=>new RoomSettings{Name=networkRoomName,RuleSet=RuleIds[menuRule],ScenarioId=menuRule==0||menuRule==2?"base":ScenarioIds()[Mathf.Clamp(menuScenario,0,ScenarioIds().Length-1)],PlayerCount=menuPlayers,TargetVictoryPoints=menuVictoryPoints,Listed=networkListed,AiSeats=Enumerable.Range(0,menuPlayers).Where(i=>networkAi[i]).Select(i=>"P"+(i+1)).ToArray(),ThreeKingdomsPackageVersion=menuThreeKingdoms&&(menuRule==2||menuRule==3)?Catan.Core.ThreeKingdoms.GeneralCatalog.B5DirectPackageVersion:null,ThreeKingdomsContentHash=menuThreeKingdoms&&(menuRule==2||menuRule==3)?Catan.Core.ThreeKingdoms.GeneralCatalog.B5DirectContentHash:null};
     async void StartLan()
     {
         if(networkWorking)return;networkWorking=true;networkMessage="正在启动随包局域网服务…";
@@ -502,7 +502,7 @@ public sealed partial class M6App
             else PastoralMenuUI.Label(new Rect(previewArea.x,previewArea.y+119,previewArea.width,36),menuRule==0?"标准岛屿":"标准城市与骑士地图",18,null,true,TextAnchor.MiddleCenter);
             MenuMapPreviews.DrawScenarioThumbnail(new Rect(previewArea.x+6,previewArea.y+164,175,124),menuRule,ids[menuScenario],menuPlayers);
             PastoralMenuUI.Label(new Rect(previewArea.x+208,previewArea.y+192,previewArea.width-220,80),MenuMapPreviews.ScenarioCaption(menuRule,ids[menuScenario],menuPlayers),15,PastoralMenuUI.Muted);
-            if(menuRule==2||menuRule==3)menuThreeKingdoms=GUILayout.Toggle(menuThreeKingdoms,"三国争霸 B5 · 49将棋盘状态包",button,GUILayout.Height(38));
+            if(menuRule==2||menuRule==3)menuThreeKingdoms=GUILayout.Toggle(menuThreeKingdoms,"三国争霸 · 桌面武将技能",button,GUILayout.Height(38));
         }
         else
         {

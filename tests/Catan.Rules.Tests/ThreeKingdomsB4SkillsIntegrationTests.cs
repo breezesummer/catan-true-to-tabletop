@@ -11,9 +11,10 @@ namespace Catan.Rules.Tests;
 /// <summary>独立原生状态注入后经 Execute 验证费用/虚拟牌；只作为宿主集成证据。</summary>
 public sealed class ThreeKingdomsB4SkillsIntegrationTests
 {
-    private static ThreeKingdomsState Generals(params string[] requested)
+    private static ThreeKingdomsState Generals(params string[] requested)=>GeneralsForPackage(GeneralCatalog.B4PackageVersion,requested);
+    private static ThreeKingdomsState GeneralsForPackage(string package,params string[] requested)
     {
-        var tk=ThreeKingdomsEngine.Create(new[]{"P1","P2","P3","P4"},42,_=>0,true,GeneralCatalog.B4PackageVersion);
+        var tk=ThreeKingdomsEngine.Create(new[]{"P1","P2","P3","P4"},42,_=>0,true,package);
         while(tk.PendingDecision!=null)
         {
             var d=tk.PendingDecision;
@@ -186,4 +187,31 @@ public sealed class ThreeKingdomsB4SkillsIntegrationTests
         Skill(game,mode,"P1","accept");Skill(game,mode,"P1","response-qice-use",(Func<B2SkillAction,bool>)(a=>a.VirtualCardId=="Alchemy"&&a.Label.EndsWith("1 + 1")));
         Assert.Equal(1,(int)game.GetAuthoritativeStateForTesting().LastDice1);Assert.Equal(1,(int)game.GetAuthoritativeStateForTesting().LastDice2);Assert.Equal(0,(int)Owner(game).ProgressCards.Length);Assert.Equal(0,(int)Owner(game).Resources.Total);Assert.Null(game.GetAuthoritativeStateForTesting().ThreeKingdomsVirtualUse);game.AssertInvariants();
     }
+    [Theory]
+    [InlineData("cities",GeneralCatalog.B45PackageVersion)] [InlineData("combined",GeneralCatalog.B45PackageVersion)]
+    [InlineData("cities",GeneralCatalog.B5DirectPackageVersion)] [InlineData("combined",GeneralCatalog.B5DirectPackageVersion)]
+    public void DirectMiewuProjectsLargeChoiceSetPromptlyAndStillRejectsForgedCommands(string mode,string package)
+    {
+        dynamic game=Fixture(mode,"tk-g41",s=>
+        {
+            s.ThreeKingdoms=GeneralsForPackage(package,"tk-g41","tk-g06","tk-g09","tk-g22");
+            s.RulesVersion=mode=="cities"?(package==GeneralCatalog.B45PackageVersion?M4.CitiesKnightsGameSession.ThreeKingdomsB45RulesVersion:M4.CitiesKnightsGameSession.ThreeKingdomsB5DirectRulesVersion)
+                :(package==GeneralCatalog.B45PackageVersion?M5.CombinedGameSession.ThreeKingdomsB45RulesVersion:M5.CombinedGameSession.ThreeKingdomsB5DirectRulesVersion);
+            modePlayer(s,"P1").Resources.Wheat=1;
+            ThreeKingdomsState tk=s.ThreeKingdoms;tk.Generals.Single(g=>g.Region==GeneralRegion.Active&&g.OwnerPlayerId=="P1").Counters=new[]{new GeneralCounter{Key="wuku",Value=3},new GeneralCounter{Key="sanchen",Value=1}};
+        });
+        string before=game.Save();var timer=System.Diagnostics.Stopwatch.StartNew();dynamic view=game.GetPlayerView("P1");timer.Stop();
+        Assert.True(timer.Elapsed<TimeSpan.FromSeconds(15),"合法用途查询反复试执行全部候选："+timer.Elapsed);
+        B2SkillAction[] skills=view.ThreeKingdoms.SkillActions;var options=skills.Where(a=>a.Command.Option=="b4-miewu-progress").ToArray();Assert.True(options.Length>50,"夹具必须包含大量虚拟用途候选。");
+        var legal=((System.Collections.IEnumerable)view.LegalActions).Cast<dynamic>().Where(c=>c.Kind.ToString()=="UseGeneralSkill"&&c.SkillCommand.Option=="b4-miewu-progress").ToArray();Assert.Equal(options.Length,legal.Length);
+        foreach(var option in options.GroupBy(a=>a.VirtualCardId).Select(g=>g.First()).Take(5))
+        {
+            dynamic command=Command(game,mode,"UseGeneralSkill");command.SkillCommand=B45SelectionContract.Copy(option.Command);dynamic preview=game.Preview(command);Assert.True((bool)preview.Success,(string)preview.Message);
+        }
+        Assert.Equal(before,(string)game.Save());
+        dynamic forged=Command(game,mode,"UseGeneralSkill");forged.SkillCommand=B45SelectionContract.Copy(options[0].Command);forged.SkillCommand.ProgressCardId="不存在的虚拟用途";Assert.False((bool)game.Execute(forged).Success);
+        Assert.Equal(before,(string)game.Save());game.AssertInvariants();
+        dynamic accepted=Command(game,mode,"UseGeneralSkill");accepted.SkillCommand=B45SelectionContract.Copy(options.First(a=>a.VirtualCardId=="Invention").Command);Accept(game,accepted);Assert.Equal(1,(int)Owner(game).Resources.Total);
+    }
+
 }
