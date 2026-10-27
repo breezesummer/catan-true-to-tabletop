@@ -38,7 +38,7 @@ namespace Catan.Core.M3
         public string[] ForbiddenRobberTileIds { get; set; } = Array.Empty<string>();
     }
 
-    public static class SeafarersScenarios
+    public static partial class SeafarersScenarios
     {
         public static string[] Ids { get { return new[] { "heading-for-new-shores", "four-islands", "fog-islands", "through-the-desert", "forgotten-tribe", "cloth-for-catan", "pirate-islands", "wonders-of-catan", "new-world" }; } }
         // Fixed layouts below are transcribed from the 2025 rulebook, not generated island approximations.

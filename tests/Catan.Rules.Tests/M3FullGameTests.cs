@@ -34,10 +34,11 @@ public sealed class M3FullGameTests
     [InlineData("pirate-islands", 3, 16u)]
     [InlineData("wonders-of-catan", 3, 17u)]
     [InlineData("new-world", 3, 18u)]
-    public void ViewOnlyLocalSeatsFinishNormalGameAndPendingSavesResumeDeterministically(string scenario, int seats, uint seed)
+    public void ProductionAiFinishesVariableGameAndPendingSavesResumeDeterministically(string scenario, int seats, uint seed)
     {
         var game = New(scenario, seats, seed);
-        var driver = new M3ViewOnlyDriver();
+        // 新局使用可变布局；旧固定图测试策略缺少可靠的跨海扩张，改用实际产品AI。
+        var driver = new Catan.AI.SeafarersAi();
         var checkedPhases = new HashSet<GamePhase>();
         var commands = 0;
         var last = game.GetPlayerView("P1");
@@ -45,7 +46,7 @@ public sealed class M3FullGameTests
         {
             // Policy gets only a detached PlayerView. The authority and save are test assertions, never policy inputs.
             var actor = Actor(last);
-            var view = game.GetPlayerView(actor);
+            var view = game.GetAiPlayerView(actor);
             var command = driver.Decide(view);
             command.Id = $"full-{seats}-{seed}-{commands++}";
             var result = game.Execute(command);
@@ -57,7 +58,7 @@ public sealed class M3FullGameTests
                 var restored = SeafarersGameSession.Load( game.Save());
                 Assert.Equal(game.Save(), restored.Save());
                 var nextActor = Actor(last);
-                var next = driver.Decide(game.GetPlayerView(nextActor)); next.Id = $"full-{seats}-{seed}-{commands++}";
+                var next = driver.Decide(game.GetAiPlayerView(nextActor)); next.Id = $"full-{seats}-{seed}-{commands++}";
                 Assert.True(game.Execute(next).Success);
                 Assert.True(restored.Execute(next).Success);
                 Assert.Equal(game.Save(), restored.Save());
@@ -75,7 +76,7 @@ public sealed class M3FullGameTests
         Invariants(game);
     }
 
-    internal static string Actor(PlayerView view) => view.Phase == GamePhase.Discard ? view.Discards.First().PlayerId :
+    internal static string Actor(PlayerView view) => view.TradeOffer != null ? view.TradeOffer.OtherPlayerId : view.Phase == GamePhase.Discard ? view.Discards.First().PlayerId :
         view.Phase == GamePhase.GoldChoice ? view.GoldClaims.First().PlayerId : view.PendingDecision?.PlayerId ?? view.ActivePlayerId;
 }
 

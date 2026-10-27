@@ -10,6 +10,7 @@ namespace Catan.Core.M3
     {
         public const string RulesVersion = "catan-seafarers-2025-en-v1";
         public const string ScenarioVersion = "m3-seafarers-v001";
+        public const string VariableScenarioVersion = "m3-seafarers-variable-v002";
         public const int SaveFormatVersion = 3;
         private readonly object gate = new object();
         private readonly SeafarersScenario scenario;
@@ -27,9 +28,12 @@ namespace Catan.Core.M3
         private SeafarersGameSession(SeafarersScenario scenario, GameState state) { this.scenario = scenario; this.state = state; }
 
         public static SeafarersGameSession Create(string scenarioId, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null)
+            => CreateForVersion(scenarioId, playerCount, seed, targetVictoryPoints, VariableScenarioVersion);
+
+        private static SeafarersGameSession CreateForVersion(string scenarioId, int playerCount, uint seed, int? targetVictoryPoints, string version)
         {
             if (playerCount != 3 && playerCount != 4) throw new ArgumentOutOfRangeException(nameof(playerCount), "航海家支持 3 或 4 人。");
-            var scenario = SeafarersScenarios.CreateSeeded(scenarioId, playerCount, seed);
+            var scenario = version == ScenarioVersion ? SeafarersScenarios.CreateSeeded(scenarioId, playerCount, seed) : SeafarersScenarios.CreateVariable(scenarioId, playerCount, seed);
             var random = new RandomState { State = seed == 0 ? 0x9e3779b9u : seed };
             var deck = new List<DevelopmentCardKind>();
             deck.AddRange(Enumerable.Repeat(DevelopmentCardKind.Knight, scenario.Id == "pirate-islands" && playerCount == 4 ? 19 : 14));
@@ -46,7 +50,7 @@ namespace Catan.Core.M3
             var start = contenders[0];
             var state = new GameState
             {
-                SaveFormatVersion = SaveFormatVersion, RulesVersion = RulesVersion, ScenarioId = scenario.Id, ScenarioVersion = ScenarioVersion,
+                SaveFormatVersion = SaveFormatVersion, RulesVersion = RulesVersion, ScenarioId = scenario.Id, ScenarioVersion = version,
                 ScenarioContentHash = Json.Hash(Json.Write(scenario)), InitialSeed = seed, Random = random, TargetVictoryPoints = VictoryPointSettings.Resolve(targetVictoryPoints, scenario.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(scenario.Id)),
                 Players = Enumerable.Range(1, playerCount).Select(i => new PlayerState { Id = "P" + i, Resources = new ResourceBag(), Pieces = new PieceSupply { Roads = 15, Settlements = 5, Cities = 4 } }).ToArray(),
                 Bank = new ResourceBag { Wood = 19, Brick = 19, Wool = 19, Wheat = 19, Ore = 19 },
@@ -163,11 +167,11 @@ namespace Catan.Core.M3
             GameState saved;
             try { saved = Json.Read<GameState>(save); }
             catch (Exception ex) when (ex is System.Runtime.Serialization.SerializationException || ex is ArgumentException || ex is System.Xml.XmlException) { throw new InvalidDataException("Invalid save JSON.", ex); }
-            if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != RulesVersion || saved.ScenarioVersion != ScenarioVersion || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
+            if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != RulesVersion || (saved.ScenarioVersion != ScenarioVersion && saved.ScenarioVersion != VariableScenarioVersion) || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
                 throw new InvalidDataException("Unsupported or malformed save.");
             if (saved.TargetVictoryPoints.HasValue && !VictoryPointSettings.IsValid(saved.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(saved.ScenarioId))) throw new InvalidDataException("存档中的胜利分数无效。");
             SeafarersGameSession session;
-            try { session = Create(saved.ScenarioId, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints); }
+            try { session = CreateForVersion(saved.ScenarioId, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints, saved.ScenarioVersion); }
             catch (ArgumentException ex) { throw new InvalidDataException("Invalid saved scenario identity.", ex); }
             saved.TargetVictoryPoints = session.state.TargetVictoryPoints;
             foreach (var record in saved.ProcessedCommands)
@@ -425,7 +429,7 @@ namespace Catan.Core.M3
         {
             Check(VictoryPointSettings.IsValid(s.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(scenario.Id)), "胜利分数无效。");
             void Check(bool valid, string message) { if (!valid) throw new InvalidDataException(message); }
-            Check(s.SaveFormatVersion == SaveFormatVersion && s.RulesVersion == RulesVersion && s.ScenarioVersion == ScenarioVersion, "Invalid version identity.");
+            Check(s.SaveFormatVersion == SaveFormatVersion && s.RulesVersion == RulesVersion && (s.ScenarioVersion == ScenarioVersion || s.ScenarioVersion == VariableScenarioVersion), "Invalid version identity.");
             Check(Enum.IsDefined(typeof(GamePhase), s.Phase) && s.Turn >= 0 && s.SetupPlacementIndex >= 0 && s.SetupPlacementIndex <= s.Players.Length * scenario.SetupRounds, "Invalid phase/turn.");
             Check(s.Players.Length == 3 || s.Players.Length == 4, "Invalid player count.");
             Check(s.Players.Select(p => p.Id).Distinct().Count() == s.Players.Length && s.Players.Any(p => p.Id == s.ActivePlayerId), "Invalid player identities.");

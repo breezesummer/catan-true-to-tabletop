@@ -11,6 +11,7 @@ namespace Catan.Core.M5
     {
         public const string RulesVersion = "catan-seafarers-cities-knights-2025-en-v1";
         public const string AllScenarioVersion = "m5-combined-all-2025-v003";
+        public const string VariableAllScenarioVersion = "m5-combined-variable-all-2025-v004";
         public const string ScenarioVersion = "m5-combined-variable-2025-v002";
         internal const string LegacyScenarioVersion = "m5-combined-official-2025-v001";
         public const int SaveFormatVersion = 5;
@@ -32,7 +33,7 @@ namespace Catan.Core.M5
         private CombinedGameSession(Scenario scenario, Port[] ports, M3.SeafarersScenario seafaring, GameState state) { this.scenario = scenario; this.ports = ports; this.seafaring = seafaring; this.state = state; }
 
         public static CombinedGameSession Create(string scenarioId, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null, bool threeKingdoms = false, bool threeKingdomsSkills = true, string threeKingdomsPackageVersion = null)
-            => CreateForVersionWithThreeKingdoms(scenarioId, playerCount, seed, targetVictoryPoints, ScenarioVersion, threeKingdoms, threeKingdomsSkills, threeKingdomsPackageVersion);
+            => CreateForVersionWithThreeKingdoms(scenarioId, playerCount, seed, targetVictoryPoints, VariableAllScenarioVersion, threeKingdoms, threeKingdomsSkills, threeKingdomsPackageVersion);
 
         private static CombinedGameSession CreateForVersion(string scenarioId, int playerCount, uint seed, int? targetVictoryPoints, string scenarioVersion)
             => CreateForVersionWithThreeKingdoms(scenarioId, playerCount, seed, targetVictoryPoints, scenarioVersion, false);
@@ -40,7 +41,8 @@ namespace Catan.Core.M5
         private static CombinedGameSession CreateForVersionWithThreeKingdoms(string scenarioId, int playerCount, uint seed, int? targetVictoryPoints, string scenarioVersion, bool threeKingdoms, bool threeKingdomsSkills = true, string threeKingdomsPackageVersion = null)
         {
             if (playerCount != 3 && playerCount != 4) throw new ArgumentOutOfRangeException(nameof(playerCount), "双扩展组合支持 3 或 4 人。");
-            var seafaring = scenarioVersion == LegacyScenarioVersion ? CombinedScenarios.Create(scenarioId, playerCount) : CombinedScenarios.CreateSeeded(scenarioId, playerCount, seed);
+            var seafaring = scenarioVersion == LegacyScenarioVersion ? CombinedScenarios.Create(scenarioId, playerCount) :
+                scenarioVersion == VariableAllScenarioVersion ? CombinedScenarios.CreateSeeded(scenarioId, playerCount, seed) : CombinedScenarios.CreateSeededLegacy(scenarioId, playerCount, seed);
             var scenario = new Scenario { Id = scenarioId, Version = seafaring.Version, Topology = new Topology { Tiles = seafaring.Tiles, Vertices = seafaring.Vertices, Edges = seafaring.Edges } };
             var random = new RandomState { State = seed == 0 ? 0x9e3779b9u : seed };
             var ports = seafaring.Ports.Select(p => new Port { Id = p.Id, Vertices = p.Vertices.ToArray(), Resource = p.Resource }).ToArray();
@@ -196,7 +198,7 @@ namespace Catan.Core.M5
             GameState saved;
             try { saved = Json.Read<GameState>(save); }
             catch (Exception ex) when (ex is System.Runtime.Serialization.SerializationException || ex is ArgumentException || ex is System.Xml.XmlException) { throw new InvalidDataException("Invalid save JSON.", ex); }
-            if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != ThreeKingdomsVersionFor(saved.ThreeKingdoms) || (saved.ScenarioVersion != ScenarioVersion && saved.ScenarioVersion != LegacyScenarioVersion && saved.ScenarioVersion != AllScenarioVersion) || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
+            if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != ThreeKingdomsVersionFor(saved.ThreeKingdoms) || (saved.ScenarioVersion != ScenarioVersion && saved.ScenarioVersion != LegacyScenarioVersion && saved.ScenarioVersion != AllScenarioVersion && saved.ScenarioVersion != VariableAllScenarioVersion) || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
                 throw new InvalidDataException("Unsupported or malformed save.");
             if (saved.ThreeKingdoms != null && !Catan.Core.ThreeKingdoms.ThreeKingdomsEngine.HasSupportedPackage(saved.ThreeKingdoms))
                 throw new InvalidDataException("三国规则版本或武将包不兼容。");

@@ -1,0 +1,28 @@
+{
+  "日期": "2026-10-27",
+  "版本": "内测版2.0.2",
+  "覆盖B6": true,
+  "云端部署": false,
+  "文件": [
+    {
+      "路径": "game version\\2.0\\Catan2.0.2-Three-Kingdoms-B6\\Builds\\Windows\\Catan2.0.2.exe",
+      "字节": 667136,
+      "SHA256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "路径": "game version\\2.0\\Catan2.0.2-Three-Kingdoms-B6\\Builds\\Windows\\Catan2.0.2_Data\\Managed\\Catan.Core.dll",
+      "字节": 1444352,
+      "SHA256": "b17468a325328f71f133efd26d5ff7e1aa6c0ca79dece160a5f9591a1bf7413e"
+    },
+    {
+      "路径": "game version\\2.0\\Catan2.0.2-Three-Kingdoms-B6\\Builds\\Windows\\Server\\Catan.Core.dll",
+      "字节": 1444352,
+      "SHA256": "b17468a325328f71f133efd26d5ff7e1aa6c0ca79dece160a5f9591a1bf7413e"
+    },
+    {
+      "路径": "game version\\2.0\\Catan2.0.2-Three-Kingdoms-B6\\Builds\\Android\\Catan2.0.2.apk",
+      "字节": 355549193,
+      "SHA256": "7136019d54e8440145c60ac0576e5f86f6717e9d2093eddb422f6df589a6705b"
+    }
+  ]
+}

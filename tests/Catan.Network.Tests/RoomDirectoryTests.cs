@@ -728,6 +728,38 @@ public sealed class RoomDirectoryTests
         Assert.Equal("保存失败的名字", restored.Room.Seats.Single(s => s.SeatId == client.SeatId).DisplayName);
     }
 
+    public static IEnumerable<object[]> RandomizedMaps()
+    {
+        foreach (var rules in new[] { "seafarers", "combined" })
+        foreach (var id in Catan.Core.M3.SeafarersScenarios.Ids)
+        foreach (var players in new[] { 3, 4 }) yield return new object[] { rules, id, players };
+    }
+
+    [Theory, MemberData(nameof(RandomizedMaps))]
+    public void NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(string rules, string id, int players)
+    {
+        using var f = new Fixture();
+        var host = f.Create(rules, id, players, Enumerable.Range(2, players - 1).Select(n => "P" + n).ToArray());
+        Assert.True(host.Success, host.Message);
+        Assert.True(f.Send(host, "Ready", new ReadyPayload { Ready = true }).Success);
+        var started = f.Send(host, "Start"); Assert.True(started.Success, started.Message);
+        string Layout(NetworkResponse response)
+        {
+            using var json = System.Text.Json.JsonDocument.Parse(response.ViewJson);
+            return json.RootElement.GetProperty("Board").GetProperty("Tiles").GetRawText();
+        }
+        var first = Layout(started);
+        var restarted = f.Send(host, "Restart"); Assert.True(restarted.Success, restarted.Message);
+        if (id == "pirate-islands") Assert.Equal(first, Layout(restarted)); else Assert.NotEqual(first, Layout(restarted));
+        f.Restart();
+        var restored = f.Directory.Handle(Fixture.Request("Reconnect", host)); Assert.True(restored.Success, restored.Message);
+        Assert.Equal(Layout(restarted), Layout(restored));
+        var another = f.Create(rules, id, players, Enumerable.Range(2, players - 1).Select(n => "P" + n).ToArray());
+        Assert.True(f.Send(another, "Ready", new ReadyPayload { Ready = true }).Success);
+        var next = f.Send(another, "Start"); Assert.True(next.Success, next.Message);
+        if (id == "pirate-islands") Assert.Equal(first, Layout(next)); else Assert.NotEqual(first, Layout(next));
+    }
+
     private sealed class MemoryStorage : IRoomStorage
     {
         public bool Fail; public readonly Dictionary<string, string> Documents = new();

@@ -9,6 +9,15 @@ namespace Catan.Core.M5
         // 2025 航海家第 5、11 页：主岛与海外区域各自使用原组件池，海陆轮廓和沙漠屏障不变。
         public static M3.SeafarersScenario CreateSeeded(string id, int playerCount, uint seed)
         {
+            var map = CreateSeededLegacy(id, playerCount, seed);
+            if (id == "heading-for-new-shores" || id == "through-the-desert" || id == "new-world" || id == "pirate-islands") return map;
+            M3.SeafarersScenarios.RandomizeVariableLayout(map, seed);
+            map.Version = CombinedGameSession.VariableAllScenarioVersion;
+            return map;
+        }
+
+        internal static M3.SeafarersScenario CreateSeededLegacy(string id, int playerCount, uint seed)
+        {
             if (id != "heading-for-new-shores" && id != "through-the-desert")
             {
                 var map = M3.SeafarersScenarios.CreateSeeded(id, playerCount, seed);
