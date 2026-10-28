@@ -166,6 +166,7 @@ public sealed partial class TabletopUI
         bool expansion=dice.Event.HasValue;
         var trayRect=new Rect(15,149,178,128);hits.Add(trayRect);
         table.Objects.Tray("dice-tray",trayRect,ModernOperationUI.Surface,StrategyHudArt.Gold);
+        CopperTabletopSkin.Outline(trayRect,false,20);
         var diceRects=expansion?expansionDiceRects:baseDiceRects;
         bool enabled=GUI.enabled;
         for(int i=0;i<diceRects.Length;i++)
@@ -221,6 +222,7 @@ public sealed partial class TabletopUI
     }
     void DrawTopButtons(TabletopSeat own,Action<string> trade,Action<int> facility)
     {
+        CopperTabletopSkin.Panel(new Rect(8,12,428,91),ModernOperationUI.Surface);
         string[] names={"银行","玩家交易","贸易设施","政治设施","科学设施"};
         for(int i=0;i<5;i++)
         {
@@ -253,7 +255,7 @@ public sealed partial class TabletopUI
             var player=seats.First(p=>p.Id==id);
             string alliance=ThreeKingdoms?.AlliancePlayerCaptionB6(player.Id);
             var panel=new Rect(x,13,width,alliance==null?191:211);hits.Add(panel);
-            ModernOperationUI.Round(panel,new Color(ModernOperationUI.Background.r,ModernOperationUI.Background.g,ModernOperationUI.Background.b,.68f));
+            CopperTabletopSkin.Panel(panel,ModernOperationUI.Background,player.Id==actor);
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
             StrategyHudArt.Avatar(new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);

@@ -183,7 +183,7 @@ public sealed partial class M6App
     {
         var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
         var skills=B45SkillCatalog.AvailableEntries(view,GeneralAssetSeatB6);
-        PastoralMenuUI.Round(SkillsArea,new Color(.11f,.15f,.11f,.94f),5);
+        CopperTabletopSkin.Panel(SkillsArea,ModernOperationUI.Background);
         skillScroll=GUI.BeginScrollView(SkillsArea,skillScroll,new Rect(0,0,128,Mathf.Max(171,skills.Length*55)));
         for(int i=0;i<skills.Length;i++)
         {
@@ -192,7 +192,7 @@ public sealed partial class M6App
             var runtime=view.SkillRuntimeStatus?.FirstOrDefault(s=>s.SkillId==skill.SkillId);
             var area=new Rect(3,i*55+3,125,51);bool selected=generalSelection.SkillId==skill.SkillId;
             bool flashing=flashingSkill==skill.SkillId&&Time.unscaledTimeAsDouble<skillFlashUntil;
-            PastoralMenuUI.Round(area,selected?new Color(.37f,.30f,.12f):flashing?new Color(.33f,.40f,.20f):new Color(.19f,.23f,.17f),4);
+            CopperTabletopSkin.Panel(area,ModernOperationUI.Surface,selected||flashing,false);
             PastoralMenuUI.Label(new Rect(area.x+4,area.y+1,117,25),skill.Name,17,enabled?PastoralMenuUI.Ivory:SkillMuted,true,TextAnchor.MiddleCenter);
             PastoralMenuUI.Label(new Rect(area.x+4,area.y+25,117,14),runtime?.Summary??info?.Limit??"依当前规则",10,SkillMuted,false,TextAnchor.MiddleCenter);
             PastoralMenuUI.Label(new Rect(area.x+4,area.y+39,117,12),(active?"主动":"被动")+(active&&!enabled?" · 暂不可用":""),9,SkillMuted,false,TextAnchor.MiddleCenter);
@@ -204,7 +204,7 @@ public sealed partial class M6App
     }
     void DrawGeneralOperationBar(ThreeKingdomsView view)
     {
-        PastoralMenuUI.Round(SkillBar,new Color(.11f,.17f,.13f,.97f),5);
+        CopperTabletopSkin.Panel(SkillBar,ModernOperationUI.Background);
         var pending=view.PendingDecision?.PlayerId==GeneralAssetSeatB6?view.PendingDecision:null;
         if(pending!=null)
         {
@@ -241,9 +241,7 @@ public sealed partial class M6App
         string state=ThreeKingdomsPhaseCaption;
         if(view.SkillDecision!=null)state+=" · 等待 "+PlayerDisplayName(view.SkillDecision.PlayerId);
         else if(view.WaitingSelectionPlayerIds?.Length>0)state+=" · 等待 "+string.Join("、",view.WaitingSelectionPlayerIds.Select(PlayerDisplayName));
-        else if(view.Clock.Phase==ThreeKingdomsPhase.Play)state+=" · 自由选择建造、卡牌与主动技能";
         bool ownFreePlay=view.Clock.Phase==ThreeKingdomsPhase.Play&&view.Clock.ActivePlayerId==GeneralAssetSeatB6;
-        if(Time.unscaledTimeAsDouble<skillFlashUntil&&!string.IsNullOrEmpty(latestSkillResult))state+="\n"+latestSkillResult;
         PastoralMenuUI.Label(ownFreePlay?new Rect(500,661,762,36):new Rect(354,661,700,36),state,16,PastoralMenuUI.Ivory);
         if(!GeneralCatalog.UsesB4Package(view.PackageVersion)&&ThreeKingdomsAdvanceAvailable&&PastoralMenuUI.Button(new Rect(1080,661,182,36),"推进当前阶段",IsHumanTurn&&GeneralCanSubmit))SubmitThreeKingdoms("AdvanceThreeKingdomsPhase");
         else if(view.Clock.Phase==ThreeKingdomsPhase.Play&&view.Clock.ActivePlayerId==GeneralAssetSeatB6&&PastoralMenuUI.Button(new Rect(354,661,132,36),"结束出牌",GeneralCanSubmit&&IsHumanTurn,true))EndThreeKingdomsPlay();
@@ -257,7 +255,7 @@ public sealed partial class M6App
         for(int i=0;i<ids.Length;i++)
         {
             var general=GeneralCatalog.Get(ids[i]);bool selected=selectedGenerals.Contains(ids[i]);var r=new Rect(352+i*width,486,width-8,143);
-            PastoralMenuUI.Round(r,selected?new Color(.35f,.32f,.16f):new Color(.19f,.23f,.17f),5);
+            CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
             PastoralMenuUI.Label(new Rect(r.x+7,r.y+8,r.width-14,30),(selected?"✓ ":"")+general.Name,23,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
             PastoralMenuUI.Label(new Rect(r.x+7,r.y+45,r.width-14,26),general.Faction+" · "+general.Title,13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
             PastoralMenuUI.Label(new Rect(r.x+7,r.y+78,r.width-14,54),string.Join(" / ",general.Skills.Select(s=>s.Name)),16,PastoralMenuUI.Ivory,false,TextAnchor.MiddleCenter);
@@ -284,7 +282,7 @@ public sealed partial class M6App
         {
             bool privateCard=i>=local.Length;var action=privateCard?privateCards[i-local.Length]:local[i];var r=new Rect(i*142,2,134,103);
             bool selected=privateCard?generalSelection.SelectedPrivateCounts[action.Command.CardType]>0:generalSelection.IsOptionSelected(action);
-            PastoralMenuUI.Round(r,selected?new Color(.39f,.34f,.16f):new Color(.18f,.22f,.17f),4);
+            CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
             int type=privateCard?action.Command.CardType:action.ResultCardType??(action.Command.Option=="choose-card"||action.Command.Option=="b4-guess"||action.Command.Option=="claim"?action.Command.CardType:-1);
             if(type>=0&&type<8)EntityCardAssets.DrawCardFace(new Rect(r.x+8,r.y+5,40,60),EntityCardAssets.ResourceOrCommodityFront(type));
             else if(Enum.TryParse(action.VirtualCardId,out Catan.Core.M4.ProgressCardKind kind))EntityCardAssets.DrawCardFace(new Rect(r.x+8,r.y+5,40,60),EntityCardAssets.ProgressFront((int)kind));

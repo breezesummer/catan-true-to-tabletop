@@ -39,7 +39,7 @@ public sealed partial class M6App
         for(int i=0;i<actions.Length;i++)
         {
             var action=actions[i];var c=action.Command;var r=new Rect(i*113+3,2,106,106);bool selected=generalSelection.IsOptionSelected(action);
-            PastoralMenuUI.Round(r,selected?new Color(.39f,.34f,.16f):new Color(.18f,.22f,.17f),4);
+            CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
             bool typed=c.Option=="card"||c.Option=="b4-daoshu"||c.Option=="claim"||c.Option=="luoying";
             int type=c.Option=="luoying"?0:c.CardType;
             string caption;
@@ -73,7 +73,7 @@ public sealed partial class M6App
         for(int i=0;i<actions.Length;i++)
         {
             var action=actions[i];bool shown=action.Command.Option=="b4-revealed";bool selected=generalSelection.IsOptionSelected(action);
-            var r=new Rect(354+i*450,509,438,118);PastoralMenuUI.Round(r,selected?new Color(.39f,.34f,.16f):new Color(.18f,.22f,.17f),4);
+            var r=new Rect(354+i*450,509,438,118);CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
             if(shown)
             {
                 var types=Enumerable.Range(0,Math.Min(8,revealed.Length)).Where(t=>revealed[t]>0).ToArray();
@@ -117,7 +117,7 @@ public sealed partial class M6App
         for(int i=0;i<actions.Length;i++)
         {
             var action=actions[i];float width=Mathf.Min(110,390f/Mathf.Max(1,actions.Length));var r=new Rect(219+i*(width+4),220,width,90);
-            bool selected=generalSelection.IsOptionSelected(action);PastoralMenuUI.Round(r,selected?new Color(.39f,.34f,.16f):new Color(.18f,.22f,.17f),4);
+            bool selected=generalSelection.IsOptionSelected(action);CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
             string face=generalSelection.SelectedDie==2?DiceEventName(action.SelectionDiceValue??0):(action.SelectionDiceValue??0).ToString();
             PastoralMenuUI.Label(new Rect(r.x+4,r.y+5,r.width-8,45),face,23,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
             PastoralMenuUI.Label(new Rect(r.x+4,r.y+53,r.width-8,29),(selected?"✓ ":"")+"候选 "+(action.Command.CardType+1),13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
@@ -132,14 +132,14 @@ public sealed partial class M6App
         for(int i=0;i<reds.Length;i++)
         {
             var r=new Rect(219+i*65,218,59,36);bool selected=fixedChoiceRed==reds[i];
-            PastoralMenuUI.Round(r,selected?new Color(.40f,.30f,.13f):new Color(.45f,.13f,.11f),4);
+            CopperTabletopSkin.Panel(r,new Color(.45f,.13f,.11f),selected);
             PastoralMenuUI.Label(r,reds[i]+" + "+(7-reds[i]),14,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
             if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1)fixedChoiceRed=reds[i];
         }
         for(int i=0;i<events.Length;i++)
         {
             var r=new Rect(219+i*65,264,59,40);bool selected=fixedChoiceEvent==events[i];
-            PastoralMenuUI.Round(r,selected?new Color(.40f,.30f,.13f):new Color(.18f,.22f,.17f),4);
+            CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
             PastoralMenuUI.Label(r,DiceEventName(events[i]),13,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
             if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1)fixedChoiceEvent=events[i];
         }

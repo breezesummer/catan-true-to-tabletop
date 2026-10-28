@@ -1,13 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-// 中世纪田园菜单控件。与桌内主题分离，不改变规则和存档字段。
+// 菜单、联机与桌内共用铜木控件；不改变规则和存档字段。
 public static class PastoralMenuUI
 {
-    public static readonly Color Ink=new Color(.22f,.17f,.11f),Muted=new Color(.46f,.38f,.27f);
-    public static readonly Color Forest=new Color(.19f,.29f,.23f),Sage=new Color(.88f,.85f,.75f),Paper=new Color(.94f,.88f,.73f);
+    public static readonly Color Ink=new Color(.98f,.91f,.76f),Muted=new Color(.80f,.67f,.48f);
+    public static readonly Color Forest=new Color(.88f,.63f,.30f),Sage=new Color(.36f,.18f,.09f),Paper=new Color(.24f,.10f,.045f);
     public static readonly Color Gold=new Color(.86f,.69f,.37f),Ivory=new Color(.95f,.90f,.79f);
-    static Texture2D paperGrain,hexMarker;
+    static Texture2D hexMarker;
     static Font currentFont;
     static Texture2D neutral,hover,selected,field;
     static readonly Dictionary<int,GUIStyle> labelStyles=new Dictionary<int,GUIStyle>();
@@ -15,6 +15,7 @@ public static class PastoralMenuUI
     public static GUIStyle Text,Small,Title,Center,Control,Eyebrow,Hero,HeroSmall;
     public static void Styles(Font font=null)
     {
+        CopperTabletopSkin.Scrollbars();
         if(Text!=null&&(font==null||font==currentFont))return;if(font!=null)currentFont=font;
         labelStyles.Clear();
         WarmFont();
@@ -24,11 +25,11 @@ public static class PastoralMenuUI
         Center=new GUIStyle(Text){fontSize=17,alignment=TextAnchor.MiddleCenter};
         Eyebrow=new GUIStyle(Text){fontSize=12,fontStyle=FontStyle.Bold};Eyebrow.normal.textColor=Forest;
         Hero=new GUIStyle(Text){fontSize=55,fontStyle=FontStyle.Bold,wordWrap=false};
-        HeroSmall=new GUIStyle(Text){fontSize=20};HeroSmall.normal.textColor=new Color(.24f,.39f,.34f);
+        HeroSmall=new GUIStyle(Text){fontSize=20};HeroSmall.normal.textColor=Gold;
         if(neutral==null)
         {
-            neutral=ControlTexture(new Color(.86f,.79f,.64f));hover=ControlTexture(new Color(.94f,.86f,.68f));
-            selected=ControlTexture(Forest);field=ControlTexture(new Color(.99f,.95f,.85f));
+            neutral=ControlTexture(new Color(.32f,.15f,.07f));hover=ControlTexture(new Color(.46f,.24f,.12f));
+            selected=ControlTexture(new Color(.49f,.25f,.10f));field=ControlTexture(new Color(.15f,.065f,.03f));
         }
         Control=new GUIStyle(GUI.skin.button){font=currentFont,fontSize=17,wordWrap=true,border=new RectOffset(12,12,12,12),padding=new RectOffset(12,12,5,5),margin=new RectOffset(3,3,3,3),alignment=TextAnchor.MiddleCenter};
         Control.normal.background=neutral;Control.normal.textColor=Ink;Control.hover.background=hover;Control.hover.textColor=Ink;
@@ -61,39 +62,16 @@ public static class PastoralMenuUI
     {if(r.width<=0||r.height<=0)return;GUI.DrawTexture(r,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,c,0,Mathf.Min(radius,Mathf.Min(r.width,r.height)*.5f));}
     public static void Panel(Rect r)
     {
-        Round(new Rect(r.x-7,r.y+9,r.width+14,r.height+12),new Color(0,0,0,.36f),9);
-        Round(r,new Color(.18f,.105f,.055f),5);
-        Round(new Rect(r.x+3,r.y+3,r.width-6,r.height-6),Gold,4);
-        Round(new Rect(r.x+5,r.y+5,r.width-10,r.height-10),new Color(.31f,.20f,.10f),3);
-        Fill(new Rect(r.x+12,r.y+12,r.width-24,r.height-24),Paper);
-        if(paperGrain==null)
-        {
-            paperGrain=new Texture2D(128,128,TextureFormat.RGBA32,false){name="菜单纸面细纹",wrapMode=TextureWrapMode.Repeat,hideFlags=HideFlags.HideAndDontSave};
-            for(int y=0;y<128;y++)for(int x=0;x<128;x++)
-            {
-                uint hash=unchecked((uint)(x+y*128+1)*747796405u+2891336453u);
-                hash=unchecked(((hash>>((int)(hash>>28)+4))^hash)*277803737u);
-                float n=((hash>>22)^hash)%256/255f;
-                paperGrain.SetPixel(x,y,new Color(.34f,.22f,.09f,n*.035f));
-            }
-            paperGrain.Apply(false,true);
-        }
-        var inside=new Rect(r.x+12,r.y+12,r.width-24,r.height-24);
-        GUI.DrawTextureWithTexCoords(inside,paperGrain,new Rect(0,0,inside.width/128,inside.height/128));
-        Fill(new Rect(r.x+22,r.y+22,r.width-44,1),new Color(.57f,.40f,.20f,.35f));
-        Fill(new Rect(r.x+22,r.yMax-23,r.width-44,1),new Color(.57f,.40f,.20f,.35f));
+        CopperTabletopSkin.Panel(r,Paper);
     }
+
     public static bool Button(Rect r,string caption,bool enabled=true,bool primary=false,bool selected=false,Color? seatColor=null)
     {
         Styles();bool before=GUI.enabled;GUI.enabled=before&&enabled;
         bool over=GUI.enabled&&r.Contains(Event.current.mousePosition);
-        Color bg=primary||selected?Forest:new Color(.87f,.80f,.66f);
-        if(over)bg=Color.Lerp(bg,primary||selected?Color.white:Forest,primary||selected?.08f:.08f);
-        if(!GUI.enabled)bg=new Color(.84f,.80f,.71f);
-        Round(new Rect(r.x,r.y+3,r.width,r.height),new Color(.12f,.07f,.03f,.22f),4);
-        Round(r,primary||selected?Gold:new Color(.55f,.40f,.23f,.6f),4);
-        Round(new Rect(r.x+1,r.y+1,r.width-2,r.height-2),bg,3);
-        Fill(new Rect(r.x+7,r.y+3,r.width-14,1),new Color(1,.94f,.72f,.18f));
+        Color bg=primary||selected?new Color(.43f,.20f,.08f):new Color(.29f,.12f,.05f);
+        if(!GUI.enabled)bg=new Color(.17f,.085f,.05f);
+        CopperTabletopSkin.Panel(r,bg,over||selected,false);
         var ink=GUI.enabled?(primary||selected?new Color(1,.99f,.94f):Ink):Muted;
         if(seatColor.HasValue)ink=seatColor.Value;
         Label(new Rect(r.x+8,r.y+1,r.width-16,r.height-2),caption,primary?19:16,ink,primary,TextAnchor.MiddleCenter);
@@ -194,11 +172,11 @@ public static class PastoralMenuUI
     {
         if(contentHeight<=viewport.height)return;
         // 保留原生滚动条的鼠标命中和拖动，只将显示换成与纸面一致的细轨。
-        Fill(new Rect(viewport.xMax-18,viewport.y,18,viewport.height),new Color(.985f,.980f,.939f));
+        Fill(new Rect(viewport.xMax-18,viewport.y,18,viewport.height),Paper);
         var track=new Rect(viewport.xMax-8,viewport.y+7,4,viewport.height-14);
-        Round(track,new Color(.78f,.82f,.72f),2);
+        Round(track,new Color(.14f,.06f,.025f),2);
         float thumb=Mathf.Max(28,track.height*viewport.height/contentHeight),range=contentHeight-viewport.height;
-        Round(new Rect(track.x,track.y+Mathf.Clamp01(scrollY/range)*(track.height-thumb),track.width,thumb),new Color(.44f,.58f,.43f),2);
+        Round(new Rect(track.x,track.y+Mathf.Clamp01(scrollY/range)*(track.height-thumb),track.width,thumb),Gold,2);
     }
     static Texture2D ControlTexture(Color color)
     {

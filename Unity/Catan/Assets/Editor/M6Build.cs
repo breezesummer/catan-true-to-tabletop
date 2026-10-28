@@ -25,7 +25,8 @@ public static class M6Build
     {
         var paths = new System.Collections.Generic.List<string> {
             "Assets/Resources/PastoralMenu/v002/medieval-harbor.png",
-            "Assets/Resources/TabletopUI/v003/oak-table-albedo.png"
+            "Assets/Resources/TabletopUI/v003/oak-table-albedo.png",
+            "Assets/Resources/TabletopUI/v013/walnut-inlay.png"
         };
         foreach (string directory in new[] {
             "Assets/Resources/TabletopUI/v008/NumberTokens",

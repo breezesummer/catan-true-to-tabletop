@@ -4,30 +4,15 @@ using UnityEngine;
 // 圆片、金属装饰和简洁符号由代码绘制；商品主体使用单独透明抠图。
 public static class StrategyHudArt
 {
-    static Texture2D ornament,bank,handshake,portraits,brushed,victory;
+    static Texture2D bank,handshake,portraits,victory;
     static readonly Dictionary<int,Texture2D> commodities=new Dictionary<int,Texture2D>();
     public static readonly Color Gold=new Color(.84f,.67f,.35f);
     // 屏幕空间雕边金属控件；与卡牌、三维棋子资产分开，不参与规则或存档。
     public static void Plaque(Rect rect,Color face,Color trim,bool hover=false)
     {
-        ModernOperationUI.Round(new Rect(rect.x+1,rect.y+4,rect.width,rect.height),new Color(0,0,0,.32f));
-        ModernOperationUI.Round(rect,Color.Lerp(trim,Color.black,.42f));
-        var bevel=new Rect(rect.x+1,rect.y+1,rect.width-2,rect.height-2);
-        ModernOperationUI.Round(bevel,Color.Lerp(trim,Color.white,hover?.30f:.10f));
-        var inset=new Rect(rect.x+3,rect.y+3,rect.width-6,rect.height-6);
-        ModernOperationUI.Round(inset,Color.Lerp(face,Color.black,.38f));
-        var body=new Rect(rect.x+4,rect.y+4,rect.width-8,rect.height-8);
-        ModernOperationUI.Round(body,hover?Color.Lerp(face,trim,.15f):face);
-        if(brushed==null)brushed=BrushedTexture();
-        var old=GUI.color;GUI.color=new Color(1,1,1,.13f);GUI.DrawTexture(body,brushed);GUI.color=old;
-        ModernOperationUI.Fill(new Rect(rect.x+11,rect.y+5,rect.width-22,1),new Color(1,1,.85f,.16f));
-        ModernOperationUI.Fill(new Rect(rect.x+11,rect.yMax-5,rect.width-22,1),new Color(0,0,0,.34f));
-        foreach(float x in new[]{rect.x+7,rect.xMax-7})
-        {
-            ModernOperationUI.Fill(new Rect(x-1,rect.center.y-2,2,4),Color.Lerp(trim,Color.white,.16f));
-            ModernOperationUI.Fill(new Rect(x-2,rect.center.y-1,4,2),trim);
-        }
+        CopperTabletopSkin.Panel(rect,face,hover);
     }
+
     public static bool HandControl(Rect rect,string caption,int kind,bool selected=false,TabletopHandCounter? counter=null)
     {
         ModernOperationUI.Styles();
@@ -143,18 +128,6 @@ public static class StrategyHudArt
         try{ModernOperationUI.Fill(new Rect(0,-width/2,delta.magnitude,width),color);}
         finally{GUI.matrix=matrix;}
     }
-    static Texture2D BrushedTexture()
-    {
-        const int width=128,height=64;var pixels=new Color[width*height];
-        for(int y=0;y<height;y++)for(int x=0;x<width;x++)
-        {
-            float grain=((x*19+y*43+x*y*7)%31)/30f;
-            float shade=.3f+.35f*y/height+.18f*grain;
-            pixels[y*width+x]=new Color(shade,shade,shade,1);
-        }
-        var texture=new Texture2D(width,height,TextureFormat.RGBA32,false){name="细磨金属控件纹理 v011",filterMode=FilterMode.Bilinear};
-        texture.SetPixels(pixels);texture.Apply(false,true);return texture;
-    }
     public static void Avatar(Rect rect,string seat)
     {
         if(portraits==null)portraits=Resources.Load<Texture2D>("TabletopUI/v010/leaders-atlas");
@@ -164,11 +137,9 @@ public static class StrategyHudArt
     }
     public static void Disc(Rect rect,Color face,bool hover=false)
     {
-        if(ornament==null)ornament=Border();
-        TabletopUI.Token(new Rect(rect.x-3,rect.y-1,rect.width+6,rect.height+6),new Color(.045f,.04f,.028f,.9f));
-        TabletopUI.Token(new Rect(rect.x+3,rect.y+3,rect.width-6,rect.height-6),hover?Color.Lerp(face,Color.white,.14f):face);
-        var old=GUI.color;GUI.color=hover?new Color(1,.9f,.62f):Gold;GUI.DrawTexture(rect,ornament);GUI.color=old;
+        CopperTabletopSkin.Disc(rect,face,hover);
     }
+
     public static void Icon(Rect rect,int index)
     {
         Texture2D texture;
@@ -185,21 +156,6 @@ public static class StrategyHudArt
             if(texture!=null)GUI.DrawTexture(rect,texture,ScaleMode.ScaleToFit);
             else OperationIconAssets.DrawGood(rect,index+3);
         }
-    }
-    static Texture2D Border()
-    {
-        const int size=256;var pixels=new Color[size*size];
-        for(int y=0;y<size;y++)for(int x=0;x<size;x++)
-        {
-            float u=(x+.5f-size/2f)/(size/2f),v=(y+.5f-size/2f)/(size/2f);
-            float radius=Mathf.Sqrt(u*u+v*v),angle=Mathf.Atan2(v,u);
-            float scallop=.915f+.018f*Mathf.Cos(angle*24);
-            bool ring=Mathf.Abs(radius-.85f)<.014f||Mathf.Abs(radius-.955f)<.015f||Mathf.Abs(radius-scallop)<.016f;
-            bool gem=radius>.875f&&radius<.95f&&Mathf.Cos(angle*12)>.89f;
-            float light=.65f+.35f*Mathf.Clamp01((-u+v+2)/4);
-            pixels[y*size+x]=ring||gem?new Color(light,light,light,1):Color.clear;
-        }
-        var result=new Texture2D(size,size,TextureFormat.RGBA32,true){name="镂金圆片边框 v010",filterMode=FilterMode.Trilinear};result.SetPixels(pixels);result.Apply(true,true);return result;
     }
     static Texture2D Symbol(bool hands)
     {

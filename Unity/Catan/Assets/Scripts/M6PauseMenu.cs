@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-// 桌内菜单沿用主页的纸面、森林绿与金色细线；菜单阻挡本地调度，不改写存档中的暂停设置。
+// 桌内菜单沿用统一铜木界面；菜单阻挡本地调度，不改写存档中的暂停设置。
 public sealed partial class M6App
 {
     int tablePausePage,tablePauseSettingsTab;
@@ -33,7 +33,7 @@ public sealed partial class M6App
     void DrawTablePauseBackdrop()
     {
         TablePauseStyles();
-        PastoralMenuUI.Fill(new Rect(0,0,1440,900),new Color(.035f,.10f,.075f,.69f));
+        PastoralMenuUI.Fill(new Rect(0,0,1440,900),new Color(.055f,.025f,.01f,.69f));
     }
     void TablePauseHeading(Rect panel,string eyebrow,string heading,string subtitle)
     {
@@ -81,13 +81,13 @@ public sealed partial class M6App
     void DrawTablePauseAppearance()
     {
         PastoralMenuUI.Label(new Rect(337,343,766,35),"选择桌面氛围",23,PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
-        PastoralMenuUI.Label(new Rect(337,389,766,28),"切换即生效，游戏菜单继续保持主页的田园风格。",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
-        var colors=new[]{new Color(.21f,.28f,.30f),new Color(.85f,.79f,.65f),new Color(.15f,.25f,.22f)};
+        PastoralMenuUI.Label(new Rect(337,389,766,28),"切换桌面配色，立即生效。",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+        var colors=new[]{new Color(.34f,.145f,.065f),new Color(.055f,.205f,.30f),new Color(.32f,.24f,.065f)};
         for(int i=0;i<StrategyHudTheme.Names.Length;i++)
         {
             var r=new Rect(337+i*261,452,244,180);bool chosen=StrategyHudTheme.Selected==i;
             if(PastoralMenuUI.Button(r,"",true,false,chosen))StrategyHudTheme.Select(i);
-            PastoralMenuUI.Round(new Rect(r.x+20,r.y+21,r.width-40,70),colors[i%colors.Length],9);
+            CopperTabletopSkin.Panel(new Rect(r.x+20,r.y+21,r.width-40,70),colors[i%colors.Length]);
             PastoralMenuUI.Label(new Rect(r.x+14,r.y+113,r.width-28,36),StrategyHudTheme.Names[i],21,chosen?PastoralMenuUI.Ivory:PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
         }
         PastoralMenuUI.Label(new Rect(337,662,766,31),"外观偏好会自动保存。",13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);

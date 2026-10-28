@@ -16,6 +16,7 @@ public static class ModernOperationUI
     public static GUIStyle Text, Small, Title, Center;
     public static void Styles(Font font=null)
     {
+        CopperTabletopSkin.Scrollbars();
         if(Text!=null&&(font==null||font==currentFont)&&themeVersion==StrategyHudTheme.Version)return;
         themeVersion=StrategyHudTheme.Version;
         if(font!=null)currentFont=font;
@@ -35,8 +36,7 @@ public static class ModernOperationUI
     }
     public static void Panel(Rect r)
     {
-        Round(new Rect(r.x-5,r.y+7,r.width+10,r.height+9),new Color(0,0,0,.20f));
-        Round(r,Line);Round(new Rect(r.x+1,r.y+1,r.width-2,r.height-2),Background);
+        CopperTabletopSkin.Panel(r,Background);
     }
     // 操作窗口与交易窗口共用同一纹理雕边、标题牌和字体。
     public static void WindowFrame(Rect area,Rect plaque,string caption,int icon=-1,int? good=null,GUIStyle heading=null)
@@ -58,11 +58,11 @@ public static class ModernOperationUI
     {
         Styles();bool old=GUI.enabled;GUI.enabled=old&&enabled;
         bool hover=GUI.enabled&&r.Contains(Event.current.mousePosition);
-        Color bg=primary?Accent:selected?Color.Lerp(Surface,Accent,.24f):Surface;
+        Color bg=primary?Color.Lerp(Surface,Accent,.32f):selected?Color.Lerp(Surface,Accent,.24f):Surface;
         if(hover)bg=Color.Lerp(bg,TextColor,.09f);
-        Round(r,GUI.enabled?bg:Color.Lerp(Background,Surface,.6f));
+        CopperTabletopSkin.Panel(r,GUI.enabled?bg:Color.Lerp(Background,Surface,.6f),hover,false);
         if(selected)Fill(new Rect(r.x+9,r.yMax-3,r.width-18,2),Accent);
-        var label=new GUIStyle(Center);label.normal.textColor=!GUI.enabled?Muted:primary?Background:TextColor;
+        var label=new GUIStyle(Center);label.normal.textColor=!GUI.enabled?Muted:primary?new Color(1,.94f,.73f):TextColor;
         if(playerId!=null)label=M6App.PlayerNameStyle(label,playerId);
         GUI.Label(r,caption,label);bool result=GUI.Button(r,GUIContent.none,GUIStyle.none);GUI.enabled=old;
         result=result&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);

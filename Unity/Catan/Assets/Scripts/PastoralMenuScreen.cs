@@ -247,7 +247,7 @@ public sealed partial class M6App
     }
     void DrawSaveSlot(Rect r,string heading,string description,string path)
     {
-        PastoralMenuUI.Round(r,new Color(.91f,.925f,.86f),12);
+        CopperTabletopSkin.Panel(r,ModernOperationUI.Surface);
         PastoralMenuUI.Label(new Rect(r.x+26,r.y+22,r.width-250,35),heading,22,null,true);
         PastoralMenuUI.Label(new Rect(r.x+26,r.y+74,r.width-260,65),description,15,PastoralMenuUI.Muted);
         if(PastoralMenuUI.Button(new Rect(r.xMax-190,r.y+65,162,46),"继续旅程   →",File.Exists(path),true))

@@ -306,6 +306,13 @@ public sealed partial class OperationDock
     void DrawBuilds(OperationSnapshot s)
     {
         var pieces=s.Builds.Where(b=>b.Track<0&&b.Icon!="development").ToArray();
+        if(pieces.Length>0)
+        {
+            var first=TabletopPieceDock.GroupLayout(pieces.Length,0);
+            var last=TabletopPieceDock.GroupLayout(pieces.Length,pieces.Length-1);
+            var rack=new Rect(first.x-4,first.y-8,first.width+8,last.yMax-first.y+16);
+            CopperTabletopSkin.Panel(rack,ModernOperationUI.Background);hits.Add(new HitShape{Rect=rack});
+        }
         for(int i=0;i<pieces.Length;i++)
         {
             var group=StockGroupLayout(pieces,i,false);
@@ -353,10 +360,11 @@ public sealed partial class OperationDock
                 {
                     bool picked=Selection.IsPieceSelected(build.Id,n);
                     if(picked&&pieceDragging)continue;
-                    var position=StockPieceLayout(r,build.Icon??build.Id,n);
-                    var world=table.Objects.Piece("stock-"+build.Id+"-"+n,build.Icon??build.Id,s.Seat,Math.Max(1,build.Level),position,picked,displayMultiplier:1);
-                    if(world==null)continue;
-                    var shape=new HitShape{World=world};
+                    // 库存使用现有模型的透明缩略图；棋盘模型完全沿用，点击仍按透明轮廓判断。
+                    var icon=TabletopPieceDock.ModelArea(r);
+                    bool enabled=GUI.enabled;GUI.enabled=true;
+                    GUI.DrawTexture(icon,piece,ScaleMode.ScaleToFit);GUI.enabled=enabled;
+                    var shape=new HitShape{Rect=icon,Texture=piece};
                     hovered|=shape.Contains(Event.current.mousePosition);
                     if(build.Count>0){hits.Add(shape);pieceFaces.Add(new PieceFace{Shape=shape,Build=build,Ordinal=n});}
                 }
@@ -482,6 +490,7 @@ public sealed partial class OperationDock
     }
     void DrawHand()
     {
+        CopperTabletopSkin.Panel(new Rect(HandViewport.x-6,852,HandViewport.width+12,42),ModernOperationUI.Surface);
         landingFaces.Clear();
         var handSlots=specialHand?specialSlots:resourceSlots;
         var landing=collectionFlightsVisible&&!HasOverlay?handSlots.Where(slot=>slot.Flight!=null&&slot.Flight.Progress(Time.unscaledTimeAsDouble)>=.60).ToArray():Array.Empty<TabletopResourceSlot>();
@@ -604,6 +613,8 @@ public sealed partial class OperationDock
             Label(new Rect(r.x+10,r.y+9,r.width-20,20),"发展卡",small);
             Label(new Rect(r.x+11,r.y+36,r.width-22,64),face.Card.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=21});
         }
+        var cardFrame=face.Texture!=null?EntityCardAssets.FitCardRect(r,(float)face.Texture.width/face.Texture.height,GUI.matrix):r;
+        CopperTabletopSkin.Card(cardFrame,face.Selected);
         if(face.Selected)
         {
             Label(new Rect(r.x+5,r.y+5,24,22),"✓",new GUIStyle(center){normal={textColor=Ink},fontSize=19});

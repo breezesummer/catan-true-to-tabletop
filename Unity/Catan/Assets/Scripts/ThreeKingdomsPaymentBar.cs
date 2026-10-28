@@ -41,7 +41,7 @@ public static class ThreeKingdomsPaymentBar
         PastoralMenuUI.Label(new Rect(352,662,525,20),progress,14,PastoralMenuUI.Ink,true);
         string reason=!string.IsNullOrEmpty(context.Notice)?context.Notice:previewReason;
         if(string.IsNullOrEmpty(reason))reason=context.Ready?"牌与用途已就绪，确认后执行。":"每张牌都需选择本次用途。";
-        PastoralMenuUI.Label(new Rect(352,681,525,19),reason,12,context.Ready?PastoralMenuUI.Muted:new Color(.52f,.29f,.10f));
+        PastoralMenuUI.Label(new Rect(352,681,525,19),reason,12,context.Ready?PastoralMenuUI.Muted:ModernOperationUI.Error);
         if(Button(new Rect(884,666,82,32),"重新选牌",enabled))context.ClearSelections();
         if(Button(new Rect(974,666,74,32),"取消",enabled)){cancel?.Invoke();return;}
         if(Button(new Rect(1056,666,100,32),context.IsSubmitting?"提交中":"确认支付",enabled&&canConfirm&&context.Ready,true))confirm?.Invoke();
@@ -49,9 +49,7 @@ public static class ThreeKingdomsPaymentBar
     static string Name(int type)=>type>=0&&type<Names.Length?Names[type]:"未选择";
     static bool Button(Rect area,string label,bool enabled,bool selected=false)
     {
-        var color=selected?new Color(.40f,.32f,.15f):new Color(.19f,.24f,.18f);
-        if(!enabled)color=new Color(.15f,.18f,.15f);
-        PastoralMenuUI.Round(area,color,4);
+        CopperTabletopSkin.Panel(area,ModernOperationUI.Surface,selected,false);
         PastoralMenuUI.Label(area,label,13,enabled?PastoralMenuUI.Ivory:PastoralMenuUI.Muted,true,TextAnchor.MiddleCenter);
         return ThreeKingdomsDirectInput.Read(area,enabled,false)==1;
     }

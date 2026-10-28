@@ -62,7 +62,7 @@ public sealed partial class TabletopHistoryUI
         {
         if(collapsed)
         {if(ModernOperationUI.Button(Collapsed,"历史 ‹"))collapsed=false;return;}
-        ModernOperationUI.Round(Feed,new Color(ModernOperationUI.Background.r,ModernOperationUI.Background.g,ModernOperationUI.Background.b,.42f));
+        CopperTabletopSkin.Panel(Feed,ModernOperationUI.Background);
         if(ModernOperationUI.Button(new Rect(Feed.x+10,Feed.y+5,76,25),"历史"))Open();
         if(ModernOperationUI.Button(new Rect(Feed.xMax-39,Feed.y+5,29,25),"›")){collapsed=true;return;}
         if(!ReferenceEquals(recentInput,entries)){recentInput=entries;recentEntries=entries.Skip(Math.Max(0,entries.Length-40)).ToArray();}
