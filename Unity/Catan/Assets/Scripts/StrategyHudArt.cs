@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// 圆片、金属装饰和简洁符号由代码绘制；商品主体使用单独透明抠图。
+// 铜框与圆片使用独立美术贴图；简洁符号由代码绘制，商品主体使用透明抠图。
 public static class StrategyHudArt
 {
     static Texture2D bank,handshake,portraits,victory;

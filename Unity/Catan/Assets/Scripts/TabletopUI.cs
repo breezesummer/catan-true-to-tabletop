@@ -165,7 +165,7 @@ public sealed partial class TabletopUI
         bank.ObserveHud(operations,bankHistory,seats);
         bool expansion=dice.Event.HasValue;
         var trayRect=new Rect(15,149,178,128);hits.Add(trayRect);
-        table.Objects.Tray("dice-tray",trayRect,ModernOperationUI.Surface,StrategyHudArt.Gold);
+        table.Objects.Tray("dice-tray",trayRect,ModernOperationUI.Surface,new Color(.17f,.075f,.03f));
         CopperTabletopSkin.Outline(trayRect,false,20);
         var diceRects=expansion?expansionDiceRects:baseDiceRects;
         bool enabled=GUI.enabled;

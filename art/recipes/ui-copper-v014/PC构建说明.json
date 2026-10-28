@@ -1,0 +1,11 @@
+{
+  "版本": "内测版2.0.2",
+  "目标": "Windows x64",
+  "客户端": "/Users/breezesummer/开发栈/Project/catan-true-to-tabletop/game version/2.0/Catan2.0.2-Copper-Art-PC-20261028/Builds/Windows/Catan2.0.2.exe",
+  "完整包": "/Users/breezesummer/开发栈/Project/catan-true-to-tabletop/game version/2.0/Catan2.0.2-Copper-Art-PC-20261028/卡坦岛之三国争霸内测版2.0.2-PC.zip",
+  "字节数": 585273506,
+  "构建": "成功，含win-x64自包含房间服务",
+  "测试": "按用户要求未运行测试；使用--skip-build-verification",
+  "正式发布": false,
+  "Android": "未构建"
+}

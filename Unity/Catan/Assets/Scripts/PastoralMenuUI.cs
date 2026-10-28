@@ -81,15 +81,7 @@ public static class PastoralMenuUI
     public static bool ReturnButton(Rect r,Font font=null)
     {
         Styles();bool over=GUI.enabled&&r.Contains(Event.current.mousePosition);
-        var trim=GUI.enabled?new Color(.79f,.68f,.43f,.92f):new Color(.43f,.47f,.36f,.65f);
-        var face=over?new Color(.20f,.34f,.27f,.98f):new Color(.105f,.22f,.18f,.96f);
-        Round(new Rect(r.x,r.y+4,r.width,r.height),new Color(.025f,.065f,.045f,.30f),14);
-        Round(r,trim,14);
-        Round(new Rect(r.x+1,r.y+1,r.width-2,r.height-2),face,13);
-        Round(new Rect(r.x+9,r.y+3,r.width-18,1),new Color(1,.96f,.77f,over?.24f:.12f),1);
-        Fill(new Rect(r.x+30,r.center.y,r.width*.10f,1),new Color(trim.r,trim.g,trim.b,.48f));
-        Fill(new Rect(r.xMax-30-r.width*.10f,r.center.y,r.width*.10f,1),new Color(trim.r,trim.g,trim.b,.48f));
-        Round(new Rect(r.x+21,r.center.y-2,4,4),trim,2);Round(new Rect(r.xMax-25,r.center.y-2,4,4),trim,2);
+        CopperTabletopSkin.Panel(r,Paper,over,false);
         var style=new GUIStyle(Center){font=font??currentFont,fontSize=17,fontStyle=FontStyle.Bold,wordWrap=false};
         style.normal.textColor=GUI.enabled?Ivory:Muted;
         GUI.Label(new Rect(r.x+44,r.y+1,r.width-88,r.height-2),"返回主菜单",style);
