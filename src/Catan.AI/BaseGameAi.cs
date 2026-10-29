@@ -58,6 +58,12 @@ public sealed class BaseGameAi
         }
         if (view.TradeOffer != null)
         { var offer = view.TradeOffer; return Make(Covers(view.OwnResources, offer.Receive) && TradeValue(view.OwnResources, offer.Give, offer.Receive) - AiOpponentStrategy.TradePenalty(view, offer.ProposerId) >= -0.01 ? CommandKind.AcceptTrade : CommandKind.RejectTrade); }
+        if (view.TradeModules != null)
+        {
+            var winningPort = view.LegalCityVertexIds.Concat(view.LegalVertexIds).FirstOrDefault(v =>
+                view.OwnVictoryPoints + 1 + HarborGain(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, v) >= view.TargetVictoryPoints);
+            if (winningPort != null) return Make(view.LegalCityVertexIds.Contains(winningPort) ? CommandKind.BuildCity : CommandKind.BuildSettlement, winningPort);
+        }
         if (view.LegalCityVertexIds.Length > 0)
             return Make(CommandKind.BuildCity, view.LegalCityVertexIds.OrderByDescending(v => Value(view, v)).First());
         if (view.LegalVertexIds.Length > 0)
@@ -146,7 +152,7 @@ public sealed class BaseGameAi
     private static double Value(PlayerView view, string vertex)
     {
         var owned = Buildings(view).Where(b => b.PlayerId == view.PlayerId).Select(b => b.LocationId).ToArray();
-        return view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
+        return HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex) + view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
         {
             var pips = 6 - Math.Abs(7 - t.Number!.Value);
             var already = view.Board.Tiles.Count(other => other.Resource == t.Resource && other.Vertices.Intersect(owned).Any());

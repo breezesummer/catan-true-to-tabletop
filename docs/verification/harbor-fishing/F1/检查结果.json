@@ -1,0 +1,2098 @@
+{
+  "日期": "2026-10-29",
+  "去重通过总数": 399,
+  "普通完整局": 36,
+  "三国完整局": 4,
+  "说明": "结果来源于本轮TRX；已修复首轮AI联盟骑士查找失败。普通完整局后只变更存档格式隔离，独立复验保存恢复；三国组使用最终代码。",
+  "检查组": [
+    {
+      "组": "海港专项",
+      "通过数": 21,
+      "案例": [
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.AwardPointsAndPlayerViewAreDetachedAndWinOnlyInFreeActiveWindow",
+          "结果": "通过",
+          "耗时": "00:00:00.0149134"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H01ThresholdTieRetentionAndOvertake",
+          "结果": "通过",
+          "耗时": "00:00:00.0012937"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H02H03LossTieAndRecoveryDoNotDuplicateAward",
+          "结果": "通过",
+          "耗时": "00:00:00.0009235"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H02NativeCityDamageVillageCollapseAndRepairRecalculate(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.1045746"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H02NativeCityDamageVillageCollapseAndRepairRecalculate(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0154894"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H04EachVertexCountsOnceAndOnlyForActualOwner",
+          "结果": "通过",
+          "耗时": "00:00:00.0006086"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H04MetropolisDuplicatePortsAndChangedOwnershipUseActualBuildings(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0075890"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H04MetropolisDuplicatePortsAndChangedOwnershipUseActualBuildings(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0061815"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H05MapExchangeCountsFinalPortsAndNeverChecksIntermediateVictory(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0493606"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H05MapExchangeCountsFinalPortsAndNeverChecksIntermediateVictory(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0937471"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"base\", target: 11)",
+          "结果": "通过",
+          "耗时": "00:00:00.0249442"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"cities\", target: 14)",
+          "结果": "通过",
+          "耗时": "00:00:00.0186922"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"combined\", target: 17)",
+          "结果": "通过",
+          "耗时": "00:00:00.0220292"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"seafarers\", target: 15)",
+          "结果": "通过",
+          "耗时": "00:00:00.0309598"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.PirateIslandsRemainsExplicitlyClosed(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0116905"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.PirateIslandsRemainsExplicitlyClosed(mode: \"seafarers\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0047929"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"base\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0971451"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.2057838"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.2398311"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"seafarers\")",
+          "结果": "通过",
+          "耗时": "00:00:00.2821575"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.UnplacedTribePortsNeverEarnHarborPoints",
+          "结果": "通过",
+          "耗时": "00:00:00.0065010"
+        }
+      ]
+    },
+    {
+      "组": "同顶点损害与AI抢胜",
+      "通过数": 3,
+      "案例": [
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H02DowngradedVillageWithItsOwnCollapseRecordCountsZero(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.1674565"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.H02DowngradedVillageWithItsOwnCollapseRecordCountsZero(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.1035221"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiTakesImmediateHarborVictoryAndLeavesViewUnchanged",
+          "结果": "通过",
+          "耗时": "00:00:00.1170972"
+        }
+      ]
+    },
+    {
+      "组": "普通产品AI完整局",
+      "通过数": 36,
+      "案例": [
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"base\", map: \"heading-for-new-shores\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:01.3501728",
+          "记录": "base/heading-for-new-shores/3人：242条命令，第49回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"base\", map: \"heading-for-new-shores\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:02.3523822",
+          "记录": "base/heading-for-new-shores/4人：426条命令，第72回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"cities\", map: \"heading-for-new-shores\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:14.2823034",
+          "记录": "cities/heading-for-new-shores/3人：323条命令，第51回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"cities\", map: \"heading-for-new-shores\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:20.6699487",
+          "记录": "cities/heading-for-new-shores/4人：594条命令，第92回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"cloth-for-catan\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:06.1414261",
+          "记录": "combined/cloth-for-catan/3人：279条命令，第60回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"cloth-for-catan\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:14.4895146",
+          "记录": "combined/cloth-for-catan/4人：464条命令，第80回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"fog-islands\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:05.3162831",
+          "记录": "combined/fog-islands/3人：303条命令，第48回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"fog-islands\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:06.4705873",
+          "记录": "combined/fog-islands/4人：336条命令，第54回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"forgotten-tribe\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:24.3624506",
+          "记录": "combined/forgotten-tribe/3人：770条命令，第167回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"forgotten-tribe\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:45.0679013",
+          "记录": "combined/forgotten-tribe/4人：1191条命令，第216回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"four-islands\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:08.5146529",
+          "记录": "combined/four-islands/3人：481条命令，第87回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"four-islands\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:10.1964196",
+          "记录": "combined/four-islands/4人：447条命令，第74回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"heading-for-new-shores\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:11.3972114",
+          "记录": "combined/heading-for-new-shores/3人：417条命令，第78回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"heading-for-new-shores\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:11.2264004",
+          "记录": "combined/heading-for-new-shores/4人：545条命令，第70回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"new-world\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:06.3487593",
+          "记录": "combined/new-world/3人：318条命令，第65回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"new-world\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:11.5110168",
+          "记录": "combined/new-world/4人：559条命令，第84回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"through-the-desert\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:10.3380055",
+          "记录": "combined/through-the-desert/3人：453条命令，第71回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"through-the-desert\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:10.5436907",
+          "记录": "combined/through-the-desert/4人：492条命令，第71回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"wonders-of-catan\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:10.3098607",
+          "记录": "combined/wonders-of-catan/3人：371条命令，第75回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"wonders-of-catan\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:16.4204182",
+          "记录": "combined/wonders-of-catan/4人：584条命令，第83回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"cloth-for-catan\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:04.4059001",
+          "记录": "seafarers/cloth-for-catan/3人：384条命令，第68回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"cloth-for-catan\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:06.6323764",
+          "记录": "seafarers/cloth-for-catan/4人：537条命令，第89回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"fog-islands\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:03.9430037",
+          "记录": "seafarers/fog-islands/3人：366条命令，第72回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"fog-islands\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:05.2059065",
+          "记录": "seafarers/fog-islands/4人：487条命令，第85回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"forgotten-tribe\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:03.8952006",
+          "记录": "seafarers/forgotten-tribe/3人：340条命令，第68回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"forgotten-tribe\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:04.5486672",
+          "记录": "seafarers/forgotten-tribe/4人：424条命令，第79回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"four-islands\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:05.0020756",
+          "记录": "seafarers/four-islands/3人：298条命令，第63回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"four-islands\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:06.0765374",
+          "记录": "seafarers/four-islands/4人：498条命令，第92回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"heading-for-new-shores\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:04.9080861",
+          "记录": "seafarers/heading-for-new-shores/3人：432条命令，第84回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"heading-for-new-shores\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:11.1534203",
+          "记录": "seafarers/heading-for-new-shores/4人：495条命令，第84回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"new-world\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:08.9366071",
+          "记录": "seafarers/new-world/3人：482条命令，第97回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"new-world\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:10.1375702",
+          "记录": "seafarers/new-world/4人：588条命令，第106回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"through-the-desert\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:04.1888422",
+          "记录": "seafarers/through-the-desert/3人：349条命令，第71回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"through-the-desert\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:05.3142889",
+          "记录": "seafarers/through-the-desert/4人：333条命令，第63回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"wonders-of-catan\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:08.1755571",
+          "记录": "seafarers/wonders-of-catan/3人：429条命令，第86回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"wonders-of-catan\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:08.6404239",
+          "记录": "seafarers/wonders-of-catan/4人：554条命令，第105回合终局。"
+        }
+      ]
+    },
+    {
+      "组": "三国完整局与联盟AI回归",
+      "通过数": 5,
+      "案例": [
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ThreeKingdomsProductAiCompletesAndReplays(mode: \"cities\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:22.3336653",
+          "记录": "三国海港/cities/3人：662条命令，第100回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ThreeKingdomsProductAiCompletesAndReplays(mode: \"cities\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:13.4058741",
+          "记录": "三国海港/cities/4人：347条命令，第42回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ThreeKingdomsProductAiCompletesAndReplays(mode: \"combined\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:35.9711706",
+          "记录": "三国海港/combined/3人：498条命令，第73回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.HarbormasterTests.ThreeKingdomsProductAiCompletesAndReplays(mode: \"combined\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:01:34.0407202",
+          "记录": "三国海港/combined/4人：746条命令，第92回合终局。"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceIntegrationTests.CityAiDefenseEvaluatesLegalAlliedKnightWithoutAssumingOwnership",
+          "结果": "通过",
+          "耗时": "00:00:00.3699076"
+        }
+      ]
+    },
+    {
+      "组": "规则与存档回归",
+      "通过数": 237,
+      "案例": [
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"Bank\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0072390"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"DevelopmentDeck\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0088865"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"Events\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0073100"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"InitialSeed\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0061207"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"PendingDecision\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0113749"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"ProcessedCommands\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0140203"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"Random\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0075363"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"RulesVersion\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0101254"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"SaveFormatVersion\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0049669"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"ScenarioContentHash\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0079319"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"ScenarioId\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0129692"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"ScenarioVersion\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0099853"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.DetachedViewsCommandsReceiptsAndAuthoritativeSnapshotsCannotMutateSession",
+          "结果": "通过",
+          "耗时": "00:00:00.0188069"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"negativeAmount\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0083298"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"overflowAmount\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0193553"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownKind\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0069154"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownLocation\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0082263"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownResource\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0105468"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownSeat\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0122006"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"wrongPhase\")",
+          "结果": "通过",
+          "耗时": "00:00:00.1087126"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"wrongSeat\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0128977"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.PendingTradeSurvivesProductionSaveAndResolvesWithSameReceipt",
+          "结果": "通过",
+          "耗时": "00:00:00.1623241"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.PreviewHasNoEffectsAndSharesExecuteValidation",
+          "结果": "通过",
+          "耗时": "00:00:00.0163893"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.SaveRestoresSetupDecisionRandomStateAndCommandDeduplication",
+          "结果": "通过",
+          "耗时": "00:00:00.0282091"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.TestFixtureCannotBeLoadedAsAProductionSaveAndM1SaveCannotBecomeM2",
+          "结果": "通过",
+          "耗时": "00:00:00.0213658"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2PersistenceTests.ViewsAndPublicReceiptsExposeOnlyOwnCardsAndNoRandomDeckOrPrivateCommandHistory",
+          "结果": "通过",
+          "耗时": "00:00:00.0520037"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.BankAndOwnedPortsUseCorrectRatio(ratio: 2)",
+          "结果": "通过",
+          "耗时": "00:00:00.0206983"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.BankAndOwnedPortsUseCorrectRatio(ratio: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0236239"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.BankAndOwnedPortsUseCorrectRatio(ratio: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0117886"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.BreakingAwardHoldersRoadReturnsTileToSupplyWhenOtherLeadersTie",
+          "结果": "通过",
+          "耗时": "00:00:00.0115827"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.BuildingCostsDistanceConnectionCityReplacementAndSupplyAreExact",
+          "结果": "通过",
+          "耗时": "00:00:00.0554568"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.DiscardAndTheftReceiptsDoNotPublishResourceTypesOrClientSuppliedSecrets",
+          "结果": "通过",
+          "耗时": "00:00:00.0231222"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.EmptyHandAdjacentVictimIsSelectableAndNoVictimEndsRobberMove",
+          "结果": "通过",
+          "耗时": "00:00:00.0400364"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.FifthRoadAndThirdKnightAwardExactlyTwoPointsThroughNormalCommands",
+          "结果": "通过",
+          "耗时": "00:00:00.0498040"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.FinitePieceSupplyRejectsConstructionEvenWithEnoughResources(supply: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0106464"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.FinitePieceSupplyRejectsConstructionEvenWithEnoughResources(supply: \"roads\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0180892"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.FinitePieceSupplyRejectsConstructionEvenWithEnoughResources(supply: \"settlements\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0074365"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.HiddenVictoryPointsCanWinImmediatelyButOnlyOnTheirOwnersTurn",
+          "结果": "通过",
+          "耗时": "00:00:00.0300036"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.InvalidPlayerTradesDoNotMutateAnything(reason: \"bystanders\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0130339"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.InvalidPlayerTradesDoNotMutateAnything(reason: \"gift\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0114515"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.InvalidPlayerTradesDoNotMutateAnything(reason: \"negative\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0119446"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.InvalidPlayerTradesDoNotMutateAnything(reason: \"overdraft\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0116990"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.InvalidPlayerTradesDoNotMutateAnything(reason: \"overlap\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0103246"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.InventionTakesTwoResourcesAndInsufficientSelectionIsAtomic(same: False)",
+          "结果": "通过",
+          "耗时": "00:00:00.1298603"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.InventionTakesTwoResourcesAndInsufficientSelectionIsAtomic(same: True)",
+          "结果": "通过",
+          "耗时": "00:00:00.0210469"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.KnightBeforeRollMovesRobberWithoutDiscardAndStealsOnlyEligibleResource",
+          "结果": "通过",
+          "耗时": "00:00:00.0230331"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.LargestArmyRequiresThreePreservesTieAndTransfersOnlyOnStrictLead",
+          "结果": "通过",
+          "耗时": "00:00:00.0277112"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.LongestRoadCountsTrailWithoutRepeatingEdgesOrSummingBranches(edges: \"E01,E02,E03,E04,E05\", expected: 5)",
+          "结果": "通过",
+          "耗时": "00:00:00.0200380"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.LongestRoadCountsTrailWithoutRepeatingEdgesOrSummingBranches(edges: \"E01,E02,E07,E08,E12,E13\", expected: 6)",
+          "结果": "通过",
+          "耗时": "00:00:00.0178961"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.LongestRoadCountsTrailWithoutRepeatingEdgesOrSummingBranches(edges: \"E01,E02,E07,E08,E12,E13,E03,E04\", expected: 8)",
+          "结果": "通过",
+          "耗时": "00:00:00.0190975"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.LongestRoadCountsTrailWithoutRepeatingEdgesOrSummingBranches(edges: \"E02,E03,E08\", expected: 2)",
+          "结果": "通过",
+          "耗时": "00:00:00.0187111"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.MonopolyCollectsOnlyNamedResourceIncludingZeroCase(amount: 0)",
+          "结果": "通过",
+          "耗时": "00:00:00.0131932"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.MonopolyCollectsOnlyNamedResourceIncludingZeroCase(amount: 7)",
+          "结果": "通过",
+          "耗时": "00:00:00.0147923"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.NewDevelopmentCardsAndSecondCardInSameTurnAreRejected(kind: PlayKnight, card: Knight)",
+          "结果": "通过",
+          "耗时": "00:00:00.0256405"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.NewDevelopmentCardsAndSecondCardInSameTurnAreRejected(kind: PlayMonopoly, card: Monopoly)",
+          "结果": "通过",
+          "耗时": "00:00:00.0227977"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.NewDevelopmentCardsAndSecondCardInSameTurnAreRejected(kind: PlayRoadBuilding, card: RoadBuilding)",
+          "结果": "通过",
+          "耗时": "00:00:00.0203461"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.NewDevelopmentCardsAndSecondCardInSameTurnAreRejected(kind: PlayYearOfPlenty, card: YearOfPlenty)",
+          "结果": "通过",
+          "耗时": "00:00:00.0283336"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.NewlyBoughtVictoryPointWinsImmediatelyAndDevelopmentDeckCannotOverdraw",
+          "结果": "通过",
+          "耗时": "00:00:00.0382338"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.NormalSetupHasFiniteOfficialSupplySnakeOrderAndSecondVillageIncome(count: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0849481"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.NormalSetupHasFiniteOfficialSupplySnakeOrderAndSecondVillageIncome(count: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0789512"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.OpponentBuildingBlocksRoadContinuationAndCannotBeUpgraded",
+          "结果": "通过",
+          "耗时": "00:00:00.0218030"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.OpponentSettlementCutsLongestRoadAndTiedHolderRetainsAward",
+          "结果": "通过",
+          "耗时": "00:00:00.0406248"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.OtherSeatMayOfferTradeToActiveSeatAndAcceptanceIsAtomic",
+          "结果": "通过",
+          "耗时": "00:00:00.0220702"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.PortsRequireOwnedBuildingAndCorrectResourceAndBankStock",
+          "结果": "通过",
+          "耗时": "00:00:00.0318153"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.ProductionPaysVillageOneAndCityTwoExceptRobber(blocked: False)",
+          "结果": "通过",
+          "耗时": "00:00:00.0133011"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.ProductionPaysVillageOneAndCityTwoExceptRobber(blocked: True)",
+          "结果": "通过",
+          "耗时": "00:00:00.0246648"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.RejectedTradeAndCancelledTradeReturnToActionWithoutTransferringCards",
+          "结果": "通过",
+          "耗时": "00:00:00.0338930"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.RoadBuildingPlacesTwoFreeConnectedRoadsAndBlocksOtherCommandsUntilFinished",
+          "结果": "通过",
+          "耗时": "00:00:00.0244493"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.RoadBuildingRespectsRemainingRoadPieceSupply(used: 14)",
+          "结果": "通过",
+          "耗时": "00:00:00.0407950"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.RoadBuildingRespectsRemainingRoadPieceSupply(used: 15)",
+          "结果": "通过",
+          "耗时": "00:00:00.0172593"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.SevenDiscardsFloorHalfOnlyAboveSevenBeforeMovingAndNeverCountsDevelopmentCards",
+          "结果": "通过",
+          "耗时": "00:00:00.0292977"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.ShortageWithMultipleRecipientsPaysNoneAndSingleRecipientGetsRemainder(multiple: False)",
+          "结果": "通过",
+          "耗时": "00:00:00.0100419"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.ShortageWithMultipleRecipientsPaysNoneAndSingleRecipientGetsRemainder(multiple: True)",
+          "结果": "通过",
+          "耗时": "00:00:00.0146755"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.UnsupportedSeatCountIsRejected(players: 2)",
+          "结果": "通过",
+          "耗时": "00:00:00.0001548"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.UnsupportedSeatCountIsRejected(players: 5)",
+          "结果": "通过",
+          "耗时": "00:00:00.0004172"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.VariablePortsShuffleSixPhysicalFramesPreservingTheirPrintedPortPositions(seed: 0)",
+          "结果": "通过",
+          "耗时": "00:00:00.0040292"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.VariablePortsShuffleSixPhysicalFramesPreservingTheirPrintedPortPositions(seed: 1)",
+          "结果": "通过",
+          "耗时": "00:00:00.0119293"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.VariablePortsShuffleSixPhysicalFramesPreservingTheirPrintedPortPositions(seed: 1234)",
+          "结果": "通过",
+          "耗时": "00:00:00.0063869"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.VariablePortsShuffleSixPhysicalFramesPreservingTheirPrintedPortPositions(seed: 42)",
+          "结果": "通过",
+          "耗时": "00:00:00.0061329"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.VariablePortsShuffleSixPhysicalFramesPreservingTheirPrintedPortPositions(seed: 4294967295)",
+          "结果": "通过",
+          "耗时": "00:00:00.0064516"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M2RulesTests.VariableSetupPreservesTerrainAndNumberSupplyAndIsSeedDeterministic",
+          "结果": "通过",
+          "耗时": "00:00:00.0165370"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"HiddenResources\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0164502"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"InitialSeed\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0104746"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"PendingDecision\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0208213"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"ProcessedCommands\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0140715"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"Random\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0224239"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"RulesVersion\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0088771"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"SaveFormatVersion\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0105899"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"ScenarioContentHash\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0118992"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"ScenarioId\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0101771"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"ScenarioVersion\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0192026"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"ShipMovedThisTurn\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0187857"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.AlteredAuthorityOrHiddenMapCannotLoad(field: \"Tiles\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0103949"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.DetachedShipTileAndGoldViewsCannotAlterAuthority",
+          "结果": "通过",
+          "耗时": "00:00:00.1383697"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"negativeAmount\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0317108"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"overflowAmount\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0232935"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownKind\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0355458"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownLocation\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0282397"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownResource\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0289435"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownSeat\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0320999"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"wrongPhase\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0300573"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"wrongSeat\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0452696"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.NewWorldPortsAreChosenInTurnAndPendingPortSaveIsAuthoritative",
+          "结果": "通过",
+          "耗时": "00:00:00.5300655"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.PlayerViewNeverContainsHiddenMapDeckRandomOrOtherHands(scenario: \"fog-islands\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0162357"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.PlayerViewNeverContainsHiddenMapDeckRandomOrOtherHands(scenario: \"forgotten-tribe\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0314450"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.PreviewIsDetachedAndFixtureSaveCannotBeLoadedAsProduction",
+          "结果": "通过",
+          "耗时": "00:00:00.0500850"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M3PersistenceTests.SaveRestoresPendingSetupAndDeduplicatesShipPlacementWithoutExtraCost",
+          "结果": "通过",
+          "耗时": "00:00:00.0642336"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M4PersistenceTests.ChangedRandomPendingOrCommoditySaveIsRejected",
+          "结果": "通过",
+          "耗时": "00:00:00.3359615"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M4PersistenceTests.DuplicateCommandDoesNotSpendTwiceAndConflictingRetryIsRejected",
+          "结果": "通过",
+          "耗时": "00:00:00.3565559"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M4PersistenceTests.PreviewDoesNotMutateDeckRandomOrCommodities",
+          "结果": "通过",
+          "耗时": "00:00:00.8855297"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M4PersistenceTests.PublicEventsDoNotExposeDiscardedCommodityKinds",
+          "结果": "通过",
+          "耗时": "00:00:00.1070755"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M4PersistenceTests.SetupPendingDecisionRestoresAndCompletesSameRoad",
+          "结果": "通过",
+          "耗时": "00:00:00.2979330"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M4PersistenceTests.SetupSaveRestoresExactAuthorityAndDeterministicNextRoll(count: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.8618715"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M4PersistenceTests.SetupSaveRestoresExactAuthorityAndDeterministicNextRoll(count: 4)",
+          "结果": "通过",
+          "耗时": "00:00:01.2398655"
+        },
+        {
+          "案例": "Catan.Rules.Tests.M4PersistenceTests.ViewsAreDetachedAndContainNoAuthoritySecrets",
+          "结果": "通过",
+          "耗时": "00:00:00.2191554"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.CityCollapsePreservesStockAndRestoresOnlyTheCityWithoutWall(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0271099"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.CityCollapsePreservesStockAndRestoresOnlyTheCityWithoutWall(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0081489"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.CollapseProtectionDoesNotPreventDirectCityRemoval(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0033001"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.CollapseProtectionDoesNotPreventDirectCityRemoval(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0043171"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.CollapsedVillageKeepsOccupancyButLosesProductionAndScore(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.1676830"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.CollapsedVillageKeepsOccupancyButLosesProductionAndScore(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0764218"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.DiplomacyRemovingDamagedOpenRoadClearsDamageAndRefundReceipt(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.1229732"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.DiplomacyRemovingDamagedOpenRoadClearsDamageAndRefundReceipt(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0466738"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.DiplomacyRemovingDamagedShipReturnsSupplyAndClearsPriorityAndReceipt",
+          "结果": "通过",
+          "耗时": "00:00:00.0331233"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.FortressLossRemovesDamagedShipRecordTogetherWithPhysicalPiece",
+          "结果": "通过",
+          "耗时": "00:00:00.0102112"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.FreeConstructionIsPreviewPureAndRecordsZeroPaidCost(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0942222"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.FreeConstructionIsPreviewPureAndRecordsZeroPaidCost(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0276085"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.ImmuneWeakestDefenderDoesNotRedirectPillageToNextWeakestPlayer(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0179507"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.ImmuneWeakestDefenderDoesNotRedirectPillageToNextWeakestPlayer(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0119442"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.MetropolisRelocationWaitsForCityOwnerAndPreservesOtherCity(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0239179"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.MetropolisRelocationWaitsForCityOwnerAndPreservesOtherCity(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0297732"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.NativePaidRoadRecordsItsActualCostForKurou(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0450356"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.NativePaidRoadRecordsItsActualCostForKurou(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0124445"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.OffTurnTokenControlRejectsTurnOwnerAndReturnsControlAfterSteal(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0124800"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.OffTurnTokenControlRejectsTurnOwnerAndReturnsControlAfterSteal(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0142626"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.OpenRoadReturnsStockClosedRoadRemainsAndRequiresRepair(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0696119"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.OpenRoadReturnsStockClosedRoadRemainsAndRequiresRepair(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0193120"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.ProductAiChoosesAffordableRepairAndDoesNotRepeatItAfterRepair(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.2847823"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.ProductAiChoosesAffordableRepairAndDoesNotRepeatItAfterRepair(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.4631276"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.RealInvasionKeepsSnapshotUntilAllDecisionsThenResetsTrack(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0181092"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.RealInvasionKeepsSnapshotUntilAllDecisionsThenResetsTrack(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0307615"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.RepairAndTechPreviewRejectStaleOptionWithoutChangingAuthority(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0077693"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.RepairAndTechPreviewRejectStaleOptionWithoutChangingAuthority(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0070301"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.ShanqiAndWushuangChangeEffectiveLevelWithoutChangingPhysicalSupply(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0110809"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.ShanqiAndWushuangChangeEffectiveLevelWithoutChangingPhysicalSupply(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0174718"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.SuppressedTopTierStillCostsActualTierToRemove(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0066438"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.SuppressedTopTierStillCostsActualTierToRemove(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0121452"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.SuppressionKeepsActualLevelsAndPermanentDowngradeSurvivesRestore(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0045446"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.SuppressionKeepsActualLevelsAndPermanentDowngradeSurvivesRestore(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0024354"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.VirtualInvasionPreservesRealTrackAndFirstAttackFlag(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0067417"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.VirtualInvasionPreservesRealTrackAndFirstAttackFlag(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0060536"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.YangweiKeepsDefensiveActivationButStillRequiresPaidActionPermission(mode: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0433712"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB5BoardTests.YangweiKeepsDefensiveActivationButStillRequiresPaidActionPermission(mode: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.1563233"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.AllianceGraphRemainsTransitiveAndDoesNotMergeOverLimit",
+          "结果": "通过",
+          "耗时": "00:00:00.0004167"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.CloneDoesNotShareSourcesMembersOrWinners",
+          "结果": "通过",
+          "耗时": "00:00:00.0039546"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.ConditionalJoinTransfersOnlyAfterConfirmationAndRestores",
+          "结果": "通过",
+          "耗时": "00:00:00.0515423"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.ControlledAllianceCannotConfirmPreviouslyOfferedUnilateralPayment(asset: \"P1\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0013558"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.ControlledAllianceCannotConfirmPreviouslyOfferedUnilateralPayment(asset: \"P2\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0003065"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.ControlledAllianceMayJoinWithoutTermsButCannotOfferUnilateralPayment(asset: \"P1\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0002158"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.ControlledAllianceMayJoinWithoutTermsButCannotOfferUnilateralPayment(asset: \"P2\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0035781"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.EmptyProgressDeckDoesNotCreateCards",
+          "结果": "通过",
+          "耗时": "00:00:00.0005459"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.EntryNegotiatesInSeatOrderAndReceivesBlueYellowOnlyOnce",
+          "结果": "通过",
+          "耗时": "00:00:00.0296704"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.HarmfulTargetEnumerationExcludesAllies(general: \"tk-g03\", option: \"civil-fanjian\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0004444"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.HarmfulTargetEnumerationExcludesAllies(general: \"tk-g17\", option: \"civil-qixi-hand\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0002531"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.HarmfulTargetEnumerationExcludesAllies(general: \"tk-g53\", option: \"b5m-chuhai\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0072709"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.RejectionLeavesBothEnemyPlayersInSeparateFactions",
+          "结果": "通过",
+          "耗时": "00:00:00.0002262"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.RetiringSourceRevokesSharingButKeepsCardsAndSavedWinner",
+          "结果": "通过",
+          "耗时": "00:00:00.0005264"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.SharedTechnologyUsesMaximumWithoutMutatingPersonalLevels",
+          "结果": "通过",
+          "耗时": "00:00:00.0011057"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6AllianceTests.UnsatisfiedTermsNeverTakePartialPaymentOrRevealInventoryToLeader",
+          "结果": "通过",
+          "耗时": "00:00:00.0018699"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.CitiesHostExchangePreservesTopologyAndRandomState",
+          "结果": "通过",
+          "耗时": "00:00:00.0284989"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.CombinedPendingRobberStartMovesWithBoardAndSurvivesAuthoritySnapshot",
+          "结果": "通过",
+          "耗时": "00:00:00.5830357"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"cloth-for-catan\", players: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0645114",
+          "记录": "cloth-for-catan/3：枚举 260 项，用时 34 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"cloth-for-catan\", players: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0328822",
+          "记录": "cloth-for-catan/4：枚举 260 项，用时 25 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"fog-islands\", players: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0728406",
+          "记录": "fog-islands/3：枚举 371 项，用时 62 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"fog-islands\", players: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0597590",
+          "记录": "fog-islands/4：枚举 383 项，用时 44 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"forgotten-tribe\", players: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0186350",
+          "记录": "forgotten-tribe/3：枚举 413 项，用时 7 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"forgotten-tribe\", players: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0176820",
+          "记录": "forgotten-tribe/4：枚举 413 项，用时 3 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"four-islands\", players: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0561234",
+          "记录": "four-islands/3：枚举 535 项，用时 48 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"four-islands\", players: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0735341",
+          "记录": "four-islands/4：枚举 547 项，用时 62 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"heading-for-new-shores\", players: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.4036730",
+          "记录": "heading-for-new-shores/3：枚举 463 项，用时 60 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"heading-for-new-shores\", players: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0869130",
+          "记录": "heading-for-new-shores/4：枚举 690 项，用时 78 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"new-world\", players: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0199669",
+          "记录": "new-world/3：枚举 785 项，用时 5 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"new-world\", players: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0387672",
+          "记录": "new-world/4：枚举 785 项，用时 10 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"pirate-islands\", players: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0486573",
+          "记录": "pirate-islands/3：枚举 97 项，用时 26 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"pirate-islands\", players: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0366501",
+          "记录": "pirate-islands/4：枚举 72 项，用时 23 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"through-the-desert\", players: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0631771",
+          "记录": "through-the-desert/3：枚举 450 项，用时 52 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"through-the-desert\", players: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.1013558",
+          "记录": "through-the-desert/4：枚举 690 项，用时 90 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"wonders-of-catan\", players: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0953049",
+          "记录": "wonders-of-catan/3：枚举 500 项，用时 80 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"wonders-of-catan\", players: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0937616",
+          "记录": "wonders-of-catan/4：枚举 500 项，用时 86 毫秒"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ExchangeMovesOnlyContentsAndIsolatedComponentsWithAttachments",
+          "结果": "通过",
+          "耗时": "00:00:00.0018239"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.FirstNativeBarbarianAttackFindsDesertAfterTamoMovedIt",
+          "结果": "通过",
+          "耗时": "00:00:00.1312241"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ForbiddenPairsHaveNoMutation(first: \"desert\", n1: null, second: \"ore\", n2: 8)",
+          "结果": "通过",
+          "耗时": "00:00:00.0000294"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ForbiddenPairsHaveNoMutation(first: \"fog\", n1: null, second: \"wood\", n2: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0001268"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ForbiddenPairsHaveNoMutation(first: \"gold\", n1: 5, second: \"wood\", n2: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0001986"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ForbiddenPairsHaveNoMutation(first: \"wood\", n1: 6, second: \"sea\", n2: null)",
+          "结果": "通过",
+          "耗时": "00:00:00.0000279"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.InvalidMapCommandLeavesLimitedChargeAndSnapshotUntouched",
+          "结果": "通过",
+          "耗时": "00:00:00.2379983"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.LandingRewardRevocationKeepsVisitedRegionAndNeverGrantsRelocationAgain",
+          "结果": "通过",
+          "耗时": "00:00:00.8509688"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.OrdinaryRedNumberLandExchangeIsAllowed",
+          "结果": "通过",
+          "耗时": "00:00:00.0000809"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.PortRelocationUsesShortestGraphDistanceAndStableEdgeTieBreak",
+          "结果": "通过",
+          "耗时": "00:00:00.0012830"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ProtectedScenarioAnchorIsNeverAnExchangeEndpoint",
+          "结果": "通过",
+          "耗时": "00:00:00.0001940"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.RotationSearchUsesFirstWholeLegalCombinationAndRollsBackWhenAllBlocked",
+          "结果": "通过",
+          "耗时": "00:00:00.0237782"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.SharedThirdLandAssetsStayAndCanInvalidateSeaExchange",
+          "结果": "通过",
+          "耗时": "00:00:00.0005308"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.TamoNativeCommandIsLimitedIdempotentAndPreviewHasNoRandomOrBoardMutation",
+          "结果": "通过",
+          "耗时": "00:00:00.3471860"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ZhimengHonorsGainBanBeforeRandomAndDoesNotReofferAfterDecline",
+          "结果": "通过",
+          "耗时": "00:00:00.0054216"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ZhimengOddCountFavorsOwnerAndEmptyPairDoesNotAsk",
+          "结果": "通过",
+          "耗时": "00:00:00.0013938"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ZhimengRecordsCrossOwnerSameTypeCardsWithoutInventingLossForKeptCards",
+          "结果": "通过",
+          "耗时": "00:00:00.0004724"
+        },
+        {
+          "案例": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ZhimengRestoresAtTargetChoiceAndSplitsRealResourcesAndCommodities",
+          "结果": "通过",
+          "耗时": "00:00:00.0053511"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.AutomaticVictoryAfterLegalActionUsesConfiguredThreshold(rules: \"base\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0089958"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.AutomaticVictoryAfterLegalActionUsesConfiguredThreshold(rules: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0989135"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.AutomaticVictoryAfterLegalActionUsesConfiguredThreshold(rules: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0416604"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.AutomaticVictoryAfterLegalActionUsesConfiguredThreshold(rules: \"seafarers\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0223740"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.CustomPirateGoalStillRequiresCapturingOwnFortress",
+          "结果": "通过",
+          "耗时": "00:00:00.1478368"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.CustomWonderGoalStillRequiresHigherWonderLevel(level: 1, wins: False)",
+          "结果": "通过",
+          "耗时": "00:00:00.0277222"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.CustomWonderGoalStillRequiresHigherWonderLevel(level: 2, wins: True)",
+          "结果": "通过",
+          "耗时": "00:00:00.0180496"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.DefaultsAndLegacySavesRetainOriginalGoals(rules: \"base\", expected: 10)",
+          "结果": "通过",
+          "耗时": "00:00:00.0561032"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.DefaultsAndLegacySavesRetainOriginalGoals(rules: \"cities\", expected: 13)",
+          "结果": "通过",
+          "耗时": "00:00:00.0742437"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.DefaultsAndLegacySavesRetainOriginalGoals(rules: \"combined\", expected: 16)",
+          "结果": "通过",
+          "耗时": "00:00:00.0792810"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.DefaultsAndLegacySavesRetainOriginalGoals(rules: \"seafarers\", expected: 14)",
+          "结果": "通过",
+          "耗时": "00:00:00.0795947"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.FourWonderLevelsStillWinWithoutMeetingCustomPointGoal",
+          "结果": "通过",
+          "耗时": "00:00:00.0085545"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.OutOfRangeGoalsAreRejectedAtCreationLoadAndInvariantChecks(rules: \"base\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0421820"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.OutOfRangeGoalsAreRejectedAtCreationLoadAndInvariantChecks(rules: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0477677"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.OutOfRangeGoalsAreRejectedAtCreationLoadAndInvariantChecks(rules: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0688702"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.OutOfRangeGoalsAreRejectedAtCreationLoadAndInvariantChecks(rules: \"seafarers\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0608529"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.PirateGoalCannotExceedItsThirteenBuildingPoints(players: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0241752"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.PirateGoalCannotExceedItsThirteenBuildingPoints(players: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0236613"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.ProductionAiCompletesCustomFivePointGameAndReloadsWinner(rules: \"base\")",
+          "结果": "通过",
+          "耗时": "00:00:00.3045355"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.ProductionAiCompletesCustomFivePointGameAndReloadsWinner(rules: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:09.9701470"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.ProductionAiCompletesCustomFivePointGameAndReloadsWinner(rules: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:02.6301483"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.ProductionAiCompletesCustomFivePointGameAndReloadsWinner(rules: \"seafarers\")",
+          "结果": "通过",
+          "耗时": "00:00:00.9364803"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.SelectedGoalIsPublicSavedAndResumesPendingDecision(rules: \"base\")",
+          "结果": "通过",
+          "耗时": "00:00:00.1419369"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.SelectedGoalIsPublicSavedAndResumesPendingDecision(rules: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.2606737"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.SelectedGoalIsPublicSavedAndResumesPendingDecision(rules: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.2576983"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.SelectedGoalIsPublicSavedAndResumesPendingDecision(rules: \"seafarers\")",
+          "结果": "通过",
+          "耗时": "00:00:00.2169638"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.VictoryUsesConfiguredThresholdAndRejectsEarlyDeclarationWithoutMutation(rules: \"base\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0133344"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.VictoryUsesConfiguredThresholdAndRejectsEarlyDeclarationWithoutMutation(rules: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.1516040"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.VictoryUsesConfiguredThresholdAndRejectsEarlyDeclarationWithoutMutation(rules: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0464807"
+        },
+        {
+          "案例": "Catan.Rules.Tests.VictoryPointSettingsTests.VictoryUsesConfiguredThresholdAndRejectsEarlyDeclarationWithoutMutation(rules: \"seafarers\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0292932"
+        }
+      ]
+    },
+    {
+      "组": "同步与序列化回归",
+      "通过数": 97,
+      "案例": [
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.DefaultsNullsAndEscapesMatchLegacy(json: \"{\\\"Message\\\":\\\"汉字\\\\n\\\\t\\\\b\\\\f\\\\r\\\\\\\\\\\\/\\\\\\\"\\\\uD83C\"···)",
+          "结果": "通过",
+          "耗时": "00:00:00.0002305"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.DefaultsNullsAndEscapesMatchLegacy(json: \"{\\\"Message\\\":null,\\\"Room\\\":null,\\\"Revision\\\":-42}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0001692"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.DefaultsNullsAndEscapesMatchLegacy(json: \"{}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0032548"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.IntegratedSkillProjectionKeepsB5AndDirectInteractionFieldsAcrossBothDecoders",
+          "结果": "通过",
+          "耗时": "00:00:00.0239795"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.LengthAndArrayBudgetsAreEnforced",
+          "结果": "通过",
+          "耗时": "00:00:00.0091915"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Message\\\":\\\"\\\\uXX00\\\"}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000083"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Message\\\":\\\"\\\\x01\\\"}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000081"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Message\\\":\\\"a\\nb\\\"}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000056"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Message\\\":false}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000083"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"R\\\\u0065vision\\\":1,\\\"Revision\\\":2}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000186"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":+1}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000147"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":01}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000814"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":1.}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0004861"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":1e}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000062"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":\\\"1\\\"}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000053"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":null}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000069"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Room\\\":{\\\"Seats\\\":[],\\\"$type\\\":\\\"authority\\\"}}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000066"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Room\\\":{\\\"Seats\\\":[],}}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000087"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Rooms\\\":[{},]}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0002042"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Success\\\":1}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000113"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{} {}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0063167"
+        },
+        {
+          "案例": "Catan.Network.Tests.DirectWireJsonTests.MutableSkillResultAndInternalSettersMatchLegacy",
+          "结果": "通过",
+          "耗时": "00:00:00.0019082"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.B4AndB5PrivateChoicesAndCommandRetriesWorkWithBothReplyShapes(rules: \"cities-knights\", b5: False)",
+          "结果": "通过",
+          "耗时": "00:00:02.8082273"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.B4AndB5PrivateChoicesAndCommandRetriesWorkWithBothReplyShapes(rules: \"cities-knights\", b5: True)",
+          "结果": "通过",
+          "耗时": "00:00:01.9998916"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.B4AndB5PrivateChoicesAndCommandRetriesWorkWithBothReplyShapes(rules: \"combined\", b5: False)",
+          "结果": "通过",
+          "耗时": "00:00:01.7694296"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.B4AndB5PrivateChoicesAndCommandRetriesWorkWithBothReplyShapes(rules: \"combined\", b5: True)",
+          "结果": "通过",
+          "耗时": "00:00:03.7349843"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.CoalescingPreservesMultipleEventsAndReplacementsAndDetectsGapsWithoutAdvancing",
+          "结果": "通过",
+          "耗时": "00:00:00.0011202"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.DirectWriterPreservesEscapesOptionalFieldsAndStrictLegacyCompatibility",
+          "结果": "通过",
+          "耗时": "00:00:00.0003334"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"base\", map: \"base\")",
+          "结果": "通过",
+          "耗时": "00:00:00.2663986"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"cities-knights\", map: \"base\")",
+          "结果": "通过",
+          "耗时": "00:00:00.6127788"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"cloth-for-catan\")",
+          "结果": "通过",
+          "耗时": "00:00:00.6078372"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"fog-islands\")",
+          "结果": "通过",
+          "耗时": "00:00:00.5599567"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"forgotten-tribe\")",
+          "结果": "通过",
+          "耗时": "00:00:00.5367788"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"four-islands\")",
+          "结果": "通过",
+          "耗时": "00:00:00.5707475"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"heading-for-new-shores\")",
+          "结果": "通过",
+          "耗时": "00:00:00.6312354"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"new-world\")",
+          "结果": "通过",
+          "耗时": "00:00:01.4218791"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"pirate-islands\")",
+          "结果": "通过",
+          "耗时": "00:00:00.6714447"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"through-the-desert\")",
+          "结果": "通过",
+          "耗时": "00:00:00.6127722"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"wonders-of-catan\")",
+          "结果": "通过",
+          "耗时": "00:00:00.8092350"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"cloth-for-catan\")",
+          "结果": "通过",
+          "耗时": "00:00:00.5899730"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"fog-islands\")",
+          "结果": "通过",
+          "耗时": "00:00:00.5390825"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"forgotten-tribe\")",
+          "结果": "通过",
+          "耗时": "00:00:00.5834122"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"four-islands\")",
+          "结果": "通过",
+          "耗时": "00:00:00.5253681"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"heading-for-new-shores\")",
+          "结果": "通过",
+          "耗时": "00:00:00.6187343"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"new-world\")",
+          "结果": "通过",
+          "耗时": "00:00:00.4952370"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"pirate-islands\")",
+          "结果": "通过",
+          "耗时": "00:00:00.5741356"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"through-the-desert\")",
+          "结果": "通过",
+          "耗时": "00:00:00.5611682"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"wonders-of-catan\")",
+          "结果": "通过",
+          "耗时": "00:00:00.6601812"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FullSnapshotsCannotCrossRoomSeatOrConnection(room: \"other\", seat: \"P1\", connection: \"c1\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000698"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FullSnapshotsCannotCrossRoomSeatOrConnection(room: \"room\", seat: \"P1\", connection: \"old\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0001539"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.FullSnapshotsCannotCrossRoomSeatOrConnection(room: \"room\", seat: \"P2\", connection: \"c1\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0001091"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.InvalidPacketDoesNotReplaceAcceptedBaseline(damage: \"events\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0001970"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.InvalidPacketDoesNotReplaceAcceptedBaseline(damage: \"hash\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0002760"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.InvalidPacketDoesNotReplaceAcceptedBaseline(damage: \"map\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0002206"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.InvalidPacketDoesNotReplaceAcceptedBaseline(damage: \"unknown\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0001919"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.InvalidPacketDoesNotReplaceAcceptedBaseline(damage: \"version\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0005740"
+        },
+        {
+          "案例": "Catan.Network.Tests.SeatStateSyncTests.RestartRequiresFullSnapshotAndLatePreviousGameCannotRollBack",
+          "结果": "通过",
+          "耗时": "00:00:00.0002836"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.AiOpponentHandsCannotEnterNetworkSnapshotsOrBeInjectedByClients(rules: \"base\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0076863"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.AiOpponentHandsCannotEnterNetworkSnapshotsOrBeInjectedByClients(rules: \"cities-knights\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0096363"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.AiOpponentHandsCannotEnterNetworkSnapshotsOrBeInjectedByClients(rules: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0117949"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.AiOpponentHandsCannotEnterNetworkSnapshotsOrBeInjectedByClients(rules: \"seafarers\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0116280"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.AuthoritativeStateCannotBeEncodedAsWireRoot",
+          "结果": "通过",
+          "耗时": "00:00:00.0215367"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.ConcurrentWireDecodingKeepsSeatDataIndependentAndStillRejectsInvalidFields",
+          "结果": "通过",
+          "耗时": "00:00:00.0755580"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"base\", scenario: \"base\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0162073"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"base\", scenario: \"base\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0761544"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"cities-knights\", scenario: \"base\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.1467142"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"cities-knights\", scenario: \"base\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0420447"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"combined\", scenario: \"heading-for-new-shores\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0324920"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"combined\", scenario: \"heading-for-new-shores\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0694085"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"combined\", scenario: \"through-the-desert\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0375698"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"combined\", scenario: \"through-the-desert\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0594375"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"cloth-for-catan\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0362684"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"cloth-for-catan\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0618925"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"fog-islands\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0446498"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"fog-islands\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0486202"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"forgotten-tribe\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0497897"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"forgotten-tribe\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0651018"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"four-islands\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0294240"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"four-islands\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.1664830"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"heading-for-new-shores\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0388875"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"heading-for-new-shores\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0462086"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"new-world\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0368825"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"new-world\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0469590"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"pirate-islands\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0403622"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"pirate-islands\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0616952"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"through-the-desert\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0333622"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"through-the-desert\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0421741"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"wonders-of-catan\", seats: 3)",
+          "结果": "通过",
+          "耗时": "00:00:00.0559046"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"wonders-of-catan\", seats: 4)",
+          "结果": "通过",
+          "耗时": "00:00:00.0569832"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.HistoryInternalSettersAndPrivateIndicatorsRoundTrip",
+          "结果": "通过",
+          "耗时": "00:00:00.0152684"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.PublicBattleStrengthSurvivesTheClientServerWire(rules: \"cities\")",
+          "结果": "通过",
+          "耗时": "00:00:00.5711746"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.PublicBattleStrengthSurvivesTheClientServerWire(rules: \"combined\")",
+          "结果": "通过",
+          "耗时": "00:00:00.1711563"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.UnicodePasswordsAndNamesRetainExactContent",
+          "结果": "通过",
+          "耗时": "00:00:00.0000997"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.UnknownCommandEnumIsRejected",
+          "结果": "通过",
+          "耗时": "00:00:00.0001427"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.UnknownDuplicateAndTypeInjectionFieldsAreRejected(input: \"{\\\"$type\\\":\\\"Catan.Core.M2.GameState\\\"}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000070"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.UnknownDuplicateAndTypeInjectionFieldsAreRejected(input: \"{\\\"Operation\\\":\\\"List\\\",\\\"Authority\\\":\\\"secret\\\"}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000546"
+        },
+        {
+          "案例": "Catan.Network.Tests.WireContractAuditTests.UnknownDuplicateAndTypeInjectionFieldsAreRejected(input: \"{\\\"Operation\\\":\\\"List\\\",\\\"Operation\\\":\\\"Command\\\"}\")",
+          "结果": "通过",
+          "耗时": "00:00:00.0000936"
+        }
+      ]
+    }
+  ]
+}

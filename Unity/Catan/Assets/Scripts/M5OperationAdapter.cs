@@ -171,6 +171,7 @@ public sealed partial class M5App
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
         tabletop.BindDiscard(Operations(),dock);
         tabletop.BindLongestRoad(view.LongestRoadPlayerId,view.Players.FirstOrDefault(p=>p.Id==view.LongestRoadPlayerId)?.LongestRoadLength??0);
+        tabletop.BindHarbormaster(view.TradeModules);
         tabletop.ObserveDice(view.Events.LastOrDefault(e=>e.Kind=="RollDice")?.Sequence??0,view.LastDice1,view.LastDice2,(int)view.LastEventDie,ai.CardPresentationRoll);
         tabletop.BindDefense(view.BarbarianPosition,view.DefenderStrength,view.BarbarianStrength);
         ai.TableDiceRolling=tabletop.DiceRolling;

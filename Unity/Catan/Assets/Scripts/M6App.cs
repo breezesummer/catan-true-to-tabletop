@@ -19,6 +19,7 @@ public sealed partial class M6App : MonoBehaviour
         public bool Paused;
         public int AiSpeedLevel=1;
         public bool HasAiSpeed;
+        public bool HasVictoryTargetChoice,CustomVictoryTarget;
         public bool ThreeKingdoms;
         public string[] PlayerNames;
     }
@@ -61,6 +62,9 @@ public sealed partial class M6App : MonoBehaviour
     int menuRule,menuScenario,menuPlayers=4,menuHuman,menuAiSpeed=1;
     int? menuVictoryPoints;
     bool menuThreeKingdoms;
+    bool menuHarbormaster;
+    public bool Harbormaster { get; private set; }
+    bool customVictoryTarget;
     bool tableMenu, escapeDismissedInteraction;
     public bool TableMenuOpen=>tableMenu;
     public void OpenTableMenu(){if(!Ready)return;ResetTablePauseMenu();tableMenu=true;escapeDismissedInteraction=false;}
@@ -182,17 +186,18 @@ public sealed partial class M6App : MonoBehaviour
         presentation=app;actor=acting;finished=done;decideAndSubmit=step;save=export;refresh=update;close=dispose;visible=show;
         InitialAuthority=null;refresh();nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);
     }
-    public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null,int? aiSpeedLevel=null,bool threeKingdoms=false)
+    public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null,int? aiSpeedLevel=null,bool threeKingdoms=false,bool harbormaster=false)
     {
         ValidateConfiguration(rules,scenario,players,human);
         if(threeKingdoms&&rules!="cities-knights"&&rules!="combined")throw new InvalidDataException("三国争霸支持城市与骑士或双扩展组合。");
         if(!networkEntering&&Network!=null&&(Network.Playing||Network.Busy||Network.RoomId!=null||Network.EnrollmentPending))Network.EndSession();
-        int target=Catan.Core.VictoryPointSettings.Resolve(targetVictoryPoints,DefaultVictoryPoints(rules,scenario,players),MaximumVictoryPoints(rules,scenario));
+        var modules=Catan.Core.TradeModules.HarbormasterRules.Create(new Catan.Core.TradeModules.TradeModuleOptions { Harbormaster=harbormaster },scenario);
+        int target=Catan.Core.VictoryPointSettings.Resolve(targetVictoryPoints,Catan.Core.TradeModules.HarbormasterRules.DefaultTarget(DefaultVictoryPoints(rules,scenario,players),modules),MaximumVictoryPoints(rules,scenario));
         if(close!=null)close();
         else if(presentation!=null){presentation.enabled=false;Destroy(presentation);}
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
-        ThreeKingdoms=threeKingdoms;ResetThreeKingdomsPanel();
+        customVictoryTarget=targetVictoryPoints.HasValue;Harbormaster=harbormaster;ThreeKingdoms=threeKingdoms;ResetThreeKingdomsPanel();
         ResetCardPresentation();ResetPlayerIdentity();
         TargetVictoryPoints=target;AiSpeedLevel=TabletopAiSpeed.Clamp(aiSpeedLevel??AiSpeedLevel);ResetBuildPresentation();
         networkMenu=false;menuPendingAction=null;tableMenu=false;encyclopediaOpen=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你使用 "+ColorLabel(human)+" 建筑。行动顺序由开局掷骰决定。";
@@ -215,7 +220,7 @@ public sealed partial class M6App : MonoBehaviour
     {
         if(NetworkGame)throw new InvalidOperationException("联机存档保存在服务器，客户端不能导出权威存档。");
         if(!Ready)throw new InvalidOperationException("No game to save");
-        return JsonUtility.ToJson(new SavedGame{RuleSet=RuleSet,ScenarioId=ScenarioId,PlayerCount=PlayerCount,HumanSeat=HumanSeat,Paused=Paused,AiSpeedLevel=AiSpeedLevel,HasAiSpeed=true,ThreeKingdoms=ThreeKingdoms,PlayerNames=localPlayerNames.ToArray(),Authority=save()},true);
+        return JsonUtility.ToJson(new SavedGame{RuleSet=RuleSet,ScenarioId=ScenarioId,PlayerCount=PlayerCount,HumanSeat=HumanSeat,Paused=Paused,AiSpeedLevel=AiSpeedLevel,HasAiSpeed=true,HasVictoryTargetChoice=true,CustomVictoryTarget=customVictoryTarget,ThreeKingdoms=ThreeKingdoms,PlayerNames=localPlayerNames.ToArray(),Authority=save()},true);
     }
     public void WriteSave(string path)
     {
@@ -259,6 +264,7 @@ public sealed partial class M6App : MonoBehaviour
         ValidateConfiguration(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat);
         ValidateAuthority(data); // Finish parsing before closing the current game.
         StartGame(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat,data.Paused,data.Authority,aiSpeedLevel:data.HasAiSpeed?data.AiSpeedLevel:1,threeKingdoms:data.ThreeKingdoms);
+        customVictoryTarget=!data.HasVictoryTargetChoice||data.CustomVictoryTarget;
         if(data.PlayerNames!=null&&data.PlayerNames.Length==data.PlayerCount)localPlayerNames=data.PlayerNames.Select(PlayerIdentityModel.NormalizeName).ToArray();
         Notice="已恢复局面、玩家姓名和颜色配置。";
     }
@@ -268,8 +274,8 @@ public sealed partial class M6App : MonoBehaviour
         MenuVisible=true;NavigateMainMenu(-1);if(presentation!=null)presentation.enabled=false;if(visible!=null)visible(false);
         menuRule=Array.IndexOf(RuleIds,RuleSet);menuPlayers=PlayerCount;menuHuman=int.Parse(HumanSeat.Substring(1))-1;
         var ids=ScenarioIds();menuScenario=Math.Max(0,Array.IndexOf(ids,ScenarioId));
-        menuVictoryPoints=TargetVictoryPoints;menuAiSpeed=AiSpeedLevel;
-        menuThreeKingdoms=ThreeKingdoms;
+        menuVictoryPoints=customVictoryTarget?TargetVictoryPoints:(int?)null;menuAiSpeed=AiSpeedLevel;
+        menuThreeKingdoms=ThreeKingdoms;menuHarbormaster=Harbormaster;
     }
     public void SaveAndReturnToMainMenu()
     {
@@ -291,6 +297,7 @@ public sealed partial class M6App : MonoBehaviour
     internal void ResumeGame(){MenuVisible=false;presentation.enabled=true;visible(true);nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);}
     string[] ScenarioIds()=>menuRule==3?CombinedIds:menuRule==1?Catan.Core.M3.SeafarersScenarios.Ids:new[]{"heading-for-new-shores"};
     string ScenarioName(string id)=>Catan.Core.M3.SeafarersScenarios.Create(id,menuPlayers).Name;
+    int MenuDefaultVictoryPoints(string rules,string scenario,int players)=>DefaultVictoryPoints(rules,scenario,players)+(menuHarbormaster&&Catan.Core.TradeModules.HarbormasterRules.Supports(scenario)?1:0);
     static int DefaultVictoryPoints(string rules,string scenario,int players)=>rules=="base"?10:rules=="cities-knights"?13:rules=="combined"?Catan.Core.M5.CombinedScenarios.Create(scenario,players).TargetVictoryPoints:Catan.Core.M3.SeafarersScenarios.Create(scenario,players).TargetVictoryPoints;
     static int MaximumVictoryPoints(string rules,string scenario)=>rules=="seafarers"?Catan.Core.VictoryPointSettings.MaximumForScenario(scenario):Catan.Core.VictoryPointSettings.Maximum;
     void Styles()

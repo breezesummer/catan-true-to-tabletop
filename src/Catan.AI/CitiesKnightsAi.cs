@@ -192,7 +192,7 @@ public sealed class CitiesKnightsAi
         if (active >= target) return null;
         var own = view.Board.Knights.Where(k => k.PlayerId == view.PlayerId).ToArray();
         var activate = legal.Where(c => c.Kind == CommandKind.ActivateKnight)
-            .OrderBy(c => { int level = own.Single(k => k.LocationId == c.TargetId).Level; return level >= target - active ? level : 10 - level; }).FirstOrDefault();
+            .OrderBy(c => { int level = view.Board.Knights.Single(k => k.LocationId == c.TargetId).Level; return level >= target - active ? level : 10 - level; }).FirstOrDefault();
         if (activate != null) return activate;
         if (view.BarbarianPosition < 5 && own.Sum(k => k.Level) >= target) return null;
         var smith = legal.Where(c => c.Kind == CommandKind.PlayProgressCard && c.ProgressCard == ProgressCardKind.Smithing)
@@ -238,10 +238,10 @@ public sealed class CitiesKnightsAi
 
     private static int PointGain(PlayerView view, Command c)
     {
-        int points = c.Kind == CommandKind.BuildCity || c.Kind == CommandKind.BuildSettlement ? 1 : 0;
+        int points = c.Kind == CommandKind.BuildCity || c.Kind == CommandKind.BuildSettlement ? 1 + HarborGain(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, c.TargetId) : 0;
         if (c.Kind == CommandKind.ImproveCity || c.Kind == CommandKind.PlayProgressCard && c.ProgressCard == ProgressCardKind.Crane)
             return GainsMetropolis(view, c.Track) ? 2 : 0;
-        if (c.Kind == CommandKind.PlayProgressCard && c.ProgressCard == ProgressCardKind.Medicine) return 1;
+        if (c.Kind == CommandKind.PlayProgressCard && c.ProgressCard == ProgressCardKind.Medicine) return 1 + HarborGain(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, c.TargetId);
         if (c.Kind == CommandKind.PlayProgressCard && c.ProgressCard == ProgressCardKind.Merchant) return view.MerchantPlayerId == view.PlayerId ? 0 : 1;
         if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 3 && (c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight || c.Kind == CommandKind.MoveKnight || c.Kind == CommandKind.DisplaceKnight))
         {
@@ -570,7 +570,7 @@ public sealed class CitiesKnightsAi
     private static double Value(PlayerView view, string vertex)
     {
         var owned = Buildings(view).Where(b => b.PlayerId == view.PlayerId).Select(b => b.LocationId).ToArray();
-        return view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
+        return HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex) + view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
         {
             var pips = 6 - Math.Abs(7 - t.Number!.Value);
             var already = view.Board.Tiles.Count(other => other.Resource == t.Resource && other.Vertices.Intersect(owned).Any());

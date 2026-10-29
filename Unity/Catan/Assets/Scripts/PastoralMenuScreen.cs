@@ -134,7 +134,7 @@ public sealed partial class M6App
         var ids=ScenarioIds();menuScenario=Mathf.Clamp(menuScenario,0,ids.Length-1);
         string map=menuRule==0?"标准岛屿":menuRule==2?"标准城邦":ScenarioName(ids[menuScenario]);
         PastoralMenuUI.Label(new Rect(497,737,510,26),RuleNames[menuRule]+"  /  "+map+(menuRule>=2&&menuThreeKingdoms?" · 三国 B5":""),16,null,true);
-        PastoralMenuUI.Label(new Rect(497,774,500,23),menuPlayers+" 人同桌  ·  你的建筑 "+PlayerIdentityModel.ColorNames[menuHuman]+"  ·  "+(menuVictoryPoints??DefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers))+" 分获胜",13,PastoralMenuUI.Muted);
+        PastoralMenuUI.Label(new Rect(497,774,500,23),menuPlayers+" 人同桌  ·  你的建筑 "+PlayerIdentityModel.ColorNames[menuHuman]+"  ·  "+(menuVictoryPoints??MenuDefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers))+" 分获胜",13,PastoralMenuUI.Muted);
         if(menuSetupStep>0&&PastoralMenuUI.Button(new Rect(1000,751,104,46),"上一步"))menuSetupStep--;
         if(PastoralMenuUI.Button(new Rect(1117,751,216,46),menuSetupStep==2?"启程 · 开始游戏":"下一步   →",true,true))
         {
@@ -176,7 +176,11 @@ public sealed partial class M6App
         PastoralMenuUI.Label(new Rect(499,565,390,24),"AI 行动节奏",14,PastoralMenuUI.Muted);
         menuAiSpeed=PastoralMenuUI.Segments(new Rect(499,603,394,43),menuAiSpeed,TabletopAiSpeed.Names);
         PastoralMenuUI.Fill(new Rect(926,286,1,374),new Color(.48f,.54f,.42f,.18f));
-        var ids=ScenarioIds();int defaults=DefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
+        var ids=ScenarioIds();
+        bool harborAllowed=Catan.Core.TradeModules.HarbormasterRules.Supports(ids[menuScenario]);
+        if(!harborAllowed)menuHarbormaster=false;
+        if(PastoralMenuUI.Button(new Rect(969,590,330,36),(menuHarbormaster?"☑ ":"☐ ")+"海港大师",harborAllowed,false,menuHarbormaster))menuHarbormaster=!menuHarbormaster;
+        int defaults=MenuDefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
         if(menuVictoryPoints.HasValue)menuVictoryPoints=Mathf.Clamp(menuVictoryPoints.Value,5,maximum);
         int points=menuVictoryPoints??defaults;
         PastoralMenuUI.Label(new Rect(966,285,330,35),"本局胜利目标",22,null,true);
@@ -187,12 +191,12 @@ public sealed partial class M6App
         if(PastoralMenuUI.Button(new Rect(1250,414,49,49),"+",points<maximum))menuVictoryPoints=points+1;
         if(PastoralMenuUI.Button(new Rect(969,544,330,39),"使用剧本推荐 · "+defaults+" 分"))menuVictoryPoints=null;
         string hint=menuRule==1&&ids[menuScenario]=="wonders-of-catan"?"奇观的特殊胜利条件仍适用。":menuRule==1&&ids[menuScenario]=="pirate-islands"?"获胜仍须夺回自己的堡垒。":menuRule==1&&ids[menuScenario]=="cloth-for-catan"?"布匹耗尽时仍按剧本规则结算。":"设置将随本局存档保留。";
-        PastoralMenuUI.Label(new Rect(969,608,330,58),"可选 5–"+maximum+" 分。"+hint,14,PastoralMenuUI.Muted);
+        PastoralMenuUI.Label(new Rect(969,638,330,58),harborAllowed?"可选 5–"+maximum+" 分。"+hint:"海盗群岛暂未开放海港大师。",14,PastoralMenuUI.Muted);
     }
     void StartConfiguredGame()
     {
         var ids=ScenarioIds();
-        StartGame(RuleIds[menuRule],ids[Mathf.Clamp(menuScenario,0,ids.Length-1)],menuPlayers,"P"+(Mathf.Clamp(menuHuman,0,menuPlayers-1)+1),targetVictoryPoints:menuVictoryPoints,aiSpeedLevel:menuAiSpeed,threeKingdoms:menuRule>=2&&menuThreeKingdoms);
+        StartGame(RuleIds[menuRule],ids[Mathf.Clamp(menuScenario,0,ids.Length-1)],menuPlayers,"P"+(Mathf.Clamp(menuHuman,0,menuPlayers-1)+1),targetVictoryPoints:menuVictoryPoints,aiSpeedLevel:menuAiSpeed,threeKingdoms:menuRule>=2&&menuThreeKingdoms,harbormaster:menuHarbormaster&&Catan.Core.TradeModules.HarbormasterRules.Supports(ids[menuScenario]));
     }
     void RequestMenuAction(Action action,string caption,bool allowSave=true)
     {

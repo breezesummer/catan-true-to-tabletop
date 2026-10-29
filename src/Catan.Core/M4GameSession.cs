@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Catan.Core.TradeModules;
 using Catan.Core.ThreeKingdoms;
 
 namespace Catan.Core.M4
@@ -28,12 +29,13 @@ namespace Catan.Core.M4
         private static readonly Resource[] Resources = (Resource[])Enum.GetValues(typeof(Resource));
         private CitiesKnightsGameSession(Scenario scenario, Port[] ports, GameState state) { this.scenario = scenario; this.ports = ports; this.state = state; }
 
-        public static CitiesKnightsGameSession Create(string topologyScenarioJson, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null, bool threeKingdoms = false, bool threeKingdomsSkills = true, string threeKingdomsPackageVersion = null)
+        public static CitiesKnightsGameSession Create(string topologyScenarioJson, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null, bool threeKingdoms = false, bool threeKingdomsSkills = true, string threeKingdomsPackageVersion = null, TradeModuleOptions tradeModules = null)
         {
             if (playerCount != 3 && playerCount != 4) throw new ArgumentOutOfRangeException(nameof(playerCount), "基础版支持 3 或 4 人。");
             // Reuse the registered immutable topology, not the M1 controlled random sequence or rules.
             Catan.Core.GameSession.Create(topologyScenarioJson);
             var scenario = Json.Read<Scenario>(topologyScenarioJson);
+            var modules = HarbormasterRules.Create(tradeModules, "m4-cities-knights");
             var random = new RandomState { State = seed == 0 ? 0x9e3779b9u : seed };
             RandomizeBoard(scenario, random);
             var ports = MakePorts(scenario, random);
@@ -48,8 +50,8 @@ namespace Catan.Core.M4
             var start = contenders[0];
             var state = new GameState
             {
-                SaveFormatVersion = SaveFormatVersion, RulesVersion = RulesVersion, ScenarioId = "m4-cities-knights", ScenarioVersion = ScenarioVersion,
-                ScenarioContentHash = Json.Hash(topologyScenarioJson.Replace("\r\n", "\n")), InitialSeed = seed, Random = random, TargetVictoryPoints = VictoryPointSettings.Resolve(targetVictoryPoints, 13),
+                TradeModules = modules, SaveFormatVersion = HarbormasterRules.SaveFormat(SaveFormatVersion, modules), RulesVersion = RulesVersion, ScenarioId = "m4-cities-knights", ScenarioVersion = ScenarioVersion,
+                ScenarioContentHash = Json.Hash(topologyScenarioJson.Replace("\r\n", "\n")), InitialSeed = seed, Random = random, TargetVictoryPoints = VictoryPointSettings.Resolve(targetVictoryPoints, HarbormasterRules.DefaultTarget(13, modules)),
                 Players = Enumerable.Range(1, playerCount).Select(i => new PlayerState { Id = "P" + i, Resources = new ResourceBag(), Pieces = new PieceSupply { Roads = 15, Settlements = 5, Cities = 4 } }).ToArray(),
                 Bank = new ResourceBag { Wood = 19, Brick = 19, Wool = 19, Wheat = 19, Ore = 19 },
                 Phase = GamePhase.SetupSettlement, ActivePlayerId = "P" + (start + 1), StartingPlayerIndex = start,
@@ -154,6 +156,7 @@ namespace Catan.Core.M4
                         PlayedKnights = p.PlayedKnights, Pieces = p.Pieces.Copy(), VictoryPoints = VictoryPoints(state, p.Id, state.WinnerPlayerId == p.Id), LongestRoadLength = LongestRoad(state, p.Id) }).ToArray(),
                     Board = new BoardView { Tiles = Json.Copy(state.Tiles), Vertices = Json.Copy(scenario.Topology.Vertices), Edges = Json.Copy(scenario.Topology.Edges), Ports = Json.Copy(CurrentPortsB6(state)),
                         Settlements = Json.Copy(state.Settlements), Cities = Json.Copy(state.Cities), Roads = Json.Copy(state.Roads), RobberTileId = state.RobberTileId },
+                    TradeModules = HarbormasterRules.View(state.TradeModules, HarborScores(state)),
                     LegalVertexIds = vertices, LegalCityVertexIds = cities, LegalEdgeIds = edges, LongestRoadPlayerId = state.LongestRoadPlayerId, LargestArmyPlayerId = state.LargestArmyPlayerId,
                     WinnerPlayerId = state.WinnerPlayerId, LastDice1 = state.LastDice1, LastDice2 = state.LastDice2, Events = Json.Copy(state.Events),
                     OwnCommodities = own.Commodities.Copy(), OwnImprovements = own.Improvements.ToArray(), CommodityBank = state.CommodityBank.Copy(),
@@ -187,13 +190,13 @@ namespace Catan.Core.M4
             GameState saved;
             try { saved = Json.Read<GameState>(save); }
             catch (Exception ex) when (ex is System.Runtime.Serialization.SerializationException || ex is ArgumentException || ex is System.Xml.XmlException) { throw new InvalidDataException("Invalid save JSON.", ex); }
-            if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != ThreeKingdomsVersionFor(saved.ThreeKingdoms) || saved.ScenarioVersion != ScenarioVersion || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
+            if (saved == null || saved.SaveFormatVersion != HarbormasterRules.SaveFormat(SaveFormatVersion, saved.TradeModules) || saved.RulesVersion != ThreeKingdomsVersionFor(saved.ThreeKingdoms) || saved.ScenarioVersion != ScenarioVersion || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
                 throw new InvalidDataException("Unsupported or malformed save.");
             if (saved.ThreeKingdoms != null && !Catan.Core.ThreeKingdoms.ThreeKingdomsEngine.HasSupportedPackage(saved.ThreeKingdoms))
                 throw new InvalidDataException("三国规则版本或武将包不兼容。");
             saved.TargetVictoryPoints = saved.TargetVictoryPoints ?? 13;
             if (!VictoryPointSettings.IsValid(saved.TargetVictoryPoints)) throw new InvalidDataException("存档中的胜利分数无效。");
-            var session = Create(topologyScenarioJson, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints, saved.ThreeKingdoms != null, saved.ThreeKingdoms?.SkillsEnabled == true, saved.ThreeKingdoms?.PackageVersion);
+            var session = Create(topologyScenarioJson, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints, saved.ThreeKingdoms != null, saved.ThreeKingdoms?.SkillsEnabled == true, saved.ThreeKingdoms?.PackageVersion, HarbormasterRules.Restore(saved.TradeModules, saved.ScenarioId));
             foreach (var record in saved.ProcessedCommands)
             {
                 if (record == null || record.Command == null) throw new InvalidDataException("Malformed command history.");
@@ -441,8 +444,11 @@ namespace Catan.Core.M4
             }
             return roads.Length == 0 ? 0 : roads.SelectMany(e => e.Vertices).Distinct().Max(v => Walk(v, false));
         }
+        private HarborScore[] HarborScores(GameState s) => s.TradeModules == null ? Array.Empty<HarborScore>() :
+            HarbormasterRules.Scores(s.Players.Select(p => p.Id), CurrentPortsB6(s).SelectMany(p => p.Vertices), s.Settlements.Where(b => B5Working(s, "Settlement", b.LocationId)), s.Cities);
         private void RecalculateAwards(GameState s)
         {
+            HarbormasterRules.Recalculate(s.TradeModules, HarborScores(s));
             s.LongestRoadPlayerId = Award(s.Players.Select(p => p.Id).ToArray(), s.Players.Select(p => LongestRoad(s, p.Id)).ToArray(), 5, s.LongestRoadPlayerId);
             s.LargestArmyPlayerId = null;
         }
@@ -453,21 +459,23 @@ namespace Catan.Core.M4
         }
         private static int VictoryPoints(GameState s, string player, bool includeHidden)
         {
-            return Math.Max(0,B5BoardRules.Score(s.ThreeKingdoms,player)+(B5(s)?B2SkillEngine.B5MilitaryScoreAdjustment(s.ThreeKingdoms,player):0)+s.Settlements.Count(b => b.PlayerId == player && B5Working(s,"Settlement",b.LocationId)) + 2 * s.Cities.Count(b => b.PlayerId == player) + (s.LongestRoadPlayerId == player ? 2 : 0)
+            return HarbormasterRules.VictoryPoints(s.TradeModules, player) + Math.Max(0,B5BoardRules.Score(s.ThreeKingdoms,player)+(B5(s)?B2SkillEngine.B5MilitaryScoreAdjustment(s.ThreeKingdoms,player):0)+s.Settlements.Count(b => b.PlayerId == player && B5Working(s,"Settlement",b.LocationId)) + 2 * s.Cities.Count(b => b.PlayerId == player) + (s.LongestRoadPlayerId == player ? 2 : 0)
                 + 2*s.Metropolises.Count(m=>m.PlayerId==player)+s.Players.Single(p=>p.Id==player).DefenderPoints+s.Players.Single(p=>p.Id==player).ProgressVictoryCards.Length+(s.MerchantPlayerId==player?1:0));
         }
         private static void CheckVictory(GameState s)
         {
+            if (s.TradeModules != null && (s.PendingDecision != null || s.TradeOffer != null || s.DecisionQueue.Length > 0 || s.ProductionPending || (s.Phase != GamePhase.Action && s.Phase != GamePhase.ProductionAwaitRoll && s.Phase != GamePhase.Finished))) return;
             if(B4(s)&&(B2Busy(s)||s.ThreeKingdomsProgressResolutions?.Length>0||s.ThreeKingdomsVirtualUse!=null))return;
             if (s.Turn > 0 && VictoryPoints(s, s.ActivePlayerId, true) >= s.TargetVictoryPoints.Value) { s.WinnerPlayerId = s.ActivePlayerId; B6AllianceRules.RecordVictory(s.ThreeKingdoms,s.WinnerPlayerId); s.Phase = GamePhase.Finished; s.PendingDecision = null; s.DecisionQueue=Array.Empty<PendingDecision>();s.ProductionPending=false;s.Discards = Array.Empty<DiscardRequirement>(); s.TradeOffer = null; }
         }
 
         private void AssertInvariants(GameState s)
         {
+            HarbormasterRules.Validate(s.TradeModules, s.ScenarioId, HarborScores(s));
             ValidateThreeKingdoms(s);
             Check(VictoryPointSettings.IsValid(s.TargetVictoryPoints), "胜利分数无效。");
             void Check(bool valid, string message) { if (!valid) throw new InvalidDataException(message); }
-            Check(s.SaveFormatVersion == SaveFormatVersion && s.RulesVersion == ThreeKingdomsVersionFor(s.ThreeKingdoms) && s.ScenarioVersion == ScenarioVersion, "Invalid version identity.");
+            Check(s.SaveFormatVersion == HarbormasterRules.SaveFormat(SaveFormatVersion, s.TradeModules) && s.RulesVersion == ThreeKingdomsVersionFor(s.ThreeKingdoms) && s.ScenarioVersion == ScenarioVersion, "Invalid version identity.");
             Check(Enum.IsDefined(typeof(GamePhase), s.Phase) && s.Turn >= 0 && s.SetupPlacementIndex >= 0 && s.SetupPlacementIndex <= s.Players.Length * 2, "Invalid phase/turn.");
             Check(s.Players.Length == 3 || s.Players.Length == 4, "Invalid player count.");
             Check(s.Players.Select(p => p.Id).Distinct().Count() == s.Players.Length && s.Players.Any(p => p.Id == s.ActivePlayerId), "Invalid player identities.");

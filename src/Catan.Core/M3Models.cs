@@ -180,9 +180,11 @@ namespace Catan.Core.M3
         [DataMember(Order=52)] public Port[] UnplacedPorts { get; set; } = Array.Empty<Port>();
         [DataMember(Order=53)] public int SetupPortIndex { get; set; }
         [DataMember(Order=54)] public PendingDecision PortReturnDecision { get; set; }
+        [DataMember(Order=400, EmitDefaultValue=false)] public TradeModules.TradeModuleState TradeModules { get; set; }
         internal GameState CopyForTransaction()
         {
             var copy = (GameState)MemberwiseClone();
+            copy.TradeModules = TradeModules?.Copy();
             copy.Random = new RandomState { AlgorithmId = Random.AlgorithmId, State = Random.State, Draws = Random.Draws };
             copy.Players = Players.Select(p => new PlayerState { Id = p.Id, Resources = p.Resources.Copy(), Pieces = p.Pieces.Copy(), DevelopmentCards = p.DevelopmentCards.ToArray(), PlayedKnights = p.PlayedKnights, ShipsRemaining = p.ShipsRemaining, BonusVictoryPoints = p.BonusVictoryPoints, HomeRegions = p.HomeRegions.ToArray(), SettledRegions = p.SettledRegions.ToArray(), Cloth = p.Cloth, WonderId = p.WonderId, WonderLevel = p.WonderLevel, HeldPorts = p.HeldPorts.ToArray() }).ToArray();
             copy.Bank = Bank.Copy();
@@ -272,6 +274,7 @@ namespace Catan.Core.M3
         public string[] LegalVertexIds { get; internal set; }
         public string[] LegalCityVertexIds { get; internal set; }
         public string[] LegalEdgeIds { get; internal set; }
+        public TradeModules.TradeModuleView TradeModules { get; internal set; }
         public string LongestRoadPlayerId { get; internal set; }
         public string LargestArmyPlayerId { get; internal set; }
         public string WinnerPlayerId { get; internal set; }

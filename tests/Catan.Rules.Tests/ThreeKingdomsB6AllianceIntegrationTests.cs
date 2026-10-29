@@ -87,6 +87,20 @@ public sealed class ThreeKingdomsB6AllianceIntegrationTests
         dynamic state=game.GetAuthoritativeStateForTesting();Assert.Equal("P2",(string)state.Knights[0].PlayerId);Assert.Equal(3,(int)state.Knights[0].Level);Assert.Equal(0,(int)Player(state).Resources.Total);Assert.Equal(0,(int)Player(state,"P2").Resources.Total);Assert.Equal(0,(int)Player(state).Improvements[1]);
         dynamic duplicate=Command(game,mode,"PromoteKnight");duplicate.TargetId=site;Assert.False((bool)game.Preview(duplicate).Success);
     }
+    [Fact]
+    public void CityAiDefenseEvaluatesLegalAlliedKnightWithoutAssumingOwnership()
+    {
+        string site=Vertex("cities");var game=(M4.CitiesKnightsGameSession)Fixture("cities",new[]{"tk-g50","tk-g12","tk-g09","tk-g22"},s=>{
+            Allies(s,"P1","P2");Player(s).Resources.Wheat=1;
+            ((M4.GameState)s).Knights=new[]{new M4.Knight{PlayerId="P2",LocationId=site,Level=2}};
+        });
+        var view=game.GetAiPlayerView("P1");var legal=view.LegalActions.ToList();string before=game.Save();
+        var choice=(M4.Command)typeof(Catan.AI.CitiesKnightsAi).GetMethod("DefenseAction",BindingFlags.NonPublic|BindingFlags.Static)!.Invoke(null,new object[]{view,legal,1})!;
+        Assert.Equal(M4.CommandKind.ActivateKnight,choice.Kind);Assert.Equal(site,choice.TargetId);Assert.Equal(before,game.Save());
+        choice.Id=ThreeKingdomsTestGame.NextId();Assert.True(game.Execute(choice).Success);
+        Assert.Equal("P2",game.GetPlayerView("P1").Board.Knights.Single().PlayerId);
+    }
+
     [Theory][InlineData("cities")][InlineData("combined")]
     public void SmithingUsesAlliedKnightSupplyAndSharedFortress(string mode)
     {

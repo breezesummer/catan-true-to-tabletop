@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Catan.Core.TradeModules;
 
 namespace Catan.Core.M3
 {
@@ -27,13 +28,14 @@ namespace Catan.Core.M3
         private static readonly Resource[] Resources = (Resource[])Enum.GetValues(typeof(Resource));
         private SeafarersGameSession(SeafarersScenario scenario, GameState state) { this.scenario = scenario; this.state = state; }
 
-        public static SeafarersGameSession Create(string scenarioId, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null)
-            => CreateForVersion(scenarioId, playerCount, seed, targetVictoryPoints, VariableScenarioVersion);
+        public static SeafarersGameSession Create(string scenarioId, int playerCount = 4, uint seed = 1, int? targetVictoryPoints = null, TradeModuleOptions tradeModules = null)
+            => CreateForVersion(scenarioId, playerCount, seed, targetVictoryPoints, VariableScenarioVersion, tradeModules);
 
-        private static SeafarersGameSession CreateForVersion(string scenarioId, int playerCount, uint seed, int? targetVictoryPoints, string version)
+        private static SeafarersGameSession CreateForVersion(string scenarioId, int playerCount, uint seed, int? targetVictoryPoints, string version, TradeModuleOptions tradeModules = null)
         {
             if (playerCount != 3 && playerCount != 4) throw new ArgumentOutOfRangeException(nameof(playerCount), "航海家支持 3 或 4 人。");
             var scenario = version == ScenarioVersion ? SeafarersScenarios.CreateSeeded(scenarioId, playerCount, seed) : SeafarersScenarios.CreateVariable(scenarioId, playerCount, seed);
+            var modules = HarbormasterRules.Create(tradeModules, scenarioId);
             var random = new RandomState { State = seed == 0 ? 0x9e3779b9u : seed };
             var deck = new List<DevelopmentCardKind>();
             deck.AddRange(Enumerable.Repeat(DevelopmentCardKind.Knight, scenario.Id == "pirate-islands" && playerCount == 4 ? 19 : 14));
@@ -50,8 +52,8 @@ namespace Catan.Core.M3
             var start = contenders[0];
             var state = new GameState
             {
-                SaveFormatVersion = SaveFormatVersion, RulesVersion = RulesVersion, ScenarioId = scenario.Id, ScenarioVersion = version,
-                ScenarioContentHash = Json.Hash(Json.Write(scenario)), InitialSeed = seed, Random = random, TargetVictoryPoints = VictoryPointSettings.Resolve(targetVictoryPoints, scenario.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(scenario.Id)),
+                TradeModules = modules, SaveFormatVersion = HarbormasterRules.SaveFormat(SaveFormatVersion, modules), RulesVersion = RulesVersion, ScenarioId = scenario.Id, ScenarioVersion = version,
+                ScenarioContentHash = Json.Hash(Json.Write(scenario)), InitialSeed = seed, Random = random, TargetVictoryPoints = VictoryPointSettings.Resolve(targetVictoryPoints, HarbormasterRules.DefaultTarget(scenario.TargetVictoryPoints, modules), VictoryPointSettings.MaximumForScenario(scenario.Id)),
                 Players = Enumerable.Range(1, playerCount).Select(i => new PlayerState { Id = "P" + i, Resources = new ResourceBag(), Pieces = new PieceSupply { Roads = 15, Settlements = 5, Cities = 4 } }).ToArray(),
                 Bank = new ResourceBag { Wood = 19, Brick = 19, Wool = 19, Wheat = 19, Ore = 19 },
                 Phase = GamePhase.SetupSettlement, ActivePlayerId = "P" + (start + 1), StartingPlayerIndex = start,
@@ -153,6 +155,7 @@ namespace Catan.Core.M3
                         PlayedKnights = p.PlayedKnights, Pieces = p.Pieces.Copy(), ShipsRemaining = p.ShipsRemaining, Cloth = p.Cloth, BonusVictoryPoints = p.BonusVictoryPoints, WonderId = p.WonderId, WonderLevel = p.WonderLevel, VictoryPoints = VictoryPoints(state, p.Id, state.WinnerPlayerId == p.Id), LongestRoadLength = LongestRoad(state, p.Id) }).ToArray(),
                     Board = new BoardView { Tiles = Json.Copy(state.Tiles), Vertices = Json.Copy(scenario.Vertices), Edges = Json.Copy(scenario.Edges), Ports = Json.Copy(state.Ports),
                         Settlements = Json.Copy(state.Settlements), Cities = Json.Copy(state.Cities), Roads = Json.Copy(state.Roads), RobberTileId = state.RobberTileId, Ships = Json.Copy(state.Ships), PirateTileId = state.PirateTileId, BonusEdgeIds = state.BonusEdgeIds.ToArray(), GiftCardEdgeIds = state.GiftCards.Select(g => g.EdgeId).ToArray(), GiftPorts = Json.Copy(state.GiftPorts), Villages = Json.Copy(state.Villages), Fortresses = Json.Copy(state.Fortresses) },
+                    TradeModules = HarbormasterRules.View(state.TradeModules, HarborScores(state)),
                     LegalVertexIds = vertices, LegalCityVertexIds = cities, LegalEdgeIds = edges, LongestRoadPlayerId = state.LongestRoadPlayerId, LargestArmyPlayerId = state.LargestArmyPlayerId,
                     WinnerPlayerId = state.WinnerPlayerId, LastDice1 = state.LastDice1, LastDice2 = state.LastDice2, Events = Json.Copy(state.Events)
                 };
@@ -167,11 +170,11 @@ namespace Catan.Core.M3
             GameState saved;
             try { saved = Json.Read<GameState>(save); }
             catch (Exception ex) when (ex is System.Runtime.Serialization.SerializationException || ex is ArgumentException || ex is System.Xml.XmlException) { throw new InvalidDataException("Invalid save JSON.", ex); }
-            if (saved == null || saved.SaveFormatVersion != SaveFormatVersion || saved.RulesVersion != RulesVersion || (saved.ScenarioVersion != ScenarioVersion && saved.ScenarioVersion != VariableScenarioVersion) || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
+            if (saved == null || saved.SaveFormatVersion != HarbormasterRules.SaveFormat(SaveFormatVersion, saved.TradeModules) || saved.RulesVersion != RulesVersion || (saved.ScenarioVersion != ScenarioVersion && saved.ScenarioVersion != VariableScenarioVersion) || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
                 throw new InvalidDataException("Unsupported or malformed save.");
             if (saved.TargetVictoryPoints.HasValue && !VictoryPointSettings.IsValid(saved.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(saved.ScenarioId))) throw new InvalidDataException("存档中的胜利分数无效。");
             SeafarersGameSession session;
-            try { session = CreateForVersion(saved.ScenarioId, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints, saved.ScenarioVersion); }
+            try { session = CreateForVersion(saved.ScenarioId, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints, saved.ScenarioVersion, HarbormasterRules.Restore(saved.TradeModules, saved.ScenarioId)); }
             catch (ArgumentException ex) { throw new InvalidDataException("Invalid saved scenario identity.", ex); }
             saved.TargetVictoryPoints = session.state.TargetVictoryPoints;
             foreach (var record in saved.ProcessedCommands)
@@ -404,8 +407,11 @@ namespace Catan.Core.M3
             }
             return roads.Length == 0 ? 0 : roads.SelectMany(e => e.Vertices).Distinct().Max(v => Walk(v, false, null));
         }
+        private HarborScore[] HarborScores(GameState s) => s.TradeModules == null ? Array.Empty<HarborScore>() :
+            HarbormasterRules.Scores(s.Players.Select(p => p.Id), s.Ports.SelectMany(p => p.Vertices), s.Settlements, s.Cities);
         private void RecalculateAwards(GameState s)
         {
+            HarbormasterRules.Recalculate(s.TradeModules, HarborScores(s));
             s.LongestRoadPlayerId = !scenario.UseLongestRoute ? null : Award(s.Players.Select(p => p.Id).ToArray(), s.Players.Select(p => LongestRoad(s, p.Id)).ToArray(), 5, s.LongestRoadPlayerId);
             s.LargestArmyPlayerId = !scenario.UseLargestArmy ? null : Award(s.Players.Select(p => p.Id).ToArray(), s.Players.Select(p => p.PlayedKnights).ToArray(), 3, s.LargestArmyPlayerId);
         }
@@ -416,20 +422,22 @@ namespace Catan.Core.M3
         }
         private static int VictoryPoints(GameState s, string player, bool includeHidden)
         {
-            return s.Settlements.Count(b => b.PlayerId == player) + 2 * s.Cities.Count(b => b.PlayerId == player) + (s.LongestRoadPlayerId == player ? 2 : 0) + (s.LargestArmyPlayerId == player ? 2 : 0)
+            return HarbormasterRules.VictoryPoints(s.TradeModules, player) + s.Settlements.Count(b => b.PlayerId == player) + 2 * s.Cities.Count(b => b.PlayerId == player) + (s.LongestRoadPlayerId == player ? 2 : 0) + (s.LargestArmyPlayerId == player ? 2 : 0)
                 + s.Players.Single(p => p.Id == player).BonusVictoryPoints + s.Players.Single(p => p.Id == player).Cloth / 2
                 + (includeHidden ? s.Players.Single(p => p.Id == player).DevelopmentCards.Count(c => c.Kind == DevelopmentCardKind.VictoryPoint) : 0);
         }
         private void CheckVictory(GameState s)
         {
+            if (s.TradeModules != null && (s.PendingDecision != null || s.TradeOffer != null || (s.Phase != GamePhase.Action && s.Phase != GamePhase.ProductionAwaitRoll && s.Phase != GamePhase.Finished))) return;
             if (s.Turn > 0 && HasVictory(s, s.ActivePlayerId)) FinishGame(s, new[] { s.ActivePlayerId });
         }
 
         private void AssertInvariants(GameState s)
         {
+            HarbormasterRules.Validate(s.TradeModules, s.ScenarioId, HarborScores(s));
             Check(VictoryPointSettings.IsValid(s.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(scenario.Id)), "胜利分数无效。");
             void Check(bool valid, string message) { if (!valid) throw new InvalidDataException(message); }
-            Check(s.SaveFormatVersion == SaveFormatVersion && s.RulesVersion == RulesVersion && (s.ScenarioVersion == ScenarioVersion || s.ScenarioVersion == VariableScenarioVersion), "Invalid version identity.");
+            Check(s.SaveFormatVersion == HarbormasterRules.SaveFormat(SaveFormatVersion, s.TradeModules) && s.RulesVersion == RulesVersion && (s.ScenarioVersion == ScenarioVersion || s.ScenarioVersion == VariableScenarioVersion), "Invalid version identity.");
             Check(Enum.IsDefined(typeof(GamePhase), s.Phase) && s.Turn >= 0 && s.SetupPlacementIndex >= 0 && s.SetupPlacementIndex <= s.Players.Length * scenario.SetupRounds, "Invalid phase/turn.");
             Check(s.Players.Length == 3 || s.Players.Length == 4, "Invalid player count.");
             Check(s.Players.Select(p => p.Id).Distinct().Count() == s.Players.Length && s.Players.Any(p => p.Id == s.ActivePlayerId), "Invalid player identities.");

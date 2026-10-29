@@ -36,7 +36,7 @@ public sealed partial class M2App : MonoBehaviour
         if(ai!=null&&ai.NetworkGame){font=MobileTabletop.LoadFont();ai.ConnectNetwork(this);return;}
 
         host=new M2LocalGameHost(ai==null?4:ai.PlayerCount);
-        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints);
+        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints,ai.Harbormaster);
 
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         var initial=host.View(ai==null?"P1":ai.HumanSeat);

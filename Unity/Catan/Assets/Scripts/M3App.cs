@@ -41,7 +41,7 @@ public sealed partial class M3App : MonoBehaviour
         if(ai!=null&&ai.NetworkGame){font=MobileTabletop.LoadFont();ai.ConnectNetwork(this);return;}
 
         host=new M3LocalGameHost(ai==null?4:ai.PlayerCount);
-        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.ScenarioId,ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints);
+        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.ScenarioId,ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints,ai.Harbormaster);
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         catalog=Catan.Core.M3.SeafarersScenarios.Ids.Select(id=>Catan.Core.M3.SeafarersScenarios.Create(id,4)).ToArray();
         var initial=host.View(ai==null?"P1":ai.HumanSeat);

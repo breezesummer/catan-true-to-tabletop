@@ -54,6 +54,7 @@ public sealed partial class TabletopUI
     readonly TabletopHandCountPresentation displayedHandCounts=new TabletopHandCountPresentation();
     readonly TabletopDefenseUI defense = new TabletopDefenseUI();
     public void BindDefense(int position,int strength,int threat) { defense.Bind(position,strength,threat); }
+    public void BindHarbormaster(Catan.Core.TradeModules.TradeModuleView modules) { defense.BindHarbormaster(modules); }
     public void BindLongestRoad(string playerId,int length) { defense.BindLongestRoad(playerId,length); }
     internal static readonly Rect TurnBannerRect = new Rect(524,9,392,82);
     public TabletopCollectionTimeline Collections => bank.Collections;

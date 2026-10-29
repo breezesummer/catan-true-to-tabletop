@@ -10,6 +10,7 @@ namespace Catan.Core.M5
             // for each target is expensive in Unity/Mono; detach the complete mutable
             // state graph directly, preserving exactly the same authority values.
             var copy=(GameState)MemberwiseClone();
+            copy.TradeModules=TradeModules?.Copy();
             copy.Special=Special?.CopyForTransaction();
             copy.B6MapPorts=B6MapPorts?.Select(p=>new Port {Id=p.Id,Vertices=p.Vertices.ToArray(),Resource=p.Resource}).ToArray();
             copy.B6LandingRecords=B6LandingRecords?.Select(r=>r.Copy()).ToArray();

@@ -8,13 +8,16 @@ public sealed class TabletopDefenseUI
     string roadPlayer;
     int roadLength;
     bool roadBound;
-    public string MobileSummary => (position>=0?"蛮族 "+position+"/7 · "+(position==7?"本次防御 ":"防御 ")+strength+"/"+threat+"\n":"")+(roadBound?"最长路线 · "+(string.IsNullOrEmpty(roadPlayer)?"暂无":M6App.PlayerLabel(roadPlayer)+" "+roadLength+" 段"):"");
+    Catan.Core.TradeModules.TradeModuleView harbor;
+    public void BindHarbormaster(Catan.Core.TradeModules.TradeModuleView modules) { harbor=modules; }
+    string HarborLabel=>harbor==null?"":string.IsNullOrEmpty(harbor.HarbormasterPlayerId)?"暂无归属":M6App.PlayerLabel(harbor.HarbormasterPlayerId)+" +2分";
+    public string MobileSummary => (position>=0?"蛮族 "+position+"/7 · "+(position==7?"本次防御 ":"防御 ")+strength+"/"+threat+"\n":"")+(roadBound?"最长路线 · "+(string.IsNullOrEmpty(roadPlayer)?"暂无":M6App.PlayerLabel(roadPlayer)+" "+roadLength+" 段"):"")+(harbor==null?"":"\n海港大师 · "+HarborLabel);
     static Texture2D ship,shield;
     public void Bind(int position,int strength,int threat)
     {this.position=position;this.strength=strength;this.threat=threat;}
     public void BindLongestRoad(string playerId,int length)
     {roadBound=true;roadPlayer=playerId;roadLength=string.IsNullOrEmpty(playerId)?0:Mathf.Max(0,length);}
-    Rect CurrentArea=>position>=0?Area:new Rect(Area.x,Area.y,Area.width,47);
+    Rect CurrentArea=>new Rect(Area.x,Area.y,Area.width,position>=0?Area.height:(harbor==null?47:77));
     public bool BlocksInput(Vector2 point)=>(position>=0||roadBound)&&CurrentArea.Contains(point);
     public void Draw()
     {
@@ -27,19 +30,25 @@ public sealed class TabletopDefenseUI
         title.normal.textColor=ink;count.normal.textColor=ModernOperationUI.Accent;
         if(position>=0)
         {
-            DrawIcon(new Rect(Area.x+12,Area.y+9,25,25),ship,ModernOperationUI.Accent);
-            GUI.Label(new Rect(Area.x+45,Area.y+6,125,27),"蛮族航程",title);
-            GUI.Label(new Rect(Area.x+174,Area.y+6,57,27),position+" / 7",count);
+            DrawIcon(new Rect(Area.x+12,Area.y+(harbor==null?9:4),25,25),ship,ModernOperationUI.Accent);
+            GUI.Label(new Rect(Area.x+45,Area.y+(harbor==null?6:1),125,27),"蛮族航程",title);
+            GUI.Label(new Rect(Area.x+174,Area.y+(harbor==null?6:1),57,27),position+" / 7",count);
             for(int i=0;i<7;i++)
-                ModernOperationUI.Round(new Rect(Area.x+14+i*32,Area.y+36,27,4),i<position?ModernOperationUI.Accent:ModernOperationUI.Surface);
+                ModernOperationUI.Round(new Rect(Area.x+14+i*32,Area.y+(harbor==null?36:27),27,4),i<position?ModernOperationUI.Accent:ModernOperationUI.Surface);
             var defenseColor=threat==0||strength>=threat?new Color(.47f,.78f,.67f):ModernOperationUI.Error;
-            DrawIcon(new Rect(Area.x+15,Area.y+47,19,23),shield,defenseColor);
-            GUI.Label(new Rect(Area.x+45,Area.y+46,145,25),position==7?"本次防御 / 蛮族":"防御 / 蛮族力量",new GUIStyle(title){fontSize=12});
+            DrawIcon(new Rect(Area.x+15,Area.y+(harbor==null?47:33),19,23),shield,defenseColor);
+            GUI.Label(new Rect(Area.x+45,Area.y+(harbor==null?46:32),145,25),position==7?"本次防御 / 蛮族":"防御 / 蛮族力量",new GUIStyle(title){fontSize=12});
             count.normal.textColor=defenseColor;
-            GUI.Label(new Rect(Area.x+179,Area.y+46,52,25),strength+" / "+threat,count);
-            ModernOperationUI.Fill(new Rect(Area.x+13,Area.y+76,Area.width-26,1),ModernOperationUI.Line);
+            GUI.Label(new Rect(Area.x+179,Area.y+(harbor==null?46:32),52,25),strength+" / "+threat,count);
+            ModernOperationUI.Fill(new Rect(Area.x+13,Area.y+(harbor==null?76:58),Area.width-26,1),ModernOperationUI.Line);
         }
-        if(roadBound)DrawLongestRoad(position>=0?Area.y+81:Area.y+10,title,count);
+        if(roadBound)DrawLongestRoad(position>=0?Area.y+(harbor==null?81:59):Area.y+10,title,count);
+        if(harbor!=null)
+        {
+            float y=position>=0?Area.y+82:Area.y+41;
+            GUI.Label(new Rect(Area.x+14,y,95,25),"海港大师",title);
+            GUI.Label(new Rect(Area.x+109,y,122,25),HarborLabel,new GUIStyle(count){fontSize=10});
+        }
     }
     void DrawLongestRoad(float y,GUIStyle title,GUIStyle count)
     {

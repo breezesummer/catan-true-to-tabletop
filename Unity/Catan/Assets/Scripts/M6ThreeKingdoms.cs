@@ -80,7 +80,7 @@ public sealed partial class M6App
     {
         if(NetworkGame||!Ready)return;
         var names=localPlayerNames.ToArray();
-        StartGame(RuleSet,ScenarioId,PlayerCount,HumanSeat,Paused,targetVictoryPoints:TargetVictoryPoints,aiSpeedLevel:AiSpeedLevel,threeKingdoms:ThreeKingdoms);
+        StartGame(RuleSet,ScenarioId,PlayerCount,HumanSeat,Paused,targetVictoryPoints:customVictoryTarget?TargetVictoryPoints:(int?)null,aiSpeedLevel:AiSpeedLevel,threeKingdoms:ThreeKingdoms,harbormaster:Harbormaster);
         localPlayerNames=names;Notice="已保留玩法、三国开关、席位、姓名、胜利目标与 AI 节奏，重新生成地图和行动顺序。";
     }
     static string GeneralName(string id)=>string.IsNullOrEmpty(id)?"尚未公开":GeneralCatalog.Get(id).Name;

@@ -140,6 +140,7 @@ namespace Catan.Core.M5
         [DataMember(Order=32)] public long EventSequence { get; set; }
         // 可空字段用于识别未保存胜利分数的旧存档。
         [DataMember(Order=200, EmitDefaultValue=false)] public int? TargetVictoryPoints { get; set; }
+        [DataMember(Order=400, EmitDefaultValue=false)] public TradeModules.TradeModuleState TradeModules { get; set; }
     }
     public sealed partial class CommandResult
     {
@@ -193,6 +194,7 @@ namespace Catan.Core.M5
         public string[] LegalVertexIds { get; internal set; }
         public string[] LegalCityVertexIds { get; internal set; }
         public string[] LegalEdgeIds { get; internal set; }
+        public TradeModules.TradeModuleView TradeModules { get; internal set; }
         public string LongestRoadPlayerId { get; internal set; }
         public string LargestArmyPlayerId { get; internal set; }
         public string WinnerPlayerId { get; internal set; }
