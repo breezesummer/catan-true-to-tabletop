@@ -1,0 +1,46 @@
+{
+  "colours": [
+    {
+      "key": "blue",
+      "srgb": [
+        0.08610419,
+        0.16801828,
+        0.3810918
+      ],
+      "linear": [
+        0.007999998047397225,
+        0.02399999801560856,
+        0.11999996135568163
+      ],
+      "source": "Unity/Catan/Assets/Art/EntityAssets/v002/player-knights/Materials/knight-blue-level-2-bare_Blue_Moulded_Plastic.mat"
+    },
+    {
+      "key": "orange",
+      "srgb": [
+        0.9776915,
+        0.516881,
+        0.14282566
+      ],
+      "linear": [
+        0.9499998629194875,
+        0.22999992790462614,
+        0.01799999534796889
+      ],
+      "source": "Unity/Catan/Assets/Art/EntityAssets/v002/player-knights/Materials/knight-orange-level-2-bare_Orange_Moulded_Plastic.mat"
+    },
+    {
+      "key": "beige",
+      "srgb": [
+        0.9162735,
+        0.85430574,
+        0.68721706
+      ],
+      "linear": [
+        0.8199998863246067,
+        0.699999830864949,
+        0.4299998804184119
+      ],
+      "source": "Unity/Catan/Assets/Art/EntityAssets/v002/player-knights/Materials/knight-beige-level-2-bare_Beige_Moulded_Plastic.mat"
+    }
+  ]
+}

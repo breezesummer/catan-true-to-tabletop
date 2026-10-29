@@ -29,7 +29,7 @@ public static class OperationPieceAssets
         else if (icon.Contains("city")) kind = "city";
         else if (icon.Contains("settlement") || icon.Contains("village")) kind = "settlement";
         else return null;
-        string path = kind=="settlement" ? "ThreeKingdoms/v001/thumbnail-"+colour : Root + kind + "-" + colour;
+        string path = kind=="settlement" ? "ThreeKingdoms/v003/thumbnail-"+colour : Root + kind + "-" + colour;
         if (!Textures.TryGetValue(path, out var texture))
         {
             texture = Resources.Load<Texture2D>(path);

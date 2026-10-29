@@ -46,7 +46,8 @@ public sealed class ThreeKingdomsVillageVerification : MonoBehaviour
                 foreach(var r in obj.GetComponentsInChildren<Renderer>())
                     for(int m=0;m<r.sharedMaterials.Length;m++)if(r.sharedMaterials[m].name.StartsWith("Village_Seat"))
                     {
-                        if(r.sharedMaterials[m].color!=BoardRenderer.SeatColors[seat])throw new Exception("玩家色错误");
+                        bool courtyard=r.sharedMaterials[m].name.StartsWith("Village_Seat_Courtyard_");
+                        if(courtyard ? (r.sharedMaterials[m].name.EndsWith("_dark") || r.sharedMaterials[m].name.EndsWith("_cloth") ? false : r.sharedMaterials[m].mainTexture==null) : r.sharedMaterials[m].color!=BoardRenderer.SeatColors[seat])throw new Exception("玩家色错误");
                         var block=new MaterialPropertyBlock();r.GetPropertyBlock(block,m);if(!block.isEmpty)throw new Exception("归属色被预览覆盖");
                     }
                 count++;

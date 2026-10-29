@@ -68,7 +68,7 @@ public static class PlayerComponentAssets
     {
         var colour = ColourKey(playerId);
         if (colour == null) return null;
-        if (type == "village") return "ThreeKingdoms/v001/tk-village-" + colour;
+        if (type == "village") return "ThreeKingdoms/v003/courtyard-" + colour;
         if (colour != "red") return Root + "player-buildings/" + type + "-" + colour;
         switch (type)
         {

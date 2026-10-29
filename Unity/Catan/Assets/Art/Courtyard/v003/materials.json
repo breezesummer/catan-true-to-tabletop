@@ -1,0 +1,409 @@
+{
+  "materials": [
+    {
+      "name": "v003_mortar.002",
+      "color": [
+        0.28999999165534973,
+        0.28999999165534973,
+        0.30000001192092896,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.8999999761581421,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_stone2.005",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_01.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_02.png",
+      "normal": "tex_00.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_stone.005",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_01.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_02.png",
+      "normal": "tex_00.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_stone1.005",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_01.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_02.png",
+      "normal": "tex_00.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_plaster.002",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_04.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_05.png",
+      "normal": "tex_03.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_wood_lacquer.002",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_07.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_08.png",
+      "normal": "tex_06.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_wood.002",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_07.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_08.png",
+      "normal": "tex_06.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_wood1.002",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_07.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_08.png",
+      "normal": "tex_06.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_paper.002",
+      "color": [
+        0.11999999731779099,
+        0.2199999988079071,
+        0.25,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.8199999928474426,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_gold.004",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_10.png",
+      "metallic": 0.8799999952316284,
+      "roughness": 1,
+      "metalRough": "tex_11.png",
+      "normal": "tex_09.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_tile.002",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_13.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_14.png",
+      "normal": "tex_12.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_tile1.002",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_13.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_14.png",
+      "normal": "tex_12.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_tile2.002",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_13.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_14.png",
+      "normal": "tex_12.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_red.002",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_16.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_17.png",
+      "normal": "tex_15.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_red_dark.002",
+      "color": [
+        0.30000001192092896,
+        0.0020000000949949026,
+        0.004000000189989805,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.41999998688697815,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_lion_烘焙图集.004",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_19.png",
+      "metallic": 0,
+      "roughness": 1,
+      "metalRough": "tex_20.png",
+      "normal": "tex_18.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_lantern.002",
+      "color": [
+        1,
+        0.47999998927116394,
+        0.03500000014901161,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.3700000047683716,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_pot.002",
+      "color": [
+        0.28999999165534973,
+        0.054999999701976776,
+        0.00800000037997961,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.2199999988079071,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_water.002",
+      "color": [
+        0.03500000014901161,
+        0.23000000417232513,
+        0.28999999165534973,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0.15000000596046448,
+      "roughness": 0.14000000059604645,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_gold_light.004",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_10.png",
+      "metallic": 0.8799999952316284,
+      "roughness": 1,
+      "metalRough": "tex_11.png",
+      "normal": "tex_09.png",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_hay.002",
+      "color": [
+        0.3499999940395355,
+        0.2199999988079071,
+        0.07000000029802322,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.8999999761581421,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_hay_dark.002",
+      "color": [
+        0.33000001311302185,
+        0.17000000178813934,
+        0.03799999877810478,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.8999999761581421,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_hay_light.002",
+      "color": [
+        0.5699999928474426,
+        0.3799999952316284,
+        0.15000000596046448,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.8700000047683716,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_rope.002",
+      "color": [
+        0.5699999928474426,
+        0.3400000035762787,
+        0.11999999731779099,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.800000011920929,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_wood_dark.002",
+      "color": [
+        0.11999999731779099,
+        0.02500000037252903,
+        0.008999999612569809,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.6000000238418579,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_cloth.002",
+      "color": [
+        0.6700000166893005,
+        0.003000000026077032,
+        0.00800000037997961,
+        1
+      ],
+      "baseColor": "",
+      "metallic": 0,
+      "roughness": 0.36000001430511475,
+      "metalRough": "",
+      "normal": "",
+      "normalScale": 1
+    },
+    {
+      "name": "v003_ornament_烘焙图集.004",
+      "color": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "baseColor": "tex_22.png",
+      "metallic": 0.8799999952316284,
+      "roughness": 1,
+      "metalRough": "tex_23.png",
+      "normal": "tex_21.png",
+      "normalScale": 1
+    }
+  ]
+}

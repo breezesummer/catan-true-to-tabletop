@@ -113,7 +113,7 @@ public sealed class PlayerComponentVerification : MonoBehaviour
                     var level=row>=5?(row-5)/2+1:0;var active=row>=5&&row%2==0;
                     // Expected resources are written independently of the asset selector.
                     var resources=new List<string>();
-                    if(row==0)resources.Add("ThreeKingdoms/v001/tk-village-"+colour);
+                    if(row==0)resources.Add("ThreeKingdoms/v003/courtyard-"+colour);
                     else if(seat==0)
                     {
                         if(row<3)resources.Add("EntityAssets/v001/city/city-red");
