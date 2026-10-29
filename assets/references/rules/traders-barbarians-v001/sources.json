@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "referenceSetId": "traders-barbarians-v001",
+  "accessedOn": "2026-10-29",
+  "accessDateTimeZone": "Asia/Shanghai",
+  "cacheRoot": ".local/reference-cache/traders-barbarians/v001",
+  "cachePolicy": "原始字节不变；不匹配保留并停止；不得静默更新锁。",
+  "sources": [
+    {
+      "id": "TB25",
+      "url": "https://www.catan.com/sites/default/files/2025-04/CN3089%20CATAN%20%E2%80%93%20T%26B%20Rulebook.pdf",
+      "cachePath": ".local/reference-cache/traders-barbarians/v001/TB25.pdf",
+      "byteLength": 27843748,
+      "sha256": "7c4938dc45480ed28fde1fccbeca450c815b36ee2f4ed57107650013313acaaf",
+      "pdfPageCount": 24,
+      "applicablePages": [
+        4,
+        9,
+        10
+      ],
+      "role": "主规则"
+    },
+    {
+      "id": "TB20",
+      "url": "https://www.catan.com/sites/default/files/2021-06/catan-t_b_2020_rule_book_200820.pdf",
+      "cachePath": ".local/reference-cache/traders-barbarians/v001/TB20.pdf",
+      "byteLength": 8415258,
+      "sha256": "08a0a6ebbdeb38e79399291f6e52432535fe8ff72210b08deafc9e40534d37ff",
+      "pdfPageCount": 24,
+      "applicablePages": [
+        6,
+        8,
+        9
+      ],
+      "role": "仅版本比较"
+    },
+    {
+      "id": "FCK",
+      "url": "https://www.catan.com/sites/default/files/2025-07/The%20Fishermen%20of%20Catan%20-%20Cities%20and%20Knights.pdf",
+      "cachePath": ".local/reference-cache/traders-barbarians/v001/FCK.pdf",
+      "byteLength": 230169,
+      "sha256": "5f08eb77b51da01b445fc0b07fe8cd5261fa7328663a9d297892cea2c06a3bcf",
+      "pdfPageCount": 1,
+      "applicablePages": [
+        1
+      ],
+      "role": "旧版组合补充，冲突以F0裁决为准"
+    },
+    {
+      "id": "FSF",
+      "url": "https://www.catan.com/sites/default/files/2025-07/The%20Fishermen%20of%20Catan%20-%20Seafarers.pdf",
+      "cachePath": ".local/reference-cache/traders-barbarians/v001/FSF.pdf",
+      "byteLength": 242970,
+      "sha256": "b684c144cffc6b49accc44d3285ccebc8797cd6b86dbd3be920a18346ffc6248",
+      "pdfPageCount": 3,
+      "applicablePages": [
+        1,
+        2,
+        3
+      ],
+      "role": "旧版组合补充，冲突以F0裁决为准"
+    },
+    {
+      "id": "FAQ",
+      "url": "https://www.catan.com/faq/traders-barbarians",
+      "cachePath": ".local/reference-cache/traders-barbarians/v001/FAQ.html",
+      "byteLength": 102213,
+      "sha256": "a85e26417bcf583b3079eb79fefb11104b7f4fd9fc644bb71ffbbe18e92b1701",
+      "sections": [
+        "Harbormaster + C&K",
+        "The Fishermen of Catan",
+        "The Lost Tribe + Harbormaster"
+      ],
+      "role": "官方补充／目录快照"
+    },
+    {
+      "id": "INDEX",
+      "url": "https://www.catan.com/understand-catan/game-rules",
+      "cachePath": ".local/reference-cache/traders-barbarians/v001/INDEX.html",
+      "byteLength": 185278,
+      "sha256": "0cedef46a64c0e52e60eee0c308f2860737b95001ba2903f6bdfb37c74485625",
+      "sections": [
+        "规则书及旧版组合目录"
+      ],
+      "role": "官方补充／目录快照"
+    }
+  ]
+}

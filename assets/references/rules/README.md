@@ -38,3 +38,24 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Fetch-Ru
 ```
 
 2026-10-14（Asia/Shanghai）本地校验：三份 PDF 与三份 HTML 快照的字节数和 SHA-256 均与各自来源清单一致。
+
+## 海港大师与捕鱼（F0）
+
+原始资料缓存于 `.local/reference-cache/traders-barbarians/v001/`，不提交Git。[来源锁](traders-barbarians-v001/sources.json)记录2026-10-29获取日期、字节数、SHA-256和页码；[规则定稿](../../../docs/harbor-fishing/F0规则定稿.md)区分官方规则与项目裁决。
+
+| ID | 缓存文件 | 使用位置 |
+| --- | --- | --- |
+| TB25 | TB25.pdf | 第4、9—10页，2025主规则 |
+| TB20 | TB20.pdf | 第6、8—9页，仅版本比较 |
+| FCK | FCK.pdf | 第1页，城市骑士旧版组合补充 |
+| FSF | FSF.pdf | 第1—3页，航海旧版组合补充 |
+| FAQ | FAQ.html | 大都会、鱼、旧靴和部落港口问题 |
+| INDEX | INDEX.html | 官方下载目录与旧版组合分类 |
+
+现有PowerShell恢复入口已纳入此来源锁；macOS／Linux也可使用以下Python入口。两者均拒绝覆盖不匹配的原文，下载失败文件保留供核查。HTML历史组合快照不属于此脚本的恢复范围，仍按其自身清单核验。
+
+```sh
+python3 tools/development/fetch_rule_references.py --set traders
+python3 tools/development/fetch_rule_references.py --set traders --verify-only
+python3 tools/validation/verify_harbor_fishing_f0.py
+```
