@@ -1,0 +1,6 @@
+{
+  "调用方式": "ImageGen内置工具；未使用CLI。",
+  "输出": "textures/wood_basecolor.png",
+  "法线来源": "复用v001/plaster_normal.png，仅用于石材和白墙的轻微微表面。",
+  "原始提示词": "A single seamless square diffuse albedo texture of refined reddish chestnut Chinese architectural hardwood, subtly lacquered, for a premium miniature Chinese courtyard 3D game model. Extremely fine straight VERTICAL grain with very low contrast, elegant warm burnt sienna and chestnut color, uniform medium reddish brown, small restrained tonal variation. Smooth clean well maintained wood, no rough cracks, no weathering, no knots, no plank joints, no borders, no objects, no text, no lighting gradients, no highlights, no shadows. Texture is flat orthographic full bleed and tiles seamlessly in both directions. Fine grain visible only on close inspection; from a distance almost solid warm reddish brown. Do not make orange and black high contrast stripes."
+}
