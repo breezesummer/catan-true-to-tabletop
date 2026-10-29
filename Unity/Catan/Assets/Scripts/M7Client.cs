@@ -300,7 +300,7 @@ public sealed class M7Client : MonoBehaviour
             else if(operation=="History")operation="HistoryCompact";
             else if(operation=="Command")operation="CommandReceipt";
         }
-        return new NetworkRequest{RequestId=Guid.NewGuid().ToString("N"),Operation=operation,RoomId=RoomId,Credential=credential,ConnectionId=connectionId,ExpectedRevision=Revision,RuleSet=rules,ExpectedRulesVersion=rules==null?null:NetworkProtocol.RulesVersion(rules),ExpectedScenarioVersion=rules==null?null:NetworkProtocol.ScenarioVersion(rules),ExpectedThreeKingdomsPackageVersion=Room?.ThreeKingdomsPackageVersion??rememberedGeneralPackage,ExpectedThreeKingdomsContentHash=Room?.ThreeKingdomsContentHash??rememberedGeneralHash,Payload=payload};
+        return new NetworkRequest{RequestId=Guid.NewGuid().ToString("N"),Operation=operation,RoomId=RoomId,Credential=credential,ConnectionId=connectionId,ExpectedRevision=Revision,RuleSet=rules,ExpectedRulesVersion=rules==null?null:NetworkProtocol.RulesVersion(rules),ExpectedScenarioVersion=rules==null?null:NetworkProtocol.ScenarioVersion(rules),SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion,ExpectedThreeKingdomsPackageVersion=Room?.ThreeKingdomsPackageVersion??rememberedGeneralPackage,ExpectedThreeKingdomsContentHash=Room?.ThreeKingdomsContentHash??rememberedGeneralHash,Payload=payload};
     }
     public void Submit(object command)
     {
@@ -685,7 +685,7 @@ public sealed class M7Client : MonoBehaviour
         {
             while(!cancel.IsCancellationRequested&&ws.State==WebSocketState.Open)
             {
-                var request=new NetworkRequest{Operation=identity.Operation,RequestId=Guid.NewGuid().ToString("N"),RoomId=identity.RoomId,Credential=identity.Credential,ConnectionId=identity.ConnectionId,RuleSet=identity.RuleSet,ExpectedRulesVersion=identity.ExpectedRulesVersion,ExpectedScenarioVersion=identity.ExpectedScenarioVersion,ExpectedThreeKingdomsPackageVersion=identity.ExpectedThreeKingdomsPackageVersion,ExpectedThreeKingdomsContentHash=identity.ExpectedThreeKingdomsContentHash,ExpectedRevision=Interlocked.Read(ref socketRevision)};
+                var request=new NetworkRequest{Operation=identity.Operation,RequestId=Guid.NewGuid().ToString("N"),RoomId=identity.RoomId,Credential=identity.Credential,ConnectionId=identity.ConnectionId,RuleSet=identity.RuleSet,ExpectedRulesVersion=identity.ExpectedRulesVersion,ExpectedScenarioVersion=identity.ExpectedScenarioVersion,SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion,ExpectedThreeKingdomsPackageVersion=identity.ExpectedThreeKingdomsPackageVersion,ExpectedThreeKingdomsContentHash=identity.ExpectedThreeKingdomsContentHash,ExpectedRevision=Interlocked.Read(ref socketRevision)};
                 var receipt=new SocketReceipt();receipts[request.RequestId]=receipt;
                 var bytes=Encoding.UTF8.GetBytes(WireJson.Serialize(request));
                 M7CommunicationLog.Record(new M7CommunicationEvent{Event="request_send",Transport=transport,Operation="Get",RequestId=request.RequestId,RoomId=request.RoomId,Revision=request.ExpectedRevision,Bytes=bytes.Length});

@@ -26,33 +26,33 @@ namespace Catan.AI
         internal static double SetupValue(Catan.Core.M2.PlayerView view, string vertex) => SetupValue(
             view.Board.Tiles, view.Board.Edges, view.Board.Settlements.Concat(view.Board.Cities),
             view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, false, false,
-            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId)) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex);
+            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId)) + FishingAi.VertexValue(view.TradeModules?.Fishing, view.Board.Tiles, vertex) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex);
 
         internal static double SetupValue(Catan.Core.M3.PlayerView view, string vertex) => SetupValue(
             view.Board.Tiles, view.Board.Edges, view.Board.Settlements.Concat(view.Board.Cities),
             view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, true, false,
-            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId)) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex);
+            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId)) + FishingAi.VertexValue(view.TradeModules?.Fishing, view.Board.Tiles, vertex) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex);
 
         internal static double SetupValue(Catan.Core.M4.PlayerView view, string vertex) => SetupValue(
             view.Board.Tiles, view.Board.Edges, view.Board.Settlements.Concat(view.Board.Cities),
             view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, false, true,
-            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId)) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex);
+            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId)) + FishingAi.VertexValue(view.TradeModules?.Fishing, view.Board.Tiles, vertex) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex);
 
         internal static double SetupValue(Catan.Core.M5.PlayerView view, string vertex) => SetupValue(
             view.Board.Tiles, view.Board.Edges, view.Board.Settlements.Concat(view.Board.Cities),
             view.Board.Ports.Select(p => (p.Resource, p.Vertices)), view.PlayerId, vertex, true, true,
-            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId)) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex);
+            OpeningSeat(view.Players.Select(p => p.Id).ToArray(), view.StartingPlayerId, view.PlayerId)) + FishingAi.VertexValue(view.TradeModules?.Fishing, view.Board.Tiles, vertex) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex);
 
         internal static int HarborGain(Catan.Core.TradeModules.TradeModuleView modules, IEnumerable<string> portVertices, string player, string vertex)
         {
-            if (modules == null || modules.HarbormasterPlayerId == player || !portVertices.Contains(vertex)) return 0;
+            if (modules?.Harbormaster != true || modules.HarbormasterPlayerId == player || !portVertices.Contains(vertex)) return 0;
             int own = modules.HarborScores.First(p => p.PlayerId == player).Points + 1;
             int others = modules.HarborScores.Where(p => p.PlayerId != player).Select(p => p.Points).DefaultIfEmpty(0).Max();
             return own >= 3 && own > others ? 2 : 0;
         }
         internal static double HarborValue(Catan.Core.TradeModules.TradeModuleView modules, IEnumerable<string> portVertices, string player, string vertex)
         {
-            if (modules == null || !portVertices.Contains(vertex)) return 0;
+            if (modules?.Harbormaster != true || !portVertices.Contains(vertex)) return 0;
             return 3 + 10 * HarborGain(modules, portVertices, player, vertex);
         }
 

@@ -60,6 +60,12 @@ namespace Catan.Core.M4
             var session = new CitiesKnightsGameSession(scenario, ports, state);
             session.InitializeProgress(state);
             if (threeKingdoms) session.InitializeThreeKingdoms(state, threeKingdomsSkills, threeKingdomsPackageVersion);
+            if (modules?.Fishing != null)
+            {
+                modules.Fishing = FishingScenarioCatalog.Create(scenario, state.Players.Select(p => p.Id).ToArray(), values => Shuffle(values, random), maximum => Draw(random, maximum));
+                FishingRules.InitializePool(modules.Fishing, values => Shuffle(values, random));
+                state.Tiles = Json.Copy(scenario.Topology.Tiles);
+            }
             session.AssertInvariants(state);
             return session;
         }
@@ -93,6 +99,7 @@ namespace Catan.Core.M4
                 {
                     PlayerId = ev.PlayerId, OtherPlayerId = string.IsNullOrEmpty(effective.OtherPlayerId) ? null : effective.OtherPlayerId,
                     Kind = ev.Kind, PublicTarget = PublicTarget(effective), PendingKind = state.PendingDecision?.Kind, PublicGeneralChanges = PublicGeneralChanges(state, next),
+                    FishAction = effective.FishAction?.ToString(),
                     Card = effective.Kind == CommandKind.PlayProgressCard ? effective.ProgressCard.ToString() : null
                 });
                 state = next;
@@ -156,7 +163,7 @@ namespace Catan.Core.M4
                         PlayedKnights = p.PlayedKnights, Pieces = p.Pieces.Copy(), VictoryPoints = VictoryPoints(state, p.Id, state.WinnerPlayerId == p.Id), LongestRoadLength = LongestRoad(state, p.Id) }).ToArray(),
                     Board = new BoardView { Tiles = Json.Copy(state.Tiles), Vertices = Json.Copy(scenario.Topology.Vertices), Edges = Json.Copy(scenario.Topology.Edges), Ports = Json.Copy(CurrentPortsB6(state)),
                         Settlements = Json.Copy(state.Settlements), Cities = Json.Copy(state.Cities), Roads = Json.Copy(state.Roads), RobberTileId = state.RobberTileId },
-                    TradeModules = HarbormasterRules.View(state.TradeModules, HarborScores(state)),
+                    TradeModules = TradeView(state, playerId),
                     LegalVertexIds = vertices, LegalCityVertexIds = cities, LegalEdgeIds = edges, LongestRoadPlayerId = state.LongestRoadPlayerId, LargestArmyPlayerId = state.LargestArmyPlayerId,
                     WinnerPlayerId = state.WinnerPlayerId, LastDice1 = state.LastDice1, LastDice2 = state.LastDice2, Events = Json.Copy(state.Events),
                     OwnCommodities = own.Commodities.Copy(), OwnImprovements = own.Improvements.ToArray(), CommodityBank = state.CommodityBank.Copy(),
@@ -170,6 +177,7 @@ namespace Catan.Core.M4
                 PopulateProgressView(state, own, view);
                 view.LegalActions = LegalExpansionActions(playerId).ToArray();
                 PopulateThreeKingdomsView(view);
+                view.LegalActions = view.LegalActions.Concat(LegalFishingActions(playerId)).ToArray();
                 return view;
             }
         }
@@ -225,6 +233,12 @@ namespace Catan.Core.M4
                 Require(c.Kind == CommandKind.AcceptTrade || c.Kind == CommandKind.RejectTrade || c.Kind == CommandKind.CancelTrade, "TradePending", "请先接受、拒绝或取消当前报价。");
                 ResolveTrade(s, p, c); return;
             }
+            if (s.TradeModules?.Fishing?.PendingPlayerId != null)
+            {
+                Require(c.Kind == CommandKind.ResolveFishReplacement, "FishReplacementPending", "请先完成捕鱼换抽选择。");
+                ResolveFishReplacement(s, c); return;
+            }
+            if (c.Kind == CommandKind.ResolveFishReplacement) throw new RuleException("NoFishDecision", "当前没有捕鱼换抽待决。");
             if (c.Kind == CommandKind.DiscardResources) { Discard(s, p, c); return; }
             if (c.Kind == CommandKind.ProposeTrade) { ProposeTrade(s, p, c); return; }
             if (ApplyProgressCommand(s, p, c)) return;
@@ -238,7 +252,8 @@ namespace Catan.Core.M4
                     if (s.SetupPlacementIndex < s.Players.Length) PlaceSettlement(s,p,c.TargetId);
                     else { s.Cities=Append(s.Cities,Placement(c.TargetId,p.Id)); p.Pieces.Cities--; }
                     if (s.SetupPlacementIndex >= s.Players.Length)
-                        foreach (var tile in scenario.Topology.Tiles.Where(t => t.Vertices.Contains(c.TargetId) && t.Resource != "desert")) Transfer(s.Bank, p.Resources, ParseResource(tile.Resource), 1);
+                        foreach (var tile in scenario.Topology.Tiles.Where(t => t.Vertices.Contains(c.TargetId) && t.Resource != "desert" && t.Resource != "lake")) Transfer(s.Bank, p.Resources, ParseResource(tile.Resource), 1);
+                    GrantSetupFish(s, p.Id, c.TargetId);
                     s.PendingDecision = new PendingDecision { Kind = "SetupRoad", PlayerId = p.Id, AnchorVertexId = c.TargetId }; s.Phase = GamePhase.SetupRoad; break;
                 case CommandKind.SetupRoad:
                     Require(s.Phase == GamePhase.SetupRoad && s.PendingDecision != null, "WrongPhase", "请先摆放开局村庄。");
@@ -249,6 +264,8 @@ namespace Catan.Core.M4
                 case CommandKind.RollDice:
                     Require(s.Phase == GamePhase.ProductionAwaitRoll, "WrongPhase", "当前不能掷骰。");
                     RollCitiesKnights(s); break;
+                case CommandKind.SpendFish: SpendFish(s, p, c); break;
+                case CommandKind.PassOldBoot: PassOldBoot(s, p, c); break;
                 case CommandKind.BuildRoad:
                     ActionPhase(s); ValidateRoad(s, p, c.TargetId, null); PayB6Construction(s, p, new ResourceBag { Wood = 1, Brick = 1 }, new ResourceBag { Wood = 1, Brick = 1 }); PlaceRoad(s, p, c.TargetId); break;
                 case CommandKind.BuildSettlement:
@@ -269,7 +286,7 @@ namespace Catan.Core.M4
                     StealHandCard(s,p,victim);
                     FinishDecision(s); break;
                 case CommandKind.EndTurn:
-                    ActionPhase(s); Require((B2Unlimited(s,p.Id)||B2Protected(s,p.Id)||p.ProgressCards.Length<=B5ProgressLimit(s,p.Id)),"ProgressHandLimit","结束回合前须将发展卡减至当前上限。"); ClearProgressTurn(s); s.ActivePlayerId = s.Players[(Array.FindIndex(s.Players, x => x.Id == p.Id) + 1) % s.Players.Length].Id; s.Turn++; s.Phase = GamePhase.ProductionAwaitRoll; break;
+                    ActionPhase(s); Require((B2Unlimited(s,p.Id)||B2Protected(s,p.Id)||p.ProgressCards.Length<=B5ProgressLimit(s,p.Id)),"ProgressHandLimit","结束回合前须将发展卡减至当前上限。"); ClearProgressTurn(s); s.ActivePlayerId = s.Players[(Array.FindIndex(s.Players, x => x.Id == p.Id) + 1) % s.Players.Length].Id; s.Turn++; FishingRules.NewTurn(s.TradeModules?.Fishing); s.Phase = GamePhase.ProductionAwaitRoll; break;
                 case CommandKind.BuildWall: ActionPhase(s); BuildWall(s,p,c.TargetId); break;
                 case CommandKind.ImproveCity: ActionPhase(s); BuildImprovement(s,p,c.Track); break;
                 case CommandKind.RecruitKnight: ActionPhase(s); RecruitKnight(s,p,c.TargetId); break;
@@ -464,14 +481,15 @@ namespace Catan.Core.M4
         }
         private static void CheckVictory(GameState s)
         {
-            if (s.TradeModules != null && (s.PendingDecision != null || s.TradeOffer != null || s.DecisionQueue.Length > 0 || s.ProductionPending || (s.Phase != GamePhase.Action && s.Phase != GamePhase.ProductionAwaitRoll && s.Phase != GamePhase.Finished))) return;
+            if (s.TradeModules != null && (s.PendingDecision != null || s.TradeOffer != null || s.DecisionQueue.Length > 0 || s.ProductionPending || s.FishProductionClaims != null || (s.Phase != GamePhase.Action && s.Phase != GamePhase.ProductionAwaitRoll && s.Phase != GamePhase.Finished))) return;
             if(B4(s)&&(B2Busy(s)||s.ThreeKingdomsProgressResolutions?.Length>0||s.ThreeKingdomsVirtualUse!=null))return;
-            if (s.Turn > 0 && VictoryPoints(s, s.ActivePlayerId, true) >= s.TargetVictoryPoints.Value) { s.WinnerPlayerId = s.ActivePlayerId; B6AllianceRules.RecordVictory(s.ThreeKingdoms,s.WinnerPlayerId); s.Phase = GamePhase.Finished; s.PendingDecision = null; s.DecisionQueue=Array.Empty<PendingDecision>();s.ProductionPending=false;s.Discards = Array.Empty<DiscardRequirement>(); s.TradeOffer = null; }
+            if (s.Turn > 0 && VictoryPoints(s, s.ActivePlayerId, true) >= FishingRules.VictoryTarget(s.TradeModules?.Fishing, s.ActivePlayerId, s.TargetVictoryPoints.Value)) { s.WinnerPlayerId = s.ActivePlayerId; B6AllianceRules.RecordVictory(s.ThreeKingdoms,s.WinnerPlayerId); s.Phase = GamePhase.Finished; s.PendingDecision = null; s.DecisionQueue=Array.Empty<PendingDecision>();s.ProductionPending=false;s.Discards = Array.Empty<DiscardRequirement>(); s.TradeOffer = null; }
         }
 
         private void AssertInvariants(GameState s)
         {
             HarbormasterRules.Validate(s.TradeModules, s.ScenarioId, HarborScores(s));
+            AssertFishingInvariants(s);
             ValidateThreeKingdoms(s);
             Check(VictoryPointSettings.IsValid(s.TargetVictoryPoints), "胜利分数无效。");
             void Check(bool valid, string message) { if (!valid) throw new InvalidDataException(message); }
@@ -498,13 +516,13 @@ namespace Catan.Core.M4
             Check(s.DevelopmentDeck.Length==0 && s.PlayedDevelopmentCards.Length==0 && s.Players.All(p=>p.DevelopmentCards.Length==0&&p.PlayedKnights==0) && s.LargestArmyPlayerId==null, "Base development cards/army are excluded.");
             ValidateExpansion(s); ValidateProgress(s);
             Check(s.Random.State != 0 && s.Random.Draws >= 0 && s.Random.AlgorithmId == "xorshift32-rejection-v1", "Invalid random state.");
-            Check(s.FirstBarbarianAttack ? scenario.Topology.Tiles.Any(t => t.Id == s.RobberTileId) : s.RobberTileId==null, "Invalid robber location.");
-            Check((s.Phase == GamePhase.SetupRoad || s.Phase == GamePhase.Discard || s.Phase == GamePhase.RobberMove || s.Phase == GamePhase.RobberSteal || s.Phase == GamePhase.RoadBuilding || s.Phase == GamePhase.PendingChoice) == (s.PendingDecision != null), "Invalid pending decision.");
+            Check(s.FirstBarbarianAttack ? (s.TradeModules?.Fishing != null && s.RobberTileId == null || scenario.Topology.Tiles.Any(t => t.Id == s.RobberTileId)) : s.RobberTileId==null, "Invalid robber location.");
+            Check((s.Phase == GamePhase.SetupRoad || s.Phase == GamePhase.Discard || s.Phase == GamePhase.RobberMove || s.Phase == GamePhase.RobberSteal || s.Phase == GamePhase.RoadBuilding || s.Phase == GamePhase.PendingChoice || s.Phase == GamePhase.FishReplacement) == (s.PendingDecision != null), "Invalid pending decision.");
             Check((s.Phase == GamePhase.Discard) == (s.Discards.Length > 0), "Discard phase mismatch.");
             Check(s.Discards.Select(d => d.PlayerId).Distinct().Count() == s.Discards.Length && s.Discards.All(d => d.Amount > 0 && s.Players.Any(p => p.Id == d.PlayerId && (B2(s) || HandCount(p) / 2 == d.Amount))), "Invalid discard obligation.");
             if (s.PendingDecision != null)
             {
-                Check(s.Phase==GamePhase.PendingChoice?s.Players.Any(p=>p.Id==s.PendingDecision.PlayerId):s.PendingDecision.PlayerId == s.ActivePlayerId || B5(s)&&B5Board(s).TokenController==s.PendingDecision.PlayerId, "Pending actor mismatch.");
+                Check((s.Phase==GamePhase.PendingChoice || s.Phase==GamePhase.FishReplacement)?s.Players.Any(p=>p.Id==s.PendingDecision.PlayerId):s.PendingDecision.PlayerId == s.ActivePlayerId || B5(s)&&B5Board(s).TokenController==s.PendingDecision.PlayerId, "Pending actor mismatch.");
                 if (s.Phase == GamePhase.SetupRoad) Check(s.PendingDecision.Kind == "SetupRoad" && Buildings(s).Any(b => b.PlayerId == s.ActivePlayerId && b.LocationId == s.PendingDecision.AnchorVertexId), "Invalid setup road anchor.");
                 else if(s.Phase!=GamePhase.PendingChoice) Check(s.PendingDecision.ReturnPhase == GamePhase.Action || s.PendingDecision.ReturnPhase == GamePhase.ProductionAwaitRoll, "Invalid decision return phase.");
                 if (s.Phase == GamePhase.RoadBuilding) Check(s.PendingDecision.RemainingRoads >= 1 && s.PendingDecision.RemainingRoads <= 2, "Invalid free road allowance.");
@@ -604,6 +622,7 @@ namespace Catan.Core.M4
         {
             if (c == null || string.IsNullOrWhiteSpace(c.Id) || c.Id.Length > 128 || string.IsNullOrWhiteSpace(c.PlayerId) || c.PlayerId.Length > 128 || (c.TargetId != null && c.TargetId.Length > 128) || (c.OtherPlayerId != null && c.OtherPlayerId.Length > 128)) return Reject("InvalidCommand", "指令缺少有效标识。");
             if ((c.GeneralIds != null && (c.GeneralIds.Length > 5 || c.GeneralIds.Any(id => id == null || id.Length > 128))) || (c.DecisionId != null && c.DecisionId.Length > 128) || (c.WindowId != null && c.WindowId.Length > 128)) return Reject("InvalidCommand", "三国指令字段无效。");
+            if (c.FishTokenIds != null && (c.FishTokenIds.Length > 7 || c.FishTokenIds.Any(t => string.IsNullOrEmpty(t) || t.Length > 16))) return Reject("InvalidCommand", "捕鱼指令字段无效。");
             var skill = c.SkillCommand;
             if (skill != null && (skill.Counts == null || skill.Counts.Length != 8 || skill.Counts.Any(n => n < 0 || n > 19) || skill.TargetPlayerIds == null || skill.TargetPlayerIds.Length > 3 || skill.TargetPlayerIds.Any(id => id == null || id.Length > 128) || skill.TileIds == null || skill.TileIds.Length > 2 || skill.TileIds.Any(id => id == null || id.Length > 128) || new[] { skill.SkillId, skill.Option, skill.ProgressCardId, skill.DecisionId, skill.WindowId }.Any(value => value != null && value.Length > 128))) return Reject("InvalidCommand", "技能指令字段无效。");
             if (!Enum.IsDefined(typeof(CommandKind), c.Kind)) return Reject("UnsupportedCommand", "不支持此操作。");
@@ -618,6 +637,9 @@ namespace Catan.Core.M4
             // Never serialize command Resources or a purchased/stolen card to this public receipt.
             switch (c.Kind)
             {
+                case CommandKind.SpendFish: return c.PlayerId + " 使用鱼筹码：" + FishActionName(c.FishAction.Value) + "。";
+                case CommandKind.PassOldBoot: return c.PlayerId + " 转交旧靴。";
+                case CommandKind.ResolveFishReplacement: return c.PlayerId + (c.TargetId == null ? " 放弃换抽。" : " 完成换抽。");
                 case CommandKind.ChooseGenerals: return c.PlayerId + " 完成私密选将。";
                 case CommandKind.DeployGeneral: return c.PlayerId + " 确认武将登场选择。";
                 case CommandKind.RetireGeneral: return c.PlayerId + " 发起武将轮换。";

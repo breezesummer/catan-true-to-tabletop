@@ -54,7 +54,8 @@ public sealed partial class TabletopUI
     readonly TabletopHandCountPresentation displayedHandCounts=new TabletopHandCountPresentation();
     readonly TabletopDefenseUI defense = new TabletopDefenseUI();
     public void BindDefense(int position,int strength,int threat) { defense.Bind(position,strength,threat); }
-    public void BindHarbormaster(Catan.Core.TradeModules.TradeModuleView modules) { defense.BindHarbormaster(modules); }
+    Catan.Core.TradeModules.FishingView fishing;
+    public void BindHarbormaster(Catan.Core.TradeModules.TradeModuleView modules) { defense.BindHarbormaster(modules); fishing=modules?.Fishing; }
     public void BindLongestRoad(string playerId,int length) { defense.BindLongestRoad(playerId,length); }
     internal static readonly Rect TurnBannerRect = new Rect(524,9,392,82);
     public TabletopCollectionTimeline Collections => bank.Collections;
@@ -260,6 +261,18 @@ public sealed partial class TabletopUI
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
             StrategyHudArt.Avatar(new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
+            if(fishing!=null)
+            {
+                var fish=fishing.Players.First(p=>p.PlayerId==player.Id);
+                var fishBadge=new Rect(x+83,27,28,34);
+                GUI.Label(fishBadge,"鱼\n"+fish.TokenCount,Style("fish",center,11,FontStyle.Bold));
+                if(fishBadge.Contains(Event.current.mousePosition)){hoveredPlayerHint="持有 "+fish.TokenCount+" 枚鱼筹码；面值仅本人可见";playerHintAnchor=fishBadge;}
+                if(fishing.OldBootPlayerId==player.Id)
+                {
+                    var bootBadge=new Rect(x+4,30,28,28);GUI.Label(bootBadge,"靴",Style("boot",center,13,FontStyle.Bold));
+                    if(bootBadge.Contains(Event.current.mousePosition)){hoveredPlayerHint="旧靴：本人的获胜目标增加1分";playerHintAnchor=bootBadge;}
+                }
+            }
             GUI.Label(new Rect(x+4,70,width-8,24),M6App.PlayerLabel(player.Id),NameStyle("player",center,player.Id,10));
             int points=player.Score==null?player.Points:player.Id==own?player.Score.Total:player.Score.PublicPoints;
             int resources=displayedHandCounts.Observe(operations?.Scope,player.Id,false,player.Resources,DiceRolling);

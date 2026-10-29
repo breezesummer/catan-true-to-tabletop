@@ -25,9 +25,9 @@ public sealed partial class M2App
     {
         if(ai==null)return false;
         var p=logical??MobileTabletop.Logical(MobileTabletop.Pointer);
-        return mapChoice.Active||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||dock.BlocksBoardInput(p);
+        return fishingDock.Contains(p)||mapChoice.Active||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||dock.BlocksBoardInput(p);
     }
-    void CancelOperationDraft(){mapChoice.Clear();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);preparedDevelopment=null;preparedPurchase=false;tableNotes=false;CancelPickup();}
+    void CancelOperationDraft(){fishingDock.Reset();mapChoice.Clear();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);preparedDevelopment=null;preparedPurchase=false;tableNotes=false;CancelPickup();}
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
     // 银行和港口分别展示各自权限；最终指令仍由同一规则入口裁决。
     OperationSnapshot TradeValidationSnapshot()
@@ -175,6 +175,7 @@ public sealed partial class M2App
         tabletop.HandFlightsVisible=dock.ResourceHandVisible;if((tabletop.HistoryOpen||!dock.HasOverlay)&&!ai.TableInspectionBlocked)tabletop.DrawHistory(font,ai.HistoryEntries,ai.HistoryPlayers);
         ai.TableOverlayOpen=mapChoice.Active||dock.HasOverlay||tabletop.ContextVisible||tabletop.HistoryOpen;
         if(!ai.TablePresentationBlocked&&ai.IsHumanTurn)mapChoice.Draw();
+        DrawFishing();ai.TableOverlayOpen|=fishingDock.Active;
         RefreshTablePrompt();GUI.matrix=Matrix4x4.identity;
     }
     void RefreshTablePrompt()
@@ -183,6 +184,7 @@ public sealed partial class M2App
     }
     void TableSeatClick(string target)
     {
+        if(fishingDock.PickPlayer(target))return;
         if(ai.IsHumanTurn&&view.Phase==GamePhase.RobberSteal&&view.PendingDecision!=null&&view.PendingDecision.EligibleVictimIds.Contains(target))
         {var c=NewCommand(CommandKind.StealResource);c.OtherPlayerId=target;Submit(c);return;}
         if(Operations().CanTrade)dock.OpenTrade(target);

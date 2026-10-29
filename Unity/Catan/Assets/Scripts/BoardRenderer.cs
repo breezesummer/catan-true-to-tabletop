@@ -88,7 +88,7 @@ public sealed class BoardRenderer : MonoBehaviour
     }
     static Color TerrainColor(string r)
     {
-        switch(r) { case "wood":return new Color(.16f,.36f,.25f); case "brick":return new Color(.62f,.28f,.18f); case "wool":return new Color(.49f,.62f,.3f); case "wheat":return new Color(.78f,.59f,.25f); default:return new Color(.68f,.58f,.41f); }
+        switch(r) { case "lake":return new Color(.15f,.48f,.62f); case "wood":return new Color(.16f,.36f,.25f); case "brick":return new Color(.62f,.28f,.18f); case "wool":return new Color(.49f,.62f,.3f); case "wheat":return new Color(.78f,.59f,.25f); default:return new Color(.68f,.58f,.41f); }
     }
     public void Refresh(PlayerView view)
     {

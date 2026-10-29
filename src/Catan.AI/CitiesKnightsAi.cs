@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Catan.Core;
+using Catan.Core.TradeModules;
 using Catan.Core.M4;
 using Command = Catan.Core.M4.Command;
 using CommandKind = Catan.Core.M4.CommandKind;
@@ -44,6 +45,7 @@ public sealed class CitiesKnightsAi
         }
         if (generalChoice != null) return generalChoice;
         if (view.TradeOffer != null) return RespondToTrade(view);
+        var fishing = FishingAi.Choose(view); if(fishing != null && view.Phase != GamePhase.Action) return fishing;
         if (view.Phase == GamePhase.SetupSettlement)
             return Make(CommandKind.SetupSettlement, view.LegalVertexIds.OrderByDescending(v => SetupValue(view, v)).ThenBy(v => v).First());
         if (view.Phase == GamePhase.SetupRoad)
@@ -93,10 +95,11 @@ public sealed class CitiesKnightsAi
         legal.AddRange(view.LegalEdgeIds.Select(v => Make(CommandKind.BuildRoad, v)));
 
         // 先结算能立即结束比赛的公开确定性得分，包括两阶段的大都会归属选择。
-        if (view.OwnVictoryPoints >= view.TargetVictoryPoints) return Make(CommandKind.DeclareVictory);
-        var winning = legal.Where(c => view.OwnVictoryPoints + PointGain(view, c) >= view.TargetVictoryPoints)
+        if (view.OwnVictoryPoints >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints)) return Make(CommandKind.DeclareVictory);
+        var winning = legal.Where(c => view.OwnVictoryPoints + PointGain(view, c) >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints))
             .OrderByDescending(c => PointGain(view, c)).ThenBy(c => c.Kind).FirstOrDefault();
         if (winning != null) return winning;
+        if(fishing != null) return fishing;
         // 对手即将终局时，先执行确有阻碍收益的蓝牌或截路；自己的立即胜利仍排在最前。
         var urgentTactic = legal.Where(c => UrgentInterference(view, c))
             .OrderByDescending(c => c.Kind == CommandKind.PlayProgressCard ? ProgressValue(view, c) : BlockValue(view, c))
@@ -227,7 +230,7 @@ public sealed class CitiesKnightsAi
             if (holder != null && view.Players.Single(p => p.Id == holder.PlayerId).Improvements[(int)track] == 5) return -1;
             return 32; // 对方四级大都会可在下一次五级升级时争取。
         }
-        int rolls = RemainingRolls(view.Turn, view.Players.Max(p => p.VictoryPoints), view.TargetVictoryPoints);
+        int rolls = RemainingRolls(view.Turn, view.Players.Max(p => p.VictoryPoints), (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints));
         bool early = rolls >= 30;
         if (track == ImprovementTrack.Science) return early ? 60 + level * 4 : 24 + level * 5;
         if (track == ImprovementTrack.Trade) return early ? 28 + level * 3 : 40 + level * 4;
@@ -243,7 +246,7 @@ public sealed class CitiesKnightsAi
             return GainsMetropolis(view, c.Track) ? 2 : 0;
         if (c.Kind == CommandKind.PlayProgressCard && c.ProgressCard == ProgressCardKind.Medicine) return 1 + HarborGain(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, c.TargetId);
         if (c.Kind == CommandKind.PlayProgressCard && c.ProgressCard == ProgressCardKind.Merchant) return view.MerchantPlayerId == view.PlayerId ? 0 : 1;
-        if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 3 && (c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight || c.Kind == CommandKind.MoveKnight || c.Kind == CommandKind.DisplaceKnight))
+        if (view.OwnVictoryPoints >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) - 3 && (c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight || c.Kind == CommandKind.MoveKnight || c.Kind == CommandKind.DisplaceKnight))
         {
             var lengths = view.Players.ToDictionary(p => p.Id, p => RoadLength(view, p.Id, c));
             int maximum = lengths.Values.Max();
@@ -491,7 +494,7 @@ public sealed class CitiesKnightsAi
     private static Command Copy(Command c) => new Command
     {
         PlayerId=c.PlayerId, Kind=c.Kind, TargetId=c.TargetId, OtherPlayerId=c.OtherPlayerId,
-        ActingAsPlayerId=c.ActingAsPlayerId, JiaoziCardType=c.JiaoziCardType, GeneralIds=c.GeneralIds?.ToArray(), DecisionId=c.DecisionId, WindowId=c.WindowId, SkillCommand=ThreeKingdomsAi.Copy(c.SkillCommand),
+        FishAction=c.FishAction, FishTokenIds=c.FishTokenIds?.ToArray(), ExpectedEventSequence=c.ExpectedEventSequence, ActingAsPlayerId=c.ActingAsPlayerId, JiaoziCardType=c.JiaoziCardType, GeneralIds=c.GeneralIds?.ToArray(), DecisionId=c.DecisionId, WindowId=c.WindowId, SkillCommand=ThreeKingdomsAi.Copy(c.SkillCommand),
         PaymentCards=c.PaymentCards?.ToArray(),GiveEffectiveCardType=c.GiveEffectiveCardType,RetireAtPhase=c.RetireAtPhase,CancelRetirementIntent=c.CancelRetirementIntent,
         DeclaredRealTypes=c.DeclaredRealTypes?.ToArray(),DeclaredEffectiveTypes=c.DeclaredEffectiveTypes?.ToArray(),
         GiveResource=c.GiveResource, ReceiveResource=c.ReceiveResource, GiveAmount=c.GiveAmount, ReceiveAmount=c.ReceiveAmount,
@@ -552,7 +555,7 @@ public sealed class CitiesKnightsAi
             double benefit = TradeValue(view.OwnResources, receive, give) + 2;
             // 自己也只差一分且此报价补齐当前目标时，才重新考虑两三步可赢的对手。
             // 一步可赢和领先六分的禁令仍以无穷大门槛保持绝对优先。
-            if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 1
+            if (view.OwnVictoryPoints >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) - 1
                 && Resources.All(r => view.OwnResources[r] + receive[r] - give[r] >= goal[r])) benefit += 16;
             var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0
                 && (view.ThreeKingdoms?.AllowedTradePartnerPlayerIds==null||view.ThreeKingdoms.AllowedTradePartnerPlayerIds.Contains(p.Id))
@@ -570,7 +573,7 @@ public sealed class CitiesKnightsAi
     private static double Value(PlayerView view, string vertex)
     {
         var owned = Buildings(view).Where(b => b.PlayerId == view.PlayerId).Select(b => b.LocationId).ToArray();
-        return HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex) + view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
+        return FishingAi.VertexValue(view.TradeModules?.Fishing, view.Board.Tiles, vertex) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex) + view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
         {
             var pips = 6 - Math.Abs(7 - t.Number!.Value);
             var already = view.Board.Tiles.Count(other => other.Resource == t.Resource && other.Vertices.Intersect(owned).Any());
@@ -605,7 +608,7 @@ public sealed class CitiesKnightsAi
             && !view.Board.Edges.Where(e => e.Vertices.Contains(v.Id)).Any(e => buildings.Any(b => e.Vertices.Contains(b.LocationId)))
             && paths.ContainsKey(v.Id)).Select(v => (target: v.Id, path: paths[v.Id])).ToArray();
         if (targets.Length == 0) return null;
-        int remaining = RemainingRolls(view.Turn, view.Players.Max(p => p.VictoryPoints), view.TargetVictoryPoints);
+        int remaining = RemainingRolls(view.Turn, view.Players.Max(p => p.VictoryPoints), (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints));
         return targets.OrderByDescending(t => 16.0 / (4 + 2 * t.path.Length) + Value(view, t.target) * remaining / 180.0 - t.path.Length * 2).ThenBy(t => t.target).First();
     }
 }

@@ -63,6 +63,8 @@ public sealed partial class M6App : MonoBehaviour
     int? menuVictoryPoints;
     bool menuThreeKingdoms;
     bool menuHarbormaster;
+    bool menuFishing;
+    public bool Fishing { get; private set; }
     public bool Harbormaster { get; private set; }
     bool customVictoryTarget;
     bool tableMenu, escapeDismissedInteraction;
@@ -186,18 +188,18 @@ public sealed partial class M6App : MonoBehaviour
         presentation=app;actor=acting;finished=done;decideAndSubmit=step;save=export;refresh=update;close=dispose;visible=show;
         InitialAuthority=null;refresh();nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);
     }
-    public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null,int? aiSpeedLevel=null,bool threeKingdoms=false,bool harbormaster=false)
+    public void StartGame(string rules,string scenario,int players,string human,bool paused=false,string authority=null,int? targetVictoryPoints=null,int? aiSpeedLevel=null,bool threeKingdoms=false,bool harbormaster=false,bool fishing=false)
     {
         ValidateConfiguration(rules,scenario,players,human);
         if(threeKingdoms&&rules!="cities-knights"&&rules!="combined")throw new InvalidDataException("三国争霸支持城市与骑士或双扩展组合。");
         if(!networkEntering&&Network!=null&&(Network.Playing||Network.Busy||Network.RoomId!=null||Network.EnrollmentPending))Network.EndSession();
-        var modules=Catan.Core.TradeModules.HarbormasterRules.Create(new Catan.Core.TradeModules.TradeModuleOptions { Harbormaster=harbormaster },scenario);
+        var modules=Catan.Core.TradeModules.HarbormasterRules.Create(new Catan.Core.TradeModules.TradeModuleOptions { Harbormaster=harbormaster, Fishing=fishing },rules=="base"?"m2-base-game":rules=="cities-knights"?"m4-cities-knights":scenario);
         int target=Catan.Core.VictoryPointSettings.Resolve(targetVictoryPoints,Catan.Core.TradeModules.HarbormasterRules.DefaultTarget(DefaultVictoryPoints(rules,scenario,players),modules),MaximumVictoryPoints(rules,scenario));
         if(close!=null)close();
         else if(presentation!=null){presentation.enabled=false;Destroy(presentation);}
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
-        customVictoryTarget=targetVictoryPoints.HasValue;Harbormaster=harbormaster;ThreeKingdoms=threeKingdoms;ResetThreeKingdomsPanel();
+        customVictoryTarget=targetVictoryPoints.HasValue;Harbormaster=harbormaster;Fishing=fishing;ThreeKingdoms=threeKingdoms;ResetThreeKingdomsPanel();
         ResetCardPresentation();ResetPlayerIdentity();
         TargetVictoryPoints=target;AiSpeedLevel=TabletopAiSpeed.Clamp(aiSpeedLevel??AiSpeedLevel);ResetBuildPresentation();
         networkMenu=false;menuPendingAction=null;tableMenu=false;encyclopediaOpen=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你使用 "+ColorLabel(human)+" 建筑。行动顺序由开局掷骰决定。";
@@ -275,7 +277,7 @@ public sealed partial class M6App : MonoBehaviour
         menuRule=Array.IndexOf(RuleIds,RuleSet);menuPlayers=PlayerCount;menuHuman=int.Parse(HumanSeat.Substring(1))-1;
         var ids=ScenarioIds();menuScenario=Math.Max(0,Array.IndexOf(ids,ScenarioId));
         menuVictoryPoints=customVictoryTarget?TargetVictoryPoints:(int?)null;menuAiSpeed=AiSpeedLevel;
-        menuThreeKingdoms=ThreeKingdoms;menuHarbormaster=Harbormaster;
+        menuThreeKingdoms=ThreeKingdoms;menuHarbormaster=Harbormaster;menuFishing=Fishing;
     }
     public void SaveAndReturnToMainMenu()
     {

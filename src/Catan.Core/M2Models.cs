@@ -222,6 +222,7 @@ namespace Catan.Core.M2
         public string[] LegalCityVertexIds { get; internal set; }
         public string[] LegalEdgeIds { get; internal set; }
         public TradeModules.TradeModuleView TradeModules { get; internal set; }
+        public Command[] LegalFishingActions { get; internal set; } = Array.Empty<Command>();
         public string LongestRoadPlayerId { get; internal set; }
         public string LargestArmyPlayerId { get; internal set; }
         public string WinnerPlayerId { get; internal set; }

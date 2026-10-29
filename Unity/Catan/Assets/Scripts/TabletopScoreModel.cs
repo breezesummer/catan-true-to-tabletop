@@ -34,7 +34,8 @@ public static class TabletopScoreModel
         var rows=Buildings(view.Board.Settlements,view.Board.Cities,playerId);
         Awards(rows,playerId,view.LongestRoadPlayerId,view.LargestArmyPlayerId,"最长道路");
         if(playerId==view.PlayerId)HiddenCards(rows,view.OwnDevelopmentCards.Count(c=>c.Kind==Catan.Core.M2.DevelopmentCardKind.VictoryPoint));
-        if(view.TradeModules!=null)rows.Add(new TabletopScoreRow("港口点数",view.TradeModules.HarborScores.First(p=>p.PlayerId==playerId).Points+" 点",0));
+        if(view.TradeModules?.Fishing?.OldBootPlayerId==playerId)rows.Add(new TabletopScoreRow("旧靴","个人胜利目标 "+(view.TargetVictoryPoints+1)+" 分",0));
+        if(view.TradeModules?.Harbormaster==true)rows.Add(new TabletopScoreRow("港口点数",view.TradeModules.HarborScores.First(p=>p.PlayerId==playerId).Points+" 点",0));
         if(view.TradeModules?.HarbormasterPlayerId==playerId)Add(rows,"海港大师","持有奖励卡",2);
         return new TabletopScoreBreakdown(playerId,playerId==view.PlayerId,rows);
     }
@@ -47,7 +48,8 @@ public static class TabletopScoreModel
         Add(rows,"剧本奖励","登岛或航路奖励",p.BonusVictoryPoints);
         Add(rows,"布匹",p.Cloth+" 匹 · 每 2 匹计 1 分",p.Cloth/2);
         if(playerId==view.PlayerId)HiddenCards(rows,view.OwnDevelopmentCards.Count(c=>c.Kind==Catan.Core.M3.DevelopmentCardKind.VictoryPoint));
-        if(view.TradeModules!=null)rows.Add(new TabletopScoreRow("港口点数",view.TradeModules.HarborScores.First(p=>p.PlayerId==playerId).Points+" 点",0));
+        if(view.TradeModules?.Fishing?.OldBootPlayerId==playerId)rows.Add(new TabletopScoreRow("旧靴","个人胜利目标 "+(view.TargetVictoryPoints+1)+" 分",0));
+        if(view.TradeModules?.Harbormaster==true)rows.Add(new TabletopScoreRow("港口点数",view.TradeModules.HarborScores.First(p=>p.PlayerId==playerId).Points+" 点",0));
         if(view.TradeModules?.HarbormasterPlayerId==playerId)Add(rows,"海港大师","持有奖励卡",2);
         return new TabletopScoreBreakdown(playerId,playerId==view.PlayerId,rows);
     }
@@ -60,7 +62,8 @@ public static class TabletopScoreModel
         CityBonuses(rows,view.Board.Metropolises.Count(m=>m.PlayerId==playerId),p.DefenderPoints,view.MerchantPlayerId==playerId);
         Add(rows,"印刷厂","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M4.ProgressCardKind.Printing));
         Add(rows,"石碑","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M4.ProgressCardKind.Constitution));
-        if(view.TradeModules!=null)rows.Add(new TabletopScoreRow("港口点数",view.TradeModules.HarborScores.First(p=>p.PlayerId==playerId).Points+" 点",0));
+        if(view.TradeModules?.Fishing?.OldBootPlayerId==playerId)rows.Add(new TabletopScoreRow("旧靴","个人胜利目标 "+(view.TargetVictoryPoints+1)+" 分",0));
+        if(view.TradeModules?.Harbormaster==true)rows.Add(new TabletopScoreRow("港口点数",view.TradeModules.HarborScores.First(p=>p.PlayerId==playerId).Points+" 点",0));
         if(view.TradeModules?.HarbormasterPlayerId==playerId)Add(rows,"海港大师","持有奖励卡",2);
         return new TabletopScoreBreakdown(playerId,playerId==view.PlayerId,rows);
     }
@@ -75,7 +78,8 @@ public static class TabletopScoreModel
         CityBonuses(rows,view.Board.Metropolises.Count(m=>m.PlayerId==playerId),p.DefenderPoints,view.MerchantPlayerId==playerId);
         Add(rows,"印刷厂","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M5.ProgressCardKind.Printing));
         Add(rows,"石碑","公开胜利点卡",p.ProgressVictoryCards.Count(c=>c==Catan.Core.M5.ProgressCardKind.Constitution));
-        if(view.TradeModules!=null)rows.Add(new TabletopScoreRow("港口点数",view.TradeModules.HarborScores.First(p=>p.PlayerId==playerId).Points+" 点",0));
+        if(view.TradeModules?.Fishing?.OldBootPlayerId==playerId)rows.Add(new TabletopScoreRow("旧靴","个人胜利目标 "+(view.TargetVictoryPoints+1)+" 分",0));
+        if(view.TradeModules?.Harbormaster==true)rows.Add(new TabletopScoreRow("港口点数",view.TradeModules.HarborScores.First(p=>p.PlayerId==playerId).Points+" 点",0));
         if(view.TradeModules?.HarbormasterPlayerId==playerId)Add(rows,"海港大师","持有奖励卡",2);
         return new TabletopScoreBreakdown(playerId,playerId==view.PlayerId,rows);
     }

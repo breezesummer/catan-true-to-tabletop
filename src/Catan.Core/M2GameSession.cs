@@ -158,7 +158,7 @@ namespace Catan.Core.M2
                         PlayedKnights = p.PlayedKnights, Pieces = p.Pieces.Copy(), VictoryPoints = VictoryPoints(state, p.Id, state.WinnerPlayerId == p.Id), LongestRoadLength = LongestRoad(state, p.Id) }).ToArray(),
                     Board = new BoardView { Tiles = Json.Copy(scenario.Topology.Tiles), Vertices = Json.Copy(scenario.Topology.Vertices), Edges = Json.Copy(scenario.Topology.Edges), Ports = Json.Copy(ports),
                         Settlements = Json.Copy(state.Settlements), Cities = Json.Copy(state.Cities), Roads = Json.Copy(state.Roads), RobberTileId = state.RobberTileId },
-                    TradeModules = TradeView(state, playerId),
+                    TradeModules = TradeView(state, playerId), LegalFishingActions = LegalFishingActions(playerId).ToArray(),
                     LegalVertexIds = vertices, LegalCityVertexIds = cities, LegalEdgeIds = edges, LongestRoadPlayerId = state.LongestRoadPlayerId, LargestArmyPlayerId = state.LargestArmyPlayerId,
                     WinnerPlayerId = state.WinnerPlayerId, LastDice1 = state.LastDice1, LastDice2 = state.LastDice2, Events = Json.Copy(state.Events)
                 };

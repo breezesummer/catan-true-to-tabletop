@@ -45,8 +45,9 @@ namespace Catan.Core.M4
             if (B2(s)) { ApplyB2(s, c); return; }
             if (tk == null)
             {
-                Require(c.Kind < CommandKind.ChooseGenerals, "ExpansionDisabled", "本局未开启三国争霸开发骨架。");
+                Require(c.Kind < CommandKind.ChooseGenerals || c.Kind >= CommandKind.SpendFish, "ExpansionDisabled", "本局未开启三国争霸开发骨架。");
                 ApplyBaseRules(s, c);
+                ResumeFishing(s);
                 return;
             }
             Require(s.Phase != GamePhase.Finished, "GameFinished", "对局已经结束。");

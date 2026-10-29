@@ -36,7 +36,7 @@ public sealed partial class M2App : MonoBehaviour
         if(ai!=null&&ai.NetworkGame){font=MobileTabletop.LoadFont();ai.ConnectNetwork(this);return;}
 
         host=new M2LocalGameHost(ai==null?4:ai.PlayerCount);
-        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints,ai.Harbormaster);
+        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints,ai.Harbormaster,ai.Fishing);
 
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         var initial=host.View(ai==null?"P1":ai.HumanSeat);
@@ -51,6 +51,7 @@ public sealed partial class M2App : MonoBehaviour
     {
         if((host==null&&!NetworkGame)||board==null)return;
         RefreshTablePrompt();
+        if(fishingDock.Active){if(Input.GetKeyDown(KeyCode.Escape))fishingDock.Reset();return;}
         Vector2 releasePoint=Vector2.zero;bool released=ai!=null&&dock.ConsumeBuildRelease(out releasePoint);
         if(mapChoice.Active&&Input.GetMouseButtonDown(1)){mapChoice.Clear();return;}
         if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}

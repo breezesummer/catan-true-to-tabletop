@@ -180,6 +180,9 @@ public sealed partial class M6App
         bool harborAllowed=Catan.Core.TradeModules.HarbormasterRules.Supports(ids[menuScenario]);
         if(!harborAllowed)menuHarbormaster=false;
         if(PastoralMenuUI.Button(new Rect(969,590,330,36),(menuHarbormaster?"☑ ":"☐ ")+"海港大师",harborAllowed,false,menuHarbormaster))menuHarbormaster=!menuHarbormaster;
+        bool fishingAllowed=menuRule==0||menuRule==2;
+        if(!fishingAllowed)menuFishing=false;
+        if(PastoralMenuUI.Button(new Rect(969,632,330,36),(menuFishing?"☑ ":"☐ ")+"捕鱼",fishingAllowed,false,menuFishing))menuFishing=!menuFishing;
         int defaults=MenuDefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
         if(menuVictoryPoints.HasValue)menuVictoryPoints=Mathf.Clamp(menuVictoryPoints.Value,5,maximum);
         int points=menuVictoryPoints??defaults;
@@ -191,12 +194,12 @@ public sealed partial class M6App
         if(PastoralMenuUI.Button(new Rect(1250,414,49,49),"+",points<maximum))menuVictoryPoints=points+1;
         if(PastoralMenuUI.Button(new Rect(969,544,330,39),"使用剧本推荐 · "+defaults+" 分"))menuVictoryPoints=null;
         string hint=menuRule==1&&ids[menuScenario]=="wonders-of-catan"?"奇观的特殊胜利条件仍适用。":menuRule==1&&ids[menuScenario]=="pirate-islands"?"获胜仍须夺回自己的堡垒。":menuRule==1&&ids[menuScenario]=="cloth-for-catan"?"布匹耗尽时仍按剧本规则结算。":"设置将随本局存档保留。";
-        PastoralMenuUI.Label(new Rect(969,638,330,58),harborAllowed?"可选 5–"+maximum+" 分。"+hint:"海盗群岛暂未开放海港大师。",14,PastoralMenuUI.Muted);
+        PastoralMenuUI.Label(new Rect(969,673,330,48),!fishingAllowed?"此地图的捕鱼尚未开放。":harborAllowed?"可选 5–"+maximum+" 分。"+hint:"海盗群岛暂未开放海港大师。",14,PastoralMenuUI.Muted);
     }
     void StartConfiguredGame()
     {
         var ids=ScenarioIds();
-        StartGame(RuleIds[menuRule],ids[Mathf.Clamp(menuScenario,0,ids.Length-1)],menuPlayers,"P"+(Mathf.Clamp(menuHuman,0,menuPlayers-1)+1),targetVictoryPoints:menuVictoryPoints,aiSpeedLevel:menuAiSpeed,threeKingdoms:menuRule>=2&&menuThreeKingdoms,harbormaster:menuHarbormaster&&Catan.Core.TradeModules.HarbormasterRules.Supports(ids[menuScenario]));
+        StartGame(RuleIds[menuRule],ids[Mathf.Clamp(menuScenario,0,ids.Length-1)],menuPlayers,"P"+(Mathf.Clamp(menuHuman,0,menuPlayers-1)+1),targetVictoryPoints:menuVictoryPoints,aiSpeedLevel:menuAiSpeed,threeKingdoms:menuRule>=2&&menuThreeKingdoms,harbormaster:menuHarbormaster&&Catan.Core.TradeModules.HarbormasterRules.Supports(ids[menuScenario]),fishing:menuFishing&&(menuRule==0||menuRule==2));
     }
     void RequestMenuAction(Action action,string caption,bool allowSave=true)
     {

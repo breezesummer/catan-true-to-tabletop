@@ -112,7 +112,7 @@ public sealed partial class RoomDirectory : IDisposable
         ValidateName(payload.DisplayName);
         if ((payload.Password?.Length ?? 0) > 128) return Reject("InvalidPassword", "房间密码过长。");
         var versions = RuleRoomGame.Versions(payload.Settings.RuleSet);
-        if (!VersionsMatch(request, versions.Rules, versions.Scenario) || !GeneralVersionsMatch(request,payload.Settings)) return Reject("VersionMismatch", "规则、场景或武将包版本不同，请更新至同一版本。");
+        if (!VersionsMatch(request, versions.Rules, versions.Scenario) || !GeneralVersionsMatch(request,payload.Settings)) return Reject("VersionMismatch", "规则、场景或武将包或附加玩法版本不同，请更新至同一版本。");
         var managerSeat = SeatIds(payload.Settings.PlayerCount).FirstOrDefault(id => !payload.Settings.AiSeats.Contains(id));
         if (managerSeat == null) return Reject("SeatOccupied", "请至少保留一个人类席位给房主。");
         var enrollment = EnrollmentIntent.Parse(request, payload);
@@ -155,6 +155,7 @@ public sealed partial class RoomDirectory : IDisposable
     private static void ValidateName(string name) { if (string.IsNullOrWhiteSpace(name) || name.Length > 40 || name.Any(char.IsControl)) throw new ArgumentException("名称无效。"); }
     private static bool GeneralVersionsMatch(NetworkRequest request,RoomSettings settings)
     {
+        if ((settings.Harbormaster || settings.Fishing) && request.SupportedTradeModulesVersion != NetworkProtocol.TradeModulesVersion) return false;
         bool handshake=request.Operation=="Create"||request.Operation=="Join"||request.Operation=="Reconnect";
         if(!handshake&&request.ExpectedThreeKingdomsPackageVersion==null&&request.ExpectedThreeKingdomsContentHash==null)return true;
         return request.ExpectedThreeKingdomsPackageVersion==settings.ThreeKingdomsPackageVersion&&request.ExpectedThreeKingdomsContentHash==settings.ThreeKingdomsContentHash;
@@ -164,6 +165,9 @@ public sealed partial class RoomDirectory : IDisposable
         if (s == null || s.PlayerCount != 3 && s.PlayerCount != 4) throw new ArgumentException("人数无效。");
         if (s.RuleSet == "cities") s.RuleSet = "cities-knights";
         ValidateName(s.Name); RuleRoomGame.Versions(s.RuleSet);
+        if ((s.Harbormaster || s.Fishing) ? s.TradeModulesVersion != NetworkProtocol.TradeModulesVersion : s.TradeModulesVersion != null) throw new ArgumentException("附加玩法版本不兼容。");
+        if (s.Fishing && s.RuleSet != "base" && s.RuleSet != "cities-knights") throw new ArgumentException("捕鱼目前只支持基础和城市骑士标准图。");
+        if (s.Harbormaster && !Catan.Core.TradeModules.HarbormasterRules.Supports(s.ScenarioId)) throw new ArgumentException("海盗群岛尚未开放海港大师。");
         if (s.RuleSet == "base" || s.RuleSet == "cities-knights") { if (s.ScenarioId != "base") throw new ArgumentException("基础场景无效。"); }
         else if (s.RuleSet == "seafarers" ? !Catan.Core.M3.SeafarersScenarios.Ids.Contains(s.ScenarioId) : !Catan.Core.M5.CombinedScenarios.Ids.Contains(s.ScenarioId)) throw new ArgumentException("剧本无效。");
         if (s.TargetVictoryPoints.HasValue && !VictoryPointSettings.IsValid(s.TargetVictoryPoints, s.RuleSet=="seafarers"?VictoryPointSettings.MaximumForScenario(s.ScenarioId):VictoryPointSettings.Maximum)) throw new ArgumentException("胜利分数无效。");
@@ -268,6 +272,7 @@ public sealed partial class RoomDirectory : IDisposable
         {
             RoomId = state.RoomId, Name = state.Settings.Name, RuleSet = state.Settings.RuleSet, ScenarioId = state.Settings.ScenarioId,
             RulesVersion = state.RulesVersion, ScenarioVersion = state.ScenarioVersion, PlayerCount = state.Settings.PlayerCount,
+            Harbormaster=state.Settings.Harbormaster,Fishing=state.Settings.Fishing,TradeModulesVersion=state.Settings.TradeModulesVersion,
             ThreeKingdomsPackageVersion=state.Settings.ThreeKingdomsPackageVersion,ThreeKingdomsContentHash=state.Settings.ThreeKingdomsContentHash,
             OccupiedSeats = state.Seats.Count + state.Settings.AiSeats.Length, TargetVictoryPoints = state.Settings.TargetVictoryPoints,
             HasPassword = state.PasswordHash != null, Listed = state.Settings.Listed && !state.Closed && !(game?.Finished ?? false) && state.Seats.Any(Connected), Started = game != null, Finished = game?.Finished ?? false,
@@ -341,7 +346,7 @@ public sealed partial class RoomDirectory : IDisposable
                 if (state.Closed) return Reject("RoomClosed", "房间已销毁，请创建或加入其他房间。");
                 if (request.Operation == "Describe") return new NetworkResponse { Success = true, RoomId = state.RoomId, RuleSet = state.Settings.RuleSet, Revision = state.Revision, Room = PublicSummary() };
                 if (request.Operation == "Join") return Join(request);
-                if (!VersionsMatch(request, state.RulesVersion, state.ScenarioVersion)||!GeneralVersionsMatch(request,state.Settings)) return Reject("VersionMismatch", "规则、场景或武将包版本不同，请更新至同一版本。");
+                if (!VersionsMatch(request, state.RulesVersion, state.ScenarioVersion)||!GeneralVersionsMatch(request,state.Settings)) return Reject("VersionMismatch", "规则、场景或武将包或附加玩法版本不同，请更新至同一版本。");
                 var hash = string.IsNullOrEmpty(request.Credential) ? null : PrivateJson.Hash(request.Credential);
                 var seat = state.Seats.SingleOrDefault(s => SameSecret(s.CredentialHash, hash));
                 if (seat == null || seat.CredentialExpiresAtUtc <= owner.options.Clock()) return Reject("Unauthorized", "席位凭据无效或已到期。");
@@ -395,10 +400,11 @@ public sealed partial class RoomDirectory : IDisposable
         private NetworkResponse Join(NetworkRequest request)
         {
             var payload = WireJson.Deserialize<JoinRoomPayload>(request.Payload ?? "{}"); ValidateName(payload.DisplayName);
+            if ((state.Settings.Harbormaster || state.Settings.Fishing) && request.SupportedTradeModulesVersion != NetworkProtocol.TradeModulesVersion) return Reject("VersionMismatch", "客户端不支持附加玩法，请更新。");
             var enrollment = EnrollmentIntent.Parse(request, payload);
             if (enrollment != null && HasEnrollment(enrollment)) return ReplayEnrollment(enrollment);
             if (state.Closed) return Reject("RoomClosed", "该大厅房间已结束，请加入其他房间或重新创建。");
-            if (!VersionsMatch(request, state.RulesVersion, state.ScenarioVersion)||!GeneralVersionsMatch(request,state.Settings)) return Reject("VersionMismatch", "规则、场景或武将包版本不同，请更新至同一版本。");
+            if (!VersionsMatch(request, state.RulesVersion, state.ScenarioVersion)||!GeneralVersionsMatch(request,state.Settings)) return Reject("VersionMismatch", "规则、场景或武将包或附加玩法版本不同，请更新至同一版本。");
             if (paused) return Reject("RoomPaused", "房间正在等待恢复保存。");
             if (game != null) return Reject("GameStarted", "对局已开始；原玩家请使用凭据重连。");
             if ((payload.Password?.Length ?? 0) > 128 || state.PasswordHash != null && !SameSecret(state.PasswordHash, PasswordHash(payload.Password ?? "", state.PasswordSalt))) return Reject("InvalidPassword", "房间密码不正确。");
@@ -477,6 +483,7 @@ public sealed partial class RoomDirectory : IDisposable
                     if (!manager) return Snapshot(seat, "ManagerRequired", "只有管理员可以修改设置。", false);
                     if (game != null) return Snapshot(seat, "GameStarted", "对局已开始。", false);
                     var settings = WireJson.Deserialize<RoomSettings>(request.Payload); ValidateSettings(settings);
+                    if ((settings.Harbormaster || settings.Fishing) && request.SupportedTradeModulesVersion != NetworkProtocol.TradeModulesVersion) return Snapshot(seat,"VersionMismatch","客户端不支持附加玩法，请更新。",false);
                     if (state.Seats.Any(s => s!=seat&&(!SeatIds(settings.PlayerCount).Contains(s.SeatId) || settings.AiSeats.Contains(s.SeatId)))) return Snapshot(seat, "SeatOccupied", "新配置不能移除或覆盖其他人类席位。", false);
                     if(!SeatIds(settings.PlayerCount).Contains(seat.SeatId)||settings.AiSeats.Contains(seat.SeatId))
                     {

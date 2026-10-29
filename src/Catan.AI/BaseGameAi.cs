@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Catan.Core;
+using Catan.Core.TradeModules;
 using Catan.Core.M2;
 using Command = Catan.Core.M2.Command;
 using CommandKind = Catan.Core.M2.CommandKind;
@@ -32,6 +33,7 @@ public sealed class BaseGameAi
     private Command Choose(PlayerView view)
     {
         Command Make(CommandKind kind, string target = null) => new() { PlayerId = view.PlayerId, Kind = kind, TargetId = target! };
+        var fishing = FishingAi.Choose(view); if(fishing != null && view.Phase != GamePhase.Action) return fishing;
         switch (view.Phase)
         {
             case GamePhase.SetupSettlement:
@@ -61,9 +63,10 @@ public sealed class BaseGameAi
         if (view.TradeModules != null)
         {
             var winningPort = view.LegalCityVertexIds.Concat(view.LegalVertexIds).FirstOrDefault(v =>
-                view.OwnVictoryPoints + 1 + HarborGain(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, v) >= view.TargetVictoryPoints);
+                view.OwnVictoryPoints + 1 + HarborGain(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, v) >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints));
             if (winningPort != null) return Make(view.LegalCityVertexIds.Contains(winningPort) ? CommandKind.BuildCity : CommandKind.BuildSettlement, winningPort);
         }
+        if(fishing != null) return fishing;
         if (view.LegalCityVertexIds.Length > 0)
             return Make(CommandKind.BuildCity, view.LegalCityVertexIds.OrderByDescending(v => Value(view, v)).First());
         if (view.LegalVertexIds.Length > 0)
@@ -130,7 +133,7 @@ public sealed class BaseGameAi
             double benefit = TradeValue(view.OwnResources, receive, give) + 2;
             // 自己也只差一分且此报价补齐当前目标时，才重新考虑两三步可赢的对手。
             // 一步可赢和领先六分的禁令仍以无穷大门槛保持绝对优先。
-            if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 1
+            if (view.OwnVictoryPoints >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) - 1
                 && Resources.All(r => view.OwnResources[r] + receive[r] - give[r] >= goal[r])) benefit += 16;
             var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0
                 && AiOpponentStrategy.CanSupply(view.OpponentHands, p.Id, need)
@@ -152,7 +155,7 @@ public sealed class BaseGameAi
     private static double Value(PlayerView view, string vertex)
     {
         var owned = Buildings(view).Where(b => b.PlayerId == view.PlayerId).Select(b => b.LocationId).ToArray();
-        return HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex) + view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
+        return FishingAi.VertexValue(view.TradeModules?.Fishing, view.Board.Tiles, vertex) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex) + view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
         {
             var pips = 6 - Math.Abs(7 - t.Number!.Value);
             var already = view.Board.Tiles.Count(other => other.Resource == t.Resource && other.Vertices.Intersect(owned).Any());

@@ -9,7 +9,7 @@ public sealed class TabletopDefenseUI
     int roadLength;
     bool roadBound;
     Catan.Core.TradeModules.TradeModuleView harbor;
-    public void BindHarbormaster(Catan.Core.TradeModules.TradeModuleView modules) { harbor=modules; }
+    public void BindHarbormaster(Catan.Core.TradeModules.TradeModuleView modules) { harbor=modules?.Harbormaster==true?modules:null; }
     string HarborLabel=>harbor==null?"":string.IsNullOrEmpty(harbor.HarbormasterPlayerId)?"暂无归属":M6App.PlayerLabel(harbor.HarbormasterPlayerId)+" +2分";
     public string MobileSummary => (position>=0?"蛮族 "+position+"/7 · "+(position==7?"本次防御 ":"防御 ")+strength+"/"+threat+"\n":"")+(roadBound?"最长路线 · "+(string.IsNullOrEmpty(roadPlayer)?"暂无":M6App.PlayerLabel(roadPlayer)+" "+roadLength+" 段"):"")+(harbor==null?"":"\n海港大师 · "+HarborLabel);
     static Texture2D ship,shield;

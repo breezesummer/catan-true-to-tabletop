@@ -8,7 +8,7 @@ namespace Catan.Core.TradeModules
     public static class FishingScenarioCatalog
     {
         public const string CurrentVersion = "standard-fishing-map-v001";
-        public static bool Supports(string scenarioId) => scenarioId == "m2-base-game";
+        public static bool Supports(string scenarioId) => scenarioId == "m2-base-game" || scenarioId == "m4-cities-knights";
         private static readonly string[][] StandardVertices =
         {
             new[] { "V04", "V08", "V12" }, new[] { "V39", "V44", "V48" },

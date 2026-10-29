@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using Catan.Core.TradeModules;
 
 namespace Catan.Core.M2
@@ -125,6 +126,33 @@ namespace Catan.Core.M2
                 case FishAction.TakeResource: return "取得一张资源";
                 case FishAction.BuildRoad: return "修建道路";
                 default: return "取得发展牌";
+            }
+        }
+        private IEnumerable<Command> LegalFishingActions(string player)
+        {
+            var fish = state.TradeModules?.Fishing;
+            if(fish == null) yield break;
+            Command Make(CommandKind kind) => new Command { PlayerId=player, Kind=kind, ExpectedEventSequence=state.EventSequence };
+            if(fish.PendingPlayerId == player)
+            {
+                foreach(var token in new string[] { null }.Concat(fish.Holdings.Single(h=>h.PlayerId==player).TokenIds))
+                { var c=Make(CommandKind.ResolveFishReplacement);c.DecisionId=fish.PendingDecisionId;c.TargetId=token;if(IsLegal(c))yield return c; }
+                yield break;
+            }
+            if(state.ActivePlayerId != player || state.Turn == 0 || state.PendingDecision != null || state.TradeOffer != null) yield break;
+            if(fish.OldBootPlayerId == player)
+                foreach(var other in state.Players.Where(p=>p.Id!=player)) { var c=Make(CommandKind.PassOldBoot);c.OtherPlayerId=other.Id;if(IsLegal(c))yield return c; }
+            var tokens=FishingRules.View(fish,player,state.TargetVictoryPoints.Value,state.EventSequence).OwnTokens;
+            foreach(FishAction action in Enum.GetValues(typeof(FishAction)))
+            {
+                var payment=FishingPayment.Select(tokens,action); if(payment.Length == 0) continue;
+                var candidates=new List<Command>();
+                Command Spend() { var c=Make(CommandKind.SpendFish);c.FishAction=action;c.FishTokenIds=payment;return c; }
+                if(action==FishAction.StealResource) foreach(var other in state.Players.Where(p=>p.Id!=player)) {var c=Spend();c.OtherPlayerId=other.Id;candidates.Add(c);}
+                else if(action==FishAction.TakeResource) foreach(var resource in Resources) {var c=Spend();c.Resource=resource;candidates.Add(c);}
+                else if(action==FishAction.BuildRoad) foreach(var edge in scenario.Topology.Edges) {var c=Spend();c.TargetId=edge.Id;candidates.Add(c);}
+                else candidates.Add(Spend());
+                foreach(var c in candidates) if(IsLegal(c))yield return c;
             }
         }
     }

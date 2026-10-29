@@ -65,6 +65,7 @@ namespace Catan.Core.M4
                 return;
             }
             if(B2(s)) { s.Phase=GamePhase.Action; return; }
+            QueueFishProduction(s, total);
             var before=s.Players.ToDictionary(p=>p.Id,HandCount); Produce(s,total); s.Phase=GamePhase.Action;
             foreach(var p in TurnOrder(s).Where(p=>B6Technology(s,p.Id,(int)ImprovementTrack.Science)>=3&&HandCount(p)==before[p.Id]))
                 if(s.Bank.Total>0) QueueDecision(s,new PendingDecision {Kind="Aqueduct",PlayerId=p.Id,ReturnPhase=GamePhase.Action});
@@ -74,7 +75,7 @@ namespace Catan.Core.M4
         {
             if(B5(s)){B5Invasion(s,"formal-invasion-"+s.ThreeKingdoms.Clock.TurnInstanceId,s.Players.Select(p=>p.Id).ToArray(),false);return;}
             s.FirstBarbarianAttack=true;
-            if(s.RobberTileId==null) s.RobberTileId=s.Tiles.Single(t=>t.Resource=="desert").Id;
+            if(s.RobberTileId==null && s.TradeModules?.Fishing==null) s.RobberTileId=s.Tiles.Single(t=>t.Resource=="desert").Id;
             var strength=s.Players.ToDictionary(p=>p.Id,p=>s.Knights.Where(k=>k.PlayerId==p.Id&&k.Active).Sum(k=>k.Level));
             s.BarbarianAttackStrength=s.Cities.Length;
             s.BarbarianDefenseStrength=strength.Values.Sum();
@@ -198,7 +199,7 @@ namespace Catan.Core.M4
         }
         private void ChaseRobber(GameState s,PlayerState p,string target)
         {
-            var knight=OwnKnight(s,p,target);Require(s.FirstBarbarianAttack&&B5KnightCanAct(s,knight),"KnightCannotAct","只有此前激活的骑士可以驱逐已进场的强盗。");
+            var knight=OwnKnight(s,p,target);Require(s.RobberTileId!=null&&s.FirstBarbarianAttack&&B5KnightCanAct(s,knight),"KnightCannotAct","只有此前激活的骑士可以驱逐已进场的强盗。");
             Require(scenario.Topology.Tiles.Single(t=>t.Id==s.RobberTileId).Vertices.Contains(target),"KnightNotAtRobber","骑士必须位于强盗所在土地旁。");
             B5Exhaust(s,knight);s.PendingDecision=new PendingDecision {Kind="Robber",PlayerId=p.Id,ReturnPhase=GamePhase.Action};s.Phase=GamePhase.RobberMove;
         }

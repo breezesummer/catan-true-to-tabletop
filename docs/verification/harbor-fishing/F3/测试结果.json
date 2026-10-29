@@ -1,0 +1,95 @@
+{
+  "日期": "2026-10-29",
+  "范围": "F3首个产品切片，工程与Editor检查；不是Android真机、四设备外网或用户试玩",
+  "去重结果": {
+    "总数": 702,
+    "通过": 700,
+    "既有失败": 2
+  },
+  "注意": "批次间存在重叠，不能直接把总数相加。保留本轮最终网络专项及完整局结果。基线复核单列，不计入去重结果。",
+  "基线复核": {
+    "源码提交": "b329d31d",
+    "本轮复现": 2,
+    "失败项目": [
+      "GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+      "TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat"
+    ],
+    "日志": ".local/development/harbor-f3/known-baseline.log"
+  },
+  "检查批次": [
+    {
+      "检查": "F2及F3初轮规则专项",
+      "记录": "tests/Catan.Rules.Tests/TestResults/fishing-f3-core.trx",
+      "总数": 43,
+      "通过": 43,
+      "失败": 0,
+      "失败项目": [],
+      "输出": []
+    },
+    {
+      "检查": "F3最终规则与产品完整局",
+      "记录": "tests/Catan.Rules.Tests/TestResults/fishing-f3-product-final.trx",
+      "总数": 31,
+      "通过": 31,
+      "失败": 0,
+      "失败项目": [],
+      "输出": [
+        "基础/3人/海港True：346指令，64回合，支付19。",
+        "基础/4人/海港False：470指令，77回合，支付29。",
+        "基础/4人/海港True：298指令，48回合，支付17。",
+        "城市骑士/4人/海港False/三国True：507指令，57回合，支付32，换抽1。",
+        "基础/3人/海港False：358指令，64回合，支付21。",
+        "城市骑士/4人/海港True/三国False：397指令，53回合，支付32，换抽0。",
+        "城市骑士/4人/海港True/三国True：543指令，61回合，支付31，换抽2。",
+        "城市骑士/3人/海港False/三国True：418指令，60回合，支付25，换抽0。",
+        "城市骑士/3人/海港True/三国True：372指令，50回合，支付20，换抽0。",
+        "城市骑士/3人/海港False/三国False：370指令，53回合，支付25，换抽0。",
+        "城市骑士/4人/海港False/三国False：503指令，72回合，支付42，换抽0。",
+        "城市骑士/3人/海港True/三国False：384指令，59回合，支付28，换抽0。"
+      ]
+    },
+    {
+      "检查": "网络全套",
+      "记录": "tests/Catan.Network.Tests/TestResults/fishing-f3-network-all.trx",
+      "总数": 287,
+      "通过": 287,
+      "失败": 0,
+      "失败项目": [],
+      "输出": []
+    },
+    {
+      "检查": "F3最终网络专项",
+      "记录": "tests/Catan.Network.Tests/TestResults/fishing-f3-network-special.trx",
+      "总数": 6,
+      "通过": 6,
+      "失败": 0,
+      "失败项目": [],
+      "输出": [
+        "base/三国False：2次鱼支付×4席；差量31142字节，完整视图及历史330559字节；两次权威提交合计10.1ms。同进程测量，非外网延迟。",
+        "cities-knights/三国True：2次鱼支付×4席；差量51498字节，完整视图及历史377526字节；两次权威提交合计105.0ms。同进程测量，非外网延迟。",
+        "cities-knights/三国False：2次鱼支付×4席；差量43060字节，完整视图及历史425295字节；两次权威提交合计223.1ms。同进程测量，非外网延迟。"
+      ]
+    },
+    {
+      "检查": "服务端全套",
+      "记录": "tests/Catan.Server.Tests/TestResults/fishing-f3-server.trx",
+      "总数": 99,
+      "通过": 99,
+      "失败": 0,
+      "失败项目": [],
+      "输出": []
+    },
+    {
+      "检查": "相关回归",
+      "记录": "tests/Catan.Rules.Tests/TestResults/fishing-f3-regression.trx",
+      "总数": 259,
+      "通过": 257,
+      "失败": 2,
+      "失败项目": [
+        "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+        "Catan.Rules.Tests.TabletopScoreTests.CitiesAndKnightsCountsMetropolisAsTwoExtraAndPublicCardsForEverySeat"
+      ],
+      "输出": []
+    }
+  ]
+}

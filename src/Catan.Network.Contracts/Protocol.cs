@@ -6,6 +6,7 @@ namespace Catan.Network.Contracts
     public static class NetworkProtocol
     {
         public const int Version = 3;
+        public const string TradeModulesVersion = "harbor-fishing-f3-v001";
         // 沿用协议3的字段布局，通过成功握手的既有 Code 协商轻量操作；旧客户端继续使用原操作。
         public const string CompactRepliesCode = "CompactRepliesV1";
         // 只有主动请求 Sync 的连接才接收此内层格式；协议3旧客户端的字段布局不变。
@@ -50,6 +51,7 @@ namespace Catan.Network.Contracts
         public string RuleSet;
         public string ExpectedRulesVersion;
         public string ExpectedScenarioVersion;
+        [DataMember(EmitDefaultValue=false)] public string SupportedTradeModulesVersion;
         [DataMember(EmitDefaultValue=false)] public string ExpectedThreeKingdomsPackageVersion;
         [DataMember(EmitDefaultValue=false)] public string ExpectedThreeKingdomsContentHash;
         // Create / Join 首次发送前由客户端生成并安全保存；重试必须保持编号、凭据和内容相同。
@@ -95,6 +97,9 @@ namespace Catan.Network.Contracts
         public int? TargetVictoryPoints;
         public bool Listed = true;
         public string[] AiSeats = Array.Empty<string>();
+        [DataMember(EmitDefaultValue=false)] public bool Harbormaster;
+        [DataMember(EmitDefaultValue=false)] public bool Fishing;
+        [DataMember(EmitDefaultValue=false)] public string TradeModulesVersion;
         [DataMember(EmitDefaultValue=false)] public string ThreeKingdomsPackageVersion;
         [DataMember(EmitDefaultValue=false)] public string ThreeKingdomsContentHash;
         // 掉线由 AI 托管，重连在下一自身行动回合接回；权威存档保留。
@@ -118,6 +123,9 @@ namespace Catan.Network.Contracts
         public string ScenarioId;
         public string RulesVersion;
         public string ScenarioVersion;
+        [DataMember(EmitDefaultValue=false)] public bool Harbormaster;
+        [DataMember(EmitDefaultValue=false)] public bool Fishing;
+        [DataMember(EmitDefaultValue=false)] public string TradeModulesVersion;
         [DataMember(EmitDefaultValue=false)] public string ThreeKingdomsPackageVersion;
         [DataMember(EmitDefaultValue=false)] public string ThreeKingdomsContentHash;
         public int PlayerCount;

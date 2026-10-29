@@ -69,7 +69,7 @@ public sealed partial class M6App
         if(!NetworkGame||networkPresentedGame!=Network.Room.GameNumber)
         {
             var room=Network.Room;networkPresentedGame=room.GameNumber;networkEntering=true;Network.Playing=true;networkMenu=false;
-            try{StartGame(room.RuleSet=="cities"?"cities-knights":room.RuleSet,room.RuleSet=="base"||room.RuleSet=="cities"||room.RuleSet=="cities-knights"?"heading-for-new-shores":room.ScenarioId,room.PlayerCount,Network.SeatId,targetVictoryPoints:room.TargetVictoryPoints,threeKingdoms:room.ThreeKingdomsPackageVersion!=null);}
+            try{StartGame(room.RuleSet=="cities"?"cities-knights":room.RuleSet,room.RuleSet=="base"||room.RuleSet=="cities"||room.RuleSet=="cities-knights"?"heading-for-new-shores":room.ScenarioId,room.PlayerCount,Network.SeatId,targetVictoryPoints:room.TargetVictoryPoints,threeKingdoms:room.ThreeKingdomsPackageVersion!=null,harbormaster:room.Harbormaster,fishing:room.Fishing);}
             finally{networkEntering=false;}
             Notice="已连接房间 "+room.RoomId+"。离线时 AI 接手，重连后在下次自己的回合恢复操作。";
         }
@@ -99,7 +99,7 @@ public sealed partial class M6App
         networkPresentedGame=-1;
         close?.Invoke();presentation=null;actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;MenuVisible=true;tableMenu=false;networkMenu=true;
     }
-    RoomSettings NetworkSettings()=>new RoomSettings{Name=networkRoomName,RuleSet=RuleIds[menuRule],ScenarioId=menuRule==0||menuRule==2?"base":ScenarioIds()[Mathf.Clamp(menuScenario,0,ScenarioIds().Length-1)],PlayerCount=menuPlayers,TargetVictoryPoints=menuVictoryPoints,Listed=networkListed,AiSeats=Enumerable.Range(0,menuPlayers).Where(i=>networkAi[i]).Select(i=>"P"+(i+1)).ToArray(),ThreeKingdomsPackageVersion=menuThreeKingdoms&&(menuRule==2||menuRule==3)?Catan.Core.ThreeKingdoms.GeneralCatalog.B6PackageVersion:null,ThreeKingdomsContentHash=menuThreeKingdoms&&(menuRule==2||menuRule==3)?Catan.Core.ThreeKingdoms.GeneralCatalog.B6ContentHash:null};
+    RoomSettings NetworkSettings()=>new RoomSettings{Harbormaster=menuHarbormaster,Fishing=menuFishing,TradeModulesVersion=menuHarbormaster||menuFishing?NetworkProtocol.TradeModulesVersion:null,Name=networkRoomName,RuleSet=RuleIds[menuRule],ScenarioId=menuRule==0||menuRule==2?"base":ScenarioIds()[Mathf.Clamp(menuScenario,0,ScenarioIds().Length-1)],PlayerCount=menuPlayers,TargetVictoryPoints=menuVictoryPoints,Listed=networkListed,AiSeats=Enumerable.Range(0,menuPlayers).Where(i=>networkAi[i]).Select(i=>"P"+(i+1)).ToArray(),ThreeKingdomsPackageVersion=menuThreeKingdoms&&(menuRule==2||menuRule==3)?Catan.Core.ThreeKingdoms.GeneralCatalog.B6PackageVersion:null,ThreeKingdomsContentHash=menuThreeKingdoms&&(menuRule==2||menuRule==3)?Catan.Core.ThreeKingdoms.GeneralCatalog.B6ContentHash:null};
     async void StartLan()
     {
         if(networkWorking)return;networkWorking=true;networkMessage="正在启动随包局域网服务…";
@@ -502,6 +502,13 @@ public sealed partial class M6App
             else PastoralMenuUI.Label(new Rect(previewArea.x,previewArea.y+119,previewArea.width,36),menuRule==0?"标准岛屿":"标准城市与骑士地图",18,null,true,TextAnchor.MiddleCenter);
             MenuMapPreviews.DrawScenarioThumbnail(new Rect(previewArea.x+6,previewArea.y+164,175,124),menuRule,ids[menuScenario],menuPlayers);
             PastoralMenuUI.Label(new Rect(previewArea.x+208,previewArea.y+192,previewArea.width-220,80),MenuMapPreviews.ScenarioCaption(menuRule,ids[menuScenario],menuPlayers),15,PastoralMenuUI.Muted);
+            bool allowedHarbor=Catan.Core.TradeModules.HarbormasterRules.Supports(ids[menuScenario]);
+            bool allowedFish=menuRule==0||menuRule==2;
+            if(!allowedHarbor)menuHarbormaster=false;if(!allowedFish)menuFishing=false;
+            GUILayout.BeginHorizontal();bool moduleEnabled=GUI.enabled;
+            GUI.enabled=moduleEnabled&&allowedHarbor;menuHarbormaster=GUILayout.Toggle(menuHarbormaster,"海港大师",button,GUILayout.Height(34));
+            GUI.enabled=moduleEnabled&&allowedFish;menuFishing=GUILayout.Toggle(menuFishing,allowedFish?"捕鱼":"捕鱼 · 此地图尚未开放",button,GUILayout.Height(34));
+            GUI.enabled=moduleEnabled;GUILayout.EndHorizontal();
             if(menuRule==2||menuRule==3)menuThreeKingdoms=GUILayout.Toggle(menuThreeKingdoms,"三国争霸 · 桌面武将技能",button,GUILayout.Height(38));
         }
         else
@@ -519,7 +526,7 @@ public sealed partial class M6App
             }
             GUILayout.EndHorizontal();
             if(Enumerable.Range(0,menuPlayers).All(i=>networkAi[i]))GUILayout.Label("请为房主保留至少一种颜色。",small);
-            var ids=ScenarioIds();int defaults=DefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
+            var ids=ScenarioIds();int defaults=MenuDefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
             if(menuVictoryPoints.HasValue)menuVictoryPoints=Mathf.Clamp(menuVictoryPoints.Value,5,maximum);
             int target=menuVictoryPoints??defaults;GUILayout.Space(26);GUILayout.Label("胜利目标",small);
             GUILayout.BeginHorizontal();
@@ -534,10 +541,10 @@ public sealed partial class M6App
     void SyncNetworkEditor()
     {
         var room=Network.Room;if(room==null){networkEditorConfiguration=null;return;}
-        string key=room.RoomId+"|"+room.Name+"|"+room.RuleSet+"|"+room.ScenarioId+"|"+room.PlayerCount+"|"+room.TargetVictoryPoints+"|"+room.Listed+"|"+room.ThreeKingdomsPackageVersion+"|"+string.Join(",",room.Seats.Where(s=>s.IsAi).Select(s=>s.SeatId));
+        string key=room.RoomId+"|"+room.Name+"|"+room.RuleSet+"|"+room.ScenarioId+"|"+room.PlayerCount+"|"+room.TargetVictoryPoints+"|"+room.Listed+"|"+room.ThreeKingdomsPackageVersion+"|"+room.Harbormaster+"|"+room.Fishing+"|"+string.Join(",",room.Seats.Where(s=>s.IsAi).Select(s=>s.SeatId));
         if(key==networkEditorConfiguration)return;networkEditorConfiguration=key;
         menuRule=Math.Max(0,Array.IndexOf(RuleIds,room.RuleSet=="cities"?"cities-knights":room.RuleSet));menuPlayers=room.PlayerCount;menuScenario=Math.Max(0,Array.IndexOf(ScenarioIds(),room.ScenarioId));menuVictoryPoints=room.TargetVictoryPoints;
-        networkRoomName=room.Name;networkListed=room.Listed;menuThreeKingdoms=room.ThreeKingdomsPackageVersion!=null;
+        networkRoomName=room.Name;networkListed=room.Listed;menuThreeKingdoms=room.ThreeKingdomsPackageVersion!=null;menuHarbormaster=room.Harbormaster;menuFishing=room.Fishing;
         for(int i=0;i<networkAi.Length;i++)networkAi[i]=room.Seats.Any(s=>s.SeatId=="P"+(i+1)&&s.IsAi);
     }
     void OnDestroy(){StopNetworkDiagnostics();lanService.Dispose();}

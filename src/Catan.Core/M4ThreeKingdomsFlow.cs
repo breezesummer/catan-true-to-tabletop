@@ -169,6 +169,7 @@ namespace Catan.Core.M4
             FinishB4Virtual(s);
             CheckB2Capacity(s);
             if(!B2Busy(s)&&s.PendingDecision==null)B6ReturnAllianceKnights(s);
+            ResumeFishing(s);
         }
 
         private void ApplyB2Native(GameState s, Command c, bool virtualCard = false, bool virtualPrepare = false)
@@ -270,7 +271,7 @@ namespace Catan.Core.M4
             s.B4SkillHandDelta=outerSkillDelta;
             if(outerSkillDelta!=null) foreach(var player in s.Players) {var after=host.GetHand(player.Id);for(int i=0;i<8;i++)outerSkillDelta[player.Id][i]+=after[i]-before[player.Id][i];}
         }
-        private static bool IsB2Construction(Command c, PendingDecision pending) => c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.BuildCity || c.Kind == CommandKind.BuildWall || c.Kind == CommandKind.PlaceFreeRoad || c.Kind == CommandKind.PlayProgressCard && (c.ProgressCard == ProgressCardKind.Medicine || c.ProgressCard == ProgressCardKind.Engineering) || c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressRoads" && !c.Decline;
+        private static bool IsB2Construction(Command c, PendingDecision pending) => c.Kind == CommandKind.SpendFish && c.FishAction == TradeModules.FishAction.BuildRoad || c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.BuildCity || c.Kind == CommandKind.BuildWall || c.Kind == CommandKind.PlaceFreeRoad || c.Kind == CommandKind.PlayProgressCard && (c.ProgressCard == ProgressCardKind.Medicine || c.ProgressCard == ProgressCardKind.Engineering) || c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressRoads" && !c.Decline;
         private Dictionary<string, Tuple<string, string>> B2Buildings(GameState s)
         {
             var result = new Dictionary<string, Tuple<string, string>>();

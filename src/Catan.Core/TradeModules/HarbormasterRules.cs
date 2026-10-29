@@ -19,6 +19,7 @@ namespace Catan.Core.TradeModules
         [DataMember(Order=1)] public string Version { get; set; } = CurrentVersion;
         [DataMember(Order=2)] public bool Harbormaster { get; set; }
         [DataMember(Order=3)] public string HarbormasterPlayerId { get; set; }
+        public const string ProductVersion = "harbor-fishing-f3-v001";
         public const string FishingVersion = "harbor-fishing-f2-v001";
         [DataMember(Order=4, EmitDefaultValue=false)] public FishingState Fishing { get; set; }
         public TradeModuleState Copy()
@@ -49,9 +50,9 @@ namespace Catan.Core.TradeModules
         public static TradeModuleState Create(TradeModuleOptions options, string scenarioId)
         {
             if (options?.Harbormaster != true && options?.Fishing != true) return null;
-            if (options.Fishing && !FishingScenarioCatalog.Supports(scenarioId)) throw new ArgumentException("当前阶段只开放基础标准图捕鱼。");
+            if (options.Fishing && !FishingScenarioCatalog.Supports(scenarioId)) throw new ArgumentException("当前阶段只开放基础和城市骑士标准图捕鱼。");
             if (!Supports(scenarioId)) throw new ArgumentException("海盗群岛暂未开放海港大师，需完成专项可达性验证。");
-            return new TradeModuleState { Harbormaster = options.Harbormaster, Version = options.Fishing ? TradeModuleState.FishingVersion : TradeModuleState.CurrentVersion, Fishing = options.Fishing ? new FishingState() : null };
+            return new TradeModuleState { Harbormaster = options.Harbormaster, Version = options.Fishing ? (scenarioId == "m4-cities-knights" ? TradeModuleState.ProductVersion : TradeModuleState.FishingVersion) : TradeModuleState.CurrentVersion, Fishing = options.Fishing ? new FishingState() : null };
         }
         public static TradeModuleOptions Restore(TradeModuleState state, string scenarioId)
         {
@@ -93,7 +94,7 @@ namespace Catan.Core.TradeModules
         }
         private static void ValidateIdentity(TradeModuleState state, string scenarioId)
         {
-            if (state != null && (state.Version != (state.Fishing == null ? TradeModuleState.CurrentVersion : TradeModuleState.FishingVersion) || (!state.Harbormaster && state.Fishing == null) || !Supports(scenarioId) || (state.Fishing != null && !FishingScenarioCatalog.Supports(scenarioId))))
+            if (state != null && (state.Version != (state.Fishing == null ? TradeModuleState.CurrentVersion : scenarioId == "m4-cities-knights" ? TradeModuleState.ProductVersion : TradeModuleState.FishingVersion) || (!state.Harbormaster && state.Fishing == null) || !Supports(scenarioId) || (state.Fishing != null && !FishingScenarioCatalog.Supports(scenarioId))))
                 throw new InvalidDataException("附加玩法版本或场景不兼容。");
         }
     }

@@ -33,12 +33,13 @@ internal sealed class RuleRoomGame
     internal static RuleRoomGame Create(RoomSettings settings, string baseJson)
     {
         var seed = System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(System.Security.Cryptography.RandomNumberGenerator.GetBytes(4));
+        var modules = new Catan.Core.TradeModules.TradeModuleOptions { Harbormaster=settings.Harbormaster, Fishing=settings.Fishing };
         return new(settings.RuleSet, settings.RuleSet switch
         {
-            "base" => M2.BaseGameSession.Create(baseJson, settings.PlayerCount, seed, settings.TargetVictoryPoints),
-            "seafarers" => M3.SeafarersGameSession.Create(settings.ScenarioId, settings.PlayerCount, seed, settings.TargetVictoryPoints),
-            "cities-knights" => M4.CitiesKnightsGameSession.Create(baseJson, settings.PlayerCount, seed, settings.TargetVictoryPoints,threeKingdoms:settings.ThreeKingdomsPackageVersion!=null,threeKingdomsPackageVersion:settings.ThreeKingdomsPackageVersion),
-            "combined" => M5.CombinedGameSession.Create(settings.ScenarioId, settings.PlayerCount, seed, settings.TargetVictoryPoints,threeKingdoms:settings.ThreeKingdomsPackageVersion!=null,threeKingdomsPackageVersion:settings.ThreeKingdomsPackageVersion),
+            "base" => M2.BaseGameSession.Create(baseJson, settings.PlayerCount, seed, settings.TargetVictoryPoints, tradeModules: modules),
+            "seafarers" => M3.SeafarersGameSession.Create(settings.ScenarioId, settings.PlayerCount, seed, settings.TargetVictoryPoints, tradeModules: modules),
+            "cities-knights" => M4.CitiesKnightsGameSession.Create(baseJson, settings.PlayerCount, seed, settings.TargetVictoryPoints,threeKingdoms:settings.ThreeKingdomsPackageVersion!=null,threeKingdomsPackageVersion:settings.ThreeKingdomsPackageVersion,tradeModules:modules),
+            "combined" => M5.CombinedGameSession.Create(settings.ScenarioId, settings.PlayerCount, seed, settings.TargetVictoryPoints,threeKingdoms:settings.ThreeKingdomsPackageVersion!=null,threeKingdomsPackageVersion:settings.ThreeKingdomsPackageVersion,tradeModules:modules),
             _ => throw new ArgumentException("未知规则包。")
         });
     }
@@ -125,7 +126,8 @@ internal sealed class RuleRoomGame
     {
         var projection=View("P1");
         var tk=projection is M4.PlayerView city?city.ThreeKingdoms:projection is M5.PlayerView combined?combined.ThreeKingdoms:null;
-        return tk?.PackageVersion==settings.ThreeKingdomsPackageVersion&&tk?.PackageContentHash==settings.ThreeKingdomsContentHash;
+        var modules = projection is M2.PlayerView basic ? basic.TradeModules : projection is M3.PlayerView sea ? sea.TradeModules : projection is M4.PlayerView cityView ? cityView.TradeModules : ((M5.PlayerView)projection).TradeModules;
+        return (modules?.Harbormaster == true) == settings.Harbormaster && (modules?.Fishing != null) == settings.Fishing && tk?.PackageVersion==settings.ThreeKingdomsPackageVersion&&tk?.PackageContentHash==settings.ThreeKingdomsContentHash;
     }
     private object AiView(string seat) => session switch { M2.BaseGameSession s => s.GetAiPlayerView(seat), M3.SeafarersGameSession s => s.GetAiPlayerView(seat), M4.CitiesKnightsGameSession s => s.GetAiPlayerView(seat), M5.CombinedGameSession s => s.GetAiPlayerView(seat), _ => throw new InvalidOperationException() };
     internal object Decide(string seat) => AiView(seat) switch

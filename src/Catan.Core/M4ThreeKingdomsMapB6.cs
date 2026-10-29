@@ -15,7 +15,7 @@ namespace Catan.Core.M4
         private Port[] CurrentPortsB6(GameState s) => s.B6MapPorts??ports;
         private sealed partial class B2Host : IThreeKingdomsB6MapHost
         {
-            public B6MapSwap[] GetMapB6Swaps() => B6MapTransaction.Enumerate(session.MapB6Snapshot(game));
+            public B6MapSwap[] GetMapB6Swaps() => B6MapTransaction.Enumerate(session.MapB6Snapshot(game)).Where(swap => session.FishingMapAllowed(game, swap.Result)).ToArray();
             public void ApplyMapB6Swap(string firstTileId,string secondTileId) => session.ApplyMapB6(game,firstTileId,secondTileId);
         }
         private B6MapSnapshot MapB6Snapshot(GameState s)
@@ -34,7 +34,7 @@ namespace Catan.Core.M4
         private void ApplyMapB6(GameState s,string first,string second)
         {
             var swap=B6MapTransaction.Preview(MapB6Snapshot(s),first,second);
-            Require(swap!=null,"InvalidMapExchange","这两块板块无法合法交换。");
+            Require(swap!=null && FishingMapAllowed(s, swap.Result),"InvalidMapExchange","这两块板块无法合法交换。");
             var result=swap.Result;
             string At(string kind,string location) => result.Pieces.FirstOrDefault(p=>p.Kind==kind&&p.OriginalLocationId==location)?.LocationId??location;
             foreach(var p in s.Settlements)p.LocationId=At("Settlement",p.LocationId);
@@ -44,7 +44,7 @@ namespace Catan.Core.M4
             foreach(var p in s.Knights)p.LocationId=At("Knight",p.LocationId);
             foreach(var p in s.Walls)p.LocationId=At("Wall",p.LocationId);
             foreach(var p in s.Metropolises)p.LocationId=At("Metropolis",p.LocationId);
-            s.Tiles=result.Tiles;s.RobberTileId=result.RobberTileId;s.MerchantTileId=result.MerchantTileId;
+            s.Tiles=result.Tiles; if(s.TradeModules?.Fishing!=null)s.TradeModules.Fishing.LakeTileId=s.Tiles.Single(t=>t.Resource=="lake").Id; s.RobberTileId=result.RobberTileId;s.MerchantTileId=result.MerchantTileId;
             s.B6MapPorts=result.Ports.Select(p=>new Port {Id=p.Id,Vertices=p.Vertices.ToArray(),Resource=p.Resource}).ToArray();
             B6MapTransaction.MoveB5Records(s.ThreeKingdoms,result);RecalculateAwards(s);
         }
