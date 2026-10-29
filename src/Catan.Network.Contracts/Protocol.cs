@@ -6,7 +6,8 @@ namespace Catan.Network.Contracts
     public static class NetworkProtocol
     {
         public const int Version = 3;
-        public const string TradeModulesVersion = "harbor-fishing-f3-v001";
+        public const string TradeModulesVersion = "harbor-fishing-f4-v001";
+        public const string StandardTradeModulesVersion = "harbor-fishing-f3-v001";
         // 沿用协议3的字段布局，通过成功握手的既有 Code 协商轻量操作；旧客户端继续使用原操作。
         public const string CompactRepliesCode = "CompactRepliesV1";
         // 只有主动请求 Sync 的连接才接收此内层格式；协议3旧客户端的字段布局不变。

@@ -180,7 +180,7 @@ public sealed partial class M6App
         bool harborAllowed=Catan.Core.TradeModules.HarbormasterRules.Supports(ids[menuScenario]);
         if(!harborAllowed)menuHarbormaster=false;
         if(PastoralMenuUI.Button(new Rect(969,590,330,36),(menuHarbormaster?"☑ ":"☐ ")+"海港大师",harborAllowed,false,menuHarbormaster))menuHarbormaster=!menuHarbormaster;
-        bool fishingAllowed=menuRule==0||menuRule==2;
+        bool fishingAllowed=menuRule==0||menuRule==2||Catan.Core.TradeModules.FishingScenarioCatalog.SupportsSeafaring(ScenarioIds()[menuScenario]);
         if(!fishingAllowed)menuFishing=false;
         if(PastoralMenuUI.Button(new Rect(969,632,330,36),(menuFishing?"☑ ":"☐ ")+"捕鱼",fishingAllowed,false,menuFishing))menuFishing=!menuFishing;
         int defaults=MenuDefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
@@ -199,7 +199,7 @@ public sealed partial class M6App
     void StartConfiguredGame()
     {
         var ids=ScenarioIds();
-        StartGame(RuleIds[menuRule],ids[Mathf.Clamp(menuScenario,0,ids.Length-1)],menuPlayers,"P"+(Mathf.Clamp(menuHuman,0,menuPlayers-1)+1),targetVictoryPoints:menuVictoryPoints,aiSpeedLevel:menuAiSpeed,threeKingdoms:menuRule>=2&&menuThreeKingdoms,harbormaster:menuHarbormaster&&Catan.Core.TradeModules.HarbormasterRules.Supports(ids[menuScenario]),fishing:menuFishing&&(menuRule==0||menuRule==2));
+        StartGame(RuleIds[menuRule],ids[Mathf.Clamp(menuScenario,0,ids.Length-1)],menuPlayers,"P"+(Mathf.Clamp(menuHuman,0,menuPlayers-1)+1),targetVictoryPoints:menuVictoryPoints,aiSpeedLevel:menuAiSpeed,threeKingdoms:menuRule>=2&&menuThreeKingdoms,harbormaster:menuHarbormaster&&Catan.Core.TradeModules.HarbormasterRules.Supports(ids[menuScenario]),fishing:menuFishing&&(menuRule==0||menuRule==2||Catan.Core.TradeModules.FishingScenarioCatalog.SupportsSeafaring(ids[menuScenario])));
     }
     void RequestMenuAction(Action action,string caption,bool allowSave=true)
     {

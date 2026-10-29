@@ -50,6 +50,12 @@ namespace Catan.Core.M3
                 contenders = rolls.Where(r => r.Total == high).Select(r => r.Player).ToArray();
             }
             var start = contenders[0];
+            if(modules?.Fishing != null)
+            {
+                FishingScenarioCatalog.PrepareSeafaring(scenario);
+                modules.Fishing=FishingScenarioCatalog.CreateSeafaring(scenario,Enumerable.Range(1,playerCount).Select(i=>"P"+i).ToArray(),values=>Shuffle(values,random));
+                FishingRules.InitializePool(modules.Fishing,values=>Shuffle(values,random));
+            }
             var state = new GameState
             {
                 TradeModules = modules, SaveFormatVersion = HarbormasterRules.SaveFormat(SaveFormatVersion, modules), RulesVersion = RulesVersion, ScenarioId = scenario.Id, ScenarioVersion = version,
@@ -57,7 +63,7 @@ namespace Catan.Core.M3
                 Players = Enumerable.Range(1, playerCount).Select(i => new PlayerState { Id = "P" + i, Resources = new ResourceBag(), Pieces = new PieceSupply { Roads = 15, Settlements = 5, Cities = 4 } }).ToArray(),
                 Bank = new ResourceBag { Wood = 19, Brick = 19, Wool = 19, Wheat = 19, Ore = 19 },
                 Phase = GamePhase.SetupSettlement, ActivePlayerId = "P" + (start + 1), StartingPlayerIndex = start,
-                RobberTileId = scenario.InitialRobberTileId, PirateTileId = scenario.InitialPirateTileId, DevelopmentDeck = deck.ToArray(), Tiles = Json.Copy(scenario.Tiles), Ports = Json.Copy(scenario.Ports)
+                RobberTileId = modules?.Fishing != null ? null : scenario.InitialRobberTileId, PirateTileId = scenario.InitialPirateTileId, DevelopmentDeck = deck.ToArray(), Tiles = Json.Copy(scenario.Tiles), Ports = Json.Copy(scenario.Ports)
             };
             var session = new SeafarersGameSession(scenario, state);
             session.InitializeSeafarers(state);
@@ -80,6 +86,7 @@ namespace Catan.Core.M3
                 try { Apply(next, command); }
                 catch (RuleException ex) { return Reject(ex.Code, ex.Message); }
                 ResolveSeafarersAfterAction(next, command);
+                ResumeFishing(next);
                 RecalculateAwards(next);
                 CheckVictory(next);
                 var ev = new GameEvent { Sequence = ++next.EventSequence, CommandId = command.Id, Kind = command.Kind.ToString(), PlayerId = command.PlayerId,
@@ -92,7 +99,7 @@ namespace Catan.Core.M3
                 history.RecordAction(GameHistoryCapture.From(state), GameHistoryCapture.From(next), new HistoryAction
                 {
                     PlayerId = command.PlayerId, OtherPlayerId = string.IsNullOrEmpty(command.OtherPlayerId) ? null : command.OtherPlayerId,
-                    Kind = command.Kind.ToString(), PublicTarget = PublicTarget(command), PendingKind = state.PendingDecision?.Kind
+                    Kind = command.Kind.ToString(), PublicTarget = PublicTarget(command), FishAction=command.FishAction?.ToString(), PendingKind = state.PendingDecision?.Kind
                 });
                 state = next;
                 return new CommandResult { Success = true, Message = state.Phase == GamePhase.Finished ? state.WinnerPlayerId + " 获胜！" : "操作已确认。", Events = Json.Copy(receipt), NewEvents = Json.Copy(receipt) };
@@ -155,7 +162,7 @@ namespace Catan.Core.M3
                         PlayedKnights = p.PlayedKnights, Pieces = p.Pieces.Copy(), ShipsRemaining = p.ShipsRemaining, Cloth = p.Cloth, BonusVictoryPoints = p.BonusVictoryPoints, WonderId = p.WonderId, WonderLevel = p.WonderLevel, VictoryPoints = VictoryPoints(state, p.Id, state.WinnerPlayerId == p.Id), LongestRoadLength = LongestRoad(state, p.Id) }).ToArray(),
                     Board = new BoardView { Tiles = Json.Copy(state.Tiles), Vertices = Json.Copy(scenario.Vertices), Edges = Json.Copy(scenario.Edges), Ports = Json.Copy(state.Ports),
                         Settlements = Json.Copy(state.Settlements), Cities = Json.Copy(state.Cities), Roads = Json.Copy(state.Roads), RobberTileId = state.RobberTileId, Ships = Json.Copy(state.Ships), PirateTileId = state.PirateTileId, BonusEdgeIds = state.BonusEdgeIds.ToArray(), GiftCardEdgeIds = state.GiftCards.Select(g => g.EdgeId).ToArray(), GiftPorts = Json.Copy(state.GiftPorts), Villages = Json.Copy(state.Villages), Fortresses = Json.Copy(state.Fortresses) },
-                    TradeModules = HarbormasterRules.View(state.TradeModules, HarborScores(state)),
+                    TradeModules = TradeView(state, playerId), LegalFishingActions = LegalFishingActions(playerId).ToArray(),
                     LegalVertexIds = vertices, LegalCityVertexIds = cities, LegalEdgeIds = edges, LongestRoadPlayerId = state.LongestRoadPlayerId, LargestArmyPlayerId = state.LargestArmyPlayerId,
                     WinnerPlayerId = state.WinnerPlayerId, LastDice1 = state.LastDice1, LastDice2 = state.LastDice2, Events = Json.Copy(state.Events)
                 };
@@ -194,6 +201,12 @@ namespace Catan.Core.M3
         {
             var p = s.Players.FirstOrDefault(x => x.Id == c.PlayerId); Require(p != null, "UnknownPlayer", "未知席位。");
             Require(s.Phase != GamePhase.Finished, "GameFinished", "对局已经结束。");
+            if(s.TradeModules?.Fishing?.PendingPlayerId != null)
+            {
+                Require(c.Kind == CommandKind.ResolveFishReplacement,"FishReplacementPending","请先完成捕鱼换抽选择。");
+                ResolveFishReplacement(s,c);return;
+            }
+            if(c.Kind == CommandKind.ResolveFishReplacement) throw new RuleException("NoFishDecision","当前没有捕鱼换抽待决。");
             if (s.TradeOffer != null)
             {
                 Require(c.Kind == CommandKind.AcceptTrade || c.Kind == CommandKind.RejectTrade || c.Kind == CommandKind.CancelTrade, "TradePending", "请先接受、拒绝或取消当前报价。");
@@ -207,10 +220,13 @@ namespace Catan.Core.M3
             if (ApplySeafarers(s, p, c)) return;
             switch (c.Kind)
             {
+                case CommandKind.SpendFish: SpendFish(s,p,c); break;
+                case CommandKind.PassOldBoot: PassOldBoot(s,p,c); break;
                 case CommandKind.SetupSettlement:
                     Require(s.Phase == GamePhase.SetupSettlement, "WrongPhase", "当前不能摆放开局村庄。");
                     ValidateSettlement(s, p, c.TargetId, true); PlaceSettlement(s, p, c.TargetId);
                     RecordRegion(s, p, c.TargetId, true);
+                    GrantSetupFish(s,p.Id,c.TargetId);
                     if (s.SetupPlacementIndex >= s.Players.Length * (scenario.SetupRounds - 1)) GrantStartingResources(s, p, c.TargetId);
                     s.PendingDecision = new PendingDecision { Kind = "SetupRoad", PlayerId = p.Id, AnchorVertexId = c.TargetId }; s.Phase = GamePhase.SetupRoad; break;
                 case CommandKind.SetupRoad:
@@ -435,6 +451,7 @@ namespace Catan.Core.M3
         private void AssertInvariants(GameState s)
         {
             HarbormasterRules.Validate(s.TradeModules, s.ScenarioId, HarborScores(s));
+            AssertFishingInvariants(s);
             Check(VictoryPointSettings.IsValid(s.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(scenario.Id)), "胜利分数无效。");
             void Check(bool valid, string message) { if (!valid) throw new InvalidDataException(message); }
             Check(s.SaveFormatVersion == HarbormasterRules.SaveFormat(SaveFormatVersion, s.TradeModules) && s.RulesVersion == RulesVersion && (s.ScenarioVersion == ScenarioVersion || s.ScenarioVersion == VariableScenarioVersion), "Invalid version identity.");
@@ -520,6 +537,9 @@ namespace Catan.Core.M3
             // Never serialize command Resources or a purchased/stolen card to this public receipt.
             switch (c.Kind)
             {
+                case CommandKind.SpendFish: return c.PlayerId + " 使用鱼筹码：" + (c.FishRemovePirate?"移出海盗":c.FishBuildShip?"建造船":FishActionName(c.FishAction.Value)) + "。";
+                case CommandKind.PassOldBoot: return c.PlayerId + " 转交旧靴。";
+                case CommandKind.ResolveFishReplacement: return c.PlayerId + (c.TargetId==null?" 放弃换抽。":" 完成换抽。");
                 case CommandKind.BuyDevelopmentCard: return c.PlayerId + " 购买了一张发展牌。";
                 case CommandKind.DiscardResources: return c.PlayerId + " 完成弃牌。";
                 case CommandKind.StealResource: return c.PlayerId + " 完成强盗偷取。";

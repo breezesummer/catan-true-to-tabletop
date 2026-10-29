@@ -33,7 +33,7 @@ namespace Catan.Core.M5
                 if(next.Kind=="DisplacedKnight"&&next.AllianceReturnHome){next.Options=B6AllianceHomeVertices(s,next.PlayerId);if(next.Options.Length==0)continue;}
                 if(next.Kind=="B5InvasionComplete") {B5CompleteInvasion(s,next.AnchorVertexId);continue;}
                 if(next.Kind=="ProgressDraw") {DrawProgressCard(s,s.Players.Single(p=>p.Id==next.PlayerId),next.Track);CheckVictory(s);if(s.Phase==GamePhase.Finished)return;continue;}
-                if(next.Kind=="BarbarianReturnHome") {foreach(var knight in s.Knights)knight.Active=false;s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;if(s.PirateTileId==null&&(seafaring.Id!="pirate-islands"||s.Special.Fortresses.Any(f=>f.Strength>0)))s.PirateTileId=InitialPirateB6(s);continue;}
+                if(next.Kind=="BarbarianReturnHome") {foreach(var knight in s.Knights)knight.Active=false;s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;if(s.PirateTileId==null&&s.TradeModules?.Fishing==null&&(seafaring.Id!="pirate-islands"||s.Special.Fortresses.Any(f=>f.Strength>0)))s.PirateTileId=InitialPirateB6(s);continue;}
                 if(next.Kind=="Aqueduct"&&s.Bank.Total==0)continue;
                 s.PendingDecision=next;s.Phase=GamePhase.PendingChoice;return;
             }
@@ -79,6 +79,7 @@ namespace Catan.Core.M5
                 return;
             }
             if(B2(s)) { s.Phase=GamePhase.Action; return; }
+            QueueFishProduction(s,total);
             var before=s.Players.ToDictionary(p=>p.Id,HandCount); Produce(s,total); s.Phase=GamePhase.Action;
             var gold=s.Players.ToDictionary(p=>p.Id,p=>s.Tiles.Where(t=>t.Resource=="gold"&&t.Number==total&&t.Id!=s.RobberTileId).Sum(t=>s.Settlements.Count(b=>b.PlayerId==p.Id&&t.Vertices.Contains(b.LocationId))+2*s.Cities.Count(b=>b.PlayerId==p.Id&&t.Vertices.Contains(b.LocationId))));
             foreach(var p in TurnOrder(s).Where(p=>gold[p.Id]>0)) QueueDecision(s,new PendingDecision {Kind="Gold",PlayerId=p.Id,Amount=gold[p.Id],ReturnPhase=GamePhase.Action});
@@ -90,7 +91,7 @@ namespace Catan.Core.M5
         {
             if(B5(s)){B5Invasion(s,"formal-invasion-"+s.ThreeKingdoms.Clock.TurnInstanceId,s.Players.Select(p=>p.Id).ToArray(),false);return;}
             s.FirstBarbarianAttack=true;
-            if(s.RobberTileId==null) s.RobberTileId=InitialRobberB6(s);
+            if(s.RobberTileId==null && s.TradeModules?.Fishing==null) s.RobberTileId=InitialRobberB6(s);
             var strength=s.Players.ToDictionary(p=>p.Id,p=>s.Knights.Where(k=>k.PlayerId==p.Id&&k.Active).Sum(k=>k.Level));
             s.BarbarianAttackStrength=s.Cities.Length;
             s.BarbarianDefenseStrength=strength.Values.Sum();

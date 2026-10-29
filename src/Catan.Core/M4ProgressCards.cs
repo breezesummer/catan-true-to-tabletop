@@ -7,6 +7,8 @@ namespace Catan.Core.M4
 {
     public sealed partial class CitiesKnightsGameSession
     {
+        private string validatedProgressTargetUseId;
+
         private void InitializeProgress(GameState s)
         {
             s.ProgressDecks = ((ImprovementTrack[])Enum.GetValues(typeof(ImprovementTrack))).Select(t =>
@@ -123,7 +125,7 @@ namespace Catan.Core.M4
                     s.CommercialHarborPlayers = s.CommercialHarborPlayers.Concat(s.Players.Where(x => x.Id != p.Id).SelectMany(x => Enumerable.Repeat(x.Id,B5ProgressFactor(s,p.Id,x.Id)))).ToArray(); break;
                 case ProgressCardKind.GuildDues:
                     var rich = OtherProgressPlayer(s, p, c.OtherPlayerId);
-                    Require(VictoryPoints(s, rich.Id, true) > VictoryPoints(s, p.Id, true), "NotMoreVictoryPoints", "大商家只能选择胜利点比你高的玩家。");
+                    Require((validatedProgressTargetUseId != null && validatedProgressTargetUseId == c.Id) || VictoryPoints(s, rich.Id, true) > VictoryPoints(s, p.Id, true), "NotMoreVictoryPoints", "大商家只能选择胜利点比你高的玩家。");
                     if (!B2Protected(s,rich.Id) && !B3Immune(s,rich.Id) && !B5ProgressImmune(s,rich.Id) && B6GainableHandCount(s,rich,p.Id) > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressGuildDues", PlayerId = p.Id, OtherPlayerId = rich.Id, Amount = Math.Min(2*B5ProgressFactor(s,p.Id,rich.Id), B6GainableHandCount(s,rich,p.Id)) });
                     break;
                 case ProgressCardKind.Merchant:

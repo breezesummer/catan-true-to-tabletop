@@ -7,6 +7,8 @@ namespace Catan.Core.M5
 {
     public sealed partial class CombinedGameSession
     {
+        private string validatedProgressTargetUseId;
+
         private void InitializeProgress(GameState s)
         {
             s.ProgressDecks = ((ImprovementTrack[])Enum.GetValues(typeof(ImprovementTrack))).Select(t =>
@@ -129,12 +131,12 @@ namespace Catan.Core.M5
                     s.CommercialHarborPlayers = s.CommercialHarborPlayers.Concat(s.Players.Where(x => x.Id != p.Id).SelectMany(x => Enumerable.Repeat(x.Id,B5ProgressFactor(s,p.Id,x.Id)))).ToArray(); break;
                 case ProgressCardKind.GuildDues:
                     var rich = OtherProgressPlayer(s, p, c.OtherPlayerId);
-                    Require(VictoryPoints(s, rich.Id, true) > VictoryPoints(s, p.Id, true), "NotMoreVictoryPoints", "大商家只能选择胜利点比你高的玩家。");
+                    Require((validatedProgressTargetUseId != null && validatedProgressTargetUseId == c.Id) || VictoryPoints(s, rich.Id, true) > VictoryPoints(s, p.Id, true), "NotMoreVictoryPoints", "大商家只能选择胜利点比你高的玩家。");
                     if (!B2Protected(s,rich.Id) && !B3Immune(s,rich.Id) && !B5ProgressImmune(s,rich.Id) && B6GainableHandCount(s,rich,p.Id) > 0) QueueDecision(s, new PendingDecision { Kind = "ProgressGuildDues", PlayerId = p.Id, OtherPlayerId = rich.Id, Amount = Math.Min(2*B5ProgressFactor(s,p.Id,rich.Id), B6GainableHandCount(s,rich,p.Id)) });
                     break;
                 case ProgressCardKind.Merchant:
                     var merchantTile = s.Tiles.FirstOrDefault(t => t.Id == c.TargetId);
-                    Require(merchantTile != null && IsLand(merchantTile) && merchantTile.Resource != "gold" && Buildings(s).Any(b => b.PlayerId == p.Id && merchantTile.Vertices.Contains(b.LocationId)), "InvalidMerchantHex", "商人必须放在你建筑相邻的陆地上。");
+                    Require(merchantTile != null && IsLand(merchantTile) && merchantTile.Resource != "gold" && merchantTile.Resource != "lake" && Buildings(s).Any(b => b.PlayerId == p.Id && merchantTile.Vertices.Contains(b.LocationId)), "InvalidMerchantHex", "商人必须放在你建筑相邻的陆地上。");
                     s.MerchantPlayerId = p.Id; s.MerchantTileId = merchantTile.Id; break;
                 case ProgressCardKind.MerchantFleet:
                     if (c.ChooseCommodity) { Require(Enum.IsDefined(typeof(Commodity), c.Commodity), "InvalidCommodity", "商品类型错误。"); s.MerchantFleetCommodities = s.MerchantFleetCommodities.Union(new[] { c.Commodity }).ToArray(); }

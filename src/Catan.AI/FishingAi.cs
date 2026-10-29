@@ -4,6 +4,8 @@ using Catan.Core;
 using Catan.Core.TradeModules;
 using M2=Catan.Core.M2;
 using M4=Catan.Core.M4;
+using M3=Catan.Core.M3;
+using M5=Catan.Core.M5;
 
 namespace Catan.AI
 {
@@ -41,6 +43,28 @@ namespace Catan.AI
                 .OrderBy(c=>c.TargetId==null?1.5:f.OwnTokens.Single(t=>t.Id==c.TargetId).Value).FirstOrDefault();
             var boot=legal.Where(c=>c.Kind==M4.CommandKind.PassOldBoot).OrderByDescending(c=>v.Players.Single(p=>p.Id==c.OtherPlayerId).VictoryPoints).FirstOrDefault();if(boot!=null)return boot;
             return legal.Where(c=>c.Kind==M4.CommandKind.SpendFish).Select(c=>(c,value:Value(c.FishAction.Value,c.Resource,c.TargetId,c.OtherPlayerId,v.OwnResources,
+                v.Board.Settlements.Concat(v.Board.Cities).ToArray(),v.Board.Tiles,v.Board.RobberTileId,v.PlayerId,v.PlayerId==null?Array.Empty<Edge>():v.Board.Edges,v.Board.Settlements.Concat(v.Board.Cities).Select(b=>b.LocationId).ToArray(),v.Players.FirstOrDefault(p=>p.Id==c.OtherPlayerId)?.VictoryPoints??0,f.OwnTokens.Length)))
+                .Where(x=>x.value>0).OrderByDescending(x=>x.value).Select(x=>x.c).FirstOrDefault();
+        }
+        internal static M3.Command Choose(M3.PlayerView v)
+        {
+            var f=v.TradeModules?.Fishing;if(f==null)return null;
+            var legal=v.LegalFishingActions;
+            if(f.PendingPlayerId==v.PlayerId) return legal.Where(c=>c.Kind==M3.CommandKind.ResolveFishReplacement)
+                .OrderBy(c=>c.TargetId==null?1.5:f.OwnTokens.Single(t=>t.Id==c.TargetId).Value).FirstOrDefault();
+            var boot=legal.Where(c=>c.Kind==M3.CommandKind.PassOldBoot).OrderByDescending(c=>v.Players.Single(p=>p.Id==c.OtherPlayerId).VictoryPoints).FirstOrDefault();if(boot!=null)return boot;
+            return legal.Where(c=>c.Kind==M3.CommandKind.SpendFish).Select(c=>(c,value:Value(c.FishAction.Value,c.Resource,c.TargetId,c.OtherPlayerId,v.OwnResources,
+                v.Board.Settlements.Concat(v.Board.Cities).ToArray(),v.Board.Tiles,v.Board.RobberTileId,v.PlayerId,v.Board.Edges,v.Board.Settlements.Concat(v.Board.Cities).Select(b=>b.LocationId).ToArray(),v.Players.FirstOrDefault(p=>p.Id==c.OtherPlayerId)?.VictoryPoints??0,f.OwnTokens.Length)))
+                .Where(x=>x.value>0).OrderByDescending(x=>x.value).Select(x=>x.c).FirstOrDefault();
+        }
+        internal static M5.Command Choose(M5.PlayerView v)
+        {
+            var f=v.TradeModules?.Fishing;if(f==null)return null;
+            var legal=v.LegalActions;
+            if(f.PendingPlayerId==v.PlayerId) return legal.Where(c=>c.Kind==M5.CommandKind.ResolveFishReplacement)
+                .OrderBy(c=>c.TargetId==null?1.5:f.OwnTokens.Single(t=>t.Id==c.TargetId).Value).FirstOrDefault();
+            var boot=legal.Where(c=>c.Kind==M5.CommandKind.PassOldBoot).OrderByDescending(c=>v.Players.Single(p=>p.Id==c.OtherPlayerId).VictoryPoints).FirstOrDefault();if(boot!=null)return boot;
+            return legal.Where(c=>c.Kind==M5.CommandKind.SpendFish).Select(c=>(c,value:Value(c.FishAction.Value,c.Resource,c.TargetId,c.OtherPlayerId,v.OwnResources,
                 v.Board.Settlements.Concat(v.Board.Cities).ToArray(),v.Board.Tiles,v.Board.RobberTileId,v.PlayerId,v.PlayerId==null?Array.Empty<Edge>():v.Board.Edges,v.Board.Settlements.Concat(v.Board.Cities).Select(b=>b.LocationId).ToArray(),v.Players.FirstOrDefault(p=>p.Id==c.OtherPlayerId)?.VictoryPoints??0,f.OwnTokens.Length)))
                 .Where(x=>x.value>0).OrderByDescending(x=>x.value).Select(x=>x.c).FirstOrDefault();
         }

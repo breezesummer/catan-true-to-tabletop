@@ -280,7 +280,7 @@ public sealed class FishingTests(ITestOutputHelper output)
         var harbor = BaseGameSession.Create(AcceptanceFixture.Json, tradeModules: new TradeModuleOptions { Harbormaster = true });
         Assert.Contains(TradeModuleState.CurrentVersion, harbor.Save()); Assert.DoesNotContain("\"Fishing\"", harbor.Save());
         Assert.Equal(harbor.Save(), BaseGameSession.Load(AcceptanceFixture.Json, harbor.Save()).Save());
-        foreach (var scenario in new[] { "heading-for-new-shores", "pirate-islands" })
+        foreach (var scenario in new[] { "forgotten-tribe", "pirate-islands" })
             Assert.Throws<ArgumentException>(() => HarbormasterRules.Create(new TradeModuleOptions { Fishing = true }, scenario));
         var valid = NewFish().Save();
         foreach (var field in new[] { "Version", "MapVersion", "LakeTileId" })

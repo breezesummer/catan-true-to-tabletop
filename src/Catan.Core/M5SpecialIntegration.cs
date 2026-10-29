@@ -130,13 +130,13 @@ namespace Catan.Core.M5
                 int best=s.Players.Max(x=>VictoryPoints(s,x.Id,true));var leaders=s.Players.Where(x=>VictoryPoints(s,x.Id,true)==best).ToArray();int cloth=leaders.Max(x=>x.Cloth);
                 FinishSpecialGame(s,leaders.Where(x=>x.Cloth==cloth).Select(x=>x.Id).ToArray());return;
             }
-            ClearProgressTurn(s);s.ShipMovedThisTurn=false;s.ActivePlayerId=s.Players[(Array.FindIndex(s.Players,x=>x.Id==p.Id)+1)%s.Players.Length].Id;s.Turn++;s.Phase=GamePhase.ProductionAwaitRoll;
+            ClearProgressTurn(s);s.ShipMovedThisTurn=false;s.ActivePlayerId=s.Players[(Array.FindIndex(s.Players,x=>x.Id==p.Id)+1)%s.Players.Length].Id;s.Turn++;Catan.Core.TradeModules.FishingRules.NewTurn(s.TradeModules?.Fishing);s.Phase=GamePhase.ProductionAwaitRoll;
         }
         private bool HasScenarioVictory(GameState s,string player)
         {
             var p=s.Players.Single(x=>x.Id==player);int score=VictoryPoints(s,player,true);
-            if(seafaring.Id=="wonders-of-catan")return p.WonderLevel==4||score>=s.TargetVictoryPoints.Value&&p.WonderLevel>s.Players.Where(x=>x.Id!=player).Max(x=>x.WonderLevel);
-            return score>=s.TargetVictoryPoints.Value&&(seafaring.Id!="pirate-islands"||s.Special.Fortresses.Single(f=>f.PlayerId==player).Strength==0);
+            if(seafaring.Id=="wonders-of-catan")return p.WonderLevel==4||score>=PersonalVictoryTarget(s,player)&&p.WonderLevel>s.Players.Where(x=>x.Id!=player).Max(x=>x.WonderLevel);
+            return score>=PersonalVictoryTarget(s,player)&&(seafaring.Id!="pirate-islands"||s.Special.Fortresses.Single(f=>f.PlayerId==player).Strength==0);
         }
         private static void FinishSpecialGame(GameState s,string[] winners)
         {

@@ -224,7 +224,7 @@ namespace Catan.Core.M5
                 Check(p.HomeRegions!=null&&p.SettledRegions!=null&&p.HomeRegions.Distinct().Count()==p.HomeRegions.Length&&p.SettledRegions.Distinct().Count()==p.SettledRegions.Length&&p.HomeRegions.All(p.SettledRegions.Contains)&&p.SettledRegions.All(id=>seafaring.Regions.Any(r=>r.Id==id)),"Invalid settlement regions.");
                 Check(seafaring.Id=="forgotten-tribe" ? p.BonusVictoryPoints>=0 : p.BonusVictoryPoints==p.SettledRegions.Count(id=>!p.HomeRegions.Contains(id))*seafaring.IslandBonusPoints-RevokedMapB6Points(s,p.Id),"Invalid region bonus.");
             }
-            Check(!s.FirstBarbarianAttack?s.PirateTileId==null:s.PirateTileId=="frame"||s.Tiles.Any(t=>t.Id==s.PirateTileId&&t.Resource=="sea")||s.PirateTileId==null&&(s.BarbarianPosition==7||seafaring.InitialPirateTileId==null||seafaring.Id=="pirate-islands"&&s.Special.Fortresses.All(f=>f.Strength==0)),"Invalid pirate location.");
+            Check(!s.FirstBarbarianAttack?s.PirateTileId==null:s.PirateTileId=="frame"||s.Tiles.Any(t=>t.Id==s.PirateTileId&&t.Resource=="sea")||s.PirateTileId==null&&(s.TradeModules?.Fishing!=null||s.BarbarianPosition==7||seafaring.InitialPirateTileId==null||seafaring.Id=="pirate-islands"&&s.Special.Fortresses.All(f=>f.Strength==0)),"Invalid pirate location.");
             var choices=s.DecisionQueue.Concat(s.PendingDecision==null?Array.Empty<PendingDecision>():new[]{s.PendingDecision});
             foreach(var d in choices.Where(d=>d.Kind=="Gold"))Check(d.Amount>0&&d.Amount<=Math.Max(1,3*(s.Cities.Length*2+s.Settlements.Length)),"Invalid gold claim.");
         }

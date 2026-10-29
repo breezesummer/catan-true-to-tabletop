@@ -53,6 +53,28 @@ public sealed class ThreeKingdomsB5CivilIntegrationTests
     {dynamic view=game.GetPlayerView("P1");if(view is M4.PlayerView a)return a.Board.Edges.First(e=>e.Vertices.Contains(vertex)).Id;M5.PlayerView b=view;return b.Board.Edges.First(e=>e.Vertices.Contains(vertex)&&b.Board.Tiles.Any(t=>t.Resource!="sea"&&e.Vertices.All(t.Vertices.Contains))).Id;}
 
     [Theory][InlineData("cities")][InlineData("combined")]
+    public void GuildDuesKeepsValidatedTargetWhenPojunResponseChangesScores(string mode)
+    {
+        string vertex=Vertex(mode);
+        dynamic game=Fixture(mode,new[]{"tk-g32","tk-g12","tk-g09","tk-g22"},s=>{
+            GiveProgress(s,"P1","GuildDues");Player(s,"P1").DefenderPoints=2;
+            Player(s,"P2").Improvements=new[]{4,0,0};Player(s,"P2").Resources.Wood=1;
+            if(s is M4.GameState a){a.Cities=new[]{M4CoreHarness.Piece(vertex,"P2")};a.Metropolises=new[]{new M4.Metropolis{PlayerId="P2",LocationId=vertex,Track=M4.ImprovementTrack.Trade}};}
+            else {var b=(M5.GameState)s;b.Cities=new[]{M5Harness.Piece(vertex,"P2")};b.Metropolises=new[]{new M5.Metropolis{PlayerId="P2",LocationId=vertex,Track=M5.ImprovementTrack.Trade}};}
+        });
+        var initial=game.GetAuthoritativeStateForTesting();Player(initial,"P1").DefenderPoints=4;Set(game,initial);
+        var invalid=Play(game,mode,"GuildDues");string before=game.Save();
+        Assert.Equal("NotMoreVictoryPoints",(string)game.Execute(invalid).ErrorCode);Assert.Equal(before,(string)game.Save());
+        Player(initial,"P1").DefenderPoints=2;Set(game,initial);
+        Accept(game,Play(game,mode,"GuildDues"));Skill(game,mode,"P1","accept");
+        // 扣置一层贸易设施会撤销目标的大都会，两人的公开分数变为相同。
+        dynamic restored=Restore(game,mode);SameSkill(game,restored,mode,"P1","civil-pojun-track");
+        Assert.Equal((string)game.Save(),(string)restored.Save());
+        Assert.Empty((Array)game.GetAuthoritativeStateForTesting().Metropolises);
+        Assert.Equal("ProgressGuildDues",(string)game.GetAuthoritativeStateForTesting().PendingDecision.Kind);
+    }
+
+    [Theory][InlineData("cities")][InlineData("combined")]
     public void PojunDefersMonopolyUntilSuppressionAndDoublesOnlyQualifiedTarget(string mode)
     {
         dynamic game=Fixture(mode,new[]{"tk-g32","tk-g12","tk-g09","tk-g22"},s=>{GiveProgress(s,"P1","ResourceMonopoly");Player(s,"P1").Improvements=new[]{3,0,0};Player(s,"P2").Improvements=new[]{4,0,0};Player(s,"P2").Resources.Wood=4;Player(s,"P3").Resources.Wood=4;Player(s,"P3").Improvements=new[]{4,0,0};});

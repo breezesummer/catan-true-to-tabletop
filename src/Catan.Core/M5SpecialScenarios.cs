@@ -11,6 +11,11 @@ private void Discover(GameState s, string player, string edge)
             {
                 Require(s.Special.HiddenResources.Length > 0, "EmptyExplorationDeck", "探索地块已耗尽。");
                 tile.Resource = s.Special.HiddenResources[0]; s.Special.HiddenResources = s.Special.HiddenResources.Skip(1).ToArray();
+                if (tile.Resource == "lake")
+                {
+                    QueueLakeDiscovery(s,player,tile,tile.Vertices.First(e.Vertices.Contains));
+                    continue;
+                }
                 if (tile.Resource != "sea")
                 {
                     var n = Draw(s.Random, s.Special.HiddenNumbers.Length); tile.Number = s.Special.HiddenNumbers[n]; s.Special.HiddenNumbers = s.Special.HiddenNumbers.Where((v, i) => i != n).ToArray();

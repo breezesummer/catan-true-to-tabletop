@@ -103,6 +103,7 @@ namespace Catan.Core.M5
             if (!B2(s) || s.ThreeKingdoms.Skills.HarvestTurnId == s.ThreeKingdoms.Clock.TurnInstanceId) return;
             var host = CardHost(s);
             int total = host.FinalDiceTotal;
+            if(total != 7) QueueFishProduction(s,total);
             var allocations = TurnOrder(s).Select(p => new B2HarvestAllocation {
                 PlayerId = p.Id, AqueductEligible = total != 7 && B6Technology(s,p.Id,(int)ImprovementTrack.Science) >= 3
             }).ToArray();

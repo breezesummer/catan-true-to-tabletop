@@ -145,7 +145,10 @@ namespace Catan.Core.M4
             {
                 var deferred = s.ThreeKingdomsDeferredCommand; s.ThreeKingdomsDeferredCommand = null;
                 bool virtualCard = s.ThreeKingdomsDeferredVirtual; s.ThreeKingdomsDeferredVirtual = false;
-                ApplyB2Native(s, deferred, virtualCard, virtualCard && tk.Clock.Phase == ThreeKingdomsPhase.Preparation);
+                // 目标已在开启响应前预检；响应改变分数不能撤销已合法选定的大商家目标。
+                var previousValidatedUse = validatedProgressTargetUseId; validatedProgressTargetUseId = deferred.Id;
+                try { ApplyB2Native(s, deferred, virtualCard, virtualCard && tk.Clock.Phase == ThreeKingdomsPhase.Preparation); }
+                finally { validatedProgressTargetUseId = previousValidatedUse; }
             }
             if (tk.Clock.Phase == ThreeKingdomsPhase.InitialPlacement && s.Turn > 0 && s.Phase == GamePhase.ProductionAwaitRoll && s.PendingDecision == null)
             {

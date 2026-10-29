@@ -5,10 +5,10 @@ using System.Linq;
 namespace Catan.Core.TradeModules
 {
     /// <summary>TB25.pdf 第9页六个浅蓝V口；沿用标准19格的稳定空间ID。</summary>
-    public static class FishingScenarioCatalog
+    public static partial class FishingScenarioCatalog
     {
         public const string CurrentVersion = "standard-fishing-map-v001";
-        public static bool Supports(string scenarioId) => scenarioId == "m2-base-game" || scenarioId == "m4-cities-knights";
+        public static bool Supports(string scenarioId) => scenarioId == "m2-base-game" || scenarioId == "m4-cities-knights" || SupportsSeafaring(scenarioId);
         private static readonly string[][] StandardVertices =
         {
             new[] { "V04", "V08", "V12" }, new[] { "V39", "V44", "V48" },
@@ -42,6 +42,7 @@ namespace Catan.Core.TradeModules
         private static int Radius(Tile t) => Math.Max(Math.Abs(t.Q), Math.Max(Math.Abs(t.R), Math.Abs(t.Q + t.R)));
         internal static void Validate(FishingState state, Tile[] tiles, Edge[] edges)
         {
+            if (state.MapVersion != null && state.MapVersion.StartsWith(SeafaringVersion+":", StringComparison.Ordinal)) { ValidateSeafaring(state,tiles,edges); return; }
             if (state.MapVersion != CurrentVersion || tiles.Length != 19 || tiles.Count(t => t.Resource == "lake") != 1 ||
                 !tiles.Any(t => t.Id == state.LakeTileId && t.Resource == "lake" && t.Number == null && Radius(t) <= 1) ||
                 state.Grounds == null || state.Grounds.Length != 6 ||

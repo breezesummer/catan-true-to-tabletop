@@ -53,7 +53,7 @@ namespace Catan.Core.TradeModules
             IEnumerable<PiecePlacement> settlements, IEnumerable<PiecePlacement> cities, int number, string robberTileId)
         {
             var sources = s.Grounds.Where(g => g.Number == number).Select(g => (id:g.Id, vertices:g.VertexIds)).ToList();
-            if (LakeNumbers.Contains(number) && s.LakeTileId != robberTileId)
+            if (s.LakeTileId != null && LakeNumbers.Contains(number) && s.LakeTileId != robberTileId)
                 sources.Add((s.LakeTileId, tiles.Single(t => t.Id == s.LakeTileId).Vertices));
             var buildings = settlements.Select(b => (piece:b, count:1)).Concat(cities.Select(b => (piece:b, count:2))).ToArray();
             return clockwisePlayers.SelectMany(player => sources.OrderBy(source => source.id, StringComparer.Ordinal).SelectMany(source =>

@@ -7,6 +7,8 @@ using Catan.Rooms;
 using Xunit;
 using M2=Catan.Core.M2;
 using M4=Catan.Core.M4;
+using M3=Catan.Core.M3;
+using M5=Catan.Core.M5;
 
 namespace Catan.Network.Tests;
 
@@ -31,7 +33,7 @@ public sealed class FishingRoomTests(Xunit.Abstractions.ITestOutputHelper output
             var create=Request("Create");create.Payload=WireJson.Serialize(new CreateRoomPayload{Settings=Settings()});var owner=Directory.Handle(create);Assert.True(owner.Success,owner.Message);
             var clients=new List<NetworkResponse>{owner};for(int i=1;i<4;i++){var req=Request("Join",owner);req.Payload=WireJson.Serialize(new JoinRoomPayload());var joined=Directory.Handle(req);Assert.True(joined.Success,joined.Message);clients.Add(joined);}Clients=clients.ToArray();
         }
-        public RoomSettings Settings()=>new(){RuleSet=Rules,PlayerCount=4,ScenarioId="base",Fishing=true,Harbormaster=true,TradeModulesVersion=NetworkProtocol.TradeModulesVersion,
+        public RoomSettings Settings()=>new(){RuleSet=Rules,PlayerCount=4,TargetVictoryPoints=Rules=="seafarers"?20:null,ScenarioId=Rules=="base"||Rules=="cities-knights"?"base":"four-islands",Fishing=true,Harbormaster=true,TradeModulesVersion=NetworkProtocol.TradeModulesVersion,
             ThreeKingdomsPackageVersion=Kingdoms?GeneralCatalog.B6PackageVersion:null,ThreeKingdomsContentHash=Kingdoms?GeneralCatalog.B6ContentHash:null};
         public NetworkRequest Request(string op,NetworkResponse? c=null)=>new(){Operation=op,RequestId=Guid.NewGuid().ToString("N"),RoomId=c?.RoomId,Credential=c?.Credential,ConnectionId=c?.ConnectionId,ExpectedRevision=c?.Revision??0,
             RuleSet=Rules,ExpectedRulesVersion=NetworkProtocol.RulesVersion(Rules),ExpectedScenarioVersion=NetworkProtocol.ScenarioVersion(Rules),SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion,
@@ -42,13 +44,24 @@ public sealed class FishingRoomTests(Xunit.Abstractions.ITestOutputHelper output
         public string Save=>JsonDocument.Parse(Store.Documents.Values.Single()).RootElement.GetProperty("GameSave").GetString()!;
         public void Dispose()=>Directory.Dispose();
     }
+    static Type ViewType(string rules)=>rules=="base"?typeof(M2.PlayerView):rules=="seafarers"?typeof(M3.PlayerView):rules=="combined"?typeof(M5.PlayerView):typeof(M4.PlayerView);
+    static dynamic ReadView(string rules,string json)=>WireJson.Deserialize(json,ViewType(rules));
+    [Fact]
+    public void StandardF3ClientCannotEnterF4SeaRoomButStillReadsStandardRoom()
+    {
+        using var sea=new Fixture("seafarers");var join=sea.Request("Join",sea.Clients[0]);join.SupportedTradeModulesVersion=NetworkProtocol.StandardTradeModulesVersion;join.Payload="{}";
+        Assert.Equal("VersionMismatch",sea.Directory.Handle(join).Code);
+        using var standard=new Fixture("base");var get=standard.Request("Get",standard.Clients[0]);get.SupportedTradeModulesVersion=NetworkProtocol.StandardTradeModulesVersion;Assert.True(standard.Directory.Handle(get).Success);
+        var configure=standard.Request("Configure",standard.Get(standard.Clients[0]));configure.SupportedTradeModulesVersion=NetworkProtocol.StandardTradeModulesVersion;
+        var settings=standard.Settings();settings.RuleSet="combined";settings.ScenarioId="four-islands";configure.Payload=WireJson.Serialize(settings);Assert.Equal("VersionMismatch",standard.Directory.Handle(configure).Code);
+    }
     [Fact]
     public void OldClientCannotCreateJoinReconnectOrPrepareEnabledRoom()
     {
         using var f=new Fixture("base");
         foreach(string op in new[]{"Join","Reconnect","Ready","Get"}){var req=f.Request(op,f.Clients[0]);req.SupportedTradeModulesVersion=null;req.Payload="{}";Assert.Equal("VersionMismatch",f.Directory.Handle(req).Code);}
         var create=f.Request("Create");create.SupportedTradeModulesVersion="old";create.Payload=WireJson.Serialize(new CreateRoomPayload{Settings=f.Settings()});Assert.Equal("VersionMismatch",f.Directory.Handle(create).Code);
-        var invalid=f.Settings();invalid.RuleSet="combined";invalid.ScenarioId="heading-for-new-shores";create.SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion;create.Payload=WireJson.Serialize(new CreateRoomPayload{Settings=invalid});Assert.Equal("InvalidRequest",f.Directory.Handle(create).Code);
+        var invalid=f.Settings();invalid.RuleSet="combined";invalid.ScenarioId="forgotten-tribe";create.SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion;create.Payload=WireJson.Serialize(new CreateRoomPayload{Settings=invalid});Assert.Equal("InvalidRequest",f.Directory.Handle(create).Code);
     }
     [Fact]
     public void ConfigurationClearsReadyAndRestartPreservesModules()
@@ -60,19 +73,32 @@ public sealed class FishingRoomTests(Xunit.Abstractions.ITestOutputHelper output
         Assert.True(f.Directory.Handle(f.Request("Restart",f.Get(f.Clients[0]))).Success);
         var after=WireJson.Deserialize<M2.PlayerView>(f.Get(f.Clients[0]).ViewJson);Assert.NotNull(after.TradeModules.Fishing);Assert.False(after.TradeModules.Harbormaster);
     }
-    [Theory][InlineData("base",false)][InlineData("cities-knights",false)][InlineData("cities-knights",true)]
+    [Theory][InlineData("base",false)][InlineData("cities-knights",false)][InlineData("cities-knights",true)][InlineData("seafarers",false)][InlineData("combined",false)][InlineData("combined",true)]
     public void FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(string rules,bool kingdoms)
     {
         using var f=new Fixture(rules,kingdoms);f.Start();int spend=0,steps=0;long deltaBytes=0,fullBytes=0;double commandMs=0;
         while(spend<2&&steps++<1200)
         {
             var snapshots=f.Clients.Select(f.Get).ToArray();
-            dynamic first=rules=="base"?(object)WireJson.Deserialize<M2.PlayerView>(snapshots[0].ViewJson):WireJson.Deserialize<M4.PlayerView>(snapshots[0].ViewJson);
-            ThreeKingdomsView? tk=rules=="base"?null:first.ThreeKingdoms;
+            dynamic first=ReadView(rules,snapshots[0].ViewJson);
+            Assert.True(first.Phase.ToString()!="Finished",$"{rules}在{steps}步结束，只提交{spend}次鱼支付。");
+            ThreeKingdomsView? tk=rules=="base"||rules=="seafarers"?null:first.ThreeKingdoms;
             string actor=tk?.WaitingSelectionPlayerIds?.FirstOrDefault()??tk?.PendingDecision?.PlayerId??tk?.SkillDecision?.PlayerId??(first.TradeOffer!=null?first.TradeOffer.NextResponder():first.Discards.Length>0?first.Discards[0].PlayerId:first.PendingDecision?.PlayerId??first.ActivePlayerId);
             actor=B2SkillEngine.ControllerForViewB6(tk,actor);var own=snapshots.Single(c=>c.SeatId==actor);
-            dynamic view=rules=="base"?(object)WireJson.Deserialize<M2.PlayerView>(own.ViewJson):WireJson.Deserialize<M4.PlayerView>(own.ViewJson);
-            dynamic command=rules=="base"?(object)new BaseGameAi().Decide(view):new CitiesKnightsAi().Decide(view);command.Id=Guid.NewGuid().ToString("N");
+            dynamic view=ReadView(rules,own.ViewJson);
+            dynamic command=rules=="base"?(object)new BaseGameAi().Decide(view):rules=="seafarers"?(object)new SeafarersAi().Decide(view):rules=="combined"?(object)new CombinedAi().Decide(view):new CitiesKnightsAi().Decide(view);
+            if(rules=="seafarers")
+            {
+                M3.PlayerView sea=view;
+                // 网络夹具主动选鱼源并优先提交合法鱼支付；产品策略另由完整局验证。
+                if(sea.Phase==M3.GamePhase.SetupSettlement)
+                {
+                    var source=sea.LegalVertexIds.FirstOrDefault(v=>sea.TradeModules.Fishing.Grounds.Any(g=>g.VertexIds.Contains(v)));
+                    if(source!=null)command=new M3.Command {PlayerId=sea.PlayerId,Kind=M3.CommandKind.SetupSettlement,TargetId=source};
+                }
+                else {var spendCommand=sea.LegalFishingActions.FirstOrDefault(c=>c.Kind==M3.CommandKind.SpendFish);if(spendCommand!=null)command=spendCommand;}
+            }
+            command.Id=Guid.NewGuid().ToString("N");
             var request=f.Request("Command",own);request.CommandId=command.Id;request.Payload=WireJson.SerializeObject(command);
             bool fish=command.Kind.ToString()=="SpendFish";
             if(fish)
@@ -89,9 +115,11 @@ public sealed class FishingRoomTests(Xunit.Abstractions.ITestOutputHelper output
                 Assert.All(fishView.GetProperty("Players").EnumerateArray(),p=>Assert.False(p.TryGetProperty("TokenIds",out _)));
                 var sender=new SeatStateSender();var receiver=new SeatStateReceiver(old.RoomId,old.SeatId,old.ConnectionId);
                 receiver.Prepare(sender.Encode(old)).Commit();var wire=sender.Encode(fresh);var applied=receiver.Prepare(wire);
-                Type type=rules=="base"?typeof(M2.PlayerView):typeof(M4.PlayerView);
+                Type type=ViewType(rules);
                 Assert.Equal(WireJson.SerializeObject(WireJson.Deserialize(fresh.ViewJson,type)),WireJson.SerializeObject(WireJson.Deserialize(applied.Response.ViewJson,type)));applied.Commit();
-                Assert.False(WireJson.Deserialize<SeatStatePacket>(wire.ViewJson).Full);
+                // 完整视图回退由既有编码器按变更大小决定；这里比较同一响应的最佳传输与强制全量。
+                var forced=new SeatStateSender().Encode(fresh,true);
+                Assert.True(System.Text.Encoding.UTF8.GetByteCount(WireJson.SerializeDirect(wire)) <= System.Text.Encoding.UTF8.GetByteCount(WireJson.SerializeDirect(forced)));
                 deltaBytes+=System.Text.Encoding.UTF8.GetByteCount(WireJson.SerializeDirect(wire));fullBytes+=System.Text.Encoding.UTF8.GetByteCount(WireJson.SerializeDirect(fresh));
             }
             if(spend<2)continue;

@@ -111,10 +111,10 @@ namespace Catan.Core.M3
         {
             void Check(bool valid, string message) { if (!valid) throw new InvalidDataException(message); }
             Check(s.Tiles != null && s.Tiles.Length == scenario.Tiles.Length && s.Tiles.Select(t => t.Id).SequenceEqual(scenario.Tiles.Select(t => t.Id)), "Tile identity changed.");
-            Check(s.Tiles.All(t => t.Resource == "sea" || t.Resource == "fog" || t.Resource == "desert" || t.Resource == "gold" || Resources.Any(r => ResourceName(r) == t.Resource)), "Invalid terrain.");
+            Check(s.Tiles.All(t => t.Resource == "sea" || t.Resource == "fog" || t.Resource == "desert" || t.Resource == "lake" && s.TradeModules?.Fishing != null || t.Resource == "gold" || Resources.Any(r => ResourceName(r) == t.Resource)), "Invalid terrain.");
             Check(s.HiddenResources.Length == s.Tiles.Count(t => t.Resource == "fog"), "Fog conservation failed.");
-            Check(s.HiddenResources.Count(r => r != "sea") == s.HiddenNumbers.Length, "Fog number conservation failed.");
-            Check(s.RobberTileId == null ? scenario.Id == "pirate-islands" : s.RobberTileId == "frame" && scenario.Id == "new-world" || s.Tiles.Any(t => t.Id == s.RobberTileId && IsLand(t)), "Invalid robber location.");
+            Check(s.HiddenResources.Count(r => r != "sea" && r != "lake") == s.HiddenNumbers.Length, "Fog number conservation failed.");
+            Check(s.RobberTileId == null ? s.TradeModules?.Fishing != null || scenario.Id == "pirate-islands" : s.RobberTileId == "frame" && scenario.Id == "new-world" || s.Tiles.Any(t => t.Id == s.RobberTileId && IsLand(t)), "Invalid robber location.");
             Check(s.PirateTileId == null || s.PirateTileId == "frame" || s.Tiles.Any(t => t.Id == s.PirateTileId && t.Resource == "sea"), "Invalid pirate location.");
             foreach (var p in s.Players)
             {

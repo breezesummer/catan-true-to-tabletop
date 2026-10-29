@@ -47,7 +47,7 @@ public sealed partial class M5App : MonoBehaviour
         Application.targetFrameRate=60;ai=GetComponent<M6App>();
         if(ai!=null&&ai.NetworkGame){font=MobileTabletop.LoadFont();ai.ConnectNetwork(this);return;}
         host=new M5LocalGameHost(ai==null?4:ai.PlayerCount);
-        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.ScenarioId,ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints,ai.ThreeKingdoms,ai.Harbormaster);
+        if(ai!=null && string.IsNullOrEmpty(ai.InitialAuthority))host.NewGame(ai.ScenarioId,ai.PlayerCount,unchecked((uint)Guid.NewGuid().GetHashCode()),ai.TargetVictoryPoints,ai.ThreeKingdoms,ai.Harbormaster,ai.Fishing);
         if(ai!=null&&!string.IsNullOrEmpty(ai.InitialAuthority))host.ImportSave(ai.InitialAuthority);
         var initial=host.View(ai==null?"P1":ai.HumanSeat);nextSeat=initial.ActivePlayerId;Refresh(initial);
         font=MobileTabletop.LoadFont();
@@ -133,6 +133,7 @@ public sealed partial class M5App : MonoBehaviour
         bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,ai.ThreeKingdomsSelectionActive||tabletop.OperationHidden||draft==null&&!operationActions);
         if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
         if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
+        if(fishingDock.Active){if(Input.GetKeyDown(KeyCode.Escape))fishingDock.Reset();return;}
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(ai!=null&&ai.ThreeKingdomsSelectionActive&&!ThreeKingdomsPaymentActive)
         {

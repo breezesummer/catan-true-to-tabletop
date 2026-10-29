@@ -45,8 +45,9 @@ namespace Catan.Core.M5
             if (B2(s)) { ApplyB2(s, c); return; }
             if (tk == null)
             {
-                Require(c.Kind < CommandKind.ChooseGenerals, "ExpansionDisabled", "本局未开启三国争霸开发骨架。");
+                Require(c.Kind < CommandKind.ChooseGenerals || c.Kind >= CommandKind.SpendFish, "ExpansionDisabled", "本局未开启三国争霸开发骨架。");
                 ApplyBaseRules(s, c);
+                ResumeFishing(s);
                 return;
             }
             Require(s.Phase != GamePhase.Finished, "GameFinished", "对局已经结束。");
@@ -102,6 +103,7 @@ namespace Catan.Core.M5
                     return;
                 }
                 ApplyBaseRules(s, c);
+                ResumeFishing(s);
                 if (s.Phase == GamePhase.Finished) return;
                 if (tk.Clock.Phase == ThreeKingdomsPhase.InitialPlacement && s.Turn > 0 && s.Phase == GamePhase.ProductionAwaitRoll && s.PendingDecision == null)
                     ThreeKingdomsEngine.BeginNormalTurns(tk);

@@ -44,6 +44,7 @@ public sealed partial class CombinedAi
             throw new InvalidOperationException("武将技能待决没有可用合法动作。");
         }
         if (generalChoice != null) return generalChoice;
+        var fish=FishingAi.Choose(view);if(fish!=null)return fish;
         if (view.TradeOffer != null) return RespondToTrade(view);
         if (view.Phase == GamePhase.SetupSettlement)
             return Make(CommandKind.SetupSettlement, view.LegalVertexIds.OrderByDescending(v => SetupValue(view, v)).ThenBy(v => v).First());
@@ -98,7 +99,7 @@ public sealed partial class CombinedAi
                 {
                     if (c.Decline || c.TargetId == null) return -1000;
                     var projected = new Command { PlayerId = view.PlayerId, Kind = c.BuildShip ? CommandKind.BuildShip : CommandKind.BuildRoad, TargetId = c.TargetId };
-                    if (view.OwnVictoryPoints + PointGain(view, projected) >= view.TargetVictoryPoints) return 10000;
+                    if (view.OwnVictoryPoints + PointGain(view, projected) >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints)) return 10000;
                     if (freeExpansion.HasValue && freeExpansion.Value.path.Length > 0 && freeExpansion.Value.path[0] == c.TargetId && freeExpansion.Value.ship == c.BuildShip) return 1000;
                     return PendingValue(view, c);
                 }).First();
@@ -111,9 +112,9 @@ public sealed partial class CombinedAi
         legal.AddRange(view.LegalShipEdgeIds.Select(v => Make(CommandKind.BuildShip, v)));
 
         // 立即终局优先于保城、发展生产和所有干扰行动，包括领取大都会的下一步待决。
-        if (view.OwnVictoryPoints >= view.TargetVictoryPoints && view.ScenarioId != "pirate-islands" && view.ScenarioId != "wonders-of-catan") return Make(CommandKind.DeclareVictory);
+        if (view.OwnVictoryPoints >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) && view.ScenarioId != "pirate-islands" && view.ScenarioId != "wonders-of-catan") return Make(CommandKind.DeclareVictory);
         var special = SpecialAction(view, legal); if (special != null) return special;
-        var winning = legal.Where(c => view.OwnVictoryPoints + PointGain(view, c) >= view.TargetVictoryPoints)
+        var winning = legal.Where(c => view.OwnVictoryPoints + PointGain(view, c) >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints))
             .OrderByDescending(c => ActionValue(view, c)).ThenBy(c => c.TargetId, StringComparer.Ordinal).FirstOrDefault();
         if (winning != null) return winning;
         // 对手即将终局时，先执行确有阻碍收益的蓝牌或截路；自己的立即胜利仍排在最前。
@@ -220,11 +221,11 @@ public sealed partial class CombinedAi
         return Make(CommandKind.EndTurn);
     }
 
-    private static int RollsLeft(PlayerView view) => RemainingRolls(view.Turn, Math.Max(view.OwnVictoryPoints, view.Players.Max(p => p.VictoryPoints)), view.TargetVictoryPoints);
+    private static int RollsLeft(PlayerView view) => RemainingRolls(view.Turn, Math.Max(view.OwnVictoryPoints, view.Players.Max(p => p.VictoryPoints)), (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints));
     private static int SettlementPoints(PlayerView view, string vertex) => SeafaringPlanning.SettlementPoints(view.ScenarioId,
         view.Board.Tiles, Buildings(view).Where(b => b.PlayerId == view.PlayerId).ToArray(), vertex);
     private static double SettlementValue(PlayerView view, string vertex, int length) => SeafaringPlanning.SettlementValue(view.ScenarioId,
-        view.Board.Tiles, view.Board.Edges, Buildings(view), view.PlayerId, vertex, length, RollsLeft(view), view.OwnVictoryPoints, view.TargetVictoryPoints);
+        view.Board.Tiles, view.Board.Edges, Buildings(view), view.PlayerId, vertex, length, RollsLeft(view), view.OwnVictoryPoints, (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints));
     private static int Missing(ResourceBag hand, ResourceBag cost) => Resources.Sum(r => Math.Max(0, cost[r] - hand[r]));
 
     private static double Threat(PlayerView view, string player) => AiOpponentStrategy.Threat(view, player);
@@ -340,7 +341,7 @@ public sealed partial class CombinedAi
             if (c.ProgressCard == ProgressCardKind.Merchant && view.MerchantPlayerId != view.PlayerId) points++;
             if (c.ProgressCard == ProgressCardKind.Crane && GainsMetropolis(view, c.Track)) points += 2;
         }
-        if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 5 &&
+        if (view.OwnVictoryPoints >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) - 5 &&
             (c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildShip || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.RecruitKnight || c.Kind == CommandKind.MoveKnight || c.Kind == CommandKind.DisplaceKnight))
             points += RouteAwardGain(view, c);
         return points;
@@ -360,7 +361,7 @@ public sealed partial class CombinedAi
                 return 0;
             case CommandKind.BuildRoad:
             case CommandKind.BuildShip:
-                if (view.OwnVictoryPoints < view.TargetVictoryPoints - 3 || view.LongestRoadPlayerId == view.PlayerId) return 0;
+                if (view.OwnVictoryPoints < (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) - 3 || view.LongestRoadPlayerId == view.PlayerId) return 0;
                 if (RouteAwardGain(view, c) > 0) return 85;
                 int length = ProjectedRouteLength(view, view.PlayerId, c);
                 int needed = Math.Max(5, view.Players.Where(p => p.Id != view.PlayerId).Max(p => p.LongestRoadLength) + 1);
@@ -586,6 +587,7 @@ public sealed partial class CombinedAi
     private static Command Copy(Command c) => new Command
     {
         PlayerId=c.PlayerId, Kind=c.Kind, TargetId=c.TargetId, OtherPlayerId=c.OtherPlayerId,
+        FishAction=c.FishAction,FishTokenIds=c.FishTokenIds?.ToArray(),ExpectedEventSequence=c.ExpectedEventSequence,FishBuildShip=c.FishBuildShip,FishRemovePirate=c.FishRemovePirate,
         ActingAsPlayerId=c.ActingAsPlayerId, JiaoziCardType=c.JiaoziCardType, GeneralIds=c.GeneralIds?.ToArray(), DecisionId=c.DecisionId, WindowId=c.WindowId, SkillCommand=ThreeKingdomsAi.Copy(c.SkillCommand),
         PaymentCards=c.PaymentCards?.ToArray(),GiveEffectiveCardType=c.GiveEffectiveCardType,RetireAtPhase=c.RetireAtPhase,CancelRetirementIntent=c.CancelRetirementIntent,
         DeclaredRealTypes=c.DeclaredRealTypes?.ToArray(),DeclaredEffectiveTypes=c.DeclaredEffectiveTypes?.ToArray(),
@@ -660,7 +662,7 @@ public sealed partial class CombinedAi
             double benefit = TradeValue(view.OwnResources, receive, give) + 2;
             // 自己也只差一分且此报价补齐当前目标时，才重新考虑两三步可赢的对手。
             // 一步可赢和领先六分的禁令仍以无穷大门槛保持绝对优先。
-            if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 1
+            if (view.OwnVictoryPoints >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) - 1
                 && Resources.All(r => view.OwnResources[r] + receive[r] - give[r] >= goal[r])) benefit += 16;
             var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0
                 && (view.ThreeKingdoms?.AllowedTradePartnerPlayerIds==null||view.ThreeKingdoms.AllowedTradePartnerPlayerIds.Contains(p.Id))
@@ -678,7 +680,7 @@ public sealed partial class CombinedAi
     private static double Value(PlayerView view, string vertex)
     {
         var owned = Buildings(view).Where(b => b.PlayerId == view.PlayerId).Select(b => b.LocationId).ToArray();
-        return HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex) + view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
+        return FishingAi.VertexValue(view.TradeModules?.Fishing,view.Board.Tiles,vertex) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex) + view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
         {
             var pips = 6 - Math.Abs(7 - t.Number!.Value);
             var already = view.Board.Tiles.Count(other => other.Resource == t.Resource && other.Vertices.Intersect(owned).Any());

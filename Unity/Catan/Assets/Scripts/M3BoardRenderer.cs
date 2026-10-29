@@ -92,7 +92,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
     }
     static Color TerrainColor(string r)
     {
-        switch(r) { case "wood":return new Color(.16f,.36f,.25f); case "brick":return new Color(.62f,.28f,.18f); case "wool":return new Color(.49f,.62f,.3f); case "wheat":return new Color(.78f,.59f,.25f); case "sea":case "water":return new Color(.07f,.34f,.52f); case "gold":return new Color(.92f,.71f,.15f); case "fog":case "hidden":return new Color(.30f,.34f,.40f); default:return new Color(.68f,.58f,.41f); }
+        switch(r) { case "lake":return new Color(.15f,.48f,.62f); case "wood":return new Color(.16f,.36f,.25f); case "brick":return new Color(.62f,.28f,.18f); case "wool":return new Color(.49f,.62f,.3f); case "wheat":return new Color(.78f,.59f,.25f); case "sea":case "water":return new Color(.07f,.34f,.52f); case "gold":return new Color(.92f,.71f,.15f); case "fog":case "hidden":return new Color(.30f,.34f,.40f); default:return new Color(.68f,.58f,.41f); }
     }
     readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)

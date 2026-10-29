@@ -29,7 +29,7 @@ namespace Catan.Core.M5
             void Check(bool valid,string message){if(!valid)throw new InvalidDataException(message);}
             var x=s.Special;
             Check(!s.Knights.Any(k=>x.Villages.Any(v=>v.VertexId==k.LocationId)||x.Fortresses.Any(f=>f.Strength>0&&f.VertexId==k.LocationId)),"骑士不能占据中立村庄或未收复要塞。");
-            Check(x.HiddenResources.Length==s.Tiles.Count(t=>t.Resource=="fog")&&x.HiddenNumbers.Length==x.HiddenResources.Count(r=>r!="sea"),"迷雾组件不守恒。");
+            Check(x.HiddenResources.Length==s.Tiles.Count(t=>t.Resource=="fog")&&x.HiddenNumbers.Length==x.HiddenResources.Count(r=>r!="sea"&&r!="lake"),"迷雾组件不守恒。");
             Check(s.Tiles.Select(t=>t.Resource).Concat(x.HiddenResources).Where(r=>r!="fog").OrderBy(r=>r).SequenceEqual(seafaring.Tiles.Select(t=>t.Resource).Concat(seafaring.HiddenResources).Where(r=>r!="fog").OrderBy(r=>r)),"地形组件不守恒。");
             Check(x.ClothSupply>=0&&x.Villages.All(v=>v.Cloth>=0&&v.Cloth<=5&&v.TradingPlayerIds.Distinct().Count()==v.TradingPlayerIds.Length&&v.TradingPlayerIds.All(id=>s.Players.Any(p=>p.Id==id)))&&s.Players.All(p=>p.Cloth>=0),"布匹状态无效。");
             Check(x.ClothSupply+x.Villages.Sum(v=>v.Cloth)+s.Players.Sum(p=>p.Cloth)==(seafaring.Villages.Length>0?50:0),"布匹不守恒。");

@@ -23,9 +23,9 @@ public sealed partial class M5App
     {
         if(ai==null)return false;
         var p=logicalMouse??MobileTabletop.Logical(MobileTabletop.Pointer);
-        return ThreeKingdomsPaymentContains(p)||SpecialBlocksMouse(p)||mapChoice.Active||ResourceChoiceVisible||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||OperationContextVisible&&tabletop.CurrentContextRect.Contains(p)||dock.BlocksBoardInput(p);
+        return fishingDock.Contains(p)||ThreeKingdomsPaymentContains(p)||SpecialBlocksMouse(p)||mapChoice.Active||ResourceChoiceVisible||ai.BlocksTableInput(p)||tabletop.BlocksBoardInput(p)||OperationContextVisible&&tabletop.CurrentContextRect.Contains(p)||dock.BlocksBoardInput(p);
     }
-    void CancelOperationDraft(){CancelThreeKingdomsPayment();mapChoice.Clear();resourceChoiceSelection=new ResourceBag();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null){board.SetSelectedShip(null);board.ClearPreview();}}
+    void CancelOperationDraft(){fishingDock.Reset();CancelThreeKingdomsPayment();mapChoice.Clear();resourceChoiceSelection=new ResourceBag();if(!dock.TradeOpen)operationPortId=null;tabletop.SetContextAnchor(null);draft=null;pickField="";operationKnightLevel=0;operationFacilityLocked=false;operationActions=false;operationKnightTarget=null;if(board!=null){board.SetSelectedShip(null);board.ClearPreview();}}
     bool DirectTabletopPlacement=>draft!=null&&(draft.Kind==CommandKind.SetupSettlement||draft.Kind==CommandKind.SetupRoad||draft.Kind==CommandKind.BuildSettlement||draft.Kind==CommandKind.BuildRoad||draft.Kind==CommandKind.BuildCity||draft.Kind==CommandKind.BuildWall||draft.Kind==CommandKind.RecruitKnight||draft.Kind==CommandKind.PromoteKnight||draft.Kind==CommandKind.ActivateKnight||draft.Kind==CommandKind.ChaseRobber||draft.Kind==CommandKind.MoveRobber||draft.Kind==CommandKind.PlaceFreeRoad||draft.Kind==CommandKind.MoveKnight||draft.Kind==CommandKind.DisplaceKnight||draft.Kind==CommandKind.SetupShip||draft.Kind==CommandKind.BuildShip||draft.Kind==CommandKind.PlaceFreeShip||draft.Kind==CommandKind.MoveShip||draft.Kind==CommandKind.MovePirate||draft.Kind==CommandKind.ChasePirate);
     bool OperationContextVisible=>!directPayment.Active&&!tabletop.OperationHidden&&view!=null&&!DirectProgressActive&&(!FreeRoadPlacementActive||FreeRoadIds.Length==0&&FreeShipIds.Length==0)&&Operations().Discard==null&&ai.IsHumanTurn&&view.TradeOffer==null&&pickField==""&&(operationActions||view.Phase==GamePhase.Action&&view.CommercialHarborPlayers.Length>0||draft!=null&&!DirectTabletopPlacement||view.Phase==GamePhase.Discard||view.Phase==GamePhase.PendingChoice||view.Phase==GamePhase.RobberSteal||view.Phase==GamePhase.RoadBuilding&&view.LegalEdgeIds.Length==0&&view.LegalShipEdgeIds.Length==0||view.Phase==GamePhase.RobberMove);
     static int[] DockCost(int wood=0,int brick=0,int wool=0,int wheat=0,int ore=0)=>new[]{wood,brick,wool,wheat,ore,0,0,0};
@@ -180,7 +180,7 @@ public sealed partial class M5App
         tabletop.Draw(font,seat,Actor(view),PhaseName(view.Phase),view.Turn,view.OwnVictoryPoints,view.LastDice1,view.LastDice2,
             view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Score=TabletopScoreModel.For(view,p.Id),Resources=p.ResourceCount,Cards=p.ProgressCardCount,ResourceHandLimit=7+2*view.Board.Walls.Count(w=>w.PlayerId==p.Id),SpecialHandLimit=4,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Ships=p.ShipsRemaining,Improvements=p.Improvements}).ToArray(),
             ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll,ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.PendingDecision==null&&view.TradeOffer==null&&!directPayment.Active,
-            ()=>Submit(New(CommandKind.RollDice)),EndTableTurn,target=>{CancelOperationDraft();dock.OpenTrade(target);},
+            ()=>Submit(New(CommandKind.RollDice)),EndTableTurn,target=>{if(fishingDock.PickPlayer(target))return;CancelOperationDraft();dock.OpenTrade(target);},
             ()=>{bool open=!operationActions;dock.Reset();CancelOperationDraft();operationActions=open;},"骑士操作",facility:dock.OpenFacility);
 
         tabletop.SetContextAnchor(operationActions&&operationKnightTarget!=null?(Vector2?)MobileTabletop.Logical(board.ScreenPoint(operationKnightTarget)):null);
@@ -197,6 +197,7 @@ public sealed partial class M5App
         if(!ai.TablePresentationBlocked&&ai.IsHumanTurn)mapChoice.Draw();
         DrawSpecialPanel();
         GUI.enabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen;DrawDirectPayment();GUI.enabled=previousEnabled;
+        DrawFishing();ai.TableOverlayOpen|=fishingDock.Active;
         RefreshTablePrompt();GUI.matrix=Matrix4x4.identity;
     }
     void RefreshTablePrompt()

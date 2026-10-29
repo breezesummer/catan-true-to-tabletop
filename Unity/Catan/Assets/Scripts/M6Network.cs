@@ -503,7 +503,7 @@ public sealed partial class M6App
             MenuMapPreviews.DrawScenarioThumbnail(new Rect(previewArea.x+6,previewArea.y+164,175,124),menuRule,ids[menuScenario],menuPlayers);
             PastoralMenuUI.Label(new Rect(previewArea.x+208,previewArea.y+192,previewArea.width-220,80),MenuMapPreviews.ScenarioCaption(menuRule,ids[menuScenario],menuPlayers),15,PastoralMenuUI.Muted);
             bool allowedHarbor=Catan.Core.TradeModules.HarbormasterRules.Supports(ids[menuScenario]);
-            bool allowedFish=menuRule==0||menuRule==2;
+            bool allowedFish=menuRule==0||menuRule==2||Catan.Core.TradeModules.FishingScenarioCatalog.SupportsSeafaring(ScenarioIds()[menuScenario]);
             if(!allowedHarbor)menuHarbormaster=false;if(!allowedFish)menuFishing=false;
             GUILayout.BeginHorizontal();bool moduleEnabled=GUI.enabled;
             GUI.enabled=moduleEnabled&&allowedHarbor;menuHarbormaster=GUILayout.Toggle(menuHarbormaster,"海港大师",button,GUILayout.Height(34));

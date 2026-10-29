@@ -147,7 +147,10 @@ namespace Catan.Core.M5
             {
                 var deferred = s.ThreeKingdomsDeferredCommand; s.ThreeKingdomsDeferredCommand = null;
                 bool virtualCard = s.ThreeKingdomsDeferredVirtual; s.ThreeKingdomsDeferredVirtual = false;
-                ApplyB2Native(s, deferred, virtualCard, virtualCard && tk.Clock.Phase == ThreeKingdomsPhase.Preparation);
+                // 目标已在开启响应前预检；响应改变分数不能撤销已合法选定的大商家目标。
+                var previousValidatedUse = validatedProgressTargetUseId; validatedProgressTargetUseId = deferred.Id;
+                try { ApplyB2Native(s, deferred, virtualCard, virtualCard && tk.Clock.Phase == ThreeKingdomsPhase.Preparation); }
+                finally { validatedProgressTargetUseId = previousValidatedUse; }
             }
             if (tk.Clock.Phase == ThreeKingdomsPhase.InitialPlacement && s.Turn > 0 && s.Phase == GamePhase.ProductionAwaitRoll && s.PendingDecision == null)
             {
@@ -172,6 +175,7 @@ namespace Catan.Core.M5
             if(!B2Busy(s)&&s.PendingDecision==null)B6ReturnAllianceKnights(s);
             if (ResumeB3PirateProduction(s)) { FinishB2Work(s); return; }
             CheckB2Capacity(s);
+            ResumeFishing(s);
         }
 
         private bool ResumeB3PirateProduction(GameState s)
@@ -281,7 +285,7 @@ namespace Catan.Core.M5
             s.B4SkillHandDelta=outerSkillDelta;
             if(outerSkillDelta!=null) foreach(var player in s.Players) {var after=host.GetHand(player.Id);for(int i=0;i<8;i++)outerSkillDelta[player.Id][i]+=after[i]-before[player.Id][i];}
         }
-        private static bool IsB2Construction(Command c, PendingDecision pending) => c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.BuildCity || c.Kind == CommandKind.BuildWall || c.Kind == CommandKind.PlaceFreeRoad || c.Kind == CommandKind.BuildShip || c.Kind == CommandKind.PlaceFreeShip || c.Kind == CommandKind.PlayProgressCard && (c.ProgressCard == ProgressCardKind.Medicine || c.ProgressCard == ProgressCardKind.Engineering) || c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressRoads" && !c.Decline;
+        private static bool IsB2Construction(Command c, PendingDecision pending) => c.Kind == CommandKind.SpendFish && c.FishAction == TradeModules.FishAction.BuildRoad || c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildSettlement || c.Kind == CommandKind.BuildCity || c.Kind == CommandKind.BuildWall || c.Kind == CommandKind.PlaceFreeRoad || c.Kind == CommandKind.BuildShip || c.Kind == CommandKind.PlaceFreeShip || c.Kind == CommandKind.PlayProgressCard && (c.ProgressCard == ProgressCardKind.Medicine || c.ProgressCard == ProgressCardKind.Engineering) || c.Kind == CommandKind.ResolveProgressChoice && pending?.Kind == "ProgressRoads" && !c.Decline;
         private Dictionary<string, Tuple<string, string>> B2Buildings(GameState s)
         {
             var result = new Dictionary<string, Tuple<string, string>>();

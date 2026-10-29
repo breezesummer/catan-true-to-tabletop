@@ -149,7 +149,7 @@ namespace Catan.Core.M5
                 foreach(var id in (type=="Road"||type=="Ship")?scenario.Topology.Edges.Select(e=>e.Id):scenario.Topology.Vertices.Select(v=>v.Id))yield return new Command{PlayerId=player,Kind=command,TargetId=id};
             }
         }
-        private static string B5CommandKind(Command c) => c.Kind==CommandKind.BuildShip||c.Kind==CommandKind.PlaceFreeShip?"Ship":c.Kind==CommandKind.BuildRoad||c.Kind==CommandKind.PlaceFreeRoad?"Road":c.Kind==CommandKind.BuildSettlement?"Settlement":c.Kind==CommandKind.BuildCity?"City":c.Kind==CommandKind.BuildWall?"Wall":c.Kind==CommandKind.ImproveCity?"Improvement":c.Kind==CommandKind.RecruitKnight||c.Kind==CommandKind.PromoteKnight?"Knight":null;
+        private static string B5CommandKind(Command c) => c.Kind==CommandKind.SpendFish&&c.FishAction==TradeModules.FishAction.BuildRoad?(c.FishBuildShip?"Ship":"Road"):c.Kind==CommandKind.BuildShip||c.Kind==CommandKind.PlaceFreeShip?"Ship":c.Kind==CommandKind.BuildRoad||c.Kind==CommandKind.PlaceFreeRoad?"Road":c.Kind==CommandKind.BuildSettlement?"Settlement":c.Kind==CommandKind.BuildCity?"City":c.Kind==CommandKind.BuildWall?"Wall":c.Kind==CommandKind.ImproveCity?"Improvement":c.Kind==CommandKind.RecruitKnight||c.Kind==CommandKind.PromoteKnight?"Knight":null;
         private void B5ApplyFree(GameState s,Command c)
         {
             var phase=s.Phase;var active=s.ActivePlayerId;var free=s.B5FreeConstruction;s.Phase=GamePhase.Action;s.ActivePlayerId=c.PlayerId;s.B5FreeConstruction=true;
@@ -272,7 +272,7 @@ namespace Catan.Core.M5
         {
             var b=B5Board(s);var invasion=b.Invasions.FirstOrDefault(x=>x.EventId==eventId);if(invasion==null)return;
             foreach(var k in s.Knights.Where(k=>invasion.Participants.Contains(k.PlayerId)))k.Active=false;
-            if(!invasion.IsVirtual){s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;if(s.PirateTileId==null&&(seafaring.Id!="pirate-islands"||s.Special.Fortresses.Any(f=>f.Strength>0)))s.PirateTileId=InitialPirateB6(s);}
+            if(!invasion.IsVirtual){s.BarbarianPosition=0;s.BarbarianAttackStrength=null;s.BarbarianDefenseStrength=null;if(s.PirateTileId==null&&s.TradeModules?.Fishing==null&&(seafaring.Id!="pirate-islands"||s.Special.Fortresses.Any(f=>f.Strength>0)))s.PirateTileId=InitialPirateB6(s);}
             b.Invasions=b.Invasions.Where(x=>x!=invasion).ToArray();B2SkillEngine.OnB5RaidResolved(CardHost(s),eventId,invasion.CityCollapsed,invasion.PointAwarded,false,null);
         }
         private void B5Invasion(GameState s,string eventId,string[] participants,bool virtualAttack)
@@ -280,7 +280,7 @@ namespace Catan.Core.M5
             var b=B5Board(s);if(b.ProcessedInvasions.Contains(eventId))return;Require(participants!=null&&participants.Distinct().Count()==participants.Length&&participants.All(p=>s.Players.Any(x=>x.Id==p)),"InvalidParticipants","入侵参与者无效。");b.ProcessedInvasions=Append(b.ProcessedInvasions,eventId);
             var ids=participants;var strength=ids.ToDictionary(p=>p,p=>s.Knights.Where(k=>k.PlayerId==p&&(k.Active||B2SkillEngine.B5AlwaysActiveKnights(s.ThreeKingdoms,p))).Sum(k=>B5KnightLevel(s,k)));
             int attack=s.Cities.Count(c=>ids.Contains(c.PlayerId)),defense=strength.Values.Sum();bool point=false;
-            if(!virtualAttack){s.BarbarianPosition=7;s.FirstBarbarianAttack=true;if(s.RobberTileId==null)s.RobberTileId=InitialRobberB6(s);s.BarbarianAttackStrength=attack;s.BarbarianDefenseStrength=defense;}
+            if(!virtualAttack){s.BarbarianPosition=7;s.FirstBarbarianAttack=true;if(s.RobberTileId==null && s.TradeModules?.Fishing==null)s.RobberTileId=InitialRobberB6(s);s.BarbarianAttackStrength=attack;s.BarbarianDefenseStrength=defense;}
             if(ids.Length>0&&defense>=attack){int max=strength.Values.Max();var winners=TurnOrder(s).Where(p=>ids.Contains(p.Id)&&strength[p.Id]==max).ToArray();if(winners.Length==1){winners[0].DefenderPoints++;point=true;}else foreach(var p in winners)QueueDecision(s,new PendingDecision{Kind="DefenderProgress",PlayerId=p.Id});}
             else if(ids.Length>0)
             {

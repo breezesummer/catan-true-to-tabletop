@@ -233,7 +233,7 @@ namespace Catan.Core.M3
             }
             else
             {
-                var total = s.LastDice1 + s.LastDice2; Produce(s, total); s.Phase = GamePhase.Action;
+                var total = s.LastDice1 + s.LastDice2; QueueFishProduction(s,total); Produce(s, total); s.Phase = GamePhase.Action;
                 var start = Array.FindIndex(s.Players, p => p.Id == s.ActivePlayerId);
                 for (var i = 0; i < s.Players.Length; i++)
                 {
@@ -267,7 +267,7 @@ namespace Catan.Core.M3
 
         private void ResolveSeafarersAfterAction(GameState s, Command c)
         {
-            bool route = c.Kind == CommandKind.SetupRoad || c.Kind == CommandKind.SetupShip || c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildShip || c.Kind == CommandKind.PlaceFreeRoad || c.Kind == CommandKind.PlaceFreeShip || c.Kind == CommandKind.MoveShip;
+            bool route = c.Kind == CommandKind.SpendFish && c.FishAction == Catan.Core.TradeModules.FishAction.BuildRoad || c.Kind == CommandKind.SetupRoad || c.Kind == CommandKind.SetupShip || c.Kind == CommandKind.BuildRoad || c.Kind == CommandKind.BuildShip || c.Kind == CommandKind.PlaceFreeRoad || c.Kind == CommandKind.PlaceFreeShip || c.Kind == CommandKind.MoveShip;
             if (route)
             {
                 Discover(s, c.PlayerId, c.TargetId);
@@ -285,6 +285,11 @@ namespace Catan.Core.M3
             {
                 Require(s.HiddenResources.Length > 0, "EmptyExplorationDeck", "探索地块已耗尽。");
                 tile.Resource = s.HiddenResources[0]; s.HiddenResources = s.HiddenResources.Skip(1).ToArray();
+                if (tile.Resource == "lake")
+                {
+                    QueueLakeDiscovery(s,player,tile,tile.Vertices.First(e.Vertices.Contains));
+                    continue;
+                }
                 if (tile.Resource != "sea")
                 {
                     var n = Draw(s.Random, s.HiddenNumbers.Length); tile.Number = s.HiddenNumbers[n]; s.HiddenNumbers = s.HiddenNumbers.Where((v, i) => i != n).ToArray();
@@ -358,8 +363,8 @@ namespace Catan.Core.M3
         private bool HasVictory(GameState s, string player)
         {
             var p = s.Players.Single(x => x.Id == player);
-            if (scenario.Id == "wonders-of-catan") return p.WonderLevel == 4 || VictoryPoints(s, player, true) >= s.TargetVictoryPoints.Value && p.WonderLevel > s.Players.Where(x => x.Id != player).Max(x => x.WonderLevel);
-            return VictoryPoints(s, player, true) >= s.TargetVictoryPoints.Value && (scenario.Id != "pirate-islands" || s.Fortresses.Single(f => f.PlayerId == player).Strength == 0);
+            if (scenario.Id == "wonders-of-catan") return p.WonderLevel == 4 || VictoryPoints(s, player, true) >= PersonalVictoryTarget(s,player) && p.WonderLevel > s.Players.Where(x => x.Id != player).Max(x => x.WonderLevel);
+            return VictoryPoints(s, player, true) >= PersonalVictoryTarget(s,player) && (scenario.Id != "pirate-islands" || s.Fortresses.Single(f => f.PlayerId == player).Strength == 0);
         }
         private static void FinishGame(GameState s, string[] winners)
         {
@@ -377,7 +382,7 @@ namespace Catan.Core.M3
                 var max = s.Players.Max(x => VictoryPoints(s, x.Id, true)); var contenders = s.Players.Where(x => VictoryPoints(s, x.Id, true) == max).ToArray();
                 var cloth = contenders.Max(x => x.Cloth); FinishGame(s, contenders.Where(x => x.Cloth == cloth).Select(x => x.Id).ToArray()); return;
             }
-            s.ActivePlayerId = s.Players[(Array.FindIndex(s.Players, x => x.Id == p.Id) + 1) % s.Players.Length].Id; s.Turn++; s.DevelopmentCardPlayedThisTurn = false; s.ShipMovedThisTurn = false; s.Phase = GamePhase.ProductionAwaitRoll;
+            s.ActivePlayerId = s.Players[(Array.FindIndex(s.Players, x => x.Id == p.Id) + 1) % s.Players.Length].Id; s.Turn++; Catan.Core.TradeModules.FishingRules.NewTurn(s.TradeModules?.Fishing); s.DevelopmentCardPlayedThisTurn = false; s.ShipMovedThisTurn = false; s.Phase = GamePhase.ProductionAwaitRoll;
         }
     }
 }

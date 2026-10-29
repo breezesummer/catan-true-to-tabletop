@@ -1,0 +1,4282 @@
+{
+  "日期": "2026-10-29",
+  "基线提交": "2a79a95a",
+  "去重总计": 656,
+  "最终通过": 656,
+  "最终失败": 0,
+  "说明": "按所列运行顺序，以同名案例最后一次结果去重；首轮失败与修复过程见验收记录。性能输出为同进程单次样本，非公网基线。",
+  "运行记录": [
+    {
+      "来源": "tests/Catan.Rules.Tests/TestResults/fishing-f4-regression.trx",
+      "SHA256": "e39b47f76ac54bc465a6caaaccd26af126e64f5150575027b45475e67092a717",
+      "计数": {
+        "total": "173",
+        "executed": "173",
+        "passed": "172",
+        "failed": "1",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "结果": [
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.DiscoverLakeDrawsExactlyOneAndFullHoldingReturnsToOriginalWindow(combined: True, full: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1424138",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.FiveActionsAreAtomicBeforeRollAndRetryDoesNotPayTwice(action: BuildRoad)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1192822",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.StandardMapPoolTargetsAndDeterminism(count: 4, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5316377",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0589391",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ThreeKingdomsProductAiCompletesAndReplays(mode: \"cities\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:15.4185430",
+          "输出": "三国海港/cities/4人：347条命令，第42回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.FirstSettlementOnEachForeignRegionAwardsBonusOnlyOncePerPlayer(scenarioId: \"through-the-desert\", bonus: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2407826",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ForbiddenPairsHaveNoMutation(first: \"desert\", n1: null, second: \"ore\", n2: 8)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000527",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"wonders-of-catan\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:09.8870550",
+          "输出": "seafarers/wonders-of-catan/3人：429条命令，第86回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F03FullHandReplacementBootStopsAndRejectingPreservesAllowance",
+          "结果": "Passed",
+          "耗时": "00:00:00.0217435",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.AllOfficialScenariosHaveExpectedGoalAndStartingPieceCount(scenario: \"pirate-islands\", goal: 10, buildings: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.6211297",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.ClothProductionUsesGeneralSupplyForShortageButEmptyVillageProducesNothing",
+          "结果": "Passed",
+          "耗时": "00:00:00.1638597",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H04EachVertexCountsOnceAndOnlyForActualOwner",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001279",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.N01ViewOnlyCompleteGameRestoresPendingDrawsAndPayments(players: 4, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:02.6598919",
+          "输出": "人数=4，海港=True，胜者=P4，回合=81，命令=341，换抽选择=2，鱼支付=12，待决与支付恢复通过"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.FiveActionsAreAtomicBeforeRollAndRetryDoesNotPayTwice(action: RemoveRobber)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1206799",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"cloth-for-catan\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1126235",
+          "输出": "cloth-for-catan/3：枚举 260 项，用时 92 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ProtectedScenarioAnchorIsNeverAnExchangeEndpoint",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001337",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"forgotten-tribe\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:01:15.7273632",
+          "输出": "combined/forgotten-tribe/4人：1191条命令，第216回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.PirateIslandsRemainsExplicitlyClosed(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0026278",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"wonders-of-catan\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:10.2064535",
+          "输出": "seafarers/wonders-of-catan/4人：554条命令，第105回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"base\", target: 11)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0096421",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"heading-for-new-shores\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3537556",
+          "输出": "heading-for-new-shores/3：枚举 463 项，用时 105 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F12BootUsesPublicPointsAndPersonalVictoryWindow",
+          "结果": "Passed",
+          "耗时": "00:00:00.0137063",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ZhimengHonorsGainBanBeforeRandomAndDoesNotReofferAfterDecline",
+          "结果": "Passed",
+          "耗时": "00:00:00.0217373",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"forgotten-tribe\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0296123",
+          "输出": "forgotten-tribe/3：枚举 413 项，用时 12 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.OpeningCityGivesOnlyOneTokenAndStandardIdentityRestores(players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:01.2941182",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.FirstSettlementOnEachForeignRegionAwardsBonusOnlyOncePerPlayer(scenarioId: \"wonders-of-catan\", bonus: 1)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1557518",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ZhimengRecordsCrossOwnerSameTypeCardsWithoutInventingLossForKeptCards",
+          "结果": "Passed",
+          "耗时": "00:00:00.0011891",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"new-world\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:11.5325483",
+          "输出": "seafarers/new-world/4人：588条命令，第106回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.DiscoverLakeDrawsExactlyOneAndFullHoldingReturnsToOriginalWindow(combined: True, full: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0211783",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.InvalidMapCommandLeavesLimitedChargeAndSnapshotUntouched",
+          "结果": "Passed",
+          "耗时": "00:00:00.3349567",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.AllOfficialScenariosHaveExpectedGoalAndStartingPieceCount(scenario: \"wonders-of-catan\", goal: 10, buildings: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.6438728",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.FirstSettlementOnEachForeignRegionAwardsBonusOnlyOncePerPlayer(scenarioId: \"four-islands\", bonus: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3303886",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.DiscoverLakeDrawsExactlyOneAndFullHoldingReturnsToOriginalWindow(combined: False, full: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0363362",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F11LakeProducesAndRobberBlocksAllFourNumbers(number: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0455271",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.DiscoverLakeDrawsExactlyOneAndFullHoldingReturnsToOriginalWindow(combined: False, full: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0512050",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"four-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:10.0609079",
+          "输出": "combined/four-islands/3人：481条命令，第87回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.StandardMapPoolTargetsAndDeterminism(count: 3, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5325830",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F06FiniteSupplySettlesInOrderAndStopsWithoutRollback",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003361",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.N01ViewOnlyCompleteGameRestoresPendingDrawsAndPayments(players: 4, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:03.4775193",
+          "输出": "人数=4，海港=False，胜者=P1，回合=86，命令=367，换抽选择=2，鱼支付=12，待决与支付恢复通过"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"pirate-islands\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0409335",
+          "输出": "pirate-islands/3：枚举 97 项，用时 24 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"through-the-desert\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1276963",
+          "输出": "through-the-desert/4：枚举 690 项，用时 119 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.ClothScoresPairsAndVillageExhaustionFinishesAtEndOfTurn",
+          "结果": "Passed",
+          "耗时": "00:00:00.0465330",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H02DowngradedVillageWithItsOwnCollapseRecordCountsZero(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0034588",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.FishRoadRecordsZeroResourcePaymentAndNoJiaoziCharge",
+          "结果": "Passed",
+          "耗时": "00:00:00.7485379",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.AllOfficialScenariosHaveExpectedGoalAndStartingPieceCount(scenario: \"heading-for-new-shores\", goal: 14, buildings: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.4763919",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.AwardPointsAndPlayerViewAreDetachedAndWinOnlyInFreeActiveWindow",
+          "结果": "Passed",
+          "耗时": "00:00:00.0040266",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.RotationSearchUsesFirstWholeLegalCombinationAndRollsBackWhenAllBlocked",
+          "结果": "Passed",
+          "耗时": "00:00:00.0304254",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"cloth-for-catan\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:08.6980372",
+          "输出": "seafarers/cloth-for-catan/4人：537条命令，第89回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.MalformedPaymentStaleVersionAndEmptyTargetsNeverChangeState",
+          "结果": "Passed",
+          "耗时": "00:00:01.6953720",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H02DowngradedVillageWithItsOwnCollapseRecordCountsZero(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0029546",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F07F09F10FiveActionsAreAtomicIdempotentAndPreRollLegal(phase: ProductionAwaitRoll)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0279657",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F07F09F10FiveActionsAreAtomicIdempotentAndPreRollLegal(phase: Action)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0432665",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H02NativeCityDamageVillageCollapseAndRepairRecalculate(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0115368",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H04MetropolisDuplicatePortsAndChangedOwnershipUseActualBuildings(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0019822",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"wonders-of-catan\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:21.6600376",
+          "输出": "combined/wonders-of-catan/4人：584条命令，第83回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"new-world\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:13.7462335",
+          "输出": "combined/new-world/4人：559条命令，第84回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"forgotten-tribe\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:05.1342180",
+          "输出": "seafarers/forgotten-tribe/3人：340条命令，第68回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.ProductPaymentUsesMinimumWasteThenFewestTokensWithoutMutatingView",
+          "结果": "Passed",
+          "耗时": "00:00:00.3548680",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"fog-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:07.1273054",
+          "输出": "seafarers/fog-islands/4人：487条命令，第85回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0357014",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"fog-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:05.3244689",
+          "输出": "seafarers/fog-islands/3人：366条命令，第72回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.ReplacementIsBoundedPrivateAndDeclineKeepsAllowance",
+          "结果": "Passed",
+          "耗时": "00:00:00.0873131",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"four-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:11.6672575",
+          "输出": "combined/four-islands/4人：447条命令，第74回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.OpeningCityGivesOnlyOneTokenAndStandardIdentityRestores(players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:01.0311309",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.LakeOnlyIncomeStillReceivesAqueductBeforeFish(kingdoms: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5025730",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"cities\", map: \"heading-for-new-shores\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:18.2163012",
+          "输出": "cities/heading-for-new-shores/3人：323条命令，第51回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ForbiddenPairsHaveNoMutation(first: \"wood\", n1: 6, second: \"sea\", n2: null)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000484",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"heading-for-new-shores\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:28.9147777",
+          "输出": "combined/heading-for-new-shores/4人：545条命令，第70回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"pirate-islands\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0362245",
+          "输出": "pirate-islands/4：枚举 72 项，用时 27 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H04MetropolisDuplicatePortsAndChangedOwnershipUseActualBuildings(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0033317",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.AllOfficialScenariosHaveExpectedGoalAndStartingPieceCount(scenario: \"new-world\", goal: 12, buildings: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.7774944",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"through-the-desert\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:05.3541980",
+          "输出": "seafarers/through-the-desert/3人：349条命令，第71回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"four-islands\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0849337",
+          "输出": "four-islands/3：枚举 535 项，用时 74 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"cities\", target: 14)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0100791",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.OrdinaryRedNumberLandExchangeIsAllowed",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001358",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.LakeMapSwapStaysInlandAndGroundsStayInSpace",
+          "结果": "Passed",
+          "耗时": "00:00:00.3076330",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.AllOfficialScenariosHaveExpectedGoalAndStartingPieceCount(scenario: \"cloth-for-catan\", goal: 14, buildings: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:01.0021374",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H02NativeCityDamageVillageCollapseAndRepairRecalculate(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0061808",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.BanRejectsChosenResourceButRandomForbiddenCardIsNotRerolledOrRefunded",
+          "结果": "Passed",
+          "耗时": "00:00:00.7451216",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.FirstSettlementOnEachForeignRegionAwardsBonusOnlyOncePerPlayer(scenarioId: \"heading-for-new-shores\", bonus: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1975396",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.SharedThirdLandAssetsStayAndCanInvalidateSeaExchange",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003562",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"forgotten-tribe\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:29.4415663",
+          "输出": "combined/forgotten-tribe/3人：770条命令，第167回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.TamoNativeCommandIsLimitedIdempotentAndPreviewHasNoRandomOrBoardMutation",
+          "结果": "Passed",
+          "耗时": "00:00:00.4263410",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"cloth-for-catan\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0414043",
+          "输出": "cloth-for-catan/4：枚举 260 项，用时 33 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.N02OpponentTokensPoolAndRandomAreAbsentFromViewsAiAndTheftHistory",
+          "结果": "Passed",
+          "耗时": "00:00:00.0213795",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"cities\", map: \"heading-for-new-shores\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:27.1921073",
+          "输出": "cities/heading-for-new-shores/4人：594条命令，第92回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.N03LegacyModulesDisabledAndUnsupportedModesAreExplicit",
+          "结果": "Failed",
+          "耗时": "00:00:00.0057938",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ZhimengOddCountFavorsOwnerAndEmptyPairDoesNotAsk",
+          "结果": "Passed",
+          "耗时": "00:00:00.0151720",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ForbiddenPairsHaveNoMutation(first: \"gold\", n1: 5, second: \"wood\", n2: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003236",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.StandardMapPoolTargetsAndDeterminism(count: 3, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5701740",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"through-the-desert\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:10.8011741",
+          "输出": "combined/through-the-desert/3人：453条命令，第71回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"through-the-desert\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:05.6617229",
+          "输出": "seafarers/through-the-desert/4人：333条命令，第63回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.PortRelocationUsesShortestGraphDistanceAndStableEdgeTieBreak",
+          "结果": "Passed",
+          "耗时": "00:00:00.0014341",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.UnplacedTribePortsNeverEarnHarborPoints",
+          "结果": "Passed",
+          "耗时": "00:00:00.0015871",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.ShipsNeverAddFishProductionClaims(combined: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0211551",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"seafarers\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0428024",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.PirateIslandDevelopmentAndReservedPieceSuppliesMatchEdition(seats: 3, deckSize: 20)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0185736",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"seafarers\", target: 15)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0131754",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ThreeKingdomsProductAiCompletesAndReplays(mode: \"combined\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:01:37.8290801",
+          "输出": "三国海港/combined/4人：746条命令，第92回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"cloth-for-catan\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:05.9063891",
+          "输出": "seafarers/cloth-for-catan/3人：384条命令，第68回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"base\", map: \"heading-for-new-shores\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:01.3718885",
+          "输出": "base/heading-for-new-shores/3人：242条命令，第49回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F11LakeProducesAndRobberBlocksAllFourNumbers(number: 11)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2340343",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.CitiesHostExchangePreservesTopologyAndRandomState",
+          "结果": "Passed",
+          "耗时": "00:00:00.0357540",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiTakesImmediateHarborVictoryAndLeavesViewUnchanged",
+          "结果": "Passed",
+          "耗时": "00:00:00.0046753",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.AllOfficialScenariosHaveExpectedGoalAndStartingPieceCount(scenario: \"forgotten-tribe\", goal: 13, buildings: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.6853614",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.CombinedPendingRobberStartMovesWithBoardAndSurvivesAuthoritySnapshot",
+          "结果": "Passed",
+          "耗时": "00:00:01.0307942",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.ShipsNeverAddFishProductionClaims(combined: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0193420",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"fog-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:08.7653904",
+          "输出": "combined/fog-islands/4人：336条命令，第54回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.AllOfficialScenariosHaveExpectedGoalAndStartingPieceCount(scenario: \"four-islands\", goal: 13, buildings: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5192845",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F11LakeProducesAndRobberBlocksAllFourNumbers(number: 12)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0729141",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"new-world\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:09.2865143",
+          "输出": "seafarers/new-world/3人：482条命令，第97回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"four-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:08.0849734",
+          "输出": "seafarers/four-islands/4人：498条命令，第92回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.ControlledFishingUsesAssetTokensAndAuthorizedPrivateView",
+          "结果": "Passed",
+          "耗时": "00:00:00.2700930",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"heading-for-new-shores\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1154438",
+          "输出": "heading-for-new-shores/4：枚举 690 项，用时 105 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F02ProductionLocksClockwiseOrderAndCityDrawsTwice",
+          "结果": "Passed",
+          "耗时": "00:00:00.0551485",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.AllyBootDoesNotRaiseActivePlayersThresholdAndAllianceCannotBeFishVictim",
+          "结果": "Passed",
+          "耗时": "00:00:00.4990928",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"base\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0186680",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ExchangeMovesOnlyContentsAndIsolatedComponentsWithAttachments",
+          "结果": "Passed",
+          "耗时": "00:00:00.0074548",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ZhimengRestoresAtTargetChoiceAndSplitsRealResourcesAndCommodities",
+          "结果": "Passed",
+          "耗时": "00:00:00.0555124",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.FiveActionsAreAtomicBeforeRollAndRetryDoesNotPayTwice(action: BuyDevelopmentCard)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0715659",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.LakeOnlyIncomeStillReceivesAqueductBeforeFish(kingdoms: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3480925",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"fog-islands\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0588002",
+          "输出": "fog-islands/4：枚举 383 项，用时 47 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"new-world\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0365127",
+          "输出": "new-world/4：枚举 785 项，用时 12 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.N01ViewOnlyCompleteGameRestoresPendingDrawsAndPayments(players: 3, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:06.8392708",
+          "输出": "人数=3，海港=True，胜者=P1，回合=67，命令=255，换抽选择=1，鱼支付=10，待决与支付恢复通过"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.N01ViewOnlyCompleteGameRestoresPendingDrawsAndPayments(players: 3, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:02.1267843",
+          "输出": "人数=3，海港=False，胜者=P1，回合=76，命令=290，换抽选择=1，鱼支付=12，待决与支付恢复通过"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"new-world\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:08.3298314",
+          "输出": "combined/new-world/3人：318条命令，第65回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H02H03LossTieAndRecoveryDoNotDuplicateAward",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001152",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"base\", map: \"heading-for-new-shores\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:03.2768978",
+          "输出": "base/heading-for-new-shores/4人：426条命令，第72回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"fog-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:07.9371581",
+          "输出": "combined/fog-islands/3人：303条命令，第48回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F06RefillAndBothPoolsEmptyNeverCreateTokens",
+          "结果": "Passed",
+          "耗时": "00:00:00.0043458",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.StandardMapPoolTargetsAndDeterminism(count: 4, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.6544477",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"heading-for-new-shores\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:06.7041745",
+          "输出": "seafarers/heading-for-new-shores/3人：432条命令，第84回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"heading-for-new-shores\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:10.5483942",
+          "输出": "combined/heading-for-new-shores/3人：417条命令，第78回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"heading-for-new-shores\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:09.4142441",
+          "输出": "seafarers/heading-for-new-shores/4人：495条命令，第84回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.LandingRewardRevocationKeepsVisitedRegionAndNeverGrantsRelocationAgain",
+          "结果": "Passed",
+          "耗时": "00:00:00.7886552",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"forgotten-tribe\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0161809",
+          "输出": "forgotten-tribe/4：枚举 413 项，用时 6 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.FishAndBootAreNotResourcesForSevenTradeOrRobbery",
+          "结果": "Passed",
+          "耗时": "00:00:00.0144507",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"four-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:11.8207988",
+          "输出": "seafarers/four-islands/3人：298条命令，第63回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H05MapExchangeCountsFinalPortsAndNeverChecksIntermediateVictory(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0166037",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.FishTheftHidesCommodityIdentityFromOtherSeats",
+          "结果": "Passed",
+          "耗时": "00:00:00.3245398",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"cloth-for-catan\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:15.3815937",
+          "输出": "combined/cloth-for-catan/4人：464条命令，第80回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F11LakeProducesAndRobberBlocksAllFourNumbers(number: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0632666",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.N04InvariantsRejectDuplicateTokensBootDiscardAndCorruptCursor",
+          "结果": "Passed",
+          "耗时": "00:00:00.0082634",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"seafarers\", map: \"forgotten-tribe\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:06.1411984",
+          "输出": "seafarers/forgotten-tribe/4人：424条命令，第79回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"wonders-of-catan\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:12.8609576",
+          "输出": "combined/wonders-of-catan/3人：371条命令，第75回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"four-islands\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0805628",
+          "输出": "four-islands/4：枚举 547 项，用时 69 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F08InvalidPaymentsAndTargetsPreserveEntireState",
+          "结果": "Passed",
+          "耗时": "00:00:00.0610716",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H05MapExchangeCountsFinalPortsAndNeverChecksIntermediateVictory(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0348877",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ThreeKingdomsProductAiCompletesAndReplays(mode: \"combined\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:37.0159402",
+          "输出": "三国海港/combined/3人：498条命令，第73回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"wonders-of-catan\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1423188",
+          "输出": "wonders-of-catan/3：枚举 500 项，用时 126 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.ForgottenTribeGiftCardIsCollectedOnceAndCannotPlaySameTurn",
+          "结果": "Passed",
+          "耗时": "00:00:00.0965484",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.F01SecondSetupOnlyOneTokenAndBootDoesNotRedraw",
+          "结果": "Passed",
+          "耗时": "00:00:00.0344550",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.PirateIslandDevelopmentAndReservedPieceSuppliesMatchEdition(seats: 4, deckSize: 25)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0104306",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.FirstNativeBarbarianAttackFindsDesertAfterTamoMovedIt",
+          "结果": "Passed",
+          "耗时": "00:00:00.1579723",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.SevenFishUsesProgressDeckPublicPointsAndOriginalHandLimit",
+          "结果": "Passed",
+          "耗时": "00:00:01.5178048",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.AllOfficialScenariosHaveExpectedGoalAndStartingPieceCount(scenario: \"through-the-desert\", goal: 14, buildings: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5237046",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"cloth-for-catan\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:08.7573899",
+          "输出": "combined/cloth-for-catan/3人：279条命令，第60回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.ClothStartsWithEightFiveTokenVillagesAndTenInSupplyAndNoLongestRoute",
+          "结果": "Passed",
+          "耗时": "00:00:00.5482992",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"fog-islands\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0612038",
+          "输出": "fog-islands/3：枚举 371 项，用时 51 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ProductAiCompletesEveryOpenConfiguration(mode: \"combined\", map: \"through-the-desert\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:14.0989896",
+          "输出": "combined/through-the-desert/4人：492条命令，第71回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.AllOfficialScenariosHaveExpectedGoalAndStartingPieceCount(scenario: \"fog-islands\", goal: 12, buildings: 2)",
+          "结果": "Passed",
+          "耗时": "00:00:00.4789436",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"through-the-desert\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1453869",
+          "输出": "through-the-desert/3：枚举 450 项，用时 136 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"new-world\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0161072",
+          "输出": "new-world/3：枚举 785 项，用时 7 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.FiveActionsAreAtomicBeforeRollAndRetryDoesNotPayTwice(action: TakeResource)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0628369",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"combined\", target: 17)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0101075",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.ThreeKingdomsProductAiCompletesAndReplays(mode: \"cities\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:23.9693925",
+          "输出": "三国海港/cities/3人：662条命令，第100回合终局。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.PirateIslandsRemainsExplicitlyClosed(mode: \"seafarers\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0018426",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingCitiesTests.FiveActionsAreAtomicBeforeRollAndRetryDoesNotPayTwice(action: StealResource)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0889228",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.EveryCombinedMapSupportsAtomicExchangeWithoutMovingScenarioAnchors(map: \"wonders-of-catan\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1017879",
+          "输出": "wonders-of-catan/4：枚举 500 项，用时 91 毫秒"
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB6MapTests.ForbiddenPairsHaveNoMutation(first: \"fog\", n1: null, second: \"wood\", n2: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0013967",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.M3ScenarioTests.FogRevealsNewLandAndGivesItsResourceWithoutLeakingRemainingDrawOrder",
+          "结果": "Passed",
+          "耗时": "00:00:00.0845545",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.HarbormasterTests.H01ThresholdTieRetentionAndOvertake",
+          "结果": "Passed",
+          "耗时": "00:00:00.0009872",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.MerchantCannotConvertLakeIntoResourceTrade",
+          "结果": "Passed",
+          "耗时": "00:00:00.1859568",
+          "输出": ""
+        }
+      ]
+    },
+    {
+      "来源": "tests/Catan.Rules.Tests/TestResults/fishing-f4-fixes.trx",
+      "SHA256": "1e715c92de57f5db8076a886be43a74c01112f458dfbee25c965d17f7a5e984b",
+      "计数": {
+        "total": "40",
+        "executed": "40",
+        "passed": "40",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "结果": [
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.NativeYichengUsesRealBishopPipelineAndNoProgressCardEntity(mode: \"cities\", hasPaidVirtualCandidate: False)",
+          "结果": "Passed",
+          "耗时": "00:00:07.9018003",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.GuildDuesKeepsValidatedTargetWhenPojunResponseChangesScores(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.3814808",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.ActiveWeimuPreventsBlueEspionageFromOpeningPrivateTargetCards(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.3016629",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.DiscoverLakeDrawsExactlyOneAndFullHoldingReturnsToOriginalWindow(combined: False, full: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2182058",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.WeimuBlocksBlueDiplomacyForOwnAndOtherUsers(mode: \"combined\", ownUse: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2751739",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.PojunDefersMonopolyUntilSuppressionAndDoublesOnlyQualifiedTarget(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.3756860",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.NativeProgressUseTriggersXiaojiOnceAndKeepsBankAndDeckConserved(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.1683614",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.PojunHarborPersistsTargetQuotasAndChargesOneResourcePerExchange(mode: \"combined\", enoughForBoth: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.4121572",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.ShipsNeverAddFishProductionClaims(combined: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0141209",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.PojunHarborPersistsTargetQuotasAndChargesOneResourcePerExchange(mode: \"combined\", enoughForBoth: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.9895604",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.YaowuRewardsOnlyActualChangesToOwnedProducingTiles(mode: \"combined\", changesNumber: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1222075",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.EmptyEspionageTargetDoesNotConsumeOrOfferResidualWeimu(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.1259369",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.GuildDuesKeepsValidatedTargetWhenPojunResponseChangesScores(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.4985526",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.NativeYichengUsesRealBishopPipelineAndNoProgressCardEntity(mode: \"combined\", hasPaidVirtualCandidate: False)",
+          "结果": "Passed",
+          "耗时": "00:00:03.4808046",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.NativeYichengUsesRealBishopPipelineAndNoProgressCardEntity(mode: \"cities\", hasPaidVirtualCandidate: True)",
+          "结果": "Passed",
+          "耗时": "00:00:04.8739290",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.NativeRoadReceiptMakesKurouRefundActualTwoCards(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.4279913",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.WeimuBlocksBlueDiplomacyForOwnAndOtherUsers(mode: \"combined\", ownUse: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2596261",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.WeimuBlocksBlueDiplomacyForOwnAndOtherUsers(mode: \"cities\", ownUse: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3134201",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.ShipsNeverAddFishProductionClaims(combined: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0371550",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.WeimuBlocksBlueDiplomacyForOwnAndOtherUsers(mode: \"cities\", ownUse: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3303459",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.NativeProgressUseTriggersXiaojiOnceAndKeepsBankAndDeckConserved(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.1711281",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingTests.N03LegacyModulesDisabledAndUnsupportedModesAreExplicit",
+          "结果": "Passed",
+          "耗时": "00:00:00.2512946",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.EmptyEspionageTargetDoesNotConsumeOrOfferResidualWeimu(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.1713764",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.RetiredWeimuResponseRestoresAndConsumesOnlyAcceptedBlueUse(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.1796990",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.PojunSmithingEnumeratesFourTargetsAndPromotesEachOnlyOnceWithRealSupply(mode: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.6969060",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.DiscoverLakeDrawsExactlyOneAndFullHoldingReturnsToOriginalWindow(combined: True, full: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0197172",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.NativeYichengUsesRealBishopPipelineAndNoProgressCardEntity(mode: \"combined\", hasPaidVirtualCandidate: True)",
+          "结果": "Passed",
+          "耗时": "00:00:02.8298414",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.ActiveWeimuPreventsBlueEspionageFromOpeningPrivateTargetCards(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.3264262",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.MerchantCannotConvertLakeIntoResourceTrade",
+          "结果": "Passed",
+          "耗时": "00:00:00.3698145",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.DiscoverLakeDrawsExactlyOneAndFullHoldingReturnsToOriginalWindow(combined: False, full: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0868617",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.PojunHarborPersistsTargetQuotasAndChargesOneResourcePerExchange(mode: \"cities\", enoughForBoth: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5277442",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.YaowuRewardsOnlyActualChangesToOwnedProducingTiles(mode: \"combined\", changesNumber: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1246097",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.YaowuRewardsOnlyActualChangesToOwnedProducingTiles(mode: \"cities\", changesNumber: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1462037",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.RetiredWeimuResponseRestoresAndConsumesOnlyAcceptedBlueUse(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.1468189",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.PojunSmithingEnumeratesFourTargetsAndPromotesEachOnlyOnceWithRealSupply(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.3615481",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.PojunDefersMonopolyUntilSuppressionAndDoublesOnlyQualifiedTarget(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.2899025",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingExplorationTests.DiscoverLakeDrawsExactlyOneAndFullHoldingReturnsToOriginalWindow(combined: True, full: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3780475",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.PojunHarborPersistsTargetQuotasAndChargesOneResourcePerExchange(mode: \"cities\", enoughForBoth: True)",
+          "结果": "Passed",
+          "耗时": "00:00:01.6415568",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.YaowuRewardsOnlyActualChangesToOwnedProducingTiles(mode: \"cities\", changesNumber: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1667227",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.ThreeKingdomsB5CivilIntegrationTests.NativeRoadReceiptMakesKurouRefundActualTwoCards(mode: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.3690609",
+          "输出": ""
+        }
+      ]
+    },
+    {
+      "来源": "tests/Catan.Rules.Tests/TestResults/fishing-f4-matrix.trx",
+      "SHA256": "42c05d9b534f3d42521c4b8d1d742f7a1bd2f927dc5d221b968d435d7bc1fb2e",
+      "计数": {
+        "total": "58",
+        "executed": "58",
+        "passed": "58",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "结果": [
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 3, combined: False, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:03.8784585",
+          "输出": "heading-for-new-shores/3人/双扩展False/三国False/海港False：313指令，54回合，支付17，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 3, combined: False, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:04.7675603",
+          "输出": "through-the-desert/3人/双扩展False/三国False/海港True：391指令，79回合，支付12，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 3, combined: True, kingdoms: True, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:26.3362932",
+          "输出": "four-islands/3人/双扩展True/三国True/海港False：223指令，31回合，支付1，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 4, combined: False, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:05.3947268",
+          "输出": "fog-islands/4人/双扩展False/三国False/海港False：426指令，69回合，支付12，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 4, combined: True, kingdoms: True, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:01:08.1858564",
+          "输出": "fog-islands/4人/双扩展True/三国True/海港True：629指令，81回合，支付11，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 4, combined: True, kingdoms: True, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:31.0571324",
+          "输出": "through-the-desert/4人/双扩展True/三国True/海港True：314指令，40回合，支付21，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 3, combined: True, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:06.5497053",
+          "输出": "through-the-desert/3人/双扩展True/三国False/海港True：353指令，63回合，支付14，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 4, combined: True, kingdoms: True, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:47.6068138",
+          "输出": "four-islands/4人/双扩展True/三国True/海港True：431指令，49回合，支付12，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 4, combined: True, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:11.7215274",
+          "输出": "heading-for-new-shores/4人/双扩展True/三国False/海港True：468指令，64回合，支付14，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 4, combined: False, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:06.6124446",
+          "输出": "through-the-desert/4人/双扩展False/三国False/海港False：455指令，74回合，支付19，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 3, combined: False, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:04.1337296",
+          "输出": "heading-for-new-shores/3人/双扩展False/三国False/海港True：350指令，62回合，支付26，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 3, combined: True, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:04.6039671",
+          "输出": "four-islands/3人/双扩展True/三国False/海港False：244指令，45回合，支付8，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.FiveFishBuildsRealShipWithoutResourcesAndRetryIsIdempotent(combined: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3028692",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 4, combined: True, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:07.1736557",
+          "输出": "through-the-desert/4人/双扩展True/三国False/海港False：388指令，60回合，支付10，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 4, combined: True, kingdoms: True, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:35.8053747",
+          "输出": "heading-for-new-shores/4人/双扩展True/三国True/海港True：344指令，51回合，支付9，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.IllegalAndStaleFishActionsLeaveAuthorityUnchanged(combined: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2639271",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.MapsAreDeterministicAndConserveSpecifiedComponents(map: \"heading-for-new-shores\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.5245140",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 4, combined: True, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:09.6513368",
+          "输出": "four-islands/4人/双扩展True/三国False/海港True：472指令，75回合，支付26，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 3, combined: True, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:12.6465242",
+          "输出": "heading-for-new-shores/3人/双扩展True/三国False/海港False：558指令，93回合，支付29，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 4, combined: True, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:10.0862257",
+          "输出": "fog-islands/4人/双扩展True/三国False/海港False：485指令，65回合，支付13，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 4, combined: False, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:06.7164961",
+          "输出": "heading-for-new-shores/4人/双扩展False/三国False/海港False：411指令，75回合，支付4，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 3, combined: True, kingdoms: True, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:01:41.9660265",
+          "输出": "heading-for-new-shores/3人/双扩展True/三国True/海港True：509指令，74回合，支付14，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 4, combined: False, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:07.6088856",
+          "输出": "fog-islands/4人/双扩展False/三国False/海港True：503指令，81回合，支付15，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 3, combined: True, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:09.4318535",
+          "输出": "four-islands/3人/双扩展True/三国False/海港True：403指令，62回合，支付21，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.FiveFishBuildsRealShipWithoutResourcesAndRetryIsIdempotent(combined: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2358130",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 3, combined: True, kingdoms: True, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:35.8302118",
+          "输出": "four-islands/3人/双扩展True/三国True/海港True：318指令，46回合，支付12，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 3, combined: True, kingdoms: True, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:01:20.4523870",
+          "输出": "through-the-desert/3人/双扩展True/三国True/海港False：415指令，58回合，支付7，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 3, combined: False, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:06.4581275",
+          "输出": "fog-islands/3人/双扩展False/三国False/海港False：483指令，89回合，支付19，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 4, combined: False, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:04.8064273",
+          "输出": "four-islands/4人/双扩展False/三国False/海港True：372指令，68回合，支付7，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 4, combined: True, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:10.2363537",
+          "输出": "through-the-desert/4人/双扩展True/三国False/海港True：389指令，58回合，支付28，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.PirateRemovalRejectsAbsentTargetAndDoesNotSteal(combined: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2208121",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 4, combined: False, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:05.3254753",
+          "输出": "four-islands/4人/双扩展False/三国False/海港False：423指令，80回合，支付10，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 4, combined: True, kingdoms: True, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:02:04.1831251",
+          "输出": "fog-islands/4人/双扩展True/三国True/海港False：798指令，99回合，支付15，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 4, combined: True, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:06.4999452",
+          "输出": "heading-for-new-shores/4人/双扩展True/三国False/海港False：315指令，46回合，支付2，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.MapsAreDeterministicAndConserveSpecifiedComponents(map: \"through-the-desert\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.3336816",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.MapsAreDeterministicAndConserveSpecifiedComponents(map: \"fog-islands\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.4204456",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.IllegalAndStaleFishActionsLeaveAuthorityUnchanged(combined: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2211041",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 3, combined: True, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:10.7979308",
+          "输出": "fog-islands/3人/双扩展True/三国False/海港True：488指令，74回合，支付36，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 3, combined: False, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:04.9266541",
+          "输出": "four-islands/3人/双扩展False/三国False/海港True：407指令，77回合，支付8，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 4, combined: True, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:57.1179403",
+          "输出": "fog-islands/4人/双扩展True/三国False/海港True：795指令，106回合，支付21，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 3, combined: True, kingdoms: True, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:34.2341503",
+          "输出": "through-the-desert/3人/双扩展True/三国True/海港True：321指令，43回合，支付10，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 4, combined: False, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:09.1760898",
+          "输出": "heading-for-new-shores/4人/双扩展False/三国False/海港True：532指令，88回合，支付19，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 3, combined: False, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:07.8081225",
+          "输出": "through-the-desert/3人/双扩展False/三国False/海港False：633指令，113回合，支付28，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 4, combined: False, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:08.2710007",
+          "输出": "through-the-desert/4人/双扩展False/三国False/海港True：481指令，81回合，支付26，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 3, combined: False, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:05.7034323",
+          "输出": "four-islands/3人/双扩展False/三国False/海港False：435指令，85回合，支付8，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 3, combined: True, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:05.8314429",
+          "输出": "through-the-desert/3人/双扩展True/三国False/海港False：341指令，59回合，支付14，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 3, combined: True, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:07.8543749",
+          "输出": "heading-for-new-shores/3人/双扩展True/三国False/海港True：450指令，82回合，支付19，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 4, combined: True, kingdoms: True, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:02:48.1170631",
+          "输出": "heading-for-new-shores/4人/双扩展True/三国True/海港False：977指令，103回合，支付14，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 4, combined: True, kingdoms: True, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:01:11.5505142",
+          "输出": "four-islands/4人/双扩展True/三国True/海港False：441指令，53回合，支付7，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"four-islands\", seats: 4, combined: True, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:09.5284748",
+          "输出": "four-islands/4人/双扩展True/三国False/海港False：436指令，70回合，支付13，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"through-the-desert\", seats: 4, combined: True, kingdoms: True, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:02:12.7829403",
+          "输出": "through-the-desert/4人/双扩展True/三国True/海港False：566指令，65回合，支付17，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"heading-for-new-shores\", seats: 3, combined: True, kingdoms: True, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:41.7821379",
+          "输出": "heading-for-new-shores/3人/双扩展True/三国True/海港False：315指令，46回合，支付12，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 3, combined: True, kingdoms: True, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:02:02.0457615",
+          "输出": "fog-islands/3人/双扩展True/三国True/海港False：558指令，67回合，支付18，换抽1。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 3, combined: True, kingdoms: False, harbor: False)",
+          "结果": "Passed",
+          "耗时": "00:00:12.5292949",
+          "输出": "fog-islands/3人/双扩展True/三国False/海港False：534指令，81回合，支付26，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 3, combined: False, kingdoms: False, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:00:07.1105015",
+          "输出": "fog-islands/3人/双扩展False/三国False/海港True：523指令，92回合，支付31，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.EveryOpenConfigurationCompletesAndReplays(map: \"fog-islands\", seats: 3, combined: True, kingdoms: True, harbor: True)",
+          "结果": "Passed",
+          "耗时": "00:01:49.6541097",
+          "输出": "fog-islands/3人/双扩展True/三国True/海港True：618指令，72回合，支付32，换抽0。"
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.PirateRemovalRejectsAbsentTargetAndDoesNotSteal(combined: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2825054",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.MapsAreDeterministicAndConserveSpecifiedComponents(map: \"four-islands\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.3088430",
+          "输出": ""
+        }
+      ]
+    },
+    {
+      "来源": "tests/Catan.Rules.Tests/TestResults/fishing-f4-actions.trx",
+      "SHA256": "9be431b038f1d3a998b35348c319bdd78bb3b12c8c16ac5aa32e9d07cf0b4cea",
+      "计数": {
+        "total": "6",
+        "executed": "6",
+        "passed": "6",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "结果": [
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.PirateRemovalRejectsAbsentTargetAndDoesNotSteal(combined: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.4545258",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.PirateRemovalRejectsAbsentTargetAndDoesNotSteal(combined: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.9250430",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.FiveFishBuildsRealShipWithoutResourcesAndRetryIsIdempotent(combined: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.9503971",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.IllegalAndStaleFishActionsLeaveAuthorityUnchanged(combined: True)",
+          "结果": "Passed",
+          "耗时": "00:00:01.1211483",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.IllegalAndStaleFishActionsLeaveAuthorityUnchanged(combined: False)",
+          "结果": "Passed",
+          "耗时": "00:00:01.1117216",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringTests.FiveFishBuildsRealShipWithoutResourcesAndRetryIsIdempotent(combined: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.7162184",
+          "输出": ""
+        }
+      ]
+    },
+    {
+      "来源": "tests/Catan.Rules.Tests/TestResults/fishing-f4-interactions.trx",
+      "SHA256": "3ffb2df9dbff30665dc18895741cd38e8c40877597d768a14b0cb9ae22eef5e3",
+      "计数": {
+        "total": "2",
+        "executed": "2",
+        "passed": "2",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "结果": [
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringInteractionTests.FishShipIsRealConstructionWithZeroResourceReceipt",
+          "结果": "Passed",
+          "耗时": "00:00:00.7568820",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Rules.Tests.FishingSeafaringInteractionTests.SeaMapLakeExchangeStaysInlandAndGroundsKeepTheirVertices",
+          "结果": "Passed",
+          "耗时": "00:00:00.1782967",
+          "输出": ""
+        }
+      ]
+    },
+    {
+      "来源": "tests/Catan.Network.Tests/TestResults/fishing-f4-network-all.trx",
+      "SHA256": "4fb3fc8d82c373f625a94a56d9327e419236e963db74eb9ffd0ecf0ff42ea162",
+      "计数": {
+        "total": "292",
+        "executed": "292",
+        "passed": "291",
+        "failed": "1",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "结果": [
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"fog-islands\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.7126912",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"seafarers\", kingdoms: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.9567244",
+          "输出": "seafarers/三国False：2次鱼支付×4席；差量39744字节，完整视图及历史339326字节；两次权威提交合计8.4ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"pirate-islands\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.5573444",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"pirate-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1680416",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"forgotten-tribe\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1785843",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.B4AndB5PrivateChoicesAndCommandRetriesWorkWithBothReplyShapes(rules: \"combined\", b5: True)",
+          "结果": "Passed",
+          "耗时": "00:00:23.9895007",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"combined\", scenario: \"heading-for-new-shores\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3167657",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"cloth-for-catan\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.0321632",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"through-the-desert\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1665218",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB5RoomTests.FortyNineGeneralRoomPreservesIndependentChoicesAndReconnect(rules: \"cities-knights\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:01.2196795",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"cloth-for-catan\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.7785957",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.VisiblePreviewTests.NormalSetupCanBePlacedThroughActualClientPreview(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:05.6681890",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"through-the-desert\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1965003",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.OldClientCannotCreateJoinReconnectOrPrepareEnabledRoom",
+          "结果": "Passed",
+          "耗时": "00:00:00.0007210",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.VisiblePreviewTests.DiceAndMultiStepChoicesFallBackToServerPreview(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0105664",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"fog-islands\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2053027",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":null}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000150",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"four-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1152529",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FullSnapshotsCannotCrossRoomSeatOrConnection(room: \"other\", seat: \"P1\", connection: \"c1\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000853",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.AiCanCompleteItsIndependentChoicesWhileHumanHasNotSubmitted(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0622968",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"four-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:01.1738478",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.ExpiryAndExplicitRevocationPreventSeatRecovery",
+          "结果": "Passed",
+          "耗时": "00:00:00.0054967",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.PartialSimultaneousSelectionSurvivesServiceRestartAndReconnectWithoutRevealingOthers(rules: \"combined\", integrated: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0316654",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.InvalidPacketDoesNotReplaceAcceptedBaseline(damage: \"map\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0002742",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"combined\", kingdoms: True)",
+          "结果": "Failed",
+          "耗时": "00:00:10.0619745",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"fog-islands\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.9917941",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"cloth-for-catan\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.4108807",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"new-world\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.1247476",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EnrollmentCommitFailureCanRetryWithPreSavedToken(operation: \"Join\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0006140",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.AuthoritativeStateCannotBeEncodedAsWireRoot",
+          "结果": "Passed",
+          "耗时": "00:00:00.0096883",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"cloth-for-catan\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1949294",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Rooms\\\":[{},]}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0005777",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.NetworkPlayerMayEndFreePlayWithAvailableSkillsWithoutAnAutomationSkip(rules: \"cities-knights\", integrated: True)",
+          "结果": "Passed",
+          "耗时": "00:00:11.9331557",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.SkillDecisionIsPrivateResumesFromAuthorityAndCommandRetriesDoNotAddHistory(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.5087708",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"combined\", count: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:01.5890820",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"through-the-desert\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:03.7728219",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"four-islands\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1599720",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EnrollmentIdTokenAndContentConflictsCannotAllocateAnotherSeat(operation: \"Create\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0055825",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.CompactRepliesKeepLegacyShapeAndRemoveUnusedSnapshotsWithoutRepeatingCommands",
+          "结果": "Passed",
+          "耗时": "00:00:00.0519805",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"through-the-desert\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.0551629",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"four-islands\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.1431149",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"wonders-of-catan\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:01.5702376",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"pirate-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3069966",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"new-world\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2182804",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MutableSkillResultAndInternalSettersMatchLegacy",
+          "结果": "Passed",
+          "耗时": "00:00:00.0061307",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.AiOpponentHandsCannotEnterNetworkSnapshotsOrBeInjectedByClients(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0326286",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"cities-knights\", count: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:01.0000167",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB5RoomTests.FortyNineGeneralRoomPreservesIndependentChoicesAndReconnect(rules: \"combined\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5077755",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB5RoomTests.FortyNineGeneralRoomPreservesIndependentChoicesAndReconnect(rules: \"combined\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3333001",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":\\\"1\\\"}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000133",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.PartialSimultaneousSelectionSurvivesServiceRestartAndReconnectWithoutRevealingOthers(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.1412638",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.SkillDecisionIsPrivateResumesFromAuthorityAndCommandRetriesDoNotAddHistory(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:02.6944927",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.CredentialIsRoomBoundAndReconnectRevokesOldConnection",
+          "结果": "Passed",
+          "耗时": "00:00:00.0004477",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.LateHeartbeatThenLastOnlinePlayerLeaveClosesWithoutLeakingPrivateState",
+          "结果": "Passed",
+          "耗时": "00:00:00.0075444",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"wonders-of-catan\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2516549",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.StandardF3ClientCannotEnterF4SeaRoomButStillReadsStandardRoom",
+          "结果": "Passed",
+          "耗时": "00:00:00.0005720",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"base\", map: \"base\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.4990996",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Message\\\":\\\"\\\\x01\\\"}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000222",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"heading-for-new-shores\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5830217",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"fog-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3078703",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"forgotten-tribe\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.0410577",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.ConfiguredAiNamesAreDistinctAndPersistAcrossRestartAndConfiguration",
+          "结果": "Passed",
+          "耗时": "00:00:00.0045175",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"four-islands\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1381958",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"forgotten-tribe\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2830146",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"four-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:01.0169218",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.DirectWriterPreservesEscapesOptionalFieldsAndStrictLegacyCompatibility",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003813",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.DuplicatePrecedesRevisionCheckAndConflictingContentCannotReplay",
+          "结果": "Passed",
+          "耗时": "00:00:00.0308652",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"forgotten-tribe\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2986341",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"new-world\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0743142",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.PendingReplacementReconnectsWithoutChangingTokensAndAiCanContinueAfterRecovery",
+          "结果": "Passed",
+          "耗时": "00:00:01.0539819",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.MissingClientStillHandsControlToAiAfterGraceWhileOthersKeepPlaying",
+          "结果": "Passed",
+          "耗时": "00:00:00.1327824",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB6RoomTests.FullPackageIndependentSelectionsRetryAndReconnectUseSameIdentity(rules: \"combined\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0741148",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"heading-for-new-shores\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.8696601",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"combined\", kingdoms: False)",
+          "结果": "Passed",
+          "耗时": "00:00:15.0998544",
+          "输出": "combined/三国False：2次鱼支付×4席；差量29902字节，完整视图及历史1014256字节；两次权威提交合计47.7ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"forgotten-tribe\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1412362",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"cities-knights\", count: 3, integrated: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0735864",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.LeftLobbyEnrollmentCannotResurrectRevokedIdentity(operation: \"Join\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003840",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"cities-knights\", scenario: \"base\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5470765",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":01}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001597",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"cities-knights\", map: \"base\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.2528845",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"new-world\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:01.0871199",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.PreviewDoesNotMutateAndPrivateHistoryIsPaged",
+          "结果": "Passed",
+          "耗时": "00:00:00.0356191",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"new-world\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2217587",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"base\", kingdoms: False)",
+          "结果": "Passed",
+          "耗时": "00:00:07.2360541",
+          "输出": "base/三国False：2次鱼支付×4席；差量32140字节，完整视图及历史293256字节；两次权威提交合计31.6ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Room\\\":{\\\"Seats\\\":[],}}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000215",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Success\\\":1}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000440",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"new-world\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3349114",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"forgotten-tribe\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.2550887",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.DefaultsNullsAndEscapesMatchLegacy(json: \"{}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0038705",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"through-the-desert\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0868616",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"combined\", scenario: \"through-the-desert\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2386411",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"through-the-desert\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1633498",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsWireTests.DisabledExpansionDoesNotAddFieldsToProtocolThree",
+          "结果": "Passed",
+          "耗时": "00:00:00.3182028",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsWireTests.PrivateCandidateIdsOnlyReachTheirOwnerAndAiHasNoExtraGeneralPermission(skills: True)",
+          "结果": "Passed",
+          "耗时": "00:00:01.2092951",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.RenameRequiresValidOwnCredentialConnectionRevisionAndNameAndFailedSaveRollsBack",
+          "结果": "Passed",
+          "耗时": "00:00:00.0362108",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.UnknownPrivateProtocolVersionsFailClosedWithoutOverwritingSave(version: 999)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0019321",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"wonders-of-catan\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:01.0226920",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"cloth-for-catan\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1443205",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.FailedRevokeKeepsOriginalCredentialAndRoomConfiguration",
+          "结果": "Passed",
+          "耗时": "00:00:00.0084362",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"base\", scenario: \"base\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0702952",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"wonders-of-catan\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3484272",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Message\\\":\\\"a\\nb\\\"}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000141",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.ServerGeneratedPushDoesNotKeepAnAbsentClientAlive",
+          "结果": "Passed",
+          "耗时": "00:00:00.0035824",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"combined\", count: 3, integrated: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0589417",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB6RoomTests.ControlledTurnAuthenticatesRealSenderAndRestoresGrantThenRevokesIt(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:04.6762821",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.VisiblePreviewTests.NormalSetupCanBePlacedThroughActualClientPreview(rules: \"base\")",
+          "结果": "Passed",
+          "耗时": "00:00:02.8716581",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.UnknownPrivateProtocolVersionsFailClosedWithoutOverwritingSave(version: 0)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001950",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.AiOpponentHandsCannotEnterNetworkSnapshotsOrBeInjectedByClients(rules: \"seafarers\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0396983",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.PartialSimultaneousSelectionSurvivesServiceRestartAndReconnectWithoutRevealingOthers(rules: \"cities-knights\", integrated: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0306676",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"heading-for-new-shores\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1166916",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"fog-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3898927",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"cities-knights\", count: 3, integrated: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0800251",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.B4AndB5PrivateChoicesAndCommandRetriesWorkWithBothReplyShapes(rules: \"cities-knights\", b5: True)",
+          "结果": "Passed",
+          "耗时": "00:00:03.6792826",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.UnknownCommandEnumIsRejected",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001229",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"combined\", scenario: \"heading-for-new-shores\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2841243",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB6RoomTests.FullPackageIndependentSelectionsRetryAndReconnectUseSameIdentity(rules: \"cities-knights\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1437178",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FullSnapshotsCannotCrossRoomSeatOrConnection(room: \"room\", seat: \"P2\", connection: \"c1\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001354",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"wonders-of-catan\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:01.0668663",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.UnknownDuplicateAndTypeInjectionFieldsAreRejected(input: \"{\\\"$type\\\":\\\"Catan.Core.M2.GameState\\\"}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000135",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.FailedAtomicSaveRestoresSnapshotAndPausesWithoutAcknowledgingSuccess",
+          "结果": "Passed",
+          "耗时": "00:00:00.0351065",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.RedCanBeAiAndCreatorUsesFirstHumanColor(seats: 4, ai: [\"P1\", \"P2\", \"P3\"], manager: \"P4\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0006774",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB6RoomTests.FullPackageIndependentSelectionsRetryAndReconnectUseSameIdentity(rules: \"cities-knights\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0787276",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"cloth-for-catan\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0523438",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.PublicBattleStrengthSurvivesTheClientServerWire(rules: \"cities\")",
+          "结果": "Passed",
+          "耗时": "00:00:08.6648137",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"cities-knights\", scenario: \"base\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1764693",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"through-the-desert\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2110139",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.ConcurrentWireDecodingKeepsSeatDataIndependentAndStillRejectsInvalidFields",
+          "结果": "Passed",
+          "耗时": "00:00:00.2406620",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.AuthenticatedPlayerCanRenameOnlyOwnSeatBeforeAndAfterStartingAndNameSurvivesRestart",
+          "结果": "Passed",
+          "耗时": "00:00:00.0110649",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.VisiblePreviewTests.NormalSetupCanBePlacedThroughActualClientPreview(rules: \"seafarers\")",
+          "结果": "Passed",
+          "耗时": "00:00:02.2069754",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"through-the-desert\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5321473",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.RetriedEnrollmentCannotChangeTheNegotiatedGeneralPackage",
+          "结果": "Passed",
+          "耗时": "00:00:00.0060454",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Room\\\":{\\\"Seats\\\":[],\\\"$type\\\":\\\"authority\\\"}}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000159",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EnrollmentCommitFailureCanRetryWithPreSavedToken(operation: \"Create\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003327",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.ExpiredEnrollmentCannotBypassCredentialLifetimeAndWrongRoomCannotClaimExistingSeat",
+          "结果": "Passed",
+          "耗时": "00:00:00.0958265",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.AiAlsoStopsAtRecoverableCommittedCommandLimit",
+          "结果": "Passed",
+          "耗时": "00:00:00.0553503",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.MissingOrWrongPackageHandshakeAndForgedSeatsAreRejected",
+          "结果": "Passed",
+          "耗时": "00:00:00.0415270",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"four-islands\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2266066",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.ExplicitLeaveAndNetworkTimeoutTransferManagementWithoutMovingAuthority",
+          "结果": "Passed",
+          "耗时": "00:00:00.0010026",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.CompactHeartbeatRenewsPresenceAndCannotBypassIdentity",
+          "结果": "Passed",
+          "耗时": "00:00:00.0006881",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"fog-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2186035",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{} {}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0133694",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.ClientHeartbeatsKeepSeatAliveWhilePushOnlyReadsPresence",
+          "结果": "Passed",
+          "耗时": "00:00:00.0027483",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB5RoomTests.FortyNineGeneralRoomPreservesIndependentChoicesAndReconnect(rules: \"cities-knights\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5331193",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.InvalidPacketDoesNotReplaceAcceptedBaseline(damage: \"version\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0007896",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.5485156",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Message\\\":\\\"\\\\uXX00\\\"}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000220",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.B4AndB5PrivateChoicesAndCommandRetriesWorkWithBothReplyShapes(rules: \"cities-knights\", b5: False)",
+          "结果": "Passed",
+          "耗时": "00:00:03.8617036",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.DefaultsNullsAndEscapesMatchLegacy(json: \"{\\\"Message\\\":null,\\\"Room\\\":null,\\\"Revision\\\":-42}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003490",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.InvalidPacketDoesNotReplaceAcceptedBaseline(damage: \"hash\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003502",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.CoalescingPreservesMultipleEventsAndReplacementsAndDetectsGapsWithoutAdvancing",
+          "结果": "Passed",
+          "耗时": "00:00:00.0010477",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"cloth-for-catan\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1560054",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.AiOpponentHandsCannotEnterNetworkSnapshotsOrBeInjectedByClients(rules: \"base\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0264659",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"cities-knights\", count: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:01.8007931",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"fog-islands\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0706808",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"through-the-desert\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0764573",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"fog-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2770691",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB5RoomTests.NewGeneralDecisionIsPrivateAndSurvivesRetryAndSave(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:17.6429397",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":+1}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000164",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.ForgedSeatInvalidActionsAndStaleRevisionDoNotChangeCommittedState",
+          "结果": "Passed",
+          "耗时": "00:00:00.0550349",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.InvalidPacketDoesNotReplaceAcceptedBaseline(damage: \"events\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0002473",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.SnakeSetupReturnsControlAtNextPlacementEvenWhenActiveColorDoesNotChange",
+          "结果": "Passed",
+          "耗时": "00:00:00.1050325",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"combined\", count: 4, integrated: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1027859",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"wonders-of-catan\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.6445535",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsWireTests.NormalSkillChoiceOnlyPublishesActionsToDecisionOwnerAndResumesIdentically",
+          "结果": "Passed",
+          "耗时": "00:00:14.4267665",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.MissingOrWrongPackageHandshakeAndForgedSeatsAreRejected",
+          "结果": "Passed",
+          "耗时": "00:00:00.0082703",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"cities-knights\", scenario: \"base\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2551790",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.VisiblePreviewTests.DiceAndMultiStepChoicesFallBackToServerPreview(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0196398",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.UnknownSaveFormatFailsClosedAndPreservesPrivateDocument",
+          "结果": "Passed",
+          "耗时": "00:00:00.0004712",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EnrollmentIdTokenAndContentConflictsCannotAllocateAnotherSeat(operation: \"Join\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0015855",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"fog-islands\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.9692697",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsWireTests.SkillCommandsRoundTripAllParametersWithoutAllowingNewRootTypes",
+          "结果": "Passed",
+          "耗时": "00:00:00.0492839",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"fog-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1392146",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"four-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2847779",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsWireTests.PrivateCandidateIdsOnlyReachTheirOwnerAndAiHasNoExtraGeneralPermission(skills: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3729489",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.RestartRequiresFullSnapshotAndLatePreviousGameCannotRollBack",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003512",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"forgotten-tribe\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1437845",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"four-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3175272",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.RoomDiagnosticsMeasureLocksAndPersistenceWithoutChangingResults",
+          "结果": "Passed",
+          "耗时": "00:00:00.0015445",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"wonders-of-catan\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2476484",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"wonders-of-catan\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2530047",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.AssigningHostColorToAiMovesOnlyHostAndKeepsIdentity",
+          "结果": "Passed",
+          "耗时": "00:00:00.0034849",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"base\", scenario: \"base\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0651607",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"pirate-islands\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2381158",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FullSnapshotsCannotCrossRoomSeatOrConnection(room: \"room\", seat: \"P1\", connection: \"old\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001789",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"wonders-of-catan\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2702474",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"new-world\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.8118097",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.RedCanBeAiAndCreatorUsesFirstHumanColor(seats: 3, ai: [\"P1\"], manager: \"P2\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003723",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.PublicBattleStrengthSurvivesTheClientServerWire(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.9650677",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"heading-for-new-shores\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.0923992",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"heading-for-new-shores\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.4629361",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EnrollmentRejectsMalformedTokenAndDoesNotDuplicateLegacyCredential",
+          "结果": "Passed",
+          "耗时": "00:00:00.0007150",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"combined\", scenario: \"through-the-desert\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2227914",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.SimultaneousCommandsFromSameSnapshotCommitExactlyOne",
+          "结果": "Passed",
+          "耗时": "00:00:00.0377956",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"heading-for-new-shores\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0985948",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.SkillDecisionIsPrivateResumesFromAuthorityAndCommandRetriesDoNotAddHistory(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:04.9476718",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"through-the-desert\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3176842",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"four-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1895580",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.AiCanCompleteItsIndependentChoicesWhileHumanHasNotSubmitted(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0539336",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"cities-knights\", count: 4, integrated: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1122132",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.NetworkPlayerMayEndFreePlayWithAvailableSkillsWithoutAnAutomationSkip(rules: \"combined\", integrated: True)",
+          "结果": "Passed",
+          "耗时": "00:00:15.8258488",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"forgotten-tribe\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1520580",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"cities-knights\", count: 4, integrated: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1201549",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"heading-for-new-shores\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1532769",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"fog-islands\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2768749",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"cloth-for-catan\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3138958",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":1.}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0010778",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB6RoomTests.FullPackageIndependentSelectionsRetryAndReconnectUseSameIdentity(rules: \"combined\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1354586",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"through-the-desert\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1365435",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"new-world\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0556283",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"wonders-of-catan\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3041788",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.HistoryInternalSettersAndPrivateIndicatorsRoundTrip",
+          "结果": "Passed",
+          "耗时": "00:00:00.0143003",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"base\", scenario: \"base\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0712400",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.AiCanCompleteItsIndependentChoicesWhileHumanHasNotSubmitted(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.2230066",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.LobbyLastLeaveClosesRoomAndNeverRelistsHistoryAfterRestart",
+          "结果": "Passed",
+          "耗时": "00:00:00.0038960",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"cities-knights\", kingdoms: False)",
+          "结果": "Passed",
+          "耗时": "00:00:17.6375389",
+          "输出": "cities-knights/三国False：2次鱼支付×4席；差量39874字节，完整视图及历史304112字节；两次权威提交合计27.8ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"new-world\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:02.0988006",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.LengthAndArrayBudgetsAreEnforced",
+          "结果": "Passed",
+          "耗时": "00:00:00.0228147",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.LegacyPrivateRoomMigratesOnNextCommitWhileLegacyWireClientIsRejected",
+          "结果": "Passed",
+          "耗时": "00:00:00.0014061",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"forgotten-tribe\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.7991643",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"forgotten-tribe\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3321490",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"cities-knights\", scenario: \"base\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2399145",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"pirate-islands\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0870199",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.HiddenRoomCanBeDescribedWithoutPrivateDataAndJoinedByNumber",
+          "结果": "Passed",
+          "耗时": "00:00:00.0005748",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"cloth-for-catan\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.4298650",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"heading-for-new-shores\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1403835",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB6RoomTests.ControlledTurnAuthenticatesRealSenderAndRestoresGrantThenRevokesIt(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:25.9152596",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"new-world\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1852488",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"cities-knights\", kingdoms: True)",
+          "结果": "Passed",
+          "耗时": "00:00:02.2495860",
+          "输出": "cities-knights/三国True：2次鱼支付×4席；差量53236字节，完整视图及历史343934字节；两次权威提交合计146.9ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.PartialSimultaneousSelectionSurvivesServiceRestartAndReconnectWithoutRevealingOthers(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.1245783",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"forgotten-tribe\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1238444",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"combined\", count: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.7597468",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.PasswordPublicListAndVersionChecksAreEnforced",
+          "结果": "Passed",
+          "耗时": "00:00:00.0723049",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.PrepareConfigureAndSeatChangesRequirePreparationAgain",
+          "结果": "Passed",
+          "耗时": "00:00:00.0070599",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.UnicodePasswordsAndNamesRetainExactContent",
+          "结果": "Passed",
+          "耗时": "00:00:00.0002086",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"pirate-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2388345",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"combined\", count: 3, integrated: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0604188",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.NetworkPlayerMayEndFreePlayWithAvailableSkillsWithoutAnAutomationSkip(rules: \"cities-knights\", integrated: False)",
+          "结果": "Passed",
+          "耗时": "00:00:06.4065003",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.ReconnectedHumanCannotInterruptPendingSetupAndReturnsAtNextOwnPlacement",
+          "结果": "Passed",
+          "耗时": "00:00:00.2047003",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.PartialSimultaneousSelectionSurvivesServiceRestartAndReconnectWithoutRevealingOthers(rules: \"combined\", integrated: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0358257",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.UnknownDuplicateAndTypeInjectionFieldsAreRejected(input: \"{\\\"Operation\\\":\\\"List\\\",\\\"Authority\\\":\\\"secret\\\"}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001434",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.AiOpponentHandsCannotEnterNetworkSnapshotsOrBeInjectedByClients(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0391712",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.RestartRecoversPendingDecisionAndCommandReceipt",
+          "结果": "Passed",
+          "耗时": "00:00:00.0381758",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.NetworkPlayerMayEndFreePlayWithAvailableSkillsWithoutAnAutomationSkip(rules: \"combined\", integrated: False)",
+          "结果": "Passed",
+          "耗时": "00:00:05.5577981",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"cloth-for-catan\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1121147",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"pirate-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1526164",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"pirate-islands\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:01.2349162",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.PartialSimultaneousSelectionSurvivesServiceRestartAndReconnectWithoutRevealingOthers(rules: \"cities-knights\", integrated: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0387575",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"wonders-of-catan\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.9245596",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.ReconnectionDuringNormalTurnWaitsUntilPlayersNextFullTurn",
+          "结果": "Passed",
+          "耗时": "00:00:00.2920436",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Message\\\":false}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000459",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"through-the-desert\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.1285749",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.VisiblePreviewTests.NormalSetupCanBePlacedThroughActualClientPreview(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:05.6193393",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.ConfigurationClearsReadyAndRestartPreservesModules",
+          "结果": "Passed",
+          "耗时": "00:00:00.0089789",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.AtomicStoreEnforcesSingleWriterAndKeepsDurableSnapshot",
+          "结果": "Passed",
+          "耗时": "00:00:00.0156621",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.B4AndB5PrivateChoicesAndCommandRetriesWorkWithBothReplyShapes(rules: \"combined\", b5: False)",
+          "结果": "Passed",
+          "耗时": "00:00:03.8727690",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"new-world\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2322657",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"heading-for-new-shores\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0818836",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"fog-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3200244",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"forgotten-tribe\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0901119",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.LostJoinReceiptReplaysOriginalSeatEvenAfterSettingsAndSeatChange",
+          "结果": "Passed",
+          "耗时": "00:00:00.0008636",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"combined\", scenario: \"new-world\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.8526391",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.AiCanCompleteItsIndependentChoicesWhileHumanHasNotSubmitted(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.6055409",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"Revision\\\":1e}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000171",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"four-islands\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3756862",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.LeftLobbyEnrollmentCannotResurrectRevokedIdentity(operation: \"Create\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0007698",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"wonders-of-catan\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.1394633",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"heading-for-new-shores\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1377255",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"heading-for-new-shores\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.0136618",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"seafarers\", map: \"pirate-islands\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.7544014",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsWireTests.NewCommandRoundTripsTokensAndRejectsUnknownFields",
+          "结果": "Passed",
+          "耗时": "00:00:00.0010323",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.LostCreateReceiptReplaysSameRoomAfterRestartWithoutRetransmittingToken",
+          "结果": "Passed",
+          "耗时": "00:00:00.0006099",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"seafarers\", id: \"pirate-islands\", players: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1158560",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.AbandonedLobbyExpiresWithoutBlockingNewRoomsAndCannotResurrectAfterRestart",
+          "结果": "Passed",
+          "耗时": "00:00:00.0013195",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB5RoomTests.NewGeneralDecisionIsPrivateAndSurvivesRetryAndSave(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:03.2648252",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB45RoomTests.EverySeatHasPrivateStableDecisionAndOldRoomRevisionDoesNotInvalidateOtherChoices(rules: \"combined\", count: 4, integrated: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0986100",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.FourSeatViewsAndHistoryRemainIdenticalAcrossMaps(rules: \"combined\", map: \"four-islands\")",
+          "结果": "Passed",
+          "耗时": "00:00:01.0280183",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.NewRoomAndHostRestartRegenerateMapsWhileReconnectKeepsBoard(rules: \"combined\", id: \"pirate-islands\", players: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.4341022",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.IntegratedSkillProjectionKeepsB5AndDirectInteractionFieldsAcrossBothDecoders",
+          "结果": "Passed",
+          "耗时": "00:00:00.0918564",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.SeatStateSyncTests.InvalidPacketDoesNotReplaceAcceptedBaseline(damage: \"unknown\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0002448",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"base\", scenario: \"base\", seats: 4)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2236723",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.RetriedEnrollmentCannotChangeTheNegotiatedGeneralPackage",
+          "结果": "Passed",
+          "耗时": "00:00:00.0336970",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.UnknownPrivateProtocolVersionsFailClosedWithoutOverwritingSave(version: -1)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0020610",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.RecentPresentationHistoryMatchesSeatProjectionAndSurvivesDuplicateCommands",
+          "结果": "Passed",
+          "耗时": "00:00:00.1555169",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.ThreeKingdomsB4RoomTests.SkillDecisionIsPrivateResumesFromAuthorityAndCommandRetriesDoNotAddHistory(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:09.0809012",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.EveryRuleAndSeatViewRoundTripsWithoutAuthority(rules: \"seafarers\", scenario: \"heading-for-new-shores\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3835646",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.WireContractAuditTests.UnknownDuplicateAndTypeInjectionFieldsAreRejected(input: \"{\\\"Operation\\\":\\\"List\\\",\\\"Operation\\\":\\\"Command\\\"}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0002008",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.MalformedOrInjectedValuesAreRejected(json: \"{\\\"R\\\\u0065vision\\\":1,\\\"Revision\\\":2}\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000355",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.DirectWireJsonTests.DefaultsNullsAndEscapesMatchLegacy(json: \"{\\\"Message\\\":\\\"汉字\\\\n\\\\t\\\\b\\\\f\\\\r\\\\\\\\\\\\/\\\\\\\"\\\\uD83C\"···)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0004733",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"cloth-for-catan\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2778215",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.RestartDuplicateKeepsOriginalReceiptWhenBackgroundManagementTransferRaisesRevision",
+          "结果": "Passed",
+          "耗时": "00:00:00.0427829",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.EverySupportedConfigurationContinuesWithAiAfterLastHumanDisconnects(rules: \"seafarers\", scenario: \"pirate-islands\", seats: 3)",
+          "结果": "Passed",
+          "耗时": "00:00:00.3109089",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.RoomDirectoryTests.TotalCommittedCommandLimitStillAllowsIdenticalRetryAndRestart",
+          "结果": "Passed",
+          "耗时": "00:00:00.0455978",
+          "输出": ""
+        }
+      ]
+    },
+    {
+      "来源": "tests/Catan.Network.Tests/TestResults/fishing-f4-network-recheck.trx",
+      "SHA256": "83a731d7b0526e1a7cb83c4cf3d9f095641d8033b64a0f4f56202a410da97591",
+      "计数": {
+        "total": "10",
+        "executed": "10",
+        "passed": "10",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "结果": [
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.StandardF3ClientCannotEnterF4SeaRoomButStillReadsStandardRoom",
+          "结果": "Passed",
+          "耗时": "00:00:00.0004881",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.PendingReplacementReconnectsWithoutChangingTokensAndAiCanContinueAfterRecovery",
+          "结果": "Passed",
+          "耗时": "00:00:03.0097520",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.ConfigurationClearsReadyAndRestartPreservesModules",
+          "结果": "Passed",
+          "耗时": "00:00:00.0061971",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"base\", kingdoms: False)",
+          "结果": "Passed",
+          "耗时": "00:00:02.2897420",
+          "输出": "base/三国False：2次鱼支付×4席；差量29614字节，完整视图及历史345206字节；两次权威提交合计15.1ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"cities-knights\", kingdoms: True)",
+          "结果": "Passed",
+          "耗时": "00:00:05.1159007",
+          "输出": "cities-knights/三国True：2次鱼支付×4席；差量63554字节，完整视图及历史439971字节；两次权威提交合计166.9ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"combined\", kingdoms: True)",
+          "结果": "Passed",
+          "耗时": "00:00:17.5275199",
+          "输出": "combined/三国True：2次鱼支付×4席；差量57612字节，完整视图及历史712403字节；两次权威提交合计255.4ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"seafarers\", kingdoms: False)",
+          "结果": "Passed",
+          "耗时": "00:00:04.3784420",
+          "输出": "seafarers/三国False：2次鱼支付×4席；差量33742字节，完整视图及历史318440字节；两次权威提交合计22.5ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"cities-knights\", kingdoms: False)",
+          "结果": "Passed",
+          "耗时": "00:00:05.7774901",
+          "输出": "cities-knights/三国False：2次鱼支付×4席；差量48878字节，完整视图及历史310387字节；两次权威提交合计73.9ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(rules: \"combined\", kingdoms: False)",
+          "结果": "Passed",
+          "耗时": "00:00:02.5671266",
+          "输出": "combined/三国False：2次鱼支付×4席；差量35796字节，完整视图及历史351184字节；两次权威提交合计13.2ms。同进程测量，非外网延迟。"
+        },
+        {
+          "名称": "Catan.Network.Tests.FishingRoomTests.OldClientCannotCreateJoinReconnectOrPrepareEnabledRoom",
+          "结果": "Passed",
+          "耗时": "00:00:00.0006318",
+          "输出": ""
+        }
+      ]
+    },
+    {
+      "来源": "tests/Catan.Server.Tests/TestResults/fishing-f4-server.trx",
+      "SHA256": "fe1c10638643aa3e5ddc5fc330103ec61434bfabda06e372b05e6d53ef721537",
+      "计数": {
+        "total": "99",
+        "executed": "99",
+        "passed": "99",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "结果": [
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.JoinedRoomUsesServerIdentityAndRoomIdAndRequiresASeat",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003349",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.JoinDescriptionAcceptsMatchingB4AndB45PackagesAndRejectsWrongHashes(package: \"three-kingdoms-direct-interaction-v1\", matching: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.2063674",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.RoomSwitchTransportTests.ClosingOldWebSocketDoesNotTakeControlFromHttpFallbackOrReplacementSocket",
+          "结果": "Passed",
+          "耗时": "00:00:01.6111738",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.DiscoveryDisabledAliasAndExplicitTestRateAreApplied",
+          "结果": "Passed",
+          "耗时": "00:00:00.0004747",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.PublicIpAddressIsNormalizedWithoutDomainOrCertificate(entered: \"[2001:db8::10]:48888\", expected: \"http://[2001:db8::10]:48888\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0251505",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.CommunicationDiagnosticsTests.RotationKeepsBoundedValidJsonFiles",
+          "结果": "Passed",
+          "耗时": "00:00:00.0870938",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.RoomChangeTests.CommittedChangeIsPublishedOutsideRoomLockAndRejectedRequestsDoNotPublish",
+          "结果": "Passed",
+          "耗时": "00:00:00.0177165",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlinePerformanceTests.HistoryPreservesMultiEventOrderUpdatesContentAndDoesNotInvalidateOnDuplicates",
+          "结果": "Passed",
+          "耗时": "00:00:00.0192575",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.StateSyncClientTests.DeferredSnapshotsHaveAByteBoundAndCoalescingKeepsTheLatestBaseline",
+          "结果": "Passed",
+          "耗时": "00:00:00.0231822",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.InvalidAddressesAndSilentHttpsDowngradeAreRejected(address: \"game.example.com:47771\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000740",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.JoinDescriptionAcceptsMatchingB4AndB45PackagesAndRejectsWrongHashes(package: \"three-kingdoms-response-effects-v1\", matching: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1613250",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.FrameCostDiagnosticsTests.BackgroundDecodeIsSeparatedFromMainThreadBudget",
+          "结果": "Passed",
+          "耗时": "00:00:00.0027758",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ClientCommunicationDiagnosticsTests.HttpLogsMetadataOnlyAndDoesNotPostTransportWorkToTheCallerContext",
+          "结果": "Passed",
+          "耗时": "00:00:00.1569002",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.NoLocalServiceIsAnEmptyResultAndRepeatedSearchStillWorks",
+          "结果": "Passed",
+          "耗时": "00:00:00.9924964",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineHttpServerTests.OnlinePrivateDirectoryNeverLoadsOrCreatesCertificateFiles",
+          "结果": "Passed",
+          "耗时": "00:00:00.0049594",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.JoinDescriptionAcceptsMatchingB4AndB45PackagesAndRejectsWrongHashes(package: \"three-kingdoms-board-state-49-direct-v1\", matching: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1835666",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.InvalidAddressesAndSilentHttpsDowngradeAreRejected(address: \"http://203.0.113.10:47771?credential=secret\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000128",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.MissingCertificateSecretDoesNotSilentlyReplaceTrustedIdentity",
+          "结果": "Passed",
+          "耗时": "00:00:01.7845557",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.InvalidAddressesAndSilentHttpsDowngradeAreRejected(address: \"http://user:secret@203.0.113.10:47771\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000116",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.CommunicationDiagnosticsTests.JsonLinesCorrelateRequestsWithoutCredentialsPayloadsOrArbitraryIdentifiers",
+          "结果": "Passed",
+          "耗时": "00:00:01.3049890",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.PublicIpAddressIsNormalizedWithoutDomainOrCertificate(entered: \"http://203.0.113.10:80\", expected: \"http://203.0.113.10\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000671",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.InvalidAddressesAndSilentHttpsDowngradeAreRejected(address: \"http://203.0.113.10:47771#fragment\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000139",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.FrameCostDiagnosticsTests.RoutineDiagnosticsAndExplicitProfileHaveIndependentCounters",
+          "结果": "Passed",
+          "耗时": "00:00:00.0020877",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.SocketHeartbeatKeepsRunningWithoutUnityFramesAndUsesTenSecondSpacing",
+          "结果": "Passed",
+          "耗时": "00:00:10.2088167",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.JoinDescriptionAcceptsMatchingB4AndB45PackagesAndRejectsWrongHashes(package: \"three-kingdoms-board-state-49-direct-v1\", matching: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1065554",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.FourSeatTransportMeasurementTests.FourLiveSocketsReduceIdleTrafficAndStillReceiveChangedBoardWithoutPolling",
+          "结果": "Passed",
+          "耗时": "00:00:44.4829669",
+          "输出": "{\n  \"measuredUtc\": \"2026-10-29T14:18:22.977667+00:00\",\n  \"scope\": \"\\u540C\\u673A\\u56DB\\u6761\\u771F\\u5B9E WebSocket\\uFF1B\\u76F8\\u540C\\u65B0\\u670D\\u52A1\\u4E0E\\u9759\\u6B62\\u68CB\\u76D8\\uFF1B\\u4E0D\\u662F\\u56DB\\u53F0\\u8BBE\\u5907\\u6216\\u5386\\u53F2\\u670D\\u52A1\\u56DE\\u653E\",\n  \"ruleSet\": \"combined\",\n  \"scenario\": \"heading-for-new-shores\",\n  \"players\": 4,\n  \"legacyOneSecond\": {\n    \"GetIntervalSeconds\": 1,\n    \"WindowSeconds\": 21.003501,\n    \"Bytes\": 2080155,\n    \"Messages\": 84,\n    \"Seats\": [\n      {\n        \"SeatId\": \"P1\",\n        \"Bytes\": 528465,\n        \"Messages\": 21,\n        \"Pushes\": 0\n      },\n      {\n        \"SeatId\": \"P2\",\n        \"Bytes\": 517230,\n        \"Messages\": 21,\n        \"Pushes\": 0\n      },\n      {\n        \"SeatId\": \"P3\",\n        \"Bytes\": 517230,\n        \"Messages\": 21,\n        \"Pushes\": 0\n      },\n      {\n        \"SeatId\": \"P4\",\n        \"Bytes\": 517230,\n        \"Messages\": 21,\n        \"Pushes\": 0\n      }\n    ]\n  },\n  \"currentTenSeconds\": {\n    \"GetIntervalSeconds\": 10,\n    \"WindowSeconds\": 21.0024292,\n    \"Bytes\": 297165,\n    \"Messages\": 12,\n    \"Seats\": [\n      {\n        \"SeatId\": \"P1\",\n        \"Bytes\": 75495,\n        \"Messages\": 3,\n        \"Pushes\": 0\n      },\n      {\n        \"SeatId\": \"P2\",\n        \"Bytes\": 73890,\n        \"Messages\": 3,\n        \"Pushes\": 0\n      },\n      {\n        \"SeatId\": \"P3\",\n        \"Bytes\": 73890,\n        \"Messages\": 3,\n        \"Pushes\": 0\n      },\n      {\n        \"SeatId\": \"P4\",\n        \"Bytes\": 73890,\n        \"Messages\": 3,\n        \"Pushes\": 0\n      }\n    ]\n  },\n  \"receiveByteReduction\": 0.8571428571428572,\n  \"boardPushDelayMs\": [\n    21.0395,\n    22.9345,\n    19.5511\n  ]\n}"
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.JoinDescriptionAcceptsMatchingB4AndB45PackagesAndRejectsWrongHashes(package: \"three-kingdoms-board-state-49-v1\", matching: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1027283",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.StateSyncClientTests.ReconnectDoesNotUnlockUntilTheNewConnectionHasCompleteEvents",
+          "结果": "Passed",
+          "耗时": "00:00:00.0045254",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.SnapshotHistoryIsReadyBeforeViewNotificationAndDoesNotSkipBackfill",
+          "结果": "Passed",
+          "耗时": "00:00:00.0012218",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.InvalidAddressesAndSilentHttpsDowngradeAreRejected(address: \"http://203.0.113.10:65536\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0029852",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlinePerformanceTests.BackgroundResponseHasViewAndHistoryReadyBeforeAtomicNotification(rules: \"cities-knights\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0180993",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.StateSyncClientTests.HttpRecoveryWaitsForCompleteEventsEvenWhenTheStateRevisionIsAlreadyApplied",
+          "结果": "Passed",
+          "耗时": "00:00:00.0158717",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.IncrementalTransportTests.SameFourSeatScriptMeasuresBothWireShapesAndRestoresDisconnectedStream",
+          "结果": "Passed",
+          "耗时": "00:00:20.3843282",
+          "输出": "{\n  \"scope\": \"\\u5355\\u673A\\u56DE\\u73AF\\u540C\\u4E00\\u56DB\\u5E2D\\u7EC4\\u5408\\u684C40\\u6761\\u52A8\\u4F5C\\uFF0C\\u4E24\\u7EC4\\u5404\\u56DB\\u6761\\u771F\\u5B9EWS\\u5206\\u522B\\u89C2\\u5BDF\\u5168\\u91CF\\u548C\\u589E\\u91CF\\uFF1B\\u542B\\u76F8\\u540C\\u547D\\u4EE4\\u56DE\\u6267\\u6B63\\u6587\\uFF1B\\u4FDD\\u5B58\\u63A5\\u53E3\\u4F7F\\u7528\\u7A7A\\u5B58\\u50A8\\uFF0C\\u4E0D\\u6D4B\\u78C1\\u76D8\\uFF1B\\u4E0D\\u542BTCP\\u5934\\u3001\\u7F51\\u5361\\u51FA\\u53E3\\u30014Mbps\\u6574\\u5F62\\u6216\\u56DB\\u8BBE\\u5907\\u5E27\\u7387\",\n  \"commands\": 40,\n  \"legacyBytes\": 6414734,\n  \"deltaBytes\": 751702,\n  \"reduction\": 0.8828163412543685,\n  \"initialLegacyBytes\": 197998,\n  \"initialDeltaBytes\": 139629,\n  \"mixedObservationCommitToQueue\": {\n    \"samples\": 320,\n    \"p50\": 61.9587,\n    \"p95\": 272.246,\n    \"p99\": 372.7056,\n    \"maximum\": 407.876\n  },\n  \"actionToDeltaArrival\": {\n    \"samples\": 160,\n    \"p50\": 81.8109,\n    \"p95\": 446.6282,\n    \"p99\": 558.6745,\n    \"maximum\": 563.1127\n  },\n  \"fourStreamsCommitToQueue\": {\n    \"samples\": 120,\n    \"p50\": 33.683,\n    \"p95\": 65.378,\n    \"p99\": 93.0176,\n    \"maximum\": 93.0233\n  },\n  \"fourStreamsActionToArrival\": {\n    \"samples\": 120,\n    \"p50\": 48.7118,\n    \"p95\": 78.6987,\n    \"p99\": 108.0205,\n    \"maximum\": 117.0746\n  }\n}"
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.UnrelatedPushesDoNotHideAMissingHeartbeatAcknowledgement",
+          "结果": "Passed",
+          "耗时": "00:00:12.0714226",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.WebSocketSchemeMatchesConfiguredTransport(endpoint: \"http://[2001:db8::10]:47771\", expected: \"ws://[2001:db8::10]:47771/ws\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000213",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.InvalidAddressesAndSilentHttpsDowngradeAreRejected(address: \"\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000094",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ClientCommunicationDiagnosticsTests.QueueOverflowAndUnwritableDirectoryNeverEscapeIntoTheGame",
+          "结果": "Passed",
+          "耗时": "00:00:00.0201253",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlinePerformanceTests.BackgroundResponseHasViewAndHistoryReadyBeforeAtomicNotification(rules: \"base\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0036678",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.InvalidServerSettingsFailBeforeStarting(option: \"--mode\", value: \"http\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000148",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.CommunicationDiagnosticsTests.UnavailableLogDirectoryDoesNotThrowIntoGameTransport",
+          "结果": "Passed",
+          "耗时": "00:00:00.0188535",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineHttpServerTests.RealOnlineHttpStillRejectsBrowserOriginsAndQueryCredentials",
+          "结果": "Passed",
+          "耗时": "00:00:00.6313325",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.InvalidServerSettingsFailBeforeStarting(option: \"--port\", value: \"65536\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001953",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.WebSocketSchemeMatchesConfiguredTransport(endpoint: \"http://203.0.113.10:47771\", expected: \"ws://203.0.113.10:47771/ws\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001334",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.EmptyOnlineLobbyAndStoppedServerHaveDistinctStatesAndRecoverAutomatically",
+          "结果": "Passed",
+          "耗时": "00:00:00.1727894",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.StateSyncClientTests.NewClientFallsBackToOldSocketOperationWithoutWaitingOneHeartbeatInterval",
+          "结果": "Passed",
+          "耗时": "00:00:00.4873661",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlinePerformanceTests.BackgroundResponseHasViewAndHistoryReadyBeforeAtomicNotification(rules: \"combined\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.1591361",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.MissingHistoryRangeFallsBackToPagingAndRestartDropsOldHistory",
+          "结果": "Passed",
+          "耗时": "00:00:00.0025119",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.UnansweredLocalProbeDoesNotAbortDelayedResponseFromAnotherHost",
+          "结果": "Passed",
+          "耗时": "00:00:00.5149678",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.InvalidAddressesAndSilentHttpsDowngradeAreRejected(address: \"https://203.0.113.10:47771\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000106",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.JoinDescriptionAcceptsMatchingB4AndB45PackagesAndRejectsWrongHashes(package: \"three-kingdoms-response-effects-v1\", matching: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.1018161",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.PasswordIsRequestedOnlyForProtectedRoomsWithoutRecovery(protectedRoom: True, remembered: True, started: True, expected: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0123923",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlinePerformanceTests.ReceiptAndStateMayArriveInEitherOrderButMissingEventsKeepTheCommandPending(stateFirst: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0113632",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.BoundClientRefreshesLobbyAfterRestartEvenWhenFirstListPrecedesRoomPresence",
+          "结果": "Passed",
+          "耗时": "00:00:05.3588175",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.InvalidServerSettingsFailBeforeStarting(option: \"--port\", value: \"0\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0121549",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlinePerformanceTests.OldServerFallbackKeepsTheOriginalCommandIdentity",
+          "结果": "Passed",
+          "耗时": "00:00:00.0169045",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.PublicIpAddressIsNormalizedWithoutDomainOrCertificate(entered: \"203.0.113.10\", expected: \"http://203.0.113.10:47771\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0002693",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.StateSyncClientTests.LobbyRecoveryDoesNotWaitForNonexistentGameViewOrHistory",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003192",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineHttpServerTests.RealOnlineServerSupportsIpHttpLobbyCreateJoinAndWebSocketWithoutCertificate",
+          "结果": "Passed",
+          "耗时": "00:00:02.2085628",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.JoinDescriptionAcceptsMatchingB4AndB45PackagesAndRejectsWrongHashes(package: \"three-kingdoms-direct-interaction-v1\", matching: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.8271624",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ClientCommunicationDiagnosticsTests.StartupDiagnosticUsesUnityBuildIdentity",
+          "结果": "Passed",
+          "耗时": "00:00:00.0119629",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.ErrorMessagesShowStageAndCauseWithoutEchoingExceptionSecrets",
+          "结果": "Passed",
+          "耗时": "00:00:00.0013595",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.RateLimiterDoesNotGrowUnboundedForNewPeerAddresses",
+          "结果": "Passed",
+          "耗时": "00:00:00.0011190",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.PublicIpAddressIsNormalizedWithoutDomainOrCertificate(entered: \" 203.0.113.10:48888 \", expected: \"http://203.0.113.10:48888\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000132",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.LobbyListDoesNotConfirmAnOldSeatAndIsIndependentOfSeatReconnectEpoch",
+          "结果": "Passed",
+          "耗时": "00:00:00.1083857",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.CommunicationDiagnosticsTests.SlowReceiverKeepsOnlyLatestPushAndEveryCommandReplyInOrder",
+          "结果": "Passed",
+          "耗时": "00:00:00.1729198",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.RateLimitRejectsOverQuotaAndDoesNotMergePeers",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001121",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.InvalidAddressesAndSilentHttpsDowngradeAreRejected(address: \"http://203.0.113.10:0\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003719",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.InvalidServerSettingsFailBeforeStarting(option: \"--ai-interval-ms\", value: \"0\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0069457",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.LanStillRequiresHttpsWithItsPinnedCertificate",
+          "结果": "Passed",
+          "耗时": "00:00:00.0004319",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.CertificateFingerprintSurvivesRestartAndAnotherWriterIsRejected",
+          "结果": "Passed",
+          "耗时": "00:00:01.7447953",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.DefaultRateBudgetAllowsFourClientsSharingOneAddress",
+          "结果": "Passed",
+          "耗时": "00:00:00.0004645",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.InvalidAddressesAndSilentHttpsDowngradeAreRejected(address: \"http://203.0.113.10:47771/api/request\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000117",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.RoomSwitchTransportTests.BoundWebSocketCanDescribeJoinCreateAndReconnectAnotherRoomWithoutLeaving",
+          "结果": "Passed",
+          "耗时": "00:00:00.2097656",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.WebSocketSchemeMatchesConfiguredTransport(endpoint: \"https://192.168.1.2:47771\", expected: \"wss://192.168.1.2:47771/ws\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001655",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.RoomChangeTests.FailedStorageOnlyPublishesPausedSavedState",
+          "结果": "Passed",
+          "耗时": "00:00:00.0833301",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.FrameCostDiagnosticsTests.RoutineDiagnosticsDoNotEnableOrAccumulateExplicitFrameCapture",
+          "结果": "Passed",
+          "耗时": "00:00:00.0014004",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.PublicIpAddressIsNormalizedWithoutDomainOrCertificate(entered: \"http://203.0.113.10:47771/\", expected: \"http://203.0.113.10:47771\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000163",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.DiscoveryKeepsHealthyRoomsAndReportsTheHostWhoseHttpsListFails",
+          "结果": "Passed",
+          "耗时": "00:00:03.0340610",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.StateSyncClientTests.LateHistoryPageCannotUndoSkillResultAlreadyAppliedByReliableStream",
+          "结果": "Passed",
+          "耗时": "00:00:00.0556090",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.PasswordIsRequestedOnlyForProtectedRoomsWithoutRecovery(protectedRoom: True, remembered: False, started: False, expected: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000051",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.PasswordIsRequestedOnlyForProtectedRoomsWithoutRecovery(protectedRoom: True, remembered: True, started: False, expected: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000026",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.RoomChangeTests.LiveConnectionReplacementAndLobbyDisconnectPublishWithoutArtificialRevision",
+          "结果": "Passed",
+          "耗时": "00:00:00.0328436",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlinePerformanceTests.BackgroundResponseHasViewAndHistoryReadyBeforeAtomicNotification(rules: \"seafarers\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0156143",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.ChangingServerDiscardsOldRequestsAndOldRoomLists",
+          "结果": "Passed",
+          "耗时": "00:00:00.2268515",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.OnlineModeDoesNotRequireCertificateOrDiscovery",
+          "结果": "Passed",
+          "耗时": "00:00:00.0012844",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlinePerformanceTests.FullApplicationQueueBackpressuresAndCancellationDoesNotLeakOldCallbacks",
+          "结果": "Passed",
+          "耗时": "00:00:00.0019921",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.HttpReconnectReplacesAnInFlightSocketHandshakeWithoutApplyingOldIdentityRejection",
+          "结果": "Passed",
+          "耗时": "00:00:00.1989483",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.ActualClientWebSocketUsesPlainHttpAndRoomPushDoesNotEraseLobbyList",
+          "结果": "Passed",
+          "耗时": "00:00:00.1591939",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineHttpServerTests.RealOnlineHttpKeepsRequestRateLimit",
+          "结果": "Passed",
+          "耗时": "00:00:00.5628294",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ClientCommunicationDiagnosticsTests.JsonLinesAreBoundedAndCarryCorrelationWithoutArbitraryPayloadFields",
+          "结果": "Passed",
+          "耗时": "00:00:00.0475134",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ClientCommunicationDiagnosticsTests.LateHttpPollCannotOverwriteRecoveredWebSocketTransportLabel",
+          "结果": "Passed",
+          "耗时": "00:00:00.0470431",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.LanDiscoveryRegressionTests.PasswordIsRequestedOnlyForProtectedRoomsWithoutRecovery(protectedRoom: False, remembered: False, started: False, expected: False)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0003114",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ClientCommunicationDiagnosticsTests.CallbackBacklogIsAppliedInOrderAcrossFrames",
+          "结果": "Passed",
+          "耗时": "00:00:00.0888454",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.InvalidServerSettingsFailBeforeStarting(option: \"--request-limit-per-10s\", value: \"0\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0001552",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.FailedSocketFallsBackToHttpAndAutomaticallyRestoresPushWithSameSeatConnection",
+          "结果": "Passed",
+          "耗时": "00:00:02.1120814",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.ServerBoundaryTests.InvalidServerSettingsFailBeforeStarting(option: \"--unknown\", value: \"value\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000484",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlinePerformanceTests.ReceiptAndStateMayArriveInEitherOrderButMissingEventsKeepTheCommandPending(stateFirst: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.0360333",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.PublicIpAddressIsNormalizedWithoutDomainOrCertificate(entered: \"http://[2001:db8::10]\", expected: \"http://[2001:db8::10]:47771\")",
+          "结果": "Passed",
+          "耗时": "00:00:00.0000265",
+          "输出": ""
+        },
+        {
+          "名称": "Catan.Server.Tests.OnlineClientTests.JoinDescriptionAcceptsMatchingB4AndB45PackagesAndRejectsWrongHashes(package: \"three-kingdoms-board-state-49-v1\", matching: True)",
+          "结果": "Passed",
+          "耗时": "00:00:00.4794880",
+          "输出": ""
+        }
+      ]
+    }
+  ]
+}

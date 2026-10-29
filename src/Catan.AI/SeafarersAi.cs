@@ -33,6 +33,7 @@ public sealed class SeafarersAi
     private Command Choose(PlayerView view)
     {
         Command Make(CommandKind kind, string target = null) => new() { PlayerId = view.PlayerId, Kind = kind, TargetId = target! };
+        var fish=FishingAi.Choose(view);if(fish!=null)return fish;
         switch (view.Phase)
         {
             case GamePhase.SetupPort:
@@ -76,13 +77,13 @@ public sealed class SeafarersAi
         if (view.TradeOffer != null)
         { var offer = view.TradeOffer; return Make(Covers(view.OwnResources, offer.Receive) && TradeValue(view.OwnResources, offer.Give, offer.Receive) - AiOpponentStrategy.TradePenalty(view, offer.ProposerId) >= -0.01 ? CommandKind.AcceptTrade : CommandKind.RejectTrade); }
         var me = view.Players.Single(p => p.Id == view.PlayerId);
-        var win = view.LegalVertexIds.Where(v => view.OwnVictoryPoints + SettlementPoints(view, v) >= view.TargetVictoryPoints)
+        var win = view.LegalVertexIds.Where(v => view.OwnVictoryPoints + SettlementPoints(view, v) >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints))
             .OrderByDescending(v => SettlementPoints(view, v)).ThenBy(v => v).FirstOrDefault();
         if (win != null) return Make(CommandKind.BuildSettlement, win);
-        if (view.OwnVictoryPoints + 1 >= view.TargetVictoryPoints && view.LegalCityVertexIds.Length > 0)
+        if (view.OwnVictoryPoints + 1 >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) && view.LegalCityVertexIds.Length > 0)
             return Make(CommandKind.BuildCity, view.LegalCityVertexIds.OrderByDescending(v => Value(view, v)).First());
         var award = CheapLongestRoute(view);
-        if (award != null && view.OwnVictoryPoints + 2 >= view.TargetVictoryPoints) return award;
+        if (award != null && view.OwnVictoryPoints + 2 >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints)) return award;
         var expansion = Expansion(view);
         if (view.ScenarioId == "pirate-islands" && view.Board.Fortresses.Single(f => f.PlayerId == view.PlayerId).Strength > 0)
         {
@@ -122,7 +123,7 @@ public sealed class SeafarersAi
         { goal = expansion.Value.path.Length == 0 ? Settlement : expansion.Value.ship ? Ship : Road; goalKind = expansion.Value.path.Length == 0 ? CommandKind.BuildSettlement : expansion.Value.ship ? CommandKind.BuildShip : CommandKind.BuildRoad; target = expansion.Value.path.Length == 0 ? expansion.Value.target : expansion.Value.path[0]; }
         else { goal = Development; goalKind = CommandKind.BuyDevelopmentCard; }
 
-        if (award != null && view.OwnVictoryPoints >= view.TargetVictoryPoints - 3) return award;
+        if (award != null && view.OwnVictoryPoints >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) - 3) return award;
 
         if (CanPlay(view, DevelopmentCardKind.YearOfPlenty) && view.Bank.Total > 0)
         {
@@ -215,7 +216,7 @@ public sealed class SeafarersAi
             double benefit = TradeValue(view.OwnResources, receive, give) + 2;
             // 自己也只差一分且此报价补齐当前目标时，才重新考虑两三步可赢的对手。
             // 一步可赢和领先六分的禁令仍以无穷大门槛保持绝对优先。
-            if (view.OwnVictoryPoints >= view.TargetVictoryPoints - 1
+            if (view.OwnVictoryPoints >= (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) - 1
                 && Resources.All(r => view.OwnResources[r] + receive[r] - give[r] >= goal[r])) benefit += 16;
             var partner = view.Players.Where(p => p.Id != view.PlayerId && p.ResourceCount > 0
                 && AiOpponentStrategy.CanSupply(view.OpponentHands, p.Id, need)
@@ -229,11 +230,11 @@ public sealed class SeafarersAi
     }
     private static bool Covers(ResourceBag hand, ResourceBag cost) => Resources.All(r => hand[r] >= cost[r]);
     private static PiecePlacement[] Buildings(PlayerView view) => view.Board.Settlements.Concat(view.Board.Cities).ToArray();
-    private static int Horizon(PlayerView view) => RemainingRolls(view.Turn, Math.Max(view.OwnVictoryPoints, view.Players.Max(p => p.VictoryPoints)), view.TargetVictoryPoints);
+    private static int Horizon(PlayerView view) => RemainingRolls(view.Turn, Math.Max(view.OwnVictoryPoints, view.Players.Max(p => p.VictoryPoints)), (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints));
     private static int SettlementPoints(PlayerView view, string vertex) => SeafaringPlanning.SettlementPoints(view.ScenarioId, view.Board.Tiles,
         Buildings(view).Where(b => b.PlayerId == view.PlayerId).ToArray(), vertex);
     private static double SettlementValue(PlayerView view, string vertex, int length) => SeafaringPlanning.SettlementValue(view.ScenarioId,
-        view.Board.Tiles, view.Board.Edges, Buildings(view), view.PlayerId, vertex, length, Horizon(view), view.OwnVictoryPoints, view.TargetVictoryPoints);
+        view.Board.Tiles, view.Board.Edges, Buildings(view), view.PlayerId, vertex, length, Horizon(view), view.OwnVictoryPoints, (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints));
 
     private static double TheftValue(PlayerView view, string playerId)
     {
@@ -271,7 +272,7 @@ public sealed class SeafarersAi
     // 仅考察一条可立即建造的路/船夺奖，避免四人局投入大量资源长期争路。
     private static Command CheapLongestRoute(PlayerView view)
     {
-        if (view.ScenarioId == "cloth-for-catan" || view.ScenarioId == "pirate-islands" || view.LongestRoadPlayerId == view.PlayerId || view.OwnVictoryPoints < view.TargetVictoryPoints - 3) return null;
+        if (view.ScenarioId == "cloth-for-catan" || view.ScenarioId == "pirate-islands" || view.LongestRoadPlayerId == view.PlayerId || view.OwnVictoryPoints < (view.TradeModules?.Fishing?.OwnVictoryTarget ?? view.TargetVictoryPoints) - 3) return null;
         var required = Math.Max(5, view.Players.Where(p => p.Id != view.PlayerId).Max(p => p.LongestRoadLength) + 1);
         var buildings = Buildings(view);
         var ownVertices = buildings.Where(b => b.PlayerId == view.PlayerId).Select(b => b.LocationId).ToHashSet();
@@ -330,7 +331,7 @@ public sealed class SeafarersAi
     private static double Value(PlayerView view, string vertex)
     {
         var owned = Buildings(view).Where(b => b.PlayerId == view.PlayerId).Select(b => b.LocationId).ToArray();
-        return HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex) + view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
+        return FishingAi.VertexValue(view.TradeModules?.Fishing,view.Board.Tiles,vertex) + HarborValue(view.TradeModules, view.Board.Ports.SelectMany(p => p.Vertices), view.PlayerId, vertex) + view.Board.Tiles.Where(t => t.Vertices.Contains(vertex) && t.Number.HasValue).Sum(t =>
         {
             var pips = 6 - Math.Abs(7 - t.Number!.Value);
             var already = view.Board.Tiles.Count(other => other.Resource == t.Resource && other.Vertices.Intersect(owned).Any());

@@ -4,11 +4,11 @@ using System.Runtime.Serialization;
 
 namespace Catan.Core.M3
 {
-    public enum CommandKind { SetupSettlement, SetupRoad, RollDice, BuildRoad, BuildSettlement, BuildCity, BankTrade, ProposeTrade, AcceptTrade, RejectTrade, CancelTrade, BuyDevelopmentCard, PlayKnight, PlayRoadBuilding, PlaceFreeRoad, FinishRoadBuilding, PlayYearOfPlenty, PlayMonopoly, DiscardResources, MoveRobber, StealResource, EndTurn, DeclareVictory, SetupShip, BuildShip, PlaceFreeShip, MoveShip, MovePirate, ChooseGoldResources, StealCloth, PlacePort, ClaimWonder, BuildWonder, AttackFortress, SetupPort, ChooseInvasionRoute }
-    public enum GamePhase { SetupSettlement, SetupRoad, ProductionAwaitRoll, Action, Discard, RobberMove, RobberSteal, RoadBuilding, Finished, GoldChoice, PortPlacement, SetupPort }
+    public enum CommandKind { SetupSettlement, SetupRoad, RollDice, BuildRoad, BuildSettlement, BuildCity, BankTrade, ProposeTrade, AcceptTrade, RejectTrade, CancelTrade, BuyDevelopmentCard, PlayKnight, PlayRoadBuilding, PlaceFreeRoad, FinishRoadBuilding, PlayYearOfPlenty, PlayMonopoly, DiscardResources, MoveRobber, StealResource, EndTurn, DeclareVictory, SetupShip, BuildShip, PlaceFreeShip, MoveShip, MovePirate, ChooseGoldResources, StealCloth, PlacePort, ClaimWonder, BuildWonder, AttackFortress, SetupPort, ChooseInvasionRoute, SpendFish, PassOldBoot, ResolveFishReplacement }
+    public enum GamePhase { SetupSettlement, SetupRoad, ProductionAwaitRoll, Action, Discard, RobberMove, RobberSteal, RoadBuilding, Finished, GoldChoice, PortPlacement, SetupPort, FishReplacement }
     public enum DevelopmentCardKind { Knight, RoadBuilding, YearOfPlenty, Monopoly, VictoryPoint }
 
-    [DataContract] public sealed class Command
+    [DataContract] public sealed partial class Command
     {
         [DataMember(Order=1)] public string Id { get; set; }
         [DataMember(Order=2)] public string PlayerId { get; set; }
@@ -122,7 +122,7 @@ namespace Catan.Core.M3
         [DataMember(Order=3)] public long Draws { get; set; }
     }
     /// <summary>Authority only. Never send this type to a UI, AI, public logger or network player.</summary>
-    [DataContract] public sealed class GameState
+    [DataContract] public sealed partial class GameState
     {
         [DataMember(Order=1)] public int SaveFormatVersion { get; set; }
         [DataMember(Order=2)] public string RulesVersion { get; set; }
@@ -185,6 +185,7 @@ namespace Catan.Core.M3
         {
             var copy = (GameState)MemberwiseClone();
             copy.TradeModules = TradeModules?.Copy();
+            copy.FishProductionClaims=FishProductionClaims?.Select(q=>q.Copy()).ToArray();
             copy.Random = new RandomState { AlgorithmId = Random.AlgorithmId, State = Random.State, Draws = Random.Draws };
             copy.Players = Players.Select(p => new PlayerState { Id = p.Id, Resources = p.Resources.Copy(), Pieces = p.Pieces.Copy(), DevelopmentCards = p.DevelopmentCards.ToArray(), PlayedKnights = p.PlayedKnights, ShipsRemaining = p.ShipsRemaining, BonusVictoryPoints = p.BonusVictoryPoints, HomeRegions = p.HomeRegions.ToArray(), SettledRegions = p.SettledRegions.ToArray(), Cloth = p.Cloth, WonderId = p.WonderId, WonderLevel = p.WonderLevel, HeldPorts = p.HeldPorts.ToArray() }).ToArray();
             copy.Bank = Bank.Copy();
@@ -275,6 +276,7 @@ namespace Catan.Core.M3
         public string[] LegalCityVertexIds { get; internal set; }
         public string[] LegalEdgeIds { get; internal set; }
         public TradeModules.TradeModuleView TradeModules { get; internal set; }
+        public Command[] LegalFishingActions { get; internal set; } = Array.Empty<Command>();
         public string LongestRoadPlayerId { get; internal set; }
         public string LargestArmyPlayerId { get; internal set; }
         public string WinnerPlayerId { get; internal set; }
