@@ -93,10 +93,11 @@ namespace Catan.Core
             bool skillChanged = (after.Skills ?? Array.Empty<B4SkillHistoryEvent>()).Any(e =>
                 !previousSkills.TryGetValue(e.EventId,out var previous)||previous.Complete!=e.Complete||previous.PublicResult!=e.PublicResult);
             // 同一宿主命令可能同时触发随机摸牌、赠予与公开产出。无明确牌流授权时保守只给牌主真实类型。
-            bool secretGoods = before.PrivateOffer || action.Kind == "UseGeneralSkill" || skillChanged || action.Kind == "StealResource" || action.Kind == "DiscardResources" || action.Kind == "ResolveProgressChoice" || action.Card == "Taxation";
+            bool fishTheft = action.Kind == "SpendFish" && action.FishAction == "StealResource";
+            bool secretGoods = fishTheft || before.PrivateOffer || action.Kind == "UseGeneralSkill" || skillChanged || action.Kind == "StealResource" || action.Kind == "DiscardResources" || action.Kind == "ResolveProgressChoice" || action.Card == "Taxation";
             // 待决目标来自权威待决，不得信任这类指令里未被规则使用的 OtherPlayerId。
             string counterpart = action.Kind == "ResolveProgressChoice" || action.Kind == "ResolveChoice" ? before.OtherPlayerId : action.OtherPlayerId ?? before.OtherPlayerId;
-            bool sharedTransfer = before.PrivateOffer&&action.Kind=="AcceptTrade" || action.Kind == "StealResource" || action.Kind == "ResolveProgressChoice" &&
+            bool sharedTransfer = fishTheft || before.PrivateOffer&&action.Kind=="AcceptTrade" || action.Kind == "StealResource" || action.Kind == "ResolveProgressChoice" &&
                 (before.PendingKind == "ProgressGuildDues" || before.PendingKind == "ProgressWedding" || before.PendingKind == "ProgressHarbor");
             foreach (var player in after.Players)
             {
@@ -189,6 +190,7 @@ namespace Catan.Core
             {"BankTrade","完成银行／港口交易"},{"ProposeTrade","提出交易"},{"AcceptTrade","接受交易"},{"RejectTrade","拒绝交易"},{"CancelTrade","取消交易"},
             {"BuyDevelopmentCard","购买发展卡"},{"PlayKnight","使用「骑士」"},{"PlayRoadBuilding","使用「道路建设」"},{"PlayYearOfPlenty","使用「丰收」"},{"PlayMonopoly","使用「垄断」"},
             {"PlaceFreeRoad","免费建造道路"},{"PlaceFreeShip","免费建造船"},{"FinishRoadBuilding","完成道路建设"},{"DiscardResources","弃置手牌"},
+            {"SpendFish","使用鱼筹码"},{"PassOldBoot","转交旧靴"},{"ResolveFishReplacement","完成捕鱼换抽选择"},
             {"MoveRobber","移动强盗"},{"StealResource","偷取手牌"},{"EndTurn","结束回合"},{"DeclareVictory","宣告胜利"},
             {"MoveShip","移动船"},{"MovePirate","移动海盗"},{"ChooseGoldResources","领取金矿资源"},{"StealCloth","偷取布匹"},
             {"PlacePort","安置港口"},{"ClaimWonder","认领奇迹"},{"BuildWonder","建造奇迹"},{"AttackFortress","攻击海盗要塞"},{"ChooseInvasionRoute","选择海盗路线"},
@@ -220,7 +222,7 @@ namespace Catan.Core
     }
     internal sealed class HistoryAction
     {
-        internal string PlayerId, OtherPlayerId, Kind, PublicTarget, Card, PendingKind;
+        internal string PlayerId, OtherPlayerId, Kind, PublicTarget, Card, PendingKind, FishAction;
         internal GameHistoryChange[] PublicGeneralChanges = Array.Empty<GameHistoryChange>();
     }
     internal sealed class HistoryPlayer

@@ -1,0 +1,946 @@
+{
+  "日期": "2026-10-29",
+  "阶段": "F2基础捕鱼",
+  "基线提交": "b329d31d8afb7062f50c91f93e585ffc4d358dea",
+  "去重结果": {
+    "Passed": 149,
+    "Failed": 1
+  },
+  "批次": [
+    {
+      "文件": "tests/Catan.Rules.Tests/TestResults/fishing-f2-related.trx",
+      "结果计数": {
+        "Passed": 146,
+        "Failed": 2
+      }
+    },
+    {
+      "文件": "tests/Catan.Rules.Tests/TestResults/fishing-f2-final.trx",
+      "结果计数": {
+        "Passed": 27
+      }
+    },
+    {
+      "文件": "tests/Catan.Rules.Tests/TestResults/fishing-f2-target.trx",
+      "结果计数": {
+        "Passed": 1
+      }
+    }
+  ],
+  "基线复核": {
+    "测试": "GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+    "源码": "git archive HEAD，无本轮改动",
+    "结果": "失败，Expected 2 / Actual 0，与当前同一断言",
+    "TRX": ".local/development/harbor-f2/baseline/tests/Catan.Rules.Tests/TestResults/fishing-f2-baseline.trx"
+  },
+  "说明": "最终结果采用每个测试的最后一次执行；地图与测试夹具修正后重跑捕鱼专项，未重复未受影响的回归。四个捕鱼完整局为测试驱动，产品AI仍属于F3。 同一测试更名仅按最终名称计一次。",
+  "测试": [
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F01SecondSetupOnlyOneTokenAndBootDoesNotRedraw",
+      "结果": "Passed",
+      "时长": "00:00:00.0219830",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F02ProductionLocksClockwiseOrderAndCityDrawsTwice",
+      "结果": "Passed",
+      "时长": "00:00:00.0151084",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F03FullHandReplacementBootStopsAndRejectingPreservesAllowance",
+      "结果": "Passed",
+      "时长": "00:00:00.0209081",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F06FiniteSupplySettlesInOrderAndStopsWithoutRollback",
+      "结果": "Passed",
+      "时长": "00:00:00.0002761",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F06RefillAndBothPoolsEmptyNeverCreateTokens",
+      "结果": "Passed",
+      "时长": "00:00:00.0031479",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F07F09F10FiveActionsAreAtomicIdempotentAndPreRollLegal(phase: Action)",
+      "结果": "Passed",
+      "时长": "00:00:00.0311020",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F07F09F10FiveActionsAreAtomicIdempotentAndPreRollLegal(phase: ProductionAwaitRoll)",
+      "结果": "Passed",
+      "时长": "00:00:00.0127130",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F08InvalidPaymentsAndTargetsPreserveEntireState",
+      "结果": "Passed",
+      "时长": "00:00:00.0308633",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F11LakeProducesAndRobberBlocksAllFourNumbers(number: 11)",
+      "结果": "Passed",
+      "时长": "00:00:00.1076296",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F11LakeProducesAndRobberBlocksAllFourNumbers(number: 12)",
+      "结果": "Passed",
+      "时长": "00:00:00.0146601",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F11LakeProducesAndRobberBlocksAllFourNumbers(number: 2)",
+      "结果": "Passed",
+      "时长": "00:00:00.0146819",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F11LakeProducesAndRobberBlocksAllFourNumbers(number: 3)",
+      "结果": "Passed",
+      "时长": "00:00:00.0148853",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.F12BootUsesPublicPointsAndPersonalVictoryWindow",
+      "结果": "Passed",
+      "时长": "00:00:00.1179567",
+      "记录文件": "fishing-f2-target.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.FishAndBootAreNotResourcesForSevenTradeOrRobbery",
+      "结果": "Passed",
+      "时长": "00:00:00.0073875",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.N01ViewOnlyCompleteGameRestoresPendingDrawsAndPayments(players: 3, harbor: False)",
+      "结果": "Passed",
+      "时长": "00:00:01.3884547",
+      "记录文件": "fishing-f2-final.trx",
+      "输出": "人数=3，海港=False，胜者=P1，回合=76，命令=290，换抽选择=1，鱼支付=12，待决与支付恢复通过"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.N01ViewOnlyCompleteGameRestoresPendingDrawsAndPayments(players: 3, harbor: True)",
+      "结果": "Passed",
+      "时长": "00:00:03.1005573",
+      "记录文件": "fishing-f2-final.trx",
+      "输出": "人数=3，海港=True，胜者=P1，回合=67，命令=255，换抽选择=1，鱼支付=10，待决与支付恢复通过"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.N01ViewOnlyCompleteGameRestoresPendingDrawsAndPayments(players: 4, harbor: False)",
+      "结果": "Passed",
+      "时长": "00:00:03.0552505",
+      "记录文件": "fishing-f2-final.trx",
+      "输出": "人数=4，海港=False，胜者=P1，回合=86，命令=367，换抽选择=2，鱼支付=12，待决与支付恢复通过"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.N01ViewOnlyCompleteGameRestoresPendingDrawsAndPayments(players: 4, harbor: True)",
+      "结果": "Passed",
+      "时长": "00:00:01.7394894",
+      "记录文件": "fishing-f2-final.trx",
+      "输出": "人数=4，海港=True，胜者=P4，回合=81，命令=341，换抽选择=2，鱼支付=12，待决与支付恢复通过"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.N02OpponentTokensPoolAndRandomAreAbsentFromViewsAiAndTheftHistory",
+      "结果": "Passed",
+      "时长": "00:00:00.0253117",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.N03LegacyModulesDisabledAndUnsupportedModesAreExplicit",
+      "结果": "Passed",
+      "时长": "00:00:00.0112745",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.N04InvariantsRejectDuplicateTokensBootDiscardAndCorruptCursor",
+      "结果": "Passed",
+      "时长": "00:00:00.0049045",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.StandardMapPoolTargetsAndDeterminism(count: 3, harbor: False)",
+      "结果": "Passed",
+      "时长": "00:00:00.2567900",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.StandardMapPoolTargetsAndDeterminism(count: 3, harbor: True)",
+      "结果": "Passed",
+      "时长": "00:00:00.3615373",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.StandardMapPoolTargetsAndDeterminism(count: 4, harbor: False)",
+      "结果": "Passed",
+      "时长": "00:00:00.4039707",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.FishingTests.StandardMapPoolTargetsAndDeterminism(count: 4, harbor: True)",
+      "结果": "Passed",
+      "时长": "00:00:00.2388377",
+      "记录文件": "fishing-f2-final.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.AllRuleSetsRebuildSameHistoryFromExistingAuthoritativeSave(rules: \"base\")",
+      "结果": "Passed",
+      "时长": "00:00:00.2055354",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.AllRuleSetsRebuildSameHistoryFromExistingAuthoritativeSave(rules: \"cities\")",
+      "结果": "Passed",
+      "时长": "00:00:01.9996772",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.AllRuleSetsRebuildSameHistoryFromExistingAuthoritativeSave(rules: \"combined\")",
+      "结果": "Passed",
+      "时长": "00:00:01.1828850",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.AllRuleSetsRebuildSameHistoryFromExistingAuthoritativeSave(rules: \"seafarers\")",
+      "结果": "Passed",
+      "时长": "00:00:01.1158876",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.BuildingHistoryRecordsExactCostAndPieceWithoutFullHand",
+      "结果": "Passed",
+      "时长": "00:00:00.0042184",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.ClothTheftRecordsPublicTokenTransfer",
+      "结果": "Passed",
+      "时长": "00:00:00.0397041",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.DevelopmentPurchaseOnlyRevealsCardIdentityToOwner",
+      "结果": "Passed",
+      "时长": "00:00:00.0030241",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.EspionageLogsTransferWithoutExposingCardToUnrelatedPlayers",
+      "结果": "Failed",
+      "时长": "00:00:00.0037456",
+      "记录文件": "fishing-f2-related.trx",
+      "错误": "Assert.Equal() Failure: Values differ\nExpected: 2\nActual:   0"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.ForcedResourceDiscardOnlyShowsCountToOtherPlayers",
+      "结果": "Passed",
+      "时长": "00:00:00.0819850",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.ForgedCounterpartyCannotGrantAccessToPrivateProgressTransfers(card: GuildDues)",
+      "结果": "Passed",
+      "时长": "00:00:00.0036325",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.ForgedCounterpartyCannotGrantAccessToPrivateProgressTransfers(card: Wedding)",
+      "结果": "Passed",
+      "时长": "00:00:00.0034692",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.FreeCraneUpgradeStillRecordsTrackAndNewLevel",
+      "结果": "Passed",
+      "时长": "00:00:00.0082823",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.InvalidPreviewAndRepeatedCommandsDoNotAppendHistory",
+      "结果": "Passed",
+      "时长": "00:00:00.0089967",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.MonopolyNamesPlayedCardAndEveryAffectedPlayersResourceChange",
+      "结果": "Passed",
+      "时长": "00:00:00.0057177",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.SabotageCasterCannotReadOpponentsPrivateDiscard",
+      "结果": "Passed",
+      "时长": "00:00:00.0017740",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.StolenResourceIdentityIsVisibleOnlyToThiefAndVictim",
+      "结果": "Passed",
+      "时长": "00:00:00.0087758",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.ThreeDiceHistoryIncludesEventFaceAndCityResourceCommodityProduction",
+      "结果": "Passed",
+      "时长": "00:00:00.2101851",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.GameHistoryTests.TradeProposalRecordsQuoteAndAcceptanceRecordsActualExchange",
+      "结果": "Passed",
+      "时长": "00:00:00.0028885",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.AwardPointsAndPlayerViewAreDetachedAndWinOnlyInFreeActiveWindow",
+      "结果": "Passed",
+      "时长": "00:00:00.0058287",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H01ThresholdTieRetentionAndOvertake",
+      "结果": "Passed",
+      "时长": "00:00:00.0009946",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H02DowngradedVillageWithItsOwnCollapseRecordCountsZero(mode: \"cities\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0078995",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H02DowngradedVillageWithItsOwnCollapseRecordCountsZero(mode: \"combined\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0058469",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H02H03LossTieAndRecoveryDoNotDuplicateAward",
+      "结果": "Passed",
+      "时长": "00:00:00.0016486",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H02NativeCityDamageVillageCollapseAndRepairRecalculate(mode: \"cities\")",
+      "结果": "Passed",
+      "时长": "00:00:00.1096793",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H02NativeCityDamageVillageCollapseAndRepairRecalculate(mode: \"combined\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0162601",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H04EachVertexCountsOnceAndOnlyForActualOwner",
+      "结果": "Passed",
+      "时长": "00:00:00.0001263",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H04MetropolisDuplicatePortsAndChangedOwnershipUseActualBuildings(mode: \"cities\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0063369",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H04MetropolisDuplicatePortsAndChangedOwnershipUseActualBuildings(mode: \"combined\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0063213",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H05MapExchangeCountsFinalPortsAndNeverChecksIntermediateVictory(mode: \"cities\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0534597",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H05MapExchangeCountsFinalPortsAndNeverChecksIntermediateVictory(mode: \"combined\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0950619",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"base\", target: 11)",
+      "结果": "Passed",
+      "时长": "00:00:00.0198650",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"cities\", target: 14)",
+      "结果": "Passed",
+      "时长": "00:00:00.0223000",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"combined\", target: 17)",
+      "结果": "Passed",
+      "时长": "00:00:00.0239323",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.H06DefaultAdjustedOnceExplicitGoalAndOldSaveUnchanged(mode: \"seafarers\", target: 15)",
+      "结果": "Passed",
+      "时长": "00:00:00.0245846",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.PirateIslandsRemainsExplicitlyClosed(mode: \"combined\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0118140",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.PirateIslandsRemainsExplicitlyClosed(mode: \"seafarers\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0047637",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"base\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0569003",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"cities\")",
+      "结果": "Passed",
+      "时长": "00:00:00.1343182",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"combined\")",
+      "结果": "Passed",
+      "时长": "00:00:00.1872861",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.PreviewIllegalAndDuplicateCommandsPreserveStateAndResume(mode: \"seafarers\")",
+      "结果": "Passed",
+      "时长": "00:00:00.2922004",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.ProductAiTakesImmediateHarborVictoryAndLeavesViewUnchanged",
+      "结果": "Passed",
+      "时长": "00:00:00.0079203",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.HarbormasterTests.UnplacedTribePortsNeverEarnHarborPoints",
+      "结果": "Passed",
+      "时长": "00:00:00.0057688",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2FullGameTests.ViewOnlyLocalSeatsFinishNormalGameAndPendingSavesResumeDeterministically(seats: 3, seed: 1)",
+      "结果": "Passed",
+      "时长": "00:00:01.0015624",
+      "记录文件": "fishing-f2-final.trx",
+      "输出": "seats=3, seed=1, winner=P1, turn=59, commands=220, save-phases=SetupRoad,Discard,RobberMove,RobberSteal,RoadBuilding"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2FullGameTests.ViewOnlyLocalSeatsFinishNormalGameAndPendingSavesResumeDeterministically(seats: 4, seed: 2)",
+      "结果": "Passed",
+      "时长": "00:00:01.3256178",
+      "记录文件": "fishing-f2-final.trx",
+      "输出": "seats=4, seed=2, winner=P3, turn=62, commands=240, save-phases=SetupRoad,Discard,RobberMove,RobberSteal,RoadBuilding"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"Bank\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0060873",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"DevelopmentDeck\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0061934",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"Events\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0107377",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"InitialSeed\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0106517",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"PendingDecision\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0077544",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"ProcessedCommands\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0062589",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"Random\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0065091",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"RulesVersion\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0072528",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"SaveFormatVersion\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0049578",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"ScenarioContentHash\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0087972",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"ScenarioId\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0058392",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.AlteredAuthorityCannotLoadEvenWhenItLooksPlausible(field: \"ScenarioVersion\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0034556",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.DetachedViewsCommandsReceiptsAndAuthoritativeSnapshotsCannotMutateSession",
+      "结果": "Passed",
+      "时长": "00:00:00.0111179",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"negativeAmount\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0061059",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"overflowAmount\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0067421",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownKind\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0048031",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownLocation\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0046377",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownResource\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0097959",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"unknownSeat\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0057118",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"wrongPhase\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0731893",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.MalformedOrUnauthorizedCommandsAreAtomic(reason: \"wrongSeat\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0058313",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.PendingTradeSurvivesProductionSaveAndResolvesWithSameReceipt",
+      "结果": "Passed",
+      "时长": "00:00:00.1087996",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.PreviewHasNoEffectsAndSharesExecuteValidation",
+      "结果": "Passed",
+      "时长": "00:00:00.0111586",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.SaveRestoresSetupDecisionRandomStateAndCommandDeduplication",
+      "结果": "Passed",
+      "时长": "00:00:00.0126547",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.TestFixtureCannotBeLoadedAsAProductionSaveAndM1SaveCannotBecomeM2",
+      "结果": "Passed",
+      "时长": "00:00:00.0104821",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2PersistenceTests.ViewsAndPublicReceiptsExposeOnlyOwnCardsAndNoRandomDeckOrPrivateCommandHistory",
+      "结果": "Passed",
+      "时长": "00:00:00.0262541",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.BankAndOwnedPortsUseCorrectRatio(ratio: 2)",
+      "结果": "Passed",
+      "时长": "00:00:00.0097934",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.BankAndOwnedPortsUseCorrectRatio(ratio: 3)",
+      "结果": "Passed",
+      "时长": "00:00:00.0114848",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.BankAndOwnedPortsUseCorrectRatio(ratio: 4)",
+      "结果": "Passed",
+      "时长": "00:00:00.0099980",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.BreakingAwardHoldersRoadReturnsTileToSupplyWhenOtherLeadersTie",
+      "结果": "Passed",
+      "时长": "00:00:00.0065204",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.BuildingCostsDistanceConnectionCityReplacementAndSupplyAreExact",
+      "结果": "Passed",
+      "时长": "00:00:00.0217831",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.DiscardAndTheftReceiptsDoNotPublishResourceTypesOrClientSuppliedSecrets",
+      "结果": "Passed",
+      "时长": "00:00:00.0088970",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.EmptyHandAdjacentVictimIsSelectableAndNoVictimEndsRobberMove",
+      "结果": "Passed",
+      "时长": "00:00:00.0165452",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.FifthRoadAndThirdKnightAwardExactlyTwoPointsThroughNormalCommands",
+      "结果": "Passed",
+      "时长": "00:00:00.0195481",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.FinitePieceSupplyRejectsConstructionEvenWithEnoughResources(supply: \"cities\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0043257",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.FinitePieceSupplyRejectsConstructionEvenWithEnoughResources(supply: \"roads\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0102310",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.FinitePieceSupplyRejectsConstructionEvenWithEnoughResources(supply: \"settlements\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0042389",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.HiddenVictoryPointsCanWinImmediatelyButOnlyOnTheirOwnersTurn",
+      "结果": "Passed",
+      "时长": "00:00:00.0140641",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.InvalidPlayerTradesDoNotMutateAnything(reason: \"bystanders\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0060822",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.InvalidPlayerTradesDoNotMutateAnything(reason: \"gift\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0049240",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.InvalidPlayerTradesDoNotMutateAnything(reason: \"negative\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0056929",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.InvalidPlayerTradesDoNotMutateAnything(reason: \"overdraft\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0047552",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.InvalidPlayerTradesDoNotMutateAnything(reason: \"overlap\")",
+      "结果": "Passed",
+      "时长": "00:00:00.0040570",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.InventionTakesTwoResourcesAndInsufficientSelectionIsAtomic(same: False)",
+      "结果": "Passed",
+      "时长": "00:00:00.0912172",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.InventionTakesTwoResourcesAndInsufficientSelectionIsAtomic(same: True)",
+      "结果": "Passed",
+      "时长": "00:00:00.0174413",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.KnightBeforeRollMovesRobberWithoutDiscardAndStealsOnlyEligibleResource",
+      "结果": "Passed",
+      "时长": "00:00:00.0201804",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.LargestArmyRequiresThreePreservesTieAndTransfersOnlyOnStrictLead",
+      "结果": "Passed",
+      "时长": "00:00:00.0128468",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.LongestRoadCountsTrailWithoutRepeatingEdgesOrSummingBranches(edges: \"E01,E02,E03,E04,E05\", expected: 5)",
+      "结果": "Passed",
+      "时长": "00:00:00.0074310",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.LongestRoadCountsTrailWithoutRepeatingEdgesOrSummingBranches(edges: \"E01,E02,E07,E08,E12,E13\", expected: 6)",
+      "结果": "Passed",
+      "时长": "00:00:00.0078348",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.LongestRoadCountsTrailWithoutRepeatingEdgesOrSummingBranches(edges: \"E01,E02,E07,E08,E12,E13,E03,E04\", expected: 8)",
+      "结果": "Passed",
+      "时长": "00:00:00.0092076",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.LongestRoadCountsTrailWithoutRepeatingEdgesOrSummingBranches(edges: \"E02,E03,E08\", expected: 2)",
+      "结果": "Passed",
+      "时长": "00:00:00.0057371",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.MonopolyCollectsOnlyNamedResourceIncludingZeroCase(amount: 0)",
+      "结果": "Passed",
+      "时长": "00:00:00.0075473",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.MonopolyCollectsOnlyNamedResourceIncludingZeroCase(amount: 7)",
+      "结果": "Passed",
+      "时长": "00:00:00.0073789",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.NewDevelopmentCardsAndSecondCardInSameTurnAreRejected(kind: PlayKnight, card: Knight)",
+      "结果": "Passed",
+      "时长": "00:00:00.0145620",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.NewDevelopmentCardsAndSecondCardInSameTurnAreRejected(kind: PlayMonopoly, card: Monopoly)",
+      "结果": "Passed",
+      "时长": "00:00:00.0141070",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.NewDevelopmentCardsAndSecondCardInSameTurnAreRejected(kind: PlayRoadBuilding, card: RoadBuilding)",
+      "结果": "Passed",
+      "时长": "00:00:00.0167891",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.NewDevelopmentCardsAndSecondCardInSameTurnAreRejected(kind: PlayYearOfPlenty, card: YearOfPlenty)",
+      "结果": "Passed",
+      "时长": "00:00:00.0141362",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.NewlyBoughtVictoryPointWinsImmediatelyAndDevelopmentDeckCannotOverdraw",
+      "结果": "Passed",
+      "时长": "00:00:00.0149539",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.NormalSetupHasFiniteOfficialSupplySnakeOrderAndSecondVillageIncome(count: 3)",
+      "结果": "Passed",
+      "时长": "00:00:00.0568212",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.NormalSetupHasFiniteOfficialSupplySnakeOrderAndSecondVillageIncome(count: 4)",
+      "结果": "Passed",
+      "时长": "00:00:00.0566386",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.OpponentBuildingBlocksRoadContinuationAndCannotBeUpgraded",
+      "结果": "Passed",
+      "时长": "00:00:00.0087230",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.OpponentSettlementCutsLongestRoadAndTiedHolderRetainsAward",
+      "结果": "Passed",
+      "时长": "00:00:00.0186501",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.OtherSeatMayOfferTradeToActiveSeatAndAcceptanceIsAtomic",
+      "结果": "Passed",
+      "时长": "00:00:00.0172371",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.PortsRequireOwnedBuildingAndCorrectResourceAndBankStock",
+      "结果": "Passed",
+      "时长": "00:00:00.0191338",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.ProductionPaysVillageOneAndCityTwoExceptRobber(blocked: False)",
+      "结果": "Passed",
+      "时长": "00:00:00.0134739",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.ProductionPaysVillageOneAndCityTwoExceptRobber(blocked: True)",
+      "结果": "Passed",
+      "时长": "00:00:00.0100903",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.RejectedTradeAndCancelledTradeReturnToActionWithoutTransferringCards",
+      "结果": "Passed",
+      "时长": "00:00:00.0156562",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.RoadBuildingPlacesTwoFreeConnectedRoadsAndBlocksOtherCommandsUntilFinished",
+      "结果": "Passed",
+      "时长": "00:00:00.0112783",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.RoadBuildingRespectsRemainingRoadPieceSupply(used: 14)",
+      "结果": "Passed",
+      "时长": "00:00:00.0252148",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.RoadBuildingRespectsRemainingRoadPieceSupply(used: 15)",
+      "结果": "Passed",
+      "时长": "00:00:00.0151484",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.SevenDiscardsFloorHalfOnlyAboveSevenBeforeMovingAndNeverCountsDevelopmentCards",
+      "结果": "Passed",
+      "时长": "00:00:00.0115735",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.ShortageWithMultipleRecipientsPaysNoneAndSingleRecipientGetsRemainder(multiple: False)",
+      "结果": "Passed",
+      "时长": "00:00:00.0072667",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.ShortageWithMultipleRecipientsPaysNoneAndSingleRecipientGetsRemainder(multiple: True)",
+      "结果": "Passed",
+      "时长": "00:00:00.0070946",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.UnsupportedSeatCountIsRejected(players: 2)",
+      "结果": "Passed",
+      "时长": "00:00:00.0000796",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.UnsupportedSeatCountIsRejected(players: 5)",
+      "结果": "Passed",
+      "时长": "00:00:00.0002408",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.VariablePortsShuffleSixPhysicalFramesPreservingTheirPrintedPortPositions(seed: 0)",
+      "结果": "Passed",
+      "时长": "00:00:00.0023008",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.VariablePortsShuffleSixPhysicalFramesPreservingTheirPrintedPortPositions(seed: 1)",
+      "结果": "Passed",
+      "时长": "00:00:00.0030196",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.VariablePortsShuffleSixPhysicalFramesPreservingTheirPrintedPortPositions(seed: 1234)",
+      "结果": "Passed",
+      "时长": "00:00:00.0033437",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.VariablePortsShuffleSixPhysicalFramesPreservingTheirPrintedPortPositions(seed: 42)",
+      "结果": "Passed",
+      "时长": "00:00:00.0026654",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.VariablePortsShuffleSixPhysicalFramesPreservingTheirPrintedPortPositions(seed: 4294967295)",
+      "结果": "Passed",
+      "时长": "00:00:00.0037113",
+      "记录文件": "fishing-f2-related.trx"
+    },
+    {
+      "测试": "Catan.Rules.Tests.M2RulesTests.VariableSetupPreservesTerrainAndNumberSupplyAndIsSeedDeterministic",
+      "结果": "Passed",
+      "时长": "00:00:00.0110405",
+      "记录文件": "fishing-f2-related.trx"
+    }
+  ]
+}

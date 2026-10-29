@@ -4,8 +4,8 @@ using System.Runtime.Serialization;
 
 namespace Catan.Core.M2
 {
-    public enum CommandKind { SetupSettlement, SetupRoad, RollDice, BuildRoad, BuildSettlement, BuildCity, BankTrade, ProposeTrade, AcceptTrade, RejectTrade, CancelTrade, BuyDevelopmentCard, PlayKnight, PlayRoadBuilding, PlaceFreeRoad, FinishRoadBuilding, PlayYearOfPlenty, PlayMonopoly, DiscardResources, MoveRobber, StealResource, EndTurn, DeclareVictory }
-    public enum GamePhase { SetupSettlement, SetupRoad, ProductionAwaitRoll, Action, Discard, RobberMove, RobberSteal, RoadBuilding, Finished }
+    public enum CommandKind { SetupSettlement, SetupRoad, RollDice, BuildRoad, BuildSettlement, BuildCity, BankTrade, ProposeTrade, AcceptTrade, RejectTrade, CancelTrade, BuyDevelopmentCard, PlayKnight, PlayRoadBuilding, PlaceFreeRoad, FinishRoadBuilding, PlayYearOfPlenty, PlayMonopoly, DiscardResources, MoveRobber, StealResource, EndTurn, DeclareVictory, SpendFish, PassOldBoot, ResolveFishReplacement }
+    public enum GamePhase { SetupSettlement, SetupRoad, ProductionAwaitRoll, Action, Discard, RobberMove, RobberSteal, RoadBuilding, Finished, FishReplacement }
     public enum DevelopmentCardKind { Knight, RoadBuilding, YearOfPlenty, Monopoly, VictoryPoint }
 
     [DataContract] public sealed class Command
@@ -24,6 +24,10 @@ namespace Catan.Core.M2
         [DataMember(Order=11)] public ResourceBag Receive { get; set; }
         [DataMember(Order=12)] public ResourceBag Resources { get; set; }
         [DataMember(Order=13)] public Resource Resource { get; set; }
+        [DataMember(Order=14, EmitDefaultValue=false)] public TradeModules.FishAction? FishAction { get; set; }
+        [DataMember(Order=15, EmitDefaultValue=false)] public string[] FishTokenIds { get; set; }
+        [DataMember(Order=16, EmitDefaultValue=false)] public string DecisionId { get; set; }
+        [DataMember(Order=17, EmitDefaultValue=false)] public long? ExpectedEventSequence { get; set; }
     }
     [DataContract] public sealed class DevelopmentCard
     {
