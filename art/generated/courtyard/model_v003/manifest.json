@@ -1,0 +1,296 @@
+{
+  "版本": "v003",
+  "日期": "2026-10-29",
+  "面数要求": "用户明确不设限制，质感优先",
+  "成品三角面": 3288092,
+  "成品网格": 45,
+  "GLB材质": 27,
+  "源文件保留高模雕刻源": true,
+  "实际烘焙": "21张1K通用PBR贴图、6张4K雕塑图集",
+  "文件": {
+    "courtyard_high.blend": {
+      "字节": 130248460,
+      "SHA256": "ab4e94f6ccee4de3d3369fc74c7dbfad127d1fab8b9e795ad887857b26d62f99"
+    },
+    "courtyard_high.fbx": {
+      "字节": 115205660,
+      "SHA256": "55f3a721b9a1df33b9d3cbfdfe8b681d3212bcfc245921d89689d86a9f79a9b8"
+    },
+    "courtyard_high.glb": {
+      "字节": 139800808,
+      "SHA256": "c823e3cc77800d4caac0b8b77efff55bd3397e7449f0f2326ae6b4ac6368506a"
+    },
+    "renders/front.png": {
+      "字节": 6065596,
+      "SHA256": "ffdbfe97f390bcfce342cf13ea05e6d005eec9ae0ad539e9de657fdf12ccfea2",
+      "像素尺寸": [
+        2048,
+        2048
+      ]
+    },
+    "renders/left.png": {
+      "字节": 2854804,
+      "SHA256": "698c4053fcf527e778ae69430157c6303bb90ed5d89a41102926065960279079",
+      "像素尺寸": [
+        1400,
+        1400
+      ]
+    },
+    "renders/lion.png": {
+      "字节": 3056803,
+      "SHA256": "7b29def9f701f93343fda193cd152388db69d99b0d01a2f95788b550bde52d58",
+      "像素尺寸": [
+        1600,
+        1600
+      ]
+    },
+    "renders/ornament.png": {
+      "字节": 3206573,
+      "SHA256": "b4dc5091ee6c865acb94ba8d78fa31f53a11d53f2edd7d74aed2d4d29f39e4cd",
+      "像素尺寸": [
+        1600,
+        1600
+      ]
+    },
+    "renders/rear.png": {
+      "字节": 2816045,
+      "SHA256": "1913e4c7108a3592789c49915d9522fc27d5acbeddeebd7995504eaacb92f60d",
+      "像素尺寸": [
+        1400,
+        1400
+      ]
+    },
+    "renders/right.png": {
+      "字节": 2826067,
+      "SHA256": "b2df83c49976c5d7450b990f72753f5a4b863ecdb523d1ba265f6345979e7932",
+      "像素尺寸": [
+        1400,
+        1400
+      ]
+    },
+    "renders/top.png": {
+      "字节": 2738327,
+      "SHA256": "9362a46f1a564f8717939665e209ac183f6e71471976eeea95d432b55862e274",
+      "像素尺寸": [
+        1400,
+        1400
+      ]
+    },
+    "textures/gold_basecolor.png": {
+      "字节": 652233,
+      "SHA256": "a7b22ded1fccb71c2d9ce7270be2ffbd5ef8efa19d097764007f61a897cf8734",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/gold_normal.png": {
+      "字节": 200757,
+      "SHA256": "b9aec3af89ae32340e90d1508dd6c3f5c21a1756443c6f8c103ef2844a55015d",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/gold_roughness.png": {
+      "字节": 257523,
+      "SHA256": "1002235eb19dfaca9ee813bcc175d06758cb5855090800ff0d5d9ee9e0f1cd83",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/lion_atlas_basecolor.png": {
+      "字节": 4977169,
+      "SHA256": "2cde0b889484107eecc4f2313fc89dd09ea55a23c487cb261aac9590e22ddf49",
+      "像素尺寸": [
+        4096,
+        4096
+      ]
+    },
+    "textures/lion_atlas_normal.png": {
+      "字节": 7441789,
+      "SHA256": "0bb3488395b855c0f2e017c732cb63e9c0a06d03c51cddeb0d1dcea758e84e5f",
+      "像素尺寸": [
+        4096,
+        4096
+      ]
+    },
+    "textures/lion_atlas_roughness.png": {
+      "字节": 3937043,
+      "SHA256": "3cf821d5a1343e1b7e2fa14df371817d580ae3a6421b8c02151f8f896eaa5748",
+      "像素尺寸": [
+        4096,
+        4096
+      ]
+    },
+    "textures/ornament_atlas_basecolor.png": {
+      "字节": 4748249,
+      "SHA256": "f700b6acf77460d124b1350b57adece37dd8529a1abbc4d3a77d854760d222be",
+      "像素尺寸": [
+        4096,
+        4096
+      ]
+    },
+    "textures/ornament_atlas_normal.png": {
+      "字节": 7619034,
+      "SHA256": "ef449c08abe779716bd3db388629739be8fbeadb5c92d5984a008ce9b72b74e7",
+      "像素尺寸": [
+        4096,
+        4096
+      ]
+    },
+    "textures/ornament_atlas_roughness.png": {
+      "字节": 3015930,
+      "SHA256": "1ceb08326df98373ce9b1e9346e68cf5543db3d8921de0f18f1853caf1a26ef1",
+      "像素尺寸": [
+        4096,
+        4096
+      ]
+    },
+    "textures/plaster_basecolor.png": {
+      "字节": 434487,
+      "SHA256": "e735db4642c3aef8c24c48bef04c3e9a05a079ac1243eb030eca34d48bf7e6c9",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/plaster_normal.png": {
+      "字节": 673682,
+      "SHA256": "f5d0c04c44681043c5973a9e1cdb3b275573e61ae10ccabd15190d9b435334a8",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/plaster_roughness.png": {
+      "字节": 269352,
+      "SHA256": "b5b598b4ff708f0eb3681fec92b60ce8ab359e4fadb82fddc1264143e651275a",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/red_basecolor.png": {
+      "字节": 428191,
+      "SHA256": "8dea2f04b3e812d01d1d6283e7364ceebd42216dd022b81e0b6b6f5a087b87e7",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/red_normal.png": {
+      "字节": 15960,
+      "SHA256": "9d635534e475c7dc60f869767dbd9b0f37a94ddd7aa9a7b98642a6bd4febe8bc",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/red_roughness.png": {
+      "字节": 213963,
+      "SHA256": "9981ae56f736da7353da8848995c5d0f5398cdf64f1d02d8e841a7773edc6f2b",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/sculpt_basecolor.png": {
+      "字节": 451899,
+      "SHA256": "45bef8a16dddcd2d8cefb08a80d663644fc093abb4cdae8c42a35bbd32c3d0b9",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/sculpt_normal.png": {
+      "字节": 759631,
+      "SHA256": "1b6d8c4b6da99f3b0049f615abfb8ded92653490776a4c42392a7f0b8793711e",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/sculpt_roughness.png": {
+      "字节": 228418,
+      "SHA256": "5765e836920c2ab66aff92de6f223102c366bea993165af34cc5f73b96ff51da",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/stone_basecolor.png": {
+      "字节": 485129,
+      "SHA256": "662a378f6deae8ea8c623d41d2877f57cb7e8af4780368eee6042a5bee8eeb98",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/stone_normal.png": {
+      "字节": 766573,
+      "SHA256": "2314707447ad0f9ec573205006727c5e81d5586bdcc24ace626a82dbbe2e6e32",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/stone_roughness.png": {
+      "字节": 300897,
+      "SHA256": "6db063983ff63984f37c932fb2f2d964a9c8a5add1a72f910267ebe6ed78887b",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/tile_basecolor.png": {
+      "字节": 472394,
+      "SHA256": "2f8ccae6fd009b9e0f9a31385d7699af9d5dae91997546ead96a17d7f5cd7222",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/tile_normal.png": {
+      "字节": 343554,
+      "SHA256": "4f1fe357b420929851bb5295ec15766ca8ad721422e39b82368c1b7d79a4db38",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/tile_roughness.png": {
+      "字节": 256765,
+      "SHA256": "e55e69c47604219dec7612a09a1fec79320872cc13f71819422bfc7d6f3ea996",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/wood_basecolor.png": {
+      "字节": 958470,
+      "SHA256": "d9a308242846bdfb05d8721b44fa3a4e7e4fc2d14216e11bfc2a9847e163885e",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/wood_normal.png": {
+      "字节": 386886,
+      "SHA256": "ceda0224ff31842ce512c1d941cdad5cfb918e0119fb4c0ed853f60042fd2b8f",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    },
+    "textures/wood_roughness.png": {
+      "字节": 111109,
+      "SHA256": "0ce4c0c693242dc1db5fe871953a55ef93609741b57aa560976fe60a1c9dca5d",
+      "像素尺寸": [
+        1024,
+        1024
+      ]
+    }
+  }
+}
