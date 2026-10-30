@@ -46,7 +46,8 @@ public sealed class TabletopDefenseUI
         if(harbor!=null)
         {
             float y=position>=0?Area.y+82:Area.y+41;
-            GUI.Label(new Rect(Area.x+14,y,95,25),"海港大师",title);
+            FishingTabletopAssets.DrawIcon(new Rect(Area.x+10,y-3,22,30),"harbormaster");
+            GUI.Label(new Rect(Area.x+36,y,75,25),"海港大师",title);
             GUI.Label(new Rect(Area.x+109,y,122,25),HarborLabel,new GUIStyle(count){fontSize=10});
         }
     }

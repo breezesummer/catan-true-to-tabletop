@@ -21,8 +21,10 @@ namespace Catan.Server.Tests;
 
 public sealed class IncrementalTransportTests(ITestOutputHelper output)
 {
-    [Fact]
-    public async Task SameFourSeatScriptMeasuresBothWireShapesAndRestoresDisconnectedStream()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task SameFourSeatScriptMeasuresBothWireShapesAndRestoresDisconnectedStream(bool fishing)
     {
         string logs = Path.Combine(Path.GetTempPath(), "catan-sync-" + Guid.NewGuid().ToString("N"));
         var diagnostics = new CommunicationDiagnostics(logs);
@@ -35,11 +37,11 @@ public sealed class IncrementalTransportTests(ITestOutputHelper output)
         var socketAddress = new Uri(address.Replace("http://", "ws://") + "/ws");
         using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(90));
         var identities = new List<NetworkResponse>();
-        var host = rooms.Handle(new NetworkRequest { Operation = "Create", ExpectedRulesVersion = NetworkProtocol.RulesVersion("combined"), ExpectedScenarioVersion = NetworkProtocol.ScenarioVersion("combined"), Payload = WireJson.Serialize(new CreateRoomPayload { Settings = new RoomSettings { RuleSet = "combined", ScenarioId = "heading-for-new-shores", PlayerCount = 4 } }) });
+        var host = rooms.Handle(new NetworkRequest { SupportedTradeModulesVersion = NetworkProtocol.TradeModulesVersion, Operation = "Create", ExpectedRulesVersion = NetworkProtocol.RulesVersion("combined"), ExpectedScenarioVersion = NetworkProtocol.ScenarioVersion("combined"), Payload = WireJson.Serialize(new CreateRoomPayload { Settings = new RoomSettings { RuleSet = "combined", ScenarioId = "heading-for-new-shores", PlayerCount = 4, Fishing=fishing, Harbormaster=fishing, TradeModulesVersion=fishing?NetworkProtocol.TradeModulesVersion:null } }) });
         Assert.True(host.Success); identities.Add(host);
         for (int n = 1; n < 4; n++)
         {
-            var joined = rooms.Handle(new NetworkRequest { Operation = "Join", RoomId = host.RoomId, ExpectedRulesVersion = NetworkProtocol.RulesVersion("combined"), ExpectedScenarioVersion = NetworkProtocol.ScenarioVersion("combined"), Payload = "{}" });
+            var joined = rooms.Handle(new NetworkRequest { SupportedTradeModulesVersion = NetworkProtocol.TradeModulesVersion, Operation = "Join", RoomId = host.RoomId, ExpectedRulesVersion = NetworkProtocol.RulesVersion("combined"), ExpectedScenarioVersion = NetworkProtocol.ScenarioVersion("combined"), Payload = "{}" });
             Assert.True(joined.Success); identities.Add(joined);
         }
         foreach (var identity in identities)
@@ -113,13 +115,13 @@ public sealed class IncrementalTransportTests(ITestOutputHelper output)
             var report = new
             {
                 scope = "单机回环同一四席组合桌40条动作，两组各四条真实WS分别观察全量和增量；含相同命令回执正文；保存接口使用空存储，不测磁盘；不含TCP头、网卡出口、4Mbps整形或四设备帧率",
-                commands = 40, legacyBytes = oldBytes, deltaBytes = newBytes, reduction = 1 - newBytes / (double)oldBytes,
+                fishing=fishing,commands = 40, legacyBytes = oldBytes, deltaBytes = newBytes, reduction = 1 - newBytes / (double)oldBytes,
                 initialLegacyBytes = initialLegacy, initialDeltaBytes = initialDelta,
                 mixedObservationCommitToQueue = Stats(triggers.Take(320).ToArray()), actionToDeltaArrival = Stats(arrivals.ToArray()),
                 fourStreamsCommitToQueue = Stats(fourStreamTriggers.ToArray()), fourStreamsActionToArrival = Stats(fourStreamArrivals.ToArray())
             };
             string json = JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }); output.WriteLine(json);
-            string? destination = Environment.GetEnvironmentVariable("CATAN_SYNC_MEASUREMENT_OUTPUT"); if (destination != null) await File.WriteAllTextAsync(destination, json, deadline.Token);
+            string? destination = Environment.GetEnvironmentVariable("CATAN_SYNC_MEASUREMENT_OUTPUT"); if (destination != null) await File.WriteAllTextAsync(destination+(fishing?".fishing.json":".baseline.json"), json, deadline.Token);
         }
         finally
         {
@@ -133,7 +135,7 @@ public sealed class IncrementalTransportTests(ITestOutputHelper output)
         return new { samples = values.Length, p50 = P(.5), p95 = P(.95), p99 = P(.99), maximum = values.Length == 0 ? 0 : values[^1] };
     }
     static string Normalize(string json) => WireJson.Serialize(WireJson.Deserialize<M5.PlayerView>(json));
-    static NetworkRequest Request(string operation, NetworkResponse identity) => new() { RequestId = Guid.NewGuid().ToString("N"), Operation = operation, RoomId = identity.RoomId, Credential = identity.Credential, ConnectionId = identity.ConnectionId, ExpectedRevision = identity.Revision, RuleSet = "combined" };
+    static NetworkRequest Request(string operation, NetworkResponse identity) => new() { SupportedTradeModulesVersion = NetworkProtocol.TradeModulesVersion, RequestId = Guid.NewGuid().ToString("N"), Operation = operation, RoomId = identity.RoomId, Credential = identity.Credential, ConnectionId = identity.ConnectionId, ExpectedRevision = identity.Revision, RuleSet = "combined" };
     sealed class Peer(NetworkResponse identity, bool delta) : IAsyncDisposable
     {
         readonly ClientWebSocket socket = new(); readonly CancellationTokenSource stopped = new(); readonly object gate = new();

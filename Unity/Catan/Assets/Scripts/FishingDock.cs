@@ -58,12 +58,12 @@ public sealed class FishingDock
         if(!SelectingMap)
         {
             ModernOperationUI.Panel(Strip);
-            if(ModernOperationUI.Button(new Rect(Strip.x+3,Strip.y+3,57,38),"鱼 "+view.OwnTokens.Sum(t=>t.Value),interactive,false,Active))open=!open;
+            if(ModernOperationUI.Button(new Rect(Strip.x+3,Strip.y+3,57,38),"鱼 "+view.OwnTokens.Sum(t=>t.Value),interactive,false,Active)){if(Active&&!replacement)Reset();else open=true;}
             for(int i=0;i<view.OwnTokens.Length;i++)
             {
                 var token=view.OwnTokens[i];var r=new Rect(Strip.x+64+i*37,Strip.y+4,34,36);
                 ModernOperationUI.Round(r,tokens.Contains(token.Id)?new Color(.22f,.59f,.68f):new Color(.23f,.32f,.38f));
-                GUI.Label(r,token.Value+"",style);
+                FishingTabletopAssets.DrawIcon(r,"fish-"+token.Value);
                 int input=ThreeKingdomsDirectInput.Read(r,interactive);
                 if(input==2){open=true;hint=token.Value+"条鱼；整枚支付，多付不找零。";}
                 if(input==1)
@@ -119,12 +119,10 @@ public sealed class FishingDock
     {
         if(view==null)return;
         var style=new GUIStyle(GUI.skin.label){font=font,fontSize=13,alignment=TextAnchor.MiddleCenter};style.normal.textColor=new Color(.5f,.92f,1f);
-        foreach(var ground in view.Grounds)
-        {
-            var p=position(ground.VertexIds[1]);var outward=(p-new Vector2(720,420)).normalized*28;p+=outward;
-            GUI.Label(new Rect(p.x-34,p.y-13,68,26),"鱼 "+ground.Number,style);
-        }
-        if(view.LakeTileId!=null){var lake=position(view.LakeTileId);GUI.Label(new Rect(lake.x-58,lake.y-16,116,32),"湖 2·3·11·12",style);}
-        GUI.Label(new Rect(752,579,332,22),"鱼池 "+view.SupplyCount+"  弃置 "+view.DiscardValues.Length,style);
+        // 地图实体由公开视图刷新；这里只绘制有限鱼池与公开弃置顶面。
+        FishingTabletopAssets.DrawIcon(new Rect(752,573,28,28),"fish-back");
+        GUI.Label(new Rect(782,576,65,24),view.SupplyCount+"",style);
+        if(view.DiscardValues.Length>0)FishingTabletopAssets.DrawIcon(new Rect(865,573,28,28),"fish-"+view.DiscardValues[view.DiscardValues.Length-1]);
+        GUI.Label(new Rect(895,576,120,24),"弃置 "+view.DiscardValues.Length,style);
     }
 }

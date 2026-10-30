@@ -180,8 +180,15 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
                 // 登记流程的长期凭据由客户端预先保存，成功回复不会再回传。
                 var credential = string.IsNullOrEmpty(response.Credential) ? mayChangeRoom && request.EnrollmentCredential != null ? request.EnrollmentCredential : request.Credential : response.Credential;
                 var operation = request.Operation == "Sync" ? "Sync" : current?.Operation == "Sync" && current.ConnectionId == response.ConnectionId ? "Sync" : "Get";
-                if (current?.ConnectionId != response.ConnectionId || current.RoomId != response.RoomId || current.Operation != operation)
-                    binding.Write(new NetworkRequest { Operation = operation, RoomId = response.RoomId, ConnectionId = response.ConnectionId, Credential = credential });
+                if (current?.ConnectionId != response.ConnectionId || current.RoomId != response.RoomId || current.Operation != operation
+                    || current.SupportedTradeModulesVersion != request.SupportedTradeModulesVersion
+                    || current.ExpectedThreeKingdomsPackageVersion != request.ExpectedThreeKingdomsPackageVersion
+                    || current.ExpectedThreeKingdomsContentHash != request.ExpectedThreeKingdomsContentHash)
+                    // 推送与普通请求走同一能力检查，保留本次已验证的客户端声明；不能伪装成服务端最新版本。
+                    binding.Write(new NetworkRequest { Operation = operation, RoomId = response.RoomId, ConnectionId = response.ConnectionId, Credential = credential,
+                        SupportedTradeModulesVersion = request.SupportedTradeModulesVersion,
+                        ExpectedThreeKingdomsPackageVersion = request.ExpectedThreeKingdomsPackageVersion,
+                        ExpectedThreeKingdomsContentHash = request.ExpectedThreeKingdomsContentHash });
                 if (current != null && current.ConnectionId != response.ConnectionId) rooms.Disconnect(current.ConnectionId);
             }
             if (response.Success && (request.Operation == "Leave" || request.Operation == "Revoke")) binding.Write(null);

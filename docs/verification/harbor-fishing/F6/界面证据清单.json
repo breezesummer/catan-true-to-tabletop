@@ -1,0 +1,65 @@
+{
+  "说明": "已审看最终移动预览8张与第三批桌面12张；桌面/移动交互组各10张（排除各自8张已被后续替代的模型图）。这里只保存8张代表截图，原始输出在.local/development/harbor-f6。桌面交互组渔场数字仍为修正前朝向，移动交互组仍为修正前FBX轴向，仅用于输入与支付证据，最终外观以前两组为准。",
+  "证据": [
+    {
+      "文件": "mobile-art-final/result.json",
+      "SHA256": "3e201b2bfb6c27ce6386b9d8a72efb45d65c350c847301fcdb39d930ea1f772b",
+      "用途": "最终模型复验"
+    },
+    {
+      "文件": "mobile-art-final/07-base-默认视角.png",
+      "SHA256": "a8b8323104024154fd56ca5359fe37ed4b652b2a9cbc244b5999bd764ff82930",
+      "用途": "最终模型复验"
+    },
+    {
+      "文件": "mobile-art-final/08-combined-俯视.png",
+      "SHA256": "d1f6eaf6ce81db99e9ee4f8effd5d263eaae817230baa692ed41c1dcecaec11e",
+      "用途": "最终模型复验"
+    },
+    {
+      "文件": "third-wave-final/result.json",
+      "SHA256": "7e3948d0ec7385999f2bd38cb976c551651c053427047a9954ba8fe74d36265e",
+      "用途": "最终模型复验"
+    },
+    {
+      "文件": "third-wave-final/combined-new-world.png",
+      "SHA256": "c8c845c297aa8c721e08d6922b128f1f3fc5962fb493178d4cd7f62c32052c64",
+      "用途": "最终模型复验"
+    },
+    {
+      "文件": "third-wave-final/combined-forgotten-tribe.png",
+      "SHA256": "e99d6768af570cdb25fe82712af13b4e8a8708c80c1a5d3e9f8c0d9ad058b91f",
+      "用途": "最终模型复验"
+    },
+    {
+      "文件": "desktop-approved/result.json",
+      "SHA256": "9cd36fde757ed893dabe94254343875e5992b5983c5d23d8a081c0ad35203745",
+      "用途": "交互检查；模型朝向另见最终复验"
+    },
+    {
+      "文件": "desktop-approved/02-base-支付预览.png",
+      "SHA256": "4ca1e976b02a9533a030cacf541e1aec7f1015485829e8385eea7c67296b3bac",
+      "用途": "交互检查；模型朝向另见最终复验"
+    },
+    {
+      "文件": "desktop-approved/05-三国城市骑士支付预览.png",
+      "SHA256": "0046eb65d1c0b1bd6edf2776a1efcaa74f854714517756261d4b9b1262ecd346",
+      "用途": "交互检查；模型朝向另见最终复验"
+    },
+    {
+      "文件": "desktop-approved/09-满额换抽恢复.png",
+      "SHA256": "a856bf1f0c529ffd18df019b49b29147bb9b9d2e84ee5a61139c5104df18bb45",
+      "用途": "交互检查；模型朝向另见最终复验"
+    },
+    {
+      "文件": "mobile-complete/result.json",
+      "SHA256": "59da815e7a62d769c78b95a945ef9d6e964ff7a2ffe7b5bd5b9fe36d86da8256",
+      "用途": "交互检查；模型朝向另见最终复验"
+    },
+    {
+      "文件": "mobile-complete/09-满额换抽恢复.png",
+      "SHA256": "06ddd62f57662ce7eff91e76f14d3a445596e5af90f1c897574b6229a8acc1d7",
+      "用途": "交互检查；模型朝向另见最终复验"
+    }
+  ]
+}

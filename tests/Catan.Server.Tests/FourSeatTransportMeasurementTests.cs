@@ -23,9 +23,11 @@ public sealed class FourSeatTransportMeasurementTests(ITestOutputHelper output)
 {
     const string RuleSet="combined";
 
-    [Fact]
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     [Trait("Category","NetworkMeasurement")]
-    public async Task FourLiveSocketsReduceIdleTrafficAndStillReceiveChangedBoardWithoutPolling()
+    public async Task FourLiveSocketsReduceIdleTrafficAndStillReceiveChangedBoardWithoutPolling(bool fishing)
     {
         using var rooms=new RoomDirectory(new MemoryStorage(),Scenario());
         var transport=new NetworkTransport(rooms,new ServerOptions());
@@ -39,7 +41,7 @@ public sealed class FourSeatTransportMeasurementTests(ITestOutputHelper output)
         {
             for(int i=0;i<4;i++)
             {
-                var peer=new MeasuredPeer();peers.Add(peer);
+                var peer=new MeasuredPeer(fishing);peers.Add(peer);
                 await peer.Connect(new Uri(address.Replace("http://","ws://")+"/ws"),deadline.Token);
                 var enrolled=await peer.Enroll(i==0?"Create":"Join",i==0?null:peers[0].Latest.RoomId,deadline.Token);
                 Assert.True(enrolled.Success,enrolled.Code);
@@ -79,13 +81,13 @@ public sealed class FourSeatTransportMeasurementTests(ITestOutputHelper output)
             var report=new
             {
                 measuredUtc=DateTimeOffset.UtcNow,scope="同机四条真实 WebSocket；相同新服务与静止棋盘；不是四台设备或历史服务回放",
-                ruleSet=RuleSet,scenario="heading-for-new-shores",players=4,
+                fishing=fishing,ruleSet=RuleSet,scenario="heading-for-new-shores",players=4,
                 legacyOneSecond=legacy,currentTenSeconds=current,
                 receiveByteReduction=1-current.Bytes/(double)legacy.Bytes,boardPushDelayMs=delays
             };
             string json=JsonSerializer.Serialize(report,new JsonSerializerOptions{WriteIndented=true});output.WriteLine(json);
             string? path=Environment.GetEnvironmentVariable("CATAN_TRANSPORT_MEASUREMENT_OUTPUT");
-            if(!string.IsNullOrWhiteSpace(path)){Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);await File.WriteAllTextAsync(path,json,deadline.Token);}
+            if(!string.IsNullOrWhiteSpace(path)){Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);await File.WriteAllTextAsync(path+(fishing?".fishing.json":".baseline.json"),json,deadline.Token);}
         }
         finally
         {
@@ -119,7 +121,7 @@ public sealed class FourSeatTransportMeasurementTests(ITestOutputHelper output)
 
     sealed record SeatMeasurement(string SeatId,long Bytes,int Messages,int Pushes);
     sealed record Measurement(double GetIntervalSeconds,double WindowSeconds,long Bytes,int Messages,SeatMeasurement[] Seats);
-    sealed class MeasuredPeer:IAsyncDisposable
+    sealed class MeasuredPeer(bool fishing):IAsyncDisposable
     {
         readonly ClientWebSocket socket=new();
         readonly CancellationTokenSource stopped=new();
@@ -137,7 +139,7 @@ public sealed class FourSeatTransportMeasurementTests(ITestOutputHelper output)
         {
             Operation=operation,RoomId=room,EnrollmentId=Guid.NewGuid().ToString("N"),EnrollmentCredential=credential,
             ExpectedRulesVersion=NetworkProtocol.RulesVersion(RuleSet),ExpectedScenarioVersion=NetworkProtocol.ScenarioVersion(RuleSet),
-            Payload=operation=="Create"?WireJson.Serialize(new CreateRoomPayload{Settings=new RoomSettings{PlayerCount=4,RuleSet=RuleSet,ScenarioId="heading-for-new-shores"}}):WireJson.Serialize(new JoinRoomPayload())
+            Payload=operation=="Create"?WireJson.Serialize(new CreateRoomPayload{Settings=new RoomSettings{PlayerCount=4,RuleSet=RuleSet,ScenarioId="heading-for-new-shores",Fishing=fishing,Harbormaster=fishing,TradeModulesVersion=fishing?NetworkProtocol.TradeModulesVersion:null}}):WireJson.Serialize(new JoinRoomPayload())
         },cancellation);
         internal Task<NetworkResponse> Request(string operation,object? payload,CancellationToken cancellation)=>Exchange(new()
         {
@@ -147,6 +149,7 @@ public sealed class FourSeatTransportMeasurementTests(ITestOutputHelper output)
         },cancellation);
         async Task<NetworkResponse> Exchange(NetworkRequest request,CancellationToken cancellation)
         {
+            request.SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion;
             request.RequestId=Guid.NewGuid().ToString("N");
             var receipt=new TaskCompletionSource<NetworkResponse>(TaskCreationOptions.RunContinuationsAsynchronously);pending[request.RequestId]=receipt;
             await socket.SendAsync(Encoding.UTF8.GetBytes(WireJson.Serialize(request)),WebSocketMessageType.Text,true,cancellation);

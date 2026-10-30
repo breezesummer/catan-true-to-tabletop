@@ -1,0 +1,42 @@
+{
+  "状态": "通过",
+  "类型": "开发包，APK采用临时测试签名",
+  "说明": "沿用当前客户端BuildVersion 2.0.2；AGENTS指定2.1.0尚未发布，本轮不升版本。没有Windows或Android设备运行证据。",
+  "产物": [
+    {
+      "文件": ".local/development/harbor-f6/build/Builds/Android/Catan2.0.2.apk",
+      "字节数": 433812614,
+      "SHA256": "3a4ad91b664d8de65fc193a7fa8371fe8f3b9c2327cd8df0cb3c2ea1efd41fd0"
+    },
+    {
+      "文件": ".local/development/harbor-f6/build/Builds/Windows/Catan2.0.2.exe",
+      "字节数": 667136,
+      "SHA256": "b9fc30bb05ca93a042831974149a681d656963e3e612ecafd9ae826759d739ad"
+    },
+    {
+      "文件": ".local/development/harbor-f6/build/Builds/Windows/UnityCrashHandler64.exe",
+      "字节数": 1728936,
+      "SHA256": "85a665f33c618ed33f3ded733cbf6b4936eeb8b3023713385c20e9e9f82a0b99"
+    },
+    {
+      "文件": ".local/development/harbor-f6/build/Builds/Windows/Server/createdump.exe",
+      "字节数": 71552,
+      "SHA256": "315307159925d33eb604186a512901d080ecfc4cd8b8198030a7d398c6af2b0b"
+    },
+    {
+      "文件": ".local/development/harbor-f6/build/Builds/Windows/Server/Catan.Server.exe",
+      "字节数": 162304,
+      "SHA256": "b25d9634cbd61a8b9035ba80a53a070e094db4e7f973e9b29d9f11093f6b0149"
+    },
+    {
+      "文件": ".local/development/harbor-f6/build/Builds/Windows/Server/Catan.Server.dll",
+      "字节数": 84480,
+      "SHA256": "5f63f8a87beb4f131ed48dd217e6bc5b2d6db08a3030b5ba63bd0f589d24e010"
+    },
+    {
+      "文件": ".local/development/harbor-f6/build/Builds/Windows/Catan2.0.2_Data/Managed/Assembly-CSharp.dll",
+      "字节数": 1533440,
+      "SHA256": "67ae43b67aab07b948ee9490baa5e2e236cc4c62d2a08673e74faa04ed426894"
+    }
+  ]
+}

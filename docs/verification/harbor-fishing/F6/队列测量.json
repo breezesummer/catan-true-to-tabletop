@@ -1,0 +1,39 @@
+{
+  "说明": "两次最终增量测试的脱敏诊断汇总；结束时测试客户端主动Abort产生ConnectionClosedPrematurely，不代表对局中断线。无消息正文。",
+  "运行": [
+    {
+      "日志目录": ".local/development/temp/catan-sync-86bc84f0d1f94a60bb5f84dccaceb8df",
+      "发送队列峰值": 1,
+      "队列满事件": 0,
+      "关闭原因": [
+        "Cancelled",
+        "WebSocket:ConnectionClosedPrematurely"
+      ],
+      "命令提交毫秒": {
+        "样本数": 70,
+        "平均": 0.17857857142857142,
+        "p50": 0.1697,
+        "p95": 0.2513,
+        "最大": 0.6315,
+        "说明": "room.commit的CommandReceipt计时，含权威提交与空存储接口，非独立纯规则函数耗时；两组不按运行先后推测捕鱼开关。"
+      }
+    },
+    {
+      "日志目录": ".local/development/temp/catan-sync-6eab1e8592794469ac517fbc5b65de22",
+      "发送队列峰值": 1,
+      "队列满事件": 0,
+      "关闭原因": [
+        "Cancelled",
+        "WebSocket:ConnectionClosedPrematurely"
+      ],
+      "命令提交毫秒": {
+        "样本数": 70,
+        "平均": 0.09475571428571429,
+        "p50": 0.0952,
+        "p95": 0.1218,
+        "最大": 0.1312,
+        "说明": "room.commit的CommandReceipt计时，含权威提交与空存储接口，非独立纯规则函数耗时；两组不按运行先后推测捕鱼开关。"
+      }
+    }
+  ]
+}

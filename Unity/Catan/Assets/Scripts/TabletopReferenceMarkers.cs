@@ -40,6 +40,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
     Vector3 boardCenter;
     float minimumZ;
 
+    public Vector3[] PublicPortPositions => ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null).Select(p=>p.Object.transform.position).ToArray();
     public int PlacedPortCount => ports.Count;
     public int GiftPortCount => gifts.Count;
     public int UnclaimedVictoryMarkerCount => bonuses.Count;

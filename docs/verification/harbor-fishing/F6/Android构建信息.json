@@ -1,0 +1,15 @@
+{
+    "version": "2.0.2",
+    "packageId": "com.catandevelopment.threekingdoms",
+    "versionCode": 20002,
+    "minApi": 26,
+    "targetApi": 36,
+    "architectures": [
+        "arm64-v8a"
+    ],
+    "graphicsApi": "OpenGLES3",
+    "scriptingBackend": "IL2CPP",
+    "ui": "shared-pc-tabletop",
+    "coreAssemblySha256": "28867dc0e7a91bd6cb4cb05360ca1e213ff6cded29215cfa18aeec38656fda8b",
+    "aiAssemblySha256": "b519aff5cb2f5821cd21c5f5329144676c4b84be3370c0111dc4fd348d614f41"
+}

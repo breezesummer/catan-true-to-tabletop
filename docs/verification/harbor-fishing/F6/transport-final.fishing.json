@@ -1,0 +1,78 @@
+{
+  "measuredUtc": "2026-10-30T02:45:51.153013+00:00",
+  "scope": "同机四条真实 WebSocket；相同新服务与静止棋盘；不是四台设备或历史服务回放",
+  "fishing": true,
+  "ruleSet": "combined",
+  "scenario": "heading-for-new-shores",
+  "players": 4,
+  "legacyOneSecond": {
+    "GetIntervalSeconds": 1,
+    "WindowSeconds": 21.0005798,
+    "Bytes": 2198931,
+    "Messages": 84,
+    "Seats": [
+      {
+        "SeatId": "P1",
+        "Bytes": 546924,
+        "Messages": 21,
+        "Pushes": 0
+      },
+      {
+        "SeatId": "P2",
+        "Bytes": 546924,
+        "Messages": 21,
+        "Pushes": 0
+      },
+      {
+        "SeatId": "P3",
+        "Bytes": 546924,
+        "Messages": 21,
+        "Pushes": 0
+      },
+      {
+        "SeatId": "P4",
+        "Bytes": 558159,
+        "Messages": 21,
+        "Pushes": 0
+      }
+    ]
+  },
+  "currentTenSeconds": {
+    "GetIntervalSeconds": 10,
+    "WindowSeconds": 21.0016024,
+    "Bytes": 314133,
+    "Messages": 12,
+    "Seats": [
+      {
+        "SeatId": "P1",
+        "Bytes": 78132,
+        "Messages": 3,
+        "Pushes": 0
+      },
+      {
+        "SeatId": "P2",
+        "Bytes": 78132,
+        "Messages": 3,
+        "Pushes": 0
+      },
+      {
+        "SeatId": "P3",
+        "Bytes": 78132,
+        "Messages": 3,
+        "Pushes": 0
+      },
+      {
+        "SeatId": "P4",
+        "Bytes": 79737,
+        "Messages": 3,
+        "Pushes": 0
+      }
+    ]
+  },
+  "receiveByteReduction": 0.8571428571428572,
+  "boardPushDelayMs": [
+    23.547,
+    23.5056,
+    23.4371
+  ]
+}

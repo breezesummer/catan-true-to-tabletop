@@ -138,6 +138,7 @@ public sealed class M5BoardRenderer : MonoBehaviour
             {Id=p.Id,Vertices=p.Vertices,Resource=p.Resource}).ToArray(),
             publicScores:view.Players.Select(p=>new TabletopReferenceMarkers.ScoreDisplay{PlayerId=p.Id,Points=p.BonusVictoryPoints}).ToArray(),
             observerSeat:view.PlayerId,table:tableScene);
+        FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position,ReferenceMarkers.PublicPortPositions);
     }
     // The live PlayerView and art verification share this public projection-only entrance.
     public void RefreshProjectedPieces(PiecePlacement[] settlements,PiecePlacement[] roads,PiecePlacement[] cities,string robberTileId,

@@ -34,6 +34,7 @@ public static class EntityBoardAssets
     {
         switch (resource)
         {
+            case "lake": return FishingTabletopAssets.Root + "lake";
             case "wood": return "PhotoSamples/v001/forest";
             case "ore": return "EntityAssets/v006/ore-tile/tile-ore";
             case "brick": return Root + "tiles/tile-hills";
@@ -131,6 +132,8 @@ public static class EntityBoardAssets
     {
         var model = PlayerComponentAssets.Model(resource);
         if (model == null) return null;
+        // F6 单网格 FBX 的根变换保留 Blender → Unity 轴转换。
+        if(resource.StartsWith(FishingTabletopAssets.Root,System.StringComparison.Ordinal))rotation*=model.transform.rotation;
         var instance = Object.Instantiate(model, bottom, rotation, parent);
         instance.name = label + " [" + model.name + "]";
         // Metre-scale, bottom-centre pivots and source materials remain authoritative for art.

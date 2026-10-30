@@ -265,11 +265,12 @@ public sealed partial class TabletopUI
             {
                 var fish=fishing.Players.First(p=>p.PlayerId==player.Id);
                 var fishBadge=new Rect(x+83,27,28,34);
-                GUI.Label(fishBadge,"鱼\n"+fish.TokenCount,Style("fish",center,11,FontStyle.Bold));
+                FishingTabletopAssets.DrawIcon(new Rect(fishBadge.x,fishBadge.y-5,28,28),"fish-back");
+                GUI.Label(new Rect(fishBadge.x,fishBadge.y+17,28,18),fish.TokenCount.ToString(),Style("fish",center,11,FontStyle.Bold));
                 if(fishBadge.Contains(Event.current.mousePosition)){hoveredPlayerHint="持有 "+fish.TokenCount+" 枚鱼筹码；面值仅本人可见";playerHintAnchor=fishBadge;}
                 if(fishing.OldBootPlayerId==player.Id)
                 {
-                    var bootBadge=new Rect(x+4,30,28,28);GUI.Label(bootBadge,"靴",Style("boot",center,13,FontStyle.Bold));
+                    var bootBadge=new Rect(x+4,30,28,28);FishingTabletopAssets.DrawIcon(bootBadge,"old-boot");
                     if(bootBadge.Contains(Event.current.mousePosition)){hoveredPlayerHint="旧靴：本人的获胜目标增加1分";playerHintAnchor=bootBadge;}
                 }
             }
