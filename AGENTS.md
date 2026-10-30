@@ -4,7 +4,7 @@
 
 游戏名：卡坦岛之三国争霸
 
-版本号：内测版2.0.2
+版本号：内测版2.1.1
 
 发布名：游戏名+版本号
 
@@ -12,7 +12,7 @@
 
 **域名:** breezesummer.cloud
 
-**IPv4:** 175.178.212.142
+**	IPv4:** 175.178.212.142
 
 **账户:** ubuntu
 
@@ -21,6 +21,8 @@
 ### 开发约定
 
 - 你输出的所有文档和说明都应使用中文。
+- Avoid unnecessary secondary labels and descriptions. Let the layout and UI  do the explaning.
+- 游戏操作优先以棋子、手牌直接交互为先，尽可能减少各种复杂的操作框、选择框。
 - 当我明确发布时，请先更新此处版本号二级版本号，重置三级版本号为1，然后同时发布pc版和Android版，放入./game version/release中。
 - README.md 只维护项目介绍、使用入口与文档导航；每轮功能更新、修复、验证结果和发布公统一按日期与标题记录到 The Farmer's Log.md。
 - 实施前阅读`docs/PROJECT_BRIEF.md` 和 `docs/ROADMAP.md` 的当前阶段内容。
