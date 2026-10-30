@@ -183,7 +183,8 @@ public sealed partial class M6App
         bool fishingAllowed=menuRule==0||menuRule==2||Catan.Core.TradeModules.FishingScenarioCatalog.SupportsSeafaring(ScenarioIds()[menuScenario]);
         if(!fishingAllowed)menuFishing=false;
         if(PastoralMenuUI.Button(new Rect(969,632,330,36),(menuFishing?"☑ ":"☐ ")+"捕鱼",fishingAllowed,false,menuFishing))menuFishing=!menuFishing;
-        int defaults=MenuDefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
+        if(!fishingAllowed)PastoralMenuUI.Label(new Rect(969,673,330,24),"海盗群岛不适合捕鱼",13,PastoralMenuUI.Muted);
+        int defaults=MenuDefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuHarbormaster);
         if(menuVictoryPoints.HasValue)menuVictoryPoints=Mathf.Clamp(menuVictoryPoints.Value,5,maximum);
         int points=menuVictoryPoints??defaults;
         PastoralMenuUI.Label(new Rect(966,285,330,35),"本局胜利目标",22,null,true);

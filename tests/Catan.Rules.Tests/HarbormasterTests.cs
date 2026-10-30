@@ -92,9 +92,10 @@ public sealed class HarbormasterTests(ITestOutputHelper output)
         game.Accept(next);resumed.Accept(next);Assert.Equal(game.Save(),resumed.Save());
     }
     [Theory][InlineData("seafarers")][InlineData("combined")]
-    public void PirateIslandsRemainsExplicitlyClosed(string mode)
+    public void PirateIslandsHarborOpensWithExplicitIdentityAndFishingStaysClosed(string mode)
     {
-        Assert.Throws<ArgumentException>(()=>Create(mode,map:"pirate-islands"));
+        Assert.Equal(TradeModuleState.ThirdWaveVersion,(string)Create(mode,map:"pirate-islands").GetPlayerView("P1").TradeModules.Version);
+        Assert.Throws<ArgumentException>(()=>HarbormasterRules.Create(new(){Fishing=true},"pirate-islands"));
         Assert.Null((object?)Create(mode,map:"pirate-islands",enabled:false).GetPlayerView("P1").TradeModules);
     }
     [Fact]

@@ -42,7 +42,7 @@ namespace Catan.Core.TradeModules
         private static int Radius(Tile t) => Math.Max(Math.Abs(t.Q), Math.Max(Math.Abs(t.R), Math.Abs(t.Q + t.R)));
         internal static void Validate(FishingState state, Tile[] tiles, Edge[] edges)
         {
-            if (state.MapVersion != null && state.MapVersion.StartsWith(SeafaringVersion+":", StringComparison.Ordinal)) { ValidateSeafaring(state,tiles,edges); return; }
+            if (state.MapVersion != null && (state.MapVersion.StartsWith(SeafaringVersion+":", StringComparison.Ordinal)||state.MapVersion.StartsWith(ThirdWaveVersion+":", StringComparison.Ordinal))) { ValidateSeafaring(state,tiles,edges); return; }
             if (state.MapVersion != CurrentVersion || tiles.Length != 19 || tiles.Count(t => t.Resource == "lake") != 1 ||
                 !tiles.Any(t => t.Id == state.LakeTileId && t.Resource == "lake" && t.Number == null && Radius(t) <= 1) ||
                 state.Grounds == null || state.Grounds.Length != 6 ||

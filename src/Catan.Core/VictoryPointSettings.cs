@@ -8,7 +8,7 @@ namespace Catan.Core
         public const int Minimum = 5;
         public const int Maximum = 20;
         // 海盗群岛没有奖励分、布匹、分数卡或两类称号，最多五座村庄和四座城市，共十三分。
-        public static int MaximumForScenario(string scenarioId) => scenarioId == "pirate-islands" ? 5 + 4 * 2 : Maximum;
+        public static int MaximumForScenario(string scenarioId, bool harbormaster = false) => scenarioId == "pirate-islands" ? 5 + 4 * 2 + (harbormaster ? 2 : 0) : Maximum;
         public static bool IsValid(int? points, int maximum = Maximum) => points.HasValue && points.Value >= Minimum && points.Value <= maximum;
         public static int Resolve(int? points, int scenarioDefault, int maximum = Maximum)
         {

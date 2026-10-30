@@ -194,7 +194,7 @@ public sealed partial class M6App : MonoBehaviour
         if(threeKingdoms&&rules!="cities-knights"&&rules!="combined")throw new InvalidDataException("三国争霸支持城市与骑士或双扩展组合。");
         if(!networkEntering&&Network!=null&&(Network.Playing||Network.Busy||Network.RoomId!=null||Network.EnrollmentPending))Network.EndSession();
         var modules=Catan.Core.TradeModules.HarbormasterRules.Create(new Catan.Core.TradeModules.TradeModuleOptions { Harbormaster=harbormaster, Fishing=fishing },rules=="base"?"m2-base-game":rules=="cities-knights"?"m4-cities-knights":scenario);
-        int target=Catan.Core.VictoryPointSettings.Resolve(targetVictoryPoints,Catan.Core.TradeModules.HarbormasterRules.DefaultTarget(DefaultVictoryPoints(rules,scenario,players),modules),MaximumVictoryPoints(rules,scenario));
+        int target=Catan.Core.VictoryPointSettings.Resolve(targetVictoryPoints,Catan.Core.TradeModules.HarbormasterRules.DefaultTarget(DefaultVictoryPoints(rules,scenario,players),modules),MaximumVictoryPoints(rules,scenario,harbormaster));
         if(close!=null)close();
         else if(presentation!=null){presentation.enabled=false;Destroy(presentation);}
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
@@ -301,7 +301,7 @@ public sealed partial class M6App : MonoBehaviour
     string ScenarioName(string id)=>Catan.Core.M3.SeafarersScenarios.Create(id,menuPlayers).Name;
     int MenuDefaultVictoryPoints(string rules,string scenario,int players)=>DefaultVictoryPoints(rules,scenario,players)+(menuHarbormaster&&Catan.Core.TradeModules.HarbormasterRules.Supports(scenario)?1:0);
     static int DefaultVictoryPoints(string rules,string scenario,int players)=>rules=="base"?10:rules=="cities-knights"?13:rules=="combined"?Catan.Core.M5.CombinedScenarios.Create(scenario,players).TargetVictoryPoints:Catan.Core.M3.SeafarersScenarios.Create(scenario,players).TargetVictoryPoints;
-    static int MaximumVictoryPoints(string rules,string scenario)=>rules=="seafarers"?Catan.Core.VictoryPointSettings.MaximumForScenario(scenario):Catan.Core.VictoryPointSettings.Maximum;
+    static int MaximumVictoryPoints(string rules,string scenario,bool harbormaster=false)=>rules=="seafarers"?Catan.Core.VictoryPointSettings.MaximumForScenario(scenario,harbormaster):Catan.Core.VictoryPointSettings.Maximum;
     void Styles()
     {
         if(label!=null)return;

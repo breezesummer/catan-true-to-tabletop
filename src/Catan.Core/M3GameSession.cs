@@ -59,7 +59,7 @@ namespace Catan.Core.M3
             var state = new GameState
             {
                 TradeModules = modules, SaveFormatVersion = HarbormasterRules.SaveFormat(SaveFormatVersion, modules), RulesVersion = RulesVersion, ScenarioId = scenario.Id, ScenarioVersion = version,
-                ScenarioContentHash = Json.Hash(Json.Write(scenario)), InitialSeed = seed, Random = random, TargetVictoryPoints = VictoryPointSettings.Resolve(targetVictoryPoints, HarbormasterRules.DefaultTarget(scenario.TargetVictoryPoints, modules), VictoryPointSettings.MaximumForScenario(scenario.Id)),
+                ScenarioContentHash = Json.Hash(Json.Write(scenario)), InitialSeed = seed, Random = random, TargetVictoryPoints = VictoryPointSettings.Resolve(targetVictoryPoints, HarbormasterRules.DefaultTarget(scenario.TargetVictoryPoints, modules), VictoryPointSettings.MaximumForScenario(scenario.Id,modules?.Harbormaster==true)),
                 Players = Enumerable.Range(1, playerCount).Select(i => new PlayerState { Id = "P" + i, Resources = new ResourceBag(), Pieces = new PieceSupply { Roads = 15, Settlements = 5, Cities = 4 } }).ToArray(),
                 Bank = new ResourceBag { Wood = 19, Brick = 19, Wool = 19, Wheat = 19, Ore = 19 },
                 Phase = GamePhase.SetupSettlement, ActivePlayerId = "P" + (start + 1), StartingPlayerIndex = start,
@@ -179,7 +179,7 @@ namespace Catan.Core.M3
             catch (Exception ex) when (ex is System.Runtime.Serialization.SerializationException || ex is ArgumentException || ex is System.Xml.XmlException) { throw new InvalidDataException("Invalid save JSON.", ex); }
             if (saved == null || saved.SaveFormatVersion != HarbormasterRules.SaveFormat(SaveFormatVersion, saved.TradeModules) || saved.RulesVersion != RulesVersion || (saved.ScenarioVersion != ScenarioVersion && saved.ScenarioVersion != VariableScenarioVersion) || saved.Players == null || saved.ProcessedCommands == null || saved.ProcessedCommands.Length > 100000)
                 throw new InvalidDataException("Unsupported or malformed save.");
-            if (saved.TargetVictoryPoints.HasValue && !VictoryPointSettings.IsValid(saved.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(saved.ScenarioId))) throw new InvalidDataException("存档中的胜利分数无效。");
+            if (saved.TargetVictoryPoints.HasValue && !VictoryPointSettings.IsValid(saved.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(saved.ScenarioId,saved.TradeModules?.Harbormaster==true))) throw new InvalidDataException("存档中的胜利分数无效。");
             SeafarersGameSession session;
             try { session = CreateForVersion(saved.ScenarioId, saved.Players.Length, saved.InitialSeed, saved.TargetVictoryPoints, saved.ScenarioVersion, HarbormasterRules.Restore(saved.TradeModules, saved.ScenarioId)); }
             catch (ArgumentException ex) { throw new InvalidDataException("Invalid saved scenario identity.", ex); }
@@ -452,7 +452,7 @@ namespace Catan.Core.M3
         {
             HarbormasterRules.Validate(s.TradeModules, s.ScenarioId, HarborScores(s));
             AssertFishingInvariants(s);
-            Check(VictoryPointSettings.IsValid(s.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(scenario.Id)), "胜利分数无效。");
+            Check(VictoryPointSettings.IsValid(s.TargetVictoryPoints, VictoryPointSettings.MaximumForScenario(scenario.Id,s.TradeModules?.Harbormaster==true)), "胜利分数无效。");
             void Check(bool valid, string message) { if (!valid) throw new InvalidDataException(message); }
             Check(s.SaveFormatVersion == HarbormasterRules.SaveFormat(SaveFormatVersion, s.TradeModules) && s.RulesVersion == RulesVersion && (s.ScenarioVersion == ScenarioVersion || s.ScenarioVersion == VariableScenarioVersion), "Invalid version identity.");
             Check(Enum.IsDefined(typeof(GamePhase), s.Phase) && s.Turn >= 0 && s.SetupPlacementIndex >= 0 && s.SetupPlacementIndex <= s.Players.Length * scenario.SetupRounds, "Invalid phase/turn.");

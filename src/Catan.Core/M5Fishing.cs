@@ -52,6 +52,7 @@ namespace Catan.Core.M5
             switch (action)
             {
                 case FishAction.RemoveRobber:
+                    Require(!c.FishRemovePirate || seafaring.Id != "cloth-for-catan" || s.Special.Villages.Any(v=>v.TradingPlayerIds.Contains(p.Id)), "NoClothRoute", "建立布匹贸易航线后才能移出海盗。");
                     Require(c.FishRemovePirate ? s.PirateTileId != null && s.PirateTileId != "frame" : s.RobberTileId != null && s.RobberTileId != "frame", "RobberAlreadyOffBoard", "强盗已经在棋盘外。"); break;
                 case FishAction.StealResource:
                     victim = s.Players.FirstOrDefault(other => other.Id == c.OtherPlayerId && other.Id != p.Id);
@@ -87,7 +88,7 @@ namespace Catan.Core.M5
         private void GrantSetupFish(GameState s, string player, string vertex)
         {
             var fish = s.TradeModules?.Fishing;
-            if (fish == null || s.SetupPlacementIndex < s.Players.Length) return;
+            if (fish == null || s.SetupPlacementIndex < s.Players.Length * (seafaring.SetupRounds - 1)) return;
             var ground = fish.Grounds.FirstOrDefault(g => g.VertexIds.Contains(vertex));
             var lake = s.Tiles.FirstOrDefault(t => t.Id == fish.LakeTileId);
             if (ground == null && lake?.Vertices.Contains(vertex) != true) return;
@@ -155,6 +156,8 @@ namespace Catan.Core.M5
             var fish = s.TradeModules?.Fishing;
             if (s.FishProductionClaims != null && (fish == null || s.FishProductionClaims.Length > 252 || fish.Queue.Length > 0 || s.FishProductionClaims.Any(q => q == null || q.Count < 1 || q.Count > 2 || !s.Players.Any(p => p.Id == q.PlayerId) || !scenario.Topology.Vertices.Any(v => v.Id == q.VertexId))))
                 throw new InvalidDataException("冻结的捕鱼产出队列无效。");
+            if(fish!=null && fish.GroundsPendingSetup != (seafaring.Id=="new-world" && s.Phase==GamePhase.SetupPort && s.Special.UnplacedPorts.Length>0))
+                throw new InvalidDataException("渔场布置必须等待新世界全部港口放置完成。");
             FishingRules.Validate(fish, s.Players.Select(p => p.Id).ToArray(), s.Tiles, scenario.Topology.Edges);
             if ((s.Phase == GamePhase.FishReplacement) != (fish?.PendingPlayerId != null) ||
                 (s.Phase == GamePhase.FishReplacement && (s.PendingDecision?.Kind != "FishReplacement" || (s.PendingDecision.ReturnPhase != GamePhase.Action && s.PendingDecision.ReturnPhase != GamePhase.ProductionAwaitRoll) || s.TradeOffer != null)))

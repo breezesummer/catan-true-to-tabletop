@@ -131,7 +131,7 @@ namespace Catan.Core.M3
             Check(s.GiftCards.All(g => scenario.GiftCardEdgeIds.Contains(g.EdgeId)) && s.BonusEdgeIds.All(scenario.BonusEdgeIds.Contains), "Invalid island gift.");
             var allPorts = s.Ports.Concat(s.GiftPorts).Concat(s.UnplacedPorts).Concat(s.Players.SelectMany(p => p.HeldPorts)).ToArray();
             Check(allPorts.Length == scenario.Ports.Length + scenario.GiftPorts.Length && allPorts.Select(p => p.Id).Distinct().Count() == allPorts.Length, "Port conservation failed.");
-            bool needsDecision = s.Phase == GamePhase.SetupPort || s.Phase == GamePhase.SetupRoad || s.Phase == GamePhase.Discard || s.Phase == GamePhase.RobberMove || s.Phase == GamePhase.RobberSteal || s.Phase == GamePhase.RoadBuilding || s.Phase == GamePhase.GoldChoice || s.Phase == GamePhase.PortPlacement;
+            bool needsDecision = s.Phase == GamePhase.SetupPort || s.Phase == GamePhase.SetupRoad || s.Phase == GamePhase.Discard || s.Phase == GamePhase.RobberMove || s.Phase == GamePhase.RobberSteal || s.Phase == GamePhase.RoadBuilding || s.Phase == GamePhase.GoldChoice || s.Phase == GamePhase.PortPlacement || s.Phase == GamePhase.FishReplacement;
             Check(needsDecision == (s.PendingDecision != null), "Invalid pending decision.");
             Check((s.Phase == GamePhase.GoldChoice) == (s.GoldClaims.Length > 0), "Gold pending mismatch.");
             Check(s.GoldClaims.All(g => g.Amount > 0 && s.Players.Any(p => p.Id == g.PlayerId)) && s.GoldClaims.Select(g => g.PlayerId).Distinct().Count() == s.GoldClaims.Length, "Invalid gold claims.");
@@ -139,7 +139,7 @@ namespace Catan.Core.M3
             Check(s.Discards.All(d => d.Amount > 0 && s.Players.Any(p => p.Id == d.PlayerId && p.Resources.Total / 2 == d.Amount)), "Invalid discard obligation.");
             if (s.PendingDecision != null)
             {
-                Check(s.PendingDecision.PlayerId == (s.Phase == GamePhase.GoldChoice ? s.GoldClaims[0].PlayerId : s.ActivePlayerId), "Pending actor mismatch.");
+                Check(s.PendingDecision.PlayerId == (s.Phase == GamePhase.FishReplacement ? s.TradeModules.Fishing.PendingPlayerId : s.Phase == GamePhase.GoldChoice ? s.GoldClaims[0].PlayerId : s.ActivePlayerId), "Pending actor mismatch.");
                 if (s.Phase == GamePhase.SetupRoad) Check(s.Settlements.Any(b => b.PlayerId == s.ActivePlayerId && b.LocationId == s.PendingDecision.AnchorVertexId), "Invalid setup anchor.");
                 if (s.Phase == GamePhase.RoadBuilding) Check(s.PendingDecision.RemainingRoads >= 1 && s.PendingDecision.RemainingRoads <= 2, "Invalid free route count.");
                 if (s.Phase == GamePhase.RobberSteal) Check(s.PendingDecision.EligibleVictimIds.Length > 0 && s.PendingDecision.EligibleVictimIds.All(id => id != s.ActivePlayerId && s.Players.Any(p => p.Id == id)), "Invalid theft targets.");

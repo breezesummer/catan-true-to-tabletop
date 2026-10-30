@@ -25,15 +25,15 @@ public sealed class FishingRoomTests(Xunit.Abstractions.ITestOutputHelper output
     sealed class Fixture:IDisposable
     {
         public readonly Storage Store=new();public RoomDirectory Directory;
-        public readonly string Rules;public readonly bool Kingdoms;public NetworkResponse[] Clients=[];
+        public readonly string Map;public readonly string Rules;public readonly bool Kingdoms;public NetworkResponse[] Clients=[];
         public string Scenario=File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"scenario.json"));
-        public Fixture(string rules,bool kingdoms=false)
+        public Fixture(string rules,bool kingdoms=false,string map="four-islands")
         {
-            Rules=rules;Kingdoms=kingdoms;Directory=new(Store,Scenario);
+            Rules=rules;Kingdoms=kingdoms;Map=map;Directory=new(Store,Scenario);
             var create=Request("Create");create.Payload=WireJson.Serialize(new CreateRoomPayload{Settings=Settings()});var owner=Directory.Handle(create);Assert.True(owner.Success,owner.Message);
             var clients=new List<NetworkResponse>{owner};for(int i=1;i<4;i++){var req=Request("Join",owner);req.Payload=WireJson.Serialize(new JoinRoomPayload());var joined=Directory.Handle(req);Assert.True(joined.Success,joined.Message);clients.Add(joined);}Clients=clients.ToArray();
         }
-        public RoomSettings Settings()=>new(){RuleSet=Rules,PlayerCount=4,TargetVictoryPoints=Rules=="seafarers"?20:null,ScenarioId=Rules=="base"||Rules=="cities-knights"?"base":"four-islands",Fishing=true,Harbormaster=true,TradeModulesVersion=NetworkProtocol.TradeModulesVersion,
+        public RoomSettings Settings()=>new(){RuleSet=Rules,PlayerCount=4,TargetVictoryPoints=Rules=="seafarers"?20:null,ScenarioId=Rules=="base"||Rules=="cities-knights"?"base":Map,Fishing=true,Harbormaster=true,TradeModulesVersion=NetworkProtocol.TradeModulesVersion,
             ThreeKingdomsPackageVersion=Kingdoms?GeneralCatalog.B6PackageVersion:null,ThreeKingdomsContentHash=Kingdoms?GeneralCatalog.B6ContentHash:null};
         public NetworkRequest Request(string op,NetworkResponse? c=null)=>new(){Operation=op,RequestId=Guid.NewGuid().ToString("N"),RoomId=c?.RoomId,Credential=c?.Credential,ConnectionId=c?.ConnectionId,ExpectedRevision=c?.Revision??0,
             RuleSet=Rules,ExpectedRulesVersion=NetworkProtocol.RulesVersion(Rules),ExpectedScenarioVersion=NetworkProtocol.ScenarioVersion(Rules),SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion,
@@ -55,13 +55,44 @@ public sealed class FishingRoomTests(Xunit.Abstractions.ITestOutputHelper output
         var configure=standard.Request("Configure",standard.Get(standard.Clients[0]));configure.SupportedTradeModulesVersion=NetworkProtocol.StandardTradeModulesVersion;
         var settings=standard.Settings();settings.RuleSet="combined";settings.ScenarioId="four-islands";configure.Payload=WireJson.Serialize(settings);Assert.Equal("VersionMismatch",standard.Directory.Handle(configure).Code);
     }
+    [Theory][InlineData("forgotten-tribe")][InlineData("cloth-for-catan")][InlineData("wonders-of-catan")][InlineData("new-world")]
+    public void F4ClientCannotEnterThirdWaveButRetainsExistingRooms(string map)
+    {
+        using var f=new Fixture("seafarers",map:map);
+        foreach(string op in new[]{"Join","Reconnect","Get","Ready"})
+        {
+            var req=f.Request(op,f.Clients[0]);req.SupportedTradeModulesVersion=NetworkProtocol.SecondWaveTradeModulesVersion;req.Payload="{}";
+            Assert.Equal("VersionMismatch",f.Directory.Handle(req).Code);
+        }
+        using var old=new Fixture("seafarers");var get=old.Request("Get",old.Clients[0]);get.SupportedTradeModulesVersion=NetworkProtocol.SecondWaveTradeModulesVersion;Assert.True(old.Directory.Handle(get).Success);
+        var configure=old.Request("Configure",old.Get(old.Clients[0]));configure.SupportedTradeModulesVersion=NetworkProtocol.SecondWaveTradeModulesVersion;
+        var settings=old.Settings();settings.ScenarioId=map;configure.Payload=WireJson.Serialize(settings);Assert.Equal("VersionMismatch",old.Directory.Handle(configure).Code);
+    }
+    [Theory][InlineData("seafarers",15)][InlineData("combined",20)]
+    public void PirateHarborCapabilitiesAndTargetLimitsAreConsistent(string rules,int maximum)
+    {
+        using var f=new Fixture(rules);
+        var settings=f.Settings();settings.ScenarioId="pirate-islands";settings.Fishing=false;settings.TargetVictoryPoints=maximum;
+        foreach(var version in new[]{NetworkProtocol.StandardTradeModulesVersion,NetworkProtocol.SecondWaveTradeModulesVersion})
+        {
+            var old=f.Request("Create");old.SupportedTradeModulesVersion=version;old.Payload=WireJson.Serialize(new CreateRoomPayload{Settings=settings});
+            Assert.Equal("VersionMismatch",f.Directory.Handle(old).Code);
+        }
+        settings.TargetVictoryPoints=maximum+1;
+        var create=f.Request("Create");create.Payload=WireJson.Serialize(new CreateRoomPayload{Settings=settings});Assert.Equal("InvalidRequest",f.Directory.Handle(create).Code);
+        settings.TargetVictoryPoints=maximum;
+        var configure=f.Request("Configure",f.Get(f.Clients[0]));configure.Payload=WireJson.Serialize(settings);Assert.True(f.Directory.Handle(configure).Success);
+        f.Start();dynamic view=ReadView(rules,f.Get(f.Clients[0]).ViewJson);Assert.Equal(maximum,(int)view.TargetVictoryPoints);Assert.Null((object?)view.TradeModules.Fishing);
+        Assert.Equal(TradeModuleState.ThirdWaveVersion,(string)view.TradeModules.Version);
+        string before=f.Save;f.Directory.Dispose();f.Directory=new RoomDirectory(f.Store,f.Scenario);Assert.Equal(before,f.Save);
+    }
     [Fact]
     public void OldClientCannotCreateJoinReconnectOrPrepareEnabledRoom()
     {
         using var f=new Fixture("base");
         foreach(string op in new[]{"Join","Reconnect","Ready","Get"}){var req=f.Request(op,f.Clients[0]);req.SupportedTradeModulesVersion=null;req.Payload="{}";Assert.Equal("VersionMismatch",f.Directory.Handle(req).Code);}
         var create=f.Request("Create");create.SupportedTradeModulesVersion="old";create.Payload=WireJson.Serialize(new CreateRoomPayload{Settings=f.Settings()});Assert.Equal("VersionMismatch",f.Directory.Handle(create).Code);
-        var invalid=f.Settings();invalid.RuleSet="combined";invalid.ScenarioId="forgotten-tribe";create.SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion;create.Payload=WireJson.Serialize(new CreateRoomPayload{Settings=invalid});Assert.Equal("InvalidRequest",f.Directory.Handle(create).Code);
+        var invalid=f.Settings();invalid.RuleSet="combined";invalid.ScenarioId="pirate-islands";create.SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion;create.Payload=WireJson.Serialize(new CreateRoomPayload{Settings=invalid});Assert.Equal("InvalidRequest",f.Directory.Handle(create).Code);
     }
     [Fact]
     public void ConfigurationClearsReadyAndRestartPreservesModules()
@@ -73,10 +104,16 @@ public sealed class FishingRoomTests(Xunit.Abstractions.ITestOutputHelper output
         Assert.True(f.Directory.Handle(f.Request("Restart",f.Get(f.Clients[0]))).Success);
         var after=WireJson.Deserialize<M2.PlayerView>(f.Get(f.Clients[0]).ViewJson);Assert.NotNull(after.TradeModules.Fishing);Assert.False(after.TradeModules.Harbormaster);
     }
-    [Theory][InlineData("base",false)][InlineData("cities-knights",false)][InlineData("cities-knights",true)][InlineData("seafarers",false)][InlineData("combined",false)][InlineData("combined",true)]
-    public void FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(string rules,bool kingdoms)
+    [Theory]
+    [InlineData("seafarers",false,"forgotten-tribe")][InlineData("combined",false,"forgotten-tribe")]
+    [InlineData("seafarers",false,"cloth-for-catan")][InlineData("combined",false,"cloth-for-catan")]
+    [InlineData("seafarers",false,"wonders-of-catan")][InlineData("combined",false,"wonders-of-catan")]
+    [InlineData("seafarers",false,"new-world")][InlineData("combined",false,"new-world")]
+    [InlineData("combined",true,"new-world")]
+    [InlineData("base",false)][InlineData("cities-knights",false)][InlineData("cities-knights",true)][InlineData("seafarers",false)][InlineData("combined",false)][InlineData("combined",true)]
+    public void FourSeatCommandsPrivacyDeltaRetryAndServiceRecovery(string rules,bool kingdoms,string map="four-islands")
     {
-        using var f=new Fixture(rules,kingdoms);f.Start();int spend=0,steps=0;long deltaBytes=0,fullBytes=0;double commandMs=0;
+        using var f=new Fixture(rules,kingdoms,map);f.Start();int spend=0,steps=0;long deltaBytes=0,fullBytes=0;double commandMs=0;
         while(spend<2&&steps++<1200)
         {
             var snapshots=f.Clients.Select(f.Get).ToArray();

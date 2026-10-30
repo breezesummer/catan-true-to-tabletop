@@ -154,8 +154,10 @@ public sealed partial class RoomDirectory : IDisposable
     }
     private static void ValidateName(string name) { if (string.IsNullOrWhiteSpace(name) || name.Length > 40 || name.Any(char.IsControl)) throw new ArgumentException("名称无效。"); }
     private static bool SupportsTradeModules(string version,RoomSettings settings) =>
-        version == NetworkProtocol.TradeModulesVersion || version == NetworkProtocol.StandardTradeModulesVersion &&
-        !(settings.Fishing && settings.RuleSet != "base" && settings.RuleSet != "cities-knights");
+        version == NetworkProtocol.TradeModulesVersion ||
+        !(settings.Harbormaster && settings.ScenarioId=="pirate-islands" || settings.Fishing && Catan.Core.TradeModules.FishingScenarioCatalog.IsThirdWave(settings.ScenarioId)) &&
+        (version == NetworkProtocol.SecondWaveTradeModulesVersion || version == NetworkProtocol.StandardTradeModulesVersion &&
+        !(settings.Fishing && settings.RuleSet != "base" && settings.RuleSet != "cities-knights"));
     private static bool GeneralVersionsMatch(NetworkRequest request,RoomSettings settings)
     {
         if ((settings.Harbormaster || settings.Fishing) && !SupportsTradeModules(request.SupportedTradeModulesVersion,settings)) return false;
@@ -173,7 +175,7 @@ public sealed partial class RoomDirectory : IDisposable
         if (s.Harbormaster && !Catan.Core.TradeModules.HarbormasterRules.Supports(s.ScenarioId)) throw new ArgumentException("海盗群岛尚未开放海港大师。");
         if (s.RuleSet == "base" || s.RuleSet == "cities-knights") { if (s.ScenarioId != "base") throw new ArgumentException("基础场景无效。"); }
         else if (s.RuleSet == "seafarers" ? !Catan.Core.M3.SeafarersScenarios.Ids.Contains(s.ScenarioId) : !Catan.Core.M5.CombinedScenarios.Ids.Contains(s.ScenarioId)) throw new ArgumentException("剧本无效。");
-        if (s.TargetVictoryPoints.HasValue && !VictoryPointSettings.IsValid(s.TargetVictoryPoints, s.RuleSet=="seafarers"?VictoryPointSettings.MaximumForScenario(s.ScenarioId):VictoryPointSettings.Maximum)) throw new ArgumentException("胜利分数无效。");
+        if (s.TargetVictoryPoints.HasValue && !VictoryPointSettings.IsValid(s.TargetVictoryPoints, s.RuleSet=="seafarers"?VictoryPointSettings.MaximumForScenario(s.ScenarioId,s.Harbormaster):VictoryPointSettings.Maximum)) throw new ArgumentException("胜利分数无效。");
         if (s.AiSeats == null || s.AiSeats.Distinct().Count() != s.AiSeats.Length || s.AiSeats.Any(id => !SeatIds(s.PlayerCount).Contains(id))) throw new ArgumentException("AI 席位无效。");
         if(s.ThreeKingdomsPackageVersion!=null||s.ThreeKingdomsContentHash!=null)
             if((s.RuleSet!="cities-knights"&&s.RuleSet!="combined")||!GeneralCatalog.IsNetworkPackage(s.ThreeKingdomsPackageVersion,s.ThreeKingdomsContentHash))

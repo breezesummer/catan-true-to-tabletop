@@ -507,7 +507,7 @@ public sealed partial class M6App
             if(!allowedHarbor)menuHarbormaster=false;if(!allowedFish)menuFishing=false;
             GUILayout.BeginHorizontal();bool moduleEnabled=GUI.enabled;
             GUI.enabled=moduleEnabled&&allowedHarbor;menuHarbormaster=GUILayout.Toggle(menuHarbormaster,"海港大师",button,GUILayout.Height(34));
-            GUI.enabled=moduleEnabled&&allowedFish;menuFishing=GUILayout.Toggle(menuFishing,allowedFish?"捕鱼":"捕鱼 · 此地图尚未开放",button,GUILayout.Height(34));
+            GUI.enabled=moduleEnabled&&allowedFish;menuFishing=GUILayout.Toggle(menuFishing,allowedFish?"捕鱼":"捕鱼 · 海盗群岛不支持",button,GUILayout.Height(34));
             GUI.enabled=moduleEnabled;GUILayout.EndHorizontal();
             if(menuRule==2||menuRule==3)menuThreeKingdoms=GUILayout.Toggle(menuThreeKingdoms,"三国争霸 · 桌面武将技能",button,GUILayout.Height(38));
         }
@@ -526,7 +526,7 @@ public sealed partial class M6App
             }
             GUILayout.EndHorizontal();
             if(Enumerable.Range(0,menuPlayers).All(i=>networkAi[i]))GUILayout.Label("请为房主保留至少一种颜色。",small);
-            var ids=ScenarioIds();int defaults=MenuDefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario]);
+            var ids=ScenarioIds();int defaults=MenuDefaultVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuPlayers),maximum=MaximumVictoryPoints(RuleIds[menuRule],ids[menuScenario],menuHarbormaster);
             if(menuVictoryPoints.HasValue)menuVictoryPoints=Mathf.Clamp(menuVictoryPoints.Value,5,maximum);
             int target=menuVictoryPoints??defaults;GUILayout.Space(26);GUILayout.Label("胜利目标",small);
             GUILayout.BeginHorizontal();

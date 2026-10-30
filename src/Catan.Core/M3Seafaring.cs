@@ -58,7 +58,7 @@ namespace Catan.Core.M3
                     var setupPort = Json.Copy(s.UnplacedPorts[0]); setupPort.EdgeId = c.TargetId; setupPort.Vertices = EdgeAt(c.TargetId).Vertices.ToArray();
                     s.Ports = Append(s.Ports, setupPort); s.UnplacedPorts = s.UnplacedPorts.Skip(1).ToArray(); s.SetupPortIndex++;
                     s.ActivePlayerId = s.Players[(s.StartingPlayerIndex + (s.UnplacedPorts.Length == 0 ? 0 : s.SetupPortIndex)) % s.Players.Length].Id;
-                    if (s.UnplacedPorts.Length == 0) { s.Phase = GamePhase.SetupSettlement; s.PendingDecision = null; }
+                    if (s.UnplacedPorts.Length == 0) { Catan.Core.TradeModules.FishingScenarioCatalog.CompletePortSetup(s.TradeModules?.Fishing,scenario,values=>Shuffle(values,s.Random)); s.Phase = GamePhase.SetupSettlement; s.PendingDecision = null; }
                     else s.PendingDecision.PlayerId = s.ActivePlayerId;
                     return true;
                 case CommandKind.SetupShip:

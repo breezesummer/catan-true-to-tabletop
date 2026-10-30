@@ -102,8 +102,8 @@ public static class FishingF4EditorVerification
         }
         yield return ReviewSeaTargets();
         yield return ReviewKingdoms();
-        Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",1);Set(app,"menuScenario",4);
-        yield return Capture("04-F5捕鱼保持禁用");
+        Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",1);Set(app,"menuScenario",6);
+        yield return Capture("04-海盗群岛捕鱼保持禁用");
     }
     static Vector2 MapPoint(M3BoardRenderer board,string id)
     {

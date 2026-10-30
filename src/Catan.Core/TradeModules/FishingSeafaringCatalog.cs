@@ -9,7 +9,10 @@ namespace Catan.Core.TradeModules
     public static partial class FishingScenarioCatalog
     {
         public const string SeafaringVersion = "seafaring-fishing-map-v001";
-        public static bool SupportsSeafaring(string id) => id == "heading-for-new-shores" || id == "four-islands" || id == "fog-islands" || id == "through-the-desert";
+        public const string ThirdWaveVersion = "seafaring-fishing-map-v002";
+        public static bool IsThirdWave(string id) => id == "forgotten-tribe" || id == "cloth-for-catan" || id == "wonders-of-catan" || id == "new-world";
+        public static string MapVersionFor(string id) => (IsThirdWave(id) ? ThirdWaveVersion : SeafaringVersion) + ":" + id;
+        public static bool SupportsSeafaring(string id) => IsThirdWave(id) || id == "heading-for-new-shores" || id == "four-islands" || id == "fog-islands" || id == "through-the-desert";
         internal static bool IsInterior(Tile tile, Tile[] tiles) => tiles.Count(t => t.Id != tile.Id && t.Vertices.Intersect(tile.Vertices).Count() == 2 && Land(t)) == 6;
         private static bool Land(Tile tile) => tile.Resource != "sea" && tile.Resource != "fog";
         private static Edge[] Coast(Tile[] tiles, Edge[] edges) => edges.Where(e =>
@@ -21,7 +24,7 @@ namespace Catan.Core.TradeModules
         // 2026-10-29 用户确认的 2025 地图适配；详见 F4 规则说明。
         internal static void PrepareSeafaring(SeafarersScenario map)
         {
-            if(map.Id=="four-islands")return;
+            if(map.Id=="four-islands" || map.Id=="cloth-for-catan" || map.Id=="wonders-of-catan" || map.Id=="new-world")return;
             if(map.Id=="fog-islands")
             {
                 int wheat=Array.IndexOf(map.HiddenResources,"wheat");
@@ -40,8 +43,8 @@ namespace Catan.Core.TradeModules
             foreach(var source in sources) foreach(var destination in destinations.OrderBy(t=>t.Id==source.Id?0:1))
             {
                 foreach(var item in original){item.tile.Resource=item.resource;item.tile.Number=item.number;}
-                var numberTile=map.Id=="through-the-desert" ? map.Tiles.SingleOrDefault(t=>t.Number==2) : source;
-                if(numberTile==null)throw new InvalidDataException("穿越沙漠缺少2号组件。");
+                var numberTile=map.Id=="through-the-desert" ? map.Tiles.SingleOrDefault(t=>t.Number==2) : map.Id=="forgotten-tribe" ? map.Tiles.SingleOrDefault(t=>map.StartingTileIds.Contains(t.Id)&&t.Number==12) : source;
+                if(numberTile==null)throw new InvalidDataException("剧本缺少指定的湖泊替换号码。");
                 // 地形与普通号码是独立实体：只移除指定田地/沙漠及指定号码，其余红点尽量留原位。
                 var resource=destination.Resource;var number=destination.Number;
                 if(source!=destination)source.Resource=resource;
@@ -50,6 +53,10 @@ namespace Catan.Core.TradeModules
                 // 资源与数字交换不得破坏正常布局的红点分离。
                 var red=map.Tiles.Where(t=>t.Number==6||t.Number==8).ToArray();
                 if(red.Any(t=>red.Any(other=>t!=other&&t.Vertices.Intersect(other.Vertices).Count()==2)))continue;
+                // 遗忘部落东岸的低产限制在湖泊适配后仍成立（航海家2025 PDF第13页）。
+                if(map.Id=="forgotten-tribe" && map.Tiles.Any(t=>map.StartingTileIds.Contains(t.Id) &&
+                    t.Q==map.Tiles.Where(x=>x.R==t.R&&map.StartingTileIds.Contains(x.Id)).Max(x=>x.Q) &&
+                    (t.Number==5||t.Number==6||t.Number==8||t.Number==9)))continue;
                 return;
             }
             foreach(var item in original){item.tile.Resource=item.resource;item.tile.Number=item.number;}
@@ -57,9 +64,13 @@ namespace Catan.Core.TradeModules
         }
 
         // FSF.pdf 第1—2页：渔场附着固定空间；排序、洗牌、有限回溯，不能无限重抽。
-        internal static FishingState CreateSeafaring(SeafarersScenario map, string[] players, Action<int[]> shuffle)
+        internal static FishingState CreateSeafaring(SeafarersScenario map, string[] players, Action<int[]> shuffle, bool portsPlaced = false)
         {
-            var fish=new FishingState {MapVersion=SeafaringVersion+":"+map.Id,LakeTileId=map.Tiles.SingleOrDefault(t=>t.Resource=="lake")?.Id,Holdings=players.Select(p=>new FishHolding {PlayerId=p}).ToArray()};
+            var fish=new FishingState {MapVersion=MapVersionFor(map.Id),LakeTileId=map.Tiles.SingleOrDefault(t=>t.Resource=="lake")?.Id,Holdings=players.Select(p=>new FishHolding {PlayerId=p}).ToArray()};
+            if(map.Id=="new-world" && !portsPlaced)
+            {
+                fish.Grounds=Array.Empty<FishingGround>();fish.GroundsPendingSetup=true;return fish;
+            }
             var coast=Coast(map.Tiles,map.Edges);
             var candidates=new List<string[]>();
             foreach(var middle in coast.SelectMany(e=>e.Vertices).Distinct().OrderBy(v=>v,StringComparer.Ordinal))
@@ -71,9 +82,10 @@ namespace Catan.Core.TradeModules
             var shuffled=order.Select(i=>candidates[i]).ToArray();
             var numbers=new[]{4,5,6,8,9,10};shuffle(numbers);
             var islands=map.Regions.OrderBy(r=>r.TileIds.Length).ThenBy(r=>r.Id,StringComparer.Ordinal).ToArray();
+            var mainIslands=map.Regions.Where(r=>r.TileIds.Any(map.StartingTileIds.Contains)).OrderBy(r=>r.Id,StringComparer.Ordinal).ToArray();
             bool Allowed(string[] vertices,int number)
             {
-                var ids=map.Id=="four-islands" ? islands[number==4||number==8?0:number==6||number==10?1:number==5?2:3].TileIds : map.Id=="fog-islands"?map.StartingTileIds:null;
+                var ids=map.Id=="four-islands" ? islands[number==4||number==8?0:number==6||number==10?1:number==5?2:3].TileIds : map.Id=="cloth-for-catan" ? mainIslands[number==4||number==5||number==6?0:1].TileIds : map.Id=="fog-islands"||map.Id=="forgotten-tribe"?map.StartingTileIds:null;
                 return ids==null || vertices.All(v=>map.Tiles.Any(t=>ids.Contains(t.Id)&&Land(t)&&t.Vertices.Contains(v)));
             }
             var selected=new List<FishingGround>();int budget=200000;
@@ -89,15 +101,29 @@ namespace Catan.Core.TradeModules
                 }
                 return false;
             }
-            if(map.Id=="four-islands"&&islands.Length!=4 || !Place(0))throw new InvalidDataException("无法在有限搜索内放置六处合规渔场。");
+            if(map.Id=="four-islands"&&islands.Length!=4 || map.Id=="cloth-for-catan"&&mainIslands.Length!=2 || !Place(0))throw new InvalidDataException("无法在有限搜索内放置六处合规渔场。");
             fish.Grounds=selected.ToArray();ValidateSeafaring(fish,map.Tiles,map.Edges);return fish;
+        }
+        // FSF.pdf 第3页：玩家完成港口分配后才生成渔场；只更新布局，不重新抽池。
+        internal static void CompletePortSetup(FishingState fish, SeafarersScenario map, Action<int[]> shuffle)
+        {
+            if(fish?.GroundsPendingSetup!=true)return;
+            fish.Grounds=CreateSeafaring(map,fish.Holdings.Select(h=>h.PlayerId).ToArray(),shuffle,true).Grounds;
+            fish.GroundsPendingSetup=false;
         }
         private static void ValidateSeafaring(FishingState fish,Tile[] tiles,Edge[] edges)
         {
-            string id=fish.MapVersion.Substring((SeafaringVersion+":").Length);
-            bool lakeRequired=id=="heading-for-new-shores"||id=="through-the-desert";
+            string id=fish.MapVersion.Substring(fish.MapVersion.IndexOf(':')+1);
+            if(fish.MapVersion!=MapVersionFor(id))throw new InvalidDataException("航海捕鱼地图版本不兼容。");
+            if(fish.GroundsPendingSetup)
+            {
+                if(id!="new-world"||fish.Grounds==null||fish.Grounds.Length!=0||fish.LakeTileId!=null||tiles.Any(t=>t.Resource=="lake"))
+                    throw new InvalidDataException("新世界待布置渔场状态无效。");
+                return;
+            }
+            bool lakeRequired=id=="heading-for-new-shores"||id=="through-the-desert"||id=="forgotten-tribe";
             var lakes=tiles.Where(t=>t.Resource=="lake").ToArray();
-            if(!SupportsSeafaring(id)||lakes.Length>1||lakeRequired&&lakes.Length!=1||id=="four-islands"&&lakes.Length!=0||
+            if(!SupportsSeafaring(id)||lakes.Length>1||lakeRequired&&lakes.Length!=1||!lakeRequired&&id!="fog-islands"&&lakes.Length!=0||
                 fish.LakeTileId!=lakes.SingleOrDefault()?.Id||lakes.Any(t=>t.Number!=null||lakeRequired&&!IsInterior(t,tiles))||
                 fish.Grounds==null||fish.Grounds.Length!=6||!fish.Grounds.Select(g=>g.Number).OrderBy(n=>n).SequenceEqual(new[]{4,5,6,8,9,10}))
                 throw new InvalidDataException("航海捕鱼地图身份或湖泊无效。");

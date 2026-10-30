@@ -1,0 +1,5982 @@
+[
+  {
+    "模式": "combined",
+    "地图": "cloth-for-catan",
+    "场景版本": "m5-combined-variable-all-2025-v004",
+    "湖泊": null,
+    "配置版本": "seafaring-fishing-map-v002:cloth-for-catan",
+    "渔场": [
+      {
+        "Id": "FG1",
+        "Number": 4,
+        "VertexIds": [
+          "V1:-1",
+          "V2:-2",
+          "V3:-1"
+        ]
+      },
+      {
+        "Id": "FG2",
+        "Number": 5,
+        "VertexIds": [
+          "V6:-2",
+          "V7:-1",
+          "V8:-2"
+        ]
+      },
+      {
+        "Id": "FG3",
+        "Number": 10,
+        "VertexIds": [
+          "V6:14",
+          "V7:13",
+          "V8:14"
+        ]
+      },
+      {
+        "Id": "FG4",
+        "Number": 9,
+        "VertexIds": [
+          "V6:20",
+          "V7:19",
+          "V8:20"
+        ]
+      },
+      {
+        "Id": "FG5",
+        "Number": 8,
+        "VertexIds": [
+          "V0:14",
+          "V1:13",
+          "V2:14"
+        ]
+      },
+      {
+        "Id": "FG6",
+        "Number": 6,
+        "VertexIds": [
+          "V7:5",
+          "V8:4",
+          "V9:5"
+        ]
+      }
+    ],
+    "地形": [
+      {
+        "id": "T0:0",
+        "q": 0,
+        "r": 0,
+        "resource": "wheat",
+        "number": 9,
+        "vertices": [
+          "V0:-2",
+          "V1:-1",
+          "V1:1",
+          "V0:2",
+          "V-1:1",
+          "V-1:-1"
+        ]
+      },
+      {
+        "id": "T1:0",
+        "q": 1,
+        "r": 0,
+        "resource": "wheat",
+        "number": 10,
+        "vertices": [
+          "V2:-2",
+          "V3:-1",
+          "V3:1",
+          "V2:2",
+          "V1:1",
+          "V1:-1"
+        ]
+      },
+      {
+        "id": "T2:0",
+        "q": 2,
+        "r": 0,
+        "resource": "wood",
+        "number": 3,
+        "vertices": [
+          "V4:-2",
+          "V5:-1",
+          "V5:1",
+          "V4:2",
+          "V3:1",
+          "V3:-1"
+        ]
+      },
+      {
+        "id": "T3:0",
+        "q": 3,
+        "r": 0,
+        "resource": "ore",
+        "number": 6,
+        "vertices": [
+          "V6:-2",
+          "V7:-1",
+          "V7:1",
+          "V6:2",
+          "V5:1",
+          "V5:-1"
+        ]
+      },
+      {
+        "id": "T4:0",
+        "q": 4,
+        "r": 0,
+        "resource": "ore",
+        "number": 3,
+        "vertices": [
+          "V8:-2",
+          "V9:-1",
+          "V9:1",
+          "V8:2",
+          "V7:1",
+          "V7:-1"
+        ]
+      },
+      {
+        "id": "T-1:1",
+        "q": -1,
+        "r": 1,
+        "resource": "brick",
+        "number": 6,
+        "vertices": [
+          "V-1:1",
+          "V0:2",
+          "V0:4",
+          "V-1:5",
+          "V-2:4",
+          "V-2:2"
+        ]
+      },
+      {
+        "id": "T0:1",
+        "q": 0,
+        "r": 1,
+        "resource": "wheat",
+        "number": 4,
+        "vertices": [
+          "V1:1",
+          "V2:2",
+          "V2:4",
+          "V1:5",
+          "V0:4",
+          "V0:2"
+        ]
+      },
+      {
+        "id": "T1:1",
+        "q": 1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:1",
+          "V4:2",
+          "V4:4",
+          "V3:5",
+          "V2:4",
+          "V2:2"
+        ]
+      },
+      {
+        "id": "T2:1",
+        "q": 2,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:1",
+          "V6:2",
+          "V6:4",
+          "V5:5",
+          "V4:4",
+          "V4:2"
+        ]
+      },
+      {
+        "id": "T3:1",
+        "q": 3,
+        "r": 1,
+        "resource": "wool",
+        "number": 11,
+        "vertices": [
+          "V7:1",
+          "V8:2",
+          "V8:4",
+          "V7:5",
+          "V6:4",
+          "V6:2"
+        ]
+      },
+      {
+        "id": "T4:1",
+        "q": 4,
+        "r": 1,
+        "resource": "wool",
+        "number": 2,
+        "vertices": [
+          "V9:1",
+          "V10:2",
+          "V10:4",
+          "V9:5",
+          "V8:4",
+          "V8:2"
+        ]
+      },
+      {
+        "id": "T-2:2",
+        "q": -2,
+        "r": 2,
+        "resource": "ore",
+        "number": 5,
+        "vertices": [
+          "V-2:4",
+          "V-1:5",
+          "V-1:7",
+          "V-2:8",
+          "V-3:7",
+          "V-3:5"
+        ]
+      },
+      {
+        "id": "T-1:2",
+        "q": -1,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V0:4",
+          "V1:5",
+          "V1:7",
+          "V0:8",
+          "V-1:7",
+          "V-1:5"
+        ]
+      },
+      {
+        "id": "T0:2",
+        "q": 0,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:4",
+          "V3:5",
+          "V3:7",
+          "V2:8",
+          "V1:7",
+          "V1:5"
+        ]
+      },
+      {
+        "id": "T1:2",
+        "q": 1,
+        "r": 2,
+        "resource": "gold",
+        "number": null,
+        "vertices": [
+          "V4:4",
+          "V5:5",
+          "V5:7",
+          "V4:8",
+          "V3:7",
+          "V3:5"
+        ]
+      },
+      {
+        "id": "T2:2",
+        "q": 2,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V6:4",
+          "V7:5",
+          "V7:7",
+          "V6:8",
+          "V5:7",
+          "V5:5"
+        ]
+      },
+      {
+        "id": "T3:2",
+        "q": 3,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:4",
+          "V9:5",
+          "V9:7",
+          "V8:8",
+          "V7:7",
+          "V7:5"
+        ]
+      },
+      {
+        "id": "T4:2",
+        "q": 4,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:4",
+          "V11:5",
+          "V11:7",
+          "V10:8",
+          "V9:7",
+          "V9:5"
+        ]
+      },
+      {
+        "id": "T-2:3",
+        "q": -2,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:7",
+          "V0:8",
+          "V0:10",
+          "V-1:11",
+          "V-2:10",
+          "V-2:8"
+        ]
+      },
+      {
+        "id": "T-1:3",
+        "q": -1,
+        "r": 3,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V1:7",
+          "V2:8",
+          "V2:10",
+          "V1:11",
+          "V0:10",
+          "V0:8"
+        ]
+      },
+      {
+        "id": "T0:3",
+        "q": 0,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:7",
+          "V4:8",
+          "V4:10",
+          "V3:11",
+          "V2:10",
+          "V2:8"
+        ]
+      },
+      {
+        "id": "T1:3",
+        "q": 1,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:7",
+          "V6:8",
+          "V6:10",
+          "V5:11",
+          "V4:10",
+          "V4:8"
+        ]
+      },
+      {
+        "id": "T2:3",
+        "q": 2,
+        "r": 3,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V7:7",
+          "V8:8",
+          "V8:10",
+          "V7:11",
+          "V6:10",
+          "V6:8"
+        ]
+      },
+      {
+        "id": "T3:3",
+        "q": 3,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V9:7",
+          "V10:8",
+          "V10:10",
+          "V9:11",
+          "V8:10",
+          "V8:8"
+        ]
+      },
+      {
+        "id": "T-3:4",
+        "q": -3,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-2:10",
+          "V-1:11",
+          "V-1:13",
+          "V-2:14",
+          "V-3:13",
+          "V-3:11"
+        ]
+      },
+      {
+        "id": "T-2:4",
+        "q": -2,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V0:10",
+          "V1:11",
+          "V1:13",
+          "V0:14",
+          "V-1:13",
+          "V-1:11"
+        ]
+      },
+      {
+        "id": "T-1:4",
+        "q": -1,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:10",
+          "V3:11",
+          "V3:13",
+          "V2:14",
+          "V1:13",
+          "V1:11"
+        ]
+      },
+      {
+        "id": "T0:4",
+        "q": 0,
+        "r": 4,
+        "resource": "gold",
+        "number": null,
+        "vertices": [
+          "V4:10",
+          "V5:11",
+          "V5:13",
+          "V4:14",
+          "V3:13",
+          "V3:11"
+        ]
+      },
+      {
+        "id": "T1:4",
+        "q": 1,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V6:10",
+          "V7:11",
+          "V7:13",
+          "V6:14",
+          "V5:13",
+          "V5:11"
+        ]
+      },
+      {
+        "id": "T2:4",
+        "q": 2,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:10",
+          "V9:11",
+          "V9:13",
+          "V8:14",
+          "V7:13",
+          "V7:11"
+        ]
+      },
+      {
+        "id": "T3:4",
+        "q": 3,
+        "r": 4,
+        "resource": "ore",
+        "number": 8,
+        "vertices": [
+          "V10:10",
+          "V11:11",
+          "V11:13",
+          "V10:14",
+          "V9:13",
+          "V9:11"
+        ]
+      },
+      {
+        "id": "T-3:5",
+        "q": -3,
+        "r": 5,
+        "resource": "wood",
+        "number": 10,
+        "vertices": [
+          "V-1:13",
+          "V0:14",
+          "V0:16",
+          "V-1:17",
+          "V-2:16",
+          "V-2:14"
+        ]
+      },
+      {
+        "id": "T-2:5",
+        "q": -2,
+        "r": 5,
+        "resource": "wood",
+        "number": 9,
+        "vertices": [
+          "V1:13",
+          "V2:14",
+          "V2:16",
+          "V1:17",
+          "V0:16",
+          "V0:14"
+        ]
+      },
+      {
+        "id": "T-1:5",
+        "q": -1,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:13",
+          "V4:14",
+          "V4:16",
+          "V3:17",
+          "V2:16",
+          "V2:14"
+        ]
+      },
+      {
+        "id": "T0:5",
+        "q": 0,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:13",
+          "V6:14",
+          "V6:16",
+          "V5:17",
+          "V4:16",
+          "V4:14"
+        ]
+      },
+      {
+        "id": "T1:5",
+        "q": 1,
+        "r": 5,
+        "resource": "wheat",
+        "number": 4,
+        "vertices": [
+          "V7:13",
+          "V8:14",
+          "V8:16",
+          "V7:17",
+          "V6:16",
+          "V6:14"
+        ]
+      },
+      {
+        "id": "T2:5",
+        "q": 2,
+        "r": 5,
+        "resource": "brick",
+        "number": 2,
+        "vertices": [
+          "V9:13",
+          "V10:14",
+          "V10:16",
+          "V9:17",
+          "V8:16",
+          "V8:14"
+        ]
+      },
+      {
+        "id": "T-3:6",
+        "q": -3,
+        "r": 6,
+        "resource": "wool",
+        "number": 5,
+        "vertices": [
+          "V0:16",
+          "V1:17",
+          "V1:19",
+          "V0:20",
+          "V-1:19",
+          "V-1:17"
+        ]
+      },
+      {
+        "id": "T-2:6",
+        "q": -2,
+        "r": 6,
+        "resource": "wheat",
+        "number": 8,
+        "vertices": [
+          "V2:16",
+          "V3:17",
+          "V3:19",
+          "V2:20",
+          "V1:19",
+          "V1:17"
+        ]
+      },
+      {
+        "id": "T-1:6",
+        "q": -1,
+        "r": 6,
+        "resource": "wool",
+        "number": 12,
+        "vertices": [
+          "V4:16",
+          "V5:17",
+          "V5:19",
+          "V4:20",
+          "V3:19",
+          "V3:17"
+        ]
+      },
+      {
+        "id": "T0:6",
+        "q": 0,
+        "r": 6,
+        "resource": "wood",
+        "number": 12,
+        "vertices": [
+          "V6:16",
+          "V7:17",
+          "V7:19",
+          "V6:20",
+          "V5:19",
+          "V5:17"
+        ]
+      },
+      {
+        "id": "T1:6",
+        "q": 1,
+        "r": 6,
+        "resource": "brick",
+        "number": 11,
+        "vertices": [
+          "V8:16",
+          "V9:17",
+          "V9:19",
+          "V8:20",
+          "V7:19",
+          "V7:17"
+        ]
+      }
+    ]
+  },
+  {
+    "模式": "combined",
+    "地图": "forgotten-tribe",
+    "场景版本": "m5-combined-variable-all-2025-v004",
+    "湖泊": "T0:3",
+    "配置版本": "seafaring-fishing-map-v002:forgotten-tribe",
+    "渔场": [
+      {
+        "Id": "FG1",
+        "Number": 9,
+        "VertexIds": [
+          "V-1:5",
+          "V0:4",
+          "V1:5"
+        ]
+      },
+      {
+        "Id": "FG2",
+        "Number": 10,
+        "VertexIds": [
+          "V5:5",
+          "V6:4",
+          "V7:5"
+        ]
+      },
+      {
+        "Id": "FG3",
+        "Number": 6,
+        "VertexIds": [
+          "V-1:13",
+          "V-2:14",
+          "V-3:13"
+        ]
+      },
+      {
+        "Id": "FG4",
+        "Number": 4,
+        "VertexIds": [
+          "V10:10",
+          "V9:11",
+          "V9:13"
+        ]
+      },
+      {
+        "Id": "FG5",
+        "Number": 8,
+        "VertexIds": [
+          "V3:13",
+          "V4:14",
+          "V5:13"
+        ]
+      },
+      {
+        "Id": "FG6",
+        "Number": 5,
+        "VertexIds": [
+          "V-2:4",
+          "V-3:5",
+          "V-3:7"
+        ]
+      }
+    ],
+    "地形": [
+      {
+        "id": "T0:0",
+        "q": 0,
+        "r": 0,
+        "resource": "gold",
+        "number": null,
+        "vertices": [
+          "V0:-2",
+          "V1:-1",
+          "V1:1",
+          "V0:2",
+          "V-1:1",
+          "V-1:-1"
+        ]
+      },
+      {
+        "id": "T1:0",
+        "q": 1,
+        "r": 0,
+        "resource": "ore",
+        "number": null,
+        "vertices": [
+          "V2:-2",
+          "V3:-1",
+          "V3:1",
+          "V2:2",
+          "V1:1",
+          "V1:-1"
+        ]
+      },
+      {
+        "id": "T2:0",
+        "q": 2,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:-2",
+          "V5:-1",
+          "V5:1",
+          "V4:2",
+          "V3:1",
+          "V3:-1"
+        ]
+      },
+      {
+        "id": "T3:0",
+        "q": 3,
+        "r": 0,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V6:-2",
+          "V7:-1",
+          "V7:1",
+          "V6:2",
+          "V5:1",
+          "V5:-1"
+        ]
+      },
+      {
+        "id": "T4:0",
+        "q": 4,
+        "r": 0,
+        "resource": "ore",
+        "number": null,
+        "vertices": [
+          "V8:-2",
+          "V9:-1",
+          "V9:1",
+          "V8:2",
+          "V7:1",
+          "V7:-1"
+        ]
+      },
+      {
+        "id": "T5:0",
+        "q": 5,
+        "r": 0,
+        "resource": "wheat",
+        "number": null,
+        "vertices": [
+          "V10:-2",
+          "V11:-1",
+          "V11:1",
+          "V10:2",
+          "V9:1",
+          "V9:-1"
+        ]
+      },
+      {
+        "id": "T-1:1",
+        "q": -1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:1",
+          "V0:2",
+          "V0:4",
+          "V-1:5",
+          "V-2:4",
+          "V-2:2"
+        ]
+      },
+      {
+        "id": "T0:1",
+        "q": 0,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V1:1",
+          "V2:2",
+          "V2:4",
+          "V1:5",
+          "V0:4",
+          "V0:2"
+        ]
+      },
+      {
+        "id": "T1:1",
+        "q": 1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:1",
+          "V4:2",
+          "V4:4",
+          "V3:5",
+          "V2:4",
+          "V2:2"
+        ]
+      },
+      {
+        "id": "T2:1",
+        "q": 2,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:1",
+          "V6:2",
+          "V6:4",
+          "V5:5",
+          "V4:4",
+          "V4:2"
+        ]
+      },
+      {
+        "id": "T3:1",
+        "q": 3,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V7:1",
+          "V8:2",
+          "V8:4",
+          "V7:5",
+          "V6:4",
+          "V6:2"
+        ]
+      },
+      {
+        "id": "T4:1",
+        "q": 4,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V9:1",
+          "V10:2",
+          "V10:4",
+          "V9:5",
+          "V8:4",
+          "V8:2"
+        ]
+      },
+      {
+        "id": "T5:1",
+        "q": 5,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V11:1",
+          "V12:2",
+          "V12:4",
+          "V11:5",
+          "V10:4",
+          "V10:2"
+        ]
+      },
+      {
+        "id": "T-2:2",
+        "q": -2,
+        "r": 2,
+        "resource": "wood",
+        "number": 4,
+        "vertices": [
+          "V-2:4",
+          "V-1:5",
+          "V-1:7",
+          "V-2:8",
+          "V-3:7",
+          "V-3:5"
+        ]
+      },
+      {
+        "id": "T-1:2",
+        "q": -1,
+        "r": 2,
+        "resource": "wool",
+        "number": 6,
+        "vertices": [
+          "V0:4",
+          "V1:5",
+          "V1:7",
+          "V0:8",
+          "V-1:7",
+          "V-1:5"
+        ]
+      },
+      {
+        "id": "T0:2",
+        "q": 0,
+        "r": 2,
+        "resource": "wool",
+        "number": 3,
+        "vertices": [
+          "V2:4",
+          "V3:5",
+          "V3:7",
+          "V2:8",
+          "V1:7",
+          "V1:5"
+        ]
+      },
+      {
+        "id": "T1:2",
+        "q": 1,
+        "r": 2,
+        "resource": "wool",
+        "number": 11,
+        "vertices": [
+          "V4:4",
+          "V5:5",
+          "V5:7",
+          "V4:8",
+          "V3:7",
+          "V3:5"
+        ]
+      },
+      {
+        "id": "T2:2",
+        "q": 2,
+        "r": 2,
+        "resource": "wheat",
+        "number": 6,
+        "vertices": [
+          "V6:4",
+          "V7:5",
+          "V7:7",
+          "V6:8",
+          "V5:7",
+          "V5:5"
+        ]
+      },
+      {
+        "id": "T3:2",
+        "q": 3,
+        "r": 2,
+        "resource": "ore",
+        "number": 2,
+        "vertices": [
+          "V8:4",
+          "V9:5",
+          "V9:7",
+          "V8:8",
+          "V7:7",
+          "V7:5"
+        ]
+      },
+      {
+        "id": "T4:2",
+        "q": 4,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:4",
+          "V11:5",
+          "V11:7",
+          "V10:8",
+          "V9:7",
+          "V9:5"
+        ]
+      },
+      {
+        "id": "T5:2",
+        "q": 5,
+        "r": 2,
+        "resource": "wool",
+        "number": null,
+        "vertices": [
+          "V12:4",
+          "V13:5",
+          "V13:7",
+          "V12:8",
+          "V11:7",
+          "V11:5"
+        ]
+      },
+      {
+        "id": "T-2:3",
+        "q": -2,
+        "r": 3,
+        "resource": "ore",
+        "number": 9,
+        "vertices": [
+          "V-1:7",
+          "V0:8",
+          "V0:10",
+          "V-1:11",
+          "V-2:10",
+          "V-2:8"
+        ]
+      },
+      {
+        "id": "T-1:3",
+        "q": -1,
+        "r": 3,
+        "resource": "ore",
+        "number": 5,
+        "vertices": [
+          "V1:7",
+          "V2:8",
+          "V2:10",
+          "V1:11",
+          "V0:10",
+          "V0:8"
+        ]
+      },
+      {
+        "id": "T0:3",
+        "q": 0,
+        "r": 3,
+        "resource": "lake",
+        "number": null,
+        "vertices": [
+          "V3:7",
+          "V4:8",
+          "V4:10",
+          "V3:11",
+          "V2:10",
+          "V2:8"
+        ]
+      },
+      {
+        "id": "T1:3",
+        "q": 1,
+        "r": 3,
+        "resource": "wheat",
+        "number": 10,
+        "vertices": [
+          "V5:7",
+          "V6:8",
+          "V6:10",
+          "V5:11",
+          "V4:10",
+          "V4:8"
+        ]
+      },
+      {
+        "id": "T2:3",
+        "q": 2,
+        "r": 3,
+        "resource": "wheat",
+        "number": 5,
+        "vertices": [
+          "V7:7",
+          "V8:8",
+          "V8:10",
+          "V7:11",
+          "V6:10",
+          "V6:8"
+        ]
+      },
+      {
+        "id": "T3:3",
+        "q": 3,
+        "r": 3,
+        "resource": "wood",
+        "number": 3,
+        "vertices": [
+          "V9:7",
+          "V10:8",
+          "V10:10",
+          "V9:11",
+          "V8:10",
+          "V8:8"
+        ]
+      },
+      {
+        "id": "T4:3",
+        "q": 4,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V11:7",
+          "V12:8",
+          "V12:10",
+          "V11:11",
+          "V10:10",
+          "V10:8"
+        ]
+      },
+      {
+        "id": "T-3:4",
+        "q": -3,
+        "r": 4,
+        "resource": "wood",
+        "number": 8,
+        "vertices": [
+          "V-2:10",
+          "V-1:11",
+          "V-1:13",
+          "V-2:14",
+          "V-3:13",
+          "V-3:11"
+        ]
+      },
+      {
+        "id": "T-2:4",
+        "q": -2,
+        "r": 4,
+        "resource": "brick",
+        "number": 9,
+        "vertices": [
+          "V0:10",
+          "V1:11",
+          "V1:13",
+          "V0:14",
+          "V-1:13",
+          "V-1:11"
+        ]
+      },
+      {
+        "id": "T-1:4",
+        "q": -1,
+        "r": 4,
+        "resource": "wool",
+        "number": 10,
+        "vertices": [
+          "V2:10",
+          "V3:11",
+          "V3:13",
+          "V2:14",
+          "V1:13",
+          "V1:11"
+        ]
+      },
+      {
+        "id": "T0:4",
+        "q": 0,
+        "r": 4,
+        "resource": "brick",
+        "number": 11,
+        "vertices": [
+          "V4:10",
+          "V5:11",
+          "V5:13",
+          "V4:14",
+          "V3:13",
+          "V3:11"
+        ]
+      },
+      {
+        "id": "T1:4",
+        "q": 1,
+        "r": 4,
+        "resource": "brick",
+        "number": 8,
+        "vertices": [
+          "V6:10",
+          "V7:11",
+          "V7:13",
+          "V6:14",
+          "V5:13",
+          "V5:11"
+        ]
+      },
+      {
+        "id": "T2:4",
+        "q": 2,
+        "r": 4,
+        "resource": "wood",
+        "number": 4,
+        "vertices": [
+          "V8:10",
+          "V9:11",
+          "V9:13",
+          "V8:14",
+          "V7:13",
+          "V7:11"
+        ]
+      },
+      {
+        "id": "T3:4",
+        "q": 3,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:10",
+          "V11:11",
+          "V11:13",
+          "V10:14",
+          "V9:13",
+          "V9:11"
+        ]
+      },
+      {
+        "id": "T4:4",
+        "q": 4,
+        "r": 4,
+        "resource": "wood",
+        "number": null,
+        "vertices": [
+          "V12:10",
+          "V13:11",
+          "V13:13",
+          "V12:14",
+          "V11:13",
+          "V11:11"
+        ]
+      },
+      {
+        "id": "T-3:5",
+        "q": -3,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:13",
+          "V0:14",
+          "V0:16",
+          "V-1:17",
+          "V-2:16",
+          "V-2:14"
+        ]
+      },
+      {
+        "id": "T-2:5",
+        "q": -2,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V1:13",
+          "V2:14",
+          "V2:16",
+          "V1:17",
+          "V0:16",
+          "V0:14"
+        ]
+      },
+      {
+        "id": "T-1:5",
+        "q": -1,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:13",
+          "V4:14",
+          "V4:16",
+          "V3:17",
+          "V2:16",
+          "V2:14"
+        ]
+      },
+      {
+        "id": "T0:5",
+        "q": 0,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:13",
+          "V6:14",
+          "V6:16",
+          "V5:17",
+          "V4:16",
+          "V4:14"
+        ]
+      },
+      {
+        "id": "T1:5",
+        "q": 1,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V7:13",
+          "V8:14",
+          "V8:16",
+          "V7:17",
+          "V6:16",
+          "V6:14"
+        ]
+      },
+      {
+        "id": "T2:5",
+        "q": 2,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V9:13",
+          "V10:14",
+          "V10:16",
+          "V9:17",
+          "V8:16",
+          "V8:14"
+        ]
+      },
+      {
+        "id": "T3:5",
+        "q": 3,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V11:13",
+          "V12:14",
+          "V12:16",
+          "V11:17",
+          "V10:16",
+          "V10:14"
+        ]
+      },
+      {
+        "id": "T-3:6",
+        "q": -3,
+        "r": 6,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V0:16",
+          "V1:17",
+          "V1:19",
+          "V0:20",
+          "V-1:19",
+          "V-1:17"
+        ]
+      },
+      {
+        "id": "T-2:6",
+        "q": -2,
+        "r": 6,
+        "resource": "brick",
+        "number": null,
+        "vertices": [
+          "V2:16",
+          "V3:17",
+          "V3:19",
+          "V2:20",
+          "V1:19",
+          "V1:17"
+        ]
+      },
+      {
+        "id": "T-1:6",
+        "q": -1,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:16",
+          "V5:17",
+          "V5:19",
+          "V4:20",
+          "V3:19",
+          "V3:17"
+        ]
+      },
+      {
+        "id": "T0:6",
+        "q": 0,
+        "r": 6,
+        "resource": "brick",
+        "number": null,
+        "vertices": [
+          "V6:16",
+          "V7:17",
+          "V7:19",
+          "V6:20",
+          "V5:19",
+          "V5:17"
+        ]
+      },
+      {
+        "id": "T1:6",
+        "q": 1,
+        "r": 6,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V8:16",
+          "V9:17",
+          "V9:19",
+          "V8:20",
+          "V7:19",
+          "V7:17"
+        ]
+      },
+      {
+        "id": "T2:6",
+        "q": 2,
+        "r": 6,
+        "resource": "gold",
+        "number": null,
+        "vertices": [
+          "V10:16",
+          "V11:17",
+          "V11:19",
+          "V10:20",
+          "V9:19",
+          "V9:17"
+        ]
+      }
+    ]
+  },
+  {
+    "模式": "combined",
+    "地图": "new-world",
+    "场景版本": "m5-combined-all-2025-v003",
+    "湖泊": null,
+    "配置版本": "seafaring-fishing-map-v002:new-world",
+    "渔场": [
+      {
+        "Id": "FG1",
+        "Number": 10,
+        "VertexIds": [
+          "V5:17",
+          "V5:19",
+          "V6:20"
+        ]
+      },
+      {
+        "Id": "FG2",
+        "Number": 4,
+        "VertexIds": [
+          "V0:16",
+          "V0:14",
+          "V1:13"
+        ]
+      },
+      {
+        "Id": "FG3",
+        "Number": 9,
+        "VertexIds": [
+          "V-2:8",
+          "V-3:7",
+          "V-3:5"
+        ]
+      },
+      {
+        "Id": "FG4",
+        "Number": 5,
+        "VertexIds": [
+          "V3:1",
+          "V3:-1",
+          "V4:-2"
+        ]
+      },
+      {
+        "Id": "FG5",
+        "Number": 8,
+        "VertexIds": [
+          "V1:19",
+          "V2:20",
+          "V3:19"
+        ]
+      },
+      {
+        "Id": "FG6",
+        "Number": 6,
+        "VertexIds": [
+          "V10:16",
+          "V10:14",
+          "V9:13"
+        ]
+      }
+    ],
+    "地形": [
+      {
+        "id": "T0:0",
+        "q": 0,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V0:-2",
+          "V1:-1",
+          "V1:1",
+          "V0:2",
+          "V-1:1",
+          "V-1:-1"
+        ]
+      },
+      {
+        "id": "T1:0",
+        "q": 1,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:-2",
+          "V3:-1",
+          "V3:1",
+          "V2:2",
+          "V1:1",
+          "V1:-1"
+        ]
+      },
+      {
+        "id": "T2:0",
+        "q": 2,
+        "r": 0,
+        "resource": "wood",
+        "number": 10,
+        "vertices": [
+          "V4:-2",
+          "V5:-1",
+          "V5:1",
+          "V4:2",
+          "V3:1",
+          "V3:-1"
+        ]
+      },
+      {
+        "id": "T3:0",
+        "q": 3,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V6:-2",
+          "V7:-1",
+          "V7:1",
+          "V6:2",
+          "V5:1",
+          "V5:-1"
+        ]
+      },
+      {
+        "id": "T4:0",
+        "q": 4,
+        "r": 0,
+        "resource": "wool",
+        "number": 6,
+        "vertices": [
+          "V8:-2",
+          "V9:-1",
+          "V9:1",
+          "V8:2",
+          "V7:1",
+          "V7:-1"
+        ]
+      },
+      {
+        "id": "T-1:1",
+        "q": -1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:1",
+          "V0:2",
+          "V0:4",
+          "V-1:5",
+          "V-2:4",
+          "V-2:2"
+        ]
+      },
+      {
+        "id": "T0:1",
+        "q": 0,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V1:1",
+          "V2:2",
+          "V2:4",
+          "V1:5",
+          "V0:4",
+          "V0:2"
+        ]
+      },
+      {
+        "id": "T1:1",
+        "q": 1,
+        "r": 1,
+        "resource": "wheat",
+        "number": 11,
+        "vertices": [
+          "V3:1",
+          "V4:2",
+          "V4:4",
+          "V3:5",
+          "V2:4",
+          "V2:2"
+        ]
+      },
+      {
+        "id": "T2:1",
+        "q": 2,
+        "r": 1,
+        "resource": "wood",
+        "number": 5,
+        "vertices": [
+          "V5:1",
+          "V6:2",
+          "V6:4",
+          "V5:5",
+          "V4:4",
+          "V4:2"
+        ]
+      },
+      {
+        "id": "T3:1",
+        "q": 3,
+        "r": 1,
+        "resource": "brick",
+        "number": 11,
+        "vertices": [
+          "V7:1",
+          "V8:2",
+          "V8:4",
+          "V7:5",
+          "V6:4",
+          "V6:2"
+        ]
+      },
+      {
+        "id": "T4:1",
+        "q": 4,
+        "r": 1,
+        "resource": "brick",
+        "number": 5,
+        "vertices": [
+          "V9:1",
+          "V10:2",
+          "V10:4",
+          "V9:5",
+          "V8:4",
+          "V8:2"
+        ]
+      },
+      {
+        "id": "T-2:2",
+        "q": -2,
+        "r": 2,
+        "resource": "wool",
+        "number": 6,
+        "vertices": [
+          "V-2:4",
+          "V-1:5",
+          "V-1:7",
+          "V-2:8",
+          "V-3:7",
+          "V-3:5"
+        ]
+      },
+      {
+        "id": "T-1:2",
+        "q": -1,
+        "r": 2,
+        "resource": "ore",
+        "number": 9,
+        "vertices": [
+          "V0:4",
+          "V1:5",
+          "V1:7",
+          "V0:8",
+          "V-1:7",
+          "V-1:5"
+        ]
+      },
+      {
+        "id": "T0:2",
+        "q": 0,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:4",
+          "V3:5",
+          "V3:7",
+          "V2:8",
+          "V1:7",
+          "V1:5"
+        ]
+      },
+      {
+        "id": "T1:2",
+        "q": 1,
+        "r": 2,
+        "resource": "wheat",
+        "number": 10,
+        "vertices": [
+          "V4:4",
+          "V5:5",
+          "V5:7",
+          "V4:8",
+          "V3:7",
+          "V3:5"
+        ]
+      },
+      {
+        "id": "T2:2",
+        "q": 2,
+        "r": 2,
+        "resource": "wool",
+        "number": 10,
+        "vertices": [
+          "V6:4",
+          "V7:5",
+          "V7:7",
+          "V6:8",
+          "V5:7",
+          "V5:5"
+        ]
+      },
+      {
+        "id": "T3:2",
+        "q": 3,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:4",
+          "V9:5",
+          "V9:7",
+          "V8:8",
+          "V7:7",
+          "V7:5"
+        ]
+      },
+      {
+        "id": "T4:2",
+        "q": 4,
+        "r": 2,
+        "resource": "ore",
+        "number": 8,
+        "vertices": [
+          "V10:4",
+          "V11:5",
+          "V11:7",
+          "V10:8",
+          "V9:7",
+          "V9:5"
+        ]
+      },
+      {
+        "id": "T-2:3",
+        "q": -2,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:7",
+          "V0:8",
+          "V0:10",
+          "V-1:11",
+          "V-2:10",
+          "V-2:8"
+        ]
+      },
+      {
+        "id": "T-1:3",
+        "q": -1,
+        "r": 3,
+        "resource": "brick",
+        "number": 5,
+        "vertices": [
+          "V1:7",
+          "V2:8",
+          "V2:10",
+          "V1:11",
+          "V0:10",
+          "V0:8"
+        ]
+      },
+      {
+        "id": "T0:3",
+        "q": 0,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:7",
+          "V4:8",
+          "V4:10",
+          "V3:11",
+          "V2:10",
+          "V2:8"
+        ]
+      },
+      {
+        "id": "T1:3",
+        "q": 1,
+        "r": 3,
+        "resource": "wheat",
+        "number": 3,
+        "vertices": [
+          "V5:7",
+          "V6:8",
+          "V6:10",
+          "V5:11",
+          "V4:10",
+          "V4:8"
+        ]
+      },
+      {
+        "id": "T2:3",
+        "q": 2,
+        "r": 3,
+        "resource": "wood",
+        "number": 9,
+        "vertices": [
+          "V7:7",
+          "V8:8",
+          "V8:10",
+          "V7:11",
+          "V6:10",
+          "V6:8"
+        ]
+      },
+      {
+        "id": "T3:3",
+        "q": 3,
+        "r": 3,
+        "resource": "wood",
+        "number": 3,
+        "vertices": [
+          "V9:7",
+          "V10:8",
+          "V10:10",
+          "V9:11",
+          "V8:10",
+          "V8:8"
+        ]
+      },
+      {
+        "id": "T-3:4",
+        "q": -3,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-2:10",
+          "V-1:11",
+          "V-1:13",
+          "V-2:14",
+          "V-3:13",
+          "V-3:11"
+        ]
+      },
+      {
+        "id": "T-2:4",
+        "q": -2,
+        "r": 4,
+        "resource": "ore",
+        "number": 12,
+        "vertices": [
+          "V0:10",
+          "V1:11",
+          "V1:13",
+          "V0:14",
+          "V-1:13",
+          "V-1:11"
+        ]
+      },
+      {
+        "id": "T-1:4",
+        "q": -1,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:10",
+          "V3:11",
+          "V3:13",
+          "V2:14",
+          "V1:13",
+          "V1:11"
+        ]
+      },
+      {
+        "id": "T0:4",
+        "q": 0,
+        "r": 4,
+        "resource": "ore",
+        "number": 3,
+        "vertices": [
+          "V4:10",
+          "V5:11",
+          "V5:13",
+          "V4:14",
+          "V3:13",
+          "V3:11"
+        ]
+      },
+      {
+        "id": "T1:4",
+        "q": 1,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V6:10",
+          "V7:11",
+          "V7:13",
+          "V6:14",
+          "V5:13",
+          "V5:11"
+        ]
+      },
+      {
+        "id": "T2:4",
+        "q": 2,
+        "r": 4,
+        "resource": "brick",
+        "number": 8,
+        "vertices": [
+          "V8:10",
+          "V9:11",
+          "V9:13",
+          "V8:14",
+          "V7:13",
+          "V7:11"
+        ]
+      },
+      {
+        "id": "T3:4",
+        "q": 3,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:10",
+          "V11:11",
+          "V11:13",
+          "V10:14",
+          "V9:13",
+          "V9:11"
+        ]
+      },
+      {
+        "id": "T-3:5",
+        "q": -3,
+        "r": 5,
+        "resource": "wheat",
+        "number": 4,
+        "vertices": [
+          "V-1:13",
+          "V0:14",
+          "V0:16",
+          "V-1:17",
+          "V-2:16",
+          "V-2:14"
+        ]
+      },
+      {
+        "id": "T-2:5",
+        "q": -2,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V1:13",
+          "V2:14",
+          "V2:16",
+          "V1:17",
+          "V0:16",
+          "V0:14"
+        ]
+      },
+      {
+        "id": "T-1:5",
+        "q": -1,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:13",
+          "V4:14",
+          "V4:16",
+          "V3:17",
+          "V2:16",
+          "V2:14"
+        ]
+      },
+      {
+        "id": "T0:5",
+        "q": 0,
+        "r": 5,
+        "resource": "wheat",
+        "number": 9,
+        "vertices": [
+          "V5:13",
+          "V6:14",
+          "V6:16",
+          "V5:17",
+          "V4:16",
+          "V4:14"
+        ]
+      },
+      {
+        "id": "T1:5",
+        "q": 1,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V7:13",
+          "V8:14",
+          "V8:16",
+          "V7:17",
+          "V6:16",
+          "V6:14"
+        ]
+      },
+      {
+        "id": "T2:5",
+        "q": 2,
+        "r": 5,
+        "resource": "wood",
+        "number": 4,
+        "vertices": [
+          "V9:13",
+          "V10:14",
+          "V10:16",
+          "V9:17",
+          "V8:16",
+          "V8:14"
+        ]
+      },
+      {
+        "id": "T-3:6",
+        "q": -3,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V0:16",
+          "V1:17",
+          "V1:19",
+          "V0:20",
+          "V-1:19",
+          "V-1:17"
+        ]
+      },
+      {
+        "id": "T-2:6",
+        "q": -2,
+        "r": 6,
+        "resource": "wool",
+        "number": 2,
+        "vertices": [
+          "V2:16",
+          "V3:17",
+          "V3:19",
+          "V2:20",
+          "V1:19",
+          "V1:17"
+        ]
+      },
+      {
+        "id": "T-1:6",
+        "q": -1,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:16",
+          "V5:17",
+          "V5:19",
+          "V4:20",
+          "V3:19",
+          "V3:17"
+        ]
+      },
+      {
+        "id": "T0:6",
+        "q": 0,
+        "r": 6,
+        "resource": "wool",
+        "number": 4,
+        "vertices": [
+          "V6:16",
+          "V7:17",
+          "V7:19",
+          "V6:20",
+          "V5:19",
+          "V5:17"
+        ]
+      },
+      {
+        "id": "T1:6",
+        "q": 1,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:16",
+          "V9:17",
+          "V9:19",
+          "V8:20",
+          "V7:19",
+          "V7:17"
+        ]
+      }
+    ]
+  },
+  {
+    "模式": "combined",
+    "地图": "wonders-of-catan",
+    "场景版本": "m5-combined-variable-all-2025-v004",
+    "湖泊": null,
+    "配置版本": "seafaring-fishing-map-v002:wonders-of-catan",
+    "渔场": [
+      {
+        "Id": "FG1",
+        "Number": 4,
+        "VertexIds": [
+          "V-2:14",
+          "V-1:13",
+          "V0:14"
+        ]
+      },
+      {
+        "Id": "FG2",
+        "Number": 9,
+        "VertexIds": [
+          "V10:14",
+          "V11:13",
+          "V11:11"
+        ]
+      },
+      {
+        "Id": "FG3",
+        "Number": 5,
+        "VertexIds": [
+          "V-1:1",
+          "V-1:-1",
+          "V0:-2"
+        ]
+      },
+      {
+        "Id": "FG4",
+        "Number": 8,
+        "VertexIds": [
+          "V4:20",
+          "V5:19",
+          "V6:20"
+        ]
+      },
+      {
+        "Id": "FG5",
+        "Number": 6,
+        "VertexIds": [
+          "V11:19",
+          "V10:20",
+          "V9:19"
+        ]
+      },
+      {
+        "Id": "FG6",
+        "Number": 10,
+        "VertexIds": [
+          "V3:17",
+          "V4:16",
+          "V4:14"
+        ]
+      }
+    ],
+    "地形": [
+      {
+        "id": "T0:0",
+        "q": 0,
+        "r": 0,
+        "resource": "gold",
+        "number": 8,
+        "vertices": [
+          "V0:-2",
+          "V1:-1",
+          "V1:1",
+          "V0:2",
+          "V-1:1",
+          "V-1:-1"
+        ]
+      },
+      {
+        "id": "T1:0",
+        "q": 1,
+        "r": 0,
+        "resource": "brick",
+        "number": 2,
+        "vertices": [
+          "V2:-2",
+          "V3:-1",
+          "V3:1",
+          "V2:2",
+          "V1:1",
+          "V1:-1"
+        ]
+      },
+      {
+        "id": "T2:0",
+        "q": 2,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:-2",
+          "V5:-1",
+          "V5:1",
+          "V4:2",
+          "V3:1",
+          "V3:-1"
+        ]
+      },
+      {
+        "id": "T3:0",
+        "q": 3,
+        "r": 0,
+        "resource": "brick",
+        "number": 11,
+        "vertices": [
+          "V6:-2",
+          "V7:-1",
+          "V7:1",
+          "V6:2",
+          "V5:1",
+          "V5:-1"
+        ]
+      },
+      {
+        "id": "T4:0",
+        "q": 4,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:-2",
+          "V9:-1",
+          "V9:1",
+          "V8:2",
+          "V7:1",
+          "V7:-1"
+        ]
+      },
+      {
+        "id": "T5:0",
+        "q": 5,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:-2",
+          "V11:-1",
+          "V11:1",
+          "V10:2",
+          "V9:1",
+          "V9:-1"
+        ]
+      },
+      {
+        "id": "T-1:1",
+        "q": -1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:1",
+          "V0:2",
+          "V0:4",
+          "V-1:5",
+          "V-2:4",
+          "V-2:2"
+        ]
+      },
+      {
+        "id": "T0:1",
+        "q": 0,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V1:1",
+          "V2:2",
+          "V2:4",
+          "V1:5",
+          "V0:4",
+          "V0:2"
+        ]
+      },
+      {
+        "id": "T1:1",
+        "q": 1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:1",
+          "V4:2",
+          "V4:4",
+          "V3:5",
+          "V2:4",
+          "V2:2"
+        ]
+      },
+      {
+        "id": "T2:1",
+        "q": 2,
+        "r": 1,
+        "resource": "ore",
+        "number": 11,
+        "vertices": [
+          "V5:1",
+          "V6:2",
+          "V6:4",
+          "V5:5",
+          "V4:4",
+          "V4:2"
+        ]
+      },
+      {
+        "id": "T3:1",
+        "q": 3,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V7:1",
+          "V8:2",
+          "V8:4",
+          "V7:5",
+          "V6:4",
+          "V6:2"
+        ]
+      },
+      {
+        "id": "T4:1",
+        "q": 4,
+        "r": 1,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V9:1",
+          "V10:2",
+          "V10:4",
+          "V9:5",
+          "V8:4",
+          "V8:2"
+        ]
+      },
+      {
+        "id": "T5:1",
+        "q": 5,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V11:1",
+          "V12:2",
+          "V12:4",
+          "V11:5",
+          "V10:4",
+          "V10:2"
+        ]
+      },
+      {
+        "id": "T-2:2",
+        "q": -2,
+        "r": 2,
+        "resource": "wheat",
+        "number": 4,
+        "vertices": [
+          "V-2:4",
+          "V-1:5",
+          "V-1:7",
+          "V-2:8",
+          "V-3:7",
+          "V-3:5"
+        ]
+      },
+      {
+        "id": "T-1:2",
+        "q": -1,
+        "r": 2,
+        "resource": "wool",
+        "number": 3,
+        "vertices": [
+          "V0:4",
+          "V1:5",
+          "V1:7",
+          "V0:8",
+          "V-1:7",
+          "V-1:5"
+        ]
+      },
+      {
+        "id": "T0:2",
+        "q": 0,
+        "r": 2,
+        "resource": "wood",
+        "number": 6,
+        "vertices": [
+          "V2:4",
+          "V3:5",
+          "V3:7",
+          "V2:8",
+          "V1:7",
+          "V1:5"
+        ]
+      },
+      {
+        "id": "T1:2",
+        "q": 1,
+        "r": 2,
+        "resource": "wool",
+        "number": 4,
+        "vertices": [
+          "V4:4",
+          "V5:5",
+          "V5:7",
+          "V4:8",
+          "V3:7",
+          "V3:5"
+        ]
+      },
+      {
+        "id": "T2:2",
+        "q": 2,
+        "r": 2,
+        "resource": "wheat",
+        "number": 5,
+        "vertices": [
+          "V6:4",
+          "V7:5",
+          "V7:7",
+          "V6:8",
+          "V5:7",
+          "V5:5"
+        ]
+      },
+      {
+        "id": "T3:2",
+        "q": 3,
+        "r": 2,
+        "resource": "wool",
+        "number": 10,
+        "vertices": [
+          "V8:4",
+          "V9:5",
+          "V9:7",
+          "V8:8",
+          "V7:7",
+          "V7:5"
+        ]
+      },
+      {
+        "id": "T4:2",
+        "q": 4,
+        "r": 2,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V10:4",
+          "V11:5",
+          "V11:7",
+          "V10:8",
+          "V9:7",
+          "V9:5"
+        ]
+      },
+      {
+        "id": "T5:2",
+        "q": 5,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V12:4",
+          "V13:5",
+          "V13:7",
+          "V12:8",
+          "V11:7",
+          "V11:5"
+        ]
+      },
+      {
+        "id": "T-2:3",
+        "q": -2,
+        "r": 3,
+        "resource": "ore",
+        "number": 8,
+        "vertices": [
+          "V-1:7",
+          "V0:8",
+          "V0:10",
+          "V-1:11",
+          "V-2:10",
+          "V-2:8"
+        ]
+      },
+      {
+        "id": "T-1:3",
+        "q": -1,
+        "r": 3,
+        "resource": "brick",
+        "number": 5,
+        "vertices": [
+          "V1:7",
+          "V2:8",
+          "V2:10",
+          "V1:11",
+          "V0:10",
+          "V0:8"
+        ]
+      },
+      {
+        "id": "T0:3",
+        "q": 0,
+        "r": 3,
+        "resource": "wood",
+        "number": 9,
+        "vertices": [
+          "V3:7",
+          "V4:8",
+          "V4:10",
+          "V3:11",
+          "V2:10",
+          "V2:8"
+        ]
+      },
+      {
+        "id": "T1:3",
+        "q": 1,
+        "r": 3,
+        "resource": "wheat",
+        "number": 8,
+        "vertices": [
+          "V5:7",
+          "V6:8",
+          "V6:10",
+          "V5:11",
+          "V4:10",
+          "V4:8"
+        ]
+      },
+      {
+        "id": "T2:3",
+        "q": 2,
+        "r": 3,
+        "resource": "wood",
+        "number": 10,
+        "vertices": [
+          "V7:7",
+          "V8:8",
+          "V8:10",
+          "V7:11",
+          "V6:10",
+          "V6:8"
+        ]
+      },
+      {
+        "id": "T3:3",
+        "q": 3,
+        "r": 3,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V9:7",
+          "V10:8",
+          "V10:10",
+          "V9:11",
+          "V8:10",
+          "V8:8"
+        ]
+      },
+      {
+        "id": "T4:3",
+        "q": 4,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V11:7",
+          "V12:8",
+          "V12:10",
+          "V11:11",
+          "V10:10",
+          "V10:8"
+        ]
+      },
+      {
+        "id": "T-3:4",
+        "q": -3,
+        "r": 4,
+        "resource": "brick",
+        "number": 3,
+        "vertices": [
+          "V-2:10",
+          "V-1:11",
+          "V-1:13",
+          "V-2:14",
+          "V-3:13",
+          "V-3:11"
+        ]
+      },
+      {
+        "id": "T-2:4",
+        "q": -2,
+        "r": 4,
+        "resource": "wool",
+        "number": 3,
+        "vertices": [
+          "V0:10",
+          "V1:11",
+          "V1:13",
+          "V0:14",
+          "V-1:13",
+          "V-1:11"
+        ]
+      },
+      {
+        "id": "T-1:4",
+        "q": -1,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:10",
+          "V3:11",
+          "V3:13",
+          "V2:14",
+          "V1:13",
+          "V1:11"
+        ]
+      },
+      {
+        "id": "T0:4",
+        "q": 0,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:10",
+          "V5:11",
+          "V5:13",
+          "V4:14",
+          "V3:13",
+          "V3:11"
+        ]
+      },
+      {
+        "id": "T1:4",
+        "q": 1,
+        "r": 4,
+        "resource": "ore",
+        "number": 9,
+        "vertices": [
+          "V6:10",
+          "V7:11",
+          "V7:13",
+          "V6:14",
+          "V5:13",
+          "V5:11"
+        ]
+      },
+      {
+        "id": "T2:4",
+        "q": 2,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:10",
+          "V9:11",
+          "V9:13",
+          "V8:14",
+          "V7:13",
+          "V7:11"
+        ]
+      },
+      {
+        "id": "T3:4",
+        "q": 3,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:10",
+          "V11:11",
+          "V11:13",
+          "V10:14",
+          "V9:13",
+          "V9:11"
+        ]
+      },
+      {
+        "id": "T4:4",
+        "q": 4,
+        "r": 4,
+        "resource": "gold",
+        "number": 6,
+        "vertices": [
+          "V12:10",
+          "V13:11",
+          "V13:13",
+          "V12:14",
+          "V11:13",
+          "V11:11"
+        ]
+      },
+      {
+        "id": "T-3:5",
+        "q": -3,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:13",
+          "V0:14",
+          "V0:16",
+          "V-1:17",
+          "V-2:16",
+          "V-2:14"
+        ]
+      },
+      {
+        "id": "T-2:5",
+        "q": -2,
+        "r": 5,
+        "resource": "wood",
+        "number": 10,
+        "vertices": [
+          "V1:13",
+          "V2:14",
+          "V2:16",
+          "V1:17",
+          "V0:16",
+          "V0:14"
+        ]
+      },
+      {
+        "id": "T-1:5",
+        "q": -1,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:13",
+          "V4:14",
+          "V4:16",
+          "V3:17",
+          "V2:16",
+          "V2:14"
+        ]
+      },
+      {
+        "id": "T0:5",
+        "q": 0,
+        "r": 5,
+        "resource": "ore",
+        "number": 12,
+        "vertices": [
+          "V5:13",
+          "V6:14",
+          "V6:16",
+          "V5:17",
+          "V4:16",
+          "V4:14"
+        ]
+      },
+      {
+        "id": "T1:5",
+        "q": 1,
+        "r": 5,
+        "resource": "brick",
+        "number": 2,
+        "vertices": [
+          "V7:13",
+          "V8:14",
+          "V8:16",
+          "V7:17",
+          "V6:16",
+          "V6:14"
+        ]
+      },
+      {
+        "id": "T2:5",
+        "q": 2,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V9:13",
+          "V10:14",
+          "V10:16",
+          "V9:17",
+          "V8:16",
+          "V8:14"
+        ]
+      },
+      {
+        "id": "T3:5",
+        "q": 3,
+        "r": 5,
+        "resource": "wood",
+        "number": 4,
+        "vertices": [
+          "V11:13",
+          "V12:14",
+          "V12:16",
+          "V11:17",
+          "V10:16",
+          "V10:14"
+        ]
+      },
+      {
+        "id": "T-3:6",
+        "q": -3,
+        "r": 6,
+        "resource": "wheat",
+        "number": 11,
+        "vertices": [
+          "V0:16",
+          "V1:17",
+          "V1:19",
+          "V0:20",
+          "V-1:19",
+          "V-1:17"
+        ]
+      },
+      {
+        "id": "T-2:6",
+        "q": -2,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:16",
+          "V3:17",
+          "V3:19",
+          "V2:20",
+          "V1:19",
+          "V1:17"
+        ]
+      },
+      {
+        "id": "T-1:6",
+        "q": -1,
+        "r": 6,
+        "resource": "wool",
+        "number": 6,
+        "vertices": [
+          "V4:16",
+          "V5:17",
+          "V5:19",
+          "V4:20",
+          "V3:19",
+          "V3:17"
+        ]
+      },
+      {
+        "id": "T0:6",
+        "q": 0,
+        "r": 6,
+        "resource": "ore",
+        "number": 9,
+        "vertices": [
+          "V6:16",
+          "V7:17",
+          "V7:19",
+          "V6:20",
+          "V5:19",
+          "V5:17"
+        ]
+      },
+      {
+        "id": "T1:6",
+        "q": 1,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:16",
+          "V9:17",
+          "V9:19",
+          "V8:20",
+          "V7:19",
+          "V7:17"
+        ]
+      },
+      {
+        "id": "T2:6",
+        "q": 2,
+        "r": 6,
+        "resource": "wheat",
+        "number": 5,
+        "vertices": [
+          "V10:16",
+          "V11:17",
+          "V11:19",
+          "V10:20",
+          "V9:19",
+          "V9:17"
+        ]
+      }
+    ]
+  },
+  {
+    "模式": "seafarers",
+    "地图": "cloth-for-catan",
+    "场景版本": "m3-seafarers-variable-v002",
+    "湖泊": null,
+    "配置版本": "seafaring-fishing-map-v002:cloth-for-catan",
+    "渔场": [
+      {
+        "Id": "FG1",
+        "Number": 9,
+        "VertexIds": [
+          "V-1:19",
+          "V-1:17",
+          "V-2:16"
+        ]
+      },
+      {
+        "Id": "FG2",
+        "Number": 6,
+        "VertexIds": [
+          "V2:2",
+          "V3:1",
+          "V4:2"
+        ]
+      },
+      {
+        "Id": "FG3",
+        "Number": 4,
+        "VertexIds": [
+          "V6:2",
+          "V6:4",
+          "V7:5"
+        ]
+      },
+      {
+        "Id": "FG4",
+        "Number": 10,
+        "VertexIds": [
+          "V10:10",
+          "V9:11",
+          "V9:13"
+        ]
+      },
+      {
+        "Id": "FG5",
+        "Number": 5,
+        "VertexIds": [
+          "V-1:-1",
+          "V0:-2",
+          "V1:-1"
+        ]
+      },
+      {
+        "Id": "FG6",
+        "Number": 8,
+        "VertexIds": [
+          "V0:20",
+          "V1:19",
+          "V2:20"
+        ]
+      }
+    ],
+    "地形": [
+      {
+        "id": "T0:0",
+        "q": 0,
+        "r": 0,
+        "resource": "ore",
+        "number": 5,
+        "vertices": [
+          "V0:-2",
+          "V1:-1",
+          "V1:1",
+          "V0:2",
+          "V-1:1",
+          "V-1:-1"
+        ]
+      },
+      {
+        "id": "T1:0",
+        "q": 1,
+        "r": 0,
+        "resource": "wood",
+        "number": 11,
+        "vertices": [
+          "V2:-2",
+          "V3:-1",
+          "V3:1",
+          "V2:2",
+          "V1:1",
+          "V1:-1"
+        ]
+      },
+      {
+        "id": "T2:0",
+        "q": 2,
+        "r": 0,
+        "resource": "brick",
+        "number": 2,
+        "vertices": [
+          "V4:-2",
+          "V5:-1",
+          "V5:1",
+          "V4:2",
+          "V3:1",
+          "V3:-1"
+        ]
+      },
+      {
+        "id": "T3:0",
+        "q": 3,
+        "r": 0,
+        "resource": "wool",
+        "number": 12,
+        "vertices": [
+          "V6:-2",
+          "V7:-1",
+          "V7:1",
+          "V6:2",
+          "V5:1",
+          "V5:-1"
+        ]
+      },
+      {
+        "id": "T4:0",
+        "q": 4,
+        "r": 0,
+        "resource": "ore",
+        "number": 3,
+        "vertices": [
+          "V8:-2",
+          "V9:-1",
+          "V9:1",
+          "V8:2",
+          "V7:1",
+          "V7:-1"
+        ]
+      },
+      {
+        "id": "T-1:1",
+        "q": -1,
+        "r": 1,
+        "resource": "wheat",
+        "number": 6,
+        "vertices": [
+          "V-1:1",
+          "V0:2",
+          "V0:4",
+          "V-1:5",
+          "V-2:4",
+          "V-2:2"
+        ]
+      },
+      {
+        "id": "T0:1",
+        "q": 0,
+        "r": 1,
+        "resource": "wood",
+        "number": 9,
+        "vertices": [
+          "V1:1",
+          "V2:2",
+          "V2:4",
+          "V1:5",
+          "V0:4",
+          "V0:2"
+        ]
+      },
+      {
+        "id": "T1:1",
+        "q": 1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:1",
+          "V4:2",
+          "V4:4",
+          "V3:5",
+          "V2:4",
+          "V2:2"
+        ]
+      },
+      {
+        "id": "T2:1",
+        "q": 2,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:1",
+          "V6:2",
+          "V6:4",
+          "V5:5",
+          "V4:4",
+          "V4:2"
+        ]
+      },
+      {
+        "id": "T3:1",
+        "q": 3,
+        "r": 1,
+        "resource": "brick",
+        "number": 3,
+        "vertices": [
+          "V7:1",
+          "V8:2",
+          "V8:4",
+          "V7:5",
+          "V6:4",
+          "V6:2"
+        ]
+      },
+      {
+        "id": "T4:1",
+        "q": 4,
+        "r": 1,
+        "resource": "wool",
+        "number": 11,
+        "vertices": [
+          "V9:1",
+          "V10:2",
+          "V10:4",
+          "V9:5",
+          "V8:4",
+          "V8:2"
+        ]
+      },
+      {
+        "id": "T-2:2",
+        "q": -2,
+        "r": 2,
+        "resource": "wool",
+        "number": 10,
+        "vertices": [
+          "V-2:4",
+          "V-1:5",
+          "V-1:7",
+          "V-2:8",
+          "V-3:7",
+          "V-3:5"
+        ]
+      },
+      {
+        "id": "T-1:2",
+        "q": -1,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V0:4",
+          "V1:5",
+          "V1:7",
+          "V0:8",
+          "V-1:7",
+          "V-1:5"
+        ]
+      },
+      {
+        "id": "T0:2",
+        "q": 0,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:4",
+          "V3:5",
+          "V3:7",
+          "V2:8",
+          "V1:7",
+          "V1:5"
+        ]
+      },
+      {
+        "id": "T1:2",
+        "q": 1,
+        "r": 2,
+        "resource": "gold",
+        "number": null,
+        "vertices": [
+          "V4:4",
+          "V5:5",
+          "V5:7",
+          "V4:8",
+          "V3:7",
+          "V3:5"
+        ]
+      },
+      {
+        "id": "T2:2",
+        "q": 2,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V6:4",
+          "V7:5",
+          "V7:7",
+          "V6:8",
+          "V5:7",
+          "V5:5"
+        ]
+      },
+      {
+        "id": "T3:2",
+        "q": 3,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:4",
+          "V9:5",
+          "V9:7",
+          "V8:8",
+          "V7:7",
+          "V7:5"
+        ]
+      },
+      {
+        "id": "T4:2",
+        "q": 4,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:4",
+          "V11:5",
+          "V11:7",
+          "V10:8",
+          "V9:7",
+          "V9:5"
+        ]
+      },
+      {
+        "id": "T-2:3",
+        "q": -2,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:7",
+          "V0:8",
+          "V0:10",
+          "V-1:11",
+          "V-2:10",
+          "V-2:8"
+        ]
+      },
+      {
+        "id": "T-1:3",
+        "q": -1,
+        "r": 3,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V1:7",
+          "V2:8",
+          "V2:10",
+          "V1:11",
+          "V0:10",
+          "V0:8"
+        ]
+      },
+      {
+        "id": "T0:3",
+        "q": 0,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:7",
+          "V4:8",
+          "V4:10",
+          "V3:11",
+          "V2:10",
+          "V2:8"
+        ]
+      },
+      {
+        "id": "T1:3",
+        "q": 1,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:7",
+          "V6:8",
+          "V6:10",
+          "V5:11",
+          "V4:10",
+          "V4:8"
+        ]
+      },
+      {
+        "id": "T2:3",
+        "q": 2,
+        "r": 3,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V7:7",
+          "V8:8",
+          "V8:10",
+          "V7:11",
+          "V6:10",
+          "V6:8"
+        ]
+      },
+      {
+        "id": "T3:3",
+        "q": 3,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V9:7",
+          "V10:8",
+          "V10:10",
+          "V9:11",
+          "V8:10",
+          "V8:8"
+        ]
+      },
+      {
+        "id": "T-3:4",
+        "q": -3,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-2:10",
+          "V-1:11",
+          "V-1:13",
+          "V-2:14",
+          "V-3:13",
+          "V-3:11"
+        ]
+      },
+      {
+        "id": "T-2:4",
+        "q": -2,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V0:10",
+          "V1:11",
+          "V1:13",
+          "V0:14",
+          "V-1:13",
+          "V-1:11"
+        ]
+      },
+      {
+        "id": "T-1:4",
+        "q": -1,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:10",
+          "V3:11",
+          "V3:13",
+          "V2:14",
+          "V1:13",
+          "V1:11"
+        ]
+      },
+      {
+        "id": "T0:4",
+        "q": 0,
+        "r": 4,
+        "resource": "gold",
+        "number": null,
+        "vertices": [
+          "V4:10",
+          "V5:11",
+          "V5:13",
+          "V4:14",
+          "V3:13",
+          "V3:11"
+        ]
+      },
+      {
+        "id": "T1:4",
+        "q": 1,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V6:10",
+          "V7:11",
+          "V7:13",
+          "V6:14",
+          "V5:13",
+          "V5:11"
+        ]
+      },
+      {
+        "id": "T2:4",
+        "q": 2,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:10",
+          "V9:11",
+          "V9:13",
+          "V8:14",
+          "V7:13",
+          "V7:11"
+        ]
+      },
+      {
+        "id": "T3:4",
+        "q": 3,
+        "r": 4,
+        "resource": "brick",
+        "number": 8,
+        "vertices": [
+          "V10:10",
+          "V11:11",
+          "V11:13",
+          "V10:14",
+          "V9:13",
+          "V9:11"
+        ]
+      },
+      {
+        "id": "T-3:5",
+        "q": -3,
+        "r": 5,
+        "resource": "ore",
+        "number": 4,
+        "vertices": [
+          "V-1:13",
+          "V0:14",
+          "V0:16",
+          "V-1:17",
+          "V-2:16",
+          "V-2:14"
+        ]
+      },
+      {
+        "id": "T-2:5",
+        "q": -2,
+        "r": 5,
+        "resource": "wood",
+        "number": 4,
+        "vertices": [
+          "V1:13",
+          "V2:14",
+          "V2:16",
+          "V1:17",
+          "V0:16",
+          "V0:14"
+        ]
+      },
+      {
+        "id": "T-1:5",
+        "q": -1,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:13",
+          "V4:14",
+          "V4:16",
+          "V3:17",
+          "V2:16",
+          "V2:14"
+        ]
+      },
+      {
+        "id": "T0:5",
+        "q": 0,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:13",
+          "V6:14",
+          "V6:16",
+          "V5:17",
+          "V4:16",
+          "V4:14"
+        ]
+      },
+      {
+        "id": "T1:5",
+        "q": 1,
+        "r": 5,
+        "resource": "wheat",
+        "number": 9,
+        "vertices": [
+          "V7:13",
+          "V8:14",
+          "V8:16",
+          "V7:17",
+          "V6:16",
+          "V6:14"
+        ]
+      },
+      {
+        "id": "T2:5",
+        "q": 2,
+        "r": 5,
+        "resource": "wheat",
+        "number": 5,
+        "vertices": [
+          "V9:13",
+          "V10:14",
+          "V10:16",
+          "V9:17",
+          "V8:16",
+          "V8:14"
+        ]
+      },
+      {
+        "id": "T-3:6",
+        "q": -3,
+        "r": 6,
+        "resource": "wheat",
+        "number": 6,
+        "vertices": [
+          "V0:16",
+          "V1:17",
+          "V1:19",
+          "V0:20",
+          "V-1:19",
+          "V-1:17"
+        ]
+      },
+      {
+        "id": "T-2:6",
+        "q": -2,
+        "r": 6,
+        "resource": "wheat",
+        "number": 10,
+        "vertices": [
+          "V2:16",
+          "V3:17",
+          "V3:19",
+          "V2:20",
+          "V1:19",
+          "V1:17"
+        ]
+      },
+      {
+        "id": "T-1:6",
+        "q": -1,
+        "r": 6,
+        "resource": "wood",
+        "number": 2,
+        "vertices": [
+          "V4:16",
+          "V5:17",
+          "V5:19",
+          "V4:20",
+          "V3:19",
+          "V3:17"
+        ]
+      },
+      {
+        "id": "T0:6",
+        "q": 0,
+        "r": 6,
+        "resource": "wool",
+        "number": 8,
+        "vertices": [
+          "V6:16",
+          "V7:17",
+          "V7:19",
+          "V6:20",
+          "V5:19",
+          "V5:17"
+        ]
+      },
+      {
+        "id": "T1:6",
+        "q": 1,
+        "r": 6,
+        "resource": "ore",
+        "number": 12,
+        "vertices": [
+          "V8:16",
+          "V9:17",
+          "V9:19",
+          "V8:20",
+          "V7:19",
+          "V7:17"
+        ]
+      }
+    ]
+  },
+  {
+    "模式": "seafarers",
+    "地图": "forgotten-tribe",
+    "场景版本": "m3-seafarers-variable-v002",
+    "湖泊": "T0:3",
+    "配置版本": "seafaring-fishing-map-v002:forgotten-tribe",
+    "渔场": [
+      {
+        "Id": "FG1",
+        "Number": 5,
+        "VertexIds": [
+          "V2:14",
+          "V3:13",
+          "V4:14"
+        ]
+      },
+      {
+        "Id": "FG2",
+        "Number": 10,
+        "VertexIds": [
+          "V0:4",
+          "V1:5",
+          "V2:4"
+        ]
+      },
+      {
+        "Id": "FG3",
+        "Number": 9,
+        "VertexIds": [
+          "V7:13",
+          "V8:14",
+          "V9:13"
+        ]
+      },
+      {
+        "Id": "FG4",
+        "Number": 4,
+        "VertexIds": [
+          "V5:5",
+          "V6:4",
+          "V7:5"
+        ]
+      },
+      {
+        "Id": "FG5",
+        "Number": 6,
+        "VertexIds": [
+          "V-1:5",
+          "V-2:4",
+          "V-3:5"
+        ]
+      },
+      {
+        "Id": "FG6",
+        "Number": 8,
+        "VertexIds": [
+          "V-2:8",
+          "V-2:10",
+          "V-3:11"
+        ]
+      }
+    ],
+    "地形": [
+      {
+        "id": "T0:0",
+        "q": 0,
+        "r": 0,
+        "resource": "gold",
+        "number": null,
+        "vertices": [
+          "V0:-2",
+          "V1:-1",
+          "V1:1",
+          "V0:2",
+          "V-1:1",
+          "V-1:-1"
+        ]
+      },
+      {
+        "id": "T1:0",
+        "q": 1,
+        "r": 0,
+        "resource": "ore",
+        "number": null,
+        "vertices": [
+          "V2:-2",
+          "V3:-1",
+          "V3:1",
+          "V2:2",
+          "V1:1",
+          "V1:-1"
+        ]
+      },
+      {
+        "id": "T2:0",
+        "q": 2,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:-2",
+          "V5:-1",
+          "V5:1",
+          "V4:2",
+          "V3:1",
+          "V3:-1"
+        ]
+      },
+      {
+        "id": "T3:0",
+        "q": 3,
+        "r": 0,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V6:-2",
+          "V7:-1",
+          "V7:1",
+          "V6:2",
+          "V5:1",
+          "V5:-1"
+        ]
+      },
+      {
+        "id": "T4:0",
+        "q": 4,
+        "r": 0,
+        "resource": "ore",
+        "number": null,
+        "vertices": [
+          "V8:-2",
+          "V9:-1",
+          "V9:1",
+          "V8:2",
+          "V7:1",
+          "V7:-1"
+        ]
+      },
+      {
+        "id": "T5:0",
+        "q": 5,
+        "r": 0,
+        "resource": "wheat",
+        "number": null,
+        "vertices": [
+          "V10:-2",
+          "V11:-1",
+          "V11:1",
+          "V10:2",
+          "V9:1",
+          "V9:-1"
+        ]
+      },
+      {
+        "id": "T-1:1",
+        "q": -1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:1",
+          "V0:2",
+          "V0:4",
+          "V-1:5",
+          "V-2:4",
+          "V-2:2"
+        ]
+      },
+      {
+        "id": "T0:1",
+        "q": 0,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V1:1",
+          "V2:2",
+          "V2:4",
+          "V1:5",
+          "V0:4",
+          "V0:2"
+        ]
+      },
+      {
+        "id": "T1:1",
+        "q": 1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:1",
+          "V4:2",
+          "V4:4",
+          "V3:5",
+          "V2:4",
+          "V2:2"
+        ]
+      },
+      {
+        "id": "T2:1",
+        "q": 2,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:1",
+          "V6:2",
+          "V6:4",
+          "V5:5",
+          "V4:4",
+          "V4:2"
+        ]
+      },
+      {
+        "id": "T3:1",
+        "q": 3,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V7:1",
+          "V8:2",
+          "V8:4",
+          "V7:5",
+          "V6:4",
+          "V6:2"
+        ]
+      },
+      {
+        "id": "T4:1",
+        "q": 4,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V9:1",
+          "V10:2",
+          "V10:4",
+          "V9:5",
+          "V8:4",
+          "V8:2"
+        ]
+      },
+      {
+        "id": "T5:1",
+        "q": 5,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V11:1",
+          "V12:2",
+          "V12:4",
+          "V11:5",
+          "V10:4",
+          "V10:2"
+        ]
+      },
+      {
+        "id": "T-2:2",
+        "q": -2,
+        "r": 2,
+        "resource": "brick",
+        "number": 6,
+        "vertices": [
+          "V-2:4",
+          "V-1:5",
+          "V-1:7",
+          "V-2:8",
+          "V-3:7",
+          "V-3:5"
+        ]
+      },
+      {
+        "id": "T-1:2",
+        "q": -1,
+        "r": 2,
+        "resource": "ore",
+        "number": 10,
+        "vertices": [
+          "V0:4",
+          "V1:5",
+          "V1:7",
+          "V0:8",
+          "V-1:7",
+          "V-1:5"
+        ]
+      },
+      {
+        "id": "T0:2",
+        "q": 0,
+        "r": 2,
+        "resource": "wool",
+        "number": 2,
+        "vertices": [
+          "V2:4",
+          "V3:5",
+          "V3:7",
+          "V2:8",
+          "V1:7",
+          "V1:5"
+        ]
+      },
+      {
+        "id": "T1:2",
+        "q": 1,
+        "r": 2,
+        "resource": "ore",
+        "number": 4,
+        "vertices": [
+          "V4:4",
+          "V5:5",
+          "V5:7",
+          "V4:8",
+          "V3:7",
+          "V3:5"
+        ]
+      },
+      {
+        "id": "T2:2",
+        "q": 2,
+        "r": 2,
+        "resource": "wheat",
+        "number": 3,
+        "vertices": [
+          "V6:4",
+          "V7:5",
+          "V7:7",
+          "V6:8",
+          "V5:7",
+          "V5:5"
+        ]
+      },
+      {
+        "id": "T3:2",
+        "q": 3,
+        "r": 2,
+        "resource": "wood",
+        "number": 11,
+        "vertices": [
+          "V8:4",
+          "V9:5",
+          "V9:7",
+          "V8:8",
+          "V7:7",
+          "V7:5"
+        ]
+      },
+      {
+        "id": "T4:2",
+        "q": 4,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:4",
+          "V11:5",
+          "V11:7",
+          "V10:8",
+          "V9:7",
+          "V9:5"
+        ]
+      },
+      {
+        "id": "T5:2",
+        "q": 5,
+        "r": 2,
+        "resource": "wool",
+        "number": null,
+        "vertices": [
+          "V12:4",
+          "V13:5",
+          "V13:7",
+          "V12:8",
+          "V11:7",
+          "V11:5"
+        ]
+      },
+      {
+        "id": "T-2:3",
+        "q": -2,
+        "r": 3,
+        "resource": "wood",
+        "number": 9,
+        "vertices": [
+          "V-1:7",
+          "V0:8",
+          "V0:10",
+          "V-1:11",
+          "V-2:10",
+          "V-2:8"
+        ]
+      },
+      {
+        "id": "T-1:3",
+        "q": -1,
+        "r": 3,
+        "resource": "wool",
+        "number": 8,
+        "vertices": [
+          "V1:7",
+          "V2:8",
+          "V2:10",
+          "V1:11",
+          "V0:10",
+          "V0:8"
+        ]
+      },
+      {
+        "id": "T0:3",
+        "q": 0,
+        "r": 3,
+        "resource": "lake",
+        "number": null,
+        "vertices": [
+          "V3:7",
+          "V4:8",
+          "V4:10",
+          "V3:11",
+          "V2:10",
+          "V2:8"
+        ]
+      },
+      {
+        "id": "T1:3",
+        "q": 1,
+        "r": 3,
+        "resource": "wood",
+        "number": 5,
+        "vertices": [
+          "V5:7",
+          "V6:8",
+          "V6:10",
+          "V5:11",
+          "V4:10",
+          "V4:8"
+        ]
+      },
+      {
+        "id": "T2:3",
+        "q": 2,
+        "r": 3,
+        "resource": "brick",
+        "number": 10,
+        "vertices": [
+          "V7:7",
+          "V8:8",
+          "V8:10",
+          "V7:11",
+          "V6:10",
+          "V6:8"
+        ]
+      },
+      {
+        "id": "T3:3",
+        "q": 3,
+        "r": 3,
+        "resource": "wheat",
+        "number": 4,
+        "vertices": [
+          "V9:7",
+          "V10:8",
+          "V10:10",
+          "V9:11",
+          "V8:10",
+          "V8:8"
+        ]
+      },
+      {
+        "id": "T4:3",
+        "q": 4,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V11:7",
+          "V12:8",
+          "V12:10",
+          "V11:11",
+          "V10:10",
+          "V10:8"
+        ]
+      },
+      {
+        "id": "T-3:4",
+        "q": -3,
+        "r": 4,
+        "resource": "wool",
+        "number": 6,
+        "vertices": [
+          "V-2:10",
+          "V-1:11",
+          "V-1:13",
+          "V-2:14",
+          "V-3:13",
+          "V-3:11"
+        ]
+      },
+      {
+        "id": "T-2:4",
+        "q": -2,
+        "r": 4,
+        "resource": "wool",
+        "number": 5,
+        "vertices": [
+          "V0:10",
+          "V1:11",
+          "V1:13",
+          "V0:14",
+          "V-1:13",
+          "V-1:11"
+        ]
+      },
+      {
+        "id": "T-1:4",
+        "q": -1,
+        "r": 4,
+        "resource": "brick",
+        "number": 11,
+        "vertices": [
+          "V2:10",
+          "V3:11",
+          "V3:13",
+          "V2:14",
+          "V1:13",
+          "V1:11"
+        ]
+      },
+      {
+        "id": "T0:4",
+        "q": 0,
+        "r": 4,
+        "resource": "wheat",
+        "number": 8,
+        "vertices": [
+          "V4:10",
+          "V5:11",
+          "V5:13",
+          "V4:14",
+          "V3:13",
+          "V3:11"
+        ]
+      },
+      {
+        "id": "T1:4",
+        "q": 1,
+        "r": 4,
+        "resource": "wood",
+        "number": 9,
+        "vertices": [
+          "V6:10",
+          "V7:11",
+          "V7:13",
+          "V6:14",
+          "V5:13",
+          "V5:11"
+        ]
+      },
+      {
+        "id": "T2:4",
+        "q": 2,
+        "r": 4,
+        "resource": "ore",
+        "number": 3,
+        "vertices": [
+          "V8:10",
+          "V9:11",
+          "V9:13",
+          "V8:14",
+          "V7:13",
+          "V7:11"
+        ]
+      },
+      {
+        "id": "T3:4",
+        "q": 3,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:10",
+          "V11:11",
+          "V11:13",
+          "V10:14",
+          "V9:13",
+          "V9:11"
+        ]
+      },
+      {
+        "id": "T4:4",
+        "q": 4,
+        "r": 4,
+        "resource": "wood",
+        "number": null,
+        "vertices": [
+          "V12:10",
+          "V13:11",
+          "V13:13",
+          "V12:14",
+          "V11:13",
+          "V11:11"
+        ]
+      },
+      {
+        "id": "T-3:5",
+        "q": -3,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:13",
+          "V0:14",
+          "V0:16",
+          "V-1:17",
+          "V-2:16",
+          "V-2:14"
+        ]
+      },
+      {
+        "id": "T-2:5",
+        "q": -2,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V1:13",
+          "V2:14",
+          "V2:16",
+          "V1:17",
+          "V0:16",
+          "V0:14"
+        ]
+      },
+      {
+        "id": "T-1:5",
+        "q": -1,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:13",
+          "V4:14",
+          "V4:16",
+          "V3:17",
+          "V2:16",
+          "V2:14"
+        ]
+      },
+      {
+        "id": "T0:5",
+        "q": 0,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:13",
+          "V6:14",
+          "V6:16",
+          "V5:17",
+          "V4:16",
+          "V4:14"
+        ]
+      },
+      {
+        "id": "T1:5",
+        "q": 1,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V7:13",
+          "V8:14",
+          "V8:16",
+          "V7:17",
+          "V6:16",
+          "V6:14"
+        ]
+      },
+      {
+        "id": "T2:5",
+        "q": 2,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V9:13",
+          "V10:14",
+          "V10:16",
+          "V9:17",
+          "V8:16",
+          "V8:14"
+        ]
+      },
+      {
+        "id": "T3:5",
+        "q": 3,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V11:13",
+          "V12:14",
+          "V12:16",
+          "V11:17",
+          "V10:16",
+          "V10:14"
+        ]
+      },
+      {
+        "id": "T-3:6",
+        "q": -3,
+        "r": 6,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V0:16",
+          "V1:17",
+          "V1:19",
+          "V0:20",
+          "V-1:19",
+          "V-1:17"
+        ]
+      },
+      {
+        "id": "T-2:6",
+        "q": -2,
+        "r": 6,
+        "resource": "brick",
+        "number": null,
+        "vertices": [
+          "V2:16",
+          "V3:17",
+          "V3:19",
+          "V2:20",
+          "V1:19",
+          "V1:17"
+        ]
+      },
+      {
+        "id": "T-1:6",
+        "q": -1,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:16",
+          "V5:17",
+          "V5:19",
+          "V4:20",
+          "V3:19",
+          "V3:17"
+        ]
+      },
+      {
+        "id": "T0:6",
+        "q": 0,
+        "r": 6,
+        "resource": "brick",
+        "number": null,
+        "vertices": [
+          "V6:16",
+          "V7:17",
+          "V7:19",
+          "V6:20",
+          "V5:19",
+          "V5:17"
+        ]
+      },
+      {
+        "id": "T1:6",
+        "q": 1,
+        "r": 6,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V8:16",
+          "V9:17",
+          "V9:19",
+          "V8:20",
+          "V7:19",
+          "V7:17"
+        ]
+      },
+      {
+        "id": "T2:6",
+        "q": 2,
+        "r": 6,
+        "resource": "gold",
+        "number": null,
+        "vertices": [
+          "V10:16",
+          "V11:17",
+          "V11:19",
+          "V10:20",
+          "V9:19",
+          "V9:17"
+        ]
+      }
+    ]
+  },
+  {
+    "模式": "seafarers",
+    "地图": "new-world",
+    "场景版本": "m3-seafarers-variable-v002",
+    "湖泊": null,
+    "配置版本": "seafaring-fishing-map-v002:new-world",
+    "渔场": [
+      {
+        "Id": "FG1",
+        "Number": 6,
+        "VertexIds": [
+          "V-2:16",
+          "V-1:17",
+          "V0:16"
+        ]
+      },
+      {
+        "Id": "FG2",
+        "Number": 8,
+        "VertexIds": [
+          "V-1:5",
+          "V0:4",
+          "V1:5"
+        ]
+      },
+      {
+        "Id": "FG3",
+        "Number": 4,
+        "VertexIds": [
+          "V3:13",
+          "V4:14",
+          "V4:16"
+        ]
+      },
+      {
+        "Id": "FG4",
+        "Number": 5,
+        "VertexIds": [
+          "V6:16",
+          "V6:14",
+          "V7:13"
+        ]
+      },
+      {
+        "Id": "FG5",
+        "Number": 10,
+        "VertexIds": [
+          "V10:4",
+          "V9:5",
+          "V8:4"
+        ]
+      },
+      {
+        "Id": "FG6",
+        "Number": 9,
+        "VertexIds": [
+          "V0:8",
+          "V0:10",
+          "V1:11"
+        ]
+      }
+    ],
+    "地形": [
+      {
+        "id": "T0:0",
+        "q": 0,
+        "r": 0,
+        "resource": "ore",
+        "number": 4,
+        "vertices": [
+          "V0:-2",
+          "V1:-1",
+          "V1:1",
+          "V0:2",
+          "V-1:1",
+          "V-1:-1"
+        ]
+      },
+      {
+        "id": "T1:0",
+        "q": 1,
+        "r": 0,
+        "resource": "wheat",
+        "number": 12,
+        "vertices": [
+          "V2:-2",
+          "V3:-1",
+          "V3:1",
+          "V2:2",
+          "V1:1",
+          "V1:-1"
+        ]
+      },
+      {
+        "id": "T2:0",
+        "q": 2,
+        "r": 0,
+        "resource": "wool",
+        "number": 10,
+        "vertices": [
+          "V4:-2",
+          "V5:-1",
+          "V5:1",
+          "V4:2",
+          "V3:1",
+          "V3:-1"
+        ]
+      },
+      {
+        "id": "T3:0",
+        "q": 3,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V6:-2",
+          "V7:-1",
+          "V7:1",
+          "V6:2",
+          "V5:1",
+          "V5:-1"
+        ]
+      },
+      {
+        "id": "T4:0",
+        "q": 4,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:-2",
+          "V9:-1",
+          "V9:1",
+          "V8:2",
+          "V7:1",
+          "V7:-1"
+        ]
+      },
+      {
+        "id": "T-1:1",
+        "q": -1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:1",
+          "V0:2",
+          "V0:4",
+          "V-1:5",
+          "V-2:4",
+          "V-2:2"
+        ]
+      },
+      {
+        "id": "T0:1",
+        "q": 0,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V1:1",
+          "V2:2",
+          "V2:4",
+          "V1:5",
+          "V0:4",
+          "V0:2"
+        ]
+      },
+      {
+        "id": "T1:1",
+        "q": 1,
+        "r": 1,
+        "resource": "wood",
+        "number": 6,
+        "vertices": [
+          "V3:1",
+          "V4:2",
+          "V4:4",
+          "V3:5",
+          "V2:4",
+          "V2:2"
+        ]
+      },
+      {
+        "id": "T2:1",
+        "q": 2,
+        "r": 1,
+        "resource": "brick",
+        "number": 9,
+        "vertices": [
+          "V5:1",
+          "V6:2",
+          "V6:4",
+          "V5:5",
+          "V4:4",
+          "V4:2"
+        ]
+      },
+      {
+        "id": "T3:1",
+        "q": 3,
+        "r": 1,
+        "resource": "wool",
+        "number": 5,
+        "vertices": [
+          "V7:1",
+          "V8:2",
+          "V8:4",
+          "V7:5",
+          "V6:4",
+          "V6:2"
+        ]
+      },
+      {
+        "id": "T4:1",
+        "q": 4,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V9:1",
+          "V10:2",
+          "V10:4",
+          "V9:5",
+          "V8:4",
+          "V8:2"
+        ]
+      },
+      {
+        "id": "T-2:2",
+        "q": -2,
+        "r": 2,
+        "resource": "wheat",
+        "number": 3,
+        "vertices": [
+          "V-2:4",
+          "V-1:5",
+          "V-1:7",
+          "V-2:8",
+          "V-3:7",
+          "V-3:5"
+        ]
+      },
+      {
+        "id": "T-1:2",
+        "q": -1,
+        "r": 2,
+        "resource": "wood",
+        "number": 8,
+        "vertices": [
+          "V0:4",
+          "V1:5",
+          "V1:7",
+          "V0:8",
+          "V-1:7",
+          "V-1:5"
+        ]
+      },
+      {
+        "id": "T0:2",
+        "q": 0,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:4",
+          "V3:5",
+          "V3:7",
+          "V2:8",
+          "V1:7",
+          "V1:5"
+        ]
+      },
+      {
+        "id": "T1:2",
+        "q": 1,
+        "r": 2,
+        "resource": "wheat",
+        "number": 11,
+        "vertices": [
+          "V4:4",
+          "V5:5",
+          "V5:7",
+          "V4:8",
+          "V3:7",
+          "V3:5"
+        ]
+      },
+      {
+        "id": "T2:2",
+        "q": 2,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V6:4",
+          "V7:5",
+          "V7:7",
+          "V6:8",
+          "V5:7",
+          "V5:5"
+        ]
+      },
+      {
+        "id": "T3:2",
+        "q": 3,
+        "r": 2,
+        "resource": "ore",
+        "number": 9,
+        "vertices": [
+          "V8:4",
+          "V9:5",
+          "V9:7",
+          "V8:8",
+          "V7:7",
+          "V7:5"
+        ]
+      },
+      {
+        "id": "T4:2",
+        "q": 4,
+        "r": 2,
+        "resource": "wheat",
+        "number": 6,
+        "vertices": [
+          "V10:4",
+          "V11:5",
+          "V11:7",
+          "V10:8",
+          "V9:7",
+          "V9:5"
+        ]
+      },
+      {
+        "id": "T-2:3",
+        "q": -2,
+        "r": 3,
+        "resource": "wheat",
+        "number": 2,
+        "vertices": [
+          "V-1:7",
+          "V0:8",
+          "V0:10",
+          "V-1:11",
+          "V-2:10",
+          "V-2:8"
+        ]
+      },
+      {
+        "id": "T-1:3",
+        "q": -1,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V1:7",
+          "V2:8",
+          "V2:10",
+          "V1:11",
+          "V0:10",
+          "V0:8"
+        ]
+      },
+      {
+        "id": "T0:3",
+        "q": 0,
+        "r": 3,
+        "resource": "ore",
+        "number": 3,
+        "vertices": [
+          "V3:7",
+          "V4:8",
+          "V4:10",
+          "V3:11",
+          "V2:10",
+          "V2:8"
+        ]
+      },
+      {
+        "id": "T1:3",
+        "q": 1,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:7",
+          "V6:8",
+          "V6:10",
+          "V5:11",
+          "V4:10",
+          "V4:8"
+        ]
+      },
+      {
+        "id": "T2:3",
+        "q": 2,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V7:7",
+          "V8:8",
+          "V8:10",
+          "V7:11",
+          "V6:10",
+          "V6:8"
+        ]
+      },
+      {
+        "id": "T3:3",
+        "q": 3,
+        "r": 3,
+        "resource": "wool",
+        "number": 5,
+        "vertices": [
+          "V9:7",
+          "V10:8",
+          "V10:10",
+          "V9:11",
+          "V8:10",
+          "V8:8"
+        ]
+      },
+      {
+        "id": "T-3:4",
+        "q": -3,
+        "r": 4,
+        "resource": "brick",
+        "number": 4,
+        "vertices": [
+          "V-2:10",
+          "V-1:11",
+          "V-1:13",
+          "V-2:14",
+          "V-3:13",
+          "V-3:11"
+        ]
+      },
+      {
+        "id": "T-2:4",
+        "q": -2,
+        "r": 4,
+        "resource": "wool",
+        "number": 10,
+        "vertices": [
+          "V0:10",
+          "V1:11",
+          "V1:13",
+          "V0:14",
+          "V-1:13",
+          "V-1:11"
+        ]
+      },
+      {
+        "id": "T-1:4",
+        "q": -1,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:10",
+          "V3:11",
+          "V3:13",
+          "V2:14",
+          "V1:13",
+          "V1:11"
+        ]
+      },
+      {
+        "id": "T0:4",
+        "q": 0,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:10",
+          "V5:11",
+          "V5:13",
+          "V4:14",
+          "V3:13",
+          "V3:11"
+        ]
+      },
+      {
+        "id": "T1:4",
+        "q": 1,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V6:10",
+          "V7:11",
+          "V7:13",
+          "V6:14",
+          "V5:13",
+          "V5:11"
+        ]
+      },
+      {
+        "id": "T2:4",
+        "q": 2,
+        "r": 4,
+        "resource": "ore",
+        "number": 11,
+        "vertices": [
+          "V8:10",
+          "V9:11",
+          "V9:13",
+          "V8:14",
+          "V7:13",
+          "V7:11"
+        ]
+      },
+      {
+        "id": "T3:4",
+        "q": 3,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:10",
+          "V11:11",
+          "V11:13",
+          "V10:14",
+          "V9:13",
+          "V9:11"
+        ]
+      },
+      {
+        "id": "T-3:5",
+        "q": -3,
+        "r": 5,
+        "resource": "brick",
+        "number": 3,
+        "vertices": [
+          "V-1:13",
+          "V0:14",
+          "V0:16",
+          "V-1:17",
+          "V-2:16",
+          "V-2:14"
+        ]
+      },
+      {
+        "id": "T-2:5",
+        "q": -2,
+        "r": 5,
+        "resource": "wood",
+        "number": 9,
+        "vertices": [
+          "V1:13",
+          "V2:14",
+          "V2:16",
+          "V1:17",
+          "V0:16",
+          "V0:14"
+        ]
+      },
+      {
+        "id": "T-1:5",
+        "q": -1,
+        "r": 5,
+        "resource": "wood",
+        "number": 5,
+        "vertices": [
+          "V3:13",
+          "V4:14",
+          "V4:16",
+          "V3:17",
+          "V2:16",
+          "V2:14"
+        ]
+      },
+      {
+        "id": "T0:5",
+        "q": 0,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V5:13",
+          "V6:14",
+          "V6:16",
+          "V5:17",
+          "V4:16",
+          "V4:14"
+        ]
+      },
+      {
+        "id": "T1:5",
+        "q": 1,
+        "r": 5,
+        "resource": "wool",
+        "number": 8,
+        "vertices": [
+          "V7:13",
+          "V8:14",
+          "V8:16",
+          "V7:17",
+          "V6:16",
+          "V6:14"
+        ]
+      },
+      {
+        "id": "T2:5",
+        "q": 2,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V9:13",
+          "V10:14",
+          "V10:16",
+          "V9:17",
+          "V8:16",
+          "V8:14"
+        ]
+      },
+      {
+        "id": "T-3:6",
+        "q": -3,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V0:16",
+          "V1:17",
+          "V1:19",
+          "V0:20",
+          "V-1:19",
+          "V-1:17"
+        ]
+      },
+      {
+        "id": "T-2:6",
+        "q": -2,
+        "r": 6,
+        "resource": "wood",
+        "number": 4,
+        "vertices": [
+          "V2:16",
+          "V3:17",
+          "V3:19",
+          "V2:20",
+          "V1:19",
+          "V1:17"
+        ]
+      },
+      {
+        "id": "T-1:6",
+        "q": -1,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:16",
+          "V5:17",
+          "V5:19",
+          "V4:20",
+          "V3:19",
+          "V3:17"
+        ]
+      },
+      {
+        "id": "T0:6",
+        "q": 0,
+        "r": 6,
+        "resource": "brick",
+        "number": 10,
+        "vertices": [
+          "V6:16",
+          "V7:17",
+          "V7:19",
+          "V6:20",
+          "V5:19",
+          "V5:17"
+        ]
+      },
+      {
+        "id": "T1:6",
+        "q": 1,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:16",
+          "V9:17",
+          "V9:19",
+          "V8:20",
+          "V7:19",
+          "V7:17"
+        ]
+      }
+    ]
+  },
+  {
+    "模式": "seafarers",
+    "地图": "wonders-of-catan",
+    "场景版本": "m3-seafarers-variable-v002",
+    "湖泊": null,
+    "配置版本": "seafaring-fishing-map-v002:wonders-of-catan",
+    "渔场": [
+      {
+        "Id": "FG1",
+        "Number": 8,
+        "VertexIds": [
+          "V-2:4",
+          "V-1:5",
+          "V0:4"
+        ]
+      },
+      {
+        "Id": "FG2",
+        "Number": 6,
+        "VertexIds": [
+          "V0:-2",
+          "V1:-1",
+          "V2:-2"
+        ]
+      },
+      {
+        "Id": "FG3",
+        "Number": 10,
+        "VertexIds": [
+          "V10:4",
+          "V11:5",
+          "V11:7"
+        ]
+      },
+      {
+        "Id": "FG4",
+        "Number": 4,
+        "VertexIds": [
+          "V11:13",
+          "V11:11",
+          "V12:10"
+        ]
+      },
+      {
+        "Id": "FG5",
+        "Number": 5,
+        "VertexIds": [
+          "V1:11",
+          "V2:10",
+          "V3:11"
+        ]
+      },
+      {
+        "Id": "FG6",
+        "Number": 9,
+        "VertexIds": [
+          "V4:16",
+          "V4:14",
+          "V5:13"
+        ]
+      }
+    ],
+    "地形": [
+      {
+        "id": "T0:0",
+        "q": 0,
+        "r": 0,
+        "resource": "gold",
+        "number": 8,
+        "vertices": [
+          "V0:-2",
+          "V1:-1",
+          "V1:1",
+          "V0:2",
+          "V-1:1",
+          "V-1:-1"
+        ]
+      },
+      {
+        "id": "T1:0",
+        "q": 1,
+        "r": 0,
+        "resource": "brick",
+        "number": 2,
+        "vertices": [
+          "V2:-2",
+          "V3:-1",
+          "V3:1",
+          "V2:2",
+          "V1:1",
+          "V1:-1"
+        ]
+      },
+      {
+        "id": "T2:0",
+        "q": 2,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:-2",
+          "V5:-1",
+          "V5:1",
+          "V4:2",
+          "V3:1",
+          "V3:-1"
+        ]
+      },
+      {
+        "id": "T3:0",
+        "q": 3,
+        "r": 0,
+        "resource": "wool",
+        "number": 8,
+        "vertices": [
+          "V6:-2",
+          "V7:-1",
+          "V7:1",
+          "V6:2",
+          "V5:1",
+          "V5:-1"
+        ]
+      },
+      {
+        "id": "T4:0",
+        "q": 4,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:-2",
+          "V9:-1",
+          "V9:1",
+          "V8:2",
+          "V7:1",
+          "V7:-1"
+        ]
+      },
+      {
+        "id": "T5:0",
+        "q": 5,
+        "r": 0,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:-2",
+          "V11:-1",
+          "V11:1",
+          "V10:2",
+          "V9:1",
+          "V9:-1"
+        ]
+      },
+      {
+        "id": "T-1:1",
+        "q": -1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:1",
+          "V0:2",
+          "V0:4",
+          "V-1:5",
+          "V-2:4",
+          "V-2:2"
+        ]
+      },
+      {
+        "id": "T0:1",
+        "q": 0,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V1:1",
+          "V2:2",
+          "V2:4",
+          "V1:5",
+          "V0:4",
+          "V0:2"
+        ]
+      },
+      {
+        "id": "T1:1",
+        "q": 1,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:1",
+          "V4:2",
+          "V4:4",
+          "V3:5",
+          "V2:4",
+          "V2:2"
+        ]
+      },
+      {
+        "id": "T2:1",
+        "q": 2,
+        "r": 1,
+        "resource": "wheat",
+        "number": 12,
+        "vertices": [
+          "V5:1",
+          "V6:2",
+          "V6:4",
+          "V5:5",
+          "V4:4",
+          "V4:2"
+        ]
+      },
+      {
+        "id": "T3:1",
+        "q": 3,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V7:1",
+          "V8:2",
+          "V8:4",
+          "V7:5",
+          "V6:4",
+          "V6:2"
+        ]
+      },
+      {
+        "id": "T4:1",
+        "q": 4,
+        "r": 1,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V9:1",
+          "V10:2",
+          "V10:4",
+          "V9:5",
+          "V8:4",
+          "V8:2"
+        ]
+      },
+      {
+        "id": "T5:1",
+        "q": 5,
+        "r": 1,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V11:1",
+          "V12:2",
+          "V12:4",
+          "V11:5",
+          "V10:4",
+          "V10:2"
+        ]
+      },
+      {
+        "id": "T-2:2",
+        "q": -2,
+        "r": 2,
+        "resource": "wood",
+        "number": 4,
+        "vertices": [
+          "V-2:4",
+          "V-1:5",
+          "V-1:7",
+          "V-2:8",
+          "V-3:7",
+          "V-3:5"
+        ]
+      },
+      {
+        "id": "T-1:2",
+        "q": -1,
+        "r": 2,
+        "resource": "wool",
+        "number": 8,
+        "vertices": [
+          "V0:4",
+          "V1:5",
+          "V1:7",
+          "V0:8",
+          "V-1:7",
+          "V-1:5"
+        ]
+      },
+      {
+        "id": "T0:2",
+        "q": 0,
+        "r": 2,
+        "resource": "wool",
+        "number": 10,
+        "vertices": [
+          "V2:4",
+          "V3:5",
+          "V3:7",
+          "V2:8",
+          "V1:7",
+          "V1:5"
+        ]
+      },
+      {
+        "id": "T1:2",
+        "q": 1,
+        "r": 2,
+        "resource": "ore",
+        "number": 2,
+        "vertices": [
+          "V4:4",
+          "V5:5",
+          "V5:7",
+          "V4:8",
+          "V3:7",
+          "V3:5"
+        ]
+      },
+      {
+        "id": "T2:2",
+        "q": 2,
+        "r": 2,
+        "resource": "wheat",
+        "number": 9,
+        "vertices": [
+          "V6:4",
+          "V7:5",
+          "V7:7",
+          "V6:8",
+          "V5:7",
+          "V5:5"
+        ]
+      },
+      {
+        "id": "T3:2",
+        "q": 3,
+        "r": 2,
+        "resource": "wood",
+        "number": 4,
+        "vertices": [
+          "V8:4",
+          "V9:5",
+          "V9:7",
+          "V8:8",
+          "V7:7",
+          "V7:5"
+        ]
+      },
+      {
+        "id": "T4:2",
+        "q": 4,
+        "r": 2,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V10:4",
+          "V11:5",
+          "V11:7",
+          "V10:8",
+          "V9:7",
+          "V9:5"
+        ]
+      },
+      {
+        "id": "T5:2",
+        "q": 5,
+        "r": 2,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V12:4",
+          "V13:5",
+          "V13:7",
+          "V12:8",
+          "V11:7",
+          "V11:5"
+        ]
+      },
+      {
+        "id": "T-2:3",
+        "q": -2,
+        "r": 3,
+        "resource": "ore",
+        "number": 3,
+        "vertices": [
+          "V-1:7",
+          "V0:8",
+          "V0:10",
+          "V-1:11",
+          "V-2:10",
+          "V-2:8"
+        ]
+      },
+      {
+        "id": "T-1:3",
+        "q": -1,
+        "r": 3,
+        "resource": "brick",
+        "number": 10,
+        "vertices": [
+          "V1:7",
+          "V2:8",
+          "V2:10",
+          "V1:11",
+          "V0:10",
+          "V0:8"
+        ]
+      },
+      {
+        "id": "T0:3",
+        "q": 0,
+        "r": 3,
+        "resource": "ore",
+        "number": 5,
+        "vertices": [
+          "V3:7",
+          "V4:8",
+          "V4:10",
+          "V3:11",
+          "V2:10",
+          "V2:8"
+        ]
+      },
+      {
+        "id": "T1:3",
+        "q": 1,
+        "r": 3,
+        "resource": "ore",
+        "number": 3,
+        "vertices": [
+          "V5:7",
+          "V6:8",
+          "V6:10",
+          "V5:11",
+          "V4:10",
+          "V4:8"
+        ]
+      },
+      {
+        "id": "T2:3",
+        "q": 2,
+        "r": 3,
+        "resource": "wool",
+        "number": 5,
+        "vertices": [
+          "V7:7",
+          "V8:8",
+          "V8:10",
+          "V7:11",
+          "V6:10",
+          "V6:8"
+        ]
+      },
+      {
+        "id": "T3:3",
+        "q": 3,
+        "r": 3,
+        "resource": "desert",
+        "number": null,
+        "vertices": [
+          "V9:7",
+          "V10:8",
+          "V10:10",
+          "V9:11",
+          "V8:10",
+          "V8:8"
+        ]
+      },
+      {
+        "id": "T4:3",
+        "q": 4,
+        "r": 3,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V11:7",
+          "V12:8",
+          "V12:10",
+          "V11:11",
+          "V10:10",
+          "V10:8"
+        ]
+      },
+      {
+        "id": "T-3:4",
+        "q": -3,
+        "r": 4,
+        "resource": "brick",
+        "number": 11,
+        "vertices": [
+          "V-2:10",
+          "V-1:11",
+          "V-1:13",
+          "V-2:14",
+          "V-3:13",
+          "V-3:11"
+        ]
+      },
+      {
+        "id": "T-2:4",
+        "q": -2,
+        "r": 4,
+        "resource": "brick",
+        "number": 6,
+        "vertices": [
+          "V0:10",
+          "V1:11",
+          "V1:13",
+          "V0:14",
+          "V-1:13",
+          "V-1:11"
+        ]
+      },
+      {
+        "id": "T-1:4",
+        "q": -1,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:10",
+          "V3:11",
+          "V3:13",
+          "V2:14",
+          "V1:13",
+          "V1:11"
+        ]
+      },
+      {
+        "id": "T0:4",
+        "q": 0,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V4:10",
+          "V5:11",
+          "V5:13",
+          "V4:14",
+          "V3:13",
+          "V3:11"
+        ]
+      },
+      {
+        "id": "T1:4",
+        "q": 1,
+        "r": 4,
+        "resource": "brick",
+        "number": 11,
+        "vertices": [
+          "V6:10",
+          "V7:11",
+          "V7:13",
+          "V6:14",
+          "V5:13",
+          "V5:11"
+        ]
+      },
+      {
+        "id": "T2:4",
+        "q": 2,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:10",
+          "V9:11",
+          "V9:13",
+          "V8:14",
+          "V7:13",
+          "V7:11"
+        ]
+      },
+      {
+        "id": "T3:4",
+        "q": 3,
+        "r": 4,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V10:10",
+          "V11:11",
+          "V11:13",
+          "V10:14",
+          "V9:13",
+          "V9:11"
+        ]
+      },
+      {
+        "id": "T4:4",
+        "q": 4,
+        "r": 4,
+        "resource": "gold",
+        "number": 6,
+        "vertices": [
+          "V12:10",
+          "V13:11",
+          "V13:13",
+          "V12:14",
+          "V11:13",
+          "V11:11"
+        ]
+      },
+      {
+        "id": "T-3:5",
+        "q": -3,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V-1:13",
+          "V0:14",
+          "V0:16",
+          "V-1:17",
+          "V-2:16",
+          "V-2:14"
+        ]
+      },
+      {
+        "id": "T-2:5",
+        "q": -2,
+        "r": 5,
+        "resource": "wood",
+        "number": 9,
+        "vertices": [
+          "V1:13",
+          "V2:14",
+          "V2:16",
+          "V1:17",
+          "V0:16",
+          "V0:14"
+        ]
+      },
+      {
+        "id": "T-1:5",
+        "q": -1,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V3:13",
+          "V4:14",
+          "V4:16",
+          "V3:17",
+          "V2:16",
+          "V2:14"
+        ]
+      },
+      {
+        "id": "T0:5",
+        "q": 0,
+        "r": 5,
+        "resource": "ore",
+        "number": 3,
+        "vertices": [
+          "V5:13",
+          "V6:14",
+          "V6:16",
+          "V5:17",
+          "V4:16",
+          "V4:14"
+        ]
+      },
+      {
+        "id": "T1:5",
+        "q": 1,
+        "r": 5,
+        "resource": "wood",
+        "number": 6,
+        "vertices": [
+          "V7:13",
+          "V8:14",
+          "V8:16",
+          "V7:17",
+          "V6:16",
+          "V6:14"
+        ]
+      },
+      {
+        "id": "T2:5",
+        "q": 2,
+        "r": 5,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V9:13",
+          "V10:14",
+          "V10:16",
+          "V9:17",
+          "V8:16",
+          "V8:14"
+        ]
+      },
+      {
+        "id": "T3:5",
+        "q": 3,
+        "r": 5,
+        "resource": "wood",
+        "number": 4,
+        "vertices": [
+          "V11:13",
+          "V12:14",
+          "V12:16",
+          "V11:17",
+          "V10:16",
+          "V10:14"
+        ]
+      },
+      {
+        "id": "T-3:6",
+        "q": -3,
+        "r": 6,
+        "resource": "wool",
+        "number": 10,
+        "vertices": [
+          "V0:16",
+          "V1:17",
+          "V1:19",
+          "V0:20",
+          "V-1:19",
+          "V-1:17"
+        ]
+      },
+      {
+        "id": "T-2:6",
+        "q": -2,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V2:16",
+          "V3:17",
+          "V3:19",
+          "V2:20",
+          "V1:19",
+          "V1:17"
+        ]
+      },
+      {
+        "id": "T-1:6",
+        "q": -1,
+        "r": 6,
+        "resource": "wheat",
+        "number": 9,
+        "vertices": [
+          "V4:16",
+          "V5:17",
+          "V5:19",
+          "V4:20",
+          "V3:19",
+          "V3:17"
+        ]
+      },
+      {
+        "id": "T0:6",
+        "q": 0,
+        "r": 6,
+        "resource": "wheat",
+        "number": 11,
+        "vertices": [
+          "V6:16",
+          "V7:17",
+          "V7:19",
+          "V6:20",
+          "V5:19",
+          "V5:17"
+        ]
+      },
+      {
+        "id": "T1:6",
+        "q": 1,
+        "r": 6,
+        "resource": "sea",
+        "number": null,
+        "vertices": [
+          "V8:16",
+          "V9:17",
+          "V9:19",
+          "V8:20",
+          "V7:19",
+          "V7:17"
+        ]
+      },
+      {
+        "id": "T2:6",
+        "q": 2,
+        "r": 6,
+        "resource": "wheat",
+        "number": 5,
+        "vertices": [
+          "V10:16",
+          "V11:17",
+          "V11:19",
+          "V10:20",
+          "V9:19",
+          "V9:17"
+        ]
+      }
+    ]
+  }
+]

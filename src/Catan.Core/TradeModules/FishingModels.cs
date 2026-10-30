@@ -50,9 +50,10 @@ namespace Catan.Core.TradeModules
         [DataMember(Order=12)] public string PendingDecisionId { get; set; }
         [DataMember(Order=13)] public long DecisionSequence { get; set; }
         [DataMember(Order=14)] public string MapVersion { get; set; } = FishingScenarioCatalog.CurrentVersion;
+        [DataMember(Order=15, EmitDefaultValue=false)] public bool GroundsPendingSetup { get; set; }
         internal FishingState Copy() => new FishingState
         {
-            Version = Version, MapVersion = MapVersion, LakeTileId = LakeTileId, Grounds = Grounds.Select(g => g.Copy()).ToArray(),
+            Version = Version, MapVersion = MapVersion, GroundsPendingSetup = GroundsPendingSetup, LakeTileId = LakeTileId, Grounds = Grounds.Select(g => g.Copy()).ToArray(),
             Supply = Supply.ToArray(), Discard = Discard.ToArray(), Holdings = Holdings.Select(h => h.Copy()).ToArray(),
             OldBootPlayerId = OldBootPlayerId, Queue = Queue.Select(q => q.Copy()).ToArray(), QueueIndex = QueueIndex,
             Remaining = Remaining, PendingPlayerId = PendingPlayerId, PendingDecisionId = PendingDecisionId, DecisionSequence = DecisionSequence

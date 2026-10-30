@@ -93,7 +93,7 @@ namespace Catan.Core.M5
                     var port=Json.Copy(s.Special.UnplacedPorts[0]);port.EdgeId=c.TargetId;port.Vertices=EdgeAt(c.TargetId).Vertices.ToArray();
                     s.Special.Ports=Append(s.Special.Ports,port);s.Special.UnplacedPorts=s.Special.UnplacedPorts.Skip(1).ToArray();s.Special.SetupPortIndex++;
                     s.ActivePlayerId=s.Players[(s.StartingPlayerIndex+(s.Special.UnplacedPorts.Length==0?0:s.Special.SetupPortIndex))%s.Players.Length].Id;
-                    if(s.Special.UnplacedPorts.Length==0){s.Phase=GamePhase.SetupSettlement;s.PendingDecision=null;}else s.PendingDecision.PlayerId=s.ActivePlayerId;return true;
+                    if(s.Special.UnplacedPorts.Length==0){Catan.Core.TradeModules.FishingScenarioCatalog.CompletePortSetup(s.TradeModules?.Fishing,seafaring,values=>Shuffle(values,s.Random));s.Phase=GamePhase.SetupSettlement;s.PendingDecision=null;}else s.PendingDecision.PlayerId=s.ActivePlayerId;return true;
                 case CommandKind.PlacePort:
                     Require(s.Phase==GamePhase.PortPlacement,"WrongPhase","当前没有待放置港口。");
                     var held=s.Special.HeldPorts.FirstOrDefault(h=>h.PlayerId==p.Id&&h.Port.Id==c.SourceId);
