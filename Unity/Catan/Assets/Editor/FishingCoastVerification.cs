@@ -111,7 +111,7 @@ public static class FishingCoastVerification
             {
                 var bounds=port.GetComponentInChildren<Renderer>().bounds;
                 if(!Contains(polygon,bounds.center))continue;
-                Require(top>bounds.max.y+.0001f,"渔港与港口重叠处没有处于上层");count++;
+                Require(bounds.min.y>top+.00005f,"港口与渔港重叠处没有处于上层");count++;
             }
         }
         return count;

@@ -113,7 +113,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
             {
                 model=CreateGround(ground);if(model==null)continue;grounds.Add(key,model);
             }
-            // 固定关联的两条海岸边是唯一位置依据；允许在原港口之上显示。
+            // 固定关联的两条海岸边是唯一位置依据；重叠处由港口在上层显示。
             if(!Fit(model,position(ids[0]),position(ids[1]),position(ids[2]),outward))
                 Debug.LogError("渔港接岸失败："+ground.Id+" / "+string.Join(",",ids));
         }

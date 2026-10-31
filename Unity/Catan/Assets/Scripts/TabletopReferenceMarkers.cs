@@ -124,7 +124,8 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
             // 将原照片纸板的沙岸实际轮廓贴到海岸边，留下 0.35 mm 的实体板缝。
             // 不凭纸板中心猜测距离，避免不同港口照片的外形产生可见空隙。
             var bottom = midpoint + normal * (item.InlandReach+.00035f);
-            bottom.y = EntityBoardAssets.BoardSurfaceHeight+.0001f;
+            // 渔港底面高出地形 0.5 mm、板厚 1.5 mm；港口再留 0.1 mm 间隙，固定显示在上层。
+            bottom.y = FishingTabletopAssets.GroundBottom+.0015f+.0001f;
             item.Object.transform.position = bottom;
             // 导入纸板的沙岸在 local +Z，向海的凸柄在 local -Z。
             item.Object.transform.rotation = Quaternion.LookRotation(-normal, Vector3.up);
