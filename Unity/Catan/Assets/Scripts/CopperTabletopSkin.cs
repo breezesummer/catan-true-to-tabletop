@@ -149,6 +149,7 @@ public static class CopperTabletopSkin
     }
     public static void Count(Rect r,bool selected=false)
     {
+        if(StrategyHudTheme.Jade){JadeTabletopSkin.Panel(r,StrategyHudTheme.Background,selected,false);return;}
         ModernOperationUI.Round(r,(StrategyHudTheme.Jade?new Color(.70f,.85f,.70f):new Color(.89f,.75f,.53f)).linear);Outline(r,selected,9);
     }
     public static void Card(Rect r,bool selected)

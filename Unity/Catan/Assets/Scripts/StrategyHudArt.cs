@@ -20,7 +20,9 @@ public static class StrategyHudArt
         Color trim=selected?ModernOperationUI.Accent:Color.Lerp(Gold,ModernOperationUI.Line,.56f);
         Color face=selected?Color.Lerp(ModernOperationUI.Surface,ModernOperationUI.Accent,.20f):ModernOperationUI.Surface;
         if(!GUI.enabled){face=Color.Lerp(ModernOperationUI.Background,face,.4f);trim=ModernOperationUI.Line;}
-        Plaque(rect,face,trim,hover);
+        using(TabletopButtonFeedback.Begin(rect))
+        {
+        if(StrategyHudTheme.Jade)JadeTabletopSkin.Panel(rect,face,hover,false);else Plaque(rect,face,trim,hover);
         var icon=counter.HasValue?new Rect(rect.x+8,rect.center.y-16,30,32):new Rect(rect.x+11,rect.center.y-10,19,20);
         Color ink=GUI.enabled?(selected?new Color(1,.94f,.75f):ModernOperationUI.TextColor):ModernOperationUI.Muted;
         HandSymbol(icon,kind,ink);
@@ -29,11 +31,12 @@ public static class StrategyHudArt
         if(counter.HasValue)
         {
             label.fontSize=10;label.normal.textColor=GUI.enabled?ModernOperationUI.Muted:ModernOperationUI.Line;
-            GUI.Label(new Rect(rect.x+39,rect.y+3,rect.width-43,16),caption,label);
+            TabletopTextFit.Label(new Rect(rect.x+37,rect.y+6,rect.width-45,13),caption,label);
             label.fontSize=14;label.normal.textColor=counter.Value.OverLimit?ModernOperationUI.Error:ink;
-            GUI.Label(new Rect(rect.x+38,rect.y+19,rect.width-42,20),counter.Value.Caption,label);
+            TabletopTextFit.Label(new Rect(rect.x+37,rect.y+20,rect.width-45,17),counter.Value.Caption,label);
         }
-        else GUI.Label(new Rect(rect.x+32,rect.y+2,rect.width-39,rect.height-4),caption,label);
+        else TabletopTextFit.Label(new Rect(rect.x+31,rect.y+5,rect.width-39,rect.height-10),caption,label);
+        }
         return TabletopButtonFeedback.Button(rect);
     }
     static void HandSymbol(Rect rect,int kind,Color ink)

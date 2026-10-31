@@ -25,7 +25,7 @@ public static class TabletopPieceDock
         var area=CountArea(group);
         var value=new GUIStyle(source){fontSize=23,fontStyle=FontStyle.Bold,alignment=TextAnchor.MiddleCenter,
             wordWrap=false,padding=new RectOffset(),clipping=TextClipping.Overflow};
-        value.normal.textColor=new Color(.24f,.11f,.055f);
-        GUI.Label(area,count.ToString(),value);GUI.enabled=enabled;
+        value.normal.textColor=StrategyHudTheme.Jade?new Color(.97f,.94f,.78f):new Color(.24f,.11f,.055f);
+        TabletopTextFit.Label(new Rect(area.x+7,area.y+4,area.width-14,area.height-8),count.ToString(),value,10);GUI.enabled=enabled;
     }
 }

@@ -191,12 +191,15 @@ public sealed partial class TabletopUI
         bool resumeOperation=OperationWindows.Hidden||OperationWindows.Closed&&(operations?.RequiresSelection==true||operations?.Discard!=null);
         if(resumeOperation){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
         if(skillSelecting){turnCaption="完成底部选择";turnEnabled=false;}
+        using(TabletopButtonFeedback.Begin(EndTurnRect,turnEnabled))
+        {
         StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
         var turnStyle=Style("turn-action",title,21);turnStyle.normal.textColor=StrategyHudTheme.Jade?new Color(.025f,.16f,.12f):turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
         while(turnStyle.fontSize>11&&turnStyle.CalcHeight(Content(turnCaption),EndTurnRect.width-40)>60)turnStyle.fontSize--;
-        GUI.Label(new Rect(EndTurnRect.x+20,EndTurnRect.y+35,EndTurnRect.width-40,60),turnCaption,turnStyle);
+        TabletopTextFit.Label(new Rect(EndTurnRect.x+18,EndTurnRect.y+35,EndTurnRect.width-36,60),turnCaption,turnStyle,11,true);
+        }
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
-        if(TabletopButtonFeedback.Button(EndTurnRect)){if(resumeOperation)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(cardCaption!=null)ConfirmCardAction();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
+        if(TabletopButtonFeedback.Button(EndTurnRect,true,true)){if(resumeOperation)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(cardCaption!=null)ConfirmCardAction();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
         DrawDiscardCount();
         GUI.enabled=tableEnabled;
     }
@@ -215,31 +218,34 @@ public sealed partial class TabletopUI
         var actorStyle=NameStyle("actor",title,actor,19,TextAnchor.MiddleLeft);actorStyle.wordWrap=false;
         string actorName=M6App.PlayerLabel(actor)+(actor==seat?" · 你":"");
         actorStyle.fontSize=Mathf.Min(19,Mathf.Max(10,Mathf.FloorToInt(19*193/Mathf.Max(193,actorStyle.CalcSize(Content(actorName)).x))));
-        GUI.Label(new Rect(r.x+181,r.y+15,193,27),actorName,actorStyle);
+        TabletopTextFit.Label(new Rect(r.x+181,r.y+15,r.width-197,27),actorName,actorStyle,8,true);
         var phaseStyle=Style("phase",small,12,alignment:TextAnchor.MiddleLeft,wrap:false);phaseStyle.normal.textColor=ModernOperationUI.Muted;
-        GUI.Label(new Rect(r.x+181,r.y+45,193,21),phase,phaseStyle);
+        TabletopTextFit.Label(new Rect(r.x+181,r.y+45,r.width-197,21),phase,phaseStyle);
         // 两端共用铭牌作为菜单入口；触屏无需键盘 Esc，也不另做一套导航栏。
         if(TabletopButtonFeedback.Button(r)&&!MobileTabletop.TouchDragged)
             UnityEngine.Object.FindFirstObjectByType<M6App>()?.OpenTableMenu();
     }
     void DrawTopButtons(TabletopSeat own,Action<string> trade,Action<int> facility)
     {
-        CopperTabletopSkin.Panel(new Rect(8,12,428,91),ModernOperationUI.Surface);
+        if(!StrategyHudTheme.Jade)CopperTabletopSkin.Panel(new Rect(8,12,428,91),ModernOperationUI.Surface);
         string[] names={"银行","玩家交易","贸易设施","政治设施","科学设施"};
         for(int i=0;i<5;i++)
         {
-            var r=new Rect(24+i*82,16,70,70);hits.Add(new Rect(r.x,r.y,r.width,85));
+            var r=StrategyHudTheme.Jade?new Rect(18+i*86,22,76,76):new Rect(24+i*82,16,70,70);hits.Add(new Rect(r.x,r.y,r.width,85));
             bool available=i<2||own?.Improvements!=null;
             bool over=r.Contains(Event.current.mousePosition);
             var face=i==2?new Color(.38f,.26f,.045f):i==3?new Color(.045f,.17f,.31f):i==4?new Color(.10f,.25f,.09f):ModernOperationUI.Surface;
-            StrategyHudArt.Disc(r,available?face:ModernOperationUI.Background,available&&over);
-            StrategyHudArt.Icon(new Rect(r.x+14,r.y+13,42,43),i);
             int level=i<2?0:own?.Improvements!=null&&own.Improvements.Length>i-2?own.Improvements[i-2]:0;
+            using(TabletopButtonFeedback.Begin(r,available))
+            {
+            StrategyHudArt.Disc(r,available?face:ModernOperationUI.Background,available&&over);
+            StrategyHudArt.Icon(new Rect(r.center.x-21,r.center.y-22,42,43),i);
             var marker=new Rect(r.center.x-11,r.yMax-7,22,22);TabletopUI.Token(marker,new Color(.045f,.055f,.05f));
             var levelStyle=Style("level",center,12,FontStyle.Bold);levelStyle.normal.textColor=StrategyHudArt.Gold;
-            GUI.Label(marker,i<2?"•":level.ToString(),levelStyle);
+            GUI.Label(marker,i<2?"–":level.ToString(),levelStyle);
+            }
             bool prior=GUI.enabled;GUI.enabled=prior&&available;
-            if(TabletopButtonFeedback.Button(r)){if(i<2)trade?.Invoke(i==0?null:"");else facility?.Invoke(i-2);}GUI.enabled=prior;
+            if(TabletopButtonFeedback.Button(r,true,true)){if(i<2)trade?.Invoke(i==0?null:"");else facility?.Invoke(i-2);}GUI.enabled=prior;
             if(over)
             {
                 string tip=names[i];
@@ -259,8 +265,8 @@ public sealed partial class TabletopUI
             var panel=new Rect(x,13,width,alliance==null?191:211);hits.Add(panel);
             if(StrategyHudTheme.Jade)JadeTabletopSkin.LightPanel(panel,player.Id==actor);else CopperTabletopSkin.Panel(panel,ModernOperationUI.Background,player.Id==actor);
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
-            StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
-            StrategyHudArt.Avatar(new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
+            if(!StrategyHudTheme.Jade)StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
+            StrategyHudArt.Avatar(StrategyHudTheme.Jade?new Rect(avatar.x+1,avatar.y,avatar.width-2,avatar.height-2):new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
             if(fishing!=null)
             {
                 var fish=fishing.Players.First(p=>p.PlayerId==player.Id);
@@ -274,7 +280,10 @@ public sealed partial class TabletopUI
                     if(bootBadge.Contains(Event.current.mousePosition)){hoveredPlayerHint="旧靴：本人的获胜目标增加1分";playerHintAnchor=bootBadge;}
                 }
             }
-            GUI.Label(new Rect(x+4,70,width-8,24),M6App.PlayerLabel(player.Id),NameStyle("player",center,player.Id,10));
+            var nameRect=new Rect(x+11,73,width-22,27);
+            var nameStyle=NameStyle("player",center,player.Id,12);
+            if(StrategyHudTheme.Jade)nameStyle.normal.textColor=JadeTabletopSkin.PlayerInk(player.Id).linear;
+            TabletopTextFit.Label(nameRect,M6App.PlayerLabel(player.Id),nameStyle,8,true);
             int points=player.Score==null?player.Points:player.Id==own?player.Score.Total:player.Score.PublicPoints;
             int resources=displayedHandCounts.Observe(operations?.Scope,player.Id,false,player.Resources,DiceRolling);
             int cards=displayedHandCounts.Observe(operations?.Scope,player.Id,true,player.Cards,DiceRolling);
@@ -284,27 +293,29 @@ public sealed partial class TabletopUI
                 player.SpecialHandLimit>0?"发展卡 · 当前 / 回合结束上限\n公开胜利点卡不占手牌上限":"发展卡 · 当前张数 / 无持有上限"};
             for(int row=0;row<6;row++)
             {
-                var r=new Rect(x+7,94+row*17,width-14,17);
-                var icon=new Rect(r.x+1,r.y,23,18);
+                var r=new Rect(x+11,101+row*15,width-22,15);
+                if(StrategyHudTheme.Jade&&row<5)Fill(new Rect(r.x+4,r.yMax,r.width-8,.5f),new Color(.12f,.38f,.26f,.10f));
+                var icon=new Rect(r.x+1,r.y-1,20,16);
                 if(row==0)StrategyHudArt.VictoryIcon(icon);
                 else if(row<4)StrategyHudArt.Icon(icon,row+1);
                 else StrategyHudArt.HandCardIcon(icon,row==5);
                 var valueStyle=Style("value",center,12,FontStyle.Bold,TextAnchor.MiddleRight);
                 valueStyle.normal.textColor=row==0?StrategyHudArt.Gold:row==1?new Color(1,.8f,.3f):row==2?new Color(.48f,.77f,1):row==3?new Color(.55f,.9f,.52f):ModernOperationUI.TextColor;
                 if(StrategyHudTheme.Jade)valueStyle.normal.textColor=row==0||row==1?new Color(.53f,.27f,.015f):row==2?new Color(.025f,.25f,.47f):new Color(.025f,.21f,.13f);
+                if(StrategyHudTheme.Jade)valueStyle.normal.textColor=valueStyle.normal.textColor.linear;
                 string value=values[row].ToString();
                 if(row>=4)
                 {
                     var counter=new TabletopHandCounter(values[row],row==4?player.ResourceHandLimit:player.SpecialHandLimit);
                     value=counter.Caption;if(counter.OverLimit)valueStyle.normal.textColor=ModernOperationUI.Error;
                 }
-                GUI.Label(new Rect(r.x+28,r.y,r.width-28,18),value,valueStyle);
+                TabletopTextFit.Label(new Rect(r.x+26,r.y,r.width-28,16),value,valueStyle);
                 if(row==0)ScoreHover(r,player.Score);
                 else if(r.Contains(Event.current.mousePosition)){hoveredPlayerHint=hints[row];playerHintAnchor=r;}
             }
             if(alliance!=null)
             {
-                var badge=new Rect(x+4,199,width-8,20);GUI.Label(badge,alliance,Style("alliance",center,11,FontStyle.Bold));
+                var badge=new Rect(x+10,197,width-20,17);TabletopTextFit.Label(badge,alliance,Style("alliance",center,11,FontStyle.Bold));
                 if(badge.Contains(Event.current.mousePosition)){hoveredPlayerHint=ThreeKingdoms.AlliancePlayerHintB6(player.Id);playerHintAnchor=badge;}
             }
             bool selecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;

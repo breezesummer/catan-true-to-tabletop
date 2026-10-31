@@ -15,6 +15,7 @@ public static class JadeThemeVerification
     static int stage,original;
     static double next;
     static string authority;
+    static string[] originalNames;
     static readonly BindingFlags Flags=BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Static;
     static JadeThemeVerification(){EditorApplication.update+=Tick;}
     public static void Run()
@@ -22,7 +23,7 @@ public static class JadeThemeVerification
         original=StrategyHudTheme.Selected;SessionState.SetInt(Key+".original",original);
         SessionState.SetString(Key,Path.GetFullPath(Path.Combine(Application.dataPath,"../../../.local/jade-theme")));
         EditorSceneManager.OpenScene("Assets/M6.unity",OpenSceneMode.Single);
-        typeof(B45DockEditorVerification).GetMethod("SetSize",Flags).Invoke(null,new object[]{1672,941});
+        typeof(B45DockEditorVerification).GetMethod("SetSize",Flags).Invoke(null,new object[]{1440,900});
         EditorApplication.isPlaying=true;
     }
     static void Tick()
@@ -44,6 +45,8 @@ public static class JadeThemeVerification
                     if(!result.Success)throw new Exception("验证开局失败："+result.ErrorCode);
                 }
                 typeof(M2App).GetMethod("M6Refresh",BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic).Invoke(basic,null);
+                originalNames=(string[])typeof(M6App).GetField("localPlayerNames",BindingFlags.Instance|BindingFlags.NonPublic).GetValue(app);
+                typeof(M6App).GetField("localPlayerNames",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(app,new[]{"玩家","Martire · Azure","羽扇纶巾卧龙先生天下三分运筹帷幄之中天下","奥古斯都"});
                 authority=app.ExportEnvelope();
                 for(int i=0;i<StrategyHudTheme.Names.Length;i++)
                 {
@@ -53,23 +56,51 @@ public static class JadeThemeVerification
                 if(!JadeTabletopSkin.Ready)throw new Exception("玉石图集缺失");
                 StrategyHudTheme.Select(3);stage++;next=EditorApplication.timeSinceStartup+3;return;
             }
-            if(stage==2)
+            // 截图和后续输入分隔至不同帧，避免异步截图记录到下一个状态。
+            switch(stage)
             {
-                ScreenCapture.CaptureScreenshot(Path.Combine(output,"青玉鎏金-实机.png"));
-                typeof(B45DockEditorVerification).GetMethod("Send",Flags).Invoke(null,new object[]{new Event{type=EventType.MouseDown,button=0,mousePosition=new Vector2(1420,875)}});
-                stage++;next=EditorApplication.timeSinceStartup+1;return;
-            }
-            if(stage==3)
-            {
-                ScreenCapture.CaptureScreenshot(Path.Combine(output,"整理手牌-按下.png"));
-                typeof(B45DockEditorVerification).GetMethod("Send",Flags).Invoke(null,new object[]{new Event{type=EventType.MouseUp,button=0,mousePosition=new Vector2(1420,875)}});
-                stage++;next=EditorApplication.timeSinceStartup+1;return;
+                case 2:
+                    CheckText("羽扇纶巾卧龙先生天下三分运筹帷幄之中天下",92,27,12,true);
+                    CheckText("Martire · Azure",92,27,12,true);
+                    CheckText("999/999",51,17,14,false);
+                    CheckText("整理手牌",57,22,11,false);
+                    CheckText("999",34,26,23,false);
+                    Send(EventType.MouseMove,new Vector2(600,600));Advance();return;
+                case 3: Capture(output,"青玉鎏金-实机.png");Advance();return;
+                case 4: Send(EventType.MouseMove,new Vector2(1226,846));Send(EventType.MouseDown,new Vector2(1226,846));Advance();return;
+                case 5: Capture(output,"整理手牌-按下.png");Advance();return;
+                case 6: Send(EventType.MouseUp,new Vector2(1226,846));Advance();return;
+                case 7: Capture(output,"整理手牌-释放.png");Advance();return;
+                case 8: Size(1280,720);Advance(2);return;
+                case 9: Capture(output,"青玉鎏金-1280x720.png");Advance();return;
+                case 10:
+                    if(app.ExportEnvelope()!=authority)throw new Exception("主题或整理手牌改变权威存档");
+                    typeof(M6App).GetField("localPlayerNames",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(app,originalNames);
+                    authority=app.ExportEnvelope();Size(1672,941);Advance(2);return;
+                case 11: Capture(output,"青玉鎏金-1672x941.png");Advance();return;
+                case 12: Size(1440,900);Advance(2);return;
+                case 13: Send(EventType.MouseMove,new Vector2(56,60));Send(EventType.MouseDown,new Vector2(56,60));Advance();return;
+                case 14: Capture(output,"圆钮-按下.png");Advance();return;
+                case 15: Send(EventType.MouseDrag,new Vector2(500,250));Advance();return;
+                case 16: Capture(output,"圆钮-移出取消.png");Advance();return;
+                case 17: Send(EventType.MouseUp,new Vector2(500,250));Advance();return;
             }
             if(app.ExportEnvelope()!=authority)throw new Exception("界面点击改变权威存档");
-            File.WriteAllText(Path.Combine(output,"验证.txt"),"通过：Unity "+Application.unityVersion+"；四主题即时切换，权威存档保持一致，玉石图集加载成功；1672×941实际GameView截图。\n");
+            File.WriteAllText(Path.Combine(output,"验证.txt"),"通过：Unity "+Application.unityVersion+"；四主题即时切换，权威存档保持一致，玉石图集加载成功；1440×900、1280×720及1672×941实际GameView截图；长中文名、英文名、按下和释放截图。\n");
             Finish(0);
         }
         catch(Exception ex){File.WriteAllText(Path.Combine(output,"失败.txt"),ex.ToString());Debug.LogException(ex);Finish(1);}
+    }
+    static void Advance(double seconds=1){stage++;next=EditorApplication.timeSinceStartup+seconds;}
+    static void Capture(string output,string name)=>ScreenCapture.CaptureScreenshot(Path.Combine(output,name));
+    static void Size(int width,int height)=>typeof(B45DockEditorVerification).GetMethod("SetSize",Flags).Invoke(null,new object[]{width,height});
+    static void Send(EventType type,Vector2 point)
+    {typeof(B45DockEditorVerification).GetMethod("Send",Flags).Invoke(null,new object[]{new Event{type=type,button=0,mousePosition=point}});}
+    static void CheckText(string text,float width,float height,int size,bool wrap)
+    {
+        var style=new GUIStyle(ModernOperationUI.Center){fontSize=size};var r=new Rect(0,0,width,height);
+        TabletopTextFit.Fit(style,text,r,8,wrap);var content=new GUIContent(text);
+        if(style.CalcHeight(content,width)>height+.1f||!wrap&&style.CalcSize(content).x>width+.1f)throw new Exception("文字超出内容区："+text);
     }
     static void Finish(int code)
     {
