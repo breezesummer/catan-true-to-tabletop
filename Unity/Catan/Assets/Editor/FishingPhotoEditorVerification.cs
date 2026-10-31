@@ -91,9 +91,9 @@ public static class FishingPhotoEditorVerification
             foreach(var ground in grounds)
             {
                 Require(ground.GetComponentsInChildren<Collider>().Length==0,"渔港遮挡拾取");
-                Require(ground.GetComponentsInChildren<MeshFilter>().Single().sharedMesh.vertexCount<200,"薄板网格异常");
+                Require(ground.GetComponentInChildren<MeshFilter>().sharedMesh.vertexCount<200,"薄板网格异常");
                 var renderer=ground.GetComponentInChildren<Renderer>();
-                Require(renderer.sharedMaterials.Any(m=>m.mainTexture!=null&&AssetDatabase.GetAssetPath(m.mainTexture).Contains("HarborFishing/v002/")),"桌面未使用原照渔港");
+                Require(ground.GetComponent<FishingNumberDisplay>()!=null&&renderer.sharedMaterials.Any(m=>m.mainTexture is RenderTexture),"桌面未接入原照水纹与独立点数");
             }
             var projected=Property(presentation,"M6View");
             var fishView=(Catan.Core.TradeModules.FishingView)Property(Property(projected,"TradeModules"),"Fishing");

@@ -1,0 +1,6 @@
+渔场 FG3 [ground-6] 避让=False
+渔场 FG2 [ground-8] 避让=False
+渔场 FG6 [ground-9] 避让=False
+渔场 FG5 [ground-10] 避让=False
+渔场 FG4 [ground-4] 避让=False
+渔场 FG1 [ground-5] 避让=True

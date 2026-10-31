@@ -22,6 +22,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
     {
         public GameObject Root;
         public Vector3[][] Shores;
+        public FishingNumberDisplay Number;
     }
     readonly Dictionary<string,GroundVisual> grounds=new Dictionary<string,GroundVisual>();
     string layoutKey;
@@ -64,7 +65,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
                 shores[side][point]=Flat(root.transform.InverseTransformPoint(anchor.position));
             }
         }
-        return new GroundVisual{Root=root,Shores=shores};
+        return new GroundVisual{Root=root,Shores=shores,Number=FishingNumberDisplay.Create(root.transform,model,ground.Number,shores[0])};
     }
     static Vector3 Flat(Vector3 value){value.y=0;return value;}
     static bool Land(Tile tile)=>tile.Resource!="sea"&&tile.Resource!="water"&&tile.Resource!="fog"&&tile.Resource!="hidden";
@@ -100,7 +101,10 @@ public sealed class FishingTabletopAssets : MonoBehaviour
     }
     void Apply(FishingView view,Tile[] tiles,Func<string,Vector3> position)
     {
+        var markers=GetComponentInChildren<TabletopReferenceMarkers>();
+        var portBounds=markers?.PublicPortFootprints??Array.Empty<Vector3[]>();
         string next=view==null?"":string.Join("|",view.Grounds.Select(g=>g.Id+":"+g.Number+":"+string.Join(",",g.VertexIds)))+string.Join("|",tiles.Select(t=>t.Id+":"+t.Resource));
+        next+="|ports:"+(markers?.PortLayoutRevision??0);
         if(next==layoutKey)return;layoutKey=next;
         retained.Clear();
         if(view!=null)foreach(var ground in view.Grounds)
@@ -116,6 +120,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
             // 固定关联的两条海岸边是唯一位置依据；重叠处由港口在上层显示。
             if(!Fit(model,position(ids[0]),position(ids[1]),position(ids[2]),outward))
                 Debug.LogError("渔港接岸失败："+ground.Id+" / "+string.Join(",",ids));
+            model.Number.Place(portBounds,outward);
         }
         var removed=new List<string>();foreach(var pair in grounds)if(!retained.Contains(pair.Key)){Destroy(pair.Value.Root);removed.Add(pair.Key);}
         foreach(var key in removed)grounds.Remove(key);

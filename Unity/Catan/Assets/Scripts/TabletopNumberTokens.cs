@@ -54,7 +54,7 @@ public sealed class TabletopNumberTokens : MonoBehaviour
             renderer.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
         }
     }
-    static Mesh CreateMesh()
+    internal static Mesh CreateMesh()
     {
         // 21 mm 直径置于板块中心，远离边与顶点建筑；薄纸牌不会遮住建筑轮廓。
         const int segments=64;const float radius=.0105f,thickness=.00045f;

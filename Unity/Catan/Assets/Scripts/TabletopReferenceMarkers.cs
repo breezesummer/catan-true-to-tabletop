@@ -41,6 +41,28 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
     float minimumZ;
 
     public Vector3[] PublicPortPositions => ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null).Select(p=>p.Object.transform.position).ToArray();
+    // 使用实际网格三角形保留港口凹口；包围盒会把渔港空闲的另一臂误判为占用。
+    public Vector3[][] PublicPortFootprints {get;private set;}=Array.Empty<Vector3[]>();
+    public int PortLayoutRevision {get;private set;}
+    string portLayoutKey;
+    void RefreshPortFootprints()
+    {
+        string key=string.Join("|",ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null).Select(p=>p.Resource+":"+p.Object.transform.localToWorldMatrix.ToString("F6")));
+        if(key==portLayoutKey)return;
+        portLayoutKey=key;PortLayoutRevision++;
+        PublicPortFootprints=ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null)
+        .SelectMany(p=>p.Object.GetComponentsInChildren<MeshFilter>()).SelectMany(m=>
+        {
+            var mesh=m.sharedMesh;var vertices=mesh.vertices;var indices=mesh.triangles;
+            var triangles=new List<Vector3[]>();
+            for(int i=0;i<indices.Length;i+=3)
+            {
+                var a=m.transform.TransformPoint(vertices[indices[i]]);var b=m.transform.TransformPoint(vertices[indices[i+1]]);var c=m.transform.TransformPoint(vertices[indices[i+2]]);
+                if(Mathf.Abs((b.x-a.x)*(c.z-a.z)-(b.z-a.z)*(c.x-a.x))>1e-10f)triangles.Add(new[]{a,b,c});
+            }
+            return triangles;
+        }).ToArray();
+    }
     public int PlacedPortCount => ports.Count;
     public int GiftPortCount => gifts.Count;
     public int UnclaimedVictoryMarkerCount => bonuses.Count;
@@ -82,6 +104,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         RefreshOceanTiles((publicPorts??Array.Empty<PortDisplay>()).Concat(publicGiftPorts??Array.Empty<PortDisplay>()));
         RefreshPorts(ports, portRoot, publicPorts, "港口 ");
         RefreshPorts(gifts, giftRoot, publicGiftPorts, "港礼 ");
+        RefreshPortFootprints();
         var wantedBonuses = new HashSet<string>(StringComparer.Ordinal);
         foreach (var id in publicBonusEdgeIds ?? Array.Empty<string>())
         {
