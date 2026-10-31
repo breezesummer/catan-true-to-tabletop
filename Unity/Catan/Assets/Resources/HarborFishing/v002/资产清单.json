@@ -1,0 +1,203 @@
+{
+  "Blender": "5.2.3 LTS",
+  "资产": [
+    {
+      "id": "lake",
+      "参考": "assets/references/inbox/商人扩展/湖泊板块.jpg",
+      "原图SHA256": "52821a944b0a9550a9002d6fa68f7414491df7b24727b28427e13d0f606e9f91",
+      "尺寸米": [
+        0.068416007,
+        0.079,
+        0.008
+      ],
+      "枢轴": "底面中心",
+      "面数": 20,
+      "三角面数": 44,
+      "几何UVSHA256": "59cbde27f90f0dfe5aa8bda515d674ea412f6e94e090f82b330a713799c60ec6",
+      "FBXSHA256": "7c5d6d00be142afca12a95295a88e88bc0e59d6005853a96d75f641ae56f82d2",
+      "贴图SHA256": "94cbfcad334c6890f64b31d4a4b5a21419f749a9564c7d224e0b0c4820943e4d",
+      "图标SHA256": "32b821ae78db41bf84f53a115d7b404f80a7daf229ed1c3761df8263822b678e",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    },
+    {
+      "id": "ground-9",
+      "参考": "assets/references/inbox/商人扩展/渔港-9.jpg",
+      "原图SHA256": "5b6217c573d78cb2a8f8a13c50df62ef1988f6c52b9d4981b5f060e393f69eec",
+      "尺寸米": [
+        0.042,
+        0.030310889,
+        0.0015
+      ],
+      "枢轴": "底面中心",
+      "面数": 22,
+      "三角面数": 44,
+      "几何UVSHA256": "e731113f6724f30f52b97a4842a73c3dc431a68279b550fb9b8b876a77e381fb",
+      "FBXSHA256": "ce946542c3151e0c7413657e70bb76d710d69d536cadb523d922c8ba00946d20",
+      "贴图SHA256": "24490db3317c13695f70c55afc617149817efccec26ae68aeb84f23e8a5e037e",
+      "图标SHA256": "33d19dc97da42566b70de681a0b04b0da600bb37cc7866fb214e6ceb12be7725",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    },
+    {
+      "id": "ground-8",
+      "参考": "assets/references/inbox/商人扩展/渔港-8.jpg",
+      "原图SHA256": "92aca44b95cef83a965b7c1529ab88bc9756a956b62ac2de784c87f76b4d366e",
+      "尺寸米": [
+        0.042,
+        0.030310889,
+        0.0015
+      ],
+      "枢轴": "底面中心",
+      "面数": 22,
+      "三角面数": 44,
+      "几何UVSHA256": "e731113f6724f30f52b97a4842a73c3dc431a68279b550fb9b8b876a77e381fb",
+      "FBXSHA256": "67f03ba479772893795f6574d948e55e076ced3ef922d2b4db198982d46278c2",
+      "贴图SHA256": "9fc17d664a31ffa4e3e8d5c066d089a549da2ad9919801aecb99c994e6da7434",
+      "图标SHA256": "f9c6f1ca3a8af5d6c5d726a8eb200907e4e016bad7b8a0f964d4a4523f06591f",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    },
+    {
+      "id": "ground-5",
+      "参考": "assets/references/inbox/商人扩展/渔港-5.jpg",
+      "原图SHA256": "e4733f49916689dbb8887aa035c11847a77f048d8344d6cbd87f554811e26b7e",
+      "尺寸米": [
+        0.042,
+        0.030310889,
+        0.0015
+      ],
+      "枢轴": "底面中心",
+      "面数": 22,
+      "三角面数": 44,
+      "几何UVSHA256": "e731113f6724f30f52b97a4842a73c3dc431a68279b550fb9b8b876a77e381fb",
+      "FBXSHA256": "82304f693bfc78ea153841ea2492946a53353a0e0004674ed22af916edfa8377",
+      "贴图SHA256": "41cff43641bbec57d616296e1a20c7e8a2b15cf4eaad8f5e554f7ab450d47c0e",
+      "图标SHA256": "8fcbc1ccb231a8702cca7143374b98e1b3dfeaccd8ec8f58715c86a7db9d3215",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    },
+    {
+      "id": "ground-10",
+      "参考": "assets/references/inbox/商人扩展/渔港-10.jpg",
+      "原图SHA256": "95b2e7ed5657ec07a4cccbfd7283451317c7f86780c191e72ccc5b038f4024d1",
+      "尺寸米": [
+        0.042,
+        0.030310889,
+        0.0015
+      ],
+      "枢轴": "底面中心",
+      "面数": 22,
+      "三角面数": 44,
+      "几何UVSHA256": "e731113f6724f30f52b97a4842a73c3dc431a68279b550fb9b8b876a77e381fb",
+      "FBXSHA256": "daddb9899e05d5def1e2676f6405a177bd75b2bb9b4ff8af927eb358ef9e09d7",
+      "贴图SHA256": "fbd45f39f955e0deeacccdd61e91fbefa2466d4db535c7d9c9cdde217ebfea3e",
+      "图标SHA256": "09f41cafc7bde9cdf035baeaf596cb3653b49c0dc48b3c28bcfea2e63cffb5d2",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    },
+    {
+      "id": "ground-6",
+      "参考": "assets/references/inbox/商人扩展/渔港-6.jpg",
+      "原图SHA256": "6dca853589077819aa9ccfebe978faea9d76aca4e03828e97a2f08a3f00dcfce",
+      "尺寸米": [
+        0.042,
+        0.030310889,
+        0.0015
+      ],
+      "枢轴": "底面中心",
+      "面数": 22,
+      "三角面数": 44,
+      "几何UVSHA256": "e731113f6724f30f52b97a4842a73c3dc431a68279b550fb9b8b876a77e381fb",
+      "FBXSHA256": "d89244c47f510e7f81dcf920dd70a858b6b6f17adcd80ac8d1ab7d0cf1d6a610",
+      "贴图SHA256": "e6d56291ebe62406db37dbc404d4eecfb740f7de317fddad9fa1388d3ff8dcc9",
+      "图标SHA256": "eb1d305ccf3ab3d767432349daf6acaf4f6e15a4d465daf64a3ecdafb8060252",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    },
+    {
+      "id": "ground-4",
+      "参考": "assets/references/inbox/商人扩展/渔港-4.jpg",
+      "原图SHA256": "bf7d7d82c431b664cc96e6684fc0dc9ae6b2bbb7199f62ad40fffd7d96374be0",
+      "尺寸米": [
+        0.042,
+        0.030310889,
+        0.0015
+      ],
+      "枢轴": "底面中心",
+      "面数": 22,
+      "三角面数": 44,
+      "几何UVSHA256": "e731113f6724f30f52b97a4842a73c3dc431a68279b550fb9b8b876a77e381fb",
+      "FBXSHA256": "e57dd7b25fe3e19c11d0668892917b911d12ef72c3c16661862bdb37b0cb0c98",
+      "贴图SHA256": "28a044c094a1ef66c3797111ded10c1d92e1b7bb60eb5a156a87d496089a4770",
+      "图标SHA256": "1e1893fcb2ef8878caef1c412e3f14906d665b24b9ab5274bedea03e1c5f6a51",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    },
+    {
+      "id": "fish-1",
+      "参考": "assets/references/inbox/商人扩展/鱼筹码-1.jpg",
+      "原图SHA256": "f4743d11119dad2aa4cad2ab4496eeee94ef7004115ada4124adb3aeecdd1a71",
+      "尺寸米": [
+        0.024,
+        0.024,
+        0.0015
+      ],
+      "枢轴": "底面中心",
+      "面数": 14,
+      "三角面数": 28,
+      "几何UVSHA256": "65093647fb44292df0e0c5662edf6b25f1e144326d16242f97a5315ebb2e2f3d",
+      "FBXSHA256": "a9e7f79f3bad060c318e8e51f69199fcea0acbb00dd28a5fe0ae7290cb505ffd",
+      "贴图SHA256": "757022893f906a8b9e35d6dc828883a46610d74a9080eab0b72e5390b10d90ec",
+      "图标SHA256": "a9062138a50d64c7fa3350c956707d3b91a2af4985973386ae559a807238556d",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    },
+    {
+      "id": "fish-2",
+      "参考": "assets/references/inbox/商人扩展/鱼筹码-2.jpg",
+      "原图SHA256": "5119e792223d89a1ebf1b27ca8f8ed94c23c728ad07b143e437164d7a497c397",
+      "尺寸米": [
+        0.024,
+        0.024,
+        0.0015
+      ],
+      "枢轴": "底面中心",
+      "面数": 14,
+      "三角面数": 28,
+      "几何UVSHA256": "65093647fb44292df0e0c5662edf6b25f1e144326d16242f97a5315ebb2e2f3d",
+      "FBXSHA256": "79c4ac7edca45191d664c0ccb65b4278d7d88a54241b567c126785d686509a6e",
+      "贴图SHA256": "c70bf8fe6c3615a3db5b5428391ca39038de5ac018d3fd936a3eae5463f2b7db",
+      "图标SHA256": "71d8c72b581efd848cb942ca7a03db1266b681924ef217d213b933457a4d4395",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    },
+    {
+      "id": "fish-3",
+      "参考": "assets/references/inbox/商人扩展/鱼筹码-3.jpg",
+      "原图SHA256": "ffed6faa95b3e2c7b1d6f399f25b09d91ff049dd839cd35cdf3aeca3c80685d4",
+      "尺寸米": [
+        0.024,
+        0.024,
+        0.0015
+      ],
+      "枢轴": "底面中心",
+      "面数": 14,
+      "三角面数": 28,
+      "几何UVSHA256": "65093647fb44292df0e0c5662edf6b25f1e144326d16242f97a5315ebb2e2f3d",
+      "FBXSHA256": "d2838c979bddd6a79a3e20d0c4b19ff768f1d6dff5ef7be7ea19df96a475cc87",
+      "贴图SHA256": "e6aa1c20361dc4b48073c682bb0c2cab8d3b33a7cd57294c9ddcebf0b53188cd",
+      "图标SHA256": "a01231d1ed781e1287b33c978664a62819edc57b46374597b9a264845a530c7a",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    },
+    {
+      "id": "old-boot",
+      "参考": "assets/references/inbox/商人扩展/臭靴筹码.jpg",
+      "原图SHA256": "6d71e7ae0ca14d39c0b44f9a2e74055fb2aceb9e4c8788bac11780515ea4c175",
+      "尺寸米": [
+        0.024,
+        0.024,
+        0.0015
+      ],
+      "枢轴": "底面中心",
+      "面数": 14,
+      "三角面数": 28,
+      "几何UVSHA256": "65093647fb44292df0e0c5662edf6b25f1e144326d16242f97a5315ebb2e2f3d",
+      "FBXSHA256": "69e19b9ef799f2c13a126749fd99002f5f82bca19bf8a4bee33d2d565a125c13",
+      "贴图SHA256": "9f7c022559b64af1ddb8c13685eed784dbbe1aed2241ea903ab04ab697c03e6d",
+      "图标SHA256": "fa93322182d0a9c6ba21900d219d61a8edbe5e0f6ab75965c797b97cceba8682",
+      "尺寸依据": "开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面"
+    }
+  ]
+}

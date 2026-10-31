@@ -14,9 +14,9 @@ public static class FishingF6SampleVerification
     {
         foreach(var name in new[]{"fish-1","fish-2","fish-3","fish-back","old-boot","harbormaster","ground-4","ground-5","ground-6","ground-8","ground-9","ground-10","lake"})
         {
-            var model=Resources.Load<GameObject>(FishingTabletopAssets.Root+name);var icon=Resources.Load<Texture2D>(FishingTabletopAssets.Root+name);
+            var model=Resources.Load<GameObject>(FishingTabletopAssets.Resource(name));var icon=Resources.Load<Texture2D>(FishingTabletopAssets.Resource(name));
             if(model==null||icon==null)throw new Exception("组件或图标缺失："+name);
-            var instance=EntityBoardAssets.ReferenceMarker(FishingTabletopAssets.Root+name,name,Vector3.zero,Quaternion.identity,null);var renderers=instance.GetComponentsInChildren<Renderer>();
+            var instance=EntityBoardAssets.ReferenceMarker(FishingTabletopAssets.Resource(name),name,Vector3.zero,Quaternion.identity,null);var renderers=instance.GetComponentsInChildren<Renderer>();
             var bounds=renderers[0].bounds;foreach(var r in renderers)bounds.Encapsulate(r.bounds);
             if(Math.Abs(bounds.min.y)>.0005f||bounds.max.y>.016f)throw new Exception("组件高度／底面错误："+name);
             if(name=="lake"&&(Math.Abs(bounds.size.x-.0684f)>.001f||Math.Abs(bounds.size.z-.0788f)>.001f))throw new Exception("湖泊未匹配尖顶六边形");
@@ -30,12 +30,12 @@ public static class FishingF6SampleVerification
     {
         foreach(var name in new[]{"fish-1","ground-4"})
         {
-            var model=Resources.Load<GameObject>(FishingTabletopAssets.Root+name);
+            var model=Resources.Load<GameObject>(FishingTabletopAssets.Resource(name));
             if(model==null)throw new Exception("模型缺失："+name);
-            var instance=EntityBoardAssets.ReferenceMarker(FishingTabletopAssets.Root+name,name,Vector3.zero,Quaternion.identity,null);
+            var instance=EntityBoardAssets.ReferenceMarker(FishingTabletopAssets.Resource(name),name,Vector3.zero,Quaternion.identity,null);
             var renderers=instance.GetComponentsInChildren<Renderer>();var bounds=renderers[0].bounds;
             foreach(var r in renderers)bounds.Encapsulate(r.bounds);
-            float width=name=="fish-1"?.024f:.028f;
+            float width=name=="fish-1"?.024f:.042f;
             if(Math.Abs(bounds.size.x-width)>.001f||Math.Abs(bounds.min.y)>.0005f||bounds.max.y>.004f)throw new Exception("模型尺度／底面错误："+name+" "+bounds);
             if(instance.GetComponentsInChildren<Collider>().Length!=0)throw new Exception("模型包含碰撞体");
             if(renderers.Any(r=>r.sharedMaterials.Any(m=>m.shader.name!="Universal Render Pipeline/Lit")))throw new Exception("材质未适配URP");

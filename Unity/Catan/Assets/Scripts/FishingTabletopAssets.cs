@@ -9,6 +9,12 @@ using UnityEngine;
 public sealed class FishingTabletopAssets : MonoBehaviour
 {
     public const string Root="HarborFishing/v001/";
+    public const string PhotoRoot="HarborFishing/v002/";
+    public static string Resource(string name)
+    {
+        bool photo=name=="lake"||name=="old-boot"||name=="fish-1"||name=="fish-2"||name=="fish-3"||name.StartsWith("ground-",StringComparison.Ordinal);
+        return (photo?PhotoRoot:Root)+name;
+    }
     readonly Dictionary<string,GameObject> grounds=new Dictionary<string,GameObject>();
     string layoutKey;
     readonly List<Vector3> occupied=new List<Vector3>();
@@ -16,7 +22,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
     static readonly Dictionary<string,Texture2D> icons=new Dictionary<string,Texture2D>();
     public static Texture2D Icon(string name)
     {
-        if(!icons.TryGetValue(name,out var texture)){texture=Resources.Load<Texture2D>(Root+name);icons[name]=texture;}
+        if(!icons.TryGetValue(name,out var texture)){texture=Resources.Load<Texture2D>(Resource(name));icons[name]=texture;}
         return texture;
     }
     public static void DrawIcon(Rect area,string name)
@@ -34,10 +40,10 @@ public sealed class FishingTabletopAssets : MonoBehaviour
     {
         var tangent=Vector3.Cross(Vector3.up,outward);
         // 有界候选仅调整装饰，不改变渔场关联顶点。窄水道中的两处渔场不能叠在一起。
-        for(int ring=0;ring<4;ring++)foreach(int side in new[]{0,-1,1,-2,2})
+        for(int ring=0;ring<6;ring++)foreach(int side in new[]{0,-1,1,-2,2})
         {
-            var p=anchor+outward*(.023f+ring*.015f)+tangent*(side*.017f);
-            if(occupied.Any(o=>FlatDistance(p,o)<.029f)||ports.Any(o=>FlatDistance(p,o)<.029f))continue;
+            var p=anchor+outward*(.033f+ring*.015f)+tangent*(side*.017f);
+            if(occupied.Any(o=>FlatDistance(p,o)<.045f)||ports.Any(o=>FlatDistance(p,o)<.041f))continue;
             bool land=false;
             foreach(var tile in tiles)
             {
@@ -54,7 +60,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
             }
             if(!land)return p;
         }
-        return anchor+outward*.083f;
+        return anchor+outward*.123f;
     }
     static float FlatDistance(Vector3 a,Vector3 b){a.y=b.y=0;return Vector3.Distance(a,b);}
     void Apply(FishingView view,Tile[] tiles,Func<string,Vector3> position,Vector3[] ports)
@@ -74,10 +80,12 @@ public sealed class FishingTabletopAssets : MonoBehaviour
             string key=ground.Id+":"+ground.Number;retained.Add(key);
             if(!grounds.TryGetValue(key,out var instance))
             {
-                instance=EntityBoardAssets.ReferenceMarker(Root+"ground-"+ground.Number,"渔场 "+ground.Id,center,Quaternion.identity,transform);
+                instance=EntityBoardAssets.ReferenceMarker(Resource("ground-"+ground.Number),"渔场 "+ground.Id,center,Quaternion.identity,transform);
                 if(instance==null)continue;grounds.Add(key,instance);
             }
             instance.transform.position=center;
+            // 地图布局变化时复用原模型，同时更新V口朝向；保留FBX根轴转换。
+            instance.transform.rotation=Quaternion.LookRotation(outward)*PlayerComponentAssets.Model(Resource("ground-"+ground.Number)).transform.rotation;
         }
         var removed=new List<string>();foreach(var pair in grounds)if(!retained.Contains(pair.Key)){Destroy(pair.Value);removed.Add(pair.Key);}
         foreach(var key in removed)grounds.Remove(key);
