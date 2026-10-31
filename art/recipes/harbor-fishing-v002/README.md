@@ -2,6 +2,8 @@
 
 2026-10-31。按用户提供的 `assets/references/inbox/商人扩展/` 原照转换六块V形渔港、湖泊、臭靴和一／二／三鱼筹码，共11件。原照内容不变，仅按用户要求重命名；原文件名、新文件名、SHA256与校正角点见[参考清单](参考清单.json)。
 
+同日按用户复核修正渔港贴岸：Blender MCP补充凹口和外尖两组三点锚点，Unity根据三顶点海岸自动选择接法、旋转和水平缩放；不再向海偏移或避让港口。40毫米海岸边上约69.28×50毫米，厚度仍1.5毫米；原始42毫米网格不作为运行占地。允许在既有港口上方显示。详见[贴岸修正与两方向实机截图](../../../docs/verification/fishing-coast-fit-v003/验收记录.md)。
+
 原照仅做几何投影，保留插画、数字、颗粒与反光，不生成或改写印刷内容。六渔港采用左右两片四边形投影，保留凹口；湖泊采用六片三角形投影；方片采用四角透视校正。背面和实际毫米尺寸未提供，背面沿用v001公开入口；模型厚边不宣称还原未知的隐藏面。
 
 通过Blender MCP生成单网格、两材质的米制厚板，底面中心为枢轴。渔港估算42×30.31×1.5毫米，筹码24×24×1.5毫米；湖泊68.416×79×8毫米，与现有尖顶六边形地块拼接。11件共420三角面。Unity只在桌面生成六渔港与湖泊；筹码与臭靴在手牌、头像等原有入口显示同源图标。
@@ -21,8 +23,10 @@
 
 1. 运行 `prepare.py`；检查原图校验值后生成校正贴图。
 2. 在Blender MCP的后台执行接口选择已有 `.blend` 作为启动文件，把 `__file__` 设为本目录 `build.py` 路径后执行脚本。脚本新建场景，默认输出到Unity的 `HarborFishing/v002/`；源文件独立保存。
-3. 在空目录重新运行 `prepare.py`，再通过Blender MCP执行 `build.py`，设置 `OUTPUT_ROOT`、`SOURCE_ROOT` 和 `TEXTURE_ROOT` 分别指向干净运行目录、源目录和校正贴图目录。本轮干净重建位于 `.local/fishing-photo-rebuild/`。
-4. 通过Blender MCP执行 `verify.py`。几何、UV和贴图按校验值比较；图标比较解码像素，因为Blender PNG含日期、路径与耗时元数据。最终图标像素完全相同。
+3. 在空目录重新运行 `prepare.py`，再通过Blender MCP执行 `build.py`，设置 `OUTPUT_ROOT`、`SOURCE_ROOT` 和 `TEXTURE_ROOT` 分别指向干净运行目录、源目录和校正贴图目录。最初批次位于 `.local/fishing-photo-rebuild/`，补充接岸锚点后的干净重建位于 `.local/fishing-coast-rebuild/`。只更新六渔港FBX时可设置 `ONLY_GROUNDS=True`、`SKIP_RENDER=True`，保留原照贴图和图标；本次新增源场景单独保存于 `art/source/harbor-fishing-v002/coast-fitting/捕鱼渔港贴合.blend`。
+4. 通过Blender MCP执行 `verify.py`，需要时通过 `CLEAN_ROOT` 指定干净运行目录。几何、UV、六个接岸锚点和贴图按校验值比较；图标比较解码像素，因为Blender PNG含日期、路径与耗时元数据。最终图标像素完全相同。
 5. Unity执行菜单 `Catan/美术/验收捕鱼实体原照`，或在启动参数中指定 `-executeMethod FishingPhotoEditorVerification.Run --fishing-photo-verify`。检查临时本地对局，不访问服务器、不写入用户存档；命令行模式完成后退出编辑器。
+
+接岸专项改用 `--fishing-coast-verify`，包含432个独立显示案例及四模式接岸点量测，输出到 `docs/verification/fishing-coast-fit-v003/`。
 
 仅替换美术资源与装饰摆放；规则身份、渔港关联顶点、湖泊号码、随机状态、隐藏信息和网络格式不变。原照资产与图标继续缓存，静止帧不建模；重排时复用渔港并刷新朝向。游戏尺寸与外观仍等待用户实测及截图确认，不推进F6、M8的产品验收状态。

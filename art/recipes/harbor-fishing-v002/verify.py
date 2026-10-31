@@ -10,7 +10,7 @@ from mathutils import Vector
 ROOT = Path(__file__).resolve().parents[3]
 RECIPE = Path(__file__).parent
 runtime = ROOT / 'Unity/Catan/Assets/Resources/HarborFishing/v002'
-clean = ROOT / '.local/fishing-photo-rebuild/runtime'
+clean = Path(globals().get('CLEAN_ROOT', ROOT / '.local/fishing-photo-rebuild/runtime'))
 expected = json.loads((runtime/'资产清单.json').read_text())['资产']
 rebuilt = {r['id']: r for r in json.loads((clean/'资产清单.json').read_text())['资产']}
 records = []
@@ -48,6 +48,16 @@ for row in expected:
     triangles = sum(len(p.vertices)-2 for p in obj.data.polygons)
     if triangles != row['三角面数']:
         raise ValueError('面数不符：'+name)
-    records.append({'id':name,'尺寸米':size,'三角面数':triangles,'回读':'单网格、两材质、UV与底面通过','干净重建':'几何、UV、原照贴图及解码图标像素一致','图标像素SHA256':icon_pixels[0]})
+    anchors = [o for o in scene.objects if o.type == 'EMPTY' and o.name.startswith('coast-')]
+    if name.startswith('ground-'):
+        wanted = {key.split('.')[0]: value for key,value in row['接岸锚点'].items()}
+        rebuilt_anchors = {key.split('.')[0]: value for key,value in other['接岸锚点'].items()}
+        if len(anchors) != 6 or wanted != rebuilt_anchors:
+            raise ValueError('两组接岸锚点缺失或重建不一致：'+name)
+        for anchor in anchors:
+            target = wanted[anchor.name.split('.')[0]]
+            if any(abs(a-b) > .000001 for a,b in zip(anchor.matrix_world.translation,target)):
+                raise ValueError('FBX接岸锚点偏移：'+name)
+    records.append({'id':name,'尺寸米':size,'三角面数':triangles,'回读':'单网格、两材质、UV与底面通过','接岸锚点数':len(anchors),'干净重建':'几何、UV、接岸锚点、原照贴图及解码图标像素一致','图标像素SHA256':icon_pixels[0]})
 result = {'状态':'通过','Blender':bpy.app.version_string,'资产数':len(records),'三角面数':sum(r['三角面数'] for r in records),'资产':records}
 (RECIPE/'Blender验证.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')

@@ -111,6 +111,17 @@ def create(name):
     bmesh.ops.recalc_face_normals(edit, faces=list(edit.faces))
     edit.to_mesh(mesh)
     edit.free()
+    if name.startswith('ground-'):
+        # 同一V形板的凹口与外尖各有两条接岸边；显式空物体锚点随FBX轴转换导出。
+        for side, indices in [('notch', (0, 1, 2)), ('point', (5, 4, 3))]:
+            for order, corner in enumerate(indices):
+                u, v = outline[corner]
+                anchor = bpy.data.objects.new('coast-'+side+'-'+str(order), None)
+                scene.collection.objects.link(anchor)
+                anchor.parent = obj
+                anchor.location = ((u-.5)*width, (.5-v)*height, 0)
+                anchor.empty_display_size = .001
+                anchor.select_set(True)
     return obj, (width, height, depth)
 
 
@@ -133,22 +144,30 @@ def capture(obj, size, view, path):
 
 
 records = []
+existing = OUT/'资产清单.json'
+partial = bool(globals().get('ONLY_GROUNDS', False))
+if partial and existing.exists():
+    records = json.loads(existing.read_text())['资产']
 references = json.loads((RECIPE/'参考清单.json').read_text())['照片']
+if partial:
+    references = [ref for ref in references if ref['id'].startswith('ground-')]
 for ref in references:
     name = ref['id']
     obj, size = create(name)
     bpy.context.view_layer.update()
     bpy.ops.export_scene.fbx(filepath=str(OUT/(name+'.fbx')), use_selection=True,
-                             object_types={'MESH'}, apply_unit_scale=True,
+                             object_types={'MESH', 'EMPTY'}, apply_unit_scale=True,
                              axis_forward='-Z', axis_up='Y', bake_anim=False,
                              path_mode='RELATIVE', use_custom_props=False)
-    capture(obj, size, 'top', OUT/(name+'.png'))
-    shutil.copyfile(OUT/(name+'.png'), PREVIEW/(name+'-顶视.png'))
-    capture(obj, size, 'side', PREVIEW/(name+'-侧视.png'))
-    capture(obj, size, 'game', PREVIEW/(name+'-默认相机.png'))
+    if not globals().get('SKIP_RENDER', False):
+        capture(obj, size, 'top', OUT/(name+'.png'))
+        shutil.copyfile(OUT/(name+'.png'), PREVIEW/(name+'-顶视.png'))
+        capture(obj, size, 'side', PREVIEW/(name+'-侧视.png'))
+        capture(obj, size, 'game', PREVIEW/(name+'-默认相机.png'))
     geometry = {'vertices': [list(v.co) for v in obj.data.vertices],
                 'polygons': [list(p.vertices) for p in obj.data.polygons],
                 'uv': [list(loop.uv) for loop in obj.data.uv_layers.active.data]}
+    records = [row for row in records if row['id'] != name]
     records.append({'id': name, '参考': ref['路径'], '原图SHA256': ref['SHA256'],
                     '尺寸米': size, '枢轴': '底面中心', '面数': len(obj.data.polygons),
                     '三角面数': sum(len(p.vertices)-2 for p in obj.data.polygons),
@@ -156,9 +175,10 @@ for ref in references:
                     'FBXSHA256': hashlib.sha256((OUT/(name+'.fbx')).read_bytes()).hexdigest(),
                     '贴图SHA256': hashlib.sha256((OUT/(name+'-albedo.png')).read_bytes()).hexdigest(),
                     '图标SHA256': hashlib.sha256((OUT/(name+'.png')).read_bytes()).hexdigest(),
+                    '接岸锚点': {child.name: list(child.location) for child in obj.children},
                     '尺寸依据': '开发估算，非实体测量；湖泊匹配现有尖顶六边形与8毫米桌面'})
     obj.hide_render = True
     obj.hide_set(True)
-bpy.data.libraries.write(str(SOURCE/'捕鱼实体原照.blend'), {scene})
+bpy.data.libraries.write(str(SOURCE/('捕鱼渔港贴合.blend' if partial else '捕鱼实体原照.blend')), {scene})
 (OUT/'资产清单.json').write_text(json.dumps({'Blender': bpy.app.version_string, '资产': records}, ensure_ascii=False, indent=2)+'\n')
 result = {'资产数': len(records), '三角面数': sum(r['三角面数'] for r in records), '输出': str(OUT)}

@@ -121,7 +121,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
     {
         ReferenceMarkers.Refresh(view.Board.Tiles,view.Board.Ports.Select(p=>new TabletopReferenceMarkers.PortDisplay
             {Id=p.Id,Vertices=p.Vertices,Resource=p.Resource}).ToArray(),observerSeat:view.PlayerId,table:tableScene);
-        FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position,ReferenceMarkers.PublicPortPositions);
+        FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position);
     }
     // The live PlayerView and art verification share this public projection-only entrance.
     public void RefreshProjectedPieces(PiecePlacement[] settlements,PiecePlacement[] roads,PiecePlacement[] cities,string robberTileId,

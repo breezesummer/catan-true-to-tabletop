@@ -163,7 +163,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
             {Id=p.Id,Vertices=p.Vertices,EdgeId=p.EdgeId,Resource=p.Resource}).ToArray(),view.Board.BonusEdgeIds,
             view.Players.Select(p=>new TabletopReferenceMarkers.ScoreDisplay{PlayerId=p.Id,Points=p.BonusVictoryPoints}).ToArray(),
             view.PlayerId,tableScene);
-        FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position,ReferenceMarkers.PublicPortPositions);
+        FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position);
     }
     GameObject Ship(string id,Color color,Transform parent)
     {

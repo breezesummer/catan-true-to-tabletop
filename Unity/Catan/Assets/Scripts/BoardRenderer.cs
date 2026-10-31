@@ -98,7 +98,7 @@ public sealed class BoardRenderer : MonoBehaviour
     {
         ReferenceMarkers.Refresh(view.Board.Tiles,view.Board.Ports.Select(p=>new TabletopReferenceMarkers.PortDisplay
             {Id=p.Id,Vertices=p.Vertices,Resource=p.Resource}).ToArray(),observerSeat:view.PlayerId,table:tableScene);
-        FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position,ReferenceMarkers.PublicPortPositions);
+        FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position);
     }
     readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)

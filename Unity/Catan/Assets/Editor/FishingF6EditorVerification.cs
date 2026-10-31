@@ -190,9 +190,15 @@ public static class FishingF6EditorVerification
             var roots=layer.transform.Cast<Transform>().Where(t=>t.name.StartsWith("渔场 ")).ToArray();
             Require(roots.Length==6,"没有生成六处实体渔场："+mode);
             Require(roots.All(t=>t.GetComponentsInChildren<Collider>().Length==0),"渔场抢占棋盘拾取");
-            for(int i=0;i<roots.Length;i++)for(int j=0;j<i;j++)Require(Vector3.Distance(roots[i].position,roots[j].position)>=.028f,"窄水道渔场重叠");
             var ids=roots.Select(t=>t.GetInstanceID()).OrderBy(i=>i).ToArray();
             object presentation=mode=="base"?(object)app.GetComponent<M2App>():mode=="cities-knights"?app.GetComponent<M4App>():mode=="seafarers"?(object)app.GetComponent<M3App>():app.GetComponent<M5App>();
+            var projected=presentation.GetType().GetProperty("M6View",Flags).GetValue(presentation);
+            var modules=projected.GetType().GetProperty("TradeModules").GetValue(projected);
+            var fishing=(Catan.Core.TradeModules.FishingView)modules.GetType().GetProperty("Fishing").GetValue(modules);
+            var publicBoard=projected.GetType().GetProperty("Board").GetValue(projected);
+            var publicTiles=(Catan.Core.Tile[])publicBoard.GetType().GetProperty("Tiles").GetValue(publicBoard);
+            var displayBoard=(Component)Get(presentation,"board");
+            FishingCoastVerification.Validate(mode,displayBoard.transform,fishing,publicTiles,id=>(Vector3)displayBoard.GetType().GetMethod("Position").Invoke(displayBoard,new object[]{id}));
             var refresh=presentation.GetType().GetMethod("M6Refresh",Flags);
             var elapsed=new List<double>();
             for(int i=0;i<100;i++){var start=System.Diagnostics.Stopwatch.GetTimestamp();refresh.Invoke(presentation,null);elapsed.Add((System.Diagnostics.Stopwatch.GetTimestamp()-start)*1000.0/System.Diagnostics.Stopwatch.Frequency);}
@@ -215,7 +221,7 @@ public static class FishingF6EditorVerification
     [Serializable] sealed class Result{public string 状态,说明;public string[] 截图;}
     static void Finish(Exception error)
     {
-        File.WriteAllText(Path.Combine(output,"result.json"),JsonUtility.ToJson(new Result{状态=error==null?"通过":"失败",说明=error==null&&Environment.GetCommandLineArgs().Contains("--f6-visual-only")?"模型复验：13件资产、四模式六渔场、无碰撞体、最小间距、100次重复刷新对象复用、默认／俯视截图与帧间隔采样通过；不计人工或设备验收。":error==null&&Environment.GetCommandLineArgs().Contains("--f6-sample")?"仅样板：尺寸、枢轴、材质、无碰撞体，以及基础版支付取消／确认、右键、移动端预览长按通过；尚未运行全模式。":error==null?"基础与城市骑士开关、存档恢复、支付预览、取消及确认通过；三国城市骑士技能底栏与鱼支付共同显示且可确认。筹码右键、适用时移动端预览长按和支付取消／确认通过；正常合法命令推进至满额换抽，真实读档及界面确认通过。采用测试局面和Unity原生GameView事件，非物理鼠标、Android真机或用户试玩；截图需另行审看。":error.ToString(),截图=images.ToArray()},true));
+        File.WriteAllText(Path.Combine(output,"result.json"),JsonUtility.ToJson(new Result{状态=error==null?"通过":"失败",说明=error==null&&Environment.GetCommandLineArgs().Contains("--f6-visual-only")?"模型复验：13件资产、四模式六渔场、无碰撞体、海岸拼接、100次重复刷新对象复用、默认／俯视截图与帧间隔采样通过；不计人工或设备验收。":error==null&&Environment.GetCommandLineArgs().Contains("--f6-sample")?"仅样板：尺寸、枢轴、材质、无碰撞体，以及基础版支付取消／确认、右键、移动端预览长按通过；尚未运行全模式。":error==null?"基础与城市骑士开关、存档恢复、支付预览、取消及确认通过；三国城市骑士技能底栏与鱼支付共同显示且可确认。筹码右键、适用时移动端预览长按和支付取消／确认通过；正常合法命令推进至满额换抽，真实读档及界面确认通过。采用测试局面和Unity原生GameView事件，非物理鼠标、Android真机或用户试玩；截图需另行审看。":error.ToString(),截图=images.ToArray()},true));
         SessionState.EraseString(Key);if(error!=null)Debug.LogException(error);EditorApplication.Exit(error==null?0:1);
     }
 }

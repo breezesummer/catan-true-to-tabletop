@@ -29,7 +29,7 @@ public static class FishingPhotoEditorVerification
     {
         if(EditorApplication.isPlaying)throw new InvalidOperationException("请先退出当前运行中的对局");
         string root=Path.GetFullPath(Path.Combine(Application.dataPath,"../../.."));
-        output=Path.Combine(root,"docs/verification/fishing-photo-v002");Directory.CreateDirectory(output);
+        output=Path.Combine(root,Environment.GetCommandLineArgs().Contains("--fishing-coast-verify")?"docs/verification/fishing-coast-fit-v003":"docs/verification/fishing-photo-v002");Directory.CreateDirectory(output);
         SessionState.SetString(Key,output);
         EditorSceneManager.OpenScene("Assets/M6.unity",OpenSceneMode.Single);
         typeof(B45DockEditorVerification).GetMethod("SetSize",Flags).Invoke(null,new object[]{1920,1200});
@@ -37,6 +37,7 @@ public static class FishingPhotoEditorVerification
     }
 
     static object Get(object owner,string field)=>owner.GetType().GetField(field,Flags).GetValue(owner);
+    static object Property(object owner,string name)=>owner.GetType().GetProperty(name,Flags).GetValue(owner);
     static void Set(object owner,string field,object value)=>owner.GetType().GetField(field,Flags).SetValue(owner,value);
     static void Require(bool ok,string message){if(!ok)throw new InvalidOperationException(message);}
     static void Tick()
@@ -62,6 +63,8 @@ public static class FishingPhotoEditorVerification
     {
         yield return 1.0;
         FishingF6SampleVerification.Run();FishingF6SampleVerification.VerifyAll();
+        FishingCoastVerification.Reset();FishingCoastVerification.Geometry();
+        checks.Add("独立几何"+FishingCoastVerification.GeometryCases+"次：凹凸两侧、12种旋转、3种海岸缩放、三顶点接岸、边长与厚度检查通过");
         foreach(string name in new[]{"lake","old-boot","fish-1","fish-2","fish-3","ground-4","ground-5","ground-6","ground-8","ground-9","ground-10"})
         {
             string resource=FishingTabletopAssets.Resource(name);
@@ -92,7 +95,12 @@ public static class FishingPhotoEditorVerification
                 var renderer=ground.GetComponentInChildren<Renderer>();
                 Require(renderer.sharedMaterials.Any(m=>m.mainTexture!=null&&AssetDatabase.GetAssetPath(m.mainTexture).Contains("HarborFishing/v002/")),"桌面未使用原照渔港");
             }
-            for(int i=0;i<grounds.Length;i++)for(int j=0;j<i;j++)Require(Vector3.Distance(grounds[i].position,grounds[j].position)>=.0449f,"渔港间距不足："+mode);
+            var projected=Property(presentation,"M6View");
+            var fishView=(Catan.Core.TradeModules.FishingView)Property(Property(projected,"TradeModules"),"Fishing");
+            var publicTiles=(Catan.Core.Tile[])Property(Property(projected,"Board"),"Tiles");
+            Func<string,Vector3> position=id=>(Vector3)board.GetType().GetMethod("Position").Invoke(board,new object[]{id});
+            FishingCoastVerification.Validate(mode,board.transform,fishView,publicTiles,position);
+            int covered=FishingCoastVerification.OverPorts(board.transform);
             var identities=grounds.Select(t=>t.GetInstanceID()).OrderBy(id=>id).ToArray();
             string before=(string)Get(Get(presentation,"host"),"session").GetType().GetMethod("Save").Invoke(Get(Get(presentation,"host"),"session"),null);
             for(int i=0;i<20;i++)presentation.GetType().GetMethod("M6Refresh",Flags).Invoke(presentation,null);
@@ -103,7 +111,7 @@ public static class FishingPhotoEditorVerification
             for(int i=0;i<grounds.Length;i++)Require(Quaternion.Angle(grounds[i].rotation,rotations[i])<.01f,"重排没有刷新V口朝向");
             string after=(string)Get(Get(presentation,"host"),"session").GetType().GetMethod("Save").Invoke(Get(Get(presentation,"host"),"session"),null);
             Require(before==after,"美术刷新改变规则状态");
-            checks.Add(mode+"：六个原照渔港、无碰撞体、间距与20次对象复用，重排朝向刷新、规则状态不变");
+            checks.Add(mode+"：六渔港三顶点接岸、凹凸两侧、20次对象复用、重排朝向刷新、规则状态不变；覆盖港口="+covered);
             board.GetType().GetMethod("SetCamera").Invoke(board,new object[]{true});yield return .8;
             var table=board.GetComponentInChildren<TabletopScene>();
             var hud=table.HudCamera;
@@ -114,6 +122,11 @@ public static class FishingPhotoEditorVerification
             string diagnostic=Path.GetFullPath(Path.Combine(Application.dataPath,"../../../.local/fishing-photo-"+mode+"-固定相机检查.json"));
             File.WriteAllText(diagnostic,JsonUtility.ToJson(new CameraCheck{像素单位=table.UnitsPerPixel,近裁面=hud.nearClipPlane,远裁面=hud.farClipPlane,模型=projection},true));
             ScreenCapture.CaptureScreenshot(Path.Combine(output,mode+"-游戏俯视.png"));yield return .8;
+            foreach(string side in new[]{"notch","point"})
+            {
+                var sample=fishView.Grounds.FirstOrDefault(g=>FishingCoastVerification.Side(grounds.Single(t=>t.name.StartsWith("渔场 "+g.Id+" ")),position(g.VertexIds[1]))==side);
+                if(sample!=null)Capture(Camera.main,position(sample.VertexIds[1]),.069f,Path.Combine(output,mode+"-渔港-"+(side=="notch"?"凸岸":"凹岸")+"贴合.png"),true);
+            }
             if(mode=="base")
             {
                 var basic=(M2App)presentation;var host=(M2LocalGameHost)Get(basic,"host");
@@ -133,6 +146,13 @@ public static class FishingPhotoEditorVerification
                 Set(game,"state",state);game.AssertInvariants();
                 typeof(M2App).GetMethod("M6Refresh",Flags).Invoke(basic,null);yield return 2.0;
                 var basicBoard=(BoardRenderer)Get(basic,"board");basicBoard.SetCamera(false);yield return 1.0;
+                var shown=game.GetPlayerView("P1");
+                FishingCoastVerification.Validate("base-开局样板",basicBoard.transform,shown.TradeModules.Fishing,shown.Board.Tiles,basicBoard.Position);
+                foreach(string side in new[]{"notch","point"})
+                {
+                    var sample=shown.TradeModules.Fishing.Grounds.FirstOrDefault(g=>FishingCoastVerification.Side(basicBoard.GetComponent<FishingTabletopAssets>().transform.Cast<Transform>().Single(t=>t.name.StartsWith("渔场 "+g.Id+" ")),basicBoard.Position(g.VertexIds[1]))==side);
+                    if(sample!=null)Capture(basicBoard.BoardCamera,basicBoard.Position(sample.VertexIds[1]),.069f,Path.Combine(output,side=="notch"?"渔港-凸岸贴合.png":"渔港-凹岸贴合.png"),true);
+                }
                 ScreenCapture.CaptureScreenshot(Path.Combine(output,"基础版-游戏默认视角.png"));yield return .8;
                 basicBoard.SetCamera(true);yield return .8;
                 ScreenCapture.CaptureScreenshot(Path.Combine(output,"基础版-湖泊渔港与臭靴.png"));yield return .8;
@@ -171,10 +191,12 @@ public static class FishingPhotoEditorVerification
         SessionState.EraseString(Key);work=null;
         File.WriteAllText(Path.Combine(output,"Unity验证.json"),JsonUtility.ToJson(new Result{状态=error==null?"通过":"失败",Unity=Application.unityVersion,显卡=SystemInfo.graphicsDeviceName,检查=checks.ToArray(),错误=error?.ToString()},true));
         if(error!=null)Debug.LogException(error);else Debug.Log("CATAN_FISHING_PHOTO_OK");
-        if(Environment.GetCommandLineArgs().Contains("--fishing-photo-verify"))EditorApplication.Exit(error==null?0:1);
+        File.WriteAllText(Path.Combine(output,"接岸检查.json"),JsonUtility.ToJson(new CoastResult{独立案例数=FishingCoastVerification.GeometryCases,独立最大误差米=FishingCoastVerification.GeometryMaxError,实机渔港=FishingCoastVerification.Records.ToArray()},true));
+        if(Environment.GetCommandLineArgs().Contains("--fishing-photo-verify")||Environment.GetCommandLineArgs().Contains("--fishing-coast-verify"))EditorApplication.Exit(error==null?0:1);
         else EditorApplication.isPlaying=false;
     }
     [Serializable] sealed class Result{public string 状态,Unity,显卡,错误;public string[] 检查;}
     [Serializable] sealed class CameraCheck{public float 像素单位,近裁面,远裁面;public Projection[] 模型;}
     [Serializable] sealed class Projection{public string 物件;public Vector3 尺寸,视口;}
+    [Serializable] sealed class CoastResult{public int 独立案例数;public float 独立最大误差米;public FishingCoastVerification.Record[] 实机渔港;}
 }
