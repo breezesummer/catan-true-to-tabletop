@@ -7,7 +7,7 @@
         1920,
         1200
       ],
-      "SHA256": "89976f9fc736a68f4e6297b8d491c544cd5c10042d48c2f6a19590c19de78ab7",
+      "SHA256": "7038f943f6b4b38d283d02e7f4619efc54ae101ccdfafe3151254da2be63273a",
       "来源": "Unity实际GameView"
     },
     {
@@ -16,7 +16,7 @@
         1920,
         1200
       ],
-      "SHA256": "4b63a6e99f7adfb5cfb315bc44a7c44c838d95f19d68473fc0b6ec142289a897",
+      "SHA256": "0be94f0ee59f6a9a2d6d0fffcca5e59badd5e90e6c388f53ff47c617e15abfc7",
       "来源": "Unity实际GameView"
     },
     {
@@ -25,7 +25,7 @@
         1920,
         1200
       ],
-      "SHA256": "8898f63d6f1880c21fd6bf014abf9f73b24413eaf2679e83cca623d0e9534a20",
+      "SHA256": "af82f0cd445ca0e60fc44edb9f5d057e674b03d7cd596d572765f0f896368d7f",
       "来源": "Unity实际GameView"
     },
     {
@@ -34,7 +34,7 @@
         1920,
         1200
       ],
-      "SHA256": "2c71d9577ad9c78871509aa7d7e35e75ec73ff29e5924ce405d4cdb5b29195a8",
+      "SHA256": "efb136ee0754fc82567f2a04df285b0384b9a3b742bfdbc79a48679907aa67ce",
       "来源": "Unity实际GameView"
     },
     {
@@ -43,7 +43,7 @@
         1920,
         1200
       ],
-      "SHA256": "eb16df15ed5559ee5920841583ae7131100b4b4378d8dfe7b979c3661d121ce9",
+      "SHA256": "9f62cd79cd2b361994abb1ca860a3767d151ca146fadde8e407fd7031046e2b0",
       "来源": "Unity实际GameView"
     },
     {
@@ -52,7 +52,7 @@
         1920,
         1200
       ],
-      "SHA256": "a9340d7b6ca8c2c01b4385c92dfb4cd6cade77b5f2ea6314369612324bc96722",
+      "SHA256": "1c473b347683f83130e6cc9b049705ef0251e3878f1e862456982e3d90345c3f",
       "来源": "Unity实际GameView"
     },
     {
@@ -61,7 +61,7 @@
         1920,
         1200
       ],
-      "SHA256": "c5c23161d5248961810a40aaede1849a99e183fcbe05cd66015bdf26a3a6f5b8",
+      "SHA256": "f6b4a583d5f29696f307749dd0549661aab95980949e208eb58f090738346413",
       "来源": "Unity实际GameView"
     },
     {
@@ -79,7 +79,7 @@
         1600,
         1200
       ],
-      "SHA256": "6ba9f022995972e865b737b3e80fc9b79a63266b000d6e9a95f45f290fb9e6dc",
+      "SHA256": "6a6d130fe17cba15f431369a5f13f81c799a6c87c61712ec65b7ab56f5a0abfa",
       "来源": "同一实际对局的URP游戏相机"
     },
     {

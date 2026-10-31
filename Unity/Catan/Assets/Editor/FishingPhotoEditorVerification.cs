@@ -77,7 +77,7 @@ public static class FishingPhotoEditorVerification
         Require(FishingTabletopAssets.Resource("fish-back")==FishingTabletopAssets.Root+"fish-back","未知背面入口错误");
         checks.Add("11件新模型、原照贴图、图标与URP材质；旧背面/奖励保留；底面、尺寸、无碰撞体通过");
 
-        foreach(string mode in new[]{"base","cities-knights","seafarers","combined"})
+        foreach(string mode in new[]{"cities-knights","base","seafarers","combined"})
         {
             app.StartGame(mode,"heading-for-new-shores",4,"P1",true,harbormaster:true,fishing:true);yield return 1.2;
             object presentation=mode=="base"?(object)app.GetComponent<M2App>():mode=="cities-knights"?app.GetComponent<M4App>():mode=="seafarers"?(object)app.GetComponent<M3App>():app.GetComponent<M5App>();
@@ -105,6 +105,14 @@ public static class FishingPhotoEditorVerification
             Require(before==after,"美术刷新改变规则状态");
             checks.Add(mode+"：六个原照渔港、无碰撞体、间距与20次对象复用，重排朝向刷新、规则状态不变");
             board.GetType().GetMethod("SetCamera").Invoke(board,new object[]{true});yield return .8;
+            var table=board.GetComponentInChildren<TabletopScene>();
+            var hud=table.HudCamera;
+            Require(hud!=null&&hud.isActiveAndEnabled&&table.TableCamera.GetUniversalAdditionalCameraData().cameraStack.Contains(hud),"固定操作模型相机未加入游戏相机："+mode);
+            Require(table.Objects.ActiveCount>=3,"骰子模型未生成："+mode);
+            checks.Add(mode+"：固定操作模型相机有效，相机叠加存在，活动桌面物件="+table.Objects.ActiveCount);
+            var projection=table.Objects.GetComponentsInChildren<Renderer>().Where(r=>r.gameObject.layer==TabletopScene.HudLayer).Take(12).Select(r=>new Projection{物件=r.name,尺寸=r.bounds.size,视口=hud.WorldToViewportPoint(r.bounds.center)}).ToArray();
+            string diagnostic=Path.GetFullPath(Path.Combine(Application.dataPath,"../../../.local/fishing-photo-"+mode+"-固定相机检查.json"));
+            File.WriteAllText(diagnostic,JsonUtility.ToJson(new CameraCheck{像素单位=table.UnitsPerPixel,近裁面=hud.nearClipPlane,远裁面=hud.farClipPlane,模型=projection},true));
             ScreenCapture.CaptureScreenshot(Path.Combine(output,mode+"-游戏俯视.png"));yield return .8;
             if(mode=="base")
             {
@@ -167,4 +175,6 @@ public static class FishingPhotoEditorVerification
         else EditorApplication.isPlaying=false;
     }
     [Serializable] sealed class Result{public string 状态,Unity,显卡,错误;public string[] 检查;}
+    [Serializable] sealed class CameraCheck{public float 像素单位,近裁面,远裁面;public Projection[] 模型;}
+    [Serializable] sealed class Projection{public string 物件;public Vector3 尺寸,视口;}
 }
