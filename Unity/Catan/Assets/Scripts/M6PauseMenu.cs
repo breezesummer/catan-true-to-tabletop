@@ -85,9 +85,9 @@ public sealed partial class M6App
         var colors=new[]{new Color(.34f,.145f,.065f),new Color(.055f,.205f,.30f),new Color(.32f,.24f,.065f)};
         for(int i=0;i<StrategyHudTheme.Names.Length;i++)
         {
-            var r=new Rect(337+i*261,452,244,180);bool chosen=StrategyHudTheme.Selected==i;
+            var r=new Rect(337+i*195,452,181,180);bool chosen=StrategyHudTheme.Selected==i;
             if(PastoralMenuUI.Button(r,"",true,false,chosen))StrategyHudTheme.Select(i);
-            CopperTabletopSkin.Panel(new Rect(r.x+20,r.y+21,r.width-40,70),colors[i%colors.Length]);
+            CopperTabletopSkin.Panel(new Rect(r.x+20,r.y+21,r.width-40,70),i==3?new Color(.24f,.53f,.42f):colors[i%colors.Length]);
             PastoralMenuUI.Label(new Rect(r.x+14,r.y+113,r.width-28,36),StrategyHudTheme.Names[i],21,chosen?PastoralMenuUI.Ivory:PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
         }
         PastoralMenuUI.Label(new Rect(337,662,766,31),"外观偏好会自动保存。",13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);

@@ -303,9 +303,9 @@ public sealed partial class M6App
             Color[] colors={new Color(.40f,.27f,.17f),new Color(.12f,.33f,.40f),new Color(.25f,.34f,.23f)};
             for(int i=0;i<StrategyHudTheme.Names.Length;i++)
             {
-                Rect r=new Rect(499+i*284,421,264,183);
+                Rect r=new Rect(499+i*211,421,195,183);
                 bool hit=PastoralMenuUI.Card(r,StrategyHudTheme.Names[i],"桌面主题",StrategyHudTheme.Selected==i);
-                PastoralMenuUI.Round(new Rect(r.x+22,r.y+117,r.width-44,40),colors[i%3],7);
+                PastoralMenuUI.Round(new Rect(r.x+22,r.y+117,r.width-44,40),i==3?new Color(.24f,.53f,.42f):colors[i%3],7);
                 if(hit)StrategyHudTheme.Select(i);
             }
             PastoralMenuUI.Label(new Rect(499,652,800,44),"想更换主页风景，请打开上方「主页风景」。",14,PastoralMenuUI.Muted);

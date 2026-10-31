@@ -64,7 +64,7 @@ public static class ModernOperationUI
         if(selected)Fill(new Rect(r.x+9,r.yMax-3,r.width-18,2),Accent);
         var label=new GUIStyle(Center);label.normal.textColor=!GUI.enabled?Muted:primary?new Color(1,.94f,.73f):TextColor;
         if(playerId!=null)label=M6App.PlayerNameStyle(label,playerId);
-        GUI.Label(r,caption,label);bool result=GUI.Button(r,GUIContent.none,GUIStyle.none);GUI.enabled=old;
+        GUI.Label(r,caption,label);bool result=TabletopButtonFeedback.Button(r,false);GUI.enabled=old;
         result=result&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
         if(result)TabletopAudio.Instance?.Click();return result;
     }
@@ -87,7 +87,7 @@ public static class ModernOperationUI
                 OperationIconAssets.DrawGood(new Rect(r.center.x-13,r.y+5,26,26),firstGood+i);
                 Label(new Rect(r.x,r.y+31,r.width,25),labels[i],Center);
                 if(i==value)Fill(new Rect(r.x+7,r.yMax-3,r.width-14,2),Accent);
-                if(GUI.Button(r,GUIContent.none,GUIStyle.none)&&!MobileTabletop.TouchDragged)value=i;
+                if(TabletopButtonFeedback.Button(r,false)&&!MobileTabletop.TouchDragged)value=i;
             }
             else if(Button(r,M6App.DisplayPlayerText(labels[i]),true,false,i==value,PlayerIdentityModel.IsPlayerId(labels[i])?labels[i]:null))value=i;
         }

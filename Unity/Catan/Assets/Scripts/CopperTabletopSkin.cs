@@ -7,25 +7,36 @@ public static class CopperTabletopSkin
     static ArtPatch panelFrame, buttonPlate, cardFrame;
     static readonly Rect DiscUv = SourceRect(43, 38, 1168, 1171, 1254, 1254);
     static GUISkin scrollSkin;
+    static int scrollVersion=-1;
+    static Texture2D jadeTrack,jadeThumb,jadeHover;
     static bool loaded;
     static readonly Color Highlight=new Color(1f,.74f,.51f),Dark=new Color(.16f,.065f,.025f);
     public static void Scrollbars()
     {
-        if(scrollSkin==GUI.skin)return;scrollSkin=GUI.skin;
+        if(scrollSkin==GUI.skin&&scrollVersion==StrategyHudTheme.Version)return;scrollSkin=GUI.skin;scrollVersion=StrategyHudTheme.Version;
         if(track==null)
         {
             track=BarTexture(new Color(.12f,.045f,.018f),false);
             thumb=BarTexture(new Color(.64f,.36f,.17f),true);
             thumbHover=BarTexture(new Color(.85f,.55f,.28f),true);
         }
-        ConfigureBar(scrollSkin.horizontalScrollbar,track,track);
-        ConfigureBar(scrollSkin.verticalScrollbar,track,track);
-        ConfigureBar(scrollSkin.horizontalScrollbarThumb,thumb,thumbHover);
-        ConfigureBar(scrollSkin.verticalScrollbarThumb,thumb,thumbHover);
-        ConfigureBar(scrollSkin.horizontalScrollbarLeftButton,thumb,thumbHover);
-        ConfigureBar(scrollSkin.horizontalScrollbarRightButton,thumb,thumbHover);
-        ConfigureBar(scrollSkin.verticalScrollbarUpButton,thumb,thumbHover);
-        ConfigureBar(scrollSkin.verticalScrollbarDownButton,thumb,thumbHover);
+        if(jadeTrack==null)
+        {
+            jadeTrack=BarTexture(new Color(.035f,.15f,.11f),false);
+            jadeThumb=BarTexture(new Color(.58f,.77f,.62f),true);
+            jadeHover=BarTexture(new Color(.81f,.91f,.72f),true);
+        }
+        var activeTrack=StrategyHudTheme.Jade?jadeTrack:track;
+        var activeThumb=StrategyHudTheme.Jade?jadeThumb:thumb;
+        var activeHover=StrategyHudTheme.Jade?jadeHover:thumbHover;
+        ConfigureBar(scrollSkin.horizontalScrollbar,activeTrack,activeTrack);
+        ConfigureBar(scrollSkin.verticalScrollbar,activeTrack,activeTrack);
+        ConfigureBar(scrollSkin.horizontalScrollbarThumb,activeThumb,activeHover);
+        ConfigureBar(scrollSkin.verticalScrollbarThumb,activeThumb,activeHover);
+        ConfigureBar(scrollSkin.horizontalScrollbarLeftButton,activeThumb,activeHover);
+        ConfigureBar(scrollSkin.horizontalScrollbarRightButton,activeThumb,activeHover);
+        ConfigureBar(scrollSkin.verticalScrollbarUpButton,activeThumb,activeHover);
+        ConfigureBar(scrollSkin.verticalScrollbarDownButton,activeThumb,activeHover);
     }
     static void ConfigureBar(GUIStyle style,Texture2D normal,Texture2D hover)
     {
@@ -93,6 +104,7 @@ public static class CopperTabletopSkin
     public static void Panel(Rect r,Color face,bool hover=false,bool ornaments=true)
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;
+        if(StrategyHudTheme.Jade){JadeTabletopSkin.Panel(r,face,hover,ornaments);return;}
         Warm();
         if(!ornaments)
         {
@@ -116,11 +128,13 @@ public static class CopperTabletopSkin
     public static void Outline(Rect r,bool selected=false,float corner=16)
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;Warm();
+        if(StrategyHudTheme.Jade){JadeTabletopSkin.Frame(r,selected,false);return;}
         DrawPatch(r,panelFrame,corner,false,selected?new Color(1.15f,1.16f,.92f):Color.white);
     }
     public static void Disc(Rect r,Color face,bool hover)
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;Warm();
+        if(StrategyHudTheme.Jade){JadeTabletopSkin.Disc(r,hover);return;}
         if(disc==null)return;
         var before=GUI.color;bool enabled=GUI.enabled;GUI.enabled=true;
         GUI.color=before*new Color(0,0,0,.36f);
@@ -135,11 +149,12 @@ public static class CopperTabletopSkin
     }
     public static void Count(Rect r,bool selected=false)
     {
-        ModernOperationUI.Round(r,new Color(.89f,.75f,.53f).linear);Outline(r,selected,9);
+        ModernOperationUI.Round(r,(StrategyHudTheme.Jade?new Color(.70f,.85f,.70f):new Color(.89f,.75f,.53f)).linear);Outline(r,selected,9);
     }
     public static void Card(Rect r,bool selected)
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;Warm();
+        if(StrategyHudTheme.Jade){JadeTabletopSkin.Frame(r,selected,true);return;}
         // 使用独立卡框，不再叠画两圈程序描边；卡牌插画与原始比例不变。
         DrawPatch(r,cardFrame,13,false,selected?new Color(1.3f,1.5f,.78f):Color.white);
     }

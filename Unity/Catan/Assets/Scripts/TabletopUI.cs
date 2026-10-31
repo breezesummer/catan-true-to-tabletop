@@ -180,7 +180,7 @@ public sealed partial class TabletopUI
             {Event.current.Use();roll?.Invoke();}
         }
         GUI.enabled=enabled;
-        if(canRoll&&!DiceRolling&&GUI.Button(trayRect,GUIContent.none,GUIStyle.none))roll?.Invoke();
+        if(canRoll&&!DiceRolling&&TabletopButtonFeedback.Button(trayRect))roll?.Invoke();
         table.Objects.End();
         string turnCaption=canRoll?"掷骰":phase.Contains("弃牌")||phase.IndexOf("Discard",StringComparison.OrdinalIgnoreCase)>=0?"等待弃牌":canEnd?"结束回合":actor!=seat?"等待玩家":"等待操作";
         hits.Add(EndTurnRect);bool turnEnabled=(canRoll||canEnd)&&!DiceRolling;
@@ -192,11 +192,11 @@ public sealed partial class TabletopUI
         if(resumeOperation){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
         if(skillSelecting){turnCaption="完成底部选择";turnEnabled=false;}
         StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
-        var turnStyle=Style("turn-action",title,21);turnStyle.normal.textColor=turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
+        var turnStyle=Style("turn-action",title,21);turnStyle.normal.textColor=StrategyHudTheme.Jade?new Color(.025f,.16f,.12f):turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
         while(turnStyle.fontSize>11&&turnStyle.CalcHeight(Content(turnCaption),EndTurnRect.width-40)>60)turnStyle.fontSize--;
         GUI.Label(new Rect(EndTurnRect.x+20,EndTurnRect.y+35,EndTurnRect.width-40,60),turnCaption,turnStyle);
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
-        if(GUI.Button(EndTurnRect,GUIContent.none,GUIStyle.none)){if(resumeOperation)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(cardCaption!=null)ConfirmCardAction();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
+        if(TabletopButtonFeedback.Button(EndTurnRect)){if(resumeOperation)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(cardCaption!=null)ConfirmCardAction();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
         DrawDiscardCount();
         GUI.enabled=tableEnabled;
     }
@@ -219,7 +219,7 @@ public sealed partial class TabletopUI
         var phaseStyle=Style("phase",small,12,alignment:TextAnchor.MiddleLeft,wrap:false);phaseStyle.normal.textColor=ModernOperationUI.Muted;
         GUI.Label(new Rect(r.x+181,r.y+45,193,21),phase,phaseStyle);
         // 两端共用铭牌作为菜单入口；触屏无需键盘 Esc，也不另做一套导航栏。
-        if(GUI.Button(r,GUIContent.none,GUIStyle.none)&&!MobileTabletop.TouchDragged)
+        if(TabletopButtonFeedback.Button(r)&&!MobileTabletop.TouchDragged)
             UnityEngine.Object.FindFirstObjectByType<M6App>()?.OpenTableMenu();
     }
     void DrawTopButtons(TabletopSeat own,Action<string> trade,Action<int> facility)
@@ -239,7 +239,7 @@ public sealed partial class TabletopUI
             var levelStyle=Style("level",center,12,FontStyle.Bold);levelStyle.normal.textColor=StrategyHudArt.Gold;
             GUI.Label(marker,i<2?"•":level.ToString(),levelStyle);
             bool prior=GUI.enabled;GUI.enabled=prior&&available;
-            if(GUI.Button(r,GUIContent.none,GUIStyle.none)){if(i<2)trade?.Invoke(i==0?null:"");else facility?.Invoke(i-2);}GUI.enabled=prior;
+            if(TabletopButtonFeedback.Button(r)){if(i<2)trade?.Invoke(i==0?null:"");else facility?.Invoke(i-2);}GUI.enabled=prior;
             if(over)
             {
                 string tip=names[i];
@@ -257,7 +257,7 @@ public sealed partial class TabletopUI
             var player=seats.First(p=>p.Id==id);
             string alliance=ThreeKingdoms?.AlliancePlayerCaptionB6(player.Id);
             var panel=new Rect(x,13,width,alliance==null?191:211);hits.Add(panel);
-            CopperTabletopSkin.Panel(panel,ModernOperationUI.Background,player.Id==actor);
+            if(StrategyHudTheme.Jade)JadeTabletopSkin.LightPanel(panel,player.Id==actor);else CopperTabletopSkin.Panel(panel,ModernOperationUI.Background,player.Id==actor);
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
             StrategyHudArt.Avatar(new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
@@ -291,6 +291,7 @@ public sealed partial class TabletopUI
                 else StrategyHudArt.HandCardIcon(icon,row==5);
                 var valueStyle=Style("value",center,12,FontStyle.Bold,TextAnchor.MiddleRight);
                 valueStyle.normal.textColor=row==0?StrategyHudArt.Gold:row==1?new Color(1,.8f,.3f):row==2?new Color(.48f,.77f,1):row==3?new Color(.55f,.9f,.52f):ModernOperationUI.TextColor;
+                if(StrategyHudTheme.Jade)valueStyle.normal.textColor=row==0||row==1?new Color(.53f,.27f,.015f):row==2?new Color(.025f,.25f,.47f):new Color(.025f,.21f,.13f);
                 string value=values[row].ToString();
                 if(row>=4)
                 {
@@ -308,7 +309,7 @@ public sealed partial class TabletopUI
             }
             bool selecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;
             if(ThreeKingdoms!=null)ThreeKingdoms.DrawThreeKingdomsAvatar(player.Id,avatar);
-            if(!selecting&&player.Id!=own&&GUI.Button(avatar,GUIContent.none,GUIStyle.none)&&!MobileTabletop.TouchDragged)trade?.Invoke(player.Id);
+            if(!selecting&&player.Id!=own&&TabletopButtonFeedback.Button(avatar)&&!MobileTabletop.TouchDragged)trade?.Invoke(player.Id);
             x+=width+5;
         }
     }
@@ -348,7 +349,7 @@ public sealed partial class TabletopUI
         // 浮层与银行在视觉上盖住席位时，不允许整块席位热区先吞掉点击。
         bool covered=TurnBannerRect.Contains(Event.current.mousePosition)||SpecialRect.Contains(Event.current.mousePosition)||HistoryBlocksInput(Event.current.mousePosition)
             ||table.ProjectLabel(TabletopBankUI.Area).Contains(Event.current.mousePosition);
-        if(!covered&&GUI.Button(seatRect,GUIContent.none,GUIStyle.none))trade?.Invoke(p.Id);
+        if(!covered&&TabletopButtonFeedback.Button(seatRect))trade?.Invoke(p.Id);
     }
     internal static Rect OpponentSeatLayout(int place) => place==1?new Rect(420,6,600,156):MirrorSideRect(new Rect(28,286,210,222),place);
     static Rect MirrorSideRect(Rect rect,int place) => place==2?new Rect(1440-rect.xMax,rect.y,rect.width,rect.height):rect;

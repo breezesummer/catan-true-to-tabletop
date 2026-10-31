@@ -503,7 +503,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
             if(index>0)Require(group.yMin>=OperationDock.StockGroupLayout(pieces,index-1,Snapshot.GoodCount==8).yMax,"建筑token区域重叠");
         }
         int prior=StrategyHudTheme.Selected;
-        for(int theme=0;theme<3;theme++)
+        for(int theme=0;theme<StrategyHudTheme.Names.Length;theme++)
         {
             StrategyHudTheme.Select(theme);Require(StrategyHudTheme.Selected==theme,"主题无法即时切换");
             Require(ModernOperationUI.Background==StrategyHudTheme.Background&&ModernOperationUI.Accent==StrategyHudTheme.Accent,"操作弹窗没有采用当前主题");

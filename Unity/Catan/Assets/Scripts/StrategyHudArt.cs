@@ -34,7 +34,7 @@ public static class StrategyHudArt
             GUI.Label(new Rect(rect.x+38,rect.y+19,rect.width-42,20),counter.Value.Caption,label);
         }
         else GUI.Label(new Rect(rect.x+32,rect.y+2,rect.width-39,rect.height-4),caption,label);
-        return GUI.Button(rect,GUIContent.none,GUIStyle.none);
+        return TabletopButtonFeedback.Button(rect);
     }
     static void HandSymbol(Rect rect,int kind,Color ink)
     {

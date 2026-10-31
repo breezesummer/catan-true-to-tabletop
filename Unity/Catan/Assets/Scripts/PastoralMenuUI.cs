@@ -75,7 +75,7 @@ public static class PastoralMenuUI
         var ink=GUI.enabled?(primary||selected?new Color(1,.99f,.94f):Ink):Muted;
         if(seatColor.HasValue)ink=seatColor.Value;
         Label(new Rect(r.x+8,r.y+1,r.width-16,r.height-2),caption,primary?19:16,ink,primary,TextAnchor.MiddleCenter);
-        bool hit=GUI.Button(r,GUIContent.none,GUIStyle.none)&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
+        bool hit=TabletopButtonFeedback.Button(r,false)&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
         GUI.enabled=before;if(hit)TabletopAudio.Instance?.Click();return hit;
     }
     public static bool ReturnButton(Rect r,Font font=null)
@@ -85,7 +85,7 @@ public static class PastoralMenuUI
         var style=new GUIStyle(Center){font=font??currentFont,fontSize=17,fontStyle=FontStyle.Bold,wordWrap=false};
         style.normal.textColor=GUI.enabled?Ivory:Muted;
         GUI.Label(new Rect(r.x+44,r.y+1,r.width-88,r.height-2),"返回主菜单",style);
-        bool hit=GUI.Button(r,GUIContent.none,GUIStyle.none)&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
+        bool hit=TabletopButtonFeedback.Button(r,false)&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
         if(hit)TabletopAudio.Instance?.Click();return hit;
     }
     public static void Section(Rect r,string caption,string detail="")
@@ -112,7 +112,7 @@ public static class PastoralMenuUI
             Hex(new Vector2(r.x+17,r.center.y),12,new Color(1,.78f,.33f,value));
             Fill(new Rect(r.x+226,r.center.y,Mathf.Max(0,r.width-226)*value,1),new Color(.87f,.68f,.32f,value*.8f));
         }
-        bool hit=GUI.Button(r,GUIContent.none,GUIStyle.none)&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
+        bool hit=TabletopButtonFeedback.Button(r,false)&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
         if(hit)TabletopAudio.Instance?.Click();return hit;
     }
     public static void Hex(Vector2 center,float radius,Color color)
