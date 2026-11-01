@@ -11,7 +11,9 @@ public sealed partial class M6App
     static readonly Color SkillMuted=new Color(.73f,.75f,.65f);
     static readonly Rect GeneralArea=new Rect(22,714,148,171);
     static readonly Rect SkillsArea=new Rect(180,714,146,171);
-    static readonly Rect SkillBar=new Rect(342,650,932,58);
+    bool FishHandSelected=>presentation is M4App fishCities?fishCities.FishHandSelected:presentation is M5App fishCombined&&fishCombined.FishHandSelected;
+    float SkillBarOffset=>FishHandSelected?-132:0;
+    Rect SkillBar=>new Rect(342,650+SkillBarOffset,932,58);
     static readonly Rect CandidateArea=new Rect(342,474,932,168);
     static readonly Rect LibraryArea=new Rect(22,416,304,288);
     static readonly string[] ThreeKingdomsCardNames={"木材","砖","羊毛","谷物","矿石","布匹","钱币","纸张"};
@@ -204,7 +206,14 @@ public sealed partial class M6App
     }
     void DrawGeneralOperationBar(ThreeKingdomsView view)
     {
-        CopperTabletopSkin.Panel(SkillBar,ModernOperationUI.Background);
+        var matrix=GUI.matrix;
+        GUI.matrix=matrix*Matrix4x4.Translate(new Vector3(0,SkillBarOffset,0));
+        try { DrawGeneralOperationBarContent(view); }
+        finally { GUI.matrix=matrix; }
+    }
+    void DrawGeneralOperationBarContent(ThreeKingdomsView view)
+    {
+        CopperTabletopSkin.Panel(new Rect(342,650,932,58),ModernOperationUI.Background);
         var pending=view.PendingDecision?.PlayerId==GeneralAssetSeatB6?view.PendingDecision:null;
         if(pending!=null)
         {

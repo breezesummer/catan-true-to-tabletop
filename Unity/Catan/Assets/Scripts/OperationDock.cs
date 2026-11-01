@@ -35,6 +35,8 @@ public sealed partial class OperationDock
     string revision, scope, hoveredBuild, previewCard, message = "";
     bool tradeOpen, playerTrade;
     bool specialHand;
+    public FishingDock Fishing;
+    bool FishHandVisible => Fishing?.Selected==true;
     int facilityTrack=-1;
     int? portGood;
     bool portTrade;
@@ -106,7 +108,7 @@ public sealed partial class OperationDock
     public bool IsPortTrade => tradeOpen&&portTrade;
     internal int VerificationFacilityTrack => facilityTrack;
     internal int[] VerificationTradeGiveGoods => tradeOpen?OperationPanelOptions.PaymentGoods(current,portTrade&&current.ValidateTradeDraft==null?portGood:null):Array.Empty<int>();
-    public bool ResourceHandVisible => !specialHand;
+    public bool ResourceHandVisible => !specialHand&&!FishHandVisible;
     internal bool DiscardMatches(OperationSnapshot snapshot) => ReferenceEquals(current,snapshot);
     // 报价权限来自当前所属席位投影；已拒绝者和旁观者不会被其他人的待回应报价锁住。
     internal static bool HasActionableOffer(OperationSnapshot snapshot) => snapshot?.Offer!=null&&(snapshot.Offer.CanAccept||snapshot.Offer.CanReject||snapshot.Offer.CanCancel);
@@ -257,7 +259,8 @@ public sealed partial class OperationDock
         if(scope!=snapshot.Scope||revision!=snapshot.Revision){Reset();scope=snapshot.Scope;revision=snapshot.Revision;}
         current=snapshot;Selection.Sync(snapshot);
         if(HasOverlay)Windows?.Describe(HasActionableOffer(snapshot)?"回应交易":tradeOpen?"继续交易":facilityTrack>=0?"城市设施":"使用发展卡");
-        if(snapshot.Discard!=null)specialHand=snapshot.Discard.Special;
+        if(snapshot.Discard!=null){specialHand=snapshot.Discard.Special;Fishing?.Hide();}
+        if(DirectSelecting)Fishing?.Hide();
         hoveredBuild=null;tooltipRect=Rect.zero;hits.Clear();faces.Clear();pieceFaces.Clear();
         // 在任何世界组件接收 MouseDown 前，先按本帧屏幕布局确定手牌命中。
         // 悬停与选中只向上抬牌，不挪动相邻卡牌。
@@ -429,6 +432,7 @@ public sealed partial class OperationDock
         }
         else resourceSlots=collections.HandSlots(s.Seat,s.Goods,s.GoodCount,Time.unscaledTimeAsDouble);
         float width=TabletopHandLayout.ResourceWidth(false),center=TabletopHandLayout.ResourceCenter(false);
+        if(FishHandVisible){hoveredHand=null;handHoverAnchor=Rect.zero;return;}
         if(specialHand)DrawSpecialHand(s,new Rect(center-width/2,TabletopHandLayout.Baseline,width,151));
         else DrawResourceHand(s,new Rect(center-width/2,TabletopHandLayout.Baseline,width,151));
         // 仅被后绘制卡牌实际遮挡的牌需要邻牌让位；已经完整露出的牌保持邻牌位置。
@@ -492,6 +496,7 @@ public sealed partial class OperationDock
     {
         CopperTabletopSkin.Panel(new Rect(HandViewport.x-6,852,HandViewport.width+12,42),ModernOperationUI.Surface);
         landingFaces.Clear();
+        if(FishHandVisible)return;
         var handSlots=specialHand?specialSlots:resourceSlots;
         var landing=collectionFlightsVisible&&!HasOverlay?handSlots.Where(slot=>slot.Flight!=null&&slot.Flight.Progress(Time.unscaledTimeAsDouble)>=.60).ToArray():Array.Empty<TabletopResourceSlot>();
         foreach(var face in faces)
@@ -531,26 +536,32 @@ public sealed partial class OperationDock
         bool holdCounts=collections!=null&&Time.unscaledTimeAsDouble<collections.OutcomesReadyAt;
         int resourceCount=displayedHandCounts.Observe(s.Scope,s.Seat,false,s.Goods.Take(s.GoodCount).Sum(),holdCounts);
         int specialCount=displayedHandCounts.Observe(s.Scope,s.Seat,true,s.Cards.Count,holdCounts);
-        if(StrategyHudArt.HandControl(resource,"资源卡"+(DirectSelecting?" · "+(DirectSelection.SelectedGoods?.Invoke()??0):""),0,!specialHand,new TabletopHandCounter(resourceCount,s.ResourceHandLimit))){specialHand=false;hoveredHand=null;handHoverAnchor=Rect.zero;}
-        if(StrategyHudArt.HandControl(special,"发展卡"+(DirectSelecting?" · "+(DirectSelection.SelectedCards?.Invoke()??0):""),1,specialHand,new TabletopHandCounter(specialCount,s.SpecialHandLimit))){specialHand=true;hoveredHand=null;handHoverAnchor=Rect.zero;}
+        if(StrategyHudArt.HandControl(resource,"资源卡"+(DirectSelecting?" · "+(DirectSelection.SelectedGoods?.Invoke()??0):""),0,!specialHand&&!FishHandVisible,new TabletopHandCounter(resourceCount,s.ResourceHandLimit))){Fishing?.Hide();specialHand=false;hoveredHand=null;handHoverAnchor=Rect.zero;}
+        if(StrategyHudArt.HandControl(special,"发展卡"+(DirectSelecting?" · "+(DirectSelection.SelectedCards?.Invoke()??0):""),1,specialHand&&!FishHandVisible,new TabletopHandCounter(specialCount,s.SpecialHandLimit))){Fishing?.Hide();specialHand=true;hoveredHand=null;handHoverAnchor=Rect.zero;}
+        if(Fishing?.Available==true)
+        {
+            var fishTab=new Rect(1178,681,96,40);Register(fishTab);
+            if(ModernOperationUI.Button(fishTab,"鱼  "+Fishing.Total,true,false,FishHandVisible))
+            {Fishing.Show();hoveredHand=null;handHoverAnchor=Rect.zero;}
+        }
         GUI.enabled=handEnabled;
         if(StrategyHudArt.HandControl(sort,"整理手牌",2))
         {
-            fallbackOrder.Sort();collections?.SortHand(s.Seat);specialOrder.Sort(s.Cards.OrderBy(c=>c.Progress?c.ArtIndex:DevelopmentOrder(c.Id)).ThenBy(c=>c.Name).Select(c=>c.Id));
+            Fishing?.Sort();fallbackOrder.Sort();collections?.SortHand(s.Seat);specialOrder.Sort(s.Cards.OrderBy(c=>c.Progress?c.ArtIndex:DevelopmentOrder(c.Id)).ThenBy(c=>c.Name).Select(c=>c.Id));
             collections?.SortSpecialHand(s.Seat,s.Cards.OrderBy(c=>c.Progress?c.ArtIndex:DevelopmentOrder(c.Id)).ThenBy(c=>c.Name).Select(c=>c.Id));
             hoveredHand=null;handHoverAnchor=Rect.zero;spreadAmounts.Clear();
         }
         double visibleCount=(specialHand?specialSlots:resourceSlots).Sum(slot=>slot.Weight);
         float contentWidth=TabletopHandLayout.ContentWidth(visibleCount,HandViewport.width);
-        if(contentWidth>HandViewport.width)
+        if(!FishHandVisible&&contentWidth>HandViewport.width)
         {
             var scrollRect=new Rect(HandViewport.x,875,HandViewport.width,13);Register(scrollRect);
             HandScroll=GUI.HorizontalScrollbar(scrollRect,HandScroll,HandViewport.width,0,contentWidth);
         }
-        if(specialHand&&s.GoodCount==5)
+        if(!FishHandVisible&&specialHand&&s.GoodCount==5)
         {
             var purchase=s.Builds.FirstOrDefault(b=>b.Icon=="development");
-            if(purchase!=null&&Button(new Rect(1178,681,96,34),"购买发展卡",purchase.CanPrepare(s)&&!DirectSelecting))PrepareDevelopmentPurchase();
+            if(purchase!=null&&Button(new Rect(Fishing?.Available==true?1066:1178,681,96,34),"购买发展卡",purchase.CanPrepare(s)&&!DirectSelecting))PrepareDevelopmentPurchase();
         }
         GUI.enabled=enabled;
     }

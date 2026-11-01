@@ -57,7 +57,7 @@ public static class FishingF6EditorVerification
         images.Add(name);
     }
     static void Require(bool ok,string message){if(!ok)throw new InvalidOperationException(message);}
-    static Vector2 InputPoint(float x,float y)=>MobileTabletop.Enabled?new Vector2(96+x*1.2f,y*1.2f):new Vector2(x,y);
+    static Vector2 InputPoint(float x,float y)=>MobileTabletop.Enabled?new Vector2(x*1920f/1440f,y*1080f/900f):new Vector2(x,y);
     static IEnumerator Click(float x,float y,int button=0)
     {
         foreach(var type in new[]{EventType.MouseMove,EventType.MouseDown,EventType.MouseUp})
@@ -77,7 +77,8 @@ public static class FishingF6EditorVerification
     }
     static IEnumerator Review()
     {
-        Size(MobileTabletop.Enabled?1920:1440,MobileTabletop.Enabled?1080:900);yield return 1.0;
+        Size(MobileTabletop.Enabled?1920:1440,MobileTabletop.Enabled?1080:900);
+        yield return 1.0;
         FishingF6SampleVerification.Run();
         if(!Environment.GetCommandLineArgs().Contains("--f6-sample"))FishingF6SampleVerification.VerifyAll();
         if(Environment.GetCommandLineArgs().Contains("--f6-visual-only")){yield return ReviewBoards();yield break;}
@@ -101,19 +102,25 @@ public static class FishingF6EditorVerification
             Require(app.IsHumanTurn,"夹具没有进入本人自由行动窗口");
             string before=(string)game.GetType().GetMethod("Save").Invoke(game,null);
             var inputDock=(FishingDock)Get(presentation,"fishingDock");
-            yield return Click(832,622,1);
+            yield return Click(1220,701);
+            Require(inputDock.Selected,"鱼手牌页签未选中");
+            yield return Click(380,755,1);
             Require(Get(inputDock,"hint")!=null,"右键未展示鱼筹码说明");
             Require((string)game.GetType().GetMethod("Save").Invoke(game,null)==before,"说明改变了权威状态");
             inputDock.Reset();
-            if(MobileTabletop.Enabled){yield return Hold(832,622);
+            if(MobileTabletop.Enabled){yield return Hold(380,755);
             Require(Get(inputDock,"hint")!=null,"长按未展示鱼筹码说明");}
             Require((string)game.GetType().GetMethod("Save").Invoke(game,null)==before,"长按修改权威状态");
             inputDock.Reset();
-            yield return Click(778,624);yield return Click(685,528);yield return Click(405,567);
+            yield return Click(1220,748);Require(!inputDock.Selected,"资源页签没有退出鱼手牌");
+            yield return Click(1220,798);Require(!inputDock.Selected,"发展页签没有退出鱼手牌");
+            yield return Click(1220,701);yield return Click(685,616);yield return Click(405,655);
             yield return Capture("02-"+mode+"-支付预览");
             Require((string)game.GetType().GetMethod("Save").Invoke(game,null)==before,"预览修改了权威状态");
-            yield return Click(1010,567);Require((string)game.GetType().GetMethod("Save").Invoke(game,null)==before,"取消扣除了鱼");
-            yield return Click(778,624);yield return Click(685,528);yield return Click(405,567);yield return Click(907,567);yield return 1.0;
+            yield return Click(380,755);Require(((string[])Get(inputDock,"tokens")).Length==1,"点击鱼牌未取消支付选择");
+            yield return Click(380,755);Require(((string[])Get(inputDock,"tokens")).Length==2,"点击鱼牌未恢复支付选择");
+            yield return Click(1010,655);Require((string)game.GetType().GetMethod("Save").Invoke(game,null)==before,"取消扣除了鱼");
+            yield return Click(1220,701);yield return Click(685,616);yield return Click(405,655);yield return Click(907,655);yield return 1.0;
             var after=game.GetType().GetMethod("GetAuthoritativeStateForTesting").Invoke(game,null);
             int wood;string[] remaining;
             if(after is Catan.Core.M2.GameState basicAfter){wood=basicAfter.Players[0].Resources.Wood;remaining=basicAfter.TradeModules.Fishing.Holdings[0].TokenIds;}
@@ -123,7 +130,7 @@ public static class FishingF6EditorVerification
         }
         if(Environment.GetCommandLineArgs().Contains("--f6-sample"))yield break;
         yield return ReviewKingdoms();
-        yield return ReviewBoards();
+        if(!Environment.GetCommandLineArgs().Contains("--fish-hand-only"))yield return ReviewBoards();
         yield return ReviewReplacement();
         Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",1);Set(app,"menuScenario",0);
         yield return Capture("04-航海捕鱼已开放");
@@ -148,8 +155,9 @@ public static class FishingF6EditorVerification
         Require(game.GetPlayerView("P1").LegalActions.Any(c=>c.FishAction==Catan.Core.TradeModules.FishAction.TakeResource),"三国测试局面没有可用取资源行动");
         presentation.GetType().GetMethod("M6Refresh",Flags).Invoke(presentation,null);yield return 2.0;
         for(int i=0;i<30&&app.TablePresentationBlocked;i++)yield return .5;
-        yield return Click(778,624);yield return Click(685,528);yield return Click(405,567);
-        yield return Capture("05-三国城市骑士支付预览");yield return Click(907,567);yield return 1.0;
+        yield return Click(1220,701);yield return Click(685,616);yield return Click(405,655);
+        Require((float)typeof(M6App).GetProperty("SkillBarOffset",Flags).GetValue(app)<-120,"三国阶段条没有避让鱼手牌操作");
+        yield return Capture("05-三国城市骑士支付预览");yield return Click(907,655);yield return 1.0;
         Require(game.GetPlayerView("P1").OwnResources.Total==before+1,"三国技能底栏遮挡了鱼支付操作");
         Require(!((TabletopDefenseUI)Get(Get(presentation,"tabletop"),"defense")).MobileSummary.Contains("海港大师"),"单开捕鱼错误展示了海港奖励");
         yield return Capture("06-三国城市骑士支付完成");app.ShowMenu();
@@ -175,9 +183,9 @@ public static class FishingF6EditorVerification
         string file=Path.Combine(output,"换抽私密测试局.json");app.WriteSave(file);app.ReadSave(file);yield return .8;
         var presentation=app.GetComponent<M2App>();game=(Catan.Core.M2.BaseGameSession)Get(Get(presentation,"host"),"session");
         Require(game.Save()==before,"恢复后随机状态或换抽游标改变");
-        yield return Click(832,622);yield return Capture("09-满额换抽恢复");
+        yield return Click(380,755);yield return Capture("09-满额换抽恢复");
         Require(game.Save()==before,"仅选择换抽筹码就扣除了鱼");
-        yield return Click(910,530);yield return .5;
+        yield return Click(910,618);yield return .5;
         Require(game.GetPlayerView(player).TradeModules.Fishing.PendingPlayerId!=player,"确认换抽没有完成本人的待决");game.AssertInvariants();
         yield return Capture("10-换抽完成");app.ShowMenu();
     }

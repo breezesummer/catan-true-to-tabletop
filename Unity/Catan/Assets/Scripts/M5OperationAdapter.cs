@@ -163,6 +163,7 @@ public sealed partial class M5App
         ai.SyncThreeKingdomsSelection();SyncDirectPayment();
         tabletop.ThreeKingdoms=ai;dock.DirectSelection=directPayment.Active?PaymentHandSelection:ai.ThreeKingdomsHandSelection;
         dock.InspectGood=ai.InspectThreeKingdomsGood;dock.InspectCard=ai.InspectThreeKingdomsCard;
+        BindFishing();
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);
         dock.Windows=tabletop.OperationWindows;mapChoice.Windows=tabletop.OperationWindows;
         bool previousEnabled=GUI.enabled,tableEnabled=previousEnabled&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!ResourceChoiceVisible;GUI.enabled=previousEnabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&tableEnabled&&!dock.BlocksHudInput(Event.current.mousePosition)&&!tabletop.BlocksOverlayInput(Event.current.mousePosition));

@@ -9,7 +9,8 @@ public sealed partial class M5App
 {
     readonly FishingDock fishingDock=new FishingDock();
     PlayerView fishingView;
-    void DrawFishing()
+    internal bool FishHandSelected=>fishingDock.Selected;
+    void BindFishing()
     {
         if(fishingView!=view)
         {
@@ -22,6 +23,10 @@ public sealed partial class M5App
             }).ToArray();
             fishingDock.Bind(view.TradeModules?.Fishing,view.PlayerId,choices);
         }
+        dock.Fishing=fishingDock;
+    }
+    void DrawFishing()
+    {
         if(tabletop.HistoryOpen||ai.TablePresentationBlocked)return;
         Func<string,Vector2> position=id=>MobileTabletop.Logical(board.ScreenPoint(id));
         fishingDock.DrawMap(font,position);
