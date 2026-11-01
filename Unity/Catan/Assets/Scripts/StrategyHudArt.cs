@@ -42,6 +42,7 @@ public static class StrategyHudArt
     static void HandSymbol(Rect rect,int kind,Color ink)
     {
         // 卡页采用三张扇形牌背，整理采用三张齐列卡纸和向下归拢箭头。
+        if(kind==3){FishIcon(rect);return;}
         if(kind==2)
         {
             for(int i=0;i<3;i++)
@@ -56,6 +57,26 @@ public static class StrategyHudArt
             return;
         }
         HandCardIcon(rect,kind==1);
+    }
+    static Texture2D fishIcon;
+    public static void FishIcon(Rect rect)
+    {
+        if(fishIcon==null)
+        {
+            const int w=96,h=64;var pixels=new Color[w*h];
+            for(int y=0;y<h;y++)for(int x=0;x<w;x++)
+            {
+                float u=(x+.5f)/w,v=(y+.5f)/h;
+                bool body=Mathf.Pow((u-.57f)/.36f,2)+Mathf.Pow((v-.5f)/.29f,2)<1;
+                bool tail=u>.04f&&u<.30f&&Mathf.Abs(v-.5f)<(.30f-u)*1.25f;
+                bool fin=u>.40f&&u<.65f&&v>.65f&&v<.88f-(u-.40f)*.5f;
+                bool eye=Mathf.Pow((u-.77f)/.025f,2)+Mathf.Pow((v-.57f)/.038f,2)<1;
+                pixels[y*w+x]=eye?new Color(.12f,.18f,.16f):body||tail||fin?Gold:Color.clear;
+            }
+            fishIcon=new Texture2D(w,h,TextureFormat.RGBA32,false){name="鱼资源图标",filterMode=FilterMode.Bilinear,wrapMode=TextureWrapMode.Clamp};
+            fishIcon.SetPixels(pixels);fishIcon.Apply(false,true);
+        }
+        GUI.DrawTexture(rect,fishIcon,ScaleMode.ScaleToFit);
     }
     public static void HandCardIcon(Rect rect,bool special)
     {

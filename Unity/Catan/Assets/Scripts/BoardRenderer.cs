@@ -168,11 +168,11 @@ public sealed class BoardRenderer : MonoBehaviour
         }
         return go;
     }
-    public Vector3 Position(string id) => id.StartsWith("V")?vertices[id]:id.StartsWith("E")?edges[id]:tiles[id];
+    public Vector3 Position(string id) => id.StartsWith("V")?vertices[id]+Vector3.up*.004f:id.StartsWith("E")?edges[id]:tiles[id];
     public string TerrainResource(string tileId) => terrainTypes[tileId];
     public Vector2 ScreenPoint(string id)
     {
-        var p=BoardCamera.WorldToScreenPoint(Position(id)+Vector3.up*.005f); return new Vector2(p.x,Screen.height-p.y);
+        var p=BoardCamera.WorldToScreenPoint(Position(id)); return new Vector2(p.x,Screen.height-p.y);
     }
     public void Preview(string id, bool road, bool legal)
     {PreviewPiece(id,TabletopPointerPreview.ForCommand(road?"BuildRoad":"BuildSettlement"),"P1",legal);}
@@ -182,9 +182,10 @@ public sealed class BoardRenderer : MonoBehaviour
     public void PreviewPiece(string id,TabletopPointerPreview preview,string seat,bool legal)
     {
         string key=id+":"+preview.Kind+":"+preview.Level+":"+preview.Active+":"+seat+":"+legal;
-        if(ghost!=null&&pointerPreviewKey==key)return;
+        if(ghost!=null&&pointerPreviewKey==key){if(legal)TabletopPointerCursor.Request();return;}
         ClearPreview();if(string.IsNullOrEmpty(id))return;pointerPreviewKey=key;
         var rotation=id.StartsWith("E")?rotations[id]:Quaternion.identity;
+        if(legal)TabletopPointerCursor.Request();
         ghost=OperationPieceAssets.PointerPreview(preview,seat,Position(id),rotation,transform,legal);
     }
     internal GameObject VerificationPointerPreview=>ghost;

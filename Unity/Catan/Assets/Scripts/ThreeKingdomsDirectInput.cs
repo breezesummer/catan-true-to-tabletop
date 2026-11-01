@@ -12,6 +12,7 @@ public static class ThreeKingdomsDirectInput
     // 1=选择，2=说明；不对权威状态作任何修改。
     public static int Read(Rect area, bool selectable, bool inspectable=true)
     {
+        TabletopPointerCursor.Hover(area,selectable);
         var e=Event.current;int id=GUIUtility.GetControlID(FocusType.Passive,area);
         if(e.type==EventType.MouseDown&&area.Contains(e.mousePosition))
         {

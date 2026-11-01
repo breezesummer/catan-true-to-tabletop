@@ -115,7 +115,17 @@ public sealed partial class M4App : MonoBehaviour
         Vector2 releasedMouse;bool buildReleased=dock.ConsumeBuildRelease(out releasedMouse);
         if(board==null)return;
         RefreshTablePrompt();
-        if(fishingDock.Active){if(Input.GetKeyDown(KeyCode.Escape))fishingDock.Reset();return;}
+        if(fishingDock.Active)
+        {
+            if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){fishingDock.Reset();board.ClearPreview();return;}
+            var fishMouse=MobileTabletop.Logical(MobileTabletop.Pointer);
+            bool fishMap=ai!=null&&ai.IsHumanTurn&&!ai.TableMenuOpen&&!ai.TablePresentationBlocked&&!DockBlocksMouse(fishMouse);
+            bool fishClick=mapPan.Update(board.TableScene,MobileTabletop.Pointer,fishMap,false);
+            if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,fishClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
+                (id,ship)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand(ship?"BuildShip":"BuildRoad"),seat,true),board.ClearPreview);
+            else board.ClearPreview();
+            return;
+        }
         if(mapChoice.Active&&Input.GetMouseButtonDown(1)){mapChoice.Clear();return;}
         if(ai!=null&&(ai.TableMenuOpen||ai.ThreeKingdomsPanelBlocksTable)){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         var pointer=MobileTabletop.Pointer;

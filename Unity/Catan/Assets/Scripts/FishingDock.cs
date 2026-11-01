@@ -18,14 +18,15 @@ public sealed class FishingDock
     static readonly Rect Strip=OperationDock.HandViewport;
     public bool Selected {get;private set;}
     public bool Available=>view!=null;
+    public int Count=>view?.OwnTokens.Length??0;
     public int Total=>view?.OwnTokens.Sum(t=>t.Value)??0;
     bool sorted;
-    Texture2D cardArt;
+    readonly Texture2D[] cardArt=new Texture2D[3];
     public void Show(){Selected=true;}
     public void Hide(){Selected=false;Reset();}
     public void Sort(){sorted=true;}
     bool SelectingMap=>chosen==null&&(action==FishAction.BuildRoad||action==FishAction.RemoveRobber);
-    Rect Actions=>new Rect(350,SelectingMap?103:594,732,88);
+    Rect Actions=>new Rect(350,SelectingMap?103:594,732,chosen!=null||action==FishAction.TakeResource||action==FishAction.BuyDevelopmentCard||view?.PendingPlayerId==owner?88:48);
     FishingView view;
     string owner, revision;
     Option[] options=Array.Empty<Option>();
@@ -55,7 +56,7 @@ public sealed class FishingDock
     {
         chosen=option;tokens=option.Action.HasValue?FishingPayment.Select(view.OwnTokens,option.Action.Value):Array.Empty<string>();
     }
-    static string Caption(FishAction a,bool cities)=>a==FishAction.RemoveRobber?"2鱼 · 移出强盗":a==FishAction.StealResource?"3鱼 · 偷牌":a==FishAction.TakeResource?"4鱼 · 取资源":a==FishAction.BuildRoad?"5鱼 · 修路":cities?"7鱼 · 进步牌":"7鱼 · 发展牌";
+    static string Caption(FishAction a,bool cities)=>a==FishAction.RemoveRobber?"2鱼 · 移出强盗":a==FishAction.StealResource?"3鱼 · 偷取手牌":a==FishAction.TakeResource?"4鱼 · 任意资源":a==FishAction.BuildRoad?"5鱼 · 新建道路":"7鱼 · 发展卡";
     public void Draw(Font font,bool interactive,bool cities,string robber,Func<string,Vector2> position,string pirate=null)
     {
         if(view==null||!Selected)return;
@@ -64,20 +65,20 @@ public sealed class FishingDock
         bool replacement=view.PendingPlayerId==owner;
         float shift=SelectingMap?-403:88;
         // 鱼牌与资源牌共用尺寸、基线和叠放间距；只改变本地支付草稿。
-        if(cardArt==null)cardArt=Resources.Load<Texture2D>("HarborFishing/Cards/fish-card");
+        for(int value=1;value<=3;value++)if(cardArt[value-1]==null)cardArt[value-1]=Resources.Load<Texture2D>("HarborFishing/Cards/fish-card-"+value);
         var hand=sorted?view.OwnTokens.OrderBy(t=>t.Value).ThenBy(t=>t.Id).ToArray():view.OwnTokens;
         float step=TabletopHandLayout.Step(hand.Length,Strip.width);
         var number=new GUIStyle(style){fontSize=25,fontStyle=FontStyle.Bold};
         number.normal.textColor=new Color(.19f,.26f,.25f);
-        var caption=new GUIStyle(style);caption.normal.textColor=number.normal.textColor;
+
         for(int i=0;i<hand.Length;i++)
         {
             var token=hand[i];bool selected=tokens.Contains(token.Id)||replacement&&chosen?.Target==token.Id;
             var r=new Rect(Strip.x+i*step,TabletopHandLayout.Baseline-(selected?22:0),TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);
             ModernOperationUI.Round(new Rect(r.x-2,r.y-2,r.width+4,r.height+4),selected?new Color(.38f,.83f,.81f):new Color(.45f,.35f,.20f));
-            if(cardArt!=null)GUI.DrawTexture(r,cardArt,ScaleMode.StretchToFill);
+            var art=cardArt[Mathf.Clamp(token.Value,1,3)-1];
+            if(art!=null)GUI.DrawTexture(r,art,ScaleMode.StretchToFill);
             GUI.Label(new Rect(r.x+7,r.y+5,32,30),token.Value.ToString(),number);
-            GUI.Label(new Rect(r.x+8,r.yMax-32,r.width-16,24),token.Value+" 鱼",caption);
             var hit=r;if(i<hand.Length-1)hit.width=step;
             int input=ThreeKingdomsDirectInput.Read(hit,interactive&&GUI.enabled);
             if(input==2)hint=token.Value+"条鱼；整张支付，多付不找零。";
@@ -111,22 +112,35 @@ public sealed class FishingDock
             if(chosen!=null)
             {
                 int paid=view.OwnTokens.Where(t=>tokens.Contains(t.Id)).Sum(t=>t.Value),cost=chosen.Action.HasValue?FishingRules.Cost(chosen.Action.Value):0;
-                GUI.Label(new Rect(365,551+shift,485,32),chosen.Action.HasValue?chosen.Label+" · 支付 "+paid+" / "+cost+"鱼":chosen.Label,style);
+                if(chosen.Action==FishAction.BuildRoad&&options.Any(o=>o.Action==action&&o.Target==chosen.Target&&o.Ship!=chosen.Ship))
+                {
+                    var target=chosen.Target;
+                    if(ModernOperationUI.Button(new Rect(365,551+shift,100,32),"新建道路",true,false,!chosen.Ship))Choose(options.First(o=>o.Action==action&&o.Target==target&&!o.Ship));
+                    if(ModernOperationUI.Button(new Rect(473,551+shift,100,32),"新建船只",true,false,chosen.Ship))Choose(options.First(o=>o.Action==action&&o.Target==target&&o.Ship));
+                }
+                else GUI.Label(new Rect(365,551+shift,485,32),chosen.Action.HasValue?chosen.Label+" · 支付 "+paid+" / "+cost+"鱼":chosen.Label,style);
                 if(ModernOperationUI.Button(new Rect(863,551+shift,96,32),"确认",paid>=cost)){var submit=chosen.Submit;var selected=tokens;Reset();submit(selected);}
             }
             else if(action==FishAction.TakeResource||action==FishAction.BuyDevelopmentCard)
             {
                 var targets=options.Where(o=>o.Action==action).ToArray();for(int i=0;i<targets.Length;i++)if(ModernOperationUI.Button(new Rect(365+i*98,551+shift,92,32),targets[i].Label))Choose(targets[i]);
             }
-            else GUI.Label(new Rect(365,551+shift,490,32),boot||action==FishAction.StealResource?"点击玩家头像":action==FishAction.BuildRoad?"点击棋盘上的道路或船位置":action==FishAction.RemoveRobber?"点击要移出的强盗或海盗":"选择行动",style);
-            if(ModernOperationUI.Button(new Rect(968,551+shift,96,32),"取消"))Reset();
-            if(chosen==null&&action==FishAction.BuildRoad)
-                foreach(var o in options.Where(o=>o.Action==action)) {var p=position(o.Target);bool both=options.Any(other=>other.Target==o.Target&&other.Action==action&&other.Ship!=o.Ship);if(ModernOperationUI.Button(new Rect(p.x+(both?(o.Ship?0:-36):-18),p.y-15,36,30),o.Ship?"船":"路"))Choose(o);}
+
+            if(chosen!=null&&ModernOperationUI.Button(new Rect(968,551+shift,96,32),"取消"))Reset();
             if(chosen==null&&action==FishAction.RemoveRobber)
                 foreach(var o in options.Where(o=>o.Action==action)) {var id=o.Pirate?pirate:robber;if(id==null||id=="frame")continue;var p=position(id);if(ModernOperationUI.Button(new Rect(p.x-32,p.y-26,64,52),o.Pirate?"海盗":"强盗"))Choose(o);}
         }
         if(hint!=null)GUI.Label(new Rect(350,Actions.y-32,390,28),hint,style);
         GUI.enabled=previous;
+    }
+    public void UpdateMap(Vector2 mouse,bool click,Catan.Core.Edge[] edges,Catan.Core.Tile[] tiles,Func<string,Vector2> position,Action<string,bool> preview,Action clear)
+    {
+        if(!Selected||action!=FishAction.BuildRoad||chosen!=null){clear();return;}
+        var roads=options.Where(o=>o.Action==FishAction.BuildRoad&&!o.Ship).Select(o=>o.Target).ToArray();
+        var ships=options.Where(o=>o.Action==FishAction.BuildRoad&&o.Ship).Select(o=>o.Target).ToArray();
+        TabletopRoadPlacement.Update(mouse,click,edges,tiles,roads,ships,position,
+            (id,legal)=>preview(id,false),(id,legal)=>preview(id,true),clear,
+            (id,ship)=>{Choose(options.First(o=>o.Action==FishAction.BuildRoad&&o.Target==id&&o.Ship==ship));clear();},null);
     }
     public void DrawMap(Font font,Func<string,Vector2> position)
     {

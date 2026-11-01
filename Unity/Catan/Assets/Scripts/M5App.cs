@@ -133,7 +133,17 @@ public sealed partial class M5App : MonoBehaviour
         bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,ai.ThreeKingdomsSelectionActive||tabletop.OperationHidden||draft==null&&!operationActions);
         if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
         if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
-        if(fishingDock.Active){if(Input.GetKeyDown(KeyCode.Escape))fishingDock.Reset();return;}
+        if(fishingDock.Active)
+        {
+            if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){fishingDock.Reset();board.ClearPreview();return;}
+            var fishMouse=MobileTabletop.Logical(MobileTabletop.Pointer);
+            bool fishMap=ai!=null&&ai.IsHumanTurn&&!ai.TableMenuOpen&&!ai.TablePresentationBlocked&&!DockBlocksMouse(fishMouse);
+            bool fishClick=mapPan.Update(board.TableScene,MobileTabletop.Pointer,fishMap,false);
+            if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,fishClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
+                (id,ship)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand(ship?"BuildShip":"BuildRoad"),seat,true),board.ClearPreview);
+            else board.ClearPreview();
+            return;
+        }
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(ai!=null&&ai.ThreeKingdomsSelectionActive&&!ThreeKingdomsPaymentActive)
         {

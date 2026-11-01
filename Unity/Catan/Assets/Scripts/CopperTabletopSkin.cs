@@ -97,7 +97,11 @@ public static class CopperTabletopSkin
             float v=row==0?art.Source.yMax-art.SliceY:row==1?art.Source.y+art.SliceY:art.Source.y;
             float uw=col==1?art.Source.width-2*art.SliceX:art.SliceX;
             float vh=row==1?art.Source.height-2*art.SliceY:art.SliceY;
-            GUI.DrawTextureWithTexCoords(new Rect(x,y,w,h),art.Texture,new Rect(u,v,uw,vh));
+            var start=GUIUtility.GUIToScreenPoint(new Vector2(x,y));
+            var end=GUIUtility.GUIToScreenPoint(new Vector2(x+w,y+h));
+            start=GUIUtility.ScreenToGUIPoint(new Vector2(Mathf.Round(start.x),Mathf.Round(start.y)));
+            end=GUIUtility.ScreenToGUIPoint(new Vector2(Mathf.Round(end.x),Mathf.Round(end.y)));
+            GUI.DrawTextureWithTexCoords(Rect.MinMaxRect(start.x,start.y,end.x,end.y),art.Texture,new Rect(u,v,uw,vh));
         }
         GUI.color=before;GUI.enabled=enabled;
     }

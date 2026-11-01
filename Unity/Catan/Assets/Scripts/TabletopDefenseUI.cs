@@ -3,7 +3,7 @@ using UnityEngine;
 // 固定屏幕状态区，只消费 PlayerView 的公开兵力、航程与最长道路奖励，不参与结算。
 public sealed class TabletopDefenseUI
 {
-    public static readonly Rect Area=new Rect(1182,207,246,108);
+    public static readonly Rect Area=new Rect(1182,239,246,124);
     int position=-1,strength,threat;
     string roadPlayer;
     int roadLength;
@@ -17,7 +17,7 @@ public sealed class TabletopDefenseUI
     {this.position=position;this.strength=strength;this.threat=threat;}
     public void BindLongestRoad(string playerId,int length)
     {roadBound=true;roadPlayer=playerId;roadLength=string.IsNullOrEmpty(playerId)?0:Mathf.Max(0,length);}
-    Rect CurrentArea=>new Rect(Area.x,Area.y,Area.width,position>=0?Area.height:(harbor==null?47:77));
+    Rect CurrentArea=>new Rect(Area.x,Area.y,Area.width,position>=0?Area.height:(harbor==null?47:86));
     public bool BlocksInput(Vector2 point)=>(position>=0||roadBound)&&CurrentArea.Contains(point);
     public void Draw()
     {
@@ -45,10 +45,11 @@ public sealed class TabletopDefenseUI
         if(roadBound)DrawLongestRoad(position>=0?Area.y+(harbor==null?81:59):Area.y+10,title,count);
         if(harbor!=null)
         {
-            float y=position>=0?Area.y+82:Area.y+41;
+            float y=position>=0?Area.y+91:Area.y+48;
+            ModernOperationUI.Fill(new Rect(Area.x+13,y-5,Area.width-26,1),ModernOperationUI.Line);
             FishingTabletopAssets.DrawIcon(new Rect(Area.x+10,y-3,22,30),"harbormaster");
             GUI.Label(new Rect(Area.x+36,y,75,25),"海港大师",title);
-            GUI.Label(new Rect(Area.x+109,y,122,25),HarborLabel,new GUIStyle(count){fontSize=10});
+            TabletopTextFit.Label(new Rect(Area.x+113,y,116,25),HarborLabel,new GUIStyle(count){fontSize=10,wordWrap=false});
         }
     }
     void DrawLongestRoad(float y,GUIStyle title,GUIStyle count)
@@ -61,7 +62,7 @@ public sealed class TabletopDefenseUI
         var result=new Rect(Area.x+109,y-2,122,25);
         count.normal.textColor=string.IsNullOrEmpty(roadPlayer)?ModernOperationUI.Muted:gold;
         string resultText=string.IsNullOrEmpty(roadPlayer)?"暂无归属":M6App.PlayerLabel(roadPlayer)+" · "+roadLength+" 段";
-        var resultStyle=M6App.PlayerNameStyle(new GUIStyle(count){fontSize=10,wordWrap=true},roadPlayer);GUI.Label(result,resultText,resultStyle);
+        var resultStyle=M6App.PlayerNameStyle(new GUIStyle(count){fontSize=10,wordWrap=false},roadPlayer);TabletopTextFit.Label(result,resultText,resultStyle);
     }
     static void DrawIcon(Rect rect,Texture2D texture,Color color)
     {var previous=GUI.color;GUI.color=color;GUI.DrawTexture(rect,texture,ScaleMode.ScaleToFit);GUI.color=previous;}

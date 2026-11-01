@@ -363,12 +363,13 @@ public sealed partial class OperationDock
                 {
                     bool picked=Selection.IsPieceSelected(build.Id,n);
                     if(picked&&pieceDragging)continue;
-                    // 库存使用现有模型的透明缩略图；棋盘模型完全沿用，点击仍按透明轮廓判断。
+                    // 库存使用现有模型的透明缩略图；棋盘模型完全沿用，整格接收点击。
                     var icon=TabletopPieceDock.ModelArea(r);
                     bool enabled=GUI.enabled;GUI.enabled=true;
                     GUI.DrawTexture(icon,piece,ScaleMode.ScaleToFit);GUI.enabled=enabled;
-                    var shape=new HitShape{Rect=icon,Texture=piece};
+                    var shape=new HitShape{Rect=r};
                     hovered|=shape.Contains(Event.current.mousePosition);
+                    TabletopPointerCursor.Hover(r,build.CanPrepare(s));
                     if(build.Count>0){hits.Add(shape);pieceFaces.Add(new PieceFace{Shape=shape,Build=build,Ordinal=n});}
                 }
                 TabletopPieceDock.DrawCount(r,build.Count,quantity);
@@ -497,6 +498,7 @@ public sealed partial class OperationDock
         CopperTabletopSkin.Panel(new Rect(HandViewport.x-6,852,HandViewport.width+12,42),ModernOperationUI.Surface);
         landingFaces.Clear();
         if(FishHandVisible)return;
+        if(hoveredHand!=null&&GUI.enabled)TabletopPointerCursor.Request();
         var handSlots=specialHand?specialSlots:resourceSlots;
         var landing=collectionFlightsVisible&&!HasOverlay?handSlots.Where(slot=>slot.Flight!=null&&slot.Flight.Progress(Time.unscaledTimeAsDouble)>=.60).ToArray():Array.Empty<TabletopResourceSlot>();
         foreach(var face in faces)
@@ -526,11 +528,11 @@ public sealed partial class OperationDock
         }
     }
     static Rect Intersect(Rect a,Rect b)=>Rect.MinMaxRect(Mathf.Max(a.xMin,b.xMin),Mathf.Max(a.yMin,b.yMin),Mathf.Min(a.xMax,b.xMax),Mathf.Min(a.yMax,b.yMax));
-    static readonly Rect HandTabsArea = new Rect(1174,681,104,208);
+    static readonly Rect HandTabsArea = new Rect(1174,681,104,219);
     void DrawHandTabs(OperationSnapshot s)
     {
         bool enabled=GUI.enabled;GUI.enabled=enabled&&!HasOverlay;
-        Rect resource=new Rect(1178,727,96,43),special=new Rect(1178,777,96,43),sort=new Rect(1178,830,96,32);
+        Rect resource=new Rect(1178,727,96,43),special=new Rect(1178,773,96,43),sort=new Rect(1178,Fishing?.Available==true?867:830,96,32);
         Register(resource);Register(special);Register(sort);
         bool handEnabled=GUI.enabled;GUI.enabled=handEnabled&&s.Discard==null;
         bool holdCounts=collections!=null&&Time.unscaledTimeAsDouble<collections.OutcomesReadyAt;
@@ -540,8 +542,8 @@ public sealed partial class OperationDock
         if(StrategyHudArt.HandControl(special,"发展卡"+(DirectSelecting?" · "+(DirectSelection.SelectedCards?.Invoke()??0):""),1,specialHand&&!FishHandVisible,new TabletopHandCounter(specialCount,s.SpecialHandLimit))){Fishing?.Hide();specialHand=true;hoveredHand=null;handHoverAnchor=Rect.zero;}
         if(Fishing?.Available==true)
         {
-            var fishTab=new Rect(1178,681,96,40);Register(fishTab);
-            if(ModernOperationUI.Button(fishTab,"鱼  "+Fishing.Total,true,false,FishHandVisible))
+            var fishTab=new Rect(1178,820,96,43);Register(fishTab);
+            if(StrategyHudArt.HandControl(fishTab,"鱼资源",3,FishHandVisible,new TabletopHandCounter(Fishing.Count,7)))
             {Fishing.Show();hoveredHand=null;handHoverAnchor=Rect.zero;}
         }
         GUI.enabled=handEnabled;

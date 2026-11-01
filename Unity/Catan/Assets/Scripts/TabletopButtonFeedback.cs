@@ -26,6 +26,7 @@ public static class TabletopButtonFeedback
     public static DrawScope Begin(Rect r,bool enabled=true)=>new DrawScope(r,GUI.enabled&&enabled);
     public static bool Button(Rect r,bool sound=true,bool round=false)
     {
+        TabletopPointerCursor.Hover(r);
         var e=Event.current;var screen=GUIUtility.GUIToScreenPoint(r.center);
         bool over=GUI.enabled&&r.Contains(e.mousePosition);
         if(e.type==EventType.MouseDown&&e.button==0&&over){pressedAt=screen;pressed=true;pressedInside=true;}

@@ -71,7 +71,17 @@ public sealed partial class M3App : MonoBehaviour
             if(!buildingMenu){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();}
             mapPan.Cancel(board.TableScene);
         }
-        if(fishingDock.Active){if(Input.GetKeyDown(KeyCode.Escape))fishingDock.Reset();return;}
+        if(fishingDock.Active)
+        {
+            if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){fishingDock.Reset();board.ClearPreview();return;}
+            var fishMouse=MobileTabletop.Logical(MobileTabletop.Pointer);
+            bool fishMap=ai!=null&&ai.IsHumanTurn&&!ai.TableMenuOpen&&!ai.TablePresentationBlocked&&!DockBlocksMouse(fishMouse);
+            bool fishClick=mapPan.Update(board.TableScene,MobileTabletop.Pointer,fishMap,false);
+            if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,fishClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
+                (id,ship)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand(ship?"BuildShip":"BuildRoad"),seat,true),board.ClearPreview);
+            else board.ClearPreview();
+            return;
+        }
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
         if(curtain||newGameDialog||view==null||ai!=null&&(!ai.IsHumanTurn||tabletop.OperationHidden))return;

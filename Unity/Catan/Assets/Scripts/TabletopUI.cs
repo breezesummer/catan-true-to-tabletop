@@ -40,7 +40,7 @@ public sealed partial class TabletopUI
         if(PlayerIdentityModel.IsPlayerId(player))value.normal.textColor=BoardRenderer.SeatColor(player.ToUpperInvariant());
         return value;
     }
-    static readonly Rect[] baseDiceRects={new Rect(43,192,43,43),new Rect(112,192,43,43)},expansionDiceRects={new Rect(43,204,39,39),new Rect(113,205,39,39),new Rect(79,164,39,39)};
+    static readonly Rect[] baseDiceRects={new Rect(43,192,43,43),new Rect(112,192,43,43)},expansionDiceRects={new Rect(46,220,31,31),new Rect(116,220,31,31),new Rect(81,191,31,31)};
     Vector2 scroll;
     bool contextVisible;
     public bool ContextVisible=>contextVisible;
@@ -262,7 +262,7 @@ public sealed partial class TabletopUI
         {
             var player=seats.First(p=>p.Id==id);
             string alliance=ThreeKingdoms?.AlliancePlayerCaptionB6(player.Id);
-            var panel=new Rect(x,13,width,alliance==null?191:211);hits.Add(panel);
+            var panel=new Rect(x,13,width,(alliance==null?191:211)+(fishing!=null?18:0));hits.Add(panel);
             if(StrategyHudTheme.Jade)JadeTabletopSkin.LightPanel(panel,player.Id==actor);else CopperTabletopSkin.Panel(panel,ModernOperationUI.Background,player.Id==actor);
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             if(!StrategyHudTheme.Jade)StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
@@ -270,9 +270,9 @@ public sealed partial class TabletopUI
             if(fishing!=null)
             {
                 var fish=fishing.Players.First(p=>p.PlayerId==player.Id);
-                var fishBadge=new Rect(x+83,27,28,34);
-                FishingTabletopAssets.DrawIcon(new Rect(fishBadge.x,fishBadge.y-5,28,28),"fish-back");
-                GUI.Label(new Rect(fishBadge.x,fishBadge.y+17,28,18),fish.TokenCount.ToString(),Style("fish",center,11,FontStyle.Bold));
+                var fishBadge=new Rect(x+12,191,width-24,16);
+                StrategyHudArt.FishIcon(new Rect(fishBadge.x,fishBadge.y,20,16));
+                GUI.Label(new Rect(fishBadge.x+26,fishBadge.y,fishBadge.width-28,16),fish.TokenCount+"/7",Style("fish",center,12,FontStyle.Bold,TextAnchor.MiddleRight));
                 if(fishBadge.Contains(Event.current.mousePosition)){hoveredPlayerHint="持有 "+fish.TokenCount+" 枚鱼筹码；面值仅本人可见";playerHintAnchor=fishBadge;}
                 if(fishing.OldBootPlayerId==player.Id)
                 {
@@ -315,7 +315,7 @@ public sealed partial class TabletopUI
             }
             if(alliance!=null)
             {
-                var badge=new Rect(x+10,197,width-20,17);TabletopTextFit.Label(badge,alliance,Style("alliance",center,11,FontStyle.Bold));
+                var badge=new Rect(x+10,fishing!=null?215:197,width-20,17);TabletopTextFit.Label(badge,alliance,Style("alliance",center,11,FontStyle.Bold));
                 if(badge.Contains(Event.current.mousePosition)){hoveredPlayerHint=ThreeKingdoms.AlliancePlayerHintB6(player.Id);playerHintAnchor=badge;}
             }
             bool selecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;

@@ -51,7 +51,17 @@ public sealed partial class M2App : MonoBehaviour
     {
         if((host==null&&!NetworkGame)||board==null)return;
         RefreshTablePrompt();
-        if(fishingDock.Active){if(Input.GetKeyDown(KeyCode.Escape))fishingDock.Reset();return;}
+        if(fishingDock.Active)
+        {
+            if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){fishingDock.Reset();board.ClearPreview();return;}
+            var fishMouse=MobileTabletop.Logical(MobileTabletop.Pointer);
+            bool fishMap=ai!=null&&ai.IsHumanTurn&&!ai.TableMenuOpen&&!ai.TablePresentationBlocked&&!DockBlocksMouse(fishMouse);
+            bool fishClick=mapPan.Update(board.TableScene,MobileTabletop.Pointer,fishMap,false);
+            if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,fishClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
+                (id,ship)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand(ship?"BuildShip":"BuildRoad"),seat,true),board.ClearPreview);
+            else board.ClearPreview();
+            return;
+        }
         Vector2 releasePoint=Vector2.zero;bool released=ai!=null&&dock.ConsumeBuildRelease(out releasePoint);
         if(mapChoice.Active&&Input.GetMouseButtonDown(1)){mapChoice.Clear();return;}
         if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}

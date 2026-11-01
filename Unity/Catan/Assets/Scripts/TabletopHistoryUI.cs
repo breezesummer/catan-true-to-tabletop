@@ -6,8 +6,8 @@ using UnityEngine;
 // 只渲染已按当前观看者权限投影的历史，不能访问权威状态。
 public sealed partial class TabletopHistoryUI
 {
-    internal static readonly Rect Feed = new Rect(1182,327,246,355);
-    static readonly Rect Collapsed=new Rect(1326,327,102,30);
+    internal static readonly Rect Feed = new Rect(1182,375,246,307);
+    static readonly Rect Collapsed=new Rect(1326,375,102,30);
     static readonly Rect Window = new Rect(210,144,1020,560);
     Vector2 feedScroll, historyScroll, diceScroll;
     string filter;
