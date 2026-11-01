@@ -100,10 +100,14 @@ public static class FishingF6EditorVerification
             Set(game,"state",state);game.GetType().GetMethod("AssertInvariants",new Type[0]).Invoke(game,null);
             presentation.GetType().GetMethod("M6Refresh",Flags).Invoke(presentation,null);yield return 1.0;
             Require(app.IsHumanTurn,"夹具没有进入本人自由行动窗口");
+            if(mode=="base")yield return VerifyBottomBoardInput((M2App)presentation);
             string before=(string)game.GetType().GetMethod("Save").Invoke(game,null);
             var inputDock=(FishingDock)Get(presentation,"fishingDock");
             yield return Click(1220,841);
             Require(inputDock.Selected,"鱼手牌页签未选中");
+            Require(!inputDock.Contains(new Vector2(1000,710)),"鱼牌空白区域仍遮挡底部棋盘");
+            Require(inputDock.Contains(new Vector2(380,755)),"实际鱼牌未拦截棋盘输入");
+            Require(inputDock.Contains(new Vector2(685,616)),"捕鱼操作栏未拦截棋盘输入");
             VerifyPointerDraft(inputDock,presentation);
             yield return Click(380,755,1);
             Require(Get(inputDock,"hint")!=null,"右键未展示鱼筹码说明");
@@ -157,6 +161,36 @@ public static class FishingF6EditorVerification
         for(int i=0;i<30;i++)preview.Invoke(board,new object[]{vertex,TabletopPointerPreview.ForCommand("BuildSettlement"),"P1",true});
         Require(board.GetType().GetProperty("VerificationPointerPreview",Flags).GetValue(board)!=null,"静止建筑预览丢失");
         board.GetType().GetMethod("ClearPreview").Invoke(board,null);
+    }
+    static IEnumerator VerifyBottomBoardInput(M2App presentation)
+    {
+        var dock=(OperationDock)Get(presentation,"dock");
+        foreach(float x in new[]{400f,720f,1000f})foreach(float y in new[]{690f,710f,800f})
+            Require(!dock.BlocksBoardInput(new Vector2(x,y)),"空手牌透明范围拦截棋盘："+x+","+y);
+        Require(dock.BlocksBoardInput(new Vector2(720,870)),"可见底栏未阻挡棋盘");
+        var board=(BoardRenderer)Get(presentation,"board");
+        var view=(Catan.Core.M2.PlayerView)Get(presentation,"view");
+        var vertices=view.Board.Vertices.OrderByDescending(v=>board.ScreenPoint(v.Id).y).Take(3).ToArray();
+        foreach(var vertex in vertices)
+        {
+            board.TableScene.ResetPan();
+            var from=board.ScreenPoint(vertex.Id);var to=MobileTabletop.ScreenPoint(new Vector2(720,710));
+            board.TableScene.PanFromScreen(new Vector2(from.x,Screen.height-from.y),new Vector2(to.x,Screen.height-to.y));
+            board.TableScene.EndPan();
+            var point=MobileTabletop.Logical(board.ScreenPoint(vertex.Id));
+            Require(Mathf.Abs(point.y-710)<2,"未将底部顶点移入原手牌拦截区");
+            bool blocked=(bool)presentation.GetType().GetMethod("DockBlocksMouse",Flags).Invoke(presentation,new object[]{(Vector2?)point});
+            Require(!blocked,"底部顶点被实际界面输入链拦截："+vertex.Id);
+            string target=(string)presentation.GetType().GetMethod("VerificationPick",Flags).Invoke(presentation,new object[]{Catan.Core.M2.CommandKind.BuildSettlement,board.ScreenPoint(vertex.Id)});
+            Require(target==vertex.Id,"底部顶点未命中："+vertex.Id);
+            board.PreviewPiece(target,TabletopPointerPreview.ForCommand("BuildSettlement"),"P1",false);
+            Require(board.HasPointerPreview,"底部顶点未生成建筑虚影："+vertex.Id);
+            board.ClearPreview();
+
+        }
+        board.TableScene.ResetPan();
+        Debug.Log("BOTTOM_BOARD_INPUT_OK: 底部三个顶点屏幕坐标输入链、拾取与虚影、九处透明空白、可见底栏命中通过");
+        yield break;
     }
     static IEnumerator ReviewKingdoms()
     {

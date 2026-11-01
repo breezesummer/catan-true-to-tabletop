@@ -220,7 +220,8 @@ public sealed partial class OperationDock
     public bool BlocksBoardInput(Vector2 logicalMouse)
     {
         if(HasOverlay)return true;
-        return pressedHand!=null || HandViewport.Contains(logicalMouse) || hoveredHand!=null&&handHoverAnchor.Contains(logicalMouse) || Windows?.Suppressed!=true&&((tradeOpen||HasActionableOffer(current))&&TradeRect.Contains(logicalMouse) ||
+        // 手牌视口是排版/滚动范围，透明留白不能遮挡后方棋盘；实际牌面由 hits 注册。
+        return pressedHand!=null || hoveredHand!=null&&handHoverAnchor.Contains(logicalMouse) || Windows?.Suppressed!=true&&((tradeOpen||HasActionableOffer(current))&&TradeRect.Contains(logicalMouse) ||
             previewCard!=null&&current?.Discard==null&&CardRect.Contains(logicalMouse)) || hits.Any(h=>h.Contains(logicalMouse));
     }
     // 预览仍阻挡桌面操作，右下角圆钮专门承担当前卡牌的使用入口。
@@ -495,7 +496,8 @@ public sealed partial class OperationDock
     }
     void DrawHand()
     {
-        CopperTabletopSkin.Panel(new Rect(HandViewport.x-6,852,HandViewport.width+12,42),ModernOperationUI.Surface);
+        var rack=new Rect(HandViewport.x-6,852,HandViewport.width+12,42);
+        CopperTabletopSkin.Panel(rack,ModernOperationUI.Surface);Register(rack);
         landingFaces.Clear();
         if(FishHandVisible)return;
         if(hoveredHand!=null&&GUI.enabled)TabletopPointerCursor.Request();
@@ -662,7 +664,7 @@ public sealed partial class OperationDock
             if(hit==null)for(int i=faces.Count-1;i>=0;i--)if(faces[i].Shape.Contains(e.mousePosition)){hit=faces[i];break;}
         }
         bool overPaper=Windows?.Suppressed!=true&&((tradeOpen||HasActionableOffer(s))&&TradeRect.Contains(e.mousePosition)||s.Discard==null&&previewCard!=null&&CardRect.Contains(e.mousePosition)||facilityTrack>=0);
-        if(e.type==EventType.ScrollWheel&&HandViewport.Contains(e.mousePosition)&&!overPaper)
+        if(e.type==EventType.ScrollWheel&&hit!=null&&!overPaper)
         {
             HandScroll=TabletopHandLayout.ClampScroll(HandScroll+(Mathf.Abs(e.delta.x)>Mathf.Abs(e.delta.y)?e.delta.x:e.delta.y)*35,(specialHand?specialSlots:resourceSlots).Sum(slot=>slot.Weight),HandViewport.width);
             hoveredHand=null;handHoverAnchor=Rect.zero;e.Use();return;

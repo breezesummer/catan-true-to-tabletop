@@ -35,13 +35,14 @@ public sealed class FishingDock
     bool open, boot;
     string[] tokens=Array.Empty<string>();
     string hint;
+    readonly List<Rect> cardHits=new List<Rect>();
     public bool Active=>Selected&&(open||chosen!=null||action!=null||boot);
-    public bool Contains(Vector2 p)=>view!=null&&Selected&&(Strip.Contains(p)||Actions.Contains(p));
+    public bool Contains(Vector2 p)=>view!=null&&Selected&&(cardHits.Any(r=>r.Contains(p))||Actions.Contains(p));
     public void Reset(){open=false;boot=false;action=null;chosen=null;tokens=Array.Empty<string>();hint=null;}
     public void Bind(FishingView fish,string player,Option[] legal)
     {
         var key=player+":"+fish?.StateSequence+":"+fish?.PendingDecisionId;
-        if(key!=revision){Reset();revision=key;}
+        if(key!=revision){Reset();cardHits.Clear();revision=key;}
         if(owner!=player||fish==null)Hide();
         view=fish;owner=player;options=legal??Array.Empty<Option>();
         if(view!=null&&view.PendingPlayerId==owner){open=true;Show();}
@@ -59,6 +60,7 @@ public sealed class FishingDock
     static string Caption(FishAction a,bool cities)=>a==FishAction.RemoveRobber?"2鱼 · 移出强盗":a==FishAction.StealResource?"3鱼 · 偷取手牌":a==FishAction.TakeResource?"4鱼 · 任意资源":a==FishAction.BuildRoad?"5鱼 · 新建道路":"7鱼 · 发展卡";
     public void Draw(Font font,bool interactive,bool cities,string robber,Func<string,Vector2> position,string pirate=null)
     {
+        cardHits.Clear();
         if(view==null||!Selected)return;
         var style=new GUIStyle(GUI.skin.label){font=font,fontSize=15,alignment=TextAnchor.MiddleCenter};style.normal.textColor=ModernOperationUI.TextColor;
         bool previous=GUI.enabled;GUI.enabled=previous&&interactive;
@@ -75,6 +77,7 @@ public sealed class FishingDock
         {
             var token=hand[i];bool selected=tokens.Contains(token.Id)||replacement&&chosen?.Target==token.Id;
             var r=new Rect(Strip.x+i*step,TabletopHandLayout.Baseline-(selected?22:0),TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);
+            cardHits.Add(new Rect(r.x-2,r.y-2,r.width+4,r.height+4));
             ModernOperationUI.Round(new Rect(r.x-2,r.y-2,r.width+4,r.height+4),selected?new Color(.38f,.83f,.81f):new Color(.45f,.35f,.20f));
             var art=cardArt[Mathf.Clamp(token.Value,1,3)-1];
             if(art!=null)GUI.DrawTexture(r,art,ScaleMode.StretchToFill);
