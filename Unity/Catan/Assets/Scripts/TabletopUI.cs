@@ -270,8 +270,8 @@ public sealed partial class TabletopUI
             if(fishing!=null)
             {
                 var fish=fishing.Players.First(p=>p.PlayerId==player.Id);
-                var fishBadge=new Rect(x+12,191,width-24,16);
-                StrategyHudArt.FishIcon(new Rect(fishBadge.x,fishBadge.y,20,16));
+                var fishBadge=new Rect(x+11,191,width-22,15);
+                StrategyHudArt.FishIcon(new Rect(fishBadge.x+1,fishBadge.y-1,20,16));
                 GUI.Label(new Rect(fishBadge.x+26,fishBadge.y,fishBadge.width-28,16),fish.TokenCount+"/7",Style("fish",center,12,FontStyle.Bold,TextAnchor.MiddleRight));
                 if(fishBadge.Contains(Event.current.mousePosition)){hoveredPlayerHint="持有 "+fish.TokenCount+" 枚鱼筹码；面值仅本人可见";playerHintAnchor=fishBadge;}
                 if(fishing.OldBootPlayerId==player.Id)

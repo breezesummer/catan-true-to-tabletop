@@ -91,7 +91,7 @@ public sealed partial class M3App : MonoBehaviour
         if(ai!=null&&!holding&&boardClick){PickTabletopObject(mouse);return;}
         if(!holding)return;
         var candidate=ResolveTarget(mouse);
-        if(candidate!=hover)
+        if(candidate!=hover||!board.HasPointerPreview)
         {
             hover=candidate;
             bool valid=hover!=""&&placementLegalIds.Contains(hover);

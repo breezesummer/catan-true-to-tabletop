@@ -45,6 +45,8 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
     public Vector3[][] PublicPortFootprints {get;private set;}=Array.Empty<Vector3[]>();
     public int PortLayoutRevision {get;private set;}
     string portLayoutKey;
+    string oceanLayoutKey;
+    readonly List<Vector3> oceanOutline=new List<Vector3>();
     void RefreshPortFootprints()
     {
         string key=string.Join("|",ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null).Select(p=>p.Resource+":"+p.Object.transform.localToWorldMatrix.ToString("F6")));
@@ -85,7 +87,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         display.giftRoot = display.Group("赠送港口");
         display.bonusRoot = display.Group("航路奖励");
         display.awardRoot = display.Group("公开奖励");
-        display.oceanRoot = display.Group("港口外侧公开装饰海格 v010");
+        display.oceanRoot = display.Group("地图外围公开装饰海格");
         return display;
     }
     Transform Group(string name)
@@ -101,7 +103,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         if (publicTiles != null) tiles = publicTiles;
         this.table = table;
         this.observerSeat = observerSeat;
-        RefreshOceanTiles((publicPorts??Array.Empty<PortDisplay>()).Concat(publicGiftPorts??Array.Empty<PortDisplay>()));
+        RefreshOceanTiles();
         RefreshPorts(ports, portRoot, publicPorts, "港口 ");
         RefreshPorts(gifts, giftRoot, publicGiftPorts, "港礼 ");
         RefreshPortFootprints();
@@ -156,16 +158,21 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         }
         Prune(existing, wanted);
     }
-    void RefreshOceanTiles(IEnumerable<PortDisplay> publicPorts)
+    void RefreshOceanTiles()
     {
+        string layout=string.Join("|",tiles.Select(t=>t.Id+":"+string.Join(",",t.Vertices)));
+        if(layout==oceanLayoutKey){if(table!=null)table.SetPresentationOutline(oceanOutline);return;}
+        oceanLayoutKey=layout;
         var wanted=new HashSet<string>(StringComparer.Ordinal);
-        var displayOutline=new List<Vector3>();
-        foreach(var port in publicPorts)
+        var displayOutline=oceanOutline;displayOutline.Clear();
+        // 所有公开板块的外边界补一圈；已有海格和迷雾同样属于地图，不能只按港口补格。
+        foreach(var edge in edges.Values)
         {
-            var endpoints=port.Vertices;
-            if((endpoints==null||endpoints.Length!=2)&&!string.IsNullOrEmpty(port.EdgeId)&&edges.TryGetValue(port.EdgeId,out var edge))endpoints=edge.Vertices;
+            var endpoints=edge.Vertices;
             if(!TryEndpoints(endpoints,out var a,out var b))continue;
-            var midpoint=(a+b)/2;var normal=CoastNormal(endpoints,midpoint,b-a);
+            var adjacent=tiles.Where(t=>endpoints.All(t.Vertices.Contains)).ToArray();
+            if(adjacent.Length!=1)continue;
+            var midpoint=(a+b)/2;var normal=midpoint-TileCenter(adjacent[0]);normal.y=0;normal.Normalize();
             // 完整相邻六边形中心距海岸半个格宽，边长来自已公开的海岸几何。
             float side=Vector3.Distance(a,b);
             var seaCenter=midpoint+normal*(side*Mathf.Sqrt(3)/2);seaCenter.y=0;
@@ -179,7 +186,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
             {
                 var obj=EntityBoardAssets.Terrain("sea",seaCenter,oceanRoot);
                 if(obj==null)continue;
-                obj.name="港口公开装饰海格 "+key;
+                obj.name="外围公开装饰海格 "+key;
                 // 原实体海板按边长 40 mm 制作，保持公开拓扑尺度；没有 collider 或规则 ID。
                 obj.transform.localScale=Vector3.one*(side/.04f);
                 oceanTiles.Add(key,obj);

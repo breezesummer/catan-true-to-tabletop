@@ -247,6 +247,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
         if(legal)TabletopPointerCursor.Request();
         ghost=OperationPieceAssets.PointerPreview(preview,seat,Position(id),rotation,transform,legal);
     }
+    public bool HasPointerPreview=>ghost!=null;
     internal GameObject VerificationPointerPreview=>ghost;
     public void ClearPreview() { pointerPreviewKey=null;if(ghost!=null){ghost.SetActive(false);Destroy(ghost);} ghost=null; }
     bool operationLayout;

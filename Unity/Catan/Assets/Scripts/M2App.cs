@@ -86,7 +86,7 @@ public sealed partial class M2App : MonoBehaviour
         if(ai!=null&&!holding&&boardClick){PickTabletopObject(mouse);return;}
         if(!holding)return;
         var candidate=ResolveTarget(mouse);
-        if(candidate!=hover)
+        if(candidate!=hover||!board.HasPointerPreview)
         {
             hover=candidate;
             bool valid=hover!=""&&Preview(NewCommand(placement,hover)).Success;

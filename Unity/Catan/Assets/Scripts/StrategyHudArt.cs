@@ -61,22 +61,13 @@ public static class StrategyHudArt
     static Texture2D fishIcon;
     public static void FishIcon(Rect rect)
     {
-        if(fishIcon==null)
-        {
-            const int w=96,h=64;var pixels=new Color[w*h];
-            for(int y=0;y<h;y++)for(int x=0;x<w;x++)
-            {
-                float u=(x+.5f)/w,v=(y+.5f)/h;
-                bool body=Mathf.Pow((u-.57f)/.36f,2)+Mathf.Pow((v-.5f)/.29f,2)<1;
-                bool tail=u>.04f&&u<.30f&&Mathf.Abs(v-.5f)<(.30f-u)*1.25f;
-                bool fin=u>.40f&&u<.65f&&v>.65f&&v<.88f-(u-.40f)*.5f;
-                bool eye=Mathf.Pow((u-.77f)/.025f,2)+Mathf.Pow((v-.57f)/.038f,2)<1;
-                pixels[y*w+x]=eye?new Color(.12f,.18f,.16f):body||tail||fin?Gold:Color.clear;
-            }
-            fishIcon=new Texture2D(w,h,TextureFormat.RGBA32,false){name="鱼资源图标",filterMode=FilterMode.Bilinear,wrapMode=TextureWrapMode.Clamp};
-            fishIcon.SetPixels(pixels);fishIcon.Apply(false,true);
-        }
-        GUI.DrawTexture(rect,fishIcon,ScaleMode.ScaleToFit);
+        if(fishIcon==null)fishIcon=Resources.Load<Texture2D>("HarborFishing/Cards/fish-icon");
+        if(fishIcon==null)return;
+        // 提取图的可见鱼身范围；在所有入口按同一中心等比显示，避免透明边距造成错位。
+        var uv=new Rect(.028f,.20f,.935f,.62f);
+        float aspect=fishIcon.width*uv.width/(fishIcon.height*uv.height);
+        float width=Mathf.Min(rect.width,rect.height*aspect),height=width/aspect;
+        GUI.DrawTextureWithTexCoords(new Rect(rect.center.x-width/2,rect.center.y-height/2,width,height),fishIcon,uv,true);
     }
     public static void HandCardIcon(Rect rect,bool special)
     {
