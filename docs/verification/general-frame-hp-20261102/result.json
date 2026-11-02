@@ -1,0 +1,20 @@
+{
+    "状态": "通过",
+    "说明": "阚泽单将真实GameView预览：检查主动选择、不可用阻止、被动左击与右击说明，截图覆盖满寿命、2轮、1轮及他人回合。局面由编辑器夹具准备，输入来自Unity原生GameView队列；未执行完整局、其他武将或Android真机验收。",
+    "诊断": "EditorPaused=False, focused=null, appFocused=False, frame=339, timeScale=1, cityEnabled=True, board=True, menu=False, samePresentation=True",
+    "支付目标方式": "",
+    "断言数": 33,
+    "鼠标点击": 3,
+    "模态窗口次数": 0,
+    "场景": [
+        "阚泽武将框预览"
+    ],
+    "截图": [
+        "阚泽-武将框与技能.png",
+        "阚泽-主动技能选中.png",
+        "阚泽-主动技能不可用.png",
+        "阚泽-勾玉-2.png",
+        "阚泽-勾玉-1.png",
+        "阚泽-其他玩家回合.png"
+    ]
+}

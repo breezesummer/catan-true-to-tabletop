@@ -6,6 +6,7 @@ public static class GeneralFrameUI
 {
     const string Root="GeneralUI/v001/";
     static Texture2D atlas,buttons;
+    static Texture2D hpGreen,hpYellow,hpRed,hpEmpty;
     static Font brush;
     static GUIStyle lettering;
     static readonly Dictionary<string,Texture2D> portraits=new Dictionary<string,Texture2D>();
@@ -16,6 +17,10 @@ public static class GeneralFrameUI
     {
         if(atlas==null)atlas=Resources.Load<Texture2D>(Root+"frame-atlas");
         if(buttons==null)buttons=Resources.Load<Texture2D>(Root+"skill-buttons");
+        if(hpGreen==null)hpGreen=Resources.Load<Texture2D>(Root+"hp-green");
+        if(hpYellow==null)hpYellow=Resources.Load<Texture2D>(Root+"hp-yellow");
+        if(hpRed==null)hpRed=Resources.Load<Texture2D>(Root+"hp-red");
+        if(hpEmpty==null)hpEmpty=Resources.Load<Texture2D>(Root+"hp-empty");
         if(lettering==null){brush=Resources.Load<Font>(Root+"SkillCalligraphy");lettering=new GUIStyle{font=brush??MobileTabletop.LoadFont(),alignment=TextAnchor.MiddleCenter,wordWrap=false};}
     }
     static void Slice(Texture2D texture,Rect source,Rect target,float width,float height)
@@ -47,7 +52,7 @@ public static class GeneralFrameUI
         Slice(atlas,new Rect(70,105,94,575),new Rect(area.x+3,area.y+6,area.width*.21f,area.height-12),1448,1086);
         Text(new Rect(area.x+2,area.y+3,area.width*.22f,23),faction??"",17,new Color(.67f,.86f,.63f));
         if(name!=null)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+2,area.y+28+i*22,area.width*.22f,24),name[i].ToString(),22,Color.white);
-        if(life>=0)Text(new Rect(area.x+2,area.yMax-49,area.width*.22f,22),life.ToString(),17);
+        if(life>=0)Health(new Rect(area.x+3,area.yMax-88,area.width*.20f,70),life,3);
         if(position>=0&&position<SeatNumbers.Length)
         {
             // 只画中文数字，黑字浅色描边压在框底，不再使用“号位”底牌。
@@ -57,6 +62,12 @@ public static class GeneralFrameUI
                 if(x!=0||y!=0)GUI.Label(new Rect(number.x+x,number.y+y,number.width,number.height),SeatNumbers[position],lettering);
             lettering.normal.textColor=new Color(.025f,.025f,.02f);GUI.Label(number,SeatNumbers[position],lettering);
         }
+    }
+    static void Health(Rect area,int current,int maximum)
+    {
+        float size=Mathf.Min(23,area.width);
+        var filled=current>=maximum?hpGreen:current>1?hpYellow:hpRed;
+        for(int i=0;i<maximum;i++)GUI.DrawTexture(new Rect(area.center.x-size/2,area.y+i*size,size,size),i<current?filled:hpEmpty,ScaleMode.ScaleToFit,true);
     }
     public static void Skill(Rect area,string name,bool active,bool enabled,bool selected,bool flashing)
     {

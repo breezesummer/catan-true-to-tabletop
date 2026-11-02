@@ -6,6 +6,8 @@ New-Item -ItemType Directory -Force -Path "$dest/Portraits" | Out-Null
 Copy-Item "$repo/art/generated/general-frame/v001/general-ui-atlas.png" "$dest/frame-atlas.png"
 Copy-Item "$repo/art/generated/general-frame/v001/skill-buttons.png" "$dest/skill-buttons.png"
 Copy-Item 'E:/无名杀2.0/无名杀-双样式懒人包/resources/app/extension/十周年UI/ui/assets/fonts/BKJT.ttf' "$dest/SkillCalligraphy.ttf"
+$hpRoot=Join-Path (Split-Path (Split-Path (Split-Path $SkinRoot))) 'theme/style/hp/image'
+foreach($entry in @(@('official1.png','hp-green.png'),@('official2.png','hp-yellow.png'),@('official3.png','hp-red.png'),@('official4.png','hp-empty.png'))){Copy-Item -LiteralPath (Join-Path $hpRoot $entry[0]) -Destination (Join-Path $dest $entry[1])}
 $source=Join-Path $SkinRoot 'kanze/循循善诱.jpg'
 $bytes=[IO.File]::ReadAllBytes($source)
 if($bytes[0]-ne 137 -or $bytes[1]-ne 80){throw '预览皮肤应为带透明通道的PNG源文件。'}

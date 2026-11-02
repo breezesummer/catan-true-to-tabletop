@@ -131,6 +131,15 @@ public static class B45InteractionEditorVerification
             Invoke(app,"ResetThreeKingdomsPanel");Inject("tk-g26",new int[5],new int[5]);yield return .5;
             saved=Save();yield return Click(new Vector2(252,738));Require(Save()==saved&&!Selection.Active,"不可用技能被触发");
             yield return Capture("阚泽-主动技能不可用");
+            foreach(int life in new[]{2,1})
+            {
+                var healthState=State();healthState.ThreeKingdoms.Generals.Single(g=>g.Region==GeneralRegion.Active&&g.OwnerPlayerId=="P1").RemainingLife=life;
+                Set(session,"state",healthState);Invoke(city,"M6Refresh");yield return .4;
+                yield return Capture("阚泽-勾玉-"+life);
+            }
+            var otherTurn=State();otherTurn.ActivePlayerId="P2";otherTurn.ThreeKingdoms.Clock.ActivePlayerId="P2";
+            Set(session,"state",otherTurn);Invoke(city,"M6Refresh");yield return .4;
+            yield return Capture("阚泽-其他玩家回合");
             Inject("tk-g26",new[]{0,2,0,0,0},new int[5]);Set(app,"inspectionText",null);yield return .5;
             cases.Add(stage);yield break;
         }
@@ -218,6 +227,7 @@ public static class B45InteractionEditorVerification
         if(result==null)result=new Result();result.状态=failure==null?"通过":"失败";
         result.诊断="EditorPaused="+EditorApplication.isPaused+", focused="+(EditorWindow.focusedWindow==null?"null":EditorWindow.focusedWindow.GetType().Name)+", appFocused="+Application.isFocused+", frame="+Time.frameCount+", timeScale="+Time.timeScale+", cityEnabled="+(city!=null&&city.enabled)+", board="+(city!=null&&Get(city,"board")!=null)+", menu="+(app!=null&&app.TableMenuOpen)+", samePresentation="+(city!=null&&ReferenceEquals(city,Get(app,"presentation")));
         result.说明="Unity真实M6界面指定局面验收，局面仅测试注入；技能五项及支付选牌、用途、确认通过Unity原生GameView输入队列注入鼠标移动/按下/松手事件完成（编辑器输入模拟，非物理鼠标），断言读取权威结果。支付地图目标方式单独记录，允许显式参数启用夹具定位但绝不计作鼠标命中通过；不作为正常完整局、Android真机或用户试玩证据。"+(failure==null?"":"\n"+failure);
+        if(Environment.GetCommandLineArgs().Contains("--general-frame-preview"))result.说明="阚泽单将真实GameView预览：检查主动选择、不可用阻止、被动左击与右击说明，截图覆盖满寿命、2轮、1轮及他人回合。局面由编辑器夹具准备，输入来自Unity原生GameView队列；未执行完整局、其他武将或Android真机验收。"+(failure==null?"":"\n"+failure);
         result.场景=cases.ToArray();result.截图=images.ToArray();File.WriteAllText(Path.Combine(output,"result.json"),JsonUtility.ToJson(result,true));
         SessionState.EraseString(Key);SessionState.EraseString(Deadline);Debug.Log("CATAN_B45_INTERACTION_"+(failure==null?"OK":"FAILED")+": "+result.说明);
         if(Environment.GetCommandLineArgs().Contains("--b45-keep-open"))
