@@ -1,0 +1,1283 @@
+[
+  {
+    "id": "tk-g01",
+    "name": "张辽",
+    "title": "登锋陷阵",
+    "dir": "sb_zhangliao",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\sb_zhangliao\\登锋陷阵.jpg",
+    "skills": [
+      {
+        "id": "tk-g01-s1",
+        "name": "突袭",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sb_zhangliao\\登锋陷阵\\sbtuxi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sb_zhangliao\\登锋陷阵\\sbtuxi2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g02",
+    "name": "吕布",
+    "title": "傲睨万物",
+    "dir": "lvbu",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\lvbu\\傲睨万物.jpg",
+    "skills": [
+      {
+        "id": "tk-g02-s1",
+        "name": "无双",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\lvbu\\傲睨万物\\wushuang1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\lvbu\\傲睨万物\\wushuang2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g02-s2",
+        "name": "利驭",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\lvbu\\傲睨万物\\liyu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\lvbu\\傲睨万物\\liyu2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g03",
+    "name": "周瑜",
+    "title": "雄姿英发",
+    "dir": "zhouyu",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\zhouyu\\雄姿英发.jpg",
+    "skills": [
+      {
+        "id": "tk-g03-s1",
+        "name": "英姿",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhouyu\\雄姿英发\\yingzi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhouyu\\雄姿英发\\yingzi2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g03-s2",
+        "name": "反间",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhouyu\\雄姿英发\\fanjian1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhouyu\\雄姿英发\\fanjian2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g04",
+    "name": "貂蝉",
+    "title": "舞惑群心",
+    "dir": "diaochan",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\diaochan\\舞惑群心.jpg",
+    "skills": [
+      {
+        "id": "tk-g04-s1",
+        "name": "惑心",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\audio\\skill\\huoxin1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\audio\\skill\\huoxin2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g04-s2",
+        "name": "闭月",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\diaochan\\舞惑群心\\biyue1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\diaochan\\舞惑群心\\biyue2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g05",
+    "name": "大乔",
+    "title": "衣垂绿川",
+    "dir": "daqiao",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\daqiao\\衣垂绿川.jpg",
+    "skills": [
+      {
+        "id": "tk-g05-s1",
+        "name": "流离",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\daqiao\\衣垂绿川\\liuli1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\daqiao\\衣垂绿川\\liuli2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g05-s2",
+        "name": "国色",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\daqiao\\衣垂绿川\\guose1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\daqiao\\衣垂绿川\\guose2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g06",
+    "name": "曹仁",
+    "title": "国之柱石",
+    "dir": "caoren",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\caoren\\国之柱石.jpg",
+    "skills": [
+      {
+        "id": "tk-g06-s1",
+        "name": "据守",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caoren\\国之柱石\\xinjushou1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caoren\\国之柱石\\xinjushou2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g07",
+    "name": "于吉",
+    "title": "神术妙法",
+    "dir": "re_yuji",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\re_yuji\\神术妙法.jpg",
+    "skills": [
+      {
+        "id": "tk-g07-s1",
+        "name": "蛊惑",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_yuji\\神术妙法\\guhuo_guess1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_yuji\\神术妙法\\guhuo_guess2.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_yuji\\神术妙法\\xinfu_guhuo1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_yuji\\神术妙法\\xinfu_guhuo2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g08",
+    "name": "甘宁",
+    "title": "万人辟易",
+    "dir": "shen_ganning",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\shen_ganning\\万人辟易.jpg",
+    "skills": [
+      {
+        "id": "tk-g08-s1",
+        "name": "劫营",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_ganning\\万人辟易\\drlt_jieying1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_ganning\\万人辟易\\drlt_jieying2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g08-s2",
+        "name": "魄袭",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_ganning\\万人辟易\\drlt_poxi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_ganning\\万人辟易\\drlt_poxi2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g09",
+    "name": "郝昭",
+    "title": "死守陈仓",
+    "dir": "haozhao",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\haozhao\\死守陈仓.jpg",
+    "skills": [
+      {
+        "id": "tk-g09-s1",
+        "name": "镇骨",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\haozhao\\死守陈仓\\drlt_zhenggu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\haozhao\\死守陈仓\\drlt_zhenggu2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g10",
+    "name": "袁绍",
+    "title": "一往无前",
+    "dir": "re_yuanshao",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\re_yuanshao\\一往无前.jpg",
+    "skills": [
+      {
+        "id": "tk-g10-s1",
+        "name": "乱击",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_yuanshao\\一往无前\\luanji1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_yuanshao\\一往无前\\luanji2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g10-s2",
+        "name": "血裔",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_yuanshao\\一往无前\\xueyi_re_yuanshao1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_yuanshao\\一往无前\\xueyi_re_yuanshao2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g11",
+    "name": "贾诩",
+    "title": "陈筹画策",
+    "dir": "jiaxu",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\jiaxu\\陈筹画策.png",
+    "skills": [
+      {
+        "id": "tk-g11-s1",
+        "name": "帷幕",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jiaxu\\陈筹画策\\weimu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jiaxu\\陈筹画策\\weimu2.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jiaxu\\陈筹画策\\weimu3.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jiaxu\\陈筹画策\\weimu4.mp3"
+        ]
+      },
+      {
+        "id": "tk-g11-s2",
+        "name": "乱武",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jiaxu\\陈筹画策\\luanwu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jiaxu\\陈筹画策\\luanwu2.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jiaxu\\陈筹画策\\luanwu3.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jiaxu\\陈筹画策\\luanwu4.mp3"
+        ]
+      },
+      {
+        "id": "tk-g11-s3",
+        "name": "间书",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_jiaxu\\冥夜引念\\jianshu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_jiaxu\\冥夜引念\\jianshu2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g12",
+    "name": "留赞",
+    "title": "灵魂歌王",
+    "dir": "liuzan",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\liuzan\\灵魂歌王.jpg",
+    "skills": [
+      {
+        "id": "tk-g12-s1",
+        "name": "奋音",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\liuzan\\灵魂歌王\\fenyin1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\liuzan\\灵魂歌王\\fenyin2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g13",
+    "name": "司马懿",
+    "title": "佳期若梦",
+    "dir": "simayi",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\simayi\\佳期若梦.jpg",
+    "skills": [
+      {
+        "id": "tk-g13-s1",
+        "name": "连破",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_simayi\\三狼吞魏\\lianpo1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_simayi\\三狼吞魏\\lianpo2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g13-s2",
+        "name": "鬼才",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\simayi\\佳期若梦\\guicai1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\simayi\\佳期若梦\\guicai2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g14",
+    "name": "曹操",
+    "title": "逐鹿天下",
+    "dir": "caocao",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\caocao\\逐鹿天下.jpg",
+    "skills": [
+      {
+        "id": "tk-g14-s1",
+        "name": "奸雄",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caocao\\逐鹿天下\\jianxiong1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caocao\\逐鹿天下\\jianxiong2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g15",
+    "name": "刘备",
+    "title": "六星耀帝",
+    "dir": "liubei",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\liubei\\六星耀帝.jpg",
+    "skills": [
+      {
+        "id": "tk-g15-s1",
+        "name": "仁德",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\liubei\\六星耀帝\\rende1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\liubei\\六星耀帝\\rende2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g16",
+    "name": "黄盖",
+    "title": "鏖战赤壁",
+    "dir": "huanggai",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\huanggai\\鏖战赤壁.jpg",
+    "skills": [
+      {
+        "id": "tk-g16-s1",
+        "name": "苦肉",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huanggai\\鏖战赤壁\\kurou1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huanggai\\鏖战赤壁\\kurou2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g17",
+    "name": "甘宁",
+    "title": "龙生九子",
+    "dir": "ganning",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\ganning\\龙生九子.jpg",
+    "skills": [
+      {
+        "id": "tk-g17-s1",
+        "name": "奇袭",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\ganning\\龙生九子\\qixi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\ganning\\龙生九子\\qixi2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g18",
+    "name": "关羽",
+    "title": "明良千古",
+    "dir": "guanyu",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\guanyu\\明良千古.jpg",
+    "skills": [
+      {
+        "id": "tk-g18-s1",
+        "name": "武圣",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\guanyu\\明良千古\\wusheng1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\guanyu\\明良千古\\wusheng2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g18-s2",
+        "name": "单骑",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jsp_guanyu\\单骑千里\\danji1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jsp_guanyu\\单骑千里\\danji2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g19",
+    "name": "诸葛亮",
+    "title": "明良千古",
+    "dir": "zhugeliang",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\zhugeliang\\明良千古.jpg",
+    "skills": [
+      {
+        "id": "tk-g19-s1",
+        "name": "观星",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhugeliang\\明良千古\\guanxing1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhugeliang\\明良千古\\guanxing2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g19-s2",
+        "name": "空城",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhugeliang\\明良千古\\kongcheng11.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhugeliang\\明良千古\\kongcheng12.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g20",
+    "name": "孟获",
+    "title": "祸崇南疆",
+    "dir": "menghuo",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\menghuo\\祸崇南疆.jpg",
+    "skills": [
+      {
+        "id": "tk-g20-s1",
+        "name": "祸首",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\menghuo\\祸崇南疆\\huoshou11.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\menghuo\\祸崇南疆\\huoshou12.mp3"
+        ]
+      },
+      {
+        "id": "tk-g20-s2",
+        "name": "再起",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\menghuo\\祸崇南疆\\zaiqi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\menghuo\\祸崇南疆\\zaiqi2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g21",
+    "name": "张昭张弘",
+    "title": "同心协力",
+    "dir": "zhangzhang",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\zhangzhang\\同心协力.jpg",
+    "skills": [
+      {
+        "id": "tk-g21-s1",
+        "name": "固症",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhangzhang\\同心协力\\guzheng1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhangzhang\\同心协力\\guzheng2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g21-s2",
+        "name": "直谏",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhangzhang\\同心协力\\zhijian.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhangzhang\\同心协力\\zhijian1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhangzhang\\同心协力\\zhijian2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g22",
+    "name": "孙权",
+    "title": "吴王六剑",
+    "dir": "sb_sunquan",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\sb_sunquan\\吴王六剑.jpg",
+    "skills": [
+      {
+        "id": "tk-g22-s1",
+        "name": "制衡",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sb_sunquan\\吴王六剑\\sbzhiheng1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sb_sunquan\\吴王六剑\\sbzhiheng2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g23",
+    "name": "陆逊",
+    "title": "烈火烛天",
+    "dir": "luxun",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\luxun\\烈火烛天.jpg",
+    "skills": [
+      {
+        "id": "tk-g23-s1",
+        "name": "连营",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\luxun\\烈火烛天\\lianying1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\luxun\\烈火烛天\\lianying2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g23-s2",
+        "name": "谦逊",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\luxun\\烈火烛天\\qianxun1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\luxun\\烈火烛天\\qianxun2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g24",
+    "name": "华雄",
+    "title": "势吞海岳",
+    "dir": "ol_sb_huaxiong",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\ol_sb_huaxiong\\势吞海岳.jpg",
+    "skills": [
+      {
+        "id": "tk-g24-s1",
+        "name": "耀武",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huaxiong\\与关周旋\\yaowu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huaxiong\\与关周旋\\yaowu2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g24-s2",
+        "name": "扬威",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\ol_sb_huaxiong\\势吞海岳\\olsbyangwei1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\ol_sb_huaxiong\\势吞海岳\\olsbyangwei2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g25",
+    "name": "董卓",
+    "title": "乱世魔王",
+    "dir": "dongzhuo",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\dongzhuo\\乱世魔王.jpg",
+    "skills": [
+      {
+        "id": "tk-g25-s1",
+        "name": "崩坏",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\dongzhuo\\乱世魔王\\benghuai1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\dongzhuo\\乱世魔王\\benghuai2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g25-s2",
+        "name": "横征",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_dongzhuo\\乱世魔王\\hengzheng1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_dongzhuo\\乱世魔王\\hengzheng2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g26",
+    "name": "阚泽",
+    "title": "循循善诱",
+    "dir": "kanze",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\kanze\\循循善诱.jpg",
+    "skills": [
+      {
+        "id": "tk-g26-s1",
+        "name": "下书",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\kanze\\循循善诱\\xiashu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\kanze\\循循善诱\\xiashu2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g26-s2",
+        "name": "宽释",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\kanze\\循循善诱\\kuanshi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\kanze\\循循善诱\\kuanshi2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g27",
+    "name": "孙尚香",
+    "title": "前后两难",
+    "dir": "sb_sunshangxiang",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\sb_sunshangxiang\\前后两难.jpg",
+    "skills": [
+      {
+        "id": "tk-g27-s1",
+        "name": "结姻",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sb_sunshangxiang\\前后两难\\sbjieyin1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sb_sunshangxiang\\前后两难\\sbjieyin2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g27-s2",
+        "name": "枭姬",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sb_sunshangxiang\\前后两难\\sbxiaoji1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sb_sunshangxiang\\前后两难\\sbxiaoji2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g28",
+    "name": "吕蒙",
+    "title": "剑起惊澜",
+    "dir": "sb_lvmeng",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\sb_lvmeng\\剑起惊澜.jpg",
+    "skills": [
+      {
+        "id": "tk-g28-s1",
+        "name": "涉猎",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_lvmeng\\兼资文武\\shelie1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_lvmeng\\兼资文武\\shelie2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g28-s2",
+        "name": "克己",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sb_lvmeng\\剑起惊澜\\sbkeji1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sb_lvmeng\\剑起惊澜\\sbkeji2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g29",
+    "name": "曹丕",
+    "title": "气荡山河",
+    "dir": "caopi",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\caopi\\气荡山河.jpg",
+    "skills": [
+      {
+        "id": "tk-g29-s1",
+        "name": "放逐",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caopi\\气荡山河\\fangzhu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caopi\\气荡山河\\fangzhu2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g29-s2",
+        "name": "颂威",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caopi\\气荡山河\\songwei21.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caopi\\气荡山河\\songwei22.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g30",
+    "name": "曹植",
+    "title": "龙生九子",
+    "dir": "caozhi",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\caozhi\\龙生九子.jpg",
+    "skills": [
+      {
+        "id": "tk-g30-s1",
+        "name": "落英",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caozhi\\龙生九子\\luoying1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caozhi\\龙生九子\\luoying2.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caozhi\\龙生九子\\luoying_discard1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caozhi\\龙生九子\\luoying_discard2.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caozhi\\龙生九子\\luoying_judge1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caozhi\\龙生九子\\luoying_judge2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g30-s2",
+        "name": "酒诗",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caozhi\\龙生九子\\jiushi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caozhi\\龙生九子\\jiushi11.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caozhi\\龙生九子\\jiushi12.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\caozhi\\龙生九子\\jiushi2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g31",
+    "name": "李儒",
+    "title": "鸩杀少帝",
+    "dir": "liru",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\liru\\鸩杀少帝.jpg",
+    "skills": [
+      {
+        "id": "tk-g31-s1",
+        "name": "焚城",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\liru\\鸩杀少帝\\fencheng1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\liru\\鸩杀少帝\\fencheng2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g31-s2",
+        "name": "绝策",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\liru\\鸩杀少帝\\juece1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\liru\\鸩杀少帝\\juece2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g32",
+    "name": "徐盛",
+    "title": "破军杀将",
+    "dir": "xusheng",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\xusheng\\破军杀将.jpg",
+    "skills": [
+      {
+        "id": "tk-g32-s1",
+        "name": "破军",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xusheng\\破军杀将\\xinpojun1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xusheng\\破军杀将\\xinpojun2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g32-s2",
+        "name": "疑城",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xusheng\\镇吴卫江\\yicheng1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xusheng\\镇吴卫江\\yicheng2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g33",
+    "name": "黄月英",
+    "title": "明良千古",
+    "dir": "huangyueying",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\huangyueying\\明良千古.jpg",
+    "skills": [
+      {
+        "id": "tk-g33-s1",
+        "name": "集智",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huangyueying\\明良千古\\jizhi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huangyueying\\明良千古\\jizhi2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g33-s2",
+        "name": "奇才",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huangyueying\\明良千古\\qicai1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huangyueying\\明良千古\\qicai2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g34",
+    "name": "荀攸",
+    "title": "竹风韵凉",
+    "dir": "xunyou",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\xunyou\\竹风韵凉.jpg",
+    "skills": [
+      {
+        "id": "tk-g34-s1",
+        "name": "奇策",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xunyou\\竹风韵凉\\qice1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xunyou\\竹风韵凉\\qice2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g34-s2",
+        "name": "智愚",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xunyou\\竹风韵凉\\zhiyu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xunyou\\竹风韵凉\\zhiyu2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g35",
+    "name": "庞统",
+    "title": "龙跃凤鸣",
+    "dir": "pangtong",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\pangtong\\龙跃凤鸣.jpg",
+    "skills": [
+      {
+        "id": "tk-g35-s1",
+        "name": "连环",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\pangtong\\龙跃凤鸣\\lianhuan11.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\pangtong\\龙跃凤鸣\\lianhuan12.mp3"
+        ]
+      },
+      {
+        "id": "tk-g35-s2",
+        "name": "涅槃",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\pangtong\\龙跃凤鸣\\niepan1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\pangtong\\龙跃凤鸣\\niepan2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g36",
+    "name": "戏志才",
+    "title": "举棋若定",
+    "dir": "xizhicai",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\xizhicai\\举棋若定.jpg",
+    "skills": [
+      {
+        "id": "tk-g36-s1",
+        "name": "先辅",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xizhicai\\举棋若定\\xianfu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xizhicai\\举棋若定\\xianfu2.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xizhicai\\举棋若定\\xianfu3.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xizhicai\\举棋若定\\xianfu4.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xizhicai\\举棋若定\\xianfu5.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xizhicai\\举棋若定\\xianfu6.mp3"
+        ]
+      },
+      {
+        "id": "tk-g36-s2",
+        "name": "筹策",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xizhicai\\举棋若定\\chouce1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xizhicai\\举棋若定\\chouce2.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xizhicai\\举棋若定\\chouce3.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g37",
+    "name": "郭嘉",
+    "title": "一世风华",
+    "dir": "guojia",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\guojia\\一世风华.jpg",
+    "skills": [
+      {
+        "id": "tk-g37-s1",
+        "name": "天妒",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\guojia\\一世风华\\tiandu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\guojia\\一世风华\\tiandu2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g37-s2",
+        "name": "遗计",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\guojia\\一世风华\\yiji1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\guojia\\一世风华\\yiji2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g38",
+    "name": "张飞",
+    "title": "据水断桥",
+    "dir": "re_zhangfei",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\re_zhangfei\\据水断桥.jpg",
+    "skills": [
+      {
+        "id": "tk-g38-s1",
+        "name": "咆哮",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_zhangfei\\据水断桥\\paoxiao_re_zhangfei1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_zhangfei\\据水断桥\\paoxiao_re_zhangfei2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g38-s2",
+        "name": "替身",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_zhangfei\\据水断桥\\retishen1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_zhangfei\\据水断桥\\retishen2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g39",
+    "name": "荀彧",
+    "title": "驱虎吞狼",
+    "dir": "xunyu",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\xunyu\\驱虎吞狼.jpg",
+    "skills": [
+      {
+        "id": "tk-g39-s1",
+        "name": "驱虎",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xunyu\\驱虎吞狼\\quhu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xunyu\\驱虎吞狼\\quhu2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g39-s2",
+        "name": "节命",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xunyu\\驱虎吞狼\\jieming1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\xunyu\\驱虎吞狼\\jieming2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g40",
+    "name": "蒋干",
+    "title": "千帆征战",
+    "dir": "jianggan",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\jianggan\\千帆征战.jpg",
+    "skills": [
+      {
+        "id": "tk-g40-s1",
+        "name": "盗书",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jianggan\\千帆征战\\daoshu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\jianggan\\千帆征战\\daoshu2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g41",
+    "name": "杜预",
+    "title": "弼朝博虬",
+    "dir": "sp_duyu",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\sp_duyu\\弼朝博虬.jpg",
+    "skills": [
+      {
+        "id": "tk-g41-s1",
+        "name": "武库",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_duyu\\弼朝博虬\\spwuku1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_duyu\\弼朝博虬\\spwuku2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g41-s2",
+        "name": "三陈",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_duyu\\弼朝博虬\\spsanchen1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_duyu\\弼朝博虬\\spsanchen2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g41-s3",
+        "name": "灭吴",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_duyu\\弼朝博虬\\spmiewu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_duyu\\弼朝博虬\\spmiewu2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g42",
+    "name": "赵云",
+    "title": "截江救主",
+    "dir": "re_zhaoyun",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\re_zhaoyun\\截江救主.jpg",
+    "skills": [
+      {
+        "id": "tk-g42-s1",
+        "name": "龙胆",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_zhaoyun\\截江救主\\longdan_sha_re_zhaoyun1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_zhaoyun\\截江救主\\longdan_sha_re_zhaoyun2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g42-s2",
+        "name": "涯角",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_zhaoyun\\截江救主\\reyajiao1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\re_zhaoyun\\截江救主\\reyajiao2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g43",
+    "name": "骆统",
+    "title": "阊门治玉",
+    "dir": "luotong",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\luotong\\阊门治玉.jpg",
+    "skills": [
+      {
+        "id": "tk-g43-s1",
+        "name": "勤政",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\luotong\\阊门治玉\\qinzheng1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\luotong\\阊门治玉\\qinzheng2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g44",
+    "name": "甄姬",
+    "title": "洛水神韵",
+    "dir": "zhenji",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\zhenji\\洛水神韵.jpg",
+    "skills": [
+      {
+        "id": "tk-g44-s1",
+        "name": "洛神",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhenji\\洛水神韵\\luoshen1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhenji\\洛水神韵\\luoshen2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g44-s2",
+        "name": "倾国",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhenji\\洛水神韵\\qingguo1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhenji\\洛水神韵\\qingguo2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g45",
+    "name": "刘琦",
+    "title": "避走江南",
+    "dir": "sp_liuqi",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\sp_liuqi\\避走江南.jpg",
+    "skills": [
+      {
+        "id": "tk-g45-s1",
+        "name": "问计",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_liuqi\\避走江南\\spwenji1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_liuqi\\避走江南\\spwenji2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g45-s2",
+        "name": "屯江",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_liuqi\\避走江南\\sptunjiang1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\sp_liuqi\\避走江南\\sptunjiang2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g46",
+    "name": "麹义",
+    "title": "沙场舞刀",
+    "dir": "quyi",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\quyi\\沙场舞刀.jpg",
+    "skills": [
+      {
+        "id": "tk-g46-s1",
+        "name": "伏骑",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\quyi\\沙场舞刀\\fuqi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\quyi\\沙场舞刀\\fuqi2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g46-s2",
+        "name": "骄姿",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\quyi\\沙场舞刀\\jiaozi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\quyi\\沙场舞刀\\jiaozi2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g47",
+    "name": "鲁肃",
+    "title": "众人之表",
+    "dir": "ol_sb_lusu",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\ol_sb_lusu\\众人之表.jpg",
+    "skills": [
+      {
+        "id": "tk-g47-s1",
+        "name": "榻谟",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_lusu\\九州为局\\tamo1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_lusu\\九州为局\\tamo2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g47-s2",
+        "name": "智盟",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_lusu\\九州为局\\zhimeng1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\shen_lusu\\九州为局\\zhimeng2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g48",
+    "name": "司马师",
+    "title": "剑戟森森",
+    "dir": "simashi",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\simashi\\剑戟森森.jpg",
+    "skills": [
+      {
+        "id": "tk-g48-s1",
+        "name": "败移",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\simashi\\剑戟森森\\baiyi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\simashi\\剑戟森森\\baiyi2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g48-s2",
+        "name": "景略",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\simashi\\剑戟森森\\jinglve1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\simashi\\剑戟森森\\jinglve2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g49",
+    "name": "邓艾",
+    "title": "夜袭洮城",
+    "dir": "dengai",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\dengai\\夜袭洮城.jpg",
+    "skills": [
+      {
+        "id": "tk-g49-s1",
+        "name": "屯田",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\dengai\\夜袭洮城\\tuntian1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\dengai\\夜袭洮城\\tuntian2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g49-s2",
+        "name": "急袭",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\dengai\\夜袭洮城\\jixi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\dengai\\夜袭洮城\\jixi2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g50",
+    "name": "钟会",
+    "title": "潜蛟觊天",
+    "dir": "zhonghui",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\zhonghui\\潜蛟觊天.jpg",
+    "skills": [
+      {
+        "id": "tk-g50-s1",
+        "name": "自立",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhonghui\\潜蛟觊天\\zili1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhonghui\\潜蛟觊天\\zili2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g50-s2",
+        "name": "排异",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhonghui\\潜蛟觊天\\paiyi1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhonghui\\潜蛟觊天\\paiyi2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g51",
+    "name": "黄忠",
+    "title": "明良千古",
+    "dir": "huangzhong",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\huangzhong\\明良千古.jpg",
+    "skills": [
+      {
+        "id": "tk-g51-s1",
+        "name": "烈弓",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huangzhong\\明良千古\\liegong1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huangzhong\\明良千古\\liegong2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g52",
+    "name": "马良",
+    "title": "挥毫自荐",
+    "dir": "maliang",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\maliang\\挥毫自荐.jpg",
+    "skills": [
+      {
+        "id": "tk-g52-s1",
+        "name": "自书",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\maliang\\挥毫自荐\\zishu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\maliang\\挥毫自荐\\zishu2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g52-s2",
+        "name": "协穆",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\old_maliang\\千计卷来\\xiemu1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\old_maliang\\千计卷来\\xiemu2.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g53",
+    "name": "周处",
+    "title": "义除三害",
+    "dir": "zhouchu",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\zhouchu\\义除三害.jpg",
+    "skills": [
+      {
+        "id": "tk-g53-s1",
+        "name": "乡害",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhouchu\\义除三害\\xianghai1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhouchu\\义除三害\\xianghai2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g53-s2",
+        "name": "除害",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhouchu\\义除三害\\chuhai1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhouchu\\义除三害\\chuhai2.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\zhouchu\\义除三害\\chuhai3.mp3"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tk-g54",
+    "name": "华佗",
+    "title": "鹿林圣手",
+    "dir": "huatuo",
+    "image": "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoskin\\huatuo\\鹿林圣手.jpg",
+    "skills": [
+      {
+        "id": "tk-g54-s1",
+        "name": "青囊",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huatuo\\鹿林圣手\\qingnang1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\extension\\千幻聆音\\sanguoaudio\\huatuo\\鹿林圣手\\qingnang2.mp3"
+        ]
+      },
+      {
+        "id": "tk-g54-s2",
+        "name": "除痂",
+        "files": [
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\audio\\skill\\chulao1.mp3",
+          "E:\\无名杀2.0\\无名杀-双样式懒人包\\resources\\app\\audio\\skill\\chulao2.mp3"
+        ]
+      }
+    ]
+  }
+]

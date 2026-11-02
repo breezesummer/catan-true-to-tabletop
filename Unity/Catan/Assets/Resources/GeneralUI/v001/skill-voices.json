@@ -1,0 +1,702 @@
+{
+  "entries": [
+    {
+      "skillId": "tk-g01-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g01-s1/1",
+        "GeneralUI/v001/Voices/tk-g01-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g02-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g02-s1/1",
+        "GeneralUI/v001/Voices/tk-g02-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g02-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g02-s2/1",
+        "GeneralUI/v001/Voices/tk-g02-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g03-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g03-s1/1",
+        "GeneralUI/v001/Voices/tk-g03-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g03-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g03-s2/1",
+        "GeneralUI/v001/Voices/tk-g03-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g04-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g04-s1/1",
+        "GeneralUI/v001/Voices/tk-g04-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g04-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g04-s2/1",
+        "GeneralUI/v001/Voices/tk-g04-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g05-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g05-s1/1",
+        "GeneralUI/v001/Voices/tk-g05-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g05-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g05-s2/1",
+        "GeneralUI/v001/Voices/tk-g05-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g06-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g06-s1/1",
+        "GeneralUI/v001/Voices/tk-g06-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g07-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g07-s1/1",
+        "GeneralUI/v001/Voices/tk-g07-s1/2",
+        "GeneralUI/v001/Voices/tk-g07-s1/3",
+        "GeneralUI/v001/Voices/tk-g07-s1/4"
+      ]
+    },
+    {
+      "skillId": "tk-g08-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g08-s1/1",
+        "GeneralUI/v001/Voices/tk-g08-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g08-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g08-s2/1",
+        "GeneralUI/v001/Voices/tk-g08-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g09-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g09-s1/1",
+        "GeneralUI/v001/Voices/tk-g09-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g10-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g10-s1/1",
+        "GeneralUI/v001/Voices/tk-g10-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g10-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g10-s2/1",
+        "GeneralUI/v001/Voices/tk-g10-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g11-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g11-s1/1",
+        "GeneralUI/v001/Voices/tk-g11-s1/2",
+        "GeneralUI/v001/Voices/tk-g11-s1/3",
+        "GeneralUI/v001/Voices/tk-g11-s1/4"
+      ]
+    },
+    {
+      "skillId": "tk-g11-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g11-s2/1",
+        "GeneralUI/v001/Voices/tk-g11-s2/2",
+        "GeneralUI/v001/Voices/tk-g11-s2/3",
+        "GeneralUI/v001/Voices/tk-g11-s2/4"
+      ]
+    },
+    {
+      "skillId": "tk-g11-s3",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g11-s3/1",
+        "GeneralUI/v001/Voices/tk-g11-s3/2"
+      ]
+    },
+    {
+      "skillId": "tk-g12-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g12-s1/1",
+        "GeneralUI/v001/Voices/tk-g12-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g13-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g13-s1/1",
+        "GeneralUI/v001/Voices/tk-g13-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g13-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g13-s2/1",
+        "GeneralUI/v001/Voices/tk-g13-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g14-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g14-s1/1",
+        "GeneralUI/v001/Voices/tk-g14-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g15-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g15-s1/1",
+        "GeneralUI/v001/Voices/tk-g15-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g16-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g16-s1/1",
+        "GeneralUI/v001/Voices/tk-g16-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g17-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g17-s1/1",
+        "GeneralUI/v001/Voices/tk-g17-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g18-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g18-s1/1",
+        "GeneralUI/v001/Voices/tk-g18-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g18-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g18-s2/1",
+        "GeneralUI/v001/Voices/tk-g18-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g19-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g19-s1/1",
+        "GeneralUI/v001/Voices/tk-g19-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g19-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g19-s2/1",
+        "GeneralUI/v001/Voices/tk-g19-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g20-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g20-s1/1",
+        "GeneralUI/v001/Voices/tk-g20-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g20-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g20-s2/1",
+        "GeneralUI/v001/Voices/tk-g20-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g21-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g21-s1/1",
+        "GeneralUI/v001/Voices/tk-g21-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g21-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g21-s2/1",
+        "GeneralUI/v001/Voices/tk-g21-s2/2",
+        "GeneralUI/v001/Voices/tk-g21-s2/3"
+      ]
+    },
+    {
+      "skillId": "tk-g22-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g22-s1/1",
+        "GeneralUI/v001/Voices/tk-g22-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g23-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g23-s1/1",
+        "GeneralUI/v001/Voices/tk-g23-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g23-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g23-s2/1",
+        "GeneralUI/v001/Voices/tk-g23-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g24-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g24-s1/1",
+        "GeneralUI/v001/Voices/tk-g24-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g24-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g24-s2/1",
+        "GeneralUI/v001/Voices/tk-g24-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g25-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g25-s1/1",
+        "GeneralUI/v001/Voices/tk-g25-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g25-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g25-s2/1",
+        "GeneralUI/v001/Voices/tk-g25-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g26-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g26-s1/1",
+        "GeneralUI/v001/Voices/tk-g26-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g26-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g26-s2/1",
+        "GeneralUI/v001/Voices/tk-g26-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g27-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g27-s1/1",
+        "GeneralUI/v001/Voices/tk-g27-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g27-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g27-s2/1",
+        "GeneralUI/v001/Voices/tk-g27-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g28-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g28-s1/1",
+        "GeneralUI/v001/Voices/tk-g28-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g28-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g28-s2/1",
+        "GeneralUI/v001/Voices/tk-g28-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g29-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g29-s1/1",
+        "GeneralUI/v001/Voices/tk-g29-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g29-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g29-s2/1",
+        "GeneralUI/v001/Voices/tk-g29-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g30-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g30-s1/1",
+        "GeneralUI/v001/Voices/tk-g30-s1/2",
+        "GeneralUI/v001/Voices/tk-g30-s1/3",
+        "GeneralUI/v001/Voices/tk-g30-s1/4",
+        "GeneralUI/v001/Voices/tk-g30-s1/5",
+        "GeneralUI/v001/Voices/tk-g30-s1/6"
+      ]
+    },
+    {
+      "skillId": "tk-g30-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g30-s2/1",
+        "GeneralUI/v001/Voices/tk-g30-s2/2",
+        "GeneralUI/v001/Voices/tk-g30-s2/3",
+        "GeneralUI/v001/Voices/tk-g30-s2/4"
+      ]
+    },
+    {
+      "skillId": "tk-g31-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g31-s1/1",
+        "GeneralUI/v001/Voices/tk-g31-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g31-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g31-s2/1",
+        "GeneralUI/v001/Voices/tk-g31-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g32-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g32-s1/1",
+        "GeneralUI/v001/Voices/tk-g32-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g32-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g32-s2/1",
+        "GeneralUI/v001/Voices/tk-g32-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g33-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g33-s1/1",
+        "GeneralUI/v001/Voices/tk-g33-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g33-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g33-s2/1",
+        "GeneralUI/v001/Voices/tk-g33-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g34-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g34-s1/1",
+        "GeneralUI/v001/Voices/tk-g34-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g34-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g34-s2/1",
+        "GeneralUI/v001/Voices/tk-g34-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g35-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g35-s1/1",
+        "GeneralUI/v001/Voices/tk-g35-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g35-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g35-s2/1",
+        "GeneralUI/v001/Voices/tk-g35-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g36-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g36-s1/1",
+        "GeneralUI/v001/Voices/tk-g36-s1/2",
+        "GeneralUI/v001/Voices/tk-g36-s1/3",
+        "GeneralUI/v001/Voices/tk-g36-s1/4",
+        "GeneralUI/v001/Voices/tk-g36-s1/5",
+        "GeneralUI/v001/Voices/tk-g36-s1/6"
+      ]
+    },
+    {
+      "skillId": "tk-g36-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g36-s2/1",
+        "GeneralUI/v001/Voices/tk-g36-s2/2",
+        "GeneralUI/v001/Voices/tk-g36-s2/3"
+      ]
+    },
+    {
+      "skillId": "tk-g37-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g37-s1/1",
+        "GeneralUI/v001/Voices/tk-g37-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g37-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g37-s2/1",
+        "GeneralUI/v001/Voices/tk-g37-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g38-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g38-s1/1",
+        "GeneralUI/v001/Voices/tk-g38-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g38-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g38-s2/1",
+        "GeneralUI/v001/Voices/tk-g38-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g39-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g39-s1/1",
+        "GeneralUI/v001/Voices/tk-g39-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g39-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g39-s2/1",
+        "GeneralUI/v001/Voices/tk-g39-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g40-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g40-s1/1",
+        "GeneralUI/v001/Voices/tk-g40-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g41-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g41-s1/1",
+        "GeneralUI/v001/Voices/tk-g41-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g41-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g41-s2/1",
+        "GeneralUI/v001/Voices/tk-g41-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g41-s3",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g41-s3/1",
+        "GeneralUI/v001/Voices/tk-g41-s3/2"
+      ]
+    },
+    {
+      "skillId": "tk-g42-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g42-s1/1",
+        "GeneralUI/v001/Voices/tk-g42-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g42-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g42-s2/1",
+        "GeneralUI/v001/Voices/tk-g42-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g43-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g43-s1/1",
+        "GeneralUI/v001/Voices/tk-g43-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g44-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g44-s1/1",
+        "GeneralUI/v001/Voices/tk-g44-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g44-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g44-s2/1",
+        "GeneralUI/v001/Voices/tk-g44-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g45-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g45-s1/1",
+        "GeneralUI/v001/Voices/tk-g45-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g45-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g45-s2/1",
+        "GeneralUI/v001/Voices/tk-g45-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g46-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g46-s1/1",
+        "GeneralUI/v001/Voices/tk-g46-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g46-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g46-s2/1",
+        "GeneralUI/v001/Voices/tk-g46-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g47-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g47-s1/1",
+        "GeneralUI/v001/Voices/tk-g47-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g47-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g47-s2/1",
+        "GeneralUI/v001/Voices/tk-g47-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g48-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g48-s1/1",
+        "GeneralUI/v001/Voices/tk-g48-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g48-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g48-s2/1",
+        "GeneralUI/v001/Voices/tk-g48-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g49-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g49-s1/1",
+        "GeneralUI/v001/Voices/tk-g49-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g49-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g49-s2/1",
+        "GeneralUI/v001/Voices/tk-g49-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g50-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g50-s1/1",
+        "GeneralUI/v001/Voices/tk-g50-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g50-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g50-s2/1",
+        "GeneralUI/v001/Voices/tk-g50-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g51-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g51-s1/1",
+        "GeneralUI/v001/Voices/tk-g51-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g52-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g52-s1/1",
+        "GeneralUI/v001/Voices/tk-g52-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g52-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g52-s2/1",
+        "GeneralUI/v001/Voices/tk-g52-s2/2"
+      ]
+    },
+    {
+      "skillId": "tk-g53-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g53-s1/1",
+        "GeneralUI/v001/Voices/tk-g53-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g53-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g53-s2/1",
+        "GeneralUI/v001/Voices/tk-g53-s2/2",
+        "GeneralUI/v001/Voices/tk-g53-s2/3"
+      ]
+    },
+    {
+      "skillId": "tk-g54-s1",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g54-s1/1",
+        "GeneralUI/v001/Voices/tk-g54-s1/2"
+      ]
+    },
+    {
+      "skillId": "tk-g54-s2",
+      "clips": [
+        "GeneralUI/v001/Voices/tk-g54-s2/1",
+        "GeneralUI/v001/Voices/tk-g54-s2/2"
+      ]
+    }
+  ]
+}

@@ -31,7 +31,7 @@ public sealed partial class M6App
     string observedSkillEvent,flashingSkill,latestSkillResult;
     double skillFlashUntil;
     bool observedSkillsInitialized;
-    ThreeKingdomsView ThreeKingdomsProjection=>presentation is M4App cities?cities.M6View?.ThreeKingdoms:
+    internal ThreeKingdomsView ThreeKingdomsProjection=>presentation is M4App cities?cities.M6View?.ThreeKingdoms:
         presentation is M5App combined?combined.M6View?.ThreeKingdoms:null;
     bool ThreeKingdomsAdvanceAvailable=>presentation is M4App cities?
         cities.M6View?.LegalActions.Any(c=>c.Kind==Catan.Core.M4.CommandKind.AdvanceThreeKingdomsPhase)==true:
@@ -175,7 +175,7 @@ public sealed partial class M6App
     {
         var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
         var general=string.IsNullOrEmpty(own?.ActiveGeneralId)?null:GeneralCatalog.Get(own.ActiveGeneralId);
-        if(general?.Id!="tk-g26")
+        if(general==null)
         {
             PastoralMenuUI.Panel(new Rect(22,714,148,171));
             PastoralMenuUI.Label(new Rect(30,722,132,29),general?.Name??"武将占位",23,null,true,TextAnchor.MiddleCenter);
@@ -197,7 +197,7 @@ public sealed partial class M6App
     {
         var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
         var skills=B45SkillCatalog.AvailableEntries(view,GeneralAssetSeatB6);
-        bool preview=own?.ActiveGeneralId=="tk-g26";
+        bool preview=!string.IsNullOrEmpty(own?.ActiveGeneralId);
         if(!preview)CopperTabletopSkin.Panel(SkillsArea,ModernOperationUI.Background);
         var viewport=new Rect(SkillsArea.x,SkillsArea.y,SkillsArea.width,preview?124:171);
         skillScroll=GUI.BeginScrollView(viewport,skillScroll,new Rect(0,0,128,Mathf.Max(viewport.height,skills.Length*55)));

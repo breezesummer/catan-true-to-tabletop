@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 
 // 所有声音均为 2D 展示；不会提交命令、访问权威存档或改变动画/规则时间。
-public sealed class TabletopAudio : MonoBehaviour
+public sealed partial class TabletopAudio : MonoBehaviour
 {
     public const int VoiceLimit = 10;
     public const float EffectsHeadroom = TabletopAudioMix.Effects, AmbientHeadroom = TabletopAudioMix.Ambience,
@@ -162,7 +162,7 @@ public sealed class TabletopAudio : MonoBehaviour
     }
     public void ResetHistory()
     {
-        model.Reset(); publicModel.Reset(); scheduled.Clear(); limiter.Reset();
+        model.Reset(); publicModel.Reset(); scheduled.Clear(); limiter.Reset(); ResetGeneralVoices();
         previousScope = null;
     }
     public void Click(bool cancel = false)
@@ -255,6 +255,7 @@ public sealed class TabletopAudio : MonoBehaviour
             if (scope != previousScope) { ResetHistory(); previousScope = scope; }
             // 历史请求与 PlayerView 同步是异步的；重连短暂静默期间持续建立基线。
             if (now < reconnectQuietUntil) model.Reset();
+            ObserveGeneralVoices(now,now<reconnectQuietUntil || owner.NetworkGame&&!connected);
             var history=owner.HistoryEntries;
             var added = model.Observe(scope, dice?.KnownHistory(history)??history, owner.AudioPublicSequence);
             if (now >= reconnectQuietUntil) foreach (var e in added) Queue(e, now);

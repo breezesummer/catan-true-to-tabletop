@@ -14,5 +14,6 @@
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopAudioModel.cs" Link="Presentation/TabletopAudioModel.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopDicePresentation.cs" Link="Presentation/TabletopDicePresentation.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/TabletopAudioSynth.cs" Link="Presentation/TabletopAudioSynth.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/GeneralVoiceCursor.cs" Link="Presentation/GeneralVoiceCursor.cs" />
   </ItemGroup>
 </Project>
