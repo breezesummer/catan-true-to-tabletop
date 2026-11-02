@@ -9,7 +9,7 @@ public sealed partial class M6App
 {
     string GeneralAssetSeatB6=>presentation is M4App cities?cities.M6View?.PlayerId??HumanSeat:presentation is M5App combined?combined.M6View?.PlayerId??HumanSeat:HumanSeat;
     static readonly Color SkillMuted=new Color(.73f,.75f,.65f);
-    static readonly Rect GeneralArea=new Rect(22,714,148,171);
+    static readonly Rect GeneralArea=new Rect(22,698,148,192);
     static readonly Rect SkillsArea=new Rect(180,714,146,171);
     bool FishHandSelected=>presentation is M4App fishCities?fishCities.FishHandSelected:presentation is M5App fishCombined&&fishCombined.FishHandSelected;
     float SkillBarOffset=>FishHandSelected?-132:0;
@@ -173,20 +173,32 @@ public sealed partial class M6App
     }
     void DrawGeneralDock(ThreeKingdomsView view)
     {
-        PastoralMenuUI.Panel(GeneralArea);var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
+        var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
         var general=string.IsNullOrEmpty(own?.ActiveGeneralId)?null:GeneralCatalog.Get(own.ActiveGeneralId);
-        PastoralMenuUI.Label(new Rect(30,722,132,29),general?.Name??"武将占位",23,null,true,TextAnchor.MiddleCenter);
-        PastoralMenuUI.Label(new Rect(30,754,132,22),general==null?"等待统一登场":general.Faction+" · 寿命 "+own.RemainingLife+" 轮",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
-        PastoralMenuUI.Label(new Rect(30,778,132,22),own?.FaceDown==true?"背面朝上":"正面朝上",13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
-        if(PastoralMenuUI.Button(new Rect(30,809,132,30),"暗置 / 武将库"))generalLibraryOpen=!generalLibraryOpen;
-        if(PastoralMenuUI.Button(new Rect(30,847,132,30),"提前隐退",view.CanRetire&&GeneralCanInteract&&!generalSelection.Active))retireDraft=!retireDraft;
+        if(general?.Id!="tk-g26")
+        {
+            PastoralMenuUI.Panel(new Rect(22,714,148,171));
+            PastoralMenuUI.Label(new Rect(30,722,132,29),general?.Name??"武将占位",23,null,true,TextAnchor.MiddleCenter);
+            PastoralMenuUI.Label(new Rect(30,754,132,22),general==null?"等待统一登场":general.Faction+" · 寿命 "+own.RemainingLife+" 轮",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+            PastoralMenuUI.Label(new Rect(30,778,132,22),own?.FaceDown==true?"背面朝上":"正面朝上",13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+            if(PastoralMenuUI.Button(new Rect(30,809,132,30),"暗置 / 武将库"))generalLibraryOpen=!generalLibraryOpen;
+            if(PastoralMenuUI.Button(new Rect(30,847,132,30),"提前隐退",view.CanRetire&&GeneralCanInteract&&!generalSelection.Active))retireDraft=!retireDraft;
+            return;
+        }
+        GeneralFrameUI.Portrait(new Rect(28,714,138,171),general?.Id,general?.Name,general?.Faction,
+            Array.IndexOf(HistoryPlayers,GeneralAssetSeatB6),view.Clock.ActivePlayerId==GeneralAssetSeatB6,own?.FaceDown==true,general==null?-1:own.RemainingLife);
+        if(ThreeKingdomsDirectInput.Read(GeneralArea,false)==2)Inspect(general.Name+"\n"+general.OriginalText,GeneralArea);
+        if(PastoralMenuUI.Button(new Rect(184,842,138,21),"武将库"))generalLibraryOpen=!generalLibraryOpen;
+        if(PastoralMenuUI.Button(new Rect(184,866,138,21),"提前隐退",view.CanRetire&&GeneralCanInteract&&!generalSelection.Active))retireDraft=!retireDraft;
     }
     void DrawGeneralSkills(ThreeKingdomsView view)
     {
         var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
         var skills=B45SkillCatalog.AvailableEntries(view,GeneralAssetSeatB6);
-        CopperTabletopSkin.Panel(SkillsArea,ModernOperationUI.Background);
-        skillScroll=GUI.BeginScrollView(SkillsArea,skillScroll,new Rect(0,0,128,Mathf.Max(171,skills.Length*55)));
+        bool preview=own?.ActiveGeneralId=="tk-g26";
+        if(!preview)CopperTabletopSkin.Panel(SkillsArea,ModernOperationUI.Background);
+        var viewport=new Rect(SkillsArea.x,SkillsArea.y,SkillsArea.width,preview?124:171);
+        skillScroll=GUI.BeginScrollView(viewport,skillScroll,new Rect(0,0,128,Mathf.Max(viewport.height,skills.Length*55)));
         for(int i=0;i<skills.Length;i++)
         {
             var skill=skills[i];var info=skill;bool active=info?.HasActiveEntry==true;
@@ -194,10 +206,14 @@ public sealed partial class M6App
             var runtime=view.SkillRuntimeStatus?.FirstOrDefault(s=>s.SkillId==skill.SkillId);
             var area=new Rect(3,i*55+3,125,51);bool selected=generalSelection.SkillId==skill.SkillId;
             bool flashing=flashingSkill==skill.SkillId&&Time.unscaledTimeAsDouble<skillFlashUntil;
-            CopperTabletopSkin.Panel(area,ModernOperationUI.Surface,selected||flashing,false);
-            PastoralMenuUI.Label(new Rect(area.x+4,area.y+1,117,25),skill.Name,17,enabled?PastoralMenuUI.Ivory:SkillMuted,true,TextAnchor.MiddleCenter);
-            PastoralMenuUI.Label(new Rect(area.x+4,area.y+25,117,14),runtime?.Summary??info?.Limit??"依当前规则",10,SkillMuted,false,TextAnchor.MiddleCenter);
-            PastoralMenuUI.Label(new Rect(area.x+4,area.y+39,117,12),(active?"主动":"被动")+(active&&!enabled?" · 暂不可用":""),9,SkillMuted,false,TextAnchor.MiddleCenter);
+            if(preview)GeneralFrameUI.Skill(area,skill.Name,active,enabled,selected,flashing);
+            else
+            {
+                CopperTabletopSkin.Panel(area,ModernOperationUI.Surface,selected||flashing,false);
+                PastoralMenuUI.Label(new Rect(area.x+4,area.y+1,117,25),skill.Name,17,enabled?PastoralMenuUI.Ivory:SkillMuted,true,TextAnchor.MiddleCenter);
+                PastoralMenuUI.Label(new Rect(area.x+4,area.y+25,117,14),runtime?.Summary??info?.Limit??"依当前规则",10,SkillMuted,false,TextAnchor.MiddleCenter);
+                PastoralMenuUI.Label(new Rect(area.x+4,area.y+39,117,12),(active?"主动":"被动")+(active&&!enabled?" · 暂不可用":""),9,SkillMuted,false,TextAnchor.MiddleCenter);
+            }
             int input=ThreeKingdomsDirectInput.Read(area,enabled);
             if(input==1)BeginGeneralSkill(skill.SkillId);
             if(input==2)Inspect((info?.Description??skill.Description)+"\n当前："+(runtime?.Summary??"")+"\n"+(enabled?"可选择牌与目标后确认。":runtime?.UnavailableReason??(active?"当前时机、费用或剩余次数不满足；可用时亮起。":"被动效果只由真实事件触发。")),new Rect(180,714+i*55,146,48));

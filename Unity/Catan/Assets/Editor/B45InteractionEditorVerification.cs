@@ -116,6 +116,24 @@ public static class B45InteractionEditorVerification
     {
         stage="启动真实桌面";SetSize(1440,900);app.StartGame("cities-knights","heading-for-new-shores",4,"P1",true,threeKingdoms:true);yield return 1.5;
         city=app.GetComponent<M4App>();Require(city!=null&&app.Ready,"城市骑士主机未启动");
+        if(Environment.GetCommandLineArgs().Contains("--general-frame-preview"))
+        {
+            stage="阚泽武将框预览";Inject("tk-g26",new[]{0,2,0,0,0},new int[5]);yield return .8;
+            Require(Resources.Load<Texture2D>("GeneralUI/v001/Portraits/tk-g26")!=null,"阚泽立绘未导入");
+            Require(Resources.Load<Texture2D>("GeneralUI/v001/skill-buttons")!=null,"主动技能底板未导入");
+            yield return Capture("阚泽-武将框与技能");
+            var saved=Save();yield return Click(new Vector2(252,793));Require(Save()==saved&&!Selection.Active,"被动技能左击改变了局面");
+            Send(EventType.MouseDown,new Vector2(252,793),1);yield return WaitForRenderedInput();
+            Send(EventType.MouseUp,new Vector2(252,793),1);yield return WaitForRenderedInput();
+            Require(Get(app,"inspectionText")!=null&&Save()==saved,"被动技能右击说明异常");
+            Set(app,"inspectionText",null);yield return Click(new Vector2(252,738));Require(Selection.Active,"下书按钮不能进入真实草稿");
+            yield return Capture("阚泽-主动技能选中");
+            Invoke(app,"ResetThreeKingdomsPanel");Inject("tk-g26",new int[5],new int[5]);yield return .5;
+            saved=Save();yield return Click(new Vector2(252,738));Require(Save()==saved&&!Selection.Active,"不可用技能被触发");
+            yield return Capture("阚泽-主动技能不可用");
+            Inject("tk-g26",new[]{0,2,0,0,0},new int[5]);Set(app,"inspectionText",null);yield return .5;
+            cases.Add(stage);yield break;
+        }
         string before=null;
         if(!Environment.GetCommandLineArgs().Contains("--b45-payment-only"))
         {
@@ -204,7 +222,7 @@ public static class B45InteractionEditorVerification
         SessionState.EraseString(Key);SessionState.EraseString(Deadline);Debug.Log("CATAN_B45_INTERACTION_"+(failure==null?"OK":"FAILED")+": "+result.说明);
         if(Environment.GetCommandLineArgs().Contains("--b45-keep-open"))
         {
-            if(failure==null){Inject("tk-g15",new[]{2,1,0,0,0},new int[5]);Set(app,"inspectionText",null);}
+            if(failure==null){Inject(Environment.GetCommandLineArgs().Contains("--general-frame-preview")?"tk-g26":"tk-g15",new[]{2,2,0,0,0},new int[5]);Set(app,"inspectionText",null);}
             work=null;return;
         }
         EditorApplication.Exit(failure==null?0:1);
