@@ -56,7 +56,8 @@ public static class GeneralFrameUI
         var previousFont=lettering.font;lettering.font=nameBrush??previousFont;
         if(name!=null)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+1,area.y+22+i*19,area.width*.19f,22),name[i].ToString(),20,Color.white);
         lettering.font=previousFont;
-        if(life>=0)Health(new Rect(area.x+3,area.yMax-88,area.width*.20f,70),life,3);
+        // 勾玉限制在左侧姓名栏内，宽度随武将框缩放，避免压到立绘或外框。
+        if(life>=0)Health(new Rect(area.x+3,area.y+area.height*.60f,Mathf.Max(1,area.width*.155f-6),area.height*.30f),life,3);
         if(position>=0&&position<SeatNumbers.Length)
         {
             // 只画中文数字，黑字浅色描边压在框底，不再使用“号位”底牌。
@@ -69,7 +70,8 @@ public static class GeneralFrameUI
     }
     static void Health(Rect area,int current,int maximum)
     {
-        float size=Mathf.Min(23,area.width);
+        if(maximum<=0)return;
+        float size=Mathf.Min(18,area.width,area.height/maximum);
         var filled=current>=maximum?hpGreen:current>1?hpYellow:hpRed;
         for(int i=0;i<maximum;i++)GUI.DrawTexture(new Rect(area.center.x-size/2,area.y+i*size,size,size),i<current?filled:hpEmpty,ScaleMode.ScaleToFit,true);
     }
