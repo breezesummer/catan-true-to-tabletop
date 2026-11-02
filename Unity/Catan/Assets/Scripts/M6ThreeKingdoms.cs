@@ -186,7 +186,9 @@ public sealed partial class M6App
             return;
         }
         GeneralFrameUI.Portrait(new Rect(28,714,138,171),general?.Id,general?.Name,general?.Faction,
-            Array.IndexOf(HistoryPlayers,GeneralAssetSeatB6),view.Clock.ActivePlayerId==GeneralAssetSeatB6,own?.FaceDown==true,general==null?-1:own.RemainingLife);
+            Array.IndexOf(HistoryPlayers,GeneralAssetSeatB6),Ready&&!Finished&&GeneralAssetSeatB6==HumanSeat&&view.Clock.ActivePlayerId==HumanSeat&&
+            view.Clock.Phase>=ThreeKingdomsPhase.Preparation&&view.Clock.Phase<=ThreeKingdomsPhase.End,
+            own?.FaceDown==true,general==null?-1:own.RemainingLife);
         if(ThreeKingdomsDirectInput.Read(GeneralArea,false)==2)Inspect(general.Name+"\n"+general.OriginalText,GeneralArea);
         if(PastoralMenuUI.Button(new Rect(184,842,138,21),"武将库"))generalLibraryOpen=!generalLibraryOpen;
         if(PastoralMenuUI.Button(new Rect(184,866,138,21),"提前隐退",view.CanRetire&&GeneralCanInteract&&!generalSelection.Active))retireDraft=!retireDraft;

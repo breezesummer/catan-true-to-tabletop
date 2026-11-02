@@ -10,6 +10,7 @@ public static class GeneralFrameUI
     static GUIStyle lettering;
     static readonly Dictionary<string,Texture2D> portraits=new Dictionary<string,Texture2D>();
     static readonly Color Gold=new Color(1f,.82f,.36f);
+    static readonly string[] SeatNumbers={"一","二","三","四"};
     static readonly Rect[] ButtonRegions={new Rect(252,51,750,270),new Rect(232,320,780,317),new Rect(252,652,750,272),new Rect(252,953,750,265)};
     static void Ensure()
     {
@@ -47,7 +48,15 @@ public static class GeneralFrameUI
         Text(new Rect(area.x+2,area.y+3,area.width*.22f,23),faction??"",17,new Color(.67f,.86f,.63f));
         if(name!=null)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+2,area.y+28+i*22,area.width*.22f,24),name[i].ToString(),22,Color.white);
         if(life>=0)Text(new Rect(area.x+2,area.yMax-49,area.width*.22f,22),life.ToString(),17);
-        if(position>=0&&position<4)Slice(atlas,new Rect(65+position*340,950,300,73),new Rect(area.x+22,area.yMax-16,area.width-25,23),1448,1086);
+        if(position>=0&&position<SeatNumbers.Length)
+        {
+            // 只画中文数字，黑字浅色描边压在框底，不再使用“号位”底牌。
+            var number=new Rect(area.x+22,area.yMax-21,area.width-25,30);
+            lettering.fontSize=30;lettering.normal.textColor=new Color(.95f,.93f,.83f);
+            for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++)
+                if(x!=0||y!=0)GUI.Label(new Rect(number.x+x,number.y+y,number.width,number.height),SeatNumbers[position],lettering);
+            lettering.normal.textColor=new Color(.025f,.025f,.02f);GUI.Label(number,SeatNumbers[position],lettering);
+        }
     }
     public static void Skill(Rect area,string name,bool active,bool enabled,bool selected,bool flashing)
     {
