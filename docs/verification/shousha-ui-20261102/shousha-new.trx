@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="17cb0b08-630e-4453-ba5d-f757690fafb6" name="BreezeSummer@BREEZEPRO 2026-11-02 22:01:12" runUser="BreezePro\BreezeSummer" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-11-02T22:01:12.1914294+08:00" queuing="2026-11-02T22:01:12.1914298+08:00" start="2026-11-02T22:01:11.1349119+08:00" finish="2026-11-02T22:01:12.1968625+08:00" />
+  <TestSettings name="default" id="f075757a-a2f5-4ce7-976d-f8d6f260fd02">
+    <Deployment runDeploymentRoot="BreezeSummer_BREEZEPRO_2026-11-02_22_01_12" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="d1923449-e31b-430c-96da-08db40b9fc8a" testId="39f7a1ae-e3c7-3d3c-cfac-fac023fc2667" testName="Catan.Rules.Tests.ThreeKingdomsB4LifecycleTests.RetirementRequiresOwnTurnAndRejectsOtherSeatWithoutMutation" computerName="BREEZEPRO" duration="00:00:00.0808434" startTime="2026-11-02T22:01:11.9968949+08:00" endTime="2026-11-02T22:01:12.0801242+08:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d1923449-e31b-430c-96da-08db40b9fc8a" />
+    <UnitTestResult executionId="38539016-7f8b-43f1-a07b-414905eff210" testId="c877cbca-8613-6687-4196-26a6b2ff0569" testName="Catan.Rules.Tests.ThreeKingdomsB45SelectionTests.SkillDescriptionContainsOnlyTheSkillRules" computerName="BREEZEPRO" duration="00:00:00.0120711" startTime="2026-11-02T22:01:11.9947408+08:00" endTime="2026-11-02T22:01:12.0140165+08:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="38539016-7f8b-43f1-a07b-414905eff210" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Catan.Rules.Tests.ThreeKingdomsB45SelectionTests.SkillDescriptionContainsOnlyTheSkillRules" storage="d:\project\catan-true-to-tabletop\tests\catan.rules.tests\bin\debug\net10.0\catan.rules.tests.dll" id="c877cbca-8613-6687-4196-26a6b2ff0569">
+      <Execution id="38539016-7f8b-43f1-a07b-414905eff210" />
+      <TestMethod codeBase="D:\Project\catan-true-to-tabletop\tests\Catan.Rules.Tests\bin\Debug\net10.0\Catan.Rules.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Catan.Rules.Tests.ThreeKingdomsB45SelectionTests" name="SkillDescriptionContainsOnlyTheSkillRules" />
+    </UnitTest>
+    <UnitTest name="Catan.Rules.Tests.ThreeKingdomsB4LifecycleTests.RetirementRequiresOwnTurnAndRejectsOtherSeatWithoutMutation" storage="d:\project\catan-true-to-tabletop\tests\catan.rules.tests\bin\debug\net10.0\catan.rules.tests.dll" id="39f7a1ae-e3c7-3d3c-cfac-fac023fc2667">
+      <Execution id="d1923449-e31b-430c-96da-08db40b9fc8a" />
+      <TestMethod codeBase="D:\Project\catan-true-to-tabletop\tests\Catan.Rules.Tests\bin\Debug\net10.0\Catan.Rules.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="Catan.Rules.Tests.ThreeKingdomsB4LifecycleTests" name="RetirementRequiresOwnTurnAndRejectsOtherSeatWithoutMutation" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="39f7a1ae-e3c7-3d3c-cfac-fac023fc2667" executionId="d1923449-e31b-430c-96da-08db40b9fc8a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c877cbca-8613-6687-4196-26a6b2ff0569" executionId="38539016-7f8b-43f1-a07b-414905eff210" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="列表中未列出的结果" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="所有已加载的结果" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.5+1b188a7b0a (64-bit .NET 10.0.12)&#xD;
+[xUnit.net 00:00:00.10]   Discovering: Catan.Rules.Tests&#xD;
+[xUnit.net 00:00:00.39]   Discovered:  Catan.Rules.Tests&#xD;
+[xUnit.net 00:00:00.42]   Starting:    Catan.Rules.Tests&#xD;
+[xUnit.net 00:00:00.53]   Finished:    Catan.Rules.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

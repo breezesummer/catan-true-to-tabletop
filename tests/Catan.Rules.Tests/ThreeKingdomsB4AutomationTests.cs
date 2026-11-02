@@ -6,21 +6,15 @@ namespace Catan.Rules.Tests;
 public sealed class ThreeKingdomsB4AutomationTests
 {
     [Fact]
-    public void RetirementIntentsArePerSeatAndWaitForThatPlayersActualBoundary()
+    public void ScheduledRetirementIsRejectedAndLegacyIntentNeverExecutes()
     {
         var s=new ThreeKingdomsState { RulesVersion=GeneralCatalog.B4RulesVersion, OpeningComplete=true,
-            Clock=new ThreeKingdomsClock { ActivePlayerId="P1",Round=2,TurnInstanceId=5,Phase=ThreeKingdomsPhase.Play } };
-        B4AutomationEngine.SetRetirement(s,"P1",ThreeKingdomsPhase.Preparation,false);
-        Assert.False(B4AutomationEngine.TakeRetirement(s));
-        s.Clock.ActivePlayerId="P2";s.Clock.TurnInstanceId=6;
-        B4AutomationEngine.SetRetirement(s,"P2",ThreeKingdomsPhase.End,false);
-        Assert.Equal(2,B4AutomationEngine.Clone(s.Automation).RetirementIntents.Length);
+            Clock=new ThreeKingdomsClock { ActivePlayerId="P1",Round=2,TurnInstanceId=5,Phase=ThreeKingdomsPhase.Play },
+            Automation=new B4AutomationState { RetirementIntents=new[]{new B4RetirementIntent {PlayerId="P1",Phase=ThreeKingdomsPhase.Play}} } };
+        Assert.Throws<InvalidOperationException>(()=>B4AutomationEngine.SetRetirement(s,"P1",ThreeKingdomsPhase.Preparation,false));
         Assert.Throws<InvalidOperationException>(()=>B4AutomationEngine.SetRetirement(s,"P1",null,true));
-        s.Clock.Phase=ThreeKingdomsPhase.Preparation;Assert.False(B4AutomationEngine.TakeRetirement(s));
-        s.Clock.Phase=ThreeKingdomsPhase.End;Assert.True(B4AutomationEngine.TakeRetirement(s));
-        Assert.False(B4AutomationEngine.TakeRetirement(s));Assert.Single(s.Automation.RetirementIntents);
-        s.Clock.ActivePlayerId="P1";s.Clock.Phase=ThreeKingdomsPhase.Preparation;s.Clock.TurnInstanceId=9;
-        Assert.True(B4AutomationEngine.TakeRetirement(s));Assert.Empty(s.Automation.RetirementIntents);
+        Assert.False(B4AutomationEngine.TakeRetirement(s));
+        Assert.Empty(s.Automation.RetirementIntents);
     }
     [Theory][InlineData("cities")][InlineData("combined")]
     public void OpeningIndependentWindowsAndAutomaticStagesResumeWithoutManualAdvance(string rules)

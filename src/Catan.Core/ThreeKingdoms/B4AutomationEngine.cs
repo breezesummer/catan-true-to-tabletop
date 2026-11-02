@@ -102,21 +102,15 @@ namespace Catan.Core.ThreeKingdoms
                 view.SkillActions=view.SkillActions.Concat(new[]{Make("automation-skip","取消发动")}).ToArray();
             }
         }
+        // 保留旧存档字段以便读取；预约不再创建或执行。
         public static void SetRetirement(ThreeKingdomsState s,string player,ThreeKingdomsPhase? phase,bool cancel)
         {
-            if(!Enabled(s)||s.Clock.ActivePlayerId!=player||!s.OpeningComplete||s.Clock.Round==0)
-                throw new InvalidOperationException("只能在自己的实际回合设置隐退意图。");
-            var a=State(s);
-            if(cancel) { if(!a.RetirementIntents.Any(i=>i.PlayerId==player)) throw new InvalidOperationException("没有可取消的隐退意图。"); a.RetirementIntents=a.RetirementIntents.Where(i=>i.PlayerId!=player).ToArray(); return; }
-            if(!phase.HasValue || phase<ThreeKingdomsPhase.Preparation || phase>ThreeKingdomsPhase.End)
-                throw new InvalidOperationException("请选择合法的隐退阶段。");
-            a.RetirementIntents=a.RetirementIntents.Where(i=>i.PlayerId!=player).Concat(new[]{new B4RetirementIntent { PlayerId=player,Phase=phase.Value,CreatedTurnId=s.Clock.TurnInstanceId }}).ToArray();
+            throw new InvalidOperationException("隐退只能在自己的回合内直接发动。");
         }
         public static bool TakeRetirement(ThreeKingdomsState s)
         {
-            var a=s.Automation; var intent=a?.RetirementIntents.FirstOrDefault(i=>i.PlayerId==s.Clock.ActivePlayerId);
-            if(intent==null || intent.PlayerId!=s.Clock.ActivePlayerId || intent.Phase!=s.Clock.Phase) return false;
-            a.RetirementIntents=a.RetirementIntents.Where(i=>i.PlayerId!=intent.PlayerId).ToArray(); return true;
+            if(s.Automation!=null)s.Automation.RetirementIntents=Array.Empty<B4RetirementIntent>();
+            return false;
         }
         public static string[] Validate(ThreeKingdomsState s)
         {

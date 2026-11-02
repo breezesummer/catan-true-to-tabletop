@@ -120,13 +120,20 @@ public static class B45InteractionEditorVerification
         {
             stage="阚泽武将框预览";Inject("tk-g26",new[]{0,2,0,0,0},new int[5]);yield return .8;
             Require(Resources.Load<Texture2D>("GeneralUI/v001/Portraits/tk-g26")!=null,"阚泽立绘未导入");
-            Require(Resources.Load<Texture2D>("GeneralUI/v001/skill-buttons")!=null,"主动技能底板未导入");
+            Require(Resources.Load<Texture2D>("GeneralUI/v002/skill-0")!=null,"主动技能底板未导入");
+            Require(Resources.Load<Font>("GeneralUI/v002/SkillCalligraphy")!=null,"手杀技能字体未导入");
+            Require(Resources.Load<Font>("GeneralUI/v002/NameCalligraphy")!=null,"手杀姓名字体未导入");
+            foreach(var camp in new[]{"wei","shu","wu","qun","jin","shen"})Require(Resources.Load<Texture2D>("GeneralUI/v002/frame-"+camp)!=null,"势力框缺失："+camp);
+            Require(!(bool)Invoke(app,"ThreeKingdomsBlocksInput",new Vector2(700,679)),"无技能时操作栏仍拦截棋盘");
             yield return Capture("阚泽-武将框与技能");
             var saved=Save();yield return Click(new Vector2(252,793));Require(Save()==saved&&!Selection.Active,"被动技能左击改变了局面");
             Send(EventType.MouseDown,new Vector2(252,793),1);yield return WaitForRenderedInput();
             Send(EventType.MouseUp,new Vector2(252,793),1);yield return WaitForRenderedInput();
             Require(Get(app,"inspectionText")!=null&&Save()==saved,"被动技能右击说明异常");
+            Require(!((string)Get(app,"inspectionText")).Contains("提交："),"说明仍包含内部合同");
+            yield return Capture("阚泽-透明技能说明");
             Set(app,"inspectionText",null);yield return Click(new Vector2(252,738));Require(Selection.Active,"下书按钮不能进入真实草稿");
+            Require((bool)Invoke(app,"ThreeKingdomsBlocksInput",new Vector2(700,679)),"技能选择时操作栏未阻止穿透");
             yield return Capture("阚泽-主动技能选中");
             Invoke(app,"ResetThreeKingdomsPanel");Inject("tk-g26",new int[5],new int[5]);yield return .5;
             saved=Save();yield return Click(new Vector2(252,738));Require(Save()==saved&&!Selection.Active,"不可用技能被触发");
@@ -140,7 +147,16 @@ public static class B45InteractionEditorVerification
             var otherTurn=State();otherTurn.ActivePlayerId="P2";otherTurn.ThreeKingdoms.Clock.ActivePlayerId="P2";
             Set(session,"state",otherTurn);Invoke(city,"M6Refresh");yield return .4;
             yield return Capture("阚泽-其他玩家回合");
-            Inject("tk-g26",new[]{0,2,0,0,0},new int[5]);Set(app,"inspectionText",null);yield return .5;
+            Inject("tk-g15",new[]{0,2,0,0,0},new int[5]);Set(app,"inspectionText",null);yield return .5;
+            Send(EventType.MouseDown,new Vector2(90,780),1);yield return WaitForRenderedInput();
+            Send(EventType.MouseUp,new Vector2(90,780),1);yield return WaitForRenderedInput();
+            Require(!((string)Get(app,"inspectionText")).Contains("###"),"武将说明仍包含Markdown标题");
+            yield return Capture("刘备-势力框与武将说明");
+            Set(app,"inspectionText",null);
+            yield return Click(new Vector2(252,788));Require((bool)Get(app,"retireDraft"),"隐退技能没有进入选择");
+            yield return Capture("刘备-隐退技能");
+            yield return Click(new Vector2(1040,679));Require(!(bool)Get(app,"retireDraft"),"隐退无法取消");
+            saved=Save();yield return Click(new Vector2(1350,825));Require(Save()!=saved,"原有结束回合按钮不可用");
             cases.Add(stage);yield break;
         }
         string before=null;

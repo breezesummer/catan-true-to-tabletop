@@ -155,6 +155,20 @@ public sealed class ThreeKingdomsB4LifecycleTests
     }
 
     [Fact]
+    public void RetirementRequiresOwnTurnAndRejectsOtherSeatWithoutMutation()
+    {
+        var state=Ready();
+        Assert.True(ThreeKingdomsEngine.Project(state,"P1").CanRetire);
+        Assert.False(ThreeKingdomsEngine.Project(state,"P2").CanRetire);
+        string before=Json(state);
+        Assert.Throws<InvalidOperationException>(()=>ThreeKingdomsEngine.RetireGeneral(state,"P2",state.WindowId,First));
+        Assert.Equal(before,Json(state));
+        ThreeKingdomsEngine.RetireGeneral(state,"P1",state.WindowId,First);
+        Assert.NotNull(state.PendingDecision);
+        Assert.False(ThreeKingdomsEngine.Project(state,"P1").CanRetire);
+    }
+
+    [Fact]
     public void DrawingTwoWithOnePublicCardConsumesItBeforeRecyclingAndNeverRecyclesRetainedCards()
     {
         var state = Ready();

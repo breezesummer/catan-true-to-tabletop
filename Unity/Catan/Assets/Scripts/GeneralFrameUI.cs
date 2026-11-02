@@ -5,23 +5,25 @@ using UnityEngine;
 public static class GeneralFrameUI
 {
     const string Root="GeneralUI/v001/";
-    static Texture2D atlas,buttons;
+    static Texture2D glow;
+    static readonly Dictionary<string,Texture2D> frames=new Dictionary<string,Texture2D>();
+    static readonly Texture2D[] buttons=new Texture2D[3];
     static Texture2D hpGreen,hpYellow,hpRed,hpEmpty;
-    static Font brush;
+    static Font brush,nameBrush;
     static GUIStyle lettering;
     static readonly Dictionary<string,Texture2D> portraits=new Dictionary<string,Texture2D>();
     static readonly Color Gold=new Color(1f,.82f,.36f);
     static readonly string[] SeatNumbers={"一","二","三","四"};
-    static readonly Rect[] ButtonRegions={new Rect(252,51,750,270),new Rect(232,320,780,317),new Rect(252,652,750,272),new Rect(252,953,750,265)};
     static void Ensure()
     {
-        if(atlas==null)atlas=Resources.Load<Texture2D>(Root+"frame-atlas");
-        if(buttons==null)buttons=Resources.Load<Texture2D>(Root+"skill-buttons");
+        if(glow==null)glow=Resources.Load<Texture2D>("GeneralUI/v002/turn-glow");
+        for(int i=0;i<3;i++)if(buttons[i]==null)buttons[i]=Resources.Load<Texture2D>("GeneralUI/v002/skill-"+i);
+        if(nameBrush==null)nameBrush=Resources.Load<Font>("GeneralUI/v002/NameCalligraphy");
         if(hpGreen==null)hpGreen=Resources.Load<Texture2D>(Root+"hp-green");
         if(hpYellow==null)hpYellow=Resources.Load<Texture2D>(Root+"hp-yellow");
         if(hpRed==null)hpRed=Resources.Load<Texture2D>(Root+"hp-red");
         if(hpEmpty==null)hpEmpty=Resources.Load<Texture2D>(Root+"hp-empty");
-        if(lettering==null){brush=Resources.Load<Font>(Root+"SkillCalligraphy");lettering=new GUIStyle{font=brush??MobileTabletop.LoadFont(),alignment=TextAnchor.MiddleCenter,wordWrap=false};}
+        if(lettering==null){brush=Resources.Load<Font>("GeneralUI/v002/SkillCalligraphy");lettering=new GUIStyle{font=brush??nameBrush??MobileTabletop.LoadFont(),alignment=TextAnchor.MiddleCenter,wordWrap=false};}
     }
     static void Slice(Texture2D texture,Rect source,Rect target,float width,float height)
     {
@@ -37,21 +39,23 @@ public static class GeneralFrameUI
     {
         Ensure();
         // 外发光与普通边框使用同一实际边界，避免切换回合时跳动。
-        if(highlighted)Slice(atlas,new Rect(500,26,510,734),new Rect(area.x-11,area.y-15,area.width+22,area.height+30),1448,1086);
-        Slice(atlas,new Rect(63,82,436,630),area,1448,1086);
+        if(highlighted)Slice(glow,new Rect(((int)(Time.unscaledTime*10)%10)*240,0,240,270),new Rect(area.x-area.width*.26f,area.y-area.height*.15f,area.width*1.52f,area.height*1.18f),2400,270);
+        string camp=faction=="魏"?"wei":faction=="蜀"?"shu":faction=="吴"?"wu":faction=="晋"?"jin":faction=="神"?"shen":"qun";
+        if(!frames.TryGetValue(camp,out var frame)){frame=Resources.Load<Texture2D>("GeneralUI/v002/frame-"+camp);frames[camp]=frame;}
+        if(frame!=null)GUI.DrawTexture(area,frame,ScaleMode.StretchToFill,true);
         Texture2D portrait=null;
         if(!string.IsNullOrEmpty(id)&&!portraits.TryGetValue(id,out portrait)){portrait=Resources.Load<Texture2D>(Root+"Portraits/"+id);portraits[id]=portrait;}
         if(portrait!=null&&!faceDown)
         {
             // 源图400×472，左右透明边与顶部露头保留；头部高于卡框约12像素。
-            var image=new Rect(area.x+area.width*.23f,area.y-12,area.width*.75f,area.height+10);
+            var image=new Rect(area.x+area.width*.155f,area.y-12,area.width*.83f,area.height+10);
             GUI.DrawTextureWithTexCoords(image,portrait,new Rect(.08f,0,.8275f,1),true);
         }
         else Text(new Rect(area.x+26,area.y+40,area.width-30,64),faceDown?"暗置":name??"待登场",22);
         // 姓名条盖在人物左侧，顶部不覆盖露出的头饰。
-        Slice(atlas,new Rect(70,105,94,575),new Rect(area.x+3,area.y+6,area.width*.21f,area.height-12),1448,1086);
-        Text(new Rect(area.x+2,area.y+3,area.width*.22f,23),faction??"",17,new Color(.67f,.86f,.63f));
-        if(name!=null)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+2,area.y+28+i*22,area.width*.22f,24),name[i].ToString(),22,Color.white);
+        var previousFont=lettering.font;lettering.font=nameBrush??previousFont;
+        if(name!=null)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+1,area.y+22+i*19,area.width*.19f,22),name[i].ToString(),20,Color.white);
+        lettering.font=previousFont;
         if(life>=0)Health(new Rect(area.x+3,area.yMax-88,area.width*.20f,70),life,3);
         if(position>=0&&position<SeatNumbers.Length)
         {
@@ -74,10 +78,16 @@ public static class GeneralFrameUI
         Ensure();bool hover=area.Contains(Event.current.mousePosition);
         if(active)
         {
-            int state=!enabled?3:selected?2:hover||flashing?1:0;
-            var source=ButtonRegions[state];
-            Slice(buttons,source,area,1254,1254);
+            int state=!enabled?2:selected||hover||flashing?1:0;
+            // 原图含透明留边；只裁去留边，不拉伸或裁掉按钮轮廓。
+            Slice(buttons[state],new Rect(28,115,990,530),area,1045,669);
         }
-        Text(area,name,name.Length>3?23:29,active&&!enabled?new Color(.56f,.51f,.32f):Gold);
+        int size=Mathf.Min(name.Length>3?23:27,Mathf.FloorToInt((area.width-18)/Mathf.Max(1,name.Length)),Mathf.FloorToInt(area.height*.6f));
+        Text(area,name,size,active&&!enabled?new Color(.56f,.51f,.32f):Gold);
+    }
+    public static bool Choice(Rect area,string name,bool enabled=true,bool selected=false)
+    {
+        Skill(area,name,true,enabled,selected,false);
+        return ThreeKingdomsDirectInput.Read(area,enabled,false)==1;
     }
 }

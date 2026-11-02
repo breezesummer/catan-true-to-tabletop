@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -89,13 +89,7 @@ namespace Catan.Core.M4
         }
         private IEnumerable<Command> B4RetirementActions(string player)
         {
-            var tk=state.ThreeKingdoms;
-            if(!B4(state)||!tk.OpeningComplete||tk.Clock.Round==0||tk.Clock.ActivePlayerId!=player||tk.PendingDecision!=null) yield break;
-            foreach(var phase in new[]{ThreeKingdomsPhase.Preparation,ThreeKingdomsPhase.Judgment,ThreeKingdomsPhase.Roll,
-                ThreeKingdomsPhase.Draw,ThreeKingdomsPhase.Play,ThreeKingdomsPhase.End})
-                yield return new Command {Kind=CommandKind.RetireGeneral,PlayerId=player,WindowId=tk.WindowId,RetireAtPhase=phase};
-            if(tk.Automation?.RetirementIntents.Any(i=>i.PlayerId==player)==true)
-                yield return new Command {Kind=CommandKind.RetireGeneral,PlayerId=player,WindowId=tk.WindowId,CancelRetirementIntent=true};
+            yield break;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Catan.Core.ThreeKingdoms
         public string CommitBoundary { get; internal set; }
         public SkillDefinition Definition => SkillId.StartsWith("tk-",StringComparison.Ordinal) ? GeneralCatalog.Get(SkillId.Substring(0,6))?.Skills.FirstOrDefault(s=>s.Id==SkillId) : null;
         public string Name => Definition?.Name ?? (SkillId==B45SkillCatalog.RepairSkillId?"常规修复":SkillId);
-        public string Description => (Definition?.OriginalText ?? "") + "\n时机：" + Timing + "\n费用：" + Cost + "\n次数：" + Limit + "\n提交：" + CommitBoundary;
+        public string Description => Definition?.OriginalText ?? "支付对应资源，修复一处受损建筑。";
     }
 
     // 名称和牌文只用于展示；分类与选择由稳定技能身份及合法命令字段确定。

@@ -12,6 +12,11 @@ public sealed class ThreeKingdomsB45SelectionTests
 
     [Fact] public void CatalogCoversThirtyGeneralsAndExactlyFiftyOneSkills()
     {Assert.Equal(30,GeneralCatalog.B4Definitions.Length);Assert.Equal(51,B45SkillCatalog.All.Length);Assert.Equal(GeneralCatalog.B4Definitions.SelectMany(g=>g.Skills).Select(s=>s.Id).OrderBy(x=>x),B45SkillCatalog.All.Select(s=>s.SkillId).OrderBy(x=>x));Assert.All(B45SkillCatalog.All,s=>{Assert.NotEmpty(s.Timing);Assert.NotEmpty(s.Cost);Assert.NotEmpty(s.Limit);Assert.NotEmpty(s.CommitBoundary);});}
+    [Fact] public void SkillDescriptionContainsOnlyTheSkillRules()
+    {
+        foreach(var skill in B45SkillCatalog.All.Where(s=>s.Definition!=null))
+            Assert.Equal(skill.Definition.OriginalText,skill.Description);
+    }
     [Fact] public void RendeSelectsMixedCardsThenPortraitInOnePureDraft()
     {var hand=Bag((0,3),(5,2));var view=View(Action("gift",target:"p2",type:0),Action("gift",target:"p2",type:5),Action("gift",target:"p3",type:0),Action("gift",target:"p3",type:5));var c=Start(view,hand);Assert.Single(c.Options);Assert.True(c.ToggleCard(0,2));Assert.True(c.ToggleCard(5,1));Assert.False(c.CanConfirm);Assert.True(c.TogglePlayer("p2"));var command=c.BuildCommand();Assert.NotNull(command);Assert.Equal(Bag((0,1),(5,1)),command.Counts);Assert.Equal(new[]{"p2"},command.TargetPlayerIds);Assert.Equal(Bag((0,3),(5,2)),hand);Assert.Equal(1,view.SkillActions[0].Command.Counts[0]);}
     [Fact] public void PortraitFirstAndReplacementRetainValidSelectedCards()
