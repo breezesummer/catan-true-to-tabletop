@@ -299,7 +299,7 @@ public sealed partial class M6App
         if(generalSelection.RequiresBankCards){DrawGeneralBankCandidates();return;}
         var options=generalSelection.Options;
         // 牌、头像、棋盘目标不生成文字组合列表。这里只容纳分支、银行类型及私密授权候选。
-        var local=options.Where(a=>IsLocalCandidate(a)||options.Length>1).ToArray();
+        var local=options.Where(a=>a.Command.Option!="civil-kurou"&&(IsLocalCandidate(a)||options.Length>1)).ToArray();
         var privateCards=generalSelection.PrivateOptions.GroupBy(a=>a.Command.CardType).Select(g=>g.First()).ToArray();
         if(local.Length==0&&privateCards.Length==0)return;
         if(privateCards.Length==0&&local.Length<=6&&local.All(a=>a.ResultCardType==null&&a.VirtualCardId==null&&a.Command.Option!="choose-card"&&a.Command.Option!="b4-guess"&&a.Command.Option!="claim"))
@@ -385,6 +385,14 @@ public sealed partial class M6App
     }
     static void Outline(Rect r,Color c,float width)
     {TabletopUI.Fill(new Rect(r.x,r.y,r.width,width),c);TabletopUI.Fill(new Rect(r.x,r.yMax-width,r.width,width),c);TabletopUI.Fill(new Rect(r.x,r.y,width,r.height),c);TabletopUI.Fill(new Rect(r.xMax-width,r.y,width,r.height),c);}
+    internal bool DrawGeneralFacilityTarget(Rect area,string player,int track)
+    {
+        string id="Improvement:"+player+":"+track;
+        if(!generalSelection.Active||!generalSelection.CandidateActions.Any(a=>B45SelectionContract.Board(a).Contains(id)))return false;
+        Outline(area,generalSelection.SelectedTiles.Contains(id)?new Color(1,.81f,.28f):new Color(.48f,.89f,.62f),2);
+        if(ThreeKingdomsDirectInput.Read(area,GeneralCanInteract&&generalSelection.CanSelectTile(id))==1)generalSelection.ToggleTile(id);
+        return true;
+    }
     void DrawGeneralBoardTargets()
     {
         if(!generalSelection.Active)return;
@@ -392,7 +400,8 @@ public sealed partial class M6App
         if(presentation is M4App a)screenPoint=a.VerificationBoard.ScreenPoint;else if(presentation is M5App b)screenPoint=b.VerificationBoard.ScreenPoint;
         if(screenPoint==null)return;
         var targets=generalSelection.CandidateActions.SelectMany(B45SelectionContract.Board).Distinct().OrderBy(id=>id,StringComparer.Ordinal)
-            .Select(id=>new {Id=id,Point=MobileTabletop.Logical(screenPoint(id))}).ToArray();
+            .Where(id=>!id.StartsWith("Improvement:",StringComparison.Ordinal))
+            .Select(id=>new {Id=id,Point=MobileTabletop.Logical(screenPoint(B45SelectionContract.BoardLocationId(id)))}).ToArray();
         foreach(var target in targets)
         {
             var id=target.Id;var point=target.Point;if(point.y<211||point.y>644||point.x<332||point.x>1274)continue;
@@ -435,9 +444,8 @@ public sealed partial class M6App
         var visible=ThreeKingdomsProjection?.Players.FirstOrDefault(p=>p.PlayerId==player);
         if(string.IsNullOrEmpty(visible?.ActiveGeneralId))return;
         var general=GeneralCatalog.Get(visible.ActiveGeneralId);
-        CopperTabletopSkin.Panel(area,ModernOperationUI.Surface,false,false);
-        GeneralFrameUI.Portrait(new Rect(area.x+4,area.y+2,27,33),general.Id,general.Name,general.Faction,-1,false,visible.FaceDown,-1);
-        PastoralMenuUI.Label(new Rect(area.x+32,area.y+2,area.width-36,area.height-4),general.Name,13,null,false,TextAnchor.MiddleCenter);
+        GeneralFrameUI.Avatar(new Rect(area.x+2,area.y-2,34,40),general.Id,visible.FaceDown);
+        PastoralMenuUI.Label(new Rect(area.x+38,area.y+2,area.width-40,area.height-4),general.Name,13,null,false,TextAnchor.MiddleCenter);
         if(ThreeKingdomsDirectInput.Read(area,GUI.enabled)==1)detailGeneralId=general.Id;
     }
     void DrawGeneralDetail()

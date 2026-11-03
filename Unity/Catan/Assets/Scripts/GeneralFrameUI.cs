@@ -53,7 +53,6 @@ public static class GeneralFrameUI
             GUI.DrawTextureWithTexCoords(image,portrait,new Rect(.08f,0,.8275f,1),true);
         }
         else Text(new Rect(area.x+area.width*.2f,area.y+area.height*.25f,area.width*.75f,area.height*.4f),faceDown?"暗置":name??"",22);
-        if(StrategyHudTheme.Ocean)OceanTabletopSkin.Frame(area,highlighted,true);
         // 姓名条盖在人物左侧，顶部不覆盖露出的头饰。
         var previousFont=lettering.font;lettering.font=nameBrush??previousFont;
         if(name!=null&&area.width>=70)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+1,area.y+(22+i*19)*portraitScale,area.width*.19f,22*portraitScale),name[i].ToString(),Mathf.Max(6,Mathf.RoundToInt(20*portraitScale)),Color.white);
@@ -69,6 +68,13 @@ public static class GeneralFrameUI
                 if(x!=0||y!=0)GUI.Label(new Rect(number.x+x,number.y+y,number.width,number.height),SeatNumbers[position],lettering);
             lettering.normal.textColor=new Color(.025f,.025f,.02f);GUI.Label(number,SeatNumbers[position],lettering);
         }
+    }
+    public static void Avatar(Rect area,string id,bool faceDown)
+    {
+        Ensure();
+        if(faceDown){Text(area,"暗置",12);return;}
+        if(!portraits.TryGetValue(id,out var portrait)){portrait=Resources.Load<Texture2D>(Root+"Portraits/"+id);portraits[id]=portrait;}
+        if(portrait!=null)GUI.DrawTextureWithTexCoords(area,portrait,new Rect(.08f,.40f,.8275f,.60f),true);
     }
     static void Health(Rect area,int current,int maximum)
     {

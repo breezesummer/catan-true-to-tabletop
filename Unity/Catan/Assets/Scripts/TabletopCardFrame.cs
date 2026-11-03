@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// 卡面共用的窄边框，四个主题即时切换；不遮住原画角标，不创建每帧贴图。
+// 只保留选中卡牌的交互描边；普通卡面不加装饰边框。
 public static class TabletopCardFrame
 {
     static readonly Color[] Bases={new Color(.34f,.15f,.065f),new Color(.025f,.24f,.30f),new Color(.24f,.29f,.35f),new Color(.055f,.36f,.25f)};
@@ -9,13 +9,8 @@ public static class TabletopCardFrame
     public static Color MetalColor=>Metals[StrategyHudTheme.Selected];
     public static void Draw(Rect r,bool selected=false)
     {
-        if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;
-        float width=Mathf.Min(r.width,r.height),rim=width*.021f,radius=width*.095f;
-        GUI.DrawTexture(r,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,BaseColor,rim,radius);
-        float inset=rim*.28f;
-        var inner=new Rect(r.x+inset,r.y+inset,r.width-2*inset,r.height-2*inset);
-        GUI.DrawTexture(inner,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,selected?StrategyHudTheme.Accent:MetalColor,Mathf.Max(.5f,rim*.25f),Mathf.Max(0,radius-inset));
-        if(selected)
-            GUI.DrawTexture(r,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,StrategyHudTheme.Accent,Mathf.Max(1,rim*.55f),radius);
+        // 普通卡面不叠加装饰边框，仅在选中时显示交互描边。
+        if(!selected||Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;
+        GUI.DrawTexture(r,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,StrategyHudTheme.Accent,1.5f,Mathf.Min(r.width,r.height)*.095f);
     }
 }

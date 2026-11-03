@@ -30,8 +30,9 @@ public sealed partial class M6App
     }
     void DrawGeneralTypeCandidates(B2SkillAction[] actions)
     {
+        if(generalSelection.Contract.DirectBatch&&generalSelection.Contract.DecisionKind=="shelie")actions=actions.Where(a=>a.Command.Option=="card").ToArray();
         PastoralMenuUI.Panel(CandidateArea);
-        string title=generalSelection.Contract.DecisionKind=="shelie"?"涉猎公开牌 · 最多取三种，已选内容保留在权威待决":
+        string title=generalSelection.Contract.DecisionKind=="shelie"?"涉猎 · 选择至多三种资源":
             actions[0].Command.Option=="b4-daoshu"?"声明要猜的真实牌种 · 再点目标头像":
             actions[0].Command.Option=="color"?"选择发展牌颜色":actions[0].Command.Option=="b4-declare"?"声明小麦张数 · 尚未公开你的手牌子集":"当前响应候选 · 选中后确认";
         PastoralMenuUI.Label(new Rect(354,480,900,22),title,14,PastoralMenuUI.Ink,true);

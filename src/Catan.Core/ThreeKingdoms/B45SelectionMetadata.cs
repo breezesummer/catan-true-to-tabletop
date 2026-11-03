@@ -8,7 +8,7 @@ namespace Catan.Core.ThreeKingdoms
     {
         public static B2SkillAction WithBoard(B2SkillAction action,B5BoardOption option)
         {
-            if(option.AssetKind!="Improvement")action.SelectionBoardIds=new[]{option.SourceId,option.TargetId}.Where(id=>!string.IsNullOrEmpty(id)).Distinct().ToArray();
+            if(option.AssetKind!="Improvement"||action.Command.Option=="civil-kurou")action.SelectionBoardIds=new[]{option.SourceId,option.TargetId}.Where(id=>!string.IsNullOrEmpty(id)).Distinct().ToArray();
             if(action.Command.Option=="civil-qixi-tech"){action.SelectionCost=new int[8];action.SelectionCost[1]=option.Level;}
             return action;
         }

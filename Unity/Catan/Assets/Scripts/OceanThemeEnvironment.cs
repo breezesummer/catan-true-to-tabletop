@@ -35,7 +35,7 @@ public sealed class OceanThemeEnvironment : MonoBehaviour
     void LateUpdate()
     {
         if(water==null||table==null)return;
-        bool active=StrategyHudTheme.Ocean;
+        bool active=true;
         water.SetFloat("_OceanTheme",active?1:0);
         if(active&&!loaded)Load();
         var camera=table.TableCamera;

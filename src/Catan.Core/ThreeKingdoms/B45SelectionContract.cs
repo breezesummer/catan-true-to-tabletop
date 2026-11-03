@@ -134,6 +134,13 @@ namespace Catan.Core.ThreeKingdoms
             Counts=c.Counts==null?null:(int[])c.Counts.Clone(),SecondaryCounts=c.SecondaryCounts==null?null:(int[])c.SecondaryCounts.Clone(),TargetPlayerIds=(c.TargetPlayerIds??Array.Empty<string>()).ToArray(),TileIds=(c.TileIds??Array.Empty<string>()).ToArray(),ProgressCardIds=c.ProgressCardIds?.ToArray()};
         public static string[] Players(B2SkillAction a) => a.SelectionPlayerIds??a.Command.TargetPlayerIds??Array.Empty<string>();
         public static string[] Board(B2SkillAction a) => a.SelectionBoardIds??a.Command.TileIds??Array.Empty<string>();
+        public static string BoardLocationId(string id)
+        {
+            if(id==null)return null;
+            foreach(string kind in new[]{"Road:","Ship:","Settlement:","City:","Wall:","Knight:"})
+                if(id.StartsWith(kind,StringComparison.Ordinal))return id.Substring(kind.Length);
+            return id;
+        }
         public static string[] Progress(B2SkillAction a) => a.Command.ProgressCardIds??((a.Command.Option=="exchange-progress"||a.Command.Option=="civil-juece-progress")?new[]{a.Command.ProgressCardId}:Array.Empty<string>());
         public static bool Batch(B2SkillAction a) => a.Command.Option=="gift"||a.Command.Option=="exchange-hand";
         public static int[] Cost(B2SkillAction a)
@@ -153,7 +160,7 @@ namespace Catan.Core.ThreeKingdoms
             string scalar=real||a.RequiredCardCount.HasValue?"":c.CardType.ToString();
             string progress=c.Option=="exchange-progress"||c.ProgressCardIds?.Length>0?"":c.ProgressCardId??"";
             if(a.VirtualCardId!=null) progress=a.VirtualCardId+":"+a.ResultCardType+(Board(a).Length>0||Players(a).Length>0?"":":"+progress);
-            if(c.Option=="response-liuli")progress="";
+            if(c.Option=="response-liuli"||c.Option=="civil-kurou")progress="";
             if(c.Option=="civil-qingnang")scalar+=":"+c.EffectiveCardType;
             return c.Option+"|"+scalar+"|"+progress+"|"+(c.Option=="fixed"||c.Option=="modify"||c.Option=="raid"||c.Option=="luoying"?string.Join(",",c.Counts??Array.Empty<int>()):"");
         }

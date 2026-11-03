@@ -75,6 +75,7 @@ namespace Catan.Core.M4
                 var position=tk.Clock.TurnInstanceId+":"+tk.Clock.PhaseId+":"+tk.Clock.Phase+":"+s.Phase;
                 trace.Enqueue(position); if(trace.Count>32) trace.Dequeue();
                 if(!seen.Add(position)) throw new InvalidOperationException("自动阶段没有进展："+string.Join(" → ",trace));
+                if(tk.Clock.Phase==ThreeKingdomsPhase.Roll&&GeneralCatalog.UsesDirectPackage(tk.PackageVersion))return;
                 var kind=tk.Clock.Phase==ThreeKingdomsPhase.Roll?CommandKind.RollDice:CommandKind.AdvanceThreeKingdomsPhase;
                 ApplyB2(s,new Command { Id="auto-"+tk.Clock.TurnInstanceId+"-"+tk.Clock.PhaseId,
                     PlayerId=tk.Clock.ActivePlayerId,Kind=kind,WindowId=tk.WindowId });

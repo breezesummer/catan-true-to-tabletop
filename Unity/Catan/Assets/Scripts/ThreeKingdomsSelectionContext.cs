@@ -14,6 +14,8 @@ public sealed class B45SelectionContext
     readonly List<string> progressKeys=new List<string>();
     readonly int[] bankCounts=new int[8];
     readonly int[] privateCounts=new int[8];
+    readonly HashSet<int> shelieTypes=new HashSet<int>();
+    bool Shelie => Contract?.DirectBatch==true&&Contract.DecisionKind=="shelie";
     string optionKey;
     int selectedDie=-1;
     bool submitting;
@@ -38,7 +40,7 @@ public sealed class B45SelectionContext
     public B2SkillCommand SkipCommand => submitting?null:B45SelectionContract.Copy(Contract?.SkipCommand);
     public string Description => Contract?.Description??"";
     public string Notice {get;private set;}
-    public string Summary => (RequiresBankCards?"已选银行牌 "+bankCounts.Sum()+" / "+RequiredBankCount+" 张 · ":"")+"已选手牌 "+SelectedCounts.Sum()+" 张"+(progress.Count>0?" · 发展牌 "+progress.Count+" 张":"")+(players.Count>0?" · 目标 "+players.Count+" 人":"")+(tiles.Count>0?" · 棋盘目标 "+tiles.Count+" 项":"")+(privateCounts.Sum()>0?" · 授权目标手牌 "+privateCounts.Sum()+" 张":"");
+    public string Summary => Shelie?"已选资源 "+shelieTypes.Count+" / 3 种":(RequiresBankCards?"已选银行牌 "+bankCounts.Sum()+" / "+RequiredBankCount+" 张 · ":"")+"已选手牌 "+SelectedCounts.Sum()+" 张"+(progress.Count>0?" · 发展牌 "+progress.Count+" 张":"")+(players.Count>0?" · 目标 "+players.Count+" 人":"")+(tiles.Count>0?" · 棋盘目标 "+tiles.Count+" 项":"")+(privateCounts.Sum()>0?" · 授权目标手牌 "+privateCounts.Sum()+" 张":"");
     public B2SkillAction[] CandidateActions => Current().ToArray();
     public B2SkillAction[] Options => Subset||Poxi?Array.Empty<B2SkillAction>():(Contract?.Actions??Array.Empty<B2SkillAction>()).Where(a=>!B45SelectionContract.IsSkip(a.Command)&&(!a.SelectionDiceIndex.HasValue||selectedDie<0||a.SelectionDiceIndex==selectedDie)).GroupBy(B45SelectionContract.OptionKey).Select(g=>g.First()).ToArray();
     public bool CanConfirm => !submitting && BuildCommand()!=null;
@@ -89,11 +91,18 @@ public sealed class B45SelectionContext
     public void Reset()
     {Contract=null;ClearSelections();optionKey=null;selectedDie=-1;submitting=false;Notice=null;}
     public void ClearSelections()
-    {handKeys.Clear();players.Clear();tiles.Clear();progress.Clear();progressKeys.Clear();Array.Clear(privateCounts,0,8);Array.Clear(bankCounts,0,8);Notice=null;}
+    {shelieTypes.Clear();handKeys.Clear();players.Clear();tiles.Clear();progress.Clear();progressKeys.Clear();Array.Clear(privateCounts,0,8);Array.Clear(bankCounts,0,8);Notice=null;}
     public void Reselect(){if(!submitting)ClearSelections();}
     public bool ChooseOption(B2SkillAction action)
     {
         if(!Active||submitting||action==null||!Options.Any(a=>B45SelectionContract.OptionKey(a)==B45SelectionContract.OptionKey(action)))return false;
+        if(Shelie)
+        {
+            int type=action.Command.CardType;
+            if(action.Command.Option!="card"||type<0||type>=5)return false;
+            if(!shelieTypes.Remove(type)&&shelieTypes.Count<3)shelieTypes.Add(type);
+            return true;
+        }
         string next=B45SelectionContract.OptionKey(action);if(next==optionKey)return true;
         optionKey=next;
         // 分支更换只保留仍可用于新分支的选择，不能将其替换成另一张牌。
@@ -105,7 +114,7 @@ public sealed class B45SelectionContext
         return true;
     }
     public bool SelectOption(B2SkillAction action)=>ChooseOption(action);
-    public bool IsOptionSelected(B2SkillAction action)=>action!=null&&optionKey==B45SelectionContract.OptionKey(action);
+    public bool IsOptionSelected(B2SkillAction action)=>action!=null&&(Shelie?shelieTypes.Contains(action.Command.CardType)&&action.Command.Option=="card":optionKey==B45SelectionContract.OptionKey(action));
     public bool IsHandSelected(int type,int ordinal)=>handKeys.Contains(HandKey(type,ordinal));
     public bool CanSelectHand(int type,int ordinal=0)
     {
@@ -211,6 +220,12 @@ public sealed class B45SelectionContext
     public B2SkillCommand BuildCommand()
     {
         if(!Active||submitting||DiceIndices.Length>0&&selectedDie<0)return null;
+        if(Shelie)
+        {
+            var c=B45SelectionContract.Copy(Contract.Actions.FirstOrDefault(a=>a.Command.Option=="done")?.Command);
+            if(c==null||shelieTypes.Any(t=>!Contract.Actions.Any(a=>a.Command.Option=="card"&&a.Command.CardType==t)))return null;
+            c.Option="b45-shelie-confirm";c.Counts=Enumerable.Range(0,8).Select(t=>shelieTypes.Contains(t)?1:0).ToArray();return c;
+        }
         if(RequiresBankCards)
         {
             if(bankCounts.Sum()!=RequiredBankCount||Enumerable.Range(0,8).Any(t=>bankCounts[t]>BankOptions.Where(a=>a.Command.CardType==t).Select(a=>a.AvailableCount??0).DefaultIfEmpty(0).Max()))return null;

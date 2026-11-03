@@ -7,6 +7,20 @@ namespace Catan.Rules.Tests;
 
 public sealed class ThreeKingdomsB45SessionTests(ITestOutputHelper output)
 {
+    [Theory][InlineData("cities","base")][InlineData("combined","heading-for-new-shores")]
+    public void CurrentPackageWaitsForExplicitRollAndRestoresTheSameWindow(string rules,string map)
+    {
+        var game=ThreeKingdomsTestGame.Create(rules,map,3,skills:true,packageVersion:GeneralCatalog.B6PackageVersion);
+        for(int step=0;step<300&&game.Authority().Clock.Phase!=ThreeKingdomsPhase.Roll;step++)game.Accept(game.Decide());
+        Assert.Equal(ThreeKingdomsPhase.Roll,game.Authority().Clock.Phase);
+        string saved=game.Save();
+        for(int i=0;i<3;i++){game.View();game.Decide();Assert.Equal(saved,game.Save());}
+        var restored=ThreeKingdomsTestGame.Load(rules,saved);
+        Assert.Equal(ThreeKingdomsPhase.Roll,restored.Authority().Clock.Phase);
+        dynamic roll=restored.Decide();Assert.Equal("RollDice",(string)roll.Kind.ToString());restored.AcceptAndResume(roll);
+        Assert.NotEqual(saved,restored.Save());
+    }
+
     public static IEnumerable<object[]> Configurations()
     {
         foreach(int seats in new[]{3,4})
@@ -26,7 +40,7 @@ public sealed class ThreeKingdomsB45SessionTests(ITestOutputHelper output)
             foreach(var g in tk.Generals.Where(g=>g.Region==GeneralRegion.Active))generals.Add(g.GeneralId);
             dynamic command=game.Decide();command.Id="B4.5整局-"+steps++;
             Assert.NotEqual("AdvanceThreeKingdomsPhase",(string)command.Kind.ToString());
-            Assert.NotEqual("RollDice",(string)command.Kind.ToString());
+            if((string)command.Kind.ToString()=="RollDice")Assert.Equal(ThreeKingdomsPhase.Roll,tk.Clock.Phase);
             var decision=tk.Skills.PendingDecision??tk.Dice?.PendingDecision??tk.Automation?.PendingDecision;
             var checkpoint=decision!=null?"技能:"+decision.Kind+":"+decision.Title:tk.PendingDecision!=null?"武将:"+tk.PendingDecision.Kind:null;
             var trace=Environment.GetEnvironmentVariable("CATAN_B45_TRACE");

@@ -10,6 +10,33 @@ public sealed class ThreeKingdomsB45SelectionTests
     static ThreeKingdomsView View(params B2SkillAction[] actions)=>new(){PackageVersion=GeneralCatalog.B45PackageVersion,WindowId="w",Clock=new(){ActivePlayerId="p1",Phase=ThreeKingdomsPhase.Play},SkillActions=actions};
     static B45SelectionContext Start(ThreeKingdomsView view,int[] hand,string? skill=null){var context=new B45SelectionContext();context.Begin(view,"p1",skill??view.SkillActions[0].Command.SkillId,hand);return context;}
 
+    [Theory][InlineData("City:V:12:14","V:12:14")][InlineData("Road:E:2:7","E:2:7")][InlineData("Wall:V001","V001")][InlineData("V:12:14","V:12:14")][InlineData("E:2:7","E:2:7")]
+    public void BoardAssetLocationPreservesColonsInsideStableMapIds(string asset,string location)
+    {Assert.Equal(location,B45SelectionContract.BoardLocationId(asset));}
+    [Fact] public void KurouSelectsBoardAssetOrFacilityWithoutEnumeratedOptionButtons()
+    {
+        B2SkillAction A(string id,string kind)
+        {
+            var a=Action("civil-kurou","tk-g16-s1");a.Command.ProgressCardId="命令:"+id;
+            return B45SelectionMetadata.WithBoard(a,new(){TargetId=id,AssetKind=kind});
+        }
+        var c=Start(View(A("City:V1","City"),A("Wall:V1","Wall"),A("Improvement:p1:0","Improvement")),new int[8]);
+        Assert.Single(c.Options);Assert.False(c.CanConfirm);
+        Assert.True(c.ToggleTile("City:V1"));Assert.Equal("命令:City:V1",c.BuildCommand().ProgressCardId);
+        Assert.True(c.ToggleTile("Improvement:p1:0"));Assert.Equal("命令:Improvement:p1:0",c.BuildCommand().ProgressCardId);
+        Assert.False(c.ToggleTile("Improvement:p2:0"));
+    }
+    [Fact] public void ShelieSelectsThreeTypesInOneReversibleDraft()
+    {
+        var actions=Enumerable.Range(0,4).Select(t=>{var a=Action("card","tk-g28-s1");a.Command.CardType=t;return a;}).Append(Action("done","tk-g28-s1")).ToArray();
+        var view=View(actions);view.SkillDecision=new(){PlayerId="p1",Kind="shelie",DecisionId="d"};
+        var c=Start(view,new int[8]);c.ChooseOption(actions[0]);c.ChooseOption(actions[1]);c.ChooseOption(actions[2]);c.ChooseOption(actions[3]);
+        Assert.Equal(Bag((0,1),(1,1),(2,1)),c.BuildCommand().Counts);Assert.Equal("已选资源 3 / 3 种",c.Summary);
+        c.ChooseOption(actions[1]);c.ChooseOption(actions[3]);
+        Assert.Equal(Bag((0,1),(2,1),(3,1)),c.BeginSubmit().Counts);Assert.Null(c.BeginSubmit());
+        Assert.All(actions,a=>Assert.Equal(new int[8],a.Command.Counts));
+    }
+
     [Fact] public void CatalogCoversThirtyGeneralsAndExactlyFiftyOneSkills()
     {Assert.Equal(30,GeneralCatalog.B4Definitions.Length);Assert.Equal(51,B45SkillCatalog.All.Length);Assert.Equal(GeneralCatalog.B4Definitions.SelectMany(g=>g.Skills).Select(s=>s.Id).OrderBy(x=>x),B45SkillCatalog.All.Select(s=>s.SkillId).OrderBy(x=>x));Assert.All(B45SkillCatalog.All,s=>{Assert.NotEmpty(s.Timing);Assert.NotEmpty(s.Cost);Assert.NotEmpty(s.Limit);Assert.NotEmpty(s.CommitBoundary);});}
     [Fact] public void SkillDescriptionContainsOnlyTheSkillRules()

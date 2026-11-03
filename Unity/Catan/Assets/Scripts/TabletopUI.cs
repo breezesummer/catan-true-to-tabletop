@@ -38,7 +38,6 @@ public sealed partial class TabletopUI
     {
         var value=Style(key+player,basis,size,FontStyle.Bold,alignment);value.richText=false;
         if(PlayerIdentityModel.IsPlayerId(player))value.normal.textColor=BoardRenderer.SeatColor(player.ToUpperInvariant());
-        if(StrategyHudTheme.Ocean)value.normal.textColor=ModernOperationUI.TextColor;
         return value;
     }
     static readonly Rect[] baseDiceRects={new Rect(43,192,43,43),new Rect(112,192,43,43)},expansionDiceRects={new Rect(46,220,31,31),new Rect(116,220,31,31),new Rect(81,191,31,31)};
@@ -245,6 +244,7 @@ public sealed partial class TabletopUI
             var levelStyle=Style("level",center,12,FontStyle.Bold);levelStyle.normal.textColor=StrategyHudArt.Gold;
             GUI.Label(marker,i<2?"–":level.ToString(),levelStyle);
             }
+            if(i>=2&&ThreeKingdoms?.DrawGeneralFacilityTarget(r,own.Id,i-2)==true)continue;
             bool prior=GUI.enabled;GUI.enabled=prior&&available;
             if(TabletopButtonFeedback.Button(r,true,true)){if(i<2)trade?.Invoke(i==0?null:"");else facility?.Invoke(i-2);}GUI.enabled=prior;
             if(over)
@@ -263,18 +263,15 @@ public sealed partial class TabletopUI
         {
             var player=seats.First(p=>p.Id==id);
             string alliance=ThreeKingdoms?.AlliancePlayerCaptionB6(player.Id);
-            var panel=new Rect(x,13,width,(alliance==null?191:211)+(fishing!=null?18:0));hits.Add(panel);
+            bool hasGeneral=ThreeKingdoms?.ThreeKingdomsProjection!=null;
+            float statsY=hasGeneral?142:103;
+            var panel=new Rect(x,13,width,statsY+86-13+(alliance==null?0:20));hits.Add(panel);
             if(StrategyHudTheme.Jade)JadeTabletopSkin.LightPanel(panel,player.Id==actor);else CopperTabletopSkin.Panel(panel,ModernOperationUI.Background,player.Id==actor);
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             if(!StrategyHudTheme.Jade)StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
             StrategyHudArt.Avatar(StrategyHudTheme.Jade?new Rect(avatar.x+1,avatar.y,avatar.width-2,avatar.height-2):new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
             if(fishing!=null)
             {
-                var fish=fishing.Players.First(p=>p.PlayerId==player.Id);
-                var fishBadge=new Rect(x+11,191,width-22,15);
-                StrategyHudArt.FishIcon(new Rect(fishBadge.x+1,fishBadge.y-1,20,16));
-                GUI.Label(new Rect(fishBadge.x+26,fishBadge.y,fishBadge.width-28,16),fish.TokenCount+"/7",Style("fish",center,12,FontStyle.Bold,TextAnchor.MiddleRight));
-                if(fishBadge.Contains(Event.current.mousePosition)){hoveredPlayerHint="持有 "+fish.TokenCount+" 枚鱼筹码；面值仅本人可见";playerHintAnchor=fishBadge;}
                 if(fishing.OldBootPlayerId==player.Id)
                 {
                     var bootBadge=new Rect(x+4,30,28,28);FishingTabletopAssets.DrawIcon(bootBadge,"old-boot");
@@ -283,25 +280,25 @@ public sealed partial class TabletopUI
             }
             var nameRect=new Rect(x+11,73,width-22,27);
             var nameStyle=NameStyle("player",center,player.Id,StrategyHudTheme.Ocean?15:12);
-            if(StrategyHudTheme.Ocean&&active)nameStyle.normal.textColor=StrategyHudTheme.Accent;
-            if(StrategyHudTheme.Jade)nameStyle.normal.textColor=JadeTabletopSkin.PlayerInk(player.Id).linear;
             TabletopTextFit.Label(nameRect,M6App.PlayerLabel(player.Id),nameStyle,8,true);
-            bool hasGeneral=ThreeKingdoms?.ThreeKingdomsProjection!=null;
             if(hasGeneral)ThreeKingdoms.DrawPlayerGeneralCard(player.Id,new Rect(x+10,100,width-20,38));
             int points=player.Score==null?player.Points:player.Id==own?player.Score.Total:player.Score.PublicPoints;
             int resources=displayedHandCounts.Observe(operations?.Scope,player.Id,false,player.Resources,DiceRolling);
             int cards=displayedHandCounts.Observe(operations?.Scope,player.Id,true,player.Cards,DiceRolling);
-            int[] values={points,player.Improvements==null?0:player.Improvements[0],player.Improvements==null?0:player.Improvements[1],player.Improvements==null?0:player.Improvements[2],resources,cards};
+            int[] values={points,player.Improvements==null?0:player.Improvements[0],player.Improvements==null?0:player.Improvements[1],player.Improvements==null?0:player.Improvements[2],resources,cards,fishing?.Players.First(p=>p.PlayerId==player.Id).TokenCount??0};
             string[] hints={"胜利点 · 悬停查看分数构成","贸易设施等级","政治设施等级","科学设施等级",
                 "资源与商品 · 当前 / 七点保护线\n超出保护线后掷出 7，须弃去一半手牌",
                 player.SpecialHandLimit>0?"发展卡 · 当前 / 回合结束上限\n公开胜利点卡不占手牌上限":"发展卡 · 当前张数 / 无持有上限"};
-            for(int row=0;row<6;row++)
+            for(int row=0;row<(fishing==null?6:7);row++)
             {
-                var r=hasGeneral?new Rect(x+7+(row%2)*51,143+(row/2)*16,49,15):new Rect(x+11,101+row*15,width-22,15);
+                int columns=row<4?3:fishing==null?2:3;
+                float cell=(width-22)/columns;
+                var r=row==0?new Rect(x+11,statsY,width-22,18):row<4?new Rect(x+11+(row-1)*cell,statsY+21,cell,18):new Rect(x+11+(row-4)*cell,statsY+42,cell,30);
                 if(StrategyHudTheme.Jade&&row<5)Fill(new Rect(r.x+4,r.yMax,r.width-8,.5f),new Color(.12f,.38f,.26f,.10f));
-                var icon=new Rect(r.x+1,r.y-1,20,16);
+                var icon=row>=4?new Rect(r.center.x-9,r.y,18,14):new Rect(r.x,r.y,14,16);
                 if(row==0)StrategyHudArt.VictoryIcon(icon);
                 else if(row<4)StrategyHudArt.Icon(icon,row+1);
+                else if(row==6)StrategyHudArt.FishIcon(icon);
                 else StrategyHudArt.HandCardIcon(icon,row==5);
                 var valueStyle=Style("value",center,12,FontStyle.Bold,TextAnchor.MiddleRight);
                 valueStyle.normal.textColor=row==0?StrategyHudArt.Gold:row==1?new Color(1,.8f,.3f):row==2?new Color(.48f,.77f,1):row==3?new Color(.55f,.9f,.52f):ModernOperationUI.TextColor;
@@ -310,16 +307,18 @@ public sealed partial class TabletopUI
                 string value=values[row].ToString();
                 if(row>=4)
                 {
-                    var counter=new TabletopHandCounter(values[row],row==4?player.ResourceHandLimit:player.SpecialHandLimit);
+                    var counter=new TabletopHandCounter(values[row],row==4?player.ResourceHandLimit:row==6?7:player.SpecialHandLimit);
                     value=counter.Caption;if(counter.OverLimit)valueStyle.normal.textColor=ModernOperationUI.Error;
                 }
-                TabletopTextFit.Label(new Rect(r.x+26,r.y,r.width-28,16),value,valueStyle);
+                valueStyle.alignment=row>=4?TextAnchor.MiddleCenter:TextAnchor.MiddleRight;
+                valueStyle.fontSize=row>=4?11:12;
+                TabletopTextFit.Label(row>=4?new Rect(r.x,r.y+14,r.width,16):new Rect(r.x+15,r.y,r.width-16,16),value,valueStyle,8);
                 if(row==0)ScoreHover(r,player.Score);
-                else if(r.Contains(Event.current.mousePosition)){hoveredPlayerHint=hints[row];playerHintAnchor=r;}
+                else if(r.Contains(Event.current.mousePosition)){hoveredPlayerHint=row==6?"鱼筹码":hints[row];playerHintAnchor=r;}
             }
             if(alliance!=null)
             {
-                var badge=new Rect(x+10,fishing!=null?215:197,width-20,17);TabletopTextFit.Label(badge,alliance,Style("alliance",center,11,FontStyle.Bold));
+                var badge=new Rect(x+10,statsY+74,width-20,17);TabletopTextFit.Label(badge,alliance,Style("alliance",center,11,FontStyle.Bold));
                 if(badge.Contains(Event.current.mousePosition)){hoveredPlayerHint=ThreeKingdoms.AlliancePlayerHintB6(player.Id);playerHintAnchor=badge;}
             }
             bool selecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;

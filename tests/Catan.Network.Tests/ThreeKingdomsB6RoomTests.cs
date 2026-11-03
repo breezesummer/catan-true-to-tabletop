@@ -98,7 +98,9 @@ public sealed class ThreeKingdomsB6RoomTests
         f.Restart();for(int i=0;i<f.Clients.Length;i++)f.Clients[i]=f.Reconnect(f.Clients[i]);controller=f.Clients.Single(c=>c.SeatId=="P2");current=f.Snapshot(controller);
         Assert.Equal(grant.AssetPlayerId,f.Tk(current).ControlB6.AssetPlayerId);Assert.Equal(grant.OpportunityId,f.Tk(current).ControlB6.OpportunityId);
         Assert.False(current.HumanControlAvailable);Assert.True(current.Room.Seats.Single(s=>s.SeatId=="P2").RejoinPending);
-        dynamic interrupted=Choose(f,current,rules);interrupted.Id=Guid.NewGuid().ToString("N");Assert.Equal("AiTakeover",f.Submit(current,interrupted,current.Revision).Code);
+        // 掷骰后可能轮到其他席位弃牌；此处仅验证重连接管门禁，重发先前命令的新ID即可。
+        dynamic interrupted=rules=="combined"?(object)WireJson.Deserialize<M5.Command>(WireJson.SerializeObject(command)):WireJson.Deserialize<M4.Command>(WireJson.SerializeObject(command));
+        interrupted.Id=Guid.NewGuid().ToString("N");Assert.Equal("AiTakeover",f.Submit(current,interrupted,current.Revision).Code);
         for(int i=0;i<280&&(f.Tk(f.Snapshot(controller)).ControlB6!=null||!f.Snapshot(controller).HumanControlAvailable);i++)
         {
             var own=Actor(f,rules);if(!own.HumanControlAvailable){Assert.Equal(1,await f.Directory.TickAiAsync());continue;}

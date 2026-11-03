@@ -8,8 +8,9 @@ public sealed partial class TabletopUiVerification
 {
     IEnumerator VerifyOceanViews()
     {
-        int index=0;
-        foreach(string rules in new[]{"base","seafarers","cities-knights","combined","combined"})
+        bool kurouOnly=Environment.GetCommandLineArgs().Contains("--kurou-view-only");
+        int index=kurouOnly?4:0;
+        foreach(string rules in kurouOnly?new[]{"combined"}:new[]{"base","seafarers","cities-knights","combined","combined"})
         {
             mode=rules;
             bool threeKingdoms=index==4;
@@ -52,11 +53,11 @@ public sealed partial class TabletopUiVerification
                 yield return new WaitForSeconds(2);yield return new WaitForEndOfFrame();SaveOceanFrame(label+"-交易.png");
                 app.HandleTableEscape();Require(!Dock.TradeOpen,"海洋主题无法取消交易");
                 Require(saved==Authority,"海洋主题取消交易改变存档");
-                foreach(int theme in new[]{0,3,1})
+                foreach(int theme in new[]{0,2,3,1})
                 {
                     StrategyHudTheme.Select(theme);yield return null;yield return new WaitForEndOfFrame();
-                    Require(ocean.sharedMaterial.GetFloat("_OceanTheme")== (theme==1?1:0),"主题切换未刷新海面");
-                    Require(environment.GetComponentsInChildren<Renderer>().Length==(theme==1?4:0),"礁石主题可见性错误");
+                    Require(ocean.sharedMaterial.GetFloat("_OceanTheme")==1,"主题切换未刷新海面");
+                    Require(environment.GetComponentsInChildren<Renderer>().Length==4,"礁石主题可见性错误");
                     Require(saved==Authority,"主题切换改变权威存档");
                     if(index==4)SaveOceanFrame("主题切换-"+theme+".png");
                 }
@@ -103,7 +104,45 @@ public sealed partial class TabletopUiVerification
             Require(table.Ocean.MaskRevision==revision,"静止棋盘重复重建海岸遮罩");
             Require(saved==Authority,"海面、缩放或平移改变了权威存档");
             Debug.Log("CATAN_OCEAN_VIEW_OK: "+label+" 动画变化像素="+changed+" 遮罩修订="+revision);
+            if(threeKingdoms)
+            {
+                var feedback=VerifyKurouPresentation();
+                while(feedback.MoveNext())yield return feedback.Current;
+            }
             configurations++;index++;
+        }
+    }
+
+    IEnumerator VerifyKurouPresentation()
+    {
+        var game=GetComponent<M5App>();var host=game.VerificationHost;
+        var session=(Catan.Core.M5.CombinedGameSession)host.GetType().GetField("session",PrivateInstance).GetValue(host);
+        var field=session.GetType().GetField("state",PrivateInstance);
+        var original=session.GetAuthoritativeStateForTesting();var state=session.GetAuthoritativeStateForTesting();
+        var selection=(B45SelectionContext)typeof(M6App).GetField("generalSelection",PrivateInstance).GetValue(app);
+        try
+        {
+            var own=state.ThreeKingdoms.Generals.First(g=>g.Region==Catan.Core.ThreeKingdoms.GeneralRegion.Active&&g.OwnerPlayerId==app.HumanSeat);
+            var huang=state.ThreeKingdoms.Generals.First(g=>g.GeneralId=="tk-g16");
+            string previous=own.GeneralId;own.GeneralId=huang.GeneralId;huang.GeneralId=previous;
+            state.Players.First(p=>p.Id==app.HumanSeat).Improvements[0]=1;
+            field.SetValue(session,state);game.M6Refresh();yield return null;
+            typeof(M6App).GetMethod("BeginGeneralSkill",PrivateInstance).Invoke(app,new object[]{"tk-g16-s1"});
+            Require(selection.Active&&selection.Options.Length==1,"苦肉未进入统一地图选择");
+            var board=selection.CandidateActions.SelectMany(Catan.Core.ThreeKingdoms.B45SelectionContract.Board).Distinct().ToArray();
+            Require(board.Any(id=>id.StartsWith("Improvement:"))&&board.Any(id=>!id.StartsWith("Improvement:")),"苦肉缺少设施或地图建筑");
+            string saved=Authority;
+            yield return new WaitForEndOfFrame();SaveOceanFrame("黄盖-直接选择.png");
+            foreach(string id in new[]{board.First(id=>!id.StartsWith("Improvement:")),board.First(id=>id.StartsWith("Improvement:"))})
+            {
+                Require(selection.ToggleTile(id)&&selection.CanConfirm,"苦肉直接目标不能确认");
+                Require(selection.BuildCommand().ProgressCardId!=null&&saved==Authority,"选择目标提前提交了技能");
+                yield return new WaitForEndOfFrame();SaveOceanFrame(id.StartsWith("Improvement:")?"黄盖-设施选中.png":"黄盖-建筑选中.png");
+            }
+        }
+        finally
+        {
+            selection.Reset();field.SetValue(session,original);game.M6Refresh();
         }
     }
 

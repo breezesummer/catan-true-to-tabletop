@@ -161,7 +161,18 @@ namespace Catan.Core.ThreeKingdoms
             }
             if (d.Kind == "shelie")
             {
-                if (c.Option == "done") { FinishShelie(host, f, a); return; }
+                if (c.Option == "done" || c.Option == "b45-shelie-confirm")
+                {
+                    if(c.Option=="b45-shelie-confirm")
+                    {
+                        Require(GeneralCatalog.UsesDirectPackage(s.PackageVersion)&&Valid(c.Counts)&&
+                            c.Counts.Sum()+f.SelectedCards.Sum()<=3&&
+                            Enumerable.Range(0,8).All(t=>c.Counts[t]<=1&&c.Counts[t]<=f.Cards[t]&&(t<5||c.Counts[t]==0)&&(c.Counts[t]==0||f.SelectedCards[t]==0)),
+                            "涉猎只能选择至多三种不同的亮出资源。");
+                        for(int t=0;t<8;t++){f.Cards[t]-=c.Counts[t];f.SelectedCards[t]+=c.Counts[t];}
+                    }
+                    FinishShelie(host, f, a); return;
+                }
                 Require(c.Option == "card" && c.CardType >= 0 && c.CardType < 5 && f.Cards[c.CardType] > 0 && f.SelectedCards[c.CardType] == 0 && f.SelectedCards.Sum() < 3, "涉猎只能选择至多三种不同的亮出资源。");
                 f.Cards[c.CardType]--; f.SelectedCards[c.CardType]++; return;
             }

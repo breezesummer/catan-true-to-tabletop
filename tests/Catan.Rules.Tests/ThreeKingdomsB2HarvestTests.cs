@@ -8,6 +8,23 @@ namespace Catan.Rules.Tests;
 public sealed class ThreeKingdomsB2HarvestTests
 {
     [Fact]
+    public void DirectShelieBatchValidatesAllCardsAndCommitsOnceWithReplay()
+    {
+        var host=ThreeKingdomsB2TestHost.Create("tk-g28");
+        host.State.PackageVersion=GeneralCatalog.B45PackageVersion;host.State.PackageContentHash=GeneralCatalog.B45ContentHash;host.State.RulesVersion=GeneralCatalog.B45RulesVersion;
+        host.EmptyBank(0,5);host.RemoveHand("P3",Cards(1,1,1,1));host.AddBank(Cards(1,1,1,1));
+        Begin(host,Cards());ResolveWithReplay(host,"P1",Active(host,"shelie"));
+        foreach(var invalid in new[]{Cards(2),Cards(1,1,1,1),Cards(0,0,0,0,1),Cards(-1),new[]{1,0}})
+        {
+            var bad=Clone(Active(host,"done"));bad.Option="b45-shelie-confirm";bad.Counts=invalid;RejectUnchanged(host,"P1",bad);
+        }
+        var command=Clone(Active(host,"done"));command.Option="b45-shelie-confirm";command.Counts=Cards(1,0,1,1);
+        ResolveWithReplay(host,"P1",command);Drain(host);
+        Assert.Equal(Cards(1,0,1,1),host.GetHand("P1"));Assert.Equal(1,host.GetBank()[1]);
+        Assert.Equal(4,host.RandomCalls);Assert.Equal(0,host.State.Skills.RevealedCards.Sum());host.AssertConserved();
+    }
+
+    [Fact]
     public void RaidAtomicallyReplacesChosenAllocationWithOneActualCardFromEachDifferentTarget()
     {
         var host = ThreeKingdomsB2TestHost.Create("tk-g01"); host.Give("P2", 0, 0, 1); host.Give("P3", 0, 0, 0, 0, 1);
