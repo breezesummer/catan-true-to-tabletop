@@ -116,7 +116,21 @@ namespace Catan.Core.ThreeKingdoms
             if (state.Clock.Phase == ThreeKingdomsPhase.RoundEnd) ContinueRoundBoundary(state, draw);
         }
 
-        private static void BeginReplacementBatch(ThreeKingdomsState state, string[] playerIds, Func<int, int> draw)
+        private static void RetireCurrentGeneral(ThreeKingdomsState state, string playerId)
+        {
+            var previous = Owned(state, playerId, GeneralRegion.Active).SingleOrDefault();
+            if (previous == null) return;
+            B2SkillEngine.OnB4GeneralRetired(state, previous);
+            B2SkillEngine.OnAllianceB6GeneralRetired(state,previous);
+            B2SkillEngine.OnB5MilitaryGeneralRetired(state, previous);
+            B2SkillEngine.OnCivilGeneralRetired(state, previous);
+            bool retain = GeneralCatalog.UsesB5Rules(state.RulesVersion) && new[] { "tk-g18", "tk-g24", "tk-g35" }.Contains(previous.GeneralId);
+            ReturnToPool(previous);
+            previous.Region = retain ? GeneralRegion.Retained : GeneralRegion.Retired;
+            if (retain) previous.OwnerPlayerId = playerId;
+        }
+
+        private static void BeginReplacementBatch(ThreeKingdomsState state, string[] playerIds, Func<int, int> draw, bool refill = true)
         {
             Require(draw != null, "缺少权威随机流。");
             BeginBatch(state, playerIds);
@@ -127,26 +141,19 @@ namespace Catan.Core.ThreeKingdoms
             // 同批先全部隐退，再固定座位预留所有候选；早提交的弃选永远不能进入同批他人的候选。
             foreach (var playerId in state.SelectionBatchPlayerIds)
             {
-                var previous = Owned(state, playerId, GeneralRegion.Active).Single();
+                var previous = Owned(state, playerId, GeneralRegion.Active).SingleOrDefault();
                 state.EffectFrames = state.EffectFrames.Concat(new[] { new ThreeKingdomsEffectFrame
                 {
                     EffectId = NewId(state, "effect"), ParentEffectId = parentEffectId,
-                    RootEventId = state.SelectionBatchId, SourceTenureId = previous.TenureId,
+                    RootEventId = state.SelectionBatchId, SourceTenureId = previous?.TenureId,
                     SkillId = "tk-lifecycle-replacement", PlayerId = playerId, Step = 1,
                     TurnInstanceId = state.Clock.TurnInstanceId, PhaseId = state.Clock.PhaseId, ReturnWindowId = state.WindowId
                 } }).ToArray();
-                B2SkillEngine.OnB4GeneralRetired(state, previous);
-                B2SkillEngine.OnAllianceB6GeneralRetired(state,previous);
-                B2SkillEngine.OnB5MilitaryGeneralRetired(state, previous);
-                B2SkillEngine.OnCivilGeneralRetired(state, previous);
-                bool retain = GeneralCatalog.UsesB5Rules(state.RulesVersion) && new[] { "tk-g18", "tk-g24", "tk-g35" }.Contains(previous.GeneralId);
-                ReturnToPool(previous);
-                previous.Region = retain ? GeneralRegion.Retained : GeneralRegion.Retired;
-                if (retain) previous.OwnerPlayerId = playerId;
+                RetireCurrentGeneral(state, playerId);
             }
             foreach (var playerId in state.SelectionBatchPlayerIds)
             {
-                int count = Math.Min(2, state.Generals.Count(g => g.Region == GeneralRegion.Pool || g.Region == GeneralRegion.Retired));
+                int count = refill ? Math.Min(2, state.Generals.Count(g => g.Region == GeneralRegion.Pool || g.Region == GeneralRegion.Retired)) : 0;
                 if (count > 0)
                     SetBatchDecision(state, playerId, ThreeKingdomsDecisionKind.SelectReplacement, DrawB4(state, playerId, count, draw), 1);
                 else

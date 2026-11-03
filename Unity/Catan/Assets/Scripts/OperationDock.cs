@@ -36,6 +36,8 @@ public sealed partial class OperationDock
     bool tradeOpen, playerTrade;
     bool specialHand;
     public FishingDock Fishing;
+    public M6App Generals;
+    bool GeneralHandVisible=>Generals?.GeneralHandVisible==true;
     bool FishHandVisible => Fishing?.Selected==true;
     int facilityTrack=-1;
     int? portGood;
@@ -108,7 +110,7 @@ public sealed partial class OperationDock
     public bool IsPortTrade => tradeOpen&&portTrade;
     internal int VerificationFacilityTrack => facilityTrack;
     internal int[] VerificationTradeGiveGoods => tradeOpen?OperationPanelOptions.PaymentGoods(current,portTrade&&current.ValidateTradeDraft==null?portGood:null):Array.Empty<int>();
-    public bool ResourceHandVisible => !specialHand&&!FishHandVisible;
+    public bool ResourceHandVisible => !specialHand&&!FishHandVisible&&!GeneralHandVisible;
     internal bool DiscardMatches(OperationSnapshot snapshot) => ReferenceEquals(current,snapshot);
     // 报价权限来自当前所属席位投影；已拒绝者和旁观者不会被其他人的待回应报价锁住。
     internal static bool HasActionableOffer(OperationSnapshot snapshot) => snapshot?.Offer!=null&&(snapshot.Offer.CanAccept||snapshot.Offer.CanReject||snapshot.Offer.CanCancel);
@@ -434,7 +436,7 @@ public sealed partial class OperationDock
         }
         else resourceSlots=collections.HandSlots(s.Seat,s.Goods,s.GoodCount,Time.unscaledTimeAsDouble);
         float width=TabletopHandLayout.ResourceWidth(false),center=TabletopHandLayout.ResourceCenter(false);
-        if(FishHandVisible){hoveredHand=null;handHoverAnchor=Rect.zero;return;}
+        if(FishHandVisible||GeneralHandVisible){hoveredHand=null;handHoverAnchor=Rect.zero;return;}
         if(specialHand)DrawSpecialHand(s,new Rect(center-width/2,TabletopHandLayout.Baseline,width,151));
         else DrawResourceHand(s,new Rect(center-width/2,TabletopHandLayout.Baseline,width,151));
         // 仅被后绘制卡牌实际遮挡的牌需要邻牌让位；已经完整露出的牌保持邻牌位置。
@@ -499,7 +501,7 @@ public sealed partial class OperationDock
         var rack=new Rect(HandViewport.x-6,852,HandViewport.width+12,42);
         CopperTabletopSkin.Panel(rack,ModernOperationUI.Surface);Register(rack);
         landingFaces.Clear();
-        if(FishHandVisible)return;
+        if(FishHandVisible||GeneralHandVisible)return;
         if(hoveredHand!=null&&GUI.enabled)TabletopPointerCursor.Request();
         var handSlots=specialHand?specialSlots:resourceSlots;
         var landing=collectionFlightsVisible&&!HasOverlay?handSlots.Where(slot=>slot.Flight!=null&&slot.Flight.Progress(Time.unscaledTimeAsDouble)>=.60).ToArray():Array.Empty<TabletopResourceSlot>();
@@ -534,19 +536,26 @@ public sealed partial class OperationDock
     void DrawHandTabs(OperationSnapshot s)
     {
         bool enabled=GUI.enabled;GUI.enabled=enabled&&!HasOverlay;
-        Rect resource=new Rect(1178,727,96,43),special=new Rect(1178,773,96,43),sort=new Rect(1178,Fishing?.Available==true?867:830,96,32);
+        bool hasGenerals=Generals?.ThreeKingdomsProjection!=null;
+        Rect resource=new Rect(1178,hasGenerals?681:727,96,43),special=new Rect(1178,hasGenerals?727:773,96,43),sort=new Rect(1178,Fishing?.Available==true?867:830,96,32);
         Register(resource);Register(special);Register(sort);
         bool handEnabled=GUI.enabled;GUI.enabled=handEnabled&&s.Discard==null;
         bool holdCounts=collections!=null&&Time.unscaledTimeAsDouble<collections.OutcomesReadyAt;
         int resourceCount=displayedHandCounts.Observe(s.Scope,s.Seat,false,s.Goods.Take(s.GoodCount).Sum(),holdCounts);
         int specialCount=displayedHandCounts.Observe(s.Scope,s.Seat,true,s.Cards.Count,holdCounts);
-        if(StrategyHudArt.HandControl(resource,"资源卡"+(DirectSelecting?" · "+(DirectSelection.SelectedGoods?.Invoke()??0):""),0,!specialHand&&!FishHandVisible,new TabletopHandCounter(resourceCount,s.ResourceHandLimit))){Fishing?.Hide();specialHand=false;hoveredHand=null;handHoverAnchor=Rect.zero;}
-        if(StrategyHudArt.HandControl(special,"发展卡"+(DirectSelecting?" · "+(DirectSelection.SelectedCards?.Invoke()??0):""),1,specialHand&&!FishHandVisible,new TabletopHandCounter(specialCount,s.SpecialHandLimit))){Fishing?.Hide();specialHand=true;hoveredHand=null;handHoverAnchor=Rect.zero;}
+        if(StrategyHudArt.HandControl(resource,"资源卡"+(DirectSelecting?" · "+(DirectSelection.SelectedGoods?.Invoke()??0):""),0,!specialHand&&!FishHandVisible&&!GeneralHandVisible,new TabletopHandCounter(resourceCount,s.ResourceHandLimit))){Generals?.CloseGeneralLibrary();Fishing?.Hide();specialHand=false;hoveredHand=null;handHoverAnchor=Rect.zero;}
+        if(StrategyHudArt.HandControl(special,"发展卡"+(DirectSelecting?" · "+(DirectSelection.SelectedCards?.Invoke()??0):""),1,specialHand&&!FishHandVisible&&!GeneralHandVisible,new TabletopHandCounter(specialCount,s.SpecialHandLimit))){Generals?.CloseGeneralLibrary();Fishing?.Hide();specialHand=true;hoveredHand=null;handHoverAnchor=Rect.zero;}
+        if(hasGenerals)
+        {
+            var generalTab=new Rect(1178,773,96,43);Register(generalTab);
+            if(ModernOperationUI.Button(generalTab,"武将库",true,false,GeneralHandVisible))
+            {Fishing?.Hide();Generals.ShowGeneralLibrary();hoveredHand=null;handHoverAnchor=Rect.zero;}
+        }
         if(Fishing?.Available==true)
         {
             var fishTab=new Rect(1178,820,96,43);Register(fishTab);
             if(StrategyHudArt.HandControl(fishTab,"鱼资源",3,FishHandVisible,new TabletopHandCounter(Fishing.Count,7)))
-            {Fishing.Show();hoveredHand=null;handHoverAnchor=Rect.zero;}
+            {Generals?.CloseGeneralLibrary();Fishing.Show();hoveredHand=null;handHoverAnchor=Rect.zero;}
         }
         GUI.enabled=handEnabled;
         if(StrategyHudArt.HandControl(sort,"整理手牌",2))
@@ -557,12 +566,12 @@ public sealed partial class OperationDock
         }
         double visibleCount=(specialHand?specialSlots:resourceSlots).Sum(slot=>slot.Weight);
         float contentWidth=TabletopHandLayout.ContentWidth(visibleCount,HandViewport.width);
-        if(!FishHandVisible&&contentWidth>HandViewport.width)
+        if(!FishHandVisible&&!GeneralHandVisible&&contentWidth>HandViewport.width)
         {
             var scrollRect=new Rect(HandViewport.x,875,HandViewport.width,13);Register(scrollRect);
             HandScroll=GUI.HorizontalScrollbar(scrollRect,HandScroll,HandViewport.width,0,contentWidth);
         }
-        if(!FishHandVisible&&specialHand&&s.GoodCount==5)
+        if(!FishHandVisible&&!GeneralHandVisible&&specialHand&&s.GoodCount==5)
         {
             var purchase=s.Builds.FirstOrDefault(b=>b.Icon=="development");
             if(purchase!=null&&Button(new Rect(Fishing?.Available==true?1066:1178,681,96,34),"购买发展卡",purchase.CanPrepare(s)&&!DirectSelecting))PrepareDevelopmentPurchase();
@@ -811,7 +820,14 @@ public sealed partial class OperationDock
         {
             target=Mathf.Clamp(target,0,Math.Max(0,s.OtherPlayers.Length-1));
             float choicesWidth=s.OtherPlayers.Length*130;
-            for(int i=0;i<s.OtherPlayers.Length;i++)if(ModernOperationUI.Button(new Rect(958-choicesWidth/2+i*130,241,121,31),DisplayPlayer(s.OtherPlayers[i]),true,false,target==i,s.OtherPlayers[i]))target=i;
+            for(int i=0;i<s.OtherPlayers.Length;i++)
+            {
+                var hit=new Rect(958-choicesWidth/2+i*130,237,121,39);
+                StrategyHudArt.Avatar(new Rect(hit.x,hit.y,32,32),s.OtherPlayers[i]);
+                Label(new Rect(hit.x+34,hit.y,87,34),DisplayPlayer(s.OtherPlayers[i]),M6App.PlayerNameStyle(new GUIStyle(small){alignment=TextAnchor.MiddleCenter},s.OtherPlayers[i]));
+                if(target==i)ModernOperationUI.Fill(new Rect(hit.x,hit.yMax-2,hit.width,2),ModernOperationUI.Accent);
+                if(ThreeKingdomsDirectInput.Read(hit,GUI.enabled)==1)target=i;
+            }
             if(dragging&&GiveDropRect.Contains(Event.current.mousePosition))Fill(GiveDropRect,new Color(.77f,.64f,.39f,.22f));
             DrawTradePlayer(new Rect(286,280,386,58),s.Seat);
             DrawTradePlayer(new Rect(768,280,386,58),s.OtherPlayers.Length>0?s.OtherPlayers[target]:"*");

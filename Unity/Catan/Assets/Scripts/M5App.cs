@@ -356,7 +356,7 @@ public sealed partial class M5App : MonoBehaviour
             var t=view.TradeOffer;Text(t.ProposerId+" 向 "+t.OtherPlayerId+" 提议：\n付出 "+BagText(t.Give,t.GiveCommodities)+"\n换取 "+BagText(t.Receive,t.ReceiveCommodities));
             if(Btn("接受交易")){Submit(New(CommandKind.AcceptTrade));return;}if(Btn("拒绝交易")){Submit(New(CommandKind.RejectTrade));return;}if(Btn("发起者取消")){Submit(New(CommandKind.CancelTrade));return;}return;
         }
-        if(view.PendingDecision!=null)Text("待决 · "+DecisionName(view.PendingDecision.Kind)+" · "+view.PendingDecision.PlayerId+(view.PendingDecision.Amount>0?" · 数量 "+view.PendingDecision.Amount:""));
+        if(ai==null&&view.PendingDecision!=null)Text(DecisionName(view.PendingDecision.Kind));
         if(view.Phase==GamePhase.SetupSettlement||view.Phase==GamePhase.SetupRoad)
         {
             Text("第一轮村庄，逆序第二轮城市；第二轮每邻接地块取一张资源。可选择道路或船，必须邻接刚放下的建筑。",true);
@@ -464,7 +464,7 @@ public sealed partial class M5App : MonoBehaviour
         if(card&&(draft.ProgressCard==ProgressCardKind.Invention||draft.ProgressCard==ProgressCardKind.Smithing))draft.TargetIds=new[]{draft.SourceId,draft.TargetId}.Where(x=>!string.IsNullOrEmpty(x)).Distinct().ToArray();
         if(k==CommandKind.CommercialHarborOffer||k==CommandKind.StealResource||k==CommandKind.ProposeTrade||card&&(draft.ProgressCard==ProgressCardKind.GuildDues||draft.ProgressCard==ProgressCardKind.Espionage||draft.ProgressCard==ProgressCardKind.Treason))
         {
-            var others=view.Players.Where(p=>p.Id!=seat).Select(p=>p.Id).ToArray();draft.OtherPlayerId=others[Cycle("对手",Math.Max(0,Array.IndexOf(others,draft.OtherPlayerId)),others)];
+            var others=view.Players.Where(p=>p.Id!=seat&&(k!=CommandKind.StealResource||view.PendingDecision.EligibleVictimIds.Contains(p.Id))).Select(p=>p.Id).ToArray();if(others.Length>0)draft.OtherPlayerId=others[Cycle("对手",Math.Max(0,Array.IndexOf(others,draft.OtherPlayerId)),others)];
         }
         if(k==CommandKind.BankTrade)
         {
@@ -535,6 +535,11 @@ public sealed partial class M5App : MonoBehaviour
     int Cycle(string title,int value,string[] choices)
     {
         if(choices.Length==0)return 0;
+        if(ai!=null&&(title=="发展卡"||title=="允许查看的发展卡"))
+        {
+            var kinds=Enum.GetValues(typeof(ProgressCardKind)).Cast<ProgressCardKind>().ToArray();
+            return ModernOperationUI.CardChoices(value,choices.Select(name=>(int)kinds.First(k=>CardName(k)==name)).ToArray());
+        }
         int resourceStart=title=="商品"?5:title=="资源"||title=="资源 / 商品"||title=="交出类型"||title=="取得类型"?0:-1;
         if(resourceStart>=0)return ModernOperationUI.ResourceKind(title,value,resourceStart,choices.Length);
         value=Mathf.Clamp(value,0,choices.Length-1);

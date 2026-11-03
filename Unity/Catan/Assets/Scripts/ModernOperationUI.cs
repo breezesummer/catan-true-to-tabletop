@@ -80,12 +80,27 @@ public static class ModernOperationUI
     {
         Styles();if(labels.Length==0)return 0;value=Mathf.Clamp(value,0,labels.Length-1);
         GUILayout.Space(5);GUILayout.Label(caption,Small);
+        bool players=Array.TrueForAll(labels,PlayerIdentityModel.IsPlayerId);
+        bool tracks=labels.Length==3&&Array.TrueForAll(labels,l=>l.StartsWith("贸易")||l.StartsWith("政治")||l.StartsWith("科学"));
+        int cellHeight=players?100:tracks?145:firstGood>=0?65:40;
         int columns=Math.Min(firstGood>=0?4:3,labels.Length),rows=(labels.Length+columns-1)/columns;
-        var area=GUILayoutUtility.GetRect(GUIContent.none,GUIStyle.none,GUILayout.Height(rows*(firstGood>=0?65:40)),GUILayout.ExpandWidth(true));
+        var area=GUILayoutUtility.GetRect(GUIContent.none,GUIStyle.none,GUILayout.Height(rows*cellHeight),GUILayout.ExpandWidth(true));
         for(int i=0;i<labels.Length;i++)
         {
-            float width=area.width/columns;var r=new Rect(area.x+(i%columns)*width,area.y+(i/columns)*(firstGood>=0?65:40),width-5,firstGood>=0?60:35);
-            if(firstGood>=0&&firstGood+i<8&&labels[i]!="不取")
+            float width=area.width/columns;var r=new Rect(area.x+(i%columns)*width,area.y+(i/columns)*cellHeight,width-5,cellHeight-5);
+            if(players||tracks)
+            {
+                var face=new Rect(r.center.x-(players?30:40),r.y+3,players?60:80,players?60:120);
+                if(players)
+                {
+                    StrategyHudArt.Avatar(face,labels[i]);
+                    Label(new Rect(r.x,face.yMax+3,r.width,28),M6App.DisplayPlayerText(labels[i]),M6App.PlayerNameStyle(new GUIStyle(Center),labels[i]));
+                }
+                else EntityCardAssets.DrawCardFace(face,EntityCardAssets.ProgressBack(i));
+                if(i==value)Fill(new Rect(r.x+7,r.yMax-3,r.width-14,2),Accent);
+                if(ThreeKingdomsDirectInput.Read(r,true)==1)value=i;
+            }
+            else if(firstGood>=0&&firstGood+i<8&&labels[i]!="不取")
             {
                 Round(r,i==value?Color.Lerp(Surface,Accent,.24f):Surface);
                 OperationIconAssets.DrawGood(new Rect(r.center.x-13,r.y+5,26,26),firstGood+i);
@@ -96,6 +111,21 @@ public static class ModernOperationUI
             else if(Button(r,M6App.DisplayPlayerText(labels[i]),true,false,i==value,PlayerIdentityModel.IsPlayerId(labels[i])?labels[i]:null))value=i;
         }
         return value;
+    }
+    public static int CardChoices(int selected,int[] faces)
+    {
+        Styles();int columns=Math.Min(6,faces.Length);
+        if(columns==0)return selected;
+        var area=GUILayoutUtility.GetRect(GUIContent.none,GUIStyle.none,GUILayout.Height(((faces.Length+columns-1)/columns)*145),GUILayout.ExpandWidth(true));
+        for(int i=0;i<faces.Length;i++)
+        {
+            float cell=area.width/columns;
+            var face=new Rect(area.x+(i%columns)*cell+(cell-80)/2,area.y+(i/columns)*145,80,120);
+            EntityCardAssets.DrawCardFace(face,EntityCardAssets.ProgressFront(faces[i]));
+            if(i==selected)Fill(new Rect(face.x,face.yMax+4,face.width,3),Accent);
+            if(ThreeKingdomsDirectInput.Read(face,GUI.enabled)==1)selected=i;
+        }
+        return selected;
     }
     public static void Cost(int[] goods)
     {

@@ -79,6 +79,7 @@ public static class FishingF6EditorVerification
     {
         Size(MobileTabletop.Enabled?1920:1440,MobileTabletop.Enabled?1080:900);
         yield return 1.0;
+        if(Environment.GetCommandLineArgs().Contains("--general-213")){yield return ReviewGenerals213();yield break;}
         FishingF6SampleVerification.Run();
         if(!Environment.GetCommandLineArgs().Contains("--f6-sample"))FishingF6SampleVerification.VerifyAll();
         if(Environment.GetCommandLineArgs().Contains("--f6-visual-only")){yield return ReviewBoards();yield break;}
@@ -107,7 +108,7 @@ public static class FishingF6EditorVerification
             Require(inputDock.Selected,"鱼手牌页签未选中");
             Require(!inputDock.Contains(new Vector2(1000,710)),"鱼牌空白区域仍遮挡底部棋盘");
             Require(inputDock.Contains(new Vector2(380,755)),"实际鱼牌未拦截棋盘输入");
-            Require(inputDock.Contains(new Vector2(685,616)),"捕鱼操作栏未拦截棋盘输入");
+            Require(inputDock.Contains(new Vector2(1030,679)),"捕鱼操作栏未拦截棋盘输入");
             VerifyPointerDraft(inputDock,presentation);
             yield return Click(380,755,1);
             Require(Get(inputDock,"hint")!=null,"右键未展示鱼筹码说明");
@@ -119,13 +120,20 @@ public static class FishingF6EditorVerification
             inputDock.Reset();
             yield return Click(1220,748);Require(!inputDock.Selected,"资源页签没有退出鱼手牌");
             yield return Click(1220,798);Require(!inputDock.Selected,"发展页签没有退出鱼手牌");
-            yield return Click(1220,841);yield return Click(685,616);yield return Click(405,655);
-            yield return Capture("02-"+mode+"-支付预览");
+            yield return Click(293,784);
+            yield return Capture("02-"+mode+"-资源选择");
             Require((string)game.GetType().GetMethod("Save").Invoke(game,null)==before,"预览修改了权威状态");
-            yield return Click(380,755);Require(((string[])Get(inputDock,"tokens")).Length==1,"点击鱼牌未取消支付选择");
-            yield return Click(380,755);Require(((string[])Get(inputDock,"tokens")).Length==2,"点击鱼牌未恢复支付选择");
-            yield return Click(1010,655);Require((string)game.GetType().GetMethod("Save").Invoke(game,null)==before,"取消扣除了鱼");
-            yield return Click(1220,841);yield return Click(685,616);yield return Click(405,655);yield return Click(907,655);yield return 1.0;
+            yield return Click(1150,679);
+            Require((string)game.GetType().GetMethod("Save").Invoke(game,null)==before,"取消扣除了鱼");
+            var roadOption=new FishingDock.Option{Kind="spend",Action=Catan.Core.TradeModules.FishAction.BuildRoad,Target="E-input-check",Label="新建道路"};
+            int submitted=0;roadOption.Submit=payment=>{Require(payment.Length>0,"建路确认缺少鱼筹码");submitted++;};
+            Set(inputDock,"action",(Catan.Core.TradeModules.FishAction?)Catan.Core.TradeModules.FishAction.BuildRoad);
+            inputDock.GetType().GetMethod("Choose",Flags).Invoke(inputDock,new object[]{roadOption});
+            yield return Capture("02-"+mode+"-道路确认");
+            yield return Click(1040,679);
+            Require(submitted==1,"道路确认按钮没有且仅有一次提交");
+            Require((string)game.GetType().GetMethod("Save").Invoke(game,null)==before,"隔离输入检查修改了权威状态");
+            yield return Click(293,784);yield return Click(368,420);yield return Click(800,618);yield return 1.0;
             var after=game.GetType().GetMethod("GetAuthoritativeStateForTesting").Invoke(game,null);
             int wood;string[] remaining;
             if(after is Catan.Core.M2.GameState basicAfter){wood=basicAfter.Players[0].Resources.Wood;remaining=basicAfter.TradeModules.Fishing.Holdings[0].TokenIds;}
@@ -139,6 +147,36 @@ public static class FishingF6EditorVerification
         yield return ReviewReplacement();
         Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",1);Set(app,"menuScenario",0);
         yield return Capture("04-航海捕鱼已开放");
+    }
+    static IEnumerator ReviewGenerals213()
+    {
+        app.StartGame("cities-knights","heading-for-new-shores",3,"P1",true,threeKingdoms:true,fishing:true);yield return 1.5;
+        yield return Capture("武将选择");
+        var verifier=app.GetComponent<ThreeKingdomsPlayerVerification>();Set(verifier,"app",app);
+        for(int i=0;i<600;i++)
+        {
+            var current=(Catan.Core.ThreeKingdoms.ThreeKingdomsView)typeof(M6App).GetProperty("ThreeKingdomsProjection",Flags).GetValue(app);
+            if(current.Clock.Phase==Catan.Core.ThreeKingdoms.ThreeKingdomsPhase.Play&&current.Clock.ActivePlayerId==app.HumanSeat&&current.PendingDecision==null)break;
+            if((bool)Get(app,"TableDiceRolling")||app.TablePresentationBlocked){yield return .1;continue;}
+            typeof(ThreeKingdomsPlayerVerification).GetMethod("Advance",Flags).Invoke(verifier,null);yield return .05;
+        }
+        yield return 1.0;
+        yield return Click(1220,794);
+        Require((bool)typeof(M6App).GetProperty("GeneralHandVisible",Flags).GetValue(app),"武将库页签未进入手牌区");
+        yield return Capture("武将手牌与玩家按钮");
+        yield return Click(396,790);
+        Require(Get(app,"detailGeneralId")!=null,"点击手牌武将未展示详情");
+        yield return Capture("手牌武将详情");
+        yield return Click(894,282);
+        var players=app.HistoryPlayers;var other=players.First(p=>p!=app.HumanSeat);
+        int index=Array.IndexOf(players,other);
+        yield return Click(1430-players.Length*119+index*119+57,118);
+        var projection=(Catan.Core.ThreeKingdoms.ThreeKingdomsView)typeof(M6App).GetProperty("ThreeKingdomsProjection",Flags).GetValue(app);
+        var general=projection.Players.First(p=>p.PlayerId==other).ActiveGeneralId;
+        Require((string)Get(app,"detailGeneralId")==general,"玩家名字下方武将按钮未打开对应详情");
+        yield return Capture("其他玩家武将详情");
+        yield return Click(894,282);yield return Click(1220,702);
+        Require(!(bool)typeof(M6App).GetProperty("GeneralHandVisible",Flags).GetValue(app),"资源页签未关闭武将手牌");
     }
     static void VerifyPointerDraft(FishingDock source,object presentation)
     {
@@ -212,9 +250,9 @@ public static class FishingF6EditorVerification
         Require(game.GetPlayerView("P1").LegalActions.Any(c=>c.FishAction==Catan.Core.TradeModules.FishAction.TakeResource),"三国测试局面没有可用取资源行动");
         presentation.GetType().GetMethod("M6Refresh",Flags).Invoke(presentation,null);yield return 2.0;
         for(int i=0;i<30&&app.TablePresentationBlocked;i++)yield return .5;
-        yield return Click(1220,841);yield return Click(685,616);yield return Click(405,655);
+        yield return Click(1220,841);yield return Click(293,784);yield return Click(368,420);
         Require((float)typeof(M6App).GetProperty("SkillBarOffset",Flags).GetValue(app)<-120,"三国阶段条没有避让鱼手牌操作");
-        yield return Capture("05-三国城市骑士支付预览");yield return Click(907,655);yield return 1.0;
+        yield return Capture("05-三国城市骑士支付预览");yield return Click(800,618);yield return 1.0;
         Require(game.GetPlayerView("P1").OwnResources.Total==before+1,"三国技能底栏遮挡了鱼支付操作");
         Require(!((TabletopDefenseUI)Get(Get(presentation,"tabletop"),"defense")).MobileSummary.Contains("海港大师"),"单开捕鱼错误展示了海港奖励");
         yield return Capture("06-三国城市骑士支付完成");app.ShowMenu();
@@ -242,7 +280,7 @@ public static class FishingF6EditorVerification
         Require(game.Save()==before,"恢复后随机状态或换抽游标改变");
         yield return Click(380,755);yield return Capture("09-满额换抽恢复");
         Require(game.Save()==before,"仅选择换抽筹码就扣除了鱼");
-        yield return Click(910,618);yield return .5;
+        yield return Click(1034,679);yield return .5;
         Require(game.GetPlayerView(player).TradeModules.Fishing.PendingPlayerId!=player,"确认换抽没有完成本人的待决");game.AssertInvariants();
         yield return Capture("10-换抽完成");app.ShowMenu();
     }
@@ -286,7 +324,7 @@ public static class FishingF6EditorVerification
     [Serializable] sealed class Result{public string 状态,说明;public string[] 截图;}
     static void Finish(Exception error)
     {
-        File.WriteAllText(Path.Combine(output,"result.json"),JsonUtility.ToJson(new Result{状态=error==null?"通过":"失败",说明=error==null&&Environment.GetCommandLineArgs().Contains("--f6-visual-only")?"模型复验：13件资产、四模式六渔场、无碰撞体、海岸拼接、100次重复刷新对象复用、默认／俯视截图与帧间隔采样通过；不计人工或设备验收。":error==null&&Environment.GetCommandLineArgs().Contains("--f6-sample")?"仅样板：尺寸、枢轴、材质、无碰撞体，以及基础版支付取消／确认、右键、移动端预览长按通过；尚未运行全模式。":error==null?"基础与城市骑士开关、存档恢复、支付预览、取消及确认通过；三国城市骑士技能底栏与鱼支付共同显示且可确认。筹码右键、适用时移动端预览长按和支付取消／确认通过；正常合法命令推进至满额换抽，真实读档及界面确认通过。采用测试局面和Unity原生GameView事件，非物理鼠标、Android真机或用户试玩；截图需另行审看。":error.ToString(),截图=images.ToArray()},true));
+        File.WriteAllText(Path.Combine(output,"result.json"),JsonUtility.ToJson(new Result{状态=error==null?"通过":"失败",说明=error==null&&Environment.GetCommandLineArgs().Contains("--general-213")?"武将库页签、手牌武将详情、其他玩家武将详情及切回资源手牌的真实GameView点击通过；四张截图需审看。":error==null&&Environment.GetCommandLineArgs().Contains("--f6-visual-only")?"模型复验：13件资产、四模式六渔场、无碰撞体、海岸拼接、100次重复刷新对象复用、默认／俯视截图与帧间隔采样通过；不计人工或设备验收。":error==null&&Environment.GetCommandLineArgs().Contains("--f6-sample")?"仅样板：尺寸、枢轴、材质、无碰撞体，以及基础版支付取消／确认、右键、移动端预览长按通过；尚未运行全模式。":error==null?"基础与城市骑士开关、存档恢复、支付预览、取消及确认通过；三国城市骑士技能底栏与鱼支付共同显示且可确认。筹码右键、适用时移动端预览长按和支付取消／确认通过；正常合法命令推进至满额换抽，真实读档及界面确认通过。采用测试局面和Unity原生GameView事件，非物理鼠标、Android真机或用户试玩；截图需另行审看。":error.ToString(),截图=images.ToArray()},true));
         SessionState.EraseString(Key);if(error!=null)Debug.LogException(error);EditorApplication.Exit(error==null?0:1);
     }
 }

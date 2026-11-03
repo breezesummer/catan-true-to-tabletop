@@ -17,6 +17,7 @@ public sealed partial class M5App
             fishingView=view;
             var choices=view.LegalActions.Where(c=>c.Kind==CommandKind.SpendFish||c.Kind==CommandKind.PassOldBoot||c.Kind==CommandKind.ResolveFishReplacement).Select(c=>new FishingDock.Option
             {
+                CardIndex=c.FishAction==FishAction.TakeResource?(int)c.Resource:(int)c.Track,
                 Kind=c.Kind==CommandKind.PassOldBoot?"boot":c.Kind==CommandKind.ResolveFishReplacement?"replace":"spend",Action=c.FishAction,Ship=c.FishBuildShip,Pirate=c.FishRemovePirate,Target=c.TargetId,Player=c.OtherPlayerId,
                 Label=c.Kind==CommandKind.PassOldBoot?"转交旧靴":c.FishAction==FishAction.BuildRoad?(c.FishBuildShip?"建造船":"修建道路"):c.FishAction==FishAction.RemoveRobber?(c.FishRemovePirate?"移出海盗":"移出强盗"):c.FishAction==FishAction.TakeResource?new[]{"木材","砖块","羊毛","小麦","矿石"}[(int)c.Resource]:c.FishAction==FishAction.BuyDevelopmentCard?new[]{"贸易","政治","科学"}[(int)c.Track]:"捕鱼行动",
                 Submit=tokens=> { var command=new Command {Id=Guid.NewGuid().ToString("N"),PlayerId=c.PlayerId,Kind=c.Kind,TargetId=c.TargetId,OtherPlayerId=c.OtherPlayerId,Resource=c.Resource,FishAction=c.FishAction,FishTokenIds=tokens,FishBuildShip=c.FishBuildShip,FishRemovePirate=c.FishRemovePirate,ExpectedEventSequence=c.ExpectedEventSequence,DecisionId=c.DecisionId,Track=c.Track, WindowId=c.WindowId, ActingAsPlayerId=c.ActingAsPlayerId,};Submit(command); }

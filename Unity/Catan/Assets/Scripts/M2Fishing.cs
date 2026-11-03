@@ -16,6 +16,7 @@ public sealed partial class M2App
             fishingView=view;
             var choices=view.LegalFishingActions.Where(c=>c.Kind==CommandKind.SpendFish||c.Kind==CommandKind.PassOldBoot||c.Kind==CommandKind.ResolveFishReplacement).Select(c=>new FishingDock.Option
             {
+                CardIndex=c.FishAction==FishAction.TakeResource?(int)c.Resource:0,
                 Kind=c.Kind==CommandKind.PassOldBoot?"boot":c.Kind==CommandKind.ResolveFishReplacement?"replace":"spend",Action=c.FishAction,Target=c.TargetId,Player=c.OtherPlayerId,
                 Label=c.Kind==CommandKind.PassOldBoot?"转交旧靴":c.FishAction==FishAction.TakeResource?new[]{"木材","砖块","羊毛","小麦","矿石"}[(int)c.Resource]:"捕鱼行动",
                 Submit=tokens=> { var command=new Command {Id=Guid.NewGuid().ToString("N"),PlayerId=c.PlayerId,Kind=c.Kind,TargetId=c.TargetId,OtherPlayerId=c.OtherPlayerId,Resource=c.Resource,FishAction=c.FishAction,FishTokenIds=tokens,ExpectedEventSequence=c.ExpectedEventSequence,DecisionId=c.DecisionId,};Submit(command); }

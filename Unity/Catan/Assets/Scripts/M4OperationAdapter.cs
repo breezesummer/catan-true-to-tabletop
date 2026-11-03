@@ -160,7 +160,7 @@ public sealed partial class M4App
         Styles();GUI.matrix=MobileTabletop.GuiMatrix;cardArt.Begin(null);
         if(view==null){GUI.matrix=Matrix4x4.identity;return;}
         ai.SyncThreeKingdomsSelection();SyncDirectPayment();
-        tabletop.ThreeKingdoms=ai;dock.DirectSelection=directPayment.Active?PaymentHandSelection:ai.ThreeKingdomsHandSelection;
+        tabletop.ThreeKingdoms=ai;dock.Generals=ai;dock.DirectSelection=directPayment.Active?PaymentHandSelection:ai.ThreeKingdomsHandSelection;
         dock.InspectGood=ai.InspectThreeKingdomsGood;dock.InspectCard=ai.InspectThreeKingdomsCard;
         BindFishing();
         tabletop.BindOperations(Operations(),dock.PrepareDevelopmentPurchase,ai.HistoryEntries);

@@ -9,7 +9,7 @@ New-Item -ItemType Directory -Force -Path $m7Plugins | Out-Null
 & $toolchain.dotnet build (Join-Path $m7RepoRoot 'src/Catan.Network.Contracts/Catan.Network.Contracts.csproj') -c Release --disable-build-servers -m:1
 if($LASTEXITCODE -ne 0){throw 'M7 共享网络协议构建失败。'}
 $m7Contract=Join-Path $m7RepoRoot 'src/Catan.Network.Contracts/bin/Release/netstandard2.1/Catan.Network.Contracts.dll'
-Copy-Item -LiteralPath $m7Contract -Destination (Join-Path $m7Plugins 'Catan.Network.Contracts.dll') -Force
+& (Join-Path $PSScriptRoot 'Copy-UnityAssembly.ps1') -Source $m7Contract -Destination (Join-Path $m7Plugins 'Catan.Network.Contracts.dll')
 & (Join-Path $PSScriptRoot 'Build-M6.ps1') -OutputRoot $OutputRoot -VerifyPlayer:$VerifyPlayer -SkipVerification:$SkipVerification
 if($LASTEXITCODE -ne 0){throw 'M7 Unity 客户端构建失败。'}
 & (Join-Path $PSScriptRoot 'Build-M7Server.ps1') -OutputRoot $OutputRoot

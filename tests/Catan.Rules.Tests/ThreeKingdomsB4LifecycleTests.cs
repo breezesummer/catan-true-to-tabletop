@@ -8,6 +8,32 @@ namespace Catan.Rules.Tests;
 /// <summary>依据 B4 同批选将、独立隐退库和耗尽边界合同。</summary>
 public sealed class ThreeKingdomsB4LifecycleTests
 {
+    [Fact]
+    public void CurrentPackageRetirementDoesNotDrawAndRefillsOnlyAfterThirdRound()
+    {
+        var state = ThreeKingdomsEngine.Create(new[] { "P1", "P2", "P3" }, 71, First, true, GeneralCatalog.B6PackageVersion);
+        ResolveAll(state);
+        ThreeKingdomsEngine.BeginNormalTurns(state);
+        int pool = state.Generals.Count(g => g.Region == GeneralRegion.Pool);
+        ThreeKingdomsEngine.RetireGeneral(state, "P1", state.WindowId, _ => throw new Exception("主动隐退不应抽将"));
+        Assert.Equal(ThreeKingdomsDecisionKind.DeployReplacement, state.PendingDecision.Kind);
+        ResolveAll(state);
+        Assert.Equal(pool, state.Generals.Count(g => g.Region == GeneralRegion.Pool));
+        Assert.Single(state.Generals.Where(g => g.OwnerPlayerId == "P1" && g.Region == GeneralRegion.Active));
+        ThreeKingdomsEngine.RetireGeneral(state, "P1", state.WindowId, _ => throw new Exception("主动隐退不应抽将"));
+        Assert.Null(state.PendingDecision);
+        Assert.DoesNotContain(state.Generals, g => g.OwnerPlayerId == "P1" && g.Region == GeneralRegion.Active);
+        Assert.False(ThreeKingdomsEngine.Project(state, "P1").CanRetire);
+        state = Restore(state);
+        for (int i = 0; i < 8; i++) { End(state); Assert.Null(state.PendingDecision); Assert.Empty(ThreeKingdomsEngine.Validate(state)); }
+        End(state);
+        Assert.Equal(3, state.Clock.Round);
+        Assert.Equal(3, state.PendingDecisions.Length);
+        Assert.All(state.PendingDecisions, d => Assert.Equal(ThreeKingdomsDecisionKind.SelectReplacement, d.Kind));
+        ResolveAll(state);
+        Assert.Equal(4, state.Clock.Round);
+    }
+
     private static int First(int count) => 0;
     private static ThreeKingdomsState Create(int seats = 3) => ThreeKingdomsEngine.Create(
         Enumerable.Range(1, seats).Select(i => "P" + i).ToArray(), 71, First, true, GeneralCatalog.B4PackageVersion);

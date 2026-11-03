@@ -170,7 +170,13 @@ namespace Catan.Core.ThreeKingdoms
                 "请先完成当前武将选择。");
             RequireWindow(state, windowId);
             Require(Owned(state, playerId, GeneralRegion.Active).Count() == 1, "当前没有可隐退的在场武将。");
-            StartReplacement(state, playerId, draw);
+            if (GeneralCatalog.UsesB6Rules(state.RulesVersion))
+            {
+                if (Owned(state, playerId, GeneralRegion.Hidden).Any())
+                    BeginReplacementBatch(state, new[] { playerId }, draw, false);
+                else { RetireCurrentGeneral(state, playerId); RefreshWindow(state); }
+            }
+            else StartReplacement(state, playerId, draw);
         }
 
         public static void BeginNormalTurns(ThreeKingdomsState state)
@@ -266,6 +272,7 @@ namespace Catan.Core.ThreeKingdoms
                 WaitingSelectionPlayerIds = UsesB4Lifecycle(state) ? (state.PendingDecisions ?? Array.Empty<ThreeKingdomsDecision>()).Select(d => d.PlayerId).ToArray() : null,
                 SkillHistory = B4SkillHistoryEngine.Project(state, viewerId),
                 CanRetire = state.OpeningComplete && state.Clock.Round > 0 && state.Clock.ActivePlayerId == viewerId
+                    && Owned(state, viewerId, GeneralRegion.Active).Any()
                     && state.PendingDecision == null && !state.ReplacementInProgress
                     && state.Clock.Phase != ThreeKingdomsPhase.RoundEnd && state.Clock.Phase != ThreeKingdomsPhase.Finished,
                 Players = state.SeatPlayerIds.Select(id =>
@@ -401,7 +408,7 @@ namespace Catan.Core.ThreeKingdoms
                 return;
             }
             SetPhase(state, ThreeKingdomsPhase.RoundEnd);
-            var snapshot = state.SeatPlayerIds.Select(id => Owned(state, id, GeneralRegion.Active).Single()).ToArray();
+            var snapshot = state.SeatPlayerIds.SelectMany(id => Owned(state, id, GeneralRegion.Active)).ToArray();
             state.RoundEndTenureSnapshot = snapshot.Select(g => g.TenureId).ToArray();
             foreach (var general in snapshot)
             {
@@ -409,7 +416,9 @@ namespace Catan.Core.ThreeKingdoms
                 general.RemainingLife--;
                 general.LastLifeDecrementRound = state.Clock.Round;
             }
-            state.ExpiredPlayerQueue = snapshot.Where(g => g.RemainingLife == 0).Select(g => g.OwnerPlayerId).ToArray();
+            state.ExpiredPlayerQueue = GeneralCatalog.UsesB6Rules(state.RulesVersion)
+                ? (state.Clock.Round % 3 == 0 ? state.SeatPlayerIds.ToArray() : Array.Empty<string>())
+                : snapshot.Where(g => g.RemainingLife == 0).Select(g => g.OwnerPlayerId).ToArray();
             ContinueRoundBoundary(state, draw);
         }
 
@@ -541,7 +550,7 @@ namespace Catan.Core.ThreeKingdoms
                 var hiddenCount = Owned(state, playerId, GeneralRegion.Hidden).Count();
                 var reservedCount = Owned(state, playerId, GeneralRegion.ReservedDeployment).Count();
                 if (activeCount > 1 || reservedCount > 1 || hiddenCount + activeCount + reservedCount > 2) errors.Add("武将库超过生命周期允许数量。");
-                if (state.OpeningComplete && activeCount != (state.ReplacementInProgress && (b4 ? state.SelectionBatchPlayerIds?.Contains(playerId) == true : state.ReplacementPlayerId == playerId) ? 0 : 1))
+                if (state.OpeningComplete && !GeneralCatalog.UsesB6Rules(state.RulesVersion) && activeCount != (state.ReplacementInProgress && (b4 ? state.SelectionBatchPlayerIds?.Contains(playerId) == true : state.ReplacementPlayerId == playerId) ? 0 : 1))
                     errors.Add("正常局缺少在场武将。");
             }
             if (b4) errors.AddRange(ValidateB4Batch(state));
@@ -583,7 +592,7 @@ namespace Catan.Core.ThreeKingdoms
                 || !Enum.IsDefined(typeof(ThreeKingdomsPhase), state.Clock.Phase)) errors.Add("正常行动游标或阶段时钟无效。");
             if (state.Clock.Phase == ThreeKingdomsPhase.RoundEnd)
             {
-                if (state.Clock.NormalSeatCursor != state.SeatPlayerIds.Length || state.RoundEndTenureSnapshot.Length != state.SeatPlayerIds.Length
+                if (state.Clock.NormalSeatCursor != state.SeatPlayerIds.Length || (GeneralCatalog.UsesB6Rules(state.RulesVersion) ? state.RoundEndTenureSnapshot.Length > state.SeatPlayerIds.Length : state.RoundEndTenureSnapshot.Length != state.SeatPlayerIds.Length)
                     || state.RoundEndTenureSnapshot.Distinct().Count() != state.RoundEndTenureSnapshot.Length
                     || state.ExpiredPlayerQueue.Distinct().Count() != state.ExpiredPlayerQueue.Length
                     || state.ExpiredPlayerQueue.Any(id => !Owned(state, id, GeneralRegion.Active).Any(g => g.RemainingLife == 0))

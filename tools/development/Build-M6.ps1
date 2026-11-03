@@ -15,7 +15,7 @@ foreach ($assemblyName in @('Catan.Core','Catan.AI')) {
     $assemblyTarget = Join-Path $m6Project "Assets\Plugins\$assemblyName.dll"
     # 内容未变时保留已导入程序集，避免无意义重导入及覆盖系统暂时映射的同一文件。
     if (!(Test-Path -LiteralPath $assemblyTarget) -or (Get-FileHash -LiteralPath $assemblySource).Hash -ne (Get-FileHash -LiteralPath $assemblyTarget).Hash) {
-        Copy-Item -LiteralPath $assemblySource -Destination $assemblyTarget -Force
+        & (Join-Path $PSScriptRoot 'Copy-UnityAssembly.ps1') -Source $assemblySource -Destination $assemblyTarget
     }
 }
 Copy-Item -LiteralPath (Join-Path $m6RepoRoot 'docs\acceptance\v0.1\scenario.json') -Destination (Join-Path $m6Project 'Assets\Resources\m1-scenario.json') -Force

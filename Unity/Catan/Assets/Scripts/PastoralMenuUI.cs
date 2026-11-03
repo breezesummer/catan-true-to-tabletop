@@ -98,7 +98,7 @@ public static class PastoralMenuUI
             s=new GUIStyle(Text){fontSize=size,fontStyle=bold?FontStyle.Bold:FontStyle.Normal,alignment=align};
             labelStyles.Add(key,s);
         }
-        s.normal.textColor=color??Ink;GUI.Label(r,text,s);
+        s.fontSize=size;s.normal.textColor=color??Ink;TabletopTextFit.Label(r,text,s,8,true);
     }
     public static bool Nav(Rect r,string text,string detail,bool selected,float blend)
     {

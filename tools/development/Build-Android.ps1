@@ -22,7 +22,7 @@ foreach ($androidAssemblyName in @('Catan.Core','Catan.AI','Catan.Network.Contra
     $androidAssemblySource = Join-Path $androidRepoRoot "src\$androidAssemblyName\bin\Release\netstandard2.1\$androidAssemblyName.dll"
     $androidAssemblyTarget = Join-Path $androidProject "Assets\Plugins\$androidAssemblyName.dll"
     if (!(Test-Path -LiteralPath $androidAssemblyTarget) -or (Get-FileHash -LiteralPath $androidAssemblySource).Hash -ne (Get-FileHash -LiteralPath $androidAssemblyTarget).Hash) {
-        Copy-Item -LiteralPath $androidAssemblySource -Destination $androidAssemblyTarget -Force
+        & (Join-Path $PSScriptRoot 'Copy-UnityAssembly.ps1') -Source $androidAssemblySource -Destination $androidAssemblyTarget
     }
 }
 

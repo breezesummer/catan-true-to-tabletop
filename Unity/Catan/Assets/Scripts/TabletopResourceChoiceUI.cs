@@ -9,7 +9,7 @@ public static class TabletopResourceChoiceUI
     static readonly string[] Names={"木头","砖块","羊毛","小麦","矿石","布匹","钱币","纸张"};
     static ResourceBag activeSelection;
     static string errorHint="";
-    public static void Draw(int amount,ResourceBag selection,ResourceBag bank,Action confirm,Action<string> notify,string caption="金矿 · 选择资源",OperationWindowState windows=null)
+    public static void Draw(int amount,ResourceBag selection,ResourceBag bank,Action confirm,Action<string> notify,string caption="金矿 · 选择资源",OperationWindowState windows=null,Action cancel=null)
     {
         if(windows?.Suppressed==true)return;
         windows?.Describe(caption);
@@ -17,8 +17,8 @@ public static class TabletopResourceChoiceUI
         GUI.BeginGroup(new Rect(0,37,1440,900));
         try
         {
-        if(ModernOperationUI.Button(new Rect(1070,224,32,30),"—")){windows?.Hide(caption);return;}
-        if(ModernOperationUI.Button(new Rect(1114,224,32,30),"×")){windows?.Close();return;}
+        if(ModernOperationUI.Button(new Rect(1070,224,32,30),"—")){if(windows!=null)windows.Hide(caption);else cancel?.Invoke();return;}
+        if(ModernOperationUI.Button(new Rect(1114,224,32,30),"×")){if(windows!=null)windows.Close();else cancel?.Invoke();return;}
         if(!ReferenceEquals(activeSelection,selection)){activeSelection=selection;errorHint="";}
         int required=Math.Min(amount,bank.Total);
         ModernOperationUI.Label(new Rect(288,269,864,32),TabletopCardInput.Hint+" · 已选 "+selection.Total+" / "+required+" 张",ModernOperationUI.Center);

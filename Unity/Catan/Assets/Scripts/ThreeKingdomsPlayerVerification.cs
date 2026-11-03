@@ -50,7 +50,7 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             yield return next;
         }
         result.status="通过";result.unity=Application.unityVersion;
-        result.note="实际 Windows 本地入口覆盖 M4/M5 各 3/4 人、选将/登场/阶段/轮换/技能选择读档及本地重开。截图为游戏相机与 IMGUI 离屏合成，须人工查看；不代表真机或用户试玩验收。";
+        result.note=Environment.GetCommandLineArgs().Contains("--interaction-213-smoke")?"实际 Windows 四种配置：选将、武将手牌与详情截图、连续隐退不补发及存档恢复；未运行技能搜索或重开检查。":"实际 Windows 本地入口覆盖 M4/M5 各 3/4 人、选将/登场/阶段/轮换/技能选择读档及本地重开。截图为游戏相机与 IMGUI 离屏合成，须人工查看；不代表真机或用户试玩验收。";
         File.WriteAllText(Path.Combine(directory,"result.json"),JsonUtility.ToJson(result,true));
         Debug.Log("CATAN_THREE_KINGDOMS_PLAYER_OK: 4 种本地配置；私密选将；阶段/轮换/技能恢复；重复隐退；保留开关重开。");
         Application.Quit(0);
@@ -94,18 +94,23 @@ public sealed class ThreeKingdomsPlayerVerification : MonoBehaviour
             Require(View.PoolCount==54-players*2,"正常选将没有保留 B6 五十四将实体总数。");
             app.VerificationOpenThreeKingdomsPanel();yield return null;
             if(result.graphics){BeginCapture(prefix+"-public-life.png");for(int frame=0;target!=null&&frame<12;frame++)yield return null;EndCapture();}
+            if(Environment.GetCommandLineArgs().Contains("--interaction-213-smoke"))
+            {
+                typeof(M6App).GetField("detailGeneralId",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).SetValue(app,View.Players.First(p=>p.PlayerId==app.HumanSeat).ActiveGeneralId);
+                if(result.graphics){BeginCapture(prefix+"-general-detail.png");for(int frame=0;target!=null&&frame<12;frame++)yield return null;EndCapture();}
+                app.CloseGeneralLibrary();
+            }
             for(int repeat=0;repeat<2;repeat++)
             {
                 stage=prefix+" 隐退 "+repeat;Require(View.CanRetire,"出牌阶段没有合法隐退入口。");Retire();yield return null;result.retirements++;
-                foreach(string checkpoint in new[]{"补将","轮换登场"})
-                {
-                    string before=SaveAndRestore(prefix+"-"+repeat+"-"+checkpoint);yield return null;yield return null;AssertRestored(before);CheckPrivacy();
-                    if(checkpoint=="轮换登场"&&repeat==1&&result.graphics)
-                    {app.VerificationOpenThreeKingdomsPanel();yield return null;BeginCapture(prefix+"-replacement.png");for(int frame=0;target!=null&&frame<12;frame++)yield return null;EndCapture();}
-                    Advance();yield return null;
-                }
-                Require(View.Clock.Phase==ThreeKingdomsPhase.Play&&View.CanRetire,"轮换没有返回原出牌阶段或错误限制重复隐退。");
+                Require(View.PendingDecision==null||View.PendingDecision.Kind==ThreeKingdomsDecisionKind.DeployReplacement,"主动隐退不应发放新武将。");
+                string before=SaveAndRestore(prefix+"-"+repeat+"-隐退");yield return null;yield return null;AssertRestored(before);CheckPrivacy();
+                if(View.PendingDecision!=null){Advance();yield return null;}
+                Require(View.Clock.Phase==ThreeKingdomsPhase.Play,"隐退没有返回原出牌阶段。");
+                Require(repeat==0?View.CanRetire:!View.CanRetire,"暗置耗尽后仍可隐退。");
             }
+
+            if(Environment.GetCommandLineArgs().Contains("--interaction-213-smoke")){result.configurations++;continue;}
             stage=prefix+" 技能选择";budget=0;int skillSearchRetirements=0;
             while(!app.IsHumanTurn||View.SkillActions==null||View.SkillActions.Length==0)
             {

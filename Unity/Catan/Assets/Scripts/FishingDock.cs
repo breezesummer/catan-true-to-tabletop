@@ -10,6 +10,7 @@ public sealed class FishingDock
     public sealed class Option
     {
         public string Kind;
+        public int CardIndex;
         public bool Ship, Pirate;
         public FishAction? Action;
         public string Target, Player, Label;
@@ -26,7 +27,9 @@ public sealed class FishingDock
     public void Hide(){Selected=false;Reset();}
     public void Sort(){sorted=true;}
     bool SelectingMap=>chosen==null&&(action==FishAction.BuildRoad||action==FishAction.RemoveRobber);
-    Rect Actions=>new Rect(350,SelectingMap?103:594,732,chosen!=null||action==FishAction.TakeResource||action==FishAction.BuyDevelopmentCard||view?.PendingPlayerId==owner?88:48);
+    static readonly Rect SkillColumn=new Rect(254,714,78,171);
+    Rect Actions=>new Rect(342,650,932,58);
+    readonly Catan.Core.ResourceBag resourceSelection=new Catan.Core.ResourceBag();
     FishingView view;
     string owner, revision;
     Option[] options=Array.Empty<Option>();
@@ -37,7 +40,7 @@ public sealed class FishingDock
     string hint;
     readonly List<Rect> cardHits=new List<Rect>();
     public bool Active=>Selected&&(open||chosen!=null||action!=null||boot);
-    public bool Contains(Vector2 p)=>view!=null&&Selected&&(cardHits.Any(r=>r.Contains(p))||Actions.Contains(p));
+    public bool Contains(Vector2 p)=>view!=null&&(SkillColumn.Contains(p)||Selected&&(cardHits.Any(r=>r.Contains(p))||Actions.Contains(p)||action==FishAction.TakeResource&&TabletopResourceChoiceUI.Area.Contains(p)||action==FishAction.BuyDevelopmentCard&&new Rect(350,460,700,180).Contains(p)));
     public void Reset(){open=false;boot=false;action=null;chosen=null;tokens=Array.Empty<string>();hint=null;}
     public void Bind(FishingView fish,string player,Option[] legal)
     {
@@ -57,15 +60,29 @@ public sealed class FishingDock
     {
         chosen=option;tokens=option.Action.HasValue?FishingPayment.Select(view.OwnTokens,option.Action.Value):Array.Empty<string>();
     }
-    static string Caption(FishAction a,bool cities)=>a==FishAction.RemoveRobber?"2鱼 · 移出强盗":a==FishAction.StealResource?"3鱼 · 偷取手牌":a==FishAction.TakeResource?"4鱼 · 任意资源":a==FishAction.BuildRoad?"5鱼 · 新建道路":"7鱼 · 发展卡";
+    static string Caption(FishAction a,bool cities)=>a==FishAction.RemoveRobber?"驱盗·2":a==FishAction.StealResource?"偷取·3":a==FishAction.TakeResource?"资源·4":a==FishAction.BuildRoad?"道路·5":"发展·7";
     public void Draw(Font font,bool interactive,bool cities,string robber,Func<string,Vector2> position,string pirate=null)
     {
         cardHits.Clear();
-        if(view==null||!Selected)return;
+        if(view==null)return;
         var style=new GUIStyle(GUI.skin.label){font=font,fontSize=15,alignment=TextAnchor.MiddleCenter};style.normal.textColor=ModernOperationUI.TextColor;
         bool previous=GUI.enabled;GUI.enabled=previous&&interactive;
         bool replacement=view.PendingPlayerId==owner;
-        float shift=SelectingMap?-403:88;
+        int skillIndex=0;
+        foreach(FishAction effect in Enum.GetValues(typeof(FishAction)))
+        {
+            var hit=new Rect(SkillColumn.x,SkillColumn.y+skillIndex++*28,SkillColumn.width,27);
+            if(GeneralFrameUI.Choice(hit,Caption(effect,cities),!replacement&&options.Any(o=>o.Action==effect),action==effect))
+            {
+                Show();action=effect;boot=false;chosen=null;
+                foreach(Catan.Core.Resource r in Enum.GetValues(typeof(Catan.Core.Resource)))resourceSelection[r]=0;
+                if(effect==FishAction.BuyDevelopmentCard&&!cities)Choose(options.First(o=>o.Action==effect));
+            }
+        }
+        if(GeneralFrameUI.Choice(new Rect(SkillColumn.x,SkillColumn.y+140,SkillColumn.width,27),"旧靴",options.Any(o=>o.Kind=="boot"),boot))
+        {Show();boot=true;action=null;chosen=null;}
+        if(!Selected){GUI.enabled=previous;return;}
+        const float shift=102;
         // 鱼牌与资源牌共用尺寸、基线和叠放间距；只改变本地支付草稿。
         for(int value=1;value<=3;value++)if(cardArt[value-1]==null)cardArt[value-1]=Resources.Load<Texture2D>("HarborFishing/Cards/fish-card-"+value);
         var hand=sorted?view.OwnTokens.OrderBy(t=>t.Value).ThenBy(t=>t.Id).ToArray():view.OwnTokens;
@@ -92,26 +109,15 @@ public sealed class FishingDock
             }
         }
         if(hand.Length==0)GUI.Label(new Rect(Strip.x,740,Strip.width,40),"尚未收获鱼",style);
-        ModernOperationUI.Panel(Actions);
+
         if(replacement)
         {
-            GUI.Label(new Rect(365,510+shift,485,34),chosen==null?"点击一张鱼牌换抽，或放弃": "弃掉所选鱼牌，随机换抽一张",style);
-            if(ModernOperationUI.Button(new Rect(864,513+shift,96,34),"换抽",chosen!=null)){var submit=chosen.Submit;Reset();submit(Array.Empty<string>());}
-            if(ModernOperationUI.Button(new Rect(968,513+shift,96,34),"放弃")){var submit=options.First(o=>o.Kind=="replace"&&o.Target==null).Submit;Reset();submit(Array.Empty<string>());}
+            GUI.Label(new Rect(354,655,485,34),chosen==null?"点击一张鱼牌换抽，或放弃": "弃掉所选鱼牌，随机换抽一张",style);
+            if(ModernOperationUI.Button(new Rect(984,661,100,36),"换抽",chosen!=null)){var submit=chosen.Submit;Reset();submit(Array.Empty<string>());}
+            if(ModernOperationUI.Button(new Rect(1108,661,100,36),"放弃")){var submit=options.First(o=>o.Kind=="replace"&&o.Target==null).Submit;Reset();submit(Array.Empty<string>());}
         }
         else
         {
-            int x=361;
-            foreach(FishAction a in Enum.GetValues(typeof(FishAction)))
-            {
-                if(ModernOperationUI.Button(new Rect(x,512+shift,126,33),(a==FishAction.BuildRoad&&options.Any(o=>o.Ship)?"5鱼 · 道路／船":a==FishAction.RemoveRobber&&options.Any(o=>o.Pirate)?"2鱼 · 移出棋子":Caption(a,cities)),options.Any(o=>o.Action==a),false,action==a))
-                {
-                    action=a;boot=false;chosen=null;
-                    if(a==FishAction.BuyDevelopmentCard&&!cities)Choose(options.First(o=>o.Action==a));
-                }
-                x+=130;
-            }
-            if(ModernOperationUI.Button(new Rect(1014,512+shift,60,33),"旧靴",options.Any(o=>o.Kind=="boot"),false,boot)){boot=true;action=null;chosen=null;}
             if(chosen!=null)
             {
                 int paid=view.OwnTokens.Where(t=>tokens.Contains(t.Id)).Sum(t=>t.Value),cost=chosen.Action.HasValue?FishingRules.Cost(chosen.Action.Value):0;
@@ -122,14 +128,31 @@ public sealed class FishingDock
                     if(ModernOperationUI.Button(new Rect(473,551+shift,100,32),"新建船只",true,false,chosen.Ship))Choose(options.First(o=>o.Action==action&&o.Target==target&&o.Ship));
                 }
                 else GUI.Label(new Rect(365,551+shift,485,32),chosen.Action.HasValue?chosen.Label+" · 支付 "+paid+" / "+cost+"鱼":chosen.Label,style);
-                if(ModernOperationUI.Button(new Rect(863,551+shift,96,32),"确认",paid>=cost)){var submit=chosen.Submit;var selected=tokens;Reset();submit(selected);}
+                if(GeneralFrameUI.Choice(new Rect(984,661,112,36),"确认",paid>=cost)){var submit=chosen.Submit;var selected=tokens;Reset();submit(selected);}
             }
-            else if(action==FishAction.TakeResource||action==FishAction.BuyDevelopmentCard)
+            else if(action==FishAction.TakeResource)
             {
-                var targets=options.Where(o=>o.Action==action).ToArray();for(int i=0;i<targets.Length;i++)if(ModernOperationUI.Button(new Rect(365+i*98,551+shift,92,32),targets[i].Label))Choose(targets[i]);
+                var bank=new Catan.Core.ResourceBag();
+                foreach(var option in options.Where(o=>o.Action==action))bank[(Catan.Core.Resource)option.CardIndex]=1;
+                TabletopResourceChoiceUI.Draw(1,resourceSelection,bank,()=>{
+                    var option=options.First(o=>o.Action==FishAction.TakeResource&&resourceSelection[(Catan.Core.Resource)o.CardIndex]>0);
+                    Choose(option);var submit=chosen.Submit;var payment=tokens;Reset();submit(payment);
+                },null,"选择资源",cancel:Reset);
             }
+            else if(action==FishAction.BuyDevelopmentCard)
+            {
+                var targets=options.Where(o=>o.Action==action).ToArray();
+                for(int i=0;i<targets.Length;i++)
+                {
+                    var face=new Rect(470+i*140,470,88,130);
+                    EntityCardAssets.DrawCardFace(face,EntityCardAssets.ProgressBack(targets[i].CardIndex));
+                    if(ThreeKingdomsDirectInput.Read(face,interactive)==1)Choose(targets[i]);
+                }
+            }
+            else if(chosen==null&&action.HasValue)
+                GUI.Label(new Rect(354,655,500,40),action==FishAction.BuildRoad?"点击道路位置":action==FishAction.StealResource?"点击玩家头像":"点击强盗或海盗",style);
 
-            if(chosen!=null&&ModernOperationUI.Button(new Rect(968,551+shift,96,32),"取消"))Reset();
+            if((chosen!=null||action.HasValue||boot)&&GeneralFrameUI.Choice(new Rect(1108,661,100,36),"取消"))Reset();
             if(chosen==null&&action==FishAction.RemoveRobber)
                 foreach(var o in options.Where(o=>o.Action==action)) {var id=o.Pirate?pirate:robber;if(id==null||id=="frame")continue;var p=position(id);if(ModernOperationUI.Button(new Rect(p.x-32,p.y-26,64,52),o.Pirate?"海盗":"强盗"))Choose(o);}
         }

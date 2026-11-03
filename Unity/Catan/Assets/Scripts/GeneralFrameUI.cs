@@ -31,13 +31,13 @@ public static class GeneralFrameUI
     }
     public static void Text(Rect area,string text,int size,Color? color=null)
     {
-        Ensure();lettering.fontSize=size;lettering.normal.textColor=new Color(.12f,.09f,.04f,.95f);
+        Ensure();lettering.fontSize=size;TabletopTextFit.Fit(lettering,text,area,8);lettering.normal.textColor=new Color(.12f,.09f,.04f,.95f);
         GUI.Label(new Rect(area.x+1,area.y+2,area.width,area.height),text,lettering);
         lettering.normal.textColor=color??Gold;GUI.Label(area,text,lettering);
     }
     public static void Portrait(Rect area,string id,string name,string faction,int position,bool highlighted,bool faceDown,int life)
     {
-        Ensure();
+        Ensure();float portraitScale=area.width/138f;
         // 外发光与普通边框使用同一实际边界，避免切换回合时跳动。
         if(highlighted)Slice(glow,new Rect(((int)(Time.unscaledTime*10)%10)*240,0,240,270),new Rect(area.x-area.width*.26f,area.y-area.height*.15f,area.width*1.52f,area.height*1.18f),2400,270);
         string camp=faction=="魏"?"wei":faction=="蜀"?"shu":faction=="吴"?"wu":faction=="晋"?"jin":faction=="神"?"shen":"qun";
@@ -48,13 +48,13 @@ public static class GeneralFrameUI
         if(portrait!=null&&!faceDown)
         {
             // 源图400×472，左右透明边与顶部露头保留；头部高于卡框约12像素。
-            var image=new Rect(area.x+area.width*.155f,area.y-12,area.width*.83f,area.height+10);
+            var image=new Rect(area.x+area.width*.155f,area.y-12*portraitScale,area.width*.83f,area.height+10*portraitScale);
             GUI.DrawTextureWithTexCoords(image,portrait,new Rect(.08f,0,.8275f,1),true);
         }
-        else Text(new Rect(area.x+26,area.y+40,area.width-30,64),faceDown?"暗置":name??"待登场",22);
+        else Text(new Rect(area.x+area.width*.2f,area.y+area.height*.25f,area.width*.75f,area.height*.4f),faceDown?"暗置":name??"",22);
         // 姓名条盖在人物左侧，顶部不覆盖露出的头饰。
         var previousFont=lettering.font;lettering.font=nameBrush??previousFont;
-        if(name!=null)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+1,area.y+22+i*19,area.width*.19f,22),name[i].ToString(),20,Color.white);
+        if(name!=null&&area.width>=70)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+1,area.y+(22+i*19)*portraitScale,area.width*.19f,22*portraitScale),name[i].ToString(),Mathf.Max(6,Mathf.RoundToInt(20*portraitScale)),Color.white);
         lettering.font=previousFont;
         // 勾玉限制在左侧姓名栏内，宽度随武将框缩放，避免压到立绘或外框。
         if(life>=0)Health(new Rect(area.x+3,area.y+area.height*.60f,Mathf.Max(1,area.width*.155f-6),area.height*.30f),life,3);
@@ -85,11 +85,11 @@ public static class GeneralFrameUI
             Slice(buttons[state],new Rect(28,115,990,530),area,1045,669);
         }
         int size=Mathf.Min(name.Length>3?23:27,Mathf.FloorToInt((area.width-18)/Mathf.Max(1,name.Length)),Mathf.FloorToInt(area.height*.6f));
-        Text(area,name,size,active&&!enabled?new Color(.56f,.51f,.32f):Gold);
+        Text(new Rect(area.x+6,area.y,area.width-12,area.height*.82f),name,size,active&&!enabled?new Color(.56f,.51f,.32f):Gold);
     }
     public static bool Choice(Rect area,string name,bool enabled=true,bool selected=false)
     {
         Skill(area,name,true,enabled,selected,false);
-        return ThreeKingdomsDirectInput.Read(area,enabled,false)==1;
+        return ThreeKingdomsDirectInput.Read(area,enabled&&GUI.enabled,false)==1;
     }
 }

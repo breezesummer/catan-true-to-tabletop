@@ -1,4 +1,4 @@
-﻿[CmdletBinding(SupportsShouldProcess=$true)]
+[CmdletBinding(SupportsShouldProcess=$true)]
 param([ValidateRange(1,20)][int]$Keep=5)
 $ErrorActionPreference='Stop'
 $retentionRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
@@ -10,7 +10,8 @@ $retentionBuilds=@($retentionParents | ForEach-Object {Get-ChildItem -LiteralPat
     $_.Name -match '^Catan\d+\.\d+\.\d+(?:-.+)?$' -and !(Test-Path -LiteralPath (Join-Path $_.FullName 'release')) -and !(Test-Path -LiteralPath (Join-Path $_.FullName '正式发布.txt'))
 } | Sort-Object @{Expression={[version]([regex]::Match($_.Name,'^Catan(\d+\.\d+\.\d+)').Groups[1].Value)};Descending=$true},@{Expression={$_.LastWriteTimeUtc};Descending=$true})
 $retentionRemoved=@()
-foreach($retentionDirectory in @($retentionBuilds | Select-Object -Skip $Keep))
+$retentionExpired=@($retentionBuilds | Group-Object { [regex]::Match($_.Name,'^Catan(\d+\.\d+)\.').Groups[1].Value } | ForEach-Object { $_.Group | Select-Object -Skip $Keep })
+foreach($retentionDirectory in $retentionExpired)
 {
     $retentionTarget=[IO.Path]::GetFullPath($retentionDirectory.FullName)
     if(!$retentionTarget.StartsWith($retentionRoot+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase) -or [IO.Path]::GetDirectoryName($retentionTarget) -notin $retentionParents.FullName -or ($retentionDirectory.Attributes -band [IO.FileAttributes]::ReparsePoint)){throw '版本清理目标必须是项目 game version 或二级版本归档下的实际版本目录。'}

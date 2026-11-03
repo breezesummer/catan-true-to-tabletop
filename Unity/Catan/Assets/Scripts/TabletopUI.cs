@@ -284,6 +284,8 @@ public sealed partial class TabletopUI
             var nameStyle=NameStyle("player",center,player.Id,12);
             if(StrategyHudTheme.Jade)nameStyle.normal.textColor=JadeTabletopSkin.PlayerInk(player.Id).linear;
             TabletopTextFit.Label(nameRect,M6App.PlayerLabel(player.Id),nameStyle,8,true);
+            bool hasGeneral=ThreeKingdoms?.ThreeKingdomsProjection!=null;
+            if(hasGeneral)ThreeKingdoms.DrawPlayerGeneralCard(player.Id,new Rect(x+10,100,width-20,38));
             int points=player.Score==null?player.Points:player.Id==own?player.Score.Total:player.Score.PublicPoints;
             int resources=displayedHandCounts.Observe(operations?.Scope,player.Id,false,player.Resources,DiceRolling);
             int cards=displayedHandCounts.Observe(operations?.Scope,player.Id,true,player.Cards,DiceRolling);
@@ -293,7 +295,7 @@ public sealed partial class TabletopUI
                 player.SpecialHandLimit>0?"发展卡 · 当前 / 回合结束上限\n公开胜利点卡不占手牌上限":"发展卡 · 当前张数 / 无持有上限"};
             for(int row=0;row<6;row++)
             {
-                var r=new Rect(x+11,101+row*15,width-22,15);
+                var r=hasGeneral?new Rect(x+7+(row%2)*51,143+(row/2)*16,49,15):new Rect(x+11,101+row*15,width-22,15);
                 if(StrategyHudTheme.Jade&&row<5)Fill(new Rect(r.x+4,r.yMax,r.width-8,.5f),new Color(.12f,.38f,.26f,.10f));
                 var icon=new Rect(r.x+1,r.y-1,20,16);
                 if(row==0)StrategyHudArt.VictoryIcon(icon);
