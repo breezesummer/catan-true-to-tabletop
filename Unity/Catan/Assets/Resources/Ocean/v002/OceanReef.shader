@@ -28,7 +28,7 @@ Shader "Catan/OceanReef"
                 float grain=Noise(p*37)*.6+Noise(p*113)*.4;
                 float vein=smoothstep(.46,.53,Noise(p*8+grain*.2));
                 // 模型不增加UV接缝；三个方向投射同一灰岩贴图，边缘小面积也保留矿物细节。
-                float3 blend=pow(abs(normalize(i.n)),4);blend/=max(.001,blend.x+blend.y+blend.z);
+                float3 blend=pow(abs(normalize(TransformWorldToObjectDir(i.n))),4);blend/=max(.001,blend.x+blend.y+blend.z);
                 float3 rock=SAMPLE_TEXTURE2D(_RockDetail,sampler_RockDetail,p.yz*96).rgb*blend.x
                     +SAMPLE_TEXTURE2D(_RockDetail,sampler_RockDetail,p.xz*96).rgb*blend.y
                     +SAMPLE_TEXTURE2D(_RockDetail,sampler_RockDetail,p.xy*96).rgb*blend.z;

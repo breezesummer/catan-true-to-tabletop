@@ -3,7 +3,7 @@ using UnityEngine;
 // 海洋概念图的独立图集；只绘制，不创建交互区域或改动布局。
 public static class OceanTabletopSkin
 {
-    static Texture2D atlas,smallDisc;
+    static Texture2D atlas,smallDisc,panelFill;
     public static bool Ready { get { Warm(); return atlas != null; } }
     static void Warm() { if(atlas==null) atlas=Resources.Load<Texture2D>("TabletopUI/v017/ocean-atlas"); }
     // 实际生图为1254方图；按可见轮廓定位，不能假定生图遵守要求的像素尺寸。
@@ -37,7 +37,14 @@ public static class OceanTabletopSkin
     {
         if(Event.current.type!=EventType.Repaint)return;
         ModernOperationUI.Round(new Rect(r.x,r.y+2,r.width,r.height),new Color(0,.025f,.04f,.3f));
-        Patch(r,ornaments?0:3,true,ornaments?15:10,selected?new Color(1.08f,1.15f,1.12f):Color.white);
+        if(panelFill==null)
+        {
+            panelFill=new Texture2D(1,64,TextureFormat.RGBA32,false){name="海洋通透渐变",hideFlags=HideFlags.HideAndDontSave,wrapMode=TextureWrapMode.Clamp};
+            for(int y=0;y<64;y++)panelFill.SetPixel(0,y,Color.Lerp(new Color(.018f,.085f,.12f,.94f),new Color(.035f,.19f,.23f,.88f),y/63f));
+            panelFill.Apply(false,true);
+        }
+        GUI.DrawTexture(new Rect(r.x+3,r.y+3,r.width-6,r.height-6),panelFill);
+        Patch(r,ornaments?0:3,false,ornaments?15:10,selected?new Color(1.08f,1.15f,1.12f):Color.white);
         if(selected)Glow(r);
     }
     public static void Frame(Rect r,bool selected=false,bool card=false)
@@ -75,9 +82,10 @@ public static class OceanTabletopSkin
         for(int y=0;y<size;y++)for(int x=0;x<size;x++)
         {
             float dx=(x+.5f-size/2f)/(size/2f),dy=(y+.5f-size/2f)/(size/2f),d=Mathf.Sqrt(dx*dx+dy*dy);
-            float ring=Mathf.Max(1-Mathf.Abs(d-.955f)/.022f,1-Mathf.Abs(d-.86f)/.012f);
+            float ring=Mathf.Max(Mathf.Clamp01((.99f-d)*90)*Mathf.Clamp01((d-.88f)*90),1-Mathf.Abs(d-.83f)/.014f);
             Color metal=Color.Lerp(new Color(.43f,.29f,.12f),new Color(1,.89f,.60f),Mathf.Clamp01(.58f+dy*.28f-dx*.17f));
-            Color color=Color.Lerp(new Color(.025f,.16f,.20f),metal,Mathf.Clamp01(ring));
+            metal*=.72f+.28f*Mathf.Cos((d-.94f)*65);
+            Color color=Color.Lerp(Color.Lerp(new Color(.018f,.08f,.12f),new Color(.04f,.22f,.25f),dy*.5f+.5f),metal,Mathf.Clamp01(ring));
             color.a=Mathf.Clamp01((1-d)*size*.5f);pixels[y*size+x]=color;
         }
         smallDisc=new Texture2D(size,size,TextureFormat.RGBA32,false){name="海洋细黄铜圆片",hideFlags=HideFlags.HideAndDontSave,wrapMode=TextureWrapMode.Clamp};

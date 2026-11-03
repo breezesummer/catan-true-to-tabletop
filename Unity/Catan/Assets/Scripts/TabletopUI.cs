@@ -38,7 +38,7 @@ public sealed partial class TabletopUI
     {
         var value=Style(key+player,basis,size,FontStyle.Bold,alignment);value.richText=false;
         if(PlayerIdentityModel.IsPlayerId(player))value.normal.textColor=BoardRenderer.SeatColor(player.ToUpperInvariant());
-        if(StrategyHudTheme.Ocean)value.normal.textColor=Color.Lerp(value.normal.textColor,ModernOperationUI.TextColor,.34f);
+        if(StrategyHudTheme.Ocean)value.normal.textColor=Color.Lerp(value.normal.textColor,ModernOperationUI.TextColor,.48f);
         return value;
     }
     static readonly Rect[] baseDiceRects={new Rect(43,192,43,43),new Rect(112,192,43,43)},expansionDiceRects={new Rect(46,220,31,31),new Rect(116,220,31,31),new Rect(81,191,31,31)};

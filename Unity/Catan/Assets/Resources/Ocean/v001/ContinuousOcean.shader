@@ -28,6 +28,7 @@ Shader "Catan/ContinuousOcean"
             float _WaterHeight;
             float _OceanTheme;
             float4 _ReefShores[4];
+            float4 _ReefAngles;
             CBUFFER_END
             struct Attributes { float4 positionOS : POSITION; };
             struct Varyings { float4 positionCS : SV_POSITION; float3 world : TEXCOORD0; };
@@ -42,8 +43,11 @@ Shader "Catan/ContinuousOcean"
                     {
                         float4 reef=_ReefShores[j];
                         if(reef.z<=0)continue;
-                        float2 q=(p-reef.xy)/reef.zw;
-                        float d=max(0,(length(q)-1)*min(reef.z,reef.w));
+                        float2 delta=p-reef.xy;
+                        float angle=_ReefAngles[j];
+                        float2 q=float2(delta.x*cos(angle)-delta.y*sin(angle),delta.x*sin(angle)+delta.y*cos(angle))/reef.zw;
+                        float edge=1+sin(q.x*9+q.y*7)*.08+sin(q.y*17-q.x*11)*.04;
+                        float d=max(0,(length(q)-edge)*min(reef.z,reef.w));
                         coast.x=min(coast.x,d/.08);
                     }
                 }
@@ -92,18 +96,22 @@ Shader "Catan/ContinuousOcean"
                 if(_OceanTheme>.5)
                 {
                     // 两组缓慢流动的同源水纹，交叉采样打散重复，几何波幅与拾取平面不变。
-                    float2 uv=p*1.45+float2(t*.0018,t*.0011);
-                    uv+=float2(sin(p.y*31-t*.21),cos(p.x*27+t*.19))*.002;
+                    float2 uv=p*1.17+float2(t*.0018,t*.0011);
+                    uv+=float2(sin(p.y*5.7-t*.07),cos(p.x*7.3+t*.06))*.045;
                     float3 detail=SAMPLE_TEXTURE2D(_OceanDetail,sampler_OceanDetail,uv).rgb;
-                    float3 secondary=SAMPLE_TEXTURE2D(_OceanDetail,sampler_OceanDetail,p*2.13+float2(-t*.0011,t*.0016)+.37).rgb;
-                    float3 blue=lerp(detail,secondary,.22)*1.12;
-                    blue=lerp(blue,blue*float3(.95,1.28,1.15),1-smoothstep(0,.025,d));
+                    float2 crossed=float2(p.x*.72-p.y*.69,p.x*.69+p.y*.72)*1.79;
+                    float3 secondary=SAMPLE_TEXTURE2D(_OceanDetail,sampler_OceanDetail,crossed+float2(-t*.0011,t*.0016)+.37).rgb;
+                    float patch=.5+.5*sin(p.x*3.7+sin(p.y*4.1))*cos(p.y*2.9-p.x*1.3);
+                    float3 blue=lerp(detail,secondary,.30+patch*.25);
+                    float luminance=dot(blue,float3(.2126,.7152,.0722));
+                    blue=lerp(luminance.xxx,blue,.78)*lerp(.94,1.15,patch);
+                    blue=lerp(blue,blue*float3(1.08,1.15,1.09),1-smoothstep(0,.034,d));
                     blue+=sun.color*spec*.065;
                     float broken=saturate((detail.g-secondary.g)*16+.35);
-                    float lace=smoothstep(.65,.99,sin(d*830-t*1.15+broken*3));
-                    lace*=smoothstep(.0002,.0015,d)*(1-smoothstep(.003,.019,d));
-                    lace*=broken;
-                    blue=lerp(blue,float3(.72,.86,.80),lace*.55);
+                    float lace=smoothstep(.12,.93,sin(d*410-t*.72+broken*5+ripple*.55));
+                    lace*=smoothstep(.0001,.0012,d)*(1-smoothstep(.003,.017,d));
+                    lace*=smoothstep(.12,.8,broken);
+                    blue=lerp(blue,float3(.79,.88,.83),lace*.65);
                     water=lerp(blue,float3(.25,.58,.59),coast.g*.38);
                 }
                 return half4(water,1);

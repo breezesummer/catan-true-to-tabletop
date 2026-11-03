@@ -16,7 +16,7 @@ public sealed class OceanThemeEnvironment : MonoBehaviour
     public void Initialize(TabletopScene owner,Material ocean){table=owner;water=ocean;}
     void Load()
     {
-        var model=Resources.Load<GameObject>("Ocean/v002/ocean-reef-cluster");
+        var model=Resources.Load<GameObject>("Ocean/v003/ocean-reef-cluster");
         var shader=Resources.Load<Shader>("Ocean/v002/OceanReef");
         if(model==null||shader==null)return;
         sourceRotation=model.transform.localRotation;sourceScale=model.transform.localScale;
@@ -55,6 +55,7 @@ public sealed class OceanThemeEnvironment : MonoBehaviour
             shores[i]=new Vector4(point.x,point.z,size*.73f,size*.39f);
         }
         water.SetVectorArray("_ReefShores",shores);
+        water.SetVector("_ReefAngles",new Vector4(-22,68,12,-22)*Mathf.Deg2Rad);
     }
     void OnDestroy(){if(stone!=null)Destroy(stone);}
 }

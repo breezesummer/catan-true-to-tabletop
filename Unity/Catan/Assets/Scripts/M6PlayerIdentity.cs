@@ -24,6 +24,7 @@ public sealed partial class M6App
         if(PlayerIdentityModel.IsPlayerId(id))
         {
             var color=BoardRenderer.SeatColor(id.ToUpperInvariant());
+            if(StrategyHudTheme.Ocean)color=Color.Lerp(color,StrategyHudTheme.Text,.48f);
             style.normal.textColor=style.hover.textColor=style.active.textColor=style.focused.textColor=color;
         }
         return style;

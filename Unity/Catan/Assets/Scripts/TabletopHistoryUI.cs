@@ -19,6 +19,7 @@ public sealed partial class TabletopHistoryUI
     TabletopDiceHistory cachedDice;
     readonly TabletopHistoryLayout feedLayout=new TabletopHistoryLayout(),fullLayout=new TabletopHistoryLayout(),diceLayout=new TabletopHistoryLayout();
     Font layoutFont;
+    int layoutTheme=-1;
     string[] playerKeys=Array.Empty<string>(),playerNames=Array.Empty<string>();
     GUIStyle compactStyle,fullStyle,diceRowStyle,turnRowStyle;
     TabletopWorldObjects diceArt;
@@ -38,9 +39,9 @@ public sealed partial class TabletopHistoryUI
         players=players??Array.Empty<string>();
         bool namesChanged=playerNames.Length!=players.Length;
         for(int i=0;!namesChanged&&i<players.Length;i++)namesChanged=playerKeys[i]!=players[i]||playerNames[i]!=M6App.PlayerLabel(players[i]);
-        if(layoutFont!=font||namesChanged)
+        if(layoutFont!=font||namesChanged||layoutTheme!=StrategyHudTheme.Version)
         {
-            layoutFont=font;playerKeys=(string[])players.Clone();playerNames=players.Select(M6App.PlayerLabel).ToArray();
+            layoutTheme=StrategyHudTheme.Version;layoutFont=font;playerKeys=(string[])players.Clone();playerNames=players.Select(M6App.PlayerLabel).ToArray();
             feedLayout.Reset();fullLayout.Reset();diceLayout.Reset();compactStyle=fullStyle=diceRowStyle=turnRowStyle=null;
         }
         entries=entries??Array.Empty<GameHistoryEntry>();players=players??Array.Empty<string>();
@@ -161,7 +162,7 @@ public sealed partial class TabletopHistoryUI
         }
         return height;
     }
-    GUIStyle HistoryStyle(bool compact)=>compact?(compactStyle??(compactStyle=new GUIStyle(ModernOperationUI.Text){fontSize=11,wordWrap=false})):(fullStyle??(fullStyle=new GUIStyle(ModernOperationUI.Text){fontSize=15,wordWrap=false}));
+    GUIStyle HistoryStyle(bool compact)=>compact?(compactStyle??(compactStyle=new GUIStyle(ModernOperationUI.Text){fontSize=StrategyHudTheme.Ocean?13:11,wordWrap=false})):(fullStyle??(fullStyle=new GUIStyle(ModernOperationUI.Text){fontSize=15,wordWrap=false}));
     float HistoryLine(Rect r,TabletopHistoryLine line,GameHistoryEntry entry,bool compact,bool draw=true)=>
         DrawCardLine(r,"",line.Player," "+line.Prefix,line.Cards,line.Suffix,HistoryStyle(compact),
             line.Quote?line.ReceivedCards:null,line.Roll?entry:null,line.Trade?null:line.Partner,line.PartnerAction,line.Emphasis,line.Track,draw);
