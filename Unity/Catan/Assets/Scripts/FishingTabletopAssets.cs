@@ -102,6 +102,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
     void Apply(FishingView view,Tile[] tiles,Func<string,Vector3> position)
     {
         var markers=GetComponentInChildren<TabletopReferenceMarkers>();
+        if(markers!=null)markers.SetFishingVertices(view?.Grounds.SelectMany(g=>g.VertexIds)??Enumerable.Empty<string>());
         var portBounds=markers?.PublicPortFootprints??Array.Empty<Vector3[]>();
         string next=view==null?"":string.Join("|",view.Grounds.Select(g=>g.Id+":"+g.Number+":"+string.Join(",",g.VertexIds)))+string.Join("|",tiles.Select(t=>t.Id+":"+t.Resource));
         next+="|ports:"+(markers?.PortLayoutRevision??0);

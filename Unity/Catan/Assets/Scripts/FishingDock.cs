@@ -40,7 +40,7 @@ public sealed class FishingDock
     string hint;
     readonly List<Rect> cardHits=new List<Rect>();
     public bool Active=>Selected&&(open||chosen!=null||action!=null||boot);
-    public bool Contains(Vector2 p)=>view!=null&&(SkillColumn.Contains(p)||Selected&&(cardHits.Any(r=>r.Contains(p))||Actions.Contains(p)||action==FishAction.TakeResource&&TabletopResourceChoiceUI.Area.Contains(p)||action==FishAction.BuyDevelopmentCard&&new Rect(350,460,700,180).Contains(p)));
+    public bool Contains(Vector2 p)=>view!=null&&Selected&&(SkillColumn.Contains(p)||(cardHits.Any(r=>r.Contains(p))||Actions.Contains(p)||action==FishAction.TakeResource&&TabletopResourceChoiceUI.Area.Contains(p)||action==FishAction.BuyDevelopmentCard&&new Rect(350,460,700,180).Contains(p)));
     public void Reset(){open=false;boot=false;action=null;chosen=null;tokens=Array.Empty<string>();hint=null;}
     public void Bind(FishingView fish,string player,Option[] legal)
     {
@@ -64,7 +64,7 @@ public sealed class FishingDock
     public void Draw(Font font,bool interactive,bool cities,string robber,Func<string,Vector2> position,string pirate=null)
     {
         cardHits.Clear();
-        if(view==null)return;
+        if(view==null||!Selected)return;
         var style=new GUIStyle(GUI.skin.label){font=font,fontSize=15,alignment=TextAnchor.MiddleCenter};style.normal.textColor=ModernOperationUI.TextColor;
         bool previous=GUI.enabled;GUI.enabled=previous&&interactive;
         bool replacement=view.PendingPlayerId==owner;

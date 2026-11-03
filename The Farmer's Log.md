@@ -1375,3 +1375,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Start-De
 - 海岸遮罩仅用公开地形，分帧生成并缓存；波浪由 GPU 本地计算，不改变规则、拾取、权威存档或通信。
 - 4 项相机单元检查、Blender FBX 回读与五类四人实际对局的 45,178 次专项断言通过；20 张默认／远景／近景／港口截图已审看。旧整套桌面检查的库存布局断言在 2.1.4 原程序也失败，未记作全量通过。详见[验收记录](docs/verification/ocean-2.1.5/验收记录.md)。
 - Windows、随包服务及 Android ARM64 构建完成，APK 签名通过；产物位于 `game version/2.1/Catan2.1.5-Continuous-Ocean`，程序／应用名称为 `Catan2.1.5`。2.1 目录保留五份构建。本轮未正式发布或部署云端，Android 真机性能、触控整局及四设备外网未验收。
+
+## 2026-11-03｜内测版 2.1.6：鱼技能分页与港口贴板
+
+- 鱼行动及旧靴按钮仅在鱼手牌分页显示，隐藏时同步关闭技能列命中区。
+- 普通港口底面恢复棋盘表面高度；与渔场共享顶点时保留叠放高度，渔场变化同步更新港口和号码避让轮廓。
+- 重新读取官方《The Fishermen of Catan - Seafarers》（FSF.pdf）第2页：穿越沙漠允许主岛及外岛渔场；按用户确认遵循官方规则，保留生成范围。
+- 四项航海捕鱼地图确定性及组件守恒检查通过，源码差异检查通过。Windows客户端、随包服务、Android ARM64构建及APK签名检查通过；2.1目录保留最近五份构建；未进行实机画面、Android触控及四设备外网验收。
+- 版本更新为2.1.6，构建目录为 `game version/2.1/Catan2.1.6-Fishing-Port-Fixes`。未正式发布或部署云端。

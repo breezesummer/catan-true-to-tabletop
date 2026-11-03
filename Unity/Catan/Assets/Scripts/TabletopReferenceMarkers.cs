@@ -107,6 +107,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         this.observerSeat = observerSeat;
         RefreshOceanTiles();
         if (table != null && table.isActiveAndEnabled) table.Ocean.Refresh(tiles, vertices);
+        lastPorts=publicPorts;lastGiftPorts=publicGiftPorts;
         RefreshPorts(ports, portRoot, publicPorts, "港口 ");
         RefreshPorts(gifts, giftRoot, publicGiftPorts, "港礼 ");
         RefreshPortFootprints();
@@ -142,6 +143,17 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         Prune(awards, wantedAwards);
         PositionAwards();
     }
+    readonly HashSet<string> FishingVertices = new HashSet<string>();
+    PortDisplay[] lastPorts, lastGiftPorts;
+    public void SetFishingVertices(IEnumerable<string> vertices)
+    {
+        var next = new HashSet<string>(vertices);
+        if(FishingVertices.SetEquals(next))return;
+        FishingVertices.Clear();FishingVertices.UnionWith(next);
+        RefreshPorts(ports,portRoot,lastPorts,"港口 ");
+        RefreshPorts(gifts,giftRoot,lastGiftPorts,"港礼 ");
+        RefreshPortFootprints();
+    }
     void RefreshPorts(Dictionary<string, Marker> existing, Transform parent, PortDisplay[] publicPorts, string name)
     {
         var wanted = new HashSet<string>(StringComparer.Ordinal);
@@ -158,7 +170,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
             // 不凭纸板中心猜测距离，避免不同港口照片的外形产生可见空隙。
             var bottom = midpoint + normal * (item.InlandReach+.00035f);
             // 渔港底面高出地形 0.5 mm、板厚 1.5 mm；港口再留 0.1 mm 间隙，固定显示在上层。
-            bottom.y = FishingTabletopAssets.GroundBottom+.0015f+.0001f;
+            bottom.y = endpoints.Any(FishingVertices.Contains) ? FishingTabletopAssets.GroundBottom+.0015f+.0001f : EntityBoardAssets.BoardSurfaceHeight;
             item.Object.transform.position = bottom;
             // 导入纸板的沙岸在 local +Z，向海的凸柄在 local -Z。
             item.Object.transform.rotation = Quaternion.LookRotation(-normal, Vector3.up);
