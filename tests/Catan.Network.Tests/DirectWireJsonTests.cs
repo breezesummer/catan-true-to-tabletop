@@ -42,7 +42,7 @@ public sealed class DirectWireJsonTests
     [Fact]
     public void IntegratedSkillProjectionKeepsB5AndDirectInteractionFieldsAcrossBothDecoders()
     {
-        var view=new ThreeKingdomsView {PackageVersion=GeneralCatalog.B5DirectPackageVersion,
+        var view=new ThreeKingdomsView {PackageVersion=GeneralCatalog.B5DirectPackageVersion,ConstructionCostAdjustment=-1,
             PublicPoolGeneralIds=new[]{"tk-g54"},RetiredGeneralIds=new[]{"tk-g01"},
             SkillRuntimeStatus=new[]{new B45SkillRuntimeStatus {SkillId="tk-g16-s1",HasLegalAction=true,Summary="可发动"}},
             SkillActions=new[]{new B2SkillAction {Command=new B2SkillCommand {SkillId="tk-g17-s1",Option="civil-qixi-tech"},SelectionCost=new[]{0,3,0,0,0,0,0,0},SelectionBoardIds=new[]{"E003"}}}};

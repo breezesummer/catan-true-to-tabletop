@@ -52,6 +52,7 @@ namespace Catan.Core.M5
     }
     public sealed partial class PlayerState
     {
+        [DataMember(Order=190)] public ProgressCardKind[] PrintedProgressCards { get; set; } = Array.Empty<ProgressCardKind>();
         [DataMember(Order=100)] public ProgressCardKind[] ProgressCards { get; set; } = Array.Empty<ProgressCardKind>();
         [DataMember(Order=101)] public ProgressCardKind[] ProgressVictoryCards { get; set; } = Array.Empty<ProgressCardKind>();
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.Serialization;
 
 namespace Catan.Core.ThreeKingdoms
@@ -158,6 +158,7 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=63, EmitDefaultValue=false)] public string ViewerPlayerId { get; set; }
         [DataMember(Order=65, EmitDefaultValue=false)] public int[] BlockedGainCardTypes { get; set; }
         [DataMember(Order=66, EmitDefaultValue=false)] public string[] AllowedTradePartnerPlayerIds { get; set; }
+        [DataMember(Order=68, EmitDefaultValue=false)] public int ConstructionCostAdjustment { get; set; }
         [DataMember(Order=67, EmitDefaultValue=false)] public bool RequireEqualPlayerTradeCounts { get; set; }
         [DataMember(Order=25, EmitDefaultValue=false)] public string[] PublicPoolGeneralIds { get; set; }
         [DataMember(Order=26, EmitDefaultValue=false)] public string[] RetiredGeneralIds { get; set; }

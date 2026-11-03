@@ -48,7 +48,7 @@ namespace Catan.Core.ThreeKingdoms
             };
         }
         private static B2SkillFrame CloneFrame(B2SkillFrame f) => new B2SkillFrame { Id = f.Id, SkillId = f.SkillId, PlayerId = f.PlayerId, TenureId = f.TenureId, Kind = f.Kind, Step = f.Step,
-            Remaining = f.Remaining, Cards = Copy(f.Cards), Targets = (string[])f.Targets.Clone(), ProgressCard = f.ProgressCard == null ? null : new B2ProgressCard { Id = f.ProgressCard.Id, Color = f.ProgressCard.Color, PublicPoint = f.ProgressCard.PublicPoint },
+            Remaining = f.Remaining, Cards = Copy(f.Cards), Targets = (string[])f.Targets.Clone(), ProgressCard = f.ProgressCard == null ? null : new B2ProgressCard { Id = f.ProgressCard.Id, Color = f.ProgressCard.Color, PublicPoint = f.ProgressCard.PublicPoint, Printed = f.ProgressCard.Printed },
             Tiles = f.Tiles.Select(t => new B2HarvestTile { TileId = t.TileId, Number = t.Number, AllowedCardTypes = (int[])t.AllowedCardTypes.Clone() }).ToArray(),
             Optional = f.Optional, SourceEventId = f.SourceEventId, SelectedCards = Copy(f.SelectedCards), Started = f.Started, B4 = CloneB4Payload(f.B4), B4OrderChosen = f.B4OrderChosen,
             CivilB5 = CloneB5CivilPayload(f.CivilB5) };

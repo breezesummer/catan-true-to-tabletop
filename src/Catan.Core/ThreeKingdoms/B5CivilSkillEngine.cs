@@ -51,7 +51,7 @@ namespace Catan.Core.ThreeKingdoms
                 }
             if(g.GeneralId=="tk-g31"&&Value(g,"fencheng",0)==0)
                 foreach(var p in s.SeatPlayerIds)actions.Add(CivilAction(s,"tk-g31-s1","civil-fencheng","焚城：从 "+p+" 开始",p));
-            if(g.GeneralId=="tk-g32"&&!loss&&hand.Sum()>=2&&Value(g,"yicheng",0)==0&&bh.GetVirtualProgressUses(player,"play").Any(u=>u.CardId=="Taxation"))actions.Add(CivilAction(s,"tk-g32-s2","civil-yicheng","疑城：弃两张手牌，视为使用主教"));
+            if(g.GeneralId=="tk-g32"&&!loss&&hand.Sum()>=2&&Value(g,"yicheng",0)==0&&bh.GetVirtualProgressUses(player,"play").Any(u=>u.CardId=="Taxation"))actions.Add(CivilAction(s,"tk-g32-s2","civil-yicheng","疑城：弃两张手牌，获得主教"));
             if(g.GeneralId=="tk-g35"&&!loss)
                 for(int n=1;n<=hand[4];n++){var a=CivilAction(s,"tk-g35-s1","civil-lianhuan","连环：弃 "+n+" 张矿石换随机资源");a.Command.Counts[4]=n;a.RealCardType=4;a.CardSelectionKind="payment";a.AvailableCount=hand[4];actions.Add(a);}
             if(g.GeneralId=="tk-g51"&&g.Counters.Count(c=>c.Key.StartsWith("liegong:",StringComparison.Ordinal)&&c.Value>0)>=7)

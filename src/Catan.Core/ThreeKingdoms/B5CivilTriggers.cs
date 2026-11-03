@@ -42,7 +42,7 @@ namespace Catan.Core.ThreeKingdoms
             foreach(var player in Order(s))
             {
                 var g=Active(s,player);if(g==null)continue;
-                if(g.GeneralId=="tk-g03"&&!IsDrawBlocked(s,player))
+                if(g.GeneralId=="tk-g03"&&s.Clock.ActivePlayerId==player&&!IsDrawBlocked(s,player))
                 {var f=CivilFrame(s,g,"tk-g03-s1","civil-yingzi",eventId);Append(s,f);}
                 if(g.GeneralId=="tk-g25"&&s.Clock.ActivePlayerId!=player&&!IsDrawBlocked(s,player)&&
                     (s.SeatPlayerIds.Where(p=>p!=player).All(p=>hands[player]<hands[p])||s.SeatPlayerIds.Where(p=>p!=player).All(p=>scores[player]<scores[p])))

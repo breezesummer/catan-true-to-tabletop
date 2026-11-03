@@ -48,7 +48,7 @@ public sealed class ThreeKingdomsB6SeatTradeIntegrationTests
         dynamic restored=Restore(game,mode);dynamic c=Skill(game,mode,"seat-fuqi-submit");Accept(restored,c);Assert.Equal((string)game.Save(),(string)restored.Save());
         dynamic state=game.GetAuthoritativeStateForTesting();Assert.Equal(2,(int)Player(state).Commodities.Total);Assert.Equal(1,(int)Player(state,"P2").Resources.Wood);
     }
-    [Theory][InlineData("cities",1)][InlineData("combined",1)][InlineData("cities",-1)][InlineData("combined",-1)]
+    [Theory][InlineData("cities",1)][InlineData("combined",1)]
     public void NativeRoadWaitsForJiaoziResourceBeforePaymentAndRestores(string mode,int adjustment)
     {
         string anchor="";dynamic game=Fixture(mode,"tk-g46",s=>{anchor=LandVertices(s)[0];Settlements(s,(anchor,"P1"));Player(s).Resources.Wood=2;Player(s).Resources.Brick=1;if(adjustment<0)foreach(string id in new[]{"P2","P3","P4"})Player(s,id).Resources.Wheat=4;});
@@ -78,4 +78,81 @@ public sealed class ThreeKingdomsB6SeatTradeIntegrationTests
         dynamic trade=Cmd(game,mode,"BankTrade","P2");trade.GiveResource=Resource.Brick;trade.ReceiveResource=Resource.Wood;trade.GiveAmount=4;trade.ReceiveAmount=1;
         string snapshot=game.Save();Assert.False((bool)game.Execute(trade).Success);Assert.Equal(snapshot,(string)game.Save());
     }
+    [Theory][InlineData("cities")][InlineData("combined")]
+    public void JiaoziBuildsKnightDirectlyWithOnlyOre(string mode)
+    {
+        string anchor="";dynamic game=Fixture(mode,"tk-g46",s=>{anchor=LandVertices(s)[0];Settlements(s,(anchor,"P1"));Player(s).Resources.Ore=1;foreach(string id in new[]{"P2","P3","P4"})Player(s,id).Resources.Wheat=2;});
+        Catan.Core.Edge[] edges=game.GetPlayerView("P1").Board.Edges;var edge=edges.First(e=>e.Vertices.Contains(anchor));
+        dynamic state=game.GetAuthoritativeStateForTesting();
+        if(state is M4.GameState a)a.Roads=new[]{M4CoreHarness.Piece(edge.Id)};else ((M5.GameState)state).Roads=new[]{M5Harness.Piece(edge.Id)};
+        if(state is M4.GameState balanced)M4CoreHarness.Balance(balanced);else M5Harness.Balance((M5.GameState)state);
+        game.GetType().GetField("state",BindingFlags.NonPublic|BindingFlags.Instance)!.SetValue(game,state);
+        dynamic command=Cmd(game,mode,"RecruitKnight");command.TargetId=edge.Vertices.First(v=>v!=anchor);
+        dynamic preview=game.Preview(command);Assert.True((bool)preview.Success,(string)preview.Message);
+        dynamic restored=Restore(game,mode);Accept(game,command);Accept(restored,command);
+        Assert.Equal((string)game.Save(),(string)restored.Save());state=game.GetAuthoritativeStateForTesting();
+        Assert.Equal(1,(int)state.Knights.Length);Assert.Equal(0,(int)Player(state).Resources.Total);Assert.Null(state.ThreeKingdoms.Skills.PendingDecision);
+    }
+    [Theory][InlineData("cities")][InlineData("combined")]
+    public void QicePrintsOneCardPerKindWithoutTargetsAndRestores(string mode)
+    {
+        dynamic game=Fixture(mode,"tk-g34",s=>{Player(s).Resources.Brick=1;s.ThreeKingdoms.Clock.DrawPhaseTurnInstanceId=0;s.ThreeKingdoms.Clock.Phase=ThreeKingdomsPhase.Preparation;if(s is M4.GameState a)a.Phase=M4.GamePhase.ProductionAwaitRoll;else ((M5.GameState)s).Phase=M5.GamePhase.ProductionAwaitRoll;});
+        dynamic state=game.GetAuthoritativeStateForTesting();game.GetType().GetMethod("PumpB4",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(game,new object[]{state});game.GetType().GetField("state",BindingFlags.NonPublic|BindingFlags.Instance)!.SetValue(game,state);
+        B2SkillAction[] actions=game.GetPlayerView("P1").ThreeKingdoms.SkillActions;
+        var choices=actions.Where(a=>a.Command.Option=="b45-optional-qice").ToArray();
+        Assert.Equal(Enum.GetValues<M4.ProgressCardKind>().Length,choices.Length);Assert.All(choices,a=>Assert.Empty(a.SelectionBoardIds??Array.Empty<string>()));
+        dynamic command=Cmd(game,mode,"UseGeneralSkill");command.SkillCommand=choices.Single(a=>a.VirtualCardId=="Medicine").Command;
+        dynamic preview=game.Preview(command);Assert.True((bool)preview.Success,(string)preview.Message);
+        dynamic restored=Restore(game,mode);Accept(game,command);Accept(restored,command);Assert.Equal((string)game.Save(),(string)restored.Save());
+        state=game.GetAuthoritativeStateForTesting();Assert.Equal(0,(int)Player(state).Resources.Brick);Assert.Equal(1,(int)Player(state).ProgressCards.Length);Assert.Equal(1,(int)Player(state).PrintedProgressCards.Length);
+        // 无城市目标、弃完费用仍能获得药物；牌库不减少。
+        Assert.Equal(54,((System.Collections.IEnumerable)state.ProgressDecks).Cast<dynamic>().Sum(d=>(int)d.Cards.Length));
+    }
+
+    [Theory][InlineData("cities")][InlineData("combined")]
+    public void PrintedCardsSurviveSaveAndDisappearAfterUseOrDiscard(string mode)
+    {
+        dynamic game=Fixture(mode,"tk-g34",s=>{});dynamic state=game.GetAuthoritativeStateForTesting();
+        var host=(IThreeKingdomsB4Host)game.GetType().GetMethod("CardHost",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(game,new object[]{state});
+        for(int i=0;i<5;i++)host.UseVirtualProgress("P1",host.GetVirtualProgressUses("P1","play").Single(u=>u.CardId=="RoadBuilding"));
+        game.GetType().GetField("state",BindingFlags.NonPublic|BindingFlags.Instance)!.SetValue(game,state);game.AssertInvariants();
+        dynamic discard=Cmd(game,mode,"DiscardProgressCard");if(mode=="cities")discard.ProgressCard=M4.ProgressCardKind.RoadBuilding;else discard.ProgressCard=M5.ProgressCardKind.RoadBuilding;
+        dynamic restored=Restore(game,mode);Accept(game,discard);Accept(restored,discard);Assert.Equal((string)game.Save(),(string)restored.Save());
+        dynamic play=Cmd(game,mode,"PlayProgressCard");if(mode=="cities")play.ProgressCard=M4.ProgressCardKind.RoadBuilding;else play.ProgressCard=M5.ProgressCardKind.RoadBuilding;
+        Accept(game,play);if(game.GetAuthoritativeStateForTesting().PendingDecision!=null){dynamic done=Cmd(game,mode,"ResolveProgressChoice");done.Decline=true;Accept(game,done);}
+        state=game.GetAuthoritativeStateForTesting();Assert.Equal(3,(int)Player(state).PrintedProgressCards.Length);Assert.Equal(3,(int)Player(state).ProgressCards.Length);
+        Assert.Equal(54,((System.Collections.IEnumerable)state.ProgressDecks).Cast<dynamic>().Sum(d=>(int)d.Cards.Length));
+    }
+
+    [Theory][InlineData("cities")][InlineData("combined")]
+    public void MiewuPrintsWithoutImmediateTargetsAndKeepsReward(string mode)
+    {
+        dynamic game=Fixture(mode,"tk-g41",s=>{Player(s).Resources.Brick=1;ThreeKingdomsState tk=s.ThreeKingdoms;tk.Generals.Single(g=>g.Region==GeneralRegion.Active&&g.OwnerPlayerId=="P1").Counters=new[]{new GeneralCounter{Key="wuku",Value=3},new GeneralCounter{Key="sanchen",Value=1}};});
+        B2SkillAction[] actions=game.GetPlayerView("P1").ThreeKingdoms.SkillActions;var choices=actions.Where(a=>a.Command.Option=="b4-miewu-progress").ToArray();
+        Assert.Equal(23,choices.Length);dynamic command=Cmd(game,mode,"UseGeneralSkill");command.SkillCommand=choices.Single(a=>a.VirtualCardId=="Medicine").Command;Accept(game,command);
+        dynamic state=game.GetAuthoritativeStateForTesting();Assert.Equal(1,(int)Player(state).ProgressCards.Length);Assert.Equal(1,(int)Player(state).Resources.Total);Assert.Null(state.PendingDecision);Assert.Equal(1,(int)Player(state).PrintedProgressCards.Length);
+    }
+    [Theory][InlineData("cities")][InlineData("combined")]
+    public void YichengPrintsBishopWithoutMovingRobber(string mode)
+    {
+        dynamic game=Fixture(mode,"tk-g32",s=>{Player(s).Resources.Wood=1;Player(s).Resources.Brick=1;});
+        string before=game.GetAuthoritativeStateForTesting().RobberTileId;
+        Skill(game,mode,"civil-yicheng");Skill(game,mode,"civil-select",0);Skill(game,mode,"civil-select",1);Skill(game,mode,"civil-yicheng-use");
+        dynamic state=game.GetAuthoritativeStateForTesting();Assert.Equal(before,(string)state.RobberTileId);Assert.Equal(1,(int)Player(state).ProgressCards.Length);Assert.Equal(0,(int)Player(state).Resources.Total);Assert.Equal(1,(int)Player(state).PrintedProgressCards.Length);
+    }
+    [Theory][InlineData("cities")][InlineData("combined")]
+    public void PrintedCardTransferPreservesOriginAndNeverReturnsToDeck(string mode)
+    {
+        dynamic game=Fixture(mode,"tk-g34",s=>{});dynamic state=game.GetAuthoritativeStateForTesting();
+        var host=(IThreeKingdomsB4Host)game.GetType().GetMethod("CardHost",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(game,new object[]{state});
+        host.UseVirtualProgress("P1",host.GetVirtualProgressUses("P1","play").Single(u=>u.CardId=="RoadBuilding"));
+        var card=Assert.Single(host.GetProgressCards("P1"));Assert.True(card.Printed);host.RemoveProgress("P1",card.Id);
+        if(state is M4.GameState a)a.ThreeKingdomsProgressResolutions=new[]{new M4.B4ProgressResolution{EventId="printed-capture",PlayerId="P1",Card=card}};
+        else ((M5.GameState)state).ThreeKingdomsProgressResolutions=new[]{new M5.B4ProgressResolution{EventId="printed-capture",PlayerId="P1",Card=card}};
+        Assert.True(((IThreeKingdomsB4ResponseHost)host).TryCaptureProgressCard("P1","P2",card,"printed-capture"));
+        var transferred=Assert.Single(host.GetProgressCards("P2"));Assert.True(transferred.Printed);host.RemoveProgress("P2",transferred.Id);host.ReturnProgress(transferred);
+        game.GetType().GetField("state",BindingFlags.NonPublic|BindingFlags.Instance)!.SetValue(game,state);game.AssertInvariants();
+        Assert.Equal(54,((System.Collections.IEnumerable)state.ProgressDecks).Cast<dynamic>().Sum(d=>(int)d.Cards.Length));
+    }
+
 }

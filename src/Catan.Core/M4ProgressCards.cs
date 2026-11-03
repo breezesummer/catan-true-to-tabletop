@@ -49,7 +49,9 @@ namespace Catan.Core.M4
             var index = Array.IndexOf(p.ProgressCards, card);
             Require(index >= 0, "NoProgressCard", "你没有这张发展卡。");
             p.ProgressCards = p.ProgressCards.Where((x, i) => i != index).ToArray();
-            if (B4(s) && played) { QueueB4Progress(s,p.Id,card,eventId); return; }
+            bool printed=TakePrinted(p,card);
+            if (B4(s) && played) { QueueB4Progress(s,p.Id,card,eventId,printed:printed); return; }
+            if(printed)return;
             var deck = s.ProgressDecks.Single(d => d.Track == ProgressCatalog.Track(card));
             deck.Cards = Append(deck.Cards, card);
         }
@@ -217,6 +219,7 @@ namespace Catan.Core.M4
                         Require(index >= 0 && !ProgressCatalog.IsVictoryPoint(c.SelectedProgressCard), "NoProgressCard", "只能选择对方手中的发展卡。");
                         other.ProgressCards = other.ProgressCards.Where((x, i) => i != index).ToArray();
                         p.ProgressCards = Append(p.ProgressCards, c.SelectedProgressCard);
+                        if(TakePrinted(other,c.SelectedProgressCard))p.PrintedProgressCards=Append(p.PrintedProgressCards??Array.Empty<ProgressCardKind>(),c.SelectedProgressCard);
                         if(B5(s)&&--d.Amount>0&&other.ProgressCards.Length>0)return;
                     }
                     break;
@@ -380,8 +383,10 @@ namespace Catan.Core.M4
         {
             if (s.ProgressDecks == null || s.ProgressDecks.Length != 3 || s.ProgressDecks.Select(d => d.Track).Distinct().Count() != 3) throw new InvalidOperationException("Invalid progress decks.");
             var cards = s.ProgressDecks.SelectMany(d => d.Cards).Concat(s.Players.SelectMany(p => p.ProgressCards)).Concat(s.Players.SelectMany(p => p.ProgressVictoryCards)).Concat((s.ThreeKingdoms?.Skills?.Frames ?? Array.Empty<Catan.Core.ThreeKingdoms.B2SkillFrame>()).Where(f => f.ProgressCard != null && !f.Kind.StartsWith("response-",StringComparison.Ordinal)).Select(f => (ProgressCardKind)Enum.Parse(typeof(ProgressCardKind), f.ProgressCard.Id))).Concat((s.ThreeKingdomsProgressResolutions??Array.Empty<B4ProgressResolution>()).Where(x=>!x.Virtual&&!x.Captured&&x.Card?.PublicPoint==false).Select(x=>(ProgressCardKind)Enum.Parse(typeof(ProgressCardKind),x.Card.Id))).ToArray();
-            if (cards.Length != 54) throw new InvalidOperationException("Progress-card conservation violated.");
-            foreach (ProgressCardKind card in Enum.GetValues(typeof(ProgressCardKind))) if (cards.Count(c => c == card) != ProgressCatalog.Count(card)) throw new InvalidOperationException("Invalid progress-card supply: " + card);
+            if(s.Players.Any(p=>(p.PrintedProgressCards??Array.Empty<ProgressCardKind>()).GroupBy(c=>c).Any(g=>g.Count()>p.ProgressCards.Concat(p.ProgressVictoryCards).Count(c=>c==g.Key))))throw new InvalidOperationException("生成发展牌来源与持有区域不一致。");
+            var printed=s.Players.SelectMany(p=>p.PrintedProgressCards??Array.Empty<ProgressCardKind>()).Concat((s.ThreeKingdoms?.Skills?.Frames??Array.Empty<B2SkillFrame>()).Where(f=>f.ProgressCard?.Printed==true&&!f.Kind.StartsWith("response-",StringComparison.Ordinal)).Select(f=>(ProgressCardKind)Enum.Parse(typeof(ProgressCardKind),f.ProgressCard.Id))).Concat((s.ThreeKingdomsProgressResolutions??Array.Empty<B4ProgressResolution>()).Where(x=>!x.Virtual&&!x.Captured&&x.Card?.Printed==true&&!x.Card.PublicPoint).Select(x=>(ProgressCardKind)Enum.Parse(typeof(ProgressCardKind),x.Card.Id))).ToArray();
+            if (cards.Length != 54+printed.Length) throw new InvalidOperationException("Progress-card conservation violated.");
+            foreach (ProgressCardKind card in Enum.GetValues(typeof(ProgressCardKind))) if (cards.Count(c => c == card) != ProgressCatalog.Count(card)+printed.Count(c=>c==card)) throw new InvalidOperationException("Invalid progress-card supply: " + card);
             if (s.Players.Any(p => p.ProgressCards.Any(ProgressCatalog.IsVictoryPoint) || p.ProgressVictoryCards.Any(c => !ProgressCatalog.IsVictoryPoint(c))) || s.ProgressDecks.Any(d => d.Cards.Any(c => ProgressCatalog.Track(c) != d.Track))) throw new InvalidOperationException("Invalid progress-card zone.");
             if (s.MerchantPlayerId != null && (!s.Players.Any(p => p.Id == s.MerchantPlayerId) || !s.Tiles.Any(t => t.Id == s.MerchantTileId && t.Resource != "sea"))) throw new InvalidOperationException("Invalid merchant.");
             if ((s.AlchemyDice1 == 0) != (s.AlchemyDice2 == 0) || s.AlchemyDice1 < 0 || s.AlchemyDice1 > 6 || s.AlchemyDice2 < 0 || s.AlchemyDice2 > 6) throw new InvalidOperationException("Invalid alchemy dice.");

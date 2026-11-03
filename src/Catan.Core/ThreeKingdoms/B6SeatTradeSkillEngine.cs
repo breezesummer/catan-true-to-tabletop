@@ -15,6 +15,7 @@ namespace Catan.Core.ThreeKingdoms
         public static void ProjectSeatTradeB6(IThreeKingdomsCardHost host, ThreeKingdomsView view, string viewer)
         {
             var s=host?.State;if(!B6Enabled(s))return;
+            view.ConstructionCostAdjustment=JiaoziAdjustmentB6(host,viewer);
             view.BlockedGainCardTypes=Enumerable.Range(0,8).Where(t=>!CanGainB6(s,viewer,t)).ToArray();
             view.AllowedTradePartnerPlayerIds=s.SeatPlayerIds.Where(p=>p!=viewer&&B6AllianceRules.CanTrade(s,viewer,p)).ToArray();
             view.RequireEqualPlayerTradeCounts=s.ControlB6!=null&&s.ControlB6.AssetPlayerId==viewer&&s.ControlB6.OpportunityId==s.Clock.OpportunityId;

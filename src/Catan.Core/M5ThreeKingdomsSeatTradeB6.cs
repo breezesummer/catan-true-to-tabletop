@@ -46,6 +46,7 @@ namespace Catan.Core.M5
                 case CommandKind.BuildRoad:return new ResourceBag{Wood=1,Brick=1};
                 case CommandKind.BuildSettlement:return new ResourceBag{Wood=1,Brick=1,Wool=1,Wheat=1};
                 case CommandKind.BuildCity:if(!s.DowngradedCities.Any(x=>x.PlayerId==c.PlayerId&&x.LocationId==c.TargetId))return new ResourceBag{Wheat=2,Ore=3};return null;
+                case CommandKind.RecruitKnight:case CommandKind.PromoteKnight:return new ResourceBag{Wool=1,Ore=1};
                 case CommandKind.BuildWall:return new ResourceBag{Brick=2};
                 case CommandKind.BuildShip:return new ResourceBag{Wood=1,Wool=1};
                 case CommandKind.PlayProgressCard:if(c.ProgressCard==ProgressCardKind.Medicine&&!s.DowngradedCities.Any(x=>x.PlayerId==c.PlayerId&&x.LocationId==c.TargetId))return new ResourceBag{Wheat=2,Ore=3};return null;
@@ -54,7 +55,7 @@ namespace Catan.Core.M5
         }
         private bool BeginSeatTradeB6Construction(GameState s,Command c,bool virtualCard,bool virtualPrepare)
         {
-            if(!B2SkillEngine.B6Enabled(s.ThreeKingdoms)||s.B5FreeConstruction||c.JiaoziCardType.HasValue||B2SkillEngine.JiaoziAdjustmentB6(CardHost(s),c.PlayerId)==0)return false;
+            if(!B2SkillEngine.B6Enabled(s.ThreeKingdoms)||s.B5FreeConstruction||c.JiaoziCardType.HasValue||B2SkillEngine.JiaoziAdjustmentB6(CardHost(s),c.PlayerId)<=0)return false;
             var standard=SeatTradeB6StandardCost(s,c);if(standard==null)return false;
             var use=new B4VirtualUse{PayloadJson=Json.Write(c),CardId=virtualCard?(virtualPrepare?"virtual-prepare":"virtual"):"native",SourceEventId=c.Id};
             Require(SeatTradeB6ConstructionChoices(s,use).Length>0,"InvalidConstruction","当前不能完成此项建造。");
@@ -79,6 +80,18 @@ namespace Catan.Core.M5
         {
             var adjustment=s.B5FreeConstruction?0:B2SkillEngine.JiaoziAdjustmentB6(CardHost(s),p.Id);
             if(adjustment==0||discounted.Total==0){Pay(s,p,discounted);return;}
+            if(adjustment<0&&!s.B6ConstructionCardType.HasValue)
+            {
+                var hand=CardHost(s).GetHand(p.Id);
+                foreach(int type in Enumerable.Range(0,5).Where(t=>discounted[(Resource)t]>0).OrderBy(t=>hand[t]-discounted[(Resource)t]))
+                {
+                    var candidate=Enumerable.Range(0,8).Select(i=>i<5?discounted[(Resource)i]:0).ToArray();
+                    if(candidate.Sum()>1)candidate[type]--;
+                    if(B4PaymentAllocator.Allocate(s.ThreeKingdoms,p.Id,hand,candidate,s.B4PaymentSelection)==null)continue;
+                    PayB4(s,p,candidate);return;
+                }
+                Require(false,"InsufficientResources","建造所需资源不足。");
+            }
             Require(s.B6ConstructionCardType.HasValue,"JiaoziChoiceRequired","请选择骄姿调整的资源。");
             var adjusted=B2SkillEngine.JiaoziCostB6(Enumerable.Range(0,8).Select(i=>i<5?discounted[(Resource)i]:0).ToArray(),
                 Enumerable.Range(0,8).Select(i=>i<5?standard[(Resource)i]:0).ToArray(),adjustment,s.B6ConstructionCardType.Value);

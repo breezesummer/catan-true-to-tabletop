@@ -194,8 +194,8 @@ namespace Catan.Core.ThreeKingdoms
             if(f.Kind=="response-jieying-take") { var cards=!IsB4HandLossForbidden(s,f.Targets[0])&&!IsProtected(s,f.Targets[0])?host.GetHand(f.Targets[0]):new int[8];B4SkillHistoryEngine.Complete(s,f.Id,"从 "+f.Targets[0]+" 获得"+cards.Sum()+"张手牌",new[]{f.Id});Remove(s,f);if(cards.Sum()>0)B4Transfer(host,f.Targets[0],f.PlayerId,cards,f.Id,f.SkillId);return true; }
             if(f.Kind=="response-qice")
             {
-                if(f.Step==0){Decide(s,f,"response-qice-use","奇策：选择发展牌用途","先选择合法非分值牌效果，再一次弃置所有手牌。");waiting=true;return true;}
-                var use=f.B4.VirtualUse;use.SourceSkillId=f.SkillId;use.SourceEventId=f.Id;B4SkillHistoryEngine.Complete(s,f.Id,"弃置全部手牌，发动虚拟发展牌："+use.Label,new[]{f.Id+":cost"});Remove(s,f);((IThreeKingdomsB4Host)host).UseVirtualProgress(f.PlayerId,use);return true;
+                if(f.Step==0){Decide(s,f,"response-qice-use","奇策：选择发展牌","弃置所有手牌，获得所选发展牌。");waiting=true;return true;}
+                var use=f.B4.VirtualUse;use.SourceSkillId=f.SkillId;use.SourceEventId=f.Id;B4SkillHistoryEngine.Complete(s,f.Id,"弃置全部手牌，获得发展牌："+use.Label,new[]{f.Id+":cost"});Remove(s,f);((IThreeKingdomsB4Host)host).UseVirtualProgress(f.PlayerId,use);return true;
             }
             if(f.Kind=="response-zhiyu")
             {

@@ -9,7 +9,21 @@ namespace Catan.Core.ThreeKingdoms
         public string Name { get; }
         public string OriginalText { get; }
         public bool Enabled => GeneralCatalog.IsEnabled(Id.Substring(0, 6));
-        internal SkillDefinition(string id, string name, string text) { Id=id; Name=name; OriginalText=text; }
+        internal SkillDefinition(string id, string name, string text) { Id=id; Name=name; OriginalText=CurrentText(id,text); }
+        private static string CurrentText(string id,string text)
+        {
+            switch(id)
+            {
+                case "tk-g03-s1":return "你的摸牌阶段，多摸一张任意资源牌（商品牌）和一张随机资源牌。";
+                case "tk-g28-s1":return "你的摸牌阶段，你可以放弃摸牌，亮出四张随机资源牌，然后获得其中不同的牌至多三张。";
+                case "tk-g34-s1":return "你的回合开始时，你可以弃置所有手牌，获得一张任意发展牌。";
+                case "tk-g32-s2":return "限定技，你的出牌阶段，弃置两张手牌，获得一张主教发展牌。";
+                case "tk-g52-s2":return "你的出牌阶段限一次，你可以弃置一张黄色发展牌和一张任意发展牌，获得一张垄断资源或垄断商品发展牌。";
+                case "tk-g46-s2":return "手牌数为全场唯一最多时，建筑和设施费用加一张；唯一最少时，费用减少一张（至少为一张）。包括骑士招募、升级和城市改良。";
+                case "tk-g41-s3":return text.Replace("将一张手牌当作任意发展牌（不包括1分牌）打出","弃置一张手牌，获得一张任意发展牌（不包括1分牌）");
+                default:return text;
+            }
+        }
     }
     public sealed class GeneralDefinition
     {

@@ -76,7 +76,7 @@ namespace Catan.Core.ThreeKingdoms
             if (f.Kind == "harvest")
             {
                 var active = Active(s, f.PlayerId);
-                var available = active?.TenureId == a.TenureId && !IsDrawBlocked(s, f.PlayerId) &&
+                var available = (a.GeneralId != "tk-g28" || s.Clock.ActivePlayerId == f.PlayerId) && active?.TenureId == a.TenureId && !IsDrawBlocked(s, f.PlayerId) &&
                     (a.GeneralId == "tk-g28" || a.GeneralId == "tk-g37" && TilePairs(host, f.PlayerId).Any() || a.GeneralId == "tk-g01" && a.Cards.Sum() > 0 && RaidTargets(host, f.PlayerId).Length > 0);
                 if (available) { Decide(s, f, "harvest", Name(f.SkillId) + "：摸牌替代", "可以保留普通产出，或使用本将替代本次主分配。"); return true; }
                 a.ChoiceComplete = true; Remove(s, f); return false;

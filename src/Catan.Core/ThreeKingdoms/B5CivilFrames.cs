@@ -112,7 +112,7 @@ namespace Catan.Core.ThreeKingdoms
             if(f.Kind=="civil-yicheng")
             {
                 if(f.Step==0){Decide(s,f,"civil-hand-select","疑城：选择两张手牌","两张真实手牌作为全部技能费用。");waiting=true;return true;}
-                if(f.Step==1){var uses=bh.GetVirtualProgressUses(owner,"play").Where(u=>u.CardId=="Taxation").ToArray();if(uses.Length==0){Remove(s,f);return true;}Decide(s,f,"civil-yicheng-use","疑城：选择主教用途","费用在确认合法用途后一次支付。");waiting=true;return true;}
+                if(f.Step==1){var uses=bh.GetVirtualProgressUses(owner,"play").Where(u=>u.CardId=="Taxation").ToArray();if(uses.Length==0){Remove(s,f);return true;}Decide(s,f,"civil-yicheng-use","疑城：获得主教","确认后弃置所选手牌。");waiting=true;return true;}
                 var use=p.VirtualUse;Remove(s,f);use.SourceSkillId=f.SkillId;use.SourceEventId=f.Id;bh.UseVirtualProgress(owner,use);return true;
             }
             if(f.Kind=="civil-lianhuan"){Remove(s,f);CivilReward(s,f,"random",f.Remaining);return true;}

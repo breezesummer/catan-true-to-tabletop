@@ -12,6 +12,13 @@ public sealed class ThreeKingdomsB5CivilSkillsTests
     private static void Entry(ThreeKingdomsB5CivilTestHost h){B2SkillEngine.OnCivilGeneralActivated(h.State,h.State.Generals[0]);B2SkillEngine.Pump(h);}
     private static int Counter(ThreeKingdomsB5CivilTestHost h,string key)=>h.State.Generals[0].Counters.FirstOrDefault(c=>c.Key==key)?.Value??0;
 
+    [Theory][InlineData("tk-g03")][InlineData("tk-g28")]
+    public void OwnDrawSkillsDoNotTriggerOnAnotherPlayersTurn(string general)
+    {
+        var h=ThreeKingdomsB5CivilTestHost.Create(general);h.State.Clock.ActivePlayerId="P2";h.State.Clock.Phase=ThreeKingdomsPhase.Draw;
+        B2SkillEngine.BeginHarvest(h,new[]{new B2HarvestAllocation{PlayerId="P1",Cards=new[]{1,0,0,0,0,0,0,0}}});
+        Assert.Null(h.State.Skills.PendingDecision);Assert.Equal(1,h.GetHand("P1").Sum());h.Conserved();
+    }
     [Fact] public void YingziAddsChosenCommodityAndOneRandomEvenWithoutProduction()
     {
         var h=ThreeKingdomsB5CivilTestHost.Create("tk-g03");h.State.Clock.Phase=ThreeKingdomsPhase.Draw;

@@ -27,6 +27,7 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=1)] public string Id { get; set; }
         [DataMember(Order=2)] public int Color { get; set; }
         [DataMember(Order=3)] public bool PublicPoint { get; set; }
+        [DataMember(Order=4)] public bool Printed { get; set; }
     }
     [DataContract] public sealed class B2HarvestTile
     {

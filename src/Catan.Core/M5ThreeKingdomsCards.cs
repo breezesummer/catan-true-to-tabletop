@@ -25,6 +25,16 @@ namespace Catan.Core.M5
         private static bool B2Busy(GameState s) => B2(s) && (B2SkillEngine.HasPending(s.ThreeKingdoms) || B3DiceEngine.HasPending(s.ThreeKingdoms) || B2SkillEngine.HasB5Comparison(s.ThreeKingdoms));
         private static string ThreeKingdomsVersionFor(ThreeKingdomsState tk) => tk == null ? RulesVersion : tk.RulesVersion == GeneralCatalog.B6RulesVersion ? ThreeKingdomsB6RulesVersion : tk.RulesVersion == GeneralCatalog.B5DirectRulesVersion ? ThreeKingdomsB5DirectRulesVersion : tk.RulesVersion == GeneralCatalog.B5RulesVersion ? ThreeKingdomsB5RulesVersion : tk.RulesVersion == GeneralCatalog.B45RulesVersion ? ThreeKingdomsB45RulesVersion : tk.RulesVersion == GeneralCatalog.B4RulesVersion ? ThreeKingdomsB4RulesVersion : tk.RulesVersion == GeneralCatalog.B3RulesVersion ? ThreeKingdomsB3RulesVersion : tk.SkillsEnabled ? ThreeKingdomsB2RulesVersion : ThreeKingdomsRulesVersion;
 
+        private static bool TakePrinted(PlayerState p,ProgressCardKind card)
+        {
+            int i=Array.IndexOf(p.PrintedProgressCards??Array.Empty<ProgressCardKind>(),card);if(i<0)return false;
+            p.PrintedProgressCards=p.PrintedProgressCards.Where((x,n)=>n!=i).ToArray();return true;
+        }
+        private static B2ProgressCard[] PrintedCards(PlayerState p)
+        {
+            var remaining=(p.PrintedProgressCards??Array.Empty<ProgressCardKind>()).ToList();
+            return p.ProgressCards.Select(c=>{bool printed=remaining.Remove(c);return new B2ProgressCard {Id=c.ToString(),Color=(int)ProgressCatalog.Track(c),PublicPoint=ProgressCatalog.IsVictoryPoint(c),Printed=printed};}).ToArray();
+        }
         private sealed partial class B2Host : IThreeKingdomsCardHost
         {
             private readonly CombinedGameSession session;
@@ -48,7 +58,7 @@ namespace Catan.Core.M5
             public void AddBank(int[] cards) => Change(game.Bank, game.CommodityBank, cards, 1);
             public int DrawRandom(int exclusiveMaximum) => Draw(game.Random, exclusiveMaximum);
             private static B2ProgressCard Card(ProgressCardKind card) => new B2ProgressCard { Id = card.ToString(), Color = (int)ProgressCatalog.Track(card), PublicPoint = ProgressCatalog.IsVictoryPoint(card) };
-            public B2ProgressCard[] GetProgressCards(string playerId) => game.Players.Single(x => x.Id == playerId).ProgressCards.Select(Card).ToArray();
+            public B2ProgressCard[] GetProgressCards(string playerId) => PrintedCards(game.Players.Single(x => x.Id == playerId));
             public int GetProgressDeckCount(int color) => game.ProgressDecks.Single(d => (int)d.Track == color).Cards.Length;
             public void RemoveProgress(string playerId, string cardId)
             {
@@ -56,6 +66,7 @@ namespace Catan.Core.M5
                 int index = Array.FindIndex(p.ProgressCards, c => c.ToString() == cardId);
                 Require(index >= 0, "NoProgressCard", "没有指定发展牌。");
                 p.ProgressCards = p.ProgressCards.Where((c, i) => i != index).ToArray();
+                TakePrinted(p,(ProgressCardKind)Enum.Parse(typeof(ProgressCardKind),cardId));
             }
             public B2ProgressCard DrawProgress(string playerId, int color)
             {
@@ -69,6 +80,7 @@ namespace Catan.Core.M5
             }
             public void ReturnProgress(B2ProgressCard card)
             {
+                if(card.Printed)return;
                 var value = (ProgressCardKind)Enum.Parse(typeof(ProgressCardKind), card.Id);
                 var deck = game.ProgressDecks.Single(d => d.Track == ProgressCatalog.Track(value)); deck.Cards = Append(deck.Cards, value);
             }

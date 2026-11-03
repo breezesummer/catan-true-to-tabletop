@@ -98,7 +98,7 @@ public sealed partial class M4App
             {
                 int[] cost=new int[8];cost[5+track]=Math.Min(5,own.Improvements[track]+1);
                 bool legal=view.LegalActions.Any(c=>c.Kind==CommandKind.ImproveCity&&(int)c.Track==track);
-                var b=AddDockBuild(s,CommandKind.ImproveCity,new[]{"贸易设施","政治设施","科学设施"}[track],"facility",1,cost,legal,track);b.Track=track;b.Level=own.Improvements[track];b.Detail="下一级需 "+(own.Improvements[track]+1)+" 张"+Goods[5+track]+"；三级能力："+new[]{"商品以 2:1 兑换","允许晋升精锐骑士","非 7 且没有产出时，选取 1 张资源"}[track]+"；四 / 五级争夺大都会";
+                var b=AddDockBuild(s,CommandKind.ImproveCity,new[]{"贸易设施","政治设施","科学设施"}[track],"facility",1,cost,legal,track);b.Track=track;b.Level=own.Improvements[track];b.Detail="下一级需 "+b.Cost.Sum()+" 张"+Goods[5+track]+"；三级能力："+new[]{"商品以 2:1 兑换","允许晋升精锐骑士","非 7 且没有产出时，选取 1 张资源"}[track]+"；四 / 五级争夺大都会";
                 if(b.Level==5){Array.Clear(b.Cost,0,8);b.Detail="设施已达到最高等级";b.UnavailableReason=b.Detail;}
             }
 
@@ -153,6 +153,12 @@ public sealed partial class M4App
     }
     OperationBuild AddDockBuild(OperationSnapshot s,CommandKind kind,string name,string icon,int count,int[] cost,bool legal,int suffix=-1)
     {
+        if(view.ThreeKingdoms?.ConstructionCostAdjustment<0&&cost.Sum()>1)
+        {
+            cost=(int[])cost.Clone();
+            int reduced=Enumerable.Range(0,8).Where(t=>cost[t]>0).OrderBy(t=>s.Goods[t]-cost[t]).First();
+            cost[reduced]--;
+        }
         var build=new OperationBuild{Id=kind.ToString()+(suffix<0?"":":"+suffix),Name=name,Icon=icon,Count=count,Cost=cost,Detail=cost.Sum()==0?"当前阶段免费放置":kind==CommandKind.PromoteKnight?"拿起高一级骑士，放到要晋升的骑士上；使用该骑士所属玩家的库存":kind==CommandKind.ImproveCity?"点击翻开下一级设施并支付商品":"拿起棋子，再点击地图上的合法位置放下"};build.ConfigureAvailability(legal,s.Goods,kind!=CommandKind.BuildCity);ConfigureDirectPaymentAvailability(build,legal,suffix);if(icon=="knight")build.Level=suffix;s.Builds.Add(build);return build;
     }
     void DrawOperationLayout()

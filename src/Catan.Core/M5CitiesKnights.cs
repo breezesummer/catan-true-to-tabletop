@@ -173,6 +173,7 @@ namespace Catan.Core.M5
             var cities=s.Cities.Where(c=>c.PlayerId==p.Id&&!s.Metropolises.Any(m=>m.LocationId==c.LocationId)).Select(c=>c.LocationId).ToArray();
             Require(!acquire||cities.Length>0,"NoMetropolisCity","取得大都会必须有一座可用城市。");
             int cost=Math.Max(0,level-discount);
+            if(cost>0&&!s.B5FreeConstruction)cost=Math.Max(1,cost+B2SkillEngine.JiaoziAdjustmentB6(CardHost(s),p.Id));
             if(B2SkillEngine.B4Enabled(s.ThreeKingdoms)) {var needs=new int[8];needs[5+(int)track]=cost;PayB4(s,p,needs);}
             else Transfer(p.Commodities,s.CommodityBank,(Commodity)(int)track,cost);
             p.Improvements[(int)track]=effective;
@@ -186,7 +187,7 @@ namespace Catan.Core.M5
             Require(scenario.Topology.Vertices.Any(v=>v.Id==target)&&!Occupied(s,target),"OccupiedVertex","骑士需要空顶点。");
             Require(OwnRouteEdges(s,p.Id).Any(e=>e.Vertices.Contains(target)),"DisconnectedKnight","骑士须连接自己的道路。");
             Require(s.Knights.Count(k=>k.PlayerId==p.Id&&k.Level==1)<2,"NoBasicKnights","基础骑士库存不足。");
-            Pay(s,p,new ResourceBag {Wool=1,Ore=1}); s.Knights=Append(s.Knights,new Knight {PlayerId=p.Id,LocationId=target,Level=1,Active=false,ActivatedTurn=B5(s)?s.Turn:0,ActedTurn=B5(s)?-1:0});
+            PayB6Construction(s,p,new ResourceBag {Wool=1,Ore=1},new ResourceBag {Wool=1,Ore=1}); s.Knights=Append(s.Knights,new Knight {PlayerId=p.Id,LocationId=target,Level=1,Active=false,ActivatedTurn=B5(s)?s.Turn:0,ActedTurn=B5(s)?-1:0});
         }
         private Knight OwnKnight(GameState s,PlayerState p,string target) {var knight=s.Knights.FirstOrDefault(k=>B6ControlsKnight(s,p.Id,k)&&k.LocationId==target);Require(knight!=null,"NotOwnKnight","请选择己方骑士。");return knight;}
         private void PromoteKnight(GameState s,PlayerState p,string target)
@@ -194,7 +195,7 @@ namespace Catan.Core.M5
             var knight=OwnKnight(s,p,target); Require(knight.Level<3&&knight.PromotedTurn!=s.Turn,"CannotPromote","每位骑士每回合只能晋升一次。");
             Require(knight.Level<2||B6Technology(s,p.Id,(int)ImprovementTrack.Politics)>=3,"FortressRequired","晋升强大骑士需要三级政治改良。");
             Require(s.Knights.Count(k=>k.PlayerId==knight.PlayerId&&k.Level==knight.Level+1)<2,"NoKnightSupply","晋升等级的骑士库存不足。");
-            Pay(s,p,new ResourceBag {Wool=1,Ore=1}); knight.Level++;knight.PromotedTurn=s.Turn;
+            PayB6Construction(s,p,new ResourceBag {Wool=1,Ore=1},new ResourceBag {Wool=1,Ore=1}); knight.Level++;knight.PromotedTurn=s.Turn;
         }
         private void ActivateKnight(GameState s,PlayerState p,string target) {var knight=OwnKnight(s,p,target);Require(!knight.Active,"AlreadyActive","骑士已经激活。");Pay(s,p,new ResourceBag {Wheat=1});knight.Active=true;knight.ActivatedTurn=s.Turn;}
         private HashSet<string> ReachableKnightVertices(GameState s,string player,string source)

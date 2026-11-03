@@ -41,15 +41,16 @@ namespace Catan.Core.M4
                     target.ProgressVictoryCards=Append(target.ProgressVictoryCards,value);
                 }
                 else target.ProgressCards=Append(target.ProgressCards,value);
+                if(card.Printed||card.PublicPoint&&TakePrinted(game.Players.Single(p=>p.Id==fromPlayerId),value))target.PrintedProgressCards=Append(target.PrintedProgressCards??Array.Empty<ProgressCardKind>(),value);
                 entry.Captured=true;return true;
             }
         }
-        private static void QueueB4Progress(GameState s,string player,ProgressCardKind? card,string eventId,bool virtualCard=false)
+        private static void QueueB4Progress(GameState s,string player,ProgressCardKind? card,string eventId,bool virtualCard=false,bool printed=false)
         {
             if(!B4(s))return;
             s.ThreeKingdomsProgressResolutions=(s.ThreeKingdomsProgressResolutions??Array.Empty<B4ProgressResolution>()).Concat(new[]{new B4ProgressResolution {
                 EventId=eventId??"progress-reveal-"+s.ThreeKingdoms.NextId++,PlayerId=player,Virtual=virtualCard,
-                Card=card.HasValue?new B2ProgressCard {Id=card.Value.ToString(),Color=(int)ProgressCatalog.Track(card.Value),PublicPoint=ProgressCatalog.IsVictoryPoint(card.Value)}:null}}).ToArray();
+                Card=card.HasValue?new B2ProgressCard {Id=card.Value.ToString(),Color=(int)ProgressCatalog.Track(card.Value),PublicPoint=ProgressCatalog.IsVictoryPoint(card.Value),Printed=printed}:null}}).ToArray();
         }
         private void FinishB4Progress(GameState s)
         {

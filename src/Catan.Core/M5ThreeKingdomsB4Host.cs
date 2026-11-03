@@ -28,6 +28,13 @@ namespace Catan.Core.M5
             public void UseVirtualProgress(string playerId,B4VirtualUse use) => session.B4UseVirtual(game,playerId,use);
             public bool CanUseVirtualProgressAfterPayment(string playerId,B4VirtualUse use,int[] consumedCards)
             {
+                if(B2SkillEngine.B6Enabled(game.ThreeKingdoms))
+                {
+                    if(use==null||consumedCards==null||consumedCards.Length!=8||consumedCards.Any(n=>n<0))return false;
+                    var printedHand=GetHand(playerId);if(Enumerable.Range(0,8).Any(i=>printedHand[i]<consumedCards[i]))return false;
+                    return true;
+                }
+
                 if(use==null||consumedCards==null||consumedCards.Length!=8||consumedCards.Any(n=>n<0))return false;
                 var currentHand=GetHand(playerId);if(Enumerable.Range(0,8).Any(i=>currentHand[i]<consumedCards[i]))return false;
                 // 用途已由 GetVirtualProgressUses 预检；只有药物与起重机会另外支付手牌。
@@ -42,6 +49,15 @@ namespace Catan.Core.M5
         }
         private B4VirtualUse[] B4VirtualUses(GameState s,string player,string timing)
         {
+            if(B2SkillEngine.B6Enabled(s.ThreeKingdoms))
+            {
+                if(!B4(s)||s.ActivePlayerId!=player||s.PendingDecision!=null||s.TradeOffer!=null) return Array.Empty<B4VirtualUse>();
+                return ((ProgressCardKind[])Enum.GetValues(typeof(ProgressCardKind))).Where(card=>timing=="prepare"||!ProgressCatalog.IsVictoryPoint(card)).Select(card => new B4VirtualUse {
+                CardId=card.ToString(), OptionId="printed:"+card, Label=DevelopmentCardText.Name(card.ToString()),
+                PayloadJson=Json.Write(new Command {PlayerId=player,Kind=CommandKind.PlayProgressCard,ProgressCard=card})
+                }).ToArray();
+            }
+
             if(!B4(s)||s.ActivePlayerId!=player||s.PendingDecision!=null||s.TradeOffer!=null) return Array.Empty<B4VirtualUse>();
             var probe=s.CopyForTransaction();probe.ThreeKingdoms.Skills.SuppressPump=true;var owner=probe.Players.Single(p=>p.Id==player);
             owner.ProgressCards=((ProgressCardKind[])Enum.GetValues(typeof(ProgressCardKind))).Where(c=>!ProgressCatalog.IsVictoryPoint(c)).ToArray();
@@ -73,6 +89,7 @@ namespace Catan.Core.M5
             }
             return result.ToArray();
         }
+
         private IEnumerable<Command> B4VirtualCandidates(GameState s,PlayerState owner)
         {
             var expanded=new HashSet<ProgressCardKind>();
@@ -124,6 +141,19 @@ namespace Catan.Core.M5
         }
         private void B4UseVirtual(GameState s,string player,B4VirtualUse use)
         {
+            if(B2SkillEngine.B6Enabled(s.ThreeKingdoms))
+            {
+                Require(B4(s)&&use!=null,"InvalidPrintedCard","发展牌无效。");
+                var card=(ProgressCardKind)Enum.Parse(typeof(ProgressCardKind),use.CardId);
+                Require(Enum.IsDefined(typeof(ProgressCardKind),card),"InvalidPrintedCard","发展牌无效。");
+                var owner=s.Players.Single(p=>p.Id==player);
+                owner.PrintedProgressCards=Append(owner.PrintedProgressCards??Array.Empty<ProgressCardKind>(),card);
+                if(ProgressCatalog.IsVictoryPoint(card)) {owner.ProgressVictoryCards=Append(owner.ProgressVictoryCards,card);QueueB4Progress(s,player,card,null);}
+                else owner.ProgressCards=Append(owner.ProgressCards,card);
+                B2SkillEngine.OnB4VirtualProgressCompleted(CardHost(s),player,use);
+                return;
+            }
+
             Require(B4(s)&&use!=null&&s.ThreeKingdomsVirtualUse==null,"VirtualUsePending","已有未完成的虚拟牌。");
             var c=Json.Read<Command>(use.PayloadJson);
             Require(c.Kind==CommandKind.PlayProgressCard&&c.PlayerId==player&&c.ProgressCard.ToString()==use.CardId&&!ProgressCatalog.IsVictoryPoint(c.ProgressCard),"InvalidVirtualUse","虚拟用牌内容无效。");
@@ -136,6 +166,7 @@ namespace Catan.Core.M5
             if(B2Busy(s)) { s.ThreeKingdomsDeferredCommand=c;s.ThreeKingdomsDeferredVirtual=true; }
             else ApplyB2Native(s,c,true,prepare);
         }
+
         private void FinishB4Virtual(GameState s)
         {
             if(!B4(s)||s.ThreeKingdomsVirtualUse==null||s.ThreeKingdomsDeferredCommand!=null||s.ThreeKingdomsProgressResolutions?.Length>0||B2Busy(s)||s.PendingDecision!=null||s.DecisionQueue.Length>0) return;
