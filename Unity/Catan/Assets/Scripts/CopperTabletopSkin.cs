@@ -8,7 +8,7 @@ public static class CopperTabletopSkin
     static readonly Rect DiscUv = SourceRect(43, 38, 1168, 1171, 1254, 1254);
     static GUISkin scrollSkin;
     static int scrollVersion=-1;
-    static Texture2D jadeTrack,jadeThumb,jadeHover;
+    static Texture2D jadeTrack,jadeThumb,jadeHover,oceanTrack,oceanThumb,oceanHover;
     static bool loaded;
     static readonly Color Highlight=new Color(1f,.74f,.51f),Dark=new Color(.16f,.065f,.025f);
     public static void Scrollbars()
@@ -26,9 +26,15 @@ public static class CopperTabletopSkin
             jadeThumb=BarTexture(new Color(.58f,.77f,.62f),true);
             jadeHover=BarTexture(new Color(.81f,.91f,.72f),true);
         }
-        var activeTrack=StrategyHudTheme.Jade?jadeTrack:track;
-        var activeThumb=StrategyHudTheme.Jade?jadeThumb:thumb;
-        var activeHover=StrategyHudTheme.Jade?jadeHover:thumbHover;
+        if(oceanTrack==null)
+        {
+            oceanTrack=BarTexture(new Color(.025f,.12f,.17f),false);
+            oceanThumb=BarTexture(new Color(.67f,.56f,.32f),true);
+            oceanHover=BarTexture(new Color(.87f,.77f,.47f),true);
+        }
+        var activeTrack=StrategyHudTheme.Ocean?oceanTrack:StrategyHudTheme.Jade?jadeTrack:track;
+        var activeThumb=StrategyHudTheme.Ocean?oceanThumb:StrategyHudTheme.Jade?jadeThumb:thumb;
+        var activeHover=StrategyHudTheme.Ocean?oceanHover:StrategyHudTheme.Jade?jadeHover:thumbHover;
         ConfigureBar(scrollSkin.horizontalScrollbar,activeTrack,activeTrack);
         ConfigureBar(scrollSkin.verticalScrollbar,activeTrack,activeTrack);
         ConfigureBar(scrollSkin.horizontalScrollbarThumb,activeThumb,activeHover);
@@ -108,6 +114,7 @@ public static class CopperTabletopSkin
     public static void Panel(Rect r,Color face,bool hover=false,bool ornaments=true)
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;
+        if(StrategyHudTheme.Ocean){OceanTabletopSkin.Panel(r,hover,ornaments);return;}
         if(StrategyHudTheme.Jade){JadeTabletopSkin.Panel(r,face,hover,ornaments);return;}
         Warm();
         if(!ornaments)
@@ -132,12 +139,14 @@ public static class CopperTabletopSkin
     public static void Outline(Rect r,bool selected=false,float corner=16)
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;Warm();
+        if(StrategyHudTheme.Ocean){OceanTabletopSkin.Frame(r,selected);return;}
         if(StrategyHudTheme.Jade){JadeTabletopSkin.Frame(r,selected,false);return;}
         DrawPatch(r,panelFrame,corner,false,selected?new Color(1.15f,1.16f,.92f):Color.white);
     }
     public static void Disc(Rect r,Color face,bool hover)
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;Warm();
+        if(StrategyHudTheme.Ocean){OceanTabletopSkin.Disc(r,hover);return;}
         if(StrategyHudTheme.Jade){JadeTabletopSkin.Disc(r,hover);return;}
         if(disc==null)return;
         var before=GUI.color;bool enabled=GUI.enabled;GUI.enabled=true;
@@ -153,12 +162,14 @@ public static class CopperTabletopSkin
     }
     public static void Count(Rect r,bool selected=false)
     {
+        if(StrategyHudTheme.Ocean){OceanTabletopSkin.Panel(r,selected,false);return;}
         if(StrategyHudTheme.Jade){JadeTabletopSkin.Panel(r,StrategyHudTheme.Background,selected,false);return;}
         ModernOperationUI.Round(r,(StrategyHudTheme.Jade?new Color(.70f,.85f,.70f):new Color(.89f,.75f,.53f)).linear);Outline(r,selected,9);
     }
     public static void Card(Rect r,bool selected)
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;Warm();
+        if(StrategyHudTheme.Ocean){OceanTabletopSkin.Frame(r,selected,true);return;}
         if(StrategyHudTheme.Jade){JadeTabletopSkin.Frame(r,selected,true);return;}
         // 使用独立卡框，不再叠画两圈程序描边；卡牌插画与原始比例不变。
         DrawPatch(r,cardFrame,13,false,selected?new Color(1.3f,1.5f,.78f):Color.white);

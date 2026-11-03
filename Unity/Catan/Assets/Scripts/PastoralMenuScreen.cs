@@ -306,6 +306,7 @@ public sealed partial class M6App
                 Rect r=new Rect(499+i*211,421,195,183);
                 bool hit=PastoralMenuUI.Card(r,StrategyHudTheme.Names[i],"桌面主题",StrategyHudTheme.Selected==i);
                 if(i==3)JadeTabletopSkin.Panel(new Rect(r.x+22,r.y+117,r.width-44,40),StrategyHudTheme.Surface,false,false);
+                else if(i==1)OceanTabletopSkin.Panel(new Rect(r.x+22,r.y+117,r.width-44,40),false,false);
                 else PastoralMenuUI.Round(new Rect(r.x+22,r.y+117,r.width-44,40),colors[i%3],7);
                 if(hit)StrategyHudTheme.Select(i);
             }

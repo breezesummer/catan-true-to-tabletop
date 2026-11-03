@@ -1,0 +1,18 @@
+[
+  {
+    "file": "Builds/Windows/Catan2.1.6.exe",
+    "sha256": "3070E580E019576B9AFCDEB4FEC18D03CEBC119F6AE84D597412905C749AD653"
+  },
+  {
+    "file": "Builds/Windows/Catan2.1.6_Data/resources.assets",
+    "sha256": "68DAFC4786B857EB56F325EF49ABE74DF9DB7FB4588AD6B93286E884BEE809A5"
+  },
+  {
+    "file": "Builds/Windows/Catan2.1.6_Data/Managed/Assembly-CSharp.dll",
+    "sha256": "6442469DA65CF07F672B8968C0B03B94BBEB7D10100E38F726905CF203FF3ABE"
+  },
+  {
+    "file": "Builds/Android/Catan2.1.6.apk",
+    "sha256": "3EBE70F5A179B786CABAC3FA95C5FB3AA77049EA0E1FCDEBBD3F3FD0A6F8A661"
+  }
+]

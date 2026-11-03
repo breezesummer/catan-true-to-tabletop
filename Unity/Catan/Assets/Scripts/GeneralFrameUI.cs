@@ -39,10 +39,11 @@ public static class GeneralFrameUI
     {
         Ensure();float portraitScale=area.width/138f;
         // 外发光与普通边框使用同一实际边界，避免切换回合时跳动。
-        if(highlighted)Slice(glow,new Rect(((int)(Time.unscaledTime*10)%10)*240,0,240,270),new Rect(area.x-area.width*.26f,area.y-area.height*.15f,area.width*1.52f,area.height*1.18f),2400,270);
+        if(highlighted&&!StrategyHudTheme.Ocean)Slice(glow,new Rect(((int)(Time.unscaledTime*10)%10)*240,0,240,270),new Rect(area.x-area.width*.26f,area.y-area.height*.15f,area.width*1.52f,area.height*1.18f),2400,270);
         string camp=faction=="魏"?"wei":faction=="蜀"?"shu":faction=="吴"?"wu":faction=="晋"?"jin":faction=="神"?"shen":"qun";
         if(!frames.TryGetValue(camp,out var frame)){frame=Resources.Load<Texture2D>("GeneralUI/v002/frame-"+camp);frames[camp]=frame;}
-        if(frame!=null)GUI.DrawTexture(area,frame,ScaleMode.StretchToFill,true);
+        if(StrategyHudTheme.Ocean)OceanTabletopSkin.Panel(area,highlighted);
+        else if(frame!=null)GUI.DrawTexture(area,frame,ScaleMode.StretchToFill,true);
         Texture2D portrait=null;
         if(!string.IsNullOrEmpty(id)&&!portraits.TryGetValue(id,out portrait)){portrait=Resources.Load<Texture2D>(Root+"Portraits/"+id);portraits[id]=portrait;}
         if(portrait!=null&&!faceDown)
@@ -52,6 +53,7 @@ public static class GeneralFrameUI
             GUI.DrawTextureWithTexCoords(image,portrait,new Rect(.08f,0,.8275f,1),true);
         }
         else Text(new Rect(area.x+area.width*.2f,area.y+area.height*.25f,area.width*.75f,area.height*.4f),faceDown?"暗置":name??"",22);
+        if(StrategyHudTheme.Ocean)OceanTabletopSkin.Frame(area,highlighted,true);
         // 姓名条盖在人物左侧，顶部不覆盖露出的头饰。
         var previousFont=lettering.font;lettering.font=nameBrush??previousFont;
         if(name!=null&&area.width>=70)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+1,area.y+(22+i*19)*portraitScale,area.width*.19f,22*portraitScale),name[i].ToString(),Mathf.Max(6,Mathf.RoundToInt(20*portraitScale)),Color.white);
@@ -82,7 +84,11 @@ public static class GeneralFrameUI
         {
             int state=!enabled?2:selected||hover||flashing?1:0;
             // 原图含透明留边；只裁去留边，不拉伸或裁掉按钮轮廓。
-            Slice(buttons[state],new Rect(28,115,990,530),area,1045,669);
+            if(StrategyHudTheme.Ocean)
+            {
+                bool prior=GUI.enabled;GUI.enabled=prior&&enabled;OceanTabletopSkin.Panel(area,state==1,false);GUI.enabled=prior;
+            }
+            else Slice(buttons[state],new Rect(28,115,990,530),area,1045,669);
         }
         int size=Mathf.Min(name.Length>3?23:27,Mathf.FloorToInt((area.width-18)/Mathf.Max(1,name.Length)),Mathf.FloorToInt(area.height*.6f));
         Text(new Rect(area.x+6,area.y,area.width-12,area.height*.82f),name,size,active&&!enabled?new Color(.56f,.51f,.32f):Gold);

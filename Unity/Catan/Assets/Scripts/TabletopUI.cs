@@ -38,6 +38,7 @@ public sealed partial class TabletopUI
     {
         var value=Style(key+player,basis,size,FontStyle.Bold,alignment);value.richText=false;
         if(PlayerIdentityModel.IsPlayerId(player))value.normal.textColor=BoardRenderer.SeatColor(player.ToUpperInvariant());
+        if(StrategyHudTheme.Ocean)value.normal.textColor=Color.Lerp(value.normal.textColor,ModernOperationUI.TextColor,.34f);
         return value;
     }
     static readonly Rect[] baseDiceRects={new Rect(43,192,43,43),new Rect(112,192,43,43)},expansionDiceRects={new Rect(46,220,31,31),new Rect(116,220,31,31),new Rect(81,191,31,31)};
@@ -167,7 +168,7 @@ public sealed partial class TabletopUI
         bank.ObserveHud(operations,bankHistory,seats);
         bool expansion=dice.Event.HasValue;
         var trayRect=new Rect(15,149,178,128);hits.Add(trayRect);
-        table.Objects.Tray("dice-tray",trayRect,ModernOperationUI.Surface,new Color(.17f,.075f,.03f));
+        table.Objects.Tray("dice-tray",trayRect,ModernOperationUI.Surface,StrategyHudTheme.Ocean?new Color(.24f,.29f,.27f):new Color(.17f,.075f,.03f));
         CopperTabletopSkin.Outline(trayRect,false,20);
         var diceRects=expansion?expansionDiceRects:baseDiceRects;
         bool enabled=GUI.enabled;

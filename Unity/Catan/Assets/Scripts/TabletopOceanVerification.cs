@@ -35,6 +35,32 @@ public sealed partial class TabletopUiVerification
             Require(table.Ocean.GetComponentsInChildren<Collider>().Length==0,"海水不得阻挡棋盘拾取");
             Require(!table.transform.parent.GetComponentsInChildren<OceanTileSurface>().Any(t=>t.GetComponentsInChildren<Renderer>().Any(r=>r.enabled)),"装饰海板未融入连续海面");
             string saved=Authority;
+            if(Environment.GetCommandLineArgs().Contains("--ocean-theme-verify"))
+            {
+                Require(OceanTabletopSkin.Ready,"海洋主题图集缺失");
+                var environment=table.GetComponentInChildren<OceanThemeEnvironment>();
+                Require(environment!=null&&environment.ReefCount==4,"边缘礁石未加载");
+                foreach(var reef in environment.GetComponentsInChildren<Renderer>())
+                {
+                    Require(reef.bounds.max.y>TabletopOcean.WaterHeight+.003f,"礁石未露出水面");
+                    Require(reef.sharedMaterial.shader.isSupported,"礁石着色器不受支持");
+                }
+                Require(ocean.sharedMaterial.GetFloat("_OceanTheme")==1,"海洋主题水面参数未启用");
+                BindDockForHeadless();CheckContextEntrances();
+                Dock.OpenTrade();Require(Dock.TradeOpen,"海洋主题无法打开交易");
+                yield return new WaitForSeconds(2);yield return new WaitForEndOfFrame();SaveOceanFrame(label+"-交易.png");
+                app.HandleTableEscape();Require(!Dock.TradeOpen,"海洋主题无法取消交易");
+                Require(saved==Authority,"海洋主题取消交易改变存档");
+                foreach(int theme in new[]{0,3,1})
+                {
+                    StrategyHudTheme.Select(theme);yield return null;yield return new WaitForEndOfFrame();
+                    Require(ocean.sharedMaterial.GetFloat("_OceanTheme")== (theme==1?1:0),"主题切换未刷新海面");
+                    Require(environment.GetComponentsInChildren<Renderer>().Length==(theme==1?4:0),"礁石主题可见性错误");
+                    Require(saved==Authority,"主题切换改变权威存档");
+                    if(index==4)SaveOceanFrame("主题切换-"+theme+".png");
+                }
+            }
+            table.Objects.Begin("verification");
             checks+=TabletopMapVerificationV010.Check(table);
             table.Objects.End(); table.Objects.Begin("verification"); table.Objects.End();
             yield return new WaitForSeconds(2);
@@ -84,7 +110,14 @@ public sealed partial class TabletopUiVerification
     {
         RenderTexture.active=null;
         var frame=ScreenCapture.CaptureScreenshotAsTexture();
-        try{File.WriteAllBytes(Path.Combine(output,name),frame.EncodeToPNG());cameraImages++;}
+        try
+        {
+            Require(frame!=null,"完整窗口截图不可用");
+            var pixels=frame.GetPixels32();int variation=0;
+            for(int i=0;i<pixels.Length;i+=257)if(!pixels[i].Equals(pixels[0]))variation++;
+            Require(variation>100,"完整窗口截图为空白，不能作为视觉验收");
+            File.WriteAllBytes(Path.Combine(output,name),frame.EncodeToPNG());cameraImages++;
+        }
         finally{Destroy(frame);}
     }
 

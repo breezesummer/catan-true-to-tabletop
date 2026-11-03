@@ -13,12 +13,13 @@ public static class StrategyHudTheme
         index=Mathf.Clamp(index,0,Names.Length-1);if(index==Selected)return;
         selected=index;Version++;PlayerPrefs.SetInt(Preference,index);PlayerPrefs.Save();
     }
+    public static bool Ocean => Selected==1;
     public static bool Jade => Selected==3;
     static Color Pick(Color original,Color ocean,Color knight)=>Selected==0?original:Selected==1?ocean:knight;
-    public static Color Background=>Jade?new Color(.035f,.17f,.135f,.98f):Pick(new Color(.22f,.085f,.038f,.98f),new Color(.025f,.09f,.15f,.97f),new Color(.14f,.105f,.026f,.97f));
-    public static Color Surface=>Jade?new Color(.12f,.34f,.27f):Pick(new Color(.34f,.145f,.065f),new Color(.055f,.205f,.30f),new Color(.32f,.24f,.065f));
-    public static Color Accent=>Jade?new Color(.94f,.80f,.46f):Pick(new Color(.87f,.70f,.40f),new Color(.40f,.81f,.95f),new Color(1f,.81f,.29f));
-    public static Color Line=>Jade?new Color(.66f,.77f,.58f):Pick(new Color(.64f,.35f,.18f),new Color(.18f,.44f,.57f),new Color(.57f,.43f,.12f));
+    public static Color Background=>Jade?new Color(.035f,.17f,.135f,.98f):Pick(new Color(.22f,.085f,.038f,.98f),new Color(.025f,.16f,.20f,.97f),new Color(.14f,.105f,.026f,.97f));
+    public static Color Surface=>Jade?new Color(.12f,.34f,.27f):Pick(new Color(.34f,.145f,.065f),new Color(.045f,.23f,.28f),new Color(.32f,.24f,.065f));
+    public static Color Accent=>Jade?new Color(.94f,.80f,.46f):Pick(new Color(.87f,.70f,.40f),new Color(.38f,.91f,.81f),new Color(1f,.81f,.29f));
+    public static Color Line=>Jade?new Color(.66f,.77f,.58f):Pick(new Color(.64f,.35f,.18f),new Color(.72f,.61f,.36f),new Color(.57f,.43f,.12f));
     public static Color Text=>new Color(.97f,.94f,.85f);
-    public static Color Muted=>Jade?new Color(.70f,.83f,.71f):Pick(new Color(.86f,.73f,.55f),new Color(.62f,.77f,.82f),new Color(.79f,.72f,.52f));
+    public static Color Muted=>Jade?new Color(.70f,.83f,.71f):Pick(new Color(.86f,.73f,.55f),new Color(.85f,.90f,.87f),new Color(.79f,.72f,.52f));
 }

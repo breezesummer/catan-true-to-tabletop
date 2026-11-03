@@ -57,8 +57,8 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
 
     IEnumerator Start()
     {
-        var args = Environment.GetCommandLineArgs(); bool oceanViews=args.Contains("--ocean-view-verify");
-        int flag = Array.IndexOf(args, oceanViews ? "--ocean-view-verify" : "--tabletop-ui-verify");
+        var args = Environment.GetCommandLineArgs(); bool oceanTheme=args.Contains("--ocean-theme-verify");bool oceanViews=args.Contains("--ocean-view-verify")||oceanTheme;
+        int flag = Array.IndexOf(args, oceanTheme?"--ocean-theme-verify":oceanViews ? "--ocean-view-verify" : "--tabletop-ui-verify");
         if (flag < 0) yield break;
         if (flag + 1 >= args.Length || (!oceanViews && !Application.isBatchMode))
         { Debug.LogError("CATAN_TABLETOP_UI_FAILED: 只能在批处理模式指定验证输出目录。"); Application.Quit(1); yield break; }
@@ -72,6 +72,8 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
             gameObject.AddComponent<TabletopCaptureBegin>().Owner=this;
             gameObject.AddComponent<TabletopCaptureEnd>().Owner=this;
         }
+        int priorTheme=StrategyHudTheme.Selected;
+        if(oceanTheme)StrategyHudTheme.Select(1);
         var run = oceanViews ? VerifyOceanViews() : Verify();
         while (true)
         {
@@ -82,10 +84,13 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
                 // 断言只包含固定说明，异常不拼接视图、命令或存档内容。
                 string reason = exception is InvalidOperationException ? exception.Message : exception.GetType().Name;
                 Debug.LogError("CATAN_TABLETOP_UI_FAILED: " + mode + " / " + reason);
+                Debug.LogError(new System.Diagnostics.StackTrace(exception,false).ToString());
+                if(oceanTheme)StrategyHudTheme.Select(priorTheme);
                 Application.Quit(1); yield break;
             }
             yield return next;
         }
+        if(oceanTheme)StrategyHudTheme.Select(priorTheme);
         File.WriteAllText(Path.Combine(output, "result.json"), JsonUtility.ToJson(new Result {
             status = "passed", configurations = configurations, checks = checks, cameraImages = cameraImages,
             guiAttempts = guiAttempts, guiImagesWithChanges = guiImagesWithChanges,
@@ -93,6 +98,7 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
             note = "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。"
         }, true));
         Debug.Log("CATAN_TABLETOP_UI_OK: configurations=" + configurations + " checks=" + checks + " cameraImages=" + cameraImages);
+        if(oceanTheme&&args.Contains("--keep-ocean-preview")){StrategyHudTheme.Select(1);yield break;}
         Application.Quit(0);
     }
 
