@@ -638,7 +638,7 @@ public sealed partial class OperationDock
             Label(new Rect(r.x+11,r.y+36,r.width-22,64),face.Card.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=21});
         }
         var cardFrame=face.Texture!=null?EntityCardAssets.FitCardRect(r,(float)face.Texture.width/face.Texture.height,GUI.matrix):r;
-        CopperTabletopSkin.Card(cardFrame,face.Selected);
+        if(face.Selected)TabletopCardFrame.Draw(cardFrame,true);
         if(face.Selected)
         {
             Label(new Rect(r.x+5,r.y+5,24,22),"✓",new GUIStyle(center){normal={textColor=Ink},fontSize=19});

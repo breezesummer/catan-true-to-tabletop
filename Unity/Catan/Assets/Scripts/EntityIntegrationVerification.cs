@@ -109,7 +109,7 @@ public sealed class EntityIntegrationVerification : MonoBehaviour
             var mountainPhoto=Resources.Load<Texture2D>("EntityAssets/v006/ore-tile/tile-ore-top");
             Require(mountainPhoto!=null&&ore.GetComponentsInChildren<Renderer>().Any(r=>r.sharedMaterials.Any(m=>m.mainTexture==mountainPhoto)),"Ore does not use the photographed mountain hex");
             var oreCard=EntityCardAssets.Texture(EntityCardAssets.Good(4).Front);
-            Require(oreCard==Resources.Load<Texture2D>("EntityAssets/v001/resource-cards/resource-ore-front")&&oreCard!=mountainPhoto,"Ore resource card was replaced by terrain art");
+            Require(oreCard!=null&&oreCard==Resources.Load<Texture2D>("EntityAssets/v006/resource-cards/resource-ore-front")&&oreCard!=mountainPhoto,"矿石资源牌未使用重绘牌面或误用了地形贴图");
             if(mode=="base")root.GetComponent<BoardRenderer>().ShowTerrain(false);
             else if(mode=="seafarers")root.GetComponent<M3BoardRenderer>().ShowTerrain(false);
             else if(mode=="cities-knights")root.GetComponent<M4BoardRenderer>().ShowTerrain(false);

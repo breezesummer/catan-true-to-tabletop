@@ -44,6 +44,14 @@ public sealed class EntityCardTextureImporter : AssetPostprocessor
         Debug.Log("CATAN_CARD_TEXTURE_ASPECT_OK: " + count + " 张卡牌贴图保持原图宽高比。");
         VerifyScreenAspect(108f/151f,"发展卡文字卡面");
         Debug.Log("CATAN_CARD_SCREEN_ASPECT_OK: 卡面在五种窗口比例和手牌／预览／出牌区域中保持屏幕像素比例。");
+        for(int i=0;i<5;i++)
+        {
+            var card=EntityCardAssets.ResourceFront(i);
+            if(card==null||card.width!=338||card.height!=552||card.isReadable)
+                throw new InvalidOperationException("重绘资源牌未正确导入："+i);
+            VerifyScreenAspect((float)card.width/card.height,"重绘资源牌"+i);
+        }
+        Debug.Log("CATAN_REDRAWN_RESOURCE_CARDS_OK: 五张重绘卡面及五种窗口比例检查通过。");
     }
 
     static void VerifyScreenAspect(float aspect,string label)

@@ -4,7 +4,7 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 
-// 照片卡面只负责显示，不决定卡牌效果或查看权限。
+// 卡面只负责显示，不决定卡牌效果或查看权限。
 // 调用方只能登记当前 PlayerView 的手牌及明确获准查看的卡面。
 public static class EntityCardAssets
 {
@@ -42,7 +42,7 @@ public static class EntityCardAssets
     {
         if (index < 0 || index >= GoodIds.Length) throw new ArgumentOutOfRangeException(nameof(index));
         if(goodCards[index]!=null)return goodCards[index];
-        if (index == 0) return goodCards[index]=new Card("wood", "PhotoSamples/v001/wood-front", "PhotoSamples/v001/resource-back");
+        if (index < 5) return goodCards[index]=new Card(GoodIds[index], "EntityAssets/v006/resource-cards/resource-"+GoodIds[index]+"-front", Root+"resource-cards/resource-back-original");
         string type = index < 5 ? "resource" : "commodity";
         return goodCards[index]=new Card(GoodIds[index], Root + type + "-cards/" + type + "-" + GoodIds[index] + "-front", index < 5 ? Root + "resource-cards/resource-back-original" : null);
     }
@@ -107,8 +107,8 @@ public static class EntityCardAssets
     public static Texture2D ResourceFront(int resource) => resource >= 0 && resource < 5 ? Texture(Good(resource).Front) : null;
     public static Texture2D CommodityFront(int commodity) => commodity >= 0 && commodity < 3 ? Texture(Good(commodity + 5).Front) : null;
     public static Texture2D ResourceOrCommodityFront(int good) => good >= 0 && good < 8 ? Texture(Good(good).Front) : null;
-    // v007：原始照片和印刷比例保持不变，只裁去实体圆角以外的拍摄背景。
-    // 纸芯、投影与整面弱受光属于显示层，不重新加工照片或遮挡规则文字。
+    // 重绘资源牌和其他实体卡面共用显示入口；保持各自比例。
+    // 纸芯、投影、弱受光与主题窄边框属于显示层，不遮挡规则文字。
     public static void DrawCardFace(Rect area,Texture2D texture,float elevation=0,Color? tint=null)
     {
         if(texture==null)return;
@@ -117,6 +117,7 @@ public static class EntityCardAssets
         float radius=Mathf.Min(rect.width,rect.height)*.095f;
         GUI.DrawTexture(rect,texture,ScaleMode.StretchToFill,true,0,tint??Color.white,0,radius);
         DrawPaperLight(rect,radius);
+        TabletopCardFrame.Draw(rect);
     }
     public static void DrawCardPaper(Rect rect,Color color,float elevation=0)
     {
@@ -124,6 +125,7 @@ public static class EntityCardAssets
         float radius=Mathf.Min(rect.width,rect.height)*.095f;
         GUI.DrawTexture(rect,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,color,0,radius);
         DrawPaperLight(rect,radius);
+        TabletopCardFrame.Draw(rect);
     }
     static void DrawPaperDepth(Rect rect,float elevation)
     {
