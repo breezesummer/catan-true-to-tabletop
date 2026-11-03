@@ -54,6 +54,7 @@ public static class EntityBoardAssets
         // 30-degree pointy hexagon. Its 8 mm top matches the existing placement surface.
         var tile = Instantiate(TerrainResource(resource), resource, bottom, Quaternion.identity, parent);
         TabletopPhysicalTileV005.Apply(tile);
+        if (tile != null && (resource == "sea" || resource == "water")) tile.AddComponent<OceanTileSurface>();
         return tile;
     }
 

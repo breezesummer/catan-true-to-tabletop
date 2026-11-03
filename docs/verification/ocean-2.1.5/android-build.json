@@ -1,0 +1,17 @@
+{
+  "version": "2.1.5",
+  "packageId": "com.catandevelopment.threekingdoms",
+  "versionCode": 20105,
+  "minApi": 26,
+  "targetApi": 36,
+  "architectures": [
+    "arm64-v8a"
+  ],
+  "graphicsApi": "OpenGLES3",
+  "scriptingBackend": "IL2CPP",
+  "ui": "shared-pc-tabletop",
+  "coreAssemblySha256": "86a5fafed302f472f59dc8f3e1f6292d451d6e98a5ff9f443847eec6fb5f6ccf",
+  "aiAssemblySha256": "bae223650e730b226c701957d98e375a73aabadb08a39ac4ada4d7c6c754a775",
+  "signingCertificateSha256": "efd26f60a7807072ff61fb0dd4660fa00859b75e9b3857a742a4c7d6e3a2bf48",
+  "apkSha256": "23062ed9f755fb9f8107f23022bcb60ad6f31cccf985a4732d1068bc1ce8198c"
+}

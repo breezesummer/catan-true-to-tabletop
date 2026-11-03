@@ -1,0 +1,26 @@
+[
+  {
+    "asset": "ocean-desktop",
+    "vertices": 25921,
+    "triangles": 51200,
+    "dimensions": [
+      16.0,
+      16.0,
+      0.0
+    ],
+    "finite": true,
+    "zero_area_faces": 0
+  },
+  {
+    "asset": "ocean-mobile",
+    "vertices": 6561,
+    "triangles": 12800,
+    "dimensions": [
+      16.0,
+      16.0,
+      0.0
+    ],
+    "finite": true,
+    "zero_area_faces": 0
+  }
+]

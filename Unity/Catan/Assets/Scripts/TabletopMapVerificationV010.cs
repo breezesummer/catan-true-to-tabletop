@@ -42,15 +42,15 @@ public static class TabletopMapVerificationV010
             require(Vector3.Distance(map.WorldToScreenPoint(mapPoint),previousMapScreen)>1,"地图缩放必须产生可见变化");
             foreach(bool overhead in new[]{false,true})
             {
-                float previousAngle=0;
+                float expectedAngle=overhead?82:66;
                 foreach(float step in new[]{.45f,.65f,.85f,1,1.25f,1.65f})
                 {
                     scene.Frame(map,overhead,step);
                     float angle=map.transform.eulerAngles.x;
-                    require(Mathf.Abs(angle-TabletopCameraModel.Angle(step,overhead))<.01f,"实际相机没有采用对应缩放的连续观察角度");
-                    require(angle>previousAngle&&angle>=32&&angle<=78.01f,"缩近时必须降低视角且最接近平视时仍保留俯视角");
+                    require(Mathf.Abs(angle-TabletopCameraModel.Angle(step,overhead))<.01f,"实际相机没有采用固定观察角度");
+                    require(Mathf.Abs(angle-expectedAngle)<.01f,"所有缩放距离必须保持同一俯角，不能压扁棋盘");
                     require(Vector2.Distance(scene.ProjectHud(worldAnchor),originalHud)<.02f,"改变地图角度不得移动固定操作模型");
-                    previousAngle=angle;
+
                 }
             }
             string[] kinds={"road","ship","settlement","city","wall","knight"};

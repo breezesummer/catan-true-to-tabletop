@@ -155,7 +155,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         float yaw=kind=="road"||kind=="ship"?90:180;
         // 正交正面图保持建筑的横向轮廓；城墙以完整顶视显示中间空位。
         float viewAngle=kind=="wall"?90:0;
-        root.rotation=Quaternion.AngleAxis(TabletopScene.StrategyCameraAngle-viewAngle,Vector3.right)*Quaternion.Euler(0,yaw,0);
+        root.rotation=Quaternion.AngleAxis(TabletopScene.HudCameraAngle-viewAngle,Vector3.right)*Quaternion.Euler(0,yaw,0);
         if(item.Hit.Renderers==null)item.Hit.Renderers=root.GetComponentsInChildren<Renderer>();
         item.Hit.LocalBoundsProjection=true;
         var projected=item.Hit.Rect;

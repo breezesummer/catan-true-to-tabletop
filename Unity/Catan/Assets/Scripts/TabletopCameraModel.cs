@@ -4,22 +4,11 @@ using System;
 public static class TabletopCameraModel
 {
     public const float ClosestZoom = .45f, DefaultZoom = 1, FarthestZoom = 1.65f;
-    public const float CloseAngle = 32, DefaultAngle = 58, FarAngle = 68, OverheadOffset = 10;
+    public const float CloseAngle = 66, DefaultAngle = 66, FarAngle = 66, OverheadOffset = 16;
 
     public static float Angle(float zoom, bool overhead)
     {
-        if (float.IsNaN(zoom)) zoom = DefaultZoom;
-        zoom = Math.Max(ClosestZoom, Math.Min(FarthestZoom, zoom));
-        float angle = zoom <= DefaultZoom
-            ? Mix(CloseAngle, DefaultAngle, (zoom - ClosestZoom) / (DefaultZoom - ClosestZoom))
-            : Mix(DefaultAngle, FarAngle, (zoom - DefaultZoom) / (FarthestZoom - DefaultZoom));
-        return angle + (overhead ? OverheadOffset : 0);
-    }
-
-    static float Mix(float from, float to, float value)
-    {
-        // 两段曲线在默认观察距离处共享零斜率，滚轮越过该点不会产生角度跳变。
-        float smooth = value * value * (3 - 2 * value);
-        return from + (to - from) * smooth;
+        // 滚轮只改变正交尺寸，两个观察模式均保持棋盘形状稳定。
+        return DefaultAngle + (overhead ? OverheadOffset : 0);
     }
 }

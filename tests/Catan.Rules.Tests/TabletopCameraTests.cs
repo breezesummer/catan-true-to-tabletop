@@ -5,8 +5,8 @@ namespace Catan.Rules.Tests;
 public sealed class TabletopCameraTests
 {
     [Theory]
-    [InlineData(false,32,58,68)]
-    [InlineData(true,42,68,78)]
+    [InlineData(false,66,66,66)]
+    [InlineData(true,82,82,82)]
     public void NearDefaultAndFarViewsKeepTheirIntendedPitch(bool overhead,float close,float normal,float far)
     {
         Assert.Equal(close,TabletopCameraModel.Angle(.45f,overhead));
@@ -20,15 +20,15 @@ public sealed class TabletopCameraTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void ZoomingInLowersPitchContinuouslyAndAlwaysRetainsADownwardView(bool overhead)
+    public void ZoomingRetainsPitchAndBoardShape(bool overhead)
     {
         float previous=TabletopCameraModel.Angle(.45f,overhead);
         for(int step=1;step<=1200;step++)
         {
             float zoom=.45f+step*.001f;
             float current=TabletopCameraModel.Angle(zoom,overhead);
-            Assert.InRange(current,32,78);
-            Assert.True(current>=previous);
+            Assert.InRange(current,66,82);
+            Assert.Equal(previous,current);
             Assert.InRange(current-previous,0,.08f);
             previous=current;
         }

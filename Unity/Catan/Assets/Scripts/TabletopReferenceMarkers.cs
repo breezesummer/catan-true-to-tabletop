@@ -46,6 +46,8 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
     public int PortLayoutRevision {get;private set;}
     string portLayoutKey;
     string oceanLayoutKey;
+    TabletopScene outlinedTable;
+    int outlineRevision = -1;
     readonly List<Vector3> oceanOutline=new List<Vector3>();
     void RefreshPortFootprints()
     {
@@ -104,9 +106,15 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         this.table = table;
         this.observerSeat = observerSeat;
         RefreshOceanTiles();
+        if (table != null && table.isActiveAndEnabled) table.Ocean.Refresh(tiles, vertices);
         RefreshPorts(ports, portRoot, publicPorts, "港口 ");
         RefreshPorts(gifts, giftRoot, publicGiftPorts, "港礼 ");
         RefreshPortFootprints();
+        if(table!=null && (outlinedTable!=table || outlineRevision!=PortLayoutRevision))
+        {
+            table.SetPresentationOutline(PublicPortFootprints.SelectMany(points=>points));
+            outlinedTable=table; outlineRevision=PortLayoutRevision;
+        }
         var wantedBonuses = new HashSet<string>(StringComparer.Ordinal);
         foreach (var id in publicBonusEdgeIds ?? Array.Empty<string>())
         {
@@ -161,7 +169,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
     void RefreshOceanTiles()
     {
         string layout=string.Join("|",tiles.Select(t=>t.Id+":"+string.Join(",",t.Vertices)));
-        if(layout==oceanLayoutKey){if(table!=null)table.SetPresentationOutline(oceanOutline);return;}
+        if(layout==oceanLayoutKey)return;
         oceanLayoutKey=layout;
         var wanted=new HashSet<string>(StringComparer.Ordinal);
         var displayOutline=oceanOutline;displayOutline.Clear();
@@ -201,7 +209,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         {
             var obj=oceanTiles[key];obj.SetActive(false);Destroy(obj);oceanTiles.Remove(key);
         }
-        if(table!=null)table.SetPresentationOutline(displayOutline);
+
     }
     Vector3 TileCenter(Tile tile)
     {

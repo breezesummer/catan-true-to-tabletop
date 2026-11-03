@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 // 仅显式开发参数启用；不注入鼠标键盘，不读取桌面，不输出权威存档或私有牌面。
-public sealed class TabletopUiVerification : MonoBehaviour
+public sealed partial class TabletopUiVerification : MonoBehaviour
 {
     const BindingFlags PrivateInstance = BindingFlags.NonPublic | BindingFlags.Instance;
     M6App app;
@@ -57,21 +57,22 @@ public sealed class TabletopUiVerification : MonoBehaviour
 
     IEnumerator Start()
     {
-        var args = Environment.GetCommandLineArgs(); int flag = Array.IndexOf(args, "--tabletop-ui-verify");
+        var args = Environment.GetCommandLineArgs(); bool oceanViews=args.Contains("--ocean-view-verify");
+        int flag = Array.IndexOf(args, oceanViews ? "--ocean-view-verify" : "--tabletop-ui-verify");
         if (flag < 0) yield break;
-        if (flag + 1 >= args.Length || !Application.isBatchMode)
+        if (flag + 1 >= args.Length || (!oceanViews && !Application.isBatchMode))
         { Debug.LogError("CATAN_TABLETOP_UI_FAILED: 只能在批处理模式指定验证输出目录。"); Application.Quit(1); yield break; }
         output = Path.GetFullPath(args[flag + 1]);
-        captureCamera = args.Contains("--tabletop-camera-render");
+        captureCamera = oceanViews || args.Contains("--tabletop-camera-render");
         if (captureCamera && SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
         { Debug.LogError("CATAN_TABLETOP_UI_FAILED: 离屏相机需要图形设备。"); Application.Quit(1); yield break; }
         app = GetComponent<M6App>(); Directory.CreateDirectory(output);
-        if(captureCamera)
+        if(captureCamera && !oceanViews)
         {
             gameObject.AddComponent<TabletopCaptureBegin>().Owner=this;
             gameObject.AddComponent<TabletopCaptureEnd>().Owner=this;
         }
-        var run = Verify();
+        var run = oceanViews ? VerifyOceanViews() : Verify();
         while (true)
         {
             object next;
@@ -422,7 +423,7 @@ public sealed class TabletopUiVerification : MonoBehaviour
         Require((stock.Root.position-stockLocation).sqrMagnitude<.00000001f&&stock.Root.localScale==stockScale,"相机缩放改变了库存模型的世界位置或尺寸");
         Require(Mathf.Abs(zoomed.width/initial.width-1)<.001f&&Mathf.Abs(stock.Rect.width/initialStock.width-1)<.001f,"地图缩放改变了固定HUD大小");
         Require(Mathf.Abs(boardCameraSize/BoardCamera.orthographicSize-1.25f)<.001f,"地图相机缩放比例不正确");
-        Require(BoardCamera.transform.eulerAngles.x<TabletopScene.StrategyCameraAngle,"放大地图没有逐渐放低观察角度");
+        Require(Mathf.Abs(BoardCamera.transform.eulerAngles.x-TabletopScene.StrategyCameraAngle)<.01f,"放大地图改变了固定俯角");
         if(facility!=null)
         {
             facility=table.Objects.Facility("facility-check",OperationDock.FacilityLayout(0),0,0);
@@ -468,9 +469,10 @@ public sealed class TabletopUiVerification : MonoBehaviour
         CheckTableLayout(table);
         checks+=TabletopMapVerificationV010.Check(table);
         table.Objects.End();table.Objects.Begin("verification");table.Objects.End();
-        var oak=Resources.Load<Texture2D>("TabletopUI/v005/smoked-oak-albedo");
-        var normal=Resources.Load<Texture2D>("TabletopUI/v005/smoked-oak-normal");
-        Require(oak!=null&&oak.width==2048&&oak.height==2048&&oak.anisoLevel==16&&normal!=null,"新版细纹桌面或微表面法线未正确导入");
+        Require(table.Ocean!=null,"连续海面未启用");
+        var oceanRenderer=table.Ocean.GetComponentsInChildren<Renderer>()[0];
+        Require(oceanRenderer.bounds.size.x>10&&oceanRenderer.bounds.size.z>10,"海面导入坐标轴错误或无法覆盖视野");
+        Require(Resources.Load<Shader>("Ocean/v001/ContinuousOcean")!=null,"海面着色器未打包");
         Require(UnityEngine.Object.FindObjectsByType<TabletopPhysicalTileV005>(FindObjectsSortMode.None)
             .Any(p=>p.GetComponentsInChildren<MeshFilter>().Any(m=>m.sharedMesh.name=="六边实体厚板倒角 v005"&&m.sharedMesh.triangles.Length==144)),
             "真实倒角网格未在正式地图中生成");

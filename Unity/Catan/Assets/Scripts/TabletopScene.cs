@@ -5,13 +5,14 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 // 桌面仅使用已公开的顶点坐标；海框、木纹与相机不参与规则和落点裁决。
-// 地图缩近时连续放低观察角度；操作模型使用固定 HUD 相机，不受地图移动影响。
+// 固定高俯角缩放；操作模型使用固定 HUD 相机，不受地图移动影响。
 public sealed class TabletopScene : MonoBehaviour
 {
     public static readonly Rect BoardArea = new Rect(0, 0, 1440, 900);
-    public static readonly Rect BoardFitArea = new Rect(184, 146, 1050, 556);
+    public static readonly Rect BoardFitArea = new Rect(158, 130, 1012, 558);
     public const int TableLayer = 30;
     public const int HudLayer = 29;
+    public const float HudCameraAngle = 58;
     public const float StrategyCameraAngle = TabletopCameraModel.DefaultAngle;
     public const float OverheadCameraAngle = StrategyCameraAngle + TabletopCameraModel.OverheadOffset;
     readonly List<Material> materials = new List<Material>();
@@ -38,6 +39,7 @@ public sealed class TabletopScene : MonoBehaviour
     public const float SurfaceHeight = -.0075f;
     public float UnitsPerPixel { get; private set; }
     public TabletopWorldObjects Objects { get; private set; }
+    public TabletopOcean Ocean { get; private set; }
     public Camera TableCamera => boardCamera;
     public Camera HudCamera => layoutCamera;
     public float DisplayScale => baseSize / Mathf.Max(.001f, boardCamera.orthographicSize);
@@ -54,7 +56,7 @@ public sealed class TabletopScene : MonoBehaviour
 
     public static TabletopScene Create(Transform parent, IEnumerable<Vector3> publicVertices)
     {
-        var root = new GameObject("烟熏橡木实体桌 v005");
+        var root = new GameObject("连续海域棋盘 v2.1.5");
         root.transform.SetParent(parent, false);
         var scene = root.AddComponent<TabletopScene>();
         scene.Initialize(publicVertices.ToArray());
@@ -75,34 +77,8 @@ public sealed class TabletopScene : MonoBehaviour
         }
 
         ConfigureLighting();
-        var wood = MakeMaterial("烟熏橡木细纹哑光清漆 v005", Color.white, .29f);
-        var grain=Resources.Load<Texture2D>("TabletopUI/v005/smoked-oak-albedo");
-        if(grain!=null)
-        {
-            grain.filterMode=FilterMode.Trilinear;grain.anisoLevel=16;
-            // 纹理按 0.75 米的实际覆盖范围平铺；无等距拼接线，也不随视角放大纹理。
-            wood.SetTexture("_BaseMap",grain);wood.SetTextureScale("_BaseMap",Vector2.one*(8/.75f));
-            var normal=Resources.Load<Texture2D>("TabletopUI/v005/smoked-oak-normal");
-            if(normal!=null)
-            {
-                wood.SetTexture("_BumpMap",normal);
-                wood.SetFloat("_BumpScale",.32f);wood.EnableKeyword("_NORMALMAP");
-            }
-        }
-        else wood.color = new Color(.335f,.266f,.202f);
-        var table = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        table.name = "细纹哑光橡木桌面"; table.transform.SetParent(transform, false);
-        table.transform.position = center + new Vector3(0, -.025f, 0);
-        table.transform.localScale = new Vector3(8, .035f, 8);
-        Destroy(table.GetComponent<Collider>());
-        table.GetComponent<Renderer>().sharedMaterial = wood;
-        SetTableLayer(table.transform);
-
-        var rim = MakeMaterial("海框纸板侧面", new Color(.025f, .16f, .22f), .16f);
-        CreatePolygon("海框厚度", outline.Select(p => new Vector3(p.x, -.0025f, p.z)).ToArray(), rim, .004f);
-        var sea = MakeMaterial("深青色覆膜海框 v005", Color.white, .32f);
-        var waves = SeaTexture(); textures.Add(waves); sea.SetTexture("_BaseMap", waves);
-        CreatePolygon("海面边框", outline, sea, 0);
+        Ocean = gameObject.AddComponent<TabletopOcean>();
+        Ocean.Initialize(center);
         InitializeLayout();
         Objects=gameObject.AddComponent<TabletopWorldObjects>();Objects.Initialize(this);
     }
@@ -137,7 +113,7 @@ public sealed class TabletopScene : MonoBehaviour
         layoutCamera.nearClipPlane=.01f;layoutCamera.farClipPlane=10;
         layoutCamera.cullingMask=1<<HudLayer;
         layoutCamera.clearFlags=CameraClearFlags.Depth;
-        layoutCamera.transform.rotation=Quaternion.Euler(StrategyCameraAngle,0,0);
+        layoutCamera.transform.rotation=Quaternion.Euler(HudCameraAngle,0,0);
         layoutCamera.GetUniversalAdditionalCameraData().renderType=CameraRenderType.Overlay;
     }
     public static void SetTableLayer(Transform root)
@@ -313,13 +289,13 @@ public sealed class TabletopScene : MonoBehaviour
         boardCamera.enabled=true;boardCamera.targetTexture=null;
         boardCamera.rect=cameraRect;boardCamera.aspect=aspect;
         boardCamera.clearFlags=CameraClearFlags.SolidColor;
-        boardCamera.backgroundColor=new Color(.22f,.11f,.045f);
+        boardCamera.backgroundColor=new Color(.045f,.19f,.26f);
         boardCamera.orthographic=true;boardCamera.nearClipPlane=.01f;boardCamera.farClipPlane=10;
         boardCamera.transform.rotation=Quaternion.Euler(TabletopCameraModel.Angle(zoom,topView),0,0);
         var up=boardCamera.transform.up;
         float minY=publicOutline.Min(p=>Vector3.Dot(p-center,up));
         float maxY=publicOutline.Max(p=>Vector3.Dot(p-center+Vector3.up*.035f,up));
-        // 拟合尺度固定在该观察模式的默认倾角，倾角随缩放变化时不会二次改写放大倍率。
+        // 固定俯角与正交尺寸解耦；缩放不会改变棋盘形状。
         var referenceUp=Quaternion.Euler(topView?OverheadCameraAngle:StrategyCameraAngle,0,0)*Vector3.up;
         float fitMinY=publicOutline.Min(p=>Vector3.Dot(p-center,referenceUp));
         float fitMaxY=publicOutline.Max(p=>Vector3.Dot(p-center+Vector3.up*.035f,referenceUp));
