@@ -6,7 +6,7 @@ public sealed class OceanThemeEnvironment : MonoBehaviour
 {
     readonly Transform[] reefs=new Transform[4];
     readonly Vector4[] shores=new Vector4[4];
-    static readonly Vector3[] Anchors={new Vector3(.018f,.977f,110),new Vector3(.992f,.15f,145),new Vector3(.95f,.005f,130),new Vector3(-.006f,.005f,100)};
+    static readonly Vector3[] Anchors={new Vector3(.018f,.977f,145),new Vector3(.995f,.095f,180),new Vector3(.87f,-.012f,155),new Vector3(-.006f,.005f,125)};
     Material stone,water;
     TabletopScene table;
     bool loaded;

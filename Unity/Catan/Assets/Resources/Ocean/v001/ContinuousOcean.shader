@@ -32,6 +32,21 @@ Shader "Catan/ContinuousOcean"
             CBUFFER_END
             struct Attributes { float4 positionOS : POSITION; };
             struct Varyings { float4 positionCS : SV_POSITION; float3 world : TEXCOORD0; };
+            float ReefDistance(float2 p)
+            {
+                float nearest=10;
+                for(int j=0;j<4;j++)
+                {
+                    float4 reef=_ReefShores[j];
+                    if(reef.z<=0)continue;
+                    float2 delta=p-reef.xy;
+                    float angle=_ReefAngles[j];
+                    float2 q=float2(delta.x*cos(angle)-delta.y*sin(angle),delta.x*sin(angle)+delta.y*cos(angle))/reef.zw;
+                    float edge=1+sin(q.x*9+q.y*7)*.08+sin(q.y*17-q.x*11)*.04;
+                    nearest=min(nearest,(length(q)-edge)*min(reef.z,reef.w));
+                }
+                return nearest;
+            }
             float2 Coast(float2 p)
             {
                 float2 uv=(p-_MaskRect.xy)/_MaskRect.zw;
@@ -39,17 +54,7 @@ Shader "Catan/ContinuousOcean"
                 if(all(uv>=0)&&all(uv<=1))coast=SAMPLE_TEXTURE2D_LOD(_CoastMask,sampler_CoastMask,uv,0).rg;
                 if(_OceanTheme>.5)
                 {
-                    for(int j=0;j<4;j++)
-                    {
-                        float4 reef=_ReefShores[j];
-                        if(reef.z<=0)continue;
-                        float2 delta=p-reef.xy;
-                        float angle=_ReefAngles[j];
-                        float2 q=float2(delta.x*cos(angle)-delta.y*sin(angle),delta.x*sin(angle)+delta.y*cos(angle))/reef.zw;
-                        float edge=1+sin(q.x*9+q.y*7)*.08+sin(q.y*17-q.x*11)*.04;
-                        float d=max(0,(length(q)-edge)*min(reef.z,reef.w));
-                        coast.x=min(coast.x,d/.08);
-                    }
+                    coast.x=min(coast.x,max(0,ReefDistance(p))/.08);
                 }
                 return coast;
             }
@@ -96,22 +101,27 @@ Shader "Catan/ContinuousOcean"
                 if(_OceanTheme>.5)
                 {
                     // 两组缓慢流动的同源水纹，交叉采样打散重复，几何波幅与拾取平面不变。
-                    float2 uv=p*1.17+float2(t*.0018,t*.0011);
-                    uv+=float2(sin(p.y*5.7-t*.07),cos(p.x*7.3+t*.06))*.045;
+                    float2 uv=p*1.34+float2(t*.0018,t*.0011);
+                    uv+=float2(sin(p.y*5.7-t*.07),cos(p.x*7.3+t*.06))*.018;
                     float3 detail=SAMPLE_TEXTURE2D(_OceanDetail,sampler_OceanDetail,uv).rgb;
-                    float2 crossed=float2(p.x*.72-p.y*.69,p.x*.69+p.y*.72)*1.79;
+                    float2 crossed=float2(p.x*.96-p.y*.28,p.x*.28+p.y*.96)*1.91;
                     float3 secondary=SAMPLE_TEXTURE2D(_OceanDetail,sampler_OceanDetail,crossed+float2(-t*.0011,t*.0016)+.37).rgb;
                     float patch=.5+.5*sin(p.x*3.7+sin(p.y*4.1))*cos(p.y*2.9-p.x*1.3);
-                    float3 blue=lerp(detail,secondary,.30+patch*.25);
-                    float luminance=dot(blue,float3(.2126,.7152,.0722));
-                    blue=lerp(luminance.xxx,blue,.78)*lerp(.94,1.15,patch);
+                    float3 blue=lerp(detail,secondary,.20+patch*.16)*lerp(.96,1.12,patch);
                     blue=lerp(blue,blue*float3(1.08,1.15,1.09),1-smoothstep(0,.034,d));
                     blue+=sun.color*spec*.065;
                     float broken=saturate((detail.g-secondary.g)*16+.35);
                     float lace=smoothstep(.12,.93,sin(d*410-t*.72+broken*5+ripple*.55));
                     lace*=smoothstep(.0001,.0012,d)*(1-smoothstep(.003,.017,d));
                     lace*=smoothstep(.12,.8,broken);
-                    blue=lerp(blue,float3(.79,.88,.83),lace*.65);
+                    blue=lerp(blue,float3(.79,.88,.83),lace*.36);
+                    // 碎礁外围有更宽的浅水与破碎白浪，普通棋盘岸线保持细浪，避免全岛白边。
+                    float reefD=ReefDistance(p);
+                    float shoal=(1-smoothstep(.002,.028,reefD))*smoothstep(-.012,.001,reefD);
+                    blue=lerp(blue,float3(.12,.47,.43),shoal*.35);
+                    float wash=sin(reefD*340-t*.85+ripple*1.5+broken*5)*.5+.5;
+                    float froth=shoal*smoothstep(.44,.86,wash)*saturate(.10+broken*.65);
+                    blue=lerp(blue,float3(.84,.91,.85),froth*.70);
                     water=lerp(blue,float3(.25,.58,.59),coast.g*.38);
                 }
                 return half4(water,1);

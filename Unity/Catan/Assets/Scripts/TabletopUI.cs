@@ -38,7 +38,7 @@ public sealed partial class TabletopUI
     {
         var value=Style(key+player,basis,size,FontStyle.Bold,alignment);value.richText=false;
         if(PlayerIdentityModel.IsPlayerId(player))value.normal.textColor=BoardRenderer.SeatColor(player.ToUpperInvariant());
-        if(StrategyHudTheme.Ocean)value.normal.textColor=Color.Lerp(value.normal.textColor,ModernOperationUI.TextColor,.48f);
+        if(StrategyHudTheme.Ocean)value.normal.textColor=ModernOperationUI.TextColor;
         return value;
     }
     static readonly Rect[] baseDiceRects={new Rect(43,192,43,43),new Rect(112,192,43,43)},expansionDiceRects={new Rect(46,220,31,31),new Rect(116,220,31,31),new Rect(81,191,31,31)};
@@ -208,7 +208,7 @@ public sealed partial class TabletopUI
     {
         var r=TurnBannerRect;hits.Add(r);
         StrategyHudArt.Plaque(r,ModernOperationUI.Background,StrategyHudArt.Gold);
-        var turnStyle=Style("turn-number",center,27,FontStyle.Bold);turnStyle.normal.textColor=StrategyHudArt.Gold;
+        var turnStyle=Style("turn-number",center,StrategyHudTheme.Ocean?32:27,FontStyle.Bold);turnStyle.normal.textColor=StrategyHudTheme.Ocean?ModernOperationUI.TextColor:StrategyHudArt.Gold;
         GUI.Label(new Rect(r.x+16,r.y+10,64,35),turn.ToString("D2"),turnStyle);
         var caption=Style("turn-caption",center,10,FontStyle.Bold);caption.normal.textColor=ModernOperationUI.Muted;
         GUI.Label(new Rect(r.x+16,r.y+46,64,20),"回  合",caption);
@@ -220,7 +220,7 @@ public sealed partial class TabletopUI
         string actorName=M6App.PlayerLabel(actor)+(actor==seat?" · 你":"");
         actorStyle.fontSize=Mathf.Min(19,Mathf.Max(10,Mathf.FloorToInt(19*193/Mathf.Max(193,actorStyle.CalcSize(Content(actorName)).x))));
         TabletopTextFit.Label(new Rect(r.x+181,r.y+15,r.width-197,27),actorName,actorStyle,8,true);
-        var phaseStyle=Style("phase",small,12,alignment:TextAnchor.MiddleLeft,wrap:false);phaseStyle.normal.textColor=ModernOperationUI.Muted;
+        var phaseStyle=Style("phase",small,StrategyHudTheme.Ocean?14:12,alignment:TextAnchor.MiddleLeft,wrap:false);phaseStyle.normal.textColor=ModernOperationUI.Muted;
         TabletopTextFit.Label(new Rect(r.x+181,r.y+45,r.width-197,21),phase,phaseStyle);
         // 两端共用铭牌作为菜单入口；触屏无需键盘 Esc，也不另做一套导航栏。
         if(TabletopButtonFeedback.Button(r)&&!MobileTabletop.TouchDragged)
@@ -282,7 +282,8 @@ public sealed partial class TabletopUI
                 }
             }
             var nameRect=new Rect(x+11,73,width-22,27);
-            var nameStyle=NameStyle("player",center,player.Id,12);
+            var nameStyle=NameStyle("player",center,player.Id,StrategyHudTheme.Ocean?15:12);
+            if(StrategyHudTheme.Ocean&&active)nameStyle.normal.textColor=StrategyHudTheme.Accent;
             if(StrategyHudTheme.Jade)nameStyle.normal.textColor=JadeTabletopSkin.PlayerInk(player.Id).linear;
             TabletopTextFit.Label(nameRect,M6App.PlayerLabel(player.Id),nameStyle,8,true);
             bool hasGeneral=ThreeKingdoms?.ThreeKingdomsProjection!=null;

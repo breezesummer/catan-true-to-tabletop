@@ -38,6 +38,7 @@ public sealed partial class TabletopUiVerification
             if(Environment.GetCommandLineArgs().Contains("--ocean-theme-verify"))
             {
                 Require(OceanTabletopSkin.Ready,"海洋主题图集缺失");
+                Require(ocean.sharedMaterial.GetTexture("_OceanDetail")!=null,"海洋主题细浪纹理缺失");
                 var environment=table.GetComponentInChildren<OceanThemeEnvironment>();
                 Require(environment!=null&&environment.ReefCount==4,"边缘礁石未加载");
                 foreach(var reef in environment.GetComponentsInChildren<Renderer>())

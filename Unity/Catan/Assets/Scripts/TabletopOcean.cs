@@ -29,7 +29,7 @@ public sealed class TabletopOcean : MonoBehaviour
         material = new Material(Resources.Load<Shader>("Ocean/v001/ContinuousOcean"));
         material.name = "连续海面 v001";
         material.SetFloat("_WaterHeight", WaterHeight);
-        material.SetTexture("_OceanDetail",Resources.Load<Texture2D>("Ocean/v002/ocean-detail"));
+        material.SetTexture("_OceanDetail",Resources.Load<Texture2D>("Ocean/v003/ocean-detail"));
         material.SetVector("_MaskRect", new Vector4(0,0,.00001f,.00001f));
         foreach (var renderer in surface.GetComponentsInChildren<Renderer>())
         {

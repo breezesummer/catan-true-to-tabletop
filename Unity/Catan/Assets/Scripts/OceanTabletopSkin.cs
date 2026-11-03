@@ -3,9 +3,13 @@ using UnityEngine;
 // 海洋概念图的独立图集；只绘制，不创建交互区域或改动布局。
 public static class OceanTabletopSkin
 {
-    static Texture2D atlas,smallDisc,panelFill;
-    public static bool Ready { get { Warm(); return atlas != null; } }
-    static void Warm() { if(atlas==null) atlas=Resources.Load<Texture2D>("TabletopUI/v017/ocean-atlas"); }
+    static Texture2D atlas,smallDisc,panelFill,compassArt;
+    public static bool Ready { get { Warm(); return atlas != null&&compassArt != null; } }
+    static void Warm()
+    {
+        if(atlas==null)atlas=Resources.Load<Texture2D>("TabletopUI/v017/ocean-atlas");
+        if(compassArt==null)compassArt=Resources.Load<Texture2D>("TabletopUI/v018/ocean-compass");
+    }
     // 实际生图为1254方图；按可见轮廓定位，不能假定生图遵守要求的像素尺寸。
     static Rect Region(int slot)
     {
@@ -44,13 +48,21 @@ public static class OceanTabletopSkin
             panelFill.Apply(false,true);
         }
         GUI.DrawTexture(new Rect(r.x+3,r.y+3,r.width-6,r.height-6),panelFill);
-        Patch(r,ornaments?0:3,false,ornaments?15:10,selected?new Color(1.08f,1.15f,1.12f):Color.white);
+        Bevel(r);
+        Patch(r,ornaments?0:3,false,ornaments?20:12,selected?new Color(1.08f,1.15f,1.12f):Color.white);
         if(selected)Glow(r);
     }
     public static void Frame(Rect r,bool selected=false,bool card=false)
     {
-        Patch(r,card?2:0,false,card?11:15,Color.white);
+        if(Event.current.type==EventType.Repaint)Bevel(r);
+        Patch(r,card?2:0,false,card?13:18,Color.white);
         if(selected)Glow(r);
+    }
+    static void Bevel(Rect r)
+    {
+        // 两层固定描边形成金属明暗，沿原边界绘制，不扩大命中区域。
+        GUI.DrawTexture(r,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,new Color(.32f,.22f,.09f,.95f),3,7);
+        GUI.DrawTexture(new Rect(r.x+1,r.y+1,r.width-2,r.height-2),Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,new Color(.96f,.83f,.53f,.85f),1,6);
     }
     static void Glow(Rect r)
     {
@@ -73,6 +85,7 @@ public static class OceanTabletopSkin
             if(smallDisc==null)CreateSmallDisc();
             GUI.DrawTexture(r,smallDisc);
         }
+        else if(compassArt!=null)GUI.DrawTexture(r,compassArt,ScaleMode.ScaleToFit);
         else GUI.DrawTextureWithTexCoords(r,atlas,Region(1));
         GUI.color=before;GUI.enabled=enabled;
     }

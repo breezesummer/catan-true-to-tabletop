@@ -25,16 +25,18 @@ Shader "Catan/OceanReef"
             half4 Frag(V i):SV_Target
             {
                 float3 p=i.local;
-                float grain=Noise(p*37)*.6+Noise(p*113)*.4;
-                float vein=smoothstep(.46,.53,Noise(p*8+grain*.2));
+                float grain=Noise(p*370)*.6+Noise(p*1130)*.4;
                 // 模型不增加UV接缝；三个方向投射同一灰岩贴图，边缘小面积也保留矿物细节。
                 float3 blend=pow(abs(normalize(TransformWorldToObjectDir(i.n))),4);blend/=max(.001,blend.x+blend.y+blend.z);
                 float3 rock=SAMPLE_TEXTURE2D(_RockDetail,sampler_RockDetail,p.yz*96).rgb*blend.x
                     +SAMPLE_TEXTURE2D(_RockDetail,sampler_RockDetail,p.xz*96).rgb*blend.y
                     +SAMPLE_TEXTURE2D(_RockDetail,sampler_RockDetail,p.xy*96).rgb*blend.z;
-                rock*=lerp(.86,1.13,grain);
+                rock*=lerp(.82,1.18,grain);
+                float up=saturate(normalize(i.n).y);
+                // 受光岩面偏浅米灰，背光面保留海水反射的青灰色。
+                rock=lerp(rock*float3(.77,.91,.93),rock*1.32+float3(.09,.085,.065),smoothstep(.12,.9,up));
                 float wet=1-smoothstep(.005,.025,i.p.y);
-                rock*=lerp(1,.48,wet);
+                rock*=lerp(float3(1,1,1),float3(.36,.55,.56),wet);
                 Light sun=GetMainLight();float light=.47+.7*saturate(dot(normalize(i.n),sun.direction));
                 return half4(rock*sun.color*light,1);
             }
