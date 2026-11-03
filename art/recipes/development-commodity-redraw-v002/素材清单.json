@@ -1,0 +1,200 @@
+[
+  {
+    "id": "alchemy",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/alchemy.png",
+    "resource": "CardRedraw/v002/alchemy",
+    "sha256": "ECAF8FA30C51C590BD2A2FA6D92093371CB9CF5E2804176C8E85684D2664E3E4"
+  },
+  {
+    "id": "crane",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/crane.png",
+    "resource": "CardRedraw/v002/crane",
+    "sha256": "1C1845B1B36957ECC898A8619282CB69D037737FDB2333512D86F9DC1233128B"
+  },
+  {
+    "id": "engineering",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/engineering.png",
+    "resource": "CardRedraw/v002/engineering",
+    "sha256": "A1249B3B8C21680F7466D3702C469469FF192691229695C99C94A19CAAC034DE"
+  },
+  {
+    "id": "invention",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/invention.png",
+    "resource": "CardRedraw/v002/invention",
+    "sha256": "91EEC37250FD7131B815A68DB9EF57FBD81E73A438BE2B4AB6A1361254EA1BEE"
+  },
+  {
+    "id": "irrigation",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/irrigation.png",
+    "resource": "CardRedraw/v002/irrigation",
+    "sha256": "90632DB05B117C40A27136FB1F5A595019660F6F3AD81C134E36ED00B65E342F"
+  },
+  {
+    "id": "medicine",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/medicine.png",
+    "resource": "CardRedraw/v002/medicine",
+    "sha256": "4EC2C0F17E7DD31217602D01DC85FB0505CAAB8CC2F0D05700ADC8C5FD63B58D"
+  },
+  {
+    "id": "mining",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/mining.png",
+    "resource": "CardRedraw/v002/mining",
+    "sha256": "DBE74808756306BB2EDDCA6B7AF124869336E42E1ED09176B1FE6A2123B576AF"
+  },
+  {
+    "id": "printing",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/printing.png",
+    "resource": "CardRedraw/v002/printing",
+    "sha256": "CA4B70ABF34CF57E05D56E256E50AD19ECE455570CF06ACA2B99CC35C6339F30"
+  },
+  {
+    "id": "road-building",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/road-building.png",
+    "resource": "CardRedraw/v002/road-building",
+    "sha256": "154D0D22B1C492EAB8903CF786C7A67E08F427718044F49EA9217BC8882A78EE"
+  },
+  {
+    "id": "smithing",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/smithing.png",
+    "resource": "CardRedraw/v002/smithing",
+    "sha256": "BE9099AA734552AD21FC96BB8E3999B9D1BD277FCFB9DCBAF1F85FE3C1925282"
+  },
+  {
+    "id": "commercial-harbor",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/commercial-harbor.png",
+    "resource": "CardRedraw/v002/commercial-harbor",
+    "sha256": "3D81E99C6D2B6A9A124C1B978CA8F0775F63DB02E1A43BB0742C1072E852FC5A"
+  },
+  {
+    "id": "guild-dues",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/guild-dues.png",
+    "resource": "CardRedraw/v002/guild-dues",
+    "sha256": "F5AB3B9B1550CD7B938415D2D9B67E8B1A421DA6D108B3251590507033FB74E9"
+  },
+  {
+    "id": "merchant",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/merchant.png",
+    "resource": "CardRedraw/v002/merchant",
+    "sha256": "C9218A2C7F67EB26D8CA2A824F33862E898B9EC2C6F0449B52DEF15315FCB50A"
+  },
+  {
+    "id": "merchant-fleet",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/merchant-fleet.png",
+    "resource": "CardRedraw/v002/merchant-fleet",
+    "sha256": "C496C3064FC79FFCE0F57C8FF280D71DD956DE8368AFD0B8D1F8213F135E9769"
+  },
+  {
+    "id": "resource-monopoly",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/resource-monopoly.png",
+    "resource": "CardRedraw/v002/resource-monopoly",
+    "sha256": "1FFD9E0505B234CC5CE2F4160C0D9F427F6A07C178672ADB20C7F9B7BD50DCD7"
+  },
+  {
+    "id": "trade-monopoly",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/trade-monopoly.png",
+    "resource": "CardRedraw/v002/trade-monopoly",
+    "sha256": "7E87D73348BCE215674700B12561BDCBBFD6F1106791AA5E4B9ABB50767C3EB2"
+  },
+  {
+    "id": "diplomacy",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/diplomacy.png",
+    "resource": "CardRedraw/v002/diplomacy",
+    "sha256": "43CAFF694BA7F2E5191617F09627E6D5EDA80C7311F502012F197B41F441B871"
+  },
+  {
+    "id": "espionage",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/espionage.png",
+    "resource": "CardRedraw/v002/espionage",
+    "sha256": "1B548CBE5AE71314C8441081EA2EC1291F2ABE5A6A7DFF38B0284891E05DBAFF"
+  },
+  {
+    "id": "encouragement",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/encouragement.png",
+    "resource": "CardRedraw/v002/encouragement",
+    "sha256": "E39EFCFD187E390112DF46E39312A4F5B42A361D7AFA475608F4E4012857D674"
+  },
+  {
+    "id": "intrigue",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/intrigue.png",
+    "resource": "CardRedraw/v002/intrigue",
+    "sha256": "0B8AF493881BB5799660BD77D557562C5CBC8199FBE006ADA7FCCA823A68C961"
+  },
+  {
+    "id": "taxation",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/taxation.png",
+    "resource": "CardRedraw/v002/taxation",
+    "sha256": "50CF6570754EBC8115D0352D0BFB00E55D46CE3A1129CE6784F4870466392BCA"
+  },
+  {
+    "id": "constitution",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/constitution.png",
+    "resource": "CardRedraw/v002/constitution",
+    "sha256": "C8DC42BD6D4710382AACF176C780FBE6BC70807A89174E3FBD1A1F60F72D9429"
+  },
+  {
+    "id": "treason",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/treason.png",
+    "resource": "CardRedraw/v002/treason",
+    "sha256": "4F50A2D93C1B53D7CA56AABAED456E08402C0927B14DB5D8AA038CA865C0A72D"
+  },
+  {
+    "id": "wedding",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/wedding.png",
+    "resource": "CardRedraw/v002/wedding",
+    "sha256": "317E7C19A71EA7DBC5D06628B1C514E4AFB66D40123C5EB943C4F6543EA3C35A"
+  },
+  {
+    "id": "sabotage",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/sabotage.png",
+    "resource": "CardRedraw/v002/sabotage",
+    "sha256": "544568E4EABC1DB4828F94CF7088D457B9E097C6E2BFB92C7461DA2B9F2B6677"
+  },
+  {
+    "id": "base-knight",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/base-knight.png",
+    "resource": "CardRedraw/v002/base-knight",
+    "sha256": "14F2004361A8F8A17D730AA2B567B15FECB2A6E8B9B7A81B58600F9B874A45E4"
+  },
+  {
+    "id": "base-road-building",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/base-road-building.png",
+    "resource": "CardRedraw/v002/base-road-building",
+    "sha256": "82B89EFDF3368287C63BD8CBDE2242110AC5FB0A3952D74A06C2DB2983F46067"
+  },
+  {
+    "id": "base-year-of-plenty",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/base-year-of-plenty.png",
+    "resource": "CardRedraw/v002/base-year-of-plenty",
+    "sha256": "0568E9A7A069D15E26391DCF800CEF7B5100F444F6DCA2FFD150A6560C44B8F9"
+  },
+  {
+    "id": "base-monopoly",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/base-monopoly.png",
+    "resource": "CardRedraw/v002/base-monopoly",
+    "sha256": "43976700BD4B37D70BC5BECD409278F654A095C6EB6E7979689EC82923EA6D98"
+  },
+  {
+    "id": "base-victory-point",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/base-victory-point.png",
+    "resource": "CardRedraw/v002/base-victory-point",
+    "sha256": "8170FC04F4F7795A576242ECD85FEFCAE51C792BE63D1704B64A78C4CE760FCD"
+  },
+  {
+    "id": "cloth",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/cloth.png",
+    "resource": "CardRedraw/v002/cloth",
+    "sha256": "7A7FDFAAB73A9838755A6EB605AA50E650100B6B924C95ED62CC87CF62F0869B"
+  },
+  {
+    "id": "coin",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/coin.png",
+    "resource": "CardRedraw/v002/coin",
+    "sha256": "FD39D448060A79C154BFD8916128C3775A208626758B361DCE5297BDA5CB2677"
+  },
+  {
+    "id": "paper",
+    "source": "Unity/Catan/Assets/Art/CardRedraw/v002/paper.png",
+    "resource": "CardRedraw/v002/paper",
+    "sha256": "8CE1EB8771699C76C5892105C385127A9369DE0AE4834226525F0C5CF25A349B"
+  }
+]

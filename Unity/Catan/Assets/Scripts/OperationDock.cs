@@ -596,7 +596,7 @@ public sealed partial class OperationDock
             if(collections!=null)collections.SpecialHandScroll=specialScroll;
             var pose=TabletopHandLayout.Resource(specialSlots,i,area.center.x,area.width,chosen,specialScroll);
             var r=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);
-            var texture=card.Progress&&card.ArtIndex>=0?EntityCardAssets.ProgressFront(card.ArtIndex):null;
+            var texture=RedrawnCardAssets.Hand(card);
             faces.Add(new HandFace{Shape=new HitShape{Rect=r},RestRect=r,Card=card,Texture=texture,Selected=chosen});
         }
     }
@@ -749,7 +749,7 @@ public sealed partial class OperationDock
     {
         var c=s.Cards.FirstOrDefault(x=>x.Id==previewCard);if(c==null){previewCard=null;return;}
         // 只放大完整卡面；使用入口统一放在右下角回合按钮。
-        var texture=c.Progress&&c.ArtIndex>=0?EntityCardAssets.ProgressFront(c.ArtIndex):null;
+        var texture=RedrawnCardAssets.Hand(c);
         var face=CardRect;
         if(texture!=null)EntityCardAssets.DrawCardFace(face,texture);
         else{face=EntityCardAssets.FitCardRect(face,TabletopHandLayout.CardWidth/TabletopHandLayout.CardHeight,GUI.matrix);ModernOperationUI.Round(face,Surface);Label(face,c.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=28});}

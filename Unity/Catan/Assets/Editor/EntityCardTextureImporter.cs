@@ -7,6 +7,7 @@ public sealed class EntityCardTextureImporter : AssetPostprocessor
 {
     internal static bool IsCardTexture(string path)
     {
+        if(path.StartsWith("Assets/Resources/CardRedraw/",StringComparison.Ordinal)&&path.EndsWith(".png",StringComparison.OrdinalIgnoreCase))return true;
         if (path == "Assets/Resources/PhotoSamples/v001/wood-front.png" ||
             path == "Assets/Resources/PhotoSamples/v001/resource-back.png") return true;
         return path.StartsWith("Assets/Resources/EntityAssets/", StringComparison.Ordinal) &&
@@ -20,13 +21,20 @@ public sealed class EntityCardTextureImporter : AssetPostprocessor
     {
         if (IsCardTexture(assetPath))
             ((TextureImporter)assetImporter).npotScale = TextureImporterNPOTScale.None;
+        if(assetPath.StartsWith("Assets/Resources/CardRedraw/",StringComparison.Ordinal))
+        {
+            var importer=(TextureImporter)assetImporter;
+            importer.maxTextureSize=1024;importer.isReadable=false;importer.mipmapEnabled=true;
+            importer.wrapMode=TextureWrapMode.Clamp;importer.filterMode=FilterMode.Trilinear;
+            importer.textureCompression=TextureImporterCompression.CompressedHQ;
+        }
     }
 
     public static void VerifyImportedCards()
     {
         int count = 0;
         foreach (string guid in AssetDatabase.FindAssets("t:Texture2D", new[] {
-            "Assets/Resources/PhotoSamples", "Assets/Resources/EntityAssets" }))
+            "Assets/Resources/PhotoSamples", "Assets/Resources/EntityAssets", "Assets/Resources/CardRedraw" }))
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
             if (!IsCardTexture(path)) continue;
@@ -52,6 +60,9 @@ public sealed class EntityCardTextureImporter : AssetPostprocessor
             VerifyScreenAspect((float)card.width/card.height,"重绘资源牌"+i);
         }
         Debug.Log("CATAN_REDRAWN_RESOURCE_CARDS_OK: 五张重绘卡面及五种窗口比例检查通过。");
+        for(int i=0;i<25;i++)if(EntityCardAssets.ProgressFront(i)==null)throw new InvalidOperationException("缺少重绘发展牌："+i);
+        for(int i=0;i<3;i++)if(EntityCardAssets.CommodityFront(i)==null)throw new InvalidOperationException("缺少重绘商品牌："+i);
+        for(int i=0;i<5;i++)if(RedrawnCardAssets.Base(i)==null)throw new InvalidOperationException("缺少基础发展牌："+i);
     }
 
     static void VerifyScreenAspect(float aspect,string label)

@@ -178,10 +178,12 @@ public sealed class TabletopBankUI
         var r=new Rect(center.x-width/2,center.y-height/2,width,height);
         var face=flight.IsSpecial?(flight.Category=="progress"?(own&&flight.ProgressIndex>=0?EntityCardAssets.ProgressFront(flight.ProgressIndex):flight.Track>=0?EntityCardAssets.ProgressBack(flight.Track):DevelopmentBack()):DevelopmentBack()):
             EntityCardAssets.Texture(own?EntityCardAssets.Good(flight.Good).Front:EntityCardAssets.Good(0).Back);
+        var developmentFace=own&&flight.Category=="development"&&t>.5f?RedrawnCardAssets.Base(flight.CardName):null;
+        if(developmentFace!=null)face=developmentFace;
         var matrix=GUI.matrix;
         GUIUtility.RotateAroundPivot(-5*Mathf.Sin(t*Mathf.PI),r.center);
         EntityCardAssets.DrawCardFace(r,face,Mathf.Sin(t*Mathf.PI));
-        if(own&&flight.Category=="development"&&t>.5f)
+        if(own&&flight.Category=="development"&&t>.5f&&developmentFace==null)
             GUI.Label(new Rect(r.x+4,r.center.y-12,r.width-8,24),flight.CardName,new GUIStyle(ModernOperationUI.Center){fontSize=Mathf.Clamp(Mathf.RoundToInt(r.width*.16f),8,17),wordWrap=false});
         GUI.matrix=matrix;
     }

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "mining",
+    "source": "assets/references/inbox/发展卡/绿色发展卡/采矿.jpg",
+    "output": "Unity/Catan/Assets/Art/CardRedraw/v002/mining.png",
+    "width": 1086,
+    "height": 1448,
+    "prompt": "两名矿工在山洞，保留绿标题色条、左上图标、米黄色框及底部空白说明区；暖米黄哑光细纸纹、精细手绘，卡面贴满画布，无文字。"
+  },
+  {
+    "id": "alchemy",
+    "source": "assets/references/inbox/发展卡/绿色发展卡/炼金术士.jpg",
+    "output": "Unity/Catan/Assets/Art/CardRedraw/v002/alchemy.png",
+    "width": 1086,
+    "height": 1448,
+    "prompt": "年长戴眼镜的炼金术士在实验室向玻璃器皿倒入冒烟液体，左有瓶罐与炉火；保留绿标题色条、左上图标、米黄色框及底部空白说明区；暖米黄哑光细纸纹、精细手绘，卡面贴满画布，无文字。"
+  },
+  {
+    "id": "crane",
+    "source": "assets/references/inbox/发展卡/绿色发展卡/起重机.jpg",
+    "output": "Unity/Catan/Assets/Art/CardRedraw/v002/crane.png",
+    "width": 1086,
+    "height": 1448,
+    "prompt": "古代工地木制起重机、长臂绳索吊钩，石铺广场有工人与骑马者；保留绿色空标题条、左上小图标、米黄色圆角框与底部空白雕花说明区；暖米黄哑光细纸纹、精致手绘、无文字、卡面贴满画布。"
+  },
+  {
+    "id": "engineering",
+    "source": "assets/references/inbox/发展卡/绿色发展卡/工程师.jpg",
+    "output": "Unity/Catan/Assets/Art/CardRedraw/v002/engineering.png",
+    "width": 1086,
+    "height": 1448,
+    "prompt": "粉橙色晚霞下的古代城墙工地，右侧卷发工程师手持图纸观察左侧脚手架和墙体；保留绿色空标题条、左上小图标、米黄色圆角框与底部空白雕花说明区；暖米黄哑光细纸纹、精致手绘、无文字。"
+  },
+  {
+    "id": "invention",
+    "source": "assets/references/inbox/发展卡/绿色发展卡/发明家.jpg",
+    "output": "Unity/Catan/Assets/Art/CardRedraw/v002/invention.png",
+    "width": 1086,
+    "height": 1448,
+    "prompt": "古代发明家在温暖昏暗木质工作室中央思考，周围木桌、草图、工具，略带俯视感；保留绿空标题带、左上小图标、米黄卡框和空白底部浮雕说明区；哑光米黄色细纸纹、精致手绘、无文字。"
+  },
+  {
+    "id": "irrigation",
+    "source": "assets/references/inbox/发展卡/绿色发展卡/灌溉.jpg",
+    "output": "Unity/Catan/Assets/Art/CardRedraw/v002/irrigation.png",
+    "width": 1086,
+    "height": 1448,
+    "prompt": "古代木制水车在绿色田野和河道边转动，水沿木槽灌溉农田；保留绿空标题带、左上小图标、米黄卡框及底部空白说明区；暖米黄哑光纸纹和精细手绘，无文字。"
+  },
+  {
+    "id": "medicine",
+    "source": "assets/references/inbox/发展卡/绿色发展卡/药物.jpg",
+    "output": "Unity/Catan/Assets/Art/CardRedraw/v002/medicine.png",
+    "width": 1024,
+    "height": 1536,
+    "prompt": "古代房间里左侧坐着病人/村民，右侧戴深色帽子的医者递上一勺药，窗外有绿田；保留绿色空标题带、左上图标、米黄卡框和空白底部雕花说明区；暖米黄哑光纸纹、精细手绘、无字。"
+  },
+  {
+    "id": "printing",
+    "source": "assets/references/inbox/发展卡/绿色发展卡/印刷厂.jpg",
+    "output": "Unity/Catan/Assets/Art/CardRedraw/v002/printing.png",
+    "width": 1086,
+    "height": 1448,
+    "prompt": "古代印刷作坊，工匠围绕木制印刷机与长桌工作，桌上纸张，后方书架和窗户；保留绿空标题带、左上小图标、米黄卡框及底部雕花空白区；暖米黄哑光纸纹、精致手绘，无文字数字或徽章。"
+  }
+]

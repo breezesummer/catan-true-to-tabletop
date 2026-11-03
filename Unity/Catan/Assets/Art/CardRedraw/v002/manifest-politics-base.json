@@ -1,0 +1,120 @@
+{
+  "title": "蓝色发展牌与基础牌重绘",
+  "model": "内置 image_gen",
+  "generatedAt": "2026-11-03",
+  "outputDirectory": "Unity/Catan/Assets/Art/CardRedraw/v002",
+  "assets": [
+    {
+      "id": "diplomacy",
+      "name": "外交官",
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/外交官.jpg",
+      "output": "diplomacy.png",
+      "outputSize": "1024x1536",
+      "prompt": "以参考卡为构图与主题依据，重绘完整竖版卡面：左上保留小型徽章框，顶部8%-17%为空白蓝色标题带，18%-64%为蓝袍外交官在石厅迎接宾客的插画，底部66%-92%为留白浅色石雕说明区；保留银灰编织内框、弧形石牌过渡与角饰。暖米色哑光细纸纹、精细半写实手绘印刷质感，色彩中性清晰，无灰雾、反光、偏色。无文字、数字、水印、卡套、外部背景，卡面紧贴画布。"
+    },
+    {
+      "id": "espionage",
+      "name": "间谍",
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/间谍.jpg",
+      "output": "espionage.png",
+      "outputSize": "1024x1536",
+      "prompt": "忠实重绘参考图的场景与构图：昏暗酒馆里两名披斗篷的中世纪间谍隔桌秘密交换情报；保留左上徽章框、空白蓝标题带、银灰编织边框和下方空白弧顶石雕说明区。统一暖米色哑光细纸纹与精细半写实手绘印刷质感，校正雾感、反光和偏色。完整竖版卡面贴满画布，无文字、数字、水印、卡套和外部背景。"
+    },
+    {
+      "id": "encouragement",
+      "name": "指挥官",
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/指挥官.jpg",
+      "output": "encouragement.png",
+      "outputSize": "1024x1536",
+      "prompt": "按参考构图重绘：身披盔甲的中世纪骑士立于草崖，远望薄雾战场，前景有持矛守卫、远处有骑士；左上徽章框、顶部8%-17%空白蓝标题带、18%-64%插画、底部66%-92%空白浅色石雕说明区，保留银灰编织框。暖米色哑光纸纹，精细半写实手绘印刷质感，颜色清晰无灰雾、反光或偏色。无文字、水印和外部背景，卡面充满画布。"
+    },
+    {
+      "id": "intrigue",
+      "name": "权谋",
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/权谋.jpg",
+      "output": "intrigue.png",
+      "outputSize": "1024x1536",
+      "prompt": "按参考图重绘：阴影中的中世纪谋士在林间小径旁操纵地图或放置路线标记，右上暖光斜照；保留空白蓝标题条、左上徽章框、银灰编织内框与底部空白石雕说明区。暖米色哑光细纸纹、精细半写实手绘印刷插画，颜色干净，无灰雾、反光与偏色。完整竖版卡面贴满画布，无文字、水印和外部背景。"
+    },
+    {
+      "id": "taxation",
+      "name": "主教",
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/主教.jpg",
+      "output": "taxation.png",
+      "outputSize": "1024x1536",
+      "prompt": "忠实重绘主教场景：戴高冠、穿浅色长袍的中世纪主教侧身立于石门与木桌旁，门外可见绿野与村庄；保留空白蓝标题条、徽章框、银灰编织框、下方弧顶空白石雕说明区。暖米色哑光细纸纹、精细半写实手绘印刷质感，清晰自然色彩，无雾感、反光、偏色。竖版卡面充满画布，无文字、水印或卡套背景。"
+    },
+    {
+      "id": "constitution",
+      "name": "石碑",
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/石碑.jpg",
+      "output": "constitution.png",
+      "outputSize": "1024x1536",
+      "prompt": "按参考图重绘：海边风吹草地上的古老凯尔特风格立石，石面刻有复杂抽象结绳纹；保留空白蓝标题条、左上徽章框、银灰编织内框和底部空白弧形石雕说明区。暖米色哑光细纸纹、精细半写实手绘印刷画面，阴天柔光且色彩中性清晰。卡面不可出现可读文字或数字，无水印、卡套、外部背景。"
+    },
+    {
+      "id": "treason",
+      "name": "叛徒",
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/叛徒.jpg",
+      "output": "treason.png",
+      "outputSize": "1024x1536",
+      "prompt": "按参考故事构图重绘：森林道路前景有倒下的蓝披风人物，持红旗的叛徒沿林间小路走向远处明亮出口，非血腥；保留空白蓝标题条、徽章框、银灰编织框、下方空白弧顶石雕区。暖米色哑光细纸纹、精细半写实手绘印刷质感，色彩清晰无雾、无反光。无文字、数字、水印、卡套或外景。"
+    },
+    {
+      "id": "wedding",
+      "name": "婚礼",
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/婚礼.jpg",
+      "output": "wedding.png",
+      "outputSize": "1024x1536",
+      "prompt": "按参考图重绘：绿意山谷中的木石教堂前举行中世纪婚礼，新郎新娘与少量宾客位于左下，彩旗飘扬，柔和晴日光；保留左上徽章框、空白蓝标题带、银灰编织框及下方空白石雕说明区。暖米色哑光纸纹与精细半写实手绘印刷质感，色彩清晰无雾、无反光。竖版卡面满幅，无文字、水印、卡套或外景。"
+    },
+    {
+      "id": "sabotage",
+      "name": "破坏者",
+      "source": "assets/references/inbox/发展卡/蓝色发展卡/破坏者.jpg",
+      "output": "sabotage.png",
+      "outputSize": "1024x1536",
+      "prompt": "按参考场景重绘：夜晚中世纪村镇街道起火，橙色火光照亮木屋，一名披斗篷的破坏者从前景离开，远处人影反应；保留空白蓝标题带、左上徽章框、银灰编织框和底部空白石雕区。暖米色哑光细纸纹、精细半写实手绘印刷质感，火光与冷夜色清楚协调，无雾、无反光。无文字、数字、水印、卡套和外部背景。"
+    },
+    {
+      "id": "base-knight",
+      "name": "骑士",
+      "source": "原创；风格参考 Unity/Catan/Assets/Art/CardRedraw/v002/mining.png 与 diplomacy.png",
+      "output": "base-knight.png",
+      "outputSize": "1024x1536",
+      "prompt": "原创基础牌：身着钢甲、披蓝斗篷的中世纪骑士持剑警戒地站在城镇道路旁；顶部留空金色标题带、左上小徽章框、银灰绳纹内框，底部留空石雕说明区。暖米色哑光细纸纹，精细半写实手绘印刷质感，与同套参考一致。完整竖版卡面贴满画布，无文字、数字、水印、卡套和外部背景。"
+    },
+    {
+      "id": "base-road-building",
+      "name": "道路工人",
+      "source": "原创；风格参考 Unity/Catan/Assets/Art/CardRedraw/v002/mining.png 与 base-knight.png",
+      "output": "base-road-building.png",
+      "outputSize": "1024x1536",
+      "prompt": "原创基础牌：两位中世纪工人在起伏的绿色乡间铺设石路，一人搬石、一人校准路面，远处通往小村；空白金色标题带、左上徽章框、银灰编织内框、底部空白弧顶石雕说明区。暖米色哑光细纸纹，精细半写实手绘印刷质感，与同套参考一致。无文字、水印、卡套和外部背景，完整卡面贴满画布。"
+    },
+    {
+      "id": "base-year-of-plenty",
+      "name": "丰收农田",
+      "source": "原创；风格参考 Unity/Catan/Assets/Art/CardRedraw/v002/mining.png 与 base-knight.png",
+      "output": "base-year-of-plenty.png",
+      "outputSize": "1024x1536",
+      "prompt": "原创基础牌：夏末丰收的中世纪农田，金色麦浪、农人收割麦捆，前景有装满蔬果的篮子，远处是农舍；空白金色标题带、左上徽章框、银灰编织内框与底部空白石雕说明区。暖米色哑光细纸纹，精细半写实手绘印刷质感，与同套参考一致。无文字、水印、卡套、外部背景，完整竖版卡面。"
+    },
+    {
+      "id": "base-monopoly",
+      "name": "收拢货物的商人",
+      "source": "原创；风格参考 Unity/Catan/Assets/Art/CardRedraw/v002/mining.png 与 base-knight.png",
+      "output": "base-monopoly.png",
+      "outputSize": "1024x1536",
+      "prompt": "原创基础牌：集市大厅里的中世纪商人将粮束、布料、陶罐和木料等多种货物揽入怀中并装进大布袋；空白金色标题带、左上徽章框、银灰编织内框、底部空白弧顶石雕说明区。暖米色哑光细纸纹，精细半写实手绘印刷质感，与同套参考一致。无文字、数字、水印、卡套和外部背景。"
+    },
+    {
+      "id": "base-victory-point",
+      "name": "宏伟中世纪建筑",
+      "source": "原创；风格参考 Unity/Catan/Assets/Art/CardRedraw/v002/mining.png 与 base-knight.png",
+      "output": "base-victory-point.png",
+      "outputSize": "1024x1536",
+      "prompt": "原创基础牌：宏伟的中世纪石砌宫殿或大教堂耸立在坚固城镇上方，层叠高塔、华丽拱门与暖金色傍晚光线，仅以建筑表达胜利点；顶部空白金色标题带、左上徽章框、银灰绳纹内框、底部空白石雕说明区。暖米色哑光细纸纹，精细半写实手绘印刷质感，与同套参考一致。无任何文字、数字、水印、卡套和外部背景。"
+    }
+  ]
+}

@@ -89,6 +89,7 @@ public sealed partial class M6App
         Texture2D texture=null;
         if(entry.CardName=="卡坦保卫者")texture=EntityCardAssets.Texture(EntityCardAssets.Defender.Front);
         if(entry.Progress&&entry.ProgressIndex>=0)texture=EntityCardAssets.ProgressFront(entry.ProgressIndex);
+        if(!entry.Progress&&texture==null)texture=RedrawnCardAssets.Base(entry.CardName);
         if(texture!=null)EntityCardAssets.DrawCardFace(face,texture);
         else
         {

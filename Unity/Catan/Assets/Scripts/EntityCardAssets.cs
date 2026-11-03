@@ -34,7 +34,12 @@ public static class EntityCardAssets
         if (!Textures.TryGetValue(path, out var texture) || texture == null)
         {
             texture = Resources.Load<Texture2D>(path);
-            if (texture != null) Textures[path] = texture;
+            if (texture != null)
+            {
+                Textures[path] = texture;
+                if(path.StartsWith(RedrawnCardAssets.Root,StringComparison.Ordinal))
+                {int index=Array.IndexOf(ProgressIds,path.Substring(RedrawnCardAssets.Root.Length));if(index>=0)RedrawnCardAssets.Register(texture,index);}
+            }
         }
         return texture;
     }
@@ -43,8 +48,7 @@ public static class EntityCardAssets
         if (index < 0 || index >= GoodIds.Length) throw new ArgumentOutOfRangeException(nameof(index));
         if(goodCards[index]!=null)return goodCards[index];
         if (index < 5) return goodCards[index]=new Card(GoodIds[index], "EntityAssets/v006/resource-cards/resource-"+GoodIds[index]+"-front", Root+"resource-cards/resource-back-original");
-        string type = index < 5 ? "resource" : "commodity";
-        return goodCards[index]=new Card(GoodIds[index], Root + type + "-cards/" + type + "-" + GoodIds[index] + "-front", index < 5 ? Root + "resource-cards/resource-back-original" : null);
+        return goodCards[index]=new Card(GoodIds[index],RedrawnCardAssets.Root+GoodIds[index]);
     }
     public static Card Progress(int index)
     {
@@ -53,7 +57,7 @@ public static class EntityCardAssets
         string track = index < 10 ? "science" : index < 16 ? "trade" : "politics";
         string folder = "progress-" + track + "/", id = "progress-" + track + "-" + ProgressIds[index];
         string back = track == "politics" ? "EntityAssets/v003/progress-politics/progress-politics-back-original" : Root + folder + "progress-" + track + "-back-original";
-        return progressCards[index]=new Card(id, Root + folder + id + "-front", back);
+        return progressCards[index]=new Card(id,RedrawnCardAssets.Root+ProgressIds[index],back);
     }
     public static Card Improvement(int track, int level, bool built)
     {
@@ -78,6 +82,7 @@ public static class EntityCardAssets
             paths.Add(Defender.Front);
             for(int card=0;card<25;card++){paths.Add(Progress(card).Front);paths.Add(Progress(card).Back);}
         }
+        else for(int card=0;card<5;card++)paths.Add(RedrawnCardAssets.BasePath(card));
         const long budget=64*1024*1024;long loaded=0;
         foreach(string path in paths.Where(p=>!string.IsNullOrEmpty(p)).Distinct())
         {
@@ -89,6 +94,8 @@ public static class EntityCardAssets
             long size=UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(texture);
             if(loaded+size>budget)yield break;
             Textures[path]=texture;loaded+=size;
+            if(path.StartsWith(RedrawnCardAssets.Root,StringComparison.Ordinal))
+            {int index=Array.IndexOf(ProgressIds,path.Substring(RedrawnCardAssets.Root.Length));if(index>=0)RedrawnCardAssets.Register(texture,index);}
         }
     }
     public static Texture2D ResourceFront(string resource)
@@ -120,6 +127,7 @@ public static class EntityCardAssets
         GUI.DrawTexture(rect,texture,ScaleMode.StretchToFill,true,0,tint??Color.white,0,radius);
         GUI.matrix=matrix;
         DrawPaperLight(rect,radius);
+        RedrawnCardAssets.DrawText(rect,texture);
         TabletopCardFrame.Draw(rect);
     }
     public static void DrawCardPaper(Rect rect,Color color,float elevation=0)
@@ -180,7 +188,7 @@ public static class EntityCardAssets
         float height=width/logicalAspect;
         return new Rect(area.center.x-width/2,area.center.y-height/2,width,height);
     }
-    public static Texture2D ProgressFront(int card) => Texture(Progress(card).Front);
+    public static Texture2D ProgressFront(int card) {var texture=Texture(Progress(card).Front);RedrawnCardAssets.Register(texture,card);return texture;}
     public static Texture2D ProgressBack(int track)
     {
         if (track < 0 || track > 2) throw new ArgumentOutOfRangeException(nameof(track));
