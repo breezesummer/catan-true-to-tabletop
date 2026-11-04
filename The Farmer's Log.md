@@ -1,5 +1,15 @@
 # 农场主手记
 
+## 2026-11-04 — 城市设施升级卡匣
+
+贸易、政治与科学共用胡桃木卡匣、布面卡槽与纸质说明页。15 张待建牌采用原设施名和建筑画，按等级排列，以金边突出下一级。修正线性颜色空间下贴图显示过亮的问题，右页显示实际持有商品与升级费用。通过城市与骑士本地对局分别截取三类设施的 0 级画面，见 [政治](docs/verification/city-facility-tray/政治.png)、[贸易](docs/verification/city-facility-tray/贸易.png)、[科学](docs/verification/city-facility-tray/科学.png)。按要求未运行自动测试。
+
+## 2026-11-04 — 城市设施正反面与卡框统一重绘
+
+- 按原版重绘政治、贸易、科学三类共15张设施卡的正面与反面；保留各级设施名、等级、商品费用和背面的骰面，15张卡背使用各自对应的建筑插画。
+- 统一正反面的纸面、类别色、鎏金双线卡框与角饰，并重绘两张设施指引图；保留原有升级排列与效果说明。
+- 插画源稿位于 `Unity/Catan/Assets/Art/EntityAssets/v003/city-improvements/`。按用户要求未运行测试或构建，仅检查卡面视觉结果。
+
 ## 2026-11-04 — 银币商品牌山体校色
 
 Luna 将银币背后的山体重绘为自然灰岩，紫色只用于缠绕金带的丝带。已替换游戏贴图并覆盖 2.1.8 双端构建。Windows 商品牌预览和手牌缩略图已复核，Android ARM64 安装包通过签名验证。[游戏截图](docs/verification/card-redraw-218-20261103/cards-6.png)
@@ -1430,3 +1440,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Start-De
 - 重新读取官方《The Fishermen of Catan - Seafarers》（FSF.pdf）第2页：穿越沙漠允许主岛及外岛渔场；按用户确认遵循官方规则，保留生成范围。
 - 四项航海捕鱼地图确定性及组件守恒检查通过，源码差异检查通过。Windows客户端、随包服务、Android ARM64构建及APK签名检查通过；2.1目录保留最近五份构建；未进行实机画面、Android触控及四设备外网验收。
 - 版本更新为2.1.6，构建目录为 `game version/2.1/Catan2.1.6-Fishing-Port-Fixes`。未正式发布或部署云端。
+
+### 2026-11-04 实际游戏入口与设施卡展示
+
+刷新与当前源码匹配的 Core 插件，重新启动 Unity，使用 M6 正式场景进入城市与骑士本地对局。修正 Game 视图 4K 放大裁切导致菜单不可见的问题，改用 Free Aspect。新增编辑器菜单“Catan/美术/进入实际游戏”，直接打开 M6 并运行。实际展开政治设施面板；当前显示为 0 级、五张待建卡背与框架。未运行自动测试，未发布。

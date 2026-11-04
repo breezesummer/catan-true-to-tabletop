@@ -290,7 +290,7 @@ public sealed partial class OperationDock
             else DrawCost(snapshot);
             if(HasOverlay&&previewCard==null)
             {
-                Rect panel=tradeOpen||HasActionableOffer(snapshot)?TradeRect:facilityTrack>=0?new Rect(440,132,560,530):CardRect;
+                Rect panel=tradeOpen||HasActionableOffer(snapshot)?TradeRect:facilityTrack>=0?FacilityRect:CardRect;
                 if(Button(new Rect(panel.xMax-98,panel.y+16,32,30),"—"))Windows?.Hide(HasActionableOffer(snapshot)?"回应交易":tradeOpen?"继续交易":facilityTrack>=0?"城市设施":"使用发展卡");
                 if(Button(new Rect(panel.xMax-54,panel.y+16,32,30),"×"))CloseWindow(snapshot);
             }
@@ -756,46 +756,77 @@ public sealed partial class OperationDock
         if(GUI.enabled&&Event.current.type==EventType.MouseDown&&Event.current.button==0&&face.Contains(Event.current.mousePosition))
         {previewCard=null;Windows?.Clear();Event.current.Use();}
     }
+    static readonly Rect FacilityRect = new Rect(270, 100, 900, 640);
+    static readonly string[] FacilityTitles = {"贸易设施", "政治设施", "科学设施"};
+    static readonly Vector2Int[] FacilityCells = {
+        new Vector2Int(1,2), new Vector2Int(0,2), new Vector2Int(0,1),
+        new Vector2Int(0,0), new Vector2Int(1,0)
+    };
+    Texture2D facilityTray;
+
+    static Material facilityPrint;
+    static void DrawFacilityPrint(Rect rect, Texture2D texture)
+    {
+        if (Event.current.type != EventType.Repaint) return;
+        if (facilityPrint == null)
+        {
+            var shader = Resources.Load<Shader>("FacilityTray/Ink");
+            if (shader != null) facilityPrint = new Material(shader) { hideFlags = HideFlags.HideAndDontSave };
+        }
+        if (facilityPrint == null) GUI.DrawTexture(rect, texture);
+        else Graphics.DrawTexture(rect, texture, facilityPrint);
+    }
+
+    void FacilityText(Rect rect, string value, int size, bool bold = false)
+    {
+        var style = new GUIStyle(text) {
+            alignment = TextAnchor.MiddleCenter, fontSize = size,
+            fontStyle = bold ? FontStyle.Bold : FontStyle.Normal, wordWrap = true
+        };
+        style.normal.textColor = QualitySettings.activeColorSpace == ColorSpace.Linear
+            ? new Color(.22f,.14f,.085f).linear : new Color(.22f,.14f,.085f);
+        Label(rect, value, style);
+    }
+
     void DrawFacilities(OperationSnapshot s)
     {
-        var build=OperationPanelOptions.Facility(s,facilityTrack);
-        if(build==null){facilityTrack=-1;return;}
-        int track=facilityTrack;
-        var tracks=new[]{"贸易","政治","科学"};
-        var area=new Rect(440,132,560,530);Paper(area);
-        Label(new Rect(466,151,430,35),tracks[track]+"设施",heading);
-        Label(new Rect(466,188,470,26),"翻开下一等级，建设你的城市文明。",small);
-        var texture=EntityCardAssets.Texture(EntityCardAssets.Guidance(false).Front);
-        float[] cuts={0,.337f,.668f,1};
-        // 在同一张完整建设板上铺满翻板；沿原照定位，但接合边不再留出可见暗缝。
-        var slots=new[]{new Rect(.503f,.638f,.366f,.279f),new Rect(.151f,.638f,.352f,.279f),
-            new Rect(.151f,.361f,.352f,.277f),new Rect(.151f,.085f,.352f,.276f),new Rect(.503f,.085f,.366f,.276f)};
-        var card=new Rect(464,237,298,395);
-        var accent=track==0?new Color(.94f,.73f,.25f):track==1?new Color(.40f,.67f,.94f):new Color(.49f,.79f,.42f);
-        ModernOperationUI.Round(new Rect(card.x-4,card.y-4,card.width+8,card.height+8),accent);
-        if(texture!=null)GUI.DrawTextureWithTexCoords(card,texture,new Rect(cuts[track],0,cuts[track+1]-cuts[track],1));
-        Register(card);
-        for(int level=1;level<=5;level++)
+        int track = facilityTrack;
+        var build = OperationPanelOptions.Facility(s, track);
+        if (build == null) { facilityTrack = -1; return; }
+
+        if (facilityTray == null) facilityTray = Resources.Load<Texture2D>("FacilityTray/tray");
+        Register(FacilityRect);
+        if (facilityTray != null) DrawFacilityPrint(FacilityRect, facilityTray);
+        else Paper(FacilityRect);
+
+        for (int level = 1; level <= 5; level++)
         {
-            var loc=slots[level-1];var slot=new Rect(card.x+loc.x*card.width,card.y+loc.y*card.height,loc.width*card.width,loc.height*card.height);
-            var face=level<=build.Level?EntityCardAssets.ImprovementBack(track,level):EntityCardAssets.ImprovementFront(track,level);
-            if(face!=null)GUI.DrawTexture(slot,face,ScaleMode.StretchToFill);
-            bool over=slot.Contains(Event.current.mousePosition);
-            if(over&&level==build.Level+1){hoveredBuild=build.Id;costAnchor=new Vector2(slot.center.x,slot.y);}
-            if(GUI.enabled&&over&&Event.current.type==EventType.MouseDown&&Event.current.button==0)
+            var cell = FacilityCells[level - 1];
+            var slot = new Rect(325 + cell.x * 202, 151 + cell.y * 181, 172, 172);
+            bool next = level == build.Level + 1;
+            Fill(new Rect(slot.x + 2, slot.y + 4, slot.width, slot.height), new Color(0,0,0,.48f));
+            if (next) Fill(new Rect(slot.x-3,slot.y-3,slot.width+6,slot.height+6), Gold);
+            var face = level <= build.Level ? EntityCardAssets.ImprovementBack(track,level)
+                                            : EntityCardAssets.ImprovementFront(track,level);
+            if (face != null) DrawFacilityPrint(slot, face);
+            if (GUI.enabled && next && slot.Contains(Event.current.mousePosition)
+                && Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
                 Event.current.Use();
-                if(level<=build.Level)s.Notify?.Invoke("这一级设施已经建成");
-                else if(level!=build.Level+1)s.Notify?.Invoke("请先升级第 "+(build.Level+1)+" 级设施");
-                else PrepareBuild(build,s);
+                PrepareBuild(build,s);
             }
         }
-        Label(new Rect(788,247,186,35),"当前  "+build.Level+" 级",new GUIStyle(heading){fontSize=20});
-        Fill(new Rect(788,298,184,2),accent);
-        Label(new Rect(788,319,186,160),build.Detail??FacilityAbility(track,build.Level),text);
-        Label(new Rect(788,506,186,72),build.Level>=5?"本设施已全部建成":"点击建设板上的下一等级，或使用下方按钮升级。",small);
-        if(Primary(new Rect(788,591,186,41),build.Level>=5?"已达最高等级":"建设第 "+(build.Level+1)+" 级",build.CanPrepare(s)&&build.Level<5))PrepareBuild(build,s);
-        if(hoveredBuild!=null)DrawCost(s);
+
+        FacilityText(new Rect(790,195,325,68), FacilityTitles[track], 36, true);
+        FacilityText(new Rect(790,276,325,58), "当前  "+build.Level+"  级", 27);
+        int good = 5 + track;
+        string cost = build.Level >= 5 ? "已达最高等级" : Names[good]+"   "+s.Goods[good]+" / "+build.Cost[good];
+        Fill(new Rect(811,366,284,61),new Color(.42f,.28f,.14f,.12f));
+        FacilityText(new Rect(811,366,284,61),cost,25,true);
+        FacilityText(new Rect(801,447,303,88),"三级 · "+FacilityAbility(track,3),20);
+        FacilityText(new Rect(801,535,303,50),"四、五级争夺大都会",17);
+        if (Primary(new Rect(815,611,278,55),build.Level>=5?"已全部建成":"建设第 "+(build.Level+1)+" 级",
+                    build.Level<5 && build.CanPrepare(s))) PrepareBuild(build,s);
     }
     public static string FacilityAbility(int track,int level)
     {
