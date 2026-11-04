@@ -168,6 +168,7 @@ public sealed partial class OperationDock
     internal bool VerificationHandsAreScreenSpace => faces.All(face=>face.Shape.World==null);
     internal int VerificationVisibleResourceCount => faces.Count(face=>face.Good>=0);
     internal int VerificationPendingResourceCount => current==null?0:Math.Max(0,current.Goods.Take(current.GoodCount).Sum()-VerificationVisibleResourceCount);
+    internal bool FacilityPageVisible => facilityTrack >= 0 && Windows?.Suppressed != true;
     public bool HasOverlay => Windows?.Suppressed!=true&&(tradeOpen || facilityTrack>=0 || previewCard!=null&&current?.Discard==null || HasActionableOffer(current));
     public bool IsDraggingPiece => pieceDragging;
     public bool ConsumeBuildRelease(out Vector2 releasedLogicalMouse)
@@ -757,7 +758,8 @@ public sealed partial class OperationDock
         {previewCard=null;Windows?.Clear();Event.current.Use();}
     }
     static readonly Rect FacilityRect = new Rect(270, 100, 900, 640);
-    static readonly string[] FacilityTitles = {"贸易设施", "政治设施", "科学设施"};
+    static readonly string[] FacilityPageIds = {"trade","politics","science"};
+    static readonly string[] FacilityGoodIds = {"cloth","coin","paper"};
     static readonly Vector2Int[] FacilityCells = {
         new Vector2Int(1,2), new Vector2Int(0,2), new Vector2Int(0,1),
         new Vector2Int(0,0), new Vector2Int(1,0)
@@ -777,14 +779,14 @@ public sealed partial class OperationDock
         else Graphics.DrawTexture(rect, texture, facilityPrint);
     }
 
-    void FacilityText(Rect rect, string value, int size, bool bold = false)
+    void FacilityText(Rect rect, string value, int size, bool bold = false, bool brass = false)
     {
         var style = new GUIStyle(text) {
             alignment = TextAnchor.MiddleCenter, fontSize = size,
             fontStyle = bold ? FontStyle.Bold : FontStyle.Normal, wordWrap = true
         };
-        style.normal.textColor = QualitySettings.activeColorSpace == ColorSpace.Linear
-            ? new Color(.22f,.14f,.085f).linear : new Color(.22f,.14f,.085f);
+        var ink = brass ? new Color(1f,.91f,.71f) : new Color(.22f,.14f,.085f);
+        style.normal.textColor = QualitySettings.activeColorSpace == ColorSpace.Linear ? ink.linear : ink;
         Label(rect, value, style);
     }
 
@@ -809,6 +811,11 @@ public sealed partial class OperationDock
             var face = level <= build.Level ? EntityCardAssets.ImprovementBack(track,level)
                                             : EntityCardAssets.ImprovementFront(track,level);
             if (face != null) DrawFacilityPrint(slot, face);
+            if (next)
+            {
+                var corners = EntityCardAssets.Texture("FacilityTray/selected");
+                if (corners != null) DrawFacilityPrint(slot,corners);
+            }
             if (GUI.enabled && next && slot.Contains(Event.current.mousePosition)
                 && Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
@@ -817,16 +824,29 @@ public sealed partial class OperationDock
             }
         }
 
-        FacilityText(new Rect(790,195,325,68), FacilityTitles[track], 36, true);
-        FacilityText(new Rect(790,276,325,58), "当前  "+build.Level+"  级", 27);
-        int good = 5 + track;
-        string cost = build.Level >= 5 ? "已达最高等级" : Names[good]+"   "+s.Goods[good]+" / "+build.Cost[good];
-        Fill(new Rect(811,366,284,61),new Color(.42f,.28f,.14f,.12f));
-        FacilityText(new Rect(811,366,284,61),cost,25,true);
-        FacilityText(new Rect(801,447,303,88),"三级 · "+FacilityAbility(track,3),20);
-        FacilityText(new Rect(801,535,303,50),"四、五级争夺大都会",17);
-        if (Primary(new Rect(815,611,278,55),build.Level>=5?"已全部建成":"建设第 "+(build.Level+1)+" 级",
-                    build.Level<5 && build.CanPrepare(s))) PrepareBuild(build,s);
+        int shownLevel = Mathf.Min(build.Level + 1, 5);
+        var page = EntityCardAssets.Texture("FacilityTray/Pages/" + FacilityPageIds[track] + "-" + shownLevel);
+        var pageRect = new Rect(767,149,374,546);
+        if (page != null) DrawFacilityPrint(pageRect,page);
+        bool complete = build.Level >= 5;
+        FacilityText(new Rect(910,201,92,24), complete ? "Ⅴ" : build.Level+" → "+shownLevel,19,true);
+        var action = new Rect(790,624,333,51);
+        Register(action);
+        if (complete)
+        {
+            FacilityText(new Rect(868,628,198,40),"已全部建成",21,true,true);
+        }
+        else
+        {
+            int good = 5+track;
+            bool available = build.CanPrepare(s);
+            var icon = EntityCardAssets.Texture("TabletopUI/v010/"+FacilityGoodIds[track]+"-cutout");
+            if (icon != null) DrawFacilityPrint(new Rect(993,633,29,29),icon);
+            FacilityText(new Rect(876,628,86,40),"建设",23,true,true);
+            FacilityText(new Rect(1024,628,76,40),s.Goods[good]+"/"+build.Cost[good],21,true,true);
+            if (!available) Fill(action,new Color(.20f,.14f,.09f,.16f));
+            if (available && GUI.Button(action,GUIContent.none,GUIStyle.none)) PrepareBuild(build,s);
+        }
     }
     public static string FacilityAbility(int track,int level)
     {

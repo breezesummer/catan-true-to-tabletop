@@ -10,6 +10,7 @@ using PlayerView = Catan.Core.M5.PlayerView;
 public sealed partial class M5App
 {
     readonly OperationDock dock=new OperationDock();
+    internal bool FacilityPageVisible => dock.FacilityPageVisible;
     readonly TabletopUI tabletop=new TabletopUI();
     bool operationActions;
     bool handOverflowDiscard;
