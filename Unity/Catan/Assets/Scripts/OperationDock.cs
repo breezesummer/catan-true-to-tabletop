@@ -824,12 +824,10 @@ public sealed partial class OperationDock
             }
         }
 
-        int shownLevel = Mathf.Min(build.Level + 1, 5);
-        var page = EntityCardAssets.Texture("FacilityTray/Pages/" + FacilityPageIds[track] + "-" + shownLevel);
+        var page = EntityCardAssets.Texture("FacilityTray/Pages/" + FacilityPageIds[track] + "-" + build.Level);
         var pageRect = new Rect(767,149,374,546);
         if (page != null) DrawFacilityPrint(pageRect,page);
         bool complete = build.Level >= 5;
-        FacilityText(new Rect(910,201,92,24), complete ? "Ⅴ" : build.Level+" → "+shownLevel,19,true);
         var action = new Rect(790,624,333,51);
         Register(action);
         if (complete)
