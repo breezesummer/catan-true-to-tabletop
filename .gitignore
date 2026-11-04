@@ -17,6 +17,8 @@
 /Unity/Catan/[Tt]emp
 /Unity/Catan/[Ll]ogs
 /Unity/Catan/[Uu]ser[Ss]ettings
+/Unity/Catan/Assets/_Recovery/
+/Unity/Catan/Assets/_Recovery.meta
 
 # .NET and local editor state
 **/bin/

@@ -40,6 +40,12 @@ public sealed partial class OperationDock
     bool GeneralHandVisible=>Generals?.GeneralHandVisible==true;
     bool FishHandVisible => Fishing?.Selected==true;
     int facilityTrack=-1;
+    bool sealNotePinned;
+    float sealNoteReveal;
+    static readonly Rect FacilitySealRect = new Rect(550, 351, 132, 124);
+    static readonly Rect SlipSealRect = new Rect(499, 365, 79, 72);
+    // 卡匣底图中，蓝布与右侧木框的交界位于 x = 758。
+    static readonly Rect SealNoteRect = new Rect(514, 380, 244, 82);
     int? portGood;
     bool portTrade;
     string tradeTitle;
@@ -193,11 +199,15 @@ public sealed partial class OperationDock
     public void OpenFacility(int track)
     {
         if(OperationPanelOptions.Facility(current,track)==null||HasActionableOffer(current)||DirectSelecting)return;
+        sealNotePinned=false;
+        sealNoteReveal=0;
         Windows?.Open();current.Cancel?.Invoke();Selection.Clear();tradeOpen=false;previewCard=null;facilityTrack=track;message="";
     }
     public int FacilityLevel(int track) => current?.Builds.FirstOrDefault(b=>b.Track==track)?.Level??0;
     public void Reset()
     {
+        sealNotePinned=false;
+        sealNoteReveal=0;
         Windows?.ResetInteraction();
         Selection.Clear(); tradeOpen=false;facilityTrack=-1;portTrade=false;portGood=null; previewCard=null; hoveredBuild=null; message="";
         Array.Clear(give,0,8);Array.Clear(receive,0,8); tooltipRect=Rect.zero;
@@ -824,6 +834,25 @@ public sealed partial class OperationDock
             }
         }
 
+        string sealState = build.Level >= 3 ? "gold" : "ink";
+        var seal = EntityCardAssets.Texture("FacilityTray/Seals/" + FacilityPageIds[track] + "-" + sealState);
+        DrawSealNote(track);
+        float slide = Mathf.SmoothStep(0f, 1f, sealNoteReveal);
+        var crest = new Rect(Vector2.Lerp(FacilitySealRect.position, SlipSealRect.position, slide),
+                             Vector2.Lerp(FacilitySealRect.size, SlipSealRect.size, slide));
+        if (seal != null) DrawFacilityPrint(crest, seal);
+        if (slide == 0f)
+        {
+            var laurel = EntityCardAssets.Texture("FacilityTray/Seals/laurel-" + sealState);
+            if (laurel != null)
+            {
+                // 月桂的透明中心给主体留位，纸签展开后仅保留主体。
+                var branches = new Rect(crest.x - crest.width * .15f, crest.y - crest.height * .06f,
+                                        crest.width * 1.3f, crest.height * 1.16f);
+                DrawFacilityPrint(branches, laurel);
+            }
+        }
+
         var page = EntityCardAssets.Texture("FacilityTray/Pages/" + FacilityPageIds[track] + "-" + build.Level);
         var pageRect = new Rect(767,149,374,546);
         if (page != null) DrawFacilityPrint(pageRect,page);
@@ -846,6 +875,38 @@ public sealed partial class OperationDock
             if (available && GUI.Button(action,GUIContent.none,GUIStyle.none)) PrepareBuild(build,s);
         }
     }
+
+    void DrawSealNote(int track)
+    {
+        var e = Event.current;
+        // 悬停后保留原落点，并允许鼠标跟随移动中的纹章。
+        Rect hit = sealNoteReveal > 0 ? Rect.MinMaxRect(SlipSealRect.x, FacilitySealRect.y,
+            FacilitySealRect.xMax, FacilitySealRect.yMax) : FacilitySealRect;
+        if (MobileTabletop.Enabled && sealNotePinned && sealNoteReveal >= 1f) hit = SlipSealRect;
+        bool overSeal = hit.Contains(e.mousePosition);
+        bool open = GUI.enabled && overSeal;
+        if (MobileTabletop.Enabled)
+        {
+            if (e.rawType == EventType.MouseDown && !overSeal) sealNotePinned = false;
+            if (GUI.Button(hit, GUIContent.none, GUIStyle.none) && !MobileTabletop.TouchDragged)
+                sealNotePinned = !sealNotePinned;
+            open = GUI.enabled && sealNotePinned;
+        }
+
+        if (e.type != EventType.Repaint) return;
+        sealNoteReveal = Mathf.MoveTowards(sealNoteReveal, open ? 1f : 0f, Time.unscaledDeltaTime / .18f);
+        if (sealNoteReveal <= 0f) return;
+        var note = EntityCardAssets.Texture("FacilityTray/Slips/" + FacilityPageIds[track]);
+        if (note == null) return;
+        float fraction = Mathf.SmoothStep(0f, 1f, sealNoteReveal);
+        float width = SealNoteRect.width * fraction;
+        var visible = new Rect(SealNoteRect.xMax-width, SealNoteRect.y, width, SealNoteRect.height);
+        var uv = new Rect(0, 0, fraction, 1);
+        if (facilityPrint != null)
+            Graphics.DrawTexture(visible, note, uv, 0, 0, 0, 0, Color.white, facilityPrint);
+        else GUI.DrawTextureWithTexCoords(visible, note, uv);
+    }
+
     public static string FacilityAbility(int track,int level)
     {
         if(level<3)return "达到 3 级后解锁城市能力";

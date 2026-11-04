@@ -31,7 +31,6 @@ IPv4:175.178.212.142
 - 规则开发先查 [本地规则索引](assets/references/rules/README.md)；引用注明来源文件与 PDF 页码。
 - 规则核心独立于 Unity、渲染、物理、UI 和网络；使用稳定的 Tile/Vertex/Edge ID，动画不影响规则结果。
 - 需要建模时必须使用blender mcp。
-- 代码修改类任务完成后，不要一个任务推送多次，最后再推送远端，。
 
 ### 在线游戏性能约定
 
