@@ -48,7 +48,17 @@ public sealed partial class TabletopUiVerification
                     Require(reef.sharedMaterial.shader.isSupported,"礁石着色器不受支持");
                 }
                 Require(ocean.sharedMaterial.GetFloat("_OceanTheme")==1,"海洋主题水面参数未启用");
+                var reefs=environment.GetComponentsInChildren<Renderer>();
+                var reefPositions=reefs.Select(reef=>reef.transform.position).ToArray();
+                table.Frame(camera,false,1.65f);yield return null;
+                Require(reefs.Select((reef,i)=>reef.transform.position==reefPositions[i]).All(same=>same),"缩放移动了礁石");
+                table.Frame(camera,false,1);
                 BindDockForHeadless();CheckContextEntrances();
+                if(Snapshot.GoodCount==8)
+                {
+                    Dock.OpenFacility(2);yield return null;yield return new WaitForEndOfFrame();
+                    SaveOceanFrame(label+"-科学设施.png");Dock.Reset();
+                }
                 Dock.OpenTrade();Require(Dock.TradeOpen,"海洋主题无法打开交易");
                 yield return new WaitForSeconds(2);yield return new WaitForEndOfFrame();SaveOceanFrame(label+"-交易.png");
                 app.HandleTableEscape();Require(!Dock.TradeOpen,"海洋主题无法取消交易");
@@ -123,6 +133,15 @@ public sealed partial class TabletopUiVerification
         try
         {
             var own=state.ThreeKingdoms.Generals.First(g=>g.Region==Catan.Core.ThreeKingdoms.GeneralRegion.Active&&g.OwnerPlayerId==app.HumanSeat);
+            var luxun=state.ThreeKingdoms.Generals.First(g=>g.GeneralId=="tk-g23");
+            (own.GeneralId,luxun.GeneralId)=(luxun.GeneralId,own.GeneralId);
+            field.SetValue(session,state);game.M6Refresh();app.ShowGeneralLibrary();
+            foreach(int theme in new[]{0,2,3,1})
+            {
+                StrategyHudTheme.Select(theme);yield return null;yield return new WaitForEndOfFrame();
+                SaveOceanFrame("陆逊-武将框与武将库-"+StrategyHudTheme.Names[theme]+".png");
+            }
+            app.CloseGeneralLibrary();
             var huang=state.ThreeKingdoms.Generals.First(g=>g.GeneralId=="tk-g16");
             string previous=own.GeneralId;own.GeneralId=huang.GeneralId;huang.GeneralId=previous;
             state.Players.First(p=>p.Id==app.HumanSeat).Improvements[0]=1;

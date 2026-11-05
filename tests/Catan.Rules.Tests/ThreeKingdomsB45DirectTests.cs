@@ -239,6 +239,29 @@ public sealed class ThreeKingdomsB45DirectTests
         Accept(buildingGame, skill); Assert.Null(buildingGame.GetPlayerView("P1").ThreeKingdoms.SkillDecision);
     }
     [Theory] [InlineData("cities")] [InlineData("combined")]
+    public void QianxunStopsForeignPlayForPrivateHandResponse(string mode)
+    {
+        dynamic game=Fixture(mode,"tk-g12",s=>
+        {
+            s.ThreeKingdoms=Generals("tk-g12","tk-g23","tk-g37","tk-g19");
+            s.ThreeKingdoms.Clock.Phase=ThreeKingdomsPhase.Draw;
+            Player(s,"P2").Resources.Brick=2;
+        });
+        InvokePump(game);
+        ThreeKingdomsView owner=game.GetPlayerView("P2").ThreeKingdoms;
+        ThreeKingdomsView actor=game.GetPlayerView("P1").ThreeKingdoms;
+        Assert.Equal("qianxun-response",owner.SkillDecision.Kind);
+        Assert.Null(actor.SkillDecision.DecisionId); Assert.Empty(actor.SkillActions);
+        Assert.False((bool)game.Execute(Command(game,mode,"EndTurn")).Success);
+        dynamic reply=Command(game,mode,"UseGeneralSkill","P2");
+        reply.SkillCommand=owner.SkillActions.Single(a=>a.Command.Option=="discard").Command;
+        Accept(game,reply);
+        Assert.True((bool)game.Execute(reply).IsDuplicate);
+        Assert.Equal(1,(int)Player(game.GetAuthoritativeStateForTesting(),"P2").Resources.Brick);
+        Assert.Null(game.GetPlayerView("P1").ThreeKingdoms.SkillDecision);
+    }
+
+    [Theory] [InlineData("cities")] [InlineData("combined")]
     public void GuoseDirectCommandCostsOnceAndDoesNotCreateAnotherActivePrompt(string mode)
     {
         dynamic game = Fixture(mode, "tk-g05", s => Player(s).Resources.Brick = 2); InvokePump(game);

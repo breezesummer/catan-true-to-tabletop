@@ -5,6 +5,8 @@ public sealed class TabletopPointerPreview
     public string Kind;
     public int Level=1;
     public bool Active;
+    public int Track;
+    public bool Wall;
     public static TabletopPointerPreview ForCommand(string command,bool setupCity=false,int knightLevel=1,bool knightActive=false)
     {
         string kind;

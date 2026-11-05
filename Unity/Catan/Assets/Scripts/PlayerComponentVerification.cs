@@ -15,12 +15,12 @@ public sealed class PlayerComponentVerification : MonoBehaviour
     {
         public string renderer,playerId,locationId,kind,resource;
         public int level,track=-1,meshCount;
-        public bool active,wall,uniqueRoot,metreScale,noColliders,sourceMeshesMatched,explicitStateMarker,explicitLevelMarker;
+        public bool active,wall,uniqueRoot,metreScale,noColliders,sourceMeshesMatched,distinctStatePose,levelMeshVerified;
     }
     [Serializable] public class Report
     {
         public string status,unityVersion,projectionMethod="RefreshProjectedPieces shared by live PlayerView";
-        public string helmetConvention="provisional: active = helmet; independent active/resting marker retained";
+        public string helmetConvention="激活时抬起兵器并佩戴玩家色盔缨，休整时放低或收立兵器";
         public int checkedInstances;
         public bool previewColoursPreserved;
         public Record[] instances;
@@ -32,12 +32,12 @@ public sealed class PlayerComponentVerification : MonoBehaviour
         public readonly PiecePlacement[] Settlements,Cities,Walls;
         public readonly Catan.Core.M4.Knight[] Knights;
         public readonly Catan.Core.M4.Metropolis[] Metropolises;
-        public Fixture()
+        public Fixture(bool buildingsOnly=false)
         {
             var vertices=new List<Vertex>();var settlements=new List<PiecePlacement>();
             var cities=new List<PiecePlacement>();var walls=new List<PiecePlacement>();
             var knights=new List<Catan.Core.M4.Knight>();var metros=new List<Catan.Core.M4.Metropolis>();
-            for(var row=0;row<11;row++)
+            for(var row=0;row<(buildingsOnly?3:11);row++)
                 for(var seat=0;seat<4;seat++)
                 {
                     var id="V-art-"+row+"-"+seat;var player="P"+(seat+1);
@@ -66,7 +66,8 @@ public sealed class PlayerComponentVerification : MonoBehaviour
         // Hide the art gallery while its camera is used for the real renderer fixtures.
         var gallery=GetComponent<EntityAssetGallery>();
         if(gallery!=null){gallery.enabled=false;if(gallery.Current!=null)gallery.Current.SetActive(false);}
-        var records=new List<Record>();var captured=new List<string>();var fixture=new Fixture();
+        bool buildingsOnly=args.Contains("--natural-components-only");
+        var records=new List<Record>();var captured=new List<string>();var fixture=new Fixture(buildingsOnly);
         foreach(var mode in new[]{"base","seafarers","cities-knights","combined"})
         {
             var root=new GameObject("Public art fixture "+mode);
@@ -113,16 +114,15 @@ public sealed class PlayerComponentVerification : MonoBehaviour
                     var level=row>=5?(row-5)/2+1:0;var active=row>=5&&row%2==0;
                     // Expected resources are written independently of the asset selector.
                     var resources=new List<string>();
-                    if(row==0)resources.Add("ThreeKingdoms/v003/courtyard-"+colour);
-                    else if(seat==0)
+                    if(row==0)resources.Add("NaturalPieces/v001/village-"+colour);
+                    else if(row<=2)resources.Add("NaturalPieces/v001/city-"+colour);
+                    else if(row<=4)
                     {
-                        if(row<3)resources.Add("EntityAssets/v001/city/city-red");
-                        else if(row<5)resources.Add("EntityAssets/v001/metropolis/metropolis-red");
-                        else resources.Add("EntityAssets/v001/knights/knight-level-"+level+(active?"-active":"-resting"));
-                        if(row==2||row==4)resources.Add("EntityAssets/v001/city-wall/city-wall-red");
+                        int direction=(seat+row)%3;
+                        resources.Add("ExpansionPieces/v001/metro-"+new[]{"trade","politics","science"}[direction]+"-"+colour);
                     }
-                    else if(row<5)resources.Add("EntityAssets/v002/player-buildings/"+kind+"-"+colour);
-                    else resources.Add("EntityAssets/v002/player-knights/knight-"+colour+"-level-"+level+(active?"-helmet":"-bare"));
+                    else resources.Add("ExpansionPieces/v001/knight-"+level+(active?"-active-":"-rest-")+colour);
+                    if(row==2||row==4)resources.Add("ExpansionPieces/v001/wall-"+colour);
                     var actualMeshes=piece.GetComponentsInChildren<MeshFilter>().Select(m=>m.sharedMesh).ToArray();
                     foreach(var resource in resources)
                     {
@@ -130,7 +130,11 @@ public sealed class PlayerComponentVerification : MonoBehaviour
                         foreach(var mesh in source.GetComponentsInChildren<MeshFilter>())
                             Require(actualMeshes.Contains(mesh.sharedMesh),"Wrong source mesh "+mode+" "+vertex.Id+" expected "+resource);
                         foreach(var material in source.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials))
-                            Require(piece.GetComponentsInChildren<Renderer>().Any(r=>r.sharedMaterials.Contains(material)),"Source material lost "+resource);
+                        {
+                            // 原有城墙与骑士共用座位塑料材质；自然材质必须逐项保留。
+                            var expectedMaterial=material.name.Contains("Plastic")?PlayerComponentAssets.BuildingPlastic(player):material;
+                            Require(piece.GetComponentsInChildren<Renderer>().Any(r=>r.sharedMaterials.Contains(expectedMaterial)),"Source material lost "+resource);
+                        }
                     }
                     Require(piece.localScale==Vector3.one,"Non-metre visual root "+vertex.Id);
                     Require(Quaternion.Angle(piece.rotation,Quaternion.Euler(0,180,0))<.01f,"Photographed face points away from default board camera "+vertex.Id);
@@ -138,22 +142,16 @@ public sealed class PlayerComponentVerification : MonoBehaviour
                     var marker=true;var track=-1;
                     if(row>=5)
                     {
-                        marker=piece.Find(active?"Active state: active":"Active state: resting")!=null;
-                        Require(marker,"Missing independent active marker "+vertex.Id);
-                        var rank=piece.Find("Knight level: "+level);
-                        Require(rank!=null&&rank.childCount==level,"Missing independent level pips "+vertex.Id);
+                        var opposite=Resources.Load<GameObject>("ExpansionPieces/v001/knight-"+level+(active?"-rest-":"-active-")+colour);
+                        Require(opposite!=null && !actualMeshes.Contains(opposite.GetComponentInChildren<MeshFilter>().sharedMesh),"骑士激活和休整姿态未分开");
+                        Require(OperationPieceAssets.Texture("knight",player,level)!=null,"骑士库存图缺失");
                     }
-                    if(row==3||row==4)
-                    {
-                        track=(seat+row)%3;var label=new[]{"Trade","Politics","Science"}[track];
-                        var visual=piece.Find("Metropolis track: "+label);Require(visual!=null,"Missing track label "+vertex.Id);
-                        Require(visual.childCount==track+1,"Wrong track pips "+vertex.Id);
-                    }
+                    if(row==3||row==4)track=(seat+row)%3;
                     records.Add(new Record{renderer=mode,playerId=player,locationId=vertex.Id,kind=kind,resource=string.Join(" + ",resources),
                         level=level,active=active,wall=row==2||row==4,track=track,meshCount=actualMeshes.Length,uniqueRoot=true,metreScale=true,
-                        noColliders=true,sourceMeshesMatched=true,explicitStateMarker=marker,explicitLevelMarker=row>=5});
+                        noColliders=true,sourceMeshesMatched=true,distinctStatePose=marker,levelMeshVerified=row>=5});
                 }
-                Require(pieces.childCount==((mode=="base"||mode=="seafarers")?8:44),"Unexpected visual root count "+mode);
+                Require(pieces.childCount==((mode=="base"||mode=="seafarers")?8:buildingsOnly?12:44),"Unexpected visual root count "+mode);
                 Require(PlayerComponentAssets.ColourKey(new Color(.3f,1f,.75f))==null&&PlayerComponentAssets.ColourKey(new Color(1f,.22f,.2f))==null,"Preview became player colour");
                 // The original preview code must still apply its green/red diagnostic colour.
                 if(mode=="base")root.GetComponent<BoardRenderer>().Preview(fixture.Vertices[0].Id,false,true);
@@ -176,7 +174,7 @@ public sealed class PlayerComponentVerification : MonoBehaviour
                 foreach(var view in new[]{"game-camera","top","side","crowded-vertex"})
                 {
                     var camera=Camera.main;camera.orthographic=true;camera.rect=new Rect(0,0,1,1);
-                    var centre=view=="crowded-vertex"?root.GetComponentsInChildren<Transform>().First(t=>t.name.StartsWith("Metropolis")&&t.name.Contains("V-art-4-2")).position:Vector3.zero;
+                    var centre=view=="crowded-vertex"?root.GetComponentsInChildren<Transform>().First(t=>t.name.StartsWith(buildingsOnly?"City":"Metropolis")&&t.name.Contains(buildingsOnly?"V-art-2-2":"V-art-4-2")).position:Vector3.zero;
                     var direction=view=="top"?new Vector3(0,1,-.0001f):view=="side"?new Vector3(0,.06f,-1):new Vector3(0,.95f,-1);
                     camera.transform.position=centre+direction.normalized*.9f;camera.transform.LookAt(centre+Vector3.up*.012f);
                     camera.orthographicSize=view=="crowded-vertex"?.068f:.29f;

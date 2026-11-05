@@ -52,7 +52,11 @@ public sealed partial class M5App
     }
     void DrawSpecialMapLabels()
     {
-        void Mark(string id,string caption){var p=MobileTabletop.Logical(board.ScreenPoint(id));GUI.Label(new Rect(p.x-45,p.y-18,130,28),caption,small);}
+        void Mark(string id,string caption,MapSymbol symbol=MapSymbol.Flag)
+        {
+            if(!string.IsNullOrEmpty(id))
+                PaintedMapSymbols.Draw(MobileTabletop.Logical(board.ScreenPoint(id)),symbol,caption,small);
+        }
         if(SpecialPanelVisible&&ai!=null&&ai.IsHumanTurn)
         {
             var actions=view.LegalActions.Where(SpecialCommand).ToArray();
@@ -61,12 +65,12 @@ public sealed partial class M5App
             foreach(var group in actions.Select((c,i)=>new{Command=c,Number=i+1}).Where(x=>x.Command.Kind==CommandKind.ConvertWarship).GroupBy(x=>x.Command.SourceId))
                 Mark(group.Key,"骑士 "+string.Join("/",group.Select(x=>x.Number)));
         }
-        foreach(var ship in view.Board.Ships.Where(s=>s.IsWarship))Mark(ship.LocationId,"战舰");
-        foreach(var v in view.Board.Villages)Mark(v.VertexId,"村 "+v.Number+" · 布 "+v.Cloth);
-        foreach(var f in view.Board.Fortresses){if(f.Strength>0)Mark(f.VertexId,f.PlayerId+" 堡垒 "+f.Strength);Mark(f.BeachheadVertexId,f.PlayerId+" 滩头");}
-        foreach(var e in view.Board.BonusEdgeIds)Mark(e,"奖励 1 分");
-        foreach(var e in view.Board.GiftCardEdgeIds)Mark(e,"进步卡礼物");
-        foreach(var p in view.Board.GiftPorts)Mark(p.EdgeId,"港口礼物");
-        foreach(var w in view.Wonders)foreach(var id in w.VertexIds)Mark(id,SpecialWonderName(w.Id));
+        foreach(var ship in view.Board.Ships.Where(s=>s.IsWarship))Mark(ship.LocationId,"战舰",MapSymbol.Warship);
+        foreach(var v in view.Board.Villages)Mark(v.VertexId,"村 "+v.Number+" · 布 "+v.Cloth,MapSymbol.Village);
+        foreach(var f in view.Board.Fortresses){if(f.Strength>0)Mark(f.VertexId,f.PlayerId+" 堡垒 "+f.Strength,MapSymbol.Fortress);Mark(f.BeachheadVertexId,f.PlayerId+" 滩头",MapSymbol.Beachhead);}
+        foreach(var e in view.Board.BonusEdgeIds)if(!board.ReferenceMarkers.HasBonusMarker(e))Mark(e,"奖励 1 分",MapSymbol.Gift);
+        foreach(var e in view.Board.GiftCardEdgeIds)Mark(e,"进步卡礼物",MapSymbol.Gift);
+        foreach(var p in view.Board.GiftPorts)if(!board.ReferenceMarkers.HasGiftPort(p.Id))Mark(p.EdgeId,"港口礼物",MapSymbol.Gift);
+        foreach(var w in view.Wonders)foreach(var id in w.VertexIds)Mark(id,SpecialWonderName(w.Id),MapSymbol.Wonder);
     }
 }

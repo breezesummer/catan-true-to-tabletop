@@ -18,6 +18,9 @@ public sealed class M5BoardRenderer : MonoBehaviour
     private readonly Dictionary<string, Vector3> tiles = new Dictionary<string, Vector3>();
     private readonly Dictionary<string, string> terrainTypes = new Dictionary<string, string>();
     private readonly Dictionary<string, Quaternion> rotations = new Dictionary<string, Quaternion>();
+    readonly BoardBuildingEntrances entrances = new BoardBuildingEntrances();
+    readonly ShipCoastLayout shipCoast=new ShipCoastLayout();
+    readonly HashSet<string> shipEdges=new HashSet<string>();
     private Transform pieces;
     public Transform CommittedPieces => pieces;
     public Quaternion PieceRotation(string locationId) => rotations.TryGetValue(locationId,out var rotation)?rotation:Quaternion.Euler(0,180,0);
@@ -57,9 +60,11 @@ public sealed class M5BoardRenderer : MonoBehaviour
         tiles["frame"]=boardCenter+new Vector3(-(maxX-minX)*.62f,0,0);
         boardRadius=Mathf.Max(.255f,(maxZ-minZ)*.66f,(maxX-minX)*.53f);
         Zoom=boardRadius;
+        shipCoast.Initialize(boardTiles,boardEdges,vertices);
         foreach (var e in boardEdges)
         {
             var a = vertices[e.Vertices[0]]; var b = vertices[e.Vertices[1]];
+            entrances.SetEdge(e,b-a);
             edges[e.Id] = (a+b)*.5f; rotations[e.Id] = Quaternion.LookRotation(b-a);
         }
         foreach (var tile in boardTiles)
@@ -134,6 +139,8 @@ public sealed class M5BoardRenderer : MonoBehaviour
     }
     public void RefreshReferenceMarkers(PlayerView view)
     {
+        shipCoast.ClearPorts();
+        foreach(var port in view.Board.Ports)shipCoast.Port(null,port.Vertices);
         ReferenceMarkers.Refresh(view.Board.Tiles,view.Board.Ports.Select(p=>new TabletopReferenceMarkers.PortDisplay
             {Id=p.Id,Vertices=p.Vertices,Resource=p.Resource}).ToArray(),
             publicScores:view.Players.Select(p=>new TabletopReferenceMarkers.ScoreDisplay{PlayerId=p.Id,Points=p.BonusVictoryPoints}).ToArray(),
@@ -150,16 +157,18 @@ public sealed class M5BoardRenderer : MonoBehaviour
         RenderExpansion(walls,knights,metropolises,merchant);
         if(barbarianPosition.HasValue)RefreshBarbarians(barbarianPosition.Value);
     }
+    readonly Dictionary<string,Vector3> knightPoints=new Dictionary<string,Vector3>();
     void RenderExpansion(PiecePlacement[] walls,Catan.Core.M5.Knight[] knights,Catan.Core.M5.Metropolis[] metropolises,string merchant)
     {
+        knightPoints.Clear();
         pieceCache.Begin("expansion",pieces);
         foreach(var wall in walls)
         {
             if(metropolises.Any(m=>m.LocationId==wall.LocationId))continue;
-            using(var change=pieceCache.Update("wall:"+wall.LocationId,wall.PlayerId))
+            using(var change=pieceCache.Update("wall:"+wall.LocationId,entrances.Appearance(wall)))
             {
                 if(!change.Changed)continue;
-                if(PlayerComponentAssets.Building("city-with-wall",wall.PlayerId,"City with wall "+wall.LocationId,Position(wall.LocationId),pieces)!=null)continue;
+                if(entrances.Place("city-with-wall",wall,"City with wall "+wall.LocationId,Position(wall.LocationId)-Vector3.up*.004f,pieces)!=null)continue;
                 // Keep a readable city and wall when the colour-specific model is unavailable.
                 CityFallback(wall.LocationId,SeatColor(wall.PlayerId));
                 var root = MarkerRoot("Wall "+wall.LocationId, Position(wall.LocationId));
@@ -172,30 +181,28 @@ public sealed class M5BoardRenderer : MonoBehaviour
             }
         }
         foreach(var k in knights)
-        using(var change=pieceCache.Update("knight:"+k.LocationId,k.PlayerId+":"+k.Level+":"+k.Active))
         {
-            if(!change.Changed)continue;
-            var asset=PlayerComponentAssets.Knight(k.PlayerId,k.Level,k.Active,"Knight L"+k.Level+" "+k.LocationId,Position(k.LocationId),pieces);
-            var root=asset!=null?asset.transform:MarkerRoot("Knight L"+k.Level+" "+k.LocationId,Position(k.LocationId));
-            if(asset==null)
+            var bottom=Position(k.LocationId)-Vector3.up*.004f+ReferenceMarkers.KnightLandInset(k.LocationId);
+            knightPoints[k.LocationId]=bottom+Vector3.up*.008f;
+            using(var change=pieceCache.Update("knight:"+k.LocationId,k.PlayerId+":"+k.Level+":"+k.Active))
             {
+                if(!change.Changed)continue;
+                var asset=PlayerComponentAssets.Knight(k.PlayerId,k.Level,k.Active,"Knight L"+k.Level+" "+k.LocationId,bottom,pieces);
+                if(asset!=null)continue;
+                var root=MarkerRoot("Knight L"+k.Level+" "+k.LocationId,bottom);
                 Marker(PrimitiveType.Cylinder,root,new Vector3(0,.002f,0),new Vector3(.015f,.002f,.015f),SeatColor(k.PlayerId));
-                for(int i=0;i<k.Level;i++)Marker(PrimitiveType.Cylinder,root,new Vector3(0,.006f+i*.004f,0),new Vector3(.010f,.0015f,.010f),SeatColor(k.PlayerId));
+                for(int i=0;i<k.Level;i++)Marker(PrimitiveType.Cube,root,new Vector3(0,.006f+i*.004f,0),new Vector3(.010f,.002f,.010f),SeatColor(k.PlayerId));
             }
-            // 激活状态沿用实体骑士头盔造型；不额外在棋子旁放置球形标记。
-            var rank=new GameObject("Knight level: "+k.Level).transform;
-            rank.SetParent(root,false);rank.localPosition=new Vector3(0,.002f,.012f);
-            for(int i=0;i<k.Level;i++)
-                Marker(PrimitiveType.Sphere,rank,new Vector3((i-(k.Level-1)*.5f)*.0025f,0,0),new Vector3(.0018f,.0018f,.0018f),Color.white);
         }
         foreach(var m in metropolises)
         {
             var hasWall=walls.Any(w=>w.LocationId==m.LocationId);
-            using(var change=pieceCache.Update("metropolis:"+m.LocationId,m.PlayerId+":"+m.Track+":"+hasWall))
+            using(var change=pieceCache.Update("metropolis:"+m.LocationId,entrances.Appearance(m.LocationId,m.PlayerId)+":"+m.Track+":"+hasWall))
             {
                 if(!change.Changed)continue;
-                var asset=PlayerComponentAssets.Building(hasWall?"metropolis-with-wall":"metropolis",m.PlayerId,"Metropolis "+m.Track+" "+m.LocationId,Position(m.LocationId),pieces);
-                var root=asset!=null?asset.transform:MarkerRoot("Metropolis "+m.Track+" "+m.LocationId,Position(m.LocationId));
+                var asset=PlayerComponentAssets.Building(hasWall?"metropolis-with-wall":"metropolis",m.PlayerId,"Metropolis "+m.Track+" "+m.LocationId,Position(m.LocationId)-Vector3.up*.004f,pieces,(int)m.Track);
+                if(asset!=null){entrances.Orient(asset,m.LocationId,m.PlayerId);continue;}
+                var root=MarkerRoot("Metropolis "+m.Track+" "+m.LocationId,Position(m.LocationId));
                 var color=new[]{new Color(.93f,.67f,.2f),new Color(.26f,.51f,.92f),new Color(.26f,.75f,.39f)}[(int)m.Track];
                 if(asset==null)
                 {
@@ -235,9 +242,10 @@ public sealed class M5BoardRenderer : MonoBehaviour
     }
     public void RefreshSeafarers(Catan.Core.M5.ShipPlacement[] ships,string pirateTileId)
     {
+        shipEdges.Clear();foreach(var placed in ships)shipEdges.Add(placed.LocationId);
         pieceCache.Begin("ships",pieces);
         foreach(var ship in ships)
-        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId))
+        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+shipCoast.HasDock(ship.LocationId)))
             if(change.Changed)Ship(ship.LocationId,SeatColor(ship.PlayerId),pieces);
         if(!string.IsNullOrEmpty(pirateTileId))
         using(var change=pieceCache.Update("pirate",pirateTileId))
@@ -254,9 +262,11 @@ public sealed class M5BoardRenderer : MonoBehaviour
         }
         pieceCache.End();
     }
+    public Vector3 ShipPosition(string edge) => operationLayout
+        ? EntityBoardAssets.ShipWaterline(Position(edge))+shipCoast.Offset(edge) : Position(edge);
     GameObject Ship(string id,Color color,Transform parent)
     {
-        var asset=EntityBoardAssets.Ship("Ship "+id,color,Position(id),rotations[id],parent);
+        var asset=EntityBoardAssets.Ship("Ship "+id,color,ShipPosition(id),rotations[id],parent);
         if(asset!=null)return asset;
         // Deterministic actual mesh placeholder. Midpoint pivot, metre units, estimated 8 mm waterline.
         var hull=Piece(true,id,color,parent,false);hull.name="Ship "+id;
@@ -302,22 +312,23 @@ public sealed class M5BoardRenderer : MonoBehaviour
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId)
     {
         ClearPreview();
+        entrances.Refresh(roads);
         pieceCache.Begin("basic",pieces);
         foreach(var p in settlements)
-        using(var change=pieceCache.Update("settlement:"+p.LocationId,p.PlayerId))
+        using(var change=pieceCache.Update("settlement:"+p.LocationId,entrances.Appearance(p)))
         {
             if(!change.Changed)continue;
-            if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
+            if(entrances.Place("village",p,p.LocationId,Position(p.LocationId)-Vector3.up*.004f,pieces)==null)
                 Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
         }
         foreach(var p in roads)
         using(var change=pieceCache.Update("road:"+p.LocationId,p.PlayerId))
             if(change.Changed)Piece(true,p.LocationId,SeatColor(p.PlayerId),pieces);
         foreach(var p in cities)
-        using(var change=pieceCache.Update("city:"+p.LocationId,p.PlayerId))
+        using(var change=pieceCache.Update("city:"+p.LocationId,entrances.Appearance(p)))
         {
             if(!change.Changed)continue;
-            if(PlayerComponentAssets.Building("city",p.PlayerId,"City "+p.LocationId,Position(p.LocationId),pieces)!=null)continue;
+            if(entrances.Place("city",p,"City "+p.LocationId,Position(p.LocationId)-Vector3.up*.004f,pieces)!=null)continue;
             CityFallback(p.LocationId,SeatColor(p.PlayerId));
         }
         if(!string.IsNullOrEmpty(robberTileId))
@@ -351,7 +362,7 @@ public sealed class M5BoardRenderer : MonoBehaviour
     {
         if(photoSample)
         {
-            var sample=PhotoSampleAssets.Piece(road,id,Position(id),road?rotations[id]:Quaternion.identity,color,parent);
+            var sample=PhotoSampleAssets.Piece(road,id,Position(id)-(road?Vector3.zero:Vector3.up*.004f),road?rotations[id]:Quaternion.identity,color,parent);
             if(sample!=null)return sample;
         }
         var go = GameObject.CreatePrimitive(PrimitiveType.Cube); Destroy(go.GetComponent<Collider>()); go.transform.SetParent(parent);
@@ -373,7 +384,7 @@ public sealed class M5BoardRenderer : MonoBehaviour
     public string TerrainResource(string tileId) => terrainTypes[tileId];
     public Vector2 ScreenPoint(string id)
     {
-        var p=BoardCamera.WorldToScreenPoint(Position(id)); return new Vector2(p.x,Screen.height-p.y);
+        var p=BoardCamera.WorldToScreenPoint(knightPoints.TryGetValue(id,out var knightPoint)?knightPoint:shipEdges.Contains(id)?ShipPosition(id)+Vector3.up*.005f:Position(id)); return new Vector2(p.x,Screen.height-p.y);
     }
     public void Preview(string id, bool road, bool legal)
     {PreviewPiece(id,TabletopPointerPreview.ForCommand(road?"BuildRoad":"BuildSettlement"),"P1",legal);}
@@ -384,17 +395,18 @@ public sealed class M5BoardRenderer : MonoBehaviour
     string pointerPreviewKey;
     public void PreviewPiece(string id,TabletopPointerPreview preview,string seat,bool legal)
     {
-        string key=id+":"+preview.Kind+":"+preview.Level+":"+preview.Active+":"+seat+":"+legal;
+        string key=id+":"+preview.Kind+":"+preview.Level+":"+preview.Active+":"+preview.Track+":"+preview.Wall+":"+seat+":"+legal;
         if(ghost!=null&&pointerPreviewKey==key){if(legal)TabletopPointerCursor.Request();return;}
         ClearPreview();if(string.IsNullOrEmpty(id))return;pointerPreviewKey=key;
         var rotation=id.StartsWith("E")?rotations[id]:Quaternion.identity;
         if(legal)TabletopPointerCursor.Request();
-        ghost=OperationPieceAssets.PointerPreview(preview,seat,Position(id),rotation,transform,legal);
+        ghost=OperationPieceAssets.PointerPreview(preview,seat,Position(id)+(preview.Kind=="knight"?ReferenceMarkers.KnightLandInset(id):Vector3.zero)+(operationLayout&&preview.Kind=="ship"?shipCoast.Offset(id):Vector3.zero),rotation,transform,legal);
+        if(preview.Kind=="settlement"||preview.Kind=="city"||preview.Kind=="wall"||preview.Kind=="metropolis")entrances.Orient(ghost,id,seat);
     }
     internal GameObject VerificationPointerPreview=>ghost;
     public void ClearPreview() { pointerPreviewKey=null;if(ghost!=null){ghost.SetActive(false);Destroy(ghost);} ghost=null; }
     bool operationLayout;
-    public void SetOperationLayout(bool enabled)
+    public void SetOperationLayout(bool enabled,TabletopScene previousView=null)
     {
         if(operationLayout==enabled)return;
         operationLayout=enabled;
@@ -407,7 +419,14 @@ public sealed class M5BoardRenderer : MonoBehaviour
         if(tableScene!=null)tableScene.SetVisible(enabled);
         if(feltTable!=null)feltTable.SetActive(!enabled);
         SetCamera(TopView);
+        if(enabled && previousView!=null){tableScene.RestoreView(previousView);Zoom=boardRadius*tableScene.ZoomMultiplier;}
     }
+    public string BuildingAt(Vector2 mouse)
+    {
+        var pixel=new Vector2(mouse.x,Screen.height-mouse.y);
+        return pieceCache.BuildingUnderRay(BoardCamera.ScreenPointToRay(pixel));
+    }
+    float legacyYaw;
     public void SetCamera(bool top)
     {
         if(operationLayout && tableScene!=null)
@@ -417,15 +436,35 @@ public sealed class M5BoardRenderer : MonoBehaviour
         TopView=top; BoardCamera.orthographic=true; BoardCamera.orthographicSize=Zoom;
         BoardCamera.transform.position=displayCenter+(top?new Vector3(0,.85f,-.001f):new Vector3(0,.65f,-.55f));
         BoardCamera.transform.LookAt(displayCenter+new Vector3(0,.005f,0));
+        BoardCamera.transform.RotateAround(displayCenter+new Vector3(0,.005f,0),Vector3.up,legacyYaw);
         BoardCamera.rect=new Rect(.0f,.10f,.74f,.80f);
     }
-    public void ChangeZoom(float delta) { Zoom=Mathf.Clamp(Zoom+delta,boardRadius*.45f,boardRadius*1.65f); SetCamera(TopView); }
+    public void ChangeZoom(float delta)
+    {
+        float minimum=operationLayout && tableScene!=null ? boardRadius*tableScene.MinimumZoom : TabletopCameraModel.DetailSize;
+        Zoom=Mathf.Clamp(Zoom+delta,minimum,boardRadius*TabletopCameraModel.FarthestZoom);
+        SetCamera(TopView);
+    }
+    public void ScrollMap(float steps,bool rotate,Vector2 pointer)
+    {
+        if(operationLayout && tableScene!=null)
+        {
+            tableScene.Wheel(steps,rotate,pointer);
+            Zoom=boardRadius*tableScene.ZoomMultiplier;
+        }
+        else if(rotate)
+        {
+            legacyYaw=Mathf.Repeat(legacyYaw+steps*TabletopCameraModel.WheelDegrees,360);
+            SetCamera(TopView);
+        }
+        else ChangeZoom(Zoom*(Mathf.Pow(.88f,steps)-1));
+    }
     public void SetSelectedShip(string edgeId)
     {
         if(string.IsNullOrEmpty(edgeId)){if(selectedShip!=null)selectedShip.gameObject.SetActive(false);return;}
         if(!edges.ContainsKey(edgeId))return;
         if(selectedShip==null)selectedShip=TabletopShipSelection.Create(transform);
-        selectedShip.Show(Position(edgeId),rotations[edgeId]);
+        selectedShip.Show(ShipPosition(edgeId),rotations[edgeId]);
     }
     public void ShowTerrain(bool show) { foreach(var m in mountains) m.SetActive(show); }
     void OnDestroy() {foreach(var m in pieceMaterials.Values)Destroy(m);foreach(var m in terrainMaterials)Destroy(m);foreach(var m in terrainMeshes)Destroy(m);}

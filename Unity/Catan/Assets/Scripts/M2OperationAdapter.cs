@@ -65,6 +65,8 @@ public sealed partial class M2App
     bool PickTabletopBuilding(Vector2 mouse)
     {
         if(view==null||curtain||newGameDialog||holding||!ai.IsHumanTurn||view.Phase!=GamePhase.Action||view.PendingDecision!=null||view.TradeOffer!=null)return false;
+        var building=board.BuildingAt(mouse);
+        if(building!=null)return OpenTabletopBuildingMenu(building);
         var village=view.Board.Settlements.Where(p=>p.PlayerId==seat).OrderBy(p=>Vector2.Distance(mouse,board.ScreenPoint(p.LocationId))).FirstOrDefault();
         return village!=null&&Vector2.Distance(mouse,board.ScreenPoint(village.LocationId))<MobileTabletop.PickRadius(25f)&&OpenTabletopBuildingMenu(village.LocationId);
     }
@@ -169,7 +171,7 @@ public sealed partial class M2App
             ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll&&view.TradeOffer==null,
             ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.TradeOffer==null,
             ()=>Submit(NewCommand(CommandKind.RollDice)),()=>Submit(NewCommand(CommandKind.EndTurn)),TableSeatClick,
-            ()=>{tableNotes=!tableNotes;},"回合备忘",facility:dock.OpenFacility);
+            ()=>{tableNotes=!tableNotes;},"回合备忘",facility:dock.OpenFacility,turnOwner:view.ActivePlayerId);
         GUI.enabled=enabled&&!mapChoice.Active&&!ai.TablePresentationBlocked&&!tabletop.HistoryOpen&&!dock.HasOverlay;
         if(ai.IsHumanTurn&&view.TradeOffer==null&&!tabletop.OperationHidden)DrawTableDecision();
         GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!mapChoice.Active&&!ai.TableInspectionBlocked&&!tabletop.HistoryOpen&&(dock.HasOverlay||!tabletop.BlocksOverlayInput(Event.current.mousePosition)));dock.Draw(displayedOperations,font);GUI.enabled=enabled;

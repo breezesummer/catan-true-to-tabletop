@@ -14,6 +14,7 @@ public sealed class BoardRenderer : MonoBehaviour
     private readonly Dictionary<string, Vector3> tiles = new Dictionary<string, Vector3>();
     private readonly Dictionary<string, string> terrainTypes = new Dictionary<string, string>();
     private readonly Dictionary<string, Quaternion> rotations = new Dictionary<string, Quaternion>();
+    readonly BoardBuildingEntrances entrances = new BoardBuildingEntrances();
     private Transform pieces;
     public Transform CommittedPieces => pieces;
     public Quaternion PieceRotation(string locationId) => rotations.TryGetValue(locationId,out var rotation)?rotation:Quaternion.Euler(0,180,0);
@@ -46,6 +47,7 @@ public sealed class BoardRenderer : MonoBehaviour
         foreach (var e in boardEdges)
         {
             var a = vertices[e.Vertices[0]]; var b = vertices[e.Vertices[1]];
+            entrances.SetEdge(e,b-a);
             edges[e.Id] = (a+b)*.5f; rotations[e.Id] = Quaternion.LookRotation(b-a);
         }
         foreach (var tile in boardTiles)
@@ -105,22 +107,23 @@ public sealed class BoardRenderer : MonoBehaviour
     {
         if(numberTokens!=null)numberTokens.Refresh(boardTiles);
         ClearPreview();
+        entrances.Refresh(roads);
         pieceCache.Begin("basic",pieces);
         foreach(var p in settlements)
-        using(var change=pieceCache.Update("settlement:"+p.LocationId,p.PlayerId))
+        using(var change=pieceCache.Update("settlement:"+p.LocationId,entrances.Appearance(p)))
         {
             if(!change.Changed)continue;
-            if(PlayerComponentAssets.Building("village",p.PlayerId,p.LocationId,Position(p.LocationId),pieces)==null)
+            if(entrances.Place("village",p,p.LocationId,Position(p.LocationId)-Vector3.up*.004f,pieces)==null)
                 Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces);
         }
         foreach(var p in roads)
         using(var change=pieceCache.Update("road:"+p.LocationId,p.PlayerId))
             if(change.Changed)Piece(true,p.LocationId,SeatColor(p.PlayerId),pieces);
         foreach(var p in cities)
-        using(var change=pieceCache.Update("city:"+p.LocationId,p.PlayerId))
+        using(var change=pieceCache.Update("city:"+p.LocationId,entrances.Appearance(p)))
         {
             if(!change.Changed)continue;
-            if(PlayerComponentAssets.Building("city",p.PlayerId,"City "+p.LocationId,Position(p.LocationId),pieces)!=null)continue;
+            if(entrances.Place("city",p,"City "+p.LocationId,Position(p.LocationId)-Vector3.up*.004f,pieces)!=null)continue;
             var city=Piece(false,p.LocationId,SeatColor(p.PlayerId),pieces,false);
             city.name="City "+p.LocationId;
             city.transform.localScale=new Vector3(.02f,.023f,.015f);
@@ -150,7 +153,7 @@ public sealed class BoardRenderer : MonoBehaviour
     {
         if(photoSample)
         {
-            var sample=PhotoSampleAssets.Piece(road,id,Position(id),road?rotations[id]:Quaternion.identity,color,parent);
+            var sample=PhotoSampleAssets.Piece(road,id,Position(id)-(road?Vector3.zero:Vector3.up*.004f),road?rotations[id]:Quaternion.identity,color,parent);
             if(sample!=null)return sample;
         }
         var go = GameObject.CreatePrimitive(PrimitiveType.Cube); Destroy(go.GetComponent<Collider>()); go.transform.SetParent(parent);
@@ -187,12 +190,13 @@ public sealed class BoardRenderer : MonoBehaviour
         var rotation=id.StartsWith("E")?rotations[id]:Quaternion.identity;
         if(legal)TabletopPointerCursor.Request();
         ghost=OperationPieceAssets.PointerPreview(preview,seat,Position(id),rotation,transform,legal);
+        if(preview.Kind=="settlement"||preview.Kind=="city"||preview.Kind=="wall")entrances.Orient(ghost,id,seat);
     }
     public bool HasPointerPreview=>ghost!=null;
     internal GameObject VerificationPointerPreview=>ghost;
     public void ClearPreview() { pointerPreviewKey=null;if(ghost!=null){ghost.SetActive(false);Destroy(ghost);} ghost=null; }
     bool operationLayout;
-    public void SetOperationLayout(bool enabled)
+    public void SetOperationLayout(bool enabled,TabletopScene previousView=null)
     {
         if(operationLayout==enabled)return;
         operationLayout=enabled;
@@ -204,7 +208,14 @@ public sealed class BoardRenderer : MonoBehaviour
         if(tableScene!=null)tableScene.SetVisible(enabled);
         if(feltTable!=null)feltTable.SetActive(!enabled);
         SetCamera(TopView);
+        if(enabled && previousView!=null){tableScene.RestoreView(previousView);Zoom=.255f*tableScene.ZoomMultiplier;}
     }
+    public string BuildingAt(Vector2 mouse)
+    {
+        var pixel=new Vector2(mouse.x,Screen.height-mouse.y);
+        return pieceCache.BuildingUnderRay(BoardCamera.ScreenPointToRay(pixel));
+    }
+    float legacyYaw;
     public void SetCamera(bool top)
     {
         if(operationLayout && tableScene!=null)
@@ -214,9 +225,29 @@ public sealed class BoardRenderer : MonoBehaviour
         TopView=top; BoardCamera.orthographic=true; BoardCamera.orthographicSize=Zoom;
         BoardCamera.transform.position=top?new Vector3(0,.65f,-.001f):new Vector3(0,.48f,-.4f);
         BoardCamera.transform.LookAt(new Vector3(0,.005f,0));
+        BoardCamera.transform.RotateAround(new Vector3(0,.005f,0),Vector3.up,legacyYaw);
         BoardCamera.rect=new Rect(.0f,.10f,.74f,.80f);
     }
-    public void ChangeZoom(float delta) { Zoom=Mathf.Clamp(Zoom+delta,.255f*.45f,.255f*1.65f); SetCamera(TopView); }
+    public void ChangeZoom(float delta)
+    {
+        float minimum=operationLayout && tableScene!=null ? .255f*tableScene.MinimumZoom : TabletopCameraModel.DetailSize;
+        Zoom=Mathf.Clamp(Zoom+delta,minimum,.255f*TabletopCameraModel.FarthestZoom);
+        SetCamera(TopView);
+    }
+    public void ScrollMap(float steps,bool rotate,Vector2 pointer)
+    {
+        if(operationLayout && tableScene!=null)
+        {
+            tableScene.Wheel(steps,rotate,pointer);
+            Zoom=.255f*tableScene.ZoomMultiplier;
+        }
+        else if(rotate)
+        {
+            legacyYaw=Mathf.Repeat(legacyYaw+steps*TabletopCameraModel.WheelDegrees,360);
+            SetCamera(TopView);
+        }
+        else ChangeZoom(Zoom*(Mathf.Pow(.88f,steps)-1));
+    }
     public void ShowTerrain(bool show) { foreach(var m in mountains) m.SetActive(show); }
     void OnDestroy() {foreach(var m in pieceMaterials.Values)Destroy(m);foreach(var m in terrainMaterials)Destroy(m);foreach(var m in terrainMeshes)Destroy(m);}
 }

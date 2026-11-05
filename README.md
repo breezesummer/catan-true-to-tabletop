@@ -2,7 +2,7 @@
 
 一款以实体桌游体验为目标的 3D 卡坦岛游戏，包含资源生产、交易、道路与聚落建设、海上探索，以及城市发展与骑士防御。项目强调在同一张桌面上观察地图、拿取棋子、摆放建筑和操作卡牌，逐步呈现立体地形收藏版的质感。
 
-项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本标识为**内测版1.7.1**；各可玩构建的实际版本与验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
+项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本为**内测版 2.1.11**。各可玩构建的验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
 
 ## 玩法与内容
 
@@ -19,7 +19,7 @@
 
 - **Windows**：鼠标键盘操作，Unity 桌面客户端。
 - **Android**：同一 Unity 工程的横屏触控版本，目标为 Android 8.0 及以上、64 位 ARM64 手机；与 PC 共用规则、当前 AI、资产和完整桌面 UI。
-- **桌面表现**：实体照片来源的板块与卡面、三维玩家组件、手牌操作、交易界面、骰子统计、历史记录、菜单与音效。
+- **桌面表现**：高清手绘地形与港口、实体卡牌、三维玩家组件、手牌操作、交易界面、骰子统计、历史记录、菜单与音效。
 
 基础版、两个扩展、已支持组合及本地 AI 已有工程验收记录。用户完整对局、最终美术、安卓真机、真实多设备及长期性能继续逐项验证，具体状态以[开发路线](docs/ROADMAP.md)及各验收文档为准。
 
@@ -28,7 +28,7 @@
 在仓库根目录执行统一 Windows 启动脚本：
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1 -BuildRoot "game version/2.1/Catan2.1.11-Painted-Map"
 ```
 
 脚本选择当前默认可玩构建。操作方式见[M6 试玩说明](docs/M6_PLAYTEST.md)，联机连接与房间使用见[M7 使用说明](docs/M7_IMPLEMENTATION.md)。PC 与 Android 下载入口及验证范围见[内测版1.6发布记录](docs/RELEASE_BETA_1_6.md)。

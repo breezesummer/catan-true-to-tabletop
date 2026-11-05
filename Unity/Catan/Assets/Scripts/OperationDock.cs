@@ -559,7 +559,7 @@ public sealed partial class OperationDock
         if(hasGenerals)
         {
             var generalTab=new Rect(1178,773,96,43);Register(generalTab);
-            if(ModernOperationUI.Button(generalTab,"武将库",true,false,GeneralHandVisible))
+            if(StrategyHudArt.HandControl(generalTab,"武将库",4,GeneralHandVisible,new TabletopHandCounter(Generals.GeneralLibraryCount,0)))
             {Fishing?.Hide();Generals.ShowGeneralLibrary();hoveredHand=null;handHoverAnchor=Rect.zero;}
         }
         if(Fishing?.Available==true)
@@ -648,7 +648,7 @@ public sealed partial class OperationDock
             Label(new Rect(r.x+10,r.y+9,r.width-20,20),"发展卡",small);
             Label(new Rect(r.x+11,r.y+36,r.width-22,64),face.Card.Name,new GUIStyle(heading){alignment=TextAnchor.MiddleCenter,fontSize=21});
         }
-        var cardFrame=face.Texture!=null?EntityCardAssets.FitCardRect(r,(float)face.Texture.width/face.Texture.height,GUI.matrix):r;
+        var cardFrame=face.Texture!=null?EntityCardAssets.FitCardRect(r,EntityCardAssets.FaceAspect(face.Texture),GUI.matrix):r;
         if(face.Selected)TabletopCardFrame.Draw(cardFrame,true);
         if(face.Selected)
         {
@@ -808,7 +808,8 @@ public sealed partial class OperationDock
 
         if (facilityTray == null) facilityTray = Resources.Load<Texture2D>("FacilityTray/tray");
         Register(FacilityRect);
-        if (facilityTray != null) DrawFacilityPrint(FacilityRect, facilityTray);
+        if (StrategyHudTheme.Ocean) OceanTabletopSkin.Panel(FacilityRect);
+        else if (facilityTray != null) DrawFacilityPrint(FacilityRect, facilityTray);
         else Paper(FacilityRect);
 
         for (int level = 1; level <= 5; level++)
@@ -868,11 +869,15 @@ public sealed partial class OperationDock
             int good = 5+track;
             bool available = build.CanPrepare(s);
             var icon = EntityCardAssets.Texture("TabletopUI/v010/"+FacilityGoodIds[track]+"-cutout");
-            if (icon != null) DrawFacilityPrint(new Rect(993,633,29,29),icon);
-            FacilityText(new Rect(876,628,86,40),"建设",23,true,true);
-            FacilityText(new Rect(1024,628,76,40),s.Goods[good]+"/"+build.Cost[good],21,true,true);
+            using (TabletopButtonFeedback.Begin(action, available))
+            {
+                if (StrategyHudTheme.Ocean) OceanTabletopSkin.Panel(action, available && action.Contains(Event.current.mousePosition), false);
+                if (icon != null) DrawFacilityPrint(new Rect(993,633,29,29),icon);
+                FacilityText(new Rect(876,628,86,40),"建设",23,true,true);
+                FacilityText(new Rect(1024,628,76,40),s.Goods[good]+"/"+build.Cost[good],21,true,true);
+            }
             if (!available) Fill(action,new Color(.20f,.14f,.09f,.16f));
-            if (available && GUI.Button(action,GUIContent.none,GUIStyle.none)) PrepareBuild(build,s);
+            if (available && TabletopButtonFeedback.Button(action)) PrepareBuild(build,s);
         }
     }
 
@@ -996,7 +1001,7 @@ public sealed partial class OperationDock
     Rect TradeCard(Rect face,int good,bool missing)
     {
         var texture=EntityCardAssets.ResourceOrCommodityFront(good);
-        face=EntityCardAssets.FitCardRect(face,texture!=null?(float)texture.width/texture.height:OperationTradeCardLayout.Aspect,GUI.matrix);
+        face=EntityCardAssets.FitCardRect(face,texture!=null?EntityCardAssets.FaceAspect(texture):OperationTradeCardLayout.Aspect,GUI.matrix);
         EntityCardAssets.DrawCardFace(face,texture,0,missing?new Color(1,.48f,.48f):Color.white);
         return face;
     }

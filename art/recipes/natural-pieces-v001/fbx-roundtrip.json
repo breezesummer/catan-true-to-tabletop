@@ -1,0 +1,23 @@
+[
+  {
+    "kind": "village",
+    "mesh_count": 1,
+    "triangles": 10540,
+    "uv_present": true,
+    "zero_area_faces": 0
+  },
+  {
+    "kind": "city",
+    "mesh_count": 1,
+    "triangles": 37899,
+    "uv_present": true,
+    "zero_area_faces": 0
+  },
+  {
+    "kind": "road",
+    "mesh_count": 1,
+    "triangles": 2684,
+    "uv_present": true,
+    "zero_area_faces": 0
+  }
+]

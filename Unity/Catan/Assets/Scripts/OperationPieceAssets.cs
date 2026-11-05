@@ -5,7 +5,6 @@ using UnityEngine;
 // Runtime never creates a camera, changes layers, or reads hidden game state.
 public static class OperationPieceAssets
 {
-    const string Root = "OperationUI/v002/pieces/";
     static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
 
     public static bool Contains(Texture2D texture, Rect rect, Vector2 point)
@@ -29,7 +28,7 @@ public static class OperationPieceAssets
         else if (icon.Contains("city")) kind = "city";
         else if (icon.Contains("settlement") || icon.Contains("village")) kind = "settlement";
         else return null;
-        string path = kind=="settlement" ? "ThreeKingdoms/v003/thumbnail-"+colour : Root + kind + "-" + colour;
+        string path = kind=="settlement" || kind=="city" || kind=="road" ? "NaturalPieces/v001/thumbnail-"+(kind=="settlement"?"village":kind)+"-"+colour : PlayerComponentAssets.ExpansionRoot+"thumb-"+(kind.StartsWith("knight-")?kind+"-rest":kind)+"-"+colour;
         if (!Textures.TryGetValue(path, out var texture))
         {
             texture = Resources.Load<Texture2D>(path);
@@ -43,15 +42,17 @@ public static class OperationPieceAssets
         var colour=legal?new Color(.3f,1f,.75f):new Color(1f,.22f,.2f);
         string label="鼠标预览 · "+preview.Kind;
         GameObject instance=null;
+        // 新模型底面即落地点，移除旧顶点棋子的四毫米展示余量。
+        if(preview.Kind=="settlement"||preview.Kind=="city"||preview.Kind=="wall"||preview.Kind=="metropolis"||preview.Kind=="knight")bottom-=Vector3.up*.004f;
         switch(preview.Kind)
         {
             case "settlement": instance=PlayerComponentAssets.Building("village",seat,label,bottom,parent);break;
             case "city": instance=PlayerComponentAssets.Building("city",seat,label,bottom,parent);break;
             case "wall": instance=PlayerComponentAssets.Building("city-with-wall",seat,label,bottom,parent);break;
-            case "metropolis": instance=PlayerComponentAssets.Building("metropolis",seat,label,bottom,parent);break;
+            case "metropolis": instance=PlayerComponentAssets.Building(preview.Wall?"metropolis-with-wall":"metropolis",seat,label,bottom,parent,preview.Track);break;
             case "knight": instance=PlayerComponentAssets.Knight(seat,preview.Level,preview.Active,label,bottom,parent);break;
-            case "road": instance=PhotoSampleAssets.Piece(true,label,bottom,rotation,colour,parent);break;
-            case "ship": int seatIndex=System.Array.IndexOf(new[]{"P1","P2","P3","P4"},seat);instance=EntityBoardAssets.Ship(label,BoardRenderer.SeatColors[Mathf.Max(0,seatIndex)],bottom,rotation,parent);break;
+            case "road": instance=PlayerComponentAssets.Road(seat,label,bottom,rotation,parent);break;
+            case "ship": int seatIndex=System.Array.IndexOf(new[]{"P1","P2","P3","P4"},seat);instance=EntityBoardAssets.Ship(label,BoardRenderer.SeatColors[Mathf.Max(0,seatIndex)],EntityBoardAssets.ShipWaterline(bottom),rotation,parent);break;
             case "robber": instance=EntityBoardAssets.Robber(label,bottom+new Vector3(.012f,EntityBoardAssets.BoardSurfaceHeight,0),parent);break;
             case "pirate": instance=EntityBoardAssets.Pirate(label,bottom+new Vector3(.012f,EntityBoardAssets.BoardSurfaceHeight,0),parent);break;
             case "merchant": instance=EntityBoardAssets.Merchant(label,bottom+new Vector3(-.013f,EntityBoardAssets.BoardSurfaceHeight,0),parent);break;

@@ -119,7 +119,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     }
     public Hit Piece(string key, string kind, string seat, int level, Vector2 position, bool raised = false, float yaw = float.NaN,float displayMultiplier=1)
     {
-        string resource = kind == "ship" ? EntityBoardAssets.ShipResource(seat) : kind == "road" ? "PhotoSamples/v001/road" :
+        string resource = kind == "ship" ? EntityBoardAssets.ShipResource(seat) : kind == "road" ? PlayerComponentAssets.RoadResource(seat) :
             kind == "knight" ? PlayerComponentAssets.KnightResource(seat, level, false) :
             PlayerComponentAssets.BuildingResource(kind == "settlement" ? "village" : kind == "wall" ? "city-wall" : kind, seat);
         var model = PlayerComponentAssets.Model(resource);
@@ -154,7 +154,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         root.position=scene.World(position);
         float yaw=kind=="road"||kind=="ship"?90:180;
         // 正交正面图保持建筑的横向轮廓；城墙以完整顶视显示中间空位。
-        float viewAngle=kind=="wall"?90:0;
+        float viewAngle=kind=="wall"?90:kind=="road"?60:0;
         root.rotation=Quaternion.AngleAxis(TabletopScene.HudCameraAngle-viewAngle,Vector3.right)*Quaternion.Euler(0,yaw,0);
         if(item.Hit.Renderers==null)item.Hit.Renderers=root.GetComponentsInChildren<Renderer>();
         item.Hit.LocalBoundsProjection=true;

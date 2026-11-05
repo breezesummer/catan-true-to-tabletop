@@ -6,6 +6,14 @@ public sealed partial class M6App
 {
     int tablePausePage,tablePauseSettingsTab;
     string tablePauseFeedback="";
+    TabletopScene settingsCamera;
+    bool pitchEdited;
+    void SaveCameraSettings()
+    {
+        if(!pitchEdited)return;
+        PlayerPrefs.Save();
+        pitchEdited=false;
+    }
     internal bool TablePauseSettingsOpen=>tableMenu&&tablePausePage==1;
 
     void ResetTablePauseMenu()
@@ -15,11 +23,12 @@ public sealed partial class M6App
     bool HandleTablePausePageEscape()
     {
         if(tablePausePage==0)return false;
-        tablePausePage=0;TabletopAudio.Instance?.FlushSettings();return true;
+        tablePausePage=0;SaveCameraSettings();TabletopAudio.Instance?.FlushSettings();return true;
     }
     void CloseTablePauseMenu(bool resumeAi=false)
     {
         tableMenu=false;encyclopediaOpen=false;tablePausePage=0;escapeDismissedInteraction=false;
+        SaveCameraSettings();
         // “继续游戏”可恢复人工暂停；故障仍保留，避免吞掉排查信息后反复执行失败指令。
         if(resumeAi&&!NetworkGame&&Fault.Length==0)Paused=false;
         nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);
@@ -118,14 +127,24 @@ public sealed partial class M6App
     }
     void DrawTablePauseView()
     {
-        PastoralMenuUI.Label(new Rect(337,349,766,34),"按自己的节奏，俯瞰这片岛屿",23,null,true,TextAnchor.MiddleCenter);
-        PastoralMenuUI.Label(new Rect(337,412,170,42),"牌桌视角",17,null,true,TextAnchor.MiddleCenter);
+        PastoralMenuUI.Label(new Rect(337,343,170,42),"牌桌视角",17,null,true,TextAnchor.MiddleCenter);
         int view=TablePauseTopView?1:0;
-        int nextView=PastoralMenuUI.Segments(new Rect(539,412,564,42),view,new[]{"斜视","俯视"});
+        int nextView=PastoralMenuUI.Segments(new Rect(539,343,564,42),view,new[]{"斜视","俯视"});
         if(nextView!=view)ToggleTableCamera();
-        PastoralMenuUI.Label(new Rect(337,496,170,42),"AI 行动节奏",17,null,true,TextAnchor.MiddleCenter);
+        if(settingsCamera==null||!settingsCamera.isActiveAndEnabled)settingsCamera=FindFirstObjectByType<TabletopScene>();
+        if(settingsCamera!=null)
+        {
+            const int low=TabletopCameraModel.MinPitch,high=TabletopCameraModel.MaxPitch;
+            PastoralMenuUI.Label(new Rect(337,412,170,38),"地图俯角",17,null,true,TextAnchor.MiddleCenter);
+            float value=(settingsCamera.Pitch-low)/(float)(high-low);
+            int pitch=Mathf.RoundToInt(low+(high-low)*PastoralMenuUI.Slider(new Rect(539,423,460,20),value));
+            if(pitch!=settingsCamera.Pitch){settingsCamera.SetPitch(pitch);pitchEdited=true;}
+            PastoralMenuUI.Label(new Rect(1009,412,94,38),settingsCamera.Pitch+"°",17,PastoralMenuUI.Forest,true,TextAnchor.MiddleCenter);
+            PastoralMenuUI.Label(new Rect(539,460,564,28),"滚轮缩放　·　Ctrl + 滚轮旋转",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleLeft);
+        }
+        PastoralMenuUI.Label(new Rect(337,512,170,42),"AI 行动节奏",17,null,true,TextAnchor.MiddleCenter);
         bool before=GUI.enabled;GUI.enabled=before&&!NetworkGame;
-        int speed=PastoralMenuUI.Segments(new Rect(539,496,564,42),AiSpeedLevel,TabletopAiSpeed.Names);
+        int speed=PastoralMenuUI.Segments(new Rect(539,512,564,42),AiSpeedLevel,TabletopAiSpeed.Names);
         GUI.enabled=before;
         if(speed!=AiSpeedLevel){AiSpeedLevel=TabletopAiSpeed.Clamp(speed);nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);}
         PastoralMenuUI.Label(new Rect(337,574,766,54),NetworkGame?"联机节奏由房间统一调度，打开本菜单不会暂停其他玩家。":"本菜单打开时，本地 AI 与牌桌操作暂停；返回后按所选节奏继续。",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);

@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="2.1.9";
+    public const string BuildVersion="2.1.11";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -314,6 +314,8 @@ public sealed partial class M6App : MonoBehaviour
         if(NetworkGame&&Event.current.type==EventType.Repaint)Network.MarkFramePresented();
         using var frameCost=FrameCost.Measure(FrameCost.Stage.Gui);
         Styles();GUI.depth=-100;GUI.matrix=MobileTabletop.GuiMatrix;
+        if(!MenuVisible && !networkMenu && TablePresentationBlocked && Event.current.type==EventType.Repaint && ThreeKingdomsProjection!=null)
+            DrawGeneralDock(ThreeKingdomsProjection,false);
         if(encyclopediaOpen&&tableMenu){DrawEncyclopedia();GUI.matrix=Matrix4x4.identity;return;}
         if(networkMenu){DrawNetworkMenu();GUI.matrix=Matrix4x4.identity;return;}
         if(MenuVisible)

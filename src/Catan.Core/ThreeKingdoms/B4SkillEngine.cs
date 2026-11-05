@@ -153,7 +153,7 @@ namespace Catan.Core.ThreeKingdoms
                 }
                 if((c.Option=="b4-select"||c.Option=="b4-selected")&&f?.B4!=null)c.Counts=Copy(f.B4.Selection);
             }
-            return actions.Where(a => !B4Enabled(host.State) || !new[] { "gift", "discard", "exchange-hand", "exchange-progress" }.Contains(a.Command.Option) || !IsB4HandLossForbidden(host.State, host.State.Clock.ActivePlayerId)).ToArray();
+            return actions.Where(a => !B4Enabled(host.State) || !new[] { "gift", "discard", "exchange-hand", "exchange-progress" }.Contains(a.Command.Option) || !IsB4HandLossForbidden(host.State, host.State.Skills.PendingDecision?.PlayerId ?? host.State.Clock.ActivePlayerId)).ToArray();
         }
         private static bool ResolveB4Active(IThreeKingdomsCardHost host, GeneralInstance g, B2SkillCommand c)
         {

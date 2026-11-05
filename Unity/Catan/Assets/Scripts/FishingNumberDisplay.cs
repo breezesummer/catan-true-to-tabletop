@@ -3,50 +3,26 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-// 独立点数复用既有圆牌网格及原照；只在公开地图布局变化时定位。
+// 渔场画面与点数独立；仅在公开海岸布局改变时重新定位。
 public sealed class FishingNumberDisplay : MonoBehaviour
 {
     readonly List<Material> materials=new List<Material>();
-    RenderTexture water;
     Mesh mesh;
     Transform token;
-    Vector3[] shore;
-    Vector2 center;
-    float radius;
     public bool Moved {get;private set;}
-    public static FishingNumberDisplay Create(Transform root,GameObject model,int number,Vector3[] anchors)
+    public static FishingNumberDisplay Create(Transform root,int number)
     {
         var display=root.gameObject.AddComponent<FishingNumberDisplay>();
-        display.Initialize(model,number,anchors);return display;
+        display.Initialize(number);return display;
     }
-    Vector3 Local(Vector2 uv)
+    void Initialize(int number)
     {
-        return shore[0]+(shore[2]-shore[0])*uv.x+
-            (shore[1]-(shore[0]+shore[2])*.5f)*((1-uv.y)/.4f);
-    }
-    void Initialize(GameObject model,int number,Vector3[] anchors)
-    {
-        shore=anchors;
-        center=new Vector2(.716f,number==6||number==8||number==9?.49f:.455f);
-        var texture=Resources.Load<Texture2D>(FishingTabletopAssets.PhotoRoot+"ground-"+number+"-albedo");
-        var patch=new Material(Resources.Load<Shader>("HarborFishing/NumberWaterPatch"));materials.Add(patch);
-        patch.SetVector("_Circle",new Vector4(center.x,center.y,.14f,.19f));
-        water=new RenderTexture(texture.width,texture.height,0,RenderTextureFormat.ARGB32){name="渔港水纹 "+number};
-        water.Create();Graphics.Blit(texture,water,patch);
-        var renderer=model.GetComponentInChildren<Renderer>();
-        var slots=renderer.sharedMaterials;
-        for(int i=0;i<slots.Length;i++)if(slots[i].mainTexture!=null)
-        {
-            var material=new Material(slots[i]);material.SetTexture("_BaseMap",water);materials.Add(material);slots[i]=material;
-        }
-        renderer.sharedMaterials=slots;
         mesh=TabletopNumberTokens.CreateMesh();
         token=new GameObject("渔港点数 "+number).transform;token.SetParent(transform,false);
         token.gameObject.AddComponent<MeshFilter>().sharedMesh=mesh;
         var face=BoardRenderer.Material(Color.white);face.SetFloat("_Metallic",0);face.SetFloat("_Smoothness",.16f);
-        face.SetTexture("_BaseMap",texture);
-        face.SetTextureScale("_BaseMap",new Vector2(.218f,.29f));
-        face.SetTextureOffset("_BaseMap",center-new Vector2(.109f,.145f));materials.Add(face);
+        face.SetTexture("_BaseMap",Resources.Load<Texture2D>("TabletopUI/v008/NumberTokens/number-"+number));
+        materials.Add(face);
         var edge=BoardRenderer.Material(new Color(.23f,.35f,.52f));edge.SetFloat("_Metallic",0);materials.Add(edge);
         var tokenRenderer=token.gameObject.AddComponent<MeshRenderer>();tokenRenderer.sharedMaterials=new[]{face,edge,edge};
         tokenRenderer.shadowCastingMode=ShadowCastingMode.Off;
@@ -78,50 +54,31 @@ public sealed class FishingNumberDisplay : MonoBehaviour
         }
         return true;
     }
-    bool FitsBoard(Vector3 point,float r)
+    public void Place(Vector3 fold,Vector3 outward,float side,Vector3[][] footprints)
     {
-        var polygon=new[]{new Vector2(0,1),new Vector2(.5f,.6f),new Vector2(1,1),new Vector2(1,.4f),new Vector2(.5f,0),new Vector2(0,.4f)}
-            .Select(uv=>transform.TransformPoint(Local(uv))).Select(p=>new Vector2(p.x,p.z)).ToArray();
-        var p=new Vector2(point.x,point.z);bool inside=false;
-        for(int i=0,j=polygon.Length-1;i<polygon.Length;j=i++)
-        {
-            var a=polygon[j];var b=polygon[i];var d=b-a;
-            float t=Mathf.Clamp01(Vector2.Dot(p-a,d)/d.sqrMagnitude);
-            if((p-a-d*t).sqrMagnitude<r*r)return false;
-            if((a.y>p.y)!=(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)inside=!inside;
-        }
-        return inside;
-    }
-    public void Place(Vector3[][] footprints,Vector3 outward)
-    {
+        float radius=side*.174f;
+        var original=fold+outward*(radius*.62f);
+        var chosen=original;
         var ports=footprints.Select(Hull).ToArray();
-        radius=Vector3.Distance(transform.TransformPoint(Local(center)),transform.TransformPoint(Local(center+Vector2.right*.109f)));
-        var original=transform.TransformPoint(Local(center));var chosen=original;bool found=false;
-        // 所有候选点位于两臂内部；绝不把数字推出渔港板。
-        var candidates=new List<Vector2>{center,new Vector2(.29f,center.y),new Vector2(.25f,.50f),new Vector2(.75f,.50f),new Vector2(.32f,.48f),new Vector2(.68f,.48f)};
-        for(int x=2;x<=8;x++)for(int y=2;y<=8;y++)candidates.Add(new Vector2(x*.1f,y*.1f));
-        foreach(float scale in new[]{1f,.85f,.7f})
+        var tangent=Vector3.Cross(outward,Vector3.up).normalized;
+        for(int step=1;step<=8&&!Clear(chosen,radius+.0004f,ports);step++)
         {
-            foreach(var uv in candidates)
-            {
-                var p=transform.TransformPoint(Local(uv));
-                if(!FitsBoard(p,radius*scale+.0003f)||!Clear(p,radius*scale+.0005f,ports))continue;
-                chosen=p;radius*=scale;found=true;break;
-            }
-            if(found)break;
+            float gap=step*radius*.40f;
+            // 沿海岸折角向两侧避让，给码头与侧牌保留圆牌半径的净距。
+            var forward=original+outward*(gap*.62f);
+            var left=forward+tangent*gap;var right=forward-tangent*gap;
+            if(Clear(left,radius+.0004f,ports)){chosen=left;break;}
+            if(Clear(right,radius+.0004f,ports)){chosen=right;break;}
+            chosen=original+outward*gap;
         }
-        chosen.y=FishingTabletopAssets.GroundBottom+.0015f+.00012f;
-        if(!found)Debug.LogError("渔港板内没有点数空位："+name);
-        Moved=Flat(chosen-original).sqrMagnitude>.000001f;
-        token.position=chosen;
-        token.rotation=Quaternion.Euler(0,-90,0);
+        Moved=(chosen-original).sqrMagnitude>.000001f;
+        chosen.y=FishingTabletopAssets.GroundBottom+.0005f;
+        token.position=chosen;token.rotation=Quaternion.identity;
         token.localScale=new Vector3(radius/.0105f/transform.lossyScale.x,1,radius/.0105f/transform.lossyScale.z);
     }
-    static Vector3 Flat(Vector3 p){p.y=0;return p;}
     void OnDestroy()
     {
         foreach(var m in materials)if(m!=null)Destroy(m);
-        if(water!=null){water.Release();Destroy(water);}
         if(mesh!=null)Destroy(mesh);
     }
 }

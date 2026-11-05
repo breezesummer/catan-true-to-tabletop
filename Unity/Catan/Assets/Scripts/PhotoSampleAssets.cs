@@ -23,6 +23,20 @@ public static class PhotoSampleAssets
     }
     public static GameObject Piece(bool road, string label, Vector3 bottom, Quaternion rotation, Color color, Transform parent)
     {
+        if(road)
+        {
+            int roadSeat=System.Array.IndexOf(BoardRenderer.SeatColors,color);
+            var natural=PlayerComponentAssets.Road("P"+(roadSeat<0?1:roadSeat+1),label,bottom,rotation,parent);
+            if(natural!=null)
+            {
+                if(roadSeat<0)
+                {
+                    var preview=new MaterialPropertyBlock();preview.SetColor("_BaseColor",color);preview.SetColor("_Color",color);
+                    foreach(var renderer in natural.GetComponentsInChildren<Renderer>())renderer.SetPropertyBlock(preview);
+                }
+                return natural;
+            }
+        }
         if(!road && PlayerComponentAssets.ColourKey(color)!=null)
         {
             int index=System.Array.IndexOf(BoardRenderer.SeatColors,color);

@@ -23,6 +23,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
         public GameObject Root;
         public Vector3[][] Shores;
         public FishingNumberDisplay Number;
+        public NaturalFishingGround Water;
     }
     readonly Dictionary<string,GroundVisual> grounds=new Dictionary<string,GroundVisual>();
     string layoutKey;
@@ -51,6 +52,8 @@ public sealed class FishingTabletopAssets : MonoBehaviour
         var model=EntityBoardAssets.ReferenceMarker(Resource(name),name,Vector3.zero,Quaternion.identity,root.transform);
         if(model==null){Destroy(root);return null;}
         model.transform.localPosition=Vector3.zero;
+        // 保留原板的三点接岸标定，实际画面使用独立浮网。
+        foreach(var renderer in model.GetComponentsInChildren<Renderer>())renderer.enabled=false;
         var nodes=model.GetComponentsInChildren<Transform>();
         var shores=new Vector3[2][];
         for(int side=0;side<2;side++)
@@ -65,7 +68,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
                 shores[side][point]=Flat(root.transform.InverseTransformPoint(anchor.position));
             }
         }
-        return new GroundVisual{Root=root,Shores=shores,Number=FishingNumberDisplay.Create(root.transform,model,ground.Number,shores[0])};
+        return new GroundVisual{Root=root,Shores=shores,Water=root.AddComponent<NaturalFishingGround>(),Number=FishingNumberDisplay.Create(root.transform,ground.Number)};
     }
     static Vector3 Flat(Vector3 value){value.y=0;return value;}
     static bool Land(Tile tile)=>tile.Resource!="sea"&&tile.Resource!="water"&&tile.Resource!="fog"&&tile.Resource!="hidden";
@@ -111,7 +114,9 @@ public sealed class FishingTabletopAssets : MonoBehaviour
         if(view!=null)foreach(var ground in view.Grounds)
         {
             var ids=ground.VertexIds;
-            var outward=(SeaNormal(ids[0],ids[1],tiles,position)+SeaNormal(ids[1],ids[2],tiles,position)).normalized;
+            var n1=SeaNormal(ids[0],ids[1],tiles,position);
+            var n2=SeaNormal(ids[1],ids[2],tiles,position);
+            var outward=(n1+n2).normalized;
             if(outward.sqrMagnitude<.5f)continue;
             string key=ground.Id+":"+ground.Number;retained.Add(key);
             if(!grounds.TryGetValue(key,out var model))
@@ -121,7 +126,9 @@ public sealed class FishingTabletopAssets : MonoBehaviour
             // 固定关联的两条海岸边是唯一位置依据；重叠处由港口在上层显示。
             if(!Fit(model,position(ids[0]),position(ids[1]),position(ids[2]),outward))
                 Debug.LogError("渔港接岸失败："+ground.Id+" / "+string.Join(",",ids));
-            model.Number.Place(portBounds,outward);
+            var a=position(ids[0]);var b=position(ids[1]);var c=position(ids[2]);
+            var fold=model.Water.Refresh(a,b,c,n1,n2);
+            model.Number.Place(fold,outward,Vector3.Distance(a,b),portBounds);
         }
         var removed=new List<string>();foreach(var pair in grounds)if(!retained.Contains(pair.Key)){Destroy(pair.Value.Root);removed.Add(pair.Key);}
         foreach(var key in removed)grounds.Remove(key);

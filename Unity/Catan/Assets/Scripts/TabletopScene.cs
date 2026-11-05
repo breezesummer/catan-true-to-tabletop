@@ -46,6 +46,12 @@ public sealed class TabletopScene : MonoBehaviour
     public bool IsPanning { get; private set; }
     public Vector3 PanOffset => panOffset;
     public bool TopView => topView;
+    public float Yaw { get; private set; }
+    public float ZoomMultiplier => zoom;
+    public float MinimumZoom => TabletopCameraModel.MinimumZoom(baseSize);
+    int normalPitch, overheadPitch;
+    public int Pitch => topView ? overheadPitch : normalPitch;
+    const string NormalPitchKey="Catan.Camera.NormalPitch", OverheadPitchKey="Catan.Camera.OverheadPitch";
     bool topView;
     float zoom = 1;
     int screenWidth, screenHeight;
@@ -65,6 +71,8 @@ public sealed class TabletopScene : MonoBehaviour
 
     void Initialize(Vector3[] publicVertices)
     {
+        normalPitch=Mathf.Clamp(PlayerPrefs.GetInt(NormalPitchKey,(int)StrategyCameraAngle),TabletopCameraModel.MinPitch,TabletopCameraModel.MaxPitch);
+        overheadPitch=Mathf.Clamp(PlayerPrefs.GetInt(OverheadPitchKey,(int)OverheadCameraAngle),TabletopCameraModel.MinPitch,TabletopCameraModel.MaxPitch);
         var hull = ConvexHull(publicVertices);
         center = new Vector3((hull.Min(p => p.x) + hull.Max(p => p.x)) * .5f, 0,
             (hull.Min(p => p.z) + hull.Max(p => p.z)) * .5f);
@@ -169,11 +177,15 @@ public sealed class TabletopScene : MonoBehaviour
         if(!plane.Raycast(previous,out float previousDistance)||!plane.Raycast(current,out float currentDistance))return;
         var movement=previous.GetPoint(previousDistance)-current.GetPoint(currentDistance);
         movement.y=0;
+        IsPanning=true;
+        MoveMap(movement);
+    }
+    void MoveMap(Vector3 movement)
+    {
         var before=panOffset;panOffset+=movement;
         // 可浏览整幅地图，但不会把棋盘永久拖离可回到的范围。
         float limit=baseSize*2;
         panOffset.x=Mathf.Clamp(panOffset.x,-limit,limit);panOffset.z=Mathf.Clamp(panOffset.z,-limit,limit);
-        IsPanning=true;
         // 平移不改变拟合、投影或安全区，直接移动相机，避免每个输入重新扫描地图。
         boardCamera.transform.position+=panOffset-before;
     }
@@ -247,6 +259,50 @@ public sealed class TabletopScene : MonoBehaviour
         ApplyCamera();
     }
 
+    public void SetPitch(int degrees,bool save=true)
+    {
+        degrees=Mathf.Clamp(degrees,TabletopCameraModel.MinPitch,TabletopCameraModel.MaxPitch);
+        if(degrees==Pitch)return;
+        var pivot=MobileTabletop.ScreenPoint(BoardFitArea.center);
+        pivot.y=Screen.height-pivot.y;
+        var anchor=BoardPoint(pivot);
+        if(topView)overheadPitch=degrees;else normalPitch=degrees;
+        if(save)PlayerPrefs.SetInt(topView?OverheadPitchKey:NormalPitchKey,degrees);
+        ApplyCamera();
+        KeepUnderPointer(pivot,anchor);
+    }
+
+    public void Wheel(float steps,bool rotate,Vector2 pointer)
+    {
+        if(steps==0||!boardCamera.pixelRect.Contains(pointer))return;
+        var anchor=BoardPoint(pointer);
+        if(rotate)Yaw=Mathf.Repeat(Yaw+steps*TabletopCameraModel.WheelDegrees,360);
+        else zoom=Mathf.Clamp(zoom*Mathf.Pow(.88f,steps),MinimumZoom,TabletopCameraModel.FarthestZoom);
+        ApplyCamera();
+        KeepUnderPointer(pointer,anchor);
+    }
+
+    public void RestoreView(TabletopScene previous)
+    {
+        Yaw=previous.Yaw;panOffset=previous.panOffset;
+        Frame(boardCamera,previous.TopView,previous.ZoomMultiplier);
+    }
+
+    Vector3 BoardPoint(Vector2 pointer)
+    {
+        var ray=boardCamera.ScreenPointToRay(pointer);
+        var plane=new Plane(Vector3.up,Vector3.up*EntityBoardAssets.BoardSurfaceHeight);
+        plane.Raycast(ray,out float distance);
+        return ray.GetPoint(distance);
+    }
+
+    void KeepUnderPointer(Vector2 pointer,Vector3 anchor)
+    {
+        var delta=anchor-BoardPoint(pointer);
+        delta.y=0;
+        MoveMap(delta);
+    }
+
     void LateUpdate()
     {
         if (boardCamera != null && (screenWidth != Screen.width || screenHeight != Screen.height || screenViewport != CurrentScreenViewport())) ApplyCamera();
@@ -270,11 +326,30 @@ public sealed class TabletopScene : MonoBehaviour
             screenViewport.width/Mathf.Max(1,screenWidth),screenViewport.height/Mathf.Max(1,screenHeight));
         float aspect = Mathf.Max(.1f,screenViewport.width/Mathf.Max(1,screenViewport.height));
         layoutCamera.aspect=aspect;layoutCamera.rect=cameraRect;
-        var publicOutline=outline.Concat(presentationOutline??new Vector3[0]).ToArray();
         var hudUp=layoutCamera.transform.up;
-        float minX=publicOutline.Min(p=>p.x-center.x),maxX=publicOutline.Max(p=>p.x-center.x);
-        float hudMinY=publicOutline.Min(p=>Vector3.Dot(p-center,hudUp));
-        float hudMaxY=publicOutline.Max(p=>Vector3.Dot(p-center+Vector3.up*.035f,hudUp));
+        var rotation=Quaternion.Euler(Pitch,Yaw,0);
+        var right=rotation*Vector3.right;
+        var up=rotation*Vector3.up;
+        var referenceUp=Quaternion.Euler(topView?OverheadCameraAngle:StrategyCameraAngle,0,0)*Vector3.up;
+        float minX=float.MaxValue,maxX=float.MinValue,hudMinY=float.MaxValue,hudMaxY=float.MinValue;
+        float minR=float.MaxValue,maxR=float.MinValue,minY=float.MaxValue,maxY=float.MinValue;
+        float fitMinY=float.MaxValue,fitMaxY=float.MinValue;
+        void Measure(Vector3[] points)
+        {
+            if(points==null)return;
+            foreach(var point in points)
+            {
+                var ground=point-center;
+                var high=ground+Vector3.up*.035f;
+                minX=Mathf.Min(minX,ground.x);maxX=Mathf.Max(maxX,ground.x);
+                float across=Vector3.Dot(ground,right);
+                minR=Mathf.Min(minR,across);maxR=Mathf.Max(maxR,across);
+                minY=Mathf.Min(minY,Vector3.Dot(ground,up));maxY=Mathf.Max(maxY,Vector3.Dot(high,up));
+                hudMinY=Mathf.Min(hudMinY,Vector3.Dot(ground,hudUp));hudMaxY=Mathf.Max(hudMaxY,Vector3.Dot(high,hudUp));
+                fitMinY=Mathf.Min(fitMinY,Vector3.Dot(ground,referenceUp));fitMaxY=Mathf.Max(fitMaxY,Vector3.Dot(high,referenceUp));
+            }
+        }
+        Measure(outline);Measure(presentationOutline);
         // HUD 的基准尺度只在地图/窗口改变时重新拟合，不跟随玩家地图缩放或拖拽。
         float hudSize=Mathf.Max((hudMaxY-hudMinY)/2/(BoardFitArea.height/900),
             (maxX-minX)/(2*aspect)/(BoardFitArea.width/1440));
@@ -291,19 +366,13 @@ public sealed class TabletopScene : MonoBehaviour
         boardCamera.clearFlags=CameraClearFlags.SolidColor;
         boardCamera.backgroundColor=new Color(.045f,.19f,.26f);
         boardCamera.orthographic=true;boardCamera.nearClipPlane=.01f;boardCamera.farClipPlane=10;
-        boardCamera.transform.rotation=Quaternion.Euler(TabletopCameraModel.Angle(zoom,topView),0,0);
-        var up=boardCamera.transform.up;
-        float minY=publicOutline.Min(p=>Vector3.Dot(p-center,up));
-        float maxY=publicOutline.Max(p=>Vector3.Dot(p-center+Vector3.up*.035f,up));
-        // 固定俯角与正交尺寸解耦；缩放不会改变棋盘形状。
-        var referenceUp=Quaternion.Euler(topView?OverheadCameraAngle:StrategyCameraAngle,0,0)*Vector3.up;
-        float fitMinY=publicOutline.Min(p=>Vector3.Dot(p-center,referenceUp));
-        float fitMaxY=publicOutline.Max(p=>Vector3.Dot(p-center+Vector3.up*.035f,referenceUp));
+        boardCamera.transform.rotation=rotation;
         baseSize=Mathf.Max((fitMaxY-fitMinY)/2/(BoardFitArea.height/900),
             (maxX-minX)/(2*aspect)/(BoardFitArea.width/1440));
+        zoom=Mathf.Clamp(zoom,MinimumZoom,TabletopCameraModel.FarthestZoom);
         boardCamera.orthographicSize=baseSize*zoom;
         var focus=center+panOffset;
-        focus+=Vector3.right*((minX+maxX)/2-(BoardFitArea.center.x/1440-.5f)*boardCamera.orthographicSize*2*aspect);
+        focus+=right*((minR+maxR)/2-(BoardFitArea.center.x/1440-.5f)*boardCamera.orthographicSize*2*aspect);
         focus+=up*((minY+maxY)/2-(.5f-BoardFitArea.center.y/900)*boardCamera.orthographicSize*2);
         boardCamera.transform.position=focus-boardCamera.transform.forward*2;
         if (expansionTrack != null && expansionMarkers != null)

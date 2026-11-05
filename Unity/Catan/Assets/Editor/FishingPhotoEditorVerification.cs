@@ -92,13 +92,15 @@ public static class FishingPhotoEditorVerification
             {
                 Require(ground.GetComponentsInChildren<Collider>().Length==0,"渔港遮挡拾取");
                 Require(ground.GetComponentInChildren<MeshFilter>().sharedMesh.vertexCount<200,"薄板网格异常");
-                var renderer=ground.GetComponentInChildren<Renderer>();
-                Require(ground.GetComponent<FishingNumberDisplay>()!=null&&renderer.sharedMaterials.Any(m=>m.mainTexture is RenderTexture),"桌面未接入原照水纹与独立点数");
+                var net=ground.Find("散网0");
+                Require(ground.GetComponent<FishingNumberDisplay>()!=null&&net!=null&&net.GetComponent<Renderer>().sharedMaterial.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+"loose-net"),"桌面未接入双边浮网与独立点数");
             }
             var projected=Property(presentation,"M6View");
             var fishView=(Catan.Core.TradeModules.FishingView)Property(Property(projected,"TradeModules"),"Fishing");
             var publicTiles=(Catan.Core.Tile[])Property(Property(projected,"Board"),"Tiles");
             Func<string,Vector3> position=id=>(Vector3)board.GetType().GetMethod("Position").Invoke(board,new object[]{id});
+            int sharedEdges=CheckPaintedTiles(board.transform,publicTiles,position);
+            checks.Add(mode+"：地形图集、公开地块编号、共享边邻格与六顶点吻合，公共边 "+sharedEdges+" 条。");
             FishingCoastVerification.Validate(mode,board.transform,fishView,publicTiles,position);
             int covered=FishingCoastVerification.OverPorts(board.transform);
             var identities=grounds.Select(t=>t.GetInstanceID()).OrderBy(id=>id).ToArray();
@@ -157,7 +159,7 @@ public static class FishingPhotoEditorVerification
                 basicBoard.SetCamera(true);yield return .8;
                 ScreenCapture.CaptureScreenshot(Path.Combine(output,"基础版-湖泊渔港与臭靴.png"));yield return .8;
                 var lake=basicBoard.transform.Find(game.GetPlayerView("P1").TradeModules.Fishing.LakeTileId);
-                Require(lake!=null&&lake.GetComponentInChildren<Renderer>().sharedMaterials.Any(m=>m.mainTexture!=null&&AssetDatabase.GetAssetPath(m.mainTexture).EndsWith("v002/lake-albedo.png")),"湖泊原照没有接入");
+                Require(lake!=null&&lake.GetComponentInChildren<Renderer>().sharedMaterials.Any(m=>m.mainTexture!=null&&m.mainTexture==Resources.Load<Texture2D>(PaintedMap.Root+"terrain-atlas")),"湖泊手绘图集没有接入");
                 Capture(basicBoard.BoardCamera,lake.position,.053f,Path.Combine(output,"湖泊-游戏近景.png"),true);
                 var ground=basicBoard.GetComponent<FishingTabletopAssets>().transform.Cast<Transform>().First(t=>t.name.Contains("ground-4"));
                 Capture(basicBoard.BoardCamera,ground.position,.052f,Path.Combine(output,"渔港-游戏近景.png"),true);
@@ -172,6 +174,38 @@ public static class FishingPhotoEditorVerification
         }
     }
 
+    static int CheckPaintedTiles(Transform board,Catan.Core.Tile[] tiles,Func<string,Vector3> position)
+    {
+        int sharedEdges=0;
+        var atlas=Resources.Load<Texture2D>(PaintedMap.Root+"terrain-atlas");
+        Require(atlas!=null&&atlas.width==4096,"地形图集分辨率错误");
+        var block=new MaterialPropertyBlock();
+        foreach(var tile in tiles)
+        {
+            var model=board.Find(tile.Id);
+            var renderer=model.GetComponentInChildren<MeshRenderer>();
+            renderer.GetPropertyBlock(block);
+            var region=block.GetVector("_Tile");
+            Require(renderer.sharedMaterial.shader.isSupported&&renderer.sharedMaterial.mainTexture==atlas&&region.z==PaintedMap.Region(tile.Resource),"公开地形显示错误 "+tile.Id);
+            var filter=model.GetComponentInChildren<MeshFilter>();
+            var top=filter.sharedMesh.vertices.Select(v=>filter.transform.TransformPoint(v)).Where(p=>Mathf.Abs(p.y-EntityBoardAssets.BoardSurfaceHeight)<.00001f).ToArray();
+            foreach(string id in tile.Vertices)
+            {
+                var vertex=position(id);
+                vertex.y=EntityBoardAssets.BoardSurfaceHeight;
+                Require(top.Any(p=>(p-vertex).sqrMagnitude<1e-10f),"顶面未到公共顶点 "+tile.Id+" / "+id);
+            }
+            foreach(var other in tiles.Where(t=>t!=tile&&tile.Vertices.Intersect(t.Vertices).Count()==2))
+            {
+                var delta=position(other.Id)-position(tile.Id);
+                int side=(Mathf.RoundToInt(Mathf.Atan2(delta.z,delta.x)*Mathf.Rad2Deg/60)+6)%6;
+                var neighbors=block.GetVector(side<4?"_NearA":"_NearB");
+                Require(neighbors[side%4]==PaintedMap.Region(other.Resource),"共享边两侧地形不匹配 "+tile.Id+" / "+other.Id);
+                sharedEdges++;
+            }
+        }
+        return sharedEdges/2;
+    }
     static void Capture(Camera camera,Vector3 center,float size,string path,bool top)
     {
         var position=camera.transform.position;var rotation=camera.transform.rotation;float originalSize=camera.orthographicSize,near=camera.nearClipPlane;var rect=camera.rect;

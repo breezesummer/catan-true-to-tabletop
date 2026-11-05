@@ -55,7 +55,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         if(key==portLayoutKey)return;
         portLayoutKey=key;PortLayoutRevision++;
         PublicPortFootprints=ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null)
-        .SelectMany(p=>p.Object.GetComponentsInChildren<MeshFilter>()).SelectMany(m=>
+        .SelectMany(p=>p.Object.GetComponentsInChildren<MeshFilter>()).Where(m=>m.name!="接岸石滩"&&m.name!="栈桥投影").SelectMany(m=>
         {
             var mesh=m.sharedMesh;var vertices=mesh.vertices;var indices=mesh.triangles;
             var triangles=new List<Vector3[]>();
@@ -166,14 +166,14 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
             var item = Put(existing, port.Id, EntityBoardAssets.PortResource(port.Resource), name + port.Id, parent);
             if (item == null) continue;
             Vector3 midpoint = (a + b) / 2, normal = CoastNormal(endpoints, midpoint, b - a);
-            // 将原照片纸板的沙岸实际轮廓贴到海岸边，留下 0.35 mm 的实体板缝。
-            // 不凭纸板中心猜测距离，避免不同港口照片的外形产生可见空隙。
-            var bottom = midpoint + normal * (item.InlandReach+.00035f);
+            // 沙岸压入公共海岸边缘，覆盖港口轮廓自身的微倒角。
+            var bottom = midpoint + normal * (item.InlandReach-CoastalDecals.DockInset);
             // 渔港底面高出地形 0.5 mm、板厚 1.5 mm；港口再留 0.1 mm 间隙，固定显示在上层。
             bottom.y = endpoints.Any(FishingVertices.Contains) ? FishingTabletopAssets.GroundBottom+.0015f+.0001f : EntityBoardAssets.BoardSurfaceHeight;
             item.Object.transform.position = bottom;
             // 导入纸板的沙岸在 local +Z，向海的凸柄在 local -Z。
             item.Object.transform.rotation = Quaternion.LookRotation(-normal, Vector3.up);
+            CoastalDecals.AlignSign(item.Object.transform);
             wanted.Add(port.Id);
         }
         Prune(existing, wanted);
@@ -233,6 +233,20 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         a = b = Vector3.zero;
         return ids != null && ids.Length == 2 && vertices.TryGetValue(ids[0], out a) && vertices.TryGetValue(ids[1], out b);
     }
+    public Vector3 KnightLandInset(string vertex)
+    {
+        if(tiles==null||!vertices.TryGetValue(vertex,out var point))return Vector3.zero;
+        Vector3 inward=Vector3.zero;int count=0;
+        foreach(var tile in tiles)
+        {
+            if(tile.Resource=="sea"||tile.Resource=="water"||tile.Resource=="fog"||tile.Resource=="hidden"||
+                tile.Vertices==null||Array.IndexOf(tile.Vertices,vertex)<0)continue;
+            if(++count==3)return Vector3.zero;
+            inward+=TileCenter(tile)-point;
+        }
+        inward.y=0;return inward.normalized*.0045f;
+    }
+
     Vector3 CoastNormal(string[] endpoints, Vector3 midpoint, Vector3 edgeDirection)
     {
         Vector3 normal = Vector3.Cross(Vector3.up, edgeDirection).normalized;
@@ -275,7 +289,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
                 inlandReach=Mathf.Max(inlandReach,instance.transform.InverseTransformPoint(filter.transform.TransformPoint(local)).z);
             }
         }
-        var item = new Marker { Object = instance, Resource = resource, InlandReach=inlandReach };
+        var item = new Marker { Object = instance, Resource = resource, InlandReach=resource.Contains("/port-")?CoastalDecals.DockLength*.5f:inlandReach };
         collection.Add(key, item);
         return item;
     }
@@ -344,6 +358,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
     {
         distance=float.PositiveInfinity;
         var mesh=filter.sharedMesh;
+        if(filter.name=="接岸石滩"||filter.name=="栈桥投影")return false;
         if(mesh==null||!mesh.isReadable)return false;
         var origin=filter.transform.InverseTransformPoint(worldRay.origin);
         var direction=filter.transform.InverseTransformVector(worldRay.direction);

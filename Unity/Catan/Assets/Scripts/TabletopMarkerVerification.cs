@@ -94,7 +94,7 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
             specialGiftPorts = specialGiftPorts, specialBonusMarkers = specialBonusMarkers, publicSpecialScenario = true, publicFogScenario = true,
             publicDataOnly = true, visualsHaveNoColliders = true, stableIds = true, outsideCoast = true,
             hiddenNumbersSuppressed = true, rulesSupplyNumberFaces = true, photographedNumberBack = true, fullUiPixelsVerified = false,
-            note = "四种真实 App 正常开局后检查公开地图；补查被遗忘的部落的公开港礼/航路奖励和迷雾岛屿的隐藏数字。独立公开夹具检查迁移、增删及奖励计数。相机图不含 IMGUI；8 张细节图各含顶视、侧视、游戏角度及翻面。未把程序截图计为用户外观确认。"
+            note = "四种模式正常开局，另查部落港礼、航路奖励与迷雾数字。离屏相机记录棋盘，八张四视图覆盖港口朝向和圆片翻面。"
         }, true));
         Debug.Log("CATAN_TABLETOP_MARKERS_OK: checks=" + checks + " cameraImages=" + cameraImages + " detailImages=" + detailImages);
         Application.Quit(0);
@@ -165,12 +165,24 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
     static string PortAsset(Resource? resource) => resource.HasValue ? "port-" + resource.Value.ToString().ToLowerInvariant() : "port-generic";
     void Source(Transform instance, string id)
     {
-        var source = Resources.Load<GameObject>(AssetRoot + id); Require(source != null && instance != null, "缺少预期实体资产 " + id);
-        var meshes = instance.GetComponentsInChildren<MeshFilter>(true).Select(m => m.sharedMesh).ToArray();
-        Require(source.GetComponentsInChildren<MeshFilter>(true).All(m => meshes.Contains(m.sharedMesh)), "实体标记网格来源错误 " + id);
-        var instanceMaterials = instance.GetComponentsInChildren<Renderer>(true).SelectMany(r => r.sharedMaterials).ToArray();
-        Require(source.GetComponentsInChildren<Renderer>(true).SelectMany(r => r.sharedMaterials).All(instanceMaterials.Contains), "实体标记材质来源错误 " + id);
-        Require(instanceMaterials.Any(m => m != null && m.mainTexture == Resources.Load<Texture2D>(TextureResource(id))), "实体标记纹理来源错误 " + id);
+        Require(instance!=null,"缺少实体标记 "+id);
+        var instanceMaterials=instance.GetComponentsInChildren<Renderer>(true).SelectMany(r=>r.sharedMaterials).ToArray();
+        if(id.StartsWith("port-",StringComparison.Ordinal))
+        {
+            Require(instanceMaterials.All(m=>m.shader.name=="Catan/CoastDecal"),"码头未使用独立画稿 "+id);
+            Require(instanceMaterials.Any(m=>m.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+id)),"码头货物不符 "+id);
+            var sign=instance.GetChild(1);
+            Require(Quaternion.Angle(sign.rotation,Quaternion.identity)<.01f,"比例牌未保持正向");
+            Require(sign.GetComponent<Renderer>().sharedMaterial.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+(id=="port-generic"?"ratio-3":"ratio-2")),"港口比例不符");
+        }
+        else
+        {
+            var source=Resources.Load<GameObject>(AssetRoot+id);
+            var meshes=instance.GetComponentsInChildren<MeshFilter>(true).Select(m=>m.sharedMesh).ToArray();
+            Require(source.GetComponentsInChildren<MeshFilter>(true).All(m=>meshes.Contains(m.sharedMesh)),"实体标记网格来源错误 "+id);
+            Require(source.GetComponentsInChildren<Renderer>(true).SelectMany(r=>r.sharedMaterials).All(instanceMaterials.Contains),"实体标记材质来源错误 "+id);
+            Require(instanceMaterials.Any(m=>m.mainTexture==Resources.Load<Texture2D>(TextureResource(id))),"实体标记纹理来源错误 "+id);
+        }
         Require(instance.localScale == Vector3.one && instance.GetComponentsInChildren<Collider>(true).Length == 0, "实体标记没有保留米制或阻挡拾取 " + id); sourceInstances++;
     }
     void CheckCoast(TabletopReferenceMarkers.PortDisplay port, Transform instance)
@@ -195,7 +207,7 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
             var bounds = BoundsOf(obj);
             bool overlaps = portBounds.min.x < bounds.max.x - .0001f && portBounds.max.x > bounds.min.x + .0001f &&
                 portBounds.min.z < bounds.max.z - .0001f && portBounds.max.z > bounds.min.z + .0001f;
-            Require(!overlaps || !FootprintIntersects(port, obj), "港口实体占地与已放建筑重合");
+            Require(!overlaps || !FootprintIntersects(port, obj), "港口实体占地与已放建筑重合："+port.name+" / "+obj.name);
         }
     }
     static bool IsWater(string resource) => resource == "sea" || resource == "water" || resource == "fog" || resource == "hidden";
@@ -261,7 +273,7 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
         Require(Markers.GetComponentsInChildren<Collider>(true).Length == 0, "公共夹具标记阻挡棋盘拾取");
         Markers.Refresh(Tiles, noPorts, noPorts, new string[0], noScores, "P1", Table);
         Require(Markers.PlacedPortCount == 0 && Markers.GiftPortCount == 0 && Markers.UnclaimedVictoryMarkerCount == 0 && Markers.AwardedVictoryMarkerCount == 0 &&
-            Markers.GetComponentsInChildren<Renderer>().All(r => !r.gameObject.activeInHierarchy), "删除奖励后存在幽灵筹码");
+            Markers.GetComponentsInChildren<Renderer>().All(r => !r.enabled || r.GetComponentInParent<OceanTileSurface>() != null), "删除奖励后存在幽灵筹码");
         CheckHiddenNumbers();
     }
     void CheckHiddenNumbers()
@@ -339,7 +351,7 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
                     var tokens = TabletopNumberTokens.Create(root.transform, new[] { tile }, new Dictionary<string, Vector3> { { tile.Id, Vector3.zero } });
                     tokens.gameObject.SetActive(true); asset = tokens.transform.GetChild(0).gameObject;
                 }
-                else { asset = Instantiate(Resources.Load<GameObject>(AssetRoot + id), root.transform); Source(asset.transform, id); }
+                else { asset = EntityBoardAssets.ReferenceMarker(AssetRoot+id,id,Vector3.zero,Quaternion.identity,root.transform); Source(asset.transform, id); }
                 SetLayer(root.transform, DetailLayer); yield return null;
                 Texture2D sheet = new Texture2D(1600, 1200, TextureFormat.RGB24, false);
                 var target = new RenderTexture(800, 600, 24); var previous = RenderTexture.active;
@@ -348,10 +360,11 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
                     target.Create();
                     for (int panel = 0; panel < 4; panel++)
                     {
-                        asset.transform.localRotation = panel == 3 ? Quaternion.Euler(180, 0, 0) : Quaternion.identity;
+                        bool port=id.StartsWith("port-",StringComparison.Ordinal);
+                        asset.transform.localRotation = panel == 3 ? (port?Quaternion.Euler(0,180,0):Quaternion.Euler(180,0,0)) : Quaternion.identity;
                         var bounds = BoundsOf(asset.transform); camera.aspect = 800f / 600;
                         camera.orthographicSize = Mathf.Max(bounds.size.z, bounds.size.x / camera.aspect, .008f) * .70f;
-                        camera.transform.rotation = Quaternion.Euler(panel == 0 || panel == 3 ? 90 : panel == 1 ? 4 : 40, 0, 0);
+                        camera.transform.rotation = Quaternion.Euler(panel == 0 || panel == 3 ? 90 : panel == 1 ? (port?18:4) : 40, 0, 0);
                         camera.transform.position = bounds.center - camera.transform.forward * .5f;
                         var request = new UniversalRenderPipeline.SingleCameraRequest { destination = target };
                         Require(RenderPipeline.SupportsRenderRequest(camera, request), "URP 不支持实体细节离屏渲染");
@@ -385,19 +398,29 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
     static bool FootprintIntersects(Transform a, Transform b)
     {
         var left = FootprintTriangles(a); var right = FootprintTriangles(b);
-        foreach (var first in left) foreach (var second in right)
+        var bounds=BoundsOf(a);
+        right.RemoveAll(t=>Outside(t,bounds.min.x,bounds.max.x,bounds.min.z,bounds.max.z));
+        foreach (var first in left)
         {
-            bool separated = false;
-            foreach (var triangle in new[] { first, second })
-                for (int edge = 0; edge < 3; edge++)
-                {
-                    var direction = triangle[(edge + 1) % 3] - triangle[edge];
-                    var axis = new Vector2(-direction.y, direction.x).normalized;
-                    float minA = first.Min(p => Vector2.Dot(p, axis)), maxA = first.Max(p => Vector2.Dot(p, axis));
-                    float minB = second.Min(p => Vector2.Dot(p, axis)), maxB = second.Max(p => Vector2.Dot(p, axis));
-                    if (maxA <= minB + .0001f || maxB <= minA + .0001f) { separated = true; break; }
-                }
-            if (!separated) return true;
+            float minX=Mathf.Min(first[0].x,Mathf.Min(first[1].x,first[2].x)), maxX=Mathf.Max(first[0].x,Mathf.Max(first[1].x,first[2].x));
+            float minZ=Mathf.Min(first[0].y,Mathf.Min(first[1].y,first[2].y)), maxZ=Mathf.Max(first[0].y,Mathf.Max(first[1].y,first[2].y));
+            foreach(var second in right)
+                if(!Outside(second,minX,maxX,minZ,maxZ)&&!Separate(first,second)&&!Separate(second,first))return true;
+        }
+        return false;
+    }
+    static bool Outside(Vector2[] t,float minX,float maxX,float minZ,float maxZ) =>
+        (t[0].x<minX&&t[1].x<minX&&t[2].x<minX)||(t[0].x>maxX&&t[1].x>maxX&&t[2].x>maxX)||
+        (t[0].y<minZ&&t[1].y<minZ&&t[2].y<minZ)||(t[0].y>maxZ&&t[1].y>maxZ&&t[2].y>maxZ);
+    static bool Separate(Vector2[] a,Vector2[] b)
+    {
+        for(int i=0;i<3;i++)
+        {
+            var edge=a[(i+1)%3]-a[i];var axis=new Vector2(-edge.y,edge.x).normalized;
+            float a0=Vector2.Dot(a[0],axis),a1=Vector2.Dot(a[1],axis),a2=Vector2.Dot(a[2],axis);
+            float b0=Vector2.Dot(b[0],axis),b1=Vector2.Dot(b[1],axis),b2=Vector2.Dot(b[2],axis);
+            if(Mathf.Max(a0,Mathf.Max(a1,a2))<=Mathf.Min(b0,Mathf.Min(b1,b2))+.0001f ||
+               Mathf.Max(b0,Mathf.Max(b1,b2))<=Mathf.Min(a0,Mathf.Min(a1,a2))+.0001f)return true;
         }
         return false;
     }
@@ -407,8 +430,10 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
         foreach (var filter in root.GetComponentsInChildren<MeshFilter>())
         {
             var mesh = filter.sharedMesh; if (mesh == null) continue;
-            var vertices = mesh.vertices.Select(v => filter.transform.TransformPoint(v)).Select(v => new Vector2(v.x, v.z)).ToArray();
-            var indices = mesh.triangles;
+            Vector3[] positions; int[] indices;
+            if(mesh.isReadable){positions=mesh.vertices;indices=mesh.triangles;}
+            else ReadMeshForVerification(mesh,out positions,out indices);
+            var vertices=positions.Select(v=>filter.transform.TransformPoint(v)).Select(v=>new Vector2(v.x,v.z)).ToArray();
             for (int i = 0; i < indices.Length; i += 3)
             {
                 var a = vertices[indices[i]]; var b = vertices[indices[i + 1]]; var c = vertices[indices[i + 2]];
@@ -416,6 +441,38 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
             }
         }
         return triangles;
+    }
+    // 图形验收专用。按真实顶点检验塔楼与栈桥，避免旋转外包框误判。
+    static void ReadMeshForVerification(Mesh mesh,out Vector3[] vertices,out int[] triangles)
+    {
+        if(mesh.GetVertexAttributeFormat(VertexAttribute.Position)!=VertexAttributeFormat.Float32)
+            throw new InvalidOperationException("不支持的验收顶点格式："+mesh.name);
+        int stream=mesh.GetVertexAttributeStream(VertexAttribute.Position);
+        int stride=mesh.GetVertexBufferStride(stream), offset=mesh.GetVertexAttributeOffset(VertexAttribute.Position);
+        using(var vertexBuffer=mesh.GetVertexBuffer(stream))
+        using(var indexBuffer=mesh.GetIndexBuffer())
+        {
+            var vr=AsyncGPUReadback.Request(vertexBuffer);
+            var ir=AsyncGPUReadback.Request(indexBuffer);
+            vr.WaitForCompletion(); ir.WaitForCompletion();
+            if(vr.hasError||ir.hasError)throw new InvalidOperationException("验收网格回读失败："+mesh.name);
+            var raw=vr.GetData<byte>().ToArray(); vertices=new Vector3[mesh.vertexCount];
+            for(int i=0;i<vertices.Length;i++)
+            {
+                int p=i*stride+offset;
+                vertices[i]=new Vector3(BitConverter.ToSingle(raw,p),BitConverter.ToSingle(raw,p+4),BitConverter.ToSingle(raw,p+8));
+            }
+            var index=ir.GetData<byte>().ToArray();var tris=new List<int>();
+            bool wide=mesh.indexFormat==IndexFormat.UInt32;
+            for(int s=0;s<mesh.subMeshCount;s++)
+            {
+                var part=mesh.GetSubMesh(s);
+                if(part.topology!=MeshTopology.Triangles)continue;
+                for(int j=part.indexStart;j<part.indexStart+part.indexCount;j++)
+                    tris.Add(part.baseVertex+(wide?BitConverter.ToInt32(index,j*4):BitConverter.ToUInt16(index,j*2)));
+            }
+            triangles=tris.ToArray();
+        }
     }
     static void SetLayer(Transform obj, int layer) { obj.gameObject.layer = layer; foreach (Transform child in obj) SetLayer(child, layer); }
     void Require(bool passed, string message) { checks++; if (!passed) throw new InvalidOperationException(message); }

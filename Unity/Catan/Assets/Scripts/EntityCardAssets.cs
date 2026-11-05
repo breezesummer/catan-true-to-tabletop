@@ -10,6 +10,7 @@ public static class EntityCardAssets
 {
     const string Root = "EntityAssets/v001/";
     static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+    static readonly HashSet<Texture2D> commodityFaces=new HashSet<Texture2D>();
     static Texture2D paperLight;
     static readonly Card[] goodCards=new Card[8],progressCards=new Card[25],improvementCards=new Card[30],guidanceCards=new Card[2];
     static readonly Card defenderCard=new Card("defender",Root+"defender-card/defender-card-front");
@@ -36,12 +37,17 @@ public static class EntityCardAssets
             texture = Resources.Load<Texture2D>(path);
             if (texture != null)
             {
-                Textures[path] = texture;
+                CacheFace(path,texture);
                 if(path.StartsWith(RedrawnCardAssets.Root,StringComparison.Ordinal))
                 {int index=Array.IndexOf(ProgressIds,path.Substring(RedrawnCardAssets.Root.Length));if(index>=0)RedrawnCardAssets.Register(texture,index);}
             }
         }
         return texture;
+    }
+    static void CacheFace(string path,Texture2D texture)
+    {
+        Textures[path]=texture;
+        if(path==Good(5).Front||path==Good(6).Front||path==Good(7).Front)commodityFaces.Add(texture);
     }
     public static Card Good(int index)
     {
@@ -93,7 +99,7 @@ public static class EntityCardAssets
             // 每帧至多接收一张，只保留预算内的预热引用；正常获准展示仍可按需加载。
             long size=UnityEngine.Profiling.Profiler.GetRuntimeMemorySizeLong(texture);
             if(loaded+size>budget)yield break;
-            Textures[path]=texture;loaded+=size;
+            CacheFace(path,texture);loaded+=size;
             if(path.StartsWith(RedrawnCardAssets.Root,StringComparison.Ordinal))
             {int index=Array.IndexOf(ProgressIds,path.Substring(RedrawnCardAssets.Root.Length));if(index>=0)RedrawnCardAssets.Register(texture,index);}
         }
@@ -114,12 +120,21 @@ public static class EntityCardAssets
     public static Texture2D ResourceFront(int resource) => resource >= 0 && resource < 5 ? Texture(Good(resource).Front) : null;
     public static Texture2D CommodityFront(int commodity) => commodity >= 0 && commodity < 3 ? Texture(Good(commodity + 5).Front) : null;
     public static Texture2D ResourceOrCommodityFront(int good) => good >= 0 && good < 8 ? Texture(Good(good).Front) : null;
-    // 重绘资源牌和其他实体卡面共用显示入口；保持各自比例。
+    public static float FaceAspect(Texture2D texture)
+    {
+        // 商品插画与资源使用同一裁切成品尺寸，飞牌、手牌与选中边框共用。
+        if (commodityFaces.Contains(texture))
+        {
+            var resource = ResourceFront(0);
+            if (resource != null) return (float)resource.width / resource.height;
+        }
+        return (float)texture.width / texture.height;
+    }
     // 纸芯、投影、弱受光与主题窄边框属于显示层，不遮挡规则文字。
     public static void DrawCardFace(Rect area,Texture2D texture,float elevation=0,Color? tint=null)
     {
         if(texture==null)return;
-        var rect=FitCardRect(area,(float)texture.width/texture.height,GUI.matrix);
+        var rect=FitCardRect(area,FaceAspect(texture),GUI.matrix);
         DrawPaperDepth(rect,elevation);
         float radius=Mathf.Min(rect.width,rect.height)*.095f;
         var matrix=GUI.matrix;

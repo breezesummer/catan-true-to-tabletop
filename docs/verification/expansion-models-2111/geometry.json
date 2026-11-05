@@ -1,0 +1,68 @@
+[
+  {
+    "part": "knight-1-active",
+    "triangles": 10164,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "part": "knight-1-rest",
+    "triangles": 9720,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "part": "knight-2-active",
+    "triangles": 8187,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "part": "knight-2-rest",
+    "triangles": 7691,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "part": "knight-3-active",
+    "triangles": 17605,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "part": "knight-3-rest",
+    "triangles": 17157,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "part": "metro-politics",
+    "triangles": 24705,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "part": "metro-science",
+    "triangles": 12945,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "part": "metro-trade",
+    "triangles": 34311,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "part": "ship",
+    "triangles": 13432,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "part": "wall",
+    "triangles": 9732,
+    "flat": 0,
+    "uv_outside": 0
+  }
+]

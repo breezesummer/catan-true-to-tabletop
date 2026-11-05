@@ -1,0 +1,233 @@
+"""经 Blender MCP 执行：自然棋子共享几何、四色材质及透明缩略图。"""
+import bpy, bmesh, math, random, json, os
+from pathlib import Path
+from mathutils import Vector
+
+ROOT=Path('D:/Project/catan-true-to-tabletop')
+ART=ROOT/'Unity/Catan/Assets/Art/NaturalPieces/v001'
+RES=ROOT/'Unity/Catan/Assets/Resources/NaturalPieces/v001'
+OUT=ROOT/'art/recipes/natural-pieces-v001'
+random.seed(211105)
+scene=bpy.data.scenes.new('自然棋子_v001')
+bpy.context.window.scene=scene
+for existing in bpy.data.scenes:
+    for obj in existing.objects:obj.select_set(False,view_layer=existing.view_layers[0])
+scene.unit_settings.system='METRIC'
+scene.render.engine='CYCLES'
+scene.cycles.samples=32
+scene.cycles.use_denoising=True
+scene.render.resolution_percentage=100
+scene.render.image_settings.file_format='PNG'
+scene.render.film_transparent=True
+scene.view_settings.view_transform='AgX'
+scene.world=bpy.data.worlds.new('自然棋子柔光')
+scene.world.use_nodes=True
+scene.world.node_tree.nodes['Background'].inputs[0].default_value=(.64,.72,.82,1)
+scene.world.node_tree.nodes['Background'].inputs[1].default_value=.65
+atlas=bpy.data.images.load(str(ART/'material-atlas.png'),check_existing=True)
+COLORS={'red':(.80,.225,.135,1),'blue':(.27,.48,.77,1),'orange':(1,.62,.20,1),'beige':(1,.96,.79,1)}
+def material(name,color):
+    m=bpy.data.materials.new(name);m.use_nodes=True
+    p=m.node_tree.nodes.get('Principled BSDF');p.inputs['Roughness'].default_value=.9
+    tex=m.node_tree.nodes.new('ShaderNodeTexImage');tex.image=atlas
+    mix=m.node_tree.nodes.new('ShaderNodeMixRGB');mix.blend_type='MULTIPLY';mix.inputs[0].default_value=1;mix.inputs[2].default_value=color
+    m.node_tree.links.new(tex.outputs['Color'],mix.inputs[1]);m.node_tree.links.new(mix.outputs[0],p.inputs['Base Color'])
+    m.diffuse_color=color
+    return m
+neutral=material('Natural_Masonry',(1,1,1,1))
+roofmat=material('Natural_Player',COLORS['red'])
+dark=material('Natural_Recess',(.18,.16,.13,1))
+mats=[neutral,roofmat,dark]
+V=[];F=[];MI=[];UV=[]
+def poly(points,mat=0,region='stone'):
+    n=len(points);start=len(V);V.extend(points);F.append(tuple(range(start,start+n)));MI.append(mat)
+    ox,oy={'roof':(0,.5),'wall':(.5,.5),'stone':(0,0),'wood':(.5,0)}[region]
+    a=random.uniform(.035,.18);b=random.uniform(.035,.18);span=.25
+    # 每面都留在所属象限内部，低 mip 也不串到邻材质。
+    UV.append([(ox+a+span*(i in (1,2)),oy+b+span*(i>=2)) for i in range(n)])
+def box(x,y,z,w,d,h,mat=0,region='stone'):
+    p=[(x+sx*w/2,y+sy*d/2,z+sz*h) for sz in (0,1) for sy in (-1,1) for sx in (-1,1)]
+    for ids in [(0,2,3,1),(4,5,7,6),(0,1,5,4),(2,6,7,3),(0,4,6,2),(1,3,7,5)]:poly([p[i] for i in ids],mat,region)
+def prism(points,thick=.025,mat=1,region='roof'):
+    upper=[(x,y,z+thick) for x,y,z in points]
+    poly(list(reversed(points)),mat,region);poly(upper,mat,region)
+    for i in range(len(points)):
+        j=(i+1)%len(points);poly([points[i],points[j],upper[j],upper[i]],mat,region)
+def beam(a,b,width,depth=None,mat=0,region='wood'):
+    a,b=Vector(a),Vector(b);axis=(b-a).normalized();u=axis.cross(Vector((0,0,1)))
+    if u.length<.01:u=Vector((1,0,0))
+    u.normalize();u*=width/2;v=axis.cross(u).normalized()*(depth or width)/2
+    p=[tuple(c+su*u+sv*v) for c in (a,b) for su,sv in [(-1,-1),(1,-1),(1,1),(-1,1)]]
+    for ids in [(3,2,1,0),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)]:poly([p[i] for i in ids],mat,region)
+def roof(x,y,z,w,d,rise,hip=False):
+    # 独立有厚度的坡面与瓦片，层叠关系在高俯视角仍可读。
+    if hip:
+        apex=Vector((x,y,z+rise));corners=[Vector((x-w/2,y-d/2,z)),Vector((x+w/2,y-d/2,z)),Vector((x+w/2,y+d/2,z)),Vector((x-w/2,y+d/2,z))]
+        for s in range(4):
+            a,b=corners[s],corners[(s+1)%4]
+            prism([tuple(a),tuple(b),tuple(apex)],.025,2,'wood')
+            rows=max(3,round(rise/.13)+2)
+            for row in range(rows):
+                t0=row/rows;t1=min(.987,(row+1)/rows+.016)
+                aa=a.lerp(apex,t0);bb=b.lerp(apex,t0);cc=a.lerp(apex,t1);dd=b.lerp(apex,t1)
+                count=max(1,round((bb-aa).length/.13))
+                for j in range(count):
+                    l=j/count+.012/count;r=(j+1)/count-.012/count
+                    prism([tuple(aa.lerp(bb,l)),tuple(aa.lerp(bb,r)),tuple(cc.lerp(dd,r)),tuple(cc.lerp(dd,l))],.035+random.random()*.008)
+            beam(tuple(a+Vector((0,0,.045))),tuple(apex+Vector((0,0,.045))),.052,mat=1,region='roof')
+    else:
+        for side in (-1,1):
+            a=Vector((x+side*w/2,y-d/2,z));b=Vector((x+side*w/2,y+d/2,z));c=Vector((x,y-d/2,z+rise));e=Vector((x,y+d/2,z+rise))
+            prism([tuple(a),tuple(b),tuple(e),tuple(c)],.025,2,'wood')
+            rows=max(3,round(w/.22));cols=max(3,round(d/.14))
+            for row in range(rows):
+                t0=row/rows;t1=min(1,(row+1)/rows+.022)
+                for j in range(cols):
+                    q0=j/cols+.01/cols;q1=(j+1)/cols-.01/cols
+                    prism([tuple(a.lerp(c,t0).lerp(b.lerp(e,t0),q0)),tuple(a.lerp(c,t0).lerp(b.lerp(e,t0),q1)),tuple(a.lerp(c,t1).lerp(b.lerp(e,t1),q1)),tuple(a.lerp(c,t1).lerp(b.lerp(e,t1),q0))],.037+random.random()*.008)
+        beam((x,y-d/2-.025,z+rise+.05),(x,y+d/2+.025,z+rise+.05),.075,mat=1,region='roof')
+        for yy in (y-d/2+.035,y+d/2-.035):
+            poly([(x-w/2+.06,yy,z),(x+w/2-.06,yy,z),(x,yy,z+rise-.045)],0,'wall')
+            for s in (-1,1):beam((x+s*(w/2-.03),yy,z),(x,yy,z+rise),.06)
+    for yy in (y-d/2,y+d/2):beam((x-w/2,yy,z),(x+w/2,yy,z),.055,mat=0,region='wood')
+    for xx in (x-w/2,x+w/2):beam((xx,y-d/2,z),(xx,y+d/2,z),.055,mat=0,region='wood')
+def arch(x,y,z,w,h,door=False):
+    radius=w/2;spring=z+h-radius
+    pts=[(x-w/2,y,z),(x+w/2,y,z)]
+    for i in range(9):
+        ang=i*math.pi/8;pts.append((x+radius*math.cos(ang),y,spring+radius*math.sin(ang)))
+    # 先暗洞，再门板；石门套产生真实凹陷阴影。
+    poly(pts,0 if door else 2,'wood')
+    t=.045 if door else .035
+    for side in (-1,1):box(x+side*(radius+t*.6),y-.008,z,t,.065,h-radius,0,'stone')
+    for i in range(8):
+        a=i*math.pi/8+.018;b=(i+1)*math.pi/8-.018
+        q=[(x+rr*math.cos(ang),y-.035,spring+rr*math.sin(ang)) for rr,ang in [(radius,a),(radius,b),(radius+t,b),(radius+t,a)]]
+        poly(q,0,'stone')
+        poly([(px,py+.06,pz) for px,py,pz in reversed(q)],0,'stone')
+        for k in range(4):
+            j=(k+1)%4;poly([q[k],q[j],(q[j][0],q[j][1]+.06,q[j][2]),(q[k][0],q[k][1]+.06,q[k][2])],0,'stone')
+    box(x,y-.025,z-.035,w+.13,.11,.055)
+    if door:
+        box(x,y-.013,z,.015,.015,h-radius*.2,2,'wood')
+        for zz in (z+h*.25,z+h*.64):box(x,y-.022,zz,w*.85,.025,.027,2,'wood')
+def stones(x,y,z,w,d,h):
+    rows=max(1,round(h/.13))
+    box(x,y,z,w,d,h,0,'stone')
+    for row in range(rows):
+        for side in (-1,1):
+            n=max(2,round(w/.20));step=w/n
+            for j in range(n):box(x-w/2+step*(j+.5),y+side*d/2,z+row*h/rows+.008,step-.014,.035,h/rows-.018)
+            n=max(2,round(d/.20));step=d/n
+            for j in range(n):box(x+side*w/2,y-d/2+step*(j+.5),z+row*h/rows+.008,.035,step-.014,h/rows-.018)
+def house(x,y,w,d,h,rise,hip=False,castle=False,base=.09):
+    if base<.1:box(x,y,0,w+.07,d+.07,.10)
+    stones(x,y,base,w,d,.17)
+    box(x,y,base+.17,w-.018,d-.018,h-.17,0,'stone' if castle else 'wall')
+    for sx in (-1,1):
+        for sy in (-1,1):
+            if castle:
+                for zz in range(max(1,round((h-.17)/.14))):box(x+sx*(w/2-.035),y+sy*(d/2-.035),base+.18+zz*.14,.11,.11,.11)
+            else:box(x+sx*(w/2-.025),y+sy*(d/2-.025),base+.17,.045,.045,h-.17,0,'wood')
+    box(x,y,base+h-.07,w+.035,d+.035,.06,0,'stone' if castle else 'wood')
+    roof(x,y,base+h,w+.18,d+.18,rise,hip)
+def chimney(x,y,z):
+    box(x,y,z,.15,.15,.30);box(x,y,z+.28,.19,.19,.055);box(x,y,z+.335,.10,.10,.002,2,'wood')
+def foundation(x,y,w,d):
+    # 每栋房屋自带贴墙石基，不额外铺设与建筑分离的方块。
+    pass
+def finish(kind,width):
+    global V,F,MI,UV
+    mesh=bpy.data.meshes.new('Natural_'+kind);mesh.from_pydata(V,[],F);mesh.materials.clear()
+    for m in mats:mesh.materials.append(m)
+    uv=mesh.uv_layers.new(name='UVMap')
+    for p,mi,coords in zip(mesh.polygons,MI,UV):
+        p.material_index=mi
+        for li,co in zip(p.loop_indices,coords):uv.data[li].uv=co
+    mesh.update()
+    bm=bmesh.new();bm.from_mesh(mesh)
+    bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=.000001)
+    bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces));bm.to_mesh(mesh);bm.free()
+    obj=bpy.data.objects.new(kind,mesh);scene.collection.objects.link(obj)
+    bpy.context.view_layer.objects.active=obj;obj.select_set(True)
+    bevel=obj.modifiers.new('柔化石瓦边缘','BEVEL');bevel.width=.006;bevel.segments=1;bevel.affect='EDGES'
+    bpy.ops.object.modifier_apply(modifier=bevel.name)
+    # 按实际游戏占地归一，底面中心为原点。
+    pts=[v.co for v in obj.data.vertices];lo=Vector(tuple(min(p[i] for p in pts) for i in range(3)));hi=Vector(tuple(max(p[i] for p in pts) for i in range(3)))
+    scale=width/max(hi.x-lo.x,hi.y-lo.y);center=Vector(((hi.x+lo.x)/2,(hi.y+lo.y)/2,lo.z))
+    for v in obj.data.vertices:v.co=(v.co-center)*scale
+    obj.data.update()
+    tri=obj.modifiers.new('导出三角面','TRIANGULATE');bpy.ops.object.modifier_apply(modifier=tri.name)
+    bm=bmesh.new();bm.from_mesh(obj.data)
+    flat=[f for f in bm.faces if f.calc_area()<1e-16]
+    if flat:bmesh.ops.delete(bm,geom=flat,context='FACES')
+    bm.to_mesh(obj.data);bm.free();obj.data.update()
+    bpy.ops.export_scene.fbx(filepath=str(ART/(kind+'.fbx')),use_selection=True,object_types={'MESH'},axis_forward='-Z',axis_up='Y',apply_unit_scale=True,bake_space_transform=True,add_leaf_bones=False,use_mesh_modifiers=True,path_mode='STRIP')
+    bpy.ops.export_scene.gltf(filepath=str(OUT/(kind+'.glb')),use_selection=True,use_active_scene=True,export_format='GLB')
+    obj.select_set(False);V=[];F=[];MI=[];UV=[]
+    return obj
+
+house(-.28,.20,.87,.95,.73,.38)
+house(.37,-.33,.53,.65,.47,.29)
+arch(-.28,-.285,.27,.24,.43,True)
+arch(.37,-.665,.20,.19,.31,True)
+for xx in (-.52,-.04):arch(xx,-.285,.63,.12,.18)
+chimney(-.51,.40,1.04)
+foundation(-.05,.02,1.55,1.51)
+for i in range(3):box(-.28,-.40-i*.095,.02+i*.015,.30,.10,.06-i*.015)
+village=finish('village',.018)
+
+# 主城：门厅低、王城主体中、中央塔高，副塔高度错落。
+house(0,.16,1.08,.94,1.35,.38,True,True)
+house(0,.27,.62,.58,.65,.36,True,True,1.63)
+house(-.65,.24,.38,.48,1.58,.25,True,True)
+house(.64,.23,.37,.46,1.15,.25,True,True)
+house(-.48,-.55,.48,.53,.55,.23,True,True)
+house(.48,-.55,.48,.53,.55,.23,True,True)
+house(0,-.55,.46,.56,.76,.27,False,True)
+arch(0,-.842,.12,.30,.59,True)
+for xx in (-.47,.47):arch(xx,-.825,.33,.14,.23)
+for xx in (-.33,0,.33):arch(xx,-.32,1.00,.14,.25)
+for xx in (-.18,0,.18):arch(xx,-.029,1.91,.11,.24)
+arch(-.65,-.006,1.30,.13,.23);arch(.64,-.006,.88,.13,.23)
+box(0,.16,.85,1.16,1.02,.075)
+box(0,.27,1.66,.69,.65,.055)
+foundation(0,0,1.70,1.65)
+for i in range(3):box(0,-.91-i*.10,.025,.43,.095,.085-i*.025)
+city=finish('city',.0205)
+
+# 道路长轴为 Blender Y，导入后沿 Unity Z 与现有边旋转一致。
+box(0,0,0,.43,2.45,.065,0,'stone')
+for side in (-1,1):
+    for j in range(13):box(side*.183,-1.225+(j+.5)*2.45/13,.035,.084,2.45/13-.012,.09+random.uniform(-.009,.009),1,'roof')
+for j in range(17):
+    for side in (-1,1):box(side*.075+random.uniform(-.008,.008),-1.225+(j+.5)*2.45/17,.045,.135,2.45/17-.012,.055+random.uniform(-.008,.008))
+road=finish('road',.027)
+models=[village,city,road]
+report=[]
+for obj in models:
+    obj.hide_render=True
+    report.append({'kind':obj.name,'triangles':len(obj.data.polygons),'vertices':len(obj.data.vertices),'materials':len(obj.data.materials),'bounds_m':[round(x,6) for x in obj.dimensions]})
+
+camera_data=bpy.data.cameras.new('验收相机');camera=bpy.data.objects.new('验收相机',camera_data);scene.collection.objects.link(camera);scene.camera=camera
+camera_data.type='ORTHO';camera_data.lens=50;camera_data.clip_start=.0001;camera_data.clip_end=10
+ld=bpy.data.lights.new('柔光','AREA');light=bpy.data.objects.new('柔光',ld);scene.collection.objects.link(light);light.location=(-.06,-.08,.13);ld.energy=.08;ld.shape='DISK';ld.size=.10
+light.rotation_euler=(Vector((0,0,.005))-light.location).to_track_quat('-Z','Y').to_euler()
+def point_camera(target,angle=58,size=.032):
+    target=Vector(target);a=math.radians(angle);camera.location=target+Vector((.015,-math.cos(a)*.12,math.sin(a)*.12));camera.rotation_euler=(target-camera.location).to_track_quat('-Z','Y').to_euler();camera_data.ortho_scale=size
+def render_thumbnails():
+    scene.render.resolution_x=512;scene.render.resolution_y=512
+    for obj in models:
+        obj.hide_render=False
+        for key,col in COLORS.items():
+            next(n for n in roofmat.node_tree.nodes if n.type=='MIX_RGB').inputs[2].default_value=col
+            roofmat.diffuse_color=col
+            obj.rotation_euler[2]=math.radians(-18 if obj!=road else 55)
+            point_camera((0,0,obj.dimensions.z*.45),58,.033 if obj==city else .027 if obj==village else .032)
+            scene.render.filepath=str(RES/('thumbnail-'+obj.name+'-'+key+'.png'));bpy.ops.render.render(write_still=True)
+        obj.rotation_euler[2]=0;obj.hide_render=True
+    next(n for n in roofmat.node_tree.nodes if n.type=='MIX_RGB').inputs[2].default_value=COLORS['red'];roofmat.diffuse_color=COLORS['red']
+
+(OUT/'geometry.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+bpy.data.libraries.write(str(OUT/'natural-pieces.blend'),{scene},fake_user=True,compress=True)
+result={'models':report,'scene':scene.name,'source':str(OUT/'natural-pieces.blend')}

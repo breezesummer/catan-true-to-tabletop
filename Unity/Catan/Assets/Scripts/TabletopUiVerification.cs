@@ -74,7 +74,7 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
         }
         int priorTheme=StrategyHudTheme.Selected;
         if(oceanTheme)StrategyHudTheme.Select(1);
-        var run = oceanViews ? VerifyOceanViews() : Verify();
+        var run = oceanViews && args.Contains("--expansion-pieces") ? VerifyExpansionPieces() : oceanViews && args.Contains("--natural-pieces") ? VerifyNaturalPieces() : oceanViews && args.Contains("--coastal-frames") ? VerifyCoastalViews() : oceanViews ? VerifyOceanViews() : Verify();
         while (true)
         {
             object next;
@@ -99,6 +99,7 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
         }, true));
         Debug.Log("CATAN_TABLETOP_UI_OK: configurations=" + configurations + " checks=" + checks + " cameraImages=" + cameraImages);
         if(oceanTheme&&args.Contains("--keep-ocean-preview")){StrategyHudTheme.Select(1);yield break;}
+        if(args.Contains("--keep-piece-preview"))yield break;
         Application.Quit(0);
     }
 
@@ -479,9 +480,10 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
         var oceanRenderer=table.Ocean.GetComponentsInChildren<Renderer>()[0];
         Require(oceanRenderer.bounds.size.x>10&&oceanRenderer.bounds.size.z>10,"海面导入坐标轴错误或无法覆盖视野");
         Require(Resources.Load<Shader>("Ocean/v001/ContinuousOcean")!=null,"海面着色器未打包");
-        Require(UnityEngine.Object.FindObjectsByType<TabletopPhysicalTileV005>(FindObjectsSortMode.None)
-            .Any(p=>p.GetComponentsInChildren<MeshFilter>().Any(m=>m.sharedMesh.name=="六边实体厚板倒角 v005"&&m.sharedMesh.triangles.Length==144)),
-            "真实倒角网格未在正式地图中生成");
+        var hex=table.transform.parent.GetComponentsInChildren<MeshRenderer>()
+            .FirstOrDefault(r=>r.sharedMaterial!=null&&r.sharedMaterial.shader.name=="Catan/PaintedMap");
+        Require(hex!=null&&Mathf.Abs(hex.bounds.size.x-.04f*Mathf.Sqrt(3))<.00001f
+            &&Mathf.Abs(hex.bounds.size.z-.08f)<.00001f,"地形没有铺满公共六边形");
         var handBefore=TabletopHandLayout.Card(15,32,720,1060,false);
         table.Frame(BoardCamera,false,.8f);
         var handAfter=TabletopHandLayout.Card(15,32,720,1060,false);

@@ -4,25 +4,29 @@ using UnityEngine;
 public sealed class TabletopDefenseUI
 {
     public static readonly Rect Area=new Rect(1182,239,246,124);
+    Rect panelArea=Area;
+    public void SetPlayerPanelBottom(float bottom){panelArea.y=Mathf.Max(Area.y,bottom+6);}
     int position=-1,strength,threat;
     string roadPlayer;
     int roadLength;
     bool roadBound;
     Catan.Core.TradeModules.TradeModuleView harbor;
     public void BindHarbormaster(Catan.Core.TradeModules.TradeModuleView modules) { harbor=modules?.Harbormaster==true?modules:null; }
-    string HarborLabel=>harbor==null?"":string.IsNullOrEmpty(harbor.HarbormasterPlayerId)?"暂无归属":M6App.PlayerLabel(harbor.HarbormasterPlayerId)+" +2分";
+    string HarborLabel=>harbor==null?"":string.IsNullOrEmpty(harbor.HarbormasterPlayerId)?"暂无归属":M6App.PlayerLabel(harbor.HarbormasterPlayerId);
     public string MobileSummary => (position>=0?"蛮族 "+position+"/7 · "+(position==7?"本次防御 ":"防御 ")+strength+"/"+threat+"\n":"")+(roadBound?"最长路线 · "+(string.IsNullOrEmpty(roadPlayer)?"暂无":M6App.PlayerLabel(roadPlayer)+" "+roadLength+" 段"):"")+(harbor==null?"":"\n海港大师 · "+HarborLabel);
     static Texture2D ship,shield;
     public void Bind(int position,int strength,int threat)
     {this.position=position;this.strength=strength;this.threat=threat;}
     public void BindLongestRoad(string playerId,int length)
     {roadBound=true;roadPlayer=playerId;roadLength=string.IsNullOrEmpty(playerId)?0:Mathf.Max(0,length);}
-    Rect CurrentArea=>new Rect(Area.x,Area.y,Area.width,position>=0?Area.height:(harbor==null?47:86));
+    Rect CurrentArea=>new Rect(Area.x,panelArea.y,Area.width,position>=0?Area.height:(harbor==null?47:86));
     public bool BlocksInput(Vector2 point)=>(position>=0||roadBound)&&CurrentArea.Contains(point);
     public void Draw()
     {
         if(position<0&&!roadBound)return;
-        ModernOperationUI.Styles();ModernOperationUI.Panel(CurrentArea);
+        ModernOperationUI.Styles();
+        var area=CurrentArea;
+        if(StrategyHudTheme.Ocean)OceanTabletopSkin.Panel(area,false,false);else ModernOperationUI.Panel(area);
         if(ship==null){ship=Icon(false);shield=Icon(true);}
         var ink=ModernOperationUI.TextColor;
         var title=new GUIStyle(ModernOperationUI.Small){fontSize=13,padding=new RectOffset(),alignment=TextAnchor.MiddleLeft,wordWrap=false};
@@ -30,26 +34,26 @@ public sealed class TabletopDefenseUI
         title.normal.textColor=ink;count.normal.textColor=ModernOperationUI.Accent;
         if(position>=0)
         {
-            DrawIcon(new Rect(Area.x+12,Area.y+(harbor==null?9:4),25,25),ship,ModernOperationUI.Accent);
-            GUI.Label(new Rect(Area.x+45,Area.y+(harbor==null?6:1),125,27),"蛮族航程",title);
-            GUI.Label(new Rect(Area.x+174,Area.y+(harbor==null?6:1),57,27),position+" / 7",count);
+            DrawIcon(new Rect(Area.x+12,area.y+(harbor==null?9:4),25,25),ship,ModernOperationUI.Accent);
+            GUI.Label(new Rect(Area.x+45,area.y+(harbor==null?6:1),125,27),"蛮族航程",title);
+            GUI.Label(new Rect(Area.x+174,area.y+(harbor==null?6:1),57,27),position+" / 7",count);
             for(int i=0;i<7;i++)
-                ModernOperationUI.Round(new Rect(Area.x+14+i*32,Area.y+(harbor==null?36:27),27,4),i<position?ModernOperationUI.Accent:ModernOperationUI.Surface);
+                ModernOperationUI.Round(new Rect(Area.x+14+i*32,area.y+(harbor==null?36:27),27,4),i<position?ModernOperationUI.Accent:ModernOperationUI.Surface);
             var defenseColor=threat==0||strength>=threat?new Color(.47f,.78f,.67f):ModernOperationUI.Error;
-            DrawIcon(new Rect(Area.x+15,Area.y+(harbor==null?47:33),19,23),shield,defenseColor);
-            GUI.Label(new Rect(Area.x+45,Area.y+(harbor==null?46:32),145,25),position==7?"本次防御 / 蛮族":"防御 / 蛮族力量",new GUIStyle(title){fontSize=12});
+            DrawIcon(new Rect(Area.x+15,area.y+(harbor==null?47:33),19,23),shield,defenseColor);
+            GUI.Label(new Rect(Area.x+45,area.y+(harbor==null?46:32),145,25),position==7?"本次防御 / 蛮族":"防御 / 蛮族力量",new GUIStyle(title){fontSize=12});
             count.normal.textColor=defenseColor;
-            GUI.Label(new Rect(Area.x+179,Area.y+(harbor==null?46:32),52,25),strength+" / "+threat,count);
-            ModernOperationUI.Fill(new Rect(Area.x+13,Area.y+(harbor==null?76:58),Area.width-26,1),ModernOperationUI.Line);
+            GUI.Label(new Rect(Area.x+179,area.y+(harbor==null?46:32),52,25),strength+" / "+threat,count);
+            ModernOperationUI.Fill(new Rect(Area.x+13,area.y+(harbor==null?76:58),Area.width-26,1),ModernOperationUI.Line);
         }
-        if(roadBound)DrawLongestRoad(position>=0?Area.y+(harbor==null?81:59):Area.y+10,title,count);
+        if(roadBound)DrawLongestRoad(position>=0?area.y+(harbor==null?81:59):area.y+10,title,count);
         if(harbor!=null)
         {
-            float y=position>=0?Area.y+91:Area.y+48;
+            float y=position>=0?area.y+91:area.y+48;
             ModernOperationUI.Fill(new Rect(Area.x+13,y-5,Area.width-26,1),ModernOperationUI.Line);
             FishingTabletopAssets.DrawIcon(new Rect(Area.x+10,y-3,22,30),"harbormaster");
             GUI.Label(new Rect(Area.x+36,y,75,25),"海港大师",title);
-            TabletopTextFit.Label(new Rect(Area.x+113,y,116,25),HarborLabel,new GUIStyle(count){fontSize=10,wordWrap=false});
+            DrawOwner(y,harbor.HarbormasterPlayerId,count);
         }
     }
     void DrawLongestRoad(float y,GUIStyle title,GUIStyle count)
@@ -59,10 +63,19 @@ public sealed class TabletopDefenseUI
         var a=new Vector2(Area.x+14,y+18);var b=new Vector2(Area.x+21,y+8);var c=new Vector2(Area.x+30,y+17);var d=new Vector2(Area.x+37,y+6);
         StrategyHudArt.Line(a,b,gold,2);StrategyHudArt.Line(b,c,gold,2);StrategyHudArt.Line(c,d,gold,2);
         GUI.Label(new Rect(Area.x+45,y-2,66,25),"最长道路",title);
-        var result=new Rect(Area.x+109,y-2,122,25);
-        count.normal.textColor=string.IsNullOrEmpty(roadPlayer)?ModernOperationUI.Muted:gold;
-        string resultText=string.IsNullOrEmpty(roadPlayer)?"暂无归属":M6App.PlayerLabel(roadPlayer)+" · "+roadLength+" 段";
-        var resultStyle=M6App.PlayerNameStyle(new GUIStyle(count){fontSize=10,wordWrap=false},roadPlayer);TabletopTextFit.Label(result,resultText,resultStyle);
+        DrawOwner(y-2,roadPlayer,count);
+    }
+    static void DrawOwner(float y,string id,GUIStyle count)
+    {
+        bool held=!string.IsNullOrEmpty(id);
+        var result=new Rect(Area.x+110,y,121,25);
+        if(held)
+        {
+            StrategyHudArt.Avatar(new Rect(result.x,y,24,24),id);
+            result.xMin+=28;
+        }
+        var style=new GUIStyle(count){fontSize=12,wordWrap=false,alignment=TextAnchor.MiddleCenter};
+        TabletopTextFit.Label(result,held?M6App.PlayerLabel(id):"暂无归属",held?M6App.PlayerNameStyle(style,id):style);
     }
     static void DrawIcon(Rect rect,Texture2D texture,Color color)
     {var previous=GUI.color;GUI.color=color;GUI.DrawTexture(rect,texture,ScaleMode.ScaleToFit);GUI.color=previous;}

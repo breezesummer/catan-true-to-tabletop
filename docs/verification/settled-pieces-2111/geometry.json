@@ -1,0 +1,20 @@
+[
+  {
+    "kind": "village",
+    "triangles": 10533,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "kind": "city",
+    "triangles": 18266,
+    "flat": 0,
+    "uv_outside": 0
+  },
+  {
+    "kind": "road",
+    "triangles": 2452,
+    "flat": 0,
+    "uv_outside": 0
+  }
+]

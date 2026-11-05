@@ -57,6 +57,7 @@ public sealed partial class M2App : MonoBehaviour
             var fishMouse=MobileTabletop.Logical(MobileTabletop.Pointer);
             bool fishMap=ai!=null&&ai.IsHumanTurn&&!ai.TableMenuOpen&&!ai.TablePresentationBlocked&&!DockBlocksMouse(fishMouse);
             bool fishClick=mapPan.Update(board.TableScene,MobileTabletop.Pointer,fishMap,false);
+            if(fishMap&&Input.mouseScrollDelta.y!=0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
             if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,fishClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
                 (id,ship)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand(ship?"BuildShip":"BuildRoad"),seat,true),board.ClearPreview);
             else board.ClearPreview();
@@ -78,7 +79,7 @@ public sealed partial class M2App : MonoBehaviour
             mapPan.Cancel(board.TableScene);
         }
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
-        if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
+        if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
         if(curtain||newGameDialog||view==null||ai!=null&&(!ai.IsHumanTurn||tabletop.OperationHidden))return;
         var mouse=released?MobileTabletop.ScreenPoint(releasePoint):pointer;
         if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(MobileTabletop.Logical(mouse))){board.ClearPreview();hover="";return;}
@@ -196,15 +197,16 @@ public sealed partial class M2App : MonoBehaviour
         using var frameCost=FrameCost.Measure(FrameCost.Stage.BoardRefresh);
         ai?.ObservePlayerOrder(current.StartingPlayerId,current.Players.Select(p=>p.Id));
         string layout=string.Join("|",current.Board.Tiles.Select(t=>t.Id+":"+t.Resource+":"+t.Number));
+        TabletopScene previousView=null;
         if(board==null||boardLayout!=layout)
         {
             bool top=board!=null&&board.TopView;float zoom=board==null?.255f:board.Zoom;
-            if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}
+            if(board!=null){previousView=board.TableScene;board.gameObject.SetActive(false);Destroy(board.gameObject);}
             board=new GameObject("M2 board").AddComponent<BoardRenderer>();
             board.Initialize(current.Board.Tiles,current.Board.Vertices,current.Board.Edges);
             board.ChangeZoom(zoom-board.Zoom);board.SetCamera(top);board.ShowTerrain(terrain);boardLayout=layout;
         }
-        board.SetOperationLayout(ai!=null);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId,current.Board.Tiles);
+        board.SetOperationLayout(ai!=null,previousView);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId,current.Board.Tiles);
         board.RefreshReferenceMarkers(current);
     }
     public void SaveGame()

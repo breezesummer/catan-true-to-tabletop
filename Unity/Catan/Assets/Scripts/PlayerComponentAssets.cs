@@ -64,57 +64,62 @@ public static class PlayerComponentAssets
         return model;
     }
 
-    public static string BuildingResource(string type, string playerId)
+    public const string ExpansionRoot="ExpansionPieces/v001/";
+    static readonly string[] MetropolisKinds={"metro-trade","metro-politics","metro-science"};
+
+    public static string BuildingResource(string type,string playerId,int track=0)
     {
-        var colour = ColourKey(playerId);
-        if (colour == null) return null;
-        if (type == "village") return "ThreeKingdoms/v003/courtyard-" + colour;
-        if (colour != "red") return Root + "player-buildings/" + type + "-" + colour;
-        switch (type)
-        {
-            case "village": return "PhotoSamples/v001/village";
-            case "city": return "EntityAssets/v001/city/city-red";
-            case "city-wall": return "EntityAssets/v001/city-wall/city-wall-red";
-            case "metropolis": return "EntityAssets/v001/metropolis/metropolis-red";
-            default: return null;
-        }
+        var colour=ColourKey(playerId);
+        if(colour==null)return null;
+        if(type=="city"||type=="village")return "NaturalPieces/v001/"+type+"-"+colour;
+        if(type=="city-wall")return ExpansionRoot+"wall-"+colour;
+        if(type=="metropolis" && track>=0 && track<MetropolisKinds.Length)
+            return ExpansionRoot+MetropolisKinds[track]+"-"+colour;
+        return null;
     }
 
-    public static string KnightResource(string playerId, int level, bool active)
+    public static string KnightResource(string playerId,int level,bool active)
     {
-        var colour = ColourKey(playerId);
-        if (colour == null || level < 1 || level > 3) return null;
-        if (colour == "red")
-            return "EntityAssets/v001/knights/knight-level-" + level + (active ? "-active" : "-resting");
-        // Helmet = active is a provisional art convention, not a change to any rule.
-        return Root + "player-knights/knight-" + colour + "-level-" + level + (active ? "-helmet" : "-bare");
+        var colour=ColourKey(playerId);
+        if(colour==null||level<1||level>3)return null;
+        return ExpansionRoot+"knight-"+level+(active?"-active-":"-rest-")+colour;
     }
 
-    public static GameObject Building(string type, string playerId, string label, Vector3 bottom, Transform parent)
+    public static GameObject Building(string type,string playerId,string label,Vector3 bottom,Transform parent,int track=0)
     {
-        var resource = BuildingResource(type, playerId);
-        var model = Model(resource);
-        if (model != null) {var instance=Instantiate(model,label,bottom,parent);MatchBuildingPlastic(instance,playerId);return instance;}
-        if (ColourKey(playerId) != "red" || (type != "city-with-wall" && type != "metropolis-with-wall")) return null;
-
-        // v001 red uses the existing separate source models under a single neutral root.
-        var insert = Model(BuildingResource(type == "city-with-wall" ? "city" : "metropolis", playerId));
-        var wall = Model(BuildingResource("city-wall", playerId));
-        if (insert == null || wall == null) return null;
-        var root = new GameObject(label + " [" + type + "-red]");
-        root.transform.SetParent(parent, false); root.transform.position = bottom;
-        root.transform.rotation = Quaternion.Euler(0, 180, 0);
-        Object.Instantiate(wall, root.transform, false);
-        Object.Instantiate(insert, root.transform, false);
-        MatchBuildingPlastic(root,playerId);
+        bool walled=type=="city-with-wall"||type=="metropolis-with-wall";
+        string insertType=walled?type.Replace("-with-wall",""):type;
+        var insert=Model(BuildingResource(insertType,playerId,track));
+        if(insert==null)return null;
+        if(!walled)return Instantiate(insert,label,bottom,parent);
+        var wall=Model(BuildingResource("city-wall",playerId));
+        if(wall==null)return null;
+        var root=new GameObject(label+" ["+type+"-"+ColourKey(playerId)+"]");
+        root.transform.SetParent(parent,false);
+        root.transform.SetPositionAndRotation(bottom,Quaternion.Euler(0,180,0));
+        var enclosure=Object.Instantiate(wall,root.transform,false);
+        if(insertType=="metropolis")enclosure.transform.localScale*=1.14f;
+        Object.Instantiate(insert,root.transform,false);
         return root;
+    }
+
+    public static string RoadResource(string playerId)
+    {
+        var colour=ColourKey(playerId);
+        return colour==null?null:"NaturalPieces/v001/road-"+colour;
+    }
+
+    public static GameObject Road(string playerId,string label,Vector3 bottom,Quaternion rotation,Transform parent)
+    {
+        var model=Model(RoadResource(playerId));if(model==null)return null;
+        var instance=Object.Instantiate(model,bottom,rotation,parent);instance.name=label;return instance;
     }
 
     public static GameObject Knight(string playerId, int level, bool active, string label, Vector3 bottom, Transform parent)
     {
         var model = Model(KnightResource(playerId, level, active));
         if(model==null)return null;
-        var instance=Instantiate(model,label,bottom,parent);MatchBuildingPlastic(instance,playerId);return instance;
+        return Instantiate(model,label,bottom,parent);
     }
 
     static GameObject Instantiate(GameObject model, string label, Vector3 bottom, Transform parent)

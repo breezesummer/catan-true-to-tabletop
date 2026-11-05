@@ -1,0 +1,38 @@
+[
+  {
+    "kind": "village",
+    "triangles": 8939,
+    "zero_area": 0,
+    "uv_outside": 0,
+    "bounds_m": [
+      0.017999999225139618,
+      0.017772868275642395,
+      0.015637854114174843
+    ],
+    "contact_faces": 76
+  },
+  {
+    "kind": "city",
+    "triangles": 21464,
+    "zero_area": 0,
+    "uv_outside": 0,
+    "bounds_m": [
+      0.02033243700861931,
+      0.020500000566244125,
+      0.027929231524467468
+    ],
+    "contact_faces": 152
+  },
+  {
+    "kind": "road",
+    "triangles": 2282,
+    "zero_area": 0,
+    "uv_outside": 0,
+    "bounds_m": [
+      0.005730612203478813,
+      0.027000000700354576,
+      0.001375749008730054
+    ],
+    "contact_faces": 38
+  }
+]

@@ -3,6 +3,7 @@ using UnityEngine;
 // 地图点击在松键时确认；超过逻辑像素阈值的拖动只改变观察位置。
 public sealed class MapPanInput
 {
+    public static bool ControlPressed => Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
     Vector2 start, previous;
     bool captured, dragging;
     int button;

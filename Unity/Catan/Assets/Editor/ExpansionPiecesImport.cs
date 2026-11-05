@@ -1,0 +1,75 @@
+using System;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+
+public static class ExpansionPiecesImport
+{
+    const string Art="Assets/Art/ExpansionPieces/v001/";
+    const string Root="Assets/Resources/ExpansionPieces/v001/";
+    [Serializable] class Geometry { public string kind; public float[] size; public int triangles; }
+    [Serializable] class Manifest { public Geometry[] items; }
+
+    [MenuItem("Catan/美术/导入扩展棋子")]
+    public static void Run()
+    {
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        string recipe=Path.Combine(Application.dataPath,"../../../art/recipes/expansion-models-v001/几何.json");
+        var parts=JsonUtility.FromJson<Manifest>("{\"items\":"+File.ReadAllText(recipe)+"}").items;
+        var colours=new[]{"red","blue","orange","beige"};
+        var tints=new[]{new Color(.82f,.23f,.145f),new Color(.27f,.48f,.77f),new Color(.98f,.54f,.18f),new Color(1,.98f,.89f)};
+        foreach(var part in parts)
+        {
+            var texture=AssetDatabase.LoadAssetAtPath<Texture2D>(Art+part.kind+"-surface.png");
+            if(texture==null)throw new InvalidOperationException("缺少烘焙材质 "+part.kind);
+            var neutral=Material("Expansion_Natural_"+part.kind,texture,Color.white,0,.13f);
+            var steel=Material("Expansion_Metal_"+part.kind,texture,Color.white,.32f,.46f);
+            var seats=colours.Select((c,i)=>Material("Expansion_Seat_"+part.kind+"_"+c,texture,tints[i],0,.16f)).ToArray();
+            var path=Art+part.kind+".fbx";
+            var importer=(ModelImporter)AssetImporter.GetAtPath(path);
+            importer.importAnimation=false;importer.addCollider=false;importer.isReadable=false;
+            importer.importNormals=ModelImporterNormals.Import;importer.SaveAndReimport();
+            var source=AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            for(int i=0;i<colours.Length;i++)
+            {
+                var root=new GameObject(part.kind+"-"+colours[i]);
+                try
+                {
+                    var model=UnityEngine.Object.Instantiate(source,root.transform,false);
+                    model.name="模型";
+                    var renderer=model.GetComponentsInChildren<MeshRenderer>().Single();
+                    renderer.sharedMaterials=renderer.sharedMaterials.Select(m=>m.name.StartsWith("Expansion_Seat")?seats[i]:
+                        m.name.StartsWith("Expansion_Metal")?steel:neutral).ToArray();
+                    var bounds=renderer.bounds;
+                    float scale=Mathf.Max(part.size[0],part.size[1])/Mathf.Max(bounds.size.x,bounds.size.z);
+                    model.transform.localScale*=scale;
+                    model.transform.localPosition-=Vector3.up*renderer.bounds.min.y;
+                    if(Mathf.Abs(renderer.bounds.size.y-part.size[2])>.00015f||Mathf.Abs(renderer.bounds.min.y)>.00005f)
+                        throw new InvalidOperationException("尺寸或落点异常 "+part.kind);
+                    PrefabUtility.SaveAsPrefabAsset(root,Root+root.name+".prefab");
+                }
+                finally{UnityEngine.Object.DestroyImmediate(root);}
+                if(part.kind.StartsWith("metro-")||part.kind.EndsWith("-active"))continue;
+                var thumb=(TextureImporter)AssetImporter.GetAtPath(Root+"thumb-"+part.kind+"-"+colours[i]+".png");
+                thumb.isReadable=true;thumb.alphaIsTransparency=true;thumb.mipmapEnabled=true;thumb.wrapMode=TextureWrapMode.Clamp;
+                thumb.SaveAndReimport();
+            }
+        }
+        AssetDatabase.SaveAssets();
+        Debug.Log("CATAN_EXPANSION_IMPORT_OK meshes="+parts.Length+" prefabs="+parts.Length*4);
+    }
+
+    static Material Material(string name,Texture2D texture,Color tint,float metallic,float smooth)
+    {
+        var path=Art+name+".mat";
+        var material=AssetDatabase.LoadAssetAtPath<Material>(path);
+        if(material==null){material=new Material(Shader.Find("Universal Render Pipeline/Lit"));AssetDatabase.CreateAsset(material,path);}
+        material.SetTexture("_BaseMap",texture);material.SetColor("_BaseColor",tint);
+        material.SetFloat("_Metallic",metallic);material.SetFloat("_Smoothness",smooth);
+        material.SetFloat("_ReceiveShadows",0);material.EnableKeyword("_RECEIVE_SHADOWS_OFF");
+        material.enableInstancing=true;EditorUtility.SetDirty(material);
+        return material;
+    }
+}
+

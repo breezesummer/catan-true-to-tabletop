@@ -89,12 +89,28 @@ public sealed class ThreeKingdomsB2ActiveTests
     [Fact]
     public void QianxunOwnDiscardTriggersLianyingOnceAndRenewsOnlyInNewPhase()
     {
-        var host = ThreeKingdomsB2TestHost.Create("tk-g23"); host.State.Clock.ActivePlayerId = "P2"; host.Give("P1", 0, 0, 1);
+        var host = ThreeKingdomsB2TestHost.Create("tk-g23"); host.Give("P1", 0, 0, 1);
         ResolveWithReplay(host, "P1", Active(host, "discard")); Drain(host);
         Assert.Equal(2, host.GetHand("P1").Sum());
         Assert.DoesNotContain(B2SkillEngine.Actions(host, "P1"), a => a.Command.Option == "discard");
         host.State.Clock.PhaseId++;
         Assert.Contains(B2SkillEngine.Actions(host, "P1"), a => a.Command.Option == "discard"); host.AssertConserved();
+    }
+
+    [Theory][InlineData(true)][InlineData(false)]
+    public void QianxunOtherTurnAsksOwnerOnceAndResumes(bool discard)
+    {
+        var host = ThreeKingdomsB2TestHost.Create("tk-g23");
+        host.State.Clock.ActivePlayerId = "P2"; host.Give("P1", 1);
+        Assert.DoesNotContain(B2SkillEngine.Actions(host, "P1"), a => a.Command.Option == "discard");
+        B2SkillEngine.OnPlayStart(host, "play-test", "P2");
+        Assert.Equal("P1", host.State.Skills.PendingDecision.PlayerId);
+        Assert.Empty(B2SkillEngine.Actions(host, "P2"));
+        var response = B2SkillEngine.Actions(host, "P1").Single(a => a.Command.Option == (discard ? "discard" : "skip"));
+        ResolveWithReplay(host, "P1", response.Command); Drain(host);
+        B2SkillEngine.OnPlayStart(host, "play-test", "P2");
+        Assert.Null(host.State.Skills.PendingDecision);
+        Assert.Equal(discard ? 2 : 1, host.GetHand("P1").Sum()); host.AssertConserved();
     }
 
     [Fact]

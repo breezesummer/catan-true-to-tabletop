@@ -75,7 +75,9 @@ public sealed partial class M5App
         int level=knight?.Level??view.PendingDecision?.DisplacedKnight?.Level??command?.KnightLevel??view.PendingDecision?.KnightLevel??1;
         bool active=knight?.Active??view.PendingDecision?.DisplacedKnight?.Active??view.PendingDecision?.KnightActive??false;
         if(card=="Smithing")level++;
-        board.PreviewPiece(target,TabletopPointerPreview.ForEffect(card,view.PendingDecision?.Kind,level,active),seat,legal);
+        var preview=TabletopPointerPreview.ForEffect(card,view.PendingDecision?.Kind,level,active);
+        ConfigureMetropolisPreview(preview,target);
+        board.PreviewPiece(target,preview,seat,legal);
     }
     void UpdateDirectProgress(Vector2 mouse,bool click)
     {

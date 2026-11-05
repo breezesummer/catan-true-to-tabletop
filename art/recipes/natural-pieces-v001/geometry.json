@@ -1,0 +1,41 @@
+[
+  {
+    "kind": "village",
+    "triangles": 10540,
+    "vertices": 5728,
+    "zero_area_faces": 0,
+    "uv_outside": 0,
+    "materials": 3,
+    "bounds_m": [
+      0.018,
+      0.0177729,
+      0.0156379
+    ]
+  },
+  {
+    "kind": "city",
+    "triangles": 37899,
+    "vertices": 20671,
+    "zero_area_faces": 0,
+    "uv_outside": 0,
+    "materials": 3,
+    "bounds_m": [
+      0.0204462,
+      0.0205,
+      0.0291075
+    ]
+  },
+  {
+    "kind": "road",
+    "triangles": 2684,
+    "vertices": 1464,
+    "zero_area_faces": 0,
+    "uv_outside": 0,
+    "materials": 3,
+    "bounds_m": [
+      0.0049592,
+      0.027,
+      0.0014718
+    ]
+  }
+]

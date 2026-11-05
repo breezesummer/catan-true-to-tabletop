@@ -189,7 +189,7 @@ public sealed partial class M5App
             view.Players.Select(p=>new TabletopSeat{Id=p.Id,Points=p.VictoryPoints,Score=TabletopScoreModel.For(view,p.Id),Resources=p.ResourceCount,Cards=p.ProgressCardCount,ResourceHandLimit=7+2*view.Board.Walls.Count(w=>w.PlayerId==p.Id),SpecialHandLimit=4,Roads=p.Pieces.Roads,Settlements=p.Pieces.Settlements,Cities=p.Pieces.Cities,Ships=p.ShipsRemaining,Improvements=p.Improvements}).ToArray(),
             ai.IsHumanTurn&&view.Phase==GamePhase.ProductionAwaitRoll,ai.IsHumanTurn&&view.Phase==GamePhase.Action&&view.PendingDecision==null&&view.TradeOffer==null&&!directPayment.Active,
             ()=>Submit(New(CommandKind.RollDice)),EndTableTurn,target=>{if(fishingDock.PickPlayer(target))return;CancelOperationDraft();dock.OpenTrade(target);},
-            ()=>{bool open=!operationActions;dock.Reset();CancelOperationDraft();operationActions=open;},"骑士操作",facility:dock.OpenFacility);
+            ()=>{bool open=!operationActions;dock.Reset();CancelOperationDraft();operationActions=open;},"骑士操作",facility:dock.OpenFacility,turnOwner:view.ActivePlayerId);
 
         tabletop.SetContextAnchor(operationActions&&operationKnightTarget!=null?(Vector2?)MobileTabletop.Logical(board.ScreenPoint(operationKnightTarget)):null);
         GUI.enabled=tableEnabled&&!mapChoice.Active&&!dock.HasOverlay;
@@ -322,6 +322,8 @@ public sealed partial class M5App
     bool PickTabletopBuilding(Vector2 mouse)
     {
         if(view==null||curtain||newGame||artOpen||!ai.IsHumanTurn)return false;
+        var building=board.BuildingAt(mouse);
+        if(building!=null)return OpenTabletopBuildingMenu(building);
         return OpenTabletopBuildingMenu(Pick("V",mouse));
     }
     bool OpenTabletopBuildingMenu(string vertex)

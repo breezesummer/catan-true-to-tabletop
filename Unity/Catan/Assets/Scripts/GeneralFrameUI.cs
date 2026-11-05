@@ -5,7 +5,7 @@ using UnityEngine;
 public static class GeneralFrameUI
 {
     const string Root="GeneralUI/v001/";
-    static Texture2D glow;
+    static Material portraitInk;
     static readonly Dictionary<string,Texture2D> frames=new Dictionary<string,Texture2D>();
     static readonly Texture2D[] buttons=new Texture2D[3];
     static Texture2D hpGreen,hpYellow,hpRed,hpEmpty;
@@ -16,7 +16,7 @@ public static class GeneralFrameUI
     static readonly string[] SeatNumbers={"一","二","三","四"};
     static void Ensure()
     {
-        if(glow==null)glow=Resources.Load<Texture2D>("GeneralUI/v002/turn-glow");
+        if(portraitInk==null)portraitInk=new Material(Resources.Load<Shader>("GeneralUI/v002/PortraitInk")){hideFlags=HideFlags.HideAndDontSave};
         for(int i=0;i<3;i++)if(buttons[i]==null)buttons[i]=Resources.Load<Texture2D>("GeneralUI/v002/skill-"+i);
         if(nameBrush==null)nameBrush=Resources.Load<Font>("GeneralUI/v002/NameCalligraphy");
         if(hpGreen==null)hpGreen=Resources.Load<Texture2D>(Root+"hp-green");
@@ -35,22 +35,26 @@ public static class GeneralFrameUI
         GUI.Label(new Rect(area.x+1,area.y+2,area.width,area.height),text,lettering);
         lettering.normal.textColor=color??Gold;GUI.Label(area,text,lettering);
     }
-    public static void Portrait(Rect area,string id,string name,string faction,int position,bool highlighted,bool faceDown,int life)
+    public static void Portrait(Rect area,string id,string name,string faction,int position,bool highlighted,bool faceDown,int life,bool own=false)
     {
         Ensure();float portraitScale=area.width/138f;
-        // 外发光与普通边框使用同一实际边界，避免切换回合时跳动。
-        if(highlighted&&!StrategyHudTheme.Ocean)Slice(glow,new Rect(((int)(Time.unscaledTime*10)%10)*240,0,240,270),new Rect(area.x-area.width*.26f,area.y-area.height*.15f,area.width*1.52f,area.height*1.18f),2400,270);
         string camp=faction=="魏"?"wei":faction=="蜀"?"shu":faction=="吴"?"wu":faction=="晋"?"jin":faction=="神"?"shen":"qun";
         if(!frames.TryGetValue(camp,out var frame)){frame=Resources.Load<Texture2D>("GeneralUI/v002/frame-"+camp);frames[camp]=frame;}
-        if(StrategyHudTheme.Ocean)OceanTabletopSkin.Panel(area,highlighted);
+        if(StrategyHudTheme.Ocean)OceanTabletopSkin.Panel(area);
         else if(frame!=null)GUI.DrawTexture(area,frame,ScaleMode.StretchToFill,true);
+        // 整个框面和流光都在立绘之后，顶边遇到发冠自然断开。
+        if(own&&StrategyHudTheme.Ocean)Flow(new Rect(area.x+3,area.y+3,area.width-6,area.height-6),true);
+        if(highlighted)Flow(area,false);
         Texture2D portrait=null;
         if(!string.IsNullOrEmpty(id)&&!portraits.TryGetValue(id,out portrait)){portrait=Resources.Load<Texture2D>(Root+"Portraits/"+id);portraits[id]=portrait;}
         if(portrait!=null&&!faceDown)
         {
-            // 源图400×472，左右透明边与顶部露头保留；头部高于卡框约12像素。
-            var image=new Rect(area.x+area.width*.155f,area.y-12*portraitScale,area.width*.83f,area.height+10*portraitScale);
-            GUI.DrawTextureWithTexCoords(image,portrait,new Rect(.08f,0,.8275f,1),true);
+            // 原图中间约 83% 是印刷画面，两侧透明区也可能有发丝、兵器，整幅绘制。
+            float fullWidth=area.width*.86f/.8275f;
+            float lift=area.height*.073f;
+            var image=new Rect(area.x+area.width*.12f-fullWidth*.08f,area.y-lift,fullWidth,area.height+lift-2*portraitScale);
+            if(Event.current.type==EventType.Repaint)
+                Graphics.DrawTexture(image,portrait,new Rect(0,0,1,1),0,0,0,0,Color.white,portraitInk);
         }
         else Text(new Rect(area.x+area.width*.2f,area.y+area.height*.25f,area.width*.75f,area.height*.4f),faceDown?"暗置":name??"",22);
         // 姓名条盖在人物左侧，顶部不覆盖露出的头饰。
@@ -67,6 +71,22 @@ public static class GeneralFrameUI
             for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++)
                 if(x!=0||y!=0)GUI.Label(new Rect(number.x+x,number.y+y,number.width,number.height),SeatNumbers[position],lettering);
             lettering.normal.textColor=new Color(.025f,.025f,.02f);GUI.Label(number,SeatNumbers[position],lettering);
+        }
+    }
+    public static void Flow(Rect r,bool blue)
+    {
+        if(Event.current.type!=EventType.Repaint)return;
+        var color=blue?new Color(.15f,.66f,1f):new Color(1f,.82f,.16f);
+        GUI.DrawTexture(r,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,color,blue?2.6f:1.6f,6);
+        // 两束亮光绕框行走；顶、底边与两侧共享同一条连续路径。
+        float length=2*(r.width+r.height);
+        for(int i=0;i<12;i++)
+        {
+            float distance=Mathf.Repeat(Time.unscaledTime*82+(i/6)*length*.5f-(i%6)*2.5f,length);
+            Vector2 p=distance<r.width?new Vector2(r.x+distance,r.y):distance<r.width+r.height?new Vector2(r.xMax,r.y+distance-r.width):
+                distance<2*r.width+r.height?new Vector2(r.xMax-(distance-r.width-r.height),r.yMax):new Vector2(r.x,r.yMax-(distance-2*r.width-r.height));
+            var glint=Color.Lerp(color,Color.white,.85f);glint.a=1-(i%6)/6f;
+            GUI.DrawTexture(new Rect(p.x-2,p.y-2,4,4),Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,glint,0,2);
         }
     }
     public static void Avatar(Rect area,string id,bool faceDown)

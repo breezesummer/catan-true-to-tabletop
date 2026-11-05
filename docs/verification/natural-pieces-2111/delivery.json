@@ -1,0 +1,11 @@
+{
+  "version": "2.1.11",
+  "platform": "Windows",
+  "build": "game version/2.1/Catan2.1.11-Painted-Map/Builds/Windows/Catan2.1.11.exe",
+  "sha256": "3070E580E019576B9AFCDEB4FEC18D03CEBC119F6AE84D597412905C749AD653",
+  "liveChecks": 669,
+  "componentInstances": 40,
+  "prefabs": 12,
+  "thumbnails": 12,
+  "sharedMeshes": 3
+}

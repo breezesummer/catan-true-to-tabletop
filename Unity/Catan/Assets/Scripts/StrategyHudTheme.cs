@@ -6,7 +6,7 @@ public static class StrategyHudTheme
     const string Preference="catan.ui.theme.v010";
     static int selected=-1;
     public static readonly string[] Names={"铜木","海洋","骑士","青玉鎏金"};
-    public static int Selected { get { if(selected<0)selected=Mathf.Clamp(PlayerPrefs.GetInt(Preference,0),0,Names.Length-1);return selected; } }
+    public static int Selected { get { if(selected<0)selected=Mathf.Clamp(PlayerPrefs.GetInt(Preference,1),0,Names.Length-1);return selected; } }
     public static int Version { get; private set; }
     public static void Select(int index)
     {

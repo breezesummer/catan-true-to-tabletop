@@ -1,0 +1,32 @@
+[
+  {
+    "kind": "village",
+    "triangles": 8939,
+    "zero_area": 0,
+    "uv_outside": 0,
+    "vertex_alpha_range": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "kind": "city",
+    "triangles": 21464,
+    "zero_area": 0,
+    "uv_outside": 0,
+    "vertex_alpha_range": [
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "kind": "road",
+    "triangles": 2282,
+    "zero_area": 0,
+    "uv_outside": 0,
+    "vertex_alpha_range": [
+      0.0,
+      1.0
+    ]
+  }
+]

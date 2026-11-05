@@ -12,6 +12,7 @@ public sealed class TabletopOcean : MonoBehaviour
     public const float WaterHeight = .0045f;
     public bool MaskReady { get; private set; }
     public int MaskRevision { get; private set; }
+    OceanThemeEnvironment scenery;
     Material material;
     Texture2D mask;
     string layoutKey;
@@ -30,6 +31,8 @@ public sealed class TabletopOcean : MonoBehaviour
         material.name = "连续海面 v001";
         material.SetFloat("_WaterHeight", WaterHeight);
         material.SetTexture("_OceanDetail",Resources.Load<Texture2D>("Ocean/v003/ocean-detail"));
+        material.SetTexture("_Gravel",Resources.Load<Texture2D>(CoastalDecals.Root+"gravel"));
+        material.SetTexture("_Sand",Resources.Load<Texture2D>(CoastalDecals.Root+"sand"));
         material.SetVector("_MaskRect", new Vector4(0,0,.00001f,.00001f));
         foreach (var renderer in surface.GetComponentsInChildren<Renderer>())
         {
@@ -38,8 +41,8 @@ public sealed class TabletopOcean : MonoBehaviour
             renderer.receiveShadows = false;
         }
         TabletopScene.SetTableLayer(surface.transform);
-        var scenery=new GameObject("海洋主题边缘环境");scenery.transform.SetParent(transform,false);
-        scenery.AddComponent<OceanThemeEnvironment>().Initialize(GetComponent<TabletopScene>(),material);
+        var islands=new GameObject("近岸礁石");islands.transform.SetParent(transform,false);
+        scenery=islands.AddComponent<OceanThemeEnvironment>();scenery.Initialize(material);
     }
 
     public void Refresh(Tile[] tiles, Dictionary<string, Vector3> vertices)
@@ -57,6 +60,12 @@ public sealed class TabletopOcean : MonoBehaviour
             var center = points.Aggregate(Vector3.zero, (sum, p) => sum + p) / points.Length;
             return new Hex { Center = new Vector2(center.x, center.z), Radius = Vector2.Distance(new Vector2(points[0].x, points[0].z), new Vector2(center.x, center.z)), Sea = t.Resource == "sea" || t.Resource == "water" };
         }).ToArray();
+        var land = hexes.Where(h => !h.Sea).ToArray();
+        if (land.Length > 0)
+        {
+            var coast = land.Select(h => h.Center).ToArray();
+            scenery.Place(coast, land.Max(h => h.Radius));
+        }
         if (baking != null) StopCoroutine(baking);
         baking = StartCoroutine(Bake(hexes));
     }

@@ -77,13 +77,14 @@ public sealed partial class M3App : MonoBehaviour
             var fishMouse=MobileTabletop.Logical(MobileTabletop.Pointer);
             bool fishMap=ai!=null&&ai.IsHumanTurn&&!ai.TableMenuOpen&&!ai.TablePresentationBlocked&&!DockBlocksMouse(fishMouse);
             bool fishClick=mapPan.Update(board.TableScene,MobileTabletop.Pointer,fishMap,false);
+            if(fishMap&&Input.mouseScrollDelta.y!=0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
             if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,fishClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
                 (id,ship)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand(ship?"BuildShip":"BuildRoad"),seat,true),board.ClearPreview);
             else board.ClearPreview();
             return;
         }
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
-        if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
+        if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
         if(curtain||newGameDialog||view==null||ai!=null&&(!ai.IsHumanTurn||tabletop.OperationHidden))return;
         var mouse=released?MobileTabletop.ScreenPoint(releasePoint):pointer;
         if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(MobileTabletop.Logical(mouse))){board.ClearPreview();hover="";return;}
@@ -223,17 +224,18 @@ public sealed partial class M3App : MonoBehaviour
         using var frameCost=FrameCost.Measure(FrameCost.Stage.BoardRefresh);
         ai?.ObservePlayerOrder(current.StartingPlayerId,current.Players.Select(p=>p.Id));
         string layout=string.Join("|",current.Board.Tiles.Select(t=>t.Id+":"+t.Resource+":"+t.Number));
+        TabletopScene previousView=null;
         if(board==null||boardLayout!=layout)
         {
             bool existing=board!=null,top=existing&&board.TopView;float zoom=existing?board.Zoom:0;
-            if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}
+            if(board!=null){previousView=board.TableScene;board.gameObject.SetActive(false);Destroy(board.gameObject);}
             board=new GameObject("M3 board").AddComponent<M3BoardRenderer>();
             board.Initialize(current.Board.Tiles,current.Board.Vertices,current.Board.Edges);
             if(existing)board.ChangeZoom(zoom-board.Zoom);board.SetCamera(top);board.ShowTerrain(terrain);boardLayout=layout;
         }
-        board.SetOperationLayout(ai!=null);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId,current.Board.Tiles);
-        board.RefreshSeafarers(current.Board.Ships,current.Board.PirateTileId);
+        board.SetOperationLayout(ai!=null,previousView);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId,current.Board.Tiles);
         board.RefreshReferenceMarkers(current);
+        board.RefreshSeafarers(current.Board.Ships,current.Board.PirateTileId);
     }
     public void SaveGame()
     {
@@ -565,18 +567,18 @@ public sealed partial class M3App : MonoBehaviour
             Label(x-25,y-21,50,25,tile.Resource=="fog"?"迷雾":tile.Number.HasValue?tile.Number.Value.ToString()+(tile.Resource=="gold"?" 金":""):"沙漠",numberStyle);
             Label(x-25,y+2,50,20,tile.Id+(tile.Id==view.Board.RobberTileId?" 强盗":""),new GUIStyle(badge){fontSize=10});
         }
-        foreach(var village in view.Board.Villages)DrawMarker(village.VertexId,"村 "+village.Number+" · 布 "+village.Cloth,new Color(.25f,.15f,.35f));
-        foreach(var fortress in view.Board.Fortresses.Where(f=>f.Strength>0))DrawMarker(fortress.VertexId,fortress.PlayerId+" 堡 "+fortress.Strength,new Color(.35f,.08f,.11f));
-        foreach(var fortress in view.Board.Fortresses.Where(f=>!string.IsNullOrEmpty(f.BeachheadVertexId)))DrawMarker(fortress.BeachheadVertexId,fortress.PlayerId+" 滩头",new Color(.12f,.26f,.38f));
-        foreach(var fortress in view.Board.Fortresses.Where(f=>!string.IsNullOrEmpty(f.InvasionStartingVertexId)))DrawMarker(fortress.InvasionStartingVertexId,fortress.PlayerId+" 西行起点",new Color(.12f,.26f,.38f));
+        foreach(var village in view.Board.Villages)DrawMarker(village.VertexId,"村 "+village.Number+" · 布 "+village.Cloth,MapSymbol.Village);
+        foreach(var fortress in view.Board.Fortresses.Where(f=>f.Strength>0))DrawMarker(fortress.VertexId,fortress.PlayerId+" 堡 "+fortress.Strength,MapSymbol.Fortress);
+        foreach(var fortress in view.Board.Fortresses.Where(f=>!string.IsNullOrEmpty(f.BeachheadVertexId)))DrawMarker(fortress.BeachheadVertexId,fortress.PlayerId+" 滩头",MapSymbol.Beachhead);
+        foreach(var fortress in view.Board.Fortresses.Where(f=>!string.IsNullOrEmpty(f.InvasionStartingVertexId)))DrawMarker(fortress.InvasionStartingVertexId,fortress.PlayerId+" 西行起点",MapSymbol.Flag);
         foreach(var edge in view.Board.BonusEdgeIds)
-            if(!board.ReferenceMarkers.HasBonusMarker(edge))DrawMarker(edge,"★",new Color(.55f,.4f,.05f));
-        foreach(var edge in view.Board.GiftCardEdgeIds)DrawMarker(edge,"礼",new Color(.10f,.4f,.35f));
+            if(!board.ReferenceMarkers.HasBonusMarker(edge))DrawMarker(edge,"★",MapSymbol.Gift);
+        foreach(var edge in view.Board.GiftCardEdgeIds)DrawMarker(edge,"礼",MapSymbol.Gift);
         foreach(var port in view.Board.GiftPorts)
-            if(!board.ReferenceMarkers.HasGiftPort(port.Id))DrawMarker(port.EdgeId,port.Resource.HasValue?ResourceNames[(int)port.Resource.Value]+"港礼":"港礼",new Color(.10f,.4f,.35f));
-        foreach(var wonder in view.Wonders)foreach(var vertex in wonder.VertexIds)DrawMarker(vertex,WonderName(wonder.Id),new Color(.4f,.3f,.08f));
-        if(!string.IsNullOrEmpty(view.Board.PirateTileId))DrawMarker(view.Board.PirateTileId,"海盗",new Color(.25f,.05f,.3f));
-        if(view.Board.RobberTileId=="frame")DrawMarker("frame","强盗",new Color(.08f,.075f,.09f),true);
+            if(!board.ReferenceMarkers.HasGiftPort(port.Id))DrawMarker(port.EdgeId,port.Resource.HasValue?ResourceNames[(int)port.Resource.Value]+"港礼":"港礼",MapSymbol.Gift);
+        foreach(var wonder in view.Wonders)foreach(var vertex in wonder.VertexIds)DrawMarker(vertex,WonderName(wonder.Id),MapSymbol.Wonder);
+        if(!string.IsNullOrEmpty(view.Board.PirateTileId))DrawMarker(view.Board.PirateTileId,"海盗",MapSymbol.Pirate);
+        if(view.Board.RobberTileId=="frame")DrawMarker("frame","强盗",MapSymbol.Flag,true);
         foreach(var port in view.Board.Ports)
         {
             if(board.ReferenceMarkers.HasPort(port.Id))
@@ -606,13 +608,10 @@ public sealed partial class M3App : MonoBehaviour
             if(id==hover){Panel(new Rect(p.x-28,p.y-31,56,24),new Color(.04f,.1f,.1f));Label(p.x-28,p.y-32,56,25,id,badge);}
         }
     }
-    void DrawMarker(string location,string label,Color color,bool frameRobber=false)
+    void DrawMarker(string location,string label,MapSymbol symbol,bool frameRobber=false)
     {
-        var p=frameRobber?board.FrameRobberScreenPoint():board.ScreenPoint(location);var logical=MobileTabletop.Logical(p);float x=logical.x,y=logical.y;
-        var markerStyle=new GUIStyle(small){wordWrap=false,padding=new RectOffset(),alignment=TextAnchor.MiddleCenter};
-        var size=markerStyle.CalcSize(new GUIContent(label));
-        var area=new Rect(x-Mathf.Max(25,size.x+8)/2,y-Mathf.Max(21,size.y+4)/2,Mathf.Max(25,size.x+8),Mathf.Max(21,size.y+4));
-        Panel(area,color);GUI.Label(area,label,markerStyle);
+        var screen=frameRobber?board.FrameRobberScreenPoint():board.ScreenPoint(location);
+        PaintedMapSymbols.Draw(MobileTabletop.Logical(screen),symbol,label,small);
     }
     void DrawGuide()
     {

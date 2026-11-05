@@ -108,14 +108,15 @@ public sealed partial class M5App : MonoBehaviour
         ai?.ObservePlayerOrder(v.StartingPlayerId,v.Players.Select(p=>p.Id));
         summary=new PublicSummary{ScenarioName=v.ScenarioName,ActivePlayerId=v.ActivePlayerId,TargetVictoryPoints=v.TargetVictoryPoints,Turn=v.Turn,BarbarianPosition=v.BarbarianPosition,LastDice1=v.LastDice1,LastDice2=v.LastDice2,LastEventDie=v.LastEventDie,Players=v.Players};
         string next=v.ScenarioId+"|"+string.Join("|",v.Board.Tiles.Select(t=>t.Id+":"+t.Resource+":"+t.Number))+"|"+string.Join("|",v.Board.Ports.Select(p=>p.Id+":"+p.Resource+":"+string.Join(",",p.Vertices)));
+        TabletopScene previousView=null;
         if(board==null||next!=layout)
         {
             bool top=board!=null&&board.TopView;
-            if(board!=null){board.gameObject.SetActive(false);Destroy(board.gameObject);}
+            if(board!=null){previousView=board.TableScene;board.gameObject.SetActive(false);Destroy(board.gameObject);}
             board=new GameObject("M5 board").AddComponent<M5BoardRenderer>();board.Initialize(v.Board.Tiles,v.Board.Vertices,v.Board.Edges);
             board.SetCamera(top);layout=next;
         }
-        board.SetOperationLayout(ai!=null);board.Refresh(v);board.ShowTerrain(terrain);
+        board.SetOperationLayout(ai!=null,previousView);board.Refresh(v);board.ShowTerrain(terrain);
     }
     public void SaveGame(){if(ai!=null){ai.SaveGame();return;}try{host.Save();status="已保存完整局面和待决选择。";}catch(Exception){status="保存失败，请检查存档目录。";}}
     public void LoadGame(){if(ai!=null){ai.LoadGame();return;}try{host.Load();var v=host.View("P1");Refresh(v);SwitchSeat(Actor(v));status="已恢复，请确认席位。";}catch(Exception){status="存档无法读取或版本不兼容，当前局面保留。";}}
@@ -139,6 +140,7 @@ public sealed partial class M5App : MonoBehaviour
             var fishMouse=MobileTabletop.Logical(MobileTabletop.Pointer);
             bool fishMap=ai!=null&&ai.IsHumanTurn&&!ai.TableMenuOpen&&!ai.TablePresentationBlocked&&!DockBlocksMouse(fishMouse);
             bool fishClick=mapPan.Update(board.TableScene,MobileTabletop.Pointer,fishMap,false);
+            if(fishMap&&Input.mouseScrollDelta.y!=0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
             if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,fishClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
                 (id,ship)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand(ship?"BuildShip":"BuildRoad"),seat,true),board.ClearPreview);
             else board.ClearPreview();
@@ -147,7 +149,7 @@ public sealed partial class M5App : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(ai!=null&&ai.ThreeKingdomsSelectionActive&&!ThreeKingdomsPaymentActive)
         {
-            if(!blocked&&Input.mouseScrollDelta.y!=0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
+            if(!blocked&&Input.mouseScrollDelta.y!=0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
             board.ClearPreview();return;
         }
         if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)&&!blocked&&(ai!=null||pointer.x<Screen.width*.70f))
@@ -156,7 +158,7 @@ public sealed partial class M5App : MonoBehaviour
             if(!knightMenu){dock.Reset();CancelOperationDraft();pickField="";board.ClearPreview();newGame=false;cardArt.Clear();}
             mapPan.Cancel(board.TableScene);
         }
-        if(!DockBlocksMouse()&&(ai!=null||Input.mousePosition.x<Screen.width*.70f)&&Input.mouseScrollDelta.y!=0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
+        if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.70f)&&Input.mouseScrollDelta.y!=0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
         if(curtain||newGame||artOpen||ai!=null&&!ai.IsHumanTurn)return;
         var mouse=buildReleased?MobileTabletop.ScreenPoint(releasedMouse):MobileTabletop.Pointer;
         var logicalMouse=MobileTabletop.Logical(mouse);
@@ -202,7 +204,16 @@ public sealed partial class M5App : MonoBehaviour
         var preview=TabletopPointerPreview.ForCommand(draft.Kind.ToString(),setupCity,level,selected?.Active??false);
         if(draft.Kind==CommandKind.PlayProgressCard||draft.Kind==CommandKind.ResolveChoice||draft.Kind==CommandKind.ResolveProgressChoice)
             preview=TabletopPointerPreview.ForEffect(draft.Kind==CommandKind.PlayProgressCard?draft.ProgressCard.ToString():null,view.PendingDecision?.Kind,level,selected?.Active??false);
+        ConfigureMetropolisPreview(preview,target);
         board.PreviewPiece(target,preview,seat,legal);
+    }
+    void ConfigureMetropolisPreview(TabletopPointerPreview preview,string vertex)
+    {
+        if(preview.Kind!="metropolis"||view.PendingDecision==null)return;
+        var decision=view.PendingDecision;
+        var source=view.Board.Metropolises.FirstOrDefault(m=>m.LocationId==decision.AnchorVertexId);
+        preview.Track=(int)(decision.Kind=="B5MetropolisRelocate"&&source!=null?source.Track:decision.Track);
+        preview.Wall=view.Board.Walls.Any(w=>w.LocationId==vertex);
     }
     internal bool TryCancelTableInteraction()
     {

@@ -22,7 +22,8 @@ public static class StrategyHudArt
         if(!GUI.enabled){face=Color.Lerp(ModernOperationUI.Background,face,.4f);trim=ModernOperationUI.Line;}
         using(TabletopButtonFeedback.Begin(rect))
         {
-        if(StrategyHudTheme.Jade)JadeTabletopSkin.Panel(rect,face,hover,false);else Plaque(rect,face,trim,hover);
+        if(StrategyHudTheme.Ocean)OceanTabletopSkin.Panel(rect,selected||hover,false);
+        else if(StrategyHudTheme.Jade)JadeTabletopSkin.Panel(rect,face,hover,false);else Plaque(rect,face,trim,hover);
         var icon=counter.HasValue?new Rect(rect.x+8,rect.center.y-16,30,32):new Rect(rect.x+11,rect.center.y-10,19,20);
         Color ink=GUI.enabled?(selected?new Color(1,.94f,.75f):ModernOperationUI.TextColor):ModernOperationUI.Muted;
         HandSymbol(icon,kind,ink);
@@ -33,7 +34,7 @@ public static class StrategyHudArt
             label.fontSize=10;label.normal.textColor=GUI.enabled?ModernOperationUI.Muted:ModernOperationUI.Line;
             TabletopTextFit.Label(new Rect(rect.x+37,rect.y+6,rect.width-45,13),caption,label);
             label.fontSize=14;label.normal.textColor=counter.Value.OverLimit?ModernOperationUI.Error:ink;
-            TabletopTextFit.Label(new Rect(rect.x+37,rect.y+20,rect.width-45,17),counter.Value.Caption,label);
+            TabletopTextFit.Label(new Rect(rect.x+37,rect.y+20,rect.width-45,17),kind==4?counter.Value.Count.ToString():counter.Value.Caption,label);
         }
         else TabletopTextFit.Label(new Rect(rect.x+31,rect.y+5,rect.width-39,rect.height-10),caption,label);
         }
@@ -42,6 +43,12 @@ public static class StrategyHudArt
     static void HandSymbol(Rect rect,int kind,Color ink)
     {
         // 卡页采用三张扇形牌背，整理采用三张齐列卡纸和向下归拢箭头。
+        if(kind==4)
+        {
+            var helmet=EntityCardAssets.Texture("GeneralUI/v002/library-helm");
+            if(helmet!=null)GUI.DrawTexture(rect,helmet,ScaleMode.ScaleToFit,true);
+            return;
+        }
         if(kind==3){FishIcon(rect);return;}
         if(kind==2)
         {

@@ -33,7 +33,7 @@ public sealed class CatanApp : MonoBehaviour
         if(host==null)return;
         if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1))CancelPickup();
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
-        if(Input.mousePosition.x<Screen.width*.74f && Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ChangeZoom(-Input.mouseScrollDelta.y*.012f);
+        if(Input.mousePosition.x<Screen.width*.74f && Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
         if(curtain||!holding)return;
         Vector2 mouse=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y);
         string candidate=ResolveTarget(road,mouse);

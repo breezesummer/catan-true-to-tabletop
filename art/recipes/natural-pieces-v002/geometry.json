@@ -1,0 +1,35 @@
+[
+  {
+    "kind": "village.004",
+    "triangles": 8939,
+    "vertices": 4652,
+    "materials": 3,
+    "bounds_m": [
+      0.018,
+      0.017773,
+      0.015638
+    ]
+  },
+  {
+    "kind": "city.004",
+    "triangles": 21464,
+    "vertices": 11643,
+    "materials": 3,
+    "bounds_m": [
+      0.020332,
+      0.0205,
+      0.027929
+    ]
+  },
+  {
+    "kind": "road.004",
+    "triangles": 2282,
+    "vertices": 1248,
+    "materials": 3,
+    "bounds_m": [
+      0.005731,
+      0.027,
+      0.001376
+    ]
+  }
+]

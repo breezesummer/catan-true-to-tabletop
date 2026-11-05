@@ -55,6 +55,7 @@ namespace Catan.AI
                     case "seat-fuqi-request": return c.CardType>=0&&c.CardType<8?Math.Max(0,desired[c.CardType]-hand[c.CardType])*20+6:5;
                     case "modify": return -200;
                     case "fixed": return -200;
+                    case "discard": return hand.Sum() == 1 ? 15 : -150;
                     case "skip": return -100;
                     case "done": return -10;
                     case "pass": return 0;

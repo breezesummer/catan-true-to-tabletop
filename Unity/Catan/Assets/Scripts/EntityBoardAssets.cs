@@ -27,53 +27,40 @@ public static class EntityBoardAssets
     }
     public static GameObject ReferenceMarker(string resource, string label, Vector3 bottom, Quaternion rotation, Transform parent)
     {
-        return string.IsNullOrEmpty(resource) ? null : Instantiate(resource, label, bottom, rotation, parent);
+        if (resource != null && resource.Contains("/port-"))
+            return CoastalDecals.Dock(resource,label,bottom,rotation,parent);
+        var marker = string.IsNullOrEmpty(resource) ? null : Instantiate(resource, label, bottom, rotation, parent);
+        if (marker != null && (resource.Contains("/port-") || resource.Contains("/ground-")))
+            PaintedMap.ApplyCoastalInk(marker, resource.Contains("/port-"));
+        return marker;
     }
 
     public static string TerrainResource(string resource)
     {
-        switch (resource)
-        {
-            case "lake": return FishingTabletopAssets.Resource("lake");
-            case "wood": return "PhotoSamples/v001/forest";
-            case "ore": return "EntityAssets/v006/ore-tile/tile-ore";
-            case "brick": return Root + "tiles/tile-hills";
-            case "wool": return Root + "tiles/tile-pasture";
-            case "wheat": return Root + "tiles/tile-fields";
-            case "desert": return Root + "tiles/tile-desert";
-            case "sea": case "water": return Root + "tiles/tile-sea";
-            case "gold": return Root + "tiles/tile-gold";
-            // Fog is an unrevealed public placeholder, never a request for a terrain asset.
-            default: return null;
-        }
+        return PaintedMap.Region(resource) >= 0 ? PaintedMap.Root + "board-hex" : null;
     }
 
     public static GameObject Terrain(string resource, Vector3 bottom, Transform parent)
     {
-        // v001 has already converted the photographed flat-top hexagon to the board's
-        // 30-degree pointy hexagon. Its 8 mm top matches the existing placement surface.
-        var tile = Instantiate(TerrainResource(resource), resource, bottom, Quaternion.identity, parent);
-        TabletopPhysicalTileV005.Apply(tile);
-        if (tile != null && (resource == "sea" || resource == "water")) tile.AddComponent<OceanTileSurface>();
-        return tile;
+        return PaintedMap.Tile(resource, bottom, parent);
     }
 
     public static string ShipResource(string playerId)
     {
         var colour = PlayerComponentAssets.ColourKey(playerId);
-        if (colour == "beige") colour = "ivory";
-        return colour == null ? null : Root + "ships/ship-" + colour;
+        return colour==null?null:PlayerComponentAssets.ExpansionRoot+"ship-"+colour;
     }
 
-    public static GameObject Ship(string label, Color seatColour, Vector3 bottom, Quaternion edgeRotation, Transform parent)
+    public static Vector3 ShipWaterline(Vector3 edge)
     {
-        var colour = PlayerComponentAssets.ColourKey(seatColour);
-        if (colour == null) return null; // Legal/illegal previews retain their readable tint.
-        if (colour == "beige") colour = "ivory";
-        var instance=Instantiate(Root+"ships/ship-"+colour,label,bottom,edgeRotation,parent);
-        int index=System.Array.IndexOf(BoardRenderer.SeatColors,seatColour);
-        PlayerComponentAssets.MatchBuildingPlastic(instance,"P"+(index+1));
-        return instance;
+        return edge+Vector3.up*(TabletopOcean.WaterHeight-BoardSurfaceHeight-.0004f);
+    }
+
+    public static GameObject Ship(string label,Color seatColour,Vector3 bottom,Quaternion edgeRotation,Transform parent)
+    {
+        var colour=PlayerComponentAssets.ColourKey(seatColour);
+        if(colour==null)return null;
+        return Instantiate(PlayerComponentAssets.ExpansionRoot+"ship-"+colour,label,bottom,edgeRotation,parent);
     }
 
     public static GameObject Robber(string label, Vector3 bottom, Transform parent)

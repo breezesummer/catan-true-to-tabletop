@@ -46,6 +46,7 @@ public static class TabletopMapVerificationV010
                 foreach(float step in new[]{.45f,.65f,.85f,1,1.25f,1.65f})
                 {
                     scene.Frame(map,overhead,step);
+                    require(Mathf.Abs(1/scene.DisplayScale-Mathf.Clamp(step,scene.MinimumZoom,TabletopCameraModel.FarthestZoom))<.001f,"地图缩放没有限制远景范围");
                     float angle=map.transform.eulerAngles.x;
                     require(Mathf.Abs(angle-TabletopCameraModel.Angle(step,overhead))<.01f,"实际相机没有采用固定观察角度");
                     require(Mathf.Abs(angle-expectedAngle)<.01f,"所有缩放距离必须保持同一俯角，不能压扁棋盘");

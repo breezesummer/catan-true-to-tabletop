@@ -193,14 +193,15 @@ public sealed partial class M6App
         if(detailGeneralId!=null)DrawGeneralDetail();
         if(inspectionText!=null)DrawGeneralInspection();
     }
-    void DrawGeneralDock(ThreeKingdomsView view)
+    void DrawGeneralDock(ThreeKingdomsView view,bool interactive=true)
     {
         var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
         var general=string.IsNullOrEmpty(own?.ActiveGeneralId)?null:GeneralCatalog.Get(own.ActiveGeneralId);
         GeneralFrameUI.Portrait(new Rect(28,714,138,171),general?.Id,general?.Name,general?.Faction,
             Array.IndexOf(HistoryPlayers,GeneralAssetSeatB6),Ready&&!Finished&&GeneralAssetSeatB6==HumanSeat&&view.Clock.ActivePlayerId==HumanSeat&&
             view.Clock.Phase>=ThreeKingdomsPhase.Preparation&&view.Clock.Phase<=ThreeKingdomsPhase.End,
-            own?.FaceDown==true,general==null?-1:own.RemainingLife);
+            own?.FaceDown==true,general==null?-1:own.RemainingLife,true);
+        if(!interactive)return;
         int portraitInput=ThreeKingdomsDirectInput.Read(GeneralArea,true);
         if(portraitInput==1&&general!=null)detailGeneralId=general.Id;
         if(portraitInput==2&&general!=null)detailGeneralId=general.Id;
@@ -428,10 +429,15 @@ public sealed partial class M6App
         PastoralMenuUI.Label(new Rect(r.x+10,r.y+portraitHeight+20,r.width-20,r.height-portraitHeight-32),description,14,PastoralMenuUI.Ivory,false,TextAnchor.MiddleCenter);
         if(selected)PastoralMenuUI.Label(new Rect(r.xMax-30,r.y+8,22,24),"✓",20,null,true,TextAnchor.MiddleCenter);
     }
-    void DrawGeneralLibrary(ThreeKingdomsView view)
+    string[] LibraryIds(ThreeKingdomsView view)
     {
         var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
-        var ids=(own?.HiddenGeneralIds??Array.Empty<string>()).Concat(string.IsNullOrEmpty(own?.ActiveGeneralId)?Array.Empty<string>():new[]{own.ActiveGeneralId}).Distinct().ToArray();
+        return (own?.HiddenGeneralIds??Array.Empty<string>()).Concat(string.IsNullOrEmpty(own?.ActiveGeneralId)?Array.Empty<string>():new[]{own.ActiveGeneralId}).Distinct().ToArray();
+    }
+    internal int GeneralLibraryCount => LibraryIds(ThreeKingdomsProjection).Length;
+    void DrawGeneralLibrary(ThreeKingdomsView view)
+    {
+        var ids=LibraryIds(view);
         for(int i=0;i<ids.Length;i++)
         {
             var general=GeneralCatalog.Get(ids[i]);var card=new Rect(LibraryArea.x+i*120,714,108,151);

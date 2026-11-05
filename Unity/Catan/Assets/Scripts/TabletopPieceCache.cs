@@ -32,6 +32,33 @@ public sealed class TabletopPieceCache
     {
         foreach(var key in entries.Keys.Where(k=>k.StartsWith(prefix,StringComparison.Ordinal)&&!touched.Contains(k)).ToArray())Remove(key);
     }
+    public string BuildingUnderRay(Ray ray)
+    {
+        string closest=null;
+        float distance=float.PositiveInfinity;
+        foreach(var item in entries)
+        {
+            string key=item.Key;
+            if(!(key.StartsWith("basic/settlement:")||key.StartsWith("basic/city:")||
+                 key.StartsWith("expansion/wall:")||key.StartsWith("expansion/metropolis:")))continue;
+            foreach(var root in item.Value.Roots)
+            {
+                if(root==null||!root.activeInHierarchy)continue;
+                foreach(var part in root.GetComponentsInChildren<MeshFilter>())
+                {
+                    if(part.sharedMesh==null)continue;
+                    var toLocal=part.transform.worldToLocalMatrix;
+                    var local=new Ray(toLocal.MultiplyPoint3x4(ray.origin),toLocal.MultiplyVector(ray.direction));
+                    if(!part.sharedMesh.bounds.IntersectRay(local,out float hit))continue;
+                    var point=part.transform.TransformPoint(local.GetPoint(hit));
+                    float depth=Vector3.Dot(point-ray.origin,ray.direction);
+                    if(depth<0||depth>=distance)continue;
+                    distance=depth;closest=key.Substring(key.IndexOf(':')+1);
+                }
+            }
+        }
+        return closest;
+    }
     void Remove(string key)
     {
         if(!entries.TryGetValue(key,out var old))return;

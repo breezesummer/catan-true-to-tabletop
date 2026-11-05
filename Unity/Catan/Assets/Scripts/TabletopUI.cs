@@ -149,7 +149,7 @@ public sealed partial class TabletopUI
     }
     public void Draw(Font font,string seat,string actor,string phase,int turn,int ownPoints,int dice1,int dice2,
         TabletopSeat[] seats,bool canRoll,bool canEnd,Action roll,Action end,Action<string> trade,
-        Action special=null,string specialLabel="",string detail="",Action<int> facility=null)
+        Action special=null,string specialLabel="",string detail="",Action<int> facility=null,string turnOwner=null)
     {
         Styles(font);ModernOperationUI.Styles(font);hits.Clear();worldHits.Clear();hoveredScore=null;table.Objects.Begin("public");
         // 临时便签覆盖的桌面物件不能先于上层按钮响应同一次点击。
@@ -160,7 +160,7 @@ public sealed partial class TabletopUI
         GUI.enabled=tableEnabled&&!skillSelecting;
         DrawTopButtons(seats.FirstOrDefault(p=>p.Id==seat),trade,facility);
         GUI.enabled=tableEnabled;
-        DrawPlayers(seats,seat,actor,trade);
+        DrawPlayers(seats,seat,turnOwner??actor,trade);
         DrawTurnBanner(seat,actor,ThreeKingdoms?.ThreeKingdomsPhaseCaption??phase,turn);
         if(skillSelecting){canRoll=false;canEnd=false;}
         defense.Draw();
@@ -227,9 +227,10 @@ public sealed partial class TabletopUI
     }
     void DrawTopButtons(TabletopSeat own,Action<string> trade,Action<int> facility)
     {
-        if(!StrategyHudTheme.Jade)CopperTabletopSkin.Panel(new Rect(8,12,428,91),ModernOperationUI.Surface);
+        int count=own?.Improvements==null?2:5;
+        if(!StrategyHudTheme.Jade)CopperTabletopSkin.Panel(new Rect(8,12,18+82*count,91),ModernOperationUI.Surface);
         string[] names={"银行","玩家交易","贸易设施","政治设施","科学设施"};
-        for(int i=0;i<5;i++)
+        for(int i=0;i<count;i++)
         {
             var r=StrategyHudTheme.Jade?new Rect(18+i*86,22,76,76):new Rect(24+i*82,16,70,70);hits.Add(new Rect(r.x,r.y,r.width,85));
             bool available=i<2||own?.Improvements!=null;
@@ -240,9 +241,13 @@ public sealed partial class TabletopUI
             {
             StrategyHudArt.Disc(r,available?face:ModernOperationUI.Background,available&&over);
             StrategyHudArt.Icon(new Rect(r.center.x-21,r.center.y-22,42,43),i);
-            var marker=new Rect(r.center.x-11,r.yMax-7,22,22);TabletopUI.Token(marker,new Color(.045f,.055f,.05f));
-            var levelStyle=Style("level",center,12,FontStyle.Bold);levelStyle.normal.textColor=StrategyHudArt.Gold;
-            GUI.Label(marker,i<2?"–":level.ToString(),levelStyle);
+            if(i>=2)
+            {
+                var marker=new Rect(r.center.x-11,r.yMax-7,22,22);
+                StrategyHudArt.Disc(marker,ModernOperationUI.Surface);
+                var levelStyle=Style("level",center,12,FontStyle.Bold);levelStyle.normal.textColor=StrategyHudTheme.Text;
+                GUI.Label(marker,level.ToString(),levelStyle);
+            }
             }
             if(i>=2&&ThreeKingdoms?.DrawGeneralFacilityTarget(r,own.Id,i-2)==true)continue;
             bool prior=GUI.enabled;GUI.enabled=prior&&available;
@@ -259,14 +264,20 @@ public sealed partial class TabletopUI
     {
         int count=Math.Max(1,seats.Length);float width=114,x=1430-count*(width+5);
         hoveredPlayerHint=null;playerHintAnchor=Rect.zero;
+        float panelBottom=0;
         foreach(var id in M6App.OrderedPlayers(seats.Select(p=>p.Id)))
         {
             var player=seats.First(p=>p.Id==id);
             string alliance=ThreeKingdoms?.AlliancePlayerCaptionB6(player.Id);
             bool hasGeneral=ThreeKingdoms?.ThreeKingdomsProjection!=null;
             float statsY=hasGeneral?142:103;
-            var panel=new Rect(x,13,width,statsY+86-13+(alliance==null?0:20));hits.Add(panel);
-            if(StrategyHudTheme.Jade)JadeTabletopSkin.LightPanel(panel,player.Id==actor);else CopperTabletopSkin.Panel(panel,ModernOperationUI.Background,player.Id==actor);
+            bool facilities=player.Improvements?.Length==3;
+            float handY=statsY+(facilities?53:20);
+            var panel=new Rect(x,13,width,handY+37-13+(alliance==null?0:19));hits.Add(panel);panelBottom=Mathf.Max(panelBottom,panel.yMax);
+            if(StrategyHudTheme.Ocean)OceanTabletopSkin.Panel(panel,false,false);
+            else if(StrategyHudTheme.Jade)JadeTabletopSkin.LightPanel(panel,player.Id==actor);
+            else CopperTabletopSkin.Panel(panel,ModernOperationUI.Background,player.Id==actor);
+            if(player.Id==actor)GeneralFrameUI.Flow(panel,false);
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             if(!StrategyHudTheme.Jade)StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
             StrategyHudArt.Avatar(StrategyHudTheme.Jade?new Rect(avatar.x+1,avatar.y,avatar.width-2,avatar.height-2):new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
@@ -291,11 +302,12 @@ public sealed partial class TabletopUI
                 player.SpecialHandLimit>0?"发展卡 · 当前 / 回合结束上限\n公开胜利点卡不占手牌上限":"发展卡 · 当前张数 / 无持有上限"};
             for(int row=0;row<(fishing==null?6:7);row++)
             {
-                int columns=row<4?3:fishing==null?2:3;
+                if(row>0&&row<4&&!facilities)continue;
+                int columns=facilities||fishing!=null?3:2;
                 float cell=(width-22)/columns;
-                var r=row==0?new Rect(x+11,statsY,width-22,18):row<4?new Rect(x+11+(row-1)*cell,statsY+21,cell,18):new Rect(x+11+(row-4)*cell,statsY+42,cell,30);
+                var r=row==0?new Rect(x+11,statsY,width-22,18):row<4?new Rect(x+11+(row-1)*cell,statsY+20,cell,30):new Rect(x+11+(row-4)*cell,handY,cell,30);
                 if(StrategyHudTheme.Jade&&row<5)Fill(new Rect(r.x+4,r.yMax,r.width-8,.5f),new Color(.12f,.38f,.26f,.10f));
-                var icon=row>=4?new Rect(r.center.x-9,r.y,18,14):new Rect(r.x,r.y,14,16);
+                var icon=row==0?new Rect(r.center.x-17,r.y,15,16):new Rect(r.center.x-9,r.y,18,14);
                 if(row==0)StrategyHudArt.VictoryIcon(icon);
                 else if(row<4)StrategyHudArt.Icon(icon,row+1);
                 else if(row==6)StrategyHudArt.FishIcon(icon);
@@ -310,15 +322,15 @@ public sealed partial class TabletopUI
                     var counter=new TabletopHandCounter(values[row],row==4?player.ResourceHandLimit:row==6?7:player.SpecialHandLimit);
                     value=counter.Caption;if(counter.OverLimit)valueStyle.normal.textColor=ModernOperationUI.Error;
                 }
-                valueStyle.alignment=row>=4?TextAnchor.MiddleCenter:TextAnchor.MiddleRight;
+                valueStyle.alignment=TextAnchor.MiddleCenter;
                 valueStyle.fontSize=row>=4?11:12;
-                TabletopTextFit.Label(row>=4?new Rect(r.x,r.y+14,r.width,16):new Rect(r.x+15,r.y,r.width-16,16),value,valueStyle,8);
+                TabletopTextFit.Label(row==0?new Rect(r.center.x,r.y,19,16):new Rect(r.x,r.y+14,r.width,16),value,valueStyle,8);
                 if(row==0)ScoreHover(r,player.Score);
                 else if(r.Contains(Event.current.mousePosition)){hoveredPlayerHint=row==6?"鱼筹码":hints[row];playerHintAnchor=r;}
             }
             if(alliance!=null)
             {
-                var badge=new Rect(x+10,statsY+74,width-20,17);TabletopTextFit.Label(badge,alliance,Style("alliance",center,11,FontStyle.Bold));
+                var badge=new Rect(x+10,handY+32,width-20,17);TabletopTextFit.Label(badge,alliance,Style("alliance",center,11,FontStyle.Bold));
                 if(badge.Contains(Event.current.mousePosition)){hoveredPlayerHint=ThreeKingdoms.AlliancePlayerHintB6(player.Id);playerHintAnchor=badge;}
             }
             bool selecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;
@@ -326,6 +338,7 @@ public sealed partial class TabletopUI
             if(!selecting&&player.Id!=own&&TabletopButtonFeedback.Button(avatar)&&!MobileTabletop.TouchDragged)trade?.Invoke(player.Id);
             x+=width+5;
         }
+        defense.SetPlayerPanelBottom(panelBottom);
     }
     void DrawPlayerHint()
     {
