@@ -162,7 +162,7 @@ public sealed partial class TabletopHistoryUI
         }
         return height;
     }
-    GUIStyle HistoryStyle(bool compact)=>compact?(compactStyle??(compactStyle=new GUIStyle(ModernOperationUI.Text){fontSize=StrategyHudTheme.Ocean?13:11,wordWrap=false})):(fullStyle??(fullStyle=new GUIStyle(ModernOperationUI.Text){fontSize=15,wordWrap=false}));
+    GUIStyle HistoryStyle(bool compact)=>compact?(compactStyle??(compactStyle=new GUIStyle(ModernOperationUI.Text){fontSize=(StrategyHudTheme.HandPainted||StrategyHudTheme.Ocean)?13:11,wordWrap=false})):(fullStyle??(fullStyle=new GUIStyle(ModernOperationUI.Text){fontSize=15,wordWrap=false}));
     float HistoryLine(Rect r,TabletopHistoryLine line,GameHistoryEntry entry,bool compact,bool draw=true)=>
         DrawCardLine(r,"",line.Player," "+line.Prefix,line.Cards,line.Suffix,HistoryStyle(compact),
             line.Quote?line.ReceivedCards:null,line.Roll?entry:null,line.Trade?null:line.Partner,line.PartnerAction,line.Emphasis,line.Track,draw);
@@ -228,7 +228,7 @@ public sealed partial class TabletopHistoryUI
             value=value??"";int at=string.IsNullOrEmpty(emphasis)?-1:value.IndexOf(emphasis,StringComparison.Ordinal);
             if(at<0||track<0){Text(value,style);return;}
             Text(value.Substring(0,at),style);
-            var colored=new GUIStyle(style);colored.normal.textColor=track==0?new Color(.94f,.73f,.25f):track==1?new Color(.40f,.67f,.94f):track==2?new Color(.49f,.79f,.42f):new Color(.88f,.71f,.47f);
+            var colored=new GUIStyle(style);colored.normal.textColor=StrategyHudTheme.HandPainted?HandPaintedTabletopSkin.TrackInk(track):track==0?new Color(.94f,.73f,.25f):track==1?new Color(.40f,.67f,.94f):track==2?new Color(.49f,.79f,.42f):new Color(.88f,.71f,.47f);
             Text(emphasis,colored);Text(value.Substring(at+emphasis.Length),style);
         }
         void Cards(GameHistoryChange[] values)

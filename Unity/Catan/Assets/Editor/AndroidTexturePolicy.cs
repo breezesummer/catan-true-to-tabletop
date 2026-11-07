@@ -31,6 +31,8 @@ public sealed class AndroidTexturePolicy : AssetPostprocessor
 
     static int MaxSize(string path)
     {
+        if(path.StartsWith("Assets/Resources/GeneralUI/Dynamic/",StringComparison.Ordinal)||
+            path.StartsWith("Assets/Resources/GeneralUI/ZhangLiao/",StringComparison.Ordinal))return 4096;
         if (path.EndsWith("/PaintedMap/terrain-atlas.jpg", StringComparison.Ordinal)) return 4096;
         if(path.Contains("/CardRedraw/"))return 1024;
         if (path.Contains("/PastoralMenu/v004/")) return 2048;

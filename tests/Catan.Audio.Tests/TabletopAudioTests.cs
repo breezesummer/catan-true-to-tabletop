@@ -218,6 +218,18 @@ public sealed class TabletopAudioTests
         Assert.Empty(state.Observe(true, true, -1, "", false));
         state.Reset(); Assert.Empty(state.Observe(true, true, -1, "", false));
     }
+    [Theory]
+    [InlineData("SetupRoad")]
+    [InlineData("BuildRoad")]
+    [InlineData("PlaceFreeRoad")]
+    [InlineData("SpendFish")]
+    [InlineData("ResolveProgressChoice")]
+    public void PublicRoadPlacementHasOneConstructionSound(string command)
+    {
+        var events = TabletopAudioModel.Classify(Entry(1, command, Change("piece", "道路", 1)));
+        Assert.Single(events, e => e.Cue == TabletopAudioCue.RoadBuild);
+    }
+
     public static IEnumerable<object[]> Cues() => Enum.GetValues<TabletopAudioCue>().Select(cue => new object[] { cue });
     [Theory][MemberData(nameof(Cues))]
     public void EveryCueHasDeterministicFiniteAudibleSamplesAndSilentEndpoints(TabletopAudioCue cue)

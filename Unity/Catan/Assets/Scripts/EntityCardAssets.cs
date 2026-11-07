@@ -137,10 +137,7 @@ public static class EntityCardAssets
         var rect=FitCardRect(area,FaceAspect(texture),GUI.matrix);
         DrawPaperDepth(rect,elevation);
         float radius=Mathf.Min(rect.width,rect.height)*.095f;
-        var matrix=GUI.matrix;
-        if(texture==ResourceFront(3))GUIUtility.RotateAroundPivot(180,rect.center);
         GUI.DrawTexture(rect,texture,ScaleMode.StretchToFill,true,0,tint??Color.white,0,radius);
-        GUI.matrix=matrix;
         DrawPaperLight(rect,radius);
         RedrawnCardAssets.DrawText(rect,texture);
         TabletopCardFrame.Draw(rect);

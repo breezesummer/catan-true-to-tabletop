@@ -30,7 +30,7 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
         public string status, unity, note;
         public int checks, checkedSourceInstances, cameraImages, detailImages;
         public int specialGiftPorts, specialBonusMarkers;
-        public bool publicDataOnly, visualsHaveNoColliders, stableIds, outsideCoast, hiddenNumbersSuppressed, rulesSupplyNumberFaces, photographedNumberBack, fullUiPixelsVerified;
+        public bool publicDataOnly, visualsHaveNoColliders, stableIds, outsideCoast, hiddenNumbersSuppressed, rulesSupplyNumberFaces, jadeNumberMesh, fullUiPixelsVerified;
         public bool publicSpecialScenario, publicFogScenario;
         public string[] assets;
         public ModeResult[] modes;
@@ -93,8 +93,8 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
             cameraImages = cameraImages, detailImages = detailImages, assets = AssetIds, modes = modes.ToArray(),
             specialGiftPorts = specialGiftPorts, specialBonusMarkers = specialBonusMarkers, publicSpecialScenario = true, publicFogScenario = true,
             publicDataOnly = true, visualsHaveNoColliders = true, stableIds = true, outsideCoast = true,
-            hiddenNumbersSuppressed = true, rulesSupplyNumberFaces = true, photographedNumberBack = true, fullUiPixelsVerified = false,
-            note = "四种模式正常开局，另查部落港礼、航路奖励与迷雾数字。离屏相机记录棋盘，八张四视图覆盖港口朝向和圆片翻面。"
+            hiddenNumbersSuppressed = true, rulesSupplyNumberFaces = true, jadeNumberMesh = true, fullUiPixelsVerified = false,
+            note = "四种模式正常开局，另查部落港礼、航路奖励与迷雾数字。离屏相机记录棋盘，八张四视图覆盖港口朝向和玉签厚度。"
         }, true));
         Debug.Log("CATAN_TABLETOP_MARKERS_OK: checks=" + checks + " cameraImages=" + cameraImages + " detailImages=" + detailImages);
         Application.Quit(0);
@@ -169,11 +169,12 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
         var instanceMaterials=instance.GetComponentsInChildren<Renderer>(true).SelectMany(r=>r.sharedMaterials).ToArray();
         if(id.StartsWith("port-",StringComparison.Ordinal))
         {
-            Require(instanceMaterials.All(m=>m.shader.name=="Catan/CoastDecal"),"码头未使用独立画稿 "+id);
-            Require(instanceMaterials.Any(m=>m.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+id)),"码头货物不符 "+id);
-            var sign=instance.GetChild(1);
-            Require(Quaternion.Angle(sign.rotation,Quaternion.identity)<.01f,"比例牌未保持正向");
-            Require(sign.GetComponent<Renderer>().sharedMaterial.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+(id=="port-generic"?"ratio-3":"ratio-2")),"港口比例不符");
+            var deck=instance.Find("PierDeck").GetComponent<Renderer>();
+            Require(deck.sharedMaterial.shader.name=="Catan/PierTimber" && deck.bounds.min.y<TabletopOcean.WaterHeight,"木栈桥缺少水下桩 "+id);
+            Require(instance.Find("Cargo_"+id.Substring(5))!=null,"码头货物不符 "+id);
+            var sign=instance.GetComponentInChildren<HarborSign>();
+            Require(sign!=null && sign.GetComponent<MeshFilter>().sharedMesh==Resources.Load<GameObject>(JadeNumberSlip.ModelPath).GetComponentInChildren<MeshFilter>().sharedMesh,"码头缺少悬浮玉签");
+            Require(sign.Face.sharedMaterial.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+"sign-"+id.Substring(5)),"玉签资源或兑换比例不符");
         }
         else
         {
@@ -222,9 +223,8 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
             var obj = active.SingleOrDefault(t => t.name == "点数 " + tile.Number + " · " + tile.Id);
             Require(obj != null, "正常点数牌没有使用规则公开数字");
             var mesh = obj.GetComponent<MeshFilter>().sharedMesh; var materials = obj.GetComponent<MeshRenderer>().sharedMaterials;
-            Require(mesh.subMeshCount == 3 && materials.Length == 3, "正常点数牌缺少独立翻面子网格");
-            Require(materials[0].mainTexture == Resources.Load<Texture2D>("TabletopUI/v008/NumberTokens/number-" + tile.Number), "正常正面没有使用原规则数字贴图");
-            Require(materials[2].mainTexture == Resources.Load<Texture2D>(AssetRoot + "number-token-back"), "正常背面没有使用实体照片");
+            Require(mesh == Resources.Load<GameObject>(JadeNumberSlip.ModelPath).GetComponentInChildren<MeshFilter>().sharedMesh, "点数没有使用玉签网格");
+            Require(materials.Length == 1 && materials[0].mainTexture == Resources.Load<Texture2D>(JadeNumberSlip.FacePath + tile.Number), "玉签点数与公开地块不符");
             Require(obj.GetComponentsInChildren<Collider>(true).Length == 0, "点数牌阻挡地图拾取");
         }
     }
@@ -361,10 +361,17 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
                     for (int panel = 0; panel < 4; panel++)
                     {
                         bool port=id.StartsWith("port-",StringComparison.Ordinal);
-                        asset.transform.localRotation = panel == 3 ? (port?Quaternion.Euler(0,180,0):Quaternion.Euler(180,0,0)) : Quaternion.identity;
-                        var bounds = BoundsOf(asset.transform); camera.aspect = 800f / 600;
-                        camera.orthographicSize = Mathf.Max(bounds.size.z, bounds.size.x / camera.aspect, .008f) * .70f;
+                        if(id=="number-token-back") asset.transform.rotation=Quaternion.Euler(panel==3?-90:90,180,0);
+                        else asset.transform.localRotation = panel == 3 ? (port?Quaternion.Euler(0,180,0):Quaternion.Euler(180,0,0)) : Quaternion.identity;
                         camera.transform.rotation = Quaternion.Euler(panel == 0 || panel == 3 ? 90 : panel == 1 ? (port?18:4) : 40, 0, 0);
+                        if(port)
+                        {
+                            var sign=asset.GetComponentInChildren<HarborSign>();
+                            sign.Place();
+                            sign.Slip.FaceCamera(camera);
+                        }
+                        var bounds = BoundsOf(asset.transform); camera.aspect = 800f / 600;
+                        camera.orthographicSize = Mathf.Max(bounds.size.y,bounds.size.z, bounds.size.x / camera.aspect, .008f) * .70f;
                         camera.transform.position = bounds.center - camera.transform.forward * .5f;
                         var request = new UniversalRenderPipeline.SingleCameraRequest { destination = target };
                         Require(RenderPipeline.SupportsRenderRequest(camera, request), "URP 不支持实体细节离屏渲染");
@@ -391,7 +398,8 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
     }
     static Bounds BoundsOf(Transform obj)
     {
-        var renderers = obj.GetComponentsInChildren<Renderer>(); if (renderers.Length == 0) throw new InvalidOperationException("实体缺少 Renderer");
+        var renderers = obj.GetComponentsInChildren<Renderer>().Where(r=>!(r is LineRenderer)).ToArray();
+        if (renderers.Length == 0) throw new InvalidOperationException("实体缺少 Renderer "+obj.name);
         var bounds = renderers[0].bounds; foreach (var renderer in renderers.Skip(1)) bounds.Encapsulate(renderer.bounds); return bounds;
     }
     // AABB 仅作快速筛选；最终比较真实网格的 XZ 三角形，避免旋转港口的包围框产生假阳性。
@@ -429,7 +437,7 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
         var triangles = new List<Vector2[]>();
         foreach (var filter in root.GetComponentsInChildren<MeshFilter>())
         {
-            var mesh = filter.sharedMesh; if (mesh == null) continue;
+            var mesh = filter.sharedMesh; if (mesh == null || filter.name=="栈桥水影" || filter.GetComponent<HarborSign>()!=null) continue;
             Vector3[] positions; int[] indices;
             if(mesh.isReadable){positions=mesh.vertices;indices=mesh.triangles;}
             else ReadMeshForVerification(mesh,out positions,out indices);

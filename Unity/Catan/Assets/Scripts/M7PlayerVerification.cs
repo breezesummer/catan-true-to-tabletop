@@ -6,13 +6,16 @@ using Catan.Network.Contracts;
 using UnityEngine;
 
 // Opt-in player test: automated human reads only its received view and uses the shipped Submit path.
-public sealed class M7PlayerVerification : MonoBehaviour
+public sealed partial class M7PlayerVerification : MonoBehaviour
 {
     [Serializable] public sealed class Configuration
     {
         public string Endpoint,CertificateFingerprint,RuleSet="base",ScenarioId="heading-for-new-shores",OutputDirectory;
         public int PlayerCount=3,MinimumTurn=3,TimeoutSeconds=180,DiscoveryPort=47772;
         public bool SkipLanDiscovery;
+        public string ReactionRunDirectory;
+        public bool VerifySkinPlayback;
+        public int PeerIndex;
     }
     [Serializable] sealed class Report
     {
@@ -48,7 +51,7 @@ public sealed class M7PlayerVerification : MonoBehaviour
             app.Network.UseCredentialDirectory(Path.Combine(config.OutputDirectory,"private-client"));app.Network.ConfigureEndpoint(config.Endpoint,config.CertificateFingerprint);
         }
         catch(Exception ex){Debug.LogError("CATAN_M7_VERIFY_FAILED: config "+ex.GetType().Name);Application.Quit(1);yield break;}
-        var work=Verify();
+        var work=string.IsNullOrEmpty(config.ReactionRunDirectory)?Verify():VerifyPublicReactions();
         while(true)
         {
             bool more;

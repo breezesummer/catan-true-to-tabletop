@@ -82,6 +82,7 @@ namespace Catan.Core.M4
                 var prior = state.ProcessedCommands.FirstOrDefault(x => x.CommandId == command.Id);
                 if (prior != null) return PriorResult(prior, fingerprint);
                 var next = state.CopyForTransaction();
+                next.Harvest = new TileHarvest();
                 Command effective;
                 try { effective=AuthorizeControlB6(next,command); ValidateB6Trade(next,effective); Apply(next, effective); }
                 catch (RuleException ex) { return Reject(ex.Code, ex.Message); }
@@ -97,11 +98,13 @@ namespace Catan.Core.M4
                 AssertInvariants(next);
                 history.RecordAction(GameHistoryCapture.From(state), GameHistoryCapture.From(next), new HistoryAction
                 {
+                    Harvest = next.Harvest.Any ? next.Harvest : null,
                     PlayerId = ev.PlayerId, OtherPlayerId = string.IsNullOrEmpty(effective.OtherPlayerId) ? null : effective.OtherPlayerId,
                     Kind = ev.Kind, PublicTarget = PublicTarget(effective), PendingKind = state.PendingDecision?.Kind, PublicGeneralChanges = PublicGeneralChanges(state, next),
                     FishAction = effective.FishAction?.ToString(),
                     Card = effective.Kind == CommandKind.PlayProgressCard ? effective.ProgressCard.ToString() : null
                 });
+                next.Harvest = null;
                 state = next;
                 return new CommandResult { Success = true, Message = state.Phase == GamePhase.Finished ? state.WinnerPlayerId + " 获胜！" : "操作已确认。", Events = Json.Copy(receipt), NewEvents = Json.Copy(receipt) };
             }
@@ -173,6 +176,12 @@ namespace Catan.Core.M4
                 };
                 if(view.TradeOffer!=null) { view.TradeOffer.B4RealGive=null;view.TradeOffer.B4ConversionPayment=false;view.TradeOffer.B4DeclarationHistoryEventId=null; }
                 view.Board.Knights = Json.Copy(state.Knights); view.Board.Walls = Json.Copy(state.Walls); view.Board.Metropolises = Json.Copy(state.Metropolises);
+                var limits = CardHost(state);
+                foreach (var pub in view.Players)
+                {
+                    pub.ResourceDiscardThreshold = limits.GetHandLimit(pub.Id);
+                    pub.ProgressCardLimit = B2Unlimited(state,pub.Id) ? 0 : B5ProgressLimit(state,pub.Id);
+                }
                 foreach (var pub in view.Players) { var actual = state.Players.Single(p => p.Id == pub.Id); pub.CommodityCount = 0; pub.Improvements = actual.Improvements.ToArray(); pub.DefenderPoints = actual.DefenderPoints; pub.WallSupply = 3-state.Walls.Count(w=>w.PlayerId==pub.Id); pub.KnightSupply = Enumerable.Range(1,3).Select(n=>2-state.Knights.Count(k=>k.PlayerId==pub.Id&&k.Level==n)-(state.PendingDecision?.DisplacedKnight is Knight displaced&&displaced.PlayerId==pub.Id&&displaced.Level==n?1:0)-state.DecisionQueue.Count(d=>d.DisplacedKnight!=null&&d.DisplacedKnight.PlayerId==pub.Id&&d.DisplacedKnight.Level==n)).ToArray(); }
                 PopulateProgressView(state, own, view);
                 view.LegalActions = LegalExpansionActions(playerId).ToArray();
@@ -327,6 +336,8 @@ namespace Catan.Core.M4
         private static void FinishDecision(GameState s) { s.Phase = s.PendingDecision.ReturnPhase; s.PendingDecision = null;if(B5(s))B5Board(s).TokenController=null; }
         private void Produce(GameState s, int total)
         {
+            int[] Hand(PlayerState p) => Resources.Select(r => p.Resources[r]).Concat(Commodities.Select(c => p.Commodities[c])).ToArray();
+            var before = s.Harvest == null ? null : s.Players.Select(Hand).ToArray();
             foreach (var resource in Resources)
             {
                 var claims = s.Players.Select(p => new { Player = p, Amount = s.Tiles.Where(t => t.Number == total && t.Id != s.RobberTileId && t.Resource == ResourceName(resource)).Sum(t =>
@@ -341,6 +352,14 @@ namespace Catan.Core.M4
                 var claims=s.Players.Select(p=>new {Player=p,Amount=s.Tiles.Where(t=>t.Number==total&&t.Id!=s.RobberTileId&&t.Resource==ResourceName(resource)).Sum(t=>s.Cities.Count(b=>b.PlayerId==p.Id&&t.Vertices.Contains(b.LocationId)))}).Where(c=>c.Amount>0).ToArray();
                 if(s.CommodityBank[commodity]>=claims.Sum(c=>c.Amount)) foreach(var claim in claims)Transfer(s.CommodityBank,claim.Player.Commodities,commodity,claim.Amount);
                 else if(claims.Length==1)Transfer(s.CommodityBank,claims[0].Player.Commodities,commodity,s.CommodityBank[commodity]);
+            }
+            if (before == null) return;
+            var producing = s.Tiles.Where(t => t.Number == total && t.Id != s.RobberTileId);
+            for (int i = 0; i < s.Players.Length; i++)
+            {
+                var p = s.Players[i];
+                var received = Hand(p).Select((n, card) => n - before[i][card]).ToArray();
+                s.Harvest.Normal(p.Id, producing, s.Settlements, s.Cities, received, true);
             }
         }
         private void Discard(GameState s, PlayerState p, Command c)

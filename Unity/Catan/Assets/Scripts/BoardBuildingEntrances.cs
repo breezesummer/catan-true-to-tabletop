@@ -44,7 +44,10 @@ internal sealed class BoardBuildingEntrances
     public void Orient(GameObject building, string vertex, string seat)
     {
         if (building != null && entrances.TryGetValue((vertex, seat), out var entrance))
+        {
             building.transform.rotation = entrance.facing;
+            building.GetComponentInChildren<FantasyBoardPiece>()?.Align(entrance.facing*Vector3.forward);
+        }
     }
 
     public GameObject Place(string kind, PiecePlacement piece, string label, Vector3 bottom, Transform parent)

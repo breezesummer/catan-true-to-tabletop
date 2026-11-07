@@ -30,9 +30,9 @@ public sealed partial class TabletopAudio
             if(text!=null)foreach(var entry in JsonUtility.FromJson<GeneralVoiceManifest>(text.text).entries)
                 generalVoicePaths[entry.skillId]=entry.clips;
         }
-        generalVoiceCursor.Observe(owner.ThreeKingdomsProjection?.SkillHistory,quiet,skill=>
+        generalVoiceCursor.ObserveEvents(owner.ThreeKingdomsProjection?.SkillHistory,quiet,entry=>
         {
-            if(muted||applicationPaused||master<=0||speech<=0||!generalVoicePaths.TryGetValue(skill,out var paths)||paths.Length==0)return;
+            if(muted||applicationPaused||master<=0||speech<=0||!generalVoicePaths.TryGetValue(entry.SkillId,out var paths)||paths.Length==0)return;
             if(generalSpeech.Count>=32)generalSpeech.Dequeue();
             generalSpeech.Enqueue(new GeneralSpeech{Path=paths[generalVoiceRandom.Next(paths.Length)],At=now});
         });

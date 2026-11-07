@@ -67,6 +67,32 @@ public sealed class PaintedMap : MonoBehaviour
         return tile;
     }
 
+    internal static readonly int RobberHex = Shader.PropertyToID("_RobberHex");
+    internal static readonly int PirateHex = Shader.PropertyToID("_PirateHex");
+
+    // z 标记目标有效，原点也能成为合法目标；边框不对应任何受掠夺的格子。
+    internal static Vector4 OccupiedHex(Dictionary<string, Vector3> tiles, string id)
+    {
+        if (id == null || id == "frame" || !tiles.TryGetValue(id, out var center)) return Vector4.zero;
+        return new Vector4(center.x, center.z, 1, 0);
+    }
+    internal void SetDangerHex(int property, Vector4 hex)
+    {
+        if (ink != null && ink.GetVector(property) != hex) ink.SetVector(property,hex);
+    }
+
+    internal void SetTileGlow(string id, bool owned, float goldAt)
+    {
+        var tile = transform.Find(id);
+        if (tile == null) return;
+        var center = tile.position;
+        var key = new Vector2Int(Mathf.RoundToInt(center.x / HalfWidth), Mathf.RoundToInt(center.z / Row));
+        if (!cells.TryGetValue(key, out var cell) || cell.renderer == null) return;
+        cell.renderer.GetPropertyBlock(block);
+        block.SetVector("_Glow", new Vector4(owned ? 1 : 0, goldAt, 0, 0));
+        cell.renderer.SetPropertyBlock(block);
+    }
+
     void LateUpdate()
     {
         foreach (var pair in cells)
@@ -81,6 +107,7 @@ public sealed class PaintedMap : MonoBehaviour
                 else last[i - 4] = adjacent;
             }
             var center = renderer.bounds.center;
+            renderer.GetPropertyBlock(block);
             block.SetVector("_Tile", new Vector4(center.x, center.z, region, 0));
             block.SetVector("_NearA", first);
             block.SetVector("_NearB", last);

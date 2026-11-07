@@ -62,6 +62,7 @@ try
         httpsPort = options.Online ? 0 : options.Port, certificateFingerprint = privateFiles.Fingerprint
     }));
     app.MapPost("/api/request", (HttpContext context, NetworkTransport transport) => transport.HttpAsync(context));
+    app.MapPost("/api/reaction", (HttpContext context, NetworkTransport transport) => transport.HttpAsync(context));
     app.Map("/ws", (HttpContext context, NetworkTransport transport) => transport.WebSocketAsync(context));
     app.Lifetime.ApplicationStarted.Register(() =>
     {

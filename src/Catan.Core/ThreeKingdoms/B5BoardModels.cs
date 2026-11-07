@@ -102,6 +102,9 @@ namespace Catan.Core.ThreeKingdoms
     }
     public static class B5BoardRules
     {
+        public static int KurouReward(B5BoardOption layer) =>
+            layer.PaidCount>0?layer.PaidCount:layer.Cost.Sum();
+
         public static bool Enabled(ThreeKingdomsState s) => GeneralCatalog.UsesB5Rules(s?.RulesVersion);
         public static B5BoardState Clone(B5BoardState b) => B2SkillEngine.CloneB5Board(b);
         public static bool Damaged(ThreeKingdomsState s, string kind, string location) => Enabled(s) && s.Board?.Damages.Any(d=>d.Kind==kind&&d.LocationId==location)==true;

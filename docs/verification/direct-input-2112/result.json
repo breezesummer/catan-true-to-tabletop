@@ -1,0 +1,12 @@
+{
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "四人穿越沙漠实际窗口，鼠标输入经过客户端正常入口，核对已确认城墙和赠牌。",
+    "configurations": 1,
+    "checks": 36,
+    "cameraImages": 7,
+    "guiAttempts": 0,
+    "guiImagesWithChanges": 0,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+}

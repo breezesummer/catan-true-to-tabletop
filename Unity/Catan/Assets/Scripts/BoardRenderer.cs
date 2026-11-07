@@ -103,8 +103,11 @@ public sealed class BoardRenderer : MonoBehaviour
         FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position);
     }
     readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
+    internal void OutlinePiece(string id)=>pieceCache.DrawOutline(id,BoardCamera);
+    internal bool HasOutlinePiece(string id)=>pieceCache.HasPiece(id);
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)
     {
+        GetComponent<PaintedMap>()?.SetDangerHex(PaintedMap.RobberHex, PaintedMap.OccupiedHex(tiles, robberTileId));
         if(numberTokens!=null)numberTokens.Refresh(boardTiles);
         ClearPreview();
         entrances.Refresh(roads);
@@ -222,6 +225,7 @@ public sealed class BoardRenderer : MonoBehaviour
         {
             TopView=top; tableScene.Frame(BoardCamera,top,Zoom/.255f); return;
         }
+        FantasyBoardPiece.SetView(false);
         TopView=top; BoardCamera.orthographic=true; BoardCamera.orthographicSize=Zoom;
         BoardCamera.transform.position=top?new Vector3(0,.65f,-.001f):new Vector3(0,.48f,-.4f);
         BoardCamera.transform.LookAt(new Vector3(0,.005f,0));

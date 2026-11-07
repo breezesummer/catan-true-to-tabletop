@@ -10,7 +10,7 @@ public static class ModernOperationUI
     public static Color Muted => StrategyHudTheme.Muted;
     public static Color Accent => StrategyHudTheme.Accent;
     public static Color Line => StrategyHudTheme.Line;
-    public static readonly Color Error=new Color(.98f,.53f,.40f);
+    public static Color Error=>StrategyHudTheme.HandPainted?new Color(.62f,.14f,.08f):new Color(.98f,.53f,.40f);
     static Font currentFont;
     static int themeVersion=-1;
     public static GUIStyle Text, Small, Title, Center;
@@ -64,7 +64,7 @@ public static class ModernOperationUI
         {
         CopperTabletopSkin.Panel(r,GUI.enabled?bg:Color.Lerp(Background,Surface,.6f),hover,false);
         if(selected)Fill(new Rect(r.x+9,r.yMax-3,r.width-18,2),Accent);
-        var label=new GUIStyle(Center);label.normal.textColor=!GUI.enabled?Muted:primary?new Color(1,.94f,.73f):TextColor;
+        var label=new GUIStyle(Center);label.normal.textColor=!GUI.enabled?Muted:primary&&!StrategyHudTheme.HandPainted?new Color(1,.94f,.73f):TextColor;
         if(playerId!=null)label=M6App.PlayerNameStyle(label,playerId);
         TabletopTextFit.Label(new Rect(r.x+9,r.y+4,r.width-18,r.height-8),caption,label,8,true);
         }

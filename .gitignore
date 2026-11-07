@@ -30,6 +30,7 @@ TestResults/
 
 # Local caches and credentials
 /codex.pem
+/audio.pem
 __pycache__/
 *.pyc
 .venv/
@@ -109,3 +110,8 @@ Desktop.ini
 /docs/verification/**/*.log
 /docs/verification/**/*.trx
 /docs/verification/**/*.gz
+/artifacts/
+/docs/verification/**/*.webp
+/docs/verification/**/*.zip
+/docs/verification/**/authority.json
+/docs/verification/**/seat.txt

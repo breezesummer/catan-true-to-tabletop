@@ -124,6 +124,9 @@ namespace Catan.Core.M5
                 case "Gold":
                     Require(c.Resources!=null&&B2SkillEngine.CanGainCardsB6(s.ThreeKingdoms,p.Id,Enumerable.Range(0,8).Select(i=>i<5?c.Resources[(Resource)i]:0).ToArray()),"GainForbidden","当前不能获得这些牌。");
                     Require(ValidBag(c.Resources)&&c.Resources.Total==Math.Min(d.Amount,B6ResourceSupply(s,p.Id))&&Covers(s.Bank,c.Resources)&&(c.Commodities==null||ValidBag(c.Commodities)&&c.Commodities.Total==0),"InvalidGoldChoice","金矿只能选择银行有库存的指定数量资源，不能选择商品。");
+                    if (s.Turn > 0)
+                        s.Harvest?.Gold(p.Id, s.Tiles.Where(t => t.Number == B5FinalDiceTotal(s) && t.Id != s.RobberTileId),
+                            s.Settlements, s.Cities, c.Resources.Total);
                     TransferBag(s.Bank,p.Resources,c.Resources); break;
                 case "Aqueduct": Require(Enum.IsDefined(typeof(Resource),c.Resource),"InvalidResource","请选择资源。"); Require(B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,(int)c.Resource),"GainForbidden","当前不能获得这种牌。"); Transfer(s.Bank,p.Resources,c.Resource,1); break;
                 case "B5MetropolisRelocate": B5ResolveMetropolis(s,p,c,d); break;

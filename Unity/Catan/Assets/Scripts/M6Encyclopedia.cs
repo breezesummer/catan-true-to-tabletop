@@ -8,7 +8,7 @@ public sealed partial class M6App
     void DrawEncyclopedia()
     {
         DrawTablePauseBackdrop();
-        TablePauseHeading(new Rect(180,50,1080,800),"翻 开 岛 屿 的 故 事","游戏百科 · 发展卡","三色发展卡名称与描述以实体卡牌面为准（繁体转简体）。" );
+        TablePauseHeading(new Rect(180,50,1080,800),"游戏百科 · 发展卡");
         for(int i=0;i<2;i++)if(PastoralMenuUI.Button(new Rect(212+i*513,250,501,40),i==0?"基础版 / 航海家":"城市与骑士 / 组合",true,false,encyclopediaCategory==i))
         {encyclopediaCategory=i;encyclopediaScroll=Vector2.zero;}
         string[] names=encyclopediaCategory==0?new[]{"骑士","道路建设","丰收","垄断","胜利点"}:M5App.Cards;

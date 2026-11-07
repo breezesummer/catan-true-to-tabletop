@@ -350,17 +350,17 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         item.Object.GetComponent<MeshRenderer>().sharedMaterials=values.Select(v=>Face(DieTexture(index,v),new Rect(0,0,1,1),Color.white,.50f)).ToArray();
         item.Hit.Renderers = item.Object.GetComponentsInChildren<Renderer>(); return item.Hit;
     }
-    public Hit Tray(string key,Rect layout,Color felt,Color rim)
+    public Hit Tray(string key,Rect layout,Color felt,Color rim,Texture2D lining=null)
     {
         var left=scene.World(new Vector2(layout.xMin,layout.center.y));var right=scene.World(new Vector2(layout.xMax,layout.center.y));
         var top=scene.World(new Vector2(layout.center.x,layout.yMin));var bottom=scene.World(new Vector2(layout.center.x,layout.yMax));
         var size=new Vector2(Vector3.Distance(left,right),Vector3.Distance(top,bottom));
-        string signature=layout+":"+size.ToString("F6")+":"+felt+":"+rim;
+        string signature=layout+":"+size.ToString("F6")+":"+felt+":"+rim+":"+(lining!=null?lining.GetInstanceID():0);
         var item=Get(key,signature,()=>{
             var root=new GameObject("三骰绒面镶金骰盘 v010");
             var floor=GameObject.CreatePrimitive(PrimitiveType.Cube);floor.name="绒面底盘";floor.transform.SetParent(root.transform,false);
             floor.transform.localScale=new Vector3(size.x,.0012f,size.y);
-            floor.GetComponent<Renderer>().sharedMaterial=Face(null,new Rect(0,0,1,1),felt,.12f);
+            floor.GetComponent<Renderer>().sharedMaterial=Face(lining,lining!=null?HandPaintedTabletopSkin.LiningUv:new Rect(0,0,1,1),felt,.12f);
             for(int i=0;i<4;i++)
             {
                 bool vertical=i<2;var rail=GameObject.CreatePrimitive(PrimitiveType.Cube);rail.name="镶金木框";rail.transform.SetParent(root.transform,false);

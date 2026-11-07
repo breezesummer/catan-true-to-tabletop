@@ -251,8 +251,11 @@ namespace Catan.Core.M4
         {
             if(B2DrawBlocked(s,p.Id)||!B2SkillEngine.CanGainB6(s.ThreeKingdoms,p.Id,(int)resource)) return;
             var sites = Buildings(s).Where(b => b.PlayerId == p.Id).Select(b => b.LocationId).ToArray();
-            var amount = 2 * s.Tiles.Count(t => t.Resource == ResourceName(resource) && t.Vertices.Any(sites.Contains))*B5ProgressFactor(s,p.Id,p.Id);
-            Transfer(s.Bank, p.Resources, resource, Math.Min(amount, s.Bank[resource]));
+            var tiles = s.Tiles.Where(t => t.Resource == ResourceName(resource) && t.Vertices.Any(sites.Contains)).ToArray();
+            int perTile = 2 * B5ProgressFactor(s,p.Id,p.Id);
+            int paid = Math.Min(perTile * tiles.Length, s.Bank[resource]);
+            Transfer(s.Bank, p.Resources, resource, paid);
+            s.Harvest?.Paid(p.Id, tiles, new[] { paid }, (tile, card) => perTile);
         }
         private void BeginProgressRoads(GameState s, PlayerState p, int count)
         {

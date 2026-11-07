@@ -8,7 +8,7 @@ public static class CopperTabletopSkin
     static readonly Rect DiscUv = SourceRect(43, 38, 1168, 1171, 1254, 1254);
     static GUISkin scrollSkin;
     static int scrollVersion=-1;
-    static Texture2D jadeTrack,jadeThumb,jadeHover,oceanTrack,oceanThumb,oceanHover;
+    static Texture2D jadeTrack,jadeThumb,jadeHover,oceanTrack,oceanThumb,oceanHover,paperTrack,paperThumb,paperHover;
     static bool loaded;
     static readonly Color Highlight=new Color(1f,.74f,.51f),Dark=new Color(.16f,.065f,.025f);
     public static void Scrollbars()
@@ -32,9 +32,15 @@ public static class CopperTabletopSkin
             oceanThumb=BarTexture(new Color(.67f,.56f,.32f),true);
             oceanHover=BarTexture(new Color(.87f,.77f,.47f),true);
         }
-        var activeTrack=StrategyHudTheme.Ocean?oceanTrack:StrategyHudTheme.Jade?jadeTrack:track;
-        var activeThumb=StrategyHudTheme.Ocean?oceanThumb:StrategyHudTheme.Jade?jadeThumb:thumb;
-        var activeHover=StrategyHudTheme.Ocean?oceanHover:StrategyHudTheme.Jade?jadeHover:thumbHover;
+        if(StrategyHudTheme.HandPainted && paperTrack==null)
+        {
+            paperTrack=BarTexture(new Color(.86f,.78f,.64f),false);
+            paperThumb=BarTexture(new Color(.37f,.55f,.42f),true);
+            paperHover=BarTexture(new Color(.48f,.66f,.51f),true);
+        }
+        var activeTrack=StrategyHudTheme.HandPainted?paperTrack:StrategyHudTheme.Ocean?oceanTrack:StrategyHudTheme.Jade?jadeTrack:track;
+        var activeThumb=StrategyHudTheme.HandPainted?paperThumb:StrategyHudTheme.Ocean?oceanThumb:StrategyHudTheme.Jade?jadeThumb:thumb;
+        var activeHover=StrategyHudTheme.HandPainted?paperHover:StrategyHudTheme.Ocean?oceanHover:StrategyHudTheme.Jade?jadeHover:thumbHover;
         ConfigureBar(scrollSkin.horizontalScrollbar,activeTrack,activeTrack);
         ConfigureBar(scrollSkin.verticalScrollbar,activeTrack,activeTrack);
         ConfigureBar(scrollSkin.horizontalScrollbarThumb,activeThumb,activeHover);
@@ -62,14 +68,14 @@ public static class CopperTabletopSkin
         value.SetPixels32(pixels);value.Apply(false,true);return value;
     }
     // 原图完整保留，UV只裁掉生图留白。以原图像素定义切片，再换成归一化坐标。
-    sealed class ArtPatch
+    internal sealed class ArtPatch
     {
         public readonly Texture2D Texture;
         public readonly Rect Source;
         public readonly float SliceX, SliceY;
         public ArtPatch(string name, int width, int height, Rect bounds, float corner)
         {
-            Texture=Resources.Load<Texture2D>("TabletopUI/v014/"+name);
+            Texture=Resources.Load<Texture2D>(name);
             Source=SourceRect(bounds.x,bounds.y,bounds.width,bounds.height,width,height);
             SliceX=corner/width;SliceY=corner/height;
         }
@@ -83,11 +89,11 @@ public static class CopperTabletopSkin
         if(loaded)return;loaded=true;
         wood=Resources.Load<Texture2D>("TabletopUI/v013/walnut-inlay");
         disc=Resources.Load<Texture2D>("TabletopUI/v014/round-button");
-        panelFrame=new ArtPatch("panel-frame",1254,1254,new Rect(22,25,1212,1189),310);
-        buttonPlate=new ArtPatch("button-plate",2171,724,new Rect(24,99,2125,502),150);
-        cardFrame=new ArtPatch("card-frame",1024,1536,new Rect(23,28,978,1471),160);
+        panelFrame=new ArtPatch("TabletopUI/v014/panel-frame",1254,1254,new Rect(22,25,1212,1189),310);
+        buttonPlate=new ArtPatch("TabletopUI/v014/button-plate",2171,724,new Rect(24,99,2125,502),150);
+        cardFrame=new ArtPatch("TabletopUI/v014/card-frame",1024,1536,new Rect(23,28,978,1471),160);
     }
-    static void DrawPatch(Rect r,ArtPatch art,float corner,bool center,Color tint)
+    internal static void DrawPatch(Rect r,ArtPatch art,float corner,bool center,Color tint,bool snapToScreen=true)
     {
         if(art.Texture==null)return;
         var before=GUI.color;bool enabled=GUI.enabled;GUI.enabled=true;
@@ -103,11 +109,16 @@ public static class CopperTabletopSkin
             float v=row==0?art.Source.yMax-art.SliceY:row==1?art.Source.y+art.SliceY:art.Source.y;
             float uw=col==1?art.Source.width-2*art.SliceX:art.SliceX;
             float vh=row==1?art.Source.height-2*art.SliceY:art.SliceY;
-            var start=GUIUtility.GUIToScreenPoint(new Vector2(x,y));
-            var end=GUIUtility.GUIToScreenPoint(new Vector2(x+w,y+h));
-            start=GUIUtility.ScreenToGUIPoint(new Vector2(Mathf.Round(start.x),Mathf.Round(start.y)));
-            end=GUIUtility.ScreenToGUIPoint(new Vector2(Mathf.Round(end.x),Mathf.Round(end.y)));
-            GUI.DrawTextureWithTexCoords(Rect.MinMaxRect(start.x,start.y,end.x,end.y),art.Texture,new Rect(u,v,uw,vh));
+            var dest=new Rect(x,y,w,h);
+            if(snapToScreen)
+            {
+                var start=GUIUtility.GUIToScreenPoint(dest.min);
+                var end=GUIUtility.GUIToScreenPoint(dest.max);
+                start=GUIUtility.ScreenToGUIPoint(new Vector2(Mathf.Round(start.x),Mathf.Round(start.y)));
+                end=GUIUtility.ScreenToGUIPoint(new Vector2(Mathf.Round(end.x),Mathf.Round(end.y)));
+                dest=Rect.MinMaxRect(start.x,start.y,end.x,end.y);
+            }
+            GUI.DrawTextureWithTexCoords(dest,art.Texture,new Rect(u,v,uw,vh));
         }
         GUI.color=before;GUI.enabled=enabled;
     }
@@ -115,6 +126,7 @@ public static class CopperTabletopSkin
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;
         if(StrategyHudTheme.Ocean){OceanTabletopSkin.Panel(r,hover,ornaments);return;}
+        if(StrategyHudTheme.HandPainted){HandPaintedTabletopSkin.Panel(r,hover,ornaments);return;}
         if(StrategyHudTheme.Jade){JadeTabletopSkin.Panel(r,face,hover,ornaments);return;}
         Warm();
         if(!ornaments)
@@ -140,6 +152,7 @@ public static class CopperTabletopSkin
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;Warm();
         if(StrategyHudTheme.Ocean){OceanTabletopSkin.Frame(r,selected);return;}
+        if(StrategyHudTheme.HandPainted){HandPaintedTabletopSkin.Frame(r,selected);return;}
         if(StrategyHudTheme.Jade){JadeTabletopSkin.Frame(r,selected,false);return;}
         DrawPatch(r,panelFrame,corner,false,selected?new Color(1.15f,1.16f,.92f):Color.white);
     }
@@ -147,6 +160,7 @@ public static class CopperTabletopSkin
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;Warm();
         if(StrategyHudTheme.Ocean){OceanTabletopSkin.Disc(r,hover);return;}
+        if(StrategyHudTheme.HandPainted){HandPaintedTabletopSkin.Disc(r,hover);return;}
         if(StrategyHudTheme.Jade){JadeTabletopSkin.Disc(r,hover);return;}
         if(disc==null)return;
         var before=GUI.color;bool enabled=GUI.enabled;GUI.enabled=true;
@@ -163,6 +177,7 @@ public static class CopperTabletopSkin
     public static void Count(Rect r,bool selected=false)
     {
         if(StrategyHudTheme.Ocean){OceanTabletopSkin.Panel(r,selected,false);return;}
+        if(StrategyHudTheme.HandPainted){HandPaintedTabletopSkin.Panel(r,selected,false);return;}
         if(StrategyHudTheme.Jade){JadeTabletopSkin.Panel(r,StrategyHudTheme.Background,selected,false);return;}
         ModernOperationUI.Round(r,(StrategyHudTheme.Jade?new Color(.70f,.85f,.70f):new Color(.89f,.75f,.53f)).linear);Outline(r,selected,9);
     }
@@ -170,6 +185,7 @@ public static class CopperTabletopSkin
     {
         if(Event.current.type!=EventType.Repaint||r.width<=0||r.height<=0)return;Warm();
         if(StrategyHudTheme.Ocean){OceanTabletopSkin.Frame(r,selected,true);return;}
+        if(StrategyHudTheme.HandPainted){HandPaintedTabletopSkin.Frame(r,selected,true);return;}
         if(StrategyHudTheme.Jade){JadeTabletopSkin.Frame(r,selected,true);return;}
         // 使用独立卡框，不再叠画两圈程序描边；卡牌插画与原始比例不变。
         DrawPatch(r,cardFrame,13,false,selected?new Color(1.3f,1.5f,.78f):Color.white);

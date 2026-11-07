@@ -100,9 +100,13 @@ public sealed class M3BoardRenderer : MonoBehaviour
         switch(r) { case "lake":return new Color(.15f,.48f,.62f); case "wood":return new Color(.16f,.36f,.25f); case "brick":return new Color(.62f,.28f,.18f); case "wool":return new Color(.49f,.62f,.3f); case "wheat":return new Color(.78f,.59f,.25f); case "sea":case "water":return new Color(.07f,.34f,.52f); case "gold":return new Color(.92f,.71f,.15f); case "fog":case "hidden":return new Color(.30f,.34f,.40f); default:return new Color(.68f,.58f,.41f); }
     }
     readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
+    internal void OutlinePiece(string id)=>pieceCache.DrawOutline(id,BoardCamera);
+    internal bool HasOutlinePiece(string id)=>pieceCache.HasPiece(id);
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId, Tile[] boardTiles=null)
     {
+        GetComponent<PaintedMap>()?.SetDangerHex(PaintedMap.RobberHex, PaintedMap.OccupiedHex(tiles, robberTileId));
         if(numberTokens!=null)numberTokens.Refresh(boardTiles);
+        shipCoast.SetHomes(settlements,cities);
         ClearPreview();
         entrances.Refresh(roads);
         pieceCache.Begin("basic",pieces);
@@ -133,10 +137,15 @@ public sealed class M3BoardRenderer : MonoBehaviour
     }
     public void RefreshSeafarers(Catan.Core.M3.ShipPlacement[] ships,string pirateTileId)
     {
-        shipEdges.Clear();foreach(var placed in ships)shipEdges.Add(placed.LocationId);
+        var pirateHex = PaintedMap.OccupiedHex(tiles, pirateTileId);
+        GetComponent<PaintedMap>()?.SetDangerHex(PaintedMap.PirateHex, pirateHex);
+        tableScene?.Ocean?.SetPirateHex(pirateHex);
+        shipEdges.Clear();shipCoast.BeginShips();
+        foreach(var placed in ships.OrderBy(s=>s.BuiltTurn)){shipEdges.Add(placed.LocationId);shipCoast.PlaceShip(placed.LocationId,placed.PlayerId);}
+        shipCoast.RefreshWakes(pieceCache,pieces,operationLayout?tableScene.Ocean:null,Position);
         pieceCache.Begin("ships",pieces);
         foreach(var ship in ships)
-        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+ship.IsWarship+":"+shipCoast.HasDock(ship.LocationId)))
+        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+ship.IsWarship+":"+operationLayout+":"+shipCoast.HasDock(ship.LocationId)+":"+shipCoast.Reversed(ship.LocationId)))
         {
             if(!change.Changed)continue;
             var mesh=Ship(ship.LocationId,SeatColor(ship.PlayerId),pieces);
@@ -144,15 +153,15 @@ public sealed class M3BoardRenderer : MonoBehaviour
             {
                 var flag=GameObject.CreatePrimitive(PrimitiveType.Sphere);Destroy(flag.GetComponent<Collider>());
                 flag.name="Warship flag";flag.transform.SetParent(pieces,false);
-                flag.transform.position=ShipPosition(ship.LocationId)+Vector3.up*.023f;
-                flag.transform.localScale=new Vector3(.004f,.008f,.003f);
+                flag.transform.position=mesh.transform.position+Vector3.up*.0083f;
+                flag.transform.localScale=new Vector3(.0015f,.003f,.0012f);
                 var black=new Color(.07f,.06f,.07f);
                 if(!pieceMaterials.TryGetValue(black,out var material)){material=Material(black);pieceMaterials.Add(black,material);}
                 flag.GetComponent<Renderer>().sharedMaterial=material;
             }
         }
         if(!string.IsNullOrEmpty(pirateTileId))
-        using(var change=pieceCache.Update("pirate",pirateTileId))
+        using(var change=pieceCache.Update("pirate",pirateTileId+":"+operationLayout+":"+ReferenceMarkers.PortLayoutRevision))
         {
             if(change.Changed)
             {
@@ -179,7 +188,8 @@ public sealed class M3BoardRenderer : MonoBehaviour
         ? EntityBoardAssets.ShipWaterline(Position(edge))+shipCoast.Offset(edge) : Position(edge);
     GameObject Ship(string id,Color color,Transform parent)
     {
-        var asset=EntityBoardAssets.Ship("Ship "+id,color,ShipPosition(id),rotations[id],parent);
+        var seat="P"+(System.Array.IndexOf(BoardRenderer.SeatColors,color)+1);
+        var asset=EntityBoardAssets.Ship("Ship "+id,color,ShipPosition(id),shipCoast.Facing(id,seat,rotations[id]),parent);
         if(asset!=null)return asset;
         // M3 v001 runtime mesh placeholder, metre scale, midpoint pivot and 8 mm waterline.
         var hull=Piece(true,id,color,parent,false);hull.name="Ship "+id;
@@ -199,7 +209,8 @@ public sealed class M3BoardRenderer : MonoBehaviour
         if(entityModel)
         {
             var bottom=position+new Vector3(.012f,EntityBoardAssets.BoardSurfaceHeight,0);
-            var asset=pirate?EntityBoardAssets.Pirate("Pirate "+tileId,bottom,parent):EntityBoardAssets.Robber("Robber "+tileId,bottom,parent);
+            var pose=pirate?ReferenceMarkers.PiratePose(position):default;
+            var asset=pirate?EntityBoardAssets.Pirate("Pirate "+tileId,bottom+pose.shift,parent,operationLayout,pose.facing):EntityBoardAssets.Robber("Robber "+tileId,bottom,parent);
             if(asset!=null)return asset;
         }
         var marker=GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -256,8 +267,10 @@ public sealed class M3BoardRenderer : MonoBehaviour
         if(ghost!=null&&pointerPreviewKey==key){if(legal)TabletopPointerCursor.Request();return;}
         ClearPreview();if(string.IsNullOrEmpty(id))return;pointerPreviewKey=key;
         var rotation=id.StartsWith("E")?rotations[id]:Quaternion.identity;
+        if(preview.Kind=="ship")rotation=shipCoast.Facing(id,seat,rotation);
         if(legal)TabletopPointerCursor.Request();
-        ghost=OperationPieceAssets.PointerPreview(preview,seat,Position(id)+(operationLayout&&preview.Kind=="ship"?shipCoast.Offset(id):Vector3.zero),rotation,transform,legal);
+        var pirate=preview.Kind=="pirate"?ReferenceMarkers.PiratePose(Position(id)):default;
+        ghost=OperationPieceAssets.PointerPreview(preview,seat,Position(id)+pirate.shift+(operationLayout&&preview.Kind=="ship"?shipCoast.Offset(id):Vector3.zero),rotation,transform,legal,operationLayout,pirate.facing);
         if(preview.Kind=="settlement"||preview.Kind=="city"||preview.Kind=="wall")entrances.Orient(ghost,id,seat);
     }
     public bool HasPointerPreview=>ghost!=null;
@@ -290,6 +303,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
         {
             TopView=top; tableScene.Frame(BoardCamera,top,Zoom/boardRadius); return;
         }
+        FantasyBoardPiece.SetView(false);
         TopView=top; BoardCamera.orthographic=true; BoardCamera.orthographicSize=Zoom;
         BoardCamera.transform.position=boardCenter+(top?new Vector3(0,.85f,-.001f):new Vector3(0,.65f,-.55f));
         BoardCamera.transform.LookAt(boardCenter+new Vector3(0,.005f,0));

@@ -1,0 +1,27 @@
+{
+  "version": "2.1.12",
+  "platform": "Windows",
+  "skins": 33,
+  "verifiedMouseClicks": 2,
+  "mode": "四人双扩展＋三国＋海港大亨＋捕鱼＋穿越沙漠",
+  "localChecksPassed": 178,
+  "transport": "本机 WebSocket",
+  "peers": [
+    {
+      "seat": "P1",
+      "event": "tk-b2-harvest-46 tk-g37 tk-g37-s1 P3"
+    },
+    {
+      "seat": "P2",
+      "event": "tk-b2-harvest-46 tk-g37 tk-g37-s1 P3"
+    },
+    {
+      "seat": "P3",
+      "event": "tk-b2-harvest-46 tk-g37 tk-g37-s1 P3"
+    },
+    {
+      "seat": "P4",
+      "event": "tk-b2-harvest-46 tk-g37 tk-g37-s1 P3"
+    }
+  ]
+}

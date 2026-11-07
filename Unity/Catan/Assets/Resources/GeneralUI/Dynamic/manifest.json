@@ -1,0 +1,269 @@
+{
+  "entries": [
+    {
+      "id": "tk-g01",
+      "idleTime": 2.6666666666666665,
+      "idleFrames": 64,
+      "attackTime": 2.7333333333333334,
+      "slash": false,
+      "sound": "tk-g01/attack-sound"
+    },
+    {
+      "id": "tk-g02",
+      "idleTime": 10,
+      "idleFrames": 160,
+      "attackTime": 2.3333332538604736,
+      "slash": false,
+      "sound": "tk-g02/attack-sound"
+    },
+    {
+      "id": "tk-g03",
+      "idleTime": 8,
+      "idleFrames": 128,
+      "attackTime": 1.25,
+      "slash": true,
+      "sound": "shared/attack-sound"
+    },
+    {
+      "id": "tk-g04",
+      "idleTime": 12,
+      "idleFrames": 192,
+      "attackTime": 2.6666667461395264,
+      "slash": false,
+      "sound": "tk-g04/attack-sound"
+    },
+    {
+      "id": "tk-g05",
+      "idleTime": 6.666666507720947,
+      "idleFrames": 112,
+      "attackTime": 2.1666667461395264,
+      "slash": false,
+      "sound": "tk-g05/attack-sound"
+    },
+    {
+      "id": "tk-g06",
+      "idleTime": 16,
+      "idleFrames": 256,
+      "attackTime": 3,
+      "slash": false,
+      "sound": "tk-g06/attack-sound"
+    },
+    {
+      "id": "tk-g08",
+      "idleTime": 6.666666507720947,
+      "idleFrames": 112,
+      "attackTime": 2.3333332538604736,
+      "slash": false,
+      "sound": "tk-g08/attack-sound"
+    },
+    {
+      "id": "tk-g09",
+      "idleTime": 10,
+      "idleFrames": 160,
+      "attackTime": 2.2333333492279053,
+      "slash": false,
+      "sound": "tk-g09/attack-sound"
+    },
+    {
+      "id": "tk-g10",
+      "idleTime": 4.670668125152588,
+      "idleFrames": 80,
+      "attackTime": 2.0014073848724365,
+      "slash": false,
+      "sound": "tk-g10/attack-sound"
+    },
+    {
+      "id": "tk-g12",
+      "idleTime": 10,
+      "idleFrames": 160,
+      "attackTime": 2.366666555404663,
+      "slash": false,
+      "sound": "tk-g12/attack-sound"
+    },
+    {
+      "id": "tk-g13",
+      "idleTime": 10,
+      "idleFrames": 160,
+      "attackTime": 2,
+      "slash": false,
+      "sound": "shared/attack-sound"
+    },
+    {
+      "id": "tk-g14",
+      "idleTime": 10,
+      "idleFrames": 160,
+      "attackTime": 2.1666667461395264,
+      "slash": false,
+      "sound": "tk-g14/attack-sound"
+    },
+    {
+      "id": "tk-g15",
+      "idleTime": 8,
+      "idleFrames": 128,
+      "attackTime": 2,
+      "slash": false,
+      "sound": "tk-g15/attack-sound"
+    },
+    {
+      "id": "tk-g16",
+      "idleTime": 5,
+      "idleFrames": 80,
+      "attackTime": 1.8333333730697632,
+      "slash": false,
+      "sound": "tk-g16/attack-sound"
+    },
+    {
+      "id": "tk-g18",
+      "idleTime": 11,
+      "idleFrames": 176,
+      "attackTime": 2,
+      "slash": false,
+      "sound": "tk-g18/attack-sound"
+    },
+    {
+      "id": "tk-g19",
+      "idleTime": 10,
+      "idleFrames": 160,
+      "attackTime": 2,
+      "slash": false,
+      "sound": "tk-g19/attack-sound"
+    },
+    {
+      "id": "tk-g20",
+      "idleTime": 8,
+      "idleFrames": 128,
+      "attackTime": 3,
+      "slash": false,
+      "sound": "tk-g20/attack-sound"
+    },
+    {
+      "id": "tk-g22",
+      "idleTime": 6.666666507720947,
+      "idleFrames": 112,
+      "attackTime": 2,
+      "slash": false,
+      "sound": "tk-g22/attack-sound"
+    },
+    {
+      "id": "tk-g23",
+      "idleTime": 5.333333492279053,
+      "idleFrames": 96,
+      "attackTime": 2.3333332538604736,
+      "slash": false,
+      "sound": "tk-g23/attack-sound"
+    },
+    {
+      "id": "tk-g28",
+      "idleTime": 2.6666667461395264,
+      "idleFrames": 48,
+      "attackTime": 2.066666603088379,
+      "slash": false,
+      "sound": "tk-g28/attack-sound"
+    },
+    {
+      "id": "tk-g29",
+      "idleTime": 5.0016398429870605,
+      "idleFrames": 96,
+      "attackTime": 3,
+      "slash": false,
+      "sound": "tk-g29/attack-sound"
+    },
+    {
+      "id": "tk-g31",
+      "idleTime": 6,
+      "idleFrames": 96,
+      "attackTime": 2.6666667461395264,
+      "slash": false,
+      "sound": "tk-g31/attack-sound"
+    },
+    {
+      "id": "tk-g33",
+      "idleTime": 10,
+      "idleFrames": 160,
+      "attackTime": 2.8333332538604736,
+      "slash": false,
+      "sound": "tk-g33/attack-sound"
+    },
+    {
+      "id": "tk-g35",
+      "idleTime": 4,
+      "idleFrames": 64,
+      "attackTime": 2.3333332538604736,
+      "slash": false,
+      "sound": "tk-g35/attack-sound"
+    },
+    {
+      "id": "tk-g37",
+      "idleTime": 4,
+      "idleFrames": 64,
+      "attackTime": 2,
+      "slash": false,
+      "sound": "shared/attack-sound"
+    },
+    {
+      "id": "tk-g38",
+      "idleTime": 5.333333492279053,
+      "idleFrames": 96,
+      "attackTime": 1.6666666269302368,
+      "slash": false,
+      "sound": "tk-g38/attack-sound"
+    },
+    {
+      "id": "tk-g39",
+      "idleTime": 8.333333015441895,
+      "idleFrames": 144,
+      "attackTime": 2.1666667461395264,
+      "slash": false,
+      "sound": "tk-g39/attack-sound"
+    },
+    {
+      "id": "tk-g41",
+      "idleTime": 12,
+      "idleFrames": 192,
+      "attackTime": 2.8333332538604736,
+      "slash": false,
+      "sound": "tk-g41/attack-sound"
+    },
+    {
+      "id": "tk-g42",
+      "idleTime": 2.6666667461395264,
+      "idleFrames": 48,
+      "attackTime": 1.6666666269302368,
+      "slash": false,
+      "sound": "tk-g42/attack-sound"
+    },
+    {
+      "id": "tk-g44",
+      "idleTime": 6.666666507720947,
+      "idleFrames": 112,
+      "attackTime": 2.5,
+      "slash": false,
+      "sound": "tk-g44/attack-sound"
+    },
+    {
+      "id": "tk-g50",
+      "idleTime": 11.333333015441895,
+      "idleFrames": 192,
+      "attackTime": 2.3333332538604736,
+      "slash": false,
+      "sound": "tk-g50/attack-sound"
+    },
+    {
+      "id": "tk-g51",
+      "idleTime": 8,
+      "idleFrames": 128,
+      "attackTime": 2.3333332538604736,
+      "slash": false,
+      "sound": "tk-g51/attack-sound"
+    },
+    {
+      "id": "tk-g53",
+      "idleTime": 10,
+      "idleFrames": 160,
+      "attackTime": 1.8333333730697632,
+      "slash": false,
+      "sound": "tk-g53/attack-sound"
+    }
+  ],
+  "slashTime": 2
+}

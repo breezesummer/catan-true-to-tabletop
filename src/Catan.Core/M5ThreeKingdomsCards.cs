@@ -35,12 +35,36 @@ namespace Catan.Core.M5
             var remaining=(p.PrintedProgressCards??Array.Empty<ProgressCardKind>()).ToList();
             return p.ProgressCards.Select(c=>{bool printed=remaining.Remove(c);return new B2ProgressCard {Id=c.ToString(),Color=(int)ProgressCatalog.Track(c),PublicPoint=ProgressCatalog.IsVictoryPoint(c),Printed=printed};}).ToArray();
         }
-        private sealed partial class B2Host : IThreeKingdomsCardHost
+        private sealed partial class B2Host : IThreeKingdomsCardHost, ITileHarvestHost
         {
             private readonly CombinedGameSession session;
             private readonly GameState game;
             public B2Host(CombinedGameSession session, GameState game) { this.session = session; this.game = game; }
             public ThreeKingdomsState State => game.ThreeKingdoms;
+            public void RecordTileHarvest(string player, int total, int[] received, int[] reservedGold = null)
+            {
+                if (game.Harvest == null || received.Sum() < 2) return;
+                var tiles = game.Tiles.Where(t => t.Number == total && (t.Id != game.RobberTileId ||
+                    B2SkillEngine.B5DoubleHarvest(State, player, t.Id)));
+                int gold = 0;
+                if (reservedGold != null)
+                {
+                    received = (int[])received.Clone();
+                    for (int card=0; card<received.Length; card++)
+                    {
+                        int paid = Math.Min(reservedGold[card],received[card]);
+                        gold += paid;
+                        received[card] -= paid;
+                    }
+                }
+                game.Harvest.Paid(player, tiles, received, (tile, card) =>
+                {
+                    string terrain = card < 5 ? TileHarvest.Terrain[card] : card == 5 ? "wool" : card == 6 ? "ore" : "wood";
+                    return tile.Resource == terrain ? B5HarvestAmount(game, player, tile, card) : 0;
+                }, tile => (B2SkillEngine.B5DoubleHarvest(State, player, tile.Id) ? 2 : 1) *
+                    (game.Settlements.Count(b => b.PlayerId == player && B5Working(game, "Settlement", b.LocationId) && tile.Vertices.Contains(b.LocationId)) +
+                     2 * game.Cities.Count(b => b.PlayerId == player && tile.Vertices.Contains(b.LocationId))), gold);
+            }
             public int FinalDiceTotal => B5FinalDiceTotal(game);
             public int[] GetHand(string playerId) { var p = game.Players.Single(x => x.Id == playerId); return Cards(p.Resources, p.Commodities); }
             public int[] GetBank() => Cards(game.Bank, game.CommodityBank);

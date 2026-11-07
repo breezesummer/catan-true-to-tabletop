@@ -18,7 +18,7 @@ using UnityEngine;
 using Stopwatch=System.Diagnostics.Stopwatch;
 
 // Network state is applied only in Update. Neither an authority nor an AI exists in this client.
-public sealed class M7Client : MonoBehaviour
+public sealed partial class M7Client : MonoBehaviour
 {
     public string Endpoint { get; private set; }
     public string Fingerprint { get; private set; }
@@ -47,6 +47,7 @@ public sealed class M7Client : MonoBehaviour
     NetworkResponse pendingReceipt;
     public bool Playing { get; internal set; }
     public bool Connected { get; private set; }
+    internal bool RestoringPlayerView=>!Connected||syncRecovery;
     public bool Busy { get; private set; }
     public bool CommandPending=>pendingCommand!=null;
     public bool EnrollmentPending=>pendingEnrollment!=null;
@@ -154,6 +155,7 @@ public sealed class M7Client : MonoBehaviour
             nextRenameAt=Time.unscaledTime+2;
             if(Room.Seats.Any(s=>s.SeatId==SeatId&&s.DisplayName!=desiredDisplayName))Request("Rename",new NamePayload{DisplayName=desiredDisplayName});
         }
+        FlushReactions();
         if(socketConnected&&(socket==null||socket.State!=WebSocketState.Open))socketConnected=false;
         if(Connected&&!previewBusy&&previewQueue.Count>0&&Time.unscaledTime>=nextPreviewAt){nextPreviewAt=Time.unscaledTime+.12f;SendPreview(previewQueue.Dequeue());}
         if(automaticReconnect&&(!socketConnected||recoverEventStream||Room?.Started==true&&viewRevision<Revision)&&!syncBusy&&!Busy&&http!=null&&connectionId!=null&&Time.unscaledTime>=nextSyncAt){nextSyncAt=Time.unscaledTime+1;PollState();}
@@ -300,6 +302,7 @@ public sealed class M7Client : MonoBehaviour
             else if(operation=="History")operation="HistoryCompact";
             else if(operation=="Command")operation="CommandReceipt";
         }
+        if(operation=="Sync"||operation=="Get"||operation=="Heartbeat")payload=NetworkProtocol.ComboReactionFeedToken;
         return new NetworkRequest{RequestId=Guid.NewGuid().ToString("N"),Operation=operation,RoomId=RoomId,Credential=credential,ConnectionId=connectionId,ExpectedRevision=Revision,RuleSet=rules,ExpectedRulesVersion=rules==null?null:NetworkProtocol.RulesVersion(rules),ExpectedScenarioVersion=rules==null?null:NetworkProtocol.ScenarioVersion(rules),SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion,ExpectedThreeKingdomsPackageVersion=Room?.ThreeKingdomsPackageVersion??rememberedGeneralPackage,ExpectedThreeKingdomsContentHash=Room?.ThreeKingdomsContentHash??rememberedGeneralHash,Payload=payload};
     }
     public void Submit(object command)
@@ -423,7 +426,7 @@ public sealed class M7Client : MonoBehaviour
         try
         {
             timeout.CancelAfter(TimeSpan.FromSeconds(15));
-            using(var message=new HttpRequestMessage(HttpMethod.Post,endpoint+"/api/request"))
+            using(var message=new HttpRequestMessage(HttpMethod.Post,endpoint+(request.Operation=="React"?"/api/reaction":"/api/request")))
             {
                 message.Content=new StringContent(body,Encoding.UTF8,"application/json");
                 using(var response=await client.SendAsync(message,HttpCompletionOption.ResponseHeadersRead,timeout.Token).ConfigureAwait(false))
@@ -472,6 +475,7 @@ public sealed class M7Client : MonoBehaviour
         using var frameCost=FrameCost.Measure(FrameCost.Stage.NetworkApply);
         using var diagnostic=new ResponseApplication(this,response);
         if(response.ProtocolVersion!=NetworkProtocol.Version){Disconnected("联机协议不兼容，请更新客户端。");return;}
+        if(response.Code==NetworkProtocol.ReactionFeedToken){ReadReactionFeed(response);return;}
         MarkLobbyResponse(response);
         if(response.Success&&response.Code==NetworkProtocol.CompactRepliesCode&&!legacyReplies)compactReplies=true;
         Status=response.Message??(response.Success?"已连接。":"请求被拒绝。");
@@ -514,6 +518,7 @@ public sealed class M7Client : MonoBehaviour
             if(response.SeatId!=null)SeatId=response.SeatId;
         }
         if(response.Room!=null&&!stale){Room=response.Room;rememberedRuleSet=Room.RuleSet;rememberedGeneralPackage=Room.ThreeKingdomsPackageVersion;rememberedGeneralHash=Room.ThreeKingdomsContentHash;}
+        ReadReactionFeed(response);
         Connected=connectionId!=null&&(response.Success||Connected);
         if(response.Room!=null&&!stale)HumanControlAvailable=response.HumanControlAvailable;
         if(response.Success&&response.Room!=null&&!response.Room.Started)recoverEventStream=recoveryHistoryPaging=syncRecovery=false;
@@ -685,7 +690,7 @@ public sealed class M7Client : MonoBehaviour
         {
             while(!cancel.IsCancellationRequested&&ws.State==WebSocketState.Open)
             {
-                var request=new NetworkRequest{Operation=identity.Operation,RequestId=Guid.NewGuid().ToString("N"),RoomId=identity.RoomId,Credential=identity.Credential,ConnectionId=identity.ConnectionId,RuleSet=identity.RuleSet,ExpectedRulesVersion=identity.ExpectedRulesVersion,ExpectedScenarioVersion=identity.ExpectedScenarioVersion,SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion,ExpectedThreeKingdomsPackageVersion=identity.ExpectedThreeKingdomsPackageVersion,ExpectedThreeKingdomsContentHash=identity.ExpectedThreeKingdomsContentHash,ExpectedRevision=Interlocked.Read(ref socketRevision)};
+                var request=new NetworkRequest{Operation=identity.Operation,RequestId=Guid.NewGuid().ToString("N"),RoomId=identity.RoomId,Credential=identity.Credential,ConnectionId=identity.ConnectionId,RuleSet=identity.RuleSet,ExpectedRulesVersion=identity.ExpectedRulesVersion,ExpectedScenarioVersion=identity.ExpectedScenarioVersion,SupportedTradeModulesVersion=NetworkProtocol.TradeModulesVersion,ExpectedThreeKingdomsPackageVersion=identity.ExpectedThreeKingdomsPackageVersion,ExpectedThreeKingdomsContentHash=identity.ExpectedThreeKingdomsContentHash,Payload=identity.Payload,ExpectedRevision=Interlocked.Read(ref socketRevision)};
                 var receipt=new SocketReceipt();receipts[request.RequestId]=receipt;
                 var bytes=Encoding.UTF8.GetBytes(WireJson.Serialize(request));
                 M7CommunicationLog.Record(new M7CommunicationEvent{Event="request_send",Transport=transport,Operation="Get",RequestId=request.RequestId,RoomId=request.RoomId,Revision=request.ExpectedRevision,Bytes=bytes.Length});
@@ -795,6 +800,7 @@ public sealed class M7Client : MonoBehaviour
     }
     public void EndSession()
     {
+        reactionConnection=null; reactionSending=false; outgoingReactions.Clear(); nextReactionSend=0;
         bool hadGame=Playing;LastError="";
         if(http!=null)M7CommunicationLog.Record(new M7CommunicationEvent{Event="endpoint_session_end",RoomId=RoomId,Revision=Revision});
         generation++;connectionEpoch++;sessionCancellation=new CancellationToken(true);lifetime?.Cancel();AbortSocket(socket);socket?.Dispose();socket=null;http?.Dispose();http=null;lifetime?.Dispose();lifetime=null;

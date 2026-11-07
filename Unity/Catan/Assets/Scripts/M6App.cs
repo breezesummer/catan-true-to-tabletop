@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="2.1.11";
+    public const string BuildVersion="2.1.12";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -70,7 +70,7 @@ public sealed partial class M6App : MonoBehaviour
     bool tableMenu, escapeDismissedInteraction;
     public bool TableMenuOpen=>tableMenu;
     public void OpenTableMenu(){if(!Ready)return;ResetTablePauseMenu();tableMenu=true;escapeDismissedInteraction=false;}
-    public bool BlocksTableInput(Vector2 p)=>MenuVisible||TablePresentationBlocked||TableDiceRolling||ThreeKingdomsBlocksInput(p)||ClosedTableSelection&&SelectionPromptArea.Contains(p);
+    public bool BlocksTableInput(Vector2 p)=>ReactionOwnsPointer(p)||MenuVisible||TablePresentationBlocked||TableDiceRolling||ThreeKingdomsBlocksInput(p)||ClosedTableSelection&&SelectionPromptArea.Contains(p);
     void ToggleTableCamera()
     {
         var b=FindFirstObjectByType<BoardRenderer>();if(b!=null)b.SetCamera(!b.TopView);
@@ -106,9 +106,11 @@ public sealed partial class M6App : MonoBehaviour
     }
     void Update()
     {
+        UpdateReactions();
         TickNetworkDiagnostics();
         using var frameCost=FrameCost.Measure(FrameCost.Stage.GameUpdate);
         UpdateCardPresentation();
+        UpdateGeneralSkins();
         if(MobileTabletop.Enabled)_=MobileTabletop.TouchDragged;
         if(Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(1))escapeDismissedInteraction=false;
         if(Input.GetKeyDown(KeyCode.Escape))HandleTableEscape();
@@ -200,7 +202,7 @@ public sealed partial class M6App : MonoBehaviour
         actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         RuleSet=rules;ScenarioId=scenario;PlayerCount=players;HumanSeat=human;Paused=paused;InitialAuthority=authority;
         customVictoryTarget=targetVictoryPoints.HasValue;Harbormaster=harbormaster;Fishing=fishing;ThreeKingdoms=threeKingdoms;ResetThreeKingdomsPanel();
-        ResetCardPresentation();ResetPlayerIdentity();
+        ResetReactions();ResetCardPresentation();ResetPlayerIdentity();
         TargetVictoryPoints=target;AiSpeedLevel=TabletopAiSpeed.Clamp(aiSpeedLevel??AiSpeedLevel);ResetBuildPresentation();
         networkMenu=false;menuPendingAction=null;tableMenu=false;encyclopediaOpen=false;escapeDismissedInteraction=false;Fault="";AiCommandsExecuted=0;LastCommandKind="";MenuVisible=false;Notice="AI 已就座。你使用 "+ColorLabel(human)+" 建筑。行动顺序由开局掷骰决定。";
         promptContext=null;promptWasHuman=false;RoadPlacementPrompt="";lastPromptStatus=lastPromptInstruction=null;TableDiceRolling=false;tablePrompts.RequireSelection("");tablePrompts.Show(Time.unscaledTimeAsDouble);
@@ -314,9 +316,18 @@ public sealed partial class M6App : MonoBehaviour
         if(NetworkGame&&Event.current.type==EventType.Repaint)Network.MarkFramePresented();
         using var frameCost=FrameCost.Measure(FrameCost.Stage.Gui);
         Styles();GUI.depth=-100;GUI.matrix=MobileTabletop.GuiMatrix;
+        var pointerEvent = Event.current;
+        if(!MenuVisible&&!tableMenu&&pointerEvent.type==EventType.MouseDown&&pointerEvent.button==1&&CancelGeneralPointerPick())
+            pointerEvent.Use();
+        if (pointerEvent.isMouse && ReactionOwnsPointer(pointerEvent.mousePosition))
+        {
+            if (pointerEvent.type == EventType.MouseDown)
+                ReactionClick(pointerEvent.mousePosition, pointerEvent.button);
+            pointerEvent.Use();
+        }
         if(!MenuVisible && !networkMenu && TablePresentationBlocked && Event.current.type==EventType.Repaint && ThreeKingdomsProjection!=null)
             DrawGeneralDock(ThreeKingdomsProjection,false);
-        if(encyclopediaOpen&&tableMenu){DrawEncyclopedia();GUI.matrix=Matrix4x4.identity;return;}
+        if(encyclopediaOpen&&tableMenu){DrawEncyclopedia();DrawCentralSkill();GUI.matrix=Matrix4x4.identity;return;}
         if(networkMenu){DrawNetworkMenu();GUI.matrix=Matrix4x4.identity;return;}
         if(MenuVisible)
         {
@@ -352,6 +363,8 @@ public sealed partial class M6App : MonoBehaviour
         }
         if(!MenuVisible&&!tableMenu)DrawPlayedCard();
         if(!MenuVisible&&!tableMenu&&!TablePresentationBlocked){DrawThreeKingdoms();DrawAllianceVictoryB6();}
+        if(!MenuVisible&&!networkMenu)DrawCentralSkill();
+        if(ReactionTableVisible)DrawReactions();
         GUI.matrix=Matrix4x4.identity;
     }
 }

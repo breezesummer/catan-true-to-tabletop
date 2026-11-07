@@ -33,8 +33,8 @@ public sealed partial class M6App
         if(generalSelection.Contract.DirectBatch&&generalSelection.Contract.DecisionKind=="shelie")actions=actions.Where(a=>a.Command.Option=="card").ToArray();
         PastoralMenuUI.Panel(CandidateArea);
         string title=generalSelection.Contract.DecisionKind=="shelie"?"涉猎 · 选择至多三种资源":
-            actions[0].Command.Option=="b4-daoshu"?"声明要猜的真实牌种 · 再点目标头像":
-            actions[0].Command.Option=="color"?"选择发展牌颜色":actions[0].Command.Option=="b4-declare"?"声明小麦张数 · 尚未公开你的手牌子集":"当前响应候选 · 选中后确认";
+            actions[0].Command.Option=="b4-daoshu"?"猜测牌种":
+            actions[0].Command.Option=="color"?"选择发展牌颜色":actions[0].Command.Option=="b4-declare"?"声明小麦张数":"选择响应";
         PastoralMenuUI.Label(new Rect(354,480,900,22),title,14,PastoralMenuUI.Ink,true);
         specialScroll=GUI.BeginScrollView(new Rect(350,505,916,130),specialScroll,new Rect(0,0,Mathf.Max(900,actions.Length*113),110));
         for(int i=0;i<actions.Length;i++)
@@ -61,7 +61,7 @@ public sealed partial class M6App
             }
             PastoralMenuUI.Label(new Rect(r.x+3,r.y+75,r.width-6,26),(selected?"✓ ":"")+caption,13,PastoralMenuUI.Ivory,false,TextAnchor.MiddleCenter);
             int input=ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting);
-            if(input==1)generalSelection.ChooseOption(action);
+            if(input==1)ChooseGeneralOption(action);
             if(input==2)Inspect(DisplayPlayerText(action.Label),new Rect(354+i*113-specialScroll.x,505,106,106));
         }
         GUI.EndScrollView();
@@ -69,7 +69,7 @@ public sealed partial class M6App
     void DrawGeneralPileCandidates()
     {
         PastoralMenuUI.Panel(CandidateArea);
-        PastoralMenuUI.Label(new Rect(354,480,900,22),"下书 · 只显示已授权亮出堆；未亮出堆保留牌背",14,PastoralMenuUI.Ink,true);
+        PastoralMenuUI.Label(new Rect(354,480,900,22),"下书 · 选一叠牌",14,PastoralMenuUI.Ink,true);
         var actions=generalSelection.Options;var revealed=ThreeKingdomsProjection.RevealedSkillCards??new int[8];
         for(int i=0;i<actions.Length;i++)
         {
@@ -86,9 +86,9 @@ public sealed partial class M6App
                 if(types.Length==0)PastoralMenuUI.Label(new Rect(r.x+12,r.y+20,r.width-24,50),"亮出堆为空",18,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
             }
             else EntityCardAssets.DrawCardFace(new Rect(r.x+188,r.y+6,48,72),EntityCardAssets.Texture(EntityCardAssets.Good(0).Back));
-            PastoralMenuUI.Label(new Rect(r.x+6,r.y+91,r.width-12,23),(selected?"✓ ":"")+(shown?"亮出堆 · "+revealed.Sum()+" 张":"未亮出堆 · 内容保密"),14,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
+            PastoralMenuUI.Label(new Rect(r.x+6,r.y+91,r.width-12,23),(selected?"✓ ":"")+(shown?"亮出堆 · "+revealed.Sum()+" 张":"未亮出堆"),14,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
             int input=ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting);
-            if(input==1)generalSelection.ChooseOption(action);
+            if(input==1)ChooseGeneralOption(action);
             if(input==2)Inspect(shown?"这些牌由对方正式亮出。":"这些牌尚未公开；选择后按规则取得，不预览真身。",r);
         }
     }
@@ -113,7 +113,7 @@ public sealed partial class M6App
         if(modify)
         {
             string values=string.Join(" / ",generalSelection.CandidateActions.Where(a=>a.SelectionDiceValue.HasValue).Select(a=>a.SelectionDiceValue.Value).Distinct().OrderBy(x=>x));
-            PastoralMenuUI.Label(new Rect(218,219,400,91),"可改为："+values+"\n点击本人手牌与棋盘高亮地块。选择不会扣牌或重掷；操作条确认后生效。",15,PastoralMenuUI.Ink);return;
+            PastoralMenuUI.Label(new Rect(218,219,400,91),"可选点数 "+values,15,PastoralMenuUI.Ink);return;
         }
         for(int i=0;i<actions.Length;i++)
         {
@@ -122,7 +122,7 @@ public sealed partial class M6App
             string face=generalSelection.SelectedDie==2?DiceEventName(action.SelectionDiceValue??0):(action.SelectionDiceValue??0).ToString();
             PastoralMenuUI.Label(new Rect(r.x+4,r.y+5,r.width-8,45),face,23,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
             PastoralMenuUI.Label(new Rect(r.x+4,r.y+53,r.width-8,29),(selected?"✓ ":"")+"候选 "+(action.Command.CardType+1),13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
-            if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1)generalSelection.ChooseOption(action);
+            if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1)ChooseGeneralOption(action);
         }
     }
     void DrawFixedDiceCandidates(B2SkillAction[] actions)
@@ -130,22 +130,23 @@ public sealed partial class M6App
         PastoralMenuUI.Label(new Rect(218,186,402,26),"直谏 · 红骰与白骰合计7；选择事件结果",14,PastoralMenuUI.Ink,true);
         var reds=actions.Select(a=>a.Command.Counts[0]).Distinct().OrderBy(x=>x).ToArray();
         var events=actions.Select(a=>a.Command.CardType).Distinct().OrderBy(x=>x).ToArray();
+        bool picked=false;
         for(int i=0;i<reds.Length;i++)
         {
             var r=new Rect(219+i*65,218,59,36);bool selected=fixedChoiceRed==reds[i];
             CopperTabletopSkin.Panel(r,new Color(.45f,.13f,.11f),selected);
             PastoralMenuUI.Label(r,reds[i]+" + "+(7-reds[i]),14,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
-            if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1)fixedChoiceRed=reds[i];
+            if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1){fixedChoiceRed=reds[i];picked=true;}
         }
         for(int i=0;i<events.Length;i++)
         {
             var r=new Rect(219+i*65,264,59,40);bool selected=fixedChoiceEvent==events[i];
             CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
             PastoralMenuUI.Label(r,DiceEventName(events[i]),13,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
-            if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1)fixedChoiceEvent=events[i];
+            if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1){fixedChoiceEvent=events[i];picked=true;}
         }
-        if(fixedChoiceRed>0&&fixedChoiceEvent>0)
-        {var chosen=actions.FirstOrDefault(a=>a.Command.Counts[0]==fixedChoiceRed&&a.Command.CardType==fixedChoiceEvent);if(chosen!=null)generalSelection.ChooseOption(chosen);}
+        if(picked&&fixedChoiceRed>0&&fixedChoiceEvent>0)
+        {var chosen=actions.FirstOrDefault(a=>a.Command.Counts[0]==fixedChoiceRed&&a.Command.CardType==fixedChoiceEvent);if(chosen!=null)ChooseGeneralOption(chosen);}
     }
     static string DiceEventName(int face)=>face<=3?"黑色 "+face:face==4?"贸易":face==5?"政治":"科学";
 }

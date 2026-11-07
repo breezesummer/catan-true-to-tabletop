@@ -8,7 +8,7 @@ namespace Catan.Server;
 
 public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options, CommunicationDiagnostics? diagnostics = null)
 {
-    private readonly PeerRateLimiter requests = new();
+    private readonly PeerRateLimiter requests = new(), reactionRequests = new();
     private readonly SemaphoreSlim socketSlots = new(options.MaxConnections);
     private static readonly UTF8Encoding StrictUtf8 = new(false, true);
 
@@ -20,7 +20,9 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
         long sent = 0;
         string? exceptionType = null;
         var peer = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-        if (!requests.Allow(peer, options.RequestLimitPer10Seconds, 10)) { context.Response.StatusCode = 429; diagnostics?.Record(new() { Event = "request.rejected", Transport = "http", Code = "RateLimited" }); await WriteHttp(context, Error("RateLimited", "请求过快，请稍后重试。")); return; }
+        bool reactionRoute = context.Request.Path == "/api/reaction";
+        var limiter = reactionRoute ? reactionRequests : requests;
+        if (!limiter.Allow(peer, reactionRoute ? 480 : options.RequestLimitPer10Seconds, 10)) { context.Response.StatusCode = 429; diagnostics?.Record(new() { Event = "request.rejected", Transport = "http", Code = "RateLimited" }); await WriteHttp(context, Error("RateLimited", "请求过快，请稍后重试。")); return; }
         if (context.Request.ContentLength > options.MaxRequestBytes) { context.Response.StatusCode = 413; diagnostics?.Record(new() { Event = "request.rejected", Transport = "http", Code = "MessageTooLarge", Bytes = context.Request.ContentLength }); await WriteHttp(context, Error("MessageTooLarge", "请求超过大小上限。")); return; }
         try
         {
@@ -34,7 +36,8 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
             }
             request = WireJson.Deserialize<NetworkRequest>(StrictUtf8.GetString(input.ToArray()));
             diagnostics?.Record(CommunicationDiagnostics.Request("request.received", "http", null, request) with { Bytes = input.Length });
-            response = Dispatch(request, "http");
+            response = reactionRoute && request?.Operation != "React"
+                ? Error("InvalidReaction", "互动请求无效。", request?.RequestId) : Dispatch(request, "http");
             sent = await WriteHttp(context, response);
         }
         catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested) { exceptionType = "RequestAborted"; }
@@ -84,13 +87,14 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
             diagnostics?.Record(new() { Event = "socket.opened", Transport = "ws", SocketId = socketId });
             void Enqueue(NetworkResponse response, NetworkRequest? request, bool push, byte[]? encoded)
             {
-                bool sync = response.Success && request?.Operation == "Sync";
-                var bytes = sync ? Array.Empty<byte>() : encoded ?? Encoding.UTF8.GetBytes(WireJson.Serialize(response));
+                bool sync = response.Success && response.Code != NetworkProtocol.ReactionFeedToken && request?.Operation == "Sync";
+                var bytes = sync || response.Code == NetworkProtocol.ReactionFeedToken ? Array.Empty<byte>() : encoded ?? Encoding.UTF8.GetBytes(WireJson.Serialize(response));
                 var metadata = CommunicationDiagnostics.Request("response.queued", "ws", socketId, request, response);
                 if (bytes.Length > NetworkProtocol.MaximumResponseBytes)
                 { closure.Set("ResponseTooLarge"); lifetime.Cancel(); return; }
                 if (!output.TryWrite(new(bytes, response, metadata, push, sync), out var coalesced))
                 {
+                    if (response.Code == NetworkProtocol.ReactionFeedToken) return;
                     closure.Set("ResponseQueueFull");
                     diagnostics?.Record(metadata with { Event = "response.queue_full", Bytes = bytes.Length, QueueDepth = output.Count });
                     lifetime.Cancel(); return;
@@ -180,12 +184,15 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
                 // 登记流程的长期凭据由客户端预先保存，成功回复不会再回传。
                 var credential = string.IsNullOrEmpty(response.Credential) ? mayChangeRoom && request.EnrollmentCredential != null ? request.EnrollmentCredential : request.Credential : response.Credential;
                 var operation = request.Operation == "Sync" ? "Sync" : current?.Operation == "Sync" && current.ConnectionId == response.ConnectionId ? "Sync" : "Get";
+                var subscription = NetworkProtocol.IsReactionSubscription(request.Payload) ? request.Payload : null;
                 if (current?.ConnectionId != response.ConnectionId || current.RoomId != response.RoomId || current.Operation != operation
+                    || current.Payload != subscription
                     || current.SupportedTradeModulesVersion != request.SupportedTradeModulesVersion
                     || current.ExpectedThreeKingdomsPackageVersion != request.ExpectedThreeKingdomsPackageVersion
                     || current.ExpectedThreeKingdomsContentHash != request.ExpectedThreeKingdomsContentHash)
                     // 推送与普通请求走同一能力检查，保留本次已验证的客户端声明；不能伪装成服务端最新版本。
                     binding.Write(new NetworkRequest { Operation = operation, RoomId = response.RoomId, ConnectionId = response.ConnectionId, Credential = credential,
+                        Payload = subscription,
                         SupportedTradeModulesVersion = request.SupportedTradeModulesVersion,
                         ExpectedThreeKingdomsPackageVersion = request.ExpectedThreeKingdomsPackageVersion,
                         ExpectedThreeKingdomsContentHash = request.ExpectedThreeKingdomsContentHash });
@@ -200,6 +207,9 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
     private async Task PushLoop(SocketBinding binding, string socketId, Action<NetworkResponse, NetworkRequest?, bool, byte[]?> enqueue, CloseReason closure, CancellationToken cancellation)
     {
         byte[]? previous = null;
+        string? reactionConnection = null;
+        int reactionGame = -1;
+        long reactionSequence = -1;
         string? previousControl = null, previousView = null, previousHistory = null;
         while (!cancellation.IsCancellationRequested)
         {
@@ -212,11 +222,22 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
             // 切房与推送可同时发生，旧房快照不能覆盖已经切换的新房界面。
             if (!ReferenceEquals(request, binding.Read())) continue;
             response.RequestId = null;
+            var feed = response.Reactions;
+            response.Reactions = null;
+            if (feed != null && (reactionConnection != response.ConnectionId || reactionGame != feed.GameNumber || reactionSequence != feed.Through))
+            {
+                var update = new NetworkResponse { Success = true, Code = NetworkProtocol.ReactionFeedToken,
+                    RoomId = response.RoomId, ConnectionId = response.ConnectionId, Revision = response.Revision, Reactions = feed };
+                enqueue(update, request, true, null);
+                reactionConnection = response.ConnectionId;
+                reactionGame = feed.GameNumber;
+                reactionSequence = feed.Through;
+            }
             // 推送仍经过身份与当前控制权检查，只生成绑定席位的可见视图。
             if (response.Success) response.Code = "Push";
             string control = WireJson.Serialize(response.Room) + response.ConnectionId + response.HumanControlAvailable;
             bool sync = request.Operation == "Sync";
-            if (sync && response.Success && previousControl == control && ReferenceEquals(previousView, response.ViewJson) && ReferenceEquals(previousHistory, response.PresentationHistoryJson)) continue;
+            if ((sync || feed != null) && response.Success && previousControl == control && ReferenceEquals(previousView, response.ViewJson) && ReferenceEquals(previousHistory, response.PresentationHistoryJson)) continue;
             var encoded = sync ? null : Encoding.UTF8.GetBytes(WireJson.Serialize(response));
             if (sync || previous == null || !encoded!.AsSpan().SequenceEqual(previous))
             {
@@ -233,14 +254,16 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
     private async Task SendLoop(WebSocket socket, SocketBinding binding, SocketOutbox output, SemaphoreSlim sendGate, CloseReason closure, CancellationToken cancellation)
     {
         string? sentRoom = null;
-        long sentRevision = 0;
+        long sentRevision = 0, reactionThrough = 0;
+        string? reactionConnection = null;
+        int reactionGame = -1;
         string? sentConnection = null;
         var stateSender = new SeatStateSender();
         while (!cancellation.IsCancellationRequested)
         {
             var message = await output.ReadAsync(cancellation);
             if (message.IsPush && (message.Response.ConnectionId != binding.Read()?.ConnectionId ||
-                message.Response.RoomId == sentRoom && message.Response.Revision < sentRevision))
+                !message.IsReaction && message.Response.RoomId == sentRoom && message.Response.Revision < sentRevision))
             {
                 diagnostics?.Record(message.Diagnostic with { Event = "push.superseded", Bytes = message.Bytes.Length });
                 continue;
@@ -257,7 +280,18 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
                 catch (System.Runtime.Serialization.SerializationException) when (message.IsSync)
                 { response = message.Response.Copy(); response.Success = false; response.Code = "SyncCapacity"; response.ViewJson = response.PresentationHistoryJson = null; }
                 if (message.IsSync && obsolete) { response = response.Copy(); response.ViewJson = null; response.PresentationHistoryJson = null; }
-                var bytes = message.IsSync ? Encoding.UTF8.GetBytes(WireJson.SerializeDirect(response)) : message.Bytes;
+                if (message.IsReaction && response.Reactions is { } feed)
+                {
+                    // 慢客户端只保留最新窗口，发包时再按本连接已发送的位置裁去重复项。
+                    if (reactionConnection != response.ConnectionId || reactionGame != feed.GameNumber) reactionThrough = 0;
+                    reactionConnection = response.ConnectionId;
+                    reactionGame = feed.GameNumber;
+                    response = response.Copy();
+                    response.Reactions = new TableReactionFeed { GameNumber = feed.GameNumber, Through = feed.Through,
+                        Items = feed.Items.Where(item => item.Sequence > reactionThrough).ToArray() };
+                    reactionThrough = feed.Through;
+                }
+                var bytes = message.IsSync || message.IsReaction ? Encoding.UTF8.GetBytes(WireJson.SerializeDirect(response)) : message.Bytes;
                 if (bytes.Length > NetworkProtocol.MaximumResponseBytes && message.IsSync)
                 {
                     response = message.Response.Copy(); response.Success = false; response.Code = "SyncCapacity"; response.ViewJson = response.PresentationHistoryJson = null;
@@ -271,7 +305,7 @@ public sealed class NetworkTransport(RoomDirectory rooms, ServerOptions options,
             }
             catch (OperationCanceledException) when (!cancellation.IsCancellationRequested)
             { closure.Set("SendDeadline"); diagnostics?.Record(message.Diagnostic with { Event = "response.send_timeout", Bytes = message.Bytes.Length, WaitMs = waited }); throw; }
-            if (message.Response.RoomId != null)
+            if (!message.IsReaction && message.Response.RoomId != null)
             {
                 if (message.Response.RoomId != sentRoom || message.Response.ConnectionId != sentConnection) sentRevision = 0;
                 sentRoom = message.Response.RoomId; sentConnection = message.Response.ConnectionId; sentRevision = Math.Max(sentRevision, message.Response.Revision);

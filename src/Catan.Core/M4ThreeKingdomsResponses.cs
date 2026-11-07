@@ -93,6 +93,7 @@ namespace Catan.Core.M4
             }
             var bank=host.GetBank();for(int i=0;i<8;i++)cards[i]=Math.Min(cards[i],bank[i]);
             host.RemoveBank(cards);host.AddHand(player,cards);
+            host.RecordTileHarvest(player,total,cards);
             B2SkillEngine.OnCardsMoved(host,eventId,new[]{new B2HandChange {PlayerId=player,BeforeCount=before.Sum(),AfterCount=before.Sum()+cards.Sum(),GainedCards=cards,SourceSkillId="tk-g08-s2"}});
         }
     }

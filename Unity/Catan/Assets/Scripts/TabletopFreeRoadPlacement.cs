@@ -5,6 +5,22 @@ using UnityEngine;
 // 四类规则和联机视图共用地图交互；落子仍通过原来的 Submit 校验与同步。
 public sealed partial class M2App
 {
+    bool UpdateSetupPlacement(Vector2 mouse,bool click)
+    {
+        if(view.Phase==Catan.Core.M2.GamePhase.SetupSettlement)
+        {
+            TabletopRoadPlacement.SetupBuilding(mouse,click,view.LegalVertexIds,board.ScreenPoint,
+                id=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupSettlement"),seat,true),
+                board.ClearPreview,id=>Submit(NewCommand(Catan.Core.M2.CommandKind.SetupSettlement,id)));
+            return true;
+        }
+        if(view.Phase!=Catan.Core.M2.GamePhase.SetupRoad)return false;
+        TabletopRoadPlacement.Update(mouse,click,view.Board.Edges,view.Board.Tiles,view.LegalEdgeIds,Array.Empty<string>(),
+            board.ScreenPoint,(id,legal)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupRoad"),seat,legal),
+            (id,legal)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupShip"),seat,legal),board.ClearPreview,
+            (id,ship)=>Submit(NewCommand(Catan.Core.M2.CommandKind.SetupRoad,id)),mapChoice);
+        return true;
+    }
     readonly TabletopChoiceBubble mapChoice=new TabletopChoiceBubble();
     void UpdateFreeRoadPlacement(Vector2 mouse,bool click)
         =>TabletopRoadPlacement.Update(mouse,click,view.Board.Edges,view.Board.Tiles,view.LegalEdgeIds,Array.Empty<string>(),
@@ -12,6 +28,22 @@ public sealed partial class M2App
 }
 public sealed partial class M3App
 {
+    bool UpdateSetupPlacement(Vector2 mouse,bool click)
+    {
+        if(view.Phase==Catan.Core.M3.GamePhase.SetupSettlement)
+        {
+            TabletopRoadPlacement.SetupBuilding(mouse,click,view.LegalVertexIds,board.ScreenPoint,
+                id=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupSettlement"),seat,true),
+                board.ClearPreview,id=>Submit(NewCommand(Catan.Core.M3.CommandKind.SetupSettlement,id)));
+            return true;
+        }
+        if(view.Phase!=Catan.Core.M3.GamePhase.SetupRoad)return false;
+        TabletopRoadPlacement.Update(mouse,click,view.Board.Edges,view.Board.Tiles,view.LegalEdgeIds,view.LegalShipEdgeIds,
+            board.ScreenPoint,(id,legal)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupRoad"),seat,legal),
+            (id,legal)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupShip"),seat,legal),board.ClearPreview,
+            (id,ship)=>Submit(NewCommand(ship?Catan.Core.M3.CommandKind.SetupShip:Catan.Core.M3.CommandKind.SetupRoad,id)),mapChoice);
+        return true;
+    }
     readonly TabletopChoiceBubble mapChoice=new TabletopChoiceBubble();
     void UpdateFreeRoadPlacement(Vector2 mouse,bool click)
         =>TabletopRoadPlacement.Update(mouse,click,view.Board.Edges,view.Board.Tiles,view.LegalEdgeIds,view.LegalShipEdgeIds,
@@ -20,6 +52,22 @@ public sealed partial class M3App
 }
 public sealed partial class M4App
 {
+    bool UpdateSetupPlacement(Vector2 mouse,bool click)
+    {
+        if(view.Phase==Catan.Core.M4.GamePhase.SetupSettlement)
+        {
+            TabletopRoadPlacement.SetupBuilding(mouse,click,view.LegalVertexIds,board.ScreenPoint,
+                id=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupSettlement",view.Board.Settlements.Any(p=>p.PlayerId==seat)),seat,true),
+                board.ClearPreview,id=>Submit(New(Catan.Core.M4.CommandKind.SetupSettlement,id)));
+            return true;
+        }
+        if(view.Phase!=Catan.Core.M4.GamePhase.SetupRoad)return false;
+        TabletopRoadPlacement.Update(mouse,click,view.Board.Edges,view.Board.Tiles,view.LegalEdgeIds,Array.Empty<string>(),
+            board.ScreenPoint,(id,legal)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupRoad"),seat,legal),
+            (id,legal)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupShip"),seat,legal),board.ClearPreview,
+            (id,ship)=>Submit(New(Catan.Core.M4.CommandKind.SetupRoad,id)),mapChoice);
+        return true;
+    }
     readonly TabletopChoiceBubble mapChoice=new TabletopChoiceBubble();
     bool FreeRoadPlacementActive=>view!=null&&(view.Phase==Catan.Core.M4.GamePhase.RoadBuilding||view.PendingDecision?.Kind=="ProgressRoads");
     string[] FreeRoadIds=>view.PendingDecision?.Kind=="ProgressRoads"?view.LegalActions.Where(c=>c.Kind==Catan.Core.M4.CommandKind.ResolveProgressChoice&&!c.Decline&&c.TargetId!=null).Select(c=>c.TargetId).Distinct().ToArray():view.LegalEdgeIds;
@@ -30,6 +78,22 @@ public sealed partial class M4App
 }
 public sealed partial class M5App
 {
+    bool UpdateSetupPlacement(Vector2 mouse,bool click)
+    {
+        if(view.Phase==Catan.Core.M5.GamePhase.SetupSettlement)
+        {
+            TabletopRoadPlacement.SetupBuilding(mouse,click,view.LegalVertexIds,board.ScreenPoint,
+                id=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupSettlement",view.Board.Settlements.Any(p=>p.PlayerId==seat)),seat,true),
+                board.ClearPreview,id=>Submit(New(Catan.Core.M5.CommandKind.SetupSettlement,id)));
+            return true;
+        }
+        if(view.Phase!=Catan.Core.M5.GamePhase.SetupRoad)return false;
+        TabletopRoadPlacement.Update(mouse,click,view.Board.Edges,view.Board.Tiles,view.LegalEdgeIds,view.LegalShipEdgeIds,
+            board.ScreenPoint,(id,legal)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupRoad"),seat,legal),
+            (id,legal)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand("SetupShip"),seat,legal),board.ClearPreview,
+            (id,ship)=>Submit(New(ship?Catan.Core.M5.CommandKind.SetupShip:Catan.Core.M5.CommandKind.SetupRoad,id)),mapChoice);
+        return true;
+    }
     readonly TabletopChoiceBubble mapChoice=new TabletopChoiceBubble();
     bool FreeRoadPlacementActive=>view!=null&&(view.Phase==Catan.Core.M5.GamePhase.RoadBuilding||view.PendingDecision?.Kind=="ProgressRoads");
     string[] FreeRoadIds=>view.PendingDecision?.Kind=="ProgressRoads"?view.LegalActions.Where(c=>c.Kind==Catan.Core.M5.CommandKind.ResolveProgressChoice&&!c.Decline&&!c.BuildShip&&c.TargetId!=null).Select(c=>c.TargetId).Distinct().ToArray():view.LegalEdgeIds;

@@ -124,6 +124,7 @@ namespace Catan.Core.M3
     /// <summary>Authority only. Never send this type to a UI, AI, public logger or network player.</summary>
     [DataContract] public sealed partial class GameState
     {
+        internal TileHarvest Harvest;
         [DataMember(Order=1)] public int SaveFormatVersion { get; set; }
         [DataMember(Order=2)] public string RulesVersion { get; set; }
         [DataMember(Order=3)] public string ScenarioId { get; set; }

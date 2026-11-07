@@ -23,6 +23,13 @@ public sealed partial class TabletopUI
     readonly List<TabletopWorldObjects.Hit> worldHits = new List<TabletopWorldObjects.Hit>();
     TabletopScene table;
     internal M6App ThreeKingdoms;
+    internal Func<string,bool> EligibleAvatar;
+    readonly Dictionary<string,Rect> playerPanels=new Dictionary<string,Rect>();
+    internal string PlayerPanelAt(Vector2 point)
+    {
+        foreach(var pair in playerPanels)if(pair.Value.Contains(point))return pair.Key;
+        return null;
+    }
     public void BindTable(TabletopScene scene) { table=scene; }
     GUIStyle text, small, center, title, button;
     readonly Dictionary<string,GUIStyle> styles=new Dictionary<string,GUIStyle>();
@@ -37,7 +44,7 @@ public sealed partial class TabletopUI
     GUIStyle NameStyle(string key,GUIStyle basis,string player,int size,TextAnchor alignment=TextAnchor.MiddleCenter)
     {
         var value=Style(key+player,basis,size,FontStyle.Bold,alignment);value.richText=false;
-        if(PlayerIdentityModel.IsPlayerId(player))value.normal.textColor=BoardRenderer.SeatColor(player.ToUpperInvariant());
+        if(PlayerIdentityModel.IsPlayerId(player))value.normal.textColor=StrategyHudTheme.PlayerInk(player.ToUpperInvariant());
         return value;
     }
     static readonly Rect[] baseDiceRects={new Rect(43,192,43,43),new Rect(112,192,43,43)},expansionDiceRects={new Rect(46,220,31,31),new Rect(116,220,31,31),new Rect(81,191,31,31)};
@@ -58,6 +65,7 @@ public sealed partial class TabletopUI
     public void BindHarbormaster(Catan.Core.TradeModules.TradeModuleView modules) { defense.BindHarbormaster(modules); fishing=modules?.Fishing; }
     public void BindLongestRoad(string playerId,int length) { defense.BindLongestRoad(playerId,length); }
     internal static readonly Rect TurnBannerRect = new Rect(524,9,392,82);
+    internal readonly TabletopTileGlow TileGlow = new TabletopTileGlow();
     public TabletopCollectionTimeline Collections => bank.Collections;
     public void BindCollectionOcclusion(Action<TabletopCollectionFlight> draw) { bank.OccludeHand=draw; }
     TabletopScoreBreakdown hoveredScore;
@@ -81,9 +89,6 @@ public sealed partial class TabletopUI
     Catan.Core.GameHistoryEntry[] bankHistory = Array.Empty<Catan.Core.GameHistoryEntry>();
     public void BindOperations(OperationSnapshot snapshot,Action purchase,Catan.Core.GameHistoryEntry[] entries)
     {operations=snapshot;OperationWindows.Sync(snapshot?.Scope,snapshot?.Revision);purchaseDevelopment=purchase;bankHistory=snapshot?.PresentedHistory(entries)??entries??Array.Empty<Catan.Core.GameHistoryEntry>();}
-    internal string CardActionCaption {get{var card=discardDock?.PreviewCard(operations);return card==null?null:CardActionReady?"使用\n"+card.Name:"未满足\n使用条件";}}
-    internal bool CardActionReady => discardDock?.CanUsePreviewCard(operations)==true&&!DiceRolling;
-    internal void ConfirmCardAction(){if(CardActionReady)discardDock.UsePreviewCard(operations);}
     public bool HistoryOpen => history.IsOpen;
     public bool HandFlightsVisible { get; set; }=true;
     public bool TryCloseOverlay()=>history.TryClose();
@@ -137,7 +142,7 @@ public sealed partial class TabletopUI
     void Styles(Font font)
     {
         if(text!=null){text.normal.textColor=small.normal.textColor=center.normal.textColor=title.normal.textColor=ModernOperationUI.TextColor;return;}
-        text=new GUIStyle(GUI.skin.label){font=font,fontSize=16,wordWrap=true};text.normal.textColor=Cream;
+        text=new GUIStyle(GUI.skin.label){font=font,fontSize=16,wordWrap=true};text.normal.textColor=ModernOperationUI.TextColor;
         small=new GUIStyle(text){fontSize=12};center=new GUIStyle(text){alignment=TextAnchor.MiddleCenter};
         title=new GUIStyle(center){fontSize=20,fontStyle=FontStyle.Bold};
         button=new GUIStyle(GUI.skin.button){font=font,fontSize=14,wordWrap=true};
@@ -157,17 +162,16 @@ public sealed partial class TabletopUI
         if(Event.current.type!=EventType.Repaint&&BlocksOverlayInput(Event.current.mousePosition))GUI.enabled=false;
         contextVisible=false;
         bool skillSelecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;
-        GUI.enabled=tableEnabled&&!skillSelecting;
-        DrawTopButtons(seats.FirstOrDefault(p=>p.Id==seat),trade,facility);
-        GUI.enabled=tableEnabled;
+        DrawTopButtons(seats.FirstOrDefault(p=>p.Id==seat),trade,facility,skillSelecting);
         DrawPlayers(seats,seat,turnOwner??actor,trade);
         DrawTurnBanner(seat,actor,ThreeKingdoms?.ThreeKingdomsPhaseCaption??phase,turn);
         if(skillSelecting){canRoll=false;canEnd=false;}
         defense.Draw();
+        TileGlow.Observe(dice.KnownHistory(bankHistory),dice.SettlesAt);
         bank.ObserveHud(operations,bankHistory,seats);
         bool expansion=dice.Event.HasValue;
         var trayRect=new Rect(15,149,178,128);hits.Add(trayRect);
-        table.Objects.Tray("dice-tray",trayRect,ModernOperationUI.Surface,StrategyHudTheme.Ocean?new Color(.24f,.29f,.27f):new Color(.17f,.075f,.03f));
+        table.Objects.Tray("dice-tray",trayRect,StrategyHudTheme.HandPainted?Color.white:ModernOperationUI.Surface,StrategyHudTheme.HandPainted?new Color(.65f,.50f,.30f):StrategyHudTheme.Ocean?new Color(.24f,.29f,.27f):new Color(.17f,.075f,.03f),StrategyHudTheme.HandPainted?HandPaintedTabletopSkin.Lining:null);
         CopperTabletopSkin.Outline(trayRect,false,20);
         var diceRects=expansion?expansionDiceRects:baseDiceRects;
         bool enabled=GUI.enabled;
@@ -184,22 +188,20 @@ public sealed partial class TabletopUI
         table.Objects.End();
         string turnCaption=canRoll?"掷骰":phase.Contains("弃牌")||phase.IndexOf("Discard",StringComparison.OrdinalIgnoreCase)>=0?"等待弃牌":canEnd?"结束回合":actor!=seat?"等待玩家":"等待操作";
         hits.Add(EndTurnRect);bool turnEnabled=(canRoll||canEnd)&&!DiceRolling;
-        string cardCaption=CardActionCaption;
-        if(cardCaption!=null){turnCaption=cardCaption;turnEnabled=CardActionReady;}
         if(DiscardActive){turnCaption=DiscardCaption;turnEnabled=DiscardReady;}
         // 必选窗口被 Esc 或叉号关闭后，回合按钮仍须提供恢复入口。
         bool resumeOperation=OperationWindows.Hidden||OperationWindows.Closed&&(operations?.RequiresSelection==true||operations?.Discard!=null);
         if(resumeOperation){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
-        if(skillSelecting){turnCaption="完成底部选择";turnEnabled=false;}
+        if(skillSelecting){turnCaption=ThreeKingdoms.GeneralActionCaption;turnEnabled=ThreeKingdoms.CanFinishGeneralAction;}
         using(TabletopButtonFeedback.Begin(EndTurnRect,turnEnabled))
         {
         StrategyHudArt.Disc(EndTurnRect,turnEnabled?ModernOperationUI.Surface:ModernOperationUI.Background,turnEnabled&&EndTurnRect.Contains(Event.current.mousePosition));
-        var turnStyle=Style("turn-action",title,21);turnStyle.normal.textColor=StrategyHudTheme.Jade?new Color(.025f,.16f,.12f):turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
+        var turnStyle=Style("turn-action",title,21);turnStyle.normal.textColor=StrategyHudTheme.HandPainted?HandPaintedTabletopSkin.DiscInk:StrategyHudTheme.Jade?new Color(.025f,.16f,.12f):turnEnabled?ModernOperationUI.TextColor:ModernOperationUI.Muted;
         while(turnStyle.fontSize>11&&turnStyle.CalcHeight(Content(turnCaption),EndTurnRect.width-40)>60)turnStyle.fontSize--;
         TabletopTextFit.Label(new Rect(EndTurnRect.x+18,EndTurnRect.y+35,EndTurnRect.width-36,60),turnCaption,turnStyle,11,true);
         }
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
-        if(TabletopButtonFeedback.Button(EndTurnRect,true,true)){if(resumeOperation)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(cardCaption!=null)ConfirmCardAction();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
+        if(TabletopButtonFeedback.Button(EndTurnRect,true,true)){if(skillSelecting)ThreeKingdoms.FinishGeneralAction();else if(resumeOperation)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
         DrawDiscardCount();
         GUI.enabled=tableEnabled;
     }
@@ -207,7 +209,7 @@ public sealed partial class TabletopUI
     {
         var r=TurnBannerRect;hits.Add(r);
         StrategyHudArt.Plaque(r,ModernOperationUI.Background,StrategyHudArt.Gold);
-        var turnStyle=Style("turn-number",center,StrategyHudTheme.Ocean?32:27,FontStyle.Bold);turnStyle.normal.textColor=StrategyHudTheme.Ocean?ModernOperationUI.TextColor:StrategyHudArt.Gold;
+        var turnStyle=Style("turn-number",center,(StrategyHudTheme.Ocean||StrategyHudTheme.HandPainted)?32:27,FontStyle.Bold);turnStyle.normal.textColor=(StrategyHudTheme.Ocean||StrategyHudTheme.HandPainted)?ModernOperationUI.TextColor:StrategyHudArt.Gold;
         GUI.Label(new Rect(r.x+16,r.y+10,64,35),turn.ToString("D2"),turnStyle);
         var caption=Style("turn-caption",center,10,FontStyle.Bold);caption.normal.textColor=ModernOperationUI.Muted;
         GUI.Label(new Rect(r.x+16,r.y+46,64,20),"回  合",caption);
@@ -219,21 +221,22 @@ public sealed partial class TabletopUI
         string actorName=M6App.PlayerLabel(actor)+(actor==seat?" · 你":"");
         actorStyle.fontSize=Mathf.Min(19,Mathf.Max(10,Mathf.FloorToInt(19*193/Mathf.Max(193,actorStyle.CalcSize(Content(actorName)).x))));
         TabletopTextFit.Label(new Rect(r.x+181,r.y+15,r.width-197,27),actorName,actorStyle,8,true);
-        var phaseStyle=Style("phase",small,StrategyHudTheme.Ocean?14:12,alignment:TextAnchor.MiddleLeft,wrap:false);phaseStyle.normal.textColor=ModernOperationUI.Muted;
+        var phaseStyle=Style("phase",small,(StrategyHudTheme.Ocean||StrategyHudTheme.HandPainted)?14:12,alignment:TextAnchor.MiddleLeft,wrap:false);phaseStyle.normal.textColor=ModernOperationUI.Muted;
         TabletopTextFit.Label(new Rect(r.x+181,r.y+45,r.width-197,21),phase,phaseStyle);
         // 两端共用铭牌作为菜单入口；触屏无需键盘 Esc，也不另做一套导航栏。
         if(TabletopButtonFeedback.Button(r)&&!MobileTabletop.TouchDragged)
             UnityEngine.Object.FindFirstObjectByType<M6App>()?.OpenTableMenu();
     }
-    void DrawTopButtons(TabletopSeat own,Action<string> trade,Action<int> facility)
+    void DrawTopButtons(TabletopSeat own,Action<string> trade,Action<int> facility,bool skillSelecting)
     {
         int count=own?.Improvements==null?2:5;
         if(!StrategyHudTheme.Jade)CopperTabletopSkin.Panel(new Rect(8,12,18+82*count,91),ModernOperationUI.Surface);
+        if(StrategyHudTheme.HandPainted)HandPaintedTabletopSkin.CornerLeaves();
         string[] names={"银行","玩家交易","贸易设施","政治设施","科学设施"};
         for(int i=0;i<count;i++)
         {
             var r=StrategyHudTheme.Jade?new Rect(18+i*86,22,76,76):new Rect(24+i*82,16,70,70);hits.Add(new Rect(r.x,r.y,r.width,85));
-            bool available=i<2||own?.Improvements!=null;
+            bool available=!skillSelecting&&(i<2||own?.Improvements!=null);
             bool over=r.Contains(Event.current.mousePosition);
             var face=i==2?new Color(.38f,.26f,.045f):i==3?new Color(.045f,.17f,.31f):i==4?new Color(.10f,.25f,.09f):ModernOperationUI.Surface;
             int level=i<2?0:own?.Improvements!=null&&own.Improvements.Length>i-2?own.Improvements[i-2]:0;
@@ -245,7 +248,7 @@ public sealed partial class TabletopUI
             {
                 var marker=new Rect(r.center.x-11,r.yMax-7,22,22);
                 StrategyHudArt.Disc(marker,ModernOperationUI.Surface);
-                var levelStyle=Style("level",center,12,FontStyle.Bold);levelStyle.normal.textColor=StrategyHudTheme.Text;
+                var levelStyle=Style("level",center,12,FontStyle.Bold);levelStyle.normal.textColor=StrategyHudTheme.HandPainted?HandPaintedTabletopSkin.DiscInk:StrategyHudTheme.Text;
                 GUI.Label(marker,level.ToString(),levelStyle);
             }
             }
@@ -263,7 +266,8 @@ public sealed partial class TabletopUI
     void DrawPlayers(TabletopSeat[] seats,string own,string actor,Action<string> trade)
     {
         int count=Math.Max(1,seats.Length);float width=114,x=1430-count*(width+5);
-        hoveredPlayerHint=null;playerHintAnchor=Rect.zero;
+        playerPanels.Clear();hoveredPlayerHint=null;playerHintAnchor=Rect.zero;
+        bool selectingSeat=EligibleAvatar!=null&&seats.Any(p=>EligibleAvatar(p.Id));
         float panelBottom=0;
         foreach(var id in M6App.OrderedPlayers(seats.Select(p=>p.Id)))
         {
@@ -273,14 +277,36 @@ public sealed partial class TabletopUI
             float statsY=hasGeneral?142:103;
             bool facilities=player.Improvements?.Length==3;
             float handY=statsY+(facilities?53:20);
-            var panel=new Rect(x,13,width,handY+37-13+(alliance==null?0:19));hits.Add(panel);panelBottom=Mathf.Max(panelBottom,panel.yMax);
+            var panel=new Rect(x,13,width,handY+37-13+(alliance==null?0:19));playerPanels[player.Id]=panel;hits.Add(panel);panelBottom=Mathf.Max(panelBottom,panel.yMax);
             if(StrategyHudTheme.Ocean)OceanTabletopSkin.Panel(panel,false,false);
+            else if(StrategyHudTheme.HandPainted)HandPaintedTabletopSkin.Panel(panel,false,false);
             else if(StrategyHudTheme.Jade)JadeTabletopSkin.LightPanel(panel,player.Id==actor);
             else CopperTabletopSkin.Panel(panel,ModernOperationUI.Background,player.Id==actor);
-            if(player.Id==actor)GeneralFrameUI.Flow(panel,false);
+            bool selecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;
+            bool reacting=ThreeKingdoms?.SelectedReaction!=null;
+            bool seatTarget=reacting||!selecting&&selectingSeat&&EligibleAvatar(player.Id);
+            if(player.Id==actor&&!seatTarget&&ThreeKingdoms?.GeneralPlayerTarget(player.Id)!=true)
+            {
+                if(StrategyHudTheme.HandPainted)HandPaintedTabletopSkin.TurnBorder(panel);
+                else GeneralFrameUI.DrawTurnGlow(panel,GeneralFrameUI.TurnGlow.Yellow);
+            }
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
-            if(!StrategyHudTheme.Jade)StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
-            StrategyHudArt.Avatar(StrategyHudTheme.Jade?new Rect(avatar.x+1,avatar.y,avatar.width-2,avatar.height-2):new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
+            var hero=new Rect(x+6,18,width-12,73);
+            var generalRow=new Rect(x+10,100,width-20,38);
+            bool inspectable=!selecting&&!selectingSeat&&!reacting;
+            bool illustrated=hasGeneral && StrategyHudTheme.HandPainted &&
+                ThreeKingdoms.DrawPlayerGeneralCard(player.Id,new Rect(x+7,114,width-14,23),inspectable,hero);
+            if(illustrated)
+            {
+                avatar=hero;
+                if(active&&!seatTarget&&ThreeKingdoms?.GeneralPlayerTarget(player.Id)!=true)
+                    ModernOperationUI.Fill(new Rect(hero.x,hero.yMax-2,hero.width,2),new Color(.82f,.56f,.19f));
+            }
+            else
+            {
+                if(!StrategyHudTheme.Jade)StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
+                StrategyHudArt.Avatar(StrategyHudTheme.Jade?new Rect(avatar.x+1,avatar.y,avatar.width-2,avatar.height-2):new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
+            }
             if(fishing!=null)
             {
                 if(fishing.OldBootPlayerId==player.Id)
@@ -289,10 +315,10 @@ public sealed partial class TabletopUI
                     if(bootBadge.Contains(Event.current.mousePosition)){hoveredPlayerHint="旧靴：本人的获胜目标增加1分";playerHintAnchor=bootBadge;}
                 }
             }
-            var nameRect=new Rect(x+11,73,width-22,27);
-            var nameStyle=NameStyle("player",center,player.Id,StrategyHudTheme.Ocean?15:12);
+            var nameRect=illustrated?new Rect(x+8,91,width-16,24):new Rect(x+11,73,width-22,27);
+            var nameStyle=NameStyle("player",center,player.Id,(StrategyHudTheme.Ocean||StrategyHudTheme.HandPainted)?15:12);
             TabletopTextFit.Label(nameRect,M6App.PlayerLabel(player.Id),nameStyle,8,true);
-            if(hasGeneral)ThreeKingdoms.DrawPlayerGeneralCard(player.Id,new Rect(x+10,100,width-20,38));
+            if(hasGeneral&&!StrategyHudTheme.HandPainted)ThreeKingdoms.DrawPlayerGeneralCard(player.Id,generalRow,inspectable);
             int points=player.Score==null?player.Points:player.Id==own?player.Score.Total:player.Score.PublicPoints;
             int resources=displayedHandCounts.Observe(operations?.Scope,player.Id,false,player.Resources,DiceRolling);
             int cards=displayedHandCounts.Observe(operations?.Scope,player.Id,true,player.Cards,DiceRolling);
@@ -316,6 +342,7 @@ public sealed partial class TabletopUI
                 valueStyle.normal.textColor=row==0?StrategyHudArt.Gold:row==1?new Color(1,.8f,.3f):row==2?new Color(.48f,.77f,1):row==3?new Color(.55f,.9f,.52f):ModernOperationUI.TextColor;
                 if(StrategyHudTheme.Jade)valueStyle.normal.textColor=row==0||row==1?new Color(.53f,.27f,.015f):row==2?new Color(.025f,.25f,.47f):new Color(.025f,.21f,.13f);
                 if(StrategyHudTheme.Jade)valueStyle.normal.textColor=valueStyle.normal.textColor.linear;
+                if(StrategyHudTheme.HandPainted)valueStyle.normal.textColor=row<=3?HandPaintedTabletopSkin.TrackInk(Math.Max(0,row-1)):ModernOperationUI.TextColor;
                 string value=values[row].ToString();
                 if(row>=4)
                 {
@@ -333,9 +360,9 @@ public sealed partial class TabletopUI
                 var badge=new Rect(x+10,handY+32,width-20,17);TabletopTextFit.Label(badge,alliance,Style("alliance",center,11,FontStyle.Bold));
                 if(badge.Contains(Event.current.mousePosition)){hoveredPlayerHint=ThreeKingdoms.AlliancePlayerHintB6(player.Id);playerHintAnchor=badge;}
             }
-            bool selecting=ThreeKingdoms?.ThreeKingdomsSelectionActive==true;
-            if(ThreeKingdoms!=null)ThreeKingdoms.DrawThreeKingdomsAvatar(player.Id,avatar);
-            if(!selecting&&player.Id!=own&&TabletopButtonFeedback.Button(avatar)&&!MobileTabletop.TouchDragged)trade?.Invoke(player.Id);
+            ThreeKingdoms?.DrawThreeKingdomsAvatar(player.Id,panel);
+            if(seatTarget)GeneralFrameUI.DrawTargetGlow(panel);
+            if(!reacting&&!selecting&&(!selectingSeat||seatTarget)&&player.Id!=own&&TabletopButtonFeedback.Button(seatTarget?panel:avatar)&&!MobileTabletop.TouchDragged)trade?.Invoke(player.Id);
             x+=width+5;
         }
         defense.SetPlayerPanelBottom(panelBottom);

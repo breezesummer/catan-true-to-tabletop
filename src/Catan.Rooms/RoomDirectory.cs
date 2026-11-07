@@ -234,7 +234,7 @@ public sealed partial class RoomDirectory : IDisposable
     private static bool SameSecret(string a, string b) => a != null && b != null && CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(a), Encoding.UTF8.GetBytes(b));
     private static NetworkResponse Reject(string code, string message) => new() { Success = false, Code = code, Message = message };
 
-    private sealed class Room
+    private sealed partial class Room
     {
         private readonly object gate = new();
         private readonly RoomDirectory owner;
@@ -314,6 +314,8 @@ public sealed partial class RoomDirectory : IDisposable
         private NetworkResponse Snapshot(SavedSeat seat, string code = null, string message = "已同步。", bool success = true, string credential = null)
         {
             var response=new NetworkResponse { Success = success, Code = code, Message = message, RoomId = state.RoomId, Revision = state.Revision, CommittedRevision = state.Revision, SeatId = seat?.SeatId, HumanControlAvailable = seat != null && !state.Closed && (game == null || !seat.ControlledByAi && Connected(seat)), RuleSet = state.Settings.RuleSet, Room = PublicSummary(), Credential = credential, ConnectionId = seat?.ConnectionId, CredentialExpiresAtUtc = seat?.CredentialExpiresAtUtc.ToString("O") };
+            if (game != null && NetworkProtocol.IsReactionSubscription(diagnosticRequest?.Payload) &&
+                diagnosticRequest.Operation is "Sync" or "Get" or "Heartbeat") response.Reactions = RecentReactions(diagnosticRequest.Payload == NetworkProtocol.ComboReactionFeedToken);
             bool compact=diagnosticRequest?.Operation is "PreviewCompact" or "HistoryCompact" or "Heartbeat" or "CommandReceipt";
             if(seat!=null&&game!=null&&!compact)
             {
@@ -370,6 +372,7 @@ public sealed partial class RoomDirectory : IDisposable
                     lastSeen[seat.ConnectionId] = owner.options.Clock(); disconnectedSince.Remove(seat.SeatId);
                     if(returning)pendingChange = new(state.RoomId, state.Revision, Stopwatch.GetTimestamp());
                 }
+                if (request.Operation == "React") return React(request, seat);
                 if (request.Operation == "Get"||request.Operation=="Heartbeat") return Snapshot(seat);
                 if(request.Operation=="Sync"){var response=Snapshot(seat);response.Code=NetworkProtocol.FullEventsCode;return response;}
                 if (request.Operation == "History"||request.Operation=="HistoryCompact")

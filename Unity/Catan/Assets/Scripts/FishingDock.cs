@@ -27,7 +27,7 @@ public sealed class FishingDock
     public void Hide(){Selected=false;Reset();}
     public void Sort(){sorted=true;}
     bool SelectingMap=>chosen==null&&(action==FishAction.BuildRoad||action==FishAction.RemoveRobber);
-    static readonly Rect SkillColumn=new Rect(254,714,78,171);
+    static readonly Rect SkillColumn=new Rect(M6App.MapMarksButton.x,M6App.MapMarksButton.y-4-171,M6App.MapMarksButton.width,171);
     Rect Actions=>new Rect(342,650,932,58);
     readonly Catan.Core.ResourceBag resourceSelection=new Catan.Core.ResourceBag();
     FishingView view;
@@ -50,6 +50,8 @@ public sealed class FishingDock
         view=fish;owner=player;options=legal??Array.Empty<Option>();
         if(view!=null&&view.PendingPlayerId==owner){open=true;Show();}
     }
+    public bool IsPlayerTarget(string player) => Active&&chosen==null&&(boot||action==FishAction.StealResource)&&
+        options.Any(o=>o.Player==player&&(boot?o.Kind=="boot":o.Action==action));
     public bool PickPlayer(string player)
     {
         if(!Active||(!boot&&action!=FishAction.StealResource))return false;
@@ -137,7 +139,7 @@ public sealed class FishingDock
                 TabletopResourceChoiceUI.Draw(1,resourceSelection,bank,()=>{
                     var option=options.First(o=>o.Action==FishAction.TakeResource&&resourceSelection[(Catan.Core.Resource)o.CardIndex]>0);
                     Choose(option);var submit=chosen.Submit;var payment=tokens;Reset();submit(payment);
-                },null,"选择资源",cancel:Reset);
+                },"选择资源",cancel:Reset);
             }
             else if(action==FishAction.BuyDevelopmentCard)
             {

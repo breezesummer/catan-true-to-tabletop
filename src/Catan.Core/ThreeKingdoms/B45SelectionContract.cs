@@ -99,7 +99,7 @@ namespace Catan.Core.ThreeKingdoms
         {
             var own=view?.Players?.FirstOrDefault(p=>p.PlayerId==playerId);
             var ids=string.IsNullOrEmpty(own?.ActiveGeneralId)?Array.Empty<string>():GeneralCatalog.Get(own.ActiveGeneralId).Skills.Select(s=>s.Id).ToArray();
-            if(view?.SkillDecision==null&&view?.PendingDecision==null)
+            if(view?.PendingDecision==null&&(view?.SkillDecision==null||view.SkillDecision.PlayerId==playerId))
                 ids=ids.Concat((view?.SkillActions??Array.Empty<B2SkillAction>()).Select(a=>a.Command.Option==RepairSkillId?RepairSkillId:a.Command.SkillId).Where(id=>id!=null)).Distinct().ToArray();
             return ids.Select(Get).Where(info=>info!=null).ToArray();
         }
@@ -121,7 +121,7 @@ namespace Catan.Core.ThreeKingdoms
         public int[] Hand { get; internal set; } = new int[8];
         public bool CanCancel => !IsResponse;
         public B2SkillCommand SkipCommand => Actions.FirstOrDefault(a=>IsSkip(a.Command))?.Command;
-        public static bool IsSkip(B2SkillCommand c) => c!=null && new[]{"skip","automation-skip","keep","cancel","decline","luoshen-stop","pass"}.Contains(c.Option);
+        public static bool IsSkip(B2SkillCommand c) => c!=null && new[]{"skip","automation-skip","keep","cancel","decline","luoshen-stop","pass","seat-cancel"}.Contains(c.Option);
         public static B45SelectionContract Build(ThreeKingdomsView view,string viewerId,string skillId,int[] hand)
         {
             var d=view?.SkillDecision;
@@ -132,7 +132,13 @@ namespace Catan.Core.ThreeKingdoms
         }
         public static B2SkillCommand Copy(B2SkillCommand c) => c==null?null:new B2SkillCommand {SkillId=c.SkillId,Option=c.Option,WindowId=c.WindowId,DecisionId=c.DecisionId,CardType=c.CardType,EffectiveCardType=c.EffectiveCardType,ProgressCardId=c.ProgressCardId,
             Counts=c.Counts==null?null:(int[])c.Counts.Clone(),SecondaryCounts=c.SecondaryCounts==null?null:(int[])c.SecondaryCounts.Clone(),TargetPlayerIds=(c.TargetPlayerIds??Array.Empty<string>()).ToArray(),TileIds=(c.TileIds??Array.Empty<string>()).ToArray(),ProgressCardIds=c.ProgressCardIds?.ToArray()};
-        public static string[] Players(B2SkillAction a) => a.SelectionPlayerIds??a.Command.TargetPlayerIds??Array.Empty<string>();
+        public static string[] Players(B2SkillAction a)
+        {
+            // 对方已经由上一阶段确定，响应只选交易条款或已授权查看的牌。
+            if(a.Command.Option=="seat-jinglue-take"||a.Command.Option?.StartsWith("alliance-b6-",StringComparison.Ordinal)==true)
+                return a.Command.TargetPlayerIds??Array.Empty<string>();
+            return a.SelectionPlayerIds??a.Command.TargetPlayerIds??Array.Empty<string>();
+        }
         public static string[] Board(B2SkillAction a) => a.SelectionBoardIds??a.Command.TileIds??Array.Empty<string>();
         public static string BoardLocationId(string id)
         {
@@ -147,6 +153,8 @@ namespace Catan.Core.ThreeKingdoms
         {
             var c=a.Command;var cost=new int[8];
             if(a.SelectionCost!=null)return (int[])a.SelectionCost.Clone();
+            if(c.Option=="seat-fuqi-give"||c.Option=="alliance-b6-card"&&a.CardSelectionKind=="select")
+            {if(c.CardType>=0&&c.CardType<8)cost[c.CardType]=1;return cost;}
             if(new[]{"b5-repair","b5m-liyu","b5m-luanji","civil-lianhuan","civil-pay-bricks"}.Contains(c.Option))return (int[])(c.Counts??cost).Clone();
             if(new[]{"b5m-resist","b5m-tax","civil-select","civil-qingnang"}.Contains(c.Option)&&c.CardType>=0&&c.CardType<8){cost[c.CardType]=1;return cost;}
             if(c.Option=="civil-qixi-hand"||c.Option=="civil-qixi-progress"){cost[1]=c.Option=="civil-qixi-hand"?1:2;return cost;}

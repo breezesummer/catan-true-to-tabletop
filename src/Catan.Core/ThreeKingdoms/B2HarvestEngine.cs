@@ -99,7 +99,14 @@ namespace Catan.Core.ThreeKingdoms
             {
                 Remove(s, f); a.Completed = true;
                 if (IsDrawBlocked(s, f.PlayerId)) { host.AddBank(a.Cards); a.Cards = new int[8]; a.ActuallyReceived = 0; }
-                else { a.ActuallyReceived = a.Cards.Sum(); Gain(host, f.PlayerId, a.Cards); a.Cards = new int[8]; }
+                else
+                {
+                    a.ActuallyReceived = a.Cards.Sum();
+                    var paid = Gain(host, f.PlayerId, a.Cards);
+                    if (a.ReplacementKind == null && host is ITileHarvestHost harvest)
+                        harvest.RecordTileHarvest(f.PlayerId, host.FinalDiceTotal, paid, a.ReservedGold);
+                    a.Cards = new int[8];
+                }
                 return false;
             }
             if (f.Kind == "raid")
@@ -152,7 +159,10 @@ namespace Catan.Core.ThreeKingdoms
             if (d.Kind == "gold")
             {
                 Require(c.Option == "card" && c.CardType >= 0 && c.CardType < 5 && a.GoldCount > 0 && host.GetBank()[c.CardType] > 0 && CanGainB6(s,f.PlayerId,c.CardType) && !IsDrawBlocked(s, f.PlayerId), "金矿资源不可领取。");
-                var cards = One(c.CardType); host.RemoveBank(cards); Add(a.Cards, cards); a.GoldCount--; return;
+                var cards = One(c.CardType); host.RemoveBank(cards); Add(a.Cards, cards); a.GoldCount--;
+                if (a.ReservedGold == null) a.ReservedGold = new int[8];
+                a.ReservedGold[c.CardType]++;
+                return;
             }
             if (d.Kind == "tiandu-card")
             {
@@ -223,6 +233,7 @@ namespace Catan.Core.ThreeKingdoms
         private static void CommitRaid(IThreeKingdomsCardHost host, B2SkillFrame f, B2HarvestAllocation a)
         {
             var s = host.State; var changes = new List<B2HandChange>(); var gain = Copy(a.Cards); Subtract(gain, a.ForgoneCards);
+            if (host is ITileHarvestHost harvest) harvest.RecordTileHarvest(f.PlayerId, host.FinalDiceTotal, gain, a.ReservedGold);
             var ownBefore = host.GetHand(f.PlayerId).Sum();
             foreach (var target in a.Targets)
             {

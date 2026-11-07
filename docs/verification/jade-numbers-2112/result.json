@@ -1,0 +1,12 @@
+{
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "Windows 客户端从第 42 回合验收存档读取公开点数；四张图像取自完整游戏窗口。",
+    "configurations": 1,
+    "checks": 101,
+    "cameraImages": 4,
+    "guiAttempts": 0,
+    "guiImagesWithChanges": 0,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+}

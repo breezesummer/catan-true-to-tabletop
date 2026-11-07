@@ -52,42 +52,48 @@ public sealed partial class M3App : MonoBehaviour
         else ai.Connect(this,host);
     }
     readonly MapPanInput mapPan=new MapPanInput();
+    void LateUpdate()
+    {
+        if(board!=null&&view!=null&&ai!=null&&ai.IsHumanTurn&&placement==CommandKind.BuildCity)
+            foreach(var target in view.LegalCityVertexIds)board.OutlinePiece(target);
+    }
     void Update()
     {
         if((host==null&&!NetworkGame)||board==null)return;
         RefreshTablePrompt();
+        if(ai!=null && ai.ReactionOwnsPointer(MobileTabletop.Logical(MobileTabletop.Pointer))){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         Vector2 releasePoint=Vector2.zero;bool released=ai!=null&&dock.ConsumeBuildRelease(out releasePoint);
         if(mapChoice.Active&&Input.GetMouseButtonDown(1)){mapChoice.Clear();return;}
         if(ai!=null&&ai.TableMenuOpen){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         var pointer=MobileTabletop.Pointer;
         bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(MobileTabletop.Logical(pointer));
         bool canMap=ai!=null&&!curtain&&!newGameDialog&&!ai.TableMenuOpen&&!blocked&&TabletopUI.ContainsMapScreenPoint(pointer);
-        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,tabletop.OperationHidden||!holding);
+        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap);
         if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
         if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
+        if(fishingDock.Active)
+        {
+            if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){fishingDock.Reset();board.ClearPreview();return;}
+            var fishMouse=MobileTabletop.Logical(MobileTabletop.Pointer);
+            bool fishMap=ai!=null&&ai.IsHumanTurn&&!ai.TableMenuOpen&&!ai.TablePresentationBlocked&&!DockBlocksMouse(fishMouse);
+            if(fishMap&&Input.mouseScrollDelta.y!=0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
+            if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,boardClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
+                (id,ship)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand(ship?"BuildShip":"BuildRoad"),seat,true),board.ClearPreview);
+            else board.ClearPreview();
+            return;
+        }
         if(ai==null&&Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)&&!blocked&&(ai!=null||pointer.x<Screen.width*.70f))
         {
             bool buildingMenu=ai!=null&&Input.GetMouseButtonDown(1)&&PickTabletopBuilding(pointer);
             if(!buildingMenu){dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();}
             mapPan.Cancel(board.TableScene);
         }
-        if(fishingDock.Active)
-        {
-            if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){fishingDock.Reset();board.ClearPreview();return;}
-            var fishMouse=MobileTabletop.Logical(MobileTabletop.Pointer);
-            bool fishMap=ai!=null&&ai.IsHumanTurn&&!ai.TableMenuOpen&&!ai.TablePresentationBlocked&&!DockBlocksMouse(fishMouse);
-            bool fishClick=mapPan.Update(board.TableScene,MobileTabletop.Pointer,fishMap,false);
-            if(fishMap&&Input.mouseScrollDelta.y!=0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
-            if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,fishClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
-                (id,ship)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand(ship?"BuildShip":"BuildRoad"),seat,true),board.ClearPreview);
-            else board.ClearPreview();
-            return;
-        }
         if(Input.GetKeyDown(KeyCode.Tab))board.SetCamera(!board.TopView);
         if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
         if(curtain||newGameDialog||view==null||ai!=null&&(!ai.IsHumanTurn||tabletop.OperationHidden))return;
         var mouse=released?MobileTabletop.ScreenPoint(releasePoint):pointer;
         if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(MobileTabletop.Logical(mouse))){board.ClearPreview();hover="";return;}
+        if(ai!=null&&!holding&&UpdateSetupPlacement(mouse,boardClick))return;
         if(ai!=null&&view.Phase==GamePhase.RoadBuilding){UpdateFreeRoadPlacement(mouse,boardClick);return;}
         if(ai!=null&&!holding&&boardClick){PickTabletopObject(mouse);return;}
         if(!holding)return;
@@ -123,17 +129,18 @@ public sealed partial class M3App : MonoBehaviour
             // 规则要求完成的待决仅关闭本地窗口，仍从选择提示继续。
             return true;
         }
-        bool active=holding||preparedDevelopment.HasValue||preparedPurchase||showSeafaring||tableNotes||tableVictim!=null||newGameDialog||cardArt.HasSelection||dock.HasCancelableInteraction;
+        bool active=holding||preparedDevelopment.HasValue||preparedPurchase||showSeafaring||tableNotes||newGameDialog||cardArt.HasSelection||dock.HasCancelableInteraction;
         if(!active)return false;
         dock.Reset();CancelOperationDraft();CancelPickup();newGameDialog=false;cardArt.Clear();return true;
     }
     static bool IsShip(CommandKind kind) => kind==CommandKind.SetupShip||kind==CommandKind.BuildShip||kind==CommandKind.PlaceFreeShip||kind==CommandKind.MoveShip;
     static bool IsToken(CommandKind kind) => kind==CommandKind.MoveRobber||kind==CommandKind.MovePirate;
     static bool IsRoad(CommandKind kind) => kind==CommandKind.SetupRoad||kind==CommandKind.BuildRoad||kind==CommandKind.PlaceFreeRoad||IsShip(kind)||kind==CommandKind.PlacePort||kind==CommandKind.SetupPort;
+    string[] pickEdges, pickTiles, pickVertices;
     string[] TargetIds()
     {
-        if(IsToken(placement))return view.Board.Tiles.Select(t=>t.Id).ToArray();
-        return IsRoad(placement)?view.Board.Edges.Select(e=>e.Id).ToArray():view.Board.Vertices.Select(v=>v.Id).ToArray();
+        if(IsToken(placement))return pickTiles;
+        return IsRoad(placement)?pickEdges:pickVertices;
     }
     string[] LegalTargets() => placementLegalIds;
     string[] ComputeLegalTargets()
@@ -155,10 +162,11 @@ public sealed partial class M3App : MonoBehaviour
     string ResolveTarget(Vector2 mouse)
     {
         string candidate="";float distance=MobileTabletop.PickRadius(IsToken(placement)?46f:25f);
+        if(ai!=null&&!TabletopUI.ContainsMapScreenPoint(mouse))return "";
         foreach(var id in TargetIds())
         {
             var projected=board.ScreenPoint(id);
-            if(ai!=null&&(!TabletopUI.ContainsMapScreenPoint(mouse)||!TabletopUI.ContainsMapScreenPoint(projected)))continue;
+            if(ai!=null&&!TabletopUI.ContainsMapScreenPoint(projected))continue;
             float current=Vector2.Distance(mouse,projected);
             if(current<distance){distance=current;candidate=id;}
         }
@@ -230,9 +238,14 @@ public sealed partial class M3App : MonoBehaviour
             bool existing=board!=null,top=existing&&board.TopView;float zoom=existing?board.Zoom:0;
             if(board!=null){previousView=board.TableScene;board.gameObject.SetActive(false);Destroy(board.gameObject);}
             board=new GameObject("M3 board").AddComponent<M3BoardRenderer>();
+            pickEdges=current.Board.Edges.Select(edge=>edge.Id).ToArray();
+            pickTiles=current.Board.Tiles.Select(tile=>tile.Id).ToArray();
+            pickVertices=current.Board.Vertices.Select(vertex=>vertex.Id).ToArray();
             board.Initialize(current.Board.Tiles,current.Board.Vertices,current.Board.Edges);
             if(existing)board.ChangeZoom(zoom-board.Zoom);board.SetCamera(top);board.ShowTerrain(terrain);boardLayout=layout;
         }
+        tabletop.TileGlow.Bind(board.GetComponent<PaintedMap>(),current.Board.Tiles,current.Board.Settlements,current.Board.Cities,
+            ai?.HumanSeat ?? current.PlayerId,current.Events.LastOrDefault()?.Sequence ?? 0);
         board.SetOperationLayout(ai!=null,previousView);board.Refresh(current.Board.Settlements,current.Board.Roads,current.Board.Cities,current.Board.RobberTileId,current.Board.Tiles);
         board.RefreshReferenceMarkers(current);
         board.RefreshSeafarers(current.Board.Ships,current.Board.PirateTileId);
@@ -292,6 +305,7 @@ public sealed partial class M3App : MonoBehaviour
     void Label(float x,float y,float width,float height,string label,GUIStyle style=null) => GUI.Label(new Rect(x,y,width,height),M6App.DisplayPlayerText(label),style??text);
     void OnGUI()
     {
+        if(ai!=null && Event.current.isMouse && ai.ReactionOwnsPointer(MobileTabletop.Logical(MobileTabletop.Pointer)))return;
         using var frameCost=FrameCost.Measure(FrameCost.Stage.Gui);
         if(host==null&&!NetworkGame)return;if(ai!=null){DrawOperationLayout();return;}Styles();cardArt.Begin(curtain||newGameDialog||view==null?null:seat);
         GUI.matrix=MobileTabletop.GuiMatrix;
@@ -692,4 +706,3 @@ public sealed partial class M3App : MonoBehaviour
         var result=host.Preview(command);return new M7Preview(result.Success,result.Message);
     }
 }
-

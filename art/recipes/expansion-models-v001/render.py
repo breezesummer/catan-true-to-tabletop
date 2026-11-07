@@ -28,11 +28,14 @@ for key,o in models.items():
     o.hide_render=True
 tint('red')
 order=['ship','wall','metro-trade','metro-politics','metro-science','knight-1-active','knight-2-active','knight-3-active']
+if 'ship' not in models:
+    order=['knight-'+str(i)+'-'+state for state in ('rest','active') for i in (1,2,3)]
+columns=len(order)//2
 for i,key in enumerate(order):
-    o=models[key];o.hide_render=False;o.location=((i%4-1.5)*.041,(.5-i//4)*.047,0)
+    o=models[key];o.hide_render=False;o.location=((i%columns-(columns-1)/2)*.041,(.5-i//columns)*.047,0)
 cam.location=(0,-.145,.15);cam.rotation_euler=(Vector((0,0,.009))-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=.175
 scene.render.resolution_x=1440;scene.render.resolution_y=860;scene.render.film_transparent=False
-scene.render.filepath=str(out/'造型检查.png');bpy.ops.render.render(write_still=True)
+scene.render.filepath=str(out/('骑士造型检查.png' if columns==3 else '造型检查.png'));bpy.ops.render.render(write_still=True)
 for o in models.values():o.location=(0,0,0);o.hide_render=True
-result={'thumbnails':20,'inspection':str(out/'造型检查.png')}
+result={'inspection':scene.render.filepath}
 

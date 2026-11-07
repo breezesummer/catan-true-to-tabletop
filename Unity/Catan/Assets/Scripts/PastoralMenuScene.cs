@@ -7,7 +7,6 @@ public static class PastoralMenuScene
     public const int CollectorTable=6;
     public const int ClassicHarbor=5;
     public static readonly string[] Names={"晨光港湾","金色麦田","林间溪谷","雪山城堡","月夜灯港","经典港湾","山海棋桌"};
-    public static readonly string[] Descriptions={"波光与海鸟，陪你启航","风过麦田，丰收正当时","溪流与落叶，山林慢时光","轻雪落城，灯火待归人","月光入港，星灯映海面","海风入港，麦浪归田","一桌山海，静候同伴"};
     static readonly string[] Paths={"dawn-harbor","golden-fields","forest-stream","snow-castle","moonlit-port"};
     static readonly Texture2D[] Artworks=new Texture2D[ThemeCount];
     static Texture2D shade;

@@ -12,10 +12,10 @@ public sealed class TabletopShipSelection : MonoBehaviour
         highlight.material=new Material(Shader.Find("Universal Render Pipeline/Unlit"));
         highlight.material.color=new Color(.20f,.98f,.82f);
         var line=root.AddComponent<LineRenderer>();line.sharedMaterial=highlight.material;
-        line.useWorldSpace=false;line.loop=true;line.widthMultiplier=.0014f;line.positionCount=4;
+        line.useWorldSpace=false;line.loop=true;line.widthMultiplier=.0008f;line.positionCount=4;
         line.shadowCastingMode=ShadowCastingMode.Off;line.receiveShadows=false;
-        line.SetPositions(new[]{new Vector3(-.010f,.001f,-.019f),new Vector3(.010f,.001f,-.019f),
-            new Vector3(.010f,.001f,.019f),new Vector3(-.010f,.001f,.019f)});
+        line.SetPositions(new[]{new Vector3(-.0045f,.002f,-.0075f),new Vector3(.0045f,.002f,-.0075f),
+            new Vector3(.0045f,.002f,.0075f),new Vector3(-.0045f,.002f,.0075f)});
         return highlight;
     }
     public void Show(Vector3 edgePosition,Quaternion edgeRotation)

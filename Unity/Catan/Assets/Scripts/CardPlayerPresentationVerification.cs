@@ -58,7 +58,7 @@ public sealed partial class InteractionPresentationVerification
             int before=publicPoints();draw();string committed=save();refresh();
             Require(app.CardPresentationBusy&&app.TablePresentationBlocked,"自动分数卡没有阻塞展示并亮牌");
             Require(app.PresentedCard.PlayerId==owner&&app.PresentedCard.ImmediateVictory,"自动分数卡归属或类型错误");
-            Require(app.PresentedCard.CardName==(card=="Printing"?"印刷术":"宪法"),"展示了错误卡名");
+            Require(app.PresentedCard.CardName==(card=="Printing"?"印刷厂":"石碑"),"展示了错误卡名");
             Require(EntityCardAssets.ProgressFront(app.PresentedCard.ProgressIndex)!=null,"缺少分数卡正面贴图");
             Require(authorityPoints()==before+1&&publicPoints()==before,"动画未分离权威结算与显示快照");
             if(eventDraw)

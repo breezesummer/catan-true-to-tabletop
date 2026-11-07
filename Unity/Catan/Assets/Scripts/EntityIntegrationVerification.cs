@@ -114,7 +114,7 @@ public sealed class EntityIntegrationVerification : MonoBehaviour
             else if(mode=="cities-knights")root.GetComponent<M4BoardRenderer>().ShowTerrain(false);
             else root.GetComponent<M5BoardRenderer>().ShowTerrain(false);
             Require(ore.gameObject.activeInHierarchy,"Flat ore board surface was hidden as a mountain decoration");
-            Source(pieces.Cast<Transform>().Single(t=>t.name.StartsWith("Robber")),"EntityAssets/v001/robber/robber-black-group");
+            Source(pieces.Cast<Transform>().Single(t=>t.name.StartsWith("Robber")),EntityBoardAssets.RobberResource);
             if(mode=="seafarers"||mode=="combined")
             {
                 var colour=new[]{"red","blue","orange","beige"};
@@ -124,7 +124,7 @@ public sealed class EntityIntegrationVerification : MonoBehaviour
             }
             if(mode=="cities-knights"||mode=="combined")
             {
-                Source(pieces.Cast<Transform>().Single(t=>t.name.StartsWith("Merchant")),"EntityAssets/v001/merchant/merchant-neutral-cart");
+                Source(pieces.Cast<Transform>().Single(t=>t.name.StartsWith("Merchant")),EntityBoardAssets.MerchantResource);
                 var track=root.GetComponentsInChildren<Transform>().Single(t=>t.name=="Barbarian track");
                 Source(track,"EntityAssets/v001/barbarian-track/barbarian-track");
                 Source(root.GetComponentsInChildren<Transform>().Single(t=>t.name.StartsWith("Barbarian ship")),"EntityAssets/v001/barbarian-ship/barbarian-ship");

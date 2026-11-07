@@ -1,0 +1,50 @@
+[
+  {
+    "model": "knight-1-active",
+    "triangles": 70662,
+    "degenerate": 0,
+    "invalidUV": 0,
+    "materials": 4,
+    "contactColor": true
+  },
+  {
+    "model": "knight-1-rest",
+    "triangles": 70662,
+    "degenerate": 0,
+    "invalidUV": 0,
+    "materials": 4,
+    "contactColor": true
+  },
+  {
+    "model": "knight-2-active",
+    "triangles": 71280,
+    "degenerate": 0,
+    "invalidUV": 0,
+    "materials": 4,
+    "contactColor": true
+  },
+  {
+    "model": "knight-2-rest",
+    "triangles": 71280,
+    "degenerate": 0,
+    "invalidUV": 0,
+    "materials": 4,
+    "contactColor": true
+  },
+  {
+    "model": "knight-3-active",
+    "triangles": 134146,
+    "degenerate": 0,
+    "invalidUV": 0,
+    "materials": 4,
+    "contactColor": true
+  },
+  {
+    "model": "knight-3-rest",
+    "triangles": 134146,
+    "degenerate": 0,
+    "invalidUV": 0,
+    "materials": 4,
+    "contactColor": true
+  }
+]

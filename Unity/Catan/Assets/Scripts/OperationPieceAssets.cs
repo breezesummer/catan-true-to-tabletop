@@ -6,6 +6,7 @@ using UnityEngine;
 public static class OperationPieceAssets
 {
     static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+    static Dictionary<string, Texture2D> paintedStock;
 
     public static bool Contains(Texture2D texture, Rect rect, Vector2 point)
     {
@@ -28,6 +29,16 @@ public static class OperationPieceAssets
         else if (icon.Contains("city")) kind = "city";
         else if (icon.Contains("settlement") || icon.Contains("village")) kind = "settlement";
         else return null;
+        if(kind!="wall")
+        {
+            if(paintedStock==null)
+            {
+                paintedStock=new Dictionary<string,Texture2D>();
+                foreach(var iconTexture in Resources.LoadAll<Texture2D>("FantasyPieces/stock"))
+                    paintedStock[iconTexture.name]=iconTexture;
+            }
+            if(paintedStock.TryGetValue((kind=="settlement"?"village":kind)+"-"+colour,out var painted))return painted;
+        }
         string path = kind=="settlement" || kind=="city" || kind=="road" ? "NaturalPieces/v001/thumbnail-"+(kind=="settlement"?"village":kind)+"-"+colour : PlayerComponentAssets.ExpansionRoot+"thumb-"+(kind.StartsWith("knight-")?kind+"-rest":kind)+"-"+colour;
         if (!Textures.TryGetValue(path, out var texture))
         {
@@ -37,7 +48,7 @@ public static class OperationPieceAssets
         return texture;
     }
 
-    public static GameObject PointerPreview(TabletopPointerPreview preview,string seat,Vector3 bottom,Quaternion rotation,Transform parent,bool legal)
+    public static GameObject PointerPreview(TabletopPointerPreview preview,string seat,Vector3 bottom,Quaternion rotation,Transform parent,bool legal,bool ocean=true,Quaternion? pirateFacing=null)
     {
         var colour=legal?new Color(.3f,1f,.75f):new Color(1f,.22f,.2f);
         string label="鼠标预览 · "+preview.Kind;
@@ -52,9 +63,9 @@ public static class OperationPieceAssets
             case "metropolis": instance=PlayerComponentAssets.Building(preview.Wall?"metropolis-with-wall":"metropolis",seat,label,bottom,parent,preview.Track);break;
             case "knight": instance=PlayerComponentAssets.Knight(seat,preview.Level,preview.Active,label,bottom,parent);break;
             case "road": instance=PlayerComponentAssets.Road(seat,label,bottom,rotation,parent);break;
-            case "ship": int seatIndex=System.Array.IndexOf(new[]{"P1","P2","P3","P4"},seat);instance=EntityBoardAssets.Ship(label,BoardRenderer.SeatColors[Mathf.Max(0,seatIndex)],EntityBoardAssets.ShipWaterline(bottom),rotation,parent);break;
+            case "ship": int seatIndex=System.Array.IndexOf(new[]{"P1","P2","P3","P4"},seat);instance=EntityBoardAssets.Ship(label,BoardRenderer.SeatColors[Mathf.Max(0,seatIndex)],ocean?EntityBoardAssets.ShipWaterline(bottom):bottom,rotation,parent);break;
             case "robber": instance=EntityBoardAssets.Robber(label,bottom+new Vector3(.012f,EntityBoardAssets.BoardSurfaceHeight,0),parent);break;
-            case "pirate": instance=EntityBoardAssets.Pirate(label,bottom+new Vector3(.012f,EntityBoardAssets.BoardSurfaceHeight,0),parent);break;
+            case "pirate": instance=EntityBoardAssets.Pirate(label,bottom+new Vector3(.012f,EntityBoardAssets.BoardSurfaceHeight,0),parent,ocean,pirateFacing);break;
             case "merchant": instance=EntityBoardAssets.Merchant(label,bottom+new Vector3(-.013f,EntityBoardAssets.BoardSurfaceHeight,0),parent);break;
             case "port": instance=EntityBoardAssets.ReferenceMarker(EntityBoardAssets.PortResource(null),label,bottom,rotation,parent);break;
         }

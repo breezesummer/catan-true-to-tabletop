@@ -26,7 +26,7 @@ public sealed class TabletopDefenseUI
         if(position<0&&!roadBound)return;
         ModernOperationUI.Styles();
         var area=CurrentArea;
-        if(StrategyHudTheme.Ocean)OceanTabletopSkin.Panel(area,false,false);else ModernOperationUI.Panel(area);
+        if(StrategyHudTheme.HandPainted||StrategyHudTheme.Ocean)CopperTabletopSkin.Panel(area,ModernOperationUI.Background,false,false);else ModernOperationUI.Panel(area);
         if(ship==null){ship=Icon(false);shield=Icon(true);}
         var ink=ModernOperationUI.TextColor;
         var title=new GUIStyle(ModernOperationUI.Small){fontSize=13,padding=new RectOffset(),alignment=TextAnchor.MiddleLeft,wordWrap=false};
@@ -39,7 +39,7 @@ public sealed class TabletopDefenseUI
             GUI.Label(new Rect(Area.x+174,area.y+(harbor==null?6:1),57,27),position+" / 7",count);
             for(int i=0;i<7;i++)
                 ModernOperationUI.Round(new Rect(Area.x+14+i*32,area.y+(harbor==null?36:27),27,4),i<position?ModernOperationUI.Accent:ModernOperationUI.Surface);
-            var defenseColor=threat==0||strength>=threat?new Color(.47f,.78f,.67f):ModernOperationUI.Error;
+            var defenseColor=threat==0||strength>=threat?(StrategyHudTheme.HandPainted?ModernOperationUI.Accent:new Color(.47f,.78f,.67f)):ModernOperationUI.Error;
             DrawIcon(new Rect(Area.x+15,area.y+(harbor==null?47:33),19,23),shield,defenseColor);
             GUI.Label(new Rect(Area.x+45,area.y+(harbor==null?46:32),145,25),position==7?"本次防御 / 蛮族":"防御 / 蛮族力量",new GUIStyle(title){fontSize=12});
             count.normal.textColor=defenseColor;

@@ -329,7 +329,7 @@ namespace Catan.Core.M5
                 tk.BankTradeRates=Enumerable.Range(0,8).Select(i=>i<5?TradeRate(state,view.PlayerId,(Resource)i):CommodityTradeRate(state,view.PlayerId,(Commodity)(i-5))).ToArray();
             }
             B2SkillEngine.Project(CardHost(state), tk, view.PlayerId);
-            if(B5(state))tk.BoardAssets=CardHost(state).GetBoardAssets().Where(a=>a.Damaged||a.Kind=="Knight"&&a.Level!=a.EffectiveLevel).ToArray();
+            if(B5(state))tk.BoardAssets=CardHost(state).GetBoardAssets().Where(a=>a.Damaged||a.Kind=="Knight"&&(a.Level!=a.EffectiveLevel||a.Active&&state.Knights.Any(k=>k.LocationId==a.LocationId&&!k.Active))).ToArray();
             if (B3(state) && state.ThreeKingdoms.Skills.PendingDecision == null) B3DiceEngine.Project(CardHost(state), tk, view.PlayerId);
             ProjectB4Automation(view, tk);
             // 换将会暂挂原技能帧；产品视图只开放最上层生命周期决策。

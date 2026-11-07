@@ -13,8 +13,27 @@ public sealed class B45SelectionContext
     readonly List<string> progress=new List<string>();
     readonly List<string> progressKeys=new List<string>();
     readonly int[] bankCounts=new int[8];
+    readonly int[] raidForgone=new int[8];
+    public bool Raid=>Contract?.SkillId=="tk-g01-s1"&&Contract.Actions.Any(a=>a.Command.Option=="raid");
+    public int RaidCount=>raidForgone.Sum();
+    public int RaidForgone(int type)=>raidForgone[type];
+    public bool ChangeRaidCard(int type,int delta)
+    {
+        if(!Raid||submitting||type<0||type>=8||Math.Abs(delta)!=1||raidForgone[type]+delta<0)return false;
+        raidForgone[type]+=delta;
+        if(!Contract.Actions.Any(a=>a.Command.Option=="raid"&&a.Command.Counts.SequenceEqual(raidForgone))&&RaidCount!=0)
+        {raidForgone[type]-=delta;return false;}
+        players.Clear();ClearAvailability();return true;
+    }
+    IEnumerable<B2SkillAction> RaidChoices()=>Contract.Actions.Where(a=>a.Command.Option=="raid"&&a.Command.Counts.SequenceEqual(raidForgone));
     readonly int[] privateCounts=new int[8];
     readonly HashSet<int> shelieTypes=new HashSet<int>();
+    readonly bool?[] handAvailability=new bool?[8];
+    readonly Dictionary<string,bool> progressAvailability=new Dictionary<string,bool>();
+    readonly Dictionary<string,bool> boardAvailability=new Dictionary<string,bool>();
+    public int Revision {get;private set;}
+    void ClearAvailability()
+    {Revision++;Array.Clear(handAvailability,0,handAvailability.Length);progressAvailability.Clear();boardAvailability.Clear();}
     bool Shelie => Contract?.DirectBatch==true&&Contract.DecisionKind=="shelie";
     string optionKey;
     int selectedDie=-1;
@@ -26,7 +45,7 @@ public sealed class B45SelectionContext
     public int SelectedDie => selectedDie;
     public int[] DiceIndices => (Contract?.Actions??Array.Empty<B2SkillAction>()).Where(a=>a.SelectionDiceIndex.HasValue).Select(a=>a.SelectionDiceIndex.Value).Distinct().ToArray();
     public bool SelectDie(int index)
-    {if(!Active||submitting||!DiceIndices.Contains(index))return false;selectedDie=index;optionKey=null;tiles.Clear();if(Options.Length==1)optionKey=B45SelectionContract.OptionKey(Options[0]);return true;}
+    {if(!Active||submitting||!DiceIndices.Contains(index))return false;ClearAvailability();selectedDie=index;optionKey=null;tiles.Clear();if(Options.Length==1)optionKey=B45SelectionContract.OptionKey(Options[0]);return true;}
     public int[] SelectedCounts => Enumerable.Range(0,8).Select(t=>handKeys.Count(k=>k.StartsWith(t+":",StringComparison.Ordinal))).ToArray();
     public int[] SelectedPrivateCounts => (int[])privateCounts.Clone();
     public int[] SelectedBankCounts => (int[])bankCounts.Clone();
@@ -43,6 +62,18 @@ public sealed class B45SelectionContext
     public string Summary => Shelie?"已选资源 "+shelieTypes.Count+" / 3 种":(RequiresBankCards?"已选银行牌 "+bankCounts.Sum()+" / "+RequiredBankCount+" 张 · ":"")+"已选手牌 "+SelectedCounts.Sum()+" 张"+(progress.Count>0?" · 发展牌 "+progress.Count+" 张":"")+(players.Count>0?" · 目标 "+players.Count+" 人":"")+(tiles.Count>0?" · 棋盘目标 "+tiles.Count+" 项":"")+(privateCounts.Sum()>0?" · 授权目标手牌 "+privateCounts.Sum()+" 张":"");
     public B2SkillAction[] CandidateActions => Current().ToArray();
     public B2SkillAction[] Options => Subset||Poxi?Array.Empty<B2SkillAction>():(Contract?.Actions??Array.Empty<B2SkillAction>()).Where(a=>!B45SelectionContract.IsSkip(a.Command)&&(!a.SelectionDiceIndex.HasValue||selectedDie<0||a.SelectionDiceIndex==selectedDie)).GroupBy(B45SelectionContract.OptionKey).Select(g=>g.First()).ToArray();
+    public bool ShowOptionChoices
+    {
+        get
+        {
+            var options=Options;
+            // 制衡的两种用途直接由点选的实体手牌区分。
+            if(options.Length==0||options.All(a=>a.Command.Option=="exchange-hand"||a.Command.Option=="exchange-progress")||options.All(a=>a.Command.Option=="civil-niepan-track"))return false;
+            if(optionKey!=null&&options.Length>1&&Current().All(a=>B45SelectionContract.Board(a).Length>0||
+                B45SelectionContract.Players(a).Length>0||B45SelectionContract.Cost(a).Sum()>0||B45SelectionContract.Progress(a).Length>0))return false;
+            return options.Length>1||options.Any(a=>a.CardSelectionKind=="declare"||a.Command.Option=="seat-jinglue-take");
+        }
+    }
     public bool CanConfirm => !submitting && BuildCommand()!=null;
     bool Subset => Contract?.DirectBatch==true&&(Contract.DecisionKind=="b4-reveal"||Contract.DecisionKind=="b4-subset");
     bool Poxi => Contract?.DirectBatch==true&&Contract.DecisionKind=="response-poxi-select";
@@ -61,11 +92,13 @@ public sealed class B45SelectionContext
     public void Refresh(ThreeKingdomsView view,int[] hand)
     {
         if(!Active)return;
+        ClearAvailability();
         var updated=B45SelectionContract.Build(view,Contract.ViewerId,SkillId,hand);
         // 本人独立选将不由此模型管理；技能投影变更必须严格匹配本人窗口与待决。
         if(updated.WindowId!=Contract.WindowId||updated.DecisionId!=Contract.DecisionId||updated.Actions.Length==0)
         {Reset();Notice="操作窗口已经变化，已清除未提交选择。";return;}
         Contract=updated;
+        if(Raid&&RaidCount>0&&!RaidChoices().Any()){Array.Clear(raidForgone,0,8);players.Clear();}
         if(optionKey!=null&&!Options.Any(a=>B45SelectionContract.OptionKey(a)==optionKey))optionKey=null;
         if(Options.Length==1)optionKey=B45SelectionContract.OptionKey(Options[0]);
         bool changed=handKeys.RemoveWhere(k=>{var split=k.Split(':');int t=int.Parse(split[0]),n=int.Parse(split[1]);return n>=Contract.Hand[t];})>0;
@@ -84,18 +117,25 @@ public sealed class B45SelectionContext
             string key=progressKeys[i];int split=key.LastIndexOf(':');int ordinal=int.Parse(key.Substring(split+1));
             if(!counts.TryGetValue(progress[i],out int count)||ordinal>=count){progress.RemoveAt(i);progressKeys.RemoveAt(i);changed=true;}
         }
-        if(changed)Notice="所选发展牌已不在当前手牌中，请重新选择。";
+        if(changed){ClearAvailability();Notice="所选发展牌已不在当前手牌中，请重新选择。";}
     }
     bool PruneProgress(Func<string,bool> remove)
     {bool changed=false;for(int i=progress.Count-1;i>=0;i--)if(remove(progress[i])){progress.RemoveAt(i);progressKeys.RemoveAt(i);changed=true;}return changed;}
     public void Reset()
     {Contract=null;ClearSelections();optionKey=null;selectedDie=-1;submitting=false;Notice=null;}
     public void ClearSelections()
-    {shelieTypes.Clear();handKeys.Clear();players.Clear();tiles.Clear();progress.Clear();progressKeys.Clear();Array.Clear(privateCounts,0,8);Array.Clear(bankCounts,0,8);Notice=null;}
-    public void Reselect(){if(!submitting)ClearSelections();}
+    {ClearAvailability();Array.Clear(raidForgone,0,8);shelieTypes.Clear();handKeys.Clear();players.Clear();tiles.Clear();progress.Clear();progressKeys.Clear();Array.Clear(privateCounts,0,8);Array.Clear(bankCounts,0,8);Notice=null;}
+    public void Reselect()
+    {
+        if(submitting)return;
+        ClearSelections();
+        selectedDie=DiceIndices.Length==1?DiceIndices[0]:-1;
+        optionKey=Options.Length==1?B45SelectionContract.OptionKey(Options[0]):null;
+    }
     public bool ChooseOption(B2SkillAction action)
     {
         if(!Active||submitting||action==null||!Options.Any(a=>B45SelectionContract.OptionKey(a)==B45SelectionContract.OptionKey(action)))return false;
+        ClearAvailability();
         if(Shelie)
         {
             int type=action.Command.CardType;
@@ -120,6 +160,12 @@ public sealed class B45SelectionContext
     {
         if(!Active||submitting||type<0||type>=8||ordinal<0||ordinal>=Contract.Hand[type])return false;
         if(IsHandSelected(type,ordinal))return true;
+        if(handAvailability[type].HasValue)return handAvailability[type].Value;
+        bool available=CanAddHandType(type);
+        handAvailability[type]=available;return available;
+    }
+    bool CanAddHandType(int type)
+    {
         if(Subset)return true;
         if(Poxi)return SelectedCounts[type]+privateCounts[type]==0&&SelectedCounts.Sum()+privateCounts.Sum()<4&&
             Contract.Actions.Any(a=>a.Command.Option=="response-poxi-select"&&a.Command.CardType==type&&a.Command.TargetPlayerIds.FirstOrDefault()==Contract.ViewerId);
@@ -130,6 +176,7 @@ public sealed class B45SelectionContext
     public bool ToggleCard(int type,int ordinal)
     {
         if(!CanSelectHand(type,ordinal))return false;
+        ClearAvailability();
         string key=HandKey(type,ordinal);if(!handKeys.Remove(key))handKeys.Add(key);
         if(!Subset&&!Poxi)RevalidateTargets();return true;
     }
@@ -137,26 +184,30 @@ public sealed class B45SelectionContext
     {
         if(!Active||submitting||string.IsNullOrEmpty(id)||Poxi)return false;
         if(players.Contains(id))return true;
+        if(Raid)return RaidCount>players.Count&&RaidChoices().Any(a=>a.Command.TargetPlayerIds.Contains(id)&&players.All(a.Command.TargetPlayerIds.Contains));
         int max=Current().Select(a=>B45SelectionContract.Players(a).Length).DefaultIfEmpty(0).Max();
         var next=max==1?new[]{id}:players.Concat(new[]{id}).ToArray();
         return Current().Any(a=>next.All(B45SelectionContract.Players(a).Contains)&&Compatible(a,true,false,true));
     }
     public bool TogglePlayer(string id)
     {
-        if(!CanSelectPlayer(id))return false;if(players.Remove(id))return true;
+        if(!CanSelectPlayer(id))return false;ClearAvailability();if(players.Remove(id))return true;
+        if(Raid){players.Add(id);return true;}
         int max=Current().Select(a=>B45SelectionContract.Players(a).Length).DefaultIfEmpty(0).Max();
         if(max==1)players.Clear();players.Add(id);RevalidateCosts();return true;
     }
     public bool CanSelectTile(string id)
     {
         if(!Active||submitting||string.IsNullOrEmpty(id))return false;if(tiles.Contains(id))return true;
+        if(boardAvailability.TryGetValue(id,out bool available))return available;
         int max=Current().Select(a=>B45SelectionContract.Board(a).Length).DefaultIfEmpty(0).Max();
         var next=max==1?new[]{id}:tiles.Concat(new[]{id}).ToArray();
-        return Current().Any(a=>next.All(B45SelectionContract.Board(a).Contains)&&Compatible(a,true,true,false));
+        available=Current().Any(a=>next.All(B45SelectionContract.Board(a).Contains)&&Compatible(a,true,true,false));
+        boardAvailability[id]=available;return available;
     }
     public bool ToggleTile(string id)
     {
-        if(!CanSelectTile(id))return false;if(tiles.Remove(id))return true;
+        if(!CanSelectTile(id))return false;ClearAvailability();if(tiles.Remove(id))return true;
         int max=Current().Select(a=>B45SelectionContract.Board(a).Length).DefaultIfEmpty(0).Max();
         if(max==1)tiles.Clear();tiles.Add(id);RevalidateCosts();return true;
     }
@@ -164,12 +215,14 @@ public sealed class B45SelectionContext
     public bool CanSelectProgress(string id,int ordinal=0)
     {
         if(!Active||submitting||id==null||ordinal<0)return false;if(IsProgressSelected(id,ordinal))return true;
+        if(progressAvailability.TryGetValue(id,out bool available))return available;
         var next=progress.Concat(new[]{id}).ToArray();
-        return Current().Any(a=>next.GroupBy(x=>x).All(g=>B45SelectionContract.Progress(a).Count(x=>x==g.Key)>=g.Count())&&Compatible(a,true,true,true));
+        available=Current().Any(a=>next.GroupBy(x=>x).All(g=>B45SelectionContract.Progress(a).Count(x=>x==g.Key)>=g.Count())&&Compatible(a,true,true,true));
+        progressAvailability[id]=available;return available;
     }
     public bool ToggleProgress(string id,int ordinal=0)
     {
-        if(!CanSelectProgress(id,ordinal))return false;string key=id+":"+ordinal;int index=progressKeys.IndexOf(key);
+        if(!CanSelectProgress(id,ordinal))return false;ClearAvailability();string key=id+":"+ordinal;int index=progressKeys.IndexOf(key);
         if(index>=0){progressKeys.RemoveAt(index);progress.RemoveAt(index);}else {progressKeys.Add(key);progress.Add(id);}return true;
     }
     public bool ToggleBankCard(int type,int delta=1)
@@ -185,6 +238,7 @@ public sealed class B45SelectionContext
     public bool TogglePrivateCard(int type)
     {
         if(!Poxi||submitting||type<0||type>=8)return false;
+        ClearAvailability();
         if(privateCounts[type]>0){privateCounts[type]=0;return true;}
         if(SelectedCounts[type]>0||SelectedCounts.Sum()+privateCounts.Sum()>=4||!PrivateActions().Any(a=>a.Command.CardType==type))return false;
         privateCounts[type]=1;return true;
@@ -201,7 +255,9 @@ public sealed class B45SelectionContext
         var cost=B45SelectionContract.Cost(action);int total=selected.Sum();
         if(B45SelectionContract.Batch(action))
         {
-            var candidates=Current().Where(a=>a.Command.Option==action.Command.Option&&players.All(B45SelectionContract.Players(a).Contains)).ToArray();
+            var recipients=B45SelectionContract.Players(action);
+            var candidates=Current().Where(a=>a.Command.Option==action.Command.Option&&
+                B45SelectionContract.Players(a).SequenceEqual(recipients)).ToArray();
             int maximum=action.Command.Option=="exchange-hand"?4:Contract.Hand.Sum();
             return (!complete||total>=1)&&total<=maximum&&Enumerable.Range(0,8).All(t=>selected[t]>=0&&selected[t]<=Contract.Hand[t]&&(selected[t]==0||candidates.Any(a=>B45SelectionContract.Cost(a)[t]>0)));
         }
@@ -219,6 +275,11 @@ public sealed class B45SelectionContext
     }
     public B2SkillCommand BuildCommand()
     {
+        if(Raid){
+            if(RaidCount==0||players.Count!=RaidCount||submitting)return null;
+            var match=RaidChoices().FirstOrDefault(a=>players.All(a.Command.TargetPlayerIds.Contains));
+            return match==null?null:B45SelectionContract.Copy(match.Command);
+        }
         if(!Active||submitting||DiceIndices.Length>0&&selectedDie<0)return null;
         if(Shelie)
         {
@@ -246,12 +307,36 @@ public sealed class B45SelectionContext
         var ready=Current().Where(a=>AllowsCost(a,SelectedCounts,true)&&SameSet(players,B45SelectionContract.Players(a))&&SameSet(tiles,B45SelectionContract.Board(a))&&SameSet(progress,B45SelectionContract.Progress(a))).ToArray();
         // 不替玩家选择尚未选定的用途；同组具体命令只能因同一选择等价。
         if(ready.Length==0||optionKey==null&&ready.Select(B45SelectionContract.OptionKey).Distinct().Count()!=1)return null;
-        var result=B45SelectionContract.Copy(ready[0].Command);
-        if(B45SelectionContract.Batch(ready[0]))result.Counts=SelectedCounts;
+        var chosen=ready[0];
+        if(ready.Length>1&&(tiles.Count>1||players.Count>1))
+        {
+            var ordered=ready.FirstOrDefault(a=>B45SelectionContract.Board(a).SequenceEqual(tiles)&&B45SelectionContract.Players(a).SequenceEqual(players));
+            if(ordered!=null)chosen=ordered;
+            else if(ready.Any(a=>!B45SelectionContract.Board(a).SequenceEqual(B45SelectionContract.Board(chosen))||
+                !B45SelectionContract.Players(a).SequenceEqual(B45SelectionContract.Players(chosen))))return null;
+        }
+        var result=B45SelectionContract.Copy(chosen.Command);
+        if(B45SelectionContract.Batch(chosen))result.Counts=SelectedCounts;
         return result;
     }
     public bool TryBuildCommand(out B2SkillCommand command){command=BuildCommand();return command!=null;}
     public B2SkillCommand BeginSubmit()
     {var command=BuildCommand();if(command!=null)submitting=true;return command;}
+    // 可变数量必须由玩家收束。仁德以点收牌人的头像收束，制衡等可在选牌后主动发动。
+    public B2SkillCommand FinishDirectPick(bool playerPicked=false)
+    {
+        var command=BuildCommand();
+        if(command==null||Subset||Shelie)return null;
+        if(Raid){if(!playerPicked)return null;submitting=true;return command;}
+        if(command.Option=="gift"&&!playerPicked||command.Option=="exchange-hand"&&SelectedCounts.Sum()<Math.Min(4,Contract.Hand.Sum()))return null;
+        if(!Poxi&&!RequiresBankCards&&Current().Any(action=>
+            Compatible(action,true,true,true)&&
+            (B45SelectionContract.Players(action).Length>players.Count||
+             B45SelectionContract.Board(action).Length>tiles.Count||
+             B45SelectionContract.Progress(action).Length>progress.Count||
+             !B45SelectionContract.Batch(action)&&B45SelectionContract.Cost(action).Sum()>SelectedCounts.Sum())))return null;
+        submitting=true;
+        return command;
+    }
     public void AcknowledgeFailure(){submitting=false;}
 }

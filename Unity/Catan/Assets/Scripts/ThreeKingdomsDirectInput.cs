@@ -12,8 +12,13 @@ public static class ThreeKingdomsDirectInput
     // 1=选择，2=说明；不对权威状态作任何修改。
     public static int Read(Rect area, bool selectable, bool inspectable=true)
     {
-        TabletopPointerCursor.Hover(area,selectable);
         var e=Event.current;int id=GUIUtility.GetControlID(FocusType.Passive,area);
+        if(!GUI.enabled||Input.touchCount>1||MobileTabletop.TouchDragged)
+        {
+            if(held==id)Reset();
+            return 0;
+        }
+        TabletopPointerCursor.Hover(area,selectable);
         if(e.type==EventType.MouseDown&&area.Contains(e.mousePosition))
         {
             if(e.button==1&&inspectable){e.Use();return 2;}
@@ -21,13 +26,14 @@ public static class ThreeKingdomsDirectInput
             {held=id;GUIUtility.hotControl=id;origin=e.mousePosition;pressedAt=Time.unscaledTimeAsDouble;dragged=false;inspected=false;e.Use();}
         }
         if(held!=id)return 0;
+        if(GUIUtility.hotControl!=held){Reset();return 0;}
         if((e.rawType==EventType.MouseDrag||e.rawType==EventType.MouseUp)&&(e.mousePosition-origin).sqrMagnitude>64||MobileTabletop.TouchDragged)dragged=true;
         if(MobileTabletop.Enabled&&!dragged&&!inspected&&inspectable&&Time.unscaledTimeAsDouble-pressedAt>=.5)
         {inspected=true;return 2;}
         if(e.rawType==EventType.MouseUp)
         {
-            bool click=!dragged&&!inspected&&area.Contains(e.mousePosition)&&selectable;
-            held=0;GUIUtility.hotControl=0;e.Use();return click?1:0;
+            bool click=e.type==EventType.MouseUp&&!dragged&&!inspected&&area.Contains(e.mousePosition)&&selectable;
+            held=0;GUIUtility.hotControl=0;if(e.type!=EventType.Used)e.Use();return click?1:0;
         }
         return 0;
     }

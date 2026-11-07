@@ -197,6 +197,9 @@ namespace Catan.Core.M3
         {
             Require(s.Phase == GamePhase.GoldChoice && s.GoldClaims.Length > 0 && s.GoldClaims[0].PlayerId == p.Id, "NotGoldRecipient", "请由待决席位选择资源。");
             Require(ValidBag(c.Resources) && c.Resources.Total == Math.Min(s.GoldClaims[0].Amount, s.Bank.Total) && Covers(s.Bank, c.Resources), "InvalidGoldChoice", "请选择规定数量且银行有库存的资源。");
+            if (s.Turn > 0 && !s.ProductionAfterGold)
+                s.Harvest?.Gold(p.Id, s.Tiles.Where(t => t.Number == s.LastDice1 + s.LastDice2 && t.Id != s.RobberTileId),
+                    s.Settlements, s.Cities, c.Resources.Total);
             TransferBag(s.Bank, p.Resources, c.Resources); s.GoldClaims = s.GoldClaims.Skip(1).ToArray();
             if (s.GoldClaims.Length > 0) s.PendingDecision.PlayerId = s.GoldClaims[0].PlayerId;
             else

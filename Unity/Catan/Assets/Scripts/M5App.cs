@@ -101,6 +101,7 @@ public sealed partial class M5App : MonoBehaviour
     }
     Command New(CommandKind kind,string target=null)=>new Command{Id=Guid.NewGuid().ToString("N"),PlayerId=seat,Kind=kind,TargetId=target,WindowId=view?.ThreeKingdoms?.WindowId,Resources=new ResourceBag(),Commodities=new CommodityBag(),Give=new ResourceBag(),Receive=new ResourceBag(),GiveCommodities=new CommodityBag(),ReceiveCommodities=new CommodityBag(),ChosenDice1=1,ChosenDice2=1};
     void Select(CommandKind kind){draft=New(kind);pickField="";scroll=Vector2.zero;}
+    string[] pickEdges, pickTiles, pickVertices;
     void Refresh(PlayerView v)
     {
         using var frameCost=FrameCost.Measure(FrameCost.Stage.BoardRefresh);
@@ -111,11 +112,16 @@ public sealed partial class M5App : MonoBehaviour
         TabletopScene previousView=null;
         if(board==null||next!=layout)
         {
+            pickEdges=v.Board.Edges.Select(edge=>edge.Id).ToArray();
+            pickTiles=v.Board.Tiles.Select(tile=>tile.Id).ToArray();
+            pickVertices=v.Board.Vertices.Select(vertex=>vertex.Id).ToArray();
             bool top=board!=null&&board.TopView;
             if(board!=null){previousView=board.TableScene;board.gameObject.SetActive(false);Destroy(board.gameObject);}
             board=new GameObject("M5 board").AddComponent<M5BoardRenderer>();board.Initialize(v.Board.Tiles,v.Board.Vertices,v.Board.Edges);
             board.SetCamera(top);layout=next;
         }
+        tabletop.TileGlow.Bind(board.GetComponent<PaintedMap>(),v.Board.Tiles,v.Board.Settlements,v.Board.Cities,
+            ai?.HumanSeat ?? v.PlayerId,v.Events.LastOrDefault()?.Sequence ?? 0);
         board.SetOperationLayout(ai!=null,previousView);board.Refresh(v);board.ShowTerrain(terrain);
     }
     public void SaveGame(){if(ai!=null){ai.SaveGame();return;}try{host.Save();status="已保存完整局面和待决选择。";}catch(Exception){status="保存失败，请检查存档目录。";}}
@@ -125,13 +131,15 @@ public sealed partial class M5App : MonoBehaviour
     {
         Vector2 releasedMouse;bool buildReleased=dock.ConsumeBuildRelease(out releasedMouse);
         if(board==null)return;
+        BeginPlayedHarbor();
         RefreshTablePrompt();
+        if(ai!=null && ai.ReactionOwnsPointer(MobileTabletop.Logical(MobileTabletop.Pointer))){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         if(mapChoice.Active&&Input.GetMouseButtonDown(1)){mapChoice.Clear();return;}
         if(ai!=null&&(ai.TableMenuOpen||ai.ThreeKingdomsPanelBlocksTable)){mapPan.Cancel(board.TableScene);board.ClearPreview();return;}
         var pointer=MobileTabletop.Pointer;
         bool blocked=DockBlocksMouse()||cardArt.BlocksBoardInput(MobileTabletop.Logical(pointer));
         bool canMap=ai!=null&&!curtain&&!newGame&&!artOpen&&!ai.TableMenuOpen&&!blocked&&TabletopUI.ContainsMapScreenPoint(pointer);
-        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap,ai.ThreeKingdomsSelectionActive||tabletop.OperationHidden||draft==null&&!operationActions);
+        bool boardClick=mapPan.Update(board.TableScene,pointer,canMap);
         if(mapPan.ZoomDelta!=0)board.ChangeZoom(mapPan.ZoomDelta);
         if(mapPan.IsDragging||mapPan.MultiTouchActive){board.ClearPreview();return;}
         if(fishingDock.Active)
@@ -139,9 +147,8 @@ public sealed partial class M5App : MonoBehaviour
             if(Input.GetKeyDown(KeyCode.Escape)||Input.GetMouseButtonDown(1)){fishingDock.Reset();board.ClearPreview();return;}
             var fishMouse=MobileTabletop.Logical(MobileTabletop.Pointer);
             bool fishMap=ai!=null&&ai.IsHumanTurn&&!ai.TableMenuOpen&&!ai.TablePresentationBlocked&&!DockBlocksMouse(fishMouse);
-            bool fishClick=mapPan.Update(board.TableScene,MobileTabletop.Pointer,fishMap,false);
             if(fishMap&&Input.mouseScrollDelta.y!=0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
-            if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,fishClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
+            if(fishMap)fishingDock.UpdateMap(MobileTabletop.Pointer,boardClick,view.Board.Edges,view.Board.Tiles,board.ScreenPoint,
                 (id,ship)=>board.PreviewPiece(id,TabletopPointerPreview.ForCommand(ship?"BuildShip":"BuildRoad"),seat,true),board.ClearPreview);
             else board.ClearPreview();
             return;
@@ -165,6 +172,8 @@ public sealed partial class M5App : MonoBehaviour
         if(DockBlocksMouse(logicalMouse)||cardArt.BlocksBoardInput(logicalMouse)){board.ClearPreview();return;}
         if(ai==null&&(mouse.x>Screen.width*.70f||mouse.y<Screen.height*.15f||mouse.y>Screen.height*.90f))return;
         if(ai!=null&&tabletop.OperationHidden){board.ClearPreview();return;}
+        if(ai!=null&&draft==null&&PickPendingMapAction(mouse,boardClick))return;
+        if(ai!=null&&draft==null&&UpdateSetupPlacement(mouse,boardClick))return;
         if(ai!=null&&DirectProgressActive){UpdateDirectProgress(mouse,boardClick);return;}
         if(ai!=null&&FreeRoadPlacementActive){UpdateFreeRoadPlacement(mouse,boardClick);return;}
         if(ai!=null&&draft==null&&boardClick){PickTabletopObject(mouse);return;}
@@ -234,9 +243,10 @@ public sealed partial class M5App : MonoBehaviour
     }
     string Pick(string type,Vector2 mouse)
     {
-        string[] ids=type=="E"?view.Board.Edges.Select(x=>x.Id).ToArray():type=="T"?view.Board.Tiles.Select(x=>x.Id).ToArray():view.Board.Vertices.Select(x=>x.Id).ToArray();
+        if(ai!=null&&!TabletopUI.ContainsMapScreenPoint(mouse))return "";
+        string[] ids=type=="E"?pickEdges:type=="T"?pickTiles:pickVertices;
         string nearest="";float distance=MobileTabletop.PickRadius(type=="T"?42:25);
-        foreach(var id in ids){var projected=board.ScreenPoint(id);if(ai!=null&&(!TabletopUI.ContainsMapScreenPoint(mouse)||!TabletopUI.ContainsMapScreenPoint(projected)))continue;float d=Vector2.Distance(mouse,projected);if(d<distance){distance=d;nearest=id;}}
+        foreach(var id in ids){var projected=board.ScreenPoint(id);if(ai!=null&&!TabletopUI.ContainsMapScreenPoint(projected))continue;float d=Vector2.Distance(mouse,projected);if(d<distance){distance=d;nearest=id;}}
         return nearest;
     }
     void Panel(Rect r,Color c){var old=GUI.color;GUI.color=c;GUI.DrawTexture(r,Texture2D.whiteTexture);GUI.color=old;}
@@ -245,6 +255,7 @@ public sealed partial class M5App : MonoBehaviour
     {value=M6App.DisplayPlayerText(value);if(ai!=null){ModernOperationUI.Styles(font);GUILayout.Label(value,minor?ModernOperationUI.Small:ModernOperationUI.Text);}else GUILayout.Label(value,minor?small:label);}
     void OnGUI()
     {
+        if(ai!=null && Event.current.isMouse && ai.ReactionOwnsPointer(MobileTabletop.Logical(MobileTabletop.Pointer)))return;
         using var frameCost=FrameCost.Measure(FrameCost.Stage.Gui);
         if(host==null&&!NetworkGame)return;if(ai!=null){bool before=GUI.enabled;GUI.enabled=before&&!ai.ThreeKingdomsPanelBlocksTable;DrawOperationLayout();GUI.enabled=before;return;}Styles();cardArt.Begin(curtain||newGame||view==null?null:seat);GUI.matrix=MobileTabletop.GuiMatrix;
         Panel(new Rect(0,0,1440,125),new Color(.045f,.09f,.10f));

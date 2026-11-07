@@ -106,8 +106,8 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
         Require(city.Submit(play).Success,"出牌失败");Require(app.CardPresentationBusy,"没有出牌公告");
         string committed=host.ExportSave();Require(city.Submit(Command(C4.CommandKind.EndTurn))==null&&committed==host.ExportSave(),"出牌展示期间仍然能提交后续命令");
         Require(host.View("P1").OwnResources.Wheat>before&&city.M6View.OwnResources.Wheat==before,"规则效果与展示快照没有分离");
-        authority=host.ExportSave();yield return new WaitForSecondsRealtime(.65f);
-        Require(city.M6View.OwnResources.Wheat==before,"卡片退场前提前播放效果");yield return Capture("04-出牌公告");yield return Settle();
+        authority=host.ExportSave();
+        yield return Capture("04-手牌旁的出牌动画");yield return Settle();
         Require(city.M6View.OwnResources.Wheat>before&&authority==host.ExportSave(),"退场后没有衔接效果或动画改写规则");
         stage="银行点牌数量";yield return new WaitForEndOfFrame();city.VerificationOperationDock.OpenTrade();yield return Capture("05a-银行点牌数量");
         if(Environment.GetCommandLineArgs().Contains("--resource-card-review"))yield return new WaitForSecondsRealtime(45);

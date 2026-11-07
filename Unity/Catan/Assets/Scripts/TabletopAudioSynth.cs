@@ -124,6 +124,8 @@ public static class TabletopAudioSynth
                 break;
             case TabletopAudioCue.ShipMove: s.NoiseBurst(0, .78, .52, .045, 2); s.Wood(.09, 320, .40); s.Tone(.16, .55, 175, .06, 4, 220); break;
             case TabletopAudioCue.PortPlace: s.Wood(0, 380, .70); s.Metal(.14, 1045, .70); s.NoiseBurst(.09, .48, .23, .08, 3); break;
+            case TabletopAudioCue.BankOpen: s.Metal(0, 1560, .72); s.Metal(.065, 1920, .59); s.Wood(.12, 390, .32); break;
+            case TabletopAudioCue.PlayerTradeOpen: s.Metal(0, 2100, .52); s.Metal(.045, 2320, .40); break;
             case TabletopAudioCue.TradeOffer: s.Metal(0, 1820, .72); s.Metal(.075, 2350, .58); s.Metal(.17, 2080, .46); break;
             case TabletopAudioCue.TradeComplete:
                 for (int i = 0; i < 6; i++) s.Metal(i * .048 + i * i * .006, 1600 + i % 3 * 430, .84 - i * .08);

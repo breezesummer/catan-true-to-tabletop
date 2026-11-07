@@ -100,7 +100,7 @@ public static class PastoralMenuUI
         }
         s.fontSize=size;s.normal.textColor=color??Ink;TabletopTextFit.Label(r,text,s,8,true);
     }
-    public static bool Nav(Rect r,string text,string detail,bool selected,float blend)
+    public static bool Nav(Rect r,string text,bool selected,float blend)
     {
         bool over=GUI.enabled&&r.Contains(Event.current.mousePosition);
         float value=selected||over?1:blend;
@@ -140,13 +140,10 @@ public static class PastoralMenuUI
         Fill(new Rect(r.x,r.y,3,r.height),new Color(.63f,.44f,.20f,.7f));
         Fill(new Rect(r.x+10,r.yMax-1,r.width-20,1),new Color(.53f,.38f,.20f,.25f));
     }
-    public static bool Card(Rect r,string heading,string detail,bool selected,string number="")
+    public static bool Card(Rect r,string heading,bool selected)
     {
         bool hit=Button(r,"",true,false,selected);
-        Color ink=selected?Ivory:Ink,sub=selected?new Color(.80f,.87f,.76f):Muted;
-        if(number.Length>0)Label(new Rect(r.x+22,r.y+15,r.width-44,22),number,12,selected?Gold:Muted);
-        Label(new Rect(r.x+22,r.y+(number.Length>0?42:18),r.width-44,34),heading,22,ink,true);
-        Label(new Rect(r.x+22,r.y+(number.Length>0?84:58),r.width-44,r.height-65),detail,13,sub);
+        Label(new Rect(r.x+22,r.y+25,r.width-44,34),heading,22,selected?Ivory:Ink,true,TextAnchor.MiddleCenter);
         return hit;
     }
     public static float Slider(Rect r,float value)

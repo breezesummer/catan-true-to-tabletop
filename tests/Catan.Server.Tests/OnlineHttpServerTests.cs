@@ -129,6 +129,89 @@ public sealed class OnlineHttpServerTests
         Assert.Equal("RateLimited", WireJson.Deserialize<NetworkResponse>(await response.Content.ReadAsStringAsync(deadline.Token)).Code);
     }
 
+    [Fact]
+    public async Task FourSeatsReceiveRepeatedReactionsWithoutAdvancingTheGame()
+    {
+        await using var server = await OnlineServer.StartAsync();
+        using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        var token = deadline.Token;
+        var seats = new List<NetworkResponse>();
+        var settings = new RoomSettings { PlayerCount = 4, RuleSet = "combined", ScenarioId = "through-the-desert",
+            Harbormaster = true, Fishing = true, TradeModulesVersion = NetworkProtocol.TradeModulesVersion,
+            ThreeKingdomsPackageVersion = Catan.Core.ThreeKingdoms.GeneralCatalog.B6PackageVersion,
+            ThreeKingdomsContentHash = Catan.Core.ThreeKingdoms.GeneralCatalog.B6ContentHash };
+        for (int i = 0; i < 4; i++)
+        {
+            var enroll = i == 0 ? Enroll("Create", new CreateRoomPayload { Settings = settings }) :
+                Enroll("Join", new JoinRoomPayload(), seats[0].RoomId);
+            enroll.ExpectedRulesVersion = NetworkProtocol.RulesVersion("combined");
+            enroll.ExpectedScenarioVersion = NetworkProtocol.ScenarioVersion("combined");
+            enroll.SupportedTradeModulesVersion = NetworkProtocol.TradeModulesVersion;
+            enroll.ExpectedThreeKingdomsPackageVersion = settings.ThreeKingdomsPackageVersion;
+            enroll.ExpectedThreeKingdomsContentHash = settings.ThreeKingdomsContentHash;
+            var seat = await server.Exchange(enroll, token);
+            Assert.True(seat.Success, seat.Message);
+            seat.Credential = enroll.EnrollmentCredential;
+            seats.Add(seat);
+        }
+        long revision = seats[3].Revision;
+        NetworkRequest Request(int index, string operation, string? payload = null) => new() {
+            RoomId = seats[index].RoomId, ConnectionId = seats[index].ConnectionId, Credential = seats[index].Credential,
+            ExpectedRevision = revision, Operation = operation, Payload = payload, RequestId = Guid.NewGuid().ToString("N"),
+            SupportedTradeModulesVersion = NetworkProtocol.TradeModulesVersion };
+        for (int i = 0; i < 4; i++)
+        {
+            var ready = await server.Exchange(Request(i, "Ready", WireJson.Serialize(new ReadyPayload { Ready = true })), token);
+            Assert.True(ready.Success); revision = ready.Revision;
+        }
+        var start = await server.Exchange(Request(0, "Start"), token);
+        Assert.True(start.Success, start.Message);
+        using var target = new ClientWebSocket();
+        using var observer = new ClientWebSocket();
+        var ws = new UriBuilder(server.Client.BaseAddress!) { Scheme = "ws", Path = "/ws" }.Uri;
+        foreach (var (socket, index) in new[] { (target, 1), (observer, 2) })
+        {
+            await socket.ConnectAsync(ws, token);
+            var response = await ExchangeSocket(socket, Request(index, "Sync", index == 1 ? NetworkProtocol.ComboReactionFeedToken : NetworkProtocol.ReactionFeedToken), token);
+            Assert.Equal(0, response.Reactions.Through);
+        }
+        var before = await server.Exchange(Request(3, "Get"), token);
+        Assert.Null(before.Reactions);
+        foreach (var kinds in new[] { new[] { "egg" }, new[] { "shoe", "flower", "wine" } })
+        {
+            var send = Request(0, "React", WireJson.Serialize(new ThrowReaction {
+                Throws = kinds.Select(kind => new ReactionTarget { Kind = kind, Target = seats[1].SeatId }).ToArray(), GameNumber = start.Room.GameNumber }));
+            var accepted = await server.Exchange(send, token);
+            Assert.True(accepted.Success); Assert.Null(accepted.ViewJson); Assert.Null(accepted.Room);
+            Assert.True((await server.Exchange(send, token)).Success);
+        }
+        foreach (var socket in new[] { target, observer })
+        {
+            var items = new List<TableReaction>();
+            while (items.Count < 4)
+            {
+                var packet = await ReadSocket(socket, token);
+                if (packet.Code != NetworkProtocol.ReactionFeedToken) continue;
+                Assert.Null(packet.Room); Assert.Null(packet.ViewJson); Assert.Null(packet.PresentationHistoryJson);
+                items.AddRange(packet.Reactions.Items);
+            }
+            Assert.Equal(new long[] { 1, 2, 3, 4 }, items.Select(r => r.Sequence));
+            Assert.Equal(socket == target ? new[] { "egg", "shoe", "flower", "wine" } : new[] { "egg", "egg", "flower", "flower" }, items.Select(r => r.Kind));
+            Assert.All(items, r => { Assert.Equal(seats[0].SeatId, r.Source); Assert.Equal(seats[1].SeatId, r.Target); });
+        }
+        var fallback = await server.Exchange(Request(3, "Get", NetworkProtocol.ReactionFeedToken), token);
+        Assert.Equal(4, fallback.Reactions.Through);
+        Assert.Equal(new[] { "egg", "egg", "flower", "flower" }, fallback.Reactions.Items.Select(r => r.Kind));
+        Assert.Equal(before.Revision, fallback.Revision);
+        Assert.Equal(before.ViewJson, fallback.ViewJson);
+        Assert.Equal(before.PresentationHistoryJson, fallback.PresentationHistoryJson);
+        var invalid = Request(0, "React", WireJson.Serialize(new ThrowReaction {
+            Throws = new[] { new ReactionTarget { Kind = "egg", Target = "P5" } }, GameNumber = start.Room.GameNumber }));
+        Assert.Equal("InvalidReaction", (await server.Exchange(invalid, token)).Code);
+        invalid.Credential = seats[2].Credential;
+        Assert.Equal("ConnectionSuperseded", (await server.Exchange(invalid, token)).Code);
+    }
+
     private static NetworkRequest Enroll(string operation, object payload, string? roomId = null) => new()
     {
         Operation = operation, RoomId = roomId,
@@ -140,20 +223,23 @@ public sealed class OnlineHttpServerTests
     {
         request.RequestId = Guid.NewGuid().ToString("N");
         await socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(WireJson.Serialize(request))), WebSocketMessageType.Text, true, cancellation);
+        NetworkResponse response;
+        do { response = await ReadSocket(socket, cancellation); } while (response.RequestId != request.RequestId);
+        return response;
+    }
+
+    private static async Task<NetworkResponse> ReadSocket(ClientWebSocket socket, CancellationToken cancellation)
+    {
         var buffer = new byte[8192];
-        while (true)
+        using var message = new MemoryStream();
+        WebSocketReceiveResult part;
+        do
         {
-            using var message = new MemoryStream();
-            WebSocketReceiveResult part;
-            do
-            {
-                part = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellation);
-                Assert.Equal(WebSocketMessageType.Text, part.MessageType);
-                message.Write(buffer, 0, part.Count);
-            } while (!part.EndOfMessage);
-            var response = WireJson.Deserialize<NetworkResponse>(Encoding.UTF8.GetString(message.ToArray()));
-            if (response.RequestId == request.RequestId) return response;
-        }
+            part = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellation);
+            Assert.Equal(WebSocketMessageType.Text, part.MessageType);
+            message.Write(buffer, 0, part.Count);
+        } while (!part.EndOfMessage);
+        return WireJson.Deserialize<NetworkResponse>(Encoding.UTF8.GetString(message.ToArray()));
     }
 
     private sealed class OnlineServer : IAsyncDisposable
@@ -208,8 +294,8 @@ public sealed class OnlineHttpServerTests
 
         public async Task<NetworkResponse> Exchange(NetworkRequest request, CancellationToken cancellation)
         {
-            request.RequestId = Guid.NewGuid().ToString("N");
-            using var response = await Client.PostAsync("api/request", new StringContent(WireJson.Serialize(request), Encoding.UTF8, "application/json"), cancellation);
+            request.RequestId ??= Guid.NewGuid().ToString("N");
+            using var response = await Client.PostAsync(request.Operation == "React" ? "api/reaction" : "api/request", new StringContent(WireJson.Serialize(request), Encoding.UTF8, "application/json"), cancellation);
             response.EnsureSuccessStatusCode();
             return WireJson.Deserialize<NetworkResponse>(await response.Content.ReadAsStringAsync(cancellation));
         }

@@ -54,7 +54,7 @@ public static class JadeThemeVerification
                     if(StrategyHudTheme.Selected!=i||app.ExportEnvelope()!=authority)throw new Exception("主题切换影响权威状态或选择失败");
                 }
                 if(!JadeTabletopSkin.Ready)throw new Exception("玉石图集缺失");
-                StrategyHudTheme.Select(3);stage++;next=EditorApplication.timeSinceStartup+3;return;
+                StrategyHudTheme.Select(2);stage++;next=EditorApplication.timeSinceStartup+3;return;
             }
             // 截图和后续输入分隔至不同帧，避免异步截图记录到下一个状态。
             switch(stage)
@@ -86,7 +86,7 @@ public static class JadeThemeVerification
                 case 17: Send(EventType.MouseUp,new Vector2(500,250));Advance();return;
             }
             if(app.ExportEnvelope()!=authority)throw new Exception("界面点击改变权威存档");
-            File.WriteAllText(Path.Combine(output,"验证.txt"),"通过：Unity "+Application.unityVersion+"；四主题即时切换，权威存档保持一致，玉石图集加载成功；1440×900、1280×720及1672×941实际GameView截图；长中文名、英文名、按下和释放截图。\n");
+            File.WriteAllText(Path.Combine(output,"验证.txt"),"通过：Unity "+Application.unityVersion+"；三主题即时切换，权威存档保持一致，玉石图集加载成功；1440×900、1280×720及1672×941实际GameView截图；长中文名、英文名、按下和释放截图。\n");
             Finish(0);
         }
         catch(Exception ex){File.WriteAllText(Path.Combine(output,"失败.txt"),ex.ToString());Debug.LogException(ex);Finish(1);}

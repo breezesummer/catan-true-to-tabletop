@@ -44,7 +44,7 @@ public sealed class ProgressVictoryPresentationTests
             owned=[view.OwnResources.Wood,view.OwnResources.Brick,view.OwnResources.Wool,view.OwnResources.Wheat,view.OwnResources.Ore,view.OwnCommodities.Cloth,view.OwnCommodities.Coin,view.OwnCommodities.Paper];
         }
         var entry=Assert.Single(history);var reveal=Assert.Single(TabletopCardReveal.From(entry));
-        Assert.Equal("P2",reveal.PlayerId);Assert.Equal("印刷术",reveal.CardName);Assert.Same(entry,reveal.Roll);
+        Assert.Equal("P2",reveal.PlayerId);Assert.Equal("印刷厂",reveal.CardName);Assert.Same(entry,reveal.Roll);
         var oldSnapshot=new OperationSnapshot{Scope="game:P1",Seat="P1",GoodCount=8,PublicSequence=0};
         var currentSnapshot=new OperationSnapshot{Scope="game:P1",Seat="P1",GoodCount=8,PublicSequence=appliedSequence,Goods=owned};
         var dice=new TabletopDicePresentation();dice.Observe(0,0,0,0,0);dice.Observe(entry.Sequence,entry.Dice1,entry.Dice2,3,10);
@@ -60,7 +60,7 @@ public sealed class ProgressVictoryPresentationTests
         collections.Observe(currentSnapshot.Scope,currentSnapshot.PresentedHistory(history),13.1,outcomesReadyAt:dice.SettlesAt);
         Assert.NotEmpty(collections.Active(13.1));
         var slots=collections.HandSlots("P1",owned,8,13.1);Assert.Equal(owned.Sum(),slots.Length);Assert.All(slots,slot=>Assert.NotNull(slot.Flight));
-        Assert.DoesNotContain(collections.Active(13.1),flight=>flight.CardName=="印刷术");
+        Assert.DoesNotContain(collections.Active(13.1),flight=>flight.CardName=="印刷厂");
         Assert.Equal(history,dice.VisibleHistory(currentSnapshot.PresentedHistory(history),13.1));
     }
     [Theory]
@@ -76,7 +76,7 @@ public sealed class ProgressVictoryPresentationTests
         {
             var history=probe.History(viewer);var entry=Assert.Single(history);
             var gain=Assert.Single(entry.Changes,c=>c.Category=="progress"&&c.PlayerId==owner&&c.Amount>0);
-            Assert.False(gain.IsPrivate);Assert.Equal(card=="Printing"?"印刷术":"宪法",gain.Name);
+            Assert.False(gain.IsPrivate);Assert.Equal(card=="Printing"?"印刷厂":"石碑",gain.Name);
             var reveal=Assert.Single(new TabletopCardRevealTimeline().Observe(history));
             Assert.Equal(owner,reveal.PlayerId);Assert.True(reveal.ImmediateVictory);Assert.True(reveal.Progress);
             Assert.Equal(card=="Printing"?7:21,reveal.ProgressIndex);
@@ -129,12 +129,12 @@ public sealed class ProgressVictoryPresentationTests
     [Fact]
     public void BatchedDiceDrawsUseTheActualRecipientAndDoNotReplayAfterRefreshOrReconnect()
     {
-        var draw=Entry(2,"RollDice","P3",Change("P4","印刷术",false),Change("P2","宪法",false),Change("P3","采矿",true));
+        var draw=Entry(2,"RollDice","P3",Change("P4","印刷厂",false),Change("P2","石碑",false),Change("P3","采矿",true));
         var timeline=new TabletopCardRevealTimeline();
         var reveals=timeline.Observe([Entry(1,"EndTurn","P2"),draw]);
         Assert.Equal(new[]{"P4","P2"},reveals.Select(c=>c.PlayerId));Assert.All(reveals,c=>Assert.True(c.ImmediateVictory));
         Assert.Empty(timeline.Observe([draw]));timeline.Reset([draw]);Assert.Empty(timeline.Observe([draw]));
-        Assert.Single(timeline.Observe([Entry(3,"ResolveChoice","P1",Change("P1","印刷术",false))]));
+        Assert.Single(timeline.Observe([Entry(3,"ResolveChoice","P1",Change("P1","印刷厂",false))]));
     }
     [Theory]
     [InlineData(false,"Printing",2u)] [InlineData(false,"Constitution",48u)]
@@ -164,7 +164,7 @@ public sealed class ProgressVictoryPresentationTests
     [Fact]
     public void HiddenCardsAndBaseVictoryCardsNeverCreateAnAutomaticPublicReveal()
     {
-        Assert.Empty(TabletopCardReveal.From(Entry(1,"RollDice","P1",Change("P2","印刷术",true),Change("P3","发展卡",false),Change("P4","胜利点",true))));
+        Assert.Empty(TabletopCardReveal.From(Entry(1,"RollDice","P1",Change("P2","印刷厂",true),Change("P3","发展卡",false),Change("P4","胜利点",true))));
     }
     static GameHistoryEntry Entry(long sequence,string kind,string player,params GameHistoryChange[] changes)
     {var entry=new GameHistoryEntry();Set(entry,"Sequence",sequence);Set(entry,"Kind",kind);Set(entry,"PlayerId",player);Set(entry,"Changes",changes);return entry;}

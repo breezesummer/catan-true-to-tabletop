@@ -1,0 +1,12 @@
+{
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "Windows 实机四人穿越沙漠，全窗口记录手绘、海洋和交易界面；核对四主题切换、本地偏好和对局一致性。",
+    "configurations": 1,
+    "checks": 23,
+    "cameraImages": 4,
+    "guiAttempts": 0,
+    "guiImagesWithChanges": 0,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+}

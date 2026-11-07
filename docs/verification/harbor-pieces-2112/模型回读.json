@@ -1,0 +1,27 @@
+{
+  "geometry": [
+    {
+      "model": "ship",
+      "triangles": 20120,
+      "degenerate": 0,
+      "invalidUV": 0,
+      "baseYmm": -0.0
+    },
+    {
+      "model": "pirate",
+      "triangles": 24762,
+      "degenerate": 0,
+      "invalidUV": 0,
+      "baseYmm": -0.0
+    },
+    {
+      "model": "wall",
+      "triangles": 19196,
+      "degenerate": 0,
+      "invalidUV": 0,
+      "baseYmm": -4.0926
+    }
+  ],
+  "sourceObjects": 3,
+  "packed": true
+}

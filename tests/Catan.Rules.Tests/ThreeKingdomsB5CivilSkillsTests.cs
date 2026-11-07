@@ -39,11 +39,11 @@ public sealed class ThreeKingdomsB5CivilSkillsTests
         Do(h,"P1","civil-fanjian");Do(h,"P2","civil-declare-type",0);Assert.Equal("P1",h.State.Skills.PendingDecision.PlayerId);Do(h,"P1","civil-road");Drain(h);
         Assert.Single(h.Applied);Assert.Equal(1,h.State.Skills.RevealedCards[1]);h.Conserved();
     }
-    [Fact] public void KurouUsesRecordedPaidLayerAndFreeConstructionPaysZero()
+    [Fact] public void KurouUsesActualDiscountedPriceOrPrintedCostForFreeConstruction()
     {
-        var h=ThreeKingdomsB5CivilTestHost.Create("tk-g16");h.AddOption("kurou","paid","P1",paid:2);h.AddOption("kurou","free","P1",paid:0);
-        Do(h,"P1","civil-kurou",id:"paid");Do(h,"P1","card",5);Do(h,"P1","card",7);Drain(h);Assert.Equal(2,h.GetHand("P1").Sum());
-        Do(h,"P1","civil-kurou",id:"free");Drain(h);Assert.Equal(2,h.GetHand("P1").Sum());Assert.Equal(2,h.Applied.Count);h.Conserved();
+        var h=ThreeKingdomsB5CivilTestHost.Create("tk-g16");h.AddOption("kurou","paid","P1",paid:1,cost:new[]{1,1});h.AddOption("kurou","free","P1",paid:0,cost:new[]{1,1});
+        Do(h,"P1","civil-kurou",id:"paid");Do(h,"P1","card",5);Drain(h);Assert.Equal(1,h.GetHand("P1").Sum());
+        Do(h,"P1","civil-kurou",id:"free");Do(h,"P1","card",0);Do(h,"P1","card",7);Drain(h);Assert.Equal(3,h.GetHand("P1").Sum());Assert.Equal(2,h.Applied.Count);h.Conserved();
     }
     [Fact] public void QixiSharesThreeUsesAcrossHandsProgressAndTechnologyAndUsesActualLevelCost()
     {

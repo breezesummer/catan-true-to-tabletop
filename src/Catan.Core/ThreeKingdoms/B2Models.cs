@@ -62,6 +62,7 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=8, EmitDefaultValue=false)] public int? ResultCardType { get; set; }
         [DataMember(Order=9, EmitDefaultValue=false)] public string[] SelectionPlayerIds { get; set; }
         [DataMember(Order=15, EmitDefaultValue=false)] public int[] SelectionCost { get; set; }
+        [DataMember(Order=16, EmitDefaultValue=false)] public int? RefundCardCount { get; set; }
         [DataMember(Order=10, EmitDefaultValue=false)] public string[] SelectionBoardIds { get; set; }
         [DataMember(Order=11, EmitDefaultValue=false)] public int? RequiredCardCount { get; set; }
         [DataMember(Order=12, EmitDefaultValue=false)] public int? SelectionDiceIndex { get; set; }
@@ -116,6 +117,8 @@ namespace Catan.Core.ThreeKingdoms
     }
     [DataContract] public sealed class B2HarvestAllocation
     {
+        // 仅用于本人结算历史，通过命令重放恢复。
+        internal int[] ReservedGold;
         [DataMember(Order=1)] public string PlayerId { get; set; }
         [DataMember(Order=2)] public int[] Cards { get; set; } = new int[8];
         [DataMember(Order=3)] public bool Completed { get; set; }

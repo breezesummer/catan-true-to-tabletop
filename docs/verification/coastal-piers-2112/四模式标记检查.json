@@ -1,0 +1,65 @@
+{
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "四种模式正常开局，另查部落港礼、航路奖励与迷雾数字。离屏相机记录棋盘，八张四视图覆盖港口朝向和玉签厚度。",
+    "checks": 1835,
+    "checkedSourceInstances": 69,
+    "cameraImages": 8,
+    "detailImages": 8,
+    "specialGiftPorts": 6,
+    "specialBonusMarkers": 8,
+    "publicDataOnly": true,
+    "visualsHaveNoColliders": true,
+    "stableIds": true,
+    "outsideCoast": true,
+    "hiddenNumbersSuppressed": true,
+    "rulesSupplyNumberFaces": true,
+    "jadeNumberMesh": true,
+    "fullUiPixelsVerified": false,
+    "publicSpecialScenario": true,
+    "publicFogScenario": true,
+    "assets": [
+        "port-generic",
+        "port-wood",
+        "port-brick",
+        "port-wool",
+        "port-wheat",
+        "port-ore",
+        "catan-victory-marker",
+        "number-token-back"
+    ],
+    "modes": [
+        {
+            "mode": "base",
+            "ports": 9,
+            "gifts": 0,
+            "unclaimedVictoryMarkers": 0,
+            "awardedVictoryMarkers": 0,
+            "numberTokens": 18
+        },
+        {
+            "mode": "seafarers",
+            "ports": 9,
+            "gifts": 0,
+            "unclaimedVictoryMarkers": 0,
+            "awardedVictoryMarkers": 0,
+            "numberTokens": 27
+        },
+        {
+            "mode": "cities-knights",
+            "ports": 9,
+            "gifts": 0,
+            "unclaimedVictoryMarkers": 0,
+            "awardedVictoryMarkers": 0,
+            "numberTokens": 18
+        },
+        {
+            "mode": "combined",
+            "ports": 9,
+            "gifts": 0,
+            "unclaimedVictoryMarkers": 0,
+            "awardedVictoryMarkers": 0,
+            "numberTokens": 27
+        }
+    ]
+}

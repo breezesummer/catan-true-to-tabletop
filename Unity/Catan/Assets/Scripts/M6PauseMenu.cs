@@ -44,20 +44,18 @@ public sealed partial class M6App
         TablePauseStyles();
         PastoralMenuUI.Fill(new Rect(0,0,1440,900),new Color(.055f,.025f,.01f,.69f));
     }
-    void TablePauseHeading(Rect panel,string eyebrow,string heading,string subtitle)
+    void TablePauseHeading(Rect panel,string heading)
     {
         PastoralMenuUI.Panel(panel);
-        PastoralMenuUI.Label(new Rect(panel.x+28,panel.y+25,panel.width-56,22),eyebrow,12,PastoralMenuUI.Forest,true,TextAnchor.MiddleCenter);
         PastoralMenuUI.Label(new Rect(panel.x+28,panel.y+61,panel.width-56,48),heading,31,PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
         PastoralMenuUI.Fill(new Rect(panel.center.x-32,panel.y+124,64,2),PastoralMenuUI.Gold);
-        PastoralMenuUI.Label(new Rect(panel.x+28,panel.y+145,panel.width-56,38),subtitle,13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
     }
     void DrawTablePauseMenu()
     {
         DrawTablePauseBackdrop();
         if(tablePausePage==1){DrawTablePauseSettings();return;}
         var panel=new Rect(440,100,560,700);
-        TablePauseHeading(panel,"山 海 之 间  ·  一 桌 好 时 光","游戏菜单","卡坦岛之三国争霸 · "+ReleaseVersion);
+        TablePauseHeading(panel,"游戏菜单");
         string[] entries={"继续游戏","保存游戏","游戏设置","游戏百科","重新开始","返回主菜单"};
         for(int i=0;i<entries.Length;i++)
         {
@@ -73,13 +71,13 @@ public sealed partial class M6App
                 case 5:ReturnToMainMenu();break;
             }
         }
-        string status=NetworkGame&&!string.IsNullOrEmpty(Network.LastError)?Network.LastError:tablePauseFeedback.Length>0?tablePauseFeedback:NetworkGame?"联机对局继续运行；房主可重新开始，所有玩家同步重开。":Fault.Length>0?"AI 已暂停："+Fault:"游戏已暂停，愿下一次落子带来丰收。";
+        string status=NetworkGame&&!string.IsNullOrEmpty(Network.LastError)?Network.LastError:tablePauseFeedback.Length>0?tablePauseFeedback:NetworkGame?"联机对局进行中":Fault.Length>0?"AI 已暂停："+Fault:"游戏已暂停";
         PastoralMenuUI.Label(new Rect(477,704,486,68),status,13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
     }
     void DrawTablePauseSettings()
     {
         var panel=new Rect(290,69,860,762);
-        TablePauseHeading(panel,"舒 适 地 游 玩","游戏设置","让声音与桌面，配合你喜欢的游戏时光。" );
+        TablePauseHeading(panel,"游戏设置");
         tablePauseSettingsTab=PastoralMenuUI.Segments(new Rect(337,272,766,42),tablePauseSettingsTab,new[]{"桌面外观","声音","视角与节奏"});
         if(tablePauseSettingsTab==0)DrawTablePauseAppearance();
         else if(tablePauseSettingsTab==1)DrawTablePauseAudio();
@@ -89,19 +87,17 @@ public sealed partial class M6App
     }
     void DrawTablePauseAppearance()
     {
-        PastoralMenuUI.Label(new Rect(337,343,766,35),"选择桌面氛围",23,PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
-        PastoralMenuUI.Label(new Rect(337,389,766,28),"切换桌面配色，立即生效。",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
-        var colors=new[]{new Color(.34f,.145f,.065f),new Color(.055f,.205f,.30f),new Color(.32f,.24f,.065f)};
         for(int i=0;i<StrategyHudTheme.Names.Length;i++)
         {
-            var r=new Rect(337+i*195,452,181,180);bool chosen=StrategyHudTheme.Selected==i;
+            float step=(766f+12)/StrategyHudTheme.Names.Length;
+            var r=new Rect(337+i*step,385,step-12,180);bool chosen=StrategyHudTheme.Selected==i;
             if(PastoralMenuUI.Button(r,"",true,false,chosen))StrategyHudTheme.Select(i);
-            if(i==3)JadeTabletopSkin.Panel(new Rect(r.x+20,r.y+21,r.width-40,70),StrategyHudTheme.Surface,false,true);
+            if(i==2)JadeTabletopSkin.Panel(new Rect(r.x+20,r.y+21,r.width-40,70),StrategyHudTheme.Surface,false,true);
+            else if(i==3)HandPaintedTabletopSkin.Preview(new Rect(r.x+20,r.y+21,r.width-40,70));
             else if(i==1)OceanTabletopSkin.Panel(new Rect(r.x+20,r.y+21,r.width-40,70));
-            else PastoralMenuUI.Round(new Rect(r.x+20,r.y+21,r.width-40,70),colors[i%colors.Length],8);
+            else PastoralMenuUI.Round(new Rect(r.x+20,r.y+21,r.width-40,70),new Color(.34f,.145f,.065f),8);
             PastoralMenuUI.Label(new Rect(r.x+14,r.y+113,r.width-28,36),StrategyHudTheme.Names[i],21,chosen?PastoralMenuUI.Ivory:PastoralMenuUI.Ink,true,TextAnchor.MiddleCenter);
         }
-        PastoralMenuUI.Label(new Rect(337,662,766,31),"外观偏好会自动保存。",13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
     }
     void DrawTablePauseAudio()
     {
@@ -147,7 +143,7 @@ public sealed partial class M6App
         int speed=PastoralMenuUI.Segments(new Rect(539,512,564,42),AiSpeedLevel,TabletopAiSpeed.Names);
         GUI.enabled=before;
         if(speed!=AiSpeedLevel){AiSpeedLevel=TabletopAiSpeed.Clamp(speed);nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);}
-        PastoralMenuUI.Label(new Rect(337,574,766,54),NetworkGame?"联机节奏由房间统一调度，打开本菜单不会暂停其他玩家。":"本菜单打开时，本地 AI 与牌桌操作暂停；返回后按所选节奏继续。",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+        PastoralMenuUI.Label(new Rect(337,574,766,54),NetworkGame?"联机对局由房间控制节奏":"",14,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
         if(RuleSet=="seafarers"&&PastoralMenuUI.Button(new Rect(526,648,388,43),"航海场景行动"))
         {CloseTablePauseMenu();GetComponent<M3App>()?.ShowScenarioActions();}
     }

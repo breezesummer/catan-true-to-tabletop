@@ -29,6 +29,9 @@ public sealed class ThreeKingdomsB2HarvestTests
     {
         var host = ThreeKingdomsB2TestHost.Create("tk-g01"); host.Give("P2", 0, 0, 1); host.Give("P3", 0, 0, 0, 0, 1);
         Begin(host, Cards(1, 1, 0, 0, 0, 1));
+        var owner=new ThreeKingdomsView();var opponent=new ThreeKingdomsView();
+        B2SkillEngine.Project(host,owner,"P1");B2SkillEngine.Project(host,opponent,"P2");
+        Assert.Equal(Cards(1,1,0,0,0,1),owner.RaidHarvestCards);Assert.Null(opponent.RaidHarvestCards);
         var raid = Active(host, "raid"); raid.Counts = Cards(1, 1); raid.TargetPlayerIds = new[] { "P2", "P3" };
         ResolveWithReplay(host, "P1", raid); Drain(host);
         Assert.Equal(Cards(0, 0, 1, 0, 1, 1), host.GetHand("P1"));

@@ -1,0 +1,26 @@
+[
+  {
+    "kind": "metro-trade",
+    "triangles": 150461,
+    "degenerate": 0,
+    "invalidUV": 0,
+    "wallIntersections": 0,
+    "overlapBoundsMm": []
+  },
+  {
+    "kind": "metro-politics",
+    "triangles": 335418,
+    "degenerate": 0,
+    "invalidUV": 0,
+    "wallIntersections": 0,
+    "overlapBoundsMm": []
+  },
+  {
+    "kind": "metro-science",
+    "triangles": 169182,
+    "degenerate": 0,
+    "invalidUV": 0,
+    "wallIntersections": 0,
+    "overlapBoundsMm": []
+  }
+]

@@ -15,18 +15,18 @@ public sealed class MapPanInput
     public float ZoomDelta { get; private set; }
     public bool MultiTouchActive => multiTouch;
 
-    public bool Update(TabletopScene scene, Vector2 screenMouse, bool canStart, bool allowPan)
+    public bool Update(TabletopScene scene, Vector2 screenMouse, bool canStart)
     {
         ZoomDelta=0;
         if(scene==null)return false;
-        if(MobileTabletop.Enabled&&(Input.touchCount>0||touchCaptured||multiTouch))return UpdateTouch(scene,canStart,allowPan);
-        if(!captured&&canStart&&(Input.GetMouseButtonDown(0)||allowPan&&Input.GetMouseButtonDown(2)))
+        if(MobileTabletop.Enabled&&(Input.touchCount>0||touchCaptured||multiTouch))return UpdateTouch(scene,canStart);
+        if(!captured&&canStart&&(Input.GetMouseButtonDown(0)||Input.GetMouseButtonDown(2)))
         {
             captured=true;dragging=false;button=Input.GetMouseButtonDown(2)?2:0;
             start=previous=screenMouse;
         }
         if(!captured)return false;
-        if(allowPan&&Input.GetMouseButton(button))
+        if(Input.GetMouseButton(button))
         {
             Vector2 delta=screenMouse-start;
             var logical=new Vector2(delta.x*1440f/Screen.width,delta.y*900f/Screen.height);
@@ -37,7 +37,7 @@ public sealed class MapPanInput
         if(!Input.GetMouseButtonUp(button))return false;
         var releasedDelta=screenMouse-start;
         var releasedLogical=new Vector2(releasedDelta.x*1440f/Screen.width,releasedDelta.y*900f/Screen.height);
-        if(allowPan&&releasedLogical.sqrMagnitude>36)
+        if(releasedLogical.sqrMagnitude>36)
         {
             if(!dragging)scene.PanFromScreen(new Vector2(start.x,Screen.height-start.y),new Vector2(screenMouse.x,Screen.height-screenMouse.y));
             dragging=true;
@@ -46,7 +46,7 @@ public sealed class MapPanInput
         captured=false;dragging=false;scene.EndPan();return click;
     }
 
-    bool UpdateTouch(TabletopScene scene,bool canStart,bool allowPan)
+    bool UpdateTouch(TabletopScene scene,bool canStart)
     {
         if(Input.touchCount==0){touchCaptured=false;multiTouch=false;pinchDistance=0;dragging=false;scene.EndPan();return false;}
         if(Input.touchCount>=2)
@@ -68,7 +68,7 @@ public sealed class MapPanInput
         {touchCaptured=true;touchId=touch.fingerId;start=previous=point;dragging=false;}
         if(!touchCaptured||touch.fingerId!=touchId)return false;
         var delta=MobileTabletop.Logical(point)-MobileTabletop.Logical(start);
-        if(allowPan&&!MobileGestureMath.IsTap(delta.x,delta.y))dragging=true;
+        if(!MobileGestureMath.IsTap(delta.x,delta.y))dragging=true;
         if(dragging)scene.PanFromScreen(new Vector2(previous.x,Screen.height-previous.y),touch.position);
         previous=point;
         if(touch.phase!=TouchPhase.Ended&&touch.phase!=TouchPhase.Canceled)return false;

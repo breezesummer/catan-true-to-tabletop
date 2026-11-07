@@ -83,6 +83,7 @@ namespace Catan.Core.M2
                 var prior = state.ProcessedCommands.FirstOrDefault(x => x.CommandId == command.Id);
                 if (prior != null) return PriorResult(prior, fingerprint);
                 var next = state.CopyForTransaction();
+                next.Harvest = new TileHarvest();
                 try { Apply(next, command); }
                 catch (RuleException ex) { return Reject(ex.Code, ex.Message); }
                 RecalculateAwards(next);
@@ -96,9 +97,11 @@ namespace Catan.Core.M2
                 AssertInvariants(next);
                 history.RecordAction(GameHistoryCapture.From(state), GameHistoryCapture.From(next), new HistoryAction
                 {
+                    Harvest = next.Harvest.Any ? next.Harvest : null,
                     PlayerId = command.PlayerId, OtherPlayerId = string.IsNullOrEmpty(command.OtherPlayerId) ? null : command.OtherPlayerId,
                     Kind = command.Kind.ToString(), PublicTarget = PublicTarget(command), PendingKind = state.PendingDecision?.Kind, FishAction = command.FishAction?.ToString()
                 });
+                next.Harvest = null;
                 state = next;
                 return new CommandResult { Success = true, Message = state.Phase == GamePhase.Finished ? state.WinnerPlayerId + " 获胜！" : "操作已确认。", Events = Json.Copy(receipt), NewEvents = Json.Copy(receipt) };
             }
@@ -332,6 +335,8 @@ namespace Catan.Core.M2
         private static void FinishDecision(GameState s) { s.Phase = s.PendingDecision.ReturnPhase; s.PendingDecision = null; }
         private void Produce(GameState s, int total)
         {
+            int[] Hand(PlayerState p) => Resources.Select(r => p.Resources[r]).ToArray();
+            var before = s.Harvest == null ? null : s.Players.Select(Hand).ToArray();
             foreach (var resource in Resources)
             {
                 var claims = s.Players.Select(p => new { Player = p, Amount = scenario.Topology.Tiles.Where(t => t.Number == total && t.Id != s.RobberTileId && t.Resource == ResourceName(resource)).Sum(t =>
@@ -339,6 +344,14 @@ namespace Catan.Core.M2
                 var requested = claims.Sum(c => c.Amount);
                 if (s.Bank[resource] >= requested) foreach (var claim in claims) Transfer(s.Bank, claim.Player.Resources, resource, claim.Amount);
                 else if (claims.Length == 1) Transfer(s.Bank, claims[0].Player.Resources, resource, s.Bank[resource]);
+            }
+            if (before == null) return;
+            var producing = scenario.Topology.Tiles.Where(t => t.Number == total && t.Id != s.RobberTileId);
+            for (int i = 0; i < s.Players.Length; i++)
+            {
+                var p = s.Players[i];
+                var received = Hand(p).Select((n, card) => n - before[i][card]).ToArray();
+                s.Harvest.Normal(p.Id, producing, s.Settlements, s.Cities, received, false);
             }
         }
         private void Discard(GameState s, PlayerState p, Command c)

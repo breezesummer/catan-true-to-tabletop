@@ -11,7 +11,7 @@ public sealed partial class M4App
     {var bank=view.Bank.Copy();foreach(int type in view.ThreeKingdoms?.BlockedGainCardTypes??Array.Empty<int>())if(type>=0&&type<5)bank[(Resource)type]=0;return bank;}
     void DrawPendingResources()
     {
-        TabletopResourceChoiceUI.Draw(1,resourceChoiceSelection,PendingResourceBankB6(),ConfirmPendingResources,ai.ShowTablePrompt,"引水渠 · 选择资源",tabletop.OperationWindows);
+        TabletopResourceChoiceUI.Draw(1,resourceChoiceSelection,PendingResourceBankB6(),ConfirmPendingResources,"引水渠 · 选择资源",tabletop.OperationWindows);
     }
     void ConfirmPendingResources()
     {
@@ -29,7 +29,7 @@ public sealed partial class M5App
     void DrawPendingResources()
     {
         bool gold=view.PendingDecision.Kind=="Gold";var bank=PendingResourceBankB6();
-        TabletopResourceChoiceUI.Draw(gold?Math.Min(view.PendingDecision.Amount,bank.Total):1,resourceChoiceSelection,bank,ConfirmPendingResources,ai.ShowTablePrompt,gold?"金矿 · 选择资源":"引水渠 · 选择资源",tabletop.OperationWindows);
+        TabletopResourceChoiceUI.Draw(gold?Math.Min(view.PendingDecision.Amount,bank.Total):1,resourceChoiceSelection,bank,ConfirmPendingResources,gold?"金矿 · 选择资源":"引水渠 · 选择资源",tabletop.OperationWindows);
     }
     void ConfirmPendingResources()
     {

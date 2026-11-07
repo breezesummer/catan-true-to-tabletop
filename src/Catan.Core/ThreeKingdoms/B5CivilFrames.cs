@@ -34,7 +34,7 @@ namespace Catan.Core.ThreeKingdoms
                 f.PlayerId=owner;p.BoardKind="damage-road";p.Argument=f.Targets[0];Decide(s,f,"civil-road","反间：处理目标一条道路","开放道路移除，封闭道路横置。");waiting=true;return true;
             }
             if(f.Kind=="civil-kurou")
-            {var current=bh.GetBoardOptions(owner,"kurou").FirstOrDefault(o=>o.Id==p.BoardOption.Id);Remove(s,f);if(current!=null){bh.ApplyBoardOption(owner,current);CivilReward(s,f,"mixed",current.PaidCount);}return true;}
+            {var current=bh.GetBoardOptions(owner,"kurou").FirstOrDefault(o=>o.Id==p.BoardOption.Id);Remove(s,f);if(current!=null){bh.ApplyBoardOption(owner,current);CivilReward(s,f,"mixed",B5BoardRules.KurouReward(current));}return true;}
             if(f.Kind.StartsWith("civil-qixi-",StringComparison.Ordinal))
             {
                 Remove(s,f);string target=f.Targets[0];if(CivilProtected(host,target,owner))return true;

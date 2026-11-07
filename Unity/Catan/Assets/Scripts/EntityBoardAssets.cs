@@ -4,6 +4,9 @@ using UnityEngine;
 public static class EntityBoardAssets
 {
     const string Root = "EntityAssets/v001/";
+    public const string RobberResource = "NeutralPieces/v001/robber-band";
+    public const string MerchantResource = "NeutralPieces/v001/peddler-stall";
+    public const string PirateResource = Root+"pirate/pirate-black";
     public const float BoardSurfaceHeight = .008f;
     public const float BarbarianTrackWidth = .190f;
     public const float BarbarianTrackDepth = .200f;
@@ -60,22 +63,26 @@ public static class EntityBoardAssets
     {
         var colour=PlayerComponentAssets.ColourKey(seatColour);
         if(colour==null)return null;
-        return Instantiate(PlayerComponentAssets.ExpansionRoot+"ship-"+colour,label,bottom,edgeRotation,parent);
+        var ship=Instantiate(PlayerComponentAssets.ExpansionRoot+"ship-"+colour,label,bottom,edgeRotation,parent);
+        if(ship!=null)ship.transform.localScale*=.38f;
+        return FantasyBoardPiece.Attach(ship,"ship",colour);
     }
 
     public static GameObject Robber(string label, Vector3 bottom, Transform parent)
     {
-        return Standing("robber/robber-black-group", label, bottom, parent);
+        return FantasyBoardPiece.Attach(Instantiate(RobberResource, label, bottom, Quaternion.identity, parent),"robber","neutral");
     }
 
-    public static GameObject Pirate(string label, Vector3 bottom, Transform parent)
+    public static GameObject Pirate(string label, Vector3 bottom, Transform parent, bool ocean=false,Quaternion? facing=null)
     {
-        return Standing("pirate/pirate-black", label, bottom, parent);
+        var pirate=Instantiate(PirateResource,label,ocean?ShipWaterline(bottom):bottom,facing??Quaternion.Euler(0,153f,0),parent);
+        if(pirate!=null)pirate.transform.localScale*=.46f;
+        return FantasyBoardPiece.Attach(pirate,"pirate","neutral");
     }
 
     public static GameObject Merchant(string label, Vector3 bottom, Transform parent)
     {
-        return Standing("merchant/merchant-neutral-cart", label, bottom, parent);
+        return FantasyBoardPiece.Attach(Instantiate(MerchantResource, label, bottom, Quaternion.identity, parent),"merchant","neutral");
     }
 
     public static GameObject BarbarianTrack(Vector3 bottom, Transform parent)

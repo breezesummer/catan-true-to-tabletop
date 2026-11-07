@@ -1,0 +1,12 @@
+{
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "真实 Windows 玩家窗口。按存档中的已确认指令重放到正常收取，截取亮起和退回常态。",
+    "configurations": 1,
+    "checks": 380,
+    "cameraImages": 4,
+    "guiAttempts": 0,
+    "guiImagesWithChanges": 0,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+}

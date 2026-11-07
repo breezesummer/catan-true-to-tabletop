@@ -10,6 +10,7 @@ public sealed class TabletopPieceCache
     {
         public string Appearance;
         public GameObject[] Roots;
+        public MeshFilter[] OutlineMeshes;
     }
     readonly Dictionary<string,Entry> entries=new Dictionary<string,Entry>();
     readonly HashSet<string> touched=new HashSet<string>();
@@ -32,6 +33,51 @@ public sealed class TabletopPieceCache
     {
         foreach(var key in entries.Keys.Where(k=>k.StartsWith(prefix,StringComparison.Ordinal)&&!touched.Contains(k)).ToArray())Remove(key);
     }
+    static Material outline,paintedOutline;
+    static MaterialPropertyBlock inkProperties;
+    bool FindPiece(string target,out Entry entry)
+    {
+        entry=null;
+        if(string.IsNullOrEmpty(target))return false;
+        var loc=Catan.Core.ThreeKingdoms.B45SelectionContract.BoardLocationId(target);
+        if(!loc.StartsWith("V",StringComparison.Ordinal))return false;
+        if(target.StartsWith("Knight:",StringComparison.Ordinal))return entries.TryGetValue("expansion/knight:"+loc,out entry);
+        return entries.TryGetValue("basic/settlement:"+loc,out entry)||entries.TryGetValue("basic/city:"+loc,out entry)
+            ||entries.TryGetValue("expansion/wall:"+loc,out entry)||entries.TryGetValue("expansion/metropolis:"+loc,out entry)
+            ||entries.TryGetValue("expansion/knight:"+loc,out entry);
+    }
+    public bool HasPiece(string target)=>FindPiece(target,out _);
+    public void DrawOutline(string target,Camera camera)
+    {
+        if(!FindPiece(target,out var piece)||camera==null)return;
+        if(outline==null){
+            var shader=Resources.Load<Shader>("PieceTargetOutline");
+            if(shader==null)return;
+            outline=new Material(shader){hideFlags=HideFlags.HideAndDontSave};
+        }
+        if(piece.OutlineMeshes==null)piece.OutlineMeshes=piece.Roots.SelectMany(r=>r.GetComponentsInChildren<MeshFilter>()).ToArray();
+        foreach(var filter in piece.OutlineMeshes){
+            var mesh=filter==null?null:filter.sharedMesh;
+            if(mesh==null||!filter.gameObject.activeInHierarchy)continue;
+            var r=filter.GetComponent<MeshRenderer>();
+            if(r==null||!r.enabled||r.forceRenderingOff)continue;
+            var source=r.sharedMaterial;var material=outline;
+            MaterialPropertyBlock properties=null;
+            if(source!=null&&source.shader.name=="Catan/FantasyInk"){
+                if(paintedOutline==null){
+                    var shader=Resources.Load<Shader>("PaintedPieceTargetOutline");
+                    if(shader==null)continue;
+                    paintedOutline=new Material(shader){hideFlags=HideFlags.HideAndDontSave};
+                }
+                if(inkProperties==null)inkProperties=new MaterialPropertyBlock();
+                inkProperties.SetTexture("_BaseMap",source.mainTexture);
+                inkProperties.SetFloat("_Atlas",source.GetFloat("_Atlas"));
+                material=paintedOutline;properties=inkProperties;
+            }
+            for(int sub=0;sub<mesh.subMeshCount;sub++)
+                Graphics.DrawMesh(mesh,filter.transform.localToWorldMatrix,material,filter.gameObject.layer,camera,sub,properties,UnityEngine.Rendering.ShadowCastingMode.Off,false);
+        }
+    }
     public string BuildingUnderRay(Ray ray)
     {
         string closest=null;
@@ -47,6 +93,8 @@ public sealed class TabletopPieceCache
                 foreach(var part in root.GetComponentsInChildren<MeshFilter>())
                 {
                     if(part.sharedMesh==null)continue;
+                    var renderer=part.GetComponent<Renderer>();
+                    if(renderer!=null && (!renderer.enabled || renderer.forceRenderingOff))continue;
                     var toLocal=part.transform.worldToLocalMatrix;
                     var local=new Ray(toLocal.MultiplyPoint3x4(ray.origin),toLocal.MultiplyVector(ray.direction));
                     if(!part.sharedMesh.bounds.IntersectRay(local,out float hit))continue;

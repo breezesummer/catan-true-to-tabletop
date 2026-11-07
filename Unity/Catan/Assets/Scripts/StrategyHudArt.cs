@@ -22,10 +22,10 @@ public static class StrategyHudArt
         if(!GUI.enabled){face=Color.Lerp(ModernOperationUI.Background,face,.4f);trim=ModernOperationUI.Line;}
         using(TabletopButtonFeedback.Begin(rect))
         {
-        if(StrategyHudTheme.Ocean)OceanTabletopSkin.Panel(rect,selected||hover,false);
+        if(StrategyHudTheme.HandPainted||StrategyHudTheme.Ocean)CopperTabletopSkin.Panel(rect,face,selected||hover,false);
         else if(StrategyHudTheme.Jade)JadeTabletopSkin.Panel(rect,face,hover,false);else Plaque(rect,face,trim,hover);
         var icon=counter.HasValue?new Rect(rect.x+8,rect.center.y-16,30,32):new Rect(rect.x+11,rect.center.y-10,19,20);
-        Color ink=GUI.enabled?(selected?new Color(1,.94f,.75f):ModernOperationUI.TextColor):ModernOperationUI.Muted;
+        Color ink=GUI.enabled?(selected&&!StrategyHudTheme.HandPainted?new Color(1,.94f,.75f):ModernOperationUI.TextColor):ModernOperationUI.Muted;
         HandSymbol(icon,kind,ink);
         var label=new GUIStyle(ModernOperationUI.Center){fontSize=kind==2?11:12,fontStyle=FontStyle.Bold,wordWrap=false,padding=new RectOffset(),alignment=TextAnchor.MiddleCenter};
         label.normal.textColor=ink;

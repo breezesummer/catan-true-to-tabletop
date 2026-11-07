@@ -17,6 +17,7 @@
     <Compile Include="../../Unity/Catan/Assets/Scripts/M7RoomEntry.cs" Link="Client/M7RoomEntry.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/M7OnlineEndpoint.cs" Link="Client/M7OnlineEndpoint.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/FrameCost.cs" Link="Client/FrameCost.cs" />
+    <Compile Include="../../Unity/Catan/Assets/Scripts/M7Reactions.cs" Link="Client/M7Reactions.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/M7Client.cs" Link="Client/M7Client.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/M7ResponseDecoder.cs" Link="Client/M7ResponseDecoder.cs" />
     <Compile Include="../../Unity/Catan/Assets/Scripts/M7HistoryBuffer.cs" Link="Client/M7HistoryBuffer.cs" />

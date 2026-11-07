@@ -6,6 +6,45 @@ using UnityEngine;
 
 public sealed partial class TabletopUiVerification
 {
+    IEnumerator VerifyPaintedHud(string[] args)
+    {
+        mode = "combined";
+        app.ReadSave(args[Array.IndexOf(args,"--painted-hud")+1]);
+        app.SetPaused(true);
+        yield return null;
+        yield return null;
+        Require(app.ScenarioId=="through-the-desert" && app.PlayerCount==4 && app.ThreeKingdoms
+            && app.Harbormaster && app.Fishing,"手绘主题验收局面不符");
+        Require(HandPaintedTabletopSkin.Ready && OceanTabletopSkin.Ready,"手绘或海洋主题贴图缺失");
+        for(int frame=0; !Table.Ocean.MaskReady && frame<600; frame++) yield return null;
+        Require(Table.Ocean.MaskReady,"棋盘尚未加载");
+        Table.Frame(BoardCamera,false,1);
+        yield return new WaitForSecondsRealtime(8.2f);
+        string saved = Authority;
+        var water=Table.Ocean.GetComponentsInChildren<Renderer>().First(r=>r.sharedMaterial.HasProperty("_PaintedSea")).sharedMaterial;
+        int maskRevision=Table.Ocean.MaskRevision;
+        foreach (int theme in new[]{3,1,2,0,3})
+        {
+            StrategyHudTheme.Select(theme);
+            yield return new WaitForSeconds(.25f);
+            yield return new WaitForEndOfFrame();
+            Require(StrategyHudTheme.Selected==theme && PlayerPrefs.GetInt("catan.ui.theme.v010")==new[]{0,1,3,4}[theme],"主题偏好编号错误");
+            Require(Authority==saved,"切换主题改变对局");
+            Require(water.GetFloat("_PaintedSea")== (theme==3?1:0),"海面没有随桌面主题切换");
+            Require(Table.Ocean.MaskRevision==maskRevision,"切换海面重新生成海岸遮罩");
+            if(theme==3)Require(water.GetTexture("_SeaWash")!=null && water.shader.isSupported,"手绘海纹未加载");
+            if (theme==3 || theme==1) SaveOceanFrame(StrategyHudTheme.Names[theme]+"-穿越沙漠.png");
+        }
+        BindDockForHeadless();
+        Dock.OpenTrade();
+        Require(Dock.TradeOpen,"交易面板无法展开");
+        yield return null;
+        yield return new WaitForEndOfFrame();
+        SaveOceanFrame("清新手绘-交易.png");
+        app.HandleTableEscape();
+        Require(!Dock.TradeOpen && Authority==saved,"关闭交易后对局发生变化");
+        configurations++;
+    }
     IEnumerator VerifyOceanViews()
     {
         bool kurouOnly=Environment.GetCommandLineArgs().Contains("--kurou-view-only");
@@ -63,7 +102,7 @@ public sealed partial class TabletopUiVerification
                 yield return new WaitForSeconds(2);yield return new WaitForEndOfFrame();SaveOceanFrame(label+"-交易.png");
                 app.HandleTableEscape();Require(!Dock.TradeOpen,"海洋主题无法取消交易");
                 Require(saved==Authority,"海洋主题取消交易改变存档");
-                foreach(int theme in new[]{0,2,3,1})
+                foreach(int theme in new[]{0,2,1})
                 {
                     StrategyHudTheme.Select(theme);yield return null;yield return new WaitForEndOfFrame();
                     Require(ocean.sharedMaterial.GetFloat("_OceanTheme")==1,"主题切换未刷新海面");
@@ -136,7 +175,7 @@ public sealed partial class TabletopUiVerification
             var luxun=state.ThreeKingdoms.Generals.First(g=>g.GeneralId=="tk-g23");
             (own.GeneralId,luxun.GeneralId)=(luxun.GeneralId,own.GeneralId);
             field.SetValue(session,state);game.M6Refresh();app.ShowGeneralLibrary();
-            foreach(int theme in new[]{0,2,3,1})
+            foreach(int theme in new[]{0,2,1})
             {
                 StrategyHudTheme.Select(theme);yield return null;yield return new WaitForEndOfFrame();
                 SaveOceanFrame("陆逊-武将框与武将库-"+StrategyHudTheme.Names[theme]+".png");

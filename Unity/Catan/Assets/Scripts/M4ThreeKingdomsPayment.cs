@@ -11,6 +11,9 @@ using GamePhase = Catan.Core.M4.GamePhase;
 public sealed partial class M4App
 {
     readonly B45PaymentContext directPayment=new B45PaymentContext();
+    internal void FocusGeneralHand(bool development)=>dock.FocusGeneralHand(development);
+    internal bool GeneralBoardCovered(Vector2 point)=>tabletop.BlocksBoardInput(point)||dock.BlocksBoardInput(point);
+    internal bool GeneralModalOpen=>curtain||newGame||artOpen||mapChoice.Active||ResourceChoiceVisible||tabletop.HistoryOpen||dock.HasOverlay;
     Command paymentCommand;
     bool paymentConfirming;
     string paymentPreviewKey;
@@ -52,6 +55,7 @@ public sealed partial class M4App
         directPayment.Begin(view.ThreeKingdoms,seat,DockGoods(view.OwnResources,view.OwnCommodities),count,bank||trade?null:cost,title??CommandName(command.Kind));
         if(bank)directPayment.ConfigureBankTrade();
         if(!bank&&!trade)dock.Reset();
+        if(ai.LongdanSelected)dock.FocusGeneralHand(false);
         paymentPreviewKey=null;status="点选实际支付牌，为每张牌选择用途，最后确认。";
         return directPayment.Active;
     }
@@ -146,7 +150,10 @@ public sealed partial class M4App
         return c;
     }
     OperationHandSelection PaymentHandSelection=>!directPayment.Active?null:new OperationHandSelection{
-        Active=true,CanSelectGood=(t,n)=>DirectPaymentCanInteract&&directPayment.CanSelect(t,n),IsGoodSelected=directPayment.IsSelected,SelectGood=(t,n)=>{if(DirectPaymentCanInteract)directPayment.ToggleCard(t,n);},
+        Active=true,CanSelectGood=(t,n)=>DirectPaymentCanInteract&&directPayment.CanSelect(t,n),IsGoodSelected=directPayment.IsSelected,SelectGood=(t,n)=>{
+            if(!DirectPaymentCanInteract)return;
+            if(ai.LongdanSelected)directPayment.ToggleLongdanCard(t,n);else directPayment.ToggleCard(t,n);
+        },
         CanSelectCard=id=>false,IsCardSelected=id=>false,SelectedGoods=()=>directPayment.Cards.Length,SelectedCards=()=>0,Reason="本次普通支付"};
     void SyncDirectPayment()
     {

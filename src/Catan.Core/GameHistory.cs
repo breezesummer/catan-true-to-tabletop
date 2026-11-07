@@ -16,6 +16,7 @@ namespace Catan.Core
         public string Kind { get; internal set; }
         public string Action { get; internal set; }
         public string TargetId { get; internal set; }
+        public IEnumerable<string> OwnMultiHarvestTiles() => Changes.Where(c => c.Category == "tile-harvest").Select(c => c.LocationId);
         public int Dice1 { get; internal set; }
         public int Dice2 { get; internal set; }
         // 城市与骑士的事件骰使用 Barbarian / Trade / Politics / Science；基础版为空。
@@ -57,6 +58,7 @@ namespace Catan.Core
             internal GameHistoryEntry Entry;
             internal Group[] Groups;
             internal B4SkillHistoryEvent Skill;
+            internal TileHarvest Harvest;
         }
         private readonly List<Record> records = new List<Record>();
         private readonly Dictionary<string,Record> skillsById = new Dictionary<string,Record>(StringComparer.Ordinal);
@@ -83,6 +85,10 @@ namespace Catan.Core
                         CardTrack = g.Details[0].CardTrack
                     });
                 }).ToArray();
+                var tiles = r.Harvest?.For(viewer);
+                if (tiles != null) entry.Changes = entry.Changes.Concat(tiles.Select(id => new GameHistoryChange {
+                    Category = "tile-harvest", PlayerId = viewer, LocationId = id, IsPrivate = true
+                })).ToArray();
                 return entry;
             }).ToArray();
         }
@@ -139,7 +145,7 @@ namespace Catan.Core
                 Dice1 = action.Kind == "RollDice" ? after.Dice1 : 0, Dice2 = action.Kind == "RollDice" ? after.Dice2 : 0,
                 EventDie = action.Kind == "RollDice" ? after.EventDie : null
             };
-            if ((action.Kind != "UseGeneralSkill" || groups.Count > 0) && (action.Kind!="ProposeTrade"||after.OfferGive.Any(n=>n>0))) records.Add(new Record { Entry = entry, Groups = groups.ToArray() });
+            if ((action.Kind != "UseGeneralSkill" || groups.Count > 0 || action.Harvest != null) && (action.Kind!="ProposeTrade"||after.OfferGive.Any(n=>n>0))) records.Add(new Record { Entry = entry, Groups = groups.ToArray(), Harvest = action.Harvest });
             foreach (var skill in after.Skills ?? Array.Empty<B4SkillHistoryEvent>())
             {
                 if (skillsById.TryGetValue(skill.EventId,out var existing))
@@ -222,6 +228,7 @@ namespace Catan.Core
     }
     internal sealed class HistoryAction
     {
+        internal TileHarvest Harvest;
         internal string PlayerId, OtherPlayerId, Kind, PublicTarget, Card, PendingKind, FishAction;
         internal GameHistoryChange[] PublicGeneralChanges = Array.Empty<GameHistoryChange>();
     }

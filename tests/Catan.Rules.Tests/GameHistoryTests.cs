@@ -126,10 +126,41 @@ public sealed class GameHistoryTests
         });
         M4CoreHarness.Accepted(game, M4CoreHarness.Cmd(M4.CommandKind.RollDice));
         var entry = Assert.Single(game.GetHistory("P2"));
+        Assert.Contains(tile.Id, Assert.Single(game.GetHistory("P1")).OwnMultiHarvestTiles());
+        Assert.Empty(entry.OwnMultiHarvestTiles());
         Assert.Equal(red, entry.Dice1); Assert.Equal(white, entry.Dice2);
         Assert.Equal(game.GetPlayerView("P2").LastEventDie.ToString(), entry.EventDie);
         Assert.Contains(entry.Changes, c => c.PlayerId == "P1" && c.GoodIndex == 0 && c.Amount == 1);
         Assert.Contains(entry.Changes, c => c.PlayerId == "P1" && c.GoodIndex == 7 && c.Amount == 1);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TwoSeparateSingleTileGainsAndOneCardShortageDoNotPulse(bool shortBank)
+    {
+        var tiles = M4CoreHarness.New().GetPlayerView("P1").Board.Tiles;
+        var pair = tiles.Where(t => t.Number.HasValue && t.Resource != "desert").GroupBy(t => t.Number)
+            .First(g => g.Count() >= 2).Take(2).ToArray();
+        var wood = tiles.First(t => t.Resource == "wood");
+        var source = shortBank ? wood : pair[0];
+        var game = M4CoreHarness.Fixture(s =>
+        {
+            s.Phase = M4.GamePhase.ProductionAwaitRoll;
+            s.AlchemyDice1 = Math.Min(6,source.Number!.Value - 1);
+            s.AlchemyDice2 = source.Number.Value - s.AlchemyDice1;
+            if (shortBank)
+            {
+                s.Cities = [M4CoreHarness.Piece(wood.Vertices[0])];
+                M4CoreHarness.Player(s,"P4").Commodities.Paper = 12;
+            }
+            else s.Settlements = pair.Select(t => M4CoreHarness.Piece(t.Vertices.First(v =>
+                !pair.Single(other => other != t).Vertices.Contains(v)))).ToArray();
+        });
+        M4CoreHarness.Accepted(game,M4CoreHarness.Cmd(M4.CommandKind.RollDice));
+        var entry = Assert.Single(game.GetHistory("P1"));
+        Assert.True(entry.Changes.Where(c => c.PlayerId=="P1" && c.Category=="goods").Sum(c => c.Amount) >= (shortBank ? 1 : 2));
+        Assert.Empty(entry.OwnMultiHarvestTiles());
     }
 
     [Fact]
@@ -142,8 +173,8 @@ public sealed class GameHistoryTests
         choose.OtherPlayerId = "P3"; // 被规则忽略的恶意字段不得为第三人授予历史知情权。
         M4ProgressHarness.Accepted(game, choose);
         Assert.Equal("使用「间谍」", game.GetHistory("P3")[0].Action);
-        foreach (var viewer in new[] { "P1", "P2" }) Assert.Equal(2, game.GetHistory(viewer)[1].Changes.Count(c => c.Name == "医学"));
-        Assert.DoesNotContain(game.GetHistory("P3")[1].Changes, c => c.Name == "医学");
+        foreach (var viewer in new[] { "P1", "P2" }) Assert.Equal(2, game.GetHistory(viewer)[1].Changes.Count(c => c.Name == DevelopmentCardText.Names[(int)M4.ProgressCardKind.Medicine]));
+        Assert.DoesNotContain(game.GetHistory("P3")[1].Changes, c => c.Name == DevelopmentCardText.Names[(int)M4.ProgressCardKind.Medicine]);
         Assert.Equal(new[] { 1, -1 }, game.GetHistory("P3")[1].Changes.Select(c => c.Amount));
     }
 

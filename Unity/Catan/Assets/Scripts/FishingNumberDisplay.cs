@@ -1,31 +1,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 // 渔场画面与点数独立；仅在公开海岸布局改变时重新定位。
 public sealed class FishingNumberDisplay : MonoBehaviour
 {
-    readonly List<Material> materials=new List<Material>();
-    Mesh mesh;
-    Transform token;
+    Transform mount;
+    JadeNumberSlip token;
     public bool Moved {get;private set;}
-    public static FishingNumberDisplay Create(Transform root,int number)
+    public static FishingNumberDisplay Create(Transform root,int number,JadeNumberAssets tokens)
     {
         var display=root.gameObject.AddComponent<FishingNumberDisplay>();
-        display.Initialize(number);return display;
-    }
-    void Initialize(int number)
-    {
-        mesh=TabletopNumberTokens.CreateMesh();
-        token=new GameObject("渔港点数 "+number).transform;token.SetParent(transform,false);
-        token.gameObject.AddComponent<MeshFilter>().sharedMesh=mesh;
-        var face=BoardRenderer.Material(Color.white);face.SetFloat("_Metallic",0);face.SetFloat("_Smoothness",.16f);
-        face.SetTexture("_BaseMap",Resources.Load<Texture2D>("TabletopUI/v008/NumberTokens/number-"+number));
-        materials.Add(face);
-        var edge=BoardRenderer.Material(new Color(.23f,.35f,.52f));edge.SetFloat("_Metallic",0);materials.Add(edge);
-        var tokenRenderer=token.gameObject.AddComponent<MeshRenderer>();tokenRenderer.sharedMaterials=new[]{face,edge,edge};
-        tokenRenderer.shadowCastingMode=ShadowCastingMode.Off;
+        display.mount=new GameObject("玉签定位").transform;
+        display.mount.SetParent(root,false);
+        display.token=tokens.CreateSlip(display.mount,"渔港点数 "+number,number);
+        return display;
     }
     static float Cross(Vector2 a,Vector2 b,Vector2 c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
     static Vector2[] Hull(Vector3[] corners)
@@ -54,10 +43,10 @@ public sealed class FishingNumberDisplay : MonoBehaviour
         }
         return true;
     }
-    public void Place(Vector3 fold,Vector3 outward,float side,Vector3[][] footprints)
+    public void Place(Vector3 anchor,Vector3 outward,float side,Vector3[][] footprints)
     {
         float radius=side*.174f;
-        var original=fold+outward*(radius*.62f);
+        var original=anchor;
         var chosen=original;
         var ports=footprints.Select(Hull).ToArray();
         var tangent=Vector3.Cross(outward,Vector3.up).normalized;
@@ -72,13 +61,9 @@ public sealed class FishingNumberDisplay : MonoBehaviour
             chosen=original+outward*gap;
         }
         Moved=(chosen-original).sqrMagnitude>.000001f;
-        chosen.y=FishingTabletopAssets.GroundBottom+.0005f;
-        token.position=chosen;token.rotation=Quaternion.identity;
-        token.localScale=new Vector3(radius/.0105f/transform.lossyScale.x,1,radius/.0105f/transform.lossyScale.z);
-    }
-    void OnDestroy()
-    {
-        foreach(var m in materials)if(m!=null)Destroy(m);
-        if(mesh!=null)Destroy(mesh);
+        chosen.y=FishingTabletopAssets.GroundBottom+.007f;
+        var scale=transform.lossyScale;
+        mount.localScale=new Vector3(1/scale.x,1/scale.y,1/scale.z);
+        token.Place(chosen,Vector2.zero,radius*1.45f);
     }
 }

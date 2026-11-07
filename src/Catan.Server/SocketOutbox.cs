@@ -6,8 +6,9 @@ namespace Catan.Server;
 
 public sealed record OutboundMessage(byte[] Bytes, NetworkResponse Response, CommunicationEvent Diagnostic, bool IsPush, bool IsSync = false)
 {
+    public bool IsReaction => Response.Code == NetworkProtocol.ReactionFeedToken;
     public long QueuedAt { get; } = Stopwatch.GetTimestamp();
-    public long BufferedBytes { get; } = IsSync ? Encoding.UTF8.GetByteCount(Response.ViewJson ?? "") + (long)Encoding.UTF8.GetByteCount(Response.PresentationHistoryJson ?? "") + 1024 : Bytes.Length;
+    public long BufferedBytes { get; } = IsSync ? Encoding.UTF8.GetByteCount(Response.ViewJson ?? "") + (long)Encoding.UTF8.GetByteCount(Response.PresentationHistoryJson ?? "") + 1024 : Response.Reactions != null ? 512 + 100L * Response.Reactions.Items.Length : Bytes.Length;
 }
 
 /// <summary>回复按顺序保留；未发送的全量推送只保留最新一份，不因旧快照堆积断开客户端。</summary>
@@ -16,9 +17,9 @@ public sealed class SocketOutbox(int responseCapacity = 8, long byteCapacity = 8
     private readonly object gate = new();
     private readonly Queue<OutboundMessage> responses = new();
     private readonly SemaphoreSlim available = new(0);
-    private OutboundMessage? latestPush;
+    private OutboundMessage? latestPush, latestReaction;
     private long bufferedBytes;
-    public int Count { get { lock (gate) return responses.Count + (latestPush == null ? 0 : 1); } }
+    public int Count { get { lock (gate) return responses.Count + (latestPush == null ? 0 : 1) + (latestReaction == null ? 0 : 1); } }
     public bool TryWrite(OutboundMessage message, out bool coalesced)
     {
         lock (gate)
@@ -26,11 +27,12 @@ public sealed class SocketOutbox(int responseCapacity = 8, long byteCapacity = 8
             coalesced = false;
             if (message.IsPush)
             {
-                coalesced = latestPush != null;
-                long nextBytes = bufferedBytes - (latestPush?.BufferedBytes ?? 0) + message.BufferedBytes;
+                ref var slot = ref (message.IsReaction ? ref latestReaction : ref latestPush);
+                coalesced = slot != null;
+                long nextBytes = bufferedBytes - (slot?.BufferedBytes ?? 0) + message.BufferedBytes;
                 if (nextBytes > byteCapacity) return false;
                 bufferedBytes = nextBytes;
-                latestPush = message;
+                slot = message;
                 if (!coalesced) available.Release();
                 return true;
             }
@@ -47,8 +49,8 @@ public sealed class SocketOutbox(int responseCapacity = 8, long byteCapacity = 8
         lock (gate)
         {
             if (responses.Count != 0) { var response = responses.Dequeue(); bufferedBytes -= response.BufferedBytes; return response; }
-            var message = latestPush!;
-            latestPush = null;
+            var message = latestPush ?? latestReaction!;
+            if (latestPush != null) latestPush = null; else latestReaction = null;
             bufferedBytes -= message.BufferedBytes;
             return message;
         }

@@ -39,7 +39,7 @@ namespace Catan.Core.ThreeKingdoms
                 LossLedger = state.LossLedger.Select(l => new B2PlayerLedger { PlayerId = l.PlayerId, TurnId = l.TurnId, LostHandCards = l.LostHandCards }).ToArray(),
                 ProcessedEvents = (string[])state.ProcessedEvents.Clone(),
                 Harvest = state.Harvest.Select(a => new B2HarvestAllocation { PlayerId = a.PlayerId, Cards = Copy(a.Cards), Completed = a.Completed, ActuallyReceived = a.ActuallyReceived,
-                    TenureId = a.TenureId, GeneralId = a.GeneralId, GoldCount = a.GoldCount, AqueductEligible = a.AqueductEligible, ChoiceComplete = a.ChoiceComplete,
+                    TenureId = a.TenureId, GeneralId = a.GeneralId, GoldCount = a.GoldCount, ReservedGold = a.ReservedGold == null ? null : Copy(a.ReservedGold), AqueductEligible = a.AqueductEligible, ChoiceComplete = a.ChoiceComplete,
                     ReplacementKind = a.ReplacementKind, ForgoneCards = Copy(a.ForgoneCards), Targets = (string[])a.Targets.Clone() }).ToArray(),
                 HarvestTurnId = state.HarvestTurnId, HarvestActive = state.HarvestActive, RevealedCards = Copy(state.RevealedCards),
                 DeferredCapacityPlayers = (string[])state.DeferredCapacityPlayers.Clone(), HarvestStage = state.HarvestStage,
@@ -65,6 +65,8 @@ namespace Catan.Core.ThreeKingdoms
                 DecisionId = d.PlayerId == viewerId ? d.DecisionId : null, WindowId = d.PlayerId == viewerId ? d.WindowId : null,
                 Kind = d.PlayerId == viewerId ? d.Kind : null, FrameId = d.PlayerId == viewerId ? d.FrameId : null };
             view.SkillActions = Actions(host, viewerId);
+            if(d?.PlayerId==viewerId&&view.SkillActions.Any(a=>a.Command.Option=="raid"))
+                view.RaidHarvestCards=state.Skills.Harvest.First(a=>a.PlayerId==viewerId).Cards.ToArray();
             B45SelectionMetadata.Annotate(host, view.SkillActions, viewerId);
             view.RevealedSkillCards = Copy(state.Skills.RevealedCards);
             view.SkillStatus = state.Skills.TimedEffects.Select(e => e.PlayerId + "：" +
@@ -598,15 +600,16 @@ namespace Catan.Core.ThreeKingdoms
         private static void Add(int[] to, int[] from) { for (var i = 0; i < 8; i++) to[i] += from[i]; }
         private static void Subtract(int[] to, int[] from) { for (var i = 0; i < 8; i++) to[i] -= from[i]; }
         private static string HistorySource(B2SkillFrame frame) => frame.SkillId==null?frame.SourceEventId:frame.Id;
-        private static void Gain(IThreeKingdomsCardHost host, string player, int[] cards, string sourceSkillId = null, string sourceEventId = null)
+        private static int[] Gain(IThreeKingdomsCardHost host, string player, int[] cards, string sourceSkillId = null, string sourceEventId = null)
         {
             if(B6Enabled(host.State)){cards=Copy(cards);var returned=new int[8];for(int t=0;t<8;t++)if(!CanGainB6(host.State,player,t)){returned[t]=cards[t];cards[t]=0;}if(returned.Sum()>0)host.AddBank(returned);}
-            if (cards.Sum() <= 0) return; var before = host.GetHand(player).Sum(); host.AddHand(player, cards);
+            if (cards.Sum() <= 0) return cards; var before = host.GetHand(player).Sum(); host.AddHand(player, cards);
             if(B4Enabled(host.State))
             {
                 string flowId=Id(host.State,"gain");var changes=new[]{new B2HandChange {PlayerId=player,BeforeCount=before,AfterCount=before+cards.Sum(),GainedCards=Copy(cards),SourceSkillId=sourceSkillId}};
                 RecordCards(host,flowId,changes);B4SkillHistoryEngine.LinkCardFlow(host.State,sourceEventId,flowId,changes);
             }
+            return cards;
         }
         private static int[] TakeRandom(IThreeKingdomsCardHost host, string player, int count)
         { var result = new int[8]; if (IsDrawBlocked(host.State, player)) return result; for (var n = 0; n < count; n++) { var bank = host.GetBank(); for(int t=0;t<8;t++)if(!CanGainB6(host.State,player,t))bank[t]=0; var total = bank.Take(5).Sum(); if (total == 0) break; var index = host.DrawRandom(total); for (var t = 0; t < 5; t++) { if (index < bank[t]) { var one = One(t); host.RemoveBank(one); Add(result, one); break; } index -= bank[t]; } } return result; }

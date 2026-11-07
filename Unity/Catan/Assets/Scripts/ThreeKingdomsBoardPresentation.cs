@@ -11,7 +11,10 @@ public sealed class ThreeKingdomsBoardPresentation
     readonly List<Pose> changed = new List<Pose>();
     public void Restore()
     {
-        foreach(var pose in changed)if(pose.Item!=null){pose.Item.localRotation=pose.Rotation;pose.Item.localScale=pose.Scale;}
+        foreach(var pose in changed)if(pose.Item!=null){
+            pose.Item.localRotation=pose.Rotation;pose.Item.localScale=pose.Scale;
+            pose.Item.GetComponentInChildren<FantasyBoardPiece>()?.SetDamaged(false);
+        }
         changed.Clear();
     }
     public void Apply(Transform pieces,B5BoardAsset[] assets)
@@ -20,8 +23,13 @@ public sealed class ThreeKingdomsBoardPresentation
         foreach(var asset in assets.Where(a=>a.Damaged))
             foreach(Transform item in pieces)
             {
-                if(item.name!=asset.LocationId&&!item.name.EndsWith(" "+asset.LocationId,StringComparison.Ordinal))continue;
+                string label=item.name;
+                int suffix=label.IndexOf(" [",StringComparison.Ordinal);
+                if(suffix>=0)label=label.Substring(0,suffix);
+                if(asset.Kind!="Road" && asset.Kind!="Ship" && asset.Kind!="Settlement")continue;
+                if(label!=(asset.Kind=="Ship"?"Ship ":"")+asset.LocationId)continue;
                 changed.Add(new Pose{Item=item,Rotation=item.localRotation,Scale=item.localScale});
+                item.GetComponentInChildren<FantasyBoardPiece>()?.SetDamaged(true);
                 if(asset.Kind=="Road"||asset.Kind=="Ship")item.localRotation*=Quaternion.Euler(0,90,0);
                 else if(asset.Kind=="Settlement")item.localScale=Vector3.Scale(item.localScale,new Vector3(1,.35f,1));
             }

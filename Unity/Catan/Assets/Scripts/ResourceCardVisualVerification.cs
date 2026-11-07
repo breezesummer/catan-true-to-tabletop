@@ -37,7 +37,7 @@ public sealed class ResourceCardVisualVerification : MonoBehaviour
             if(!development&&EntityCardAssets.ResourceOrCommodityFront(i)!=cards[i])
             {Debug.LogError("CATAN_RESOURCE_CARDS_FAILED: 卡面入口不一致");Application.Quit(1);yield break;}
         }
-        for(int theme=0;theme<(development?7:4);theme++)
+        for(int theme=0;theme<(development?7:StrategyHudTheme.Names.Length);theme++)
         {
             if(development)page=theme;else StrategyHudTheme.Select(theme);
             captureRequested=true;
@@ -50,7 +50,7 @@ public sealed class ResourceCardVisualVerification : MonoBehaviour
             File.WriteAllBytes(Path.Combine(output,(development?"cards-":"theme-")+theme+".png"),shot.EncodeToPNG());Destroy(shot);
         }
         StrategyHudTheme.Select(priorTheme);
-        File.WriteAllText(Path.Combine(output,"result.json"),development?"{\"status\":\"passed\",\"developmentCards\":30,\"commodities\":3,\"screenshots\":7}":"{\"status\":\"passed\",\"resourceCards\":5,\"themes\":4,\"screenshots\":4,\"readableTextures\":0}");
+        File.WriteAllText(Path.Combine(output,"result.json"),development?"{\"status\":\"passed\",\"developmentCards\":30,\"commodities\":3,\"screenshots\":7}":"{\"status\":\"passed\",\"resourceCards\":5,\"themes\":"+StrategyHudTheme.Names.Length+",\"screenshots\":"+StrategyHudTheme.Names.Length+",\"readableTextures\":0}");
         Debug.Log(development?"CATAN_RESOURCE_CARDS_OK: 30种发展牌与3种商品牌、7页实际GUI绘制完成":"CATAN_RESOURCE_CARDS_OK: 五种卡面、四个主题及独立运行截图完成");Application.Quit(0);
     }
     void OnDestroy(){StrategyHudTheme.Select(priorTheme);}

@@ -78,6 +78,16 @@ public sealed class B45PaymentContext
         if(i>=0){cards.RemoveAt(i);SelectedIndex=Math.Min(i,cards.Count-1);}else{cards.Add(new B45PaymentCard{RealType=type,Ordinal=ordinal});SelectedIndex=cards.Count-1;}
         Notice=null;
     }
+    public void ToggleLongdanCard(int type,int ordinal)
+    {
+        bool removing=IsSelected(type,ordinal);
+        ToggleCard(type,ordinal);
+        if(removing||Current==null||Current.RealType!=type||Current.Ordinal!=ordinal)return;
+        var uses=AllowedUses;
+        var selected=EffectiveCounts;
+        var fitting=uses.Where(t=>cost==null||selected[t]<cost[t]).OrderBy(t=>t==type).ToArray();
+        if(fitting.Length>0)ChooseUse(fitting[0]);
+    }
     public void FocusCard(int index){if(!IsSubmitting&&index>=0&&index<cards.Count)SelectedIndex=index;}
     public void ChooseUse(int type){if(!IsSubmitting&&Current!=null&&AllowedUses.Contains(type)){Current.Use=type;Notice=null;}}
     public void SetDeclaring(bool value)

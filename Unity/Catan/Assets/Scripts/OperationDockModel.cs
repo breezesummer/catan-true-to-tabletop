@@ -30,6 +30,7 @@ public sealed class OperationSnapshot
     public OperationOffer Offer;
     public Action<OperationBuild> PrepareBuild;
     public Action<OperationHandCard> PrepareCard;
+    public Func<OperationHandCard,float,float,bool> DropCard;
     public Action Cancel;
     public Action<string> Notify;
     public Func<OperationTrade, string> Trade;
@@ -41,6 +42,7 @@ public sealed class OperationSnapshot
 public sealed class OperationHandSelection
 {
     public bool Active;
+    public bool HighlightTargets;
     public Func<int,int,bool> CanSelectGood,IsGoodSelected;
     public Action<int,int> SelectGood;
     public Func<string,bool> CanSelectCard,IsCardSelected;
@@ -102,7 +104,7 @@ public sealed class OperationHandCard
 {
     public string Id, Name, Detail, UnavailableReason;
     public int ArtIndex = -1;
-    public bool Progress, Playable;
+    public bool Progress, Playable, Immediate;
 }
 public sealed class OperationOffer
 {

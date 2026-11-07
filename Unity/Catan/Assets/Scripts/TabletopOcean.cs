@@ -14,6 +14,9 @@ public sealed class TabletopOcean : MonoBehaviour
     public int MaskRevision { get; private set; }
     OceanThemeEnvironment scenery;
     Material material;
+    Texture2D seaWash;
+    int themeVersion=-1;
+    internal Material WakeMaterial { get; private set; }
     Texture2D mask;
     string layoutKey;
     Tile[] lastTiles;
@@ -29,10 +32,12 @@ public sealed class TabletopOcean : MonoBehaviour
         surface.name = "连续海面：轻浪与反光";
         material = new Material(Resources.Load<Shader>("Ocean/v001/ContinuousOcean"));
         material.name = "连续海面 v001";
+        WakeMaterial=new Material(Resources.Load<Shader>("Ocean/v001/ShipWake"));
         material.SetFloat("_WaterHeight", WaterHeight);
         material.SetTexture("_OceanDetail",Resources.Load<Texture2D>("Ocean/v003/ocean-detail"));
         material.SetTexture("_Gravel",Resources.Load<Texture2D>(CoastalDecals.Root+"gravel"));
         material.SetTexture("_Sand",Resources.Load<Texture2D>(CoastalDecals.Root+"sand"));
+        RefreshTheme();
         material.SetVector("_MaskRect", new Vector4(0,0,.00001f,.00001f));
         foreach (var renderer in surface.GetComponentsInChildren<Renderer>())
         {
@@ -43,6 +48,28 @@ public sealed class TabletopOcean : MonoBehaviour
         TabletopScene.SetTableLayer(surface.transform);
         var islands=new GameObject("近岸礁石");islands.transform.SetParent(transform,false);
         scenery=islands.AddComponent<OceanThemeEnvironment>();scenery.Initialize(material);
+    }
+
+    internal void SetPirateHex(Vector4 hex)
+    {
+        if (material != null && material.GetVector(PaintedMap.PirateHex) != hex)
+            material.SetVector(PaintedMap.PirateHex,hex);
+    }
+
+    void Update()
+    {
+        if(material!=null && themeVersion!=StrategyHudTheme.Version) RefreshTheme();
+    }
+
+    void RefreshTheme()
+    {
+        themeVersion=StrategyHudTheme.Version;
+        if(StrategyHudTheme.HandPainted && seaWash==null)
+        {
+            seaWash=Resources.Load<Texture2D>("TabletopUI/HandPainted/sea-wash");
+            material.SetTexture("_SeaWash",seaWash);
+        }
+        material.SetFloat("_PaintedSea",StrategyHudTheme.HandPainted && seaWash!=null?1:0);
     }
 
     public void Refresh(Tile[] tiles, Dictionary<string, Vector3> vertices)
@@ -106,6 +133,8 @@ public sealed class TabletopOcean : MonoBehaviour
         next.SetPixels32(pixels); next.Apply(false, true);
         material.SetTexture("_CoastMask", next);
         material.SetVector("_MaskRect", new Vector4(minX, minZ, width, depth));
+        WakeMaterial.SetTexture("_CoastMask",next);
+        WakeMaterial.SetVector("_MaskRect",new Vector4(minX,minZ,width,depth));
         if (mask != null) Destroy(mask);
         mask = next; MaskReady = true; MaskRevision++; baking = null;
         Debug.Log("CATAN_OCEAN_READY: mask=512 revision="+MaskRevision+" mobile="+Application.isMobilePlatform);
@@ -120,5 +149,5 @@ public sealed class TabletopOcean : MonoBehaviour
         foreach (var renderer in hiddenSea) if (renderer != null) renderer.enabled = true;
         hiddenSea.Clear();
     }
-    void OnDestroy() { if (material != null) Destroy(material); if (mask != null) Destroy(mask); }
+    void OnDestroy() { if (material != null) Destroy(material); if (WakeMaterial!=null) Destroy(WakeMaterial); if (mask != null) Destroy(mask); }
 }

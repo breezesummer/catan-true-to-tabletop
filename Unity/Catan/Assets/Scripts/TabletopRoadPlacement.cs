@@ -15,6 +15,23 @@ public static class TabletopRoadPlacement
         return "请在地图上点击合法位置新建道路 "+Mathf.Clamp(placed,0,total)+"/"+total;
     }
 
+    public static void SetupBuilding(Vector2 mouse,bool click,string[] vertices,Func<string,Vector2> screen,
+        Action<string> preview,Action clear,Action<string> place)
+    {
+        string target="";
+        float distance=MobileTabletop.PickRadius(25);
+        if(TabletopUI.ContainsMapScreenPoint(mouse))foreach(var vertex in vertices)
+        {
+            var point=screen(vertex);
+            if(!TabletopUI.ContainsMapScreenPoint(point))continue;
+            float delta=Vector2.Distance(mouse,point);
+            if(delta<distance){target=vertex;distance=delta;}
+        }
+        if(target.Length==0){clear();return;}
+        preview(target);
+        if(click)place(target);
+    }
+
     public static void Update(Vector2 mouse,bool click,Edge[] edges,Tile[] tiles,string[] roads,string[] ships,
         Func<string,Vector2> screen,Action<string,bool> roadPreview,Action<string,bool> shipPreview,Action clear,Action<string,bool> place,TabletopChoiceBubble choice)
     {
@@ -26,10 +43,15 @@ public static class TabletopRoadPlacement
             if(current<distance){target=id;distance=current;}
         }
         if(target.Length==0){clear();return;}
+        bool ambiguous=false;
         bool ship=!roads.Contains(target);
         if(!ship&&ships.Contains(target))
         {
             var edge=edges.First(e=>e.Id==target);
+            var edgeAxis=screen(edge.Vertices[1])-screen(edge.Vertices[0]);
+            var normal=new Vector2(-edgeAxis.y,edgeAxis.x).normalized;
+            float offset=Mathf.Abs(Vector2.Dot(mouse-screen(target),normal));
+            ambiguous=offset<MobileTabletop.PickRadius(25)*.2f;
             var adjacent=tiles.Where(t=>edge.Vertices.All(t.Vertices.Contains)).ToArray();
             var nearest=adjacent.OrderBy(t=>Vector2.SqrMagnitude(mouse-screen(t.Id))).FirstOrDefault();
             ship=nearest!=null&&(nearest.Resource=="sea"||nearest.Resource=="water");
@@ -39,7 +61,7 @@ public static class TabletopRoadPlacement
         if(ship)shipPreview(target,true);else roadPreview(target,true);
         if(click)
         {
-            if(choice!=null&&roads.Contains(target)&&ships.Contains(target))choice.Open(screen(target),"选择道路或船",new[]{"道路","船"},i=>place(target,i==1));
+            if(choice!=null&&ambiguous)choice.Open(screen(target),"选择道路或船",new[]{"道路","船"},i=>place(target,i==1));
             else place(target,ship);
         }
     }

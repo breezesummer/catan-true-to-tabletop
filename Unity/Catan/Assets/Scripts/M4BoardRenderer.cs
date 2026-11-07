@@ -116,7 +116,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
         RefreshReferenceMarkers(view);
         if(numberTokens!=null)numberTokens.Refresh(view.Board.Tiles);
         RefreshProjectedPieces(view.Board.Settlements,view.Board.Roads,view.Board.Cities,view.Board.RobberTileId,
-            view.Board.Walls,view.Board.Knights,view.Board.Metropolises,view.MerchantTileId,view.BarbarianPosition);
+            view.Board.Walls,view.Board.Knights,view.Board.Metropolises,view.MerchantTileId,view.BarbarianPosition,view.ThreeKingdoms?.BoardAssets);
         threeKingdomsPieces.Apply(pieces,view.ThreeKingdoms?.BoardAssets);
     }
     public void RefreshReferenceMarkers(PlayerView view)
@@ -127,15 +127,15 @@ public sealed class M4BoardRenderer : MonoBehaviour
     }
     // The live PlayerView and art verification share this public projection-only entrance.
     public void RefreshProjectedPieces(PiecePlacement[] settlements,PiecePlacement[] roads,PiecePlacement[] cities,string robberTileId,
-        PiecePlacement[] walls,Catan.Core.M4.Knight[] knights,Catan.Core.M4.Metropolis[] metropolises,string merchant,int? barbarianPosition=null)
+        PiecePlacement[] walls,Catan.Core.M4.Knight[] knights,Catan.Core.M4.Metropolis[] metropolises,string merchant,int? barbarianPosition=null,Catan.Core.ThreeKingdoms.B5BoardAsset[] skillAssets=null)
     {
         var expanded=new HashSet<string>(walls.Select(w=>w.LocationId).Concat(metropolises.Select(m=>m.LocationId)));
         Refresh(settlements,roads,cities.Where(c=>!expanded.Contains(c.LocationId)).ToArray(),robberTileId);
-        RenderExpansion(walls,knights,metropolises,merchant);
+        RenderExpansion(walls,knights,metropolises,merchant,skillAssets);
         if(barbarianPosition.HasValue)RefreshBarbarians(barbarianPosition.Value);
     }
     readonly Dictionary<string,Vector3> knightPoints=new Dictionary<string,Vector3>();
-    void RenderExpansion(PiecePlacement[] walls,Catan.Core.M4.Knight[] knights,Catan.Core.M4.Metropolis[] metropolises,string merchant)
+    void RenderExpansion(PiecePlacement[] walls,Catan.Core.M4.Knight[] knights,Catan.Core.M4.Metropolis[] metropolises,string merchant,Catan.Core.ThreeKingdoms.B5BoardAsset[] skillAssets)
     {
         knightPoints.Clear();
         pieceCache.Begin("expansion",pieces);
@@ -161,10 +161,11 @@ public sealed class M4BoardRenderer : MonoBehaviour
         {
             var bottom=Position(k.LocationId)-Vector3.up*.004f+ReferenceMarkers.KnightLandInset(k.LocationId);
             knightPoints[k.LocationId]=bottom+Vector3.up*.008f;
-            using(var change=pieceCache.Update("knight:"+k.LocationId,k.PlayerId+":"+k.Level+":"+k.Active))
+            bool active=k.Active||skillAssets?.Any(a=>a.Kind=="Knight"&&a.LocationId==k.LocationId&&a.Active)==true;
+            using(var change=pieceCache.Update("knight:"+k.LocationId,k.PlayerId+":"+k.Level+":"+active))
             {
                 if(!change.Changed)continue;
-                var asset=PlayerComponentAssets.Knight(k.PlayerId,k.Level,k.Active,"Knight L"+k.Level+" "+k.LocationId,bottom,pieces);
+                var asset=PlayerComponentAssets.Knight(k.PlayerId,k.Level,active,"Knight L"+k.Level+" "+k.LocationId,bottom,pieces);
                 if(asset!=null)continue;
                 var root=MarkerRoot("Knight L"+k.Level+" "+k.LocationId,bottom);
                 Marker(PrimitiveType.Cylinder,root,new Vector3(0,.002f,0),new Vector3(.015f,.002f,.015f),SeatColor(k.PlayerId));
@@ -244,9 +245,12 @@ public sealed class M4BoardRenderer : MonoBehaviour
         barbarianShip=barbarianTrack==null?null:EntityBoardAssets.BarbarianShip(position,barbarianTrack.transform,publicMarkers);
     }
     readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
+    internal void OutlinePiece(string id)=>pieceCache.DrawOutline(id,BoardCamera);
+    internal bool HasOutlinePiece(string id)=>pieceCache.HasPiece(id);
     readonly ThreeKingdomsBoardPresentation threeKingdomsPieces=new ThreeKingdomsBoardPresentation();
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId)
     {
+        GetComponent<PaintedMap>()?.SetDangerHex(PaintedMap.RobberHex, PaintedMap.OccupiedHex(tiles, robberTileId));
         ClearPreview();
         entrances.Refresh(roads);
         pieceCache.Begin("basic",pieces);
@@ -367,6 +371,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
         {
             TopView=top; tableScene.Frame(BoardCamera,top,Zoom/.255f); return;
         }
+        FantasyBoardPiece.SetView(false);
         TopView=top; BoardCamera.orthographic=true; BoardCamera.orthographicSize=Zoom;
         BoardCamera.transform.position=displayCenter+(top?new Vector3(0,.65f,-.001f):new Vector3(0,.48f,-.4f));
         BoardCamera.transform.LookAt(displayCenter+new Vector3(0,.005f,0));

@@ -13,6 +13,8 @@ public sealed partial class M6App
     Action pendingNetworkPresentation;
     long pendingNetworkSequence;
     const double CardRevealDuration=2.15;
+    const double OwnCardDuration=.55;
+    bool CompactReveal(TabletopCardReveal card)=>card.PlayerId==HumanSeat&&!card.ImmediateVictory&&card.Roll==null;
     internal GameHistoryEntry CardPresentationRoll { get; private set; }
     internal bool CardPresentationBusy=>playedCards.Count>0;
     internal TabletopCardReveal PresentedCard=>playedCards.Count>0?playedCards.Peek():null;
@@ -62,7 +64,7 @@ public sealed partial class M6App
         {var networkApply=pendingNetworkPresentation;pendingNetworkPresentation=null;networkApply();}
         if(!CardPresentationBusy)return;
         if(MenuVisible||tableMenu){cardStarted+=Time.unscaledDeltaTime;return;}
-        if(Time.unscaledTimeAsDouble-cardStarted<CardRevealDuration)return;
+        if(Time.unscaledTimeAsDouble-cardStarted<(CompactReveal(playedCards.Peek())?OwnCardDuration:CardRevealDuration))return;
         playedCards.Dequeue();cardStarted=Time.unscaledTimeAsDouble;
         if(CardPresentationBusy)return;
         var apply=afterPlayedCards;afterPlayedCards=null;apply?.Invoke();CardPresentationRoll=null;
@@ -75,6 +77,21 @@ public sealed partial class M6App
         string card=entry.CardName;
         float elapsed=(float)(Time.unscaledTimeAsDouble-cardStarted);
         if(elapsed<0)return;
+        Texture2D texture=null;
+        if(entry.CardName=="卡坦保卫者")texture=EntityCardAssets.Texture(EntityCardAssets.Defender.Front);
+        if(entry.Progress&&entry.ProgressIndex>=0)texture=EntityCardAssets.ProgressFront(entry.ProgressIndex);
+        if(!entry.Progress&&texture==null)texture=RedrawnCardAssets.Base(entry.CardName);
+        if(CompactReveal(entry))
+        {
+            float progress=Mathf.Clamp01(elapsed/(float)OwnCardDuration);
+            var faceAtHand=new Rect(Mathf.Lerp(322,260,progress),Mathf.Lerp(702,571,progress),64,94);
+            var previous=GUI.color;
+            GUI.color=new Color(1,1,1,1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(.6f,1,progress)));
+            if(texture!=null)EntityCardAssets.DrawCardFace(faceAtHand,texture);
+            else GUI.Label(faceAtHand,card,label);
+            GUI.color=previous;
+            return;
+        }
         float enter=Mathf.SmoothStep(0,1,elapsed/.48f),leave=Mathf.SmoothStep(0,1,(elapsed-1.63f)/.52f);
         float x=Mathf.Lerp(-260,610,enter)+leave*1100;
         // 头像、姓名、动作提示与卡面共用中轴，按阅读顺序由上至下进退场。
@@ -86,10 +103,6 @@ public sealed partial class M6App
             face=new Rect(Mathf.Lerp(Mathf.Lerp(-260,610,enter),destination.center.x-22,leave),Mathf.Lerp(336,destination.yMax+3,leave),Mathf.Lerp(220,44,leave),Mathf.Lerp(326,65,leave));
         }
         Panel(new Rect(0,0,1440,900),new Color(0,0,0,.30f));
-        Texture2D texture=null;
-        if(entry.CardName=="卡坦保卫者")texture=EntityCardAssets.Texture(EntityCardAssets.Defender.Front);
-        if(entry.Progress&&entry.ProgressIndex>=0)texture=EntityCardAssets.ProgressFront(entry.ProgressIndex);
-        if(!entry.Progress&&texture==null)texture=RedrawnCardAssets.Base(entry.CardName);
         if(texture!=null)EntityCardAssets.DrawCardFace(face,texture);
         else
         {

@@ -103,7 +103,7 @@ public sealed class MedievalMenuVerification : MonoBehaviour
             var tokens=FindObjectsByType<TabletopNumberTokens>(FindObjectsInactive.Include,FindObjectsSortMode.None);
             Require(tokens.Length==1,"真实棋盘缺少数字组件");
             var numbers=tokens[0].GetComponentsInChildren<MeshRenderer>(true);
-            Require(numbers.Length>0&&numbers.All(r=>r.sharedMaterials[0].mainTexture!=null&&r.sharedMaterials[2].mainTexture!=null),"真实棋盘数字正反面贴图缺失");
+            Require(numbers.Length>0&&numbers.All(r=>r.sharedMaterial.mainTexture!=null&&r.GetComponent<JadeNumberSlip>()!=null),"真实棋盘玉签或点数贴图缺失");
             yield return Capture("board-"+modes[i]);
             app.ShowMenu();
             foreach(int page in new[]{0,1,2,3,4,-1})

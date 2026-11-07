@@ -12,15 +12,47 @@ public sealed partial class M5App
     Vector2 specialScroll;
     static bool SpecialCommand(Command c)=>new[]{CommandKind.SetupPort,CommandKind.PlacePort,CommandKind.ClaimWonder,CommandKind.BuildWonder,CommandKind.ConvertWarship,CommandKind.AttackFortress,CommandKind.ChooseInvasionRoute,CommandKind.StealCloth}.Contains(c.Kind);
     bool SpecialPanelVisible=>view!=null&&(specialOpen||view.Phase==GamePhase.SetupPort||view.Phase==GamePhase.PortPlacement);
-    bool SpecialBlocksMouse(Vector2 p)=>new Rect(1040,82,220,34).Contains(p)||SpecialPanelVisible&&new Rect(1032,120,380,410).Contains(p);
+    bool SpecialRelevant=>view!=null&&(view.Wonders.Length>0||view.Board.Fortresses.Length>0||view.Board.Villages.Length>0||view.ScenarioId=="forgotten-tribe"||SpecialPanelVisible);
+    static readonly Rect FramePirateButton=new Rect(15,283,178,32);
+    bool HasDirectTokenMoves=>view.Phase==GamePhase.RobberMove&&view.LegalActions.Any(c=>c.Kind==CommandKind.MoveRobber||c.Kind==CommandKind.MovePirate);
+    bool CanSendPirateToFrame=>view.Phase==GamePhase.RobberMove&&view.LegalActions.Any(c=>c.Kind==CommandKind.MovePirate&&c.TargetId=="frame");
+    bool SpecialBlocksMouse(Vector2 p)=>view!=null&&(CanSendPirateToFrame&&FramePirateButton.Contains(p)||SpecialRelevant&&new Rect(1040,82,220,34).Contains(p)||specialOpen&&new Rect(1032,120,380,410).Contains(p));
+    bool PickPendingMapAction(Vector2 mouse,bool click)
+    {
+        bool port=view.Phase==GamePhase.SetupPort||view.Phase==GamePhase.PortPlacement;
+        if(!port&&!HasDirectTokenMoves)return false;
+        string target=Pick(port?"E":"T",mouse);
+        var move=view.LegalActions.FirstOrDefault(c=>c.TargetId==target&&(port?
+            c.Kind==CommandKind.SetupPort||c.Kind==CommandKind.PlacePort:
+            c.Kind==CommandKind.MovePirate||c.Kind==CommandKind.MoveRobber));
+        if(move==null){board.ClearPreview();return true;}
+        board.PreviewPiece(target,TabletopPointerPreview.ForCommand(move.Kind.ToString()),seat,true);
+        if(!click)return true;
+        if(port&&view.LegalActions.Count(c=>c.Kind==move.Kind&&c.TargetId==target)>1)
+        {
+            var ports=view.LegalActions.Where(c=>c.Kind==move.Kind&&c.TargetId==target).ToArray();
+            var labels=ports.Select(c=>{
+                var item=view.HeldPorts.FirstOrDefault(h=>h.Id==c.SourceId);
+                return item?.Resource==null?"通用港 3:1":Goods[(int)item.Resource.Value]+"港 2:1";
+            }).ToArray();
+            mapChoice.Open(mouse,"放置港口",labels,i=>PlaceMapAction(ports[i]));
+        }
+        else PlaceMapAction(move);
+        return true;
+    }
+    void PlaceMapAction(Command candidate)
+    {
+        var command=New(candidate.Kind,candidate.TargetId);
+        command.SourceId=candidate.SourceId;
+        Submit(command);
+    }
     void DrawSpecialPanel()
     {
         if(view==null||ai==null||ai.TablePresentationBlocked||tabletop.HistoryOpen)return;
-        bool pending=view.Phase==GamePhase.SetupPort||view.Phase==GamePhase.PortPlacement;
-        bool relevant=view.Wonders.Length>0||view.Board.Fortresses.Length>0||view.Board.Villages.Length>0||view.ScenarioId=="forgotten-tribe"||pending;
-        if(!relevant)return;
+        if(ai.IsHumanTurn&&CanSendPirateToFrame&&ModernOperationUI.Button(FramePirateButton,"海盗移至外海"))Submit(New(CommandKind.MovePirate,"frame"));
+        if(!SpecialRelevant)return;
         if(GUI.Button(new Rect(1040,82,220,34),"海洋剧本 · 专属行动",button))specialOpen=!specialOpen;
-        if(!specialOpen&&!pending)return;
+        if(!specialOpen)return;
         GUI.Box(new Rect(1032,120,380,410),GUIContent.none);
         GUILayout.BeginArea(new Rect(1042,130,360,390));specialScroll=GUILayout.BeginScrollView(specialScroll);
         DrawSpecialActions();GUILayout.EndScrollView();GUILayout.EndArea();
@@ -61,7 +93,7 @@ public sealed partial class M5App
         {
             var actions=view.LegalActions.Where(SpecialCommand).ToArray();
             foreach(var group in actions.Select((c,i)=>new{Command=c,Number=i+1}).Where(x=>x.Command.Kind==CommandKind.SetupPort||x.Command.Kind==CommandKind.PlacePort||x.Command.Kind==CommandKind.ConvertWarship||x.Command.Kind==CommandKind.ChooseInvasionRoute).GroupBy(x=>x.Command.TargetId))
-                Mark(group.Key,"选项 "+string.Join("/",group.Select(x=>x.Number)));
+                Mark(group.Key,group.First().Command.Kind==CommandKind.SetupPort||group.First().Command.Kind==CommandKind.PlacePort?"港口":"选项 "+string.Join("/",group.Select(x=>x.Number)));
             foreach(var group in actions.Select((c,i)=>new{Command=c,Number=i+1}).Where(x=>x.Command.Kind==CommandKind.ConvertWarship).GroupBy(x=>x.Command.SourceId))
                 Mark(group.Key,"骑士 "+string.Join("/",group.Select(x=>x.Number)));
         }

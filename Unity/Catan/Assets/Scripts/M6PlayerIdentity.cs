@@ -23,7 +23,7 @@ public sealed partial class M6App
         var style=new GUIStyle(basis){richText=false};
         if(PlayerIdentityModel.IsPlayerId(id))
         {
-            var color=BoardRenderer.SeatColor(id.ToUpperInvariant());
+            var color=StrategyHudTheme.PlayerInk(id.ToUpperInvariant());
             style.normal.textColor=style.hover.textColor=style.active.textColor=style.focused.textColor=color;
         }
         return style;

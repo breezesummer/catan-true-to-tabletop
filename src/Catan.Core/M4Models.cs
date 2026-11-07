@@ -106,6 +106,7 @@ namespace Catan.Core.M4
     /// <summary>Authority only. Never send this type to a UI, AI, public logger or network player.</summary>
     [DataContract] public sealed partial class GameState
     {
+        internal TileHarvest Harvest;
         [DataMember(Order=1)] public int SaveFormatVersion { get; set; }
         [DataMember(Order=2)] public string RulesVersion { get; set; }
         [DataMember(Order=3)] public string ScenarioId { get; set; }
@@ -165,6 +166,9 @@ namespace Catan.Core.M4
     {
         public string Id { get; internal set; }
         public int ResourceCount { get; internal set; }
+        public int? ResourceDiscardThreshold { get; internal set; }
+        // 零表示没有发展牌持有上限；缺省值兼容旧房间。
+        public int? ProgressCardLimit { get; internal set; }
         public int DevelopmentCardCount { get; internal set; }
         public int PlayedKnights { get; internal set; }
         public int VictoryPoints { get; internal set; }

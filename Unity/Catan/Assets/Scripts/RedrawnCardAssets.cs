@@ -34,7 +34,8 @@ public static class RedrawnCardAssets
         string title=index<25?Catan.Core.DevelopmentCardText.Names[index]:baseNames[index-25];
         string description=index<25?Catan.Core.DevelopmentCardText.Descriptions[index]:baseDescriptions[index-25];
         heading.fontSize=Mathf.Max(5,Mathf.RoundToInt(r.width*.105f));
-        GUI.Label(new Rect(r.x+r.width*.25f,r.y+r.height*.045f,r.width*.65f,r.height*.105f),title,heading);
+        float titleWidth=r.width*.65f;
+        GUI.Label(new Rect(r.center.x-titleWidth*.5f,r.y+r.height*.045f,titleWidth,r.height*.105f),title,heading);
         if(r.width<75)return;
         var area=new Rect(r.x+r.width*.09f,r.y+r.height*.67f,r.width*.82f,r.height*.25f);
         var content=contents[index]??(contents[index]=new GUIContent(description));

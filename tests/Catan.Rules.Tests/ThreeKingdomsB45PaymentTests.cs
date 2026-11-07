@@ -10,6 +10,20 @@ public sealed class ThreeKingdomsB45PaymentTests
     static int[] Bag(params (int type,int count)[] values){var result=new int[8];foreach(var (t,n) in values)result[t]=n;return result;}
     static ThreeKingdomsView View(string general="tk-g42")=>new(){PackageVersion=GeneralCatalog.B45PackageVersion,WindowId="w",Players=new[]{new ThreeKingdomsPlayerView{PlayerId="P1",ActiveGeneralId=general}},EffectiveCardTypes=Enumerable.Range(0,8).Select(t=>t==0||t==1?new[]{0,1}:new[]{t}).ToArray()};
     static B45PaymentContext Start(ThreeKingdomsView view,int[] hand,int count,int[]? cost=null){var c=new B45PaymentContext();c.Begin(view,"P1",hand,count,cost,"测试支付");return c;}
+    [Theory][InlineData(0,1)][InlineData(1,0)][InlineData(2,3)][InlineData(3,2)]
+    public void LongdanClickUsesTheAlternateThenPaysTheRemainingPrintedCost(int actual,int alternate)
+    {
+        var view=View();
+        view.EffectiveCardTypes[actual]=new[]{actual,alternate};
+        var context=Start(view,Bag((actual,2)),2,Bag((actual,1),(alternate,1)));
+        context.ToggleLongdanCard(actual,0);
+        Assert.Equal(alternate,context.Current.Use);
+        context.ToggleLongdanCard(actual,1);
+        Assert.Equal(new[]{alternate,actual},context.EffectiveTypes);
+        Assert.True(context.Ready);
+        context.ToggleLongdanCard(actual,0);
+        Assert.False(context.Ready);
+    }
     [Fact] public void RealCopiesAndEveryUseRequireExplicitSelection()
     {var c=Start(View(),Bag((1,3)),2,Bag((0,1),(1,1)));c.ToggleCard(1,2);Assert.Equal(-1,c.Current.Use);Assert.False(c.Ready);c.ChooseUse(0);c.ToggleCard(1,0);c.ChooseUse(1);Assert.True(c.Ready);Assert.True(c.IsSelected(1,2));Assert.False(c.IsSelected(1,1));Assert.False(c.CanSelect(1,1));}
     [Fact] public void PaymentDraftCannotSubstituteAnUnownedOrDisappearedCopy()

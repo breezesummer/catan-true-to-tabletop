@@ -6,6 +6,9 @@ namespace Catan.Network.Contracts
     public static class NetworkProtocol
     {
         public const int Version = 3;
+        public const string ReactionFeedToken = "TableReactionsV1";
+        public const string ComboReactionFeedToken = "TableReactionsV2";
+        public static bool IsReactionSubscription(string value) => value == ComboReactionFeedToken || value == ReactionFeedToken;
         public const string TradeModulesVersion = "harbor-fishing-f5-v001";
         public const string SecondWaveTradeModulesVersion = "harbor-fishing-f4-v001";
         public const string StandardTradeModulesVersion = "harbor-fishing-f3-v001";
@@ -89,6 +92,27 @@ namespace Catan.Network.Contracts
         public bool HasMoreHistory;
         public RoomSummary[] Rooms = Array.Empty<RoomSummary>();
         public RoomSummary Room;
+        [DataMember(EmitDefaultValue=false)] public TableReactionFeed Reactions;
+    }
+    public sealed class ThrowReaction
+    {
+        public int GameNumber;
+        public ReactionTarget[] Throws;
+    }
+    public sealed class ReactionTarget
+    {
+        public string Kind, Target;
+    }
+    public sealed class TableReaction
+    {
+        public string Kind, Source, Target;
+        public long Sequence;
+    }
+    public sealed class TableReactionFeed
+    {
+        public int GameNumber;
+        public long Through;
+        public TableReaction[] Items;
     }
     public sealed class RoomSettings
     {

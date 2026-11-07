@@ -5,7 +5,7 @@ using Catan.Core;
 using UnityEngine;
 
 // 仅接收 PlayerView 已公开的地图、港口与剧本奖励；不读取权威状态或隐藏手牌。
-public sealed class TabletopReferenceMarkers : MonoBehaviour
+public sealed partial class TabletopReferenceMarkers : MonoBehaviour
 {
     public sealed class PortDisplay
     {
@@ -23,7 +23,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         public GameObject Object;
         public string Resource, PlayerId;
         public int Ordinal;
-        public float InlandReach;
+        public HarborSign Sign;
     }
     readonly Dictionary<string, Marker> ports = new Dictionary<string, Marker>();
     readonly Dictionary<string, Marker> gifts = new Dictionary<string, Marker>();
@@ -55,17 +55,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         if(key==portLayoutKey)return;
         portLayoutKey=key;PortLayoutRevision++;
         PublicPortFootprints=ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null)
-        .SelectMany(p=>p.Object.GetComponentsInChildren<MeshFilter>()).Where(m=>m.name!="接岸石滩"&&m.name!="栈桥投影").SelectMany(m=>
-        {
-            var mesh=m.sharedMesh;var vertices=mesh.vertices;var indices=mesh.triangles;
-            var triangles=new List<Vector3[]>();
-            for(int i=0;i<indices.Length;i+=3)
-            {
-                var a=m.transform.TransformPoint(vertices[indices[i]]);var b=m.transform.TransformPoint(vertices[indices[i+1]]);var c=m.transform.TransformPoint(vertices[indices[i+2]]);
-                if(Mathf.Abs((b.x-a.x)*(c.z-a.z)-(b.z-a.z)*(c.x-a.x))>1e-10f)triangles.Add(new[]{a,b,c});
-            }
-            return triangles;
-        }).ToArray();
+        .SelectMany(p=>CoastalDecals.Footprint(p.Object.transform)).ToArray();
     }
     public int PlacedPortCount => ports.Count;
     public int GiftPortCount => gifts.Count;
@@ -107,7 +97,6 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         this.observerSeat = observerSeat;
         RefreshOceanTiles();
         if (table != null && table.isActiveAndEnabled) table.Ocean.Refresh(tiles, vertices);
-        lastPorts=publicPorts;lastGiftPorts=publicGiftPorts;
         RefreshPorts(ports, portRoot, publicPorts, "港口 ");
         RefreshPorts(gifts, giftRoot, publicGiftPorts, "港礼 ");
         RefreshPortFootprints();
@@ -143,17 +132,6 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         Prune(awards, wantedAwards);
         PositionAwards();
     }
-    readonly HashSet<string> FishingVertices = new HashSet<string>();
-    PortDisplay[] lastPorts, lastGiftPorts;
-    public void SetFishingVertices(IEnumerable<string> vertices)
-    {
-        var next = new HashSet<string>(vertices);
-        if(FishingVertices.SetEquals(next))return;
-        FishingVertices.Clear();FishingVertices.UnionWith(next);
-        RefreshPorts(ports,portRoot,lastPorts,"港口 ");
-        RefreshPorts(gifts,giftRoot,lastGiftPorts,"港礼 ");
-        RefreshPortFootprints();
-    }
     void RefreshPorts(Dictionary<string, Marker> existing, Transform parent, PortDisplay[] publicPorts, string name)
     {
         var wanted = new HashSet<string>(StringComparer.Ordinal);
@@ -166,14 +144,11 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
             var item = Put(existing, port.Id, EntityBoardAssets.PortResource(port.Resource), name + port.Id, parent);
             if (item == null) continue;
             Vector3 midpoint = (a + b) / 2, normal = CoastNormal(endpoints, midpoint, b - a);
-            // 沙岸压入公共海岸边缘，覆盖港口轮廓自身的微倒角。
-            var bottom = midpoint + normal * (item.InlandReach-CoastalDecals.DockInset);
-            // 渔港底面高出地形 0.5 mm、板厚 1.5 mm；港口再留 0.1 mm 间隙，固定显示在上层。
-            bottom.y = endpoints.Any(FishingVertices.Contains) ? FishingTabletopAssets.GroundBottom+.0015f+.0001f : EntityBoardAssets.BoardSurfaceHeight;
-            item.Object.transform.position = bottom;
-            // 导入纸板的沙岸在 local +Z，向海的凸柄在 local -Z。
-            item.Object.transform.rotation = Quaternion.LookRotation(-normal, Vector3.up);
-            CoastalDecals.AlignSign(item.Object.transform);
+            // 桥头略搭上岸边，海侧平台和水下桩随公开海岸边一起转动。
+            var bottom = midpoint + normal * (CoastalDecals.ShoreEnd - CoastalDecals.DockInset);
+            bottom.y = EntityBoardAssets.BoardSurfaceHeight;
+            item.Object.transform.SetPositionAndRotation(bottom, Quaternion.LookRotation(-normal, Vector3.up));
+            item.Sign?.Place();
             wanted.Add(port.Id);
         }
         Prune(existing, wanted);
@@ -247,6 +222,46 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         inward.y=0;return inward.normalized*.0045f;
     }
 
+    // 仅使用公开的港口与地形。泊位始终在所属六角内，同一局面重连后保持一致。
+    public (Vector3 shift, Quaternion facing) PiratePose(Vector3 center)
+    {
+        Vector3 openWater=Vector3.zero;
+        foreach(var tile in tiles)
+        {
+            if(tile.Resource=="sea" || tile.Resource=="fog" || tile.Resource=="hidden")continue;
+            var delta=center-TileCenter(tile);delta.y=0;
+            if(delta.sqrMagnitude<.006f)openWater+=delta;
+        }
+        int direction=openWater.sqrMagnitude>.000001f?FantasyPieceFrames.Heading(openWater):3;
+        var facing=Quaternion.Euler(0,60*direction,0);
+        var standard=Vector3.right*.012f;
+        float Clearance(Vector3 candidate)
+        {
+            float nearest=.04f*.04f;
+            foreach(var group in new[]{ports,gifts})
+            foreach(var marker in group.Values)
+            {
+                if(marker.Sign==null)continue;
+                // 将签面中心投影回默认 66° 视角下的水面。
+                var anchor=marker.Object.transform.TransformPoint(HarborSign.LocalAnchor);
+                var sign=new Vector2(anchor.x+HarborSign.BoardOffset.x,
+                    anchor.z+HarborSign.BoardOffset.y+(anchor.y-TabletopOcean.WaterHeight)/Mathf.Tan(TabletopCameraModel.DefaultAngle*Mathf.Deg2Rad));
+                nearest=Mathf.Min(nearest,(sign-new Vector2(center.x+candidate.x,center.z+candidate.z)).sqrMagnitude);
+            }
+            return nearest;
+        }
+        var shift=standard;
+        float best=Clearance(shift);
+        if(best<.026f*.026f)
+            for(int i=0;i<6;i++)
+            {
+                var offset=Quaternion.Euler(0,60*i,0)*Vector3.forward*.019f;
+                float distance=Clearance(offset);
+                if(distance>best){best=distance;shift=offset;}
+            }
+        return (shift-standard,facing);
+    }
+
     Vector3 CoastNormal(string[] endpoints, Vector3 midpoint, Vector3 edgeDirection)
     {
         Vector3 normal = Vector3.Cross(Vector3.up, edgeDirection).normalized;
@@ -278,18 +293,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         }
         var instance = EntityBoardAssets.ReferenceMarker(resource, name, Vector3.zero, Quaternion.identity, parent);
         if (instance == null) return null;
-        float inlandReach=0;
-        foreach(var filter in instance.GetComponentsInChildren<MeshFilter>())
-        {
-            if(filter.sharedMesh==null)continue;
-            var bounds=filter.sharedMesh.bounds;
-            for(int i=0;i<8;i++)
-            {
-                var local=bounds.center+Vector3.Scale(bounds.extents,new Vector3((i&1)==0?-1:1,(i&2)==0?-1:1,(i&4)==0?-1:1));
-                inlandReach=Mathf.Max(inlandReach,instance.transform.InverseTransformPoint(filter.transform.TransformPoint(local)).z);
-            }
-        }
-        var item = new Marker { Object = instance, Resource = resource, InlandReach=resource.Contains("/port-")?CoastalDecals.DockLength*.5f:inlandReach };
+        var item = new Marker { Object = instance, Resource = resource, Sign=instance.GetComponentInChildren<HarborSign>() };
         collection.Add(key, item);
         return item;
     }
@@ -307,7 +311,10 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
         item.Object.SetActive(false);
         Destroy(item.Object);
     }
-    void LateUpdate() => PositionAwards();
+    void LateUpdate()
+    {
+        PositionAwards();
+    }
     void PositionAwards()
     {
         foreach (var item in awards.Values)
@@ -337,6 +344,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
     public string PickPort(Vector2 screenMouse,Camera camera)
     {
         if(camera==null)return null;
+        AlignPortSigns(camera);
         var logical=new Vector2(screenMouse.x*1440/Screen.width,screenMouse.y*900/Screen.height);
         var ray=camera.ScreenPointToRay(new Vector3(screenMouse.x,Screen.height-screenMouse.y,0));
         string nearest=null;float distance=float.PositiveInfinity;
@@ -348,21 +356,26 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
             // 投影包围盒只用于粗筛。斜向海岸的包围盒会包含岸边道路/船，必须命中真实纸板轮廓。
             foreach(var filter in pair.Value.Object.GetComponentsInChildren<MeshFilter>())
             {
+                if(filter.transform==pair.Value.Sign?.transform && !pair.Value.Sign.Face.enabled)continue;
                 if(TryHitMesh(ray,filter,out float candidate)&&candidate<distance)
                 {distance=candidate;nearest=pair.Key;}
             }
         }
         return nearest;
     }
+    static readonly Dictionary<Mesh, (Vector3[] vertices, int[] triangles)> pickMeshes = new Dictionary<Mesh, (Vector3[], int[])>();
     static bool TryHitMesh(Ray worldRay,MeshFilter filter,out float distance)
     {
         distance=float.PositiveInfinity;
-        var mesh=filter.sharedMesh;
-        if(filter.name=="接岸石滩"||filter.name=="栈桥投影")return false;
-        if(mesh==null||!mesh.isReadable)return false;
+        if(filter.name=="栈桥水影"||filter.sharedMesh==null)return false;
+        var mesh=CoastalDecals.HitMesh(filter.sharedMesh);
+        if(!mesh.isReadable)return false;
         var origin=filter.transform.InverseTransformPoint(worldRay.origin);
         var direction=filter.transform.InverseTransformVector(worldRay.direction);
-        var positions=mesh.vertices;var triangles=mesh.triangles;
+        if (!mesh.bounds.IntersectRay(new Ray(origin,direction))) return false;
+        if (!pickMeshes.TryGetValue(mesh,out var data))
+            pickMeshes[mesh]=data=(mesh.vertices,mesh.triangles);
+        var positions=data.vertices;var triangles=data.triangles;
         for(int i=0;i+2<triangles.Length;i+=3)
         {
             var a=positions[triangles[i]];var edge1=positions[triangles[i+1]]-a;var edge2=positions[triangles[i+2]]-a;
@@ -392,7 +405,7 @@ public sealed class TabletopReferenceMarkers : MonoBehaviour
     {
         var instance = PortObject(id);
         if (instance == null || camera == null) return Rect.zero;
-        var renderers = instance.GetComponentsInChildren<Renderer>();
+        var renderers = instance.GetComponentsInChildren<MeshRenderer>();
         if (renderers.Length == 0) return Rect.zero;
         Bounds bounds = renderers[0].bounds;
         foreach (var renderer in renderers.Skip(1)) bounds.Encapsulate(renderer.bounds);

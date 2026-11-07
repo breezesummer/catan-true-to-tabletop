@@ -12,7 +12,7 @@ public enum TabletopAudioCue
     KnightRecruit, KnightPromote, KnightActivate, KnightMove, KnightCombat,
     BarbarianAdvance, BarbarianInvasion, BuildingCollapse, FacilityUpgrade, WonderBuild,
     TurnEnd, YourTurn, Victory, Decision, Error, Save, Network,
-    TradeUpgrade, PoliticsUpgrade, ScienceUpgrade, BarbarianSail
+    TradeUpgrade, PoliticsUpgrade, ScienceUpgrade, BarbarianSail, BankOpen, PlayerTradeOpen
 }
 
 public readonly struct TabletopAudioEvent
@@ -116,7 +116,11 @@ public sealed class TabletopAudioModel
             case "DiscardResources": case "DiscardProgressCard": cue = TabletopAudioCue.CardPick; break;
             default: cue = entry.Kind != null && entry.Kind.StartsWith("Play", StringComparison.Ordinal) ? TabletopAudioCue.CardPlay : TabletopAudioCue.Decision; break;
         }
+        bool placedRoad = changes.Any(c => c != null && !c.IsPrivate && c.Category == "piece" && c.Amount > 0 && c.Name == "道路");
+        if (placedRoad && cue == TabletopAudioCue.Decision) cue = TabletopAudioCue.RoadBuild;
         result.Add(new TabletopAudioEvent(cue));
+        if (placedRoad && cue != TabletopAudioCue.RoadBuild)
+            result.Add(new TabletopAudioEvent(TabletopAudioCue.RoadBuild, .10));
         if (entry.Kind == "PlayKnight") result.Add(new TabletopAudioEvent(TabletopAudioCue.KnightCombat, .22));
         bool promoted = changes.Any(c => c != null && c.Category == "piece" && c.Amount > 0 && KnightLevel(c.Name) > 0 &&
             changes.Any(d => d != null && d.Category == "piece" && d.Amount < 0 && d.PlayerId == c.PlayerId && d.LocationId == c.LocationId &&

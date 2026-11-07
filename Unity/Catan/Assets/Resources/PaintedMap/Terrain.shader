@@ -6,6 +6,9 @@ Shader "Catan/PaintedMap"
         _Gravel("潮间带砂砾", 2D) = "white" {}
         _Sand("沙滩",2D)="white" {}
         _Tile("中心与地形", Vector) = (0,0,0,0)
+        _RobberHex("强盗陆地", Vector) = (0,0,0,0)
+        _PirateHex("海盗海格", Vector) = (0,0,0,0)
+        _Glow("本人地块与收取时间", Vector) = (0,-100,0,0)
         _NearA("邻格一至四", Vector) = (-1,-1,-1,-1)
         _NearB("邻格五至六", Vector) = (-1,-1,0,0)
     }
@@ -24,8 +27,9 @@ Shader "Catan/PaintedMap"
             TEXTURE2D(_Sand); SAMPLER(sampler_Sand);
             #include "Coast/CoastCommon.hlsl"
             CBUFFER_START(UnityPerMaterial)
-            float4 _Tile, _NearA, _NearB;
+            float4 _Tile, _NearA, _NearB, _Glow, _RobberHex, _PirateHex;
             CBUFFER_END
+            #include "DangerHex.hlsl"
             struct Input { float4 pos : POSITION; float3 normal : NORMAL; };
             struct Output { float4 pos : SV_POSITION; float3 world : TEXCOORD0; float up : TEXCOORD1; };
             Output Vert(Input v)
@@ -87,6 +91,25 @@ Shader "Catan/PaintedMap"
                     sand=lerp(rock,sand,beach);
                     sand*=lerp(1,.64,smoothstep(.72,.96,shore));
                     color=lerp(color,sand,smoothstep(.05,.83,shore+.10*fleck));
+                }
+                float4 hazard = _Tile.z == 8 ? _PirateHex : _RobberHex;
+                if (_CatanMapMarksHidden < .5 && i.up > .5 && hazard.z > .5 && all(abs(_Tile.xy - hazard.xy) < .001))
+                    color = DangerHex(color,delta);
+                else if (_Glow.x > .5 && _CatanMapMarksHidden < .5 && i.up > .5)
+                {
+                    float2 d = abs(delta);
+                    float edge = .034641016 - max(d.x, dot(d, float2(.5,.8660254)));
+                    float aa = max(.00018, fwidth(edge) * .6);
+                    float edgeStroke = 1 - smoothstep(.00018, .00052 + aa, abs(edge - .0030));
+                    float halo = exp2(-abs(edge - .0030) * 950);
+                    float age = _Time.y - _Glow.y;
+                    float flash = smoothstep(0,.16,age) * (1 - smoothstep(.73,1.65,age));
+                    float inner = 1 - smoothstep(.00018,.00048 + aa, abs(edge - lerp(.0038,.0063,saturate(age * 3.5))));
+                    half3 jade = half3(.16,.88,.58);
+                    half3 gold = half3(1,.52,.055);
+                    color = lerp(color, lerp(jade,gold,flash), saturate(.16*halo + edgeStroke*lerp(.71,.98,flash)));
+                    color += halo * lerp(jade*.085,gold*.22,flash);
+                    color = lerp(color,half3(1,.80,.23),inner*flash*.94);
                 }
                 return half4(color*lerp(.70,1,saturate(i.up)),1);
             }

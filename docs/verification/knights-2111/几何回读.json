@@ -1,0 +1,44 @@
+[
+  {
+    "model": "knight-1-active",
+    "triangles": 7900,
+    "invalidArea": 0,
+    "invalidUV": 0,
+    "materials": 3
+  },
+  {
+    "model": "knight-1-rest",
+    "triangles": 7911,
+    "invalidArea": 0,
+    "invalidUV": 0,
+    "materials": 3
+  },
+  {
+    "model": "knight-2-active",
+    "triangles": 7414,
+    "invalidArea": 0,
+    "invalidUV": 0,
+    "materials": 3
+  },
+  {
+    "model": "knight-2-rest",
+    "triangles": 7414,
+    "invalidArea": 0,
+    "invalidUV": 0,
+    "materials": 3
+  },
+  {
+    "model": "knight-3-active",
+    "triangles": 15132,
+    "invalidArea": 0,
+    "invalidUV": 0,
+    "materials": 3
+  },
+  {
+    "model": "knight-3-rest",
+    "triangles": 15164,
+    "invalidArea": 0,
+    "invalidUV": 0,
+    "materials": 3
+  }
+]

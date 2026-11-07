@@ -46,15 +46,16 @@ public sealed partial class TabletopUiVerification
                 string kind=Vector3.Dot(b-(a+c)*.5f,outer[1]-b)>0?"凸岸":"凹岸";
                 var port=ports.FirstOrDefault(t=>
                 {
-                    var entry=t.position+t.forward*(CoastalDecals.DockLength*.5f-CoastalDecals.DockInset);
+                    var entry=t.position+t.forward*(CoastalDecals.ShoreEnd-CoastalDecals.DockInset);
                     return new[]{(a+b)*.5f,(b+c)*.5f}.Any(mid=>(new Vector2(mid.x-entry.x,mid.z-entry.z)).magnitude<.0035f);
                 });
                 string label=kind+(port==null?"":"重合");
                 for(int j=0;j<2;j++)Require(ground.Find("散网"+j)!=null,"缺少沿岸散网");
                 if(port!=null)
                 {
-                    var sign=port.GetChild(1);
-                    var pixel=BoardCamera.WorldToScreenPoint(sign.position);
+                    markers.AlignPortSigns(BoardCamera);
+                    var sign=port.GetComponentInChildren<HarborSign>();
+                    var pixel=BoardCamera.WorldToScreenPoint(sign.Face.bounds.center);
                     Require(markers.PickPort(new Vector2(pixel.x,Screen.height-pixel.y),BoardCamera)!=null,"比例牌不能命中贸易港");
                 }
                 if(observed.Add(label))
@@ -115,7 +116,7 @@ public sealed partial class TabletopUiVerification
             target.Release();Destroy(target);Destroy(image);Destroy(root);
         }
     }
-    void DetailFrame(Vector3 center,string label,bool full=false)
+    void DetailFrame(Vector3 center,string label,bool full=false,float detailSize=.052f,Vector3? eyeOffset=null)
     {
         var camera=BoardCamera;
         var pos=camera.transform.position;var rot=camera.transform.rotation;
@@ -124,14 +125,17 @@ public sealed partial class TabletopUiVerification
         var target=new RenderTexture(width,height,24);
         var previous=RenderTexture.active;
         var frame=new Texture2D(width,height,TextureFormat.RGB24,false);
+        var markers=Table.transform.parent.GetComponentInChildren<TabletopReferenceMarkers>();
         try
         {
             if(!full)
             {
-                camera.rect=new Rect(0,0,1,1);camera.orthographicSize=.052f;camera.nearClipPlane=.0001f;
+                camera.rect=new Rect(0,0,1,1);camera.orthographicSize=detailSize;camera.nearClipPlane=.0001f;
                 camera.aspect=(float)width/height;
-                camera.transform.SetPositionAndRotation(center+new Vector3(0,.16f,-.035f),Quaternion.LookRotation(new Vector3(0,-.16f,.035f)));
+                var offset=eyeOffset??new Vector3(0,.16f,-.035f);
+                camera.transform.SetPositionAndRotation(center+offset,Quaternion.LookRotation(-offset));
             }
+            markers.AlignPortSigns(camera);
             RenderPipeline.SubmitRenderRequest(camera,new UniversalRenderPipeline.SingleCameraRequest{destination=target});
             RenderTexture.active=target;
             frame.ReadPixels(new Rect(0,0,width,height),0,0);frame.Apply();
@@ -143,6 +147,7 @@ public sealed partial class TabletopUiVerification
         {
             RenderTexture.active=previous;target.Release();Destroy(target);Destroy(frame);
             camera.rect=rect;camera.aspect=aspect;camera.orthographicSize=size;camera.nearClipPlane=near;camera.transform.SetPositionAndRotation(pos,rot);
+            markers.AlignPortSigns(camera);
         }
     }
 }

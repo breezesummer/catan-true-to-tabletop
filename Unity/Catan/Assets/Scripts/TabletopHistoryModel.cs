@@ -129,7 +129,7 @@ public static class TabletopHistoryModel
             string suffix=build&&group.Key.PlayerId==entry.PlayerId&&group.Key.Sign<0?(medicineUpgrade?"升级了城市":action.Replace("建造","建造了").Replace("招募骑士","建造了骑士").Replace("升级","升级了").Replace("晋升","晋升了").Replace("激活","激活了").Replace("购买","购买了")):"";
             result.Add(new TabletopHistoryLine{Player=group.Key.PlayerId,Prefix=group.Key.Sign>0?"收获":"使用",Suffix=suffix,Cards=group.ToArray()});
         }
-        foreach(var c in changes.Where(c=>!consumed.Contains(c)&&c.GoodIndex<0&&c.Category!="resource-count"))
+        foreach(var c in changes.Where(c=>!consumed.Contains(c)&&c.GoodIndex<0&&c.Category!="resource-count"&&c.Category!="tile-harvest"))
         {
             if(c.Category=="piece"&&(build||action.Contains(c.Name)))continue;
             if(c.Amount<0&&(c.Category=="progress"||c.Category=="development")&&action.Contains(c.Name))continue;

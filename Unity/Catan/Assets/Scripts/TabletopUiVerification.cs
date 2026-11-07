@@ -74,7 +74,8 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
         }
         int priorTheme=StrategyHudTheme.Selected;
         if(oceanTheme)StrategyHudTheme.Select(1);
-        var run = oceanViews && args.Contains("--expansion-pieces") ? VerifyExpansionPieces() : oceanViews && args.Contains("--natural-pieces") ? VerifyNaturalPieces() : oceanViews && args.Contains("--coastal-frames") ? VerifyCoastalViews() : oceanViews ? VerifyOceanViews() : Verify();
+        var run = oceanTheme && args.Contains("--painted-hud") ? VerifyPaintedHud(args) : oceanViews && args.Contains("--audit-all") ? VerifyWholeTable(args) : oceanViews && args.Contains("--direct-input") ? VerifyDirectInput(args) : oceanViews && args.Contains("--tile-glow") ? VerifyTileGlow(args) : oceanViews && args.Contains("--reaction-views") ? VerifyReactionViews(args) : oceanViews && args.Contains("--pier-views") ? VerifyPierViews(args) : oceanViews && args.Contains("--expansion-pieces") ? VerifyExpansionPieces() : oceanViews && args.Contains("--natural-pieces") ? VerifyNaturalPieces() : oceanViews && args.Contains("--coastal-frames") ? VerifyCoastalViews() : oceanViews ? VerifyOceanViews() : Verify();
+        if(oceanViews&&args.Contains("--zhang-liao"))run=VerifyZhangLiao(args);
         while (true)
         {
             object next;
@@ -92,10 +93,10 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
         }
         if(oceanTheme)StrategyHudTheme.Select(priorTheme);
         File.WriteAllText(Path.Combine(output, "result.json"), JsonUtility.ToJson(new Result {
-            status = "passed", configurations = configurations, checks = checks, cameraImages = cameraImages,
+            status = args.Contains("--audit-all") ? "completed" : "passed", configurations = configurations, checks = checks, cameraImages = cameraImages,
             guiAttempts = guiAttempts, guiImagesWithChanges = guiImagesWithChanges,
             unity = Application.unityVersion, graphics = captureCamera, fullUiPixelsVerified = false,
-            note = "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。"
+            note = args.Contains("--painted-hud") ? "Windows 实机四人穿越沙漠，全窗口记录手绘、海洋和交易界面；核对四主题切换、本地偏好和对局一致性。" : args.Contains("--audit-all") ? "各项目的操作与结算见逐项结果.tsv。" : args.Contains("--direct-input") ? "四人穿越沙漠实际窗口，鼠标输入经过客户端正常入口，核对已确认城墙和赠牌。" : args.Contains("--tile-glow") ? "真实 Windows 玩家窗口。按存档中的已确认指令重放到正常收取，截取亮起和退回常态。" : args.Contains("--jade-numbers") ? "Windows 客户端从第 42 回合验收存档读取公开点数；四张图像取自完整游戏窗口。" : "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。"
         }, true));
         Debug.Log("CATAN_TABLETOP_UI_OK: configurations=" + configurations + " checks=" + checks + " cameraImages=" + cameraImages);
         if(oceanTheme&&args.Contains("--keep-ocean-preview")){StrategyHudTheme.Select(1);yield break;}

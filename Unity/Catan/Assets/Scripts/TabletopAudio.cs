@@ -55,6 +55,20 @@ public sealed partial class TabletopAudio : MonoBehaviour
     bool wasConnected;
     string previousNotice, previousScope;
     int uiFrame = -1;
+    TabletopAudioCue? pendingClick;
+    public static string EffectPath(TabletopAudioCue cue)
+    {
+        switch (cue)
+        {
+            case TabletopAudioCue.BankOpen:
+            case TabletopAudioCue.PlayerTradeOpen:
+            case TabletopAudioCue.CardDraw:
+            case TabletopAudioCue.RoadBuild:
+                return "TabletopAudio/Recorded/" + cue;
+            default:
+                return AssetRoot + "Effects/" + cue;
+        }
+    }
     float ambientBlend;
     int pointerButton = -1;
     Vector2 pointerStart;
@@ -73,7 +87,7 @@ public sealed partial class TabletopAudio : MonoBehaviour
         muted = PlayerPrefs.GetInt(PreferencePrefix + "muted", 0) != 0;
         foreach (TabletopAudioCue cue in Enum.GetValues(typeof(TabletopAudioCue)))
         {
-            var clip = Resources.Load<AudioClip>(AssetRoot + "Effects/" + cue);
+            var clip = Resources.Load<AudioClip>(EffectPath(cue));
             if (clip == null) clip = GeneratedClip("卡坦音效 " + cue, TabletopAudioSynth.Render(cue));
             clips.Add(cue, clip);
         }
@@ -169,7 +183,14 @@ public sealed partial class TabletopAudio : MonoBehaviour
     {
         if (uiFrame == Time.frameCount || MobileTabletop.TouchDragged) return;
         uiFrame = Time.frameCount;
-        Play(cancel ? TabletopAudioCue.UiBack : TabletopAudioCue.UiClick);
+        pendingClick = cancel ? TabletopAudioCue.UiBack : TabletopAudioCue.UiClick;
+    }
+    public void TradeClick(bool player)
+    {
+        // 实际开启的交易窗口优先于同一帧由指针或按钮登记的通用点击。
+        pendingClick = null;
+        uiFrame = Time.frameCount;
+        Play(player ? TabletopAudioCue.PlayerTradeOpen : TabletopAudioCue.BankOpen);
     }
     internal void ObserveGuiPointerDown(int button)
     {
@@ -188,17 +209,21 @@ public sealed partial class TabletopAudio : MonoBehaviour
         double now = Time.unscaledTimeAsDouble;
         if (!limiter.Admit(cue, now)) return;
         if (cue == TabletopAudioCue.KnightRecruit || cue == TabletopAudioCue.KnightActivate) PlaySpeech(cue);
-        if (effects <= 0) return;
+        PlayEffectClip(clip, gain, Priority(cue));
+    }
+    internal void PlayEffectClip(AudioClip clip, float gain = 1, int priority = 120)
+    {
+        if (!Ready || clip == null || muted || applicationPaused || master <= 0 || effects <= 0) return;
         var source = voices.FirstOrDefault(v => !v.isPlaying);
         if (source == null)
         {
             // 紧急事件可以替换最旧普通声，普通动作不会切掉警报或胜利乐句。
-            source = voices.Where(v => v.priority >= Priority(cue)).OrderByDescending(v => v.time).FirstOrDefault();
+            source = voices.Where(v => v.priority >= priority).OrderByDescending(v => v.time).FirstOrDefault();
             if (source == null) return;
         }
         source.Stop(); source.clip = clip; source.pitch = 1;
         voiceGains[Array.IndexOf(voices, source)] = Volume(gain);
-        source.priority = Priority(cue); source.volume = master * effects * Volume(gain) * EffectsHeadroom / Math.Max(1, ActiveVoices + 1);
+        source.priority = priority; source.volume = master * effects * Volume(gain) * EffectsHeadroom / Math.Max(1, ActiveVoices + 1);
         source.mute = false; source.Play(); ApplyVolumes(); PlayedCueCount++;
     }
     static int Priority(TabletopAudioCue cue) => cue == TabletopAudioCue.BarbarianInvasion || cue == TabletopAudioCue.BuildingCollapse || cue == TabletopAudioCue.Victory ? 35 :
@@ -217,6 +242,11 @@ public sealed partial class TabletopAudio : MonoBehaviour
     {
         if (!Ready || owner == null) return;
         double now = Time.unscaledTimeAsDouble;
+        if (pendingClick.HasValue && uiFrame != Time.frameCount)
+        {
+            Play(pendingClick.Value);
+            pendingClick = null;
+        }
         // 旧 IMGUI 在不同 MonoBehaviour 之间不会可靠保留 Used；输入作为全局兜底。
         // 所有短按均给柔和反馈（包括空白），实际控件可显式 Click 并按帧去重。
         if (Input.GetMouseButtonDown(0)) ObserveGuiPointerDown(0);

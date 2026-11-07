@@ -367,6 +367,7 @@ public sealed class TabletopScene : MonoBehaviour
         boardCamera.backgroundColor=new Color(.045f,.19f,.26f);
         boardCamera.orthographic=true;boardCamera.nearClipPlane=.01f;boardCamera.farClipPlane=10;
         boardCamera.transform.rotation=rotation;
+        FantasyBoardPiece.SetView(Pitch == TabletopCameraModel.DefaultAngle && Mathf.Abs(Mathf.DeltaAngle(Yaw,0)) < .01f);
         baseSize=Mathf.Max((fitMaxY-fitMinY)/2/(BoardFitArea.height/900),
             (maxX-minX)/(2*aspect)/(BoardFitArea.width/1440));
         zoom=Mathf.Clamp(zoom,MinimumZoom,TabletopCameraModel.FarthestZoom);

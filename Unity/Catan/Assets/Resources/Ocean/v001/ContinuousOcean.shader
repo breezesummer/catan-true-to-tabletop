@@ -4,9 +4,12 @@ Shader "Catan/ContinuousOcean"
     {
         _CoastMask("公开海岸", 2D) = "white" {}
         _MaskRect("遮罩范围", Vector) = (0,0,1,1)
+        _PirateHex("海盗海格", Vector) = (0,0,0,0)
         _WaterHeight("水位", Float) = 0.0045
         _OceanTheme("海洋主题", Float) = 0
         _OceanDetail("海洋细波", 2D) = "white" {}
+        _PaintedSea("手绘海面", Float) = 0
+        _SeaWash("水彩海纹", 2D) = "white" {}
         _Gravel("潮间带砂砾",2D) = "white" {}
         _Sand("沙滩",2D)="white" {}
     }
@@ -25,16 +28,19 @@ Shader "Catan/ContinuousOcean"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             TEXTURE2D(_CoastMask); SAMPLER(sampler_CoastMask);
             TEXTURE2D(_OceanDetail); SAMPLER(sampler_OceanDetail);
+            TEXTURE2D(_SeaWash); SAMPLER(sampler_SeaWash);
             TEXTURE2D(_Gravel); SAMPLER(sampler_Gravel);
             TEXTURE2D(_Sand); SAMPLER(sampler_Sand);
             #include "../../PaintedMap/Coast/CoastCommon.hlsl"
             CBUFFER_START(UnityPerMaterial)
-            float4 _MaskRect;
+            float4 _MaskRect, _PirateHex;
             float _WaterHeight;
             float _OceanTheme;
+            float _PaintedSea;
             float4 _ReefShores[4];
             float4 _ReefAngles;
             CBUFFER_END
+            #include "../../PaintedMap/DangerHex.hlsl"
             struct Attributes { float4 positionOS : POSITION; };
             struct Varyings { float4 positionCS : SV_POSITION; float3 world : TEXCOORD0; };
             float ReefDistance(float2 p)
@@ -75,12 +81,21 @@ Shader "Catan/ContinuousOcean"
                 p.y=_WaterHeight+Wave(p.xz,_Time.y)*smoothstep(.06,.45,coast.r)*(1-coast.g*.8);
                 o.world=p; o.positionCS=TransformWorldToHClip(p); return o;
             }
-            half4 Frag(Varyings i) : SV_Target
+            half3 PaintedWater(float2 p,float t,float2 coast,float d)
             {
-                float2 p=i.world.xz;
-                float t=_Time.y;
-                float2 coast=Coast(p);
-                float d=coast.r*.08;
+                float2 drift=float2(sin(p.y*17+t*.27),cos(p.x*12-t*.19))*.0025;
+                half3 wash=SAMPLE_TEXTURE2D(_SeaWash,sampler_SeaWash,p*1.65+drift).rgb;
+                float shallow=1-smoothstep(.0005,.030,d);
+                wash=lerp(wash,half3(.45,.75,.62),shallow*.39);
+                float crest=sin(d*635-t*.72+sin(p.x*89+p.y*113)*2.1);
+                float breaks=smoothstep(.35,.93,sin(p.x*317+p.y*151)*sin(p.y*197-p.x*83+t*.17));
+                float foam=(1-smoothstep(.001,.009,d))*smoothstep(.55,.94,crest)*breaks;
+                wash=lerp(wash,half3(.84,.88,.73),foam*.32);
+                return lerp(wash,half3(.51,.77,.70),coast.g*.11);
+            }
+
+            half3 OceanWater(Varyings i,float2 p,float t,float2 coast,float d)
+            {
                 float a=dot(p,float2(26,17))-t*.85;
                 float b=dot(p,float2(-19,34))-t*1.1;
                 float ripple=sin(p.x*181+p.y*143+sin(p.y*51-t*.6)*1.5-t*1.2);
@@ -142,6 +157,18 @@ Shader "Catan/ContinuousOcean"
                     blue=lerp(blue,float3(.84,.91,.85),froth*.24);
                     water=lerp(blue,float3(.16,.43,.43),coast.g*.05);
                 }
+                return water;
+            }
+            half4 Frag(Varyings i) : SV_Target
+            {
+                float2 p=i.world.xz;
+                float2 coast=Coast(p);
+                float d=coast.r*.08;
+                half3 water;
+                [branch] if(_PaintedSea>.5) water=PaintedWater(p,_Time.y,coast,d);
+                else water=OceanWater(i,p,_Time.y,coast,d);
+                if (_CatanMapMarksHidden < .5 && _PirateHex.z > .5)
+                    water = DangerHex(water,p - _PirateHex.xy);
                 return half4(water,1);
             }
             ENDHLSL

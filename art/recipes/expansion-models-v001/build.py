@@ -8,7 +8,8 @@ ROOT=Path('D:/Project/catan-true-to-tabletop')
 ART=ROOT/'Unity/Catan/Assets/Art/ExpansionPieces/v001'
 RES=ROOT/'Unity/Catan/Assets/Resources/ExpansionPieces/v001'
 OUT=ROOT/'art/recipes/expansion-models-v001'
-scene=bpy.data.scenes.new('扩展棋子_第一版')
+knights_only=globals().get('knights_only',False)
+scene=bpy.data.scenes.new(globals().get('scene_name','三国骑士' if knights_only else '扩展棋子_第一版'))
 bpy.context.window.scene=scene
 scene.unit_settings.system='METRIC'
 rng=random.Random(1183)
@@ -29,7 +30,8 @@ for i,(name,rgb) in enumerate(swatches.items()):
     if name in ('iron','steel','brass'):grain+=.026*np.sin(x*75+y*17)
     vals=np.clip(np.asarray(rgb)[None,None,:]/255*grain[:,:,None],0,1)
     pix[(i//4)*256:(i//4+1)*256,(i%4)*256:(i%4+1)*256,:3]=vals
-tex.pixels.foreach_set(pix.ravel());tex.filepath_raw=str(ART/'palette.png');tex.file_format='PNG';tex.save()
+tex.pixels.foreach_set(pix.ravel());tex.filepath_raw=str(ART/'palette.png');tex.file_format='PNG'
+if globals().get('save_palette',not knights_only):tex.save()
 def material(name,metallic):
     m=bpy.data.materials.new(name);m.use_nodes=True
     n=m.node_tree.nodes;p=n.get('Principled BSDF');p.inputs['Metallic'].default_value=metallic;p.inputs['Roughness'].default_value=.61 if metallic else .88

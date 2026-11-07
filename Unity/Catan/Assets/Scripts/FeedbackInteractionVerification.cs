@@ -43,15 +43,14 @@ public sealed partial class InteractionPresentationVerification
         PolishSetField(dock,"current",snapshot);PolishSetField(dock,"scope",snapshot.Scope);PolishSetField(dock,"revision",snapshot.Revision);PolishSetField(dock,"specialHand",true);dock.Selection.Sync(snapshot);
         table=(TabletopScene)PolishGet(PolishGet(game,"VerificationBoard"),"TableScene");return hud;
     }
-    void CheckCardPreviewHud(TabletopUI hud,OperationDock dock,OperationSnapshot snapshot,OperationHandCard card)
+    void PickFeedbackCard(OperationDock dock,OperationSnapshot snapshot,OperationHandCard card)
     {
-        dock.ToggleCardPreview(snapshot,card);
-        Require(dock.PreviewCard(snapshot)==card&&hud.CardActionCaption=="使用\n"+card.Name,"预览没有把所选卡牌移到右下角使用入口");
-        Require(dock.BlocksBoardInput(new Vector2(720,430))&&!dock.BlocksHudInput(TabletopUI.EndTurnRect.center),"预览未阻挡棋盘或右下角按钮被遮挡");
+        dock.PickHandCard(snapshot,card);
+        Require(!dock.HasOverlay,"点手牌后有窗口遮住了棋盘");
     }
     IEnumerator VerifyBasicCardAction()
     {
-        stage="基础发展卡右下角使用";app.StartGame("base","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
+        stage="基础发展卡从手中打出";app.StartGame("base","heading-for-new-shores",4,"P1",true);yield return null;yield return null;
         var game=GetComponent<M2App>();var host=game.VerificationHost;
         var session=(Catan.Core.M2.BaseGameSession)typeof(M2LocalGameHost).GetField("session",Private).GetValue(host);
         var state=session.GetAuthoritativeStateForTesting();state.ActivePlayerId="P1";state.Turn=9;state.Phase=Catan.Core.M2.GamePhase.Action;state.SetupPlacementIndex=8;state.PendingDecision=null;
@@ -64,20 +63,19 @@ public sealed partial class InteractionPresentationVerification
         var snapshot=game.VerificationOperationSnapshot;var dock=game.VerificationOperationDock;var hud=BindFeedbackCardHud(game);string before=host.ExportSave();
         foreach(var card in snapshot.Cards.Where(c=>!c.Playable))
         {
-            CheckCardPreviewHud(hud,dock,snapshot,card);Require(!hud.CardActionReady,"新买卡或胜利点卡错误允许使用");hud.ConfirmCardAction();
-            Require(before==host.ExportSave(),"查看或尝试使用不可用卡改变了权威局面");dock.ToggleCardPreview(snapshot,card);
-            Require(!dock.HasOverlay&&hud.CardActionCaption==null,"再次点击同一张牌未关闭预览");
+            PickFeedbackCard(dock,snapshot,card);
+            Require(before==host.ExportSave(),"不可用牌被打出");
         }
-        var knight=snapshot.Cards.First(c=>c.Playable);CheckCardPreviewHud(hud,dock,snapshot,knight);
-        Require(before==host.ExportSave()&&hud.CardActionReady,"合法卡牌预览提前出牌或使用入口被禁用");
-        if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("基础发展卡预览");
-        hud.ConfirmCardAction();yield return null;yield return SettleFeedback();
-        Require(host.View("P1").Players.First(p=>p.Id=="P1").PlayedKnights==1&&host.View("P1").Phase==Catan.Core.M2.GamePhase.RobberMove,"右下角使用骑士未走正常出牌与强盗待决");
-        snapshot=game.VerificationOperationSnapshot;hud=BindFeedbackCardHud(game);before=host.ExportSave();
-        CheckCardPreviewHud(hud,dock,snapshot,snapshot.Cards[0]);Require(snapshot.RequiresSelection&&!hud.CardActionReady,"强盗待决仍允许使用其他卡牌");hud.ConfirmCardAction();Require(before==host.ExportSave(),"预览绕过了强盗待决");dock.Reset();session.AssertInvariants();
+        var knight=snapshot.Cards.First(c=>c.Playable);PickFeedbackCard(dock,snapshot,knight);
+        Require(before==host.ExportSave()&&dock.HasCancelableInteraction,"第一次点骑士应当只抬起手牌");
+        if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("基础发展卡拿起");
+        PickFeedbackCard(dock,snapshot,knight);yield return null;yield return SettleFeedback();
+        Require(host.View("P1").Players.First(p=>p.Id=="P1").PlayedKnights==1&&host.View("P1").Phase==Catan.Core.M2.GamePhase.RobberMove,"第二次点骑士未进入强盗待决");
+        snapshot=game.VerificationOperationSnapshot;BindFeedbackCardHud(game);before=host.ExportSave();
+        PickFeedbackCard(dock,snapshot,snapshot.Cards[0]);Require(snapshot.RequiresSelection&&before==host.ExportSave(),"手牌点击绕过了强盗待决");dock.Reset();session.AssertInvariants();
     }
 
-    // 逐张从正式预览的右下角入口使用，区分无需参数的执行与必须保留的效果选择。
+    // 逐张从手牌入口使用，区分无需参数的执行与必须保留的效果选择。
     IEnumerator VerifyImmediateProgressActions()
     {
         foreach(string rules in new[]{"cities-knights","combined"})
@@ -117,17 +115,16 @@ public sealed partial class InteractionPresentationVerification
             var hud=BindFeedbackCardHud(game);var dock=(OperationDock)PolishGet(game,"VerificationOperationDock");var snapshot=(OperationSnapshot)PolishGet(game,"VerificationOperationSnapshot");
             var selected=snapshot.Cards.Single(c=>c.ArtIndex==Convert.ToInt32(kind));Require(selected.Playable,"直接使用夹具没有合法卡牌 "+card);
             Func<string> save=()=>(string)host.GetType().GetMethod("ExportSave").Invoke(host,null);string before=save();
-            CheckCardPreviewHud(hud,dock,snapshot,selected);Require(hud.CardActionReady&&save()==before,"使用前预览错误消耗牌 "+card);
-            hud.ConfirmCardAction();
+            PickFeedbackCard(dock,snapshot,selected);Require(save()==before,"第一次点牌提前消耗牌 "+card);
+            if(selected.Immediate)PickFeedbackCard(dock,snapshot,selected);
             if(card=="MerchantFleet")
             {
                 yield return null;yield return null;
                 var draft=game.GetType().GetField("draft",Private).GetValue(game);
                 Require(save()==before&&!app.CardPresentationBusy,"商船队选择效果前已经耗卡或播放出牌动画");
                 Require(draft!=null&&PolishGet(draft,"Kind").ToString()=="PlayProgressCard"&&PolishGet(draft,"ProgressCard").ToString()==card,"商船队未保留合法用牌草稿");
-                Require((bool)PolishGet(game,"OperationContextVisible")&&!dock.HasOverlay,"商船队没有从预览进入效果选择");
-                Require(Vector2.Distance(hud.CurrentContextRect.center,new Vector2(720,450))<.01f,"发展卡必要选择弹窗没有居中");
-                if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture(rules+"-商船队必要选择居中");
+                Require(!(bool)PolishGet(game,"OperationContextVisible")&&(bool)PolishGet(game,"ProgressChoiceRow")&&!dock.HasOverlay,"贸易船队没有在手牌上方提供资源选择");
+                if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture(rules+"-贸易船队手牌上方选资源");
                 snapshot.Cancel?.Invoke();Require(save()==before,"取消商船队效果选择改变了权威局面");
                 session.GetType().GetMethod("AssertInvariants").Invoke(session,null);continue;
             }
@@ -182,10 +179,10 @@ public sealed partial class InteractionPresentationVerification
             var action=game.M6View.LegalActions.FirstOrDefault(x=>x.Kind==Catan.Core.M4.CommandKind.PlayProgressCard&&x.ProgressCard==card);
             Require(action!=null,"夹具没有合法用牌动作 "+card);
             var snapshot=game.VerificationOperationSnapshot;var hud=BindFeedbackCardHud(game);string previewBefore=host.ExportSave();
-            CheckCardPreviewHud(hud,game.VerificationOperationDock,snapshot,snapshot.Cards.First(x=>x.ArtIndex==(int)card));
-            Require(hud.CardActionReady&&previewBefore==host.ExportSave(),"进步卡预览提前消耗牌或无法使用");
-            if(card==Catan.Core.M4.ProgressCardKind.Merchant&&Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("城市骑士发展卡预览");
-            hud.ConfirmCardAction();Require(previewBefore==host.ExportSave(),"进入地图选目标时提前消耗进步卡");
+            PickFeedbackCard(game.VerificationOperationDock,snapshot,snapshot.Cards.First(x=>x.ArtIndex==(int)card));
+            Require(previewBefore==host.ExportSave(),"选择目标前发展卡被消耗");
+            if(card==Catan.Core.M4.ProgressCardKind.Merchant&&Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("城市骑士手牌直选目标");
+            Require(previewBefore==host.ExportSave(),"进入地图选目标时提前消耗进步卡");
             Require((bool)PolishGet(game,"DirectProgressActive"),"未进入地图用牌模式");Require(!(bool)PolishGet(game,"OperationContextVisible"),"旧菜单仍然遮挡棋盘");
             var input=typeof(M4App).GetMethod("UpdateDirectProgress",Private);
             string before=host.ExportSave();input.Invoke(game,new object[]{new Vector2(-100,-100),true});Require(before==host.ExportSave(),"非法地图点击改变状态");
@@ -221,7 +218,7 @@ public sealed partial class InteractionPresentationVerification
         s.PendingDecision=new Catan.Core.M4.PendingDecision{Kind="ProgressTreasonRemove",PlayerId="P1",OtherPlayerId="P2",Options=new[]{betrayedKnight},ReturnPhase=Catan.Core.M4.GamePhase.Action};
         s.DecisionQueue=Array.Empty<Catan.Core.M4.PendingDecision>();
         typeof(Catan.Core.M4.CitiesKnightsGameSession).GetField("state",Private).SetValue(currentSession,s);
-        current.M6Refresh();yield return null;yield return SettleFeedback();yield return VerifyRequiredChoicePrompt("叛变");
+        current.M6Refresh();yield return null;yield return SettleFeedback();yield return VerifyRequiredChoicePrompt(DevelopmentCardText.Name("Treason"));
         typeof(M4App).GetMethod("UpdateDirectProgress",Private).Invoke(current,new object[]{current.VerificationBoard.ScreenPoint(betrayedKnight),true});
         yield return null;yield return SettleFeedback();
         Require(!currentSession.GetAuthoritativeStateForTesting().Knights.Any(k=>k.LocationId==betrayedKnight),"叛变地图选择未移除骑士");
@@ -283,8 +280,8 @@ public sealed partial class InteractionPresentationVerification
             var action=game.M6View.LegalActions.FirstOrDefault(x=>x.Kind==Catan.Core.M5.CommandKind.PlayProgressCard&&x.ProgressCard==card);
             Require(action!=null,"夹具没有合法用牌动作 "+card);
             var snapshot=game.VerificationOperationSnapshot;var hud=BindFeedbackCardHud(game);string previewBefore=host.ExportSave();
-            CheckCardPreviewHud(hud,game.VerificationOperationDock,snapshot,snapshot.Cards.First(x=>x.ArtIndex==(int)card));
-            Require(hud.CardActionReady&&previewBefore==host.ExportSave(),"组合进步卡预览提前消耗牌或无法使用");hud.ConfirmCardAction();
+            PickFeedbackCard(game.VerificationOperationDock,snapshot,snapshot.Cards.First(x=>x.ArtIndex==(int)card));
+            Require(previewBefore==host.ExportSave(),"组合发展卡选目标时提前消耗牌");
             Require(previewBefore==host.ExportSave(),"组合进步卡进入地图选目标时提前消耗牌");
             Require((bool)PolishGet(game,"DirectProgressActive"),"未进入地图用牌模式");Require(!(bool)PolishGet(game,"OperationContextVisible"),"旧菜单仍然遮挡棋盘");
             var input=typeof(M5App).GetMethod("UpdateDirectProgress",Private);
@@ -321,7 +318,7 @@ public sealed partial class InteractionPresentationVerification
         s.PendingDecision=new Catan.Core.M5.PendingDecision{Kind="ProgressTreasonRemove",PlayerId="P1",OtherPlayerId="P2",Options=new[]{betrayedKnight},ReturnPhase=Catan.Core.M5.GamePhase.Action};
         s.DecisionQueue=Array.Empty<Catan.Core.M5.PendingDecision>();
         typeof(Catan.Core.M5.CombinedGameSession).GetField("state",Private).SetValue(currentSession,s);
-        current.M6Refresh();yield return null;yield return SettleFeedback();yield return VerifyRequiredChoicePrompt("叛变");
+        current.M6Refresh();yield return null;yield return SettleFeedback();yield return VerifyRequiredChoicePrompt(DevelopmentCardText.Name("Treason"));
         typeof(M5App).GetMethod("UpdateDirectProgress",Private).Invoke(current,new object[]{current.VerificationBoard.ScreenPoint(betrayedKnight),true});
         yield return null;yield return SettleFeedback();
         Require(!currentSession.GetAuthoritativeStateForTesting().Knights.Any(k=>k.LocationId==betrayedKnight),"叛变地图选择未移除骑士");

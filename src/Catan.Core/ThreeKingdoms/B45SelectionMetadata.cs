@@ -8,6 +8,7 @@ namespace Catan.Core.ThreeKingdoms
     {
         public static B2SkillAction WithBoard(B2SkillAction action,B5BoardOption option)
         {
+            if(action.Command.Option=="civil-kurou")action.RefundCardCount=B5BoardRules.KurouReward(option);
             if(option.AssetKind!="Improvement"||action.Command.Option=="civil-kurou")action.SelectionBoardIds=new[]{option.SourceId,option.TargetId}.Where(id=>!string.IsNullOrEmpty(id)).Distinct().ToArray();
             if(action.Command.Option=="civil-qixi-tech"){action.SelectionCost=new int[8];action.SelectionCost[1]=option.Level;}
             return action;
@@ -44,6 +45,7 @@ namespace Catan.Core.ThreeKingdoms
             foreach(var action in actions??Array.Empty<B2SkillAction>())
             {
                 var c=action.Command;
+                if(c.Option=="civil-niepan-track")action.SelectionBoardIds=new[]{"Improvement:"+viewerId+":"+c.CardType};
                 if(c.Option=="response-liuli"&&host is IThreeKingdomsB4ResponseHost response)
                 {
                     if(moves==null)moves=response.GetTokenMoves(viewerId);

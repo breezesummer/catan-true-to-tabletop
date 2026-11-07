@@ -10,6 +10,26 @@ public sealed class ThreeKingdomsB45SelectionTests
     static ThreeKingdomsView View(params B2SkillAction[] actions)=>new(){PackageVersion=GeneralCatalog.B45PackageVersion,WindowId="w",Clock=new(){ActivePlayerId="p1",Phase=ThreeKingdomsPhase.Play},SkillActions=actions};
     static B45SelectionContext Start(ThreeKingdomsView view,int[] hand,string? skill=null){var context=new B45SelectionContext();context.Begin(view,"p1",skill??view.SkillActions[0].Command.SkillId,hand);return context;}
 
+    [Fact] public void RaidChoosesForgoneHarvestBeforeDistinctPlayersAndSpendsNoHandCards()
+    {
+        const string skill="tk-g01-s1";
+        var a=Action("raid",skill,"p2");a.Command.Counts=Bag((2,1));
+        var b=Action("raid",skill,"p3");b.Command.Counts=Bag((5,1));
+        var both=Action("raid",skill);both.Command.Counts=Bag((2,1),(5,1));both.Command.TargetPlayerIds=new[]{"p2","p3"};
+        var ctx=Start(View(a,b,both,Action("pass",skill)),new int[8]);
+        Assert.False(ctx.CanSelectPlayer("p2"));
+        Assert.False(ctx.ChangeRaidCard(0,1));Assert.True(ctx.ChangeRaidCard(2,1));
+        Assert.False(ctx.ChangeRaidCard(2,1));Assert.True(ctx.ChangeRaidCard(5,1));
+        Assert.True(ctx.TogglePlayer("p3"));Assert.Null(ctx.FinishDirectPick(true));
+        Assert.True(ctx.TogglePlayer("p3"));Assert.Empty(ctx.SelectedPlayers);
+        Assert.True(ctx.TogglePlayer("p3"));Assert.True(ctx.TogglePlayer("p2"));
+        var c=ctx.FinishDirectPick(true);Assert.NotNull(c);Assert.Equal(both.Command.Counts,c.Counts);
+        Assert.Equal(new[]{"p2","p3"},c.TargetPlayerIds);
+        ctx.Reselect();ctx.Reset();
+        ctx=Start(View(a,b,both,Action("pass",skill)),new int[8]);
+        Assert.True(ctx.ChangeRaidCard(2,1));Assert.True(ctx.ChangeRaidCard(2,-1));Assert.False(ctx.CanSelectPlayer("p2"));Assert.Equal("pass",ctx.SkipCommand.Option);
+    }
+
     [Theory][InlineData("City:V:12:14","V:12:14")][InlineData("Road:E:2:7","E:2:7")][InlineData("Wall:V001","V001")][InlineData("V:12:14","V:12:14")][InlineData("E:2:7","E:2:7")]
     public void BoardAssetLocationPreservesColonsInsideStableMapIds(string asset,string location)
     {Assert.Equal(location,B45SelectionContract.BoardLocationId(asset));}
@@ -48,6 +68,47 @@ public sealed class ThreeKingdomsB45SelectionTests
     {var hand=Bag((0,3),(5,2));var view=View(Action("gift",target:"p2",type:0),Action("gift",target:"p2",type:5),Action("gift",target:"p3",type:0),Action("gift",target:"p3",type:5));var c=Start(view,hand);Assert.Single(c.Options);Assert.True(c.ToggleCard(0,2));Assert.True(c.ToggleCard(5,1));Assert.False(c.CanConfirm);Assert.True(c.TogglePlayer("p2"));var command=c.BuildCommand();Assert.NotNull(command);Assert.Equal(Bag((0,1),(5,1)),command.Counts);Assert.Equal(new[]{"p2"},command.TargetPlayerIds);Assert.Equal(Bag((0,3),(5,2)),hand);Assert.Equal(1,view.SkillActions[0].Command.Counts[0]);}
     [Fact] public void PortraitFirstAndReplacementRetainValidSelectedCards()
     {var c=Start(View(Action("gift",target:"p2",type:0),Action("gift",target:"p3",type:0)),Bag((0,3)));Assert.True(c.TogglePlayer("p2"));Assert.True(c.ToggleCard(0,2));Assert.True(c.TogglePlayer("p3"));Assert.Equal(new[]{"p3"},c.SelectedPlayers);Assert.True(c.IsHandSelected(0,2));Assert.True(c.CanConfirm);}
+    [Fact] public void GiftCommitsOnceWhenRecipientIsClickedAfterCards()
+    {
+        var c=Start(View(Action("gift",target:"p2",type:0),Action("gift",target:"p2",type:5)),Bag((0,2),(5,1)));
+        c.ToggleCard(0,1);Assert.Null(c.FinishDirectPick());
+        c.ToggleCard(5,0);Assert.Null(c.FinishDirectPick());
+        c.TogglePlayer("p2");var command=c.FinishDirectPick(playerPicked:true);
+        Assert.Equal(new[]{"p2"},command.TargetPlayerIds);Assert.Equal(Bag((0,1),(5,1)),command.Counts);
+        Assert.Null(c.FinishDirectPick(playerPicked:true));
+    }
+    [Fact] public void OptionalAdditionalTargetsRemainSelectableUntilPlayerFinishes()
+    {
+        var one=Action("fangzhu",target:"p2");
+        var two=Action("fangzhu");two.Command.TargetPlayerIds=new[]{"p2","p3"};
+        var c=Start(View(one,two),new int[8]);c.TogglePlayer("p2");
+        Assert.True(c.CanConfirm);Assert.Null(c.FinishDirectPick(true));c.TogglePlayer("p3");
+        Assert.Equal(new[]{"p2","p3"},c.FinishDirectPick(true).TargetPlayerIds);
+    }
+    [Fact] public void GiftLightsOnlyPlayersWhoCanReceiveEverySelectedCard()
+    {
+        var c=Start(View(Action("gift",target:"p2",type:0),Action("gift",target:"p3",type:5)),Bag((0,1),(5,1)));
+        Assert.True(c.CanSelectHand(5));c.ToggleCard(0,0);
+        Assert.False(c.CanSelectHand(5));Assert.False(c.CanSelectPlayer("p3"));Assert.True(c.CanSelectPlayer("p2"));
+        c.ToggleCard(0,0);Assert.True(c.CanSelectHand(5));
+    }
+    [Fact] public void DirectBoardPickPreservesSourceAndDestinationWhenBothDirectionsAreLegal()
+    {
+        var forward=Action("move");forward.Command.TileIds=new[]{"V1","V2"};
+        var reverse=Action("move");reverse.Command.TileIds=new[]{"V2","V1"};
+        var c=Start(View(forward,reverse),new int[8]);c.ToggleTile("V2");
+        Assert.Null(c.FinishDirectPick());c.ToggleTile("V1");
+        Assert.Equal(new[]{"V2","V1"},c.FinishDirectPick().TileIds);
+    }
+    [Fact] public void RealTradeCardAndFixedOpponentArePickedOnlyOnce()
+    {
+        var give=Action("seat-fuqi-give");give.Command.CardType=3;
+        var c=Start(View(give),Bag((3,1)));Assert.Null(c.FinishDirectPick());
+        c.ToggleCard(3,0);Assert.Equal(3,c.FinishDirectPick().CardType);
+        var take=Action("seat-jinglue-take");take.Command.CardType=4;take.SelectionPlayerIds=new[]{"p2"};
+        c=Start(View(take),new int[8]);Assert.True(c.ShowOptionChoices);
+        Assert.False(c.CanSelectPlayer("p2"));c.ChooseOption(take);Assert.Equal(4,c.FinishDirectPick().CardType);
+    }
     [Fact] public void DisplaySortDoesNotMoveSelectionToAnotherCopy()
     {var view=View(Action("gift",target:"p2",type:0));var c=Start(view,Bag((0,4)));c.ToggleCard(0,2);c.Refresh(view,Bag((0,4)));Assert.True(c.IsHandSelected(0,2));Assert.False(c.IsHandSelected(0,0));c.Refresh(view,Bag((0,2)));Assert.Empty(c.SelectedCounts.Where(n=>n!=0));}
     [Fact] public void ZhihengAcceptsFourRealCardsAndRejectsFifth()
