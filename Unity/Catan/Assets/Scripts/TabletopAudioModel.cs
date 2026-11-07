@@ -95,6 +95,8 @@ public sealed class TabletopAudioModel
             case "BuildCity": cue = TabletopAudioCue.CityBuild; break;
             case "BuildWall": cue = TabletopAudioCue.WallBuild; break;
             case "SetupShip": case "BuildShip": case "PlaceFreeShip": cue = TabletopAudioCue.ShipBuild; break;
+            case "SpendFish" when changes.Any(c => c != null && !c.IsPrivate && c.Category == "piece" && c.Name == "船" && c.Amount > 0):
+                cue = TabletopAudioCue.ShipBuild; break;
             case "MoveShip": cue = TabletopAudioCue.ShipMove; break;
             case "SetupPort": case "PlacePort": cue = TabletopAudioCue.PortPlace; break;
             case "BankTrade": case "AcceptTrade": case "CommercialHarborOffer": cue = TabletopAudioCue.TradeComplete; break;

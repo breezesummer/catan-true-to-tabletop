@@ -64,6 +64,9 @@ public sealed partial class TabletopAudio : MonoBehaviour
             case TabletopAudioCue.PlayerTradeOpen:
             case TabletopAudioCue.CardDraw:
             case TabletopAudioCue.RoadBuild:
+            case TabletopAudioCue.SettlementBuild:
+            case TabletopAudioCue.CityBuild:
+            case TabletopAudioCue.ShipBuild:
                 return "TabletopAudio/Recorded/" + cue;
             default:
                 return AssetRoot + "Effects/" + cue;
