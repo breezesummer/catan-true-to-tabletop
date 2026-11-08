@@ -2,6 +2,6 @@
   "name": "catan-tabletop-tools",
   "private": true,
   "dependencies": {
-    "@elevenlabs/elevenlabs-js": "^2.76.0"
+    "@elevenlabs/elevenlabs-js": "2.77.0"
   }
 }

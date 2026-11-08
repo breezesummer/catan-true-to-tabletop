@@ -8,6 +8,7 @@ public sealed partial class M6App
 {
     readonly Queue<TabletopCardReveal> playedCards=new Queue<TabletopCardReveal>();
     readonly TabletopCardRevealTimeline cardReveals=new TabletopCardRevealTimeline();
+    TabletopCardReveal spokenCard;
     double cardStarted;
     Action afterPlayedCards;
     Action pendingNetworkPresentation;
@@ -31,7 +32,7 @@ public sealed partial class M6App
     }
     void ResetCardPresentation(GameHistoryEntry[] history=null)
     {
-        playedCards.Clear();afterPlayedCards=null;pendingNetworkPresentation=null;CardPresentationRoll=null;cardReveals.Reset(history);
+        playedCards.Clear();spokenCard=null;afterPlayedCards=null;pendingNetworkPresentation=null;CardPresentationRoll=null;cardReveals.Reset(history);
     }
     // 指令已在规则层完成；显示旧快照至卡牌退场，再统一刷新并衔接现有飞牌／棋盘效果。
     internal bool PresentPlayedCard(GameHistoryEntry[] history,Action applyView)
@@ -64,6 +65,12 @@ public sealed partial class M6App
         {var networkApply=pendingNetworkPresentation;pendingNetworkPresentation=null;networkApply();}
         if(!CardPresentationBusy)return;
         if(MenuVisible||tableMenu){cardStarted+=Time.unscaledDeltaTime;return;}
+        var current=playedCards.Peek();
+        if(Time.unscaledTimeAsDouble>=cardStarted && spokenCard!=current)
+        {
+            spokenCard=current;
+            tabletopAudio?.PlayCardName(current.CardName);
+        }
         if(Time.unscaledTimeAsDouble-cardStarted<(CompactReveal(playedCards.Peek())?OwnCardDuration:CardRevealDuration))return;
         playedCards.Dequeue();cardStarted=Time.unscaledTimeAsDouble;
         if(CardPresentationBusy)return;

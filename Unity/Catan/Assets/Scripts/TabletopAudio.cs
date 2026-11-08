@@ -111,6 +111,8 @@ public sealed partial class TabletopAudio : MonoBehaviour
         for (int language = 0; language < 2; language++) for (int action = 0; action < 2; action++) for (int variant = 0; variant < 2; variant++)
             speechClips[language * 4 + action * 2 + variant] = Resources.Load<AudioClip>(AssetRoot + "Voices/" + (language == 0 ? "zh/" : "en/") +
                 (action == 0 ? "KnightRecruit" : "KnightActivate") + (variant + 1).ToString("D2"));
+        foreach (var clip in Resources.LoadAll<AudioClip>("TabletopAudio/CardNames"))
+            cardNames.Add(clip.name, clip);
         fallbackListener = gameObject.AddComponent<AudioListener>(); fallbackListener.enabled = false;
         UpdateListener();
         gameObject.AddComponent<TabletopAudioGuiTap>().Initialize(this);
@@ -137,6 +139,16 @@ public sealed partial class TabletopAudio : MonoBehaviour
         return speechClips[language * 4 + (cue == TabletopAudioCue.KnightRecruit ? 0 : 2) + variant];
     }
     public void SetMenuTheme(int index) { menuTheme = Mathf.Clamp(index, 0, 4); SettingsChanged(); }
+    readonly Dictionary<string, AudioClip> cardNames = new Dictionary<string, AudioClip>(StringComparer.Ordinal);
+    public void PlayCardName(string name)
+    {
+        if (!Ready || muted || applicationPaused || master <= 0 || speech <= 0 ||
+            !cardNames.TryGetValue(name, out var clip)) return;
+        speechSource.clip = clip;
+        speechSource.pitch = 1;
+        speechSource.Play();
+    }
+
     public void PreviewVoice() { PlaySpeech(TabletopAudioCue.KnightRecruit, true); }
     void PlaySpeech(TabletopAudioCue cue, bool preview = false)
     {
