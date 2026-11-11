@@ -256,9 +256,6 @@ public sealed partial class M6App
                 ApplyVolume(375,"总音量",a.MasterVolume,v=>a.MasterVolume=v);ApplyVolume(433,"操作音效",a.EffectsVolume,v=>a.EffectsVolume=v);
                 ApplyVolume(491,"背景音乐",a.MusicVolume,v=>a.MusicVolume=v);ApplyVolume(549,"自然环境",a.AmbientVolume,v=>a.AmbientVolume=v);
                 ApplyVolume(607,"骑士语音",a.VoiceVolume,v=>a.VoiceVolume=v);
-                Caption(new Rect(222,669,260,48),"语音语言");
-                for(int i=0;i<2;i++)if(KeyButton(new Rect(546+i*164,665,153,52),i==0?"中文":"英语",a.VoiceLanguage==i))a.VoiceLanguage=i;
-                if(KeyButton(new Rect(1039,665,317,52),"试听骑士语音"))a.PreviewVoice();
             }
         }else if(tab==2){
             for(int i=0;i<4;i++){

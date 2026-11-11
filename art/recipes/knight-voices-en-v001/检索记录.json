@@ -1,0 +1,366 @@
+{
+  "date": "2026-11-11",
+  "note": "音色库关键词检索返回的36个独立候选，按角色资料初筛；原始语言与描述保留供应商内容。",
+  "voices": [
+    {
+      "voiceId": "TxWZERZ5Hc6h9dGxVmXa",
+      "name": "Jerry B. - Gruff and Gritty Commander",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "american",
+      "useCase": "characters_animation",
+      "descriptive": "intense",
+      "description": "A gruff, gritty, and authoritative military commander voice ideal for video games, trailers, simulations, and animation. Perfect for barking battlefield orders, delivering gritty motivational speeches, or commanding radio comms with raw intensity. This voice embodies toughness, discipline, and leadership — making it a strong fit for combat games, tactical strategy, war stories, and post-apocalyptic action settings."
+    },
+    {
+      "voiceId": "mSOmKHC6GZcZbSTGlqHO",
+      "name": "Mister Gruff - Miserable old neighbor",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "characters_animation",
+      "descriptive": "intense",
+      "description": "Mr. Gruff is a gritty, grumbling old guy with an attitude."
+    },
+    {
+      "voiceId": "A48Y4xFQ2YpCgXhLXguK",
+      "name": "Lord Griff - Epic Fantasy & whispers",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "american",
+      "useCase": "characters_animation",
+      "descriptive": "serious",
+      "description": "A commanding, cinematic fantasy voice with range from whispered conspiracies in dark hallways to thunderous bellows on the battlefield and raw anguish.  \n\nEqually at home in subtle conversation, calculated menace, warmth, grief, or intense action. Perfect for fantasy films, games, audiobooks, and medieval—or even modern—settings that need a powerful character voice with a broad emotional range and an unexpected twist."
+    },
+    {
+      "voiceId": "7rQX8r6PVq3gfJ8rZzyE",
+      "name": "John North - Northern Englishman",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "british",
+      "useCase": "characters_animation",
+      "descriptive": "mature",
+      "description": "A warm, slightly gruff Northern English male character with a candid, down-to-earth delivery and grounded resonance. Best for regional characters, dialogue in fiction, character-led audiobooks and stories that need an authentic Northern presence. Direct, friendly and quietly authoritative, with steady pacing."
+    },
+    {
+      "voiceId": "4Vl3K2x290GidNvuaLm7",
+      "name": "Matthew Schmitz - Old Pirate Captain",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "british",
+      "useCase": "characters_animation",
+      "descriptive": "intense",
+      "description": "Gruff older male pirate, thick West Country English accent, strongly rhotic, broad southwestern vowels, gravelly baritone, sea-worn texture, intimidating, cynical, commanding, deliberate pacing, low chest resonance, harsh consonants, dangerous calm, rugged authenticity, seasoned captain. Perfect for games, characters, storytelling, adventure, high seas, steampunk, ocean sailing. Created by Matthew Schmitz, a professional voice actor."
+    },
+    {
+      "voiceId": "LRpNiUBlcqgIsKUzcrlN",
+      "name": "Georg - Funny and Emotional",
+      "category": "high_quality",
+      "language": "de",
+      "accent": "standard",
+      "useCase": "characters_animation",
+      "descriptive": "raspy",
+      "description": "Old German male voice, spoken by a grandfather over 90 years of age, quavering, crackly, and raspy. His voice can shift unexpectedly from fragile and strained to surprisingly dynamic, giving him a comical and humorous charm. In his constant, rambling self-talk, he remains gentle, full of character, and endearing. While he might occasionally snap in a gruff and frustrated tone, he quickly softens, returning to the role of the wise and kind elder despite his schoolmasterly presence of a teacher."
+    },
+    {
+      "voiceId": "507tTFX0IPtqFzGd1CAL",
+      "name": "Rusty Malone",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "american",
+      "useCase": "characters_animation",
+      "descriptive": "casual",
+      "description": "A deep, raspy, grumbling character voice with a rough, textured tone and a grounded presence. He sounds warm yet weathered, like a seasoned storyteller with gravel in his voice and experience in every word. Ideal for immersive NPC dialogue, realtime gameplay, API-driven game systems, and dynamic interactive worlds. Perfect for fantasy worlds, narrators, guardians, creatures, or strong background characters. Love this voice? Look out for other character voices by Alex Vox."
+    },
+    {
+      "voiceId": "1RVpBInY9YUYMLSUQReV",
+      "name": "Cody McAvoy - Devoted Knight",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "conversational",
+      "descriptive": "pleasant",
+      "description": "Young American male with a Calm, Pleasant, Multi Cultural voice. Great for conversations."
+    },
+    {
+      "voiceId": "dHd5gvgSOzSfduK4CvEg",
+      "name": "Ed - Late Night Announcer",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "american",
+      "useCase": "characters_animation",
+      "descriptive": "hyped",
+      "description": "Comedy show introduction voice. Over the top cheesy American male. For live radio audience silly events. Game shows, award shows, parody trailers. Celebrity guest or Saturday sketch club stage intros. Cartoons or animation. A funny vintage character by Hey Its Brad."
+    },
+    {
+      "voiceId": "aYIHaVW2uuV2iGj07rJH",
+      "name": "John – Deep Late Night Narrator",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "australian",
+      "useCase": "narrative_story",
+      "descriptive": "deep",
+      "description": "A rich, deep voice with the smooth authority of a late-night presenter. Confident yet approachable, perfect for corporate narrations, e-learning, commercials, audiobooks, and storytelling that needs impact with style. A voice that engages, reassures, and inspires."
+    },
+    {
+      "voiceId": "wcATjh8zBDfepqUbl99V",
+      "name": "Rick - Raspy Late Night Vibes",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "narrative_story",
+      "descriptive": "raspy",
+      "description": "A slow, mellow, and slightly monotone voice with a tired, raspy texture. It has a soft, intimate closeness and feels like someone reading while half-asleep. The pacing is relaxed and unhurried, making it perfect for calm narration, late-night storytelling, ASMR-style content, or any audio needing a gentle, low-energy delivery."
+    },
+    {
+      "voiceId": "MiMKqJ83WLvaWJ72ZewF",
+      "name": "Michael McKnight - The Deep Narrator",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "narrative_story",
+      "descriptive": "confident",
+      "description": "Deep, resonant and trustworthy American male voice, naturally baritone with a warm, authoritative delivery.  Perfect for corporate narrations, explainer videos, documentaries and audiobooks.  Studio-quality recording with zero noise floor, distinctive, professional and clear."
+    },
+    {
+      "voiceId": "Eo34sgRIiRsXmeSahWk8",
+      "name": "Johamma Night - Deep, Steady and Clear",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "informative_educational",
+      "descriptive": "modulated",
+      "description": "Male. Steady, articulate, moderately-deep vocal with fantastic candor and modulation. Expressive and clear with controlled expressive range to ensure constancy and consistency across media types."
+    },
+    {
+      "voiceId": "nMIA4WKPPcq1FPgrQWvp",
+      "name": "Alok K – Calming Late Night Storyteller",
+      "category": "professional",
+      "language": "en",
+      "accent": "indian",
+      "useCase": "narrative_story",
+      "descriptive": "pleasant",
+      "description": "Alok K delivers a deep, bassy, and thoughtful delivery crafted for late-night listening. His conversational storytelling style feels intimate and immersive, making every line land with emotion and presence. Ideal for late-night RJ shows, storytelling podcasts, relationship stories, confessions, poetry, and long-form narratives. Perfect for night-time radio, podcasts, YouTube storytelling channels, and audio content designed for quiet, after-hours listening.\n"
+    },
+    {
+      "voiceId": "oJUpLOe3yEYTEIjO6ddh",
+      "name": "Leo Ashcraft - Late-Night Radio Host",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "narrative_story",
+      "descriptive": "deep",
+      "description": "Deep, warm American male voice with real broadcast experience. Calm, intimate and slightly mysterious, the voice of late-night radio talking to one listener in the dark. Natural pauses and dry humor. Ideal for paranormal, mystery and true crime narration, podcasts, documentaries, audiobooks and storytelling."
+    },
+    {
+      "voiceId": "LGoOLxZLGwuJCrk0OzGE",
+      "name": "Walter - Late night podcast",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "conversational",
+      "descriptive": "casual",
+      "description": "Walter is a warm, low-tempo English voice crafted for late-night podcasts, storytelling, and intimate long-form content. His tone is smooth, steady, and subtly emotional—perfect for hosts who want to create a relaxing, personal connection with listeners. Walter sounds like the kind of voice you’d hear at 11 p.m., speaking softly about life, philosophy, relationships, success, or self-improvement."
+    },
+    {
+      "voiceId": "e6jn5T8JX8OL4Rj0WG4w",
+      "name": "Brady J - Romantic Late Night Companion",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "narrative_story",
+      "descriptive": "calm",
+      "description": "Flirty, teasing, and wrapped in an irresistible ASMR texture — Brady J turns late night conversations into something you feel as much as hear. His romantic tone is slow, deliberate, and impossibly close, making every word land with quiet intensity. Built for ASMR companion experiences, romantic late night interactions, and intimate conversational flows. Ideal for companion apps, romance platforms, and immersive audio experiences designed to make nights feel electric and unforgettable.\r\n"
+    },
+    {
+      "voiceId": "EVXo8sYUBCMYpdFW7CX0",
+      "name": "Lucius - Flirty Late-Night Companion",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "american",
+      "useCase": "narrative_story",
+      "descriptive": "calm",
+      "description": "Smooth, teasing, and deliberately unhurried — Lucius lets a conversation build slowly, never rushing toward a moment that works better with patience. His warm, playful delivery carries just enough restraint to feel genuinely flirty rather than performed. Built for companion apps, romantic chat experiences, and late-night conversational content. Ideal for Replika-style apps, Character.AI-based products, and adult-oriented companion platforms."
+    },
+    {
+      "voiceId": "NFG5qt843uXKj4pFvR7C",
+      "name": "Adam Stone - Smooth, Deep and Relaxed",
+      "category": "professional",
+      "language": "en",
+      "accent": "british",
+      "useCase": "narrative_story",
+      "descriptive": "meditative",
+      "description": "A middle aged 'Brit' with a velvety laid back, late night talk show host timbre."
+    },
+    {
+      "voiceId": "auq43ws1oslv0tO4BDa7",
+      "name": "Adam Stone - Smooth and Relaxed",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "british",
+      "useCase": "narrative_story",
+      "descriptive": "deep",
+      "description": "Updated for even higher quality. A British man with a velvety, laid-back, late-night talk show warmth. Deep, smooth, studio-quality delivery for long or short-form retention and high engagement across socials, podcasts, adverts, and professional video production. I'm also your perfect choice for narration and audio books. More cinematic, more intimate, more engaging."
+    },
+    {
+      "voiceId": "HKFOb9iktHA85uKXydRT",
+      "name": "Russ – Deep, Smooth and Articulate",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "american",
+      "useCase": "informative_educational",
+      "descriptive": "professional",
+      "description": "Deep, articulate, and smooth — like a late-night radio DJ crossed with Sam Elliott, but without the twang. A grounded, non-regional voice that commands attention with calm authority."
+    },
+    {
+      "voiceId": "pFQStpMdprGFILRDrWR2",
+      "name": "Nathaniel - Deep, Meditative and Mellow",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "british",
+      "useCase": "narrative_story",
+      "descriptive": "deep",
+      "description": "Nathaniel’s deep, mellow tone brings calm and intimacy to any story — making him the perfect pick for late-night storytelling, reflective monologues, or emotional narration.\r\n\r\nHis style echoes classic radio RJs, ideal for podcasts, audio fiction, YouTube voiceovers, or Spotify sleep stories. Already a popular voice on ElevenLabs, Nathaniel’s profile has crossed 300 million characters, a testament to its immersive, midnight charm.\r\n"
+    },
+    {
+      "voiceId": "ljo9gAlSqKOvF6D8sOsX",
+      "name": "Viking Bjorn - Epic Medieval Raider",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "swedish",
+      "useCase": "characters_animation",
+      "descriptive": "deep",
+      "description": "Hear the wind in the fjords in the voice of Ragnar the Viking. Gravelly and deep, it echoes with the strength of the North and the wisdom of a life lived by the axe and the sea. This authoritative Nordic voice is ideal for bringing to life powerful Viking characters, reflective warriors, and captivating narrators in fantasy and historical tales."
+    },
+    {
+      "voiceId": "HAvvFKatz0uu0Fv55Riy",
+      "name": "Matthew Schmitz - Ancient Sage Dragon Wizard",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "british",
+      "useCase": "characters_animation",
+      "descriptive": "raspy",
+      "description": "Fantasy character voice rife with wisdom and old age. Underlying rasp and venom. Great for a sorcerer, mage, medieval philosopher, or an elder alchemist. Performed by Matthew Schmitz, a professional audiobook narrator with large fan base. This voice is ideal for stories, games, animated film."
+    },
+    {
+      "voiceId": "GLSWsaquVBsIPLPPRi2s",
+      "name": "George - War-torn Seargant",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "american",
+      "useCase": "characters_animation",
+      "descriptive": "confident",
+      "description": "War-torn. Tough. Commanding.\nA boots-on-the-ground voice with the edge of a sergeant and the swagger of a seasoned soldier. Confident, sometimes arrogant, always in control. Perfect for war scenes, battlefield orders, or hardened monologues—but also capable of quiet, weathered reflection. Brings depth or comedy to leaders, outlaws, and broken heroes alike."
+    },
+    {
+      "voiceId": "AocjYzHzWRalprWmBG9m",
+      "name": "Greg - Ghostly, Gritty, Brave and Raspy",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "american",
+      "useCase": "characters_animation",
+      "descriptive": "intense",
+      "description": "A Gritty American male with a sinister voice fitting for a Tortured Experimental Soldier. Dark rough and ready to hunt down the enemies in your games, shorts, or maybe even SC mods."
+    },
+    {
+      "voiceId": "Av4Fi2idMFuA8kTbVZgv",
+      "name": "Russel - Raw Cowboy",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "characters_animation",
+      "descriptive": "rough",
+      "description": "Delivers a rough, timeworn growl, perfect for grizzled cowboys, tough grandfathers, battle-scarred soldiers, or weathered rebels. The hoarseness adds a raw, authentic edge, whether for gritty showdowns or tales of old. It’s a voice that carries history, suited for both hard-edged characters and nostalgic stories of the past."
+    },
+    {
+      "voiceId": "YRJMFMoNhLEYl3Nae0G6",
+      "name": "Xavier - Big, Deep & Powerful narrator",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "narrative_story",
+      "descriptive": "deep",
+      "description": "An American Male, a veteran soldier with a deep and powerful yet growly voice."
+    },
+    {
+      "voiceId": "Ho7fjSHAC1BzucANXMRy",
+      "name": "Matthew Schmitz - African Tribal Warrior",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "south african",
+      "useCase": "characters_animation",
+      "descriptive": "deep",
+      "description": "Deep South African, Zulu-influenced accent, commanding male voice, regal, tribal hunter, ceremonial delivery, slow deliberate speech, rich chest resonance, authoritative, dignified voice, stoic delivery, solemn, powerful, cinematic African voice, ancestral storyteller, noble leader, gravelly baritone, measured cadence, dramatic pauses, restrained intensity, ancient warrior character, epic, mythic, masculine, deep. Voiced by Matthew Schmitz, a professional voice actor with a large following."
+    },
+    {
+      "voiceId": "10NkTYmU7tSz3Kkl3Lex",
+      "name": "Kaelen - Amateur Warrior",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "american",
+      "useCase": "narrative_story",
+      "descriptive": "wise",
+      "description": "Rugged, gravelly male bass-baritone. Intense and textured, perfect for cinematic trailers or hardened character monologues."
+    },
+    {
+      "voiceId": "AyUH0Pu6NRwQV6bOdfNx",
+      "name": "Connery - Dramatic Mythology Storyteller",
+      "category": "high_quality",
+      "language": "en",
+      "accent": "american",
+      "useCase": "narrative_story",
+      "descriptive": "modulated",
+      "description": "Deep, commanding, and cinematic, with a powerful presence built for stories of gods, warriors, legends, and ancient worlds. Perfect for mythology narration, epic storytelling, fantasy lore, historical legends, dramatic trailers, audiobooks, and cinematic content. A strong fit for podcasts, games, documentaries, and creators looking for a grand, authoritative voice that makes every story feel larger than life."
+    },
+    {
+      "voiceId": "unWb9iRIK7Xxf4A5Hfis",
+      "name": "Valf - Anime Protagonist Charismatic",
+      "category": "professional",
+      "language": "en",
+      "accent": "american",
+      "useCase": "characters_animation",
+      "descriptive": "neutral",
+      "description": "Youthful, expressive anime protagonist voice with natural charm, curiosity, determination, and emotion. Versatile from casual, playful dialogue to intense battles, dramatic speeches, heartfelt scenes, and emotional moments. Perfect for anime, animation, games, RPGs, visual novels, storytelling, and character skits. Ideal for young heroes, adventurous protagonists, energetic leads, aspiring warriors, supernatural characters, and relatable anime characters."
+    },
+    {
+      "voiceId": "VPF8D2whCW2BL8tFWO6e",
+      "name": "Indrajeet M - Hindu Mythology Narrator",
+      "category": "professional",
+      "language": "en",
+      "accent": "indian",
+      "useCase": "narrative_story",
+      "descriptive": "formal",
+      "description": "Divine, epic, and legendary — Indrajeet M turns ancient battles and sacred legends into something listeners feel in their chest. His deep, weighted delivery carries every god, demon, and warrior with the gravity the story demands, holding attention scene after scene. Built for full-length audiobook series and devotional scripture readings. Ideal for audiobook studios and devotional content creators."
+    },
+    {
+      "voiceId": "VBv8HlWLOm4a3AlDyI0b",
+      "name": "Sethu - Deep Noir Narrator",
+      "category": "professional",
+      "language": "en",
+      "accent": "indian",
+      "useCase": "narrative_story",
+      "descriptive": "deep",
+      "description": "A rough, breathy, and authoritative deep male voice. Ideal for anti-heroes, exhausted warriors, cyberpunk narrators, and high-stakes dramatic readings. Features a slow, deliberate pacing with heavy vocal fry."
+    },
+    {
+      "voiceId": "YKrm0N1EAM9Bw27j8kuD",
+      "name": "Leónidas - Legendary Spartan Warrior",
+      "category": "high_quality",
+      "language": "es",
+      "accent": "peninsular",
+      "useCase": "characters_animation",
+      "descriptive": "rough",
+      "description": "Ideal for trailers, videogames, battle cries, or heroic monologues where strength, defiance, and legendary presence must be heard. Commanding, brave, and fierce tone—perfect for epic battle scenes, heroic speeches, or historical reenactments. "
+    },
+    {
+      "voiceId": "TlxVR97quVHvTxE8Qkcm",
+      "name": "Samurai -  Japanese Natural Male",
+      "category": "professional",
+      "language": "ja",
+      "accent": "kanto",
+      "useCase": "conversational",
+      "descriptive": "calm",
+      "description": "The voice of a Japanese man, embodying the strength of a samurai, the resilience of a warrior, and the kindness of the Japanese spirit. A powerful yet gentle voice, combining confidence, warmth, and natural clarity. Perfect for storytelling, narration, anime, and engaging content."
+    }
+  ]
+}

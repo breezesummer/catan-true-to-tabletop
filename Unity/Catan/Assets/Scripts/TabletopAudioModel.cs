@@ -20,7 +20,9 @@ public readonly struct TabletopAudioEvent
     public readonly TabletopAudioCue Cue;
     public readonly double Delay;
     public readonly long RollSequence;
-    public TabletopAudioEvent(TabletopAudioCue cue, double delay = 0,long rollSequence=0) { Cue = cue; Delay = delay; RollSequence=rollSequence; }
+    public readonly KnightVoiceSelection KnightVoice;
+    public TabletopAudioEvent(TabletopAudioCue cue, double delay = 0,long rollSequence=0, KnightVoiceSelection knightVoice=default)
+    { Cue = cue; Delay = delay; RollSequence=rollSequence; KnightVoice=knightVoice; }
 }
 
 public static class TabletopAudioTiming
@@ -125,8 +127,8 @@ public sealed class TabletopAudioModel
         if (placedRoad && cue != TabletopAudioCue.RoadBuild)
             result.Add(new TabletopAudioEvent(TabletopAudioCue.RoadBuild, .10));
         if (entry.Kind == "PlayKnight") result.Add(new TabletopAudioEvent(TabletopAudioCue.KnightCombat, .22));
-        bool promoted = changes.Any(c => c != null && c.Category == "piece" && c.Amount > 0 && KnightLevel(c.Name) > 0 &&
-            changes.Any(d => d != null && d.Category == "piece" && d.Amount < 0 && d.PlayerId == c.PlayerId && d.LocationId == c.LocationId &&
+        bool promoted = changes.Any(c => c != null && !c.IsPrivate && c.Category == "piece" && c.Amount > 0 && KnightLevel(c.Name) > 0 &&
+            changes.Any(d => d != null && !d.IsPrivate && d.Category == "piece" && d.Amount < 0 && d.PlayerId == c.PlayerId && d.LocationId == c.LocationId &&
                 KnightLevel(d.Name) > 0 && KnightLevel(d.Name) < KnightLevel(c.Name)));
         if (promoted && cue != TabletopAudioCue.KnightPromote)
             result.Add(new TabletopAudioEvent(TabletopAudioCue.KnightPromote, cue == TabletopAudioCue.CardPlay ? .22 : .10));
@@ -146,14 +148,22 @@ public sealed class TabletopAudioModel
             result.Add(new TabletopAudioEvent(TabletopAudioCue.BarbarianAdvance, .62));
         if (entry.Kind == "ResolveChoice" || entry.Kind == "ResolveProgressChoice")
         {
-            if (!promoted && changes.Any(c => c != null && c.Category == "piece" && c.Name != null && c.Name.Contains("骑士") &&
-                !changes.Any(d => d != null && d.Category == "piece" && d.Amount == -c.Amount && d.PlayerId == c.PlayerId &&
+            if (!promoted && changes.Any(c => c != null && !c.IsPrivate && c.Category == "piece" && c.Name != null && c.Name.Contains("骑士") &&
+                !changes.Any(d => d != null && !d.IsPrivate && d.Category == "piece" && d.Amount == -c.Amount && d.PlayerId == c.PlayerId &&
                     d.LocationId == c.LocationId && KnightIdentity(d.Name) == KnightIdentity(c.Name))))
                 result.Add(new TabletopAudioEvent(TabletopAudioCue.KnightCombat, .10));
             if (changes.Any(c => c != null && c.Category == "piece" && c.Amount > 0 && c.Name != null && c.Name.Contains("大都会")))
                 result.Add(new TabletopAudioEvent(TabletopAudioCue.FacilityUpgrade, .10));
         }
-        return rolls?result.Select(e=>new TabletopAudioEvent(e.Cue,e.Delay,entry.Sequence)).ToArray():result.ToArray();
+        var knightVoice = KnightVoiceSelector.Select(entry);
+        if (knightVoice.Valid)
+        {
+            var effect = KnightVoiceCatalog.Effect(knightVoice);
+            int index = result.FindIndex(sound => sound.Cue == effect);
+            if (index < 0) result.Add(new TabletopAudioEvent(effect, .10, knightVoice: knightVoice));
+            else { var sound = result[index]; result[index] = new TabletopAudioEvent(sound.Cue, sound.Delay, sound.RollSequence, knightVoice); }
+        }
+        return rolls?result.Select(e=>new TabletopAudioEvent(e.Cue,e.Delay,entry.Sequence,e.KnightVoice)).ToArray():result.ToArray();
     }
 
     static string KnightIdentity(string name) => (name ?? "").Replace("（激活）", "").Replace("（休眠）", "");

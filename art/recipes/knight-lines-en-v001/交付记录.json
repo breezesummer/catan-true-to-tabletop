@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-11",
+  "clipCount": 36,
+  "voiceAssignment": [
+    {
+      "level": 1,
+      "name": "John North",
+      "voiceId": "7rQX8r6PVq3gfJ8rZzyE"
+    },
+    {
+      "level": 2,
+      "name": "George",
+      "voiceId": "GLSWsaquVBsIPLPPRi2s"
+    },
+    {
+      "level": 3,
+      "name": "Lord Griff",
+      "voiceId": "A48Y4xFQ2YpCgXhLXguK"
+    }
+  ],
+  "bundle": "art/exports/knight-lines-en-v001/骑士英语配音-36句.zip",
+  "bundleBytes": 5136266,
+  "bundleSha256": "a43e26b86b0bd0d5099b49722d3c14573a544f787039584e1dc9509ddb7317e4",
+  "montages": [
+    {
+      "level": 1,
+      "voiceName": "John North",
+      "file": "art/exports/knight-lines-en-v001/分级试听/1级骑士-John-North-12句试听.wav",
+      "durationSecs": 27.89
+    },
+    {
+      "level": 2,
+      "voiceName": "George",
+      "file": "art/exports/knight-lines-en-v001/分级试听/2级骑士-George-12句试听.wav",
+      "durationSecs": 30.71
+    },
+    {
+      "level": 3,
+      "voiceName": "Lord Griff",
+      "file": "art/exports/knight-lines-en-v001/分级试听/3级骑士-Lord-Griff-12句试听.wav",
+      "durationSecs": 33.29
+    }
+  ]
+}

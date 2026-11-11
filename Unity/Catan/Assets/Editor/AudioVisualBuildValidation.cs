@@ -23,8 +23,8 @@ public static class AudioVisualBuildValidation
             Audio("Assets/Resources/" + TabletopAudio.EffectPath(cue) + (cue == TabletopAudioCue.ShipBuild ? ".mp3" : ".wav"));
         for (int theme = 0; theme < 5; theme++) Audio(audioRoot + "Ambience/Theme" + theme + ".wav");
         Audio(audioRoot + "Music/SeaBreezeHome.wav");
-        foreach (string language in new[] { "zh", "en" }) foreach (string action in new[] { "KnightRecruit", "KnightActivate" })
-        for (int variant = 1; variant <= 2; variant++) Audio(audioRoot + "Voices/" + language + "/" + action + variant.ToString("D2") + ".wav");
+        for (int level = 1; level <= 3; level++) for (int action = 1; action <= 6; action++)
+        for (int variant = 0; variant < 2; variant++) Audio("Assets/Resources/" + KnightVoiceCatalog.Path((KnightVoiceAction)action, level, variant) + ".wav");
         Texture(Resources.Load<Texture2D>("PastoralMenu/v004/title"),"独立菜单标题");
         Debug.Log("CATAN_AUDIO_VISUAL_TEXTURES_OK: " + count + " 张地图、4 张玩法封面与"+PastoralMenuScene.ThemeCount+"张主页原画、独立标题完整。");
     }

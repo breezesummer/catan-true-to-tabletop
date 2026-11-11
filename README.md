@@ -30,7 +30,7 @@ Windows 闪退后，双击游戏旁的 `查看崩溃报告.exe`，即可打开�
 在仓库根目录执行统一 Windows 启动脚本：
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1 -BuildRoot "game version/2.1/Catan2.1.14-Sunny-Sea-And-Glow"
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1 -BuildRoot "game version/2.1/Catan2.1.14-Knight-Voices"
 ```
 
 脚本选择当前默认可玩构建。操作方式见[M6 试玩说明](docs/M6_PLAYTEST.md)，联机连接与房间使用见[M7 使用说明](docs/M7_IMPLEMENTATION.md)。PC 与 Android 下载入口及验证范围见[内测版1.6发布记录](docs/RELEASE_BETA_1_6.md)。

@@ -23,33 +23,30 @@ public sealed partial class TabletopAudio : MonoBehaviour
     public float AmbientVolume { get => ambient; set { ambient = Volume(value); SettingsChanged(); } }
     public float MusicVolume { get => music; set { music = Volume(value); SettingsChanged(); } }
     public float VoiceVolume { get => speech; set { speech = Volume(value); SettingsChanged(); } }
-    public int VoiceLanguage { get => voiceLanguage; set { voiceLanguage = Mathf.Clamp(value, 0, 1); SettingsChanged(); } }
     public int MenuTheme => menuTheme;
-    public bool Muted { get => muted; set { muted = value; if (muted) { scheduled.Clear(); foreach (var voice in voices) if (voice != null) voice.Stop(); if (speechSource != null) speechSource.Stop(); } SettingsChanged(); } }
+    public bool Muted { get => muted; set { muted = value; if (muted) { scheduled.Clear(); ResetKnightVoices(); foreach (var voice in voices) if (voice != null) voice.Stop(); if (speechSource != null) speechSource.Stop(); } SettingsChanged(); } }
     public bool MenuAmbienceActive => environmentSources.Any(s => s != null && s.isPlaying && s.volume > .0001f);
     public bool MusicActive => musicSource != null && musicSource.isPlaying && musicSource.volume > .0001f;
-    public int VoiceClipCount => speechClips.Count(c => c != null);
     readonly Dictionary<TabletopAudioCue, AudioClip> clips = new Dictionary<TabletopAudioCue, AudioClip>();
     readonly TabletopAudioModel model = new TabletopAudioModel();
     readonly TabletopAudioPublicModel publicModel = new TabletopAudioPublicModel();
     readonly TabletopAudioLimiter limiter = new TabletopAudioLimiter();
     TabletopDicePresentation dice;
     public void BindDice(TabletopDicePresentation value) { dice=value; }
-    struct Scheduled { internal TabletopAudioCue Cue; internal double At; }
+    struct Scheduled { internal TabletopAudioEvent Event; internal double At; }
     readonly List<Scheduled> scheduled = new List<Scheduled>();
     AudioSource[] voices = Array.Empty<AudioSource>();
     float[] voiceGains = Array.Empty<float>();
     readonly AudioSource[] environmentSources = new AudioSource[5];
     readonly AudioClip[] environmentClips = new AudioClip[5];
     readonly float[] environmentWeights = new float[5];
-    readonly AudioClip[] speechClips = new AudioClip[8];
     readonly List<AudioClip> generatedClips = new List<AudioClip>();
     AudioSource musicSource, speechSource;
     AudioClip musicClip;
     M6App owner;
     AudioListener fallbackListener;
     float master, effects, ambient, music, speech, musicDuck = 1;
-    int voiceLanguage, menuTheme, speechVariant;
+    int menuTheme;
     bool muted, settingsDirty, applicationPaused;
     double saveSettingsAt, reconnectQuietUntil, nextListenerCheck;
     bool wasConnected;
@@ -85,7 +82,6 @@ public sealed partial class TabletopAudio : MonoBehaviour
         ambient = Volume(PlayerPrefs.GetFloat(PreferencePrefix + "ambient", .34f));
         music = Volume(PlayerPrefs.GetFloat(PreferencePrefix + "music", .52f));
         speech = Volume(PlayerPrefs.GetFloat(PreferencePrefix + "voice", .90f));
-        voiceLanguage = Mathf.Clamp(PlayerPrefs.GetInt(PreferencePrefix + "language", 0), 0, 1);
         menuTheme = Mathf.Clamp(PlayerPrefs.GetInt(PreferencePrefix + "theme", 0), 0, 4);
         muted = PlayerPrefs.GetInt(PreferencePrefix + "muted", 0) != 0;
         foreach (TabletopAudioCue cue in Enum.GetValues(typeof(TabletopAudioCue)))
@@ -108,9 +104,7 @@ public sealed partial class TabletopAudio : MonoBehaviour
         if (musicClip == null) musicClip = GeneratedClip("海风归途", TabletopAudioSynth.RenderMusic());
         musicSource = NewSource("循环背景音乐", true); musicSource.clip = musicClip;
         speechSource = NewSource("骑士语音", false); speechSource.priority = 40;
-        for (int language = 0; language < 2; language++) for (int action = 0; action < 2; action++) for (int variant = 0; variant < 2; variant++)
-            speechClips[language * 4 + action * 2 + variant] = Resources.Load<AudioClip>(AssetRoot + "Voices/" + (language == 0 ? "zh/" : "en/") +
-                (action == 0 ? "KnightRecruit" : "KnightActivate") + (variant + 1).ToString("D2"));
+        StartCoroutine(LoadKnightVoices());
         foreach (var clip in Resources.LoadAll<AudioClip>("TabletopAudio/CardNames"))
             cardNames.Add(clip.name, clip);
         fallbackListener = gameObject.AddComponent<AudioListener>(); fallbackListener.enabled = false;
@@ -133,11 +127,6 @@ public sealed partial class TabletopAudio : MonoBehaviour
     public AudioClip GetClip(TabletopAudioCue cue) => clips.TryGetValue(cue, out var clip) ? clip : null;
     public AudioClip GetMusicClip() => musicClip;
     public AudioClip GetAmbienceClip(int theme) => theme >= 0 && theme < 5 ? environmentClips[theme] : null;
-    public AudioClip GetVoiceClip(int language, TabletopAudioCue cue, int variant = 0)
-    {
-        if (language < 0 || language > 1 || variant < 0 || variant > 1 || (cue != TabletopAudioCue.KnightRecruit && cue != TabletopAudioCue.KnightActivate)) return null;
-        return speechClips[language * 4 + (cue == TabletopAudioCue.KnightRecruit ? 0 : 2) + variant];
-    }
     public void SetMenuTheme(int index) { menuTheme = Mathf.Clamp(index, 0, 4); SettingsChanged(); }
     readonly Dictionary<string, AudioClip> cardNames = new Dictionary<string, AudioClip>(StringComparer.Ordinal);
     public void PlayCardName(string name)
@@ -149,17 +138,10 @@ public sealed partial class TabletopAudio : MonoBehaviour
         speechSource.Play();
     }
 
-    public void PreviewVoice() { PlaySpeech(TabletopAudioCue.KnightRecruit, true); }
-    void PlaySpeech(TabletopAudioCue cue, bool preview = false)
-    {
-        if (!Ready || muted || applicationPaused || master <= 0 || speech <= 0 || speechSource == null) return;
-        if (!preview && speechSource.isPlaying) return;
-        var clip = GetVoiceClip(voiceLanguage, cue, speechVariant++ % 2); if (clip == null) return;
-        speechSource.Stop(); speechSource.clip = clip; speechSource.pitch = 1; ApplyVolumes(); speechSource.Play();
-    }
     static float Volume(float value) => float.IsNaN(value) || float.IsInfinity(value) ? 0 : Mathf.Clamp01(value);
     void SettingsChanged()
     {
+        if (muted || master <= 0 || speech <= 0) { ResetKnightVoices(); if (speechSource != null) speechSource.Stop(); }
         settingsDirty = true; saveSettingsAt = Time.unscaledTimeAsDouble + .55;
         ApplyVolumes();
     }
@@ -171,7 +153,6 @@ public sealed partial class TabletopAudio : MonoBehaviour
         PlayerPrefs.SetFloat(PreferencePrefix + "ambient", ambient);
         PlayerPrefs.SetFloat(PreferencePrefix + "music", music);
         PlayerPrefs.SetFloat(PreferencePrefix + "voice", speech);
-        PlayerPrefs.SetInt(PreferencePrefix + "language", voiceLanguage);
         PlayerPrefs.SetInt(PreferencePrefix + "theme", menuTheme);
         PlayerPrefs.SetInt(PreferencePrefix + "muted", muted ? 1 : 0); PlayerPrefs.Save(); settingsDirty = false;
     }
@@ -187,11 +168,11 @@ public sealed partial class TabletopAudio : MonoBehaviour
         for (int i = 0; i < 5; i++) if (environmentSources[i] != null)
         { environmentSources[i].mute = muted || applicationPaused; environmentSources[i].volume = master * ambient * ambientBlend * environmentWeights[i] * AmbientHeadroom; }
         if (musicSource != null) { musicSource.mute = muted || applicationPaused; musicSource.volume = master * music * musicDuck * MusicHeadroom; }
-        if (speechSource != null) { speechSource.mute = muted || applicationPaused; speechSource.volume = master * speech * SpeechHeadroom; }
+        if (speechSource != null) { speechSource.mute = muted || applicationPaused; speechSource.volume = master * speech * SpeechHeadroom * SpeechClipGain; }
     }
     public void ResetHistory()
     {
-        model.Reset(); publicModel.Reset(); scheduled.Clear(); limiter.Reset(); ResetGeneralVoices();
+        model.Reset(); publicModel.Reset(); scheduled.Clear(); limiter.Reset(); ResetGeneralVoices(); ResetKnightVoices();
         previousScope = null;
     }
     public void Click(bool cancel = false)
@@ -223,7 +204,6 @@ public sealed partial class TabletopAudio : MonoBehaviour
         if (!Ready || muted || applicationPaused || master <= 0 || !clips.TryGetValue(cue, out var clip)) return;
         double now = Time.unscaledTimeAsDouble;
         if (!limiter.Admit(cue, now)) return;
-        if (cue == TabletopAudioCue.KnightRecruit || cue == TabletopAudioCue.KnightActivate) PlaySpeech(cue);
         PlayEffectClip(clip, gain, Priority(cue));
     }
     internal void PlayEffectClip(AudioClip clip, float gain = 1, int priority = 120)
@@ -250,8 +230,8 @@ public sealed partial class TabletopAudio : MonoBehaviour
         if(e.Cue==TabletopAudioCue.DiceRoll&&e.RollSequence>0&&dice!=null&&e.RollSequence==dice.Sequence&&!dice.IsRolling(now))return;
         double at=dice==null?now+e.Delay:TabletopAudioTiming.ScheduledAt(e,now,dice.Sequence,dice.SettlesAt,dice.IsRolling(now));
         // 同一帧同类收牌/卡牌事件合并，既不暴露手牌数量，也不会堆叠增益。
-        if (scheduled.Any(s => s.Cue == e.Cue && Math.Abs(s.At - at) < .04)) return;
-        scheduled.Add(new Scheduled { Cue = e.Cue, At = at });
+        if (scheduled.Any(s => s.Event.Cue == e.Cue && s.Event.KnightVoice.Action == e.KnightVoice.Action && s.Event.KnightVoice.Level == e.KnightVoice.Level && Math.Abs(s.At - at) < .04)) return;
+        scheduled.Add(new Scheduled { Event = e, At = at });
     }
     void Update()
     {
@@ -319,18 +299,20 @@ public sealed partial class TabletopAudio : MonoBehaviour
             else if (notice != null && (notice.Contains("已保存") || notice.Contains("已恢复"))) Play(TabletopAudioCue.Save);
         }
         previousNotice = notice;
-        for (int i = scheduled.Count - 1; i >= 0; i--)
+        for (int i = 0; i < scheduled.Count;)
             if (scheduled[i].At <= now)
             {
                 bool rolling=dice!=null&&dice.IsRolling(now);
                 // 公开胜利牌退场前仍展示旧视图；保留收牌事件至 applyView 后，与真正起飞同帧衔接。
-                if(!TabletopAudioTiming.CanPlay(scheduled[i].Cue,rolling,owner.CardPresentationBusy))
+                if(!TabletopAudioTiming.CanPlay(scheduled[i].Event.Cue,rolling,owner.CardPresentationBusy))
                 {
                     if(rolling){var delayed=scheduled[i];delayed.At=dice.SettlesAt;scheduled[i]=delayed;}
-                    continue;
+                    i++; continue;
                 }
-                var cue = scheduled[i].Cue; scheduled.RemoveAt(i); Play(cue);
+                var entry = scheduled[i].Event; scheduled.RemoveAt(i); Play(entry.Cue); QueueKnightVoice(entry.KnightVoice, now);
             }
+            else i++;
+        PumpKnightVoices(now);
         if (Input.GetKeyDown(KeyCode.Escape)) Click(true);
     }
     void UpdateListener()
@@ -345,9 +327,7 @@ public sealed partial class TabletopAudio : MonoBehaviour
         bool pastoral = owner != null && owner.MenuVisible && !owner.NetworkGame;
         label.normal.textColor = pastoral ? PastoralMenuUI.Ink : ModernOperationUI.TextColor;
         GUI.Label(new Rect(area.x, area.y, 70, 24), "声音设置", label);
-        if (ModernOperationUI.Button(new Rect(area.xMax - 254, area.y, 77, 24), muted ? "已静音" : "声音开启", true, false, !muted)) { Muted = !muted; if (!muted) Click(); }
-        if (ModernOperationUI.Button(new Rect(area.xMax - 169, area.y, 89, 24), voiceLanguage == 0 ? "真人：应答" : "真人：战呼")) VoiceLanguage = 1 - VoiceLanguage;
-        if (ModernOperationUI.Button(new Rect(area.xMax - 72, area.y, 72, 24), "语音试听")) PreviewVoice();
+        if (ModernOperationUI.Button(new Rect(area.xMax - 89, area.y, 89, 24), muted ? "已静音" : "声音开启", true, false, !muted)) { Muted = !muted; if (!muted) Click(); }
         float width = area.width / 5;
         DrawCompactSlider(new Rect(area.x, area.y + 30, width - 10, 36), "总音量", master, v => MasterVolume = v, label);
         DrawCompactSlider(new Rect(area.x + width, area.y + 30, width - 10, 36), "音效", effects, v => EffectsVolume = v, label);
@@ -373,7 +353,7 @@ public sealed partial class TabletopAudio : MonoBehaviour
         applicationPaused = paused; ApplyVolumes();
         if (paused)
         {
-            scheduled.Clear(); FlushSettings(); foreach (var source in environmentSources) if (source != null) source.Pause();
+            scheduled.Clear(); ResetKnightVoices(); FlushSettings(); foreach (var source in environmentSources) if (source != null) source.Pause();
             if (musicSource != null) musicSource.Pause(); if (speechSource != null) speechSource.Stop();
             foreach (var source in voices) if (source != null) source.Stop();
         }

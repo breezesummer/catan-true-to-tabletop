@@ -1,0 +1,106 @@
+{
+  "date": "2026-11-11",
+  "status": "英语人物音色待玩家试听",
+  "voices": [
+    {
+      "rank": 1,
+      "name": "John North",
+      "direction": "英式骑士",
+      "file": "art/exports/knight-voices-en-v001/01-John-North-英式骑士.mp3",
+      "sha256": "e3ca1d32e52b25928820c878341c3416c5a364a4bc5fcb74f9ab6fd93e9c84ba",
+      "sampleRate": 44100,
+      "channels": 1,
+      "durationSecs": 10.919,
+      "peakDbfs": -3.13,
+      "rmsDbfs": -20.48,
+      "clippedSamples": 0,
+      "recognizedLanguage": "eng",
+      "languageProbability": 0.9612635970115662,
+      "transcriptionModel": "scribe_v2",
+      "transcript": "Aye, where'd you need me? [laughs] Payday, now you're talking. Pirates, clear these waters. Bandits, off the road. Shields up, with me",
+      "audioEvents": [
+        {
+          "text": "[laughs]",
+          "start": 1.48,
+          "end": 2.1,
+          "type": "audio_event",
+          "logprob": -0.0017878730601902741
+        }
+      ],
+      "auditionFile": "art/exports/knight-voices-en-v001/01-John-North-英式骑士-音量对齐试听.wav",
+      "auditionSha256": "32fe63e2d00d7dcef54502f8f0dc3d5f57bf3cf8fd29b98a729d46f860ff4e25",
+      "auditionGainDb": -0.52,
+      "auditionRmsDbfs": -21.004,
+      "auditionClippedSamples": 0
+    },
+    {
+      "rank": 2,
+      "name": "Lord Griff",
+      "direction": "奇幻重骑",
+      "file": "art/exports/knight-voices-en-v001/02-Lord-Griff-奇幻重骑.mp3",
+      "sha256": "6175c67f1e6ba36be298b09f7f1db3fa85cca7b568657eb3062303cd9fff63dc",
+      "sampleRate": 44100,
+      "channels": 1,
+      "durationSecs": 10.762,
+      "peakDbfs": -1.21,
+      "rmsDbfs": -20.83,
+      "clippedSamples": 0,
+      "recognizedLanguage": "eng",
+      "languageProbability": 0.958245575428009,
+      "transcriptionModel": "scribe_v2",
+      "transcript": "Aye, where do you need me? [laughs] Payday, now you're talking. Pirates, clear these waters. Bandits, off the road. Shields up, with me",
+      "audioEvents": [
+        {
+          "text": "[laughs]",
+          "start": 1.48,
+          "end": 2.26,
+          "type": "audio_event",
+          "logprob": -0.0004413414474863468
+        }
+      ],
+      "auditionFile": "art/exports/knight-voices-en-v001/02-Lord-Griff-奇幻重骑-音量对齐试听.wav",
+      "auditionSha256": "1ed88c4009d4db17c6bcd8f682370be1ce16b31481f3782210e98803df4304a7",
+      "auditionGainDb": -0.17,
+      "auditionRmsDbfs": -20.999,
+      "auditionClippedSamples": 0
+    },
+    {
+      "rank": 3,
+      "name": "George",
+      "direction": "战场老兵",
+      "file": "art/exports/knight-voices-en-v001/03-George-战场老兵.mp3",
+      "sha256": "dfc9ab836f9b0a48017feedf6e0d015a43f223bbe869c164e1ec7b33f180e678",
+      "sampleRate": 44100,
+      "channels": 1,
+      "durationSecs": 10.684,
+      "peakDbfs": -8.88,
+      "rmsDbfs": -28.15,
+      "clippedSamples": 0,
+      "recognizedLanguage": "eng",
+      "languageProbability": 0.9653877019882202,
+      "transcriptionModel": "scribe_v2",
+      "transcript": "Aye? Where do you need me? [laughs] Payday. Now you're talking. Pirates, clear these waters. Bandits, off the road. Shields up. With me",
+      "audioEvents": [
+        {
+          "text": "[laughs]",
+          "start": 1.52,
+          "end": 2.34,
+          "type": "audio_event",
+          "logprob": -9.114847974463676e-05
+        }
+      ],
+      "auditionFile": "art/exports/knight-voices-en-v001/03-George-战场老兵-音量对齐试听.wav",
+      "auditionSha256": "9d91f5fd807591f9a275584d25e35e564a5fbc13c738b8289c04140eee2344b5",
+      "auditionGainDb": 7.15,
+      "auditionRmsDbfs": -20.999,
+      "auditionClippedSamples": 0
+    }
+  ],
+  "auditionProcessing": {
+    "method": "统一均方根电平",
+    "targetRmsDbfs": -21,
+    "sampleRate": 44100,
+    "channels": 1,
+    "sampleWidth": 16
+  }
+}

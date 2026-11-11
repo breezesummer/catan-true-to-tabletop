@@ -74,7 +74,7 @@ public sealed class AudioVisualVerification : MonoBehaviour
         yield return null;
         var audio = TabletopAudio.Instance;
         Require(audio.Ready, "音频未就绪");
-        foreach (string name in new[] { "MasterVolume", "EffectsVolume", "AmbientVolume", "MusicVolume", "VoiceVolume", "VoiceLanguage", "Muted" })
+        foreach (string name in new[] { "MasterVolume", "EffectsVolume", "AmbientVolume", "MusicVolume", "VoiceVolume", "Muted" })
         {
             var p = typeof(TabletopAudio).GetProperty(name);
             Require(p != null, "缺少声音设置 " + name);
@@ -89,11 +89,12 @@ public sealed class AudioVisualVerification : MonoBehaviour
         CheckClip(audio.GetMusicClip(), "背景音乐");
         Require(audio.GetMusicClip().length > 45, "完整乐句时长不足");
         Require(audio.GetComponents<AudioSource>().Any(s => s.clip == audio.GetMusicClip() && s.loop), "背景音乐没有开启循环");
-        Require(audio.VoiceClipCount == 8, "中英语音不齐全");
+        while (!audio.KnightVoicesLoaded) yield return null;
+        Require(audio.VoiceClipCount == KnightVoiceCatalog.ClipCount, "骑士分级语音不齐全");
         for (int theme = 0; theme < 5; theme++) CheckClip(audio.GetAmbienceClip(theme), "主题环境 " + theme);
-        for (int language = 0; language < 2; language++)
-        foreach (var cue in new[] { TabletopAudioCue.KnightRecruit, TabletopAudioCue.KnightActivate })
-        for (int variant = 0; variant < 2; variant++) CheckClip(audio.GetVoiceClip(language, cue, variant), "骑士语音 " + language + "/" + cue + "/" + variant);
+        for (int level = 1; level <= 3; level++)
+        for (int action = 1; action <= 6; action++)
+        for (int variant = 0; variant < 2; variant++) CheckClip(audio.GetKnightVoiceClip((KnightVoiceAction)action, level, variant), "骑士语音 " + level + "/" + action + "/" + variant, KnightVoiceCatalog.Gain);
         foreach (string key in new[] { "MusicVolume", "VoiceVolume" })
         {
             var p = typeof(TabletopAudio).GetProperty(key);
@@ -101,9 +102,8 @@ public sealed class AudioVisualVerification : MonoBehaviour
             p.SetValue(audio, 2f); Require((float)p.GetValue(audio) == 1, key + "超限没有限制");
             p.SetValue(audio, audioPreferences[key]);
         }
-        audio.VoiceLanguage = 1; audio.MusicVolume = .37f; audio.VoiceVolume = .61f; audio.FlushSettings();
-        Require(PlayerPrefs.GetInt("catan.audio.v1.language", -1) == 1 &&
-            Math.Abs(PlayerPrefs.GetFloat("catan.audio.v1.music", -1) - .37f) < .001f &&
+        audio.MusicVolume = .37f; audio.VoiceVolume = .61f; audio.FlushSettings();
+        Require(Math.Abs(PlayerPrefs.GetFloat("catan.audio.v1.music", -1) - .37f) < .001f &&
             Math.Abs(PlayerPrefs.GetFloat("catan.audio.v1.voice", -1) - .61f) < .001f, "新增声音设置没有持久化");
         stage = "地图与扩展完整覆盖";
         string[] scenarios = { "heading-for-new-shores", "four-islands", "fog-islands", "through-the-desert", "forgotten-tribe", "cloth-for-catan", "pirate-islands", "wonders-of-catan", "new-world" };
@@ -176,12 +176,12 @@ public sealed class AudioVisualVerification : MonoBehaviour
         Require(app.ExportEnvelope() == authority, "关闭动态改变了对局");
     }
 
-    void CheckClip(AudioClip clip, string name)
+    void CheckClip(AudioClip clip, string name, float gain = 1)
     {
         Require(clip != null && clip.samples > 0 && clip.frequency >= 16000, "片段缺失 " + name);
         var data = new float[clip.samples * clip.channels];
         Require(clip.GetData(data, 0) && data.Any(v => Math.Abs(v) > .0001f), "片段静音或不可读 " + name);
-        Require(data.All(v => !float.IsNaN(v) && !float.IsInfinity(v) && Math.Abs(v) <= .701f), "片段无效或超出混音余量 " + name + " 峰值=" + data.Max(v => Math.Abs(v)));
+        Require(data.All(v => !float.IsNaN(v) && !float.IsInfinity(v) && Math.Abs(v * gain) <= .701f), "片段无效或超出混音余量 " + name + " 峰值=" + data.Max(v => Math.Abs(v)));
     }
     // 独立离屏渲染可在隐藏窗口验证局部水波，不能代替完整菜单窗口验收。
     void CheckClassicHarbor(Shader shader)

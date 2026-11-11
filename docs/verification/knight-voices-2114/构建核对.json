@@ -1,0 +1,84 @@
+{
+  "日期": "2026-11-11",
+  "版本": "内测版2.1.14",
+  "目标": "Windows x86-64",
+  "基线提交": "cbaf428d4816986da6f245aa38d726bda3d17734",
+  "构建状态": "通过",
+  "资源数": 36,
+  "编辑器检查": 256,
+  "实际语音播放次数": 39,
+  "音频单元测试": {
+    "通过": 298,
+    "失败": 0
+  },
+  "资源与已交付成品完全一致": true,
+  "移除设置试听与语音选择": true,
+  "构建日志标记": [
+    "CATAN_AUDIO_VISUAL_TEXTURES_OK",
+    "CATAN_M6_UNITY_CORE_OK",
+    "CATAN_M6_UNITY_BUILD_OK"
+  ],
+  "产物": [
+    {
+      "文件": "game version/2.1/Catan2.1.14-Knight-Voices/Builds/Windows/Catan2.1.14.exe",
+      "字节数": 667136,
+      "sha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "文件": "game version/2.1/Catan2.1.14-Knight-Voices/Builds/Windows/Catan2.1.14_Data/Managed/Assembly-CSharp.dll",
+      "字节数": 1808896,
+      "sha256": "0bbad51c61cef246fda11ff294f1e3ec2dee5768516461a03ed4d95d1988cd51"
+    }
+  ],
+  "已核对源文件": [
+    {
+      "文件": "Unity/Catan/Assets/Editor/AudioVisualBuildValidation.cs",
+      "sha256": "0cee2bb4917b385dabbcf65c23228fc247356803656fd9616408574c02dfc405"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Editor/KnightVoiceEditorVerification.cs",
+      "sha256": "5bc3648835a43afafb61477ef1be7278525be0da7f717e06615ccac4c9e1f1f4"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Editor/KnightVoiceEditorVerification.cs.meta",
+      "sha256": "9dce62c653134d7be16bc509cc8a2bb0a39477a4883f4bafd74c4394f7991112"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Resources/TabletopAudio/KnightVoices.meta",
+      "sha256": "31c724298a8fecfbb03ccdb6f735770bc25ccaaf945bf03555b025ebc89db628"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Scripts/AcceptedMenu.cs",
+      "sha256": "3226b1aad0582bc933981faf7b05da96bf2d6e29baaff51222425e14ca126ecf"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Scripts/AudioVisualVerification.cs",
+      "sha256": "f4a438b018222ec98a793c07cbd62b8d0a94629386339f5247468ff2d513905b"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Scripts/KnightVoiceModel.cs",
+      "sha256": "19fb82cf33ae825fef873c0dbb821367c5de5a33593a48514c012216d74d6889"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Scripts/KnightVoiceModel.cs.meta",
+      "sha256": "77b032cc5916beeaa6757f13f6c7dd4e733072f38551a335c941d8c06f6852fc"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Scripts/TabletopAudio.cs",
+      "sha256": "abdc21d124b7d710659e6c56ba480cf8f152b5bdba45165a4440cac057f83643"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Scripts/TabletopAudioModel.cs",
+      "sha256": "748f2ce0db86cad59f34263f9213f3bed1090fa70603d5564bb0d28dc8c1a7c0"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Scripts/TabletopKnightVoices.cs",
+      "sha256": "3e5b207b89e134467479f6eec75a461eafb15fc897ec5b602006915c567a262e"
+    },
+    {
+      "文件": "Unity/Catan/Assets/Scripts/TabletopKnightVoices.cs.meta",
+      "sha256": "274032a8d2410a64ea58bd63ed9005e925a314c82a91447d83a2b95f067ce1b6"
+    }
+  ],
+  "运行范围": "macOS Unity Editor实际播放与画面；Windows交叉构建"
+}

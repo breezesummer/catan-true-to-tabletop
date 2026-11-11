@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-11",
+  "provider": "ElevenLabs",
+  "modelId": "eleven_v4",
+  "languageCode": "en",
+  "outputFormat": "mp3_44100_128",
+  "voiceSettings": { "stability": 0.5, "similarityBoost": 0.75 },
+  "seed": 2026111111,
+  "text": "[casual] Aye? Where do you need me?\n[chuckles] Payday! Now you're talking.\n[stern] Pirates! Clear these waters!\n[angry] Bandits! Off the road!\n[determined] Shields up! With me!",
+  "sceneOrder": ["日常应答", "领饷", "驱赶海盗", "驱赶强盗", "发起进攻"],
+  "voices": [
+    { "rank": 1, "sourceVoiceId": "7rQX8r6PVq3gfJ8rZzyE", "name": "John North", "direction": "英式骑士", "filename": "01-John-North-英式骑士.mp3", "libraryName": "Catan-英语骑士-John-North" },
+    { "rank": 2, "sourceVoiceId": "A48Y4xFQ2YpCgXhLXguK", "name": "Lord Griff", "direction": "奇幻重骑", "filename": "02-Lord-Griff-奇幻重骑.mp3", "libraryName": "Catan-英语骑士-Lord-Griff" },
+    { "rank": 3, "sourceVoiceId": "GLSWsaquVBsIPLPPRi2s", "name": "George", "direction": "战场老兵", "filename": "03-George-战场老兵.mp3", "libraryName": "Catan-英语骑士-George" }
+  ]
+}
