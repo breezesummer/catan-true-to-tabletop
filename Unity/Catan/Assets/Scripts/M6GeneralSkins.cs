@@ -58,6 +58,7 @@ public sealed partial class M6App
         var general=GeneralCatalog.Get(entry.GeneralId);
         if(general==null||string.IsNullOrEmpty(entry.SkillId)){nextSkill++;return;}
         var selected=GeneralSkinArt.Get(entry.GeneralId);
+        if(selected==null){nextSkill++;return;}
         if(!GeneralSkinArt.AttackReady(selected))return;
         var skill=Array.Find(general.Skills,s=>s.Id==entry.SkillId);
         skillCaption=general.Name+" · "+(skill?.Name??"技能");

@@ -14,18 +14,17 @@ internal static class GeneralSkinArt
         public string id,sound;
         public float idleTime,attackTime;
         public int idleFrames;
-        public bool slash;
         [NonSerialized] public bool useStatic;
         [NonSerialized] public string idlePath,attackPath;
     }
-    [Serializable] sealed class Manifest { public Skin[] entries; public float slashTime; }
+    [Serializable] sealed class Manifest { public Skin[] entries; }
     sealed class TextureSlot { public ResourceRequest request; public int lastFrame; }
     static readonly Dictionary<string,TextureSlot> textures=new Dictionary<string,TextureSlot>();
     static readonly Dictionary<string,Skin> skins=new Dictionary<string,Skin>();
     static readonly Dictionary<string,ResourceRequest> sounds=new Dictionary<string,ResourceRequest>();
     internal static ResourceRequest AttackSound(Skin skin)
     {
-        string key=skin?.sound??"shared/attack-sound";
+        string key=skin.sound;
         if(!sounds.TryGetValue(key,out var request))
             sounds[key]=request=Resources.LoadAsync<AudioClip>(Root+key);
         return request;
@@ -80,12 +79,12 @@ internal static class GeneralSkinArt
     }
     internal static bool AttackReady(Skin skin)
     {
+        if(skin==null)return false;
         var sound=AttackSound(skin);
-        bool ready=skin==null||Texture(skin.attackPath)!=null;
-        if(skin==null||skin.slash)ready&=Texture(Root+"shared/attack")!=null;
+        bool ready=Texture(skin.attackPath)!=null;
         return ready&&sound.isDone;
     }
-    internal static float AttackSeconds(Skin skin)=>skin?.attackTime??manifest.slashTime;
+    internal static float AttackSeconds(Skin skin)=>skin.attackTime;
     internal static void Idle(Rect area,Skin skin)
     {
         if(Event.current.type!=EventType.Repaint)return;
@@ -98,8 +97,6 @@ internal static class GeneralSkinArt
         var area=CenterArea;
         if(skin!=null)
             Sheet(area,Texture(skin.attackPath),phase,skin.id==FirstSkin?66:48,8);
-        if(skin==null||skin.slash)
-            Sheet(area,Texture(Root+"shared/attack"),phase,48,8);
     }
     static void Sheet(Rect area,Texture2D texture,float phase,int count,int columns)
     {

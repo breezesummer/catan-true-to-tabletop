@@ -57,6 +57,7 @@ async function main(){
                 fs.copyFileSync(source,path.join(output,entry.sound+'.mp3'));
             }
         }
+        fs.mkdirSync(path.join(output,'shared'),{recursive:true});
         fs.copyFileSync(path.join(extension,'../audio/skill/qinggang_skill.mp3'),path.join(output,'shared/attack-sound.mp3'));
     }
     if(process.argv.includes('--audio-only')){
@@ -77,7 +78,7 @@ async function main(){
             if(data.idle) await saveSheet(path.join(dir,'idle.png'),data.idle);
             if(data.attack) await saveSheet(path.join(dir,'attack.png'),data.attack);
             console.log(id,data.idleTime,data.attackTime);
-            return {id,idleTime:data.idleTime,idleFrames:data.idleFrames,attackTime:data.attackTime,slash:args.fallback===true};
+            return {id,idleTime:data.idleTime,idleFrames:data.idleFrames,attackTime:data.attackTime};
         } finally {await page.close();}
     }
     try {
@@ -95,9 +96,8 @@ async function main(){
         }
         if(entries.length!==33) throw new Error('动皮数量错误 '+entries.length);
         if(idleOnly)return;
-        const slash=await bake('shared',{attack:skeleton(path.join(decade,'assets/animation/effect_qinggangjian'),null)});
         importSounds(entries);
-        fs.writeFileSync(path.join(output,'manifest.json'),JSON.stringify({entries,slashTime:slash.attackTime},null,2)+'\n');
+        fs.writeFileSync(path.join(output,'manifest.json'),JSON.stringify({entries},null,2)+'\n');
     } finally {await browser.close();}
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

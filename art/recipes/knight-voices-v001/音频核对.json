@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-11",
+  "provider": "ElevenLabs",
+  "transcriptionModel": "scribe_v2",
+  "status": "待用户试听音色",
+  "previewCharacters": 117,
+  "voices": [
+    {
+      "level": 1,
+      "name": "一级骑士-爽快青年",
+      "selectedPreview": 2,
+      "file": "art/exports/knight-voices-v001/一级骑士-爽快青年.mp3",
+      "sha256": "9d76b0fbcfbf2e4d786cabac260395b1beb22519b34ab18e782fff95813a994e",
+      "sampleRate": 44100,
+      "channels": 1,
+      "durationSecs": 30.041,
+      "peakDbfs": -1.82,
+      "rmsDbfs": -19.9,
+      "clippedSamples": 0,
+      "neutralMedianPitchHzApprox": 158,
+      "recognizedLanguage": "zho",
+      "languageProbability": 0.9964112639427185,
+      "transcript": "我来报到了。准备好了，等您指示。好，我这就过去。这里有我守着，您放心。海盗，离远点，这不许抢船。强盗把路让开，别再抢东西了。准备接招，我来打开局面。这身装备正合适。本领又长进了，更大的责任交给我吧。前往新的驻地，那里有我驻守。"
+    },
+    {
+      "level": 2,
+      "name": "二级骑士-干练老兵",
+      "selectedPreview": 1,
+      "file": "art/exports/knight-voices-v001/二级骑士-干练老兵.mp3",
+      "sha256": "e5d68b14a1614c41d3120f40c97779418d2d93eadeba761a7b1b9d5657961f95",
+      "sampleRate": 44100,
+      "channels": 1,
+      "durationSecs": 34.429,
+      "peakDbfs": -2.64,
+      "rmsDbfs": -21.05,
+      "clippedSamples": 0,
+      "neutralMedianPitchHzApprox": 104,
+      "recognizedLanguage": "zho",
+      "languageProbability": 0.9941402673721313,
+      "transcript": "我来报到了。准备好了，等您指示。好，我这就过去。这里有我守着，您放心。海盗，离远点儿，这儿不许抢船。强盗，把路让开，别再强抢东西了。准备接招，我来打开局面。这身装备正合适。本领又长进了。更大的责任交给我吧。前往新的驻地，那里有我驻守。"
+    },
+    {
+      "level": 3,
+      "name": "三级骑士-沉稳精锐",
+      "selectedPreview": 2,
+      "file": "art/exports/knight-voices-v001/三级骑士-沉稳精锐.mp3",
+      "sha256": "4b73d146884ab854b83b52588010112d58c3562bcedd3a5fa4d81937108ff1cd",
+      "sampleRate": 44100,
+      "channels": 1,
+      "durationSecs": 39.889,
+      "peakDbfs": -2.68,
+      "rmsDbfs": -21.39,
+      "clippedSamples": 0,
+      "neutralMedianPitchHzApprox": 80,
+      "recognizedLanguage": "zho",
+      "languageProbability": 0.9949206113815308,
+      "transcript": "我来报到了。准备好了，等您指示。好，我这就过去。这里有我守着，您放心。海盗，离远点儿，这儿不许抢船。强盗，把路让开，别再抢东西了。准备接招，我来打开局面。这身装备正合适，本领又长进了。更大的责任交给我吧。前往新的驻地，那里有我驻守。"
+    }
+  ]
+}

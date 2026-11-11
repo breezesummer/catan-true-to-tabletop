@@ -1,0 +1,369 @@
+{
+  "date": "2026-11-11",
+  "provider": "ElevenLabs",
+  "modelId": "eleven_ttv_v3",
+  "outputFormat": "mp3_44100_128",
+  "generationSettings": {
+    "guidanceScale": 3,
+    "loudness": 0.35
+  },
+  "previewText": "[casual] 嗯？叫我啊？来了，来了。护腕系上就走。去哪儿？行，你指个地方，我过去。\n[chuckles] 嘿，发饷了？这还差不多。吃饱了就有劲，放心，这儿我守着。\n[stern] 喂！那条贼船，离远点！还有你，强盗，把路让开！\n[determined] 别急，跟在我后头。好……就是现在，冲！",
+  "source": "https://elevenlabs.io/docs/api-reference/text-to-voice/design",
+  "voices": [
+    {
+      "level": 1,
+      "name": "一级骑士-冒失新兵",
+      "libraryName": "Catan-通用一级骑士-营地新兵-20261111-R2",
+      "description": "中文普通话母语，二十五岁的男性。一个刚巡逻回来的年轻步兵，护腕还没系好，被熟悉的队长叫住，边忙边随口搭话。结实的青年男声，嗓音有一点毛边和鼻腔感，嘴巴放松，气息有真实的小起伏。性格热心、直率，有些冒失，答应事情比想事情快。像真人影视里营地士兵和同伴近距离聊天，几个字会自然黏在一起，重音随当下反应变化。发饷时忍不住咧嘴笑，面对敌人立刻收住笑意，短促喝退。说话带生活气，反应鲜活，声音朴实。",
+      "seed": 2026111201,
+      "generatedAt": "2026-11-11T02:21:52.313Z",
+      "selectedPreview": 1,
+      "returnedText": "[casual] 嗯？叫我啊？来了，来了。护腕系上就走。去哪儿？行，你指个地方，我过去。\n[chuckles] 嘿，发饷了？这还差不多。吃饱了就有劲，放心，这儿我守着。\n[stern] 喂！那条贼船，离远点！还有你，强盗，把路让开！\n[determined] 别急，跟在我后头。好……就是现在，冲！",
+      "previews": [
+        {
+          "index": 1,
+          "generatedVoiceId": "scuY6CG2wnjOv9FN1R1N",
+          "mediaType": "audio/mpeg",
+          "durationSecs": 20.9268125,
+          "language": "wuu",
+          "file": "art/exports/knight-voices-v002/候选/一级骑士-冒失新兵-候选1.mp3",
+          "bytes": 334829,
+          "sha256": "3c41ef4a02b6bc48b47701922b6820667125e7ff24992d7f99d92f545d1a3296"
+        },
+        {
+          "index": 2,
+          "generatedVoiceId": "ZhYWkoy4mt7bNy1gZsMR",
+          "mediaType": "audio/mpeg",
+          "durationSecs": 25.158625,
+          "language": "wuu",
+          "file": "art/exports/knight-voices-v002/候选/一级骑士-冒失新兵-候选2.mp3",
+          "bytes": 402538,
+          "sha256": "09ec3c408a150b737ee3b1943351ec692831722f844cbe2868452e3b0565e10a"
+        },
+        {
+          "index": 3,
+          "generatedVoiceId": "YNEiOWvHwxWNQINl86EZ",
+          "mediaType": "audio/mpeg",
+          "durationSecs": 29.8868125,
+          "language": "wuu",
+          "file": "art/exports/knight-voices-v002/候选/一级骑士-冒失新兵-候选3.mp3",
+          "bytes": 478189,
+          "sha256": "1c459d9d69b789280be3377dbba56aced22026c88c3987af11f01d5e62cbb15d"
+        }
+      ],
+      "auditionFile": "art/exports/knight-voices-v002/一级骑士-冒失新兵.mp3",
+      "voiceId": "scuY6CG2wnjOv9FN1R1N",
+      "librarySavedAt": "2026-11-11T02:27:05.757Z",
+      "shortAuditionFile": "art/exports/knight-voices-v002/一级骑士-冒失新兵-短句试听.wav",
+      "shortAuditionSha256": "1653bc1555747f9b2c4cb49a6d497f41297e4ca73a0570596051efe1c4326d5c",
+      "shortAuditionDurationSecs": 12.868,
+      "shortAuditionEdits": [
+        {
+          "id": "01",
+          "name": "接话",
+          "source": "art/exports/knight-voices-v002/短句原音/一级骑士-冒失新兵-01-接话.mp3",
+          "sourceSha256": "b4e8c59d838891b2e08db4001c0752c8c1cb8ce2153104f3ce76e2948a240b79",
+          "sourceDurationSecs": 3.396,
+          "sourceRangeSecs": [
+            0,
+            3.396
+          ],
+          "montageStartSecs": 0,
+          "peakDbfs": -1.27,
+          "clippedSamples": 0
+        },
+        {
+          "id": "02",
+          "name": "领饷",
+          "source": "art/exports/knight-voices-v002/短句原音/一级骑士-冒失新兵-02-领饷.mp3",
+          "sourceSha256": "27ac3db2f2a1c7b611dc88030ed24abb529162ba00cc657895b3dbdb1392b201",
+          "sourceDurationSecs": 3.082,
+          "sourceRangeSecs": [
+            0,
+            3.082
+          ],
+          "montageStartSecs": 3.846,
+          "peakDbfs": -1.87,
+          "clippedSamples": 0
+        },
+        {
+          "id": "03",
+          "name": "驱盗",
+          "source": "art/exports/knight-voices-v002/短句原音/一级骑士-冒失新兵-03-驱盗.mp3",
+          "sourceSha256": "db799b314aca6b02fe7f6d63a73fafeb56991c70d68b45e7e03ee1ff241a455b",
+          "sourceDurationSecs": 1.959,
+          "sourceRangeSecs": [
+            0.08,
+            1.959
+          ],
+          "montageStartSecs": 7.378,
+          "peakDbfs": -1.78,
+          "clippedSamples": 0
+        },
+        {
+          "id": "04",
+          "name": "冲锋",
+          "source": "art/exports/knight-voices-v002/短句原音/一级骑士-冒失新兵-04-冲锋.mp3",
+          "sourceSha256": "e3aa21d7097825943b037b5290ed278e1151a66c76ca9f1009e639cbd3c3fc0f",
+          "sourceDurationSecs": 3.161,
+          "sourceRangeSecs": [
+            0,
+            3.161
+          ],
+          "montageStartSecs": 9.708,
+          "peakDbfs": -1.09,
+          "clippedSamples": 0
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "name": "二级骑士-粗粝老兵",
+      "libraryName": "Catan-通用二级骑士-粗粝老兵-20261111-R2",
+      "description": "中文普通话母语，三十五岁的男性。一位在海边营地摸爬滚打多年的老兵，正靠着木栅栏整理装备，同伴叫他时抬头接话。嗓子被海风吹得略干，男中音有明显粗糙颗粒和轻微沙哑，发声轻松，口腔松弛。性格直爽、机灵，略带一点痞气和干巴巴的幽默。熟人面前会先半哼一声，再随口应下，笑只从气息里漏一点。语速随情绪自然变化，会吞掉轻声的字，停顿不规则，句尾顺着气息落下。赶人时突然锋利，动手时话短、有劲。真人影视式的角色即时对白。",
+      "seed": 2026111202,
+      "generatedAt": "2026-11-11T02:22:07.655Z",
+      "selectedPreview": 2,
+      "returnedText": "[casual] 嗯？叫我啊？来了，来了。护腕系上就走。去哪儿？行，你指个地方，我过去。\n[chuckles] 嘿，发饷了？这还差不多。吃饱了就有劲，放心，这儿我守着。\n[stern] 喂！那条贼船，离远点！还有你，强盗，把路让开！\n[determined] 别急，跟在我后头。好……就是现在，冲！",
+      "previews": [
+        {
+          "index": 1,
+          "generatedVoiceId": "0F0YV5pW9ELYhDlQevul",
+          "mediaType": "audio/mpeg",
+          "durationSecs": 26.67375,
+          "language": "wuu",
+          "file": "art/exports/knight-voices-v002/候选/二级骑士-粗粝老兵-候选1.mp3",
+          "bytes": 426780,
+          "sha256": "81484c4e92ba22ae427ab2f121e88580eb5c16ebf840cd3858f45607386be5cd"
+        },
+        {
+          "index": 2,
+          "generatedVoiceId": "x5UYaPazblXUnlRFyYia",
+          "mediaType": "audio/mpeg",
+          "durationSecs": 32.2116875,
+          "language": "wuu",
+          "file": "art/exports/knight-voices-v002/候选/二级骑士-粗粝老兵-候选2.mp3",
+          "bytes": 515387,
+          "sha256": "a3e99c2dc9e7a1d5e7466d31f99a0361310ab0364f112760ca8e464ef6b339be"
+        },
+        {
+          "index": 3,
+          "generatedVoiceId": "fUd3NceYKeEx2RhLhqxl",
+          "mediaType": "audio/mpeg",
+          "durationSecs": 29.5733125,
+          "language": "wuu",
+          "file": "art/exports/knight-voices-v002/候选/二级骑士-粗粝老兵-候选3.mp3",
+          "bytes": 473173,
+          "sha256": "e3c6b0a32e2c5e97cd170dcda5b89b4051a2f5b1ce9d97e4517e0e07b677b2fc"
+        }
+      ],
+      "auditionFile": "art/exports/knight-voices-v002/二级骑士-粗粝老兵.mp3",
+      "voiceId": "x5UYaPazblXUnlRFyYia",
+      "librarySavedAt": "2026-11-11T02:27:20.447Z",
+      "shortAuditionFile": "art/exports/knight-voices-v002/二级骑士-粗粝老兵-自然短句.mp3",
+      "shortAuditionSha256": "36adc178ccfb3d3ddef2a855aa21e85396eda7d9c423b546eea65607f4c24899",
+      "shortAuditionDurationSecs": 10.188,
+      "shortAuditionEdits": [
+        {
+          "name": "接话、领饷、驱盗、冲锋",
+          "source": "art/exports/knight-voices-v002/二级骑士-粗粝老兵-自然短句.mp3",
+          "sourceSha256": "36adc178ccfb3d3ddef2a855aa21e85396eda7d9c423b546eea65607f4c24899",
+          "sourceDurationSecs": 10.188,
+          "sourceRangeSecs": [
+            0,
+            10.188
+          ],
+          "montageStartSecs": 0,
+          "peakDbfs": -1.28,
+          "clippedSamples": 0
+        }
+      ],
+      "alternateAudition": {
+        "modelId": "eleven_v3",
+        "languageCode": "zh",
+        "outputFormat": "mp3_44100_128",
+        "voiceSettings": {
+          "stability": 0.5,
+          "similarityBoost": 0.75,
+          "useSpeakerBoost": false
+        },
+        "seed": 2026111722,
+        "text": "[casual] 嗯？叫我啊？来了，来了！\n[chuckles] 发饷啦！这还差不多。\n[stern] 喂，贼船！离远点！\n[shouts] 看我的！冲！",
+        "file": "art/exports/knight-voices-v002/二级骑士-粗粝老兵-自然短句.mp3",
+        "bytes": 163465,
+        "sha256": "36adc178ccfb3d3ddef2a855aa21e85396eda7d9c423b546eea65607f4c24899",
+        "generatedAt": "2026-11-11T02:30:25.908Z"
+      },
+      "previousShortAudition": {
+        "shortAuditionFile": "art/exports/knight-voices-v002/二级骑士-粗粝老兵-短句试听.wav",
+        "shortAuditionSha256": "fe57caed380d993906962dcf9d220cc782d3d651a11a298eb91ccdb4c559916f",
+        "shortAuditionDurationSecs": 13.247,
+        "shortAuditionEdits": [
+          {
+            "id": "01",
+            "name": "接话",
+            "source": "art/exports/knight-voices-v002/短句原音/二级骑士-粗粝老兵-01-接话.mp3",
+            "sourceSha256": "bd42326388c57cbed65f392fdc575b286679442dc596fe8eb7faf59be4aa6614",
+            "sourceDurationSecs": 2.691,
+            "sourceRangeSecs": [
+              0,
+              2.32
+            ],
+            "montageStartSecs": 0,
+            "peakDbfs": -2.74,
+            "clippedSamples": 0
+          },
+          {
+            "id": "02",
+            "name": "领饷",
+            "source": "art/exports/knight-voices-v002/短句原音/二级骑士-粗粝老兵-02-领饷.mp3",
+            "sourceSha256": "f73136c60a45b9024542b1ab8525a971a8914bc6414f0edfabf0be4573fe05cf",
+            "sourceDurationSecs": 3.971,
+            "sourceRangeSecs": [
+              0,
+              3.971
+            ],
+            "montageStartSecs": 2.77,
+            "peakDbfs": -1.59,
+            "clippedSamples": 0
+          },
+          {
+            "id": "03",
+            "name": "驱盗",
+            "source": "art/exports/knight-voices-v002/短句原音/二级骑士-粗粝老兵-03-驱盗.mp3",
+            "sourceSha256": "55373e6d4dbf19da40829eee022918fee5600b0c10c47230ee0e65d168cd3e45",
+            "sourceDurationSecs": 2.926,
+            "sourceRangeSecs": [
+              0.01,
+              2.926
+            ],
+            "montageStartSecs": 7.191,
+            "peakDbfs": -1.92,
+            "clippedSamples": 0
+          },
+          {
+            "id": "04",
+            "name": "冲锋",
+            "source": "art/exports/knight-voices-v002/短句原音/二级骑士-粗粝老兵-04-冲锋.mp3",
+            "sourceSha256": "3ca17cae9d097ee18dd6fbf262063c47693ff4d73b6767164145234f52fe564e",
+            "sourceDurationSecs": 2.691,
+            "sourceRangeSecs": [
+              0,
+              2.691
+            ],
+            "montageStartSecs": 10.556,
+            "peakDbfs": -0.88,
+            "clippedSamples": 0
+          }
+        ]
+      },
+      "auditionSelectionNote": "二级短句采用自然稳定档，保留情绪标签；自动转写识别为中文，原始独立短句另行保留。"
+    },
+    {
+      "level": 3,
+      "name": "三级骑士-寡言重骑",
+      "libraryName": "Catan-通用三级骑士-寡言重骑-20261111-R2",
+      "description": "中文普通话母语，四十二岁的男性。一位久经战阵的重甲骑士，刚结束巡逻，站在熟悉的同伴身旁说话。声音厚实、有磨损感，带低哑颗粒和自然呼吸，保持正常成年男声的音域。嗓子像常年在野外喊过话，日常说话却省力、随意。性格寡言，有底气，偶尔带一点老兵的冷幽默。回答时先轻轻应一声，语句自然连贯，句尾放松收下，不逐字加重。对自己人有温度，面对危险压住气息，真正出手时突然短促发力。像真人冒险电影里活在场景中的士兵，讲话是在回应眼前的人。",
+      "seed": 2026111203,
+      "generatedAt": "2026-11-11T02:22:21.486Z",
+      "selectedPreview": 1,
+      "returnedText": "[casual] 嗯？叫我啊？来了，来了。护腕系上就走。去哪儿？行，你指个地方，我过去。\n[chuckles] 嘿，发饷了？这还差不多。吃饱了就有劲，放心，这儿我守着。\n[stern] 喂！那条贼船，离远点！还有你，强盗，把路让开！\n[determined] 别急，跟在我后头。好……就是现在，冲！",
+      "previews": [
+        {
+          "index": 1,
+          "generatedVoiceId": "BooQyPc29H7zqlshS6MV",
+          "mediaType": "audio/mpeg",
+          "durationSecs": 30.6705,
+          "language": "wuu",
+          "file": "art/exports/knight-voices-v002/候选/三级骑士-寡言重骑-候选1.mp3",
+          "bytes": 490728,
+          "sha256": "7d41c90ddbcea871f8fb621271af05c0bc88e33d80735a0a1265f8fc6d210449"
+        },
+        {
+          "index": 2,
+          "generatedVoiceId": "ENmIyANA1o9h1VYiPFvW",
+          "mediaType": "audio/mpeg",
+          "durationSecs": 25.7333125,
+          "language": "wuu",
+          "file": "art/exports/knight-voices-v002/候选/三级骑士-寡言重骑-候选2.mp3",
+          "bytes": 411733,
+          "sha256": "fc78b006198218f9d47cfc9a033f89585b19c1cb2a2c734e7186701b51883c27"
+        },
+        {
+          "index": 3,
+          "generatedVoiceId": "PmoE80Xvq6siPqY68lNW",
+          "mediaType": "audio/mpeg",
+          "durationSecs": 23.5651875,
+          "language": "wuu",
+          "file": "art/exports/knight-voices-v002/候选/三级骑士-寡言重骑-候选3.mp3",
+          "bytes": 377043,
+          "sha256": "b8992c6adfa6d9e9002b121370a021ec93880665c3ce59f4b35ad676dab0a002"
+        }
+      ],
+      "auditionFile": "art/exports/knight-voices-v002/三级骑士-寡言重骑.mp3",
+      "voiceId": "BooQyPc29H7zqlshS6MV",
+      "librarySavedAt": "2026-11-11T02:27:34.815Z",
+      "shortAuditionFile": "art/exports/knight-voices-v002/三级骑士-寡言重骑-短句试听.wav",
+      "shortAuditionSha256": "f2a232d38f55817137e6ad2ffb4deaf05aea9c1e3ca2018b8f4c101af5aab739",
+      "shortAuditionDurationSecs": 13.958,
+      "shortAuditionEdits": [
+        {
+          "id": "01",
+          "name": "接话",
+          "source": "art/exports/knight-voices-v002/短句原音/三级骑士-寡言重骑-01-接话.mp3",
+          "sourceSha256": "f3205b57a96aabfede07aa8af7800785b00be30f2fe2ff3630f884de1efc94e3",
+          "sourceDurationSecs": 2.429,
+          "sourceRangeSecs": [
+            0,
+            2.429
+          ],
+          "montageStartSecs": 0,
+          "peakDbfs": -1.9,
+          "clippedSamples": 0
+        },
+        {
+          "id": "02",
+          "name": "领饷",
+          "source": "art/exports/knight-voices-v002/短句原音/三级骑士-寡言重骑-02-领饷.mp3",
+          "sourceSha256": "238e3c232323b01afbe5a4766cf84e4cb11813c79d073594bb3f94bf888ba629",
+          "sourceDurationSecs": 4.284,
+          "sourceRangeSecs": [
+            0,
+            3.84
+          ],
+          "montageStartSecs": 2.879,
+          "peakDbfs": -1.1,
+          "clippedSamples": 0
+        },
+        {
+          "id": "03",
+          "name": "驱盗",
+          "source": "art/exports/knight-voices-v002/短句原音/三级骑士-寡言重骑-03-驱盗.mp3",
+          "sourceSha256": "4598b78a409d932ed2c9c7a850afec2427375413fe5b23827c44d71a9f11c2f9",
+          "sourceDurationSecs": 2.351,
+          "sourceRangeSecs": [
+            0.02,
+            2.351
+          ],
+          "montageStartSecs": 7.169,
+          "peakDbfs": -0.78,
+          "clippedSamples": 0
+        },
+        {
+          "id": "04",
+          "name": "冲锋",
+          "source": "art/exports/knight-voices-v002/短句原音/三级骑士-寡言重骑-04-冲锋.mp3",
+          "sourceSha256": "23bcce3d49ebf83fc12597037d8bb0c3049a2df990f1fb53357cfe09852e041d",
+          "sourceDurationSecs": 4.127,
+          "sourceRangeSecs": [
+            0.12,
+            4.127
+          ],
+          "montageStartSecs": 9.95,
+          "peakDbfs": -1.75,
+          "clippedSamples": 0
+        }
+      ]
+    }
+  ]
+}
