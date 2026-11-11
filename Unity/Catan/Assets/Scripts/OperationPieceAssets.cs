@@ -8,6 +8,17 @@ public static class OperationPieceAssets
     static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
     static Dictionary<string, Texture2D> paintedStock;
 
+    public static void DrawStock(Rect area,Texture2D texture)
+    {
+        // 实体道路从水平面看很薄，库存尺寸下保留可辨认的侧面高度。
+        if(texture.width>texture.height*10)
+        {
+            float height=area.width*.10f;
+            GUI.DrawTexture(new Rect(area.x,area.center.y-height/2,area.width,height),texture);
+        }
+        else GUI.DrawTexture(area,texture,ScaleMode.ScaleToFit);
+    }
+
     public static bool Contains(Texture2D texture, Rect rect, Vector2 point)
     {
         float width=Mathf.Min(rect.width,rect.height*texture.width/texture.height),height=width*texture.height/texture.width;
@@ -29,7 +40,7 @@ public static class OperationPieceAssets
         else if (icon.Contains("city")) kind = "city";
         else if (icon.Contains("settlement") || icon.Contains("village")) kind = "settlement";
         else return null;
-        if(kind!="wall")
+        if(BoardArtPreference.Painted && kind!="wall")
         {
             if(paintedStock==null)
             {
@@ -39,7 +50,7 @@ public static class OperationPieceAssets
             }
             if(paintedStock.TryGetValue((kind=="settlement"?"village":kind)+"-"+colour,out var painted))return painted;
         }
-        string path = kind=="settlement" || kind=="city" || kind=="road" ? "NaturalPieces/v001/thumbnail-"+(kind=="settlement"?"village":kind)+"-"+colour : PlayerComponentAssets.ExpansionRoot+"thumb-"+(kind.StartsWith("knight-")?kind+"-rest":kind)+"-"+colour;
+        string path="StockModels/"+kind+"-"+colour;
         if (!Textures.TryGetValue(path, out var texture))
         {
             texture = Resources.Load<Texture2D>(path);
@@ -79,7 +90,22 @@ public static class OperationPieceAssets
         var block=new MaterialPropertyBlock();block.SetColor("_BaseColor",colour);block.SetColor("_Color",colour);
         foreach(var renderer in instance.GetComponentsInChildren<Renderer>())
         {
-            if(preview.Kind!="settlement"){renderer.SetPropertyBlock(block);continue;}
+            if(preview.Kind!="settlement")
+            {
+                renderer.SetPropertyBlock(block);
+                if(preview.Kind=="ship")
+                {
+                    var materials=renderer.sharedMaterials;
+                    var sailBlock=new MaterialPropertyBlock();
+                    for(int i=0;i<materials.Length;i++)
+                        if(materials[i]!=null && EntityBoardAssets.IsSailMaterial(materials[i].name))
+                        {
+                            sailBlock.SetColor("_BaseColor",materials[i].GetColor("_BaseColor"));
+                            renderer.SetPropertyBlock(sailBlock,i);
+                        }
+                }
+                continue;
+            }
             for(int i=0;i<renderer.sharedMaterials.Length;i++)
                 if(renderer.sharedMaterials[i]==null || !renderer.sharedMaterials[i].name.StartsWith("Village_Seat"))
                     renderer.SetPropertyBlock(block,i);

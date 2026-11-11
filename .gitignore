@@ -31,6 +31,13 @@ TestResults/
 # Local caches and credentials
 /codex.pem
 /audio.pem
+# 本地私钥、签名证书与签名密钥库
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
 __pycache__/
 *.pyc
 .venv/
@@ -60,6 +67,9 @@ Thumbs.db
 Desktop.ini
 *.tmp
 *.bak
+# 本机崩溃转储
+*.dmp
+*.stackdump
 
 # Office 编辑锁文件与 Unity 自动生成的 IDE 工程
 ~$*.docx

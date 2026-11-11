@@ -112,7 +112,7 @@ public sealed class ThreeKingdomsB45SelectionTests
     [Fact] public void DisplaySortDoesNotMoveSelectionToAnotherCopy()
     {var view=View(Action("gift",target:"p2",type:0));var c=Start(view,Bag((0,4)));c.ToggleCard(0,2);c.Refresh(view,Bag((0,4)));Assert.True(c.IsHandSelected(0,2));Assert.False(c.IsHandSelected(0,0));c.Refresh(view,Bag((0,2)));Assert.Empty(c.SelectedCounts.Where(n=>n!=0));}
     [Fact] public void ZhihengAcceptsFourRealCardsAndRejectsFifth()
-    {var c=Start(View(Action("exchange-hand","tk-g22-s1",type:0),Action("exchange-hand","tk-g22-s1",type:5)),Bag((0,3),(5,2)));c.ToggleCard(0,0);c.ToggleCard(0,2);c.ToggleCard(5,0);c.ToggleCard(5,1);Assert.False(c.ToggleCard(0,1));Assert.True(c.CanConfirm);Assert.Equal(4,c.BuildCommand().Counts.Sum());}
+    {var c=Start(View(Action("exchange-hand","tk-g22-s1",type:0),Action("exchange-hand","tk-g22-s1",type:5)),Bag((0,3),(5,2)));c.ToggleCard(0,0);c.ToggleCard(0,2);c.ToggleCard(5,0);c.ToggleCard(5,1);Assert.False(c.ToggleCard(0,1));Assert.Null(c.FinishDirectPick());Assert.True(c.CanConfirm);Assert.Equal(4,c.BeginSubmit().Counts.Sum());}
     [Fact] public void GuoseRequiresExactlyTwoBricksAndLegalPortrait()
     {var c=Start(View(Action("response-guose","tk-g05-s2","p2",1,2)),Bag((1,3),(0,4)));Assert.False(c.ToggleCard(0,0));Assert.False(c.TogglePlayer("p1"));c.ToggleCard(1,1);c.TogglePlayer("p2");Assert.False(c.CanConfirm);c.ToggleCard(1,2);Assert.True(c.CanConfirm);Assert.False(c.ToggleCard(1,0));}
     [Fact] public void BoardTargetsUseStableIdsAndIgnoreLabel()
@@ -130,7 +130,7 @@ public sealed class ThreeKingdomsB45SelectionTests
     [Fact] public void PureSelectionDoesNotGenerateCommandsForPassiveButtons()
     {Assert.False(B45SkillCatalog.Get("tk-g42-s1").HasActiveEntry);Assert.False(B45SkillCatalog.Get("tk-g44-s2").HasActiveEntry);Assert.False(B45SkillCatalog.Get("tk-g13-s2").HasActiveEntry);Assert.True(B45SkillCatalog.Get("tk-g15-s1").HasActiveEntry);}
     [Fact] public void ProgressCopyIdentityRemainsTheClickedOrdinal()
-    {var a=Action("exchange-progress","tk-g22-s1");a.Command.ProgressCardId="Invention";var c=Start(View(a),new int[8]);Assert.True(c.ToggleProgress("Invention",2));Assert.True(c.IsProgressSelected("Invention",2));Assert.False(c.IsProgressSelected("Invention",0));Assert.Equal("Invention",c.BuildCommand().ProgressCardId);Assert.False(c.ToggleProgress("Invention",0));}
+    {var a=Action("exchange-progress","tk-g22-s1");a.Command.ProgressCardId="Invention";var c=Start(View(a),new int[8]);Assert.True(c.ToggleProgress("Invention",2));Assert.Null(c.FinishDirectPick());Assert.True(c.IsProgressSelected("Invention",2));Assert.False(c.IsProgressSelected("Invention",0));Assert.Equal("Invention",c.BuildCommand().ProgressCardId);Assert.False(c.ToggleProgress("Invention",0));}
     [Fact] public void XiemuTwoSameKindCopiesRemainDistinctInDraft()
     {var a=Action("b4-xiemu","tk-g52-s2");a.Command.ProgressCardIds=new[]{"Merchant","Merchant"};a.Command.ProgressCardId="virtual-monopoly";a.VirtualCardId="ResourceMonopoly";var c=Start(View(a),new int[8]);Assert.True(c.ToggleProgress("Merchant",1));Assert.True(c.ToggleProgress("Merchant",3));Assert.False(c.ToggleProgress("Merchant",0));Assert.True(c.CanConfirm);Assert.Equal(new[]{"Merchant","Merchant"},c.BuildCommand().ProgressCardIds);}
     [Fact] public void PoxiKeepsOwnAndAuthorizedCardsSeparateAndSubmitsOnce()

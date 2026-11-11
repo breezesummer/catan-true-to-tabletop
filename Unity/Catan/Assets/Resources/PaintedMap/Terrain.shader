@@ -8,7 +8,8 @@ Shader "Catan/PaintedMap"
         _Tile("中心与地形", Vector) = (0,0,0,0)
         _RobberHex("强盗陆地", Vector) = (0,0,0,0)
         _PirateHex("海盗海格", Vector) = (0,0,0,0)
-        _Glow("本人地块与收取时间", Vector) = (0,-100,0,0)
+        _Glow("本人地块与常态倍产", Vector) = (0,-100,0,0)
+        [HideInInspector] _HarvestClock("收取显示时钟", Float) = 0
         _NearA("邻格一至四", Vector) = (-1,-1,-1,-1)
         _NearB("邻格五至六", Vector) = (-1,-1,0,0)
     }
@@ -21,13 +22,16 @@ Shader "Catan/PaintedMap"
             #pragma vertex Vert
             #pragma fragment Frag
             #pragma target 3.0
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
             TEXTURE2D(_Gravel); SAMPLER(sampler_Gravel);
             TEXTURE2D(_Sand); SAMPLER(sampler_Sand);
             #include "Coast/CoastCommon.hlsl"
             CBUFFER_START(UnityPerMaterial)
             float4 _Tile, _NearA, _NearB, _Glow, _RobberHex, _PirateHex;
+            float _HarvestClock;
             CBUFFER_END
             #include "DangerHex.hlsl"
             struct Input { float4 pos : POSITION; float3 normal : NORMAL; };
@@ -92,25 +96,8 @@ Shader "Catan/PaintedMap"
                     sand*=lerp(1,.64,smoothstep(.72,.96,shore));
                     color=lerp(color,sand,smoothstep(.05,.83,shore+.10*fleck));
                 }
-                float4 hazard = _Tile.z == 8 ? _PirateHex : _RobberHex;
-                if (_CatanMapMarksHidden < .5 && i.up > .5 && hazard.z > .5 && all(abs(_Tile.xy - hazard.xy) < .001))
-                    color = DangerHex(color,delta);
-                else if (_Glow.x > .5 && _CatanMapMarksHidden < .5 && i.up > .5)
-                {
-                    float2 d = abs(delta);
-                    float edge = .034641016 - max(d.x, dot(d, float2(.5,.8660254)));
-                    float aa = max(.00018, fwidth(edge) * .6);
-                    float edgeStroke = 1 - smoothstep(.00018, .00052 + aa, abs(edge - .0030));
-                    float halo = exp2(-abs(edge - .0030) * 950);
-                    float age = _Time.y - _Glow.y;
-                    float flash = smoothstep(0,.16,age) * (1 - smoothstep(.73,1.65,age));
-                    float inner = 1 - smoothstep(.00018,.00048 + aa, abs(edge - lerp(.0038,.0063,saturate(age * 3.5))));
-                    half3 jade = half3(.16,.88,.58);
-                    half3 gold = half3(1,.52,.055);
-                    color = lerp(color, lerp(jade,gold,flash), saturate(.16*halo + edgeStroke*lerp(.71,.98,flash)));
-                    color += halo * lerp(jade*.085,gold*.22,flash);
-                    color = lerp(color,half3(1,.80,.23),inner*flash*.94);
-                }
+                half sunlit=MainLightRealtimeShadow(TransformWorldToShadowCoord(i.world));
+                color*=lerp(half3(.57,.62,.67),half3(1,1,1),sunlit);
                 return half4(color*lerp(.70,1,saturate(i.up)),1);
             }
             ENDHLSL

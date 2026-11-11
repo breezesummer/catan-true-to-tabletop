@@ -1,0 +1,12 @@
+{
+    "status": "passed",
+    "unity": "6000.3.25f1",
+    "note": "Windows 客户端读取四人穿越沙漠存档；检查常态产量与荧光层，共享材质，固定时间离屏截取沿边流动。未执行桌面鼠标操作或完整界面像素验收。",
+    "configurations": 1,
+    "checks": 203,
+    "cameraImages": 9,
+    "guiAttempts": 0,
+    "guiImagesWithChanges": 0,
+    "graphics": true,
+    "fullUiPixelsVerified": false
+}

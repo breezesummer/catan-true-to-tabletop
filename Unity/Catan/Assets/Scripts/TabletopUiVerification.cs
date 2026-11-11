@@ -76,6 +76,9 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
         if(oceanTheme)StrategyHudTheme.Select(1);
         var run = oceanTheme && args.Contains("--painted-hud") ? VerifyPaintedHud(args) : oceanViews && args.Contains("--audit-all") ? VerifyWholeTable(args) : oceanViews && args.Contains("--direct-input") ? VerifyDirectInput(args) : oceanViews && args.Contains("--tile-glow") ? VerifyTileGlow(args) : oceanViews && args.Contains("--reaction-views") ? VerifyReactionViews(args) : oceanViews && args.Contains("--pier-views") ? VerifyPierViews(args) : oceanViews && args.Contains("--expansion-pieces") ? VerifyExpansionPieces() : oceanViews && args.Contains("--natural-pieces") ? VerifyNaturalPieces() : oceanViews && args.Contains("--coastal-frames") ? VerifyCoastalViews() : oceanViews ? VerifyOceanViews() : Verify();
         if(oceanViews&&args.Contains("--zhang-liao"))run=VerifyZhangLiao(args);
+        if(oceanViews&&args.Contains("--hud-effects"))run=VerifyHudEffects(args);
+        if(oceanViews&&args.Contains("--timber-port"))run=VerifyTimberPort(args);
+        if(oceanViews&&args.Contains("--player-colors"))run=VerifyPlayerColors(args);
         while (true)
         {
             object next;
@@ -96,7 +99,7 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
             status = args.Contains("--audit-all") ? "completed" : "passed", configurations = configurations, checks = checks, cameraImages = cameraImages,
             guiAttempts = guiAttempts, guiImagesWithChanges = guiImagesWithChanges,
             unity = Application.unityVersion, graphics = captureCamera, fullUiPixelsVerified = false,
-            note = args.Contains("--painted-hud") ? "Windows 实机四人穿越沙漠，全窗口记录手绘、海洋和交易界面；核对四主题切换、本地偏好和对局一致性。" : args.Contains("--audit-all") ? "各项目的操作与结算见逐项结果.tsv。" : args.Contains("--direct-input") ? "四人穿越沙漠实际窗口，鼠标输入经过客户端正常入口，核对已确认城墙和赠牌。" : args.Contains("--tile-glow") ? "真实 Windows 玩家窗口。按存档中的已确认指令重放到正常收取，截取亮起和退回常态。" : args.Contains("--jade-numbers") ? "Windows 客户端从第 42 回合验收存档读取公开点数；四张图像取自完整游戏窗口。" : "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。"
+            note = args.Contains("--painted-hud") ? "Windows 实机四人穿越沙漠，全窗口记录手绘、海洋和交易界面；核对四主题切换、本地偏好和对局一致性。" : args.Contains("--audit-all") ? "各项目的操作与结算见逐项结果.tsv。" : args.Contains("--direct-input") ? "四人穿越沙漠实际窗口，鼠标输入经过客户端正常入口，核对已确认城墙和赠牌。" : args.Contains("--tile-glow") ? "Windows 客户端读取四人穿越沙漠存档；检查常态产量与荧光层，共享材质，固定时间离屏截取沿边流动。未执行桌面鼠标操作或完整界面像素验收。" : args.Contains("--jade-numbers") ? "Windows 客户端从第 42 回合验收存档读取公开点数；四张图像取自完整游戏窗口。" : "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。"
         }, true));
         Debug.Log("CATAN_TABLETOP_UI_OK: configurations=" + configurations + " checks=" + checks + " cameraImages=" + cameraImages);
         if(oceanTheme&&args.Contains("--keep-ocean-preview")){StrategyHudTheme.Select(1);yield break;}
@@ -186,14 +189,12 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
         app.ShowMenu();
         // ShowMenu 先回到风景主页；从正式导航进入配置页，再逐层验证 Esc。
         var navigate=typeof(M6App).GetMethod("NavigateMainMenu",PrivateInstance);
-        var setupStep=typeof(M6App).GetField("menuSetupStep",PrivateInstance);
+        var picker=typeof(M6App).GetField("atlasOpen",PrivateInstance);
         var menuPage=typeof(M6App).GetField("menuPage",PrivateInstance);
-        Require(navigate!=null&&setupStep!=null&&menuPage!=null,"缺少当前分层菜单导航入口");
-        navigate.Invoke(app,new object[]{0});setupStep.SetValue(app,2);
+        Require(navigate!=null&&picker!=null&&menuPage!=null,"缺少当前分层菜单导航入口");
+        navigate.Invoke(app,new object[]{0});picker.SetValue(app,true);
         app.HandleTableEscape();
-        Require(app.MenuVisible&&!app.TableMenuOpen&&(int)setupStep.GetValue(app)==1&&Authority==before,"配置第三步 Esc 未返回地图选择或改变了局面");
-        app.HandleTableEscape();
-        Require(app.MenuVisible&&!app.TableMenuOpen&&(int)setupStep.GetValue(app)==0&&Authority==before,"地图选择 Esc 未返回玩法选择或改变了局面");
+        Require(app.MenuVisible&&!(bool)picker.GetValue(app)&&(int)menuPage.GetValue(app)==0&&Authority==before,"选图返回改变对局或离开配桌页");
         app.HandleTableEscape();
         Require(app.MenuVisible&&!app.TableMenuOpen&&(int)menuPage.GetValue(app)==-1&&Authority==before,"配置首页 Esc 未返回风景主页或改变了局面");
         app.HandleTableEscape();

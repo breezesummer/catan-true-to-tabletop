@@ -98,7 +98,7 @@ public static class FishingF5EditorVerification
             game.GetType().GetMethod("AssertInvariants",new Type[0]).Invoke(game,null);
             yield return Capture(mode+"-"+map);app.ShowMenu();
         }
-        Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",1);Set(app,"menuScenario",6);Set(app,"menuFishing",true);Set(app,"menuHarbormaster",true);Set(app,"menuVictoryPoints",15);
+        Set(app,"menuPage",0);Set(app,"atlasOpen",false);Set(app,"menuRule",1);Set(app,"menuScenario",6);Set(app,"menuFishing",true);Set(app,"menuHarbormaster",true);Set(app,"menuVictoryPoints",15);
         yield return Capture("海盗群岛海港与捕鱼禁用");
         Require(!(bool)Get(app,"menuFishing")&&(bool)Get(app,"menuHarbormaster"),"海盗群岛开关不一致");
         Require((int?)Get(app,"menuVictoryPoints")==15,"海港目标被旧13分上限截断");

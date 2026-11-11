@@ -10,6 +10,20 @@ public static class CoastalDecals
     const float SeaEnd=-.0157f;
     public const float DockLength=ShoreEnd-SeaEnd;
     public const float DockInset=.0016f;
+    static float pierModelLength;
+    public static float PierModelLength
+    {
+        get
+        {
+            if(pierModelLength>0)return pierModelLength;
+            LoadPier();
+            var deck=parts["PierDeck"];
+            var bounds=deck.sharedMesh.bounds;
+            var matrix=deck.transform.localToWorldMatrix;
+            pierModelLength=Mathf.Abs(matrix.m20)*bounds.size.x+Mathf.Abs(matrix.m21)*bounds.size.y+Mathf.Abs(matrix.m22)*bounds.size.z;
+            return pierModelLength;
+        }
+    }
     static Mesh rectangle;
     static Mesh Surface(string name, Vector3[] points, Vector2[] uv, int[] triangles)
     {
@@ -27,9 +41,7 @@ public static class CoastalDecals
         return rectangle;
     }
     static readonly Dictionary<string, MeshFilter> parts = new Dictionary<string, MeshFilter>();
-    static readonly Dictionary<Mesh, Mesh> cargoHitMeshes = new Dictionary<Mesh, Mesh>();
-    static readonly string[] contactCells={"wood","brick","ore","wheat","wool","generic"};
-    static Material timber, cargoFinish, waterShadow;
+    static Material timber, waterShadow;
 
     static void LoadPier()
     {
@@ -39,13 +51,6 @@ public static class CoastalDecals
             parts[part.name] = part;
         timber = new Material(Resources.Load<Shader>(Root + "PierTimber"));
         timber.mainTexture = Resources.Load<Texture2D>("TabletopUI/v003/oak-table-albedo");
-        timber.SetTexture("_CargoContact",Resources.Load<Texture2D>(Root+"cargo-contact"));
-        cargoFinish = new Material(Resources.Load<Shader>(Root + "HarborCargo"));
-        cargoFinish.mainTexture = Resources.Load<Texture2D>(Root + "cargo-pigments");
-        cargoFinish.SetTexture("_SurfaceMap",Resources.Load<Texture2D>(Root + "cargo-surface"));
-        foreach (var part in parts)
-            if (part.Key.StartsWith("Cargo_", System.StringComparison.Ordinal))
-                cargoHitMeshes.Add(part.Value.sharedMesh,parts["Pick_" + part.Key.Substring(6)].sharedMesh);
         waterShadow = new Material(Resources.Load<Shader>(Root + "PierWaterShadow"));
     }
 
@@ -60,27 +65,70 @@ public static class CoastalDecals
         obj.gameObject.AddComponent<MeshFilter>().sharedMesh = source.sharedMesh;
         var renderer = obj.gameObject.AddComponent<MeshRenderer>();
         renderer.sharedMaterial = material;
-        renderer.shadowCastingMode = ShadowCastingMode.Off;
+        renderer.shadowCastingMode = ShadowCastingMode.On;
         return obj;
     }
 
     public static GameObject Dock(string resource, string label, Vector3 bottom, Quaternion rotation, Transform parent)
     {
-        LoadPier();
         string cargo = resource.Substring(resource.LastIndexOf("port-", System.StringComparison.Ordinal) + 5);
         var root = new GameObject(label).transform;
         root.SetParent(parent, false);
         root.SetPositionAndRotation(bottom, rotation);
-        var deck = Place(root, "PierDeck", timber);
-        int cell=System.Array.IndexOf(contactCells,cargo);
-        var block=new MaterialPropertyBlock();
-        block.SetVector("_ContactCell",new Vector4(cell%3,1-cell/3,0,0));
-        deck.GetComponent<Renderer>().SetPropertyBlock(block);
-        Place(root,"Cargo_"+cargo,cargoFinish);
+        if(!BoardArtPreference.Painted) AddPier(root);
+        else if(cargo=="wood") root.gameObject.AddComponent<PaintedTimberPort>();
+        else AddPaintedDock(root,cargo);
         var markers = parent != null ? parent.GetComponentInParent<TabletopReferenceMarkers>() : null;
         var assets = JadeNumberAssets.For(markers != null ? markers.transform.parent : parent != null ? parent : root);
         var slip = assets.CreateSlip(root, "港口贸易玉签", Root+"sign-"+cargo);
         slip.gameObject.AddComponent<HarborSign>().Initialize(slip);
+        return root.gameObject;
+    }
+
+    static readonly Dictionary<string,Material> paintedMaterials=new Dictionary<string,Material>();
+    static Mesh paintedDock;
+    static readonly Rect[] PaintedSections={
+        Rect.MinMaxRect(-.0105f,SeaEnd,.0105f,-.00027f),
+        Rect.MinMaxRect(-.0034f,-.00027f,.0034f,ShoreEnd)
+    };
+    static void AddPaintedDock(Transform root,string cargo)
+    {
+        if(paintedDock==null)
+        {
+            var points=new List<Vector3>();
+            var uv=new List<Vector2>();
+            var indices=new List<int>();
+            foreach(var r in PaintedSections)
+            {
+                int start=points.Count;
+                foreach(var p in new[]{XZ(r.xMin,r.yMin),XZ(r.xMin,r.yMax),XZ(r.xMax,r.yMax),XZ(r.xMax,r.yMin)})
+                {
+                    points.Add(p);
+                    uv.Add(new Vector2(.5f+p.x/.021f,(p.z-SeaEnd)/DockLength));
+                }
+                foreach(int index in Quad)indices.Add(start+index);
+            }
+            paintedDock=Surface("港口画稿轮廓",points.ToArray(),uv.ToArray(),indices.ToArray());
+        }
+        if(!paintedMaterials.TryGetValue(cargo,out var material))
+        {
+            material=new Material(Resources.Load<Shader>("FantasyPieces/FantasyInk"))
+                {mainTexture=Resources.Load<Texture2D>(Root+"port-"+cargo),renderQueue=3001};
+            paintedMaterials[cargo]=material;
+        }
+        var face=new GameObject("港口原画");
+        face.transform.SetParent(root,false);
+        face.transform.localPosition=Vector3.up*.00035f;
+        face.AddComponent<MeshFilter>().sharedMesh=paintedDock;
+        var renderer=face.AddComponent<MeshRenderer>();
+        renderer.sharedMaterial=material;
+        renderer.shadowCastingMode=ShadowCastingMode.Off;
+    }
+
+    static void AddPier(Transform root)
+    {
+        LoadPier();
+        Place(root, "PierDeck", timber);
         var shadow = new GameObject("栈桥水影").transform;
         shadow.SetParent(root,false);
         shadow.localScale = new Vector3(.038f,1,.038f);
@@ -89,17 +137,17 @@ public static class CoastalDecals
         var renderer = shadow.gameObject.AddComponent<MeshRenderer>();
         renderer.sharedMaterial = waterShadow;
         renderer.shadowCastingMode = ShadowCastingMode.Off;
-        return root.gameObject;
     }
-
-    // 货堆用保留主要外形的拾取网格，纤维、铆钉和麦芒只参与绘制。
-    public static Mesh HitMesh(Mesh visible) =>
-        cargoHitMeshes.TryGetValue(visible,out var proxy) ? proxy : visible;
 
     // 避让渔场与取景只需桥面投影；每块木板、缆绳和货物都在这两段轮廓内。
     public static IEnumerable<Vector3[]> Footprint(Transform root)
     {
-        foreach (var rect in DeckSections)
+        if(root.TryGetComponent<PaintedTimberPort>(out var timberPort))
+        {
+            foreach(var triangle in timberPort.Footprint()) yield return triangle;
+            yield break;
+        }
+        foreach (var rect in root.Find("港口原画")!=null ? PaintedSections : DeckSections)
         {
             var a = root.TransformPoint(XZ(rect.xMin,rect.yMin));
             var b = root.TransformPoint(XZ(rect.xMin,rect.yMax));

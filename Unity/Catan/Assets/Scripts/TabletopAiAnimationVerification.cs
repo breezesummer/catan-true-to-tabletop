@@ -58,6 +58,7 @@ public sealed class TabletopAiAnimationVerification:MonoBehaviour
     }
     IEnumerator Verify()
     {
+        BoardArtPreference.Select(false, persist: false);
         VerifyCacheChanges();
         yield return new WaitForEndOfFrame();CaptureImage("00-开局AI速度选项");
         string[] modes={"base","seafarers","cities-knights","combined"};int[] speeds={0,1,2,1};
@@ -81,6 +82,7 @@ public sealed class TabletopAiAnimationVerification:MonoBehaviour
                 yield return new WaitForEndOfFrame();Sample(mode,speed,"起飞",started);
                 Require(app.VerificationBuildFlightCount>0,"公开建造没有产生飞行模型");
                 Require(app.VerificationBuildHiddenRenderers>0,"飞行时目标模型提前出现");
+                VerifyModelLayers();
                 VerifyUnchangedRefresh();
                 CaptureImage(mode+"-"+action+"-起飞");
                 yield return new WaitForSecondsRealtime((float)TabletopAiSpeed.FlightDuration(speed)*.44f);
@@ -91,6 +93,7 @@ public sealed class TabletopAiAnimationVerification:MonoBehaviour
                 while(app.VerificationBuildFlightCount>0&&Time.realtimeSinceStartupAsDouble<landingDeadline)yield return new WaitForSecondsRealtime(.01f);
                 yield return new WaitForEndOfFrame();Sample(mode,speed,"落地",started);CaptureImage(mode+"-"+action+"-落地");
                 Require(app.VerificationBuildFlightCount==0,"建造飞行动画未结束（真实等待 "+(Time.realtimeSinceStartupAsDouble-landingStarted).ToString("F3",CultureInfo.InvariantCulture)+" 秒，动画时间经过 "+(Time.unscaledTimeAsDouble-landingGameTime).ToString("F3",CultureInfo.InvariantCulture)+" 秒）");
+                VerifyModelLayers();
                 Require(app.ExportEnvelope()==before,"动画改变了权威局面或存档配置");
                 Require(action!=0||app.VerificationBuildVisibleGlowCount>0,"本回合光环网格或着色器没有进入实际构建");
                 Require(action==0?app.VerificationBuildHighlightCount>0:app.VerificationBuildHighlightCount==0,action==0?"本回合建筑没有发光高亮":"初设转交下一席位后高亮没有清除");
@@ -109,6 +112,17 @@ public sealed class TabletopAiAnimationVerification:MonoBehaviour
                 board.ShowComponentSamples();
                 Require(ids.SequenceEqual(board.CommittedPieces.Cast<Transform>().Select(t=>t.GetInstanceID())),"双扩展棋子重复刷新没有复用");
             }
+        }
+    }
+    static void VerifyModelLayers()
+    {
+        var pieces=UnityEngine.Object.FindObjectsByType<FantasyBoardPiece>(FindObjectsSortMode.None);
+        Require(pieces.Length>0,"未找到参与建造的棋子");
+        foreach(var piece in pieces)
+        {
+            var painting=piece.transform.Find("幻想棋子画面").GetComponent<Renderer>();
+            Require(!painting.enabled || painting.forceRenderingOff,"3D 模式出现绘图叠层："+piece.name);
+            Require(piece.GetComponentsInChildren<Renderer>().Any(r=>r!=painting && !r.forceRenderingOff),"3D 棋子缺少实体："+piece.name);
         }
     }
     void VerifyCacheChanges()
@@ -162,7 +176,11 @@ public sealed class TabletopAiAnimationVerification:MonoBehaviour
         // 仅根据公开先手选择相隔两个座位的人类；起手和下一席位均为真实产品 AI。
         human="P"+((int.Parse(active.Substring(1))+1)%4+1);
     }
-    void CaptureImage(string name)=>captures.Add(new Capture{Name=name,Image=ScreenCapture.CaptureScreenshotAsTexture()});
+    void CaptureImage(string name)
+    {
+        var image=ScreenCapture.CaptureScreenshotAsTexture();
+        if(image!=null)captures.Add(new Capture{Name=name,Image=image});
+    }
     void Sample(string mode,int speed,string phase,double started)
     {
         Vector2 point=app.VerificationBuildFlightPosition;

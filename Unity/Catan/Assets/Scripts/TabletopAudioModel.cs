@@ -120,7 +120,8 @@ public sealed class TabletopAudioModel
         }
         bool placedRoad = changes.Any(c => c != null && !c.IsPrivate && c.Category == "piece" && c.Amount > 0 && c.Name == "道路");
         if (placedRoad && cue == TabletopAudioCue.Decision) cue = TabletopAudioCue.RoadBuild;
-        result.Add(new TabletopAudioEvent(cue));
+        // 发展牌已有独立配音，不再叠加拍牌拟声；牌效果仍沿用各自音效。
+        if (cue != TabletopAudioCue.CardPlay) result.Add(new TabletopAudioEvent(cue));
         if (placedRoad && cue != TabletopAudioCue.RoadBuild)
             result.Add(new TabletopAudioEvent(TabletopAudioCue.RoadBuild, .10));
         if (entry.Kind == "PlayKnight") result.Add(new TabletopAudioEvent(TabletopAudioCue.KnightCombat, .22));

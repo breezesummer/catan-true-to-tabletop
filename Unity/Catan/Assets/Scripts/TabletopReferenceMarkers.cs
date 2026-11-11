@@ -24,6 +24,7 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
         public string Resource, PlayerId;
         public int Ordinal;
         public HarborSign Sign;
+        public bool PaintedPort;
     }
     readonly Dictionary<string, Marker> ports = new Dictionary<string, Marker>();
     readonly Dictionary<string, Marker> gifts = new Dictionary<string, Marker>();
@@ -51,7 +52,7 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
     readonly List<Vector3> oceanOutline=new List<Vector3>();
     void RefreshPortFootprints()
     {
-        string key=string.Join("|",ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null).Select(p=>p.Resource+":"+p.Object.transform.localToWorldMatrix.ToString("F6")));
+        string key=BoardArtPreference.Painted+"|"+string.Join("|",ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null).Select(p=>p.Resource+":"+p.Object.transform.localToWorldMatrix.ToString("F6")));
         if(key==portLayoutKey)return;
         portLayoutKey=key;PortLayoutRevision++;
         PublicPortFootprints=ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null)
@@ -148,6 +149,8 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
             var bottom = midpoint + normal * (CoastalDecals.ShoreEnd - CoastalDecals.DockInset);
             bottom.y = EntityBoardAssets.BoardSurfaceHeight;
             item.Object.transform.SetPositionAndRotation(bottom, Quaternion.LookRotation(-normal, Vector3.up));
+            if(item.Object.TryGetComponent<PaintedTimberPort>(out var art))
+                art.Align(normal, Vector3.Distance(a,b));
             item.Sign?.Place();
             wanted.Add(port.Id);
         }
@@ -243,9 +246,9 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
             {
                 if(marker.Sign==null)continue;
                 // 将签面中心投影回默认 66° 视角下的水面。
-                var anchor=marker.Object.transform.TransformPoint(HarborSign.LocalAnchor);
-                var sign=new Vector2(anchor.x+HarborSign.BoardOffset.x,
-                    anchor.z+HarborSign.BoardOffset.y+(anchor.y-TabletopOcean.WaterHeight)/Mathf.Tan(TabletopCameraModel.DefaultAngle*Mathf.Deg2Rad));
+                var anchor=marker.Sign.Face.bounds.center;
+                var sign=new Vector2(anchor.x,
+                    anchor.z+(anchor.y-TabletopOcean.WaterHeight)/Mathf.Tan(TabletopCameraModel.DefaultAngle*Mathf.Deg2Rad));
                 nearest=Mathf.Min(nearest,(sign-new Vector2(center.x+candidate.x,center.z+candidate.z)).sqrMagnitude);
             }
             return nearest;
@@ -285,15 +288,16 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
     }
     static Marker Put(Dictionary<string, Marker> collection, string key, string resource, string name, Transform parent)
     {
+        bool paintedPort=BoardArtPreference.Painted && resource!=null && resource.Contains("/port-");
         if (collection.TryGetValue(key, out var known))
         {
-            if (known.Resource == resource && known.Object != null) return known;
+            if (known.Resource == resource && known.Object != null && known.PaintedPort==paintedPort) return known;
             Remove(known);
             collection.Remove(key);
         }
         var instance = EntityBoardAssets.ReferenceMarker(resource, name, Vector3.zero, Quaternion.identity, parent);
         if (instance == null) return null;
-        var item = new Marker { Object = instance, Resource = resource, Sign=instance.GetComponentInChildren<HarborSign>() };
+        var item = new Marker { Object = instance, Resource = resource, PaintedPort=paintedPort, Sign=instance.GetComponentInChildren<HarborSign>() };
         collection.Add(key, item);
         return item;
     }
@@ -368,7 +372,7 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
     {
         distance=float.PositiveInfinity;
         if(filter.name=="栈桥水影"||filter.sharedMesh==null)return false;
-        var mesh=CoastalDecals.HitMesh(filter.sharedMesh);
+        var mesh=filter.sharedMesh;
         if(!mesh.isReadable)return false;
         var origin=filter.transform.InverseTransformPoint(worldRay.origin);
         var direction=filter.transform.InverseTransformVector(worldRay.direction);

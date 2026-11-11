@@ -2,9 +2,9 @@
   "entries": [
     {
       "id": "tk-g01",
-      "idleTime": 2.6666666666666665,
+      "idleTime": 2.6666667461395264,
       "idleFrames": 64,
-      "attackTime": 2.7333333333333334,
+      "attackTime": 2.7333333492279053,
       "slash": false,
       "sound": "tk-g01/attack-sound"
     },

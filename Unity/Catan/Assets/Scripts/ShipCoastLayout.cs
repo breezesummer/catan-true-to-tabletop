@@ -97,7 +97,7 @@ internal sealed class ShipCoastLayout
             }
             // 两船船艉相对时，各自画至公共顶点，避免同一片水面叠两道泡沫。
             if(next!=null && next.Vertices[Reversed(next.Id)?1:0]==joint)next=null;
-            var signature=joint+":"+HasDock(edge.Id)+":"+next?.Id+":"+(next!=null&&HasDock(next.Id));
+            var signature=joint+":"+BoardArtPreference.Painted+":"+HasDock(edge.Id)+":"+next?.Id+":"+(next!=null&&HasDock(next.Id));
             using(var change=cache.Update(edge.Id,signature))
             {
                 if(!change.Changed)continue;
@@ -109,7 +109,14 @@ internal sealed class ShipCoastLayout
         }
         cache.End();
     }
-    public Vector3 Offset(string edge)=>normals.TryGetValue(edge,out var normal)
-        ? normal*(HasDock(edge)?CoastalDecals.DockLength+.0075f:.0075f):Vector3.zero;
+    // 同一船模按船长等比缩放，靠泊时留四分之一船宽的水缝。
+    internal static float HullBeam => EntityBoardAssets.ShipLength*(10.09f/56.423f);
+    public Vector3 Offset(string edge)
+    {
+        if (!normals.TryGetValue(edge,out var normal)) return Vector3.zero;
+        float berth = BoardArtPreference.Painted ? CoastalDecals.DockLength + .0075f :
+            CoastalDecals.DockLength - CoastalDecals.DockInset + HullBeam * .75f;
+        return normal * (HasDock(edge) ? berth : .0075f);
+    }
 }
 

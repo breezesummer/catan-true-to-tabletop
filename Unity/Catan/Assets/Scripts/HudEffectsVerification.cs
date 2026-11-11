@@ -1,0 +1,128 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Linq;
+using Catan.Core.M5;
+using Catan.Core.TradeModules;
+using UnityEngine;
+
+public sealed partial class TabletopUiVerification
+{
+    IEnumerator VerifyHudEffects(string[] args)
+    {
+        mode="combined";
+        app.ReadSave(args[Array.IndexOf(args,"--hud-effects")+1]);
+        yield return null;yield return null;
+        Require(app.PlayerCount==4 && app.Harbormaster && app.Fishing && app.ThreeKingdoms && app.ScenarioId=="through-the-desert","验收局面错误");
+        auditGame=GetComponent<M5App>();
+        auditSession=(CombinedGameSession)typeof(M5LocalGameHost).GetField("session",PrivateInstance).GetValue(auditGame.VerificationHost);
+        var state=auditSession.GetAuthoritativeStateForTesting();
+        var fish=state.TradeModules.Fishing;
+        if(args.Contains("--fish-road-prompt"))
+        {
+            var held=fish.Holdings.Single(h=>h.PlayerId==app.HumanSeat);
+            var payment=new[]{2,3}.Select(value=>fish.Supply.First(id=>FishingRules.Value(id)==value)).ToArray();
+            var discard=fish.Supply.Except(payment).Where(id=>FishingRules.Value(id)>0).Take(4).ToArray();
+            fish.Supply=fish.Supply.Except(payment).Except(discard).ToArray();
+            fish.Discard=fish.Discard.Concat(discard).ToArray();
+            held.TokenIds=held.TokenIds.Concat(payment).ToArray();
+            ActivateAudit(state);
+            double readyUntil=Time.realtimeSinceStartupAsDouble+30;
+            while(auditGame.VerificationOperationDock.Fishing==null||app.OpeningOrderMessage.Length>0)
+            {
+                Require(Time.realtimeSinceStartupAsDouble<readyUntil,"鱼手牌区尚未显示");
+                yield return new WaitForEndOfFrame();
+            }
+            Require(auditGame.M6View.LegalActions.Any(c=>c.FishAction==FishAction.BuildRoad),"验收局缺少可修建道路");
+            var dock=auditGame.VerificationOperationDock.Fishing;
+            var original=Authority;
+            dock.Show();
+            yield return new WaitForEndOfFrame();
+            SaveOceanFrame("鱼资源.png");
+            typeof(FishingDock).GetField("action",PrivateInstance).SetValue(dock,FishAction.BuildRoad);
+            yield return new WaitForEndOfFrame();
+            SaveOceanFrame("鱼资源选路.png");
+            Require(dock.Active&&Authority==original,"选择道路时改变了对局");
+            configurations++;
+            yield break;
+        }
+        Require(fish.Supply.Contains(FishingRules.OldBootId),"验收起点未保留旧靴");
+        fish.Supply=fish.Supply.Where(t=>t!=FishingRules.OldBootId).ToArray();
+        fish.OldBootPlayerId=app.HumanSeat;
+        ActivateAudit(state);
+        var projection=app.ThreeKingdomsProjection;
+        var own=projection.Players.Single(p=>p.PlayerId==app.HumanSeat);
+        Require(projection.Clock.ActivePlayerId==own.PlayerId,"本席不是行动席");
+        var skin=GeneralSkinArt.Get(own.ActiveGeneralId);
+        Require(skin!=null,"本席缺少动皮");
+        bool oldStatic=skin.useStatic,painted=BoardArtPreference.Painted;
+        int theme=StrategyHudTheme.Selected;
+        try
+        {
+            StrategyHudTheme.Select(1);GeneralSkinArt.SetStatic(skin,false);
+            double until=Time.realtimeSinceStartupAsDouble+15;
+            while(!GeneralSkinArt.IdleReady(skin)||app.OpeningOrderMessage.Length>0)
+            {Require(Time.realtimeSinceStartupAsDouble<until,"武将牌未就绪");yield return null;}
+            var authority=Authority;
+            if(args.Contains("--portrait-glow"))
+            {
+                foreach(bool fixedSkin in new[]{false,true})
+                {
+                    GeneralSkinArt.SetStatic(skin,fixedSkin);
+                    var seen=new bool[10];
+                    double deadline=Time.realtimeSinceStartupAsDouble+12;
+                    while(seen.Any(value=>!value))
+                    {
+                        yield return new WaitForEndOfFrame();
+                        Require(Time.realtimeSinceStartupAsDouble<deadline,"未捕获完整武将光效周期");
+                        int frame=Mathf.FloorToInt(Mathf.Repeat(Time.unscaledTime,.9f)*10f/.9f);
+                        if(seen[frame])continue;
+                        seen[frame]=true;
+                        var screen=ScreenCapture.CaptureScreenshotAsTexture();
+                        int w=Mathf.RoundToInt(Screen.width*224f/1920),h=Mathf.RoundToInt(Screen.height*282f/1080);
+                        var crop=new Texture2D(w,h,TextureFormat.RGB24,false);
+                        try
+                        {
+                            crop.SetPixels(screen.GetPixels(Mathf.RoundToInt(Screen.width*16f/1920),0,w,h));
+                            crop.Apply();
+                            File.WriteAllBytes(Path.Combine(output,(fixedSkin?"静皮":"动皮")+frame+".png"),crop.EncodeToPNG());
+                            if(!fixedSkin)
+                            {
+                                int sw=Mathf.RoundToInt(Screen.width*184f/1920),sh=Mathf.RoundToInt(Screen.height*292f/1080);
+                                var seat=new Texture2D(sw,sh,TextureFormat.RGB24,false);
+                                try
+                                {
+                                    seat.SetPixels(screen.GetPixels(Screen.width-sw,Screen.height-sh,sw,sh));
+                                    seat.Apply();
+                                    File.WriteAllBytes(Path.Combine(output,"席位"+frame+".png"),seat.EncodeToPNG());
+                                }
+                                finally{Destroy(seat);}
+                            }
+                        }
+                        finally {Destroy(crop);Destroy(screen);}
+                    }
+                }
+                Require(Authority==authority,"切换武将框光效改变对局");
+                configurations++;
+                yield break;
+            }
+            foreach(bool useArt in new[]{true,false})
+            {
+                app.SelectBoardArt(useArt);
+                yield return null;yield return new WaitForEndOfFrame();
+                foreach(var kind in new[]{"settlement","city","road","ship","wall","knight-1","knight-2","knight-3"})
+                {
+                    int level=kind.StartsWith("knight")?kind[7]-'0':1;
+                    var tex=OperationPieceAssets.Texture(kind,own.PlayerId,level);
+                    Require(tex!=null,"缺少库存图 "+kind);
+                    if(!useArt||kind=="wall")
+                        Require(tex==Resources.Load<Texture2D>("StockModels/"+kind+"-"+PlayerComponentAssets.ColourKey(own.PlayerId)),"库存未切到实体模型 "+kind);
+                }
+                SaveOceanFrame(useArt?"绘图库存与外光.png":"模型库存与外光.png");
+                Require(authority==Authority,"切换库存样式改变对局");
+            }
+            configurations++;
+        }
+        finally {app.SelectBoardArt(painted);GeneralSkinArt.SetStatic(skin,oldStatic);StrategyHudTheme.Select(theme);}
+    }
+}

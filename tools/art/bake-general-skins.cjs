@@ -7,13 +7,14 @@ const sharp = require('sharp');
 const render = require('./render-general-skin.cjs');
 
 const extension = process.argv[2];
-const output = path.resolve('Unity/Catan/Assets/Resources/GeneralUI/Dynamic');
+const output = path.resolve(process.env.CATAN_SKIN_OUTPUT || 'Unity/Catan/Assets/Resources/GeneralUI/Dynamic');
 const decade = path.join(extension, '十周年UI');
 const assets = path.join(decade, 'assets/dynamic');
 const switcher = path.join(extension, '皮肤切换');
 const read = file => fs.readFileSync(file, 'utf8');
 const encoded = file => fs.readFileSync(file).toString('base64');
-const camps = {魏:'wei',蜀:'shu',吴:'wu',群:'qun',神:'shen'};
+const idleOnly = process.argv.includes('--idle-only');
+const camps={魏:'wei',蜀:'shu',吴:'wu',群:'qun',神:'shen',晋:'jin'};
 const configText = read(path.join(decade,'src/skins/dynamicSkin.js'));
 const config = vm.runInNewContext('('+configText.match(/export const dynamicSkinConfig = (\{[\s\S]*?\n\});/)[1]+')');
 const skins = Object.values(config).flatMap(Object.values);
@@ -32,7 +33,13 @@ function skeleton(stem, action, options={}) {
 }
 
 async function saveSheet(file, data) {
-    await sharp(Buffer.from(data,'base64')).png({palette:true,quality:96,effort:4,dither:.35}).toFile(file);
+    const staging=file+'.tmp';
+    try {
+        await sharp(Buffer.from(data,'base64')).png({compressionLevel:4}).toFile(staging);
+        fs.renameSync(staging,file);
+    } finally {
+        fs.rmSync(staging,{force:true});
+    }
 }
 
 async function main(){
@@ -68,7 +75,7 @@ async function main(){
             const dir=path.join(output,id);
             fs.mkdirSync(dir,{recursive:true});
             if(data.idle) await saveSheet(path.join(dir,'idle.png'),data.idle);
-            await saveSheet(path.join(dir,'attack.png'),data.attack);
+            if(data.attack) await saveSheet(path.join(dir,'attack.png'),data.attack);
             console.log(id,data.idleTime,data.attackTime);
             return {id,idleTime:data.idleTime,idleFrames:data.idleFrames,attackTime:data.attackTime,slash:args.fallback===true};
         } finally {await page.close();}
@@ -78,19 +85,16 @@ async function main(){
             const folder=(id==='tk-g08'?'神甘宁':name)+'/'+(id==='tk-g31'?'鸩杀少帝':title);
             const skin=skins.find(s=>s?.name?.startsWith(folder+'/'));
             if(!skin || !fs.existsSync(path.join(assets,folder))) continue;
-            if(id==='tk-g01'){
-                entries.push({id,idleTime:80/30,idleFrames:64,attackTime:82/30,slash:false});
-                continue;
-            }
             const idle=skeleton(path.join(assets,skin.name),skin.action||'DaiJi',skin);
             const bg=skin.beijing && skeleton(path.join(assets,skin.beijing.name),null,skin.beijing);
             const configured=skin.gongji;
             const attack=configured?.name?skeleton(path.join(assets,configured.name),configured.action||'play',configured):null;
             const fallback=id==='tk-g03';
-            const arc=encoded(path.join(switcher,'images/border',camps[camp]+'.png'));
-            entries.push(await bake(id,{idle,bg,attack,arc,fallback}));
+            entries.push(await bake(id,{idle,bg,attack,idleOnly,fallback,camp:camps[camp],
+                idleFrames:id==='tk-g01'?64:undefined,attackFrames:id==='tk-g01'?66:48}));
         }
         if(entries.length!==33) throw new Error('动皮数量错误 '+entries.length);
+        if(idleOnly)return;
         const slash=await bake('shared',{attack:skeleton(path.join(decade,'assets/animation/effect_qinggangjian'),null)});
         importSounds(entries);
         fs.writeFileSync(path.join(output,'manifest.json'),JSON.stringify({entries,slashTime:slash.attackTime},null,2)+'\n');

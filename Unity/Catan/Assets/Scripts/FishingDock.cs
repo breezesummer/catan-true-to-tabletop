@@ -63,7 +63,7 @@ public sealed class FishingDock
         chosen=option;tokens=option.Action.HasValue?FishingPayment.Select(view.OwnTokens,option.Action.Value):Array.Empty<string>();
     }
     static string Caption(FishAction a,bool cities)=>a==FishAction.RemoveRobber?"驱盗·2":a==FishAction.StealResource?"偷取·3":a==FishAction.TakeResource?"资源·4":a==FishAction.BuildRoad?"道路·5":"发展·7";
-    public void Draw(Font font,bool interactive,bool cities,string robber,Func<string,Vector2> position,string pirate=null)
+    public void Draw(M6App app,Font font,bool interactive,bool cities,string robber,Func<string,Vector2> position,string pirate=null)
     {
         cardHits.Clear();
         if(view==null||!Selected)return;
@@ -152,7 +152,7 @@ public sealed class FishingDock
                 }
             }
             else if(chosen==null&&action.HasValue)
-                GUI.Label(new Rect(354,655,500,40),action==FishAction.BuildRoad?"点击道路位置":action==FishAction.StealResource?"点击玩家头像":"点击强盗或海盗",style);
+                app.DrawHandInstruction(action==FishAction.BuildRoad?"请选择修建道路的位置":action==FishAction.StealResource?"请选择玩家头像":"请选择强盗或海盗");
 
             if((chosen!=null||action.HasValue||boot)&&GeneralFrameUI.Choice(new Rect(1108,661,100,36),"取消"))Reset();
             if(chosen==null&&action==FishAction.RemoveRobber)
@@ -169,15 +169,5 @@ public sealed class FishingDock
         TabletopRoadPlacement.Update(mouse,click,edges,tiles,roads,ships,position,
             (id,legal)=>preview(id,false),(id,legal)=>preview(id,true),clear,
             (id,ship)=>{Choose(options.First(o=>o.Action==FishAction.BuildRoad&&o.Target==id&&o.Ship==ship));clear();},null);
-    }
-    public void DrawMap(Font font,Func<string,Vector2> position)
-    {
-        if(view==null||!Selected)return;
-        var style=new GUIStyle(GUI.skin.label){font=font,fontSize=13,alignment=TextAnchor.MiddleCenter};style.normal.textColor=new Color(.5f,.92f,1f);
-        // 地图实体由公开视图刷新；这里只绘制有限鱼池与公开弃置顶面。
-        FishingTabletopAssets.DrawIcon(new Rect(752,573,28,28),"fish-back");
-        GUI.Label(new Rect(782,576,65,24),view.SupplyCount+"",style);
-        if(view.DiscardValues.Length>0)FishingTabletopAssets.DrawIcon(new Rect(865,573,28,28),"fish-"+view.DiscardValues[view.DiscardValues.Length-1]);
-        GUI.Label(new Rect(895,576,120,24),"弃置 "+view.DiscardValues.Length,style);
     }
 }

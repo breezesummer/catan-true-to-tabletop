@@ -12,7 +12,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
     public const string PhotoRoot="HarborFishing/v002/";
     public static string Resource(string name)
     {
-        bool photo=name=="lake"||name=="old-boot"||name=="fish-1"||name=="fish-2"||name=="fish-3"||name.StartsWith("ground-",StringComparison.Ordinal);
+        bool photo=name=="lake"||name=="old-boot"||name=="score-boot"||name=="fish-1"||name=="fish-2"||name=="fish-3"||name.StartsWith("ground-",StringComparison.Ordinal);
         return (photo?PhotoRoot:Root)+name;
     }
     // 原照板的两组折边分别适配凸岸与凹岸；厚度不随海岸长度缩放。

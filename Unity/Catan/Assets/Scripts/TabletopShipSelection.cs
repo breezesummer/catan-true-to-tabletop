@@ -14,8 +14,9 @@ public sealed class TabletopShipSelection : MonoBehaviour
         var line=root.AddComponent<LineRenderer>();line.sharedMaterial=highlight.material;
         line.useWorldSpace=false;line.loop=true;line.widthMultiplier=.0008f;line.positionCount=4;
         line.shadowCastingMode=ShadowCastingMode.Off;line.receiveShadows=false;
-        line.SetPositions(new[]{new Vector3(-.0045f,.002f,-.0075f),new Vector3(.0045f,.002f,-.0075f),
-            new Vector3(.0045f,.002f,.0075f),new Vector3(-.0045f,.002f,.0075f)});
+        float halfWidth=ShipCoastLayout.HullBeam*.62f, halfLength=EntityBoardAssets.ShipLength*.52f;
+        line.SetPositions(new[]{new Vector3(-halfWidth,.002f,-halfLength),new Vector3(halfWidth,.002f,-halfLength),
+            new Vector3(halfWidth,.002f,halfLength),new Vector3(-halfWidth,.002f,halfLength)});
         return highlight;
     }
     public void Show(Vector3 edgePosition,Quaternion edgeRotation)

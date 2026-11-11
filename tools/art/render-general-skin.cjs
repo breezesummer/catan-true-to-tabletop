@@ -1,5 +1,5 @@
 /* 本函数在离屏页面中执行，按原始配置取景，攻击动作使用整段动作共同的取景范围。 */
-module.exports=async function render({idle,bg,attack,arc,fallback}) {
+module.exports=async function render({idle,bg,attack,camp,fallback,idleFrames,attackFrames=48,idleOnly=false}) {
     const modern=Boolean(idle?.json);
     const sp=modern?window.spine_4:window.spine;
     const web=modern?sp:sp.webgl;
@@ -74,31 +74,36 @@ module.exports=async function render({idle,bg,attack,arc,fallback}) {
     const result={idleTime:0,attackTime:hit.duration};
     if(primary){
         const motion=anim(primary,idle.action);
-        const w=144,h=192,n=Math.max(48,Math.min(256,Math.ceil(motion.duration*16/16)*16));
+        const w=256,h=352,n=idleFrames||Math.max(48,Math.min(256,Math.ceil(motion.duration*16/16)*16));
         const sheet=canvas(16*w,h*n/16),dest=sheet.getContext('2d');
-        const crown=await image(arc);
         const frame=canvas(w,h),ctx=frame.getContext('2d');
-        const mask=canvas(w,h),mc=mask.getContext('2d',{willReadFrequently:true});
-        mc.drawImage(crown,0,0,w,h*.285);
-        const alpha=mc.getImageData(0,0,w,h).data;
-        mc.clearRect(0,0,w,h);mc.fillStyle='white';
-        for(let x=0;x<w;x++){
-            let y=0;while(y<28&&alpha[(y*w+x)*4+3]<60)y++;
-            mc.fillRect(x,y+1,1,h-y-1);
-        }
+        // 牌面只有一条外轮廓。画芯贴齐右边和底边，势力栏留在同一轮廓内。
+        const outline=new Path2D('M0 44 Q0 25 16 18 Q63 -2 135 1 Q201 0 241 13 Q256 18 256 36 V335 Q256 352 239 352 H17 Q0 352 0 335 Z');
+        const windowPath=new Path2D('M41 53 Q41 31 61 22 Q96 5 146 6 Q208 5 256 19 V352 H41 Z');
+        const colors={wei:'#30577b',shu:'#872c34',wu:'#386435',qun:'#7b7359',shen:'#8f7739',jin:'#665078'};
+        const gradient=ctx.createLinearGradient(0,18,0,h);
+        gradient.addColorStop(0,colors[camp]);gradient.addColorStop(.64,'#393a38');gradient.addColorStop(1,'#232426');
+        const x=41,pw=w-x;
         const idleBox=portraitBox(idle),bgBox=bg&&portraitBox(bg);
         const bgMotion=background&&anim(background,'BeiJing');
         for(let i=0;i<n;i++){
             ctx.clearRect(0,0,w,h);
-            ctx.fillStyle='#32313c';ctx.fillRect(0,0,w,h);
-            if(background){paint(background,bgMotion,bgMotion.duration*i/n,bgBox,w,h);ctx.drawImage(cv,0,0);}
-            paint(primary,motion,motion.duration*i/n,idleBox,w,h);ctx.drawImage(cv,0,0);
-            ctx.globalCompositeOperation='destination-in';ctx.drawImage(mask,0,0);ctx.globalCompositeOperation='source-over';
-            ctx.drawImage(crown,0,0,w,h*.285);dest.drawImage(frame,(i%16)*w,Math.floor(i/16)*h);
+            ctx.save();ctx.clip(outline);
+            ctx.fillStyle=gradient;ctx.fillRect(0,0,w,h);
+            ctx.save();ctx.clip(windowPath);
+            ctx.fillStyle='#32313c';ctx.fillRect(x,0,pw,h);
+            if(background){paint(background,bgMotion,bgMotion.duration*i/n,bgBox,w,h);ctx.drawImage(cv,x,0,pw,h);}
+            paint(primary,motion,motion.duration*i/n,idleBox,w,h);ctx.drawImage(cv,x,0,pw,h);
+            ctx.lineWidth=2;ctx.strokeStyle='rgba(24,20,21,.68)';ctx.stroke(windowPath);
+            ctx.restore();
+            ctx.lineWidth=2;ctx.strokeStyle='rgba(23,25,24,.72)';ctx.stroke(outline);
+            ctx.restore();
+            dest.drawImage(frame,(i%16)*w,Math.floor(i/16)*h);
         }
         result.idle=sheet.toDataURL().split(',')[1];result.idleTime=motion.duration;result.idleFrames=n;
     }
-    const w=384,h=320,n=48,sheet=canvas(w*8,h*6),dest=sheet.getContext('2d');
+    if(idleOnly)return result;
+    const w=768,h=640,n=attackFrames,sheet=canvas(w*8,h*Math.ceil(n/8)),dest=sheet.getContext('2d');
     const box=centered(actor,hit);
     if(fallback)result.attackTime=Math.min(1.25,hit.duration);
     for(let i=0;i<n;i++){

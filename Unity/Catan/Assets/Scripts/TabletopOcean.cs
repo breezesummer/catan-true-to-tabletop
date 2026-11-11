@@ -43,7 +43,7 @@ public sealed class TabletopOcean : MonoBehaviour
         {
             renderer.sharedMaterial = material;
             renderer.shadowCastingMode = ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
+            renderer.receiveShadows = true;
         }
         TabletopScene.SetTableLayer(surface.transform);
         var islands=new GameObject("近岸礁石");islands.transform.SetParent(transform,false);

@@ -54,6 +54,25 @@ public sealed partial class TabletopUiVerification
         for(int i=0;i<600&&(!Table.Ocean.MaskReady||!app.IsHumanTurn);i++)yield return null;
         yield return new WaitForSecondsRealtime(1);
         var city=game.M6View.LegalActions.First(c=>c.Kind==CommandKind.PlayProgressCard&&c.ProgressCard==ProgressCardKind.Engineering).TargetId;
+        if (args.Contains("--verify-card-voices"))
+        {
+            var ids = Catan.Core.DevelopmentCardText.Names.Concat(new[] { "骑士", "道路建设", "丰收", "垄断", "胜利点" });
+            foreach (string id in ids)
+            {
+                var clip = Resources.Load<AudioClip>("TabletopAudio/CardNames/" + id);
+                Require(clip != null && clip.length > .1f, "缺少发展牌语音：" + id);
+            }
+            var action = game.M6View.LegalActions.First(c => c.Kind == CommandKind.PlayProgressCard && c.ProgressCard == ProgressCardKind.Engineering && c.TargetId == city);
+            action.Id = Guid.NewGuid().ToString("N");
+            Require(game.Submit(action)?.Success == true, "工程师出牌失败");
+            var sources = TabletopAudio.Instance.GetComponents<AudioSource>();
+            bool speaking() => sources.Any(s => s.isPlaying && !s.mute && s.volume > 0 && s.clip != null && s.clip.name == "工程师");
+            double until = Time.realtimeSinceStartupAsDouble + 12;
+            while (!speaking() && Time.realtimeSinceStartupAsDouble < until) yield return null;
+            Require(speaking(), "语音声道未播放工程师");
+            Debug.Log("CATAN_CARD_VOICES_OK: 30 张原版配音齐全，工程师出牌后开始播报。");
+            yield break;
+        }
         var board=game.VerificationBoard;
         var target=board.ScreenPoint(city);
         var destination=MobileTabletop.ScreenPoint(new Vector2(735,420));

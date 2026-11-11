@@ -38,9 +38,9 @@ public sealed partial class TabletopUiVerification
             var painted=pictures.Select(p=>p.transform.Find("幻想棋子画面").GetComponent<MeshRenderer>()).ToArray();
             var state=view.Board;
             foreach(var kind in new[]{"village","city","road","ship"})
-                Require(painted.Any(r=>r.enabled && r.sharedMaterial.name.Contains("-"+kind+"-")),"实局缺少"+kind);
+                Require(painted.Any(r=>!r.forceRenderingOff && r.sharedMaterial.name.Contains("-"+kind+"-")),"实局缺少"+kind);
             foreach(var colour in new[]{"red","blue","orange","beige"})
-                Require(painted.Any(r=>r.enabled && r.sharedMaterial.name.EndsWith("-"+colour)),"实局缺少玩家色"+colour);
+                Require(painted.Any(r=>!r.forceRenderingOff && r.sharedMaterial.name.EndsWith("-"+colour)),"实局缺少玩家色"+colour);
             yield return new WaitForEndOfFrame();SaveOceanFrame("幻想棋子-全盘.png");
             var coastalCity=state.Cities.First(p=>state.Ships.Any(s=>s.PlayerId==p.PlayerId && Edges.First(e=>e.Id==s.LocationId).Vertices.Contains(p.LocationId)));
             FocusDetail(board.Position(coastalCity.LocationId),false);
@@ -58,11 +58,11 @@ public sealed partial class TabletopUiVerification
             foreach(var kind in new[]{"village","city","road","ship"})
                 Require(OperationPieceAssets.Texture(kind,"P1").name==kind+"-red","库存图与棋盘不符："+kind);
             ScrollBoard(1,true,BoardCamera.pixelRect.center);
-            Require(painted.All(r=>!r.enabled),"旋转后未切换实体棋子");
+            Require(painted.All(r=>r.forceRenderingOff),"旋转后未切换实体棋子");
             ScrollBoard(-1,true,BoardCamera.pixelRect.center);
-            Require(painted.All(r=>r.enabled),"返回原视角时画稿没有恢复");
+            Require(painted.All(r=>!r.forceRenderingOff),"返回原视角时画稿没有恢复");
             Table.Frame(BoardCamera,true,1);
-            Require(painted.All(r=>!r.enabled),"改变俯角后未切换实体棋子");
+            Require(painted.All(r=>r.forceRenderingOff),"改变俯角后未切换实体棋子");
             Table.Frame(BoardCamera,false,1);
             if(args.Contains("--fantasy-directions"))
             {
@@ -91,8 +91,8 @@ public sealed partial class TabletopUiVerification
                 var piece=board.CommittedPieces.Cast<Transform>().Single(t=>t.name.StartsWith((robber?"Robber ":"Merchant ")+id+" [",StringComparison.Ordinal));
                 var renderer=piece.GetComponentInChildren<MeshRenderer>();
                 var bound=renderer.bounds;
-                Require(Mathf.Abs(bound.min.y-piece.position.y)<.0002f && Mathf.Abs(bound.size.y-(robber ? .02036f : .01913f))<.0003f,"中立棋子高度或轴向不符："+kind+" "+bound);
-                Require(renderer.sharedMaterial.mainTexture==Resources.Load<Texture2D>("NeutralPieces/v001/neutral-palette") && renderer.sharedMaterial.shader.isSupported,"中立棋子调色材质缺失："+kind);
+                Require(Mathf.Abs(bound.min.y-piece.position.y)<.0002f && Mathf.Abs(bound.size.y-(robber ? .02036f : .01576f))<.0003f,"中立棋子高度或轴向不符："+kind+" "+bound);
+                Require(renderer.sharedMaterial.mainTexture==Resources.Load<Texture2D>(robber?"NeutralPieces/v001/robber-surface":"NeutralPieces/v001/peddler-surface") && renderer.sharedMaterial.shader.isSupported,"中立棋子调色材质缺失："+kind);
                 Require(piece.GetComponentsInChildren<Collider>().Length==0,"中立棋子阻挡地块拾取");
                 var preview=OperationPieceAssets.PointerPreview(new TabletopPointerPreview{Kind=kind},"P1",board.Position(id),Quaternion.identity,null,true);
                 Require(preview.GetComponentInChildren<MeshFilter>().sharedMesh==piece.GetComponentInChildren<MeshFilter>().sharedMesh && Vector3.Distance(preview.transform.position,piece.position)<.00001f && Quaternion.Angle(preview.transform.rotation,piece.rotation)<.01f,"中立棋子落点预览不一致");
@@ -101,11 +101,44 @@ public sealed partial class TabletopUiVerification
                 yield return null;yield return new WaitForEndOfFrame();
                 var title=(robber?"强盗":"货郎")+((robber?state.RobberTileId:view.MerchantTileId)==null?"-公开投影":"-实局");
                 SaveOceanFrame(title+".png");
-                var facing=Quaternion.Euler(30,0,0);
+                bool priorPainted=BoardArtPreference.Painted;
+                if(robber)
+                {
+                    BoardArtPreference.Select(true,false);
+                    var painting=piece.Find("幻想棋子画面").GetComponent<MeshRenderer>();
+                    Require(!painting.forceRenderingOff && renderer.forceRenderingOff &&
+                        painting.sharedMaterial.mainTexture==Resources.Load<Texture2D>("FantasyPieces/Views/robber"),"强盗绘制视图未使用同源画稿");
+                    yield return new WaitForEndOfFrame();SaveOceanFrame("强盗-绘制视图.png");
+                    BoardArtPreference.Select(false,false);
+                    Require(!renderer.forceRenderingOff && painting.forceRenderingOff &&
+                        renderer.sharedMaterial.GetTexture("_BumpMap")==Resources.Load<Texture2D>("NeutralPieces/v001/robber-normal") &&
+                        renderer.sharedMaterial.GetTexture("_MetallicGlossMap")==Resources.Load<Texture2D>("NeutralPieces/v001/robber-metal"),"强盗实体材质未完整加载");
+                }
+                var facing=robber?Quaternion.Euler(30,0,0):Quaternion.Euler(18,-12,0);
                 var centre=piece.position+Vector3.up*.009f;
                 BoardCamera.transform.SetPositionAndRotation(centre-facing*Vector3.forward*.18f,facing);
-                BoardCamera.orthographicSize=.040f;
+                BoardCamera.orthographicSize=robber?.040f:.030f;
                 yield return new WaitForEndOfFrame();SaveOceanFrame(title+"-特写.png");
+                if(robber) BoardArtPreference.Select(priorPainted,false);
+            }
+            if(args.Contains("--detailed-pirate"))
+            {
+                var sea=state.PirateTileId ?? state.Tiles.First(t=>t.Resource=="sea").Id;
+                board.RefreshSeafarers(state.Ships,sea);
+                var pirate=board.CommittedPieces.Cast<Transform>().Single(t=>t.name.StartsWith("Pirate "+sea+" [",StringComparison.Ordinal));
+                var mesh=pirate.GetComponentInChildren<MeshFilter>().sharedMesh;
+                var pose=board.ReferenceMarkers.PiratePose(board.Position(sea));
+                var ghost=OperationPieceAssets.PointerPreview(new TabletopPointerPreview{Kind="pirate"},"P1",board.Position(sea)+pose.shift,Quaternion.identity,null,true,true,pose.facing);
+                Require(mesh!=null && mesh.vertexCount>0 && mesh==Resources.Load<GameObject>(EntityBoardAssets.PirateResource).GetComponentInChildren<MeshFilter>().sharedMesh,"海盗网格加载错误");
+                Require(ghost.GetComponentInChildren<MeshFilter>().sharedMesh==mesh && Vector3.Distance(ghost.transform.position,pirate.position)<.00002f,"海盗落点预览错误");
+                Destroy(ghost);
+                FocusDetail(pirate.position,false);
+                yield return null;yield return new WaitForEndOfFrame();SaveOceanFrame("海盗-棋盘.png");
+                var facing=Quaternion.LookRotation(-(pirate.rotation*new Vector3(.62f,.64f,1f)),Vector3.up);
+                var target=pirate.position+Vector3.up*.0045f;
+                BoardCamera.transform.SetPositionAndRotation(target-facing*Vector3.forward*.18f,facing);
+                BoardCamera.orthographicSize=.022f;
+                yield return new WaitForEndOfFrame();SaveOceanFrame("海盗-特写.png");
             }
             board.Refresh(view);
             Require(Authority==authority,"棋子投影影响存档");
@@ -174,8 +207,8 @@ public sealed partial class TabletopUiVerification
                 if(first==null)first=filter.sharedMesh;
                 Require(filter.sharedMesh==first,"四色共享网格失败 "+part);
                 var materials=filter.GetComponent<Renderer>().sharedMaterials;
-                Require(materials.All(m=>m!=null&&m.mainTexture!=null&&m.shader.isSupported),"无效材质 "+part);
-                Require(materials.Any(m=>m.name.EndsWith("_"+colour)),"玩家色丢失 "+part);
+                Require(materials.All(m=>m!=null&&(part=="ship"||m.mainTexture!=null)&&m.shader.isSupported),"无效材质 "+part);
+                Require(materials.Any(m=>part=="ship"?m.name=="归属旗布-"+colour:m.name.EndsWith("_"+colour)),"玩家色丢失 "+part);
                 Require(model.GetComponentsInChildren<Collider>().Length==0,"新增棋子阻挡输入");
             }
         }

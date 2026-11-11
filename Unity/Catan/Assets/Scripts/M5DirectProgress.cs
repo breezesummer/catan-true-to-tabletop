@@ -316,7 +316,7 @@ public sealed partial class M5App
     void BeginDirectProgress()
     {
         if(!DirectProgressActive)return;
-        status=SeatProgress?"点选玩家头像":draft.ProgressCard==ProgressCardKind.Crane?"点选要升级的城市设施":ProgressChoiceRow?"点选牌面上的目标":draft.ProgressCard==ProgressCardKind.Smithing?"点选要晋升的骑士":"点选棋盘目标";
+        status=TabletopSelectionPrompt.ProgressInstruction(draft.ProgressCard.ToString());
         ai.ShowTablePrompt(status);
     }
     void PreviewDirectTarget(string target,string card,Command command,bool legal)
@@ -357,7 +357,7 @@ public sealed partial class M5App
                     var tile=view.Board.Tiles.FirstOrDefault(t=>t.Id==target);
                     bool eligible=tile!=null&&new[]{3,4,5,9,10,11}.Contains(tile.Number??0);
                     board.PreviewPiece(target,TabletopPointerPreview.ForEffect("Invention"),seat,eligible);
-                    if(click&&eligible){draft.SourceId=target;status="已选第一枚数字，点选第二枚数字交换。";ai.ShowTablePrompt(status);}return;
+                    if(click&&eligible){draft.SourceId=target;status="请选择第二枚数字圆片";ai.ShowTablePrompt(status);}return;
                 }
             }
             if(kind==ProgressCardKind.Smithing)command.TargetIds=new[]{target};

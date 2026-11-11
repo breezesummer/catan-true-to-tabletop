@@ -35,6 +35,12 @@ public static class ExpansionPiecesImport
         Import(kind=>kind=="ship"||kind=="wall"||kind=="pirate");
     }
 
+    [MenuItem("Catan/美术/导入海盗船")]
+    public static void ImportPirate()
+    {
+        Import(kind=>kind=="pirate");
+    }
+
     static void Import(Func<string,bool> include)
     {
         AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
@@ -43,10 +49,11 @@ public static class ExpansionPiecesImport
         if(include!=null)parts=parts.Where(part=>include(part.kind)).ToArray();
         var colours=new[]{"red","blue","orange","beige"};
         var contact=AssetDatabase.LoadAssetAtPath<Material>("Assets/Art/NaturalPieces/v001/Natural_Contact.mat");
-        var tints=new[]{new Color(.82f,.23f,.145f),new Color(.27f,.48f,.77f),new Color(.98f,.54f,.18f),new Color(1,.98f,.89f)};
+        var tints=BoardRenderer.SeatColors;
         int prefabCount=0;
         foreach(var part in parts)
         {
+            if(part.kind=="ship"){AndaluciaShipImport.Prepare();continue;}
             bool pirate=part.kind=="pirate";
             if(part.kind.StartsWith("metro-",StringComparison.Ordinal)||part.kind=="ship"||pirate||part.kind=="wall")ImportSurfaceTexture(part.kind);
             var texture=AssetDatabase.LoadAssetAtPath<Texture2D>(Art+part.kind+"-surface.png");
@@ -76,6 +83,7 @@ public static class ExpansionPiecesImport
                     model.transform.localPosition+=Vector3.up*(part.baseY-renderer.bounds.min.y);
                     if(Mathf.Abs(renderer.bounds.size.y-part.size[2])>.00015f||Mathf.Abs(renderer.bounds.min.y-part.baseY)>.00005f)
                         throw new InvalidOperationException("尺寸或落点异常 "+part.kind);
+                    if(pirate)model.transform.localScale*=EntityBoardAssets.PirateLength/Mathf.Max(renderer.bounds.size.x,renderer.bounds.size.z);
                     string output=pirate?"Assets/Resources/"+EntityBoardAssets.PirateResource+".prefab":Root+root.name+".prefab";
                     PrefabUtility.SaveAsPrefabAsset(root,output);
                     prefabCount++;
@@ -88,6 +96,7 @@ public static class ExpansionPiecesImport
             }
         }
         AssetDatabase.SaveAssets();
+        PlayerPieceColorImport.ApplyKinds(parts.Select(p=>p.kind).Where(k=>k!="pirate"&&k!="ship").ToArray());
         Debug.Log("CATAN_EXPANSION_IMPORT_OK meshes="+parts.Length+" prefabs="+prefabCount);
     }
 

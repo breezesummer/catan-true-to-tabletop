@@ -61,7 +61,7 @@ public sealed class TabletopPresentationTests
     }
     [Theory]
     [InlineData("PillageCity","降级为村庄","城市")]
-    [InlineData("ProgressTreasonRemove","叛变","己方骑士")]
+    [InlineData("ProgressTreasonRemove","叛徒","己方骑士")]
     [InlineData("ProgressTreasonPlace","安置","替补骑士")]
     [InlineData("DisplacedKnight","安置","被驱逐的骑士")]
     [InlineData("Metropolis","大都会","城市")]
@@ -259,10 +259,15 @@ public sealed class TabletopPresentationTests
         {
             var slots=Enumerable.Range(0,count).Select(index=>new TabletopResourceSlot{Good=index%5,Ordinal=index/5}).ToArray();
             foreach(float scroll in new[]{0,TabletopHandLayout.MaximumScroll(count,width)})
-            for(int index=0;index<count;index++)
             {
-                var pose=TabletopHandLayout.Resource(slots,index,center,width,false,scroll);
-                Assert.Equal(TabletopHandLayout.Card(index,count,center,width,false,scroll).X,pose.X,3);
+                var row=new TabletopHandLayout.Row(slots,center,width,scroll);
+                for(int index=0;index<count;index++)
+                    Assert.Equal(TabletopHandLayout.Card(index,count,center,width,false,scroll).X,row.Next(slots[index].Weight),3);
+                slots[count/2].Weight=.375;
+                var inserting=new TabletopHandLayout.Row(slots,center,width,scroll);
+                for(int index=0;index<count;index++)
+                    Assert.Equal(TabletopHandLayout.Resource(slots,index,center,width,false,scroll).X,inserting.Next(slots[index].Weight),3);
+                slots[count/2].Weight=1;
             }
         }
     }

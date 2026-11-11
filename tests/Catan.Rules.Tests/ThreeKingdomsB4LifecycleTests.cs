@@ -34,6 +34,37 @@ public sealed class ThreeKingdomsB4LifecycleTests
         Assert.Equal(4, state.Clock.Round);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ScheduledRefillKeepsLivingGeneralUntilItsOwnExpiry(bool chooseFirst)
+    {
+        var state = ThreeKingdomsEngine.Create(new[] { "P1", "P2", "P3", "P4" }, 71, First, true, GeneralCatalog.B6PackageVersion);
+        ResolveAll(state);
+        ThreeKingdomsEngine.BeginNormalTurns(state);
+        for (int i = 0; i < 8; i++) End(state);
+        ThreeKingdomsEngine.RetireGeneral(state, "P1", state.WindowId, First);
+        ResolveAll(state);
+        var general = state.Generals.Single(g => g.OwnerPlayerId == "P1" && g.Region == GeneralRegion.Active);
+        string tenure = general.TenureId;
+        for (int i = 0; i < 4; i++) End(state);
+        if (!chooseFirst)
+            foreach (var seat in state.SeatPlayerIds.Skip(1)) { Resolve(state, seat); Resolve(state, seat); }
+        var reserve = ThreeKingdomsEngine.GetPendingDecision(state, "P1").CandidateIds[0];
+        Resolve(state, "P1");
+        Assert.Null(ThreeKingdomsEngine.GetPendingDecision(state, "P1"));
+        state = Restore(state);
+        ResolveAll(state);
+        general = state.Generals.Single(g => g.TenureId == tenure);
+        Assert.Equal(GeneralRegion.Active, general.Region);
+        Assert.Equal(2, general.RemainingLife);
+        Assert.Contains(state.Generals, g => g.GeneralId == reserve && g.Region == GeneralRegion.Hidden && g.OwnerPlayerId == "P1");
+        for (int i = 0; i < 8; i++) End(state);
+        Assert.Equal(ThreeKingdomsDecisionKind.DeployReplacement, state.PendingDecision.Kind);
+        ResolveAll(state);
+        Assert.Contains(state.Generals, g => g.GeneralId == reserve && g.Region == GeneralRegion.Active && g.RemainingLife == 3);
+    }
+
     private static int First(int count) => 0;
     private static ThreeKingdomsState Create(int seats = 3) => ThreeKingdomsEngine.Create(
         Enumerable.Range(1, seats).Select(i => "P" + i).ToArray(), 71, First, true, GeneralCatalog.B4PackageVersion);

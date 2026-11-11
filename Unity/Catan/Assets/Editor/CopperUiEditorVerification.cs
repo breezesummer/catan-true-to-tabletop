@@ -60,8 +60,8 @@ public static class CopperUiEditorVerification
         Size(1920,1080);yield return 1.0;
         yield return Capture("01-主菜单");
         Set(app,"menuPage",0);yield return Capture("02-开局配置");
-        Set(app,"menuSetupStep",1);yield return Capture("02b-地图配置");
-        Set(app,"menuSetupStep",2);yield return Capture("02c-同桌配置");
+        Set(app,"atlasOpen",true);yield return Capture("02b-地图配置");
+        Set(app,"atlasOpen",false);yield return Capture("02c-同桌配置");
         Set(app,"menuPage",1);yield return Capture("02d-加载游戏");
         Set(app,"menuPage",4);yield return Capture("03-设置");
         app.StartGame("combined","heading-for-new-shores",4,"P1",true);yield return 3.2;

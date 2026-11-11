@@ -37,14 +37,6 @@ public static class HandPaintedTabletopSkin
         if (leaves != null) GUI.DrawTexture(new Rect(-5,-5,237,79),leaves);
     }
 
-    public static void TurnBorder(Rect area)
-    {
-        if (Event.current.type != EventType.Repaint) return;
-        var edge = new Rect(area.x-1,area.y-1,area.width+2,area.height+2);
-        GUI.DrawTexture(edge,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,new Color(.89f,.68f,.32f),3,6);
-        GUI.DrawTexture(area,Texture2D.whiteTexture,ScaleMode.StretchToFill,true,0,new Color(.99f,.91f,.68f),1,5);
-    }
-
     public static Color TrackInk(int track)
     {
         if (track == 1) return new Color(.17f,.32f,.48f);

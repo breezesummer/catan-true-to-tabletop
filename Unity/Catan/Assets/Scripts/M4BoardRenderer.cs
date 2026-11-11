@@ -334,6 +334,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
     public void PreviewPiece(string id,TabletopPointerPreview preview,string seat,bool legal)
     {
         string key=id+":"+preview.Kind+":"+preview.Level+":"+preview.Active+":"+preview.Track+":"+preview.Wall+":"+seat+":"+legal;
+        if(preview.Kind=="port")key+=":"+BoardArtPreference.Painted;
         if(ghost!=null&&pointerPreviewKey==key){if(legal)TabletopPointerCursor.Request();return;}
         ClearPreview();if(string.IsNullOrEmpty(id))return;pointerPreviewKey=key;
         var rotation=id.StartsWith("E")?rotations[id]:Quaternion.identity;

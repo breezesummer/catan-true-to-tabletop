@@ -9,18 +9,18 @@ public sealed class FantasyBoardPiece : MonoBehaviour
     static readonly Dictionary<string, Material> materials = new Dictionary<string, Material>();
     static event Action<bool> viewChanged;
     static bool paintedView = true;
-    Renderer[] solid;
-    MeshRenderer painting;
-    MeshFilter filter;
-    string kind;
-    bool damaged;
+    [SerializeField] Renderer[] solid;
+    [SerializeField] MeshRenderer painting;
+    [SerializeField] MeshFilter filter;
+    [SerializeField] string kind;
+    [SerializeField] bool damaged;
     public int Frame {get; private set;}
 
     public static Color Pigment(string colour)
     {
-        if (colour=="red") return new Color(.93f,.18f,.16f);
-        if (colour=="orange") return new Color(1,.39f,.055f);
-        return new Color(1,.96f,.82f);
+        for(int i=0;i<BoardRenderer.SeatColors.Length;i++)
+            if(PlayerComponentAssets.ColourKey("P"+(i+1))==colour)return BoardRenderer.SeatColors[i];
+        return Color.white;
     }
 
     public static void SetView(bool painted)
@@ -40,7 +40,7 @@ public sealed class FantasyBoardPiece : MonoBehaviour
             var shader = Resources.Load<Shader>("FantasyPieces/FantasyInk");
             if (texture == null || shader == null) return root;
             material = new Material(shader) { name = "幻想棋子-" + key, mainTexture = texture };
-            material.SetFloat("_Swap", colour == "blue" || colour=="neutral" ? 0 : 1);
+            material.SetFloat("_Swap", colour=="neutral" ? 0 : 1);
             material.SetFloat("_Atlas",FantasyPieceFrames.IsBuilding(kind)||kind=="ship"||kind=="pirate"||kind=="knights"?1:0);
             material.SetColor("_Pigment", Pigment(colour));
             // 建筑覆盖路段端部，船覆盖其尾浪。
@@ -83,10 +83,13 @@ public sealed class FantasyBoardPiece : MonoBehaviour
     void Select(bool painted)
     {
         if (painting == null) return;
+        if(FantasyPieceFrames.IsBuilding(kind)) painted=BoardArtPreference.Painted;
+        else painted &= BoardArtPreference.Painted;
         painted &= !damaged;
-        painting.enabled = painted;
+        painting.forceRenderingOff = !painted;
         foreach (var part in solid) part.forceRenderingOff = painted;
     }
-    void OnEnable() { viewChanged += Select; Select(paintedView); }
-    void OnDisable() { viewChanged -= Select; }
+    void ApplyStyle() => Select(paintedView);
+    void OnEnable() { viewChanged += Select; BoardArtPreference.Changed+=ApplyStyle; ApplyStyle(); }
+    void OnDisable() { viewChanged -= Select; BoardArtPreference.Changed-=ApplyStyle; }
 }

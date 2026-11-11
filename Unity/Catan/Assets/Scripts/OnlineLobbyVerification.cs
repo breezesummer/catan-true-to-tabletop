@@ -56,6 +56,9 @@ public sealed class OnlineLobbyVerification : MonoBehaviour
     }
     IEnumerator Verify()
     {
+        Screen.SetResolution(1600,900,false);
+        yield return new WaitForSecondsRealtime(.5f);
+        while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
         while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
         stage="未配置联机服务器";Call("OpenSeparatedNetworkMenu",false);
         Require(app.OnlineLobbyState==M7LobbyConnectionState.Unconfigured&&!app.OnlineRoomActionsAvailable);
@@ -82,13 +85,31 @@ public sealed class OnlineLobbyVerification : MonoBehaviour
         Require(File.ReadAllText(app.OnlineReviewSettingsPath)==onlineAddress&&app.OnlineRoomActionsAvailable);
         yield return Capture("05-online-empty-lobby");
 
-        stage="创建公开房间";Set("networkTab",1);Set("networkSettingsPage",0);Set("menuRule",0);Set("menuPlayers",4);
+        stage="创建公开房间";Set("networkTab",1);Set("menuRule",3);Set("menuPlayers",4);
+        Set("menuScenario",Array.IndexOf(Catan.Core.M5.CombinedScenarios.Ids,"through-the-desert"));
+        Set("menuThreeKingdoms",true);Set("menuHarbormaster",true);Set("menuFishing",true);
         Set("networkRoomName","在线大厅验收房间");Set("networkPassword","");
         yield return Capture("06-create-room");Call("CreateOnlineRoom");
         yield return Wait(()=>!app.Network.Busy&&app.Network.Room!=null);
         string createdRoom=app.Network.RoomId;Require(app.Network.Room.Name=="在线大厅验收房间"&&app.Network.SeatId!=null);
         yield return Capture("07-created-current-room");
 
+        stage="四席准备与房主菜单";
+        var guests=new List<M7Client>();
+        foreach(var name in new[]{"曹操","孙权","诸葛亮"}){
+            var guest=MakeClient(name);guests.Add(guest);guest.Join(createdRoom,name,"");
+            yield return Wait(()=>!guest.Busy&&guest.Room?.RoomId==createdRoom);
+            guest.Ready(true);yield return Wait(()=>!guest.Busy);
+        }
+        yield return Wait(()=>!app.Network.Busy&&app.Network.Room.Seats.All(s=>s.Occupied&&(s.SeatId==app.Network.SeatId||s.Ready)));
+        app.Network.Ready(true);
+        yield return Wait(()=>!app.Network.Busy&&app.Network.Room.Seats.All(s=>s.Occupied&&s.Ready));
+        Require(app.Network.Room.ScenarioId=="through-the-desert"&&app.Network.Room.Harbormaster&&app.Network.Room.Fishing);
+        yield return Capture("07a-four-ready-seats");
+        Set("lanRoomPage",1);yield return Capture("07b-room-settings");
+        Set("lanRoomPage",2);yield return Capture("07c-connection-recovery");
+        Set("lanRoomPage",0);
+        foreach(var guest in guests){guest.Leave();yield return Wait(()=>!guest.Busy&&guest.Room==null);}
         var open=MakeClient("open");var locked=MakeClient("locked");
         open.Create(new RoomSettings{Name="好友的公开房间",RuleSet="base",ScenarioId="base",PlayerCount=4,Listed=true},"验收好友甲","");
         yield return Wait(()=>!open.Busy&&open.Room!=null);

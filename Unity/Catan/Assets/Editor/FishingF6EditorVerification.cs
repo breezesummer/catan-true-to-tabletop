@@ -83,7 +83,7 @@ public static class FishingF6EditorVerification
         FishingF6SampleVerification.Run();
         if(!Environment.GetCommandLineArgs().Contains("--f6-sample"))FishingF6SampleVerification.VerifyAll();
         if(Environment.GetCommandLineArgs().Contains("--f6-visual-only")){yield return ReviewBoards();yield break;}
-        Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",2);Set(app,"menuHarbormaster",true);Set(app,"menuFishing",true);Set(app,"menuVictoryPoints",null);
+        Set(app,"menuPage",0);Set(app,"atlasOpen",false);Set(app,"menuRule",2);Set(app,"menuHarbormaster",true);Set(app,"menuFishing",true);Set(app,"menuVictoryPoints",null);
         yield return Capture("01-城市骑士捕鱼配置");
         foreach(string mode in (Environment.GetCommandLineArgs().Contains("--f6-sample")?new[]{"base"}:new[]{"base","cities-knights"}))
         {
@@ -145,7 +145,7 @@ public static class FishingF6EditorVerification
         yield return ReviewKingdoms();
         if(!Environment.GetCommandLineArgs().Contains("--fish-hand-only"))yield return ReviewBoards();
         yield return ReviewReplacement();
-        Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",1);Set(app,"menuScenario",0);
+        Set(app,"menuPage",0);Set(app,"atlasOpen",false);Set(app,"menuRule",1);Set(app,"menuScenario",0);
         yield return Capture("04-航海捕鱼已开放");
     }
     static IEnumerator ReviewGenerals213()

@@ -24,6 +24,8 @@ Shader "Catan/ContinuousOcean"
             #pragma vertex Vert
             #pragma fragment Frag
             #pragma target 3.0
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             TEXTURE2D(_CoastMask); SAMPLER(sampler_CoastMask);
@@ -86,7 +88,7 @@ Shader "Catan/ContinuousOcean"
                 float2 drift=float2(sin(p.y*17+t*.27),cos(p.x*12-t*.19))*.0025;
                 half3 wash=SAMPLE_TEXTURE2D(_SeaWash,sampler_SeaWash,p*1.65+drift).rgb;
                 float shallow=1-smoothstep(.0005,.030,d);
-                wash=lerp(wash,half3(.45,.75,.62),shallow*.39);
+                wash=lerp(wash,lerp(half3(.018,.26,.37),half3(.10,.54,.49),shallow),.46);
                 float crest=sin(d*635-t*.72+sin(p.x*89+p.y*113)*2.1);
                 float breaks=smoothstep(.35,.93,sin(p.x*317+p.y*151)*sin(p.y*197-p.x*83+t*.17));
                 float foam=(1-smoothstep(.001,.009,d))*smoothstep(.55,.94,crest)*breaks;
@@ -94,7 +96,7 @@ Shader "Catan/ContinuousOcean"
                 return lerp(wash,half3(.51,.77,.70),coast.g*.11);
             }
 
-            half3 OceanWater(Varyings i,float2 p,float t,float2 coast,float d)
+            half3 OceanWater(Varyings i,float2 p,float t,float2 coast,float d,Light sun)
             {
                 float a=dot(p,float2(26,17))-t*.85;
                 float b=dot(p,float2(-19,34))-t*1.1;
@@ -105,11 +107,10 @@ Shader "Catan/ContinuousOcean"
                 slope+=float2(ripple,ripple2)*.16*lerp(.3,1,damp);
                 float3 n=normalize(float3(-slope.x,1,-slope.y));
                 float3 view=GetWorldSpaceNormalizeViewDir(i.world);
-                Light sun=GetMainLight();
                 float fresnel=.04+.40*pow(1-saturate(dot(n,view)),4);
                 float spec=pow(saturate(dot(n,normalize(sun.direction+view))),80);
                 float broad=sin(p.x*12+sin(p.y*18)*.6+t*.08)*sin(p.y*16-t*.07);
-                float3 water=lerp(float3(.16,.40,.43),float3(.045,.19,.26),smoothstep(0,.065,d));
+                float3 water=lerp(float3(.13,.54,.47),float3(.021,.26,.38),smoothstep(0,.065,d));
                 water+=broad*float3(.004,.009,.012)+(ripple+ripple2)*.0025;
                 float3 sky=lerp(float3(.18,.32,.42),float3(.55,.68,.74),saturate(n.z*3+.5));
                 water=lerp(water,sky,fresnel)+sun.color*spec*.32;
@@ -131,16 +132,18 @@ Shader "Catan/ContinuousOcean"
                     float offshore=smoothstep(.012,.040,d);
                     float wavePatch=smoothstep(.18,.78,sin(p.x*19+p.y*11+t*.09)*cos(p.y*14-p.x*7)*.5+.5);
                     float3 blue=lerp(detail,secondary,.12+patch*.10)*lerp(.96,1.12,patch);
-                    blue=lerp(float3(.006,.085,.10),blue,.125+offshore*(.015+wavePatch*.035));
+                    float3 basin=lerp(float3(.048,.43,.38),float3(.011,.215,.33),smoothstep(.006,.064,d));
+                    basin*=.88+.23*patch+.05*broad;
+                    blue=lerp(basin,blue,.16+offshore*(.025+wavePatch*.065));
                     // 岸脚的沉砂、水下卵石与浅水按距离逐层显出。高频波纹只打断小段浪花。
                     float grain=sin(p.x*1060+p.y*390)*sin(p.y*820-p.x*510);
                     float beach=BeachAmount(p);
                     float sand=1-smoothstep(.0003,lerp(.0025,.0055,beach)+ShoreVariation(p)*.0009,d);
                     float shallows=1-smoothstep(.001,.007+sin(p.x*250+p.y*113)*.0012,d);
-                    blue=lerp(blue,float3(.035,.23,.205),shallows*.48);
+                    blue=lerp(blue,float3(.10,.50,.43),shallows*.44);
                     half3 bed=lerp(SAMPLE_TEXTURE2D(_Gravel,sampler_Gravel,p*23).rgb,SAMPLE_TEXTURE2D(_Sand,sampler_Sand,p*16).rgb,beach);
                     blue=lerp(blue,bed*float3(.40,.55,.48),sand*.64);
-                    blue+=sun.color*spec*.065;
+                    blue+=sun.color*spec*.28;
                     float broken=saturate((detail.g-secondary.g)*16+.35);
                     float lace=smoothstep(.12,.93,sin(d*410-t*.72+broken*5+ripple*.55));
                     lace*=smoothstep(.0001,.0012,d)*(1-smoothstep(.002,.007,d));
@@ -164,11 +167,19 @@ Shader "Catan/ContinuousOcean"
                 float2 p=i.world.xz;
                 float2 coast=Coast(p);
                 float d=coast.r*.08;
+                Light sun=GetMainLight(TransformWorldToShadowCoord(i.world));
                 half3 water;
                 [branch] if(_PaintedSea>.5) water=PaintedWater(p,_Time.y,coast,d);
-                else water=OceanWater(i,p,_Time.y,coast,d);
-                if (_CatanMapMarksHidden < .5 && _PirateHex.z > .5)
-                    water = DangerHex(water,p - _PirateHex.xy);
+                else water=OceanWater(i,p,_Time.y,coast,d,sun);
+                // 碎光随风浪游走；用屏幕导数软化远景浪尖，避免缩放时闪烁。
+                float phase=dot(p,float2(358,1270))-_Time.y*1.22+2.1*sin(dot(p,float2(-93,61))-_Time.y*.24);
+                float ripple=sin(phase+.84*sin(dot(p,float2(-221,197))-_Time.y*.47));
+                float patch=sin(dot(p,float2(37,21))+_Time.y*.21)*cos(dot(p,float2(-16,43))-_Time.y*.13);
+                float breaks=smoothstep(.27,.87,sin(dot(p,float2(-548,179))+sin(phase*.21)+_Time.y*.38));
+                float aa=min(.16,fwidth(ripple));
+                float glitter=smoothstep(.87-aa,1.0,ripple)*breaks*smoothstep(.07,.80,patch)*smoothstep(.003,.024,d);
+                water*=lerp(half3(.48,.57,.66),half3(1,1,1),sun.shadowAttenuation);
+                water+=sun.color*glitter*.069*sun.shadowAttenuation;
                 return half4(water,1);
             }
             ENDHLSL

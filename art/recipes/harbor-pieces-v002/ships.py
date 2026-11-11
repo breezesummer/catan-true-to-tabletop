@@ -149,9 +149,12 @@ def pirate():
     rod((0,-.67,.25),(0,-.57,1.56),.031,'wood',.017)
     def main(u,t):
         x=(u-.5)*(1.15-.15*t)-.10+.24*t
-        return (x,.34-.61*t-.14*sin(t*pi)-.055*sin(u*pi)*sin(t*pi)+.11*(u-.5),
+        belly=sin(t*pi)*sin(u*pi)
+        pleats=.018*sin(5*pi*u+2*t)*sin(t*pi)+.009*sin(11*pi*u-t)*t**2
+        return (x,.34-.61*t-.17*sin(t*pi)-.235*belly+pleats+.11*(u-.5),
                 1.62+.49*u-.86*t+.10*t*u+.06*t*(2*u-1)**2)
-    sail(main,lambda i,j:'iron' if j==9 else 'blue')
+    sail(main,lambda i,j:'iron' if j==23 else 'blue',40,24)
+    pirate_rigging(main)
     rod(main(0,0),main(1,0),.028,'wood');rod(main(0,1),main(1,1),.022,'wood')
     # 艏三角帆沿船长方向斜张，与横置主帆在俯视下形成折角。
     peak=Vector((0,-.57,1.51));tip=Vector((.03,-1.46,.90));clew=Vector((.40,-.75,.43))
@@ -187,3 +190,56 @@ def pirate():
     rod((.20,.90,.73),(.39,1.30,.19),.021,'wood',.032)
     q=[(.33,1.19,.35),(.42,1.26,.28),(.49,1.39,.11),(.44,1.40,.093)]
     loft([q,[(x-.019,y,z) for x,y,z in q]],'plank')
+
+
+def pirate_rigging(main):
+    # 帆边绳、横桁绑扎和从桅顶经滑轮回到船舷的绳路。
+    for u in (0,1):
+        path([main(u,j/24) for j in range(25)],.011,'leather',8)
+    for t in (0,1):
+        path([main(j/40,t) for j in range(41)],.010,'linen',8)
+    for u in (.18,.40,.62,.84):
+        path([Vector(main(u,j/24))+Vector((0,-.004,0)) for j in range(25)],.0042,'iron',6)
+    for j in range(9):
+        u=(j+.5)/9; p=Vector(main(u,0))
+        path([p+Vector((0,.028*cos(i*tau/12),.03*sin(i*tau/12))) for i in range(13)],.005,'linen',6)
+    for side in (-1,1):
+        sheet=Vector(main((side+1)/2,1))
+        block=Vector((side*.37,-.57,.42))
+        path([sheet,sheet.lerp(block,.46)+Vector((0,0,-.027)),block],.009,'linen',8)
+        bulb(block,(.023,.017,.031),'wood',12)
+        path([block,(side*.40,-.35,.367),(side*.34,-.13,.31)],.008,'leather',8)
+        for j in range(3):
+            y=.03+.16*j; x=side*board_width(RAIDER,y)
+            bottom=Vector((x,y,.40)); upper=bottom+Vector((side*-.014,.013,.088))
+            for center in (bottom,upper):
+                bulb(center,(.030,.022,.032),'wood',12)
+            for k in (-1,0,1):
+                off=Vector((.004,k*.013,0))
+                rod(bottom+off,upper+off,.0046,'linen',n=6)
+            rod(upper,(side*.024,.30+j*.028,1.89),.008,'leather',n=8)
+        # 炮架与舷缘护材沿船壳走；两条亮木线有助于俯视时读清船体。
+        for zfrac in (.48,.92):
+            points=[(side*w*(.44+.56*zfrac**.65),y,h*zfrac) for y,w,h in RAIDER]
+            path(points,.013,'plank',8)
+        for y in (-.49,-.18,.14):
+            w=board_width(RAIDER,y)
+            box(side*(w-.07),y,.264,.105,.10,.047,'plank')
+        for j in range(5):
+            y=.57+j*.092
+            rod((side*.247,y,.64),(side*.247,y,.745),.010,'brass',n=8)
+    # 舵轮、木销架及盘绳均固定在尾楼或甲板上。
+    wheel=Vector((0,.72,.76))
+    rim=[wheel+Vector((.109*cos(i*tau/36),0,.109*sin(i*tau/36))) for i in range(37)]
+    path(rim,.012,'wood',8)
+    rod((0,.79,.59),(0,.79,.76),.027,'wood')
+    rod((0,.71,.76),(0,.79,.76),.020,'brass')
+    for i in range(8):
+        direction=Vector((cos(i*tau/8),0,sin(i*tau/8)))
+        rod(wheel,wheel+direction*.131,.008,'plank',n=8)
+        bulb(wheel+direction*.132,(.013,.011,.013),'brass',8)
+    points=[]
+    for j in range(145):
+        t=j/144; a=t*tau*4.4
+        points.append((-.20+(.027+.075*t)*cos(a),.13+(.019+.051*t)*sin(a),.265+.002*t))
+    path(points,.006,'linen',6)

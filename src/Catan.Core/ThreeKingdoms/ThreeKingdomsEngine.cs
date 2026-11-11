@@ -106,7 +106,7 @@ namespace Catan.Core.ThreeKingdoms
         public static void ChooseGenerals(ThreeKingdomsState state, string playerId, string[] generalIds,
             string decisionId, string windowId, Func<int, int> draw)
         {
-            if (UsesB4Lifecycle(state)) { ChooseBatchGenerals(state, playerId, generalIds, decisionId, windowId); return; }
+            if (UsesB4Lifecycle(state)) { ChooseBatchGenerals(state, playerId, generalIds, decisionId, windowId, draw); return; }
             var pending = RequireDecision(state, playerId, decisionId, windowId);
             Require(pending.Kind == ThreeKingdomsDecisionKind.SelectOpening || pending.Kind == ThreeKingdomsDecisionKind.SelectReplacement,
                 "当前需要选择登场武将。");
@@ -416,9 +416,18 @@ namespace Catan.Core.ThreeKingdoms
                 general.RemainingLife--;
                 general.LastLifeDecrementRound = state.Clock.Round;
             }
-            state.ExpiredPlayerQueue = GeneralCatalog.UsesB6Rules(state.RulesVersion)
-                ? (state.Clock.Round % 3 == 0 ? state.SeatPlayerIds.ToArray() : Array.Empty<string>())
-                : snapshot.Where(g => g.RemainingLife == 0).Select(g => g.OwnerPlayerId).ToArray();
+            state.ExpiredPlayerQueue = snapshot.Where(g => g.RemainingLife == 0).Select(g => g.OwnerPlayerId).ToArray();
+            if (GeneralCatalog.UsesB6Rules(state.RulesVersion))
+            {
+                bool refill = state.Clock.Round % 3 == 0;
+                var players = refill ? state.SeatPlayerIds : state.ExpiredPlayerQueue;
+                state.ExpiredPlayerQueue = Array.Empty<string>();
+                if (players.Length > 0)
+                {
+                    BeginReplacementBatch(state, players, draw, refill);
+                    return;
+                }
+            }
             ContinueRoundBoundary(state, draw);
         }
 

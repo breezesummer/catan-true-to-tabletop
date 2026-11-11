@@ -5,8 +5,8 @@ public sealed partial class TabletopReferenceMarkers
     // 拾取和逐角度验收可能在 LateUpdate 之前切换镜头。
     public void AlignPortSigns(Camera camera)
     {
-        foreach (var port in ports.Values) port.Sign?.Slip.FaceCamera(camera);
-        foreach (var gift in gifts.Values) gift.Sign?.Slip.FaceCamera(camera);
+        foreach (var port in ports.Values) if (port.Sign != null && !port.Sign.OnDeck) port.Sign.Slip.FaceCamera(camera);
+        foreach (var gift in gifts.Values) if (gift.Sign != null && !gift.Sign.OnDeck) gift.Sign.Slip.FaceCamera(camera);
     }
 
     static Vector2 ProjectSign(Vector3 p,Transform camera) =>

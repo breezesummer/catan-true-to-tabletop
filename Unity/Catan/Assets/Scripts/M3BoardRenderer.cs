@@ -145,7 +145,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
         shipCoast.RefreshWakes(pieceCache,pieces,operationLayout?tableScene.Ocean:null,Position);
         pieceCache.Begin("ships",pieces);
         foreach(var ship in ships)
-        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+ship.IsWarship+":"+operationLayout+":"+shipCoast.HasDock(ship.LocationId)+":"+shipCoast.Reversed(ship.LocationId)))
+        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+ship.IsWarship+":"+operationLayout+":"+BoardArtPreference.Painted+":"+shipCoast.HasDock(ship.LocationId)+":"+shipCoast.Reversed(ship.LocationId)))
         {
             if(!change.Changed)continue;
             var mesh=Ship(ship.LocationId,SeatColor(ship.PlayerId),pieces);
@@ -264,6 +264,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
     public void PreviewPiece(string id,TabletopPointerPreview preview,string seat,bool legal)
     {
         string key=id+":"+preview.Kind+":"+preview.Level+":"+preview.Active+":"+seat+":"+legal;
+        if(preview.Kind=="port")key+=":"+BoardArtPreference.Painted;
         if(ghost!=null&&pointerPreviewKey==key){if(legal)TabletopPointerCursor.Request();return;}
         ClearPreview();if(string.IsNullOrEmpty(id))return;pointerPreviewKey=key;
         var rotation=id.StartsWith("E")?rotations[id]:Quaternion.identity;

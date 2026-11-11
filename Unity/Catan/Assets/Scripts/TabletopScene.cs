@@ -14,7 +14,7 @@ public sealed class TabletopScene : MonoBehaviour
     public const int HudLayer = 29;
     public const float HudCameraAngle = 58;
     public const float StrategyCameraAngle = TabletopCameraModel.DefaultAngle;
-    public const float OverheadCameraAngle = StrategyCameraAngle + TabletopCameraModel.OverheadOffset;
+    public const float OverheadCameraAngle = TabletopCameraModel.OverheadAngle;
     readonly List<Material> materials = new List<Material>();
     readonly List<Mesh> meshes = new List<Mesh>();
     readonly List<Texture2D> textures = new List<Texture2D>();
@@ -95,17 +95,17 @@ public sealed class TabletopScene : MonoBehaviour
     {
         // 用方向明确的柔和主光体现现有雕塑网格；三色环境光保留侧面层次。
         RenderSettings.ambientMode=AmbientMode.Trilight;
-        RenderSettings.ambientSkyColor=new Color(.44f,.47f,.51f);
-        RenderSettings.ambientEquatorColor=new Color(.28f,.30f,.32f);
-        RenderSettings.ambientGroundColor=new Color(.18f,.15f,.12f);
+        RenderSettings.ambientSkyColor=new Color(.51f,.59f,.68f);
+        RenderSettings.ambientEquatorColor=new Color(.32f,.37f,.40f);
+        RenderSettings.ambientGroundColor=new Color(.19f,.17f,.15f);
         foreach(var light in FindObjectsByType<Light>(FindObjectsSortMode.None))
         {
             if(light.type!=LightType.Directional)continue;
-            light.intensity=1.22f;
-            light.color=new Color(1,.95f,.87f);
-            light.transform.rotation=Quaternion.Euler(48,-38,0);
+            light.intensity=1.56f;
+            light.color=new Color(1,.96f,.88f);
+            light.transform.rotation=Quaternion.Euler(44,32,0);
             light.shadows=LightShadows.Soft;
-            light.shadowStrength=.78f;
+            light.shadowStrength=.88f;
             light.shadowBias=.08f;light.shadowNormalBias=.08f;
             break;
         }

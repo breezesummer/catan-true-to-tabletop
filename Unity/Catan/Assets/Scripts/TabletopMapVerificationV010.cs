@@ -42,7 +42,7 @@ public static class TabletopMapVerificationV010
             require(Vector3.Distance(map.WorldToScreenPoint(mapPoint),previousMapScreen)>1,"地图缩放必须产生可见变化");
             foreach(bool overhead in new[]{false,true})
             {
-                float expectedAngle=overhead?82:66;
+                float expectedAngle=overhead?82:45;
                 foreach(float step in new[]{.45f,.65f,.85f,1,1.25f,1.65f})
                 {
                     scene.Frame(map,overhead,step);
@@ -66,7 +66,7 @@ public static class TabletopMapVerificationV010
                 require(!rect.Overlaps(TabletopPieceDock.CountArea(group)),"库存数量被对应建筑遮挡");
                 require(Vector2.Distance(rect.center,position)<.02f,"库存建筑没有与同一行数量垂直对齐");
                 float topFacing=Vector3.Dot(piece.Root.up,-hud.transform.forward);
-                require(kinds[index]=="wall"?topFacing>.999f:Mathf.Abs(topFacing)<.001f,"库存建筑必须正面横视，城墙必须俯视");
+                require(Mathf.Abs(topFacing)<.001f,"库存模型应水平正视，船舶应水平侧视");
                 require(piece.Contains(rect.center),"小框建筑无法按实际轮廓范围拾取");
             }
         }

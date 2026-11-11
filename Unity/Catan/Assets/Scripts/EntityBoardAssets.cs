@@ -7,6 +7,15 @@ public static class EntityBoardAssets
     public const string RobberResource = "NeutralPieces/v001/robber-band";
     public const string MerchantResource = "NeutralPieces/v001/peddler-stall";
     public const string PirateResource = Root+"pirate/pirate-black";
+    public const float ShipLength = CoastalDecals.DockLength;
+    public const float ShipDraft = .0004f;
+    public const float ShipDeckAboveKeel = BoardSurfaceHeight + HarborSign.DeckHeight - TabletopOcean.WaterHeight + ShipDraft;
+    public static Color SailColour(int seat) => seat==3 ? Color.white : BoardRenderer.SeatColors[seat];
+    public static bool IsSailMaterial(string name) =>
+        name.StartsWith("受风亚麻",System.StringComparison.Ordinal) ||
+        name.StartsWith("本白亚麻",System.StringComparison.Ordinal) ||
+        name.StartsWith("归属旗布",System.StringComparison.Ordinal);
+    public static float PirateLength => CoastalDecals.PierModelLength*.75f;
     public const float BoardSurfaceHeight = .008f;
     public const float BarbarianTrackWidth = .190f;
     public const float BarbarianTrackDepth = .200f;
@@ -56,7 +65,7 @@ public static class EntityBoardAssets
 
     public static Vector3 ShipWaterline(Vector3 edge)
     {
-        return edge+Vector3.up*(TabletopOcean.WaterHeight-BoardSurfaceHeight-.0004f);
+        return edge+Vector3.up*(TabletopOcean.WaterHeight-BoardSurfaceHeight-ShipDraft);
     }
 
     public static GameObject Ship(string label,Color seatColour,Vector3 bottom,Quaternion edgeRotation,Transform parent)
@@ -64,7 +73,7 @@ public static class EntityBoardAssets
         var colour=PlayerComponentAssets.ColourKey(seatColour);
         if(colour==null)return null;
         var ship=Instantiate(PlayerComponentAssets.ExpansionRoot+"ship-"+colour,label,bottom,edgeRotation,parent);
-        if(ship!=null)ship.transform.localScale*=.38f;
+
         return FantasyBoardPiece.Attach(ship,"ship",colour);
     }
 
@@ -76,7 +85,7 @@ public static class EntityBoardAssets
     public static GameObject Pirate(string label, Vector3 bottom, Transform parent, bool ocean=false,Quaternion? facing=null)
     {
         var pirate=Instantiate(PirateResource,label,ocean?ShipWaterline(bottom):bottom,facing??Quaternion.Euler(0,153f,0),parent);
-        if(pirate!=null)pirate.transform.localScale*=.46f;
+
         return FantasyBoardPiece.Attach(pirate,"pirate","neutral");
     }
 

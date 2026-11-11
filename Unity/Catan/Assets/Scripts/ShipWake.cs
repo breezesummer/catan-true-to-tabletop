@@ -10,9 +10,12 @@ public sealed class ShipWake : MonoBehaviour
         const int steps=16;
         ship.y=corner.y=end.y=TabletopOcean.WaterHeight;
         var aft=(corner-ship).normalized;
-        var start=ship+aft*.0047f;
+        float length=EntityBoardAssets.ShipLength;
+        var start=ship+aft*(length*.48f);
         bool connected=(end-corner).sqrMagnitude>.000001f;
-        var finish=connected?Vector3.MoveTowards(end,corner,.0048f):corner;
+        var finish=connected?Vector3.MoveTowards(end,corner,length*.48f):corner;
+        // 单船占满航段时，泡沫仍需从艉部向后消散。
+        if(!connected && Vector3.Dot(finish-start,aft)<length*.18f)finish=start+aft*(length*.18f);
         var points=new Vector3[(steps+1)*2];
         var uv=new Vector2[points.Length];
         var indices=new int[steps*6];
@@ -23,7 +26,7 @@ public sealed class ShipWake : MonoBehaviour
             var b=Vector3.Lerp(corner,finish,t);
             var center=connected?Vector3.Lerp(a,b,t):Vector3.Lerp(start,finish,t);
             var tangent=connected?(b-a).normalized:aft;
-            var side=Vector3.Cross(Vector3.up,tangent)*Mathf.Lerp(.0023f,.0046f,t);
+            var side=Vector3.Cross(Vector3.up,tangent)*ShipCoastLayout.HullBeam*Mathf.Lerp(.34f,.72f,t);
             center.y=TabletopOcean.WaterHeight;
             int k=i*2;
             points[k]=center-side;points[k+1]=center+side;

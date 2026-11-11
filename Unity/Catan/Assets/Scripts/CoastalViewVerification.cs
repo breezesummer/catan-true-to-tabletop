@@ -8,6 +8,81 @@ using UnityEngine.Rendering.Universal;
 
 public sealed partial class TabletopUiVerification
 {
+    IEnumerator VerifyTimberPort(string[] args)
+    {
+        mode="combined";
+        app.ReadSave(args[System.Array.IndexOf(args,"--timber-port")+1]);
+        yield return null; yield return null;
+        Require(app.PlayerCount==4 && app.ThreeKingdoms && app.Fishing && app.Harbormaster && app.ScenarioId=="through-the-desert","木材港验收配置错误");
+        for(int i=0;i<900&&!Table.Ocean.MaskReady;i++)yield return null;
+        Require(Table.Ocean.MaskReady,"海岸遮罩未就绪");
+        bool previous=BoardArtPreference.Painted;
+        app.SelectBoardArt(true);
+        try
+        {
+            var markers=Table.transform.parent.GetComponentInChildren<TabletopReferenceMarkers>();
+            var port=markers.transform.Find("港口").GetComponentInChildren<PaintedTimberPort>();
+            Require(port!=null,"地图缺少木材港");
+            var surface=port.transform.Find("木材港原画").GetComponent<MeshFilter>();
+            Require(surface.sharedMesh.vertexCount>4 && surface.GetComponent<Renderer>().sharedMaterial.mainTexture!=null,"木材港缺少原画或透明轮廓");
+            var probe=new GameObject("木材港六向导入检查");
+            probe.SetActive(false);
+            try
+            {
+                var art=probe.AddComponent<PaintedTimberPort>();
+                var drawings=new HashSet<Texture>();
+                for(int i=0;i<6;i++)
+                {
+                    art.Align(Quaternion.Euler(0,30+60*i,0)*Vector3.forward,.04f);
+                    var renderer=probe.GetComponentInChildren<MeshRenderer>(true);
+                    var texture=renderer.sharedMaterial.mainTexture;
+                    Require(texture!=null && texture.width>=1500 && drawings.Add(texture) &&
+                        art.Footprint().Any(),"木材港方向缺少独立高清画稿或拾取轮廓："+i);
+                }
+            }
+            finally { Destroy(probe); }
+            Table.Frame(BoardCamera,false,1);
+            yield return new WaitForEndOfFrame();
+            var id=port.name.Substring("港口 ".Length);
+            bool hit=port.Footprint().Any(t=>{
+                var pixel=BoardCamera.WorldToScreenPoint((t[0]+t[1]+t[2])/3);
+                return markers.PickPort(new Vector2(pixel.x,Screen.height-pixel.y),BoardCamera)==id;
+            });
+            Require(hit,"木材港画稿未命中交易港");
+            yield return new WaitForSecondsRealtime(2);
+            yield return new WaitForEndOfFrame();
+            if(args.Contains("--board-art-views")) DetailFrame(Vector3.zero,"穿越沙漠-全盘",true);
+            else SaveOceanFrame("穿越沙漠-全盘.png");
+            DetailFrame(surface.GetComponent<Renderer>().bounds.center,"木材港-近景",detailSize:.044f);
+            if(args.Contains("--board-art-views"))
+            {
+                var center=surface.GetComponent<Renderer>().bounds.center;
+                var authority=Authority;
+                int portCount=markers.PlacedPortCount;
+                foreach(bool painted in new[]{false,true})
+                {
+                    app.SelectBoardArt(painted);
+                    yield return null;
+                    yield return new WaitForEndOfFrame();
+                    Require(markers.PlacedPortCount==portCount && markers.transform.Find("港口").Cast<Transform>()
+                        .Where(t=>t.gameObject.activeSelf).All(t=>painted
+                        ? t.Find("木材港原画")!=null || t.Find("港口原画")!=null : t.Find("PierDeck")!=null),"港口未同步切换");
+                    var pieces=GetComponent<M5App>().VerificationBoard.CommittedPieces.GetComponentsInChildren<FantasyBoardPiece>();
+                    var buildings=pieces.Where(p=>p.transform.Find("幻想棋子画面")?.GetComponent<MeshRenderer>().sharedMaterial.mainTexture.name is "city" or "village" or "metro-trade" or "metro-science" or "metro-politics").ToArray();
+                    Require(buildings.Length>0 && buildings.All(p=>p.transform.Find("幻想棋子画面").GetComponent<MeshRenderer>().forceRenderingOff==!painted),"建筑未同步切换");
+                    Require(Authority==authority,"外观切换改变了对局");
+                    if(!painted)
+                    {
+                        DetailFrame(Vector3.zero,"3D-全盘",true);
+                        DetailFrame(center,"3D-近景",detailSize:.044f);
+                    }
+                }
+            }
+            configurations++;
+        }
+        finally { if(previous!=BoardArtPreference.Painted) app.SelectBoardArt(previous); }
+    }
+
     IEnumerator VerifyCoastalViews()
     {
         var observed=new HashSet<string>();
@@ -116,13 +191,19 @@ public sealed partial class TabletopUiVerification
             target.Release();Destroy(target);Destroy(image);Destroy(root);
         }
     }
-    void DetailFrame(Vector3 center,string label,bool full=false,float detailSize=.052f,Vector3? eyeOffset=null)
+    void DetailFrame(Vector3 center,string label,bool full=false,float detailSize=.052f,Vector3? eyeOffset=null,Vector3? viewUp=null,bool matchCameraMsaa=false)
     {
         var camera=BoardCamera;
         var pos=camera.transform.position;var rot=camera.transform.rotation;
         var rect=camera.rect;float size=camera.orthographicSize,near=camera.nearClipPlane,aspect=camera.aspect;
         int width=full?1920:1280,height=full?1200:960;
         var target=new RenderTexture(width,height,24);
+        if(matchCameraMsaa && camera.allowMSAA && GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset pipeline)
+        {
+            var descriptor=target.descriptor;
+            descriptor.msaaSamples=pipeline.msaaSampleCount;
+            target.antiAliasing=SystemInfo.GetRenderTextureSupportedMSAASampleCount(descriptor);
+        }
         var previous=RenderTexture.active;
         var frame=new Texture2D(width,height,TextureFormat.RGB24,false);
         var markers=Table.transform.parent.GetComponentInChildren<TabletopReferenceMarkers>();
@@ -133,7 +214,7 @@ public sealed partial class TabletopUiVerification
                 camera.rect=new Rect(0,0,1,1);camera.orthographicSize=detailSize;camera.nearClipPlane=.0001f;
                 camera.aspect=(float)width/height;
                 var offset=eyeOffset??new Vector3(0,.16f,-.035f);
-                camera.transform.SetPositionAndRotation(center+offset,Quaternion.LookRotation(-offset));
+                camera.transform.SetPositionAndRotation(center+offset,Quaternion.LookRotation(-offset,viewUp??Vector3.up));
             }
             markers.AlignPortSigns(camera);
             RenderPipeline.SubmitRenderRequest(camera,new UniversalRenderPipeline.SingleCameraRequest{destination=target});

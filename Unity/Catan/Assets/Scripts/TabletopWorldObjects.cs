@@ -57,6 +57,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     readonly List<Item> recycled=new List<Item>();
     const int PoolCapacity=64;
     readonly Dictionary<string, Material> faceMaterials = new Dictionary<string, Material>();
+    readonly Dictionary<int,Material[]> dieMaterials=new Dictionary<int,Material[]>();
     readonly Dictionary<int, Texture2D> diceTextures = new Dictionary<int, Texture2D>();
     readonly List<Mesh> meshes = new List<Mesh>();
     TabletopScene scene;
@@ -69,7 +70,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     {
         scene=owner;
         // 在开局时准备有限骰面与资源贴图，避免首次动画中同步生成或加载。
-        for(int die=0;die<3;die++)for(int face=die==2?0:1;face<=(die==2?3:6);face++)DieTexture(die,face);
+        for(int die=0;die<3;die++)for(int face=die==2?0:1;face<=(die==2?3:6);face++)DieMaterials(die,face);
         var app=FindFirstObjectByType<M6App>();string rules=app==null?"base":app.RuleSet;
         for(int good=0;good<(rules=="combined"||rules=="cities-knights"?8:5);good++)EntityCardAssets.ResourceOrCommodityFront(good);
         StartCoroutine(EntityCardAssets.Prewarm(rules));
@@ -153,9 +154,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         root.localScale=item.OriginalScale;
         root.position=scene.World(position);
         float yaw=kind=="road"||kind=="ship"?90:180;
-        // 正交正面图保持建筑的横向轮廓；城墙以完整顶视显示中间空位。
-        float viewAngle=kind=="wall"?90:kind=="road"?60:0;
-        root.rotation=Quaternion.AngleAxis(TabletopScene.HudCameraAngle-viewAngle,Vector3.right)*Quaternion.Euler(0,yaw,0);
+        root.rotation=Quaternion.AngleAxis(TabletopScene.HudCameraAngle,Vector3.right)*Quaternion.Euler(0,yaw,0);
         if(item.Hit.Renderers==null)item.Hit.Renderers=root.GetComponentsInChildren<Renderer>();
         item.Hit.LocalBoundsProjection=true;
         var projected=item.Hit.Rect;
@@ -334,6 +333,14 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         item.Object.transform.rotation = Quaternion.Euler(0,28+(rolling ? (1-Mathf.Pow(1-progress,3))*720*(index%2==0?1:-1) : 0),0);
         if(item.DieFace==value)return item.Hit;
         item.DieFace=value;
+        item.Front.sharedMaterials=DieMaterials(index,value);
+        if(item.Hit.Renderers==null)item.Hit.Renderers=item.Object.GetComponentsInChildren<Renderer>();
+        return item.Hit;
+    }
+    Material[] DieMaterials(int index,int value)
+    {
+        int key=index*8+value;
+        if(dieMaterials.TryGetValue(key,out var materials))return materials;
         int[] values;
         if(index==2)
         {
@@ -347,8 +354,9 @@ public sealed class TabletopWorldObjects : MonoBehaviour
             int right=Enumerable.Range(1,6).First(n=>n!=value&&n!=7-value&&n!=front&&n!=7-front);
             values=new[]{value,7-value,7-front,front,7-right,right};
         }
-        item.Object.GetComponent<MeshRenderer>().sharedMaterials=values.Select(v=>Face(DieTexture(index,v),new Rect(0,0,1,1),Color.white,.50f)).ToArray();
-        item.Hit.Renderers = item.Object.GetComponentsInChildren<Renderer>(); return item.Hit;
+        materials=values.Select(v=>Face(DieTexture(index,v),new Rect(0,0,1,1),Color.white,.50f)).ToArray();
+        dieMaterials.Add(key,materials);
+        return materials;
     }
     public Hit Tray(string key,Rect layout,Color felt,Color rim,Texture2D lining=null)
     {
@@ -371,7 +379,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
             return root;
         });
         item.Object.transform.position=scene.World(layout.center)+Vector3.down*.001f;
-        item.Hit.Renderers=item.Object.GetComponentsInChildren<Renderer>();return item.Hit;
+        if(item.Hit.Renderers==null)item.Hit.Renderers=item.Object.GetComponentsInChildren<Renderer>();return item.Hit;
     }
     GameObject RoundedDie(float side)
     {

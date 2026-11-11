@@ -8,7 +8,7 @@ using UnityEngine;
 public sealed partial class M6App
 {
     string GeneralAssetSeatB6=>presentation is M4App cities?cities.M6View?.PlayerId??HumanSeat:presentation is M5App combined?combined.M6View?.PlayerId??HumanSeat:HumanSeat;
-    static readonly Rect GeneralArea=new Rect(22,698,148,192);
+    static readonly Rect GeneralArea=new Rect(22,692,148,198);
     static readonly Rect SkillsArea=new Rect(176,714,76,171);
     bool FishHandSelected=>presentation is M4App fishCities?fishCities.FishHandSelected:presentation is M5App fishCombined&&fishCombined.FishHandSelected;
     float SkillBarOffset=>FishHandSelected?-132:0;
@@ -244,7 +244,7 @@ public sealed partial class M6App
         SyncThreeKingdomsSelection();var view=ThreeKingdomsProjection;if(view==null)return;
         PastoralMenuUI.Styles(font);
         bool enabled=GUI.enabled;
-        GUI.enabled=enabled&&!GeneralTableCovered&&detailGeneralId==null&&inspectionText==null;
+        GUI.enabled=enabled&&(Event.current.type==EventType.Repaint||!GeneralTableCovered&&detailGeneralId==null&&inspectionText==null);
         DrawGeneralDock(view);DrawGeneralSkills(view);
         if(!NativeGeneralPaymentActive&&ThreeKingdomsSkillSelectionActive)DrawGeneralOperationBar(view);
         if(view.PendingDecision?.PlayerId==GeneralAssetSeatB6)DrawGeneralCandidates(view.PendingDecision);
@@ -260,7 +260,9 @@ public sealed partial class M6App
     {
         var own=view.Players.FirstOrDefault(p=>p.PlayerId==GeneralAssetSeatB6);
         var general=string.IsNullOrEmpty(own?.ActiveGeneralId)?null:GeneralCatalog.Get(own.ActiveGeneralId);
-        GeneralFrameUI.Portrait(new Rect(28,714,138,171),general?.Id,general?.Name,general?.Faction,
+        bool dynamicPortrait=own?.FaceDown==false && GeneralSkinArt.Get(general?.Id)?.useStatic==false;
+        var portrait=dynamicPortrait?new Rect(40,692,126,193):new Rect(28,714,138,171);
+        GeneralFrameUI.Portrait(portrait,general?.Id,general?.Name,general?.Faction,
             Array.IndexOf(HistoryPlayers,GeneralAssetSeatB6),Ready&&!Finished&&GeneralAssetSeatB6==HumanSeat&&view.Clock.ActivePlayerId==HumanSeat&&
             view.Clock.Phase>=ThreeKingdomsPhase.Preparation&&view.Clock.Phase<=ThreeKingdomsPhase.End,
             own?.FaceDown==true,general==null?-1:own.RemainingLife);
@@ -282,12 +284,12 @@ public sealed partial class M6App
             bool responding=generalSelection.Contract?.IsResponse==true&&generalSelection.SkillId==skill.SkillId;
             bool longdan=skill.SkillId=="tk-g42-s1"&&LongdanAvailable(view);
             bool active=skill.HasActiveEntry||responding||longdan;
-            bool enabled=active&&GeneralCanInteract&&!generalSelection.IsSubmitting&&view.PendingDecision==null&&
+            bool available=active&&!generalSelection.IsSubmitting&&view.PendingDecision==null&&
                 (longdan||responding||view.SkillDecision==null&&view.SkillActions.Any(a=>a.Command.SkillId==skill.SkillId||skill.SkillId==B45SkillCatalog.RepairSkillId&&a.Command.Option==B45SkillCatalog.RepairSkillId));
             var area=new Rect(1,i*skillStep+2,70,skillStep-4);bool selected=generalSelection.SkillId==skill.SkillId||longdan&&LongdanSelected;
             bool flashing=flashingSkill==skill.SkillId&&Time.unscaledTimeAsDouble<skillFlashUntil;
-            GeneralFrameUI.Skill(area,skill.Name,active,enabled,selected,flashing);
-            int input=ThreeKingdomsDirectInput.Read(area,enabled);
+            GeneralFrameUI.Skill(area,skill.Name,active,available,selected,flashing);
+            int input=ThreeKingdomsDirectInput.Read(area,available&&GeneralCanInteract);
             if(input==1)
             {
                 if(longdan)
@@ -308,21 +310,11 @@ public sealed partial class M6App
         }
         var retireArea=new Rect(1,skills.Length*skillStep+2,70,skillStep-4);
         bool canRetire=view.CanRetire&&view.Clock.ActivePlayerId==GeneralAssetSeatB6&&GeneralCanInteract&&!generalSelection.Active;
-        GeneralFrameUI.Skill(retireArea,"隐退",true,canRetire,retireDraft,false);
+        GeneralFrameUI.Skill(retireArea,"隐退",true,view.CanRetire&&view.Clock.ActivePlayerId==GeneralAssetSeatB6&&!generalSelection.Active,retireDraft,false);
         int retireInput=ThreeKingdomsDirectInput.Read(retireArea,canRetire);
         if(retireInput==1)retireDraft=!retireDraft;
         if(retireInput==2)Inspect("隐退\n令当前武将隐退，已有暗置武将登场；系统每三轮补发。",SkillsArea);
         GUI.EndGroup();
-        if(generalSelection.SkipCommand!=null)
-        {
-            int row=Array.FindIndex(skills,s=>s.SkillId==generalSelection.SkillId);
-            if(row>=0)
-            {
-                var skipArea=new Rect(SkillsArea.xMax+4,SkillsArea.y+row*skillStep+2,76,skillStep-4);
-                if(GeneralFrameUI.Choice(skipArea,GeneralSkipName,GeneralCanSubmit&&!generalSelection.IsSubmitting))
-                    SubmitGeneralSkill(generalSelection.SkipCommand);
-            }
-        }
     }
     string GeneralSkipName=>generalSelection.SkipCommand?.Option=="keep"?"保留骰子":generalSelection.SkipCommand?.Option=="luoshen-stop"?"停止重掷":"跳过";
     void DrawGeneralOperationBar(ThreeKingdomsView view)
@@ -354,10 +346,115 @@ public sealed partial class M6App
         }
         if(generalSelection.Active)
         {
-            bool fallbackSkip=generalSelection.SkipCommand!=null&&!B45SkillCatalog.AvailableEntries(view,GeneralAssetSeatB6).Any(s=>s.SkillId==generalSelection.SkillId);
-            if(fallbackSkip&&GeneralFrameUI.Choice(new Rect(972,661,88,36),GeneralSkipName,GeneralCanSubmit&&!generalSelection.IsSubmitting))SubmitGeneralSkill(generalSelection.SkipCommand);
+            string instruction=CurrentSkillInstruction(view);
+            if(instruction.Length>0)DrawHandInstruction(instruction);
+            bool skip=generalSelection.SkipCommand!=null;
+            bool cancel=generalSelection.CanCancel;
+            bool confirm=generalSelection.CanConfirm;
+            if(confirm||generalSelection.SkillId=="tk-g22-s1")
+            {
+                if(GeneralFrameUI.Choice(skip||cancel?SkillConfirmRect:SkillCancelRect, "确认", GeneralCanSubmit&&confirm,true))
+                {FinishGeneralAction();return;}
+            }
+            if(skip||cancel)
+            {
+                if(GeneralFrameUI.Choice(SkillCancelRect,skip?GeneralSkipName:"取消",GeneralCanSubmit&&!generalSelection.IsSubmitting))
+                {
+                    if(skip)SubmitGeneralSkill(generalSelection.SkipCommand);
+                    else CancelGeneralPointerPick();
+                }
+            }
             return;
         }
+    }
+    internal static readonly Rect SkillConfirmRect=new Rect(TabletopHandLayout.RestRight-192,673,90,29);
+    internal static readonly Rect SkillCancelRect=new Rect(TabletopHandLayout.RestRight-94,673,94,29);
+    GUIStyle handInstructionStyle;
+    internal void DrawHandInstruction(string text)
+    {
+        if(handInstructionStyle==null)
+        {
+            Styles();
+            handInstructionStyle=new GUIStyle(title){fontSize=30,alignment=TextAnchor.MiddleCenter,wordWrap=false};
+            handInstructionStyle.normal.textColor=PromptColor;
+        }
+        TabletopTextFit.Label(new Rect(TabletopHandLayout.RestLeft,640,TabletopHandLayout.RestRight-TabletopHandLayout.RestLeft,35),text,handInstructionStyle,18,true);
+    }
+    int instructionRevision=-1;
+    string skillInstruction;
+    string CurrentSkillInstruction(ThreeKingdomsView view)
+    {
+        if(instructionRevision!=generalSelection.Revision)
+        {
+            instructionRevision=generalSelection.Revision;
+            skillInstruction=ResolveSkillInstruction(view);
+        }
+        return skillInstruction;
+    }
+    string ResolveSkillInstruction(ThreeKingdomsView view)
+    {
+        var s=generalSelection;
+        if(s.SkillId=="tk-g22-s1")return "请选择至多四张资源牌或一张发展牌";
+        if(s.RequiresBankCards||s.Raid||s.DiceIndices.Length>0||s.Contract.DecisionKind=="shelie"||
+           s.Contract.DecisionKind=="b4-pile"||s.Contract.DecisionKind=="b4-declare")return "";
+        if(s.SkillId=="tk-g05-s2"&&!s.Contract.IsResponse)
+            return s.SelectedCounts.Sum()<2?"请选择两张砖":"请选择一名其他玩家作为「乐不思蜀」的目标";
+        if(s.Contract.DecisionKind=="response-poxi-select")return "请从双方手牌中选择四张牌，每种各一张";
+        var decision=view.SkillDecision;
+        if(decision?.PlayerId==GeneralAssetSeatB6)
+        {
+            if(decision.Kind=="optional")return "是否发动「"+GeneralActionCaption+"」？";
+            switch(decision.Kind)
+            {
+                case "civil-fencheng":case "civil-fencheng-discard":case "civil-pojun":
+                case "civil-guess":case "b4-guess":case "b4-give":case "response-guhuo":
+                    return DisplayPlayerText(decision.Description??decision.Title);
+                case "civil-burn":return "请选择一座己方城市焚毁";
+                case "civil-two-roads":return "请选择两条不同的道路";
+                case "civil-luanwu":return "请选择支付两张砖或承受道路损失";
+                case "civil-subset":case "b4-subset":return "请选择至少一张手牌暗置";
+                case "b4-reveal":return "请选择要展示的手牌，可以不选";
+                case "response-jieying-target":return "请选择一名其他玩家作为「劫营」的目标";
+                case "response-qice-use":return "请选择要获得的发展牌";
+                case "response-zhiyu-discard":return "请选择一张手牌弃置";
+                case "b5m-luanji-defend":return "是否支付一张矿石抵御本次入侵？";
+                case "map-zhimeng-target":return "请选择一名其他玩家，与其均分双方手牌";
+                case "seat-jinglue-card":return "请选择一张与上次取得的牌种不同的手牌";
+                case "seat-fuqi-give":return "请选择一张要交出的手牌";
+                case "seat-fuqi-request":return "请选择要取得的一至两张资源牌或商品牌";
+                default:return DisplayPlayerText(decision.Title??"");
+            }
+        }
+        return ActiveSkillInstruction(s.SkillId,s);
+    }
+    static string ActiveSkillInstruction(string skill,B45SelectionContext selection)
+    {
+        switch(skill)
+        {
+            case "tk-g03-s2":return "请选择一名其他玩家猜测牌种";
+            case "tk-g05-s1":return selection.SelectedCounts.Sum()==0?"请选择一张小麦":"请选择强盗或海盗的新位置";
+            case "tk-g08-s2":return "请选择一名其他玩家查看其手牌";
+            case "tk-g11-s3":return "请选择两名不同的其他玩家参与「间书」";
+            case "tk-g15-s1":return selection.SelectedCounts.Sum()==0?"请选择要赠予的手牌":"请选择一名其他玩家接收所选手牌";
+            case "tk-g16-s1":return "请选择一处己方建筑或设施拆除";
+            case "tk-g29-s1":return "请选择两名不同的玩家翻面";
+            case "tk-g31-s1":return "请选择一名玩家作为「焚城」的起始玩家";
+            case "tk-g35-s1":return "请选择至少一张矿石，换取等量随机资源牌";
+            case "tk-g39-s1":return "请选择一名其他玩家进行猜测";
+            case "tk-g45-s1":return "请选择一名其他玩家交付手牌";
+            case "tk-g46-s1":return "请选择一名领土接壤的玩家";
+            case "tk-g47-s1":return selection.SelectedTiles.Length==0?"请选择第一块待交换的地块":"请选择可与其交换的第二块地块";
+            case "tk-g48-s1":return "请选择两名不同的玩家交换座次";
+            case "tk-g48-s2":return "请选择一名其他玩家查看其手牌";
+            case "tk-g49-s2":return "请选择一名其他玩家，消耗一枚田标记取得其一张手牌";
+            case "tk-g54-s1":return selection.SelectedCounts.Sum()==0?"请选择一张手牌作为修复费用":"请选择一处受损建筑或设施进行修复";
+        }
+        var actions=selection.CandidateActions;
+        if(actions.Any(a=>B45SelectionContract.Cost(a).Sum()>selection.SelectedCounts.Sum()))return "请选择发动技能所需的手牌";
+        if(actions.Any(a=>B45SelectionContract.Players(a).Length>selection.SelectedPlayers.Length))return "请选择目标玩家";
+        if(actions.Any(a=>B45SelectionContract.Progress(a).Length>selection.SelectedProgress.Length))return "请选择发动技能所需的发展牌";
+        if(actions.Any(a=>B45SelectionContract.Board(a).Length>selection.SelectedTiles.Length))return "请选择技能作用的棋盘目标";
+        return "";
     }
     void EndThreeKingdomsPlay()
     {if(presentation is M4App a)a.EndThreeKingdomsTurn();else if(presentation is M5App b)b.EndThreeKingdomsTurn();}
@@ -600,7 +697,7 @@ public sealed partial class M6App
     {
         var r=InspectionRect;TabletopUI.Fill(r,new Color(.035f,.04f,.035f,.64f));
         var close=new Rect(r.xMax-37,r.y+5,30,27);
-        GeneralFrameUI.Text(close,"×",22,Color.white);
+        ModernOperationUI.DrawWindowSymbol(close,"×",Color.white);
         if(ThreeKingdomsDirectInput.Read(close,true,false)==1){inspectionText=null;return;}
         var style=new GUIStyle(GUI.skin.label){font=font,fontSize=14,wordWrap=true};style.normal.textColor=PastoralMenuUI.Ivory;
         float h=style.CalcHeight(new GUIContent(inspectionText),r.width-42);

@@ -15,6 +15,9 @@ public sealed class PaintedMap : MonoBehaviour
     readonly Dictionary<Vector2Int, (Renderer renderer, int region)> cells = new Dictionary<Vector2Int, (Renderer, int)>();
     MaterialPropertyBlock block;
     Material ink;
+    Material fluorescence;
+    Mesh fluorescenceMesh;
+    readonly Dictionary<string, MeshRenderer> glowSurfaces = new Dictionary<string, MeshRenderer>();
     void Awake() { block = new MaterialPropertyBlock(); }
 
     // 港口与渔场仍使用各自的轮廓和接岸锚点。共用印墨只覆盖有图案的部分。
@@ -78,10 +81,14 @@ public sealed class PaintedMap : MonoBehaviour
     }
     internal void SetDangerHex(int property, Vector4 hex)
     {
-        if (ink != null && ink.GetVector(property) != hex) ink.SetVector(property,hex);
+        if (ink == null || ink.GetVector(property) == hex) return;
+        ink.SetVector(property,hex);
+        if (fluorescence != null && property == RobberHex) fluorescence.SetVector(property,hex);
+        SetFluorescence(property==RobberHex?"强盗危险":"海盗危险",new Vector3(hex.x,0,hex.y),hex.z>.5f,false,true,
+            property==PirateHex?TabletopOcean.WaterHeight+.0015f:EntityBoardAssets.BoardSurfaceHeight+.0005f);
     }
 
-    internal void SetTileGlow(string id, bool owned, float goldAt)
+    internal void SetTileGlow(string id, bool owned, float goldAt, bool multiple = false)
     {
         var tile = transform.Find(id);
         if (tile == null) return;
@@ -89,8 +96,50 @@ public sealed class PaintedMap : MonoBehaviour
         var key = new Vector2Int(Mathf.RoundToInt(center.x / HalfWidth), Mathf.RoundToInt(center.z / Row));
         if (!cells.TryGetValue(key, out var cell) || cell.renderer == null) return;
         cell.renderer.GetPropertyBlock(block);
-        block.SetVector("_Glow", new Vector4(owned ? 1 : 0, goldAt, 0, 0));
+        block.SetVector("_Glow", new Vector4(owned ? 1 : 0, goldAt, multiple ? 1 : 0, 0));
         cell.renderer.SetPropertyBlock(block);
+        SetFluorescence(id,center,owned,multiple);
+    }
+
+    void SetFluorescence(string id, Vector3 center, bool owned, bool multiple, bool danger=false, float height=EntityBoardAssets.BoardSurfaceHeight+.0005f)
+    {
+        if (!glowSurfaces.TryGetValue(id,out var surface))
+        {
+            if (!owned) return;
+            if (fluorescence == null)
+            {
+                fluorescence = new Material(Resources.Load<Shader>(Root+"TileFluorescence")) { name="地块荧光共享材质" };
+                fluorescence.SetVector(RobberHex,ink.GetVector(RobberHex));
+                fluorescenceMesh = new Mesh { name="地块荧光平面" };
+                fluorescenceMesh.vertices = new[] { new Vector3(-.049f,0,-.049f),new Vector3(-.049f,0,.049f),new Vector3(.049f,0,.049f),new Vector3(.049f,0,-.049f) };
+                fluorescenceMesh.triangles = new[] {0,1,2,0,2,3};
+                fluorescenceMesh.RecalculateBounds();
+                fluorescenceMesh.UploadMeshData(true);
+            }
+            var go = new GameObject((danger?"危险荧光 ":"产出荧光 ")+id);
+            go.transform.SetParent(transform,false);
+            go.transform.position = new Vector3(center.x,EntityBoardAssets.BoardSurfaceHeight+.0005f,center.z);
+            go.AddComponent<MeshFilter>().sharedMesh=fluorescenceMesh;
+            surface=go.AddComponent<MeshRenderer>();
+            surface.sharedMaterial=fluorescence;
+            surface.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
+            surface.receiveShadows=false;
+            glowSurfaces[id]=surface;
+        }
+        surface.enabled=owned;
+        surface.transform.position=new Vector3(center.x,height,center.z);
+        block.Clear();
+        block.SetVector("_Center",new Vector4(center.x,center.z,multiple?1:0,danger?1:0));
+        surface.SetPropertyBlock(block);
+    }
+
+    int glowFrame=-1;
+    internal void UpdateGlowClock()
+    {
+        if(ink==null||glowFrame==Time.frameCount)return;
+        glowFrame=Time.frameCount;
+        ink.SetFloat("_HarvestClock",Time.unscaledTime);
+        if(fluorescence!=null)fluorescence.SetFloat("_FlowClock",Time.unscaledTime);
     }
 
     void LateUpdate()
@@ -115,5 +164,5 @@ public sealed class PaintedMap : MonoBehaviour
         }
         enabled = false;
     }
-    void OnDestroy() { if (ink != null) Destroy(ink); }
+    void OnDestroy() { if (ink != null) Destroy(ink); if(fluorescence!=null)Destroy(fluorescence); if(fluorescenceMesh!=null)Destroy(fluorescenceMesh); }
 }

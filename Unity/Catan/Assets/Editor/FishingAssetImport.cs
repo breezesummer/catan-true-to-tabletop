@@ -32,5 +32,10 @@ public sealed class FishingAssetImport : AssetPostprocessor
         importer.alphaIsTransparency=!albedo;importer.mipmapEnabled=albedo;importer.maxTextureSize=albedo?1024:256;
         importer.textureCompression=albedo?TextureImporterCompression.CompressedHQ:TextureImporterCompression.Uncompressed;
         if(albedo){importer.filterMode=FilterMode.Trilinear;importer.anisoLevel=4;}
+        if(assetPath.EndsWith("/score-boot.png"))
+        {
+            importer.npotScale=TextureImporterNPOTScale.None;
+            importer.mipmapEnabled=true;importer.filterMode=FilterMode.Trilinear;
+        }
     }
 }

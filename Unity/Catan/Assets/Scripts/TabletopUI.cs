@@ -286,10 +286,7 @@ public sealed partial class TabletopUI
             bool reacting=ThreeKingdoms?.SelectedReaction!=null;
             bool seatTarget=reacting||!selecting&&selectingSeat&&EligibleAvatar(player.Id);
             if(player.Id==actor&&!seatTarget&&ThreeKingdoms?.GeneralPlayerTarget(player.Id)!=true)
-            {
-                if(StrategyHudTheme.HandPainted)HandPaintedTabletopSkin.TurnBorder(panel);
-                else GeneralFrameUI.DrawTurnGlow(panel,GeneralFrameUI.TurnGlow.Yellow);
-            }
+                GeneralFrameUI.DrawTurnGlow(panel);
             var avatar=new Rect(x+(width-50)/2,20,50,50);bool active=player.Id==actor;
             var hero=new Rect(x+6,18,width-12,73);
             var generalRow=new Rect(x+10,100,width-20,38);
@@ -306,14 +303,6 @@ public sealed partial class TabletopUI
             {
                 if(!StrategyHudTheme.Jade)StrategyHudArt.Disc(avatar,BoardRenderer.SeatColor(player.Id)*.65f,active);
                 StrategyHudArt.Avatar(StrategyHudTheme.Jade?new Rect(avatar.x+1,avatar.y,avatar.width-2,avatar.height-2):new Rect(avatar.x+4,avatar.y+4,avatar.width-8,avatar.height-8),player.Id);
-            }
-            if(fishing!=null)
-            {
-                if(fishing.OldBootPlayerId==player.Id)
-                {
-                    var bootBadge=new Rect(x+4,30,28,28);FishingTabletopAssets.DrawIcon(bootBadge,"old-boot");
-                    if(bootBadge.Contains(Event.current.mousePosition)){hoveredPlayerHint="旧靴：本人的获胜目标增加1分";playerHintAnchor=bootBadge;}
-                }
             }
             var nameRect=illustrated?new Rect(x+8,91,width-16,24):new Rect(x+11,73,width-22,27);
             var nameStyle=NameStyle("player",center,player.Id,(StrategyHudTheme.Ocean||StrategyHudTheme.HandPainted)?15:12);
@@ -334,7 +323,18 @@ public sealed partial class TabletopUI
                 var r=row==0?new Rect(x+11,statsY,width-22,18):row<4?new Rect(x+11+(row-1)*cell,statsY+20,cell,30):new Rect(x+11+(row-4)*cell,handY,cell,30);
                 if(StrategyHudTheme.Jade&&row<5)Fill(new Rect(r.x+4,r.yMax,r.width-8,.5f),new Color(.12f,.38f,.26f,.10f));
                 var icon=row==0?new Rect(r.center.x-17,r.y,15,16):new Rect(r.center.x-9,r.y,18,14);
-                if(row==0)StrategyHudArt.VictoryIcon(icon);
+                bool overBoot=false;
+                if(row==0)
+                {
+                    StrategyHudArt.VictoryIcon(icon);
+                    if(fishing?.OldBootPlayerId==player.Id)
+                    {
+                        var boot=new Rect(icon.x-21,icon.center.y-10,19,20);
+                        FishingTabletopAssets.DrawIcon(boot,"score-boot");
+                        overBoot=boot.Contains(Event.current.mousePosition);
+                        if(overBoot){hoveredPlayerHint="旧靴：本人的获胜目标增加1分";playerHintAnchor=boot;}
+                    }
+                }
                 else if(row<4)StrategyHudArt.Icon(icon,row+1);
                 else if(row==6)StrategyHudArt.FishIcon(icon);
                 else StrategyHudArt.HandCardIcon(icon,row==5);
@@ -352,7 +352,7 @@ public sealed partial class TabletopUI
                 valueStyle.alignment=TextAnchor.MiddleCenter;
                 valueStyle.fontSize=row>=4?11:12;
                 TabletopTextFit.Label(row==0?new Rect(r.center.x,r.y,19,16):new Rect(r.x,r.y+14,r.width,16),value,valueStyle,8);
-                if(row==0)ScoreHover(r,player.Score);
+                if(row==0){if(!overBoot)ScoreHover(r,player.Score);}
                 else if(r.Contains(Event.current.mousePosition)){hoveredPlayerHint=row==6?"鱼筹码":hints[row];playerHintAnchor=r;}
             }
             if(alliance!=null)

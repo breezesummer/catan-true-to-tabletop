@@ -59,7 +59,7 @@ public static class HarborF1EditorVerification
     static IEnumerator Review()
     {
         Size(1920,1080);yield return 1.0;
-        Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",0);Set(app,"menuHarbormaster",true);Set(app,"menuVictoryPoints",null);
+        Set(app,"menuPage",0);Set(app,"atlasOpen",false);Set(app,"menuRule",0);Set(app,"menuHarbormaster",true);Set(app,"menuVictoryPoints",null);
         var defaults=typeof(M6App).GetMethod("MenuDefaultVictoryPoints",Flags);
         Require((int)defaults.Invoke(app,new object[]{"base","heading-for-new-shores",4})==11,"海港默认目标未增加一次");
         yield return Capture("01-海港开局配置");
@@ -97,7 +97,7 @@ public static class HarborF1EditorVerification
         typeof(M2App).GetMethod("M6Refresh",Flags).Invoke(baseApp,null);
         Require(game.GetPlayerView("P1").OwnVictoryPoints==5,"海港奖励未纳入总分");
         yield return Capture("04-持有海港奖励夹具");
-        app.ShowMenu();Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",1);
+        app.ShowMenu();Set(app,"menuPage",0);Set(app,"atlasOpen",false);Set(app,"menuRule",1);
         Set(app,"menuScenario",System.Array.IndexOf(Catan.Core.M3.SeafarersScenarios.Ids,"pirate-islands"));
         yield return Capture("05-海盗群岛禁用");
     }

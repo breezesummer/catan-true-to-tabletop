@@ -6,7 +6,7 @@ internal static class FantasyPieceFrames
 {
     static readonly Dictionary<(string,int),Mesh> meshes = new Dictionary<(string,int),Mesh>();
     static readonly float pitchSin = Mathf.Sin(TabletopCameraModel.DefaultAngle*Mathf.Deg2Rad);
-    internal const float ShipLength = .016f;
+    internal static float ShipLength => EntityBoardAssets.ShipLength;
     // 在船体水线标定艉、艏。桅顶和龙头高于水面，不能用轮廓包围盒作为中心。
     static readonly Vector2[] shipStern = {new(260,463),new(96,423),new(111,153),new(259,78),new(405,109),new(390,408)};
     static readonly Vector2[] shipBow = {new(260,54),new(438,111),new(427,379),new(259,461),new(63,387),new(86,113)};
@@ -39,17 +39,19 @@ internal static class FantasyPieceFrames
         if(mirrored)cell=2;
         float width=kind switch {
             "road"=>.039f, "village"=>.025f, "city"=>.030f, "knights"=>.026f,
-            "robber"=>.021f, "merchant"=>.022f, _=>.034f
+            "robber"=>.026f, "merchant"=>.022f, _=>.034f
         };
         float scaleX=width/512, scaleZ=scaleX/pitchSin, shear=0;
         Vector2 pivot=new Vector2(256,building?291:kind=="knights"?323:256);
+        // 山匪源镜头以离地 9 毫米处为中心；绘制底面的投影与实体落点重合。
+        if(kind=="robber") pivot.y+=.009f*Mathf.Cos(TabletopCameraModel.DefaultAngle*Mathf.Deg2Rad)/scaleX;
         if(ship)
         {
             Vector2 stern=kind=="ship"?shipStern[frame]:pirateStern[frame];
             Vector2 bow=kind=="ship"?shipBow[frame]:pirateBow[frame];
             pivot=(stern+bow)*.5f;
             Vector2 axis=bow-stern;
-            Vector3 span=Quaternion.Euler(0,frame*60,0)*Vector3.forward*(kind=="ship"?ShipLength:.023f);
+            Vector3 span=Quaternion.Euler(0,frame*60,0)*Vector3.forward*(kind=="pirate"?EntityBoardAssets.PirateLength:ShipLength);
             if(Mathf.Abs(axis.x)>1)
             {
                 scaleX=span.x/axis.x;

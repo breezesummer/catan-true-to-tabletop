@@ -176,20 +176,21 @@ public sealed partial class M6App
         reactionFlights.Clear();
         SyncReactionCursor();
     }
+    void DrawReactionButtons(bool enabled)
+    {
+        GeneralFrameUI.Skill(MapMarksButton, TabletopMapMarks.Visible ? "隐藏" : "显示", true, enabled, !TabletopMapMarks.Visible, false);
+        GeneralFrameUI.Skill(ReactionButton, "互动", true, enabled && ReactionButtonEnabled, ReactionMenu || SelectedReaction != null, false);
+        if (enabled && ReactionMenu && ReactionButtonEnabled)
+        {
+            LoadReactionArt();
+            DrawReactionOption(EggOption, reactionArt["egg"].Flying);
+            DrawReactionOption(FlowerOption, reactionArt["flower"].Flying);
+        }
+    }
     void DrawReactions()
     {
         if (Event.current.type != EventType.Repaint) return;
-        GeneralFrameUI.Skill(MapMarksButton, TabletopMapMarks.Visible ? "隐藏" : "显示", true, true, !TabletopMapMarks.Visible, false);
-        if (ReactionButtonEnabled)
-        {
-            GeneralFrameUI.Skill(ReactionButton, "互动", true, true, ReactionMenu || SelectedReaction != null, false);
-            if (ReactionMenu)
-            {
-                LoadReactionArt();
-                DrawReactionOption(EggOption, reactionArt["egg"].Flying);
-                DrawReactionOption(FlowerOption, reactionArt["flower"].Flying);
-            }
-        }
+        DrawReactionButtons(true);
         foreach (var flight in reactionFlights)
         {
             float age = Time.unscaledTime - flight.Start;

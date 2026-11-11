@@ -54,6 +54,23 @@ public static class ModernOperationUI
         GUI.Label(new Rect(left+(hasIcon?39:0),plaque.y+4,textWidth+4,plaque.height-8),caption,style);
     }
     public static void Label(Rect r,string value,GUIStyle style=null){Styles();GUI.Label(r,value,style??Text);}
+    public static bool DrawWindowSymbol(Rect button,string caption,Color color)
+    {
+        if(caption!="—"&&caption!="×")return false;
+        if(Event.current.type!=EventType.Repaint)return true;
+        Vector2 center=button.center;
+        float radius=Mathf.Min(button.width,button.height)*.22f;
+        if(caption=="—")
+            Fill(new Rect(center.x-radius,center.y-1,radius*2,2),color);
+        else
+        {
+            var diagonal=new Vector2(radius*.8f,radius*.8f);
+            StrategyHudArt.Line(center-diagonal,center+diagonal,color,2);
+            diagonal.y=-diagonal.y;
+            StrategyHudArt.Line(center-diagonal,center+diagonal,color,2);
+        }
+        return true;
+    }
     public static bool Button(Rect r,string caption,bool enabled=true,bool primary=false,bool selected=false,string playerId=null)
     {
         Styles();bool old=GUI.enabled;GUI.enabled=old&&enabled;
@@ -66,7 +83,8 @@ public static class ModernOperationUI
         if(selected)Fill(new Rect(r.x+9,r.yMax-3,r.width-18,2),Accent);
         var label=new GUIStyle(Center);label.normal.textColor=!GUI.enabled?Muted:primary&&!StrategyHudTheme.HandPainted?new Color(1,.94f,.73f):TextColor;
         if(playerId!=null)label=M6App.PlayerNameStyle(label,playerId);
-        TabletopTextFit.Label(new Rect(r.x+9,r.y+4,r.width-18,r.height-8),caption,label,8,true);
+        if(!DrawWindowSymbol(r,caption,label.normal.textColor))
+            TabletopTextFit.Label(new Rect(r.x+9,r.y+4,r.width-18,r.height-8),caption,label,8,true);
         }
         bool result=TabletopButtonFeedback.Button(r,false);GUI.enabled=old;
         result=result&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);

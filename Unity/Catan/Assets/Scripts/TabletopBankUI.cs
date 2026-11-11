@@ -36,12 +36,7 @@ public sealed class TabletopBankUI
         developmentSource=new Rect(70,32,34,48);
         for(int track=0;track<3;track++)specialSources[track]=new Rect(54+track*8,32,34,48);
         var slots=timeline.HandSlots(snapshot.Seat,snapshot.Goods,snapshot.GoodCount,Time.unscaledTimeAsDouble);
-        for(int index=0;index<slots.Length;index++)
-        {
-            if(slots[index].Flight==null)continue;
-            var pose=TabletopHandLayout.Resource(slots,index,TabletopHandLayout.ResourceCenter(false),TabletopHandLayout.ResourceWidth(false),false,timeline.ResourceHandScroll);
-            ownDestinations[slots[index].Flight]=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);ownSlotIndices[slots[index].Flight]=index;
-        }
+        BindDestinations(slots,TabletopHandLayout.ResourceCenter(false),TabletopHandLayout.ResourceWidth(false),timeline.ResourceHandScroll);
         BindSpecialDestinations(snapshot);
         // 对手收牌只飞向公开头像，不恢复对手实体手牌或卡面。
         var ordered=seats.OrderBy(s=>s.Id).ToArray();
@@ -96,13 +91,7 @@ public sealed class TabletopBankUI
         BindSpecialDestinations(snapshot);
         float center=TabletopHandLayout.ResourceCenter(snapshot.Cards.Count>0),width=TabletopHandLayout.ResourceWidth(snapshot.Cards.Count>0);
         var slots=timeline.HandSlots(snapshot.Seat,snapshot.Goods,snapshot.GoodCount,Time.unscaledTimeAsDouble);
-        for(int index=0;index<slots.Length;index++)
-        {
-            if(slots[index].Flight==null)continue;
-            var pose=TabletopHandLayout.Resource(slots,index,center,width,false,timeline.ResourceHandScroll);
-            ownDestinations[slots[index].Flight]=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);
-            ownSlotIndices[slots[index].Flight]=index;
-        }
+        BindDestinations(slots,center,width,timeline.ResourceHandScroll);
         var order=TabletopUI.OpponentOrder(snapshot.Seat,seats.Select(s=>s.Id));
         for(int i=0;i<order.Length;i++)
         {
@@ -114,11 +103,18 @@ public sealed class TabletopBankUI
     void BindSpecialDestinations(OperationSnapshot snapshot)
     {
         var slots=timeline.SpecialSlots(snapshot.Seat,snapshot.Cards,Time.unscaledTimeAsDouble);
+        BindDestinations(slots,TabletopHandLayout.SpecialCenter(false),TabletopHandLayout.SpecialWidth(false),timeline.SpecialHandScroll);
+    }
+    void BindDestinations(TabletopResourceSlot[] slots,float center,float width,float scroll)
+    {
+        var row=new TabletopHandLayout.Row(slots,center,width,scroll);
         for(int index=0;index<slots.Length;index++)
         {
-            var flight=slots[index].Flight;if(flight==null)continue;
-            var pose=TabletopHandLayout.Resource(slots,index,TabletopHandLayout.SpecialCenter(false),TabletopHandLayout.SpecialWidth(false),false,timeline.SpecialHandScroll);
-            ownDestinations[flight]=new Rect(pose.X,pose.Y,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);ownSlotIndices[flight]=index;
+            var slot=slots[index];
+            float x=row.Next(slot.Weight);
+            if(slot.Flight==null)continue;
+            ownDestinations[slot.Flight]=new Rect(x,TabletopHandLayout.Baseline,TabletopHandLayout.CardWidth,TabletopHandLayout.CardHeight);
+            ownSlotIndices[slot.Flight]=index;
         }
     }
     static void DrawCount(TabletopScene table,Rect layout,int count)
@@ -156,7 +152,7 @@ public sealed class TabletopBankUI
         Rect start;
         if(flight.SourcePlayerId!=null&&destinations.TryGetValue(flight.SourcePlayerId,out var playerStart))start=playerStart;
         else if(flight.SourceTileId!=null&&current.CollectionPosition!=null)
-        {var point=current.CollectionPosition(flight.SourceTileId);start=new Rect(point.X-17,point.Y-24,34,48);}
+        {var point=flight.LaunchPoint??=current.CollectionPosition(flight.SourceTileId);start=new Rect(point.X-17,point.Y-24,34,48);}
         else if(flight.IsSpecial)start=flight.Category=="development"?developmentSource:specialSources.TryGetValue(flight.Track,out var specialStart)?specialStart:developmentSource;
         else if(!sources.TryGetValue(flight.Good,out start))return;
         bool own=flight.Player==current.Seat;

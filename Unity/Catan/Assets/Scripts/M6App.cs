@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="2.1.12";
+    public const string BuildVersion="2.1.14";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -293,7 +293,7 @@ public sealed partial class M6App : MonoBehaviour
     public void ReturnToMainMenu()
     {
         ResetCardPresentation();ResetBuildPresentation();
-        if(NetworkGame)Network.Leave();
+        if(NetworkGame)Network.LeaveToMainMenu();
         close?.Invoke();presentation=null;actor=null;finished=null;decideAndSubmit=null;save=null;refresh=null;close=null;visible=null;
         historySource=null;historyEntries=Array.Empty<Catan.Core.GameHistoryEntry>();lastHistoryRevision=-1;
         tableMenu=false;MenuVisible=true;TableDiceRolling=false;NavigateMainMenu(-1);
@@ -325,8 +325,16 @@ public sealed partial class M6App : MonoBehaviour
                 ReactionClick(pointerEvent.mousePosition, pointerEvent.button);
             pointerEvent.Use();
         }
-        if(!MenuVisible && !networkMenu && TablePresentationBlocked && Event.current.type==EventType.Repaint && ThreeKingdomsProjection!=null)
-            DrawGeneralDock(ThreeKingdomsProjection,false);
+        if(!MenuVisible && !networkMenu && TablePresentationBlocked && Event.current.type==EventType.Repaint)
+        {
+            var view=ThreeKingdomsProjection;
+            if(view!=null)
+            {
+                DrawGeneralDock(view,false);
+                DrawGeneralSkills(view);
+            }
+            if(tableMenu)DrawReactionButtons(false);
+        }
         if(encyclopediaOpen&&tableMenu){DrawEncyclopedia();DrawCentralSkill();GUI.matrix=Matrix4x4.identity;return;}
         if(networkMenu){DrawNetworkMenu();GUI.matrix=Matrix4x4.identity;return;}
         if(MenuVisible)
@@ -344,6 +352,11 @@ public sealed partial class M6App : MonoBehaviour
             string prompt=DisplayPlayerText(RoadPlacementPrompt.Length>0?RoadPlacementPrompt:CurrentTablePrompt);
             bool facilityVisible = presentation is M4App city && city.FacilityPageVisible
                 || presentation is M5App combined && combined.FacilityPageVisible;
+            bool handInstruction=presentation is M4App m4&&m4.ShowHandInstruction||presentation is M5App m5&&m5.ShowHandInstruction;
+            if(!tableMenu&&!facilityVisible&&ThreeKingdomsProjection!=null&&!ThreeKingdomsSelectionActive&&
+                !GeneralTableCovered&&!TablePresentationBlocked&&!TableMapChoiceOpen&&!TableOverlayOpen&&
+                handInstruction&&HasRequiredTableSelection&&prompt.Length>0)
+                DrawHandInstruction(prompt);
             if(!facilityVisible&&ThreeKingdomsProjection==null&&prompt.Length>0&&!TablePresentationBlocked&&!TableMapChoiceOpen&&(!TableOverlayOpen||HasRequiredTableSelection))
             {
                 bool primary=prompt=="你的回合"||Finished;

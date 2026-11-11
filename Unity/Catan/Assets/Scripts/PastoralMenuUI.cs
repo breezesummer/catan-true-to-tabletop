@@ -65,16 +65,27 @@ public static class PastoralMenuUI
         CopperTabletopSkin.Panel(r,Paper);
     }
 
-    public static bool Button(Rect r,string caption,bool enabled=true,bool primary=false,bool selected=false,Color? seatColor=null)
+    public static bool Button(Rect r,string caption,bool enabled=true,bool primary=false,bool selected=false,Color? seatColor=null,bool homeStyle=false)
     {
         Styles();bool before=GUI.enabled;GUI.enabled=before&&enabled;
         bool over=GUI.enabled&&r.Contains(Event.current.mousePosition);
-        Color bg=primary||selected?new Color(.43f,.20f,.08f):new Color(.29f,.12f,.05f);
-        if(!GUI.enabled)bg=new Color(.17f,.085f,.05f);
-        CopperTabletopSkin.Panel(r,bg,over||selected,false);
-        var ink=GUI.enabled?(primary||selected?new Color(1,.99f,.94f):Ink):Muted;
+        Color ink;
+        if(homeStyle){
+            var bg=primary||selected?new Color(.43f,.20f,.08f):new Color(.29f,.12f,.05f);
+            if(!GUI.enabled)bg=new Color(.17f,.085f,.05f);
+            CopperTabletopSkin.Panel(r,bg,over||selected,false);
+            ink=GUI.enabled?(primary||selected?new Color(1,.99f,.94f):Ink):Muted;
+        }else{
+            var old=GUI.color;
+            if(!GUI.enabled)GUI.color=new Color(.77f,.74f,.68f,old.a);
+            else if(over)GUI.color=new Color(1,.96f,.85f,old.a);
+            M6App.Surface(r,primary||selected?"primary":"control");
+            GUI.color=old;
+            ink=primary||selected?Ivory:new Color(.23f,.14f,.08f);
+        }
         if(seatColor.HasValue)ink=seatColor.Value;
-        Label(new Rect(r.x+8,r.y+1,r.width-16,r.height-2),caption,primary?19:16,ink,primary,TextAnchor.MiddleCenter);
+        if(!ModernOperationUI.DrawWindowSymbol(r,caption,ink))
+            Label(new Rect(r.x+8,r.y+1,r.width-16,r.height-2),caption,primary?19:16,ink,primary,TextAnchor.MiddleCenter);
         bool hit=TabletopButtonFeedback.Button(r,false)&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
         GUI.enabled=before;if(hit)TabletopAudio.Instance?.Click();return hit;
     }

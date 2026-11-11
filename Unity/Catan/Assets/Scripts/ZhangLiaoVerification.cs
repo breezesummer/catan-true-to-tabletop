@@ -94,13 +94,18 @@ public sealed partial class TabletopUiVerification
                 {
                     Require(Time.realtimeSinceStartupAsDouble<until,"动皮资源缺失 "+skin.id);yield return null;
                 }
+                var idle=Resources.Load<Texture2D>(skin.idlePath);
+                var attack=Resources.Load<Texture2D>(skin.attackPath);
+                Require(idle.width==16*256 && idle.height==((skin.idleFrames+15)/16)*352,"待机图集被缩小 "+skin.id);
+                Require(attack.width==8*768 && attack.height==(skin.id=="tk-g01"?9:6)*640,"出框图集被缩小 "+skin.id);
                 Require(skin.idleTime>0&&skin.attackTime>0&&skin.idleFrames>0,"动皮时长或帧数异常 "+skin.id);
                 Require(GeneralSkinArt.AttackSound(skin).asset is AudioClip sound&&sound.length>0,"攻击音效缺失 "+skin.id);
                 count++;
-                if(skin.id!="tk-g31")continue;
+                if(skin.id!="tk-g31"&&skin.id!="tk-g16")continue;
                 var detail=typeof(M6App).GetField("detailGeneralId",PrivateInstance);
                 detail.SetValue(app,skin.id);yield return null;yield return new WaitForEndOfFrame();
-                SaveOceanFrame("李儒-动皮.png");
+                SaveOceanFrame(general.Name+"-动皮.png");
+                if(skin.id=="tk-g16"){detail.SetValue(app,null);continue;}
                 if(click){foreach(var step in DirectClick(new Vector2(557,286),"切换静皮"))yield return step;}
                 else GeneralSkinArt.SetStatic(skin,true);
                 Require(skin.useStatic&&!GeneralSkinArt.IdleReady(skin)&&GeneralSkinArt.AttackReady(skin),"静皮切换影响公开技能特效");

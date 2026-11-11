@@ -10,7 +10,7 @@ public static class NaturalPiecesImport
     const string Art="Assets/Art/NaturalPieces/v001/";
     const string Root="Assets/Resources/NaturalPieces/v001/";
     static readonly string[] Colours={"red","blue","orange","beige"};
-    static readonly Color[] Tints={new Color(.80f,.27f,.17f),new Color(.27f,.48f,.77f),new Color(.98f,.54f,.18f),new Color(1,.98f,.89f)};
+    static Color[] Tints => BoardRenderer.SeatColors;
     [MenuItem("Catan/美术/导入自然四色棋子")]
     public static void Run()
     {
@@ -67,7 +67,9 @@ public static class NaturalPiecesImport
                 thumbnail.maxTextureSize=512;thumbnail.wrapMode=TextureWrapMode.Clamp;thumbnail.SaveAndReimport();
             }
         }
-        AssetDatabase.SaveAssets();Debug.Log("CATAN_NATURAL_IMPORT_OK: 12 prefabs, 3 shared meshes");
+        AssetDatabase.SaveAssets();
+        PlayerPieceColorImport.ApplyKinds(new[]{"village","city","road"});
+        Debug.Log("CATAN_NATURAL_IMPORT_OK: 12 prefabs, 3 shared meshes");
     }
     static Bounds Bounds(Renderer[] renderers){var b=renderers[0].bounds;foreach(var r in renderers.Skip(1))b.Encapsulate(r.bounds);return b;}
     static Material MakeContact()

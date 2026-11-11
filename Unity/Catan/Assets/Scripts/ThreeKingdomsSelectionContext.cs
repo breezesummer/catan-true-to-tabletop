@@ -326,9 +326,9 @@ public sealed class B45SelectionContext
     public B2SkillCommand FinishDirectPick(bool playerPicked=false)
     {
         var command=BuildCommand();
-        if(command==null||Subset||Shelie)return null;
+        if(command==null||Subset||Shelie||SkillId=="tk-g22-s1")return null;
         if(Raid){if(!playerPicked)return null;submitting=true;return command;}
-        if(command.Option=="gift"&&!playerPicked||command.Option=="exchange-hand"&&SelectedCounts.Sum()<Math.Min(4,Contract.Hand.Sum()))return null;
+        if(command.Option=="gift"&&!playerPicked)return null;
         if(!Poxi&&!RequiresBankCards&&Current().Any(action=>
             Compatible(action,true,true,true)&&
             (B45SelectionContract.Players(action).Length>players.Count||

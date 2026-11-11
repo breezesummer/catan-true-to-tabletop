@@ -69,7 +69,7 @@ public static class FishingF3EditorVerification
     static IEnumerator Review()
     {
         Size(1440,900);yield return 1.0;
-        Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",2);Set(app,"menuHarbormaster",true);Set(app,"menuFishing",true);Set(app,"menuVictoryPoints",null);
+        Set(app,"menuPage",0);Set(app,"atlasOpen",false);Set(app,"menuRule",2);Set(app,"menuHarbormaster",true);Set(app,"menuFishing",true);Set(app,"menuVictoryPoints",null);
         yield return Capture("01-城市骑士捕鱼配置");
         foreach(string mode in new[]{"base","cities-knights"})
         {
@@ -101,7 +101,7 @@ public static class FishingF3EditorVerification
             yield return Capture("03-"+mode+"-支付完成");app.ShowMenu();
         }
         yield return ReviewKingdoms();
-        Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",1);Set(app,"menuScenario",0);
+        Set(app,"menuPage",0);Set(app,"atlasOpen",false);Set(app,"menuRule",1);Set(app,"menuScenario",0);
         yield return Capture("04-航海捕鱼禁用");
     }
     static IEnumerator ReviewKingdoms()

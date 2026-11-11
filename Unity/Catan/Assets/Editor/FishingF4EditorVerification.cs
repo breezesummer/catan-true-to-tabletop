@@ -69,7 +69,7 @@ public static class FishingF4EditorVerification
     static IEnumerator Review()
     {
         Size(1440,900);yield return 1.0;
-        Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",3);Set(app,"menuHarbormaster",true);Set(app,"menuFishing",true);Set(app,"menuVictoryPoints",null);
+        Set(app,"menuPage",0);Set(app,"atlasOpen",false);Set(app,"menuRule",3);Set(app,"menuHarbormaster",true);Set(app,"menuFishing",true);Set(app,"menuVictoryPoints",null);
         yield return Capture("01-双扩展捕鱼配置");
         foreach(string mode in new[]{"seafarers","combined"})
         {
@@ -102,7 +102,7 @@ public static class FishingF4EditorVerification
         }
         yield return ReviewSeaTargets();
         yield return ReviewKingdoms();
-        Set(app,"menuPage",0);Set(app,"menuSetupStep",2);Set(app,"menuRule",1);Set(app,"menuScenario",6);
+        Set(app,"menuPage",0);Set(app,"atlasOpen",false);Set(app,"menuRule",1);Set(app,"menuScenario",6);
         yield return Capture("04-海盗群岛捕鱼保持禁用");
     }
     static Vector2 MapPoint(M3BoardRenderer board,string id)

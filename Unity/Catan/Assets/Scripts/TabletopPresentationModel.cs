@@ -25,6 +25,27 @@ public static class TabletopHandLayout
     public static float SpecialCenter(bool hasResources) => (RestLeft+RestRight)/2;
     public static float SpecialWidth(bool hasResources) => RestRight-RestLeft;
     public static bool IsObscured(float nextX,float x,float width) => nextX<x+width-.5f;
+    public struct Row
+    {
+        readonly float left, step;
+        double before;
+        public readonly float Scroll;
+        public Row(TabletopResourceSlot[] slots,float center,float width,float scroll)
+        {
+            double count=0;
+            foreach(var slot in slots)count+=slot.Weight;
+            Scroll=ClampScroll(scroll,count,width);
+            left=center-width/2-Scroll;
+            step=Step(count,width);
+            before=0;
+        }
+        public float Next(double weight)
+        {
+            float x=left+(float)before*step;
+            before+=weight;
+            return x;
+        }
+    }
     public static TabletopCardPose Resource(TabletopResourceSlot[] slots,int index,float center,float width,bool selected,float scroll=0)
     {
         double count=slots.Sum(slot=>slot.Weight),before=slots.Take(index).Sum(slot=>slot.Weight);
@@ -77,6 +98,29 @@ public sealed class TabletopPromptSequence
 }
 public static class TabletopSelectionPrompt
 {
+    public static string ProgressInstruction(string kind)
+    {
+        switch(kind)
+        {
+            case "Engineering":return "请选择一座己方城市免费修建城墙";
+            case "Medicine":return "请选择一座己方村庄升级为城市";
+            case "Merchant":return "请选择与己方建筑相邻的资源地块放置商人";
+            case "Taxation":return "请选择强盗的新位置";
+            case "Diplomacy":return "请选择一条开放道路或一艘开放航线上的船";
+            case "Invention":return "请选择第一枚待交换的数字圆片";
+            case "Intrigue":return "请选择与己方路线相连的一名敌方骑士";
+            case "Smithing":return "请选择要晋升的骑士";
+            case "Treason":return "请选择一名其他玩家移除骑士";
+            case "Espionage":return "请选择一名其他玩家查看其发展牌";
+            case "GuildDues":return "请选择一名分数高于你的玩家";
+            case "Crane":return "请选择一项城市设施升级";
+            case "Alchemy":return "请选择红骰与白骰的点数";
+            case "MerchantFleet":return "请选择一种资源或商品，本回合可按二比一交易";
+            case "ResourceMonopoly":return "请选择要垄断的资源种类";
+            case "TradeMonopoly":return "请选择要垄断的商品种类";
+            default:return "";
+        }
+    }
     public static bool IsDirectMapDecision(string kind)
     {
         switch(kind)
@@ -126,6 +170,7 @@ public sealed class TabletopCollectionFlight
     public string Category,CardName,CardId,SourceTileId,SourcePlayerId;
     public int ProgressIndex=-1,Track=-1;
     public bool IsSpecial => Category=="development"||Category=="progress";
+    public TabletopCardPose LaunchPoint;
     public double Started;
     public const double Duration = 1.05;
     public double Progress(double now) => Math.Max(0,Math.Min(1,(now-Started)/Duration));

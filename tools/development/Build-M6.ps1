@@ -25,6 +25,9 @@ if ($DevelopmentProbe) { $m6ExtraArguments += '--ultra-development-build' }
 & $toolchain.unity -batchmode -nographics -quit -buildTarget Win64 -projectPath $m6Project -executeMethod $m6BuildMethod --m6-output-root $m6OutputRoot @m6ExtraArguments -logFile (Join-Path $m6Logs 'unity-build.log') | Out-Host
 if ($LASTEXITCODE -ne 0) { throw "Unity 构建失败，请检查 $m6Logs/unity-build.log。" }
 if (!(Select-String -LiteralPath (Join-Path $m6Logs 'unity-build.log') -Pattern 'CATAN_M6_UNITY_BUILD_OK' -Quiet)) { throw '未找到 Unity 构建成功标记。' }
+$reportViewer = Join-Path $m6OutputRoot 'Builds/Windows/查看崩溃报告.exe'
+& "$env:WINDIR/Microsoft.NET/Framework64/v4.0.30319/csc.exe" /nologo /target:winexe /codepage:65001 "/out:$reportViewer" /reference:System.Windows.Forms.dll (Join-Path $PSScriptRoot 'CrashReportViewer.cs') (Join-Path $m6Project 'Assets/Scripts/NativeCrashReports.cs')
+if ($LASTEXITCODE -ne 0) { throw '崩溃报告查看工具构建失败。' }
 Write-Host ("M6 .NET / Unity 构建耗时 {0:N1} 秒。" -f $m6BuildClock.Elapsed.TotalSeconds)
 if ($VerifyPlayer -and !$SkipVerification) {
     $m6Player = Join-Path $m6OutputRoot "Builds/Windows/$m6FileStem.exe"

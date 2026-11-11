@@ -30,8 +30,7 @@ public sealed partial class M5App
     {
         if(tabletop.HistoryOpen||ai.TablePresentationBlocked)return;
         Func<string,Vector2> position=id=>MobileTabletop.Logical(board.ScreenPoint(id));
-        fishingDock.DrawMap(font,position);
         if(dock.HasOverlay||mapChoice.Active||OperationContextVisible||ai.ThreeKingdomsSelectionActive||directPayment.Active||ResourceChoiceVisible) { fishingDock.Reset(); return; }
-        fishingDock.Draw(font,ai.IsHumanTurn,true,view.Board.RobberTileId,position,view.Board.PirateTileId);
+        fishingDock.Draw(ai,font,ai.IsHumanTurn,true,view.Board.RobberTileId,position,view.Board.PirateTileId);
     }
 }

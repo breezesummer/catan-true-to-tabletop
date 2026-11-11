@@ -28,7 +28,7 @@ Shader "Catan/PierWaterShadow"
             {
                 float deck=Shade(i.mm-float2(0,-8.0),float2(12.2,7.6));
                 float walk=Shade(i.mm-float2(0,5.3),float2(2.9,5.8));
-                return half4(.008,.038,.034,.38*max(deck,walk));
+                return half4(.008,.038,.034,.13*max(deck,walk));
             }
             ENDHLSL
         }

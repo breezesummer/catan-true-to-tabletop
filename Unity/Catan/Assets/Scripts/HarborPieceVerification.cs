@@ -55,8 +55,11 @@ public sealed partial class TabletopUiVerification
             {
                 var hull=Piece("Ship "+ship.LocationId);
                 var wake=wakes.Single(w=>w.name=="船尾浪 "+ship.LocationId);
-                var bounds=hull.GetComponentInChildren<MeshFilter>().sharedMesh.bounds;
-                Require(Mathf.Abs(bounds.size.z*hull.lossyScale.z-.01121f)<.0002f,"船身比例不符");
+                var filter=hull.GetComponentInChildren<MeshFilter>();
+                var size=filter.sharedMesh.bounds.size;
+                float Span(Vector3 axis)=>Mathf.Abs(Vector3.Dot(hull.forward,filter.transform.TransformVector(axis)));
+                float length=Span(Vector3.right*size.x)+Span(Vector3.up*size.y)+Span(Vector3.forward*size.z);
+                Require(Mathf.Abs(length-EntityBoardAssets.ShipLength)<.0002f,"船身比例不符");
                 var strip=wake.GetComponent<MeshFilter>().sharedMesh;
                 var stern=(strip.vertices[0]+strip.vertices[1])*.5f;
                 Require(Vector3.Dot(stern-hull.position,-hull.forward)>.004f,"尾浪起点不在船艉");

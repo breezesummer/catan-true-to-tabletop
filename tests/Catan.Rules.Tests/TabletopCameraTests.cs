@@ -5,7 +5,7 @@ namespace Catan.Rules.Tests;
 public sealed class TabletopCameraTests
 {
     [Theory]
-    [InlineData(false,66,66,66)]
+    [InlineData(false,45,45,45)]
     [InlineData(true,82,82,82)]
     public void NearDefaultAndFarViewsKeepTheirIntendedPitch(bool overhead,float close,float normal,float far)
     {
@@ -27,7 +27,7 @@ public sealed class TabletopCameraTests
         {
             float zoom=.45f+step*.001f;
             float current=TabletopCameraModel.Angle(zoom,overhead);
-            Assert.InRange(current,66,82);
+            Assert.InRange(current,45,82);
             Assert.Equal(previous,current);
             Assert.InRange(current-previous,0,.08f);
             previous=current;

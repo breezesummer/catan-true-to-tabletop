@@ -7,8 +7,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: NeutralPalette
-    second: {fileID: 2100000, guid: 0b6463014fad4ee990684cf5af02dbb0, type: 2}
+      name: RobberSurface
+    second: {fileID: 2100000, guid: 54ae67c262284b1abb63c215e77bb7d9, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

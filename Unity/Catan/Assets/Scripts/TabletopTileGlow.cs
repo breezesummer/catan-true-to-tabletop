@@ -4,79 +4,51 @@ using System.Linq;
 using Catan.Core;
 using UnityEngine;
 
-// 每张棋桌只使用本人投影。读档与重返房间从公开建筑历史恢复玉光，金纹只追随新结算。
+// 只消费当前观看者的公开棋盘投影；流光表示常态产量，与结算历史、动画无关。
 internal sealed class TabletopTileGlow
 {
-    const float NoGold = -100;
-    readonly HashSet<string> villages = new HashSet<string>();
-    readonly HashSet<string> owned = new HashSet<string>();
-    readonly Dictionary<string,float> gold = new Dictionary<string,float>();
+    readonly Dictionary<string,int> levels = new Dictionary<string,int>();
     PaintedMap map;
-    Tile[] land;
-    string seat;
-    long baseline, latest;
-    GameHistoryEntry[] lastHistory;
-    internal IEnumerable<string> Owned => owned;
-    internal string LastGoldTile { get; private set; }
-    internal float LastGoldAt { get; private set; } = NoGold;
+    internal IEnumerable<string> Owned => levels.Keys;
+    internal int Level(string id) => levels.TryGetValue(id,out var level) ? level : 0;
+
+    internal static int ProductionLevel(Tile tile, PiecePlacement[] settlements, PiecePlacement[] cities, string viewer)
+    {
+        bool produces = tile.Resource == "lake" || (tile.Number.HasValue && tile.Number > 0 &&
+            (tile.Resource == "wood" || tile.Resource == "brick" || tile.Resource == "wool" ||
+             tile.Resource == "wheat" || tile.Resource == "ore" || tile.Resource == "gold"));
+        if (!produces) return 0;
+        int count = settlements.Count(b => b.PlayerId == viewer && tile.Vertices.Contains(b.LocationId)) +
+            2 * cities.Count(b => b.PlayerId == viewer && tile.Vertices.Contains(b.LocationId));
+        return Math.Min(2,count);
+    }
 
     internal void Bind(PaintedMap next, Tile[] tiles, PiecePlacement[] settlements, PiecePlacement[] cities, string viewer, long sequence)
     {
-        bool reset = seat != viewer || sequence < latest;
-        if (reset)
-        {
-            if (map != null) foreach (var id in owned) map.SetTileGlow(id,false,NoGold);
-            villages.Clear(); owned.Clear(); gold.Clear(); lastHistory = null;
-            seat = viewer; baseline = latest = sequence; LastGoldTile = null; LastGoldAt = NoGold;
-        }
-        bool newMap = map != next;
+        bool changedMap = map != next;
+        if (changedMap && map != null)
+            foreach (var id in levels.Keys) map.SetTileGlow(id,false,-100);
         map = next;
-        land = tiles.Where(t => PaintedMap.Region(t.Resource) >= 0 && PaintedMap.Region(t.Resource) < 8).ToArray();
-        foreach (var b in settlements.Concat(cities))
-            if (b.PlayerId == seat) villages.Add(b.LocationId);
-        RefreshOwned(newMap);
-    }
-
-    void RefreshOwned(bool repaint)
-    {
-        if (map == null || land == null) return;
-        foreach (var tile in land)
-            if (tile.Vertices.Any(villages.Contains) && (owned.Add(tile.Id) || repaint))
-                map.SetTileGlow(tile.Id,true,gold.TryGetValue(tile.Id,out var start) ? start : NoGold);
+        var removed = new HashSet<string>(levels.Keys);
+        foreach (var tile in tiles)
+        {
+            int level = ProductionLevel(tile,settlements,cities,viewer);
+            removed.Remove(tile.Id);
+            if (changedMap || Level(tile.Id) != level)
+                map?.SetTileGlow(tile.Id,level > 0,-100,level > 1);
+            if (level > 0) levels[tile.Id] = level;
+            else levels.Remove(tile.Id);
+        }
+        foreach (var id in removed)
+        {
+            map?.SetTileGlow(id,false,-100);
+            levels.Remove(id);
+        }
     }
 
     internal void Observe(GameHistoryEntry[] history, double settlesAt)
     {
-        if (map == null || history == null || ReferenceEquals(history,lastHistory)) return;
-        long previous = latest;
-        bool gainedSite = false;
-        // 正常追加只访问新增尾段；补页或改写历史时再扫描旧建筑。
-        int from = 0;
-        if (lastHistory != null && lastHistory.Length > 0 && history.Length > lastHistory.Length &&
-            history[lastHistory.Length-1].Sequence == lastHistory[lastHistory.Length-1].Sequence &&
-            history[lastHistory.Length].Sequence > previous)
-            from = lastHistory.Length;
-        for (int i=from; i<history.Length; i++)
-        {
-            var entry = history[i];
-            foreach (var change in entry.Changes)
-                if (change.Category == "piece" && change.PlayerId == seat && (change.Name == "村庄" || change.Name == "城市"))
-                    gainedSite |= villages.Add(change.LocationId);
-            latest = Math.Max(latest,entry.Sequence);
-        }
-        if (gainedSite) RefreshOwned(false);
-        for (int i=history.Length-1; i>=0; i--)
-        {
-            var entry = history[i];
-            if (entry.Sequence <= previous || entry.Sequence <= baseline) break;
-            foreach (var id in entry.OwnMultiHarvestTiles())
-            {
-                if (!owned.Contains(id)) continue;
-                float start = Time.time + (float)Math.Max(0,settlesAt - Time.unscaledTimeAsDouble);
-                gold[id] = start; map.SetTileGlow(id,true,start);
-                LastGoldTile = id; LastGoldAt = start;
-            }
-        }
-        lastHistory = history;
+        // 每帧仅推进共享材质时钟，地块属性仅在棋盘投影改变时更新。
+        if (map != null) map.UpdateGlowClock();
     }
 }

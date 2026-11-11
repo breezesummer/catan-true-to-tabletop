@@ -291,6 +291,7 @@ public sealed partial class M7Client : MonoBehaviour
     public void RestartRoom(){if(CanRestartRoom)Request("Restart");}
     public void Reconnect(){if(string.IsNullOrEmpty(credential)||string.IsNullOrEmpty(RoomId)){Status="此设备没有该房间的恢复凭据，请从大厅加入。";return;}automaticReconnect=true;Request("Reconnect");}
     public void ForgetIdentity(){try{if(File.Exists(IdentityPath))File.Delete(IdentityPath);if(RoomId!=null&&File.Exists(RoomIdentityPath(RoomId)))File.Delete(RoomIdentityPath(RoomId));}catch(IOException){}ClearEnrollment();EndSession();Status="已忘记本设备的恢复身份和待确认申请；可重新加入可用席位。";}
+    public void LeaveToMainMenu()=>ChangeRoom(null,EndSession);
     public void Leave()=>ChangeRoom(null,()=>{ListRooms();Status="已退出房间，可创建或加入其他房间。";});
     public void Transfer(string seat)=>Request("Transfer",new SeatPayload{SeatId=seat});
     NetworkRequest Envelope(string operation,string payload=null)

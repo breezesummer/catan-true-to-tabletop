@@ -149,15 +149,15 @@ public sealed class AudioVisualVerification : MonoBehaviour
         Go(4); Set("menuSettingsTab", 1); yield return Capture("settings-sound");
         Set("menuSettingsTab", 2); yield return Capture("settings-appearance");
         Set("menuSettingsTab", 3); yield return Capture("settings-landscapes");
-        Go(0); Set("menuSetupStep", 0); yield return Capture("rule-covers");
-        Set("menuSetupStep", 1);
+        Go(0); yield return Capture("rule-covers");
+        
         for (int rule = 0; rule < 4; rule++)
         {
             Set("menuRule", rule); Set("menuScenario", 0);
             yield return Capture("maps-" + rule);
         }
         // 只展示创建页，不调用连接、发现或创建房间入口。
-        Set("networkMenu", true); Set("networkLan", true); Set("networkTab", 1); Set("networkSettingsPage", 1);
+        Set("networkMenu", true); Set("networkLan", true); Set("networkTab", 1);
         yield return Capture("network-map-preview");
         Require(!app.Network.Connected, "预览不应连接网络服务");
         Set("networkMenu", false);

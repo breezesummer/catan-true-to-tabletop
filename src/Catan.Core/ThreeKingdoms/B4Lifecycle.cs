@@ -57,7 +57,7 @@ namespace Catan.Core.ThreeKingdoms
         private static void SynchronizePendingSelection(ThreeKingdomsState state) =>
             state.PendingDecision = state.PendingDecisions.FirstOrDefault();
 
-        private static void ChooseBatchGenerals(ThreeKingdomsState state, string playerId, string[] generalIds, string decisionId, string windowId)
+        private static void ChooseBatchGenerals(ThreeKingdomsState state, string playerId, string[] generalIds, string decisionId, string windowId, Func<int, int> draw)
         {
             var pending = RequireDecision(state, playerId, decisionId, windowId);
             Require(pending.Kind == ThreeKingdomsDecisionKind.SelectOpening || pending.Kind == ThreeKingdomsDecisionKind.SelectReplacement,
@@ -69,6 +69,13 @@ namespace Catan.Core.ThreeKingdoms
                 var general = Find(state, id);
                 if (generalIds.Contains(id)) general.Region = GeneralRegion.Hidden;
                 else ReturnToPool(general);
+            }
+            if (pending.Kind == ThreeKingdomsDecisionKind.SelectReplacement && Owned(state, playerId, GeneralRegion.Active).Any())
+            {
+                state.PendingDecisions = state.PendingDecisions.Where(d => d.PlayerId != playerId).ToArray();
+                SynchronizePendingSelection(state);
+                FinishBatchIfReady(state, false, draw);
+                return;
             }
             if (pending.Kind == ThreeKingdomsDecisionKind.SelectReplacement)
                 state.EffectFrames.Single(f => f.SkillId == "tk-lifecycle-replacement" && f.PlayerId == playerId).Step = 2;
@@ -95,12 +102,18 @@ namespace Catan.Core.ThreeKingdoms
                 state.OpeningSeatCursor++;
             }
             else state.EffectFrames.Single(f => f.SkillId == "tk-lifecycle-replacement" && f.PlayerId == playerId).Step = 3;
-            if (state.PendingDecisions.Length != 0) return;
+            FinishBatchIfReady(state, pending.Kind == ThreeKingdomsDecisionKind.DeployOpening, draw);
+        }
 
-            bool opening = pending.Kind == ThreeKingdomsDecisionKind.DeployOpening;
+        private static void FinishBatchIfReady(ThreeKingdomsState state, bool opening, Func<int,int> draw)
+        {
+            if (state.PendingDecisions.Length != 0) return;
             int enteredRound = opening ? 1 : state.ReplacementReturnPhase == ThreeKingdomsPhase.RoundEnd ? state.Clock.Round + 1 : state.Clock.Round;
             foreach (var id in state.SelectionBatchPlayerIds)
-                Activate(state, Owned(state, id, GeneralRegion.ReservedDeployment).Single(), enteredRound);
+            {
+                var reserved = Owned(state, id, GeneralRegion.ReservedDeployment).SingleOrDefault();
+                if (reserved != null) Activate(state, reserved, enteredRound);
+            }
             state.SelectionBatchId = null;
             state.SelectionBatchPlayerIds = Array.Empty<string>();
             if (opening)
@@ -149,7 +162,8 @@ namespace Catan.Core.ThreeKingdoms
                     SkillId = "tk-lifecycle-replacement", PlayerId = playerId, Step = 1,
                     TurnInstanceId = state.Clock.TurnInstanceId, PhaseId = state.Clock.PhaseId, ReturnWindowId = state.WindowId
                 } }).ToArray();
-                RetireCurrentGeneral(state, playerId);
+                if (state.Clock.Phase != ThreeKingdomsPhase.RoundEnd || previous?.RemainingLife == 0)
+                    RetireCurrentGeneral(state, playerId);
             }
             foreach (var playerId in state.SelectionBatchPlayerIds)
             {
@@ -159,11 +173,16 @@ namespace Catan.Core.ThreeKingdoms
                 else
                 {
                     string[] hidden = Owned(state, playerId, GeneralRegion.Hidden).Select(g => g.GeneralId).OrderBy(x => x, StringComparer.Ordinal).ToArray();
+                    if (GeneralCatalog.UsesB6Rules(state.RulesVersion) && (hidden.Length == 0 || Owned(state, playerId, GeneralRegion.Active).Any())) continue;
                     Require(hidden.Length > 0, "公共库、隐退库与暗置武将均为空，无法恢复正常局面。");
                     state.EffectFrames.Single(f => f.SkillId == "tk-lifecycle-replacement" && f.PlayerId == playerId).Step = 2;
                     SetBatchDecision(state, playerId, ThreeKingdomsDecisionKind.DeployReplacement, hidden, 1);
                 }
             }
+            state.SelectionBatchPlayerIds = state.PendingDecisions.Select(d => d.PlayerId).ToArray();
+            state.ReplacementPlayerId = state.SelectionBatchPlayerIds.Length == 1 ? state.SelectionBatchPlayerIds[0] : null;
+            state.EffectFrames = state.EffectFrames.Where(f => f.SkillId != "tk-lifecycle-replacement" || state.SelectionBatchPlayerIds.Contains(f.PlayerId)).ToArray();
+            FinishBatchIfReady(state, false, draw);
         }
 
         private static string[] DrawB4(ThreeKingdomsState state, string playerId, int count, Func<int, int> draw)
@@ -236,7 +255,8 @@ namespace Catan.Core.ThreeKingdoms
                 var pending = decisions.FirstOrDefault(d => d.PlayerId == playerId);
                 int reserved = Owned(state, playerId, GeneralRegion.ReservedDeployment).Count();
                 bool member = batchPlayers.Contains(playerId);
-                if (reserved != (member && pending == null ? 1 : 0)) errors.Add("武将拟登场区与批次提交不一致。");
+                bool retainedActive = member && Owned(state, playerId, GeneralRegion.Active).Any();
+                if (reserved != (member && pending == null && !retainedActive ? 1 : 0)) errors.Add("武将拟登场区与批次提交不一致。");
                 if (Owned(state, playerId, GeneralRegion.Candidate).Any() && (pending == null
                     || pending.Kind != ThreeKingdomsDecisionKind.SelectOpening && pending.Kind != ThreeKingdomsDecisionKind.SelectReplacement))
                     errors.Add("候选区缺少本席待决。");
@@ -245,7 +265,7 @@ namespace Catan.Core.ThreeKingdoms
                 var frames = state.EffectFrames.Where(f => f != null && f.SkillId == "tk-lifecycle-replacement" && f.PlayerId == playerId).ToArray();
                 if (frames.Length != (member && state.ReplacementInProgress ? 1 : 0)) errors.Add("补将缺少本席效果帧。");
                 else if (frames.Length == 1 && (frames[0].RootEventId != state.SelectionBatchId || frames[0].Step !=
-                    (pending == null ? 3 : pending.Kind == ThreeKingdomsDecisionKind.SelectReplacement ? 1 : 2))) errors.Add("补将效果帧步骤不一致。");
+                    (pending == null && !retainedActive ? 3 : retainedActive || pending.Kind == ThreeKingdomsDecisionKind.SelectReplacement ? 1 : 2))) errors.Add("补将效果帧步骤不一致。");
             }
             return errors.Distinct().ToArray();
         }

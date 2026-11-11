@@ -49,11 +49,12 @@ public sealed class TabletopAudioTests
         foreach (var set in sets) foreach (string name in Enum.GetNames(set)) yield return [set.Namespace!, name];
     }
     [Theory][MemberData(nameof(Commands))]
-    public void EveryExistingCommandInEachRuleSetHasAnAudioResponse(string rules, string kind)
+    public void EveryExistingCommandUsesValidAudioWithoutCardSlaps(string rules, string kind)
     {
         Assert.NotEmpty(rules);
         var events = TabletopAudioModel.Classify(Entry(1, kind));
-        Assert.NotEmpty(events);
+        if (!kind.StartsWith("Play", StringComparison.Ordinal)) Assert.NotEmpty(events);
+        Assert.DoesNotContain(events, e => e.Cue == TabletopAudioCue.CardPlay);
         Assert.All(events, e => Assert.True(Enum.IsDefined(e.Cue)));
     }
     [Theory]
@@ -69,10 +70,17 @@ public sealed class TabletopAudioTests
     [InlineData("DisplaceKnight", TabletopAudioCue.KnightCombat)]
     [InlineData("ImproveCity", TabletopAudioCue.FacilityUpgrade)]
     [InlineData("BankTrade", TabletopAudioCue.TradeComplete)]
-    [InlineData("PlayProgressCard", TabletopAudioCue.CardPlay)]
     [InlineData("UnknownFutureOperation", TabletopAudioCue.Decision)]
     public void DistinctActionsUseExpectedAudioFamily(string kind, TabletopAudioCue cue)
         => Assert.Equal(cue, TabletopAudioModel.Classify(Entry(1, kind))[0].Cue);
+
+    [Theory]
+    [InlineData("PlayRoadBuilding")]
+    [InlineData("PlayYearOfPlenty")]
+    [InlineData("PlayMonopoly")]
+    [InlineData("PlayProgressCard")]
+    public void DevelopmentCardPlayDoesNotAddFoleyWithoutAnEffect(string kind)
+        => Assert.Empty(TabletopAudioModel.Classify(Entry(1, kind)));
 
     [Fact]
     public void FirstBindingSaveLoadingRoomChangesAndExplicitReconnectNeverReplayHistory()
@@ -265,16 +273,16 @@ public sealed class TabletopAudioTests
         var hidden = Change("status", name, 1); Set(hidden, "IsPrivate", true);
         Assert.Equal(TabletopAudioCue.FacilityUpgrade, TabletopAudioModel.Classify(Entry(6, "ImproveCity", hidden))[0].Cue);
         var crane = TabletopAudioModel.Classify(Entry(7, "PlayProgressCard", Change("status", name, 1)));
-        Assert.Equal(TabletopAudioCue.CardPlay, crane[0].Cue);
+        Assert.DoesNotContain(crane, e => e.Cue == TabletopAudioCue.CardPlay);
         Assert.Contains(crane, e => e.Cue == cue && e.Delay >= .22);
     }
 
     [Fact]
-    public void KnightDevelopmentCardSlidesBeforeCavalryAndAllKnightActionsHaveDedicatedFeedback()
+    public void KnightDevelopmentCardKeepsCavalryWithoutCardSlapAndAllKnightActionsHaveDedicatedFeedback()
     {
         var events = TabletopAudioModel.Classify(Entry(1, "PlayKnight"));
-        Assert.Equal(TabletopAudioCue.CardPlay, events[0].Cue);
-        Assert.Contains(events, e => e.Cue == TabletopAudioCue.KnightCombat && e.Delay > events[0].Delay);
+        Assert.DoesNotContain(events, e => e.Cue == TabletopAudioCue.CardPlay);
+        Assert.Contains(events, e => e.Cue == TabletopAudioCue.KnightCombat && e.Delay == .22);
         foreach (string command in new[] { "DisplaceKnight", "ChaseRobber", "ChasePirate", "AttackFortress" })
             Assert.Equal(TabletopAudioCue.KnightCombat, TabletopAudioModel.Classify(Entry(1, command))[0].Cue);
         Assert.Equal(TabletopAudioCue.KnightRecruit, TabletopAudioModel.Classify(Entry(1, "RecruitKnight"))[0].Cue);

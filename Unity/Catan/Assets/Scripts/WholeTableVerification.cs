@@ -536,6 +536,25 @@ public sealed partial class TabletopUiVerification
         }
         ActivateAudit(state);yield return new WaitForSecondsRealtime(.6f);
         var view=auditGame.M6View.ThreeKingdoms;
+        if(skill.Id=="tk-g22-s1")
+        {
+            foreach(var target in new[]{(string)null,"P2"})
+            {
+                Dock.OpenTrade(target);
+                yield return null;yield return new WaitForEndOfFrame();
+                Require(Dock.TradeOpen,"交易面板未打开");
+                SaveOceanFrame(target==null?"银行与常驻按钮.png":"报价与常驻按钮.png");
+                if(target==null)
+                {
+                    foreach(var step in DirectClick(new Vector2(1096,170),"最小化银行"))yield return step;
+                    Require(Dock.Windows.Hidden,"银行窗口未最小化");
+                    foreach(var step in DirectClick(TabletopUI.EndTurnRect.center,"恢复银行"))yield return step;
+                    Require(Dock.TradeOpen&&!Dock.Windows.Suppressed,"银行窗口未恢复");
+                }
+                foreach(var step in DirectClick(new Vector2(1140,170),"关闭交易面板"))yield return step;
+                Require(!Dock.TradeOpen,"交易面板未关闭");
+            }
+        }
         var entries=B45SkillCatalog.AvailableEntries(view,"P1");int idx=Array.FindIndex(entries,e=>e.SkillId==skill.Id);
         if(idx<0)throw new InvalidOperationException("武将旁没有技能入口");
         var skillPoint=new Vector2(211,738+idx*Mathf.Min(49,171f/(1+entries.Length)));
@@ -608,7 +627,18 @@ public sealed partial class TabletopUiVerification
                     var card=Snapshot.Cards.FirstOrDefault(c=>((ProgressCardKind)c.ArtIndex).ToString()==id);
                     if(card!=null){var r=Dock.VerificationSpecialRect(card.Id);foreach(var f in DirectClick(new Vector2(r.x+10,r.center.y),"选发展牌"))yield return f;}
                 }
-                if(selection.CanConfirm)foreach(var f in DirectClick(TabletopUI.EndTurnRect.center,"完成已选对象"))yield return f;
+                if(skill.Id=="tk-g22-s1"&&selection.CanConfirm)
+                {
+                    int before=auditSession.GetAuthoritativeStateForTesting().ProcessedCommands.Length;
+                    foreach(var f in DirectClick(M6App.SkillCancelRect.center,"取消制衡"))yield return f;
+                    Require(!selection.Active&&auditSession.GetAuthoritativeStateForTesting().ProcessedCommands.Length==before,"取消制衡提交了命令或未清除草稿");
+                    foreach(var f in DirectClick(skillPoint,"重新发动制衡"))yield return f;
+                    Require(!selection.CanConfirm,"制衡保留了已经取消的选牌");
+                    int type=Array.FindIndex(cost,x=>x>0);
+                    var face=Dock.HandCardRect(type,0).Value;
+                    foreach(var f in DirectClick(new Vector2(face.x+10,face.center.y),"重新选择手牌"))yield return f;
+                }
+                if(selection.CanConfirm)foreach(var f in DirectClick((selection.CanCancel||selection.SkipCommand!=null?M6App.SkillConfirmRect.center:M6App.SkillCancelRect.center),"确认已选对象"))yield return f;
             }
         }
         for(int k=0;k<32;k++)
@@ -636,7 +666,7 @@ public sealed partial class TabletopUiVerification
                 foreach(var f in DirectClick(pos,"选"+pending.Title))yield return f;
             }
             else if(selection.CanConfirm){
-                foreach(var f in DirectClick(TabletopUI.EndTurnRect.center,"点技能处理"+pending.Title))yield return f;
+                foreach(var f in DirectClick((selection.CanCancel||selection.SkipCommand!=null?M6App.SkillConfirmRect.center:M6App.SkillCancelRect.center),"确认"+pending.Title))yield return f;
             }
             else if(selection.RequiresBankCards){
                 foreach(var f in DirectClick(new Vector2(402,542),"选银行牌"))yield return f;

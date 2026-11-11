@@ -94,7 +94,8 @@ def footing(obj,origin,scale):
     bmesh.ops.triangulate(bm,faces=[f for f in bm.faces if f.material_index==3]);bm.to_mesh(obj.data);bm.free();obj.data.update()
 
 report=[]
-for tag in ('ship','pirate','wall'):
+only_pirate=globals().get('pirate_only',False)
+for tag in (('pirate',) if only_pirate else ('ship','pirate','wall')):
     palette(tag);rng.seed(1183)
     if tag=='wall':
         gatewall()
@@ -146,7 +147,7 @@ lamp.rotation_euler=(-lamp.location).to_track_quat('-Z','Y').to_euler()
 scene.cycles.samples=16;scene.cycles.use_denoising=True;scene.render.film_transparent=True
 scene.render.resolution_percentage=100;scene.render.resolution_x=384;scene.render.resolution_y=384
 colours={'red':(.82,.23,.145),'blue':(.27,.48,.77),'orange':(.98,.54,.18),'beige':(1,.98,.89)}
-for tag in ('ship','wall'):
+for tag in (() if only_pirate else ('ship','wall')):
     obj=models[tag];obj.hide_render=False
     target=Vector((0,0,obj.dimensions.z*.45));cam.location=target+Vector((.042,-.105,.095 if tag=='ship' else .17))
     cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=max(obj.dimensions)*1.42
@@ -156,18 +157,27 @@ for tag in ('ship','wall'):
         scene.render.filepath=str(stage/f'thumb-{tag}-{key}.png');bpy.ops.render.render(write_still=True)
     mix.inputs[2].default_value=(.059,.196,.554,1)
     obj.hide_render=True
-for i,obj in enumerate(models.values()):obj.location=((i-1)*.042,0,0);obj.hide_render=False
+for i,obj in enumerate(models.values()):obj.location=(0 if only_pirate else (i-1)*.042,0,0);obj.hide_render=False
 target=Vector((0,0,.009));cam.location=target+Vector((0,-.11,.12))
 cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=.13
 scene.render.resolution_x=1350;scene.render.resolution_y=535
-scene.render.filepath=str(stage/'模型合照.png');bpy.ops.render.render(write_still=True)
-bpy.data.libraries.write(str(stage/'海湾棋子.blend'),{scene},fake_user=True,compress=True)
+if only_pirate:
+    target=Vector((0,0,.011));cam.location=target+Vector((.080,-.115,.071))
+    cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=.052
+    scene.render.resolution_x=1000;scene.render.resolution_y=800
+scene.render.filepath=str(stage/('海盗精雕.png' if only_pirate else '模型合照.png'));bpy.ops.render.render(write_still=True)
+source_name='海盗精雕.blend' if only_pirate else '海湾棋子.blend'
+bpy.data.libraries.write(str(stage/source_name),{scene},fake_user=True,compress=True)
 for f in stage.iterdir():
-    dst=recipe if f.name in ('海湾棋子.blend','模型合照.png') else RES if f.name.startswith('thumb-') else destination
+    dst=recipe if f.name in (source_name,'模型合照.png','海盗精雕.png') else RES if f.name.startswith('thumb-') else destination
     shutil.copy2(f,dst/f.name)
 manifest=common/'几何.json';prior=json.loads(manifest.read_text('utf8'))
 by_kind={i['kind']:i for i in prior}
 by_kind.update({i['kind']:i for i in report})
 manifest.write_text(json.dumps(list(by_kind.values()),indent=2),encoding='utf8')
-(recipe/'几何.json').write_text(json.dumps(report,indent=2),encoding='utf8')
+harbor={i['kind']:i for i in json.loads((recipe/'几何.json').read_text('utf8'))}
+harbor.update({i['kind']:i for i in report})
+(recipe/'几何.json').write_text(json.dumps(list(harbor.values()),indent=2),encoding='utf8')
 if stage.resolve().parent==(ROOT/'.local').resolve() and stage.name.startswith('harbor-sculpt-'):shutil.rmtree(stage)
+
+

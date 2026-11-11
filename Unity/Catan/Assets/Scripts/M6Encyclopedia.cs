@@ -17,13 +17,13 @@ public sealed partial class M6App
         encyclopediaScroll=GUI.BeginScrollView(viewport,encyclopediaScroll,new Rect(0,0,988,contentHeight));
         for(int i=0;i<names.Length;i++)
         {
-            PastoralMenuUI.Label(new Rect(12,i*100+8,954,28),names[i],21,null,true,TextAnchor.MiddleCenter);
-            PastoralMenuUI.Label(new Rect(24,i*100+43,930,49),help[i],16,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+            PastoralMenuUI.Label(new Rect(12,i*100+8,954,28),names[i],21,new Color(.23f,.14f,.08f),true,TextAnchor.MiddleCenter);
+            PastoralMenuUI.Label(new Rect(24,i*100+43,930,49),help[i],16,new Color(.39f,.27f,.17f),false,TextAnchor.MiddleCenter);
             PastoralMenuUI.Fill(new Rect(24,i*100+98,930,1),new Color(.48f,.54f,.42f,.15f));
         }
         GUI.EndScrollView();
         PastoralMenuUI.ScrollIndicator(viewport,contentHeight,encyclopediaScroll.y);
-        PastoralMenuUI.Label(new Rect(230,700,980,50),encyclopediaCategory==0?"基础发展卡：新买的卡本回合不能使用；每回合最多使用一张（胜利点卡除外）。":"发展卡：通常在自己回合行动阶段使用；炼金术士在掷骰前使用；印刷厂、石碑须即时公开。只有超过四张时才可弃置。",13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+        PastoralMenuUI.Label(new Rect(230,700,980,50),encyclopediaCategory==0?"基础发展卡：新买的卡本回合不能使用；每回合最多使用一张（胜利点卡除外）。":"发展卡：通常在自己回合行动阶段使用；炼金术士在掷骰前使用；印刷厂、石碑须即时公开。只有超过四张时才可弃置。",13,new Color(.39f,.27f,.17f),false,TextAnchor.MiddleCenter);
         if(PastoralMenuUI.Button(new Rect(526,775,388,48),"返回游戏菜单",true,true))encyclopediaOpen=false;
     }
 }

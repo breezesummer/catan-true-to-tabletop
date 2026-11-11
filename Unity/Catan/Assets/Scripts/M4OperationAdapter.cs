@@ -256,6 +256,9 @@ public sealed partial class M4App
         Submit(New(CommandKind.EndTurn));
     }
     bool RequiresTableSelection=>directPayment.Active||OfferingHarbor||DirectProgressActive||pickField!=""||handOverflowDiscard||operationActions&&operationKnightTarget==null||TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString());
+    internal bool ShowHandInstruction=>!ResourceChoiceVisible&&!directPayment.Active&&!dock.HasOverlay&&
+        view!=null&&view.TradeOffer==null&&view.Phase!=GamePhase.ThreeKingdoms&&
+        view.ThreeKingdoms?.SkillDecision==null&&!FishHandSelected&&RequiresTableSelection;
     string TableInstruction()
     {
         if(OfferingHarbor)return harborOrdinal<0?"点选要送出的资源":"点选收取资源的玩家";

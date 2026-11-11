@@ -48,6 +48,8 @@ public sealed class LanMenuVerification : MonoBehaviour
     }
     IEnumerator Verify()
     {
+        Screen.SetResolution(1600,900,false);
+        yield return new WaitForSecondsRealtime(.5f);
         while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
         Call("NavigateMainMenu",2);stage="进入局域网自动服务";
         yield return Wait(()=>!(bool)Get("networkWorking")&&!(bool)Get("lanPreparing"));
@@ -119,6 +121,7 @@ public sealed class LanMenuVerification : MonoBehaviour
         {
             stage="返回主页后重新创建房间 "+round;
             app.Network.Playing=true;app.ReturnToMainMenu();
+            yield return Wait(()=>!app.Network.EndpointConfigured);
             Require(!app.Network.EndpointConfigured);
             Require(!(bool)typeof(M6App).GetProperty("CanUseMenuEndpoint",Flags).GetValue(app));
             Call("OpenSeparatedNetworkMenu",true);

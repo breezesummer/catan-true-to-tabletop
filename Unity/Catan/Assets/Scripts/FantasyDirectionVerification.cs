@@ -103,7 +103,7 @@ public sealed partial class TabletopUiVerification
             ??state.Tiles.Where(t=>t.Id!=land.Id&&t.Resource!="sea"&&t.Vertices.Length==6).OrderBy(t=>(board.Position(t.Id)-board.Position(land.Id)).sqrMagnitude).First();
         Project(empty,noMetro,noKnights,land.Id,other.Id,sea.Id);
         foreach(string kind in new[]{"robber","merchant","pirate"})
-            Require(board.CommittedPieces.GetComponentsInChildren<MeshRenderer>().Any(r=>r.enabled&&r.sharedMaterial.name=="幻想棋子-"+kind+"-neutral"),kind+"画稿未启用");
+            Require(board.CommittedPieces.GetComponentsInChildren<MeshRenderer>().Any(r=>!r.forceRenderingOff&&r.sharedMaterial.name=="幻想棋子-"+kind+"-neutral"),kind+"画稿未启用");
         Detail((board.Position(land.Id)+board.Position(other.Id))*.5f);
         yield return new WaitForEndOfFrame();SaveOceanFrame("强盗与商人-棋盘投影.png");
         Detail(seaCenter);

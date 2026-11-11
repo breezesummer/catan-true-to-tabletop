@@ -6,9 +6,9 @@ internal static class GeneralSkinArt
 {
     const string Root="GeneralUI/Dynamic/";
     const string FirstSkin="tk-g01";
-    const string LegacyRoot="GeneralUI/ZhangLiao/";
+
     const string Preference="catan.general.static.";
-    const int TextureLimit=24;
+    const int TextureLimit=12;
     [Serializable] internal sealed class Skin
     {
         public string id,sound;
@@ -39,8 +39,8 @@ internal static class GeneralSkinArt
             manifest=JsonUtility.FromJson<Manifest>(Resources.Load<TextAsset>(Root+"manifest").text);
             foreach(var skin in manifest.entries)
             {
-                skin.idlePath=skin.id==FirstSkin?LegacyRoot+"idle":Root+skin.id+"/idle";
-                skin.attackPath=skin.id==FirstSkin?LegacyRoot+"raid":Root+skin.id+"/attack";
+                skin.idlePath=Root+skin.id+"/idle";
+                skin.attackPath=Root+skin.id+"/attack";
                 skin.useStatic=PlayerPrefs.GetInt(Preference+skin.id,0)!=0;
                 skins.Add(skin.id,skin);
             }
@@ -76,13 +76,7 @@ internal static class GeneralSkinArt
     internal static bool IdleReady(Skin skin)
     {
         if(skin==null||skin.useStatic)return false;
-        bool ready=Texture(skin.idlePath)!=null;
-        if(skin.id==FirstSkin)
-        {
-            ready&=Texture(LegacyRoot+"scene")!=null;
-            ready&=Texture(LegacyRoot+"wei-arc")!=null;
-        }
-        return ready;
+        return Texture(skin.idlePath)!=null;
     }
     internal static bool AttackReady(Skin skin)
     {
@@ -95,11 +89,8 @@ internal static class GeneralSkinArt
     internal static void Idle(Rect area,Skin skin)
     {
         if(Event.current.type!=EventType.Repaint)return;
-        bool first=skin.id==FirstSkin;
-        if(first)GUI.DrawTexture(area,Texture(LegacyRoot+"scene"));
         float phase=(float)((Time.unscaledTimeAsDouble%skin.idleTime)/skin.idleTime);
-        Sheet(area,Texture(skin.idlePath),phase,skin.idleFrames,first?8:16);
-        if(first)GUI.DrawTexture(new Rect(area.x,area.y,area.width,area.height*73/256),Texture(LegacyRoot+"wei-arc"));
+        Sheet(area,Texture(skin.idlePath),phase,skin.idleFrames,16);
     }
     internal static Rect CenterArea=>new Rect(720-315,450-262.5f,630,525);
     internal static void Attack(Skin skin,float phase)
@@ -113,11 +104,14 @@ internal static class GeneralSkinArt
     static void Sheet(Rect area,Texture2D texture,float phase,int count,int columns)
     {
         if(texture==null)return;
+        GUI.DrawTextureWithTexCoords(area,texture,FrameUV(texture,phase,count,columns),true);
+    }
+    static Rect FrameUV(Texture2D texture,float phase,int count,int columns)
+    {
         int index=Mathf.Clamp((int)(phase*count),0,count-1);
         int rows=(count+columns-1)/columns;
         float x=.5f/texture.width,y=.5f/texture.height;
-        var uv=new Rect(index%columns/(float)columns+x,1-(index/columns+1)/(float)rows+y,
+        return new Rect(index%columns/(float)columns+x,1-(index/columns+1)/(float)rows+y,
             1f/columns-2*x,1f/rows-2*y);
-        GUI.DrawTextureWithTexCoords(area,texture,uv,true);
     }
 }

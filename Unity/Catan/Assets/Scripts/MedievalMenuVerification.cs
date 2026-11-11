@@ -78,9 +78,13 @@ public sealed class MedievalMenuVerification : MonoBehaviour
             Require(Screen.width==size.x&&Screen.height==size.y,"分辨率未生效");
         }
         Screen.SetResolution(1440,900,false);yield return new WaitForSecondsRealtime(.5f);
-        Go(0);Set("menuSetupStep",0);yield return Capture("new-game-rules");
-        Set("menuRule",1);Set("menuSetupStep",1);yield return Capture("new-game-maps");
-        Set("menuSetupStep",2);yield return Capture("new-game-table");
+        Go(0);Set("menuRule",3);Set("menuScenario",Array.IndexOf(Catan.Core.M5.CombinedScenarios.Ids,"through-the-desert"));
+        Set("menuPlayers",4);Set("menuThreeKingdoms",true);Set("menuHarbormaster",true);Set("menuFishing",true);
+        yield return Capture("new-game-configured");
+        Set("atlasOpen",true);yield return Capture("new-game-maps");
+        Set("mapScroll",new Vector2(0,10000));yield return Capture("new-game-maps-bottom");
+        Require(((Vector2)typeof(M6App).GetField("mapScroll",Flags).GetValue(app)).y>0,"地图列表未滚至后续行");
+        Set("atlasOpen",false);
         Go(1);yield return Capture("load-empty");
         Go(4);Set("menuSettingsTab",0);yield return Capture("settings-player");
         Set("menuSettingsTab",1);yield return Capture("settings-sound");
@@ -88,7 +92,7 @@ public sealed class MedievalMenuVerification : MonoBehaviour
         Set("menuSettingsTab",3);yield return Capture("settings-landscape");
         Go(2);yield return Capture("lan-room-list");
         Set("networkTab",1);
-        for(int part=0;part<3;part++){Set("networkSettingsPage",part);yield return Capture("lan-create-"+part);}
+        yield return Capture("lan-create-room");
         string address=(string)typeof(M6App).GetField("networkAddress",Flags).GetValue(app);
         Go(3);Require(string.IsNullOrEmpty((string)typeof(M6App).GetField("networkAddress",Flags).GetValue(app)),"在线入口继承了局域网地址");
         yield return Capture("online-connect");
@@ -97,7 +101,7 @@ public sealed class MedievalMenuVerification : MonoBehaviour
         for(int i=0;i<4;i++)
         {
             stage=modes[i]+"-菜单隔离";
-            app.StartGame(modes[i],i==3?"through-the-desert":"heading-for-new-shores",i%2==0?3:4,"P1",true);
+            app.StartGame(modes[i],i==3?"through-the-desert":"heading-for-new-shores",i%2==0?3:4,"P1",true,threeKingdoms:i==3,harbormaster:i==3,fishing:i==3);
             for(int wait=0;!app.Ready&&wait<240;wait++)yield return null;
             Require(app.Ready,"开局未就绪");string authority=app.ExportEnvelope();
             var tokens=FindObjectsByType<TabletopNumberTokens>(FindObjectsInactive.Include,FindObjectsSortMode.None);
@@ -105,6 +109,12 @@ public sealed class MedievalMenuVerification : MonoBehaviour
             var numbers=tokens[0].GetComponentsInChildren<MeshRenderer>(true);
             Require(numbers.Length>0&&numbers.All(r=>r.sharedMaterial.mainTexture!=null&&r.GetComponent<JadeNumberSlip>()!=null),"真实棋盘玉签或点数贴图缺失");
             yield return Capture("board-"+modes[i]);
+            if(i==3){
+                app.OpenTableMenu();yield return Capture("pause-menu");
+                Set("tablePausePage",1);yield return Capture("pause-settings");
+                Set("tablePauseSettingsTab",1);yield return Capture("pause-audio");
+                Set("tablePauseSettingsTab",4);yield return Capture("pause-view");
+            }
             app.ShowMenu();
             foreach(int page in new[]{0,1,2,3,4,-1})
             {Go(page);yield return null;Require(app.ExportEnvelope()==authority&&!app.StepAi(),"导航改变权威局面");}

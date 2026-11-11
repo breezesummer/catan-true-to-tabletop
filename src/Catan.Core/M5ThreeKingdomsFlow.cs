@@ -21,17 +21,16 @@ namespace Catan.Core.M5
             Require(c.WindowId == (B4(s) && (c.Kind == CommandKind.ChooseGenerals || c.Kind == CommandKind.DeployGeneral) ? ThreeKingdomsEngine.GetPendingDecision(tk, c.PlayerId)?.WindowId : tk.WindowId), "StaleWindow", "操作窗口已更新，请重新选择。");
             try
             {
-                if (c.Kind == CommandKind.ChooseGenerals)
+                if (c.Kind == CommandKind.ChooseGenerals || c.Kind == CommandKind.DeployGeneral)
                 {
-                    ThreeKingdomsEngine.ChooseGenerals(tk, c.PlayerId, c.GeneralIds, c.DecisionId, c.WindowId, n => Draw(s.Random, n));
-                    if (B3(s)) { B2SkillEngine.RefreshDecision(tk); B3DiceEngine.RefreshDecision(tk); }
-                    return;
-                }
-                if (c.Kind == CommandKind.DeployGeneral)
-                {
-                    Require(c.GeneralIds?.Length == 1, "InvalidGeneralSelection", "必须选择一张武将登场。");
                     long previousOpportunity = tk.Clock.OpportunityId;
-                    ThreeKingdomsEngine.DeployGeneral(tk, c.PlayerId, c.GeneralIds[0], c.DecisionId, c.WindowId, n => Draw(s.Random, n));
+                    if (c.Kind == CommandKind.ChooseGenerals)
+                        ThreeKingdomsEngine.ChooseGenerals(tk, c.PlayerId, c.GeneralIds, c.DecisionId, c.WindowId, n => Draw(s.Random, n));
+                    else
+                    {
+                        Require(c.GeneralIds?.Length == 1, "InvalidGeneralSelection", "必须选择一张武将登场。");
+                        ThreeKingdomsEngine.DeployGeneral(tk, c.PlayerId, c.GeneralIds[0], c.DecisionId, c.WindowId, n => Draw(s.Random, n));
+                    }
                     if (tk.PendingDecision == null && tk.Clock.Round > 0)
                     {
                         s.ActivePlayerId = tk.Clock.ActivePlayerId;

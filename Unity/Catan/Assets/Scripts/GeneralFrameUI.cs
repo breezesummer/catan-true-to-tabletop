@@ -5,9 +5,9 @@ using UnityEngine;
 public static class GeneralFrameUI
 {
     const string Root="GeneralUI/v001/";
-    public enum TurnGlow { Green, Yellow, Blue }
-    static readonly string[] glowPaths={"GeneralUI/v002/turn-glow","GeneralUI/v002/turn-glow-yellow","GeneralUI/v002/turn-glow-blue"};
-    static readonly Texture2D[] glowSheets=new Texture2D[glowPaths.Length];
+    static readonly Texture2D[,] portraitGlows=new Texture2D[2,3];
+    static readonly string[] glowColors={"green","blue","yellow"};
+    static Texture2D panelGlow;
     static readonly Dictionary<string,Texture2D> frames=new Dictionary<string,Texture2D>();
     static readonly Texture2D[] buttons=new Texture2D[3];
     static Texture2D hpGreen,hpYellow,hpRed,hpEmpty;
@@ -40,23 +40,15 @@ public static class GeneralFrameUI
     {
         Ensure();float portraitScale=area.width/138f;
         string camp=faction=="魏"?"wei":faction=="蜀"?"shu":faction=="吴"?"wu":faction=="晋"?"jin":faction=="神"?"shen":"qun";
-        if(!frames.TryGetValue(camp,out var frame)){frame=Resources.Load<Texture2D>("GeneralUI/v002/frame-"+camp);frames[camp]=frame;}
-        if(highlighted)
-        {
-            if(StrategyHudTheme.HandPainted)HandPaintedTabletopSkin.TurnBorder(area);
-            else DrawPortraitGlow(area,StrategyHudTheme.Ocean?TurnGlow.Blue:TurnGlow.Green);
-        }
         var skin=faceDown?null:GeneralSkinArt.Get(id);
         bool dynamic=GeneralSkinArt.IdleReady(skin);
-        if(dynamic)
+        if(highlighted)DrawPortraitGlow(area,dynamic);
+        if(dynamic)GeneralSkinArt.Idle(area,skin);
+        else
         {
-            // 手杀动皮使用独立势力顶弧，保留左侧姓名栏。
-            Slice(frame,new Rect(0,0,29,228),new Rect(area.x,area.y,area.width*29/170,area.height),170,228);
-            var inner=Rect.MinMaxRect(area.x+area.width*29/170,area.y-area.height*.09f,
-                area.x+area.width*167/170,area.y+area.height*225/228);
-            GeneralSkinArt.Idle(inner,skin);
+            if(!frames.TryGetValue(camp,out var frame)){frame=Resources.Load<Texture2D>("GeneralUI/v002/frame-"+camp);frames[camp]=frame;}
+            if(frame!=null)GUI.DrawTexture(area,frame,ScaleMode.StretchToFill,true);
         }
-        else if(frame!=null)GUI.DrawTexture(area,frame,ScaleMode.StretchToFill,true);
         Texture2D portrait=null;
         if(!string.IsNullOrEmpty(id)&&!portraits.TryGetValue(id,out portrait)){portrait=Resources.Load<Texture2D>(Root+"Portraits/"+id);portraits[id]=portrait;}
         if(!dynamic&&portrait!=null&&!faceDown)
@@ -72,7 +64,12 @@ public static class GeneralFrameUI
         else if(!dynamic)Text(new Rect(area.x+area.width*.2f,area.y+area.height*.25f,area.width*.75f,area.height*.4f),faceDown?"暗置":name??"",22);
         // 姓名条盖在人物左侧，顶部不覆盖露出的头饰。
         var previousFont=lettering.font;lettering.font=nameBrush??previousFont;
-        if(name!=null&&area.width>=70)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+1,area.y+(22+i*19)*portraitScale,area.width*.19f,22*portraitScale),name[i].ToString(),Mathf.Max(6,Mathf.RoundToInt(20*portraitScale)),Color.white);
+        float labelWidth=area.width*(dynamic ? .16f : .19f);
+        if(dynamic&&!string.IsNullOrEmpty(faction)&&area.width>=70)
+            Text(new Rect(area.x+1,area.y+area.height*.09f,labelWidth,18*portraitScale),faction,
+                Mathf.Max(6,Mathf.RoundToInt(15*portraitScale)),Color.white);
+        float nameTop=dynamic?area.height*.19f:22*portraitScale;
+        if(name!=null&&area.width>=70)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+1,area.y+nameTop+i*19*portraitScale,labelWidth,22*portraitScale),name[i].ToString(),Mathf.Max(6,Mathf.RoundToInt(20*portraitScale)),Color.white);
         lettering.font=previousFont;
         // 勾玉限制在左侧姓名栏内，宽度随武将框缩放，避免压到立绘或外框。
         if(life>=0)Health(new Rect(area.x+3,area.y+area.height*.60f,Mathf.Max(1,area.width*.155f-6),area.height*.30f),life,3);
@@ -86,51 +83,37 @@ public static class GeneralFrameUI
             lettering.normal.textColor=new Color(.025f,.025f,.02f);GUI.Label(number,SeatNumbers[position],lettering);
         }
     }
-    static void DrawPortraitGlow(Rect area,TurnGlow color)
+    static void DrawPortraitGlow(Rect area,bool dynamic)
     {
         if(Event.current.type!=EventType.Repaint)return;
-        var sheet=GlowSheet(color);
+        int shape=dynamic?1:0,color=StrategyHudTheme.Ocean?1:StrategyHudTheme.HandPainted?2:0;
+        var sheet=portraitGlows[shape,color];
+        if(sheet==null)
+        {
+            string name=dynamic?"dynamic":"static";
+            portraitGlows[shape,color]=sheet=Resources.Load<Texture2D>("GeneralUI/v002/portrait-glow-"+name+"-"+glowColors[color]);
+        }
+        DrawGlowFrame(area,sheet);
+    }
+    static void DrawGlowFrame(Rect area,Texture2D sheet)
+    {
         if(sheet==null)return;
-        // 手杀光带上方敞开。沿中线翻转下半帧，将三条亮边闭合成完整外圈。
-        // 每帧左右亮脊位于 x=52、187，底部位于 y=251，对准势力框外沿。
-        float pad=area.width*2/138f;
-        float sx=(area.width+2*pad)/(187-52);
-        float sy=(area.height*.5f+pad)/(251-140);
-        // 两半共用一个物理像素边界，避免非整数缩放时在光带中段漏出一行底色。
-        var seam=GUIUtility.GUIToScreenPoint(area.center);
-        seam.y=Mathf.Round(seam.y);
-        float middle=GUIUtility.ScreenToGUIPoint(seam).y;
-        var half=new Rect(area.x-pad-52*sx,middle,240*sx,area.center.y+130*sy-middle);
-        float u=GlowFrame()/10f;
-        GUI.DrawTextureWithTexCoords(half,sheet,new Rect(u,0,.1f,130/270f));
-        half.yMin=area.center.y-130*sy;
-        half.yMax=middle;
-        GUI.DrawTextureWithTexCoords(half,sheet,new Rect(u,130/270f,.1f,-130/270f));
+        int frame=Mathf.FloorToInt(Mathf.Repeat(Time.unscaledTime,.9f)*10f/.9f);
+        float dx=area.width*40/256,dy=area.height*40/352;
+        var bounds=new Rect(area.x-dx,area.y-dy,area.width+2*dx,area.height+2*dy);
+        GUI.DrawTextureWithTexCoords(bounds,sheet,new Rect((frame%5)/5f,(1-frame/5)/2f,.2f,.5f),true);
     }
-    public static void DrawTargetGlow(Rect area)
+    static void DrawPanelHalo(Rect area,Color color)
     {
         if(Event.current.type!=EventType.Repaint)return;
-        var clip=new Rect(area.x+2,area.y+2,area.width-4,area.height-4);
-        var prior=GUI.color;
-        GUI.BeginGroup(clip);
-        GUI.color=prior*new Color(1f,.075f,.09f,.77f);
-        DrawPortraitGlow(new Rect(3,3,clip.width-6,clip.height-6),TurnGlow.Yellow);
-        GUI.color=prior;
-        GUI.EndGroup();
+        var previous=GUI.color;
+        GUI.color=previous*color;
+        if(panelGlow==null)panelGlow=Resources.Load<Texture2D>("GeneralUI/v002/portrait-glow-seat-yellow");
+        DrawGlowFrame(area,panelGlow);
+        GUI.color=previous;
     }
-    static int GlowFrame()=>Mathf.FloorToInt(Mathf.Repeat(Time.unscaledTime,.9f)*10f/.9f);
-    static Texture2D GlowSheet(TurnGlow color)
-    {
-        int index=(int)color;
-        if(glowSheets[index]==null)glowSheets[index]=Resources.Load<Texture2D>(glowPaths[index]);
-        return glowSheets[index];
-    }
-    public static void DrawTurnGlow(Rect area,TurnGlow color)
-    {
-        if(Event.current.type!=EventType.Repaint)return;
-        var bounds=new Rect(area.x-area.width*.26f,area.y-area.height*.15f,area.width*1.52f,area.height*1.18f);
-        Slice(GlowSheet(color),new Rect(GlowFrame()*240,0,240,270),bounds,2400,270);
-    }
+    public static void DrawTargetGlow(Rect area)=>DrawPanelHalo(area,new Color(1,.12f,.12f));
+    public static void DrawTurnGlow(Rect area)=>DrawPanelHalo(area,Color.white);
     public static void Avatar(Rect area,string id,bool faceDown)
     {
         Ensure();
@@ -160,6 +143,8 @@ public static class GeneralFrameUI
             }
             else Slice(buttons[state],new Rect(28,115,990,530),area,1045,669);
         }
+        var ink=active&&!enabled?new Color(.56f,.51f,.32f):Gold;
+        if(ModernOperationUI.DrawWindowSymbol(area,name,ink))return;
         int size=Mathf.Min(name.Length>3?23:27,Mathf.FloorToInt((area.width-18)/Mathf.Max(1,name.Length)),Mathf.FloorToInt(area.height*.6f));
         if(active && StrategyHudTheme.HandPainted)
         {
@@ -170,7 +155,7 @@ public static class GeneralFrameUI
             GUI.Label(caption,name,lettering);
             return;
         }
-        Text(new Rect(area.x+6,area.y,area.width-12,area.height*.82f),name,size,active&&!enabled?new Color(.56f,.51f,.32f):Gold);
+        Text(new Rect(area.x+6,area.y,area.width-12,StrategyHudTheme.Ocean?area.height:area.height*.82f),name,size,ink);
     }
     public static bool Choice(Rect area,string name,bool enabled=true,bool selected=false)
     {
