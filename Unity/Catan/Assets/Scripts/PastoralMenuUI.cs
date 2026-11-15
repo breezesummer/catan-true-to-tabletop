@@ -4,6 +4,26 @@ using System.Collections.Generic;
 // 菜单、联机与桌内共用铜木控件；不改变规则和存档字段。
 public static class PastoralMenuUI
 {
+    // 控件沿用设计画布。文字单独在窗口像素网格中排版，保留滚动组的裁剪与偏移。
+    public readonly struct PixelText : System.IDisposable
+    {
+        readonly Matrix4x4 matrix;
+        public readonly Rect Area;
+        public readonly int Size;
+        public PixelText(Rect area,int size)
+        {
+            matrix=GUI.matrix;
+            Size=Mathf.Max(1,Mathf.RoundToInt(size*Mathf.Min(matrix.m00,matrix.m11)));
+            GUI.matrix=Matrix4x4.identity;
+            var origin=GUIUtility.GUIToScreenPoint(Vector2.zero);
+            var start=matrix.MultiplyPoint3x4(origin+area.min);
+            var end=matrix.MultiplyPoint3x4(origin+area.max);
+            var min=GUIUtility.ScreenToGUIPoint(new Vector2(Mathf.Round(start.x),Mathf.Round(start.y)));
+            var max=GUIUtility.ScreenToGUIPoint(new Vector2(Mathf.Round(end.x),Mathf.Round(end.y)));
+            Area=Rect.MinMaxRect(min.x,min.y,max.x,max.y);
+        }
+        public void Dispose(){GUI.matrix=matrix;}
+    }
     public static readonly Color Ink=new Color(.98f,.91f,.76f),Muted=new Color(.80f,.67f,.48f);
     public static readonly Color Forest=new Color(.88f,.63f,.30f),Sage=new Color(.36f,.18f,.09f),Paper=new Color(.24f,.10f,.045f);
     public static readonly Color Gold=new Color(.86f,.69f,.37f),Ivory=new Color(.95f,.90f,.79f);
@@ -109,7 +129,10 @@ public static class PastoralMenuUI
             s=new GUIStyle(Text){fontSize=size,fontStyle=bold?FontStyle.Bold:FontStyle.Normal,alignment=align};
             labelStyles.Add(key,s);
         }
-        s.fontSize=size;s.normal.textColor=color??Ink;TabletopTextFit.Label(r,text,s,8,true);
+        using(var pixels=new PixelText(r,size)){
+            s.fontSize=pixels.Size;s.normal.textColor=color??Ink;
+            TabletopTextFit.Label(pixels.Area,text,s,Mathf.Min(8,pixels.Size),true);
+        }
     }
     public static bool Nav(Rect r,string text,bool selected,float blend)
     {

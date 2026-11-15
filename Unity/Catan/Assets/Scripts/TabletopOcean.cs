@@ -17,6 +17,7 @@ public sealed class TabletopOcean : MonoBehaviour
     Texture2D seaWash;
     int themeVersion=-1;
     internal Material WakeMaterial { get; private set; }
+    internal Material PierWaterMaterial { get; private set; }
     Texture2D mask;
     string layoutKey;
     Tile[] lastTiles;
@@ -33,8 +34,10 @@ public sealed class TabletopOcean : MonoBehaviour
         material = new Material(Resources.Load<Shader>("Ocean/v001/ContinuousOcean"));
         material.name = "连续海面 v001";
         WakeMaterial=new Material(Resources.Load<Shader>("Ocean/v001/ShipWake"));
+        PierWaterMaterial=new Material(Resources.Load<Shader>(CoastalDecals.Root+"PierWaterShadow"));
         material.SetFloat("_WaterHeight", WaterHeight);
         material.SetTexture("_OceanDetail",Resources.Load<Texture2D>("Ocean/v003/ocean-detail"));
+        material.SetTexture("_NearWater",Resources.Load<Texture2D>(PaintedMap.Root+"open-sea"));
         material.SetTexture("_Gravel",Resources.Load<Texture2D>(CoastalDecals.Root+"gravel"));
         material.SetTexture("_Sand",Resources.Load<Texture2D>(CoastalDecals.Root+"sand"));
         RefreshTheme();
@@ -135,6 +138,8 @@ public sealed class TabletopOcean : MonoBehaviour
         material.SetVector("_MaskRect", new Vector4(minX, minZ, width, depth));
         WakeMaterial.SetTexture("_CoastMask",next);
         WakeMaterial.SetVector("_MaskRect",new Vector4(minX,minZ,width,depth));
+        PierWaterMaterial.SetTexture("_CoastMask",next);
+        PierWaterMaterial.SetVector("_MaskRect",new Vector4(minX,minZ,width,depth));
         if (mask != null) Destroy(mask);
         mask = next; MaskReady = true; MaskRevision++; baking = null;
         Debug.Log("CATAN_OCEAN_READY: mask=512 revision="+MaskRevision+" mobile="+Application.isMobilePlatform);
@@ -149,5 +154,5 @@ public sealed class TabletopOcean : MonoBehaviour
         foreach (var renderer in hiddenSea) if (renderer != null) renderer.enabled = true;
         hiddenSea.Clear();
     }
-    void OnDestroy() { if (material != null) Destroy(material); if (WakeMaterial!=null) Destroy(WakeMaterial); if (mask != null) Destroy(mask); }
+    void OnDestroy() { if (material != null) Destroy(material); if (WakeMaterial!=null) Destroy(WakeMaterial); if(PierWaterMaterial!=null) Destroy(PierWaterMaterial); if (mask != null) Destroy(mask); }
 }

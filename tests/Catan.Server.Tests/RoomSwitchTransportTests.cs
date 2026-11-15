@@ -45,7 +45,7 @@ public sealed class RoomSwitchTransportTests
             }
             await firstClosed.Task.WaitAsync(deadline.Token);
             using var http = new HttpClient();
-            clock = clock.AddSeconds(30);
+            clock = clock.AddSeconds(46);
             using var response = await http.PostAsync(address + "/api/request", new StringContent(WireJson.Serialize(Bound("Get", host, host.Credential)), Encoding.UTF8, "application/json"), deadline.Token);
             var fallback = WireJson.Deserialize<NetworkResponse>(await response.Content.ReadAsStringAsync(deadline.Token));
             Assert.True(fallback.Success); Assert.True(fallback.HumanControlAvailable);

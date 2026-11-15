@@ -1,0 +1,33 @@
+{
+  "version": "2.1.15",
+  "buildRoot": "game version/2.1/Catan2.1.15-Knight-Voices",
+  "windowsSaveLoadVerified": true,
+  "androidPackageVerified": true,
+  "artifacts": [
+    {
+      "file": "Builds/Windows/Catan2.1.15.exe",
+      "bytes": 667136,
+      "sha256": "3070e580e019576b9afcdeb4fec18d03cebc119f6ae84d597412905c749ad653"
+    },
+    {
+      "file": "Builds/Windows/Catan2.1.15_Data/Managed/Assembly-CSharp.dll",
+      "bytes": 1864704,
+      "sha256": "a9d97ee8c679223b5fd274f0cb3974aaeb6f1eb339e2fdf2e93e0cb431b006e4"
+    },
+    {
+      "file": "Builds/Windows/Server/Catan.Server.exe",
+      "bytes": 162304,
+      "sha256": "79fcf9a7586b7ff8a0b06d58b61ed2452a06edad527ea184452390a554ba7fc5"
+    },
+    {
+      "file": "Builds/Windows/Server/Catan.Rooms.dll",
+      "bytes": 74240,
+      "sha256": "0578122b925f3c676c31097e6ad69d21d4858f441d9bf1a2bd5b1a8e8e1ff01e"
+    },
+    {
+      "file": "Builds/Android/Catan2.1.15.apk",
+      "bytes": 983075906,
+      "sha256": "4f006ba0bd7eb727dcb3ce4ab64fde0252b8f209a977d596450e1c25e1714512"
+    }
+  ]
+}

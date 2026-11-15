@@ -10,6 +10,73 @@ public sealed class ThreeKingdomsB45SelectionTests
     static ThreeKingdomsView View(params B2SkillAction[] actions)=>new(){PackageVersion=GeneralCatalog.B45PackageVersion,WindowId="w",Clock=new(){ActivePlayerId="p1",Phase=ThreeKingdomsPhase.Play},SkillActions=actions};
     static B45SelectionContext Start(ThreeKingdomsView view,int[] hand,string? skill=null){var context=new B45SelectionContext();context.Begin(view,"p1",skill??view.SkillActions[0].Command.SkillId,hand);return context;}
 
+    [Theory]
+    [InlineData("tk-g01-s1","harvest","raid","pass")]
+    [InlineData("tk-g37-s1","harvest","tiles","pass")]
+    [InlineData("tk-g23-s2","qianxun-response","discard","skip")]
+    [InlineData("tk-g30-s1","luoying","luoying","skip")]
+    [InlineData("tk-g13-s2","dice-modify","modify","skip")]
+    [InlineData("tk-g21-s2","dice-fixed","fixed","skip")]
+    [InlineData("tk-g20-s1","dice-fixed","fixed","skip")]
+    [InlineData("tk-g20-s1","b5m-huoshou-move","b5m-huoshou-move","b5m-huoshou-skip")]
+    public void OptionalParametersAppearOnlyAfterConfirmation(string skill,string kind,string option,string skip)
+    {
+        var view=View(Action(option,skill),Action(skip,skill));
+        view.SkillDecision=new(){PlayerId="p1",Kind=kind,DecisionId="first"};
+        var c=Start(view,new int[8]);
+        Assert.True(c.AwaitingActivation);
+        Assert.True(c.CanConfirm);
+        Assert.Empty(c.CandidateActions);
+        Assert.Equal(skip,c.SkipCommand.Option);
+        Assert.True(c.OpenActivationChoices());
+        c.Refresh(view,new int[8]);
+        Assert.False(c.AwaitingActivation);
+        Assert.Equal(option,Assert.Single(c.CandidateActions).Command.Option);
+        view.SkillDecision.DecisionId="second";
+        c.Refresh(view,new int[8]);
+        Assert.False(c.Active);
+        c.Begin(view,"p1",skill,new int[8]);
+        Assert.True(c.AwaitingActivation);
+    }
+
+    [Theory]
+    [InlineData("tk-g19-s1","dice-observe","observe","skip")]
+    [InlineData("tk-g44-s1","dice-luoshen","luoshen-reroll","luoshen-stop")]
+    [InlineData("tk-g28-s1","harvest","shelie","pass")]
+    [InlineData("tk-g34-s2","optional","accept","skip")]
+    public void ActivationOffersSubmitExistingChoiceWithoutCandidatePanel(string skill,string kind,string activate,string cancel)
+    {
+        var view=View(Action(activate,skill),Action(cancel,skill));
+        view.SkillDecision=new(){PlayerId="p1",Kind=kind,DecisionId="offer"};
+        var draft=Start(view,new int[8]);
+        draft.Refresh(view,new int[8]);
+        Assert.True(draft.AwaitingActivation);
+        Assert.False(draft.ShowOptionChoices);
+        Assert.False(draft.OpenActivationChoices());
+        Assert.Equal(cancel,draft.SkipCommand.Option);
+        Assert.Equal(activate,draft.BeginSubmit().Option);
+    }
+
+    [Fact] public void ZaiqiRequiresExplicitEffectThenChoosesCityOnBoard()
+    {
+        B2SkillAction City(string id){var a=Action("b5m-zaiqi-city","tk-g20-s2");a.Command.ProgressCardId=id;a.SelectionBoardIds=new[]{id};return a;}
+        var first=City("v1");var second=City("v2");var point=Action("b5m-zaiqi-point","tk-g20-s2");
+        var view=View(first,second,point);view.SkillDecision=new(){PlayerId="p1",Kind="b5m-zaiqi",DecisionId="d"};
+        var c=Start(view,new int[8]);Assert.Equal(2,c.Options.Length);Assert.True(c.AwaitingEffectChoice);Assert.True(c.ShowOptionChoices);
+        Assert.False(c.CanSelectTile("v1"));Assert.Null(c.FinishDirectPick());
+        Assert.True(c.ChooseOption(first));Assert.False(c.ShowOptionChoices);Assert.Null(c.FinishDirectPick());
+        Assert.True(c.ToggleTile("v2"));Assert.Equal("v2",c.FinishDirectPick().ProgressCardId);
+        c=Start(view,new int[8]);c.ChooseOption(point);Assert.Equal("b5m-zaiqi-point",c.FinishDirectPick().Option);
+        view.SkillActions=new[]{point};c=Start(view,new int[8]);Assert.True(c.AwaitingEffectChoice);Assert.Null(c.FinishDirectPick());
+    }
+    [Fact] public void BoardSkillsDoNotEnumerateTargetsAsOptionChoices()
+    {
+        var actions=Enumerable.Range(0,12).Select(i=>{var a=Action("civil-liegong","tk-g51-s1");a.Command.ProgressCardId="asset"+i;a.SelectionBoardIds=new[]{"v"+i};return a;}).ToArray();
+        var c=Start(View(actions),new int[8]);Assert.False(c.ShowOptionChoices);Assert.True(c.ToggleTile("v7"));Assert.Equal("asset7",c.FinishDirectPick().ProgressCardId);
+        var roads=Action("civil-liegong-roads","tk-g51-s1");c=Start(View(actions.Append(roads).ToArray()),new int[8]);Assert.True(c.ShowOptionChoices);
+        c.ChooseOption(roads);Assert.Equal("civil-liegong-roads",c.FinishDirectPick().Option);
+    }
+
     [Fact] public void RaidChoosesForgoneHarvestBeforeDistinctPlayersAndSpendsNoHandCards()
     {
         const string skill="tk-g01-s1";
@@ -23,7 +90,7 @@ public sealed class ThreeKingdomsB45SelectionTests
         Assert.True(ctx.TogglePlayer("p3"));Assert.Null(ctx.FinishDirectPick(true));
         Assert.True(ctx.TogglePlayer("p3"));Assert.Empty(ctx.SelectedPlayers);
         Assert.True(ctx.TogglePlayer("p3"));Assert.True(ctx.TogglePlayer("p2"));
-        var c=ctx.FinishDirectPick(true);Assert.NotNull(c);Assert.Equal(both.Command.Counts,c.Counts);
+        Assert.Null(ctx.FinishDirectPick(true));var c=ctx.BeginSubmit();Assert.NotNull(c);Assert.Equal(both.Command.Counts,c.Counts);
         Assert.Equal(new[]{"p2","p3"},c.TargetPlayerIds);
         ctx.Reselect();ctx.Reset();
         ctx=Start(View(a,b,both,Action("pass",skill)),new int[8]);
@@ -104,7 +171,8 @@ public sealed class ThreeKingdomsB45SelectionTests
     {
         var give=Action("seat-fuqi-give");give.Command.CardType=3;
         var c=Start(View(give),Bag((3,1)));Assert.Null(c.FinishDirectPick());
-        c.ToggleCard(3,0);Assert.Equal(3,c.FinishDirectPick().CardType);
+        c.ToggleCard(3,0);Assert.Null(c.FinishDirectPick());Assert.True(c.ToggleCard(3,0));Assert.False(c.CanConfirm);
+        c.ToggleCard(3,0);Assert.Equal(3,c.BeginSubmit().CardType);
         var take=Action("seat-jinglue-take");take.Command.CardType=4;take.SelectionPlayerIds=new[]{"p2"};
         c=Start(View(take),new int[8]);Assert.True(c.ShowOptionChoices);
         Assert.False(c.CanSelectPlayer("p2"));c.ChooseOption(take);Assert.Equal(4,c.FinishDirectPick().CardType);

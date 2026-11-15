@@ -11,16 +11,19 @@ public sealed class TabletopDicePresentation
     public int Second { get; private set; } = 6;
     public int? Event { get; private set; }
     public long Sequence { get; private set; }
+    public bool ActualRoll { get; private set; } = true;
     public double SettlesAt => started + Duration;
     bool initialized;
     double started = double.NegativeInfinity;
     GameHistoryEntry[] knownInput,knownOutput,visibleInput,visibleOutput;
     long knownSequence=-1,visibleSequence=-1;
     bool visibleRolling;
-    public void Observe(long rollSequence, int first, int second, int? eventDie, double now)
+    public void Observe(long rollSequence, int first, int second, int? eventDie, double now,bool actualRoll=true)
     {
         // 首次连接视图（含读档）直接显示已确认结果；相同点数的新掷骰仍会启动动画。
-        if (initialized && rollSequence != Sequence && rollSequence > 0) started = now;
+        if(!actualRoll)started=double.NegativeInfinity;
+        else if (initialized && rollSequence != Sequence && rollSequence > 0) started = now;
+        ActualRoll=actualRoll;
         initialized = true; Sequence = rollSequence;
         First = first > 0 ? first : 1; Second = second > 0 ? second : 6; Event = eventDie;
     }

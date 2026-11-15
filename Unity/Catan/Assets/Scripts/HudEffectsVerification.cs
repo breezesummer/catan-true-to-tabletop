@@ -5,6 +5,7 @@ using System.Linq;
 using Catan.Core.M5;
 using Catan.Core.TradeModules;
 using UnityEngine;
+using Catan.Core.ThreeKingdoms;
 
 public sealed partial class TabletopUiVerification
 {
@@ -17,6 +18,63 @@ public sealed partial class TabletopUiVerification
         auditGame=GetComponent<M5App>();
         auditSession=(CombinedGameSession)typeof(M5LocalGameHost).GetField("session",PrivateInstance).GetValue(auditGame.VerificationHost);
         var state=auditSession.GetAuthoritativeStateForTesting();
+        if(args.Contains("--fixed-event-faces"))
+        {
+            var active=state.ThreeKingdoms.Generals.Single(g=>g.Region==GeneralRegion.Active&&g.OwnerPlayerId==app.HumanSeat);
+            var fixedGeneral=state.ThreeKingdoms.Generals.Single(g=>g.GeneralId=="tk-g21");
+            (active.GeneralId,fixedGeneral.GeneralId)=(fixedGeneral.GeneralId,active.GeneralId);
+            (active.InstanceId,fixedGeneral.InstanceId)=(fixedGeneral.InstanceId,active.InstanceId);
+            var host=(IThreeKingdomsCardHost)typeof(CombinedGameSession).GetMethod("CardHost",PrivateInstance).Invoke(auditSession,new object[]{state});
+            state.ThreeKingdoms.Dice.OpenedTurnId=-1;
+            B3DiceEngine.BeginTurn(host);
+            ActivateAudit(state);
+            yield return new WaitForSecondsRealtime(1);
+            app.SyncThreeKingdomsSelection();
+            var picker=(B45SelectionContext)typeof(M6App).GetField("generalSelection",PrivateInstance).GetValue(app);
+            if(picker.AwaitingActivation)picker.OpenActivationChoices();
+            yield return new WaitForEndOfFrame();
+            Require(picker.Options.Where(a=>a.Command.Option=="fixed").Select(a=>a.Command.CardType).Distinct().Count()==4,"直谏四个候选未就绪");
+            string before=Authority;
+            int redBefore=app.FixedDieValue(0);
+            foreach(var step in DirectClick(new Vector2(62,223),"拖转红骰"))yield return step;
+            Require(app.FixedDieValue(0)!=redBefore&&app.FixedDieValue(0)+app.FixedDieValue(1)==7,"红白骰未联动");
+            var eventPick=typeof(M6App).GetField("fixedChoiceEvent",PrivateInstance);
+            foreach(var step in DirectClick(new Vector2(98,184),"转动事件骰"))yield return step;
+            Require((int)eventPick.GetValue(app)==4&&Authority==before,"事件骰未从船面转至贸易城堡");
+            yield return new WaitForEndOfFrame();
+            SaveOceanFrame("直谏事件骰.png");
+            int red=app.FixedDieValue(0);
+            foreach(var step in DirectClick(TabletopUI.EndTurnRect.center,"确认直谏"))yield return step;
+            var result=auditSession.GetAuthoritativeStateForTesting().ThreeKingdoms.Dice.FixedResult;
+            Require(result!=null&&result.Red==red&&result.White==7-red&&result.EventFace==4,"直谏确认结果错误");
+            configurations++;
+            yield break;
+        }
+        if(args.Contains("--dice-selection"))
+        {
+            var active=state.ThreeKingdoms.Generals.Single(g=>g.Region==GeneralRegion.Active && g.OwnerPlayerId==app.HumanSeat);
+            var ghost=state.ThreeKingdoms.Generals.Single(g=>g.GeneralId=="tk-g13");
+            (active.GeneralId,ghost.GeneralId)=(ghost.GeneralId,active.GeneralId);
+            (active.InstanceId,ghost.InstanceId)=(ghost.InstanceId,active.InstanceId);
+            var host=(IThreeKingdomsCardHost)typeof(CombinedGameSession).GetMethod("CardHost",PrivateInstance).Invoke(auditSession,new object[]{state});
+            B3DiceEngine.BeginJudgment(host,app.HumanSeat,"骰子光效验收");
+            ActivateAudit(state);
+            yield return new WaitForSecondsRealtime(1);
+            app.SyncThreeKingdomsSelection();
+            var picker=(B45SelectionContext)typeof(M6App).GetField("generalSelection",PrivateInstance).GetValue(app);
+            Require(picker.DiceIndices.Contains(0)&&picker.DiceIndices.Contains(1),"缺少红白候选骰子");
+            Require(picker.SelectDie(0),"无法选中红骰");
+            string before=Authority;
+            for(int i=0;i<2;i++)
+            {
+                yield return new WaitForSecondsRealtime(.35f);
+                yield return new WaitForEndOfFrame();
+                SaveOceanFrame("骰子选择-"+i+".png");
+            }
+            Require(app.DieVisualState(0)==2&&app.DieVisualState(1)==1&&Authority==before,"选骰光效状态错误");
+            configurations++;
+            yield break;
+        }
         var fish=state.TradeModules.Fishing;
         if(args.Contains("--fish-road-prompt"))
         {

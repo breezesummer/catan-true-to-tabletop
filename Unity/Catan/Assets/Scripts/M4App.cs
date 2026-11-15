@@ -73,7 +73,7 @@ public sealed partial class M4App : MonoBehaviour
     {
         CitiesKnightsGameSession.StampControlB6(view,command);
         if(TryBeginDirectPayment(command))return null;
-        if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status=ai.Network.Status;return null;}
+        if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status="";return null;}
         bool ownGeneralChoice=(command.Kind==CommandKind.ChooseGenerals||command.Kind==CommandKind.DeployGeneral)&&view?.ThreeKingdoms?.PendingDecision?.PlayerId==command.PlayerId;
         if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!ownGeneralChoice&&!(command.Kind==CommandKind.UseGeneralSkill&&view?.ThreeKingdoms?.SkillActions?.Length>0&&!ai.TableDiceRolling)&&!(command.Kind==CommandKind.RetireGeneral&&view?.ThreeKingdoms?.CanRetire==true)&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
         if(ai!=null&&command==draft&&!DockKnightTargetMatches(command.TargetId)){status="请选择低一级的己方骑士晋升。";return null;}

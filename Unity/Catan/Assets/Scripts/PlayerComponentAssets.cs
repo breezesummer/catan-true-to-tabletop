@@ -130,10 +130,101 @@ public static class PlayerComponentAssets
     {
         var model = Model(KnightResource(playerId, level, active));
         if(model==null)return null;
-        return FantasyBoardPiece.Attach(Instantiate(model,label,bottom,parent),"knights",ColourKey(playerId),
+        var instance = Instantiate(model,label,bottom,parent);
+        ApplyKnightFinish(instance,playerId,level,active);
+        return FantasyBoardPiece.Attach(instance,"knights",ColourKey(playerId),
             level-1+(active?3:0));
     }
 
+    static readonly Dictionary<(Material,string),Material> helmetFinishes = new();
+    static Material updraftMaterial;
+
+    static void ApplyKnightFinish(GameObject instance,string playerId,int level,bool active)
+    {
+        var renderer=instance.GetComponentInChildren<MeshRenderer>();
+        var parts=renderer.sharedMaterials;
+        for(int i=0;i<parts.Length;i++)
+        {
+            var metal=parts[i];
+            if(metal==null || !metal.name.StartsWith("Expansion_Metal_knight-"))continue;
+            if(!helmetFinishes.TryGetValue((metal,playerId),out var finish))
+            {
+                finish=new Material(Resources.Load<Shader>(ExpansionRoot+"KnightHelmet"));
+                finish.SetTexture("_BaseMap",metal.GetTexture("_BaseMap"));
+                finish.SetColor("_Pigment",BoardRenderer.SeatColor(playerId));
+                // 当前雕塑的头部原点在下颌，二级出击前倾，骑兵从马背起算。
+                float scale = level == 3 ? .0106f : .0108f;
+                float hip = level == 3 ? 1.84f : level == 2 && active ? .844f : .931f;
+                float chin = hip + (level == 2 && active ? .445f : .46f);
+                finish.SetVector("_Helmet", new Vector4((chin + .14f) * scale,
+                    (chin + .43f) * scale, (level == 3 ? .49f : .38f) * scale, 0));
+                helmetFinishes.Add((metal,playerId),finish);
+            }
+            parts[i]=finish;
+        }
+        renderer.sharedMaterials=parts;
+        if(!active)return;
+        AddKnightUpdraft(instance,BoardRenderer.SeatColor(playerId),level);
+    }
+
+    static void AddKnightUpdraft(GameObject knight, Color colour, int level)
+    {
+        float height = level == 3 ? .026f : .019f;
+        var wind = new GameObject("骑士激活气流");
+        wind.transform.SetParent(knight.transform, false);
+        wind.transform.localPosition = Vector3.up * .0005f;
+        var particles = wind.AddComponent<ParticleSystem>();
+        particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
+        var main = particles.main;
+        main.duration = 1.6f;
+        main.loop = true;
+        main.prewarm = true;
+        main.simulationSpace = ParticleSystemSimulationSpace.Local;
+        main.startLifetime = new ParticleSystem.MinMaxCurve(1.32f, 1.42f);
+        main.startSpeed = 0;
+        main.startSize = new ParticleSystem.MinMaxCurve(height * .027f, height * .052f);
+        main.startColor = colour;
+        main.maxParticles = 96;
+        var emission = particles.emission;
+        emission.rateOverTime = 65;
+        var shape = particles.shape;
+        shape.shapeType = ParticleSystemShapeType.Circle;
+        shape.rotation = new Vector3(90, 0, 0);
+        shape.radius = height * .245f;
+        shape.radiusThickness = .23f;
+
+        var flow = particles.velocityOverLifetime;
+        flow.enabled = true;
+        flow.space = ParticleSystemSimulationSpace.Local;
+        var steady = AnimationCurve.Linear(0, 1, 1, 1);
+        var zero = new ParticleSystem.MinMaxCurve(0, steady);
+        flow.x = zero;
+        flow.z = zero;
+        flow.orbitalX = zero;
+        flow.orbitalZ = zero;
+        flow.y = new ParticleSystem.MinMaxCurve(height * 1.06f, steady);
+        flow.orbitalY = new ParticleSystem.MinMaxCurve(2.4f, steady);
+        flow.radial = new ParticleSystem.MinMaxCurve(height, new AnimationCurve(new Keyframe(0, 0), new Keyframe(.73f, 0), new Keyframe(1, .53f)));
+        var fade = particles.colorOverLifetime;
+        fade.enabled = true;
+        var gradient = new Gradient();
+        gradient.SetKeys(new[] { new GradientColorKey(Color.white, 0), new GradientColorKey(Color.white, 1) },
+            new[] { new GradientAlphaKey(0, 0), new GradientAlphaKey(.95f, .13f),
+                new GradientAlphaKey(1, .80f), new GradientAlphaKey(0, 1) });
+        fade.color = gradient;
+
+        var renderer = wind.GetComponent<ParticleSystemRenderer>();
+        if (updraftMaterial == null)
+            updraftMaterial = new Material(Resources.Load<Shader>(ExpansionRoot + "KnightUpdraft"));
+        renderer.sharedMaterial = updraftMaterial;
+        renderer.renderMode = ParticleSystemRenderMode.Stretch;
+        renderer.lengthScale = 5.2f;
+        renderer.velocityScale = .06f;
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        renderer.receiveShadows = false;
+        particles.Play();
+    }
     static GameObject Instantiate(GameObject model, string label, Vector3 bottom, Transform parent)
     {
         // Match the inspected gallery orientation: the sculpt's photographed face looks toward the default board camera.

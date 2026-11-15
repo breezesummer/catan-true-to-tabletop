@@ -152,6 +152,9 @@ namespace Catan.Core.ThreeKingdoms
                     a.AvailableCount=c.Option=="b4-daoshu"?(int?)null:host.GetHand(owner)[c.CardType]-(c.Option=="b4-select"?f?.B4?.Selection[c.CardType]??0:0);
                 }
                 if((c.Option=="b4-select"||c.Option=="b4-selected")&&f?.B4!=null)c.Counts=Copy(f.B4.Selection);
+                // 两堆张数本已公开；为 AI 提供结构化数量，不投影暗堆牌种。
+                if((c.Option=="b4-revealed"||c.Option=="b4-hidden")&&f?.B4!=null)
+                    a.AvailableCount=c.Option=="b4-revealed"?f.B4.Selection.Sum():host.GetHand(f.Targets[0]).Sum()-f.B4.Selection.Sum();
             }
             return actions.Where(a => !B4Enabled(host.State) || !new[] { "gift", "discard", "exchange-hand", "exchange-progress" }.Contains(a.Command.Option) || !IsB4HandLossForbidden(host.State, host.State.Skills.PendingDecision?.PlayerId ?? host.State.Clock.ActivePlayerId)).ToArray();
         }

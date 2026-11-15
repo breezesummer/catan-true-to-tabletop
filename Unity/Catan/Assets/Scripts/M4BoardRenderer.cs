@@ -62,6 +62,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
             var center = tile.Vertices.Select(v=>vertices[v]).Aggregate(Vector3.zero,(s,v)=>s+v)/6f;
             center.y = 0;
             tiles[tile.Id] = center;
+            selectionCorners[tile.Id]=tile.Vertices.ToArray();
             terrainTypes[tile.Id] = tile.Resource;
             var obj = EntityBoardAssets.Terrain(tile.Resource, center, transform);
             if (obj == null)
@@ -245,7 +246,7 @@ public sealed class M4BoardRenderer : MonoBehaviour
         barbarianShip=barbarianTrack==null?null:EntityBoardAssets.BarbarianShip(position,barbarianTrack.transform,publicMarkers);
     }
     readonly TabletopPieceCache pieceCache=new TabletopPieceCache();
-    internal void OutlinePiece(string id)=>pieceCache.DrawOutline(id,BoardCamera);
+    internal void OutlinePiece(string id,bool selected=false)=>pieceCache.DrawOutline(id,BoardCamera,selected);
     internal bool HasOutlinePiece(string id)=>pieceCache.HasPiece(id);
     readonly ThreeKingdomsBoardPresentation threeKingdomsPieces=new ThreeKingdomsBoardPresentation();
     public void Refresh(PiecePlacement[] settlements, PiecePlacement[] roads, PiecePlacement[] cities, string robberTileId)
@@ -322,6 +323,29 @@ public sealed class M4BoardRenderer : MonoBehaviour
     }
     public Vector3 Position(string id) => id.StartsWith("V")?vertices[id]+Vector3.up*.004f:id.StartsWith("E")?edges[id]:tiles[id];
     public string TerrainResource(string tileId) => terrainTypes[tileId];
+    readonly Dictionary<string,string[]> selectionCorners=new Dictionary<string,string[]>();
+    readonly Dictionary<string,(int frame,bool selected,float start)> tileTransitions=new Dictionary<string,(int,bool,float)>();
+    internal bool DrawTileSelection(string id,bool selected)
+    {
+        if(!selectionCorners.TryGetValue(id,out var corners))return false;
+        if(Event.current.type!=EventType.Repaint)return true;
+        float now=Time.unscaledTime;
+        if(!tileTransitions.TryGetValue(id,out var state)||state.frame<Time.frameCount-1||state.selected!=selected)
+            state=(Time.frameCount,selected,now);
+        tileTransitions[id]=(Time.frameCount,selected,state.start);
+        float transition=Mathf.SmoothStep(0,1,(now-state.start)/(selected?.22f:.16f));
+        Vector2 Project(string vertex){
+            var p=BoardCamera.WorldToScreenPoint(Vector3.Lerp(vertices[vertex],tiles[id],.045f));
+            return MobileTabletop.Logical(new Vector2(p.x,Screen.height-p.y));
+        }
+        var last=Project(corners[corners.Length-1]);
+        foreach(var corner in corners){
+            var next=Project(corner);
+            ProgressTableUI.Edge(last,next,selected,transition);
+            last=next;
+        }
+        return true;
+    }
     public Vector2 ScreenPoint(string id)
     {
         var p=BoardCamera.WorldToScreenPoint(knightPoints.TryGetValue(id,out var knightPoint)?knightPoint:Position(id)); return new Vector2(p.x,Screen.height-p.y);

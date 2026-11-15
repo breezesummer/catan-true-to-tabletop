@@ -16,5 +16,8 @@ public sealed partial class M6App
         presentation is M4App cities ? cities.WindowHud.OperationWindows :
         presentation is M5App combined ? combined.WindowHud.OperationWindows : null;
     internal bool ClosedTableSelection => CurrentTableWindows?.Closed == true && HasRequiredTableSelection;
+    internal Rect FramePirateButtonArea=>ThreeKingdomsProjection!=null
+        ?new Rect(TabletopHandLayout.RestRight-178,642,178,32)
+        :new Rect(SelectionPromptArea.xMax-178,SelectionPromptArea.center.y-16+(OpeningOrderMessage.Length>0?48:0),178,32);
     static readonly Rect SelectionPromptArea = new Rect(264,126,912,112);
 }

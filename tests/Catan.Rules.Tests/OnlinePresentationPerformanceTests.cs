@@ -26,6 +26,40 @@ public sealed class OnlinePresentationPerformanceTests
     {var value=new T();foreach(var property in fields.GetType().GetProperties())typeof(T).GetProperty(property.Name)!.SetValue(value,property.GetValue(fields));return value;}
     static GameHistoryEntry Entry(int sequence,string? action=null,int dice1=0,int dice2=0,string? skill=null,int amount=0)=>Data<GameHistoryEntry>(new{Sequence=(long)sequence,Action=action,Dice1=dice1,Dice2=dice2,SkillEventId=skill,Changes=amount==0?Array.Empty<GameHistoryChange>():new[]{Data<GameHistoryChange>(new{Category="goods",GoodIndex=0,PlayerId="P1",Amount=amount})}});
     [Fact]
+    public void CollectionFramesReuseSlotsWithoutAllocatingAndStillAdvanceInsertion()
+    {
+        var timeline=new TabletopCollectionTimeline();timeline.Observe("局1",Array.Empty<GameHistoryEntry>(),0);
+        timeline.Observe("局1",new[]{Entry(1,amount:12)},1);
+        var owned=new[]{12,0,0,0,0,0,0,0};
+        var slots=timeline.HandSlots("P1",owned,8,1.1);
+        var buffer=new List<TabletopCollectionFlight>(32);timeline.CopyActive(1.1,buffer);
+        long before=GC.GetAllocatedBytesForCurrentThread();
+        for(int frame=0;frame<120;frame++)
+        {
+            double now=1.1+frame*.007;
+            timeline.HandSlots("P1",owned,8,now);timeline.CopyActive(now,buffer);
+        }
+        long allocated=GC.GetAllocatedBytesForCurrentThread()-before;
+        Assert.True(allocated<1024,$"收牌热路径120帧分配 {allocated} 字节");
+        Assert.Same(slots,timeline.HandSlots("P1",owned,8,1.95));
+        Assert.True(slots[0].Weight>0);Assert.True(slots[^1].Weight<slots[0].Weight);
+        var arrived=timeline.HandSlots("P1",owned,8,3);
+        Assert.All(arrived,slot=>{Assert.Null(slot.Flight);Assert.Equal(1,slot.Weight);});
+        owned[0]=3;Assert.Equal(3,timeline.HandSlots("P1",owned,8,3.1).Length);
+    }
+    [Fact]
+    public void CachedCollectionLayoutInvalidatesOnSortingAndScopeChange()
+    {
+        var timeline=new TabletopCollectionTimeline();timeline.Observe("局1",Array.Empty<GameHistoryEntry>(),0);
+        timeline.HandSlots("P1",new[]{0,1,0,0,0},5,0);
+        var owned=new[]{1,1,0,0,0};
+        Assert.Equal(new[]{1,0},timeline.HandSlots("P1",owned,5,1).Select(s=>s.Good));
+        timeline.SortHand("P1");Assert.Equal(new[]{0,1},timeline.HandSlots("P1",owned,5,1).Select(s=>s.Good));
+        var previous=timeline.HandSlots("P1",owned,5,1);
+        timeline.Observe("局2",Array.Empty<GameHistoryEntry>(),2);
+        Assert.NotSame(previous,timeline.HandSlots("P1",owned,5,2));
+    }
+    [Fact]
     public void HistoryViewportOnlyMeasuresNewOrReplacedRowsAndFindsVisibleRange()
     {
         var rows=Enumerable.Range(1,2000).Select(n=>Entry(n)).ToArray();

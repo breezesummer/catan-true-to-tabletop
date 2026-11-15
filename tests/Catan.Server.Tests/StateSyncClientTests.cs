@@ -15,6 +15,70 @@ namespace Catan.Server.Tests;
 
 public sealed class StateSyncClientTests
 {
+    [Theory]
+    [InlineData("cities-knights", false)]
+    [InlineData("cities-knights", true)]
+    [InlineData("combined", false)]
+    [InlineData("combined", true)]
+    public async Task TianduCardSubstepWithoutNewHistoryReleasesReceiptAfterCompleteStream(string rules, bool stateFirst)
+    {
+        var client = new M7Client(); Field("connectionId").SetValue(client, "c1"); Field("automaticReconnect").SetValue(client, false);
+        var sender = new SeatStateSender(); var reader = new SeatStateReceiver("room", "P1", "c1");
+        NetworkResponse Substep(long sequence)
+        {
+            var response = State(sequence, "郭嘉发动「天妒」：正在结算");
+            response.RuleSet = response.Room.RuleSet = rules;
+            response.ViewJson = "{\"PlayerId\":\"P1\",\"Events\":[{\"Sequence\":" + sequence + "}],\"ThreeKingdoms\":{\"SkillDecision\":{\"PlayerId\":\"P1\",\"Kind\":\"tiandu-card\",\"DecisionId\":\"tile-" + sequence + "\"}}}";
+            return response;
+        }
+        try
+        {
+            await Apply(client, sender, reader, Substep(1)); Assert.True(client.CanInteract);
+            Field("pendingCommand").SetValue(client, new NetworkRequest { CommandId = "天妒第一块领牌" });
+            if (stateFirst) await Apply(client, sender, reader, Substep(2));
+            var receipt = Substep(2); receipt.ViewJson = receipt.PresentationHistoryJson = null!;
+            receipt.CommittedRevision = 2;
+            Field("pendingReceipt").SetValue(client, receipt);
+            Method("Apply").Invoke(client, new object[] { receipt, false, false });
+            if (!stateFirst)
+            {
+                Assert.True(client.CommandPending); Assert.False(client.CanInteract);
+                await Apply(client, sender, reader, Substep(2));
+            }
+            Assert.Equal(1, client.History.Last().Sequence);
+            Assert.False(client.CommandPending); Assert.True(client.CanInteract);
+            Assert.True(client.HasPresentationHistory(2)); Assert.False(client.HasPresentationHistory(3));
+        }
+        finally { client.EndSession(); }
+    }
+
+    [Fact]
+    public async Task SparseSkillHistoryWaitsForFinalLegacyPageBeforeReleasingReceipt()
+    {
+        var client = new M7Client(); client.ConfigureEndpoint("http://127.0.0.1:47771", "");
+        Field("connectionId").SetValue(client, "c1");
+        var handler = new HistoryHandler { Response = State(2, "开始") };
+        ((HttpClient)Field("http").GetValue(client)!).Dispose(); Field("http").SetValue(client, new HttpClient(handler));
+        try
+        {
+            Field("pendingCommand").SetValue(client, new NetworkRequest { CommandId = "天妒领牌" });
+            var receipt = State(2, "开始"); receipt.ViewJson = receipt.PresentationHistoryJson = null!; receipt.CommittedRevision = 2;
+            Field("pendingReceipt").SetValue(client, receipt);
+            var state = State(2, "开始"); state.PresentationHistoryJson = null!;
+            var decoder = (M7ResponseDecoder)Field("responseDecoder").GetValue(client)!;
+            state = await decoder.Decode(Encoding.UTF8.GetBytes(WireJson.Serialize(state)), "base", "Get", null!, CancellationToken.None);
+            Method("Apply").Invoke(client, new object[] { state, false, false });
+            await handler.Entered.Task.WaitAsync(TimeSpan.FromSeconds(2));
+            Assert.True(client.CommandPending); Assert.False(client.CanInteract); Assert.False(client.HasPresentationHistory(2));
+            handler.Release.TrySetResult(true);
+            using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            do { await Task.Delay(5, deadline.Token); Method("Update").Invoke(client, null); } while ((bool)Field("historyBusy").GetValue(client)!);
+            Assert.Equal(1, client.History.Last().Sequence);
+            Assert.False(client.CommandPending); Assert.True(client.CanInteract); Assert.True(client.HasPresentationHistory(2));
+        }
+        finally { handler.Release.TrySetResult(true); client.EndSession(); }
+    }
+
     [Fact]
     public async Task ReconnectDoesNotUnlockUntilTheNewConnectionHasCompleteEvents()
     {
@@ -157,11 +221,12 @@ public sealed class StateSyncClientTests
     }
     sealed class HistoryHandler : HttpMessageHandler
     {
+        public NetworkResponse? Response;
         public TaskCompletionSource<bool> Entered = new(TaskCreationOptions.RunContinuationsAsynchronously), Release = new(TaskCreationOptions.RunContinuationsAsynchronously);
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellation)
         {
             Entered.TrySetResult(true); await Release.Task.WaitAsync(cancellation);
-            var response = State(1, "开始"); response.ViewJson = response.PresentationHistoryJson = null!; response.HistoryJson = "[{\"Sequence\":1,\"SkillEventId\":\"a\",\"Action\":\"开始\"}]"; response.HistoryCursor = 1;
+            var response = Response ?? State(1, "开始"); response.ViewJson = response.PresentationHistoryJson = null!; response.HistoryJson = "[{\"Sequence\":1,\"SkillEventId\":\"a\",\"Action\":\"开始\"}]"; response.HistoryCursor = 1;
             return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(WireJson.Serialize(response)) };
         }
     }

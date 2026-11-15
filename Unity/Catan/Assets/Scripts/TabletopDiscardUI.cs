@@ -8,6 +8,9 @@ public sealed partial class TabletopUI
     OperationDock discardDock;
     public void BindDiscard(OperationSnapshot snapshot, OperationDock dock)
     { discardSnapshot = snapshot; discardDock = dock; }
+    internal bool DevelopmentCardInspecting => discardDock?.InspectingDevelopment==true;
+    internal bool DevelopmentCardReady => DevelopmentCardInspecting&&discardDock.DiscardMatches(discardSnapshot)&&discardDock.InspectedDevelopmentReady;
+    internal void ConfirmDevelopmentCard(){if(DevelopmentCardReady)discardDock.UseSelectedCard(discardSnapshot);}
     internal bool DiscardActive => discardSnapshot?.Discard != null;
     internal bool DiscardReady => DiscardActive && discardSnapshot.CanInteract && discardDock.DiscardMatches(discardSnapshot) &&
         discardSnapshot.Discard.Ready(discardDock.Selection.Selected, discardSnapshot.Goods, discardDock.SelectedDiscardCard);

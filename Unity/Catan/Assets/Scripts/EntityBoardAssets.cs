@@ -7,7 +7,7 @@ public static class EntityBoardAssets
     public const string RobberResource = "NeutralPieces/v001/robber-band";
     public const string MerchantResource = "NeutralPieces/v001/peddler-stall";
     public const string PirateResource = Root+"pirate/pirate-black";
-    public const float ShipLength = CoastalDecals.DockLength;
+    public const float ShipLength = .0272f;
     public const float ShipDraft = .0004f;
     public const float ShipDeckAboveKeel = BoardSurfaceHeight + HarborSign.DeckHeight - TabletopOcean.WaterHeight + ShipDraft;
     public static Color SailColour(int seat) => seat==3 ? Color.white : BoardRenderer.SeatColors[seat];
@@ -15,7 +15,7 @@ public static class EntityBoardAssets
         name.StartsWith("受风亚麻",System.StringComparison.Ordinal) ||
         name.StartsWith("本白亚麻",System.StringComparison.Ordinal) ||
         name.StartsWith("归属旗布",System.StringComparison.Ordinal);
-    public static float PirateLength => CoastalDecals.PierModelLength*.75f;
+    public static float PirateLength => ShipLength*.75f;
     public const float BoardSurfaceHeight = .008f;
     public const float BarbarianTrackWidth = .190f;
     public const float BarbarianTrackDepth = .200f;

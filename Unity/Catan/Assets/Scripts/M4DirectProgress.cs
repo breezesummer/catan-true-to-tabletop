@@ -37,11 +37,8 @@ public sealed partial class M4App
     }
     void ChooseSmithingTarget(string target,Command command)
     {
-        bool repeated=smithingSelected.Contains(target);
-        smithingSelected=(string[])command.TargetIds.Clone();
-        bool more=AllianceSmithingB6?smithingPlans.Any(p=>p.Length>smithingSelected.Length&&smithingSelected.All(p.Contains)):TabletopSmithingSelection.NextTargets(smithingPlans,smithingSelected).Length>0;
-        if(repeated||!more){Submit(command);return;}
-        ai.ShowTablePrompt(status="再选一名骑士，或再点已选骑士完成晋升");
+        smithingSelected=smithingSelected.Contains(target)?smithingSelected.Where(id=>id!=target).ToArray():(string[])command.TargetIds.Clone();
+        ai.ShowTablePrompt(status="请选择要晋升的骑士");
     }
     bool DirectProgressActive => view!=null && (draft!=null && draft.Kind==CommandKind.PlayProgressCard &&
         !ImmediateProgress(draft.ProgressCard)
@@ -72,6 +69,55 @@ public sealed partial class M4App
     bool CanOfferHarbor=>draft==null&&view?.CommercialHarborPlayers?.Length>0&&view.ActivePlayerId==seat&&view.PendingDecision==null&&view.Phase==Catan.Core.M4.GamePhase.Action&&view.TradeOffer==null&&!operationActions&&!dock.HasOverlay;
     static readonly Rect HarborEntry=new Rect(665,618,110,39);
     int harborOrdinal=-1;
+    int harborResponseGood=-1;
+    readonly OperationSelection privateProgressSelection=new OperationSelection();
+    object privateProgressView;
+    Vector2 privateProgressScroll;
+    bool GuildDuesResponse=>view?.PendingDecision?.PlayerId==seat&&view.PendingDecision.Kind=="ProgressGuildDues";
+    bool SmithingPicking=>draft?.Kind==CommandKind.PlayProgressCard&&draft.ProgressCard==ProgressCardKind.Smithing;
+    bool AlchemyPicking=>draft?.Kind==CommandKind.PlayProgressCard&&draft.ProgressCard==ProgressCardKind.Alchemy;
+    void RotateAlchemyDie(int index,int value)
+    {
+        if(!AlchemyPicking)return;
+        if(index==0)draft.ChosenDice1=value;else draft.ChosenDice2=value;
+    }
+    bool ProgressConfirmActive=>AlchemyPicking||HarborResponse||GuildDuesResponse||SmithingPicking;
+    bool ProgressConfirmReady=>Operations().CanInteract&&(HarborResponse?harborOrdinal>=0&&CanSelectHarborGood(harborResponseGood,harborOrdinal):
+        GuildDuesResponse?privateProgressSelection.Selected.Sum()==view.PendingDecision.Amount:
+        AlchemyPicking||SmithingPicking&&TabletopSmithingSelection.CanConfirm(SmithingPlans(),smithingSelected));
+    void SyncProgressConfirmation()
+    {
+        if(GuildDuesResponse&&!ReferenceEquals(privateProgressView,view))
+        {
+            privateProgressView=view;
+            privateProgressSelection.Sync(new OperationSnapshot{Scope="大商家:"+seat,Seat=seat,Revision=view.Turn+":"+view.Events.Length,
+                Goods=DockGoods(view.PrivateTargetResources,view.PrivateTargetCommodities)});
+        }
+        if(!GuildDuesResponse){privateProgressView=null;privateProgressSelection.Clear();}
+        if(HarborResponse&&!ReferenceEquals(harborResponseView,view))
+        {harborResponseView=view;harborOrdinal=-1;harborResponseGood=-1;dock.FocusGeneralHand(false);}
+        if(!HarborResponse){harborResponseView=null;harborResponseGood=-1;}
+        tabletop.BindAlchemy(AlchemyPicking&&!tabletop.OperationHidden?draft.ChosenDice1:view.AlchemyDice1,
+            AlchemyPicking&&!tabletop.OperationHidden?draft.ChosenDice2:view.AlchemyDice2,
+            AlchemyPicking&&!tabletop.OperationHidden?(Action<int,int>)RotateAlchemyDie:null);
+        tabletop.BindProgressConfirmation(ProgressConfirmActive&&!ai.ThreeKingdomsSelectionActive?(Action)ConfirmProgressSelection:null,ProgressConfirmActive&&ProgressConfirmReady);
+    }
+    void ConfirmProgressSelection()
+    {
+        if(!ProgressConfirmActive||!ProgressConfirmReady)return;
+        if(AlchemyPicking){Submit(draft);return;}
+        if(SmithingPicking)
+        {var c=New(CommandKind.PlayProgressCard);c.ProgressCard=ProgressCardKind.Smithing;c.TargetIds=(string[])smithingSelected.Clone();Submit(c);return;}
+        var command=New(CommandKind.ResolveProgressChoice);
+        if(HarborResponse)command.Commodity=(Commodity)(harborResponseGood-5);
+        else for(int t=0;t<8;t++){if(t<5)command.Resources[(Resource)t]=privateProgressSelection.Selected[t];else command.Commodities[(Commodity)(t-5)]=privateProgressSelection.Selected[t];}
+        Submit(command);
+    }
+    void DrawProgressConfirmation()
+    {
+        if(!ProgressConfirmActive||AlchemyPicking)return;
+        if(GeneralFrameUI.Choice(M6App.SkillCancelRect,"确认",ProgressConfirmReady,true))ConfirmProgressSelection();
+    }
     object harborResponseView;
     OperationHandSelection harborHand;
     bool HarborResponse=>view?.PendingDecision?.PlayerId==seat&&view.PendingDecision?.Kind=="ProgressHarbor"&&
@@ -83,8 +129,8 @@ public sealed partial class M4App
         {harborResponseView=view;dock.FocusGeneralHand(false);}
         return harborHand??(harborHand=new OperationHandSelection{
             Active=true,CanSelectGood=CanSelectHarborGood,SelectGood=SelectHarborGood,
-            IsGoodSelected=(good,index)=>OfferingHarbor&&harborOrdinal==index&&(int)draft.Resource==good,
-            SelectedGoods=()=>OfferingHarbor&&harborOrdinal>=0?1:0
+            IsGoodSelected=(good,index)=>harborOrdinal==index&&(HarborResponse?harborResponseGood==good:OfferingHarbor&&(int)draft.Resource==good),
+            SelectedGoods=()=>harborOrdinal>=0?1:0
         });
     }
     bool CanSelectHarborGood(int good,int ordinal)
@@ -97,7 +143,7 @@ public sealed partial class M4App
         if(!CanSelectHarborGood(good,ordinal))return;
         if(HarborResponse)
         {
-            var command=New(CommandKind.ResolveProgressChoice);command.Commodity=(Commodity)(good-5);Submit(command);return;
+            harborOrdinal=harborOrdinal==ordinal&&harborResponseGood==good?-1:ordinal;harborResponseGood=good;return;
         }
         bool same=harborOrdinal==ordinal&&draft.Resource==(Resource)good;
         harborOrdinal=same?-1:ordinal;draft.Resource=(Resource)good;
@@ -149,11 +195,11 @@ public sealed partial class M4App
     {
         if(board==null||view==null||ai==null||!ai.IsHumanTurn||ai.TableMenuOpen)return;
         if(ai.ThreeKingdomsSkillSelectionActive){
-            foreach(var id in ai.GeneralPieceTargets())board.OutlinePiece(id);
+            foreach(var id in ai.GeneralPieceTargets())board.OutlinePiece(id,ai.GeneralTargetSelected(id));
             return;
         }
         if(DirectProgressActive){
-            if(!ProgressChoiceRow)foreach(var id in ProgressTargets())board.OutlinePiece(id);
+            if(!ProgressChoiceRow)foreach(var id in ProgressTargets())board.OutlinePiece(id,id==draft?.SourceId||smithingSelected.Contains(id));
             return;
         }
         if(draft==null||string.IsNullOrEmpty(pickField))return;
@@ -201,6 +247,7 @@ public sealed partial class M4App
             var point=MobileTabletop.Logical(board.ScreenPoint(target));
             bool chosen=target==draft?.SourceId||draft?.ProgressCard==ProgressCardKind.Smithing&&smithingSelected.Contains(target);
             var number=numbers?view.Board.Tiles.First(t=>t.Id==target).Number:null;
+            if(!numbers&&board.DrawTileSelection(target,chosen))continue;
             ProgressTableUI.Mark(point,chosen,number);
         }
     }
@@ -244,7 +291,7 @@ public sealed partial class M4App
             {
                 var track=(ImprovementTrack)i;
                 bool legal=view.LegalActions.Any(c=>c.Kind==CommandKind.ResolveChoice&&c.Track==track);
-                if(!ProgressTableUI.Card(i,3,EntityCardAssets.ProgressBack(i),Tracks[i],legal))continue;
+                if(!ProgressTableUI.Card(i,3,EntityCardAssets.ProgressBack(i),legal))continue;
                 var command=New(CommandKind.ResolveChoice);command.Track=track;Submit(command);return;
             }
             return;
@@ -255,31 +302,30 @@ public sealed partial class M4App
             for(int i=0;i<cards.Length;i++)
             {
                 var card=cards[i];
-                if(ProgressTableUI.Card(i,cards.Length+1,EntityCardAssets.ProgressFront((int)card),CardName(card)))
+                if(ProgressTableUI.Card(i,cards.Length+1,EntityCardAssets.ProgressFront((int)card)))
                 {var take=New(CommandKind.ResolveProgressChoice);take.SelectedProgressCard=card;Submit(take);return;}
             }
-            if(ModernOperationUI.Button(ProgressTableUI.Item(cards.Length,cards.Length+1),"跳过"))
+            if(ModernOperationUI.Button(ProgressTableUI.ButtonArea(cards.Length,cards.Length+1),"跳过"))
             {var skip=New(CommandKind.ResolveProgressChoice);skip.Decline=true;Submit(skip);}
             return;
         }
         if(pending!=null&&pending.PlayerId==seat&&pending.Kind=="ProgressGuildDues")
         {
-            if(draft?.Kind!=CommandKind.ResolveProgressChoice)Select(CommandKind.ResolveProgressChoice);
             var goods=DockGoods(view.PrivateTargetResources,view.PrivateTargetCommodities);
-            var order=Enumerable.Range(0,goods.Length).Where(i=>goods[i]>0&&view.ThreeKingdoms?.BlockedGainCardTypes?.Contains(i)!=true).ToArray();
-            for(int i=0;i<order.Length;i++)
+            int count=Enumerable.Range(0,8).Where(t=>view.ThreeKingdoms?.BlockedGainCardTypes?.Contains(t)!=true).Sum(t=>goods[t]);
+            privateProgressScroll=GUI.BeginScrollView(ProgressTableUI.Area,privateProgressScroll,new Rect(0,0,Mathf.Max(ProgressTableUI.Area.width-20,count*144),210));
+            int index=0;
+            for(int good=0;good<8;good++)for(int ordinal=0;ordinal<goods[good];ordinal++)
             {
-                int good=order[i],picked=good<5?draft.Resources[(Resource)good]:draft.Commodities[(Commodity)(good-5)];
-                if(!ProgressTableUI.Card(i,order.Length+1,EntityCardAssets.ResourceOrCommodityFront(good),Goods[good]+" ×"+(goods[good]-picked),picked<goods[good]))continue;
-                if(good<5)draft.Resources[(Resource)good]++;else draft.Commodities[(Commodity)(good-5)]++;
-                if(draft.Resources.Total+draft.Commodities.Total==pending.Amount)
-                {
-                    Submit(draft);
-                }
-                return;
+                if(view.ThreeKingdoms?.BlockedGainCardTypes?.Contains(good)==true)continue;
+                bool selected=privateProgressSelection.IsCardSelected(good,ordinal);
+                var rect=new Rect(Mathf.Max(0,(ProgressTableUI.Area.width-20-count*144)/2)+index++*144,selected?0:10,132,198);
+                EntityCardAssets.DrawCardFace(rect,EntityCardAssets.ResourceOrCommodityFront(good));
+                if(ThreeKingdomsDirectInput.Read(rect,Operations().CanInteract&&(selected||privateProgressSelection.Selected.Sum()<pending.Amount),false)==1)
+                    privateProgressSelection.Toggle(good,ordinal,goods[good]);
             }
-            if(ModernOperationUI.Button(ProgressTableUI.Item(order.Length,order.Length+1),"重选",draft.Resources.Total+draft.Commodities.Total>0))
-            {draft.Resources=new ResourceBag();draft.Commodities=new CommodityBag();}
+            GUI.EndScrollView();
+            ai.DrawHandInstruction("请选择取得 "+pending.Amount+" 张牌");
             return;
         }
         if(HarborResponse)return;
@@ -289,24 +335,12 @@ public sealed partial class M4App
             // 城市设施的常驻按钮就是三个轨道的选择入口。
             return;
         }
-        if(draft.ProgressCard==ProgressCardKind.Alchemy)
-        {
-            for(int i=0;i<12;i++)
-            {
-                int value=i%6+1;bool red=i<6;
-                var r=ProgressTableUI.Item(i,12);r.y+=20;r.height=48;
-                if(!ModernOperationUI.Button(r,(red?"红 ":"白 ")+value,true,false,(red?draft.ChosenDice1:draft.ChosenDice2)==value))continue;
-                if(red)draft.ChosenDice1=value;else draft.ChosenDice2=value;
-                if(draft.ChosenDice1!=0&&draft.ChosenDice2!=0)Submit(draft);
-                return;
-            }
-            return;
-        }
+        if(AlchemyPicking)return;
         int start=draft.ProgressCard==ProgressCardKind.TradeMonopoly?5:0;
         int end=draft.ProgressCard==ProgressCardKind.ResourceMonopoly?5:8;
         for(int good=start;good<end;good++)
         {
-            if(!ProgressTableUI.Card(good-start,end-start,EntityCardAssets.ResourceOrCommodityFront(good),Goods[good]))continue;
+            if(!ProgressTableUI.Card(good-start,end-start,EntityCardAssets.ResourceOrCommodityFront(good)))continue;
             var c=draft;
             c.ChooseCommodity=good>=5;
             if(good<5)c.Resource=(Resource)good;else c.Commodity=(Commodity)(good-5);

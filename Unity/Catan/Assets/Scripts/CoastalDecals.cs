@@ -7,7 +7,7 @@ public static class CoastalDecals
 {
     public const string Root = PaintedMap.Root + "Coast/";
     public const float ShoreEnd=.0115f;
-    const float SeaEnd=-.0157f;
+    const float SeaEnd=-.0215f;
     public const float DockLength=ShoreEnd-SeaEnd;
     public const float DockInset=.0016f;
     static float pierModelLength;
@@ -46,9 +46,9 @@ public static class CoastalDecals
     static void LoadPier()
     {
         if (timber != null) return;
-        var library = Resources.Load<GameObject>(Root + "pier");
+        var library = Resources.Load<GameObject>(Root + "harbor-house");
         foreach (var part in library.GetComponentsInChildren<MeshFilter>())
-            parts[part.name] = part;
+            parts[part.name == "CoastalWalkway" ? "PierDeck" : part.name] = part;
         timber = new Material(Resources.Load<Shader>(Root + "PierTimber"));
         timber.mainTexture = Resources.Load<Texture2D>("TabletopUI/v003/oak-table-albedo");
         waterShadow = new Material(Resources.Load<Shader>(Root + "PierWaterShadow"));
@@ -75,55 +75,24 @@ public static class CoastalDecals
         var root = new GameObject(label).transform;
         root.SetParent(parent, false);
         root.SetPositionAndRotation(bottom, rotation);
-        if(!BoardArtPreference.Painted) AddPier(root);
-        else if(cargo=="wood") root.gameObject.AddComponent<PaintedTimberPort>();
-        else AddPaintedDock(root,cargo);
-        var markers = parent != null ? parent.GetComponentInParent<TabletopReferenceMarkers>() : null;
-        var assets = JadeNumberAssets.For(markers != null ? markers.transform.parent : parent != null ? parent : root);
-        var slip = assets.CreateSlip(root, "港口贸易玉签", Root+"sign-"+cargo);
-        slip.gameObject.AddComponent<HarborSign>().Initialize(slip);
+        AddPier(root);
+        Place(root, "HarborHouse", timber);
+        var rig = new GameObject("吊旗").transform;
+        rig.SetParent(root, false);
+        rig.localPosition = new Vector3(-.0146f, 0, -.0208f);
+        Place(rig, "HarborMast", timber);
+        if (!flagMaterials.TryGetValue(cargo, out var cloth))
+        {
+            cloth = new Material(Resources.Load<Shader>(Root + "HarborCloth"));
+            cloth.mainTexture = Resources.Load<Texture2D>(Root + "flag-" + cargo);
+            flagMaterials[cargo] = cloth;
+        }
+        var flag = Place(rig, "HarborFlag", cloth);
+        flag.gameObject.AddComponent<HarborSign>().Initialize();
         return root.gameObject;
     }
 
-    static readonly Dictionary<string,Material> paintedMaterials=new Dictionary<string,Material>();
-    static Mesh paintedDock;
-    static readonly Rect[] PaintedSections={
-        Rect.MinMaxRect(-.0105f,SeaEnd,.0105f,-.00027f),
-        Rect.MinMaxRect(-.0034f,-.00027f,.0034f,ShoreEnd)
-    };
-    static void AddPaintedDock(Transform root,string cargo)
-    {
-        if(paintedDock==null)
-        {
-            var points=new List<Vector3>();
-            var uv=new List<Vector2>();
-            var indices=new List<int>();
-            foreach(var r in PaintedSections)
-            {
-                int start=points.Count;
-                foreach(var p in new[]{XZ(r.xMin,r.yMin),XZ(r.xMin,r.yMax),XZ(r.xMax,r.yMax),XZ(r.xMax,r.yMin)})
-                {
-                    points.Add(p);
-                    uv.Add(new Vector2(.5f+p.x/.021f,(p.z-SeaEnd)/DockLength));
-                }
-                foreach(int index in Quad)indices.Add(start+index);
-            }
-            paintedDock=Surface("港口画稿轮廓",points.ToArray(),uv.ToArray(),indices.ToArray());
-        }
-        if(!paintedMaterials.TryGetValue(cargo,out var material))
-        {
-            material=new Material(Resources.Load<Shader>("FantasyPieces/FantasyInk"))
-                {mainTexture=Resources.Load<Texture2D>(Root+"port-"+cargo),renderQueue=3001};
-            paintedMaterials[cargo]=material;
-        }
-        var face=new GameObject("港口原画");
-        face.transform.SetParent(root,false);
-        face.transform.localPosition=Vector3.up*.00035f;
-        face.AddComponent<MeshFilter>().sharedMesh=paintedDock;
-        var renderer=face.AddComponent<MeshRenderer>();
-        renderer.sharedMaterial=material;
-        renderer.shadowCastingMode=ShadowCastingMode.Off;
-    }
+    static readonly Dictionary<string, Material> flagMaterials = new Dictionary<string, Material>();
 
     static void AddPier(Transform root)
     {
@@ -131,23 +100,19 @@ public static class CoastalDecals
         Place(root, "PierDeck", timber);
         var shadow = new GameObject("栈桥水影").transform;
         shadow.SetParent(root,false);
-        shadow.localScale = new Vector3(.038f,1,.038f);
+        shadow.localScale = new Vector3(.068f,1,.068f);
         shadow.localPosition = Vector3.up*(TabletopOcean.WaterHeight+.00008f-EntityBoardAssets.BoardSurfaceHeight);
         shadow.gameObject.AddComponent<MeshFilter>().sharedMesh = Rectangle();
         var renderer = shadow.gameObject.AddComponent<MeshRenderer>();
-        renderer.sharedMaterial = waterShadow;
+        var markers = root.GetComponentInParent<TabletopReferenceMarkers>();
+        renderer.sharedMaterial = markers != null && markers.PierWaterMaterial != null ? markers.PierWaterMaterial : waterShadow;
         renderer.shadowCastingMode = ShadowCastingMode.Off;
     }
 
     // 避让渔场与取景只需桥面投影；每块木板、缆绳和货物都在这两段轮廓内。
     public static IEnumerable<Vector3[]> Footprint(Transform root)
     {
-        if(root.TryGetComponent<PaintedTimberPort>(out var timberPort))
-        {
-            foreach(var triangle in timberPort.Footprint()) yield return triangle;
-            yield break;
-        }
-        foreach (var rect in root.Find("港口原画")!=null ? PaintedSections : DeckSections)
+        foreach (var rect in DeckSections)
         {
             var a = root.TransformPoint(XZ(rect.xMin,rect.yMin));
             var b = root.TransformPoint(XZ(rect.xMin,rect.yMax));
@@ -158,8 +123,7 @@ public static class CoastalDecals
         }
     }
     static readonly Rect[] DeckSections = {
-        Rect.MinMaxRect(-.0124f,SeaEnd,.0124f,-.00027f),
-        Rect.MinMaxRect(-.0037f,-.00027f,.0037f,.01152f),
-        Rect.MinMaxRect(.00510f,-.00027f,.01220f,.00169f)
+        Rect.MinMaxRect(-.00572f,SeaEnd,.00572f,ShoreEnd),
+        Rect.MinMaxRect(-.0152f,-.0214f,-.0140f,-.0202f)
     };
 }

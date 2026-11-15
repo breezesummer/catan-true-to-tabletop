@@ -114,6 +114,32 @@ public static class B45InteractionEditorVerification
     {bool modal=((OperationDock)Get(city,"dock")).HasOverlay;bool block=(bool)app.GetType().GetProperty("ThreeKingdomsPanelBlocksTable",Instance).GetValue(app);if(modal||block)result.模态窗口次数++;Require(!modal,"操作打开了模态窗口");Require(!block,"全屏输入拦截仍然存在");}
     static IEnumerator Verify()
     {
+        if(Environment.GetCommandLineArgs().Contains("--gold-resource-review"))
+        {
+            stage="金矿领取";SetSize(1440,900);
+            app.StartGame("combined","through-the-desert",4,"P1",true,threeKingdoms:true,harbormaster:true,fishing:true);
+            yield return 1.5;
+            var game=app.GetComponent<M5App>();var host=game.VerificationHost;
+            var policy=new Catan.AI.CombinedAi();
+            for(int i=0;i<300;i++){
+                var v=host.View("P1");
+                if(v.Phase==Catan.Core.M5.GamePhase.ProductionAwaitRoll&&v.ActivePlayerId=="P1"&&v.ThreeKingdoms.SkillDecision==null)break;
+                var actor=v.ThreeKingdoms.WaitingSelectionPlayerIds.FirstOrDefault()??M5App.Actor(v);
+                var command=policy.Decide((Catan.Core.M5.PlayerView)Invoke(host,"AiView",actor));command.Id=Guid.NewGuid().ToString("N");
+                Require(host.Submit(command).Success,"推进开局失败");
+            }
+            var combined=(Catan.Core.M5.CombinedGameSession)Get(host,"session");
+            var goldState=combined.GetAuthoritativeStateForTesting();
+            var impl=combined.GetType().GetNestedType("B2Host",BindingFlags.NonPublic);
+            var harvestHost=(IThreeKingdomsCardHost)Activator.CreateInstance(impl,combined,goldState);
+            B2SkillEngine.BeginHarvest(harvestHost,new[]{new B2HarvestAllocation{PlayerId="P1",GoldCount=1}});
+            Set(combined,"state",goldState);Invoke(game,"M6Refresh");yield return 2.0;
+            Require(Selection.Contract?.DecisionKind=="gold","没有进入金矿选择");
+            yield return Capture("金矿资源选择框");
+            yield return Click(new Vector2(368,466));
+            Require(host.View("P1").ThreeKingdoms.SkillDecision?.Kind!="gold","点击后金矿仍未领取");
+            yield break;
+        }
         stage="启动真实桌面";SetSize(1440,900);app.StartGame("cities-knights","heading-for-new-shores",4,"P1",true,threeKingdoms:true);yield return 1.5;
         city=app.GetComponent<M4App>();Require(city!=null&&app.Ready,"城市骑士主机未启动");
         if(Environment.GetCommandLineArgs().Contains("--general-frame-preview"))
@@ -244,6 +270,7 @@ public static class B45InteractionEditorVerification
         result.诊断="EditorPaused="+EditorApplication.isPaused+", focused="+(EditorWindow.focusedWindow==null?"null":EditorWindow.focusedWindow.GetType().Name)+", appFocused="+Application.isFocused+", frame="+Time.frameCount+", timeScale="+Time.timeScale+", cityEnabled="+(city!=null&&city.enabled)+", board="+(city!=null&&Get(city,"board")!=null)+", menu="+(app!=null&&app.TableMenuOpen)+", samePresentation="+(city!=null&&ReferenceEquals(city,Get(app,"presentation")));
         result.说明="Unity真实M6界面指定局面验收，局面仅测试注入；技能五项及支付选牌、用途、确认通过Unity原生GameView输入队列注入鼠标移动/按下/松手事件完成（编辑器输入模拟，非物理鼠标），断言读取权威结果。支付地图目标方式单独记录，允许显式参数启用夹具定位但绝不计作鼠标命中通过；不作为正常完整局、Android真机或用户试玩证据。"+(failure==null?"":"\n"+failure);
         if(Environment.GetCommandLineArgs().Contains("--general-frame-preview"))result.说明="阚泽单将真实GameView预览：检查主动选择、不可用阻止、被动左击与右击说明，截图覆盖满寿命、2轮、1轮及他人回合。局面由编辑器夹具准备，输入来自Unity原生GameView队列；未执行完整局、其他武将或Android真机验收。"+(failure==null?"":"\n"+failure);
+        if(Environment.GetCommandLineArgs().Contains("--gold-resource-review"))result.说明="在双扩展、三国、海港、捕鱼、穿越沙漠局面触发金矿分配，在 GameView 中截图并点击领取。"+(failure==null?"":"\n"+failure);
         result.场景=cases.ToArray();result.截图=images.ToArray();File.WriteAllText(Path.Combine(output,"result.json"),JsonUtility.ToJson(result,true));
         SessionState.EraseString(Key);SessionState.EraseString(Deadline);Debug.Log("CATAN_B45_INTERACTION_"+(failure==null?"OK":"FAILED")+": "+result.说明);
         if(Environment.GetCommandLineArgs().Contains("--b45-keep-open"))

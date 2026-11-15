@@ -41,7 +41,7 @@ namespace Catan.Core.ThreeKingdoms
                     case "tk-g05-s1":summary=Remaining(general,"liuli",phase);if(Left(general,"liuli",phase)==0)specific="本出牌阶段流离次数已用。";else if(host.GetHand(viewerId)[3]<1)specific="需要1张真实麦子。";break;
                     case "tk-g05-s2":summary=Remaining(general,"guose",phase);if(Left(general,"guose",phase)==0)specific="本出牌阶段国色次数已用。";else if(host.GetHand(viewerId)[1]<2)specific="需要2张真实砖。";break;
                     case "tk-g08-s2":summary=Remaining(general,"poxi",phase);if(Left(general,"poxi",phase)==0)specific="本阶段已提交魄袭目标，次数不会因重选退回。";break;
-                    case "tk-g12-s1":int previous=Value(general,"fenyin",phase);summary=previous>=1&&previous<=5?"上次："+new[]{"道路","船","村庄","城市","城墙"}[previous-1]:"本阶段尚无建造记录";break;
+                    case "tk-g12-s1":int previous=B2SkillEngine.PreviousFenyinBuilding(general);summary=previous>=1&&previous<=5?"上次："+new[]{"道路","船","村庄","城市","城墙"}[previous-1]:"尚无建造记录";break;
                     case "tk-g13-s1":summary=Remaining(general,"lianpo",0);if(Left(general,"lianpo",0)==0)specific="本任连破限定次数已用。";break;
                     case "tk-g14-s1":summary="可截获 "+Left(general,"jianxiong",0,4)+" / 4";break;
                     case "tk-g15-s1":summary="赠牌余数 "+Value(general,"rende",turn)+" / 2";break;

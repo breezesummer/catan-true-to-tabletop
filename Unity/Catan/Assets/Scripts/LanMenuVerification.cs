@@ -48,7 +48,7 @@ public sealed class LanMenuVerification : MonoBehaviour
     }
     IEnumerator Verify()
     {
-        Screen.SetResolution(1600,900,false);
+        Screen.SetResolution(1920,1080,false);
         yield return new WaitForSecondsRealtime(.5f);
         while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
         Call("NavigateMainMenu",2);stage="进入局域网自动服务";
@@ -57,6 +57,7 @@ public sealed class LanMenuVerification : MonoBehaviour
         Require(app.Network.Room==null);
         if(((M7LanService.Advertisement[])Get("networkFound")).Length==0){Call("DiscoverLan");yield return Wait(()=>!(bool)Get("networkWorking"));}
         Require(((M7LanService.Advertisement[])Get("networkFound")).Length>0);
+        Require((string)Call("HeaderConnectionLabel")!="已连接");
         string pin=File.ReadAllText(Path.Combine(app.LanReviewDataDirectory,"server-fingerprint.txt")).Trim();
         // 重复启动应复用已验证的服务，不会因固定端口再次启动失败。
         var ready=service.Start(app.LanReviewDataDirectory);yield return Wait(()=>ready.IsCompleted);Require(!ready.IsFaulted);
@@ -87,10 +88,13 @@ public sealed class LanMenuVerification : MonoBehaviour
         }
         yield return Capture("01-auto-service-no-room");
         var open=MakeClient("open",pin);var locked=MakeClient("locked",pin);
-        open.Create(new RoomSettings{Name="无需密码的朋友房间",RuleSet="base",ScenarioId="base",PlayerCount=4,Listed=true},"朋友甲","");
+        open.Create(new RoomSettings{Name="江东小聚",RuleSet="combined",ScenarioId="through-the-desert",ThreeKingdomsPackageVersion=Catan.Core.ThreeKingdoms.GeneralCatalog.B6PackageVersion,ThreeKingdomsContentHash=Catan.Core.ThreeKingdoms.GeneralCatalog.B6ContentHash,Harbormaster=true,Fishing=true,TradeModulesVersion=NetworkProtocol.TradeModulesVersion,PlayerCount=4,Listed=true},"青禾","");
         yield return Wait(()=>!open.Busy&&open.Room!=null);
-        locked.Create(new RoomSettings{Name="需要密码的朋友房间",RuleSet="base",ScenarioId="base",PlayerCount=4,Listed=true},"朋友乙","验收密码");
+        locked.Create(new RoomSettings{Name="海上新城",RuleSet="seafarers",ScenarioId="four-islands",PlayerCount=4,Listed=true},"子木","验收密码");
         yield return Wait(()=>!locked.Busy&&locked.Room!=null);
+        var third=MakeClient("islands",pin);
+        third.Create(new RoomSettings{Name="群岛之夜",RuleSet="seafarers",ScenarioId="fog-islands",PlayerCount=3,Listed=true},"山月","");
+        yield return Wait(()=>!third.Busy&&third.Room!=null);
         stage="未创建房间直接搜索";Call("DiscoverLan");yield return Wait(()=>!(bool)Get("networkWorking"));
         var servers=(M7LanService.Advertisement[])Get("networkFound");
         var server=servers.First(s=>s.Rooms.Any(r=>r.RoomId==open.RoomId));
@@ -98,8 +102,35 @@ public sealed class LanMenuVerification : MonoBehaviour
         Require(app.Network.Room==null);Require(Get("pendingJoinRoom")==null);yield return Capture("02-room-list-no-password-field");
         stage="无密码直接加入";Call("RequestJoinRoom",openRoom,server,false);Require(Get("pendingJoinRoom")==null);
         yield return Wait(()=>!app.Network.Busy&&app.Network.Room?.RoomId==open.RoomId);
+        Require((string)Call("HeaderConnectionLabel")=="已连接");
+        stage="房间木屋换座与准备";
+        open.Ready(true);yield return Wait(()=>!open.Busy);
+        var seatedGuest=MakeClient("room-guest",pin);seatedGuest.Join(open.RoomId,"山海","");
+        yield return Wait(()=>!seatedGuest.Busy&&seatedGuest.Room!=null);
+        seatedGuest.Ready(true);yield return Wait(()=>!seatedGuest.Busy);
+        yield return Wait(()=>app.Network.Room.Seats.Count(s=>s.Occupied)==3);
+        yield return Capture("03a-room-player-unready");
+        string originalSeat=app.Network.SeatId;
+        var emptySeat=app.Network.Room.Seats.Single(s=>!s.Occupied&&!s.IsAi);
+        Call("RoomSeatAction",app.Network.Room,emptySeat);
+        yield return Wait(()=>!app.Network.Busy&&app.Network.SeatId==emptySeat.SeatId);
+        Require(app.Network.Room.ManagerSeatId==open.SeatId);
+        Call("RoomSeatAction",app.Network.Room,app.Network.Room.Seats.Single(s=>s.SeatId==app.Network.SeatId));
+        yield return Wait(()=>!app.Network.Busy&&app.Network.Room.Seats.Single(s=>s.SeatId==app.Network.SeatId).Ready);
+        yield return Capture("03b-room-player-ready");
+        Call("RoomSeatAction",app.Network.Room,app.Network.Room.Seats.Single(s=>s.SeatId==app.Network.SeatId));
+        yield return Wait(()=>!app.Network.Busy&&!app.Network.Room.Seats.Single(s=>s.SeatId==app.Network.SeatId).Ready);
+        Call("RoomSeatAction",app.Network.Room,app.Network.Room.Seats.Single(s=>s.SeatId==originalSeat));
+        yield return Wait(()=>!app.Network.Busy&&app.Network.SeatId==originalSeat);
+        Require(app.Network.Room.ManagerSeatId!=app.Network.SeatId);
+        seatedGuest.Leave();yield return Wait(()=>!seatedGuest.Busy&&seatedGuest.Room==null);
         yield return null;Set("networkTab",0);Require((bool)Call("JoinedRoom",openRoom,server));
         yield return Capture("03-already-joined");
+        foreach(var size in new[]{new Vector2Int(1280,720),new Vector2Int(1920,900)}){
+            Screen.SetResolution(size.x,size.y,false);yield return new WaitForSecondsRealtime(.3f);
+            yield return Capture("03c-lobby-"+size.x+"x"+size.y);
+        }
+        Screen.SetResolution(1920,1080,false);yield return new WaitForSecondsRealtime(.3f);
         stage="密码弹窗取消保留原桌";Call("RequestJoinRoom",lockedRoom,server,false);
         Require(Get("pendingJoinRoom")!=null);Require(app.Network.RoomId==open.RoomId);
         Set("joinPassword","验收密码");yield return Capture("04-password-dialog-masked");

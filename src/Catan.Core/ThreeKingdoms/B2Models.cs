@@ -63,6 +63,8 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=9, EmitDefaultValue=false)] public string[] SelectionPlayerIds { get; set; }
         [DataMember(Order=15, EmitDefaultValue=false)] public int[] SelectionCost { get; set; }
         [DataMember(Order=16, EmitDefaultValue=false)] public int? RefundCardCount { get; set; }
+        [DataMember(Order=17, EmitDefaultValue=false)] public int? MinimumHandCount { get; set; }
+        [DataMember(Order=18, EmitDefaultValue=false)] public int? MaximumHandCount { get; set; }
         [DataMember(Order=10, EmitDefaultValue=false)] public string[] SelectionBoardIds { get; set; }
         [DataMember(Order=11, EmitDefaultValue=false)] public int? RequiredCardCount { get; set; }
         [DataMember(Order=12, EmitDefaultValue=false)] public int? SelectionDiceIndex { get; set; }

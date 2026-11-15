@@ -5,16 +5,22 @@ using UnityEngine;
 // 金矿、引水渠和捕鱼共用银行牌面。取单张直接落定，多张可调整后再领取。
 public static class TabletopResourceChoiceUI
 {
-    public static readonly Rect Area=new Rect(352,462,738,242);
+    public static readonly Rect Area=new Rect((1440-738)/2,(900-242)/2,738,242);
+    internal static readonly Rect CompactArea=new Rect((1440-932)/2,(900-140)/2,932,140);
+
+    internal static void DrawFrame(Rect area,string caption,int selected,int required)
+    {
+        PastoralMenuUI.Panel(area);
+        PastoralMenuUI.Label(new Rect(area.x,area.y+12,area.width,32),required>0?caption+selected+"/"+required:caption,16,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
+    }
     static readonly string[] Names={"木材","砖块","羊毛","小麦","矿石"};
 
-    public static void Draw(int amount,ResourceBag selection,ResourceBag bank,Action confirm,string caption="金矿 · 选择资源",OperationWindowState windows=null,Action cancel=null)
+    public static void Draw(int amount,ResourceBag selection,ResourceBag bank,Action confirm,string caption="金矿：请选择资源",OperationWindowState windows=null,Action cancel=null)
     {
         if(windows?.Suppressed==true)return;
         windows?.Describe(caption);
         int required=Math.Min(amount,bank.Total);
-        string title=required>1?caption+"   "+selection.Total+" / "+required:caption;
-        ModernOperationUI.WindowFrame(Area,new Rect(Area.x+16,Area.y+6,Area.width-104,32),title);
+        DrawFrame(Area,caption,selection.Total,required);
         if(ModernOperationUI.Button(new Rect(Area.xMax-80,Area.y+8,32,28),"—"))
         {if(windows!=null)windows.Hide(caption);else cancel?.Invoke();return;}
         if(ModernOperationUI.Button(new Rect(Area.xMax-42,Area.y+8,32,28),"×"))

@@ -69,8 +69,8 @@ public sealed partial class InteractionPresentationVerification
         var knight=snapshot.Cards.First(c=>c.Playable);PickFeedbackCard(dock,snapshot,knight);
         Require(before==host.ExportSave()&&dock.HasCancelableInteraction,"第一次点骑士应当只抬起手牌");
         if(Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("基础发展卡拿起");
-        PickFeedbackCard(dock,snapshot,knight);yield return null;yield return SettleFeedback();
-        Require(host.View("P1").Players.First(p=>p.Id=="P1").PlayedKnights==1&&host.View("P1").Phase==Catan.Core.M2.GamePhase.RobberMove,"第二次点骑士未进入强盗待决");
+        PickFeedbackCard(dock,snapshot,knight);Require(before==host.ExportSave(),"重复查看卡牌提前使用");Require(hud.DevelopmentCardInspecting&&hud.DevelopmentCardReady,"右下角使用按钮没有就绪");hud.ConfirmDevelopmentCard();yield return null;yield return SettleFeedback();
+        Require(host.View("P1").Players.First(p=>p.Id=="P1").PlayedKnights==1&&host.View("P1").Phase==Catan.Core.M2.GamePhase.RobberMove,"使用按钮未进入强盗待决");
         snapshot=game.VerificationOperationSnapshot;BindFeedbackCardHud(game);before=host.ExportSave();
         PickFeedbackCard(dock,snapshot,snapshot.Cards[0]);Require(snapshot.RequiresSelection&&before==host.ExportSave(),"手牌点击绕过了强盗待决");dock.Reset();session.AssertInvariants();
     }
@@ -116,7 +116,7 @@ public sealed partial class InteractionPresentationVerification
             var selected=snapshot.Cards.Single(c=>c.ArtIndex==Convert.ToInt32(kind));Require(selected.Playable,"直接使用夹具没有合法卡牌 "+card);
             Func<string> save=()=>(string)host.GetType().GetMethod("ExportSave").Invoke(host,null);string before=save();
             PickFeedbackCard(dock,snapshot,selected);Require(save()==before,"第一次点牌提前消耗牌 "+card);
-            if(selected.Immediate)PickFeedbackCard(dock,snapshot,selected);
+            dock.UseSelectedCard(snapshot);
             if(card=="MerchantFleet")
             {
                 yield return null;yield return null;
@@ -181,6 +181,7 @@ public sealed partial class InteractionPresentationVerification
             var snapshot=game.VerificationOperationSnapshot;var hud=BindFeedbackCardHud(game);string previewBefore=host.ExportSave();
             PickFeedbackCard(game.VerificationOperationDock,snapshot,snapshot.Cards.First(x=>x.ArtIndex==(int)card));
             Require(previewBefore==host.ExportSave(),"选择目标前发展卡被消耗");
+            game.VerificationOperationDock.UseSelectedCard(snapshot);
             if(card==Catan.Core.M4.ProgressCardKind.Merchant&&Environment.GetCommandLineArgs().Contains("--feedback-screenshots"))yield return Capture("城市骑士手牌直选目标");
             Require(previewBefore==host.ExportSave(),"进入地图选目标时提前消耗进步卡");
             Require((bool)PolishGet(game,"DirectProgressActive"),"未进入地图用牌模式");Require(!(bool)PolishGet(game,"OperationContextVisible"),"旧菜单仍然遮挡棋盘");
@@ -282,6 +283,7 @@ public sealed partial class InteractionPresentationVerification
             var snapshot=game.VerificationOperationSnapshot;var hud=BindFeedbackCardHud(game);string previewBefore=host.ExportSave();
             PickFeedbackCard(game.VerificationOperationDock,snapshot,snapshot.Cards.First(x=>x.ArtIndex==(int)card));
             Require(previewBefore==host.ExportSave(),"组合发展卡选目标时提前消耗牌");
+            game.VerificationOperationDock.UseSelectedCard(snapshot);
             Require(previewBefore==host.ExportSave(),"组合进步卡进入地图选目标时提前消耗牌");
             Require((bool)PolishGet(game,"DirectProgressActive"),"未进入地图用牌模式");Require(!(bool)PolishGet(game,"OperationContextVisible"),"旧菜单仍然遮挡棋盘");
             var input=typeof(M5App).GetMethod("UpdateDirectProgress",Private);

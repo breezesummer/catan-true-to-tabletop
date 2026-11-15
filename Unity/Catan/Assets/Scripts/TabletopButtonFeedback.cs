@@ -24,7 +24,7 @@ public static class TabletopButtonFeedback
         public void Dispose(){GUI.matrix=matrix;}
     }
     public static DrawScope Begin(Rect r,bool enabled=true)=>new DrawScope(r,GUI.enabled&&enabled);
-    public static bool Button(Rect r,bool sound=true,bool round=false)
+    public static bool Button(Rect r,bool sound=true,bool round=false,bool drawOverlay=true)
     {
         TabletopPointerCursor.Hover(r);
         var e=Event.current;var screen=GUIUtility.GUIToScreenPoint(r.center);
@@ -36,7 +36,7 @@ public static class TabletopButtonFeedback
         if(e.rawType==EventType.MouseUp&&e.button==0)pressed=false;
         hit=hit&&(!MobileTabletop.Enabled||!MobileTabletop.TouchDragged);
         if(hit){releasedAt=screen;releasedTime=Time.unscaledTime;if(sound)TabletopAudio.Instance?.Click();}
-        if(e.type==EventType.Repaint&&GUI.enabled)
+        if(drawOverlay&&e.type==EventType.Repaint&&GUI.enabled)
         {
             float pulse=releasedAt==screen?Mathf.Clamp01(1-(Time.unscaledTime-releasedTime)/.24f):0;
             if(over||pulse>0||down)

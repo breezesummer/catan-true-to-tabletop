@@ -284,9 +284,7 @@ public sealed partial class M3App
             for(int good=0;good<5;good++)
             {
                 bool available=monopoly||preparedResourceCards[good]<view.Bank[(Resource)good];
-                string caption=new[]{"木材","砖块","羊毛","小麦","矿石"}[good];
-                if(preparedResourceCards[good]>0)caption+=" ×"+preparedResourceCards[good];
-                if(!ProgressTableUI.Card(good,monopoly?5:6,EntityCardAssets.ResourceOrCommodityFront(good),caption,available))continue;
+                if(!ProgressTableUI.Card(good,monopoly?5:6,EntityCardAssets.ResourceOrCommodityFront(good),available,preparedResourceCards[good]))continue;
                 if(monopoly){var play=NewCommand(CommandKind.PlayMonopoly);play.Resource=(Resource)good;Submit(play);return;}
                 preparedResourceCards[good]++;
                 if(preparedResourceCards.Sum()==needed)
@@ -297,7 +295,7 @@ public sealed partial class M3App
                 }
                 return;
             }
-            if(!monopoly&&ModernOperationUI.Button(ProgressTableUI.Item(5,6),needed==0?"打出":"重选",needed==0||preparedResourceCards.Sum()>0))
+            if(!monopoly&&ModernOperationUI.Button(ProgressTableUI.ButtonArea(5,6),needed==0?"打出":"重选",needed==0||preparedResourceCards.Sum()>0))
             {
                 if(needed==0){var play=NewCommand(CommandKind.PlayYearOfPlenty);play.Resources=new ResourceBag();Submit(play);}
                 else Array.Clear(preparedResourceCards,0,preparedResourceCards.Length);

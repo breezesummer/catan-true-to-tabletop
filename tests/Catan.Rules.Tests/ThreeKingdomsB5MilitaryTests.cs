@@ -168,10 +168,38 @@ public sealed class ThreeKingdomsB5MilitaryTests
         var h=B5MilitaryHost.Create("tk-g20","tk-g21");h.State.Clock.Phase=ThreeKingdomsPhase.Preparation;B3DiceEngine.BeginTurn(h);var skip=B3DiceEngine.Actions(h,"P1").Single(a=>a.Command.Option=="skip").Command;B3DiceEngine.Resolve(h,"P1",skip);Assert.Equal("P2",h.State.Dice.PendingDecision.PlayerId);Assert.Equal(0,Counter(h,"P1","huoshou"));Assert.Empty(h.Invasions);
     }
     [Fact]
+    public void HuoshouHasOneFixedResultAndBypassesGuanxingAndGuicai()
+    {
+        var h=B5MilitaryHost.Create("tk-g19","tk-g20","tk-g13");h.State.Clock.Phase=ThreeKingdomsPhase.Preparation;B3DiceEngine.BeginTurn(h);
+        var actions=B3DiceEngine.Actions(h,"P2");var fixedAction=Assert.Single(actions,a=>a.Command.Option=="fixed");
+        Assert.Equal(6,fixedAction.Command.Counts[0]);Assert.Equal(1,fixedAction.Command.CardType);
+        B45SelectionMetadata.AnnotateDice(h,actions);Assert.Null(fixedAction.SelectionDiceIndex);
+        B3DiceEngine.Resolve(h,"P2",fixedAction.Command);var restored=h.Copy();
+        var publicView=new ThreeKingdomsView();B3DiceEngine.Project(h,publicView,"P3");
+        Assert.Equal(6,publicView.FixedDiceResult.Red);publicView.FixedDiceResult.Red=2;Assert.Equal(6,h.State.Dice.FixedResult.Red);
+        foreach(var host in new[]{h,restored}){
+            host.State.Clock.Phase=ThreeKingdomsPhase.Roll;B3DiceEngine.BeginRoll(host,"P1","fixed-formal");
+            Assert.Null(host.State.Dice.PendingDecision);var result=B3DiceEngine.TakeFinal(host)!;
+            Assert.Equal(6,result.Red);Assert.Equal(1,result.White);Assert.Equal(1,result.EventFace);
+            Assert.False(result.ActualRoll);Assert.False(result.NumericActualRoll);Assert.False(result.EventActualRoll);Assert.Equal(0,host.Inner.RandomCalls);
+        }
+    }
+    [Fact]
     public void HuoshouEndMovementSurvivesRetirementAndCanBeDeclined()
     {
         var h=B5MilitaryHost.Create("tk-g20");h.Moves=new[]{new B4TokenMove{OptionId="move",TileId="t1",TokenKind="robber",Label="移动"}};B2SkillEngine.CommitB5Huoshou(h,"P1","h");h.State.Generals[0].Region=GeneralRegion.Retired;
         B2SkillEngine.OnB5MilitaryEnd(h,"end");B2SkillEngine.Pump(h);Choose(h,"P1","b5m-huoshou-move");Drain(h);Assert.Single(h.AppliedMoves);B2SkillEngine.OnB5MilitaryEnd(h,"end");Assert.Empty(h.State.Skills.Frames);
+    }
+    [Fact]
+    public void HuoshouMovementProjectsTileAndVictimForDirectMapSelection()
+    {
+        var h=B5MilitaryHost.Create("tk-g20");h.Moves=new[]{new B4TokenMove{OptionId="move",TileId="t1",VictimPlayerId="P2",TokenKind="robber",Label="移动"}};
+        B2SkillEngine.CommitB5Huoshou(h,"P1","h");B2SkillEngine.OnB5MilitaryEnd(h,"end");B2SkillEngine.Pump(h);
+        var view=new ThreeKingdomsView();B2SkillEngine.Project(h,view,"P1");
+        var action=Assert.Single(view.SkillActions,a=>a.Command.Option=="b5m-huoshou-move");
+        Assert.Equal(new[]{"t1"},B45SelectionContract.Board(action));Assert.Equal(new[]{"P2"},B45SelectionContract.Players(action));
+        var c=new B45SelectionContext();c.Begin(view,"P1",null,new int[8]);Assert.False(c.ShowOptionChoices);Assert.NotNull(c.SkipCommand);
+        Assert.True(c.ToggleTile("t1"));Assert.Null(c.FinishDirectPick());Assert.True(c.TogglePlayer("P2"));Assert.Equal("move",c.FinishDirectPick(true).ProgressCardId);
     }
     [Fact]
     public void ZaiqiOnlyOffersSatisfiedBranchesAndKeepsTileEffectAfterRetirement()

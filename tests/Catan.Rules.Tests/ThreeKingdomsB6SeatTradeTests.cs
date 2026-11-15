@@ -37,6 +37,21 @@ public sealed class ThreeKingdomsB6SeatTradeTests
         Assert.Equal(h.Inner.Snapshot(),restored.Inner.Snapshot());Assert.Equal(count,h.GetHand("P1").Sum());Assert.Equal(3-count,h.GetHand("P2").Sum());Assert.Equal(1,h.State.Generals[0].Counters.Single(c=>c.Key=="fuqi").Value);h.Inner.AssertConserved();
     }
     [Fact]
+    public void FuqiBatchRequestCanBeRevisedLocallyAndCommitsOnce()
+    {
+        var h=Host.Create("tk-g46");h.Inner.Give("P1",1);h.Inner.Give("P2",0,0,0,0,0,2);
+        Use(h,"seat-fuqi");Use(h,"seat-fuqi-give",0);
+        var view=new ThreeKingdomsView{PackageVersion=h.State.PackageVersion,WindowId=h.State.WindowId};B2SkillEngine.Project(h,view,"P1");
+        Assert.All(view.SkillActions,a=>Assert.Null(a.RequiredCardCount));
+        var draft=new B45SelectionContext();draft.Begin(view,"P1",null,h.GetHand("P1"));var before=h.Inner.Snapshot();
+        Assert.True(draft.RequiresBankCards);draft.ToggleBankCard(5);draft.ToggleBankCard(6);Assert.Null(draft.FinishDirectPick());
+        Assert.True(draft.ToggleBankCard(6,-1));Assert.True(draft.ToggleBankCard(5));Assert.True(draft.CanConfirm);Assert.Equal(before,h.Inner.Snapshot());
+        var command=draft.BeginSubmit();Assert.Equal("seat-fuqi-batch-submit",command.Option);
+        var bad=B45SelectionContract.Copy(command);bad.SecondaryCounts[5]=3;
+        Assert.Throws<InvalidOperationException>(()=>B2SkillEngine.Resolve(h,"P1",bad));Assert.Equal(before,h.Inner.Snapshot());
+        B2SkillEngine.Resolve(h,"P1",command);Assert.Equal(2,h.GetHand("P1")[5]);Assert.Equal(1,h.GetHand("P2")[0]);h.Inner.AssertConserved();
+    }
+    [Fact]
     public void FuqiHiddenInsufficiencyConsumesBothAttemptsWithoutChangingCards()
     {
         var h=Host.Create("tk-g46");h.Inner.Give("P1",1);

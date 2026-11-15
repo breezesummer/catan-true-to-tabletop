@@ -9,7 +9,7 @@ namespace Catan.Core.ThreeKingdoms
         public static B2SkillAction WithBoard(B2SkillAction action,B5BoardOption option)
         {
             if(action.Command.Option=="civil-kurou")action.RefundCardCount=B5BoardRules.KurouReward(option);
-            if(option.AssetKind!="Improvement"||action.Command.Option=="civil-kurou")action.SelectionBoardIds=new[]{option.SourceId,option.TargetId}.Where(id=>!string.IsNullOrEmpty(id)).Distinct().ToArray();
+            action.SelectionBoardIds=new[]{option.SourceId,option.TargetId}.Where(id=>!string.IsNullOrEmpty(id)).Distinct().ToArray();
             if(action.Command.Option=="civil-qixi-tech"){action.SelectionCost=new int[8];action.SelectionCost[1]=option.Level;}
             return action;
         }
@@ -34,7 +34,7 @@ namespace Catan.Core.ThreeKingdoms
                     action.SelectionDiceIndex=roll.ChoiceCursor;
                     action.SelectionDiceValue=roll.ChoiceCursor==0?candidate.Red:roll.ChoiceCursor==1?candidate.White:candidate.EventFace;
                 }
-                else if(c.Option=="fixed") {action.SelectionDiceIndex=0;action.SelectionDiceValue=c.Counts[0];}
+                else if(c.Option=="fixed"&&c.SkillId!="tk-g20-s1") {action.SelectionDiceIndex=0;action.SelectionDiceValue=c.Counts[0];}
             }
         }
         // 只对已经过规则验证的用途增加公开稳定目标，不把原生载荷或私密数据传给客户端。
@@ -46,7 +46,7 @@ namespace Catan.Core.ThreeKingdoms
             {
                 var c=action.Command;
                 if(c.Option=="civil-niepan-track")action.SelectionBoardIds=new[]{"Improvement:"+viewerId+":"+c.CardType};
-                if(c.Option=="response-liuli"&&host is IThreeKingdomsB4ResponseHost response)
+                if((c.Option=="response-liuli"||c.Option=="b5m-huoshou-move")&&host is IThreeKingdomsB4ResponseHost response)
                 {
                     if(moves==null)moves=response.GetTokenMoves(viewerId);
                     var move=moves.FirstOrDefault(m=>m.OptionId==c.ProgressCardId);

@@ -28,19 +28,16 @@ public sealed class ThreeKingdomsB6RoomTests
 
     private static object Field(object instance,string name)=>instance.GetType().GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!.GetValue(instance)!;
     private static void SetField(object instance,string name,object value)=>instance.GetType().GetField(name,BindingFlags.Instance|BindingFlags.NonPublic)!.SetValue(instance,value);
-    private static void AssertControlledRejoinBoundary(ThreeKingdomsB4RoomTests.Fixture f,B6ControlGrant grant)
+    private static void AssertControlledReconnect(ThreeKingdomsB4RoomTests.Fixture f,B6ControlGrant grant)
     {
-        var room=((IDictionary)Field(f.Directory,"rooms")).Values.Cast<object>().Single();var state=Field(room,"state");
-        var seats=((IEnumerable)state.GetType().GetProperty("Seats")!.GetValue(state)!).Cast<object>().ToArray();
-        object Seat(string id)=>seats.Single(s=>(string)s.GetType().GetProperty("SeatId")!.GetValue(s)! == id);
-        void Set(object s,string name,object? value)=>s.GetType().GetProperty(name)!.SetValue(s,value);
-        bool Ai(object s)=>(bool)s.GetType().GetProperty("ControlledByAi")!.GetValue(s)!;
-        var controller=Seat(grant.ControllerPlayerId);var asset=Seat(grant.AssetPlayerId);
-        // 两席均在上一个机会离线后重连；当前已有惑心授权，下一边界只应把控制交还实际操作者。
-        foreach(var seat in new[]{controller,asset}){Set(seat,"ControlledByAi",true);Set(seat,"RejoinAfterTurnKey","prior-opportunity");}
-        room.GetType().GetMethod("RestoreHumanControlAtTurnBoundary",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(room,null);
-        Assert.False(Ai(controller));Assert.True(Ai(asset));
-        foreach(var seat in new[]{controller,asset}){Set(seat,"ControlledByAi",false);Set(seat,"RejoinAfterTurnKey",null);}
+        // 本人重连接回席位，惑心等规则授予的代操关系仍由规则判定。
+        foreach(var id in new[]{grant.ControllerPlayerId,grant.AssetPlayerId})
+        {
+            int index=Array.FindIndex(f.Clients,c=>c.SeatId==id);f.Directory.Disconnect(f.Clients[index].ConnectionId);
+            var resumed=f.Reconnect(f.Clients[index]);Assert.True(resumed.Success);Assert.True(resumed.HumanControlAvailable);
+            Assert.False(resumed.Room.Seats.Single(s=>s.SeatId==id).ControlledByAi);Assert.False(resumed.Room.Seats.Single(s=>s.SeatId==id).RejoinPending);
+            f.Clients[index]=resumed;
+        }
     }
     private static void SeedControlOpening(ThreeKingdomsB4RoomTests.Fixture f,string rules)
     {
@@ -82,7 +79,8 @@ public sealed class ThreeKingdomsB6RoomTests
         for(int i=0;i<150&&f.Tk(f.Snapshot(f.Clients[1])).ControlB6==null;i++)
         {var own=Actor(f,rules);var selected=Choose(f,own,rules);var applied=f.Submit(own,selected,own.Revision);Assert.True(applied.Success,$"步骤{i}：{applied.Code}:{applied.Message}；命令{WireJson.SerializeObject(selected)}；待决{System.Text.Json.JsonSerializer.Serialize(f.Tk(own).PendingDecision)}");}
         var controller=f.Clients.Single(c=>c.SeatId=="P2");var current=f.Snapshot(controller);var grant=f.Tk(current).ControlB6;Assert.NotNull(grant);Assert.Equal("P2",grant.ControllerPlayerId);Assert.NotEqual("P2",grant.AssetPlayerId);
-        AssertControlledRejoinBoundary(f,grant);
+        AssertControlledReconnect(f,grant);
+        controller=f.Clients.Single(c=>c.SeatId=="P2");
         for(int i=0;i<80;i++)
         {
             var actor=Actor(f,rules);if(actor.SeatId=="P2")break;
@@ -97,10 +95,7 @@ public sealed class ThreeKingdomsB6RoomTests
         var appliedCommand=f.Submit(current,command,current.Revision);Assert.True(appliedCommand.Success,appliedCommand.Message);string save=f.GameSave;Assert.True(f.Submit(current,command,current.Revision).IsDuplicate);Assert.Equal(save,f.GameSave);
         f.Restart();for(int i=0;i<f.Clients.Length;i++)f.Clients[i]=f.Reconnect(f.Clients[i]);controller=f.Clients.Single(c=>c.SeatId=="P2");current=f.Snapshot(controller);
         Assert.Equal(grant.AssetPlayerId,f.Tk(current).ControlB6.AssetPlayerId);Assert.Equal(grant.OpportunityId,f.Tk(current).ControlB6.OpportunityId);
-        Assert.False(current.HumanControlAvailable);Assert.True(current.Room.Seats.Single(s=>s.SeatId=="P2").RejoinPending);
-        // 掷骰后可能轮到其他席位弃牌；此处仅验证重连接管门禁，重发先前命令的新ID即可。
-        dynamic interrupted=rules=="combined"?(object)WireJson.Deserialize<M5.Command>(WireJson.SerializeObject(command)):WireJson.Deserialize<M4.Command>(WireJson.SerializeObject(command));
-        interrupted.Id=Guid.NewGuid().ToString("N");Assert.Equal("AiTakeover",f.Submit(current,interrupted,current.Revision).Code);
+        Assert.True(current.HumanControlAvailable);Assert.False(current.Room.Seats.Single(s=>s.SeatId=="P2").RejoinPending);
         for(int i=0;i<280&&(f.Tk(f.Snapshot(controller)).ControlB6!=null||!f.Snapshot(controller).HumanControlAvailable);i++)
         {
             var own=Actor(f,rules);if(!own.HumanControlAvailable){Assert.Equal(1,await f.Directory.TickAiAsync());continue;}

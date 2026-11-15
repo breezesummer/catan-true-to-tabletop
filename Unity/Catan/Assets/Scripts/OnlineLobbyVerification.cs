@@ -56,12 +56,13 @@ public sealed class OnlineLobbyVerification : MonoBehaviour
     }
     IEnumerator Verify()
     {
-        Screen.SetResolution(1600,900,false);
+        Screen.SetResolution(1920,1080,false);
         yield return new WaitForSecondsRealtime(.5f);
         while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
         while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
         stage="未配置联机服务器";Call("OpenSeparatedNetworkMenu",false);
         Require(app.OnlineLobbyState==M7LobbyConnectionState.Unconfigured&&!app.OnlineRoomActionsAvailable);
+        Require((string)Call("HeaderConnectionLabel")=="未连接");
         yield return Capture("01-unconfigured-lobby");
 
         // 本机只接收 TCP、不返回 HTTP 的端口，提供真实、稳定的连接中画面。
@@ -70,11 +71,13 @@ public sealed class OnlineLobbyVerification : MonoBehaviour
         var accepted=waitingServer.AcceptTcpClientAsync();
         Set("networkOnlineDraft",offlineAddress);Call("SaveOnlineServerAddress");
         Require(app.OnlineLobbyState==M7LobbyConnectionState.Connecting&&!app.OnlineRoomActionsAvailable);
+        Require((string)Call("HeaderConnectionLabel")=="连接中");
         yield return Wait(()=>accepted.IsCompleted);
         waitingConnection=accepted.Result;yield return Capture("02-connecting-lobby");
         waitingConnection.Dispose();waitingConnection=null;waitingServer.Stop();waitingServer=null;
         stage="服务器不在线";yield return Wait(()=>app.OnlineLobbyState==M7LobbyConnectionState.Offline&&!app.Network.Busy);
         Require(app.Network.Rooms.Length==0&&!app.OnlineRoomActionsAvailable);
+        Require((string)Call("HeaderConnectionLabel")=="未连接");
         Call("CreateOnlineRoom");Require(app.Network.Room==null&&!app.Network.Busy);
         yield return Capture("03-server-offline");
 
@@ -83,6 +86,7 @@ public sealed class OnlineLobbyVerification : MonoBehaviour
         yield return Wait(()=>app.OnlineLobbyState==M7LobbyConnectionState.Online&&!app.Network.Busy);
         Require(app.Network.Endpoint==onlineAddress&&app.Network.Rooms.Length==0&&app.Network.Room==null);
         Require(File.ReadAllText(app.OnlineReviewSettingsPath)==onlineAddress&&app.OnlineRoomActionsAvailable);
+        Require((string)Call("HeaderConnectionLabel")=="已连接");
         yield return Capture("05-online-empty-lobby");
 
         stage="创建公开房间";Set("networkTab",1);Set("menuRule",3);Set("menuPlayers",4);
@@ -92,7 +96,23 @@ public sealed class OnlineLobbyVerification : MonoBehaviour
         yield return Capture("06-create-room");Call("CreateOnlineRoom");
         yield return Wait(()=>!app.Network.Busy&&app.Network.Room!=null);
         string createdRoom=app.Network.RoomId;Require(app.Network.Room.Name=="在线大厅验收房间"&&app.Network.SeatId!=null);
+        app.Network.SetDisplayName("清风");
+        yield return Wait(()=>app.Network.Room.Seats.Any(s=>s.SeatId==app.Network.SeatId&&s.DisplayName=="清风"));
         yield return Capture("07-created-current-room");
+
+        stage="房间木屋直接换座与准备";
+        string firstSeat=app.Network.SeatId;
+        var emptySeat=app.Network.Room.Seats.Last(s=>!s.Occupied&&!s.IsAi);
+        Call("RoomSeatAction",app.Network.Room,emptySeat);
+        yield return Wait(()=>!app.Network.Busy&&app.Network.SeatId==emptySeat.SeatId);
+        Require(app.Network.Room.ManagerSeatId==emptySeat.SeatId);
+        Call("RoomSeatAction",app.Network.Room,app.Network.Room.Seats.Single(s=>s.SeatId==app.Network.SeatId));
+        yield return Wait(()=>!app.Network.Busy&&app.Network.Room.Seats.Single(s=>s.SeatId==app.Network.SeatId).Ready);
+        Call("RoomSeatAction",app.Network.Room,app.Network.Room.Seats.Single(s=>s.SeatId==app.Network.SeatId));
+        yield return Wait(()=>!app.Network.Busy&&!app.Network.Room.Seats.Single(s=>s.SeatId==app.Network.SeatId).Ready);
+        Call("RoomSeatAction",app.Network.Room,app.Network.Room.Seats.Single(s=>s.SeatId==firstSeat));
+        yield return Wait(()=>!app.Network.Busy&&app.Network.SeatId==firstSeat);
+        Require(app.Network.Room.ManagerSeatId==firstSeat);
 
         stage="四席准备与房主菜单";
         var guests=new List<M7Client>();
@@ -106,21 +126,57 @@ public sealed class OnlineLobbyVerification : MonoBehaviour
         yield return Wait(()=>!app.Network.Busy&&app.Network.Room.Seats.All(s=>s.Occupied&&s.Ready));
         Require(app.Network.Room.ScenarioId=="through-the-desert"&&app.Network.Room.Harbormaster&&app.Network.Room.Fishing);
         yield return Capture("07a-four-ready-seats");
+        stage="大厅回房入口恢复原席";
+        string retainedSeat=app.Network.SeatId;
+        // 模拟自动恢复已停止的客户端状态；回房处理器经真实服务执行 Reconnect。
+        typeof(M7Client).GetField("automaticReconnect",Flags).SetValue(app.Network,false);
+        typeof(M7Client).GetProperty("Connected").SetValue(app.Network,false);
+        Set("networkTab",0);Call("ReturnToCurrentRoom");
+        yield return Wait(()=>!app.Network.Busy&&app.Network.Connected);
+        Require(app.Network.RoomId==createdRoom&&app.Network.SeatId==retainedSeat);
+        Require((int)Get("networkTab")==2&&(string)Call("HeaderConnectionLabel")=="已连接");
+        // 用真实长玩家名核对名牌留白，房主点击其他玩家仍打开原有转交确认。
+        const string longName="江上客与山海同游共赴沙漠争霸四方再相逢";
+        guests[0].SetDisplayName(longName);yield return Wait(()=>!guests[0].Busy);
+        yield return Wait(()=>app.Network.Room.Seats.Any(s=>s.DisplayName==longName));
+        Call("RoomSeatAction",app.Network.Room,app.Network.Room.Seats.Single(s=>s.SeatId==guests[0].SeatId));
+        Require((string)Get("transferSeat")==guests[0].SeatId);
+        yield return Capture("07d-transfer-host-long-name");Set("transferSeat",null);
+        yield return Capture("07e-long-name-seats");
+        foreach(var size in new[]{new Vector2Int(1280,720),new Vector2Int(1440,900),new Vector2Int(1920,900)}){
+            Screen.SetResolution(size.x,size.y,false);yield return new WaitForSecondsRealtime(.3f);
+            yield return Capture("07f-room-"+size.x+"x"+size.y);
+        }
+        Screen.SetResolution(1920,1080,false);yield return new WaitForSecondsRealtime(.3f);
         Set("lanRoomPage",1);yield return Capture("07b-room-settings");
-        Set("lanRoomPage",2);yield return Capture("07c-connection-recovery");
         Set("lanRoomPage",0);
+        Set("networkTab",0);Call("OpenOnlineConnectionSettings");
+        Require((int)Get("networkTab")==3&&(string)Get("networkOnlineDraft")==onlineAddress);
+        yield return Capture("07c-connection-settings");
+        foreach(var size in new[]{new Vector2Int(1280,720),new Vector2Int(1440,900),new Vector2Int(1920,900)}){
+            Screen.SetResolution(size.x,size.y,false);yield return new WaitForSecondsRealtime(.3f);
+            yield return Capture("07c-connection-settings-"+size.x+"x"+size.y);
+        }
+        Screen.SetResolution(1920,1080,false);yield return new WaitForSecondsRealtime(.3f);
+        Set("networkOnlineDraft","");yield return Capture("07c-connection-settings-empty");
+        Set("networkOnlineDraft",onlineAddress);Set("networkTab",2);
         foreach(var guest in guests){guest.Leave();yield return Wait(()=>!guest.Busy&&guest.Room==null);}
         var open=MakeClient("open");var locked=MakeClient("locked");
-        open.Create(new RoomSettings{Name="好友的公开房间",RuleSet="base",ScenarioId="base",PlayerCount=4,Listed=true},"验收好友甲","");
+        open.Create(new RoomSettings{Name="沙海同行",RuleSet="combined",ScenarioId="through-the-desert",PlayerCount=4,Listed=true},"验收好友甲","");
         yield return Wait(()=>!open.Busy&&open.Room!=null);
-        locked.Create(new RoomSettings{Name="好友的密码房间",RuleSet="base",ScenarioId="base",PlayerCount=4,Listed=true},"验收好友乙","验收密码");
+        locked.Create(new RoomSettings{Name="群岛之夜",RuleSet="seafarers",ScenarioId="four-islands",PlayerCount=4,Listed=true},"验收好友乙","验收密码");
         yield return Wait(()=>!locked.Busy&&locked.Room!=null);
         stage="大厅显示实际服务端房间";Set("networkTab",0);Call("RefreshOnlineLobby");
         yield return Wait(()=>!app.Network.Busy&&app.Network.Rooms.Length>=3);
         var openRoom=app.Network.Rooms.Single(r=>r.RoomId==open.RoomId);var lockedRoom=app.Network.Rooms.Single(r=>r.RoomId==locked.RoomId);
         Require(app.Network.Rooms.Any(r=>r.RoomId==createdRoom));yield return Capture("08-room-list");
+        foreach(var size in new[]{new Vector2Int(1280,720),new Vector2Int(1920,900)}){
+            Screen.SetResolution(size.x,size.y,false);yield return new WaitForSecondsRealtime(.3f);
+            yield return Capture("08a-lobby-"+size.x+"x"+size.y);
+        }
+        Screen.SetResolution(1920,1080,false);yield return new WaitForSecondsRealtime(.3f);
 
-        stage="点击无密码房间直接加入";Call("RequestJoinRoom",openRoom,null,false);
+        stage="按房间代码加入";Set("networkRoomId",openRoom.RoomId);Call("JoinLobbyCode");
         Require(Get("pendingJoinRoom")==null);yield return Wait(()=>!app.Network.Busy&&app.Network.RoomId==open.RoomId&&app.Network.Room!=null);
         Require((bool)Call("JoinedRoom",openRoom,null));
         stage="密码弹窗与取消";Call("RequestJoinRoom",lockedRoom,null,false);Require(Get("pendingJoinRoom")!=null);
@@ -139,6 +195,7 @@ public sealed class OnlineLobbyVerification : MonoBehaviour
         yield return Wait(()=>File.Exists(Path.Combine(output,"server-stopped.signal")),90);
         app.Network.ListRooms();yield return Wait(()=>!app.Network.Busy&&app.OnlineLobbyState==M7LobbyConnectionState.Offline);
         Require(app.Network.Rooms.Length==0&&!app.OnlineRoomActionsAvailable);
+        Require((string)Call("HeaderConnectionLabel")=="未连接");
         string retainedRoom=app.Network.RoomId;Call("CreateOnlineRoom");Call("RequestJoinRoom",openRoom,null,false);
         Require(!app.Network.Busy&&app.Network.RoomId==retainedRoom&&Get("pendingJoinRoom")==null);
         yield return Capture("12-stopped-server-clears-rooms");
@@ -154,6 +211,31 @@ public sealed class OnlineLobbyVerification : MonoBehaviour
         yield return Wait(()=>!app.Network.Busy&&app.OnlineLobbyState==M7LobbyConnectionState.Online);
         Require(app.Network.Endpoint==onlineAddress&&File.ReadAllText(app.OnlineReviewSettingsPath)==onlineAddress);
         yield return Capture("14-saved-address-auto-connect");
+
+        stage="大厅后台查询保持控件和输入稳定";
+        Set("networkRoomId","沙海同行");Set("networkScroll",new Vector2(0,12));
+        float until=Time.realtimeSinceStartup+6;
+        while(Time.realtimeSinceStartup<until){Require(!app.Network.Busy);Require((string)Get("networkRoomId")=="沙海同行");yield return null;}
+        yield return Capture("15-lobby-after-background-poll");
+
+        stage="真实 AI 托管状态条与房间标题";
+        var settings=new RoomSettings{Name="沙海同盟",RuleSet="combined",ScenarioId="through-the-desert",PlayerCount=4,
+            Harbormaster=true,Fishing=true,TradeModulesVersion=NetworkProtocol.TradeModulesVersion,AiSeats=new[]{"P3","P4"},
+            ThreeKingdomsPackageVersion=Catan.Core.ThreeKingdoms.GeneralCatalog.B6PackageVersion,
+            ThreeKingdomsContentHash=Catan.Core.ThreeKingdoms.GeneralCatalog.B6ContentHash};
+        app.Network.Create(settings,"清风","");yield return Wait(()=>!app.Network.Busy&&app.Network.Room?.Name==settings.Name);
+        var trustee=MakeClient("托管玩家");trustee.Join(app.Network.RoomId,"托管玩家","");yield return Wait(()=>!trustee.Busy&&trustee.Room!=null);
+        trustee.Ready(true);yield return Wait(()=>!trustee.Busy&&app.Network.Room.Seats.Any(s=>s.SeatId==trustee.SeatId&&s.Ready));
+        app.Network.Ready(true);yield return Wait(()=>!app.Network.Busy&&app.Network.Room.Seats.All(s=>s.IsAi||s.Ready));
+        app.Network.StartRoom();yield return Wait(()=>app.Ready&&app.Network.Playing);
+        Call("OpenNetworkMenu");Set("networkTab",2);Set("lanRoomPage",0);
+        trustee.Leave();yield return Wait(()=>!trustee.Busy&&app.Network.Room.Seats.Any(s=>s.ControlledByAi));
+        Require(app.Network.Room.Name=="沙海同盟");yield return null;Require(!app.Network.LobbyPollingEnabled);
+        yield return Capture("16-room-ai-takeover");
+        foreach(var size in new[]{new Vector2Int(1280,720),new Vector2Int(1440,900)}){
+            Screen.SetResolution(size.x,size.y,false);yield return new WaitForSecondsRealtime(.3f);
+            yield return Capture("16-room-ai-takeover-"+size.x+"x"+size.y);
+        }
     }
     M7Client MakeClient(string name)
     {

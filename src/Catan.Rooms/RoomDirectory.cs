@@ -360,11 +360,12 @@ public sealed partial class RoomDirectory : IDisposable
                 if (state.Closed) return Reject("RoomClosed", "该大厅房间已结束，请加入其他房间或重新创建。");
                 if (request.Operation == "Reconnect") return Reconnect(seat);
                 if (string.IsNullOrEmpty(request.ConnectionId) || !SameSecret(seat.ConnectionId, request.ConnectionId)) return Reject("ConnectionSuperseded", "该席位已由新连接接管，请重新连接。");
-                if (observedClientActivity && game != null && !Connected(seat))
+                if (observedClientActivity && game != null && (!Connected(seat) || seat.ControlledByAi || seat.RejoinAfterTurnKey != null))
                 {
                     var before = PrivateJson.Copy(state);
-                    seat.ControlledByAi = true; seat.RejoinAfterTurnKey = game.TurnKey; state.Revision++;
+                    seat.ControlledByAi = false; seat.RejoinAfterTurnKey = null; state.Revision++;
                     if (!Commit(before)) return Reject("PersistenceFailed", "重连状态保存失败，请稍后重新连接。");
+                    Trace("room.human-control-restored", started);
                 }
                 if (observedClientActivity)
                 {
@@ -429,15 +430,14 @@ public sealed partial class RoomDirectory : IDisposable
         private NetworkResponse Reconnect(SavedSeat seat)
         {
             if (state.Closed) return Reject("RoomClosed", "该大厅房间已结束，请加入其他房间或重新创建。");
+            var started = Stopwatch.GetTimestamp();
             var before = PrivateJson.Copy(state); var old = seat.ConnectionId; seat.ConnectionId = PrivateJson.Token();
-            // 活跃连接替换不打断当前控制；真正离线后的重连需等待下一次自身回合。
-            if (game != null && !Connected(before.Seats.Single(s => s.SeatId == seat.SeatId)))
-            {
-                seat.ControlledByAi = true; seat.RejoinAfterTurnKey = game.TurnKey; state.Revision++;
-                // 同时选将没有当前行动回合；仍有效的个人待决可在重连锁内安全交回本人。
-                if(game.HasIndependentSelection(seat.SeatId)){seat.ControlledByAi=false;seat.RejoinAfterTurnKey=null;}
-            }
+            // 与 AI 执行共用房间锁，当前已提交的行动保留，后续操作立即交还本人。
+            bool restored = game != null && (!Connected(before.Seats.Single(s => s.SeatId == seat.SeatId)) || seat.ControlledByAi || seat.RejoinAfterTurnKey != null);
+            if (restored) state.Revision++;
+            seat.ControlledByAi = false; seat.RejoinAfterTurnKey = null;
             if (!Commit(before)) return Reject("PersistenceFailed", "连接接管保存失败，请稍后重试。");
+            if (restored) Trace("room.human-control-restored", started);
             if (old != null) lastSeen.Remove(old); lastSeen[seat.ConnectionId] = owner.options.Clock(); disconnectedSince.Remove(seat.SeatId); return Snapshot(seat);
         }
         private NetworkResponse Command(NetworkRequest request, SavedSeat seat)
@@ -456,14 +456,14 @@ public sealed partial class RoomDirectory : IDisposable
                 if (previous.SeatId != seat.SeatId || previous.Fingerprint != fingerprint) return Snapshot(seat, "CommandConflict", "同一命令标识不能用于不同操作。", false);
                 var duplicate = Snapshot(seat, previous.Code, previous.Message, previous.Success); duplicate.IsDuplicate = true; duplicate.CommittedRevision = previous.Revision; return duplicate;
             }
-            if (seat.ControlledByAi) return Snapshot(seat, "AiTakeover", "AI 正在接管，重连后将在下一次自己的行动回合恢复操作。", false);
+            if (seat.ControlledByAi) return Snapshot(seat, "AiTakeover", "AI 正在接管，重连后立即恢复操作。", false);
             if (!preview && game.CommandCount >= owner.options.MaximumCommittedCommands) return Snapshot(seat, "CommandLimit", "本房间已达到可恢复的命令上限，最后保存局面已保留。", false);
             if (paused) return Snapshot(seat, "RoomPaused", "保存失败后房间已暂停，请管理员恢复保存。", false);
             if (request.ExpectedRevision != state.Revision && !(request.ExpectedRevision<state.Revision&&game.HasIndependentSelectionToken(command))) return Snapshot(seat, "StaleRevision", "局面已更新，请根据最新局面重新决定。", false);
             if (preview) { var check = game.Execute(command, true); return Snapshot(seat, check.Code, check.Message, check.Success); }
             if (state.Receipts.Count >= 100000) return Snapshot(seat, "CommandLimit", "本房间已达到保存命令上限。", false);
             var before = PrivateJson.Copy(state); var result = game.Execute(command, false);
-            if (result.Success) { state.Revision++; state.GameSave = game.Save(); RestoreHumanControlAtTurnBoundary(); }
+            if (result.Success) { state.Revision++; state.GameSave = game.Save(); }
             state.Receipts.Add(request.CommandId, new SavedReceipt { SeatId = seat.SeatId, Fingerprint = fingerprint, Success = result.Success, Code = result.Code, Message = result.Message, Revision = state.Revision });
             if (!Commit(before)) return Snapshot(state.Seats.Single(s => s.SeatId == seat.SeatId), "PersistenceFailed", "操作未提交；房间已恢复到最后保存局面并暂停。", false);
             return Snapshot(seat, result.Code, result.Message, result.Success);
@@ -585,18 +585,6 @@ public sealed partial class RoomDirectory : IDisposable
                 else pendingChange = new(state.RoomId, state.Revision, Stopwatch.GetTimestamp());
             }
         }
-        private bool CanRestoreHumanControl(SavedSeat seat) => game != null && !game.Finished && seat.ControlledByAi && Connected(seat) && seat.RejoinAfterTurnKey != null && seat.RejoinAfterTurnKey != game.TurnKey && game.ActiveControllerPlayerId == seat.SeatId;
-        private bool RestoreHumanControlAtTurnBoundary()
-        {
-            if (game == null || game.Finished) return false;
-            bool changed = false;
-            foreach (var seat in state.Seats)
-                if (CanRestoreHumanControl(seat))
-                {
-                    seat.ControlledByAi = false; seat.RejoinAfterTurnKey = null; changed = true;
-                }
-            return changed;
-        }
         internal bool TickAi()
         {
             lock (gate)
@@ -627,7 +615,6 @@ public sealed partial class RoomDirectory : IDisposable
                     }
                     if (game == null && state.Seats.Count == 0) { PreserveBeforeChange(); state.Closed = true; state.ManagerSeatId = null; changed = true; }
                     if (game == null && changed) { state.ManagerSeatId = state.Seats.OrderByDescending(Connected).Select(s => s.SeatId).FirstOrDefault(); ResetReady(); }
-                    if (state.Seats.Any(CanRestoreHumanControl)) { PreserveBeforeChange(); changed |= RestoreHumanControlAtTurnBoundary(); }
                     if (changed) { state.Revision++; if (!Commit(prior)) return false; }
                     if (state.Closed) return false;
                 }
@@ -644,7 +631,7 @@ public sealed partial class RoomDirectory : IDisposable
                 var command = game.Decide(actor); command.GetType().GetProperty("Id").SetValue(command, "ai-" + Guid.NewGuid().ToString("N"));
                 var before = PrivateJson.Copy(state); var result = game.Execute(command, false);
                 if (!result.Success) { paused = true; return false; }
-                state.Revision++; state.GameSave = game.Save(); RestoreHumanControlAtTurnBoundary(); return Commit(before);
+                state.Revision++; state.GameSave = game.Save(); return Commit(before);
             }
         }
     }

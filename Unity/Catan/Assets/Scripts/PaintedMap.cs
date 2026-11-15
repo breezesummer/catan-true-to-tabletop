@@ -56,8 +56,9 @@ public sealed class PaintedMap : MonoBehaviour
         {
             map.ink = new Material(Resources.Load<Shader>(Root + "Terrain")) { name = "手绘棋盘" };
             map.ink.mainTexture = Resources.Load<Texture2D>(Root + "terrain-atlas");
-            map.ink.SetTexture("_Gravel",Resources.Load<Texture2D>(CoastalDecals.Root+"gravel"));
-            map.ink.SetTexture("_Sand",Resources.Load<Texture2D>(CoastalDecals.Root+"sand"));
+            map.ink.SetTexture("_RoadEdge",Resources.Load<Texture2D>(CoastalDecals.Root+"road-edge"));
+            map.ink.SetTexture("_RoadVerges",Resources.Load<Texture2D>(CoastalDecals.Root+"road-verges"));
+            map.ink.SetTexture("_BeachEdge",Resources.Load<Texture2D>(CoastalDecals.Root+"beach-edge"));
         }
         var model = PlayerComponentAssets.Model(Root + "board-hex");
         var tile = Instantiate(model, center, model.transform.rotation, parent);

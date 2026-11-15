@@ -12,6 +12,34 @@ namespace Catan.AI
             if (view == null || !view.SkillsEnabled) return null;
             bool required = view.SkillDecision != null;
             var choices = view.SkillActions ?? Array.Empty<B2SkillAction>();
+            if (view.SkillDecision?.Kind == "b4-reveal")
+            {
+                var confirm = choices.FirstOrDefault(a => a?.Command?.Option == "b4-selected");
+                if (confirm != null)
+                {
+                    var pile = SplitXiashu(hand, desired);
+                    var reveal = Copy(confirm.Command);
+                    if (GeneralCatalog.UsesDirectPackage(view.PackageVersion))
+                    {
+                        reveal.Option = "b45-selected"; reveal.Counts = pile; return reveal;
+                    }
+                    // 旧包逐张提交；依据已投影的选中数量继续，读档后也不会选到整手。
+                    var next = choices.FirstOrDefault(a => a?.Command?.Option == "b4-select" &&
+                        a.Command.CardType >= 0 && a.Command.CardType < 8 &&
+                        a.Command.Counts[a.Command.CardType] < pile[a.Command.CardType]);
+                    return Copy(next?.Command ?? confirm.Command);
+                }
+            }
+            if (view.SkillDecision?.Kind == "b4-pile")
+            {
+                // 暗堆只使用公开张数估值，绝不读取对方私密牌种。
+                var pile = choices.Where(a => a?.Command != null &&
+                    (a.Command.Option == "b4-revealed" || a.Command.Option == "b4-hidden"))
+                    .OrderByDescending(a => a.Command.Option == "b4-revealed"
+                        ? HandValue(view.RevealedSkillCards, hand, desired)
+                        : (a.AvailableCount ?? 0) * 1.75).FirstOrDefault();
+                if (pile != null) return Copy(pile.Command);
+            }
             double Value(B2SkillCommand c)
             {
                 if (!required)
@@ -38,6 +66,13 @@ namespace Catan.AI
                     if (GeneralCatalog.UsesDirectPackage(view.PackageVersion))
                     {
                         if (c.Option == "b4-jieming") return 20;
+                        if (c.Option == "b4-xiashu")
+                        {
+                            // 预计对手合理分堆；计入交出全部手牌和失去建设材料的代价。
+                            int other = (c.TargetPlayerIds ?? Array.Empty<string>()).Sum(handCount);
+                            double gain = (other + hand.Sum()) * .5 * 1.75 - HandValue(hand, new int[8], desired);
+                            return gain > 0 ? gain : double.NegativeInfinity;
+                        }
                         if (c.Option == "response-jixi") return 12;
                         if (c.Option == "b4-daoshu") return c.CardType >= 0 && c.CardType < 8 ? Math.Max(0, desired[c.CardType] - hand[c.CardType]) + 4 : 1;
                     }
@@ -81,6 +116,29 @@ namespace Catan.AI
                 }
             }
             return selected;
+        }
+
+        private static double HandValue(int[] cards, int[] held, int[] desired)
+        {
+            double value = 0;
+            for (int type = 0; type < 8; type++)
+                value += cards[type] + 2 * Math.Min(cards[type], Math.Max(0, desired[type] - held[type]));
+            return value;
+        }
+
+        private static int[] SplitXiashu(int[] hand, int[] desired)
+        {
+            // 同种牌先均分，再把余牌按建设价值放到较弱的一堆，保护最差情况下的剩余收益。
+            var shown = hand.Select(n => n / 2).ToArray();
+            var hidden = (int[])shown.Clone();
+            foreach (int type in Enumerable.Range(0, 8).Where(i => hand[i] % 2 != 0)
+                .OrderByDescending(i => desired[i] > shown[i] ? 3 : 1))
+            {
+                double left = HandValue(shown, new int[8], desired), right = HandValue(hidden, new int[8], desired);
+                var destination = left < right || left == right && shown.Sum() <= hidden.Sum() ? shown : hidden;
+                destination[type]++;
+            }
+            return shown;
         }
 
         internal static B2SkillCommand Copy(B2SkillCommand command) => command == null ? null : new B2SkillCommand

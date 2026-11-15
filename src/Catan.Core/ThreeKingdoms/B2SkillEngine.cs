@@ -130,10 +130,16 @@ namespace Catan.Core.ThreeKingdoms
             var type = Array.IndexOf(types, buildingType == "Wall" ? "CityWall" : buildingType);
             OnB4Built(host, eventId, type);
             if (g?.GeneralId != "tk-g12" || s.Clock.Phase != ThreeKingdomsPhase.Play || s.Clock.ActivePlayerId != playerId || type < 0 || !Mark(s, "built:" + eventId)) return;
-            var c = Counter(g, "fenyin", s.Clock.PhaseId); var previous = c.Value; c.Value = type + 1;
+            var previous = PreviousFenyinBuilding(g);
+            var c = Counter(g, "fenyin", 0);
+            c.Value = type + 1;
             if (previous != 0 && previous != c.Value) Append(s, Frame(s, g, "tk-g12-s1", "resource", 1, eventId));
             Pump(host);
         }
+
+        // 旧存档按阶段标记，但每名武将始终只保留一条奋音记录。
+        internal static int PreviousFenyinBuilding(GeneralInstance general) =>
+            general.Counters.FirstOrDefault(c => c.Key == "fenyin")?.Value ?? 0;
 
         public static void OnEnd(IThreeKingdomsCardHost host, string eventId)
         {

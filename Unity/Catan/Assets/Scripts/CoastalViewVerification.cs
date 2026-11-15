@@ -8,6 +8,51 @@ using UnityEngine.Rendering.Universal;
 
 public sealed partial class TabletopUiVerification
 {
+    IEnumerator VerifyTerrainArt()
+    {
+        mode="combined";
+        app.StartGame(mode,"through-the-desert",4,"P1",true,threeKingdoms:true,harbormaster:true,fishing:true);
+        yield return null;
+        yield return null;
+        for(int step=0;!Snapshot.CanTrade && step<4000;step++)
+        {
+            if(app.IsHumanTurn) Advance();
+            else { app.SetPaused(false); app.StepAi(); app.SetPaused(true); }
+            yield return null;
+        }
+        for(int frame=0;!Table.Ocean.MaskReady && frame<900;frame++) yield return null;
+        Require(Table.Ocean.MaskReady && Snapshot.CanTrade,"验收对局未就绪");
+        var map=Table.transform.parent.GetComponentInChildren<PaintedMap>();
+        var land=Tiles.First(t=>PaintedMap.Region(t.Resource)>=0 && PaintedMap.Region(t.Resource)<8 &&
+            Tiles.Any(s=>PaintedMap.Region(s.Resource)==8 && t.Vertices.Intersect(s.Vertices).Count()==2));
+        var surface=map.transform.Find(land.Id).GetComponentInChildren<MeshRenderer>();
+        var ink=surface.sharedMaterial;
+        Require(ink.shader.isSupported && ink.mainTexture!=null && ink.GetTexture("_RoadEdge")!=null &&
+            ink.GetTexture("_BeachEdge")!=null,"地块边缘素材未加载");
+        Table.Frame(BoardCamera,false,1);
+        yield return new WaitForSecondsRealtime(2);
+        yield return new WaitForEndOfFrame();
+        SaveOceanFrame("穿越沙漠-对局.png");
+        DetailFrame(surface.bounds.center,"穿越沙漠-海岸近景",detailSize:.112f,matchCameraMsaa:true);
+        if(System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"--wave-frames")>=0)
+        {
+            for(int frame=0;frame<3;frame++)
+            {
+                yield return new WaitForSecondsRealtime(.45f);
+                yield return new WaitForEndOfFrame();
+                DetailFrame(surface.bounds.center,"波光-"+frame,detailSize:.112f,matchCameraMsaa:true);
+            }
+        }
+        var pasture=map.transform.Find(Tiles.First(t=>PaintedMap.Region(t.Resource)==2).Id);
+        DetailFrame(pasture.position,"牧场路肩",detailSize:.064f,matchCameraMsaa:true);
+        foreach(var region in new[]{1,4})
+        {
+            var tile=Tiles.Where(t=>PaintedMap.Region(t.Resource)==region)
+                .OrderByDescending(t=>Tiles.Count(n=>n!=t && PaintedMap.Region(n.Resource)<8 && t.Vertices.Intersect(n.Vertices).Count()==2)).First();
+            DetailFrame(map.transform.Find(tile.Id).position,region==1?"砖丘路肩":"矿山路肩",detailSize:.064f,matchCameraMsaa:true);
+        }
+        configurations++;
+    }
     IEnumerator VerifyTimberPort(string[] args)
     {
         mode="combined";
@@ -21,34 +66,15 @@ public sealed partial class TabletopUiVerification
         try
         {
             var markers=Table.transform.parent.GetComponentInChildren<TabletopReferenceMarkers>();
-            var port=markers.transform.Find("港口").GetComponentInChildren<PaintedTimberPort>();
-            Require(port!=null,"地图缺少木材港");
-            var surface=port.transform.Find("木材港原画").GetComponent<MeshFilter>();
-            Require(surface.sharedMesh.vertexCount>4 && surface.GetComponent<Renderer>().sharedMaterial.mainTexture!=null,"木材港缺少原画或透明轮廓");
-            var probe=new GameObject("木材港六向导入检查");
-            probe.SetActive(false);
-            try
-            {
-                var art=probe.AddComponent<PaintedTimberPort>();
-                var drawings=new HashSet<Texture>();
-                for(int i=0;i<6;i++)
-                {
-                    art.Align(Quaternion.Euler(0,30+60*i,0)*Vector3.forward,.04f);
-                    var renderer=probe.GetComponentInChildren<MeshRenderer>(true);
-                    var texture=renderer.sharedMaterial.mainTexture;
-                    Require(texture!=null && texture.width>=1500 && drawings.Add(texture) &&
-                        art.Footprint().Any(),"木材港方向缺少独立高清画稿或拾取轮廓："+i);
-                }
-            }
-            finally { Destroy(probe); }
+            var wood=GetComponent<M5App>().M6View.Board.Ports.First(p=>p.Resource==Catan.Core.Resource.Wood);
+            var port=markers.PortObject(wood.Id);
+            var surface=port.transform.Find("HarborHouse");
+            var flag=port.GetComponentInChildren<HarborSign>();
+            Require(flag.Face.sharedMaterial.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+"flag-wood"),"木材旗图错误");
             Table.Frame(BoardCamera,false,1);
             yield return new WaitForEndOfFrame();
-            var id=port.name.Substring("港口 ".Length);
-            bool hit=port.Footprint().Any(t=>{
-                var pixel=BoardCamera.WorldToScreenPoint((t[0]+t[1]+t[2])/3);
-                return markers.PickPort(new Vector2(pixel.x,Screen.height-pixel.y),BoardCamera)==id;
-            });
-            Require(hit,"木材港画稿未命中交易港");
+            var pixel=BoardCamera.WorldToScreenPoint(flag.Face.bounds.center);
+            Require(markers.PickPort(new Vector2(pixel.x,Screen.height-pixel.y),BoardCamera)==wood.Id,"木材港吊旗未命中");
             yield return new WaitForSecondsRealtime(2);
             yield return new WaitForEndOfFrame();
             if(args.Contains("--board-art-views")) DetailFrame(Vector3.zero,"穿越沙漠-全盘",true);
@@ -65,14 +91,23 @@ public sealed partial class TabletopUiVerification
                     yield return null;
                     yield return new WaitForEndOfFrame();
                     Require(markers.PlacedPortCount==portCount && markers.transform.Find("港口").Cast<Transform>()
-                        .Where(t=>t.gameObject.activeSelf).All(t=>painted
-                        ? t.Find("木材港原画")!=null || t.Find("港口原画")!=null : t.Find("PierDeck")!=null),"港口未同步切换");
+                        .Where(t=>t.gameObject.activeSelf).All(t=>t.Find("HarborHouse")!=null && t.GetComponentInChildren<HarborSign>()!=null),"港口未同步切换");
                     var pieces=GetComponent<M5App>().VerificationBoard.CommittedPieces.GetComponentsInChildren<FantasyBoardPiece>();
                     var buildings=pieces.Where(p=>p.transform.Find("幻想棋子画面")?.GetComponent<MeshRenderer>().sharedMaterial.mainTexture.name is "city" or "village" or "metro-trade" or "metro-science" or "metro-politics").ToArray();
                     Require(buildings.Length>0 && buildings.All(p=>p.transform.Find("幻想棋子画面").GetComponent<MeshRenderer>().forceRenderingOff==!painted),"建筑未同步切换");
                     Require(Authority==authority,"外观切换改变了对局");
                     if(!painted)
                     {
+                        if(args.Contains("--wheat-coast"))
+                        {
+                            var focus=markers.WheatPortCenter;
+                            Require(focus!=Vector3.zero,"未找到砖丘麦港");
+                            focus.y=EntityBoardAssets.BoardSurfaceHeight;
+                            var heading=Quaternion.Euler(0,-60,0);
+                            focus+=heading*new Vector3(.013f,0,.009f);
+                            var eye=heading*new Vector3(0,.135f,-.096f);
+                            DetailFrame(focus,"麦港-修改后",detailSize:.038f,eyeOffset:eye,matchCameraMsaa:true);
+                        }
                         DetailFrame(Vector3.zero,"3D-全盘",true);
                         DetailFrame(center,"3D-近景",detailSize:.044f);
                     }

@@ -10,7 +10,7 @@ public sealed class TabletopShipSelection : MonoBehaviour
         var root=new GameObject("所选船航线高亮 v010");root.transform.SetParent(parent,false);
         var highlight=root.AddComponent<TabletopShipSelection>();
         highlight.material=new Material(Shader.Find("Universal Render Pipeline/Unlit"));
-        highlight.material.color=new Color(.20f,.98f,.82f);
+        highlight.material.color=ProgressTableUI.Gold;
         var line=root.AddComponent<LineRenderer>();line.sharedMaterial=highlight.material;
         line.useWorldSpace=false;line.loop=true;line.widthMultiplier=.0008f;line.positionCount=4;
         line.shadowCastingMode=ShadowCastingMode.Off;line.receiveShadows=false;

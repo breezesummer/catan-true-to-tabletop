@@ -134,7 +134,7 @@ namespace Catan.Core.ThreeKingdoms
             if (d.Kind == "seat-fuqi-request")
             {
                 if (f.B4.OtherSelection.Sum() < 2) foreach (int t in Enumerable.Range(0, 8).Where(t => CanGainB6(s, f.PlayerId, t)))
-                    actions.Add(SeatCardAction(s, f, d, "seat-fuqi-request", t, "要求", "declare"));
+                {var a=SeatCardAction(s, f, d, "seat-fuqi-request", t, "要求", "declare");a.MinimumHandCount=1;a.MaximumHandCount=2;actions.Add(a);}
                 if (f.B4.OtherSelection.Sum() > 0)
                 { var a = Action(s, f.SkillId, "seat-fuqi-submit", "发起 1:" + f.B4.OtherSelection.Sum() + " 交易", d); a.Command.Counts = Copy(f.B4.Selection); a.Command.SecondaryCounts = Copy(f.B4.OtherSelection); actions.Add(a); }
             }
@@ -152,7 +152,10 @@ namespace Catan.Core.ThreeKingdoms
         private static bool ResolveSeatTradeB6Decision(IThreeKingdomsCardHost host, B2SkillFrame f, B2SkillDecision d, B2SkillCommand c)
         {
             if (!d.Kind.StartsWith("seat-", StringComparison.Ordinal)) return false;
-            var legal = new List<B2SkillAction>(); AddSeatTradeB6DecisionActions(host, f, d, legal); Require(legal.Any(a => SameB4Action(a.Command, c) && (a.Command.SecondaryCounts ?? new int[8]).SequenceEqual(c.SecondaryCounts ?? new int[8]) && a.Command.Counts.SequenceEqual(c.Counts)), "所选牌或交易内容无效。");
+            bool batch=c.Option=="seat-fuqi-batch-submit";
+            if(batch)Require(GeneralCatalog.UsesDirectRules(host.State.RulesVersion)&&d.Kind=="seat-fuqi-request"&&Valid(c.SecondaryCounts)&&
+                c.SecondaryCounts.Sum()>=1&&c.SecondaryCounts.Sum()<=2&&Enumerable.Range(0,8).All(t=>c.SecondaryCounts[t]==0||CanGainB6(host.State,f.PlayerId,t)),"伏骑要求的牌数或类型无效。");
+            else {var legal = new List<B2SkillAction>(); AddSeatTradeB6DecisionActions(host, f, d, legal); Require(legal.Any(a => SameB4Action(a.Command, c) && (a.Command.SecondaryCounts ?? new int[8]).SequenceEqual(c.SecondaryCounts ?? new int[8]) && a.Command.Counts.SequenceEqual(c.Counts)), "所选牌或交易内容无效。");}
             var s = host.State;
             if (c.Option == "seat-cancel") { Remove(s, f); return true; }
             if (c.Option == "seat-fuqi-give") { f.B4.Selection = One(c.CardType); f.Step = 1; return true; }
@@ -166,9 +169,9 @@ namespace Catan.Core.ThreeKingdoms
                 AddTimed(s, "b6-jinglue:" + c.CardType, f.PlayerId, null, s.Clock.OpportunityId);
                 Remove(s, f); B4Transfer(host, f.Targets[0], f.PlayerId, One(c.CardType), f.Id + ":take", f.SkillId); return true;
             }
-            Require(c.Option == "seat-fuqi-submit" && FuqiAllowed(host, f.PlayerId, f.Targets[0]) && Value(g, "fuqi", s.Clock.PhaseId) < 2, "当前不能发起伏骑交易。");
+            Require((batch||c.Option == "seat-fuqi-submit") && FuqiAllowed(host, f.PlayerId, f.Targets[0]) && Value(g, "fuqi", s.Clock.PhaseId) < 2, "当前不能发起伏骑交易。");
             Counter(g, "fuqi", s.Clock.PhaseId).Value++;
-            int[] give = f.B4.Selection, receive = f.B4.OtherSelection; string target = f.Targets[0]; Remove(s, f);
+            int[] give = f.B4.Selection, receive = batch?Copy(c.SecondaryCounts):f.B4.OtherSelection; string target = f.Targets[0]; Remove(s, f);
             if (!Contains(host.GetHand(f.PlayerId), give) || !Contains(host.GetHand(target), receive)) { B4SkillHistoryEngine.Complete(s, f.Id, "伏骑交易未成交"); return true; }
             int before = host.GetHand(f.PlayerId).Sum(), targetBefore = host.GetHand(target).Sum();
             host.RemoveHand(f.PlayerId, give); host.RemoveHand(target, receive); host.AddHand(f.PlayerId, receive); host.AddHand(target, give);

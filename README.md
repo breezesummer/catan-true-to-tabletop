@@ -2,7 +2,7 @@
 
 一款以实体桌游体验为目标的 3D 卡坦岛游戏，包含资源生产、交易、道路与聚落建设、海上探索，以及城市发展与骑士防御。项目强调在同一张桌面上观察地图、拿取棋子、摆放建筑和操作卡牌，逐步呈现立体地形收藏版的质感。
 
-项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本为**内测版 2.1.14**。各可玩构建的验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
+项目由用户主导玩法与视觉选择、提供实体组件参考并试玩验收，AI 负责代码、美术生产与验证。当前项目版本为**内测版 2.1.15**。各可玩构建的验证范围见[开发日志](The%20Farmer%27s%20Log.md)。
 
 ## 玩法与内容
 
@@ -30,7 +30,7 @@ Windows 闪退后，双击游戏旁的 `查看崩溃报告.exe`，即可打开�
 在仓库根目录执行统一 Windows 启动脚本：
 
 ```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1 -BuildRoot "game version/2.1/Catan2.1.14-Knight-Voices"
+pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1 -BuildRoot "game version/2.1/Catan2.1.15-Knight-Voices"
 ```
 
 脚本选择当前默认可玩构建。操作方式见[M6 试玩说明](docs/M6_PLAYTEST.md)，联机连接与房间使用见[M7 使用说明](docs/M7_IMPLEMENTATION.md)。PC 与 Android 下载入口及验证范围见[内测版1.6发布记录](docs/RELEASE_BETA_1_6.md)。
@@ -74,6 +74,7 @@ macOS 开发入口为 `tools/development/Start-Dev.command`，打开 Unity 使�
 - [B5规则合同](docs/three-kingdoms/B5规则定稿.md)、[实现说明](docs/three-kingdoms/B5实现说明.md)与[验收记录](docs/verification/three-kingdoms-b5/验收记录.md)：49将棋盘状态包的规则、实现和证据入口。
 - [本地规则索引](assets/references/rules/README.md)：规则原件与查询入口。
 - [美术生产规范](docs/ART_PIPELINE.md)：参考采集、资产制作、导入和复现。
+- [菜单设计与实现模板](docs/菜单设计与实现模板.md)说明如何从原型取形、制作材质与文字，并用实机对照校准。
 - [三国风格棋子制作流程](docs/三国风格棋子制作流程.md)：造型、组件与状态、参考多视图、建模材质、预算及游戏内验收。
 - [豪华典藏版ultra主题实施方案](docs/ULTRA_THEME_IMPLEMENTATION_PLAN.md)：真实桌游与 ultra 双主题、三维资产、环境动态及分步验收。
 - [AI 2.0 补丁](docs/AI_PATCH_2_0.md)：当前 AI 策略、交易限制和专用信息权限。

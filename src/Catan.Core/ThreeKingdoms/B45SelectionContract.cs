@@ -121,7 +121,7 @@ namespace Catan.Core.ThreeKingdoms
         public int[] Hand { get; internal set; } = new int[8];
         public bool CanCancel => !IsResponse;
         public B2SkillCommand SkipCommand => Actions.FirstOrDefault(a=>IsSkip(a.Command))?.Command;
-        public static bool IsSkip(B2SkillCommand c) => c!=null && new[]{"skip","automation-skip","keep","cancel","decline","luoshen-stop","pass","seat-cancel"}.Contains(c.Option);
+        public static bool IsSkip(B2SkillCommand c) => c!=null && new[]{"skip","automation-skip","keep","cancel","decline","luoshen-stop","pass","seat-cancel","b5m-huoshou-skip"}.Contains(c.Option);
         public static B45SelectionContract Build(ThreeKingdomsView view,string viewerId,string skillId,int[] hand)
         {
             var d=view?.SkillDecision;
@@ -168,7 +168,7 @@ namespace Catan.Core.ThreeKingdoms
             string scalar=real||a.RequiredCardCount.HasValue?"":c.CardType.ToString();
             string progress=c.Option=="exchange-progress"||c.ProgressCardIds?.Length>0?"":c.ProgressCardId??"";
             if(a.VirtualCardId!=null) progress=a.VirtualCardId+":"+a.ResultCardType+(Board(a).Length>0||Players(a).Length>0?"":":"+progress);
-            if(c.Option=="response-liuli"||c.Option=="civil-kurou")progress="";
+            if(a.VirtualCardId==null&&Board(a).Length>0||c.Option=="response-liuli"||c.Option=="civil-kurou")progress="";
             if(c.Option=="civil-qingnang")scalar+=":"+c.EffectiveCardType;
             return c.Option+"|"+scalar+"|"+progress+"|"+(c.Option=="fixed"||c.Option=="modify"||c.Option=="raid"||c.Option=="luoying"?string.Join(",",c.Counts??Array.Empty<int>()):"");
         }

@@ -47,17 +47,46 @@ public sealed class ThreeKingdomsB45InteractionIntegrationTests
         var response=Draft(h,"P2");Assert.False(response.CanCancel);Assert.True(response.ToggleCard(5,0));Execute(h,"P2",response);
         Assert.Equal(1,h.GetHand("P1")[5]);Assert.Equal(2,h.GetHand("P2").Sum());h.AssertConserved();
     }
-    [Theory][InlineData("tk-g06","tk-g06-s1",4)][InlineData("tk-g13","tk-g13-s1",4)]
-    public void OptionalBankChoiceUsesActualBatchAndSkipsInitialActivation(string general,string skill,int count)
+    [Theory][InlineData("tk-g06","tk-g06-s1",4)]
+    public void OptionalBankChoiceAsksBeforeDrawing(string general,string skill,int count)
     {
         var h=Host(general);h.State.Clock.Phase=ThreeKingdomsPhase.End;B2SkillEngine.OnEnd(h,"结束");var before=h.Snapshot();var c=Draft(h,"P1",skill);
-        Assert.True(c.RequiresBankCards);Assert.Equal(count,c.RequiredBankCount);Assert.NotNull(c.SkipCommand);Assert.DoesNotContain(c.Options,a=>a.Command.Option=="accept");
+        Assert.True(c.AwaitingActivation);Assert.False(c.RequiresBankCards);Assert.NotNull(c.SkipCommand);Execute(h,"P1",c);c=Draft(h,"P1",skill);before=h.Snapshot();
+        Assert.True(c.RequiresBankCards);Assert.Equal(count,c.RequiredBankCount);Assert.DoesNotContain(c.Options,a=>a.Command.Option=="accept");
         for(int i=0;i<count;i++)Assert.True(c.ToggleBankCard(0));Assert.Equal(before,h.Snapshot());Execute(h,"P1",c);Assert.Equal(count,h.GetHand("P1")[0]);h.AssertConserved();
+    }
+    [Theory][InlineData(true)][InlineData(false)]
+    public void LianpoAsksBeforeBankSelection(bool accept)
+    {
+        var h=Host("tk-g13");
+        h.State.Clock.Phase=ThreeKingdomsPhase.End;
+        B2SkillEngine.OnEnd(h,"结束");
+        var c=Draft(h,"P1");
+        c.Refresh(View(h,"P1"),h.GetHand("P1"));
+        Assert.False(c.RequiresBankCards);
+        Assert.False(c.ShowOptionChoices);
+        Assert.Equal("accept",c.BuildCommand().Option);
+        if(!accept)
+        {
+            B2SkillEngine.Resolve(h,"P1",c.SkipCommand);
+            Assert.Empty(h.State.Clock.ExtraTurnQueue);
+            Assert.False(B2SkillEngine.HasPending(h.State));
+            return;
+        }
+        Execute(h,"P1",c);
+        Assert.Equal(new[]{"P1"},h.State.Clock.ExtraTurnQueue);
+        c=Draft(h,"P1");
+        Assert.True(c.RequiresBankCards);
+        Assert.Null(c.SkipCommand);
+        for(int i=0;i<4;i++)Assert.True(c.ToggleBankCard(0));
+        Execute(h,"P1",c);
+        Assert.Equal(4,h.GetHand("P1")[0]);
+        h.AssertConserved();
     }
     [Fact] public void QiceDirectResponseUsesAuthorizedVirtualOptionWithoutTargetLeak()
     {
         var h=Host("tk-g34");h.Give("P1",2,1);h.State.Clock.Phase=ThreeKingdomsPhase.Preparation;B2SkillEngine.OnB4Preparation(h,"奇策开始");
-        var before=h.Snapshot();var c=Draft(h,"P1","tk-g34-s1");Assert.Single(c.Options);Assert.Equal("b45-optional-qice",c.Options[0].Command.Option);Assert.True(c.CanConfirm);Assert.Equal(before,h.Snapshot());
+        var before=h.Snapshot();var c=Draft(h,"P1","tk-g34-s1");Assert.True(c.AwaitingActivation);Execute(h,"P1",c);c=Draft(h,"P1");before=h.Snapshot();Assert.Single(c.Options);Assert.Equal("response-qice-use",c.Options[0].Command.Option);Assert.True(c.CanConfirm);Assert.Equal(before,h.Snapshot());
         Execute(h,"P1",c);Assert.Single(h.VirtualUses);Assert.Equal(0,h.GetHand("P1").Sum());h.AssertConserved();
     }
     [Fact] public void XiashuDirectSubsetAndHiddenPileKeepSeparateAuthoritySteps()

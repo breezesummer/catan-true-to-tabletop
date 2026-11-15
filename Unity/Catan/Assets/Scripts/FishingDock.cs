@@ -62,7 +62,7 @@ public sealed class FishingDock
     {
         chosen=option;tokens=option.Action.HasValue?FishingPayment.Select(view.OwnTokens,option.Action.Value):Array.Empty<string>();
     }
-    static string Caption(FishAction a,bool cities)=>a==FishAction.RemoveRobber?"驱盗·2":a==FishAction.StealResource?"偷取·3":a==FishAction.TakeResource?"资源·4":a==FishAction.BuildRoad?"道路·5":"发展·7";
+    static string Caption(FishAction a)=>a==FishAction.RemoveRobber?"驱盗":a==FishAction.StealResource?"偷取":a==FishAction.TakeResource?"资源":a==FishAction.BuildRoad?"道路":"发展";
     public void Draw(M6App app,Font font,bool interactive,bool cities,string robber,Func<string,Vector2> position,string pirate=null)
     {
         cardHits.Clear();
@@ -71,17 +71,20 @@ public sealed class FishingDock
         bool previous=GUI.enabled;GUI.enabled=previous&&interactive;
         bool replacement=view.PendingPlayerId==owner;
         int skillIndex=0;
+        Rect hoveredButton=default;
+        int hoveredCost=0;
         foreach(FishAction effect in Enum.GetValues(typeof(FishAction)))
         {
             var hit=new Rect(SkillColumn.x,SkillColumn.y+skillIndex++*28,SkillColumn.width,27);
-            if(GeneralFrameUI.Choice(hit,Caption(effect,cities),!replacement&&options.Any(o=>o.Action==effect),action==effect))
+            if(hit.Contains(Event.current.mousePosition)){hoveredButton=hit;hoveredCost=FishingRules.Cost(effect);}
+            if(GeneralFrameUI.Choice(hit,Caption(effect),!replacement&&options.Any(o=>o.Action==effect),action==effect,largeCentered:true))
             {
                 Show();action=effect;boot=false;chosen=null;
                 foreach(Catan.Core.Resource r in Enum.GetValues(typeof(Catan.Core.Resource)))resourceSelection[r]=0;
                 if(effect==FishAction.BuyDevelopmentCard&&!cities)Choose(options.First(o=>o.Action==effect));
             }
         }
-        if(GeneralFrameUI.Choice(new Rect(SkillColumn.x,SkillColumn.y+140,SkillColumn.width,27),"旧靴",options.Any(o=>o.Kind=="boot"),boot))
+        if(GeneralFrameUI.Choice(new Rect(SkillColumn.x,SkillColumn.y+140,SkillColumn.width,27),"旧靴",options.Any(o=>o.Kind=="boot"),boot,largeCentered:true))
         {Show();boot=true;action=null;chosen=null;}
         if(!Selected){GUI.enabled=previous;return;}
         const float shift=102;
@@ -156,10 +159,18 @@ public sealed class FishingDock
 
             if((chosen!=null||action.HasValue||boot)&&GeneralFrameUI.Choice(new Rect(1108,661,100,36),"取消"))Reset();
             if(chosen==null&&action==FishAction.RemoveRobber)
-                foreach(var o in options.Where(o=>o.Action==action)) {var id=o.Pirate?pirate:robber;if(id==null||id=="frame")continue;var p=position(id);if(ModernOperationUI.Button(new Rect(p.x-32,p.y-26,64,52),o.Pirate?"海盗":"强盗"))Choose(o);}
+                foreach(var o in options.Where(o=>o.Action==action)) {var id=o.Pirate?pirate:robber;if(id==null||id=="frame")continue;var p=position(id);ProgressTableUI.Mark(p,false,null);if(ThreeKingdomsDirectInput.Read(new Rect(p.x-32,p.y-26,64,52),interactive,false)==1)Choose(o);}
         }
         if(hint!=null)GUI.Label(new Rect(350,Actions.y-32,390,28),hint,style);
         GUI.enabled=previous;
+        if(hoveredCost>0 && Event.current.type==EventType.Repaint)
+        {
+            float stepWidth=hoveredButton.height;
+            var panel=new Rect(hoveredButton.xMax,hoveredButton.y,hoveredCost*stepWidth+8,hoveredButton.height);
+            GeneralFrameUI.SkillBackground(panel,1);
+            for(int i=0;i<hoveredCost;i++)
+                StrategyHudArt.FishIcon(new Rect(panel.x+4+i*stepWidth,panel.y+3,stepWidth,panel.height-6));
+        }
     }
     public void UpdateMap(Vector2 mouse,bool click,Catan.Core.Edge[] edges,Catan.Core.Tile[] tiles,Func<string,Vector2> position,Action<string,bool> preview,Action clear)
     {

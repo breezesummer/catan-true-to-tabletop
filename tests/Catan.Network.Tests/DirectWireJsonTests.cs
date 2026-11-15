@@ -43,14 +43,17 @@ public sealed class DirectWireJsonTests
     public void IntegratedSkillProjectionKeepsB5AndDirectInteractionFieldsAcrossBothDecoders()
     {
         var view=new ThreeKingdomsView {PackageVersion=GeneralCatalog.B5DirectPackageVersion,ConstructionCostAdjustment=-1,
+            FixedDiceResult=new B3DiceResult{Red=6,White=1,EventFace=1,Purpose=B3DicePurpose.Formal},
             PublicPoolGeneralIds=new[]{"tk-g54"},RetiredGeneralIds=new[]{"tk-g01"},
             SkillRuntimeStatus=new[]{new B45SkillRuntimeStatus {SkillId="tk-g16-s1",HasLegalAction=true,Summary="可发动"}},
-            SkillActions=new[]{new B2SkillAction {Command=new B2SkillCommand {SkillId="tk-g17-s1",Option="civil-qixi-tech"},SelectionCost=new[]{0,3,0,0,0,0,0,0},SelectionBoardIds=new[]{"E003"}}}};
+            SkillActions=new[]{new B2SkillAction {Command=new B2SkillCommand {SkillId="tk-g17-s1",Option="civil-qixi-tech"},SelectionCost=new[]{0,3,0,0,0,0,0,0},SelectionBoardIds=new[]{"E003"},MinimumHandCount=2,MaximumHandCount=9}}};
         using var buffer=new MemoryStream();new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(ThreeKingdomsView)).WriteObject(buffer,view);
         string json="{\"ThreeKingdoms\":"+System.Text.Encoding.UTF8.GetString(buffer.ToArray())+"}";
         var direct=WireJson.Deserialize<Catan.Core.M4.PlayerView>(json);var legacy=WireJson.DeserializeLegacy<Catan.Core.M4.PlayerView>(json);
         Assert.Equal(WireJson.Serialize(legacy),WireJson.Serialize(direct));Assert.Equal(view.SkillActions[0].SelectionCost,direct.ThreeKingdoms.SkillActions[0].SelectionCost);
+        Assert.Equal(2,direct.ThreeKingdoms.SkillActions[0].MinimumHandCount);Assert.Equal(9,direct.ThreeKingdoms.SkillActions[0].MaximumHandCount);
         Assert.Equal(view.PublicPoolGeneralIds,direct.ThreeKingdoms.PublicPoolGeneralIds);Assert.True(Assert.Single(direct.ThreeKingdoms.SkillRuntimeStatus).HasLegalAction);
+        Assert.Equal(6,direct.ThreeKingdoms.FixedDiceResult.Red);Assert.Equal(1,direct.ThreeKingdoms.FixedDiceResult.White);Assert.False(direct.ThreeKingdoms.FixedDiceResult.ActualRoll);
     }
 
 }

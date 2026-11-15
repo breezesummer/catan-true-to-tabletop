@@ -13,7 +13,9 @@ public sealed class MenuPreviewTextureImporter : AssetPostprocessor
         importer.mipmapEnabled = false;
         importer.npotScale = TextureImporterNPOTScale.None;
         importer.maxTextureSize = accepted ? 2048 : 1024;
-        importer.textureCompression = TextureImporterCompression.Compressed;
+        bool setupPlate = assetPath.StartsWith("Assets/Resources/AcceptedMenu/setup-");
+        importer.textureCompression = setupPlate ? TextureImporterCompression.Uncompressed : TextureImporterCompression.Compressed;
+        if (setupPlate) importer.alphaIsTransparency = true;
         importer.wrapMode = TextureWrapMode.Clamp;
         importer.filterMode = FilterMode.Bilinear;
         importer.isReadable = false;

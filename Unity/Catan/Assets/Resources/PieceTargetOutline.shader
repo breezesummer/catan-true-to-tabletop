@@ -9,6 +9,7 @@ Shader "Catan/PieceTargetOutline"
             Blend SrcAlpha OneMinusSrcAlpha
             HLSLPROGRAM
             #pragma vertex vert
+            float _Selected;
             #pragma fragment frag
             #include "UnityCG.cginc"
             struct appdata { float4 vertex:POSITION; float3 normal:NORMAL; };
@@ -24,7 +25,7 @@ Shader "Catan/PieceTargetOutline"
             }
             half4 frag(output i):SV_Target
             {
-                return half4(0.08,1.0,0.30,0.84+0.13*sin(_Time.y*4));
+                return half4(lerp(half3(1,.93,.73),half3(1,.72,.28),_Selected),.91+.08*sin(_Time.y*3));
             }
             ENDHLSL
         }

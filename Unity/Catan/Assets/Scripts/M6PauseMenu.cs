@@ -4,8 +4,12 @@ using UnityEngine;
 // 桌内菜单沿用统一铜木界面；菜单阻挡本地调度，不改写存档中的暂停设置。
 public sealed partial class M6App
 {
-    int tablePausePage,tablePauseSettingsTab=2;
+    int tablePausePage,tablePauseSettingsTab=1;
     string tablePauseFeedback="";
+    float tablePauseFeedbackUntil;
+    static readonly string[] TablePauseEntries={"继续游戏","保存游戏","游戏设置","游戏百科","重新开始","返回主菜单"};
+    static readonly Rect[] TablePauseButtons={new Rect(610,219,447,97),new Rect(626,334,416,64),
+        new Rect(626,413,416,64),new Rect(626,492,416,64),new Rect(626,617,416,64),new Rect(626,697,416,64)};
     TabletopScene settingsCamera;
     bool pitchEdited;
     void SaveCameraSettings()
@@ -18,7 +22,7 @@ public sealed partial class M6App
 
     void ResetTablePauseMenu()
     {
-        tablePausePage=0;tablePauseFeedback="";encyclopediaOpen=false;
+        tablePausePage=0;tablePauseFeedback="";tablePauseFeedbackUntil=0;encyclopediaOpen=false;
     }
     bool HandleTablePausePageEscape()
     {
@@ -53,25 +57,50 @@ public sealed partial class M6App
     {
         DrawTablePauseBackdrop();
         if(tablePausePage==1){DrawTablePauseSettings();return;}
-        var panel=new Rect(440,100,560,700);
-        TablePauseHeading(panel,"游戏菜单");
-        string[] entries={"继续游戏","保存游戏","游戏设置","游戏百科","重新开始","返回主菜单"};
-        for(int i=0;i<entries.Length;i++)
-        {
-            bool restart=NetworkGame&&i==4;
-            if(!PastoralMenuUI.Button(new Rect(526,302+i*62,388,58),entries[i],!restart||Network.CanRestartRoom,true))continue;
-            switch(i)
-            {
-                case 0:CloseTablePauseMenu(true);break;
-                case 1:SaveGame();tablePauseFeedback=Notice;break;
-                case 2:menuPlayerName=LocalPlayerName;tablePausePage=1;tablePauseFeedback="";GUI.FocusControl(null);break;
-                case 3:encyclopediaOpen=true;break;
-                case 4:if(NetworkGame){Network.RestartRoom();tablePauseFeedback="正在重新生成地图与行动顺序…";}else RestartLocalGame();break;
-                case 5:ReturnToMainMenu();break;
+        int clicked=-1;
+        var matrix=GUI.matrix;
+        GUI.matrix=matrix*Matrix4x4.Translate(new Vector3(720,450,0))*Matrix4x4.Scale(new Vector3(2f/3,2f/3,1))*Matrix4x4.Translate(new Vector3(-720,-450,0))*Matrix4x4.Scale(new Vector3(1440f/1672,900f/941,1));
+        try{
+            Picture(new Rect(555,98,554,747),"setup-pause-sheet");
+            PauseMenuRule(598,155,96);PauseMenuRule(975,155,95);
+            Caption(new Rect(710,117,249,66),"游戏菜单",48);
+            PauseMenuRule(626,586,416);
+            for(int i=0;i<TablePauseEntries.Length;i++){
+                string text=i==1&&Time.unscaledTime<tablePauseFeedbackUntil?tablePauseFeedback:TablePauseEntries[i];
+                if(PauseMenuButton(TablePauseButtons[i],text,i==0,TablePauseEntryEnabled(i)))clicked=i;
             }
+        }finally{GUI.matrix=matrix;}
+        if(clicked>=0)ActivateTablePauseEntry(clicked);
+    }
+    void PauseMenuRule(float x,float y,float width){
+        PastoralMenuUI.Fill(new Rect(x,y,width,1),new Color32(157,99,44,220));
+        PastoralMenuUI.Fill(new Rect(x,y+1,width,1),new Color32(255,238,197,130));
+    }
+    bool PauseMenuButton(Rect r,string text,bool resume,bool available){
+        var tint=GUI.color;
+        if(!available)GUI.color=new Color(.80f,.77f,.71f,tint.a);
+        Picture(InsetMenuRect(r,resume?-12:-8),resume?"setup-pause-resume":"setup-pause-wood");
+        GUI.color=tint;
+        var lettering=new Rect(r.x+(resume?96:30),r.y-2,r.width-(resume?192:60),r.height);
+        PlateLettering(lettering,text,resume?44:36,resume?PlateInk.Gold:PlateInk.Wood,strengthen:true);
+        return available&&Hit(r,false);
+    }
+    bool TablePauseEntryEnabled(int index)=>index>=0&&index<TablePauseEntries.Length&&
+        (index!=4||!NetworkGame||Network.CanRestartRoom);
+    void ActivateTablePauseEntry(int index){
+        if(!TablePauseEntryEnabled(index))return;
+        switch(index){
+            case 0:CloseTablePauseMenu(true);break;
+            case 1:
+                SaveGame(MenuLocalSavePath);
+                tablePauseFeedback=Notice.StartsWith("保存失败",StringComparison.Ordinal)?"保存失败":NetworkGame?"自动保存":"已保存";
+                tablePauseFeedbackUntil=Time.unscaledTime+2;
+                break;
+            case 2:menuPlayerName=LocalPlayerName;tablePausePage=1;tablePauseFeedback="";GUI.FocusControl(null);break;
+            case 3:encyclopediaOpen=true;break;
+            case 4:if(NetworkGame)Network.RestartRoom();else RestartLocalGame();break;
+            case 5:ReturnToMainMenu();break;
         }
-        string status=NetworkGame&&!string.IsNullOrEmpty(Network.LastError)?Network.LastError:tablePauseFeedback.Length>0?tablePauseFeedback:NetworkGame?"联机对局进行中":Fault.Length>0?"AI 已暂停："+Fault:"游戏已暂停";
-        PastoralMenuUI.Label(new Rect(477,704,486,68),status,13,new Color(.39f,.27f,.17f),false,TextAnchor.MiddleCenter);
     }
     void DrawTablePauseSettings()
     {

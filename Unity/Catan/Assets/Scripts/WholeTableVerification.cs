@@ -147,7 +147,16 @@ public sealed partial class TabletopUiVerification
         GiveCard(state,own,kind);
         if(kind==ProgressCardKind.CommercialHarbor){state.CommodityBank[Catan.Core.M5.Commodity.Paper]--;state.Players[1].Commodities[Catan.Core.M5.Commodity.Paper]++;}
         if(kind==ProgressCardKind.Espionage)GiveCard(state,state.Players[1],ProgressCardKind.Invention);
-        if(kind==ProgressCardKind.Alchemy){state.Phase=GamePhase.ProductionAwaitRoll;state.ThreeKingdoms.Clock.Phase=ThreeKingdomsPhase.Roll;}
+        if(kind==ProgressCardKind.Alchemy)
+        {
+            typeof(M6App).GetProperty("HumanSeat").SetValue(app,state.ActivePlayerId);
+            own=state.Players.First(p=>p.Id==state.ActivePlayerId);
+            GiveCard(state,own,kind);
+            state.Phase=GamePhase.ProductionAwaitRoll;
+            state.ThreeKingdoms.Clock.Phase=ThreeKingdomsPhase.Roll;
+            state.ThreeKingdoms.Dice.FormalRollTurnId=-1;
+            state.ThreeKingdoms.Dice.Roll=null;
+        }
         ActivateAudit(state);yield return new WaitForSecondsRealtime(.65f);
         double until=Time.realtimeSinceStartupAsDouble+12;
         while((!app.IsHumanTurn||!Snapshot.CanInteract)&&Time.realtimeSinceStartupAsDouble<until)yield return null;
@@ -174,7 +183,13 @@ public sealed partial class TabletopUiVerification
         if(Snapshot.Cards[index].Immediate)
         {foreach(var f in DirectClick(handPoint,"打出手牌"))yield return f;}
         else if(kind==ProgressCardKind.Alchemy)
-        {foreach(var i in new[]{2,9})foreach(var f in DirectClick(ProgressTableUI.Item(i,12).center,"选骰子"))yield return f;}
+        {
+            foreach(var f in DirectClick(TabletopUI.EndTurnRect.center,"使用炼金术士"))yield return f;
+            foreach(var point in new[]{new Vector2(62,223),new Vector2(132,224)})
+                foreach(var f in DirectClick(point,"旋转骰子"))yield return f;
+            yield return new WaitForEndOfFrame();SaveOceanFrame("炼金术士-确认前.png");
+            foreach(var f in DirectClick(TabletopUI.EndTurnRect.center,"确认炼金术士"))yield return f;
+        }
         else if(kind==ProgressCardKind.Crane)
         {foreach(var f in DirectClick(new Vector2(54+(2+(int)legal.Track)*82,50),"点城市设施"))yield return f;}
         else if(kind==ProgressCardKind.MerchantFleet||kind==ProgressCardKind.ResourceMonopoly||kind==ProgressCardKind.TradeMonopoly)
@@ -189,6 +204,14 @@ public sealed partial class TabletopUiVerification
         }
         yield return new WaitForSecondsRealtime(1f);
         var after=auditSession.GetAuthoritativeStateForTesting();
+        if(kind==ProgressCardKind.Alchemy)
+        {
+            double readyDeadline=Time.realtimeSinceStartupAsDouble+16;
+            while(!app.IsHumanTurn && Time.realtimeSinceStartupAsDouble<readyDeadline)yield return null;
+            Require(after.AlchemyDice1>0&&after.AlchemyDice2>0&&!after.ProcessedCommands.Skip(state.ProcessedCommands.Length).Any(c=>c.Command.Kind==CommandKind.RollDice),"确认后未等待手动掷骰");
+            foreach(var step in DirectClick(TabletopUI.EndTurnRect.center,"手动掷事件骰"))yield return step;
+            after=auditSession.GetAuthoritativeStateForTesting();
+        }
         if(after.ProcessedCommands.Length<=state.ProcessedCommands.Length||!after.ProcessedCommands.Skip(state.ProcessedCommands.Length).Any(c=>c.Command.Kind==CommandKind.PlayProgressCard&&c.Command.ProgressCard==kind))
             throw new InvalidOperationException("手牌未提交");
         if(kind==ProgressCardKind.CommercialHarbor)
@@ -255,11 +278,15 @@ public sealed partial class TabletopUiVerification
     }
     string VerifyCardResult(ProgressCardKind kind,GameState before,GameState after)
     {
-        var source=before.Players.First(p=>p.Id=="P1");var own=after.Players.First(p=>p.Id=="P1");
+        var player=kind==ProgressCardKind.Alchemy?before.ActivePlayerId:"P1";var source=before.Players.First(p=>p.Id==player);var own=after.Players.First(p=>p.Id==player);
         var command=after.ProcessedCommands.Skip(before.ProcessedCommands.Length).First(c=>c.Command.Kind==CommandKind.PlayProgressCard).Command;
         Require(own.ProgressCards.Count(c=>c==kind)<source.ProgressCards.Count(c=>c==kind),"牌未消耗");
         switch(kind){
-        case ProgressCardKind.Alchemy:Require(after.AlchemyDice1==3&&after.AlchemyDice2==4,"骰面未记住");return "所选骰面为 3、4";
+        case ProgressCardKind.Alchemy:
+            var played=after.ProcessedCommands.Last(c=>c.Command.Kind==CommandKind.PlayProgressCard&&c.Command.ProgressCard==kind).Command;
+            Require(played.ChosenDice1==Math.Max(1,before.LastDice1)%6+1&&played.ChosenDice2==(before.LastDice2>0?before.LastDice2:6)%6+1,"旋转骰面错误");
+            Require(after.ProcessedCommands.Skip(before.ProcessedCommands.Length).Any(c=>c.Command.Kind==CommandKind.RollDice),"手动掷骰未提交");
+            return "旋转红白骰后确认，再点击掷骰";
         case ProgressCardKind.Crane:Require(own.Improvements[(int)command.Track]==source.Improvements[(int)command.Track]+1,"设施未升级");return "点选的设施升一级";
         case ProgressCardKind.Engineering:Require(after.Walls.Any(w=>w.PlayerId=="P1"&&w.LocationId==command.TargetId),"城墙未落定");return "目标城市增加城墙";
         case ProgressCardKind.Invention:Require(after.Tiles.Single(t=>t.Id==command.TargetId).Number==before.Tiles.Single(t=>t.Id==command.SourceId).Number&&after.Tiles.Single(t=>t.Id==command.SourceId).Number==before.Tiles.Single(t=>t.Id==command.TargetId).Number,"两枚数字未互换");return "点中的两枚数字互换";
@@ -488,11 +515,23 @@ public sealed partial class TabletopUiVerification
         var prior=Fixture<GameState>(skill.Id,"before");
         if(input!=null)state=input;
         if(skill.Id=="tk-g01-s1"){
+            if(input==null){
+                foreach(var seat in state.Players.Skip(1)){
+                    seat.Resources.Wood++;state.Bank[Resource.Wood]--;
+                }
+                state.ThreeKingdoms.Skills.HarvestTurnId=state.ThreeKingdoms.Clock.TurnInstanceId-1;
+                var host=(IThreeKingdomsCardHost)typeof(CombinedGameSession).GetMethod("CardHost",PrivateInstance).Invoke(auditSession,new object[]{state});
+                B2SkillEngine.BeginHarvest(host,new[]{new B2HarvestAllocation{PlayerId="P1",Cards=new[]{1,0,1,0,0,0,0,0}}});
+            }
             ActivateAudit(state);yield return new WaitForSecondsRealtime(.8f);
             var viewRaid=auditGame.M6View.ThreeKingdoms;
             var raidAction=viewRaid.SkillActions.First(a=>a.Command.Option=="raid"&&a.Command.Counts.Sum()==2);
             var selected=raidAction.Command;var kinds=Enumerable.Range(0,8).Where(t=>viewRaid.RaidHarvestCards[t]>0).ToArray();
             var picker=(B45SelectionContext)typeof(M6App).GetField("generalSelection",PrivateInstance).GetValue(app);
+            if(picker.AwaitingActivation){
+                foreach(var f in DirectClick(M6App.SkillConfirmRect.center,"发动突袭"))yield return f;
+            }
+            yield return new WaitForEndOfFrame();SaveOceanFrame(auditItem+"-资源.png");
             Require(picker.Raid&&!picker.CanSelectPlayer(selected.TargetPlayerIds[0]),"少收前已经能选玩家");
             for(int i=0;i<kinds.Length;i++)for(int n=0;n<selected.Counts[kinds[i]];n++)
                 foreach(var step in DirectClick(M6App.RaidCardRect(i,kinds.Length).center,"少收"+B45PaymentContext.Names[kinds[i]]))yield return step;
@@ -500,15 +539,18 @@ public sealed partial class TabletopUiVerification
             yield return new WaitForSecondsRealtime(.25f);yield return new WaitForEndOfFrame();SaveOceanFrame(auditItem+"-选中.png");
             foreach(var id in selected.TargetPlayerIds){
                 Require(picker.CanSelectPlayer(id),"合法玩家信息框不可选");
-                var pos=Avatar(id)+new Vector2(30,122);
-                foreach(var step in DirectClick(pos,"点"+id+"信息框下半部"))yield return step;
+                var pos=Avatar(id);
+                foreach(var step in DirectClick(pos,"点"+id+"头像"))yield return step;
             }
+            Require(picker.CanConfirm&&!picker.IsSubmitting,"点击头像应保留草稿");
+            yield return new WaitForEndOfFrame();SaveOceanFrame(auditItem+"-待确认.png");
+            foreach(var step in DirectClick(M6App.SkillConfirmRect.center,"确认突袭"))yield return step;
             var final=auditSession.GetAuthoritativeStateForTesting();
             var executed=final.ProcessedCommands.Skip(state.ProcessedCommands.Length).Select(c=>c.Command)
                 .First(c=>c.Kind==CommandKind.UseGeneralSkill&&c.SkillCommand?.Option=="raid").SkillCommand;
             Require(executed.Counts.SequenceEqual(selected.Counts)&&executed.TargetPlayerIds.OrderBy(t=>t).SequenceEqual(selected.TargetPlayerIds.OrderBy(t=>t)),"少收或目标不符");
             Require(final.ThreeKingdoms.SkillHistory.Any(h=>h.SkillId==skill.Id&&h.Complete&&h.PublicResult.Contains("实际获得 2 张")),"没有实际取得两张手牌");
-            auditStatus="已结算：少收羊毛、布匹各一张，点两名不同玩家的信息框，各取一张手牌";yield break;
+            auditStatus="已结算：确认前保留草稿，确认后从两名所选玩家各取一张手牌";yield break;
         }
         if(prior!=null)
         {

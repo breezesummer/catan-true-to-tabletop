@@ -47,7 +47,7 @@ public sealed class TabletopPieceCache
             ||entries.TryGetValue("expansion/knight:"+loc,out entry);
     }
     public bool HasPiece(string target)=>FindPiece(target,out _);
-    public void DrawOutline(string target,Camera camera)
+    public void DrawOutline(string target,Camera camera,bool selected=false)
     {
         if(!FindPiece(target,out var piece)||camera==null)return;
         if(outline==null){
@@ -62,7 +62,10 @@ public sealed class TabletopPieceCache
             var r=filter.GetComponent<MeshRenderer>();
             if(r==null||!r.enabled||r.forceRenderingOff)continue;
             var source=r.sharedMaterial;var material=outline;
-            MaterialPropertyBlock properties=null;
+            if(inkProperties==null)inkProperties=new MaterialPropertyBlock();
+            inkProperties.Clear();
+            inkProperties.SetFloat("_Selected",selected?1:0);
+            MaterialPropertyBlock properties=inkProperties;
             if(source!=null&&source.shader.name=="Catan/FantasyInk"){
                 if(paintedOutline==null){
                     var shader=Resources.Load<Shader>("PaintedPieceTargetOutline");

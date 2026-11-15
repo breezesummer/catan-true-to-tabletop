@@ -141,6 +141,38 @@ public sealed class ThreeKingdomsB2HarvestTests
         Assert.Equal(30, host.GetBank()[4]); Assert.Equal(2, host.State.Skills.Harvest.Single(a => a.PlayerId == "P1").ActuallyReceived); host.AssertConserved();
     }
 
+    [Theory][InlineData(0)][InlineData(7)]
+    public void TianduCurrentPackageRefreshesDirectSelectionBetweenTilesAndResumesHarvest(int firstCard)
+    {
+        var host = TianduHost(9);
+        host.State.RulesVersion = GeneralCatalog.B6RulesVersion;
+        host.State.PackageVersion = GeneralCatalog.B6PackageVersion;
+        host.State.PackageContentHash = GeneralCatalog.B6ContentHash;
+        ThreeKingdomsView View()
+        {
+            var view = ThreeKingdomsEngine.Project(host.State, "P1");
+            B2SkillEngine.Project(host, view, "P1"); return view;
+        }
+        Begin(host, Cards(0, 0, 0, 0, 2));
+        var draft = new B45SelectionContext(); draft.Begin(View(), "P1", null, host.GetHand("P1"));
+        Assert.False(draft.ToggleTile("A森林")); Assert.True(draft.OpenActivationChoices());
+        Assert.True(draft.ToggleTile("A森林")); Assert.False(draft.CanConfirm);
+        Assert.True(draft.ToggleTile("B麦田"));
+        ResolveWithReplay(host, "P1", draft.BeginSubmit());
+        foreach (int type in new[] { firstCard, 3 })
+        {
+            Assert.Equal("tiandu-card", host.State.Skills.PendingDecision.Kind);
+            var view = View(); draft.Refresh(view, host.GetHand("P1")); Assert.False(draft.Active);
+            draft.Begin(view, "P1", null, host.GetHand("P1"));
+            Assert.True(draft.ChooseOption(draft.Options.Single(a => a.Command.CardType == type)));
+            ResolveWithReplay(host, "P1", draft.BeginSubmit());
+        }
+        Assert.False(host.State.Skills.HarvestActive); Assert.False(B2SkillEngine.HasPending(host.State));
+        Assert.Equal(1, host.GetHand("P1")[firstCard]); Assert.Equal(1, host.GetHand("P1")[3]);
+        Assert.Equal(30, host.GetBank()[4]); Assert.True(Assert.Single(host.State.SkillHistory, e => e.SkillId == "tk-g37-s1").Complete);
+        host.AssertConserved();
+    }
+
     [Theory][InlineData("duplicate")][InlineData("wrong-sum")][InlineData("missing-tile")]
     public void TianduInvalidPairDoesNotReleaseOrdinaryReservation(string invalid)
     {

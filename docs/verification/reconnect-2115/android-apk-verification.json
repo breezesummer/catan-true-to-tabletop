@@ -1,0 +1,32 @@
+{
+  "status": "passed",
+  "checkedAtUtc": "2026-11-13T03:15:57.5708462Z",
+  "apk": "Catan2.1.15.apk",
+  "bytes": 983075906,
+  "sha256": "4F006BA0BD7EB727DCB3CE4AB64FDE0252B8F209A977D596450E1C25E1714512",
+  "packageId": "com.catandevelopment.threekingdoms",
+  "versionName": "2.1.15",
+  "versionCode": 20115,
+  "minSdk": 26,
+  "targetSdk": 36,
+  "activity": "com.unity3d.player.UnityPlayerActivity",
+  "orientation": "sensorLandscape",
+  "landscape": true,
+  "glEsVersion": "0x30000",
+  "nativeArchitectures": [
+    "arm64-v8a",
+    "x86_64"
+  ],
+  "signatureV2Verified": true,
+  "signatureV3Verified": false,
+  "signaturePolicy": "minSdk 26 要求有效 v2；v3 仅记录，不强制。",
+  "signaturePolicySource": "https://source.android.com/docs/security/features/apksigning/v2",
+  "signerCertificateSha256": [
+    "EFD26F60A7807072FF61FB0DD4660FA00859B75E9B3857A742A4C7D6E3A2BF48"
+  ],
+  "debuggable": false,
+  "zipFiles": 2667,
+  "forbiddenEntries": 0,
+  "developmentDataAbsent": true,
+  "failure": null
+}

@@ -17,7 +17,7 @@ public sealed class TabletopBuildPiece
 
 public static class TabletopAiSpeed
 {
-    public static readonly string[] Names={"慢速 · 观摩","标准","快速"};
+    public static readonly string[] Names={"慢速","标准","快速"};
     public static int Clamp(int level)=>Math.Max(0,Math.Min(2,level));
     public static double Interval(int level)=>level==0?1.7:level==2?.55:1.05;
     public static double FlightDuration(int level)=>level==0?1.15:level==2?.36:.72;

@@ -29,7 +29,7 @@ public sealed partial class M5App
     void DrawPendingResources()
     {
         bool gold=view.PendingDecision.Kind=="Gold";var bank=PendingResourceBankB6();
-        TabletopResourceChoiceUI.Draw(gold?Math.Min(view.PendingDecision.Amount,bank.Total):1,resourceChoiceSelection,bank,ConfirmPendingResources,gold?"金矿 · 选择资源":"引水渠 · 选择资源",tabletop.OperationWindows);
+        TabletopResourceChoiceUI.Draw(gold?Math.Min(view.PendingDecision.Amount,bank.Total):1,resourceChoiceSelection,bank,ConfirmPendingResources,gold?"金矿：请选择资源":"引水渠 · 选择资源",tabletop.OperationWindows);
     }
     void ConfirmPendingResources()
     {

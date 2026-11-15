@@ -185,8 +185,14 @@ public sealed class ThreeKingdomsB2ActiveTests
         { B2SkillEngine.OnBuilt(host, item.Item1, "P1", item.Item2); Drain(host); }
         Assert.Equal(2, host.GetHand("P1").Sum());
         B2SkillEngine.OnBuilt(host, "f", "P1", "City"); Drain(host); Assert.Equal(2, host.GetHand("P1").Sum());
-        host.State.Clock.PhaseId++; B2SkillEngine.OnBuilt(host, "new-phase", "P1", "Settlement"); Drain(host);
-        Assert.Equal(2, host.GetHand("P1").Sum()); host.AssertConserved();
+        host.State.Clock.TurnInstanceId++;
+        host.State.Clock.PhaseId++;
+        B2SkillEngine.OnBuilt(host, "new-turn", "P1", "Settlement"); Drain(host);
+        Assert.Equal(3, host.GetHand("P1").Sum());
+        host.State.Clock.TurnInstanceId++;
+        host.State.Clock.PhaseId++;
+        B2SkillEngine.OnBuilt(host, "same-type", "P1", "Settlement"); Drain(host);
+        Assert.Equal(3, host.GetHand("P1").Sum()); host.AssertConserved();
     }
 
     [Fact]

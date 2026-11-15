@@ -7,18 +7,36 @@ public sealed partial class M6App
 {
     static readonly Rect DiceChoicesArea=new Rect(206,180,426,150);
     static readonly Rect[] SkillDiceAreas={new Rect(40,201,45,45),new Rect(110,202,45,45),new Rect(76,161,45,45)};
+    internal int DieVisualState(int index)
+    {
+        var actions=generalSelection.Contract?.Actions;
+        if(actions!=null)
+            foreach(var candidate in actions)
+                if(candidate.SelectionDiceIndex==index)return generalSelection.SelectedDie==index?2:1;
+        return 0;
+    }
     string specialChoiceToken;
     int fixedChoiceRed=-1,fixedChoiceEvent=-1;
+    internal bool TurningFixedDice=>generalSelection.Contract?.DecisionKind=="dice-fixed"&&generalSelection.SkillId=="tk-g21-s2"&&!generalSelection.AwaitingActivation&&!generalSelection.IsSubmitting;
+    internal string FixedDiceDecision=>generalSelection.Contract?.DecisionId;
+    internal int FixedDieValue(int index)=>index==0?fixedChoiceRed:index==1?7-fixedChoiceRed:fixedChoiceEvent<=3?0:fixedChoiceEvent-3;
+    internal void SetFixedDice(int red,int symbol)
+    {
+        fixedChoiceRed=red;fixedChoiceEvent=symbol==0?1:symbol+3;
+        var pick=generalSelection.Options.FirstOrDefault(a=>a.Command.Option=="fixed"&&a.Command.Counts[0]==red&&a.Command.CardType==fixedChoiceEvent);
+        if(pick!=null)generalSelection.ChooseOption(pick);
+    }
     Vector2 specialScroll;
-    internal bool SpecialGeneralCandidatesContain(Vector2 p)=>generalSelection.Active&&generalSelection.DiceIndices.Length>0&&
-        (DiceChoicesArea.Contains(p)||SkillDiceAreas.Any(r=>r.Contains(p)));
+    internal bool SpecialGeneralCandidatesContain(Vector2 p)=>!TurningFixedDice&&generalSelection.Active&&generalSelection.DiceIndices.Length>0&&
+        (generalSelection.SelectedDie>=0&&!generalSelection.Options.Any(a=>a.Command.Option=="modify")&&DiceChoicesArea.Contains(p)||SkillDiceAreas.Any(r=>r.Contains(p)));
     bool DrawSpecialGeneralCandidates()
     {
         if(!generalSelection.Active)return false;
         var contract=generalSelection.Contract;var options=generalSelection.Options;
         string token=contract.WindowId+"|"+contract.DecisionId;
-        if(token!=specialChoiceToken){specialChoiceToken=token;fixedChoiceRed=fixedChoiceEvent=-1;specialScroll=Vector2.zero;}
+        if(token!=specialChoiceToken){specialChoiceToken=token;specialScroll=Vector2.zero;}
         if(contract.DirectBatch&&(contract.DecisionKind=="b4-reveal"||contract.DecisionKind=="b4-subset"))return true;
+        if(TurningFixedDice)return true;
         if(generalSelection.DiceIndices.Length>0){DrawGeneralDiceCandidates();return true;}
         if(contract.DecisionKind=="b4-pile"){DrawGeneralPileCandidates();return true;}
         if(generalSelection.RequiresBankCards)return false;
@@ -97,56 +115,37 @@ public sealed partial class M6App
         foreach(int index in generalSelection.DiceIndices)
         {
             if(index<0||index>=SkillDiceAreas.Length)continue;var r=SkillDiceAreas[index];bool selected=generalSelection.SelectedDie==index;
-            Outline(r,selected?new Color(1,.81f,.28f):new Color(.48f,.89f,.62f),3);
-            PastoralMenuUI.Label(new Rect(r.x-6,r.yMax+2,r.width+12,20),index==0?"红骰":index==1?"白骰":"事件骰",12,PastoralMenuUI.Ivory,false,TextAnchor.MiddleCenter);
             int input=ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting);
             if(input==1){generalSelection.SelectDie(index);specialScroll=Vector2.zero;}
             if(input==2)Inspect(generalSelection.Description,r);
         }
-        PastoralMenuUI.Panel(DiceChoicesArea);
-        if(generalSelection.SelectedDie<0)
-        {PastoralMenuUI.Label(new Rect(218,193,402,118),"先点选描边的红骰或白骰，再选择费用与对应合法地块。",16,PastoralMenuUI.Ink,false,TextAnchor.MiddleCenter);return;}
+        if(generalSelection.SelectedDie<0)return;
         var actions=generalSelection.Options;
-        if(actions.Any(a=>a.Command.Option=="fixed")){DrawFixedDiceCandidates(actions.Where(a=>a.Command.Option=="fixed").ToArray());return;}
         bool modify=actions.Any(a=>a.Command.Option=="modify");
-        PastoralMenuUI.Label(new Rect(218,186,402,26),modify?"鬼才 · 选真实费用及高亮地块决定点数":"观星 · 选择这颗骰子的合法候选",14,PastoralMenuUI.Ink,true);
-        if(modify)
-        {
-            string values=string.Join(" / ",generalSelection.CandidateActions.Where(a=>a.SelectionDiceValue.HasValue).Select(a=>a.SelectionDiceValue.Value).Distinct().OrderBy(x=>x));
-            PastoralMenuUI.Label(new Rect(218,219,400,91),"可选点数 "+values,15,PastoralMenuUI.Ink);return;
-        }
+        if(modify)return; // 鬼才直接通过手牌和棋盘地块决定结果。
         for(int i=0;i<actions.Length;i++)
         {
-            var action=actions[i];float width=Mathf.Min(110,390f/Mathf.Max(1,actions.Length));var r=new Rect(219+i*(width+4),220,width,90);
-            bool selected=generalSelection.IsOptionSelected(action);CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
-            string face=generalSelection.SelectedDie==2?DiceEventName(action.SelectionDiceValue??0):(action.SelectionDiceValue??0).ToString();
-            PastoralMenuUI.Label(new Rect(r.x+4,r.y+5,r.width-8,45),face,23,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
-            PastoralMenuUI.Label(new Rect(r.x+4,r.y+53,r.width-8,29),(selected?"✓ ":"")+"候选 "+(action.Command.CardType+1),13,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
+            var action=actions[i];float step=Mathf.Min(72,390f/Mathf.Max(1,actions.Length));
+            var r=new Rect(219+i*step,207,step-4,54);
+            bool selected=generalSelection.IsOptionSelected(action);
+            int face=action.SelectionDiceValue??0;
+            if(generalSelection.SelectedDie==2)
+            {
+                float side=Mathf.Min(r.width,r.height)-4;
+                r=new Rect(r.center.x-side/2,r.center.y-side/2,side,side);
+                DrawEventDie(r,face,selected);
+            }
+            else ProgressTableUI.DiceFace(r,face,generalSelection.SelectedDie==0,selected);
             if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1)ChooseGeneralOption(action);
         }
     }
-    void DrawFixedDiceCandidates(B2SkillAction[] actions)
+    void DrawEventDie(Rect r,int face,bool selected)
     {
-        PastoralMenuUI.Label(new Rect(218,186,402,26),"直谏 · 红骰与白骰合计7；选择事件结果",14,PastoralMenuUI.Ink,true);
-        var reds=actions.Select(a=>a.Command.Counts[0]).Distinct().OrderBy(x=>x).ToArray();
-        var events=actions.Select(a=>a.Command.CardType).Distinct().OrderBy(x=>x).ToArray();
-        bool picked=false;
-        for(int i=0;i<reds.Length;i++)
-        {
-            var r=new Rect(219+i*65,218,59,36);bool selected=fixedChoiceRed==reds[i];
-            CopperTabletopSkin.Panel(r,new Color(.45f,.13f,.11f),selected);
-            PastoralMenuUI.Label(r,reds[i]+" + "+(7-reds[i]),14,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
-            if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1){fixedChoiceRed=reds[i];picked=true;}
-        }
-        for(int i=0;i<events.Length;i++)
-        {
-            var r=new Rect(219+i*65,264,59,40);bool selected=fixedChoiceEvent==events[i];
-            CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
-            PastoralMenuUI.Label(r,DiceEventName(events[i]),13,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
-            if(ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting)==1){fixedChoiceEvent=events[i];picked=true;}
-        }
-        if(picked&&fixedChoiceRed>0&&fixedChoiceEvent>0)
-        {var chosen=actions.FirstOrDefault(a=>a.Command.Counts[0]==fixedChoiceRed&&a.Command.CardType==fixedChoiceEvent);if(chosen!=null)ChooseGeneralOption(chosen);}
+        if(Event.current.type!=EventType.Repaint)return;
+        var table=presentation is M4App cities?cities.VerificationBoard.TableScene:
+            ((M5App)presentation).VerificationBoard.TableScene;
+        int symbol=face<=3?0:face-3;
+        GUI.DrawTexture(r,table.Objects.EventDieTexture(symbol),ScaleMode.StretchToFill,true,0,Color.white,0,r.width*.18f);
+        ProgressTableUI.FaceGlow(r,selected);
     }
-    static string DiceEventName(int face)=>face<=3?"黑色 "+face:face==4?"贸易":face==5?"政治":"科学";
 }

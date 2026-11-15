@@ -169,17 +169,9 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
         var instanceMaterials=instance.GetComponentsInChildren<Renderer>(true).SelectMany(r=>r.sharedMaterials).ToArray();
         if(id.StartsWith("port-",StringComparison.Ordinal))
         {
-            if(BoardArtPreference.Painted)
-                Require(instance.Find(id=="port-wood"?"木材港原画":"港口原画")?.GetComponent<Renderer>().sharedMaterial.mainTexture!=null,"港口缺少原画 "+id);
-            else
-            {
-                var deck=instance.Find("PierDeck").GetComponent<Renderer>();
-                Require(deck.sharedMaterial.shader.name=="Catan/PierTimber" && deck.bounds.min.y<TabletopOcean.WaterHeight,"木栈桥缺少水下桩 "+id);
-                Require(instance.GetComponentInChildren<HarborSign>().OnDeck,"贸易牌未装在甲板上 "+id);
-            }
+            Require(instance.Find("PierDeck")!=null && instance.Find("HarborHouse")!=null,"港屋或桥面缺失 "+id);
             var sign=instance.GetComponentInChildren<HarborSign>();
-            Require(sign!=null && sign.GetComponent<MeshFilter>().sharedMesh==Resources.Load<GameObject>(JadeNumberSlip.ModelPath).GetComponentInChildren<MeshFilter>().sharedMesh,"码头缺少悬浮玉签");
-            Require(sign.Face.sharedMaterial.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+"sign-"+id.Substring(5)),"玉签资源或兑换比例不符");
+            Require(sign!=null && sign.Face.sharedMaterial.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+"flag-"+id.Substring(5)), "吊旗类型不符 "+id);
         }
         else
         {
@@ -372,8 +364,7 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
                         if(port)
                         {
                             var sign=asset.GetComponentInChildren<HarborSign>();
-                            sign.Place();
-                            if (!sign.OnDeck) sign.Slip.FaceCamera(camera);
+                            sign.FaceCamera(camera);
                         }
                         var bounds = BoundsOf(asset.transform); camera.aspect = 800f / 600;
                         camera.orthographicSize = Mathf.Max(bounds.size.y,bounds.size.z, bounds.size.x / camera.aspect, .008f) * .70f;

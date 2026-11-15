@@ -7,7 +7,7 @@ using UnityEngine;
 // A policy is passed only the acting seat's detached PlayerView, never a host or save payload.
 public sealed partial class M6App : MonoBehaviour
 {
-    public const string BuildVersion="2.1.14";
+    public const string BuildVersion="2.1.16";
     public const string ProductFileName="Catan"+BuildVersion;
     public const string ReleaseVersion="内测版"+BuildVersion;
     [Serializable]
@@ -42,7 +42,7 @@ public sealed partial class M6App : MonoBehaviour
     public bool Finished=>Ready&&finished();
     public string CurrentActor=>Ready?actor():"";
     public bool IsHumanTurn=>Ready&&!Finished&&!TablePresentationBlocked&&!TableDiceRolling&&CurrentActor==HumanSeat&&(!NetworkGame||Network.CanInteract);
-    public string WaitingText=>NetworkGame?(Network.CanInteract?"等待 "+PlayerDisplayName(CurrentActor)+" 完成操作。":Network.Status):Fault!=""?"AI 已暂停："+Fault:Paused?"AI 已暂停。按 Esc 打开菜单继续。":Finished?"本局已结束。":"等待 "+PlayerDisplayName(CurrentActor)+" · AI 正在行动。";
+    public string WaitingText=>NetworkGame?(Network.CanInteract?"等待 "+PlayerDisplayName(CurrentActor)+" 完成操作。":""):Fault!=""?"AI 已暂停："+Fault:Paused?"AI 已暂停。按 Esc 打开菜单继续。":Finished?"本局已结束。":"等待 "+PlayerDisplayName(CurrentActor)+" · AI 正在行动。";
     public string SavePath=>Path.Combine(Application.persistentDataPath,"m6-local-ai-v1.json");
 
     Func<string> actor,save;
@@ -59,6 +59,10 @@ public sealed partial class M6App : MonoBehaviour
     bool promptWasHuman;
     internal bool TableDiceRolling;
     internal bool TableOverlayOpen;
+    internal bool DevelopmentInspectionOpen=>presentation is M2App cardBase&&cardBase.VerificationOperationDock.InspectingDevelopment||
+        presentation is M3App cardSea&&cardSea.VerificationOperationDock.InspectingDevelopment||
+        presentation is M4App cardCity&&cardCity.VerificationOperationDock.InspectingDevelopment||
+        presentation is M5App cardCombined&&cardCombined.VerificationOperationDock.InspectingDevelopment;
     int menuRule,menuScenario,menuPlayers=4,menuHuman,menuAiSpeed=1;
     int? menuVictoryPoints;
     bool menuThreeKingdoms;
@@ -106,6 +110,7 @@ public sealed partial class M6App : MonoBehaviour
     }
     void Update()
     {
+        if(Network!=null)Network.LobbyPollingEnabled=networkMenu&&networkTab==0;
         UpdateReactions();
         TickNetworkDiagnostics();
         using var frameCost=FrameCost.Measure(FrameCost.Stage.GameUpdate);
@@ -159,6 +164,30 @@ public sealed partial class M6App : MonoBehaviour
         }
     }
     public void SetPaused(bool value){if(NetworkGame){Notice="联机 AI 由服务器调度；其他玩家断线时等待。";return;}Paused=value;if(!value)Fault="";nextAction=Time.unscaledTime+(float)TabletopAiSpeed.Interval(AiSpeedLevel);ShowTablePrompt(value?"AI 已暂停":"AI 已继续");}
+    GUIStyle syncPromptStyle,syncPromptShadow;
+    void DrawSyncLoss()
+    {
+        if(!NetworkGame||!Network.ShowSyncLoss)return;
+        string message=Network.ControlLost?"连接中断":!Network.Connected?
+            (Network.CommandPending?"正在重连，操作待确认…":"正在重连…"):"正在同步棋盘…";
+        if(syncPromptStyle==null)
+        {
+            syncPromptStyle=new GUIStyle(title){fontSize=46,alignment=TextAnchor.MiddleCenter};
+            syncPromptStyle.normal.textColor=PromptColor;
+            syncPromptShadow=new GUIStyle(syncPromptStyle);
+            syncPromptShadow.normal.textColor=new Color(.10f,.025f,.01f,.55f);
+        }
+        var banner=TabletopUI.TurnBannerRect;
+        var area=new Rect(banner.center.x-440,banner.yMax+4,880,64);
+        var shadow=area;shadow.position+=new Vector2(1,2);
+        GUI.Label(shadow,message,syncPromptShadow);
+        GUI.Label(area,message,syncPromptStyle);
+        if(Network.ControlLost&&GUI.Button(new Rect(banner.center.x-70,area.yMax,140,42),Network.RequiresLobbyReentry?"返回大厅":"重新连接"))
+        {
+            if(Network.RequiresLobbyReentry){Network.ForgetIdentity();OpenSeparatedNetworkMenu(networkLan);}
+            else Network.Reconnect();
+        }
+    }
     public void ShowTablePrompt(string value)=>tablePrompts.Show(Time.unscaledTimeAsDouble,value);
     internal string CurrentTablePrompt=>tablePrompts.At(Time.unscaledTimeAsDouble);
     internal bool HasRequiredTableSelection=>tablePrompts.RequiredSelection.Length>0;
@@ -247,7 +276,8 @@ public sealed partial class M6App : MonoBehaviour
     void OnApplicationFocus(bool focused){NetworkApplicationFocus(focused);}
     void OnApplicationPause(bool paused){NetworkApplicationPause(paused);if(paused&&CanAutoSave)SaveGame();}
     void OnApplicationQuit(){StopNetworkDiagnostics();if(CanAutoSave)SaveGame();}
-    public void SaveGame(){if(NetworkGame){Notice="每条已确认操作均由服务器自动保存；重启后使用原席位重连。";ShowTablePrompt("服务器自动保存");return;}try{WriteSave(SavePath);Notice="已保存权威局面、待决、随机状态、人类席位和 AI 暂停设置。";ShowTablePrompt("游戏已保存");}catch(Exception ex){Notice="保存失败（"+ex.GetType().Name+"），请检查存档目录。";ShowTablePrompt("保存失败");}}
+    public void SaveGame()=>SaveGame(SavePath);
+    void SaveGame(string path){if(NetworkGame){Notice="每条已确认操作均由服务器自动保存；重启后使用原席位重连。";ShowTablePrompt("服务器自动保存");return;}try{WriteSave(path);Notice="已保存权威局面、待决、随机状态、人类席位和 AI 暂停设置。";ShowTablePrompt("游戏已保存");}catch(Exception ex){Notice="保存失败（"+ex.GetType().Name+"），请检查存档目录。";ShowTablePrompt("保存失败");}}
     public void LoadGame()
     {
         if(NetworkGame){Network.Reconnect();return;}
@@ -335,7 +365,9 @@ public sealed partial class M6App : MonoBehaviour
             }
             if(tableMenu)DrawReactionButtons(false);
         }
-        if(encyclopediaOpen&&tableMenu){DrawEncyclopedia();DrawCentralSkill();GUI.matrix=Matrix4x4.identity;return;}
+        // 局内菜单与百科覆盖演出，演出仍按原有时序更新，不盖住菜单按钮。
+        if(!MenuVisible&&!networkMenu&&tableMenu)DrawCentralSkill();
+        if(encyclopediaOpen&&tableMenu){DrawEncyclopedia();GUI.matrix=Matrix4x4.identity;return;}
         if(networkMenu){DrawNetworkMenu();GUI.matrix=Matrix4x4.identity;return;}
         if(MenuVisible)
         {
@@ -347,17 +379,17 @@ public sealed partial class M6App : MonoBehaviour
             {
                 DrawTablePauseMenu();
             }
-            if(!tableMenu&&NetworkGame&&!Network.CanInteract)GUI.Label(new Rect(300,82,840,56),DisplayPlayerText(Network.Status),small);
-            DrawOpeningOrder();
+
+            if(!DevelopmentInspectionOpen)DrawOpeningOrder();
             string prompt=DisplayPlayerText(RoadPlacementPrompt.Length>0?RoadPlacementPrompt:CurrentTablePrompt);
             bool facilityVisible = presentation is M4App city && city.FacilityPageVisible
                 || presentation is M5App combined && combined.FacilityPageVisible;
             bool handInstruction=presentation is M4App m4&&m4.ShowHandInstruction||presentation is M5App m5&&m5.ShowHandInstruction;
-            if(!tableMenu&&!facilityVisible&&ThreeKingdomsProjection!=null&&!ThreeKingdomsSelectionActive&&
+            if(!DevelopmentInspectionOpen&&!tableMenu&&!facilityVisible&&ThreeKingdomsProjection!=null&&!ThreeKingdomsSelectionActive&&
                 !GeneralTableCovered&&!TablePresentationBlocked&&!TableMapChoiceOpen&&!TableOverlayOpen&&
                 handInstruction&&HasRequiredTableSelection&&prompt.Length>0)
                 DrawHandInstruction(prompt);
-            if(!facilityVisible&&ThreeKingdomsProjection==null&&prompt.Length>0&&!TablePresentationBlocked&&!TableMapChoiceOpen&&(!TableOverlayOpen||HasRequiredTableSelection))
+            if(!DevelopmentInspectionOpen&&!facilityVisible&&ThreeKingdomsProjection==null&&prompt.Length>0&&!TablePresentationBlocked&&!TableMapChoiceOpen&&(!TableOverlayOpen||HasRequiredTableSelection))
             {
                 bool primary=prompt=="你的回合"||Finished;
                 var promptStyle=new GUIStyle(title){fontSize=primary?46:26,alignment=TextAnchor.MiddleCenter,wordWrap=true};
@@ -376,8 +408,9 @@ public sealed partial class M6App : MonoBehaviour
         }
         if(!MenuVisible&&!tableMenu)DrawPlayedCard();
         if(!MenuVisible&&!tableMenu&&!TablePresentationBlocked){DrawThreeKingdoms();DrawAllianceVictoryB6();}
-        if(!MenuVisible&&!networkMenu)DrawCentralSkill();
+        if(!MenuVisible&&!networkMenu&&!tableMenu&&!DevelopmentInspectionOpen)DrawCentralSkill();
         if(ReactionTableVisible)DrawReactions();
+        if(!MenuVisible&&!networkMenu&&!tableMenu)DrawSyncLoss();
         GUI.matrix=Matrix4x4.identity;
     }
 }

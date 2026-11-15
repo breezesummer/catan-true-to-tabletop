@@ -114,7 +114,7 @@ public static class TabletopSelectionPrompt
             case "Espionage":return "请选择一名其他玩家查看其发展牌";
             case "GuildDues":return "请选择一名分数高于你的玩家";
             case "Crane":return "请选择一项城市设施升级";
-            case "Alchemy":return "请选择红骰与白骰的点数";
+            case "Alchemy":return "请旋转红白骰子";
             case "MerchantFleet":return "请选择一种资源或商品，本回合可按二比一交易";
             case "ResourceMonopoly":return "请选择要垄断的资源种类";
             case "TradeMonopoly":return "请选择要垄断的商品种类";
@@ -215,6 +215,14 @@ public sealed class TabletopCollectionTimeline
     // 仅客户端展示位置；飞牌与手牌复用偏移，不进入权威存档。
     public float ResourceHandScroll,SpecialHandScroll;
     readonly System.Collections.Generic.List<TabletopCollectionFlight> flights = new System.Collections.Generic.List<TabletopCollectionFlight>();
+    sealed class ResourceLayout
+    {
+        internal readonly int[] Counts=new int[8];
+        internal int GoodCount;
+        internal TabletopResourceSlot[] Slots;
+        internal readonly System.Collections.Generic.List<TabletopCollectionFlight> Flights=new System.Collections.Generic.List<TabletopCollectionFlight>();
+    }
+    readonly System.Collections.Generic.Dictionary<string,ResourceLayout> resourceLayouts=new System.Collections.Generic.Dictionary<string,ResourceLayout>();
     string scope;
     long sequence;
     bool initialized;
@@ -234,20 +242,20 @@ public sealed class TabletopCollectionTimeline
         OutcomesReadyAt=outcomesReadyAt??double.NegativeInfinity;
         entries=entries??Array.Empty<Catan.Core.GameHistoryEntry>();
         if(initialized&&scope==playerScope&&ReferenceEquals(observedEntries,entries))
-        {flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);return;}
+        {PruneExpired(now);return;}
         observedEntries=entries;
         long latest=entries.Length==0?0:entries.Max(e=>e.Sequence);
         if(!initialized||scope!=playerScope||latest<sequence)
         {
             // 首次绑定、换局和读档均只接收当前历史基线，不能重播旧的收牌。
-            flights.Clear();orders.Clear();specialOrders.Clear();handChanges.Clear();ResourceHandScroll=SpecialHandScroll=0;initialized=true;scope=playerScope;sequence=latest;
+            flights.Clear();orders.Clear();specialOrders.Clear();handChanges.Clear();resourceLayouts.Clear();ResourceHandScroll=SpecialHandScroll=0;initialized=true;scope=playerScope;sequence=latest;
             consumed.Clear();foreach(var entry in entries)consumed[EventKey(entry)]=entry;RecoveryUntil=double.NegativeInfinity;
             observedTiles=tiles==null?null:CopyTiles(tiles);
             var roll=entries.OrderBy(e=>e.Sequence).LastOrDefault(e=>e.Dice1>0);lastRoll=roll==null?0:roll.Dice1+roll.Dice2;
             productionPending=roll!=null&&lastRoll!=7&&!entries.Where(e=>e.Sequence>=roll.Sequence).Any(e=>e.Kind=="EndTurn"||e.Changes.Any(c=>c.Category=="goods"&&c.Amount>0));return;
         }
         var updates=entries.Where(e=>e.Sequence>sequence||e.SkillEventId!=null&&(!consumed.TryGetValue(EventKey(e),out var old)||!ReferenceEquals(old,e))).OrderBy(e=>e.Sequence).ToArray();
-        if(updates.Length==0){flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);return;}
+        if(updates.Length==0){PruneExpired(now);return;}
         var sourceTiles=CopyTiles(observedTiles??tiles??Array.Empty<TabletopCollectionTile>());
         int inventions=updates.Count(e=>e.Action=="使用「发明家」");bool numbersReliable=true;
         foreach(var entry in updates)
@@ -312,7 +320,7 @@ public sealed class TabletopCollectionTimeline
             if(flights.Count>256){flights.Clear();RecoveryUntil=now+3;}
         }
         observedTiles=tiles==null?sourceTiles:CopyTiles(tiles);
-        sequence=latest;flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);
+        sequence=latest;PruneExpired(now);
     }
     sealed class CollectionChange
     {
@@ -364,16 +372,39 @@ public sealed class TabletopCollectionTimeline
     }
     public TabletopCollectionFlight[] Active(double now)
     {
-        flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);
+        PruneExpired(now);
         return flights.Where(f=>now>=f.Started).ToArray();
+    }
+    void PruneExpired(double now)
+    {
+        for(int i=flights.Count-1;i>=0;i--)if(now-flights[i].Started>=TabletopCollectionFlight.Duration)flights.RemoveAt(i);
+    }
+    public void CopyActive(double now,System.Collections.Generic.List<TabletopCollectionFlight> destination)
+    {
+        PruneExpired(now);destination.Clear();
+        foreach(var flight in flights)if(now>=flight.Started)destination.Add(flight);
     }
     public TabletopResourceSlot[] HandSlots(string player,int[] owned,int goodCount,double now)
     {
-        flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);
-        var result=new System.Collections.Generic.List<TabletopResourceSlot>();
+        PruneExpired(now);
         player=player??"";
-        if(!orders.TryGetValue(player,out var order))orders[player]=order=new TabletopHandOrder();
         handChanges.TryGetValue(player,out var pendingChanges);
+        if(!resourceLayouts.TryGetValue(player,out var layout))resourceLayouts[player]=layout=new ResourceLayout();
+        bool unchanged=layout.Slots!=null&&layout.GoodCount==goodCount&&(pendingChanges==null||pendingChanges.Count==0)&&layout.Flights.Count==flights.Count;
+        for(int good=0;unchanged&&good<goodCount;good++)unchanged=layout.Counts[good]==owned[good];
+        for(int i=0;unchanged&&i<flights.Count;i++)unchanged=ReferenceEquals(layout.Flights[i],flights[i]);
+        if(unchanged)
+        {
+            // 插槽身份只随持牌、排序或飞牌集合变化；动画帧只更新插入权重。
+            foreach(var slot in layout.Slots)slot.Weight=slot.Flight==null?1:slot.Flight.Insertion(now);
+            return layout.Slots;
+        }
+        return RebuildResourceSlots(player,owned,goodCount,now,layout,pendingChanges);
+    }
+    TabletopResourceSlot[] RebuildResourceSlots(string player,int[] owned,int goodCount,double now,ResourceLayout layout,System.Collections.Generic.List<TabletopHandChange> pendingChanges)
+    {
+        var result=new System.Collections.Generic.List<TabletopResourceSlot>();
+        if(!orders.TryGetValue(player,out var order))orders[player]=order=new TabletopHandOrder();
         order.Sync(owned,goodCount,pendingChanges);
         if(pendingChanges!=null)pendingChanges.Clear();
         var incomingByGood=new System.Collections.Generic.Dictionary<int,TabletopCollectionFlight[]>();
@@ -394,9 +425,12 @@ public sealed class TabletopCollectionTimeline
             var flight=ordinal<visibleByGood[good]?null:incomingByGood[good][ordinal-visibleByGood[good]];
             result.Add(new TabletopResourceSlot{Good=good,Ordinal=ordinal,Flight=flight,Weight=flight==null?1:flight.Insertion(now)});
         }
-        return result.ToArray();
+        layout.GoodCount=goodCount;
+        for(int good=0;good<goodCount;good++)layout.Counts[good]=owned[good];
+        layout.Flights.Clear();layout.Flights.AddRange(flights);
+        return layout.Slots=result.ToArray();
     }
-    public void SortHand(string player){if(player!=null&&orders.TryGetValue(player,out var order))order.Sort();}
+    public void SortHand(string player){if(player!=null&&orders.TryGetValue(player,out var order)){order.Sort();resourceLayouts.Remove(player);}}
     string[] Origins(Catan.Core.GameHistoryEntry entry,string player,int good,bool production,TabletopCollectionTile[] tiles)
     {
         if(entry.Kind=="SetupSettlement")return tiles.Where(t=>t.Vertices.Contains(entry.TargetId)&&t.Yield(player,good,true)>0).OrderBy(t=>t.Id).Select(t=>t.Id).ToArray();
@@ -413,7 +447,7 @@ public sealed class TabletopCollectionTimeline
     static int ProgressIndex(string name) => Array.IndexOf(Catan.Core.DevelopmentCardText.Names,name);
     public TabletopResourceSlot[] SpecialSlots(string player,System.Collections.Generic.IEnumerable<OperationHandCard> owned,double now)
     {
-        flights.RemoveAll(f=>now-f.Started>=TabletopCollectionFlight.Duration);
+        PruneExpired(now);
         var cards=(owned??Array.Empty<OperationHandCard>()).ToArray();
         if(!specialOrders.TryGetValue(player,out var order))specialOrders[player]=order=new TabletopSpecialHandOrder();
         var ids=order.Sync(cards.Select(c=>c.Id));

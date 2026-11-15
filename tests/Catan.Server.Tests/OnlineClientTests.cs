@@ -410,6 +410,48 @@ public sealed class OnlineClientTests
         finally {client.EndSession();}
     }
 
+    [Fact]
+    public async Task BackgroundLobbyQueryKeepsControlsAvailableAndDoesNotReleaseAnActiveCommandLock()
+    {
+        var entered=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var release=new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        int requests=0;
+        await using var app=Server("http://127.0.0.1:0",async _=>{Interlocked.Increment(ref requests);entered.TrySetResult();await release.Task;return List("更新后的房间");});
+        await app.StartAsync();var client=Client();
+        try
+        {
+            client.ConfigureEndpoint(Address(app),"");
+            typeof(M7Client).GetProperty("LastError")!.SetValue(client,"保留操作反馈");
+            client.ListRooms(true);await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.False(client.Busy);Assert.Equal("保留操作反馈",client.LastError);
+            client.ListRooms(true);Assert.Equal(1,requests);
+            // 后台列表返回时，玩家可能已提交准备或加入；不能替前台请求解除操作锁。
+            typeof(M7Client).GetProperty("Busy")!.SetValue(client,true);
+            release.TrySetResult();await PumpUntil(client,()=>client.Rooms.Length==1);
+            Assert.True(client.Busy);Assert.Equal("更新后的房间",client.Rooms[0].RoomId);
+            Assert.Equal("保留操作反馈",client.LastError);
+        }
+        finally {release.TrySetResult();client.EndSession();}
+    }
+
+    [Fact]
+    public async Task RoomPageCanSuspendLobbyPollingWithoutDisablingSeatStateSync()
+    {
+        int requests=0;
+        await using var app=Server("http://127.0.0.1:0",_=>{Interlocked.Increment(ref requests);return Task.FromResult(List("房间"));});
+        await app.StartAsync();var client=Client();
+        try
+        {
+            client.ConfigureEndpoint(Address(app),"");Field("LobbyPollingEnabled").SetValue(client,false);
+            Field("nextLobbyPollAt").SetValue(client,float.MinValue);
+            Tick(client);Assert.Equal(0,requests);Assert.False(client.Busy);
+            Field("LobbyPollingEnabled").SetValue(client,true);Tick(client);
+            Assert.False(client.Busy);
+            await PumpUntil(client,()=>client.Rooms.Length==1);Assert.Equal(1,requests);
+        }
+        finally {client.EndSession();}
+    }
+
     static M7Client Client()
     {
         var client=new M7Client();client.UseCredentialDirectory(Path.Combine(Path.GetTempPath(),"catan-online-client-tests",Guid.NewGuid().ToString("N")));return client;

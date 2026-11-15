@@ -13,10 +13,10 @@ public sealed partial class M5App
     static bool SpecialCommand(Command c)=>new[]{CommandKind.SetupPort,CommandKind.PlacePort,CommandKind.ClaimWonder,CommandKind.BuildWonder,CommandKind.ConvertWarship,CommandKind.AttackFortress,CommandKind.ChooseInvasionRoute,CommandKind.StealCloth}.Contains(c.Kind);
     bool SpecialPanelVisible=>view!=null&&(specialOpen||view.Phase==GamePhase.SetupPort||view.Phase==GamePhase.PortPlacement);
     bool SpecialRelevant=>view!=null&&(view.Wonders.Length>0||view.Board.Fortresses.Length>0||view.Board.Villages.Length>0||view.ScenarioId=="forgotten-tribe"||SpecialPanelVisible);
-    static readonly Rect FramePirateButton=new Rect(15,283,178,32);
+    Rect FramePirateButton=>ai.FramePirateButtonArea;
     bool HasDirectTokenMoves=>view.Phase==GamePhase.RobberMove&&view.LegalActions.Any(c=>c.Kind==CommandKind.MoveRobber||c.Kind==CommandKind.MovePirate);
     bool CanSendPirateToFrame=>view.Phase==GamePhase.RobberMove&&view.LegalActions.Any(c=>c.Kind==CommandKind.MovePirate&&c.TargetId=="frame");
-    bool SpecialBlocksMouse(Vector2 p)=>view!=null&&(CanSendPirateToFrame&&FramePirateButton.Contains(p)||SpecialRelevant&&new Rect(1040,82,220,34).Contains(p)||specialOpen&&new Rect(1032,120,380,410).Contains(p));
+    bool SpecialBlocksMouse(Vector2 p)=>view!=null&&(ai!=null&&ai.IsHumanTurn&&CanSendPirateToFrame&&FramePirateButton.Contains(p)||SpecialRelevant&&new Rect(1040,82,220,34).Contains(p)||specialOpen&&new Rect(1032,120,380,410).Contains(p));
     bool PickPendingMapAction(Vector2 mouse,bool click)
     {
         bool port=view.Phase==GamePhase.SetupPort||view.Phase==GamePhase.PortPlacement;

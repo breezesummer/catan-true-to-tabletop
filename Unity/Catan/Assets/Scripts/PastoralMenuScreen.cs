@@ -6,7 +6,7 @@ using UnityEngine;
 public sealed partial class M6App
 {
     // -1 为纯风景主页，五个入口分别拥有独立内容；开局配置只在三个步骤内共享。
-    int menuPage=-1,menuSettingsTab;
+    int menuPage=-1,menuSettingsTab=1;
     Font pastoralMenuFont;
     Texture2D collectorTitle;
     readonly float[] menuNavBlend=new float[5];
@@ -15,7 +15,9 @@ public sealed partial class M6App
     bool menuPendingAllowSave;
     string menuPendingCaption,menuInlineMessage="";
     string menuPlayerName;
-    string menuPreviewPath,menuPreviewText,menuPreviewBackupText;
+    string menuPreviewPath;
+    SavePreview recentSave,earlierSave;
+    float nextSavePreviewCheck;
     long menuPreviewStamp=-1,menuPreviewBackupStamp=-1;
     internal string MenuReviewSavePath;
     string MenuLocalSavePath=>MenuReviewSavePath??SavePath;
@@ -26,6 +28,7 @@ public sealed partial class M6App
         atlasOpen=false;seatOptionsOpen=false;GUI.FocusControl(null);menuInlineMessage="";menuPageAt=Time.unscaledTime;
         if(page==2||page==3){OpenSeparatedNetworkMenu(page==2);return;}
         networkMenu=false;menuPage=page;
+        if(page==1){backupExpanded=false;nextSavePreviewCheck=0;}
     }
     void HandleMainMenuEscape()
     {
@@ -95,24 +98,40 @@ public sealed partial class M6App
     }
     void RefreshMenuSavePreview()
     {
-        string path=MenuLocalSavePath;long stamp=File.Exists(path)?File.GetLastWriteTimeUtc(path).Ticks:0;
-        string backup=path+".bak";long backupStamp=File.Exists(backup)?File.GetLastWriteTimeUtc(backup).Ticks:0;
-        if(path==menuPreviewPath&&stamp==menuPreviewStamp&&backupStamp==menuPreviewBackupStamp)return;
+        if(Time.unscaledTime<nextSavePreviewCheck)return;
+        nextSavePreviewCheck=Time.unscaledTime+.5f;
+        string path=MenuLocalSavePath,backup=path+".bak";
+        long stamp=File.Exists(path)?File.GetLastWriteTimeUtc(path).Ticks:0;
+        long backupStamp=File.Exists(backup)?File.GetLastWriteTimeUtc(backup).Ticks:0;
+        if(path!=menuPreviewPath||stamp!=menuPreviewStamp)recentSave=ReadSavePreview(path,stamp);
+        if(path!=menuPreviewPath||backupStamp!=menuPreviewBackupStamp)earlierSave=ReadSavePreview(backup,backupStamp);
         menuPreviewPath=path;menuPreviewStamp=stamp;menuPreviewBackupStamp=backupStamp;
-        menuPreviewText=MenuSaveDescription(path);menuPreviewBackupText=MenuSaveDescription(backup);
     }
-    string MenuSaveDescription(string path)
-    {
-        if(!File.Exists(path))return "暂无存档";
-        try
-        {
+    sealed class SavePreview{
+        public string Map,Artwork,Timestamp;
+        public int Players,Seat;
+        public bool[] Modes;
+    }
+    // 只投影权威存档里的模块标记，兼容原有存档封装。
+    [Serializable] sealed class PreviewAuthority{public PreviewTrade TradeModules;}
+    [Serializable] sealed class PreviewTrade{public bool Harbormaster;public PreviewFishing Fishing;}
+    [Serializable] sealed class PreviewFishing{public string Version;}
+    SavePreview ReadSavePreview(string path,long stamp){
+        if(stamp==0)return null;
+        try{
             var data=JsonUtility.FromJson<SavedGame>(File.ReadAllText(path));
             if(data==null||data.Version!=1||string.IsNullOrEmpty(data.Authority))throw new InvalidDataException();
             ValidateConfiguration(data.RuleSet,data.ScenarioId,data.PlayerCount,data.HumanSeat);
-            string map=data.RuleSet=="base"||data.RuleSet=="cities-knights"?"标准岛屿":MapTitle(data.ScenarioId);
-            if(path==MenuLocalSavePath)primarySaveMap=map;else backupSaveMap=map;
-            return RuleNames[Array.IndexOf(RuleIds,data.RuleSet)]+(data.ThreeKingdoms?" · 三国争霸":"")+"  ·  "+data.PlayerCount+" 人  ·  "+ColorLabel(data.HumanSeat)+"建筑"+"\n保存于 "+File.GetLastWriteTime(path).ToString("yyyy-MM-dd  HH:mm");
-        }
-        catch{return "此存档无法预览，可能损坏或版本不兼容。";}
+            bool sea=data.RuleSet=="seafarers"||data.RuleSet=="combined";
+            var trade=JsonUtility.FromJson<PreviewAuthority>(data.Authority)?.TradeModules;
+            return new SavePreview{
+                Map=sea?MapTitle(data.ScenarioId):"标准岛屿",
+                Artwork=sea?"atlas-"+data.ScenarioId+"-"+data.PlayerCount:"map-标准岛屿",
+                Players=data.PlayerCount,Seat=data.HumanSeat[1]-'1',
+                Timestamp="保存于 "+new DateTime(stamp,DateTimeKind.Utc).ToLocalTime().ToString("yyyy-MM-dd  HH:mm"),
+                Modes=new[]{true,sea,data.RuleSet=="cities-knights"||data.RuleSet=="combined",data.ThreeKingdoms,
+                    trade!=null&&(trade.Harbormaster||!string.IsNullOrEmpty(trade.Fishing?.Version))}
+            };
+        }catch{return new SavePreview{Map="无法读取这份存档"};}
     }
 }

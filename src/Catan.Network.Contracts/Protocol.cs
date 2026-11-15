@@ -80,7 +80,7 @@ namespace Catan.Network.Contracts
         public long CommittedRevision;
         public bool IsDuplicate;
         public string SeatId;
-        // 对局中由 AI 托管或等待下一自身回合接回时为 false；读取自己的可见局面仍获允许。
+        // 对局中由 AI 托管时为 false；重连成功后立即交还真人控制。
         public bool HumanControlAvailable;
         public string RuleSet;
         public string ViewJson;
@@ -128,7 +128,7 @@ namespace Catan.Network.Contracts
         [DataMember(EmitDefaultValue=false)] public string TradeModulesVersion;
         [DataMember(EmitDefaultValue=false)] public string ThreeKingdomsPackageVersion;
         [DataMember(EmitDefaultValue=false)] public string ThreeKingdomsContentHash;
-        // 掉线由 AI 托管，重连在下一自身行动回合接回；权威存档保留。
+        // 掉线由 AI 托管，重连成功后立即接回；权威存档保留。
     }
     public sealed class CreateRoomPayload
     {

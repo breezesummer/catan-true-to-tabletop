@@ -7,6 +7,7 @@ using UnityEngine;
 // 银行仅消费玩家视图的公开库存与获准历史，飞牌只呈现已经完成的结算。
 public sealed class TabletopBankUI
 {
+    static readonly Unity.Profiling.ProfilerMarker CollectionDrawMarker=new Unity.Profiling.ProfilerMarker("Catan.Collection.DrawFlights");
     public static readonly Rect Area = new Rect(18,55,220,210);
     readonly TabletopCollectionTimeline timeline = new TabletopCollectionTimeline();
     TabletopDicePresentation dice;
@@ -23,6 +24,8 @@ public sealed class TabletopBankUI
     readonly Dictionary<string,Rect> destinations = new Dictionary<string,Rect>();
     readonly Dictionary<TabletopCollectionFlight,Rect> ownDestinations = new Dictionary<TabletopCollectionFlight,Rect>();
     readonly Dictionary<TabletopCollectionFlight,int> ownSlotIndices = new Dictionary<TabletopCollectionFlight,int>();
+    readonly List<TabletopCollectionFlight> activeFlights=new List<TabletopCollectionFlight>();
+    readonly List<TabletopCollectionFlight> landingFlights=new List<TabletopCollectionFlight>();
     OperationSnapshot current;
     static Texture2D developmentBack;
     static readonly string[] Names = {"木材","砖块","羊毛","谷物","矿石","布匹","钱币","纸张"};
@@ -135,17 +138,25 @@ public sealed class TabletopBankUI
     {
         if(timeline.RecoveryUntil>Time.unscaledTimeAsDouble)ModernOperationUI.Label(new Rect(480,680,480,28),"已恢复当前手牌与棋盘",ModernOperationUI.Center);
         if(current==null||Event.current.type!=EventType.Repaint)return;
+        using var collectionSample=CollectionDrawMarker.Auto();
         double now=Time.unscaledTimeAsDouble;
-        var active=timeline.Active(now);
-        var landing=active.Where(f=>f.Player==current.Seat&&f.IsSpecial!=ownHandVisible&&f.Progress(now)>=.60&&ownSlotIndices.ContainsKey(f))
-            .OrderBy(f=>ownSlotIndices[f]).ToArray();
+        timeline.CopyActive(now,activeFlights);landingFlights.Clear();
+        foreach(var flight in activeFlights)
+            if(flight.Player==current.Seat&&flight.IsSpecial!=ownHandVisible&&flight.Progress(now)>=.60&&ownSlotIndices.ContainsKey(flight))landingFlights.Add(flight);
+        // 复用有界缓冲，避免在收牌过程中每帧创建筛选、排序数组。
+        for(int i=1;i<landingFlights.Count;i++)
+        {
+            var flight=landingFlights[i];int j=i-1;
+            while(j>=0&&ownSlotIndices[landingFlights[j]]>ownSlotIndices[flight]){landingFlights[j+1]=landingFlights[j];j--;}
+            landingFlights[j+1]=flight;
+        }
         // 落位牌按真实手牌插槽从左向右合成，右邻牌逐渐遮挡下沉部分；仍在空中的牌最后绘制。
-        foreach(var flight in landing)
+        foreach(var flight in landingFlights)
         {
             DrawFlight(flight,now,ownHandVisible);
             OccludeHand?.Invoke(flight);
         }
-        foreach(var flight in active.Where(f=>!landing.Contains(f)))DrawFlight(flight,now,ownHandVisible);
+        foreach(var flight in activeFlights)if(!landingFlights.Contains(flight))DrawFlight(flight,now,ownHandVisible);
     }
     void DrawFlight(TabletopCollectionFlight flight,double now,bool resourceHandVisible)
     {

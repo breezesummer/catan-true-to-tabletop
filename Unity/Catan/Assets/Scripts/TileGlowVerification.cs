@@ -231,9 +231,9 @@ public sealed partial class TabletopUiVerification
         var slips = GetComponent<M5App>().VerificationBoard.GetComponentsInChildren<JadeNumberSlip>();
         foreach (var prefix in new[] { "点数 ", "湖泊点数 ", "渔港点数 " })
             Require(slips.Any(s => s.name.StartsWith(prefix,StringComparison.Ordinal)), "缺少验收玉签 "+prefix);
-        var ports = slips.Where(s => s.GetComponent<HarborSign>() != null).ToArray();
-        Require(ports.Length > 0 && ports.All(s => s.GetComponent<Renderer>().enabled), "港口贸易签不可见");
-        Require(slips.Except(ports).All(s => s.GetComponent<Renderer>().enabled == visible), "点数玉签显示状态不一致");
+        var ports = GetComponent<M5App>().VerificationBoard.GetComponentsInChildren<HarborSign>();
+        Require(ports.Length > 0 && ports.All(s => s.Face.enabled), "港口吊旗不可见");
+        Require(slips.All(s => s.GetComponent<Renderer>().enabled == visible), "点数玉签显示状态不一致");
         Require(TabletopMapMarks.Visible == visible && Shader.GetGlobalFloat("_CatanMapMarksHidden") == (visible ? 0 : 1),"地块光效显示状态不一致");
     }
 }

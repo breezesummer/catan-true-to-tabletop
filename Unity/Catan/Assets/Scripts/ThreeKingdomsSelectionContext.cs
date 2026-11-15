@@ -23,7 +23,15 @@ public sealed class B45SelectionContext
         raidForgone[type]+=delta;
         if(!Contract.Actions.Any(a=>a.Command.Option=="raid"&&a.Command.Counts.SequenceEqual(raidForgone))&&RaidCount!=0)
         {raidForgone[type]-=delta;return false;}
-        players.Clear();ClearAvailability();return true;
+        while(players.Count>0&&!RaidChoices().Any(a=>players.All(a.Command.TargetPlayerIds.Contains)))players.RemoveAt(players.Count-1);
+        ClearAvailability();return true;
+    }
+    public void CycleRaidCard(int type)
+    {
+        if(ChangeRaidCard(type,1))return;
+        if(raidForgone[type]>0){while(ChangeRaidCard(type,-1)){} return;}
+        if(!Raid||submitting||!Contract.Actions.Any(a=>a.Command.Option=="raid"&&a.Command.Counts[type]==1&&a.Command.Counts.Sum()==1))return;
+        Array.Clear(raidForgone,0,8);ChangeRaidCard(type,1);
     }
     IEnumerable<B2SkillAction> RaidChoices()=>Contract.Actions.Where(a=>a.Command.Option=="raid"&&a.Command.Counts.SequenceEqual(raidForgone));
     readonly int[] privateCounts=new int[8];
@@ -35,6 +43,7 @@ public sealed class B45SelectionContext
     void ClearAvailability()
     {Revision++;Array.Clear(handAvailability,0,handAvailability.Length);progressAvailability.Clear();boardAvailability.Clear();}
     bool Shelie => Contract?.DirectBatch==true&&Contract.DecisionKind=="shelie";
+    bool FuqiRequest => Contract?.DirectBatch==true&&Contract.DecisionKind=="seat-fuqi-request";
     string optionKey;
     int selectedDie=-1;
     bool submitting;
@@ -49,15 +58,17 @@ public sealed class B45SelectionContext
     public int[] SelectedCounts => Enumerable.Range(0,8).Select(t=>handKeys.Count(k=>k.StartsWith(t+":",StringComparison.Ordinal))).ToArray();
     public int[] SelectedPrivateCounts => (int[])privateCounts.Clone();
     public int[] SelectedBankCounts => (int[])bankCounts.Clone();
-    public bool RequiresBankCards => Current().Any(a=>a.RequiredCardCount.HasValue);
-    public int RequiredBankCount => Current().Where(a=>a.RequiredCardCount.HasValue).Select(a=>a.RequiredCardCount.Value).DefaultIfEmpty(0).Max();
-    public B2SkillAction[] BankOptions => Current().Where(a=>a.RequiredCardCount.HasValue).ToArray();
+    public bool RequiresBankCards => FuqiRequest||Current().Any(a=>a.RequiredCardCount.HasValue);
+    public int RequiredBankCount => FuqiRequest?MaximumHandCount:Current().Where(a=>a.RequiredCardCount.HasValue).Select(a=>a.RequiredCardCount.Value).DefaultIfEmpty(0).Max();
+    public B2SkillAction[] BankOptions => Current().Where(a=>FuqiRequest?a.Command.Option=="seat-fuqi-request":a.RequiredCardCount.HasValue).ToArray();
+    int BankAvailable(int type)=>FuqiRequest&&BankOptions.Any(a=>a.Command.CardType==type)?MaximumHandCount:BankOptions.Where(a=>a.Command.CardType==type).Select(a=>a.AvailableCount??0).DefaultIfEmpty(0).Max();
     public string[] SelectedPlayers => players.ToArray();
     public string[] SelectedTiles => tiles.ToArray();
     public string[] SelectedProgress => progress.ToArray();
     public bool CanCancel => Contract?.CanCancel==true && !submitting;
     public B2SkillCommand SkipCommand => submitting?null:B45SelectionContract.Copy(Contract?.SkipCommand);
     public string Description => Contract?.Description??"";
+    public bool AwaitingEffectChoice => Contract?.DecisionKind=="b5m-zaiqi"&&optionKey==null;
     public string Notice {get;private set;}
     public string Summary => Shelie?"已选资源 "+shelieTypes.Count+" / 3 种":(RequiresBankCards?"已选银行牌 "+bankCounts.Sum()+" / "+RequiredBankCount+" 张 · ":"")+"已选手牌 "+SelectedCounts.Sum()+" 张"+(progress.Count>0?" · 发展牌 "+progress.Count+" 张":"")+(players.Count>0?" · 目标 "+players.Count+" 人":"")+(tiles.Count>0?" · 棋盘目标 "+tiles.Count+" 项":"")+(privateCounts.Sum()>0?" · 授权目标手牌 "+privateCounts.Sum()+" 张":"");
     public B2SkillAction[] CandidateActions => Current().ToArray();
@@ -67,25 +78,88 @@ public sealed class B45SelectionContext
         get
         {
             var options=Options;
+            if(CivilHandBatch||AwaitingActivation)return false;
+            if(Contract?.DecisionKind=="b5m-zaiqi")return AwaitingEffectChoice;
             // 制衡的两种用途直接由点选的实体手牌区分。
             if(options.Length==0||options.All(a=>a.Command.Option=="exchange-hand"||a.Command.Option=="exchange-progress")||options.All(a=>a.Command.Option=="civil-niepan-track"))return false;
             if(optionKey!=null&&options.Length>1&&Current().All(a=>B45SelectionContract.Board(a).Length>0||
                 B45SelectionContract.Players(a).Length>0||B45SelectionContract.Cost(a).Sum()>0||B45SelectionContract.Progress(a).Length>0))return false;
-            return options.Length>1||options.Any(a=>a.CardSelectionKind=="declare"||a.Command.Option=="seat-jinglue-take");
+            return options.Any(a=>B45SelectionContract.Board(a).Length==0&&B45SelectionContract.Players(a).Length==0&&B45SelectionContract.Cost(a).Sum()==0&&B45SelectionContract.Progress(a).Length==0)||options.Any(a=>a.VirtualCardId!=null||a.CardSelectionKind=="declare"||a.Command.Option=="seat-jinglue-take");
         }
     }
-    public bool CanConfirm => !submitting && BuildCommand()!=null;
+    public bool CanConfirm => !submitting && (pendingChoices!=null||BuildCommand()!=null);
+    public bool CivilHandBatch => Contract?.DirectBatch==true&&(Contract.DecisionKind=="civil-fencheng-discard"||Contract.DecisionKind=="civil-subset"||Contract.DecisionKind=="civil-hand-select")&&Contract.Actions.Any(a=>a.MinimumHandCount.HasValue&&a.MaximumHandCount.HasValue);
+    public int MinimumHandCount => Contract?.Actions.Where(a=>a.MinimumHandCount.HasValue).Select(a=>a.MinimumHandCount.Value).DefaultIfEmpty(0).Max()??0;
+    public int MaximumHandCount => Contract?.Actions.Where(a=>a.MaximumHandCount.HasValue).Select(a=>a.MaximumHandCount.Value).DefaultIfEmpty(0).Max()??0;
     bool Subset => Contract?.DirectBatch==true&&(Contract.DecisionKind=="b4-reveal"||Contract.DecisionKind=="b4-subset");
     bool Poxi => Contract?.DirectBatch==true&&Contract.DecisionKind=="response-poxi-select";
     static string HandKey(int type,int ordinal)=>type+":"+ordinal;
     static bool SameSet(IEnumerable<string> first,IEnumerable<string> second) => first.OrderBy(x=>x,StringComparer.Ordinal).SequenceEqual(second.OrderBy(x=>x,StringComparer.Ordinal));
     IEnumerable<B2SkillAction> Current() => (Contract?.Actions??Array.Empty<B2SkillAction>()).Where(a=>!B45SelectionContract.IsSkip(a.Command)&&(optionKey==null||B45SelectionContract.OptionKey(a)==optionKey)&&(!a.SelectionDiceIndex.HasValue||selectedDie<0||a.SelectionDiceIndex==selectedDie));
+    B45SelectionContract pendingChoices;
+    bool choicesOpened;
+    public bool AwaitingActivation {get;private set;}
+
+    static bool NeedsActivation(B45SelectionContract contract)
+    {
+        switch(contract.DecisionKind)
+        {
+            case "optional":
+            case "harvest":
+            case "qianxun-response":
+            case "luoying":
+            case "dice-modify":
+            case "dice-fixed":
+            case "dice-observe":
+            case "dice-luoshen":
+            case "b5m-huoshou-move": return true;
+            default: return false;
+        }
+    }
+
+    B45SelectionContract BuildSelection(ThreeKingdomsView view,string viewerId,string skillId,int[] hand)
+    {
+        var contract=B45SelectionContract.Build(view,viewerId,skillId,hand);
+        pendingChoices=null;
+        AwaitingActivation=false;
+        if(choicesOpened||!NeedsActivation(contract)||contract.SkipCommand==null)return contract;
+        var skip=contract.Actions.First(a=>B45SelectionContract.IsSkip(a.Command));
+        if(!contract.Actions.Any(a=>!B45SelectionContract.IsSkip(a.Command)))return contract;
+        AwaitingActivation=true;
+        // 这些窗口已有独立发动动作，确认直接提交，后续候选由规则生成。
+        if(contract.DecisionKind=="dice-observe"||contract.DecisionKind=="dice-luoshen"||
+            contract.DecisionKind=="harvest"&&contract.Actions.Any(a=>a.Command.Option=="shelie")||
+            contract.DecisionKind=="optional"&&contract.Actions.Any(a=>a.Command.Option=="accept"))
+            return contract;
+        var actions=new[]{skip};
+        if(contract.DecisionKind=="optional")
+        {
+            var accept=B45SelectionContract.Copy(skip.Command);
+            accept.Option="accept";
+            actions=new[]{new B2SkillAction {Command=accept,Label="发动"},skip};
+        }
+        else pendingChoices=contract;
+        var prompt=new ThreeKingdomsView {WindowId=view.WindowId,PackageVersion=view.PackageVersion,
+            SkillDecision=view.SkillDecision,SkillActions=actions};
+        return B45SelectionContract.Build(prompt,viewerId,contract.SkillId,hand);
+    }
+
+    public bool OpenActivationChoices()
+    {
+        if(pendingChoices==null||submitting)return false;
+        Contract=pendingChoices;
+        pendingChoices=null;
+        choicesOpened=true;
+        AwaitingActivation=false;
+        Reselect();
+        return true;
+    }
     public void Begin(ThreeKingdomsView view,string viewerId,string skillId,int[] hand)
     {
-        Reset();Contract=B45SelectionContract.Build(view,viewerId,skillId,hand);
+        Reset();Contract=BuildSelection(view,viewerId,skillId,hand);
         if(Contract.Actions.Length==0){Reset();return;}
         if(DiceIndices.Length==1)selectedDie=DiceIndices[0];
-        if(Options.Length==1)optionKey=B45SelectionContract.OptionKey(Options[0]);
+        if(Options.Length==1&&Contract.DecisionKind!="b5m-zaiqi")optionKey=B45SelectionContract.OptionKey(Options[0]);
     }
     public void Begin(ThreeKingdomsView view,string skillId,int[] hand)
     {Begin(view,view?.SkillDecision?.PlayerId??view?.Clock?.ActivePlayerId,skillId,hand);}
@@ -93,20 +167,20 @@ public sealed class B45SelectionContext
     {
         if(!Active)return;
         ClearAvailability();
-        var updated=B45SelectionContract.Build(view,Contract.ViewerId,SkillId,hand);
+        var updated=BuildSelection(view,Contract.ViewerId,SkillId,hand);
         // 本人独立选将不由此模型管理；技能投影变更必须严格匹配本人窗口与待决。
         if(updated.WindowId!=Contract.WindowId||updated.DecisionId!=Contract.DecisionId||updated.Actions.Length==0)
         {Reset();Notice="操作窗口已经变化，已清除未提交选择。";return;}
         Contract=updated;
         if(Raid&&RaidCount>0&&!RaidChoices().Any()){Array.Clear(raidForgone,0,8);players.Clear();}
         if(optionKey!=null&&!Options.Any(a=>B45SelectionContract.OptionKey(a)==optionKey))optionKey=null;
-        if(Options.Length==1)optionKey=B45SelectionContract.OptionKey(Options[0]);
+        if(Options.Length==1&&Contract.DecisionKind!="b5m-zaiqi")optionKey=B45SelectionContract.OptionKey(Options[0]);
         bool changed=handKeys.RemoveWhere(k=>{var split=k.Split(':');int t=int.Parse(split[0]),n=int.Parse(split[1]);return n>=Contract.Hand[t];})>0;
         changed|=players.RemoveAll(p=>!Current().Any(a=>B45SelectionContract.Players(a).Contains(p)))>0;
         changed|=tiles.RemoveAll(t=>!Current().Any(a=>B45SelectionContract.Board(a).Contains(t)))>0;
         changed|=PruneProgress(p=>!Current().Any(a=>B45SelectionContract.Progress(a).Contains(p)));
         for(int t=0;t<8;t++)if(privateCounts[t]>0&&!PrivateActions().Any(a=>a.Command.CardType==t)){privateCounts[t]=0;changed=true;}
-        for(int t=0;t<8;t++){int available=BankOptions.Where(a=>a.Command.CardType==t).Select(a=>a.AvailableCount??0).DefaultIfEmpty(0).Max();if(bankCounts[t]>available){bankCounts[t]=0;changed=true;}}
+        for(int t=0;t<8;t++){int available=BankAvailable(t);if(bankCounts[t]>available){bankCounts[t]=0;changed=true;}}
         if(changed)Notice="牌或目标已变化，失效选择已清除。";
     }
     public void RevalidateProgressCopies(string[] ownedKinds)
@@ -122,7 +196,7 @@ public sealed class B45SelectionContext
     bool PruneProgress(Func<string,bool> remove)
     {bool changed=false;for(int i=progress.Count-1;i>=0;i--)if(remove(progress[i])){progress.RemoveAt(i);progressKeys.RemoveAt(i);changed=true;}return changed;}
     public void Reset()
-    {Contract=null;ClearSelections();optionKey=null;selectedDie=-1;submitting=false;Notice=null;}
+    {Contract=null;pendingChoices=null;choicesOpened=false;AwaitingActivation=false;ClearSelections();optionKey=null;selectedDie=-1;submitting=false;Notice=null;}
     public void ClearSelections()
     {ClearAvailability();Array.Clear(raidForgone,0,8);shelieTypes.Clear();handKeys.Clear();players.Clear();tiles.Clear();progress.Clear();progressKeys.Clear();Array.Clear(privateCounts,0,8);Array.Clear(bankCounts,0,8);Notice=null;}
     public void Reselect()
@@ -130,7 +204,7 @@ public sealed class B45SelectionContext
         if(submitting)return;
         ClearSelections();
         selectedDie=DiceIndices.Length==1?DiceIndices[0]:-1;
-        optionKey=Options.Length==1?B45SelectionContract.OptionKey(Options[0]):null;
+        optionKey=Options.Length==1&&Contract.DecisionKind!="b5m-zaiqi"?B45SelectionContract.OptionKey(Options[0]):null;
     }
     public bool ChooseOption(B2SkillAction action)
     {
@@ -166,6 +240,7 @@ public sealed class B45SelectionContext
     }
     bool CanAddHandType(int type)
     {
+        if(CivilHandBatch)return SelectedCounts.Sum()<MaximumHandCount;
         if(Subset)return true;
         if(Poxi)return SelectedCounts[type]+privateCounts[type]==0&&SelectedCounts.Sum()+privateCounts.Sum()<4&&
             Contract.Actions.Any(a=>a.Command.Option=="response-poxi-select"&&a.Command.CardType==type&&a.Command.TargetPlayerIds.FirstOrDefault()==Contract.ViewerId);
@@ -178,13 +253,13 @@ public sealed class B45SelectionContext
         if(!CanSelectHand(type,ordinal))return false;
         ClearAvailability();
         string key=HandKey(type,ordinal);if(!handKeys.Remove(key))handKeys.Add(key);
-        if(!Subset&&!Poxi)RevalidateTargets();return true;
+        if(!CivilHandBatch&&!Subset&&!Poxi)RevalidateTargets();return true;
     }
     public bool CanSelectPlayer(string id)
     {
         if(!Active||submitting||string.IsNullOrEmpty(id)||Poxi)return false;
         if(players.Contains(id))return true;
-        if(Raid)return RaidCount>players.Count&&RaidChoices().Any(a=>a.Command.TargetPlayerIds.Contains(id)&&players.All(a.Command.TargetPlayerIds.Contains));
+        if(Raid)return RaidChoices().Any(a=>a.Command.TargetPlayerIds.Contains(id)&&players.Take(Math.Max(0,RaidCount-1)).All(a.Command.TargetPlayerIds.Contains));
         int max=Current().Select(a=>B45SelectionContract.Players(a).Length).DefaultIfEmpty(0).Max();
         var next=max==1?new[]{id}:players.Concat(new[]{id}).ToArray();
         return Current().Any(a=>next.All(B45SelectionContract.Players(a).Contains)&&Compatible(a,true,false,true));
@@ -192,13 +267,13 @@ public sealed class B45SelectionContext
     public bool TogglePlayer(string id)
     {
         if(!CanSelectPlayer(id))return false;ClearAvailability();if(players.Remove(id))return true;
-        if(Raid){players.Add(id);return true;}
+        if(Raid){if(players.Count==RaidCount)players.RemoveAt(players.Count-1);players.Add(id);return true;}
         int max=Current().Select(a=>B45SelectionContract.Players(a).Length).DefaultIfEmpty(0).Max();
         if(max==1)players.Clear();players.Add(id);RevalidateCosts();return true;
     }
     public bool CanSelectTile(string id)
     {
-        if(!Active||submitting||string.IsNullOrEmpty(id))return false;if(tiles.Contains(id))return true;
+        if(!Active||submitting||AwaitingEffectChoice||string.IsNullOrEmpty(id))return false;if(tiles.Contains(id))return true;
         if(boardAvailability.TryGetValue(id,out bool available))return available;
         int max=Current().Select(a=>B45SelectionContract.Board(a).Length).DefaultIfEmpty(0).Max();
         var next=max==1?new[]{id}:tiles.Concat(new[]{id}).ToArray();
@@ -229,7 +304,7 @@ public sealed class B45SelectionContext
     {
         if(!Active||submitting||type<0||type>=8||delta==0)return false;
         int next=bankCounts[type]+Math.Sign(delta);if(next<0)return false;
-        int available=BankOptions.Where(a=>a.Command.CardType==type).Select(a=>a.AvailableCount??0).DefaultIfEmpty(0).Max();
+        int available=BankAvailable(type);
         if(next>available||bankCounts.Sum()+Math.Sign(delta)>RequiredBankCount)return false;
         bankCounts[type]=next;return true;
     }
@@ -280,7 +355,14 @@ public sealed class B45SelectionContext
             var match=RaidChoices().FirstOrDefault(a=>players.All(a.Command.TargetPlayerIds.Contains));
             return match==null?null:B45SelectionContract.Copy(match.Command);
         }
-        if(!Active||submitting||DiceIndices.Length>0&&selectedDie<0)return null;
+        if(!Active||submitting||AwaitingEffectChoice||DiceIndices.Length>0&&selectedDie<0)return null;
+        if(CivilHandBatch)
+        {
+            var counts=SelectedCounts;
+            if(counts.Sum()<MinimumHandCount||counts.Sum()>MaximumHandCount)return null;
+            var c=B45SelectionContract.Copy(Contract.Actions.First(a=>a.MinimumHandCount.HasValue).Command);
+            c.Option="civil-selected-batch";c.CardType=-1;c.Counts=counts;return c;
+        }
         if(Shelie)
         {
             var c=B45SelectionContract.Copy(Contract.Actions.FirstOrDefault(a=>a.Command.Option=="done")?.Command);
@@ -289,8 +371,9 @@ public sealed class B45SelectionContext
         }
         if(RequiresBankCards)
         {
-            if(bankCounts.Sum()!=RequiredBankCount||Enumerable.Range(0,8).Any(t=>bankCounts[t]>BankOptions.Where(a=>a.Command.CardType==t).Select(a=>a.AvailableCount??0).DefaultIfEmpty(0).Max()))return null;
-            var c=B45SelectionContract.Copy(BankOptions.FirstOrDefault()?.Command);if(c==null)return null;c.CardType=-1;c.Counts=(int[])bankCounts.Clone();return c;
+            if((FuqiRequest?bankCounts.Sum()<MinimumHandCount||bankCounts.Sum()>MaximumHandCount:bankCounts.Sum()!=RequiredBankCount)||Enumerable.Range(0,8).Any(t=>bankCounts[t]>BankAvailable(t)))return null;
+            var c=B45SelectionContract.Copy(BankOptions.FirstOrDefault()?.Command);if(c==null)return null;c.CardType=-1;
+            if(FuqiRequest){c.Option="seat-fuqi-batch-submit";c.SecondaryCounts=(int[])bankCounts.Clone();}else c.Counts=(int[])bankCounts.Clone();return c;
         }
         if(Subset)
         {
@@ -326,8 +409,10 @@ public sealed class B45SelectionContext
     public B2SkillCommand FinishDirectPick(bool playerPicked=false)
     {
         var command=BuildCommand();
-        if(command==null||Subset||Shelie||SkillId=="tk-g22-s1")return null;
-        if(Raid){if(!playerPicked)return null;submitting=true;return command;}
+        if(command==null||CivilHandBatch||Subset||Shelie||Poxi||FuqiRequest||SkillId=="tk-g22-s1")return null;
+        // 实体手牌与发展牌先保留可撤销草稿；赠牌仍以接收者头像收束。
+        if(command.Option!="gift"&&(SelectedCounts.Sum()>0||progress.Count>0))return null;
+        if(Raid)return null;
         if(command.Option=="gift"&&!playerPicked)return null;
         if(!Poxi&&!RequiresBankCards&&Current().Any(action=>
             Compatible(action,true,true,true)&&

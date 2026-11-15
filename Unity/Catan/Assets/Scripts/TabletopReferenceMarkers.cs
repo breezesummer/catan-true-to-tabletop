@@ -24,7 +24,6 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
         public string Resource, PlayerId;
         public int Ordinal;
         public HarborSign Sign;
-        public bool PaintedPort;
     }
     readonly Dictionary<string, Marker> ports = new Dictionary<string, Marker>();
     readonly Dictionary<string, Marker> gifts = new Dictionary<string, Marker>();
@@ -36,6 +35,7 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
     Tile[] tiles;
     Transform portRoot, giftRoot, bonusRoot, awardRoot, oceanRoot;
     TabletopScene table;
+    internal Material PierWaterMaterial => table != null && table.Ocean != null ? table.Ocean.PierWaterMaterial : null;
     string observerSeat;
     string[] playerIds = Array.Empty<string>();
     Vector3 boardCenter;
@@ -96,6 +96,7 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
         if (publicTiles != null) tiles = publicTiles;
         this.table = table;
         this.observerSeat = observerSeat;
+        UpdateWheatCoast(publicPorts);
         RefreshOceanTiles();
         if (table != null && table.isActiveAndEnabled) table.Ocean.Refresh(tiles, vertices);
         RefreshPorts(ports, portRoot, publicPorts, "港口 ");
@@ -149,18 +150,89 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
             var bottom = midpoint + normal * (CoastalDecals.ShoreEnd - CoastalDecals.DockInset);
             bottom.y = EntityBoardAssets.BoardSurfaceHeight;
             item.Object.transform.SetPositionAndRotation(bottom, Quaternion.LookRotation(-normal, Vector3.up));
-            if(item.Object.TryGetComponent<PaintedTimberPort>(out var art))
-                art.Align(normal, Vector3.Distance(a,b));
-            item.Sign?.Place();
+
             wanted.Add(port.Id);
         }
         Prune(existing, wanted);
     }
+    internal Vector3 WheatPortCenter {get;private set;}
+    void UpdateWheatCoast(PortDisplay[] publicPorts)
+    {
+        foreach(var port in publicPorts ?? Array.Empty<PortDisplay>())
+        {
+            if(port.Resource!=Resource.Wheat) continue;
+            var ids=port.Vertices;
+            if((ids==null || ids.Length!=2) && port.EdgeId!=null && edges.TryGetValue(port.EdgeId,out var edge)) ids=edge.Vertices;
+            if(TryEndpoints(ids,out var a,out var b) && tiles.Any(t=>t.Resource=="brick" && ids.All(t.Vertices.Contains)))
+            { WheatPortCenter=(a+b)*.5f; return; }
+        }
+        WheatPortCenter=Vector3.zero;
+    }
+    Mesh coastalMesh;
+    Material shoreMaterial;
+    void OnDestroy()
+    {
+        if(coastalMesh!=null) Destroy(coastalMesh);
+        if(shoreMaterial!=null) Destroy(shoreMaterial);
+    }
+    void RebuildCoast()
+    {
+        var coast=new List<(Edge edge,Vector3 normal)>();
+        var joins=new Dictionary<string,Vector3>();
+        float height=EntityBoardAssets.BoardSurfaceHeight+.000045f;
+        foreach(var edge in edges.Values)
+        {
+            var ids=edge.Vertices;
+            if(!TryEndpoints(ids,out var a,out var b)) continue;
+            var adjacent=tiles.Where(t=>ids.All(t.Vertices.Contains)).ToArray();
+            var land=adjacent.FirstOrDefault(t=>PaintedMap.Region(t.Resource)>=0 && PaintedMap.Region(t.Resource)<8);
+            if(land==null || adjacent.Any(t=>t!=land && t.Resource!="sea" && t.Resource!="water")) continue;
+            var normal=CoastNormal(ids,(a+b)*.5f,b-a);
+            if(coast.Count==0)
+            {
+                var terrain=transform.parent.Find(land.Id)?.GetComponentInChildren<MeshRenderer>();
+                if(terrain!=null) height=terrain.bounds.max.y+.000045f;
+            }
+            coast.Add((edge,normal));
+            foreach(var id in ids) joins[id]=joins.TryGetValue(id,out var sum)?sum+normal:normal;
+        }
+        var points=new List<Vector3>();var uv=new List<Vector2>();var triangles=new List<int>();
+        foreach(var segment in coast)
+        {
+            int start=points.Count;
+            foreach(var id in segment.edge.Vertices)
+            {
+                // 两边共用角平分线，同一端点的内外缘位置一致。
+                var join=joins[id].normalized;
+                var offset=join/Mathf.Max(.5f,Vector3.Dot(join,segment.normal));
+                var center=vertices[id]; center.y=height;
+                foreach(float d in new[]{-.115f,.29f})
+                {
+                    points.Add(transform.InverseTransformPoint(center+offset*(.04f*d)));
+                    uv.Add(new Vector2(d,0));
+                }
+            }
+            triangles.AddRange(new[]{start,start+1,start+2,start+2,start+1,start+3});
+        }
+        if(coastalMesh==null) coastalMesh=new Mesh {name="连续平绘海岸"};
+        coastalMesh.Clear();
+        coastalMesh.SetVertices(points);coastalMesh.SetUVs(0,uv);coastalMesh.SetTriangles(triangles,0);
+        var filter=GetComponent<MeshFilter>() ?? gameObject.AddComponent<MeshFilter>();
+        filter.sharedMesh=coastalMesh;
+        var renderer=GetComponent<MeshRenderer>() ?? gameObject.AddComponent<MeshRenderer>();
+        if(shoreMaterial==null){
+            shoreMaterial=new Material(Resources.Load<Shader>(CoastalDecals.Root+"WheatShore"));
+            shoreMaterial.SetTexture("_Sand",Resources.Load<Texture2D>(CoastalDecals.Root+"sand"));
+        }
+        renderer.sharedMaterial=shoreMaterial;
+        renderer.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
+    }
     void RefreshOceanTiles()
     {
-        string layout=string.Join("|",tiles.Select(t=>t.Id+":"+string.Join(",",t.Vertices)));
+        string layout=string.Join("|",tiles.Select(t=>t.Id+":"+t.Resource+":"+string.Join(",",t.Vertices)));
         if(layout==oceanLayoutKey)return;
         oceanLayoutKey=layout;
+        RebuildCoast();
         var wanted=new HashSet<string>(StringComparer.Ordinal);
         var displayOutline=oceanOutline;displayOutline.Clear();
         // 所有公开板块的外边界补一圈；已有海格和迷雾同样属于地图，不能只按港口补格。
@@ -288,16 +360,15 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
     }
     static Marker Put(Dictionary<string, Marker> collection, string key, string resource, string name, Transform parent)
     {
-        bool paintedPort=BoardArtPreference.Painted && resource!=null && resource.Contains("/port-");
         if (collection.TryGetValue(key, out var known))
         {
-            if (known.Resource == resource && known.Object != null && known.PaintedPort==paintedPort) return known;
+            if (known.Resource == resource && known.Object != null) return known;
             Remove(known);
             collection.Remove(key);
         }
         var instance = EntityBoardAssets.ReferenceMarker(resource, name, Vector3.zero, Quaternion.identity, parent);
         if (instance == null) return null;
-        var item = new Marker { Object = instance, Resource = resource, PaintedPort=paintedPort, Sign=instance.GetComponentInChildren<HarborSign>() };
+        var item = new Marker { Object = instance, Resource = resource, Sign=instance.GetComponentInChildren<HarborSign>() };
         collection.Add(key, item);
         return item;
     }
@@ -318,6 +389,8 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
     void LateUpdate()
     {
         PositionAwards();
+        var camera = Camera.main;
+        if (camera != null) AlignPortSigns(camera);
     }
     void PositionAwards()
     {

@@ -30,10 +30,10 @@ public static class GeneralFrameUI
     {
         if(texture!=null)GUI.DrawTextureWithTexCoords(target,texture,new Rect(source.x/width,1-source.yMax/height,source.width/width,source.height/height),true);
     }
-    public static void Text(Rect area,string text,int size,Color? color=null)
+    public static void Text(Rect area,string text,int size,Color? color=null,bool shadow=true)
     {
         Ensure();lettering.fontSize=size;TabletopTextFit.Fit(lettering,text,area,8);lettering.normal.textColor=new Color(.12f,.09f,.04f,.95f);
-        GUI.Label(new Rect(area.x+1,area.y+2,area.width,area.height),text,lettering);
+        if(shadow)GUI.Label(new Rect(area.x+1,area.y+2,area.width,area.height),text,lettering);
         lettering.normal.textColor=color??Gold;GUI.Label(area,text,lettering);
     }
     public static void Portrait(Rect area,string id,string name,string faction,int position,bool highlighted,bool faceDown,int life)
@@ -67,7 +67,7 @@ public static class GeneralFrameUI
         float labelWidth=area.width*(dynamic ? .16f : .19f);
         if(dynamic&&!string.IsNullOrEmpty(faction)&&area.width>=70)
             Text(new Rect(area.x+1,area.y+area.height*.09f,labelWidth,18*portraitScale),faction,
-                Mathf.Max(6,Mathf.RoundToInt(15*portraitScale)),Color.white);
+                Mathf.Max(6,Mathf.RoundToInt(15*portraitScale)),FactionInk(camp),shadow:false);
         float nameTop=dynamic?area.height*.19f:22*portraitScale;
         if(name!=null&&area.width>=70)for(int i=0;i<name.Length;i++)Text(new Rect(area.x+1,area.y+nameTop+i*19*portraitScale,labelWidth,22*portraitScale),name[i].ToString(),Mathf.Max(6,Mathf.RoundToInt(20*portraitScale)),Color.white);
         lettering.font=previousFont;
@@ -83,6 +83,18 @@ public static class GeneralFrameUI
             lettering.normal.textColor=new Color(.025f,.025f,.02f);GUI.Label(number,SeatNumbers[position],lettering);
         }
     }
+    static Color FactionInk(string camp)
+    {
+        switch(camp)
+        {
+            case "wei": return new Color32(128,188,248,255);
+            case "shu": return new Color32(255,130,127,255);
+            case "wu": return new Color32(143,220,136,255);
+            case "jin": return new Color32(211,167,244,255);
+            case "shen": return Gold;
+            default: return new Color32(222,212,181,255);
+        }
+    }
     static void DrawPortraitGlow(Rect area,bool dynamic)
     {
         if(Event.current.type!=EventType.Repaint)return;
@@ -93,15 +105,27 @@ public static class GeneralFrameUI
             string name=dynamic?"dynamic":"static";
             portraitGlows[shape,color]=sheet=Resources.Load<Texture2D>("GeneralUI/v002/portrait-glow-"+name+"-"+glowColors[color]);
         }
-        DrawGlowFrame(area,sheet);
+        DrawGlowFrame(area,sheet,900f);
     }
-    static void DrawGlowFrame(Rect area,Texture2D sheet)
+    static void DrawGlowFrame(Rect area,Texture2D sheet,float bottomLimit=float.PositiveInfinity)
     {
         if(sheet==null)return;
         int frame=Mathf.FloorToInt(Mathf.Repeat(Time.unscaledTime,.9f)*10f/.9f);
         float dx=area.width*40/256,dy=area.height*40/352;
         var bounds=new Rect(area.x-dx,area.y-dy,area.width+2*dx,area.height+2*dy);
-        GUI.DrawTextureWithTexCoords(bounds,sheet,new Rect((frame%5)/5f,(1-frame/5)/2f,.2f,.5f),true);
+        var uv=new Rect((frame%5)/5f,(1-frame/5)/2f,.2f,.5f);
+        if(bounds.yMax<=bottomLimit)
+        {
+            GUI.DrawTextureWithTexCoords(bounds,sheet,uv,true);
+            return;
+        }
+        // 保留牌面轮廓的位置，把框外的下沿辉光收进底部留白。
+        float lowerUV=uv.height*dy/bounds.height;
+        GUI.DrawTextureWithTexCoords(Rect.MinMaxRect(bounds.x,bounds.y,bounds.xMax,area.yMax),sheet,
+            Rect.MinMaxRect(uv.x,uv.y+lowerUV,uv.xMax,uv.yMax),true);
+        if(bottomLimit>area.yMax)
+            GUI.DrawTextureWithTexCoords(Rect.MinMaxRect(bounds.x,area.yMax,bounds.xMax,bottomLimit),sheet,
+                new Rect(uv.x,uv.y,uv.width,lowerUV),true);
     }
     static void DrawPanelHalo(Rect area,Color color)
     {
@@ -130,21 +154,31 @@ public static class GeneralFrameUI
         var filled=current>=maximum?hpGreen:current>1?hpYellow:hpRed;
         for(int i=0;i<maximum;i++)GUI.DrawTexture(new Rect(area.center.x-size/2,area.y+i*size,size,size),i<current?filled:hpEmpty,ScaleMode.ScaleToFit,true);
     }
-    public static void Skill(Rect area,string name,bool active,bool enabled,bool selected,bool flashing)
+    public static void SkillBackground(Rect area,int state)
+    {
+        Ensure();
+        if(StrategyHudTheme.HandPainted || StrategyHudTheme.Ocean)
+            CopperTabletopSkin.Panel(area,StrategyHudTheme.Surface,state==1,false);
+        else Slice(buttons[state],new Rect(28,115,990,530),area,1045,669);
+    }
+    public static void Skill(Rect area,string name,bool active,bool enabled,bool selected,bool flashing,bool largeCentered=false)
     {
         Ensure();bool hover=area.Contains(Event.current.mousePosition);
         if(active)
         {
-            int state=!enabled?2:selected||hover||flashing?1:0;
-            // 原图含透明留边；只裁去留边，不拉伸或裁掉按钮轮廓。
-            if(StrategyHudTheme.HandPainted || StrategyHudTheme.Ocean)
-            {
-                bool prior=GUI.enabled;GUI.enabled=prior&&enabled;CopperTabletopSkin.Panel(area,StrategyHudTheme.Surface,state==1,false);GUI.enabled=prior;
-            }
-            else Slice(buttons[state],new Rect(28,115,990,530),area,1045,669);
+            bool prior=GUI.enabled;
+            if(StrategyHudTheme.HandPainted || StrategyHudTheme.Ocean)GUI.enabled=prior&&enabled;
+            SkillBackground(area,!enabled?2:selected||hover||flashing?1:0);
+            GUI.enabled=prior;
         }
         var ink=active&&!enabled?new Color(.56f,.51f,.32f):Gold;
         if(ModernOperationUI.DrawWindowSymbol(area,name,ink))return;
+        if(largeCentered)
+        {
+            Text(new Rect(area.x+4,area.y,area.width-8,area.height),name,Mathf.FloorToInt(area.height*.82f),
+                StrategyHudTheme.HandPainted?(enabled?StrategyHudTheme.Text:StrategyHudTheme.Muted):ink);
+            return;
+        }
         int size=Mathf.Min(name.Length>3?23:27,Mathf.FloorToInt((area.width-18)/Mathf.Max(1,name.Length)),Mathf.FloorToInt(area.height*.6f));
         if(active && StrategyHudTheme.HandPainted)
         {
@@ -157,9 +191,9 @@ public static class GeneralFrameUI
         }
         Text(new Rect(area.x+6,area.y,area.width-12,StrategyHudTheme.Ocean?area.height:area.height*.82f),name,size,ink);
     }
-    public static bool Choice(Rect area,string name,bool enabled=true,bool selected=false)
+    public static bool Choice(Rect area,string name,bool enabled=true,bool selected=false,bool largeCentered=false)
     {
-        Skill(area,name,true,enabled,selected,false);
+        Skill(area,name,true,enabled,selected,false,largeCentered);
         return ThreeKingdomsDirectInput.Read(area,enabled&&GUI.enabled,false)==1;
     }
 }

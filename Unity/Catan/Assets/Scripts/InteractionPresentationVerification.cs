@@ -31,7 +31,7 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
         if(feedback)Debug.Log("CATAN_FEEDBACK_START");
         gameObject.AddComponent<InteractionCaptureBegin>().Owner=this;gameObject.AddComponent<InteractionCaptureEnd>().Owner=this;
         if(cards||polish)while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
-        yield return null;var run=feedback?VerifyFeedback():polish?VerifyTablePolish():cards?VerifyCardPlayers():args.Contains("--resource-layout-review")?VerifyResourceLayouts():Verify();
+        yield return null;var run=feedback?(args.Contains("--feedback-current-only")?VerifyCurrentFeedback():VerifyFeedback()):polish?VerifyTablePolish():cards?VerifyCardPlayers():args.Contains("--resource-layout-review")?VerifyResourceLayouts():Verify();
         run=FlattenVerification(run);
         while(true)
         {
@@ -207,6 +207,15 @@ public sealed partial class InteractionPresentationVerification:MonoBehaviour
     IEnumerator Settle(){double deadline=Time.unscaledTimeAsDouble+8;while(app.TablePresentationBlocked&&Time.unscaledTimeAsDouble<deadline)yield return null;Require(!app.TablePresentationBlocked,"动画未在期限内结束");yield return new WaitForEndOfFrame();}
     IEnumerator Capture(string name)
     {
+        if(Environment.GetCommandLineArgs().Contains("--feedback-current-only")&&(!Environment.GetCommandLineArgs().Contains("--hand-selection-review")||Environment.GetCommandLineArgs().Contains("--hand-selection-screen-capture")))
+        {
+            if(Environment.GetCommandLineArgs().Contains("--hand-selection-screen-capture"))yield return new WaitForSecondsRealtime(.3f);
+            yield return new WaitForEndOfFrame();
+            var screen=ScreenCapture.CaptureScreenshotAsTexture();
+            Require(screen!=null&&screen.width==Screen.width&&screen.height==Screen.height,"实机截图尺寸错误");
+            Require(screen.GetPixels32().Count(p=>p.r>20||p.g>20||p.b>20)>screen.width*screen.height/8,"实机截图黑屏");
+            File.WriteAllBytes(Path.Combine(output,name+".png"),screen.EncodeToPNG());images++;Destroy(screen);yield break;
+        }
         yield return new WaitForEndOfFrame();captureName=name;capture=new RenderTexture(1440,900,24,RenderTextureFormat.ARGB32);capture.Create();table.RenderComposite(capture);
         double deadline=Time.unscaledTimeAsDouble+2;while(capture!=null&&Time.unscaledTimeAsDouble<deadline)yield return null;
         if(capture!=null){capture.Release();Destroy(capture);capture=null;Debug.LogWarning("CATAN_INTERACTION_GUI_UNAVAILABLE: "+name);}

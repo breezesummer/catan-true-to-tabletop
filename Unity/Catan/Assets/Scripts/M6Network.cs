@@ -45,7 +45,7 @@ public sealed partial class M6App
         Network=gameObject.AddComponent<M7Client>();Network.ViewChanged+=ApplyNetworkView;
         Network.SessionEnded+=CloseNetworkPresentation;
         Network.ReactionReceived+=PlayReaction;
-        Network.CommandFeedback+=message=>{Notice=message;ShowTablePrompt(message);generalSelection.Reset();generalSubmitting=false;selectionView=null;};
+        Network.CommandFeedback+=message=>{if(!string.IsNullOrEmpty(message)){Notice=message;ShowTablePrompt(message);}generalSelection.Reset();generalSubmitting=false;selectionView=null;};
         Network.PreviewChanged+=()=>
         {
             // A late preview updates hover colours and cached action availability without cancelling drafts.

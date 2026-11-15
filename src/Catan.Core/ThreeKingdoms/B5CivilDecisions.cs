@@ -10,7 +10,9 @@ namespace Catan.Core.ThreeKingdoms
         {
             var p=f.CivilB5;var hand=host.GetHand(f.PlayerId);if(p.Selection.Sum()>=maximum)return;
             for(int t=0;t<8;t++)if(hand[t]>p.Selection[t])
-            {var a=CivilAction(host.State,f.SkillId,"civil-select","选择"+CardNames[t],null,null,t,d);a.CardSelectionKind="select";a.AvailableCount=hand[t]-p.Selection[t];a.Command.Counts=Copy(p.Selection);actions.Add(a);}
+            {var a=CivilAction(host.State,f.SkillId,"civil-select","选择"+CardNames[t],null,null,t,d);a.CardSelectionKind="select";a.AvailableCount=hand[t]-p.Selection[t];a.Command.Counts=Copy(p.Selection);
+                a.MinimumHandCount=d.Kind=="civil-fencheng-discard"?p.Budget+1:d.Kind=="civil-subset"?1:maximum;
+                a.MaximumHandCount=maximum;actions.Add(a);}
         }
         private static bool AddCivilDecisionActions(IThreeKingdomsCardHost host,B2SkillFrame f,B2SkillDecision d,List<B2SkillAction> actions)
         {
@@ -25,8 +27,9 @@ namespace Catan.Core.ThreeKingdoms
                 actions.Add(CivilAction(s,f.SkillId,"civil-penalty","承受道路处理",null,null,-1,d));
             }
             else if(d.Kind=="civil-subset")
-            {CivilSelectActions(host,f,d,actions,host.GetHand(f.PlayerId).Sum());if(p.Selection.Sum()>0){var a=CivilAction(s,f.SkillId,"civil-selected","确认暗选手牌",null,null,-1,d);a.Command.Counts=Copy(p.Selection);actions.Add(a);}}
-            else if(d.Kind=="civil-stone-declare")for(int n=0;n<=p.Selection.Sum();n++)actions.Add(CivilAction(s,f.SkillId,"civil-stone-declare","声明矿石 "+n+" 张",null,null,n,d));
+            {CivilSelectActions(host,f,d,actions,host.GetHand(f.PlayerId).Sum());if(p.Selection.Sum()>0){var a=CivilAction(s,f.SkillId,"civil-selected","确认暗选手牌",null,null,-1,d);a.Command.Counts=Copy(p.Selection);a.MinimumHandCount=1;a.MaximumHandCount=host.GetHand(f.PlayerId).Sum();actions.Add(a);}}
+            else if(d.Kind=="civil-stone-declare")for(int n=0;n<=p.Selection.Sum();n++)
+            {var a=CivilAction(s,f.SkillId,"civil-stone-declare","声明矿石 "+n+" 张",null,null,n,d);a.RealCardType=null;a.CardSelectionKind="number";actions.Add(a);}
             else if(d.Kind=="civil-guess")
             {actions.Add(CivilAction(s,f.SkillId,"civil-true","猜声明为真",null,null,-1,d));actions.Add(CivilAction(s,f.SkillId,"civil-false","猜声明为假",null,null,-1,d));}
             else if(d.Kind=="civil-hand-select")CivilSelectActions(host,f,d,actions,f.Remaining);
@@ -40,7 +43,7 @@ namespace Catan.Core.ThreeKingdoms
                 actions.Add(CivilAction(s,f.SkillId,"civil-fencheng-burn","焚毁城市（无合法城市则无损失）",null,null,-1,d));
             }
             else if(d.Kind=="civil-fencheng-discard")
-            {CivilSelectActions(host,f,d,actions,host.GetHand(f.PlayerId).Sum());if(p.Selection.Sum()>p.Budget){var a=CivilAction(s,f.SkillId,"civil-fencheng-commit","弃置选中的 "+p.Selection.Sum()+" 张",null,null,-1,d);a.Command.Counts=Copy(p.Selection);actions.Add(a);}}
+            {CivilSelectActions(host,f,d,actions,host.GetHand(f.PlayerId).Sum());if(p.Selection.Sum()>p.Budget){var a=CivilAction(s,f.SkillId,"civil-fencheng-commit","弃置选中的 "+p.Selection.Sum()+" 张",null,null,-1,d);a.Command.Counts=Copy(p.Selection);a.MinimumHandCount=p.Budget+1;a.MaximumHandCount=host.GetHand(f.PlayerId).Sum();actions.Add(a);}}
             else if(d.Kind=="civil-two-roads")
             {
                 string kind=f.Kind=="civil-liegong-roads"?"liegong-road":"damage-road";string arg=f.Kind=="civil-liegong-roads"?null:f.PlayerId;
@@ -60,6 +63,24 @@ namespace Catan.Core.ThreeKingdoms
         }
         private static bool ResolveCivilDecision(IThreeKingdomsCardHost host,B2SkillFrame f,B2SkillDecision d,B2SkillCommand c)
         {
+            if(c.Option=="civil-selected-batch")
+            {
+                Require(GeneralCatalog.UsesDirectRules(host.State.RulesVersion)&&CivilReady(host)&&
+                    (d.Kind=="civil-fencheng-discard"||d.Kind=="civil-subset"||d.Kind=="civil-hand-select"),"当前不是批量手牌选择步骤。");
+                int minimum=d.Kind=="civil-fencheng-discard"?f.CivilB5.Budget+1:d.Kind=="civil-subset"?1:f.Remaining;
+                int maximum=d.Kind=="civil-hand-select"?f.Remaining:host.GetHand(f.PlayerId).Sum();
+                Require(Valid(c.Counts)&&Contains(host.GetHand(f.PlayerId),c.Counts)&&c.Counts.Sum()>=minimum&&c.Counts.Sum()<=maximum&&
+                    (d.Kind=="civil-subset"||!IsB4HandLossForbidden(host.State,f.PlayerId)),"所选手牌数量、持有或弃牌条件已变化。");
+                var uses=f.Kind=="civil-yicheng"?((IThreeKingdomsB5Host)host).GetVirtualProgressUses(CivilOwner(f),"play").Where(u=>u.CardId=="Taxation").ToArray():Array.Empty<B4VirtualUse>();
+                if(f.Kind=="civil-yicheng")Require(uses.Length>0&&Active(host.State,CivilOwner(f))?.TenureId==f.TenureId,"疑城的主教用途已失效。");
+                // 校验完整批次后才改变权威选择，保留旧的逐张命令供已有 AI 与存档继续结算。
+                f.CivilB5.Selection=Copy(c.Counts);
+                if(d.Kind=="civil-fencheng-discard")
+                {string player=f.PlayerId;var cards=Copy(c.Counts);CivilNextTarget(f,cards.Sum());B4Discard(host,player,cards,f.Id+":discard:"+player);}
+                else if(f.Kind=="civil-yicheng"&&uses.Length==1)CivilPayYicheng(host,f,uses[0]);
+                else if(d.Kind=="civil-subset"||f.Kind=="civil-yicheng")f.Step=1;
+                return true;
+            }
             if(!d.Kind.StartsWith("civil-",StringComparison.Ordinal))return false;var legal=new List<B2SkillAction>();AddCivilDecisionActions(host,f,d,legal);Require(legal.Any(a=>SameCivilAction(a.Command,c)),"B5 选择已经失效或不属于当前玩家。");
             var s=host.State;var p=f.CivilB5;var owner=CivilOwner(f);var bh=(IThreeKingdomsB5Host)host;
             if(c.Option=="civil-select")
@@ -118,11 +139,13 @@ namespace Catan.Core.ThreeKingdoms
             if(c.Option=="civil-yicheng-use")
             {
                 Require(Contains(host.GetHand(owner),p.Selection)&&p.Selection.Sum()==2&&!IsB4HandLossForbidden(s,owner),"疑城的两张实体费用已失效。");
-                p.VirtualUse=bh.GetVirtualProgressUses(owner,"play").Single(u=>u.OptionId==c.ProgressCardId&&u.CardId=="Taxation");Counter(Active(s,owner),"yicheng",0).Value=1;f.Step=2;B4Discard(host,owner,p.Selection,f.Id+":cost");return true;
+                CivilPayYicheng(host,f,bh.GetVirtualProgressUses(owner,"play").Single(u=>u.OptionId==c.ProgressCardId&&u.CardId=="Taxation"));return true;
             }
             if(c.Option=="civil-niepan-track"){p.SelectedIds=p.SelectedIds.Concat(new[]{c.CardType.ToString()}).ToArray();return true;}
             throw new InvalidOperationException("未知 B5 技能选择："+c.Option);
         }
+        private static void CivilPayYicheng(IThreeKingdomsCardHost host,B2SkillFrame f,B4VirtualUse use)
+        {f.CivilB5.VirtualUse=use;Counter(Active(host.State,CivilOwner(f)),"yicheng",0).Value=1;f.Step=2;B4Discard(host,CivilOwner(f),f.CivilB5.Selection,f.Id+":cost");}
         public static void ProjectCivilB5(IThreeKingdomsCardHost host,ThreeKingdomsView view,string viewer)
         {
             if(!CivilReady(host))return;var s=host.State;var cs=s.CivilB5;if(cs==null)return;

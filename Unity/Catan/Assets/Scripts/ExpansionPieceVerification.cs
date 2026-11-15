@@ -9,6 +9,50 @@ using M5=Catan.Core.M5;
 // 显式开发入口：先恢复正常规则推进的双扩展对局，再短暂排布公开投影以检查稀有棋子。
 public sealed partial class TabletopUiVerification
 {
+    IEnumerator VerifyKnightUpdraft()
+    {
+        mode="combined";
+        app.StartGame(mode,"through-the-desert",4,"P1",true,threeKingdoms:true,harbormaster:true,fishing:true);
+        yield return new WaitForSeconds(2);
+        var app5=GetComponent<M5App>();
+        var board=app5.VerificationBoard;
+        var view=app5.M6View;
+        var state=view.Board;
+        var edge=Edges.Where(e=>e.Vertices.All(v=>Tiles.Count(t=>t.Vertices.Contains(v)&&t.Resource!="sea")>=2))
+            .OrderBy(e=>Mathf.Abs((board.Position(e.Vertices[0])-board.Position(e.Vertices[1])).z)).First();
+        var vertices=edge.Vertices.OrderBy(v=>board.Position(v).x).ToArray();
+        var cam=BoardCamera;
+        for(int level=1;level<=3;level++)
+        {
+            var poses=vertices.Select((v,i)=>new M5.Knight{PlayerId="P2",Level=level,Active=i==1,LocationId=v}).ToArray();
+            board.RefreshProjectedPieces(state.Settlements,state.Roads,state.Cities,state.RobberTileId,state.Walls,poses,
+                state.Metropolises,view.MerchantTileId);
+            FantasyBoardPiece.SetView(false);
+            yield return new WaitForSeconds(1.8f);
+            var roots=board.CommittedPieces.GetComponentsInChildren<FantasyBoardPiece>();
+            var pair=vertices.Select(v=>roots.Single(p=>p.name.StartsWith("Knight L"+level+" "+v+" [")).transform).ToArray();
+            var wind=pair[1].GetComponentInChildren<ParticleSystem>();
+            Require(wind!=null && wind.particleCount>0 && pair[0].GetComponentInChildren<ParticleSystem>()==null,"激活与休整气流不符");
+            FantasyBoardPiece.SetView(false);
+            var rot=Quaternion.Euler(32,0,0);
+            var center=(pair[0].position+pair[1].position)*.5f+Vector3.up*(level==3?.015f:.012f);
+            cam.transform.SetPositionAndRotation(center-rot*Vector3.forward*.24f,rot);
+            cam.orthographicSize=level==3?.032f:.025f;
+            var rt=RenderTexture.GetTemporary(1440,900,24);
+            var prior=cam.targetTexture;
+            var active=RenderTexture.active;
+            var rect=cam.rect;
+            var tex=new Texture2D(1440,900,TextureFormat.RGB24,false);
+            try
+            {
+                cam.rect=new Rect(0,0,1,1);cam.targetTexture=rt;cam.Render();RenderTexture.active=rt;
+                tex.ReadPixels(new Rect(0,0,1440,900),0,0);tex.Apply();
+                File.WriteAllBytes(Path.Combine(output,"knight-level-"+level+".png"),tex.EncodeToPNG());
+                cameraImages++;
+            }
+            finally {cam.rect=rect;cam.targetTexture=prior;RenderTexture.active=active;RenderTexture.ReleaseTemporary(rt);Destroy(tex);}
+        }
+    }
     IEnumerator VerifyExpansionPieces()
     {
         mode="combined";

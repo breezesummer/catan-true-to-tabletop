@@ -9,6 +9,7 @@ Shader "Catan/PaintedPieceTargetOutline"
         {
             HLSLPROGRAM
             #pragma vertex Vert
+            float _Selected;
             #pragma fragment Frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
@@ -34,7 +35,7 @@ Shader "Catan/PaintedPieceTargetOutline"
                 }
                 half alpha=saturate(edge-center)*(.88+.1*sin(_Time.y*4));
                 clip(alpha-.025);
-                return half4(.045,1.0,.23,alpha);
+                return half4(lerp(half3(1,.93,.73),half3(1,.72,.28),_Selected),alpha);
             }
             ENDHLSL
         }

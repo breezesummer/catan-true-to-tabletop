@@ -278,7 +278,7 @@ public sealed class RoomDirectoryTests
         using var f = new Fixture(); var actor = f.Actor(f.StartHumans());
         var command = new BaseGameAi().Decide(WireJson.Deserialize<M2.PlayerView>(actor.ViewJson)); command.Id = "before-restart"; var request = f.Command(actor, command);
         var accepted = f.Directory.Handle(request); Assert.True(accepted.Success); var view = WireJson.Deserialize<M2.PlayerView>(accepted.ViewJson); Assert.NotNull(view.PendingDecision);
-        f.Restart(); var resumed = f.Directory.Handle(Fixture.Request("Reconnect", actor)); Assert.True(resumed.Success); Assert.Equal(accepted.Revision + 1, resumed.Revision); Assert.Equal(accepted.ViewJson, resumed.ViewJson); Assert.False(resumed.HumanControlAvailable);
+        f.Restart(); var resumed = f.Directory.Handle(Fixture.Request("Reconnect", actor)); Assert.True(resumed.Success); Assert.Equal(accepted.Revision + 1, resumed.Revision); Assert.Equal(accepted.ViewJson, resumed.ViewJson); Assert.True(resumed.HumanControlAvailable);
         request.ConnectionId = resumed.ConnectionId; var retry = f.Directory.Handle(request); Assert.True(retry.IsDuplicate); Assert.Equal(accepted.CommittedRevision, retry.CommittedRevision);
     }
 
@@ -297,7 +297,7 @@ public sealed class RoomDirectoryTests
         request.ConnectionId = resumed.ConnectionId; var retry = f.Directory.Handle(request);
         Assert.True(retry.Success); Assert.True(retry.IsDuplicate); Assert.True(retry.Revision > resumed.Revision);
         Assert.Equal(actor.SeatId, retry.Room.ManagerSeatId); Assert.Equal(accepted.CommittedRevision, retry.CommittedRevision);
-        Assert.NotNull(retry.ViewJson); Assert.False(retry.HumanControlAvailable);
+        Assert.NotNull(retry.ViewJson); Assert.True(retry.HumanControlAvailable);
     }
 
     [Fact]
@@ -362,7 +362,7 @@ public sealed class RoomDirectoryTests
         var before = f.Directory.Handle(Fixture.Request("Get", host)); f.Directory.Disconnect(host.ConnectionId); Assert.Empty(f.Directory.ListPublicRooms());
         Assert.Equal(1, await f.Directory.TickAiAsync());
         var resume = f.Directory.Handle(Fixture.Request("Reconnect", host)); Assert.True(resume.Success); Assert.True(resume.Revision > before.Revision);
-        Assert.False(resume.HumanControlAvailable); Assert.True(resume.Room.Seats.Single(s => s.SeatId == host.SeatId).RejoinPending); Assert.False(resume.Room.Paused);
+        Assert.True(resume.HumanControlAvailable); Assert.False(resume.Room.Seats.Single(s => s.SeatId == host.SeatId).RejoinPending); Assert.False(resume.Room.Seats.Single(s => s.SeatId == host.SeatId).ControlledByAi); Assert.False(resume.Room.Paused);
     }
 
     [Fact]
@@ -584,38 +584,35 @@ public sealed class RoomDirectoryTests
     }
 
     [Fact]
-    public async Task ReconnectedHumanCannotInterruptPendingSetupAndReturnsAtNextOwnPlacement()
+    public async Task ReconnectedHumanImmediatelyContinuesPendingSetupAndKeepsCommandReceiptAfterRestart()
     {
         using var f = new Fixture(); var clients = f.StartHumans(); var actor = f.Actor(clients);
         var setup = new BaseGameAi().Decide(WireJson.Deserialize<M2.PlayerView>(actor.ViewJson)); setup.Id = "before-ai-setup";
         Assert.True(f.Directory.Handle(f.Command(actor, setup)).Success);
         foreach (var client in clients) f.Directory.Disconnect(client.ConnectionId);
         var resumed = f.Directory.Handle(Fixture.Request("Reconnect", actor)); resumed.Credential = actor.Credential;
-        Assert.False(resumed.HumanControlAvailable); Assert.True(resumed.Room.Seats.Single(s => s.SeatId == actor.SeatId).RejoinPending);
-        var road = new BaseGameAi().Decide(WireJson.Deserialize<M2.PlayerView>(resumed.ViewJson)); road.Id = "cannot-interrupt-ai";
-        var denied = f.Directory.Handle(f.Command(resumed, road)); Assert.Equal("AiTakeover", denied.Code); Assert.Equal(resumed.ViewJson, denied.ViewJson);
-        var preview = f.Command(resumed, road); preview.Operation = "Preview"; Assert.Equal("AiTakeover", f.Directory.Handle(preview).Code);
-        // 重试已提交的旧命令仍返回原回执，不能被托管状态误判为新行动。
+        Assert.True(resumed.HumanControlAvailable); Assert.False(resumed.Room.Seats.Single(s => s.SeatId == actor.SeatId).RejoinPending);
+        Assert.False(resumed.Room.Seats.Single(s => s.SeatId == actor.SeatId).ControlledByAi);
+        Assert.Equal(M2.GamePhase.SetupRoad, WireJson.Deserialize<M2.PlayerView>(resumed.ViewJson).Phase);
+        Assert.Equal(0, await f.Directory.TickAiAsync());
+        resumed = f.Directory.Handle(Fixture.Request("Get", resumed)); resumed.Credential = actor.Credential;
+        var road = new BaseGameAi().Decide(WireJson.Deserialize<M2.PlayerView>(resumed.ViewJson)); road.Id = "human-continues-road";
+        var preview = f.Command(resumed, road); preview.Operation = "Preview"; Assert.True(f.Directory.Handle(preview).Success);
+        Assert.Equal("ConnectionSuperseded", f.Directory.Handle(f.Command(actor, road)).Code);
+        // 重试已提交的旧命令仍返回原回执，不能重复摆放。
         var retry = f.Command(resumed, setup); Assert.True(f.Directory.Handle(retry).IsDuplicate);
-        // 托管与待接回边界随私有房间一起保存；重启不能让真人打断原待决。
+        // 服务重启后仍直接接回原待决，无需让 AI 完成道路。
         f.Restart(); resumed = f.Directory.Handle(Fixture.Request("Reconnect", resumed)); resumed.Credential = actor.Credential;
-        Assert.True(resumed.Success); Assert.False(resumed.HumanControlAvailable);
-        Assert.True(resumed.Room.Seats.Single(s => s.SeatId == actor.SeatId).RejoinPending);
-        Assert.Equal(1, await f.Directory.TickAiAsync());
-        var current = f.Directory.Handle(Fixture.Request("Get", resumed)); Assert.False(current.HumanControlAvailable);
-        Assert.NotEqual(actor.SeatId, WireJson.Deserialize<M2.PlayerView>(current.ViewJson).ActivePlayerId);
-        for (int n = 0; n < 30 && !current.HumanControlAvailable; n++)
-        {
-            Assert.Equal(1, await f.Directory.TickAiAsync()); current = f.Directory.Handle(Fixture.Request("Get", resumed));
-        }
-        Assert.True(current.HumanControlAvailable); Assert.False(current.Room.Seats.Single(s => s.SeatId == actor.SeatId).RejoinPending);
-        var own = WireJson.Deserialize<M2.PlayerView>(current.ViewJson); Assert.Equal(actor.SeatId, own.ActivePlayerId); Assert.Equal(M2.GamePhase.SetupSettlement, own.Phase);
-        current.Credential = actor.Credential; var next = new BaseGameAi().Decide(own); next.Id = "human-returned";
-        Assert.True(f.Directory.Handle(f.Command(current, next)).Success);
+        Assert.True(resumed.Success); Assert.True(resumed.HumanControlAvailable);
+        Assert.False(resumed.Room.Seats.Single(s => s.SeatId == actor.SeatId).RejoinPending);
+        Assert.Equal(0, await f.Directory.TickAiAsync());
+        resumed = f.Directory.Handle(Fixture.Request("Get", resumed)); resumed.Credential = actor.Credential;
+        Assert.Equal(M2.GamePhase.SetupRoad, WireJson.Deserialize<M2.PlayerView>(resumed.ViewJson).Phase);
+        Assert.True(f.Directory.Handle(f.Command(resumed, road)).Success);
     }
 
     [Fact]
-    public async Task ReconnectionDuringNormalTurnWaitsUntilPlayersNextFullTurn()
+    public async Task ReconnectionDuringNormalTurnImmediatelyRestoresSameTurn()
     {
         using var f = new Fixture(); var clients = f.StartHumans();
         for (int n = 0; n < 12; n++)
@@ -626,19 +623,17 @@ public sealed class RoomDirectoryTests
         var human = f.Actor(clients); var initial = WireJson.Deserialize<M2.PlayerView>(human.ViewJson); Assert.Equal(1, initial.Turn);
         foreach (var client in clients) f.Directory.Disconnect(client.ConnectionId);
         var resumed = f.Directory.Handle(Fixture.Request("Reconnect", human)); resumed.Credential = human.Credential;
-        var current = resumed;
-        for (int n = 0; n < 300 && !current.HumanControlAvailable; n++)
-        {
-            Assert.Equal(1, await f.Directory.TickAiAsync()); current = f.Directory.Handle(Fixture.Request("Get", resumed));
-            var visible = WireJson.Deserialize<M2.PlayerView>(current.ViewJson);
-            if (visible.Turn == initial.Turn || visible.ActivePlayerId != human.SeatId) Assert.False(current.HumanControlAvailable);
-        }
-        Assert.True(current.HumanControlAvailable); var returned = WireJson.Deserialize<M2.PlayerView>(current.ViewJson);
-        Assert.True(returned.Turn > initial.Turn); Assert.Equal(human.SeatId, returned.ActivePlayerId); Assert.Equal(M2.GamePhase.ProductionAwaitRoll, returned.Phase);
+        Assert.True(resumed.HumanControlAvailable); Assert.Equal(human.ViewJson, resumed.ViewJson);
+        Assert.Equal(0, await f.Directory.TickAiAsync());
+        resumed = f.Directory.Handle(Fixture.Request("Get", resumed)); resumed.Credential = human.Credential;
+        var returned = WireJson.Deserialize<M2.PlayerView>(resumed.ViewJson);
+        Assert.Equal(initial.Turn, returned.Turn); Assert.Equal(human.SeatId, returned.ActivePlayerId); Assert.Equal(M2.GamePhase.ProductionAwaitRoll, returned.Phase);
+        var roll = new BaseGameAi().Decide(returned); roll.Id = "human-rolls-same-turn";
+        Assert.True(f.Directory.Handle(f.Command(resumed, roll)).Success);
     }
 
     [Fact]
-    public async Task SnakeSetupReturnsControlAtNextPlacementEvenWhenActiveColorDoesNotChange()
+    public async Task SnakeSetupReconnectStopsAiBeforePendingRoad()
     {
         using var f = new Fixture(); var clients = f.StartHumans();
         for (int n = 0; n < 5; n++)
@@ -648,10 +643,64 @@ public sealed class RoomDirectoryTests
         }
         var human = f.Actor(clients); Assert.Equal(M2.GamePhase.SetupRoad, WireJson.Deserialize<M2.PlayerView>(human.ViewJson).Phase);
         foreach (var client in clients) f.Directory.Disconnect(client.ConnectionId);
-        var resumed = f.Directory.Handle(Fixture.Request("Reconnect", human)); resumed.Credential = human.Credential; Assert.False(resumed.HumanControlAvailable);
-        Assert.Equal(1, await f.Directory.TickAiAsync());
+        var resumed = f.Directory.Handle(Fixture.Request("Reconnect", human)); resumed.Credential = human.Credential; Assert.True(resumed.HumanControlAvailable);
+        Assert.Equal(0, await f.Directory.TickAiAsync());
         var returned = f.Directory.Handle(Fixture.Request("Get", resumed)); var visible = WireJson.Deserialize<M2.PlayerView>(returned.ViewJson);
-        Assert.True(returned.HumanControlAvailable); Assert.Equal(human.SeatId, visible.ActivePlayerId); Assert.Equal(M2.GamePhase.SetupSettlement, visible.Phase);
+        Assert.True(returned.HumanControlAvailable); Assert.Equal(human.SeatId, visible.ActivePlayerId); Assert.Equal(M2.GamePhase.SetupRoad, visible.Phase);
+    }
+
+    [Fact]
+    public async Task ReconnectKeepsCommittedAiMoveAndStopsFurtherAiActions()
+    {
+        using var f = new Fixture(); var clients = f.StartHumans(); var actor = f.Actor(clients);
+        f.Directory.Disconnect(actor.ConnectionId);
+        Assert.Equal(1, await f.Directory.TickAiAsync());
+        var observer = clients.First(c => c.SeatId != actor.SeatId);
+        var committed = f.Directory.Handle(Fixture.Request("Get", observer));
+        var resumed = f.Directory.Handle(Fixture.Request("Reconnect", actor)); resumed.Credential = actor.Credential;
+        Assert.True(resumed.Success); Assert.True(resumed.HumanControlAvailable);
+        var view = WireJson.Deserialize<M2.PlayerView>(resumed.ViewJson);
+        Assert.Equal(M2.GamePhase.SetupRoad, view.Phase);
+        Assert.Single(view.Board.Settlements);
+        Assert.Equal(committed.Revision + 1, resumed.Revision);
+        Assert.Equal(0, await f.Directory.TickAiAsync());
+        var road = new BaseGameAi().Decide(view); road.Id = "after-ai-settlement";
+        Assert.True(f.Directory.Handle(f.Command(resumed, road)).Success);
+    }
+
+    [Fact]
+    public async Task TimedOutHeartbeatImmediatelyRestoresControlAfterAiTakeover()
+    {
+        var clock = DateTimeOffset.UtcNow;
+        using var f = new Fixture(new RoomDirectoryOptions { Clock = () => clock, ConnectionTimeout = TimeSpan.FromSeconds(10) });
+        var clients = f.StartHumans(); var actor = f.Actor(clients);
+        clock += TimeSpan.FromSeconds(11);
+        foreach (var client in clients.Where(c => c.SeatId != actor.SeatId)) Assert.True(f.Directory.Handle(Fixture.Request("Heartbeat", client)).HumanControlAvailable);
+        Assert.Equal(1, await f.Directory.TickAiAsync());
+        var resumed = f.Directory.Handle(Fixture.Request("Heartbeat", actor));
+        Assert.True(resumed.Success); Assert.True(resumed.HumanControlAvailable);
+        Assert.False(resumed.Room.Seats.Single(s => s.SeatId == actor.SeatId).ControlledByAi);
+        Assert.False(resumed.Room.Seats.Single(s => s.SeatId == actor.SeatId).RejoinPending);
+        Assert.Equal(0, await f.Directory.TickAiAsync());
+    }
+
+    [Fact]
+    public async Task FailedReconnectDoesNotReleaseAiUntilControlChangeIsSaved()
+    {
+        using var f = new Fixture(); var actor = f.Actor(f.StartHumans());
+        f.Directory.Disconnect(actor.ConnectionId);
+        f.Storage.Fail = true;
+        var failed = f.Directory.Handle(Fixture.Request("Reconnect", actor));
+        Assert.False(failed.Success); Assert.Equal("PersistenceFailed", failed.Code);
+        f.Storage.Fail = false;
+        var resumed = f.Directory.Handle(Fixture.Request("Reconnect", actor)); resumed.Credential = actor.Credential;
+        Assert.True(resumed.Success); Assert.True(resumed.HumanControlAvailable);
+        Assert.True(resumed.Room.Paused);
+        var manager = resumed.Room.ManagerSeatId == resumed.SeatId ? resumed : f.Clients.Single(c => c.SeatId == resumed.Room.ManagerSeatId);
+        Assert.True(f.Send(manager, "Recover").Success);
+        Assert.Equal(0, await f.Directory.TickAiAsync());
+        var road = new BaseGameAi().Decide(WireJson.Deserialize<M2.PlayerView>(resumed.ViewJson)); road.Id = "saved-human-control";
+        Assert.True(f.Directory.Handle(f.Command(resumed, road)).Success);
     }
 
     [Fact]
@@ -662,7 +711,7 @@ public sealed class RoomDirectoryTests
         var clients = f.StartHumans(); var actor = f.Actor(clients);
         clock += TimeSpan.FromSeconds(11);
         var late = f.Directory.Handle(Fixture.Request("Get", actor));
-        Assert.False(late.HumanControlAvailable); Assert.True(late.Room.Seats.Single(s => s.SeatId == actor.SeatId).RejoinPending);
+        Assert.True(late.HumanControlAvailable); Assert.False(late.Room.Seats.Single(s => s.SeatId == actor.SeatId).RejoinPending);
         Assert.True(f.Send(actor, "Leave").Success); Assert.Empty(f.Directory.ListPublicRooms());
         Assert.Equal(0, await f.Directory.TickAiAsync());
         var description = f.Directory.Handle(new() { Operation = "Describe", RoomId = actor.RoomId });

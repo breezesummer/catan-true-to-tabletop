@@ -48,8 +48,7 @@ node_modules/
 !.env.example
 
 # Blender 恢复备份；制作源文件按下方本地素材规则管理
-*.blend1
-*.blend2
+*.blend[0-9]*
 
 # 可由已保存的脚本、配方和源贴图重建的中间文件（本地保留）
 art/source/entity-conversion-v*/**/*.blend

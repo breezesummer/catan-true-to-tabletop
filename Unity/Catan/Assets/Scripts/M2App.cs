@@ -177,7 +177,7 @@ public sealed partial class M2App : MonoBehaviour
     public CommandResult Drop(string target){var command=NewCommand(placement,target);return Submit(command);}
     public CommandResult Submit(Command command)
     {
-        if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status=ai.Network.Status;return null;}
+        if(NetworkGame){dock.Reset();CancelOperationDraft();cardArt.Clear();ai.Network.Submit(command);status="";return null;}
         if(ai!=null&&(command.PlayerId!=ai.HumanSeat||!ai.IsHumanTurn&&!(command.Kind==CommandKind.CancelTrade&&view!=null&&view.TradeOffer!=null&&view.TradeOffer.ProposerId==seat))){status="请等待当前 AI 或待决席位完成操作。";return null;}
         CancelPickup();
         dock.Reset();CancelOperationDraft();var result=host.Submit(command);

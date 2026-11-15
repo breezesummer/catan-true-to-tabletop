@@ -218,9 +218,10 @@ public sealed class TabletopSpecialCollectionTests
         var draw=M4CoreHarness.Cmd(M4.CommandKind.ResolveChoice);draw.Track=M4.ImprovementTrack.Trade;M4CoreHarness.Accepted(game,draw);
         owner.Observe("P1",game.GetHistory("P1"),10);observer.Observe("P2",game.GetHistory("P2"),10);
         var own=Assert.Single(owner.Active(10.5));var other=Assert.Single(observer.Active(10.5));
-        Assert.Equal("progress",own.Category);Assert.Equal(10,own.ProgressIndex);Assert.Equal(0,own.Track);Assert.Equal("商业港口",own.CardName);
+        string cardName=DevelopmentCardText.Names[10];
+        Assert.Equal("progress",own.Category);Assert.Equal(10,own.ProgressIndex);Assert.Equal(0,own.Track);Assert.Equal(cardName,own.CardName);
         Assert.Equal("发展卡",other.CardName);Assert.Equal(-1,other.ProgressIndex);Assert.Equal(-1,other.Track);
-        var slot=Assert.Single(owner.SpecialSlots("P1",[new(){Id="10:0",Name="商业港口",Progress=true,ArtIndex=10}],10.5));
+        var slot=Assert.Single(owner.SpecialSlots("P1",[new(){Id="10:0",Name=cardName,Progress=true,ArtIndex=10}],10.5));
         Assert.Same(own,slot.Flight);Assert.Equal(0,slot.Weight);
         Assert.Null(Assert.Single(owner.SpecialSlots("P1",[slot.Card],11.1)).Flight);
     }

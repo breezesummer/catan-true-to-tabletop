@@ -48,6 +48,8 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         public string Signature;
         public int Generation;
         public int DieFace=-1;
+        public int GlowState;
+        public MeshRenderer Glow;
         public Mesh[] OwnedMeshes;
         public Vector3 OriginalScale;
         public Quaternion OriginalRotation;
@@ -57,6 +59,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     readonly List<Item> recycled=new List<Item>();
     const int PoolCapacity=64;
     readonly Dictionary<string, Material> faceMaterials = new Dictionary<string, Material>();
+    readonly Material[][] glowFaces=new Material[2][];
     readonly Dictionary<int,Material[]> dieMaterials=new Dictionary<int,Material[]>();
     readonly Dictionary<int, Texture2D> diceTextures = new Dictionary<int, Texture2D>();
     readonly List<Mesh> meshes = new List<Mesh>();
@@ -322,7 +325,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         return Surface(key, location, new Vector2(slot.width*board.Size.x,slot.height*board.Size.y),
             built ? EntityCardAssets.ImprovementBack(track,level) : EntityCardAssets.ImprovementFront(track,level), new Rect(0,0,1,1),.00075f,.045f);
     }
-    public Hit Die(string key, Rect layout, int index, int value, float progress, bool rolling)
+    public Hit Die(string key, Rect layout, int index, int value, float progress, bool rolling,int glowState=0,Quaternion? pose=null)
     {
         float side = layout.width * scene.UnitsPerPixel;
         var item = Get(key, side.ToString("F6"), () => RoundedDie(side));
@@ -330,7 +333,34 @@ public sealed class TabletopWorldObjects : MonoBehaviour
         var position = scene.World(layout.center) + Vector3.up * (side/2+.0002f + Mathf.Abs(Mathf.Sin(progress*Mathf.PI*5))*motion*side*.6f);
         position.x += Mathf.Sin(progress*Mathf.PI*6+index)*motion*side*.15f;
         item.Object.transform.position = position;
-        item.Object.transform.rotation = Quaternion.Euler(0,28+(rolling ? (1-Mathf.Pow(1-progress,3))*720*(index%2==0?1:-1) : 0),0);
+        item.Object.transform.rotation = Quaternion.Euler(0,28+(rolling ? (1-Mathf.Pow(1-progress,3))*720*(index%2==0?1:-1) : 0),0)*(pose??Quaternion.identity);
+        if(item.GlowState!=glowState)
+        {
+            item.GlowState=glowState;
+            if(glowState!=0)
+            {
+                if(item.Glow==null)
+                {
+                    var shell=new GameObject("骰子贴身流光");
+                    shell.layer=item.Object.layer;
+                    shell.transform.SetParent(item.Object.transform,false);
+                    shell.transform.localScale=Vector3.one*1.012f;
+                    shell.AddComponent<MeshFilter>().sharedMesh=item.Object.GetComponent<MeshFilter>().sharedMesh;
+                    item.Glow=shell.AddComponent<MeshRenderer>();
+                    item.Glow.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
+                    item.Glow.receiveShadows=false;
+                }
+                int slot=glowState-1;
+                if(glowFaces[slot]==null)
+                {
+                    var mat=new Material(Resources.Load<Shader>("DiceSelection"));
+                    mat.SetFloat("_Chosen",slot);
+                    glowFaces[slot]=Enumerable.Repeat(mat,6).ToArray();
+                }
+                item.Glow.sharedMaterials=glowFaces[slot];
+            }
+            item.Glow.enabled=glowState!=0;
+        }
         if(item.DieFace==value)return item.Hit;
         item.DieFace=value;
         item.Front.sharedMaterials=DieMaterials(index,value);
@@ -341,22 +371,23 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     {
         int key=index*8+value;
         if(dieMaterials.TryGetValue(key,out var materials))return materials;
-        int[] values;
-        if(index==2)
-        {
-            // 事件骰保留三面船和黄／蓝／绿各一面，只把权威结果换到顶面。
-            values=new[]{0,0,0,1,3,2};int topFace=Array.IndexOf(values,value);
-            values[topFace]=values[0];values[0]=value;
-        }
-        else
-        {
-            int front=Enumerable.Range(1,6).First(n=>n!=value&&n!=7-value);
-            int right=Enumerable.Range(1,6).First(n=>n!=value&&n!=7-value&&n!=front&&n!=7-front);
-            values=new[]{value,7-value,7-front,front,7-right,right};
-        }
+        var values=DieFaces(index,value);
         materials=values.Select(v=>Face(DieTexture(index,v),new Rect(0,0,1,1),Color.white,.50f)).ToArray();
         dieMaterials.Add(key,materials);
         return materials;
+    }
+    internal static int[] DieFaces(int index,int value)
+    {
+        if(index==2)
+        {
+            var faces=new[]{0,0,0,1,3,2};
+            int top=Array.IndexOf(faces,value);
+            faces[top]=0;faces[0]=value;
+            return faces;
+        }
+        int front=Enumerable.Range(1,6).First(n=>n!=value&&n!=7-value);
+        int right=Enumerable.Range(1,6).First(n=>n!=value&&n!=7-value&&n!=front&&n!=7-front);
+        return new[]{value,7-value,7-front,front,7-right,right};
     }
     public Hit Tray(string key,Rect layout,Color felt,Color rim,Texture2D lining=null)
     {
@@ -437,6 +468,7 @@ public sealed class TabletopWorldObjects : MonoBehaviour
     }
     void OnDestroy()
     {
+        foreach(var faces in glowFaces)if(faces!=null)Destroy(faces[0]);
         foreach(var m in faceMaterials.Values)Destroy(m);
         foreach(var m in meshes)Destroy(m);
         foreach(var t in diceTextures.Values)Destroy(t);

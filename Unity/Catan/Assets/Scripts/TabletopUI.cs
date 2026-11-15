@@ -23,6 +23,77 @@ public sealed partial class TabletopUI
     readonly List<TabletopWorldObjects.Hit> worldHits = new List<TabletopWorldObjects.Hit>();
     TabletopScene table;
     internal M6App ThreeKingdoms;
+    Action<int,int> rotateAlchemy;
+    int alchemyRed,alchemyWhite,dragDie=-1;
+    bool eventOnly,dragStepped;
+    Vector2 dragOrigin;
+    string fixedDecision;
+    int turningMode;
+    readonly DieTurn[] turns={new DieTurn(),new DieTurn(),new DieTurn()};
+    static readonly Vector3[] normals={Vector3.up,Vector3.down,Vector3.forward,Vector3.back,Vector3.left,Vector3.right};
+    sealed class DieTurn
+    {
+        public int baseValue,result;
+        public int[] faces;
+        public Quaternion pose=Quaternion.identity,from,target;
+        public float settledAt;
+        public void Reset(int index,int value)
+        {
+            baseValue=result=value;faces=TabletopWorldObjects.DieFaces(index,value);
+            pose=from=target=Quaternion.identity;settledAt=-1;
+        }
+        public Quaternion Display()
+        {
+            if(settledAt>=0)pose=Quaternion.Slerp(from,target,Mathf.SmoothStep(0,1,(Time.unscaledTime-settledAt)/.16f));
+            return pose;
+        }
+        public void Snap(int requested=-1)
+        {
+            int top=0;float best=-2;
+            for(int j=0;j<6;j++)
+            {
+                float height=(pose*normals[j]).y;
+                if((requested<0||faces[j]==requested)&&height>best){top=j;best=height;}
+            }
+            result=faces[top];from=pose;
+            target=Quaternion.FromToRotation(pose*normals[top],Vector3.up)*pose;
+            settledAt=Time.unscaledTime;
+        }
+    }
+    internal void BindAlchemy(int red,int white,Action<int,int> rotate)
+    {alchemyRed=red;alchemyWhite=white;rotateAlchemy=rotate;}
+    void HandleDieTurn(int index,TabletopWorldObjects.Hit hit,bool fixedDice)
+    {
+        var e=Event.current;var turn=turns[index];
+        if(!GUI.enabled){if(dragDie==index){turn.Snap(turn.result);dragDie=-1;}return;}
+        bool tap=false;int direction=1;
+        if(e.type==EventType.MouseDown&&e.button==0&&hit.Contains(e.mousePosition))
+        {dragDie=index;dragOrigin=e.mousePosition;dragStepped=false;turn.settledAt=-1;e.Use();return;}
+        if(e.type==EventType.MouseDrag&&dragDie==index)
+        {
+            Vector2 delta=e.mousePosition-dragOrigin;
+            if(dragStepped||delta.sqrMagnitude>=9)
+            {
+                dragStepped=true;dragOrigin=e.mousePosition;
+                turn.pose=Quaternion.AngleAxis(delta.magnitude*2.5f,new Vector3(delta.y,0,-delta.x).normalized)*turn.pose;
+            }
+            e.Use();return;
+        }
+        if(e.rawType==EventType.MouseUp&&dragDie==index&&e.button==0)
+        {tap=!dragStepped;dragDie=-1;}
+        else if(e.type==EventType.ScrollWheel&&hit.Contains(e.mousePosition))
+        {tap=true;direction=e.delta.y>0?-1:1;}
+        else return;
+        int count=index==2?4:6,first=index==2?0:1;
+        turn.Snap(tap?first+(turn.result-first+direction+count)%count:-1);
+        if(fixedDice)ThreeKingdoms.SetFixedDice(turns[0].result,turns[2].result);
+        else rotateAlchemy(index,turn.result);
+        e.Use();
+    }
+    Action progressConfirm;
+    bool progressConfirmReady;
+    internal void BindProgressConfirmation(Action confirm,bool ready)
+    {progressConfirm=confirm;progressConfirmReady=ready;}
     internal Func<string,bool> EligibleAvatar;
     readonly Dictionary<string,Rect> playerPanels=new Dictionary<string,Rect>();
     internal string PlayerPanelAt(Vector2 point)
@@ -98,11 +169,18 @@ public sealed partial class TabletopUI
     public void DrawHistory(Font font,Catan.Core.GameHistoryEntry[] entries,string[] players)
     {history.Windows=OperationWindows;if(!history.IsOpen)bank.DrawFlights(HandFlightsVisible);if(history.IsOpen||!contextVisible)history.Draw(font,operations?.PresentedHistory(entries)??entries,players,table.Objects);if(!history.IsOpen){DrawScoreDetails();DrawPlayerHint();}}
     public bool DiceRolling => dice.IsRolling(Time.unscaledTimeAsDouble);
-    public void ObserveDice(long sequence,int first,int second,int? eventDie,Catan.Core.GameHistoryEntry presentationRoll=null)
+    public void ObserveDice(long sequence,int first,int second,int? eventDie,Catan.Core.GameHistoryEntry presentationRoll=null,bool actualRoll=true)
     {
         if(presentationRoll!=null&&presentationRoll.Sequence>sequence)
         {sequence=presentationRoll.Sequence;first=presentationRoll.Dice1;second=presentationRoll.Dice2;eventDie=presentationRoll.EventDie=="Science"?3:presentationRoll.EventDie=="Politics"?2:presentationRoll.EventDie=="Trade"?1:0;}
-        dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble);
+        if(sequence!=dice.Sequence)
+        {
+            eventOnly=false;
+            var history=ThreeKingdoms?.HistoryEntries??bankHistory;
+            var roll=Array.FindLast(history,e=>e.Sequence==sequence&&TabletopDicePresentation.IsRoll(e));
+            if(roll!=null)eventOnly=history.Any(e=>e.Turn==roll.Turn&&e.PlayerId==roll.PlayerId&&e.Sequence<roll.Sequence&&e.Kind=="PlayProgressCard"&&e.Action=="使用「"+Catan.Core.DevelopmentCardText.Name("Alchemy")+"」");
+        }
+        dice.Observe(sequence,first,second,eventDie,Time.unscaledTimeAsDouble,actualRoll);
         bank.BindDice(dice);history.BindDice(dice);TabletopAudio.Instance?.BindDice(dice);
     }
     static readonly Color Cream = new Color(.96f,.88f,.70f), Ink = new Color(.24f,.12f,.06f);
@@ -175,10 +253,31 @@ public sealed partial class TabletopUI
         CopperTabletopSkin.Outline(trayRect,false,20);
         var diceRects=expansion?expansionDiceRects:baseDiceRects;
         bool enabled=GUI.enabled;
+        bool fixedDice=ThreeKingdoms?.TurningFixedDice==true;
+        int mode=fixedDice?2:rotateAlchemy!=null?1:0;
+        var decision=fixedDice?ThreeKingdoms.FixedDiceDecision:null;
+        if(mode!=turningMode||decision!=fixedDecision)
+        {
+            turningMode=mode;fixedDecision=decision;dragDie=-1;
+            if(mode!=0)
+            {
+                turns[0].Reset(0,fixedDice?dice.First:alchemyRed);
+                turns[1].Reset(1,fixedDice?7-dice.First:alchemyWhite);
+                turns[2].Reset(2,dice.Event??0);
+                if(fixedDice)ThreeKingdoms.SetFixedDice(turns[0].result,turns[2].result);
+            }
+        }
         for(int i=0;i<diceRects.Length;i++)
         {
             double now=Time.unscaledTimeAsDouble;
-            var die=table.Objects.Die("dice-"+i,diceRects[i],i,dice.Face(i,now),dice.Progress(now),DiceRolling);worldHits.Add(die);
+            bool numeric=i<2,editing=fixedDice?i!=1:numeric&&rotateAlchemy!=null;
+            bool stationary=numeric&&(eventOnly&&DiceRolling||alchemyRed>0);
+            int value=stationary?(alchemyRed>0?(i==0?alchemyRed:alchemyWhite):(i==0?dice.First:dice.Second)):dice.Face(i,now);
+            if(fixedDice)value=ThreeKingdoms.FixedDieValue(i);
+            if(editing)value=turns[i].baseValue;
+            var die=table.Objects.Die("dice-"+i,diceRects[i],i,value,dice.Progress(now),DiceRolling&&!stationary,editing?1:(ThreeKingdoms?.DieVisualState(i)??0),editing?(Quaternion?)turns[i].Display():null);
+            worldHits.Add(die);
+            if(editing){GUI.enabled=enabled;HandleDieTurn(i,die,fixedDice);continue;}
             GUI.enabled=enabled&&canRoll&&!DiceRolling;
             if(GUI.enabled&&die.Contains(Event.current.mousePosition)&&Event.current.type==EventType.MouseDown&&Event.current.button==0)
             {Event.current.Use();roll?.Invoke();}
@@ -188,7 +287,9 @@ public sealed partial class TabletopUI
         table.Objects.End();
         string turnCaption=canRoll?"掷骰":phase.Contains("弃牌")||phase.IndexOf("Discard",StringComparison.OrdinalIgnoreCase)>=0?"等待弃牌":canEnd?"结束回合":actor!=seat?"等待玩家":"等待操作";
         hits.Add(EndTurnRect);bool turnEnabled=(canRoll||canEnd)&&!DiceRolling;
+        if(DevelopmentCardInspecting){turnCaption="使用";turnEnabled=DevelopmentCardReady&&!DiceRolling;}
         if(DiscardActive){turnCaption=DiscardCaption;turnEnabled=DiscardReady;}
+        if(progressConfirm!=null){turnCaption="确认";turnEnabled=progressConfirmReady&&!DiceRolling;}
         // 必选窗口被 Esc 或叉号关闭后，回合按钮仍须提供恢复入口。
         bool resumeOperation=OperationWindows.Hidden||OperationWindows.Closed&&(operations?.RequiresSelection==true||operations?.Discard!=null);
         if(resumeOperation){turnCaption=OperationWindows.Caption??"继续选择";turnEnabled=true;}
@@ -201,7 +302,7 @@ public sealed partial class TabletopUI
         TabletopTextFit.Label(new Rect(EndTurnRect.x+18,EndTurnRect.y+35,EndTurnRect.width-36,60),turnCaption,turnStyle,11,true);
         }
         bool previous=GUI.enabled;GUI.enabled=previous&&turnEnabled;
-        if(TabletopButtonFeedback.Button(EndTurnRect,true,true)){if(skillSelecting)ThreeKingdoms.FinishGeneralAction();else if(resumeOperation)OperationWindows.Resume();else if(DiscardActive)ConfirmDiscard();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
+        if(TabletopButtonFeedback.Button(EndTurnRect,true,true)){if(skillSelecting)ThreeKingdoms.FinishGeneralAction();else if(resumeOperation)OperationWindows.Resume();else if(progressConfirm!=null)progressConfirm();else if(DiscardActive)ConfirmDiscard();else if(DevelopmentCardInspecting)ConfirmDevelopmentCard();else if(canRoll)roll?.Invoke();else end?.Invoke();}GUI.enabled=previous;
         DrawDiscardCount();
         GUI.enabled=tableEnabled;
     }
@@ -218,7 +319,7 @@ public sealed partial class TabletopUI
         StrategyHudArt.Disc(portrait,BoardRenderer.SeatColor(actor)*.62f,true);
         StrategyHudArt.Avatar(new Rect(portrait.x+6,portrait.y+6,portrait.width-12,portrait.height-12),actor);
         var actorStyle=NameStyle("actor",title,actor,19,TextAnchor.MiddleLeft);actorStyle.wordWrap=false;
-        string actorName=M6App.PlayerLabel(actor)+(actor==seat?" · 你":"");
+        string actorName=M6App.PlayerLabel(actor);
         actorStyle.fontSize=Mathf.Min(19,Mathf.Max(10,Mathf.FloorToInt(19*193/Mathf.Max(193,actorStyle.CalcSize(Content(actorName)).x))));
         TabletopTextFit.Label(new Rect(r.x+181,r.y+15,r.width-197,27),actorName,actorStyle,8,true);
         var phaseStyle=Style("phase",small,(StrategyHudTheme.Ocean||StrategyHudTheme.HandPainted)?14:12,alignment:TextAnchor.MiddleLeft,wrap:false);phaseStyle.normal.textColor=ModernOperationUI.Muted;

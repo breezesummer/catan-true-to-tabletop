@@ -11,6 +11,13 @@ namespace Catan.Rules.Tests;
 public sealed class TabletopDiceHistoryTests
 {
     [Fact]
+    public void FixedResultAppearsImmediatelyWithoutRollingAndNextRealRollAnimates()
+    {
+        var dice=new TabletopDicePresentation();dice.Observe(1,2,3,1,0);dice.Observe(2,6,1,0,1,false);
+        Assert.False(dice.ActualRoll);Assert.False(dice.IsRolling(1));Assert.Equal(6,dice.Face(0,1));Assert.Equal(1,dice.Face(1,1));Assert.Equal(0,dice.Face(2,1));
+        dice.Observe(3,4,5,2,2);Assert.True(dice.ActualRoll);Assert.True(dice.IsRolling(2));
+    }
+    [Fact]
     public void EmptyHistoryHasNoRollsAndNeverDividesByZero()
     {
         var history = new TabletopDiceHistory(null);

@@ -52,14 +52,14 @@ def soldier(level,active):
     global transform
     mounted=level==3;heavy=level!=1
     if mounted:horse_body()
-    hip_z=1.54 if mounted else (.844 if level==2 and active else .931)
+    hip_z=1.84 if mounted else (.844 if level==2 and active else .931)
     lean=math.radians(12 if level==2 and active else 9 if mounted and active else 3)
     twist=math.radians(-16 if level==2 and active else 9 if level==1 and active else -5)
-    center=Vector((-.044 if level==2 and active else 0,-.045 if active else 0,hip_z))
+    center=Vector((-.044 if level==2 and active else 0,.22 if mounted else -.045 if active else 0,hip_z))
     torso=Matrix.Translation(center) @ Matrix.Rotation(twist,4,'Z') @ Matrix.Rotation(lean,4,'X')
     for side in (-1,1):
         if mounted:
-            hip=(side*.135,.060,hip_z);knee=(side*.404,-.265,hip_z-.28);ankle=(side*.426,-.142,hip_z-.58)
+            hip=(side*.145,.22,hip_z);knee=(side*.391,-.035,hip_z-.31);ankle=(side*.396,.095,hip_z-.65)
         else:
             x=(.51 if level==2 else .34) if active else .197
             knee=(side*x*.78,-.127+side*(.14 if active else .035),.472 if active and level==2 else .515)
@@ -69,7 +69,7 @@ def soldier(level,active):
         if mounted:
             x,y,z=ankle
             loop((x,y-.027,z-.049),(.082,0,0),(0,0,.088),.011,'steel',24)
-            line([(side*.192,.047,1.50),(side*.33,.014,1.255),(x,y,z+.032)],.018,'hide')
+            line([(side*.205,.20,1.65),(side*.34,.14,1.43),(x,y,z+.032)],.018,'hide')
     transform=torso
     cuirass(heavy)
     head=torso @ Matrix.Translation((0,-.031,.475)) @ Matrix.Rotation(-lean*.55,4,'X') @ Matrix.Rotation(-twist*.6,4,'Z')
@@ -91,14 +91,14 @@ def soldier(level,active):
         left=right+direction*(.69 if active else .52)
         warhammer(left,direction)
     else:
-        right=Vector((-.41,-.33,1.90) if active else (-.31,-.14,1.83))
-        left=Vector((.33,-.29,1.82))
+        right=Vector((-.41,-.14,2.17) if active else (-.31,.06,2.13))
+        left=Vector((.33,-.16,2.14))
         direction=Vector((-.47,-.85,.55) if active else (-.12,-.18,.98)).normalized()
         base=right-direction*.39;point=right+direction*1.62
         rod(base,point,.039,'wood',.021,n=24)
         rod(point-direction*.05,point+direction*.05,.035,'gold',.028,n=20)
         segment(point,point+direction*.35,[(0,.029,.020),(.18,.078,.026),(.42,.040,.016),(1,.001,.001)],'edge',4)
-        shield(left+Vector((.136,.17,-.25)),False,True)
+        shield(left+Vector((.155,.27,-.13)),False,True)
     for s,hand in ((-1,right),(1,left)):
         top=shoulder_pts[s]
         if level==2 and active:

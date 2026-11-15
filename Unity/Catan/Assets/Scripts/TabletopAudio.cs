@@ -226,6 +226,7 @@ public sealed partial class TabletopAudio : MonoBehaviour
     void Queue(TabletopAudioEvent e, double now)
     {
         if (scheduled.Count >= 32) return;
+        if(e.Cue==TabletopAudioCue.DiceRoll&&dice?.ActualRoll==false&&e.RollSequence==dice.Sequence)return;
         // 迟到历史无需在已停止的骰子上补播滚动声；收获声仍按公开结果正常执行。
         if(e.Cue==TabletopAudioCue.DiceRoll&&e.RollSequence>0&&dice!=null&&e.RollSequence==dice.Sequence&&!dice.IsRolling(now))return;
         double at=dice==null?now+e.Delay:TabletopAudioTiming.ScheduledAt(e,now,dice.Sequence,dice.SettlesAt,dice.IsRolling(now));

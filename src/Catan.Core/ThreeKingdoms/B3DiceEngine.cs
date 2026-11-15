@@ -199,7 +199,7 @@ namespace Catan.Core.ThreeKingdoms
                 if (!CanFix(s,g) || g.TenureId != dice.FixedResponderTenures[dice.FixedResponderCursor]) return actions.ToArray();
                 bool huoshou=g.GeneralId=="tk-g20";string skill=huoshou?"tk-g20-s1":"tk-g21-s2",name=huoshou?"祸首":"直谏";
                 actions.Add(Action(s,skill,"skip","放弃"+name));
-                foreach (var face in huoshou?new[]{1}:new[] { 1, 4, 5, 6 }) for (var red = 1; red <= 6; red++)
+                foreach (var face in huoshou?new[]{1}:new[] { 1, 4, 5, 6 }) foreach (var red in huoshou?new[]{6}:new[]{1,2,3,4,5,6})
                 { var a = Action(s, skill, "fixed", name+"：" + EventName(face) + " 7（红 " + red + "，白 " + (7 - red) + "）"); a.Command.CardType = face; a.Command.Counts[0] = red; actions.Add(a); }
             }
             else if (d.Kind == "dice-observe")
@@ -273,6 +273,7 @@ namespace Catan.Core.ThreeKingdoms
 
         public static void Project(IThreeKingdomsCardHost host, ThreeKingdomsView view, string viewerId)
         {
+            view.FixedDiceResult=Enabled(host.State)?CopyResult(host.State.Dice?.FixedResult):null;
             if (!Enabled(host.State) || !HasPending(host.State) || B2SkillEngine.HasPending(host.State)) return;
             var d = host.State.Dice.PendingDecision;
             view.SkillActions = Actions(host, viewerId);

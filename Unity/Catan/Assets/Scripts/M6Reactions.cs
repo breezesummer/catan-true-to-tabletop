@@ -4,7 +4,7 @@ using UnityEngine;
 
 public sealed partial class M6App
 {
-    internal static readonly Rect ReactionButton = new Rect(OperationDock.HandRack.x - 4 - 78, OperationDock.HandRack.y, 78, OperationDock.HandRack.height);
+    internal static readonly Rect ReactionButton = new Rect(OperationDock.HandRack.x - 4 - 50, OperationDock.HandRack.y, 50, OperationDock.HandRack.height);
     internal static readonly Rect MapMarksButton = new Rect(ReactionButton.x, ReactionButton.y - 4 - ReactionButton.height, ReactionButton.width, ReactionButton.height);
     internal static readonly Rect FlowerOption = new Rect(ReactionButton.x - 4 - 40, ReactionButton.y, 40, ReactionButton.height);
     internal static readonly Rect EggOption = new Rect(FlowerOption.x - 4 - 40, ReactionButton.y, 40, ReactionButton.height);

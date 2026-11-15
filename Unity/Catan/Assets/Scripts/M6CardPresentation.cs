@@ -42,7 +42,7 @@ public sealed partial class M6App
         if(recovered>0)
         {
             afterPlayedCards=null;CardPresentationRoll=null;
-            ShowTablePrompt("已同步 "+recovered+" 次较早的出牌结果");
+            if(!NetworkGame)ShowTablePrompt("已同步 "+recovered+" 次较早的出牌结果");
             M7CommunicationLog.Record(new M7CommunicationEvent{Component="presentation",Event="presentation_recovery",Code="card_reveals",Count=recovered,RoomId=Network?.RoomId,Revision=Network?.Revision??-1});
             return false;
         }
@@ -56,12 +56,12 @@ public sealed partial class M6App
     }
     internal bool WaitForPresentationHistory(long sequence,Action applyView)
     {
-        if(sequence<=cardReveals.Sequence||(Network.History.LastOrDefault()?.Sequence??0)>=sequence)return false;
+        if(sequence<=cardReveals.Sequence||Network.HasPresentationHistory(sequence))return false;
         pendingNetworkSequence=sequence;pendingNetworkPresentation=applyView;return true;
     }
     void UpdateCardPresentation()
     {
-        if(pendingNetworkPresentation!=null&&(Network.History.LastOrDefault()?.Sequence??0)>=pendingNetworkSequence)
+        if(pendingNetworkPresentation!=null&&Network.HasPresentationHistory(pendingNetworkSequence))
         {var networkApply=pendingNetworkPresentation;pendingNetworkPresentation=null;networkApply();}
         if(!CardPresentationBusy)return;
         if(MenuVisible||tableMenu){cardStarted+=Time.unscaledDeltaTime;return;}
@@ -120,7 +120,7 @@ public sealed partial class M6App
         StrategyHudArt.Avatar(new Rect(x+75,135,70,70),entry.PlayerId);
         var nameStyle=PlayerNameStyle(new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=29},entry.PlayerId);
         GUI.Label(new Rect(x-240,219,700,42),PlayerDisplayName(entry.PlayerId),nameStyle);
-        GUI.Label(new Rect(x-240,264,700,54),(entry.ImmediateVictory?"获得了「":"使用了「")+card+"」",new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=27});
+        if(entry.ImmediateVictory)GUI.Label(new Rect(x-240,264,700,54),"获得了「"+card+"」",new GUIStyle(title){alignment=TextAnchor.MiddleCenter,fontSize=27});
 
     }
 }

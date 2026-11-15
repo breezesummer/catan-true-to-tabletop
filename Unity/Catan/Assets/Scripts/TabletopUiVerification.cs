@@ -77,8 +77,10 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
         var run = oceanTheme && args.Contains("--painted-hud") ? VerifyPaintedHud(args) : oceanViews && args.Contains("--audit-all") ? VerifyWholeTable(args) : oceanViews && args.Contains("--direct-input") ? VerifyDirectInput(args) : oceanViews && args.Contains("--tile-glow") ? VerifyTileGlow(args) : oceanViews && args.Contains("--reaction-views") ? VerifyReactionViews(args) : oceanViews && args.Contains("--pier-views") ? VerifyPierViews(args) : oceanViews && args.Contains("--expansion-pieces") ? VerifyExpansionPieces() : oceanViews && args.Contains("--natural-pieces") ? VerifyNaturalPieces() : oceanViews && args.Contains("--coastal-frames") ? VerifyCoastalViews() : oceanViews ? VerifyOceanViews() : Verify();
         if(oceanViews&&args.Contains("--zhang-liao"))run=VerifyZhangLiao(args);
         if(oceanViews&&args.Contains("--hud-effects"))run=VerifyHudEffects(args);
+        if(oceanViews&&args.Contains("--terrain-art"))run=VerifyTerrainArt();
         if(oceanViews&&args.Contains("--timber-port"))run=VerifyTimberPort(args);
         if(oceanViews&&args.Contains("--player-colors"))run=VerifyPlayerColors(args);
+        if(oceanViews&&args.Contains("--knight-updraft"))run=VerifyKnightUpdraft();
         while (true)
         {
             object next;

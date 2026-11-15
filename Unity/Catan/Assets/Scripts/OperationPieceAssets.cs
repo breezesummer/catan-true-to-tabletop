@@ -61,7 +61,7 @@ public static class OperationPieceAssets
 
     public static GameObject PointerPreview(TabletopPointerPreview preview,string seat,Vector3 bottom,Quaternion rotation,Transform parent,bool legal,bool ocean=true,Quaternion? pirateFacing=null)
     {
-        var colour=legal?new Color(.3f,1f,.75f):new Color(1f,.22f,.2f);
+        var colour=legal?ProgressTableUI.Gold:new Color(.64f,.29f,.19f);
         string label="鼠标预览 · "+preview.Kind;
         GameObject instance=null;
         // 新模型底面即落地点，移除旧顶点棋子的四毫米展示余量。
@@ -111,6 +111,7 @@ public static class OperationPieceAssets
                     renderer.SetPropertyBlock(block,i);
         }
         foreach(var collider in instance.GetComponentsInChildren<Collider>())Object.Destroy(collider);
+        instance.AddComponent<SelectionArrival>();
         return instance;
     }
     static Material pointerMaterial;
