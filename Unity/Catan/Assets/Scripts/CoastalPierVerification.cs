@@ -43,7 +43,8 @@ public sealed partial class TabletopUiVerification
             // 栈桥配方的水平桥板从 0.53 毫米起，高 0.69 毫米。
             float pierY=root.TransformPoint(Vector3.up*.00122f).y;
             Require(deck!=null,"缺少主甲板测点");
-            Require(Mathf.Abs(deck.position.y-pierY)<.00005f,"主甲板与港口桥面高度不符");
+            float expectedDeckY=TabletopOcean.WaterHeight+(pierY-TabletopOcean.WaterHeight)*EntityBoardAssets.ShipScale;
+            Require(Mathf.Abs(deck.position.y-expectedDeckY)<.00005f,"主甲板未随船模等比缩小");
             Require(deck.position.y>TabletopOcean.WaterHeight&&actual.position.y<TabletopOcean.WaterHeight,"商船吃水异常");
             Debug.Log($"安达卢西亚号甲板 {deck.position.y*1000:F2} 毫米，港口桥面 {pierY*1000:F2} 毫米");
             foreach(string key in new[]{"P1","P2","P3","P4","pirate"})
@@ -165,6 +166,13 @@ public sealed partial class TabletopUiVerification
             Require(markers.PickPort(new Vector2(pixel.x,Screen.height-pixel.y),BoardCamera)==group.First().Id,
                 "货物的拾取轮廓没有命中贸易港");
             var tag=root.GetComponentInChildren<HarborSign>();
+            if(args.Contains("--flag-print"))
+            {
+                var offset=(root.right*.35f+root.forward+Vector3.up*1.35f).normalized*.16f;
+                var pivot=tag.transform.parent.position;
+                var target=new Vector3(pivot.x,tag.Face.bounds.center.y,pivot.z)+Vector3.ProjectOnPlane(offset,Vector3.up).normalized*.002f;
+                DetailFrame(target,"旗面-"+kind,detailSize:.010f,eyeOffset:offset,matchCameraMsaa:true);
+            }
             var tagPixel=BoardCamera.WorldToScreenPoint(tag.Face.bounds.center);
             var tagRect=TabletopReferenceMarkers.SignBounds(tag.Face,BoardCamera);
             float px=BoardCamera.pixelHeight/(2*BoardCamera.orthographicSize);

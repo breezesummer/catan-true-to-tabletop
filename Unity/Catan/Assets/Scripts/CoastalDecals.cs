@@ -42,6 +42,8 @@ public static class CoastalDecals
     }
     static readonly Dictionary<string, MeshFilter> parts = new Dictionary<string, MeshFilter>();
     static Material timber, waterShadow;
+    static Texture2D linen;
+    static Vector3 printCenter, printWidth, printHeight;
 
     static void LoadPier()
     {
@@ -49,6 +51,23 @@ public static class CoastalDecals
         var library = Resources.Load<GameObject>(Root + "harbor-house");
         foreach (var part in library.GetComponentsInChildren<MeshFilter>())
             parts[part.name == "CoastalWalkway" ? "PierDeck" : part.name] = part;
+        // 读取一次布面四边中点。模型导入的轴向、比例由变换矩阵处理。
+        var mesh = parts["HarborFlag"].sharedMesh;
+        var vertices = mesh.vertices;
+        var uv = mesh.uv;
+        Vector3 PointAt(Vector2 target)
+        {
+            int best = 0;
+            for (int i=1; i<uv.Length; i++)
+                if ((uv[i]-target).sqrMagnitude < (uv[best]-target).sqrMagnitude) best=i;
+            return vertices[best];
+        }
+        var top = PointAt(new Vector2(.5f,1));
+        var bottom = PointAt(new Vector2(.5f,0));
+        printCenter = (top+bottom)*.5f;
+        printHeight = top-bottom;
+        printWidth = PointAt(new Vector2(1,.5f))-PointAt(new Vector2(0,.5f));
+        linen = Resources.Load<Texture2D>(Root+"flag-linen");
         timber = new Material(Resources.Load<Shader>(Root + "PierTimber"));
         timber.mainTexture = Resources.Load<Texture2D>("TabletopUI/v003/oak-table-albedo");
         waterShadow = new Material(Resources.Load<Shader>(Root + "PierWaterShadow"));
@@ -85,6 +104,10 @@ public static class CoastalDecals
         {
             cloth = new Material(Resources.Load<Shader>(Root + "HarborCloth"));
             cloth.mainTexture = Resources.Load<Texture2D>(Root + "flag-" + cargo);
+            cloth.SetTexture("_Linen", linen);
+            cloth.SetVector("_PrintCenter", printCenter);
+            cloth.SetVector("_PrintWidth", printWidth);
+            cloth.SetVector("_PrintHeight", printHeight);
             flagMaterials[cargo] = cloth;
         }
         var flag = Place(rig, "HarborFlag", cloth);
