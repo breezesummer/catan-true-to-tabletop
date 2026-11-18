@@ -111,6 +111,7 @@ public sealed partial class M6App : MonoBehaviour
     void Update()
     {
         if(Network!=null)Network.LobbyPollingEnabled=networkMenu&&networkTab==0;
+        CaptureBookMapIfNeeded();
         UpdateReactions();
         TickNetworkDiagnostics();
         using var frameCost=FrameCost.Measure(FrameCost.Stage.GameUpdate);
@@ -127,7 +128,7 @@ public sealed partial class M6App : MonoBehaviour
     {
         if(MenuVisible){HandleMainMenuEscape();return;}
         if(!Ready)return;
-        if(encyclopediaOpen){encyclopediaOpen=false;return;}
+        if(encyclopediaOpen){BookBack();return;}
         if(tableMenu){if(HandleTablePausePageEscape())return;CloseTablePauseMenu();escapeDismissedInteraction=false;return;}
         if(TryCloseThreeKingdomsPanel())return;
         // 第一遍放回本地草稿；规则要求的待决面板即使自动出现，下一遍仍能打开菜单。

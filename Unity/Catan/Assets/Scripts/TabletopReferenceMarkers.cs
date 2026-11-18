@@ -217,9 +217,9 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
         if(coastalMesh==null) coastalMesh=new Mesh {name="连续平绘海岸"};
         coastalMesh.Clear();
         coastalMesh.SetVertices(points);coastalMesh.SetUVs(0,uv);coastalMesh.SetTriangles(triangles,0);
-        var filter=GetComponent<MeshFilter>() ?? gameObject.AddComponent<MeshFilter>();
+        if(!TryGetComponent<MeshFilter>(out var filter)) filter=gameObject.AddComponent<MeshFilter>();
         filter.sharedMesh=coastalMesh;
-        var renderer=GetComponent<MeshRenderer>() ?? gameObject.AddComponent<MeshRenderer>();
+        if(!TryGetComponent<MeshRenderer>(out var renderer)) renderer=gameObject.AddComponent<MeshRenderer>();
         if(shoreMaterial==null){
             shoreMaterial=new Material(Resources.Load<Shader>(CoastalDecals.Root+"WheatShore"));
             shoreMaterial.SetTexture("_Sand",Resources.Load<Texture2D>(CoastalDecals.Root+"sand"));

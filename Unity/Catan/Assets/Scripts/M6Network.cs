@@ -247,5 +247,5 @@ public sealed partial class M6App
         networkRoomName=room.Name;networkListed=room.Listed;menuThreeKingdoms=room.ThreeKingdomsPackageVersion!=null;menuHarbormaster=room.Harbormaster;menuFishing=room.Fishing;
         for(int i=0;i<networkAi.Length;i++)networkAi[i]=room.Seats.Any(s=>s.SeatId=="P"+(i+1)&&s.IsAi);
     }
-    void OnDestroy(){ResetReactions();StopNetworkDiagnostics();lanService.Dispose();}
+    void OnDestroy(){if(bookImageMaterial!=null)Destroy(bookImageMaterial);ReleaseBookMap();ResetReactions();StopNetworkDiagnostics();lanService.Dispose();}
 }

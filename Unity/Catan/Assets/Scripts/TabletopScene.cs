@@ -91,6 +91,37 @@ public sealed class TabletopScene : MonoBehaviour
         Objects=gameObject.AddComponent<TabletopWorldObjects>();Objects.Initialize(this);
     }
 
+    // 只在打开百科时拍摄公开棋盘，独立相机不会移动玩家视角或叠加手牌 HUD。
+    internal RenderTexture CaptureEncyclopediaMap()
+    {
+        if(boardCamera==null||outline==null)return null;
+        var owner=new GameObject("百科地图取景");
+        var camera=owner.AddComponent<Camera>();
+        camera.enabled=false;
+        camera.CopyFrom(boardCamera);
+        camera.enabled=false;
+        camera.rect=new Rect(0,0,1,1);
+        camera.orthographic=true;
+        camera.nearClipPlane=.01f;
+        camera.aspect=978f/456f;
+        camera.transform.rotation=Quaternion.Euler(61,0,0);
+        camera.transform.position=center-camera.transform.forward*1.5f;
+        float size=.01f;
+        foreach(var point in outline){
+            var local=camera.transform.InverseTransformPoint(point);
+            size=Mathf.Max(size,Mathf.Abs(local.x)/camera.aspect,Mathf.Abs(local.y));
+        }
+        camera.orthographicSize=size*1.07f;
+        var target=new RenderTexture(1176,548,24,RenderTextureFormat.ARGB32);
+        try{
+            target.Create();
+            RenderPipeline.SubmitRenderRequest(camera,new UniversalRenderPipeline.SingleCameraRequest{destination=target});
+            return target;
+        }catch{
+            target.Release();Destroy(target);throw;
+        }finally{Destroy(owner);}
+    }
+
     void ConfigureLighting()
     {
         // 用方向明确的柔和主光体现现有雕塑网格；三色环境光保留侧面层次。

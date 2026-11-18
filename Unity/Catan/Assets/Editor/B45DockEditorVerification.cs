@@ -23,7 +23,7 @@ public static class B45DockEditorVerification
         EditorSceneManager.OpenScene("Assets/M6.unity",OpenSceneMode.Single);GameView().Focus();EditorApplication.isPlaying=true;
     }
     static EditorWindow GameView()=>EditorWindow.GetWindow(typeof(EditorWindow).Assembly.GetType("UnityEditor.GameView"));
-    static void SetSize(int width,int height)
+    internal static void SetSize(int width,int height)
     {
         var assembly=typeof(EditorWindow).Assembly;var sizesType=assembly.GetType("UnityEditor.GameViewSizes");
         var singleton=typeof(ScriptableSingleton<>).MakeGenericType(sizesType);var sizes=singleton.GetProperty("instance",BindingFlags.Public|BindingFlags.Static).GetValue(null);
@@ -42,7 +42,7 @@ public static class B45DockEditorVerification
         }
         return null;
     }
-    static void Send(Event e)
+    internal static void Send(Event e)
     {
         var window=GameView();window.Focus();
         // 与 GameView.OnGUI 相同的原生队列；输入已是游戏像素，不经过编辑器工具栏和缩放。

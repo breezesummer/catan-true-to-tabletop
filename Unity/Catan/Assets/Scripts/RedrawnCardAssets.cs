@@ -96,10 +96,12 @@ public static class RedrawnCardAssets
         int kind;return int.TryParse((card.Id??"").Split(':')[0],out kind)?Base(kind):null;
     }
     public static Texture2D Base(string name)=>Base(name=="修路"?1:Array.IndexOf(baseNames,name));
-    public static void DrawText(Rect r,Texture2D texture)
+    public static void DrawText(Rect r,Texture2D texture,bool originalInk=false)
     {
         if(!labels.TryGetValue(texture,out int index))return;
-        if(heading==null){var font=Resources.Load<Font>("Fonts/NotoSerifCJKsc-Regular");heading=new GUIStyle(GUI.skin.label){font=font,alignment=TextAnchor.MiddleCenter,fontStyle=FontStyle.Bold,wordWrap=false,padding=new RectOffset(0,0,0,0)};body=new GUIStyle(heading){wordWrap=true};heading.normal.textColor=body.normal.textColor=new Color(.12f,.085f,.04f);}
+        if(heading==null){var font=Resources.Load<Font>("Fonts/NotoSerifCJKsc-Regular");heading=new GUIStyle(GUI.skin.label){font=font,alignment=TextAnchor.MiddleCenter,fontStyle=FontStyle.Bold,wordWrap=false,padding=new RectOffset(0,0,0,0)};body=new GUIStyle(heading){wordWrap=true};}
+        var ink=new Color(.12f,.085f,.04f);
+        heading.normal.textColor=body.normal.textColor=originalInk&&QualitySettings.activeColorSpace==ColorSpace.Linear?ink.linear:ink;
         string title=index<25?Catan.Core.DevelopmentCardText.Names[index]:baseNames[index-25];
         string description=index<25?Catan.Core.DevelopmentCardText.Descriptions[index]:baseDescriptions[index-25];
         DrawTitle(r,index,title);

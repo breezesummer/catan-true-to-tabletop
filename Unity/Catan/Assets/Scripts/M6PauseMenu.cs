@@ -97,7 +97,7 @@ public sealed partial class M6App
                 tablePauseFeedbackUntil=Time.unscaledTime+2;
                 break;
             case 2:menuPlayerName=LocalPlayerName;tablePausePage=1;tablePauseFeedback="";GUI.FocusControl(null);break;
-            case 3:encyclopediaOpen=true;break;
+            case 3:OpenBook();break;
             case 4:if(NetworkGame)Network.RestartRoom();else RestartLocalGame();break;
             case 5:ReturnToMainMenu();break;
         }
