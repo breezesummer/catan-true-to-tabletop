@@ -4,7 +4,7 @@
 
 2026-10-15 新增同版本 Unity 6000.3.25f1 Android Build Support（revision `e1dba0a9aba4`），没有另建 Unity 工程或更换编辑器。模块保存在原 Editor 的 `Data/PlaybackEngines/AndroidPlayer`，SDK API／Build Tools 36、NDK r27c `27.2.12479018`、Temurin JDK `17.0.18+8`、Unity 自带 Gradle `9.3.1` 均已实际读取版本。官方模块安装包 1,548,575,120 字节，MD5 `AA3D7C889732969EABF48BFFF342B8E6` 与 Unity Technologies SF 数字签名有效；JDK ZIP 的 SHA-256 与官方链接的 `15e8817d1f5db6db3571ebe7430ef37f7fa8e60e8ff6f3e18ca1cb4c29f78774` 一致。临时下载转发仅用于本任务，完成后已停止并清理配置，未修改系统代理、路由或原有节点。
 
-安卓构建入口为 `tools/development/Build-Android.ps1`，Gradle 缓存与签名材料分别保存在本项目 `.local/development/caches/gradle` 与 `.local/development/credentials/android`。用于验收的 Google API 35 x86_64 模拟器位于 `D:/Development/Android`，通过 WHPX 与 SwiftShader 无窗口运行；它属于本地测试设备，不代替真实手机的性能确认。实际 APK 与设备结果见 [安卓适配说明](ANDROID_PORT_V001.md) 和 [本轮验证摘要](verification/android-port-v001/summary.json)。以下 M0 配置与历史验证记录保留原文。
+安卓构建入口为 `tools/development/Build-Android.ps1`，Gradle 缓存与签名材料分别保存在本项目 `.local/development/caches/gradle` 与 `.local/development/credentials/android`。用于验收的 Google API 35 x86_64 模拟器位于 `D:/Development/Android`，通过 WHPX 与 SwiftShader 无窗口运行；它属于本地测试设备，不代替真实手机的性能确认。实际 APK 与设备结果见 [安卓适配说明](archive/专项迭代/ANDROID_PORT_V001.md) 和 [本轮验证摘要](verification/android-port-v001/summary.json)。以下 M0 配置与历史验证记录保留原文。
 
 配置日期：2026 年 10 月 8 日。`D:\Development` 下每个工具各占一个目录，Unity Hub 与 Editor 合并在 `Unity` 目录内。项目缓存、日志、临时文件和项目专用编辑器配置都位于 `D:\Project\the-settlers-of-catan\.local`。现有 C 盘 .NET 6 运行时未移除，本项目通过专用启动脚本使用 D 盘 SDK。
 
@@ -90,7 +90,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Verify-E
 
 M0 收口时再次运行完整 `-Unity` 检查，最终于 2026-10-08 22:52（Asia/Shanghai）通过。复跑发现并修复了 `UnitySmoke.cs` 覆盖现有 Renderer 资产导致的临时错误；修复后独立 .NET 2/2、Blender、Unity 导入编译、Windows 构建运行与 URP 渲染全部通过。新截图已打开核对。完整命令、固定版本、证据归档、SHA-256 及引擎退出诊断见 [M0 工具链复验记录](verification/M0_TOOLCHAIN_2026-10-08.md)。上文较早的截图与验证经过作为历史记录保留，以该复验记录为收口证据。
 
-M0 已完成，见 [阶段验收](M0_ACCEPTANCE.md)。按用户确认，开发采用官方 2025 规则和明确标注的估算尺寸，实体版本与实测资料后补；[v0.1 人工验收序列](acceptance/V0_1_ACCEPTANCE.md) 已固定并核对数据自洽性。尚未实施正式游戏功能，不能把环境通过结论用于代替 M1 的规则、Unity 交互和存档验收。
+M0 已完成，见 [阶段验收](archive/里程碑/M0_ACCEPTANCE.md)。按用户确认，开发采用官方 2025 规则和明确标注的估算尺寸，实体版本与实测资料后补；[v0.1 人工验收序列](acceptance/V0_1_ACCEPTANCE.md) 已固定并核对数据自洽性。尚未实施正式游戏功能，不能把环境通过结论用于代替 M1 的规则、Unity 交互和存档验收。
 
 配置依据：[.NET Windows 手动安装](https://learn.microsoft.com/dotnet/core/install/windows#manual-install)、[Unity 下载存档](https://unity.com/releases/editor/archive)、[Unity 安装命令](https://docs.unity3d.com/6000.3/Documentation/Manual/InstallingUnity.html)、[Unity 包缓存配置](https://docs.unity3d.com/6000.3/Documentation/Manual/upm-config-cache.html)、[Blender 4.5 官方下载目录](https://download.blender.org/release/Blender4.5/)、[VS Code 命令行配置](https://code.visualstudio.com/docs/configure/command-line)。
 

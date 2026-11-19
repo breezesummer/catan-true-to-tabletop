@@ -49,7 +49,7 @@ def source_inventory(text):
 
 def verify():
     baseline = json.loads(read(DOCS / "three-kingdoms/B0原始资料指纹.json"))
-    encyclopedia = read(DOCS / "三国争霸游戏百科.md")
+    encyclopedia = read(DOCS / "archive/三国实施/B0原始资料.md")
     inventory = source_inventory(encyclopedia)
     checks = []
 
@@ -60,6 +60,10 @@ def verify():
 
     require(inventory == baseline["原始资料"], "54将原文、附注、逐将问题建议及20项全局原问题答复与本轮前快照一致")
     generals = inventory["武将"]
+    current = source_inventory(read(DOCS / "三国争霸游戏百科.md"))["武将"]
+    latest = source_inventory(read(DOCS / "archive/三国实施/武将原始问答.md"))["武将"]
+    require([g["原文哈希"] for g in current] == [g["原文哈希"] for g in latest],
+            "现行百科54将牌文与归档原文逐项相同")
     require([g["编号"] for g in generals] == list(range(1, 55)), "武将01至54无缺失、重复或换序")
     require(sum(len(g["技能"]) for g in generals) == 97, "97个具名技能原文保留")
     require(sum(len(g["附注"]) for g in generals) == 2, "黄忠与鲁肃两条原附注保留")
@@ -71,13 +75,12 @@ def verify():
     main = read(DOCS / "three-kingdoms/B0规则定稿.md")
     first = read(DOCS / "three-kingdoms/B0首批武将规范.md")
     maps = read(DOCS / "three-kingdoms/B0九图兼容与冲突例.md")
-    plan = read(DOCS / "三国争霸扩展实现方案.md")
     global_ids = re.findall(r"^\| (G\d{2}) \|", main, re.M)
     require(global_ids == [f"G{i:02}" for i in range(1, 21)], "G01至G20各有一项规范处置")
     deferred = re.findall(r"^\| W(\d{2}) \| (B\d) \|", main, re.M)
     require([int(n) for n, _ in deferred] == [i for i in range(1, 55) if i not in FIRST],
             "45张后批与9张首批恰好覆盖54将，互不重叠")
-    phases = {int(n): phase for n, phase in re.findall(r"^\| (\d{2}) [^|]+\|[^|]+\| (B\d) \|", plan, re.M)}
+    phases = {int(n): phase for n, phase in re.findall(r"^\| (\d{2}) [^|]+\|[^|]+\| (B\d) \|", encyclopedia, re.M)}
     require(len(phases) == 54 and all(phases[i] == "B2" for i in FIRST), "首批正好覆盖原方案全部B2武将")
     require(all(phases[int(n)] == phase for n, phase in deferred), "后批隔离登记与原方案批次一致")
     headings = re.findall(r"^#{2,4}[^\n]*\bW(\d{2})\b[^\n]*$", first, re.M)
@@ -111,7 +114,7 @@ def verify():
             remaining -= 2
         require(minimum - 1 - 2 * (players - 1) < 5, f"{players}人少一张时末席确实不足5候选")
 
-    checked_files = [DOCS / "三国争霸游戏百科.md", DOCS / "三国争霸扩展实现方案.md",
+    checked_files = [DOCS / "archive/三国实施/B0原始资料.md", DOCS / "archive/三国实施/武将原始问答.md", DOCS / "三国争霸游戏百科.md", DOCS / "archive/实施方案/三国争霸扩展实现方案.md",
                      *sorted((DOCS / "three-kingdoms").glob("B0*.md")),
                      DOCS / "verification/three-kingdoms-b0/验收记录.md"]
     links = 0

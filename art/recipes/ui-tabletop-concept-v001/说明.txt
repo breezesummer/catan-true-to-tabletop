@@ -8,7 +8,7 @@
 说明：人物、房间、木桌、骰子造型与物件细节为概念示意；生成位图不等于可用的三维网格或已实现的 Unity 交互。卡面、数字和落点以规则数据及实际资产为准。
 检查：已查看生成图，检查四席位布局、地图为主、前景自有棋子与手牌、对手手牌背面，以及没有常驻操作栏和分隔边框。没有改动游戏代码；本轮未运行规则测试、Unity 构建或真实交互验收。
 保留：原始参考及生成原图均不覆盖、不删除。未改动路线图；概念首稿不属于阶段完成。
-参考一：docs/verification/m6-2026-10-09/m6-ui-restored-human.jpg（较早 M6 界面参考；当前操作区布局另读 docs/UI_OPERATIONS_V001.md）
+参考一：docs/verification/m6-2026-10-09/m6-ui-restored-human.jpg（较早 M6 界面参考；当前操作区布局另读 docs/archive/专项迭代/UI_OPERATIONS_V001.md）
 参考二：docs/verification/ore-tile-v004/combined/game-camera.png（板块及棋子外观）
 参考三：art/previews/entity-conversion-v001/resource-cards/game-camera.png（实体资源卡面）
 参考四：art/previews/photo-samples-v001/game-camera.png（木材卡、红色村庄与道路样板）

@@ -8,7 +8,7 @@ manifest.json 已登记第一批五份样板来源。每项素材填写 id、ori
 
 先提供少量样板即可。完整采集规范见 ../../docs/ART_PIPELINE.md；卡牌精确文字需独立核对后进入规则数据。
 
-2026-10-08 用户已确认：M0 先采用官方 2025 规则与明确标注的估算尺寸，实体参考后补。2026-10-09 已收到原始照片并完成首批样板，见 [PHOTO_SAMPLES_V001.md](../../docs/PHOTO_SAMPLES_V001.md)。实体版本和实测尺寸仍未知。官方规则来源另登记在 [rules/v001/sources.json](rules/v001/sources.json)，不冒充用户实物参考。
+2026-10-08 用户已确认：M0 先采用官方 2025 规则与明确标注的估算尺寸，实体参考后补。2026-10-09 已收到原始照片并完成首批样板，见 [PHOTO_SAMPLES_V001.md](../../docs/archive/专项迭代/PHOTO_SAMPLES_V001.md)。实体版本和实测尺寸仍未知。官方规则来源另登记在 [rules/v001/sources.json](rules/v001/sources.json)，不冒充用户实物参考。
 
 尺度与补充流程见 [REFERENCE_BASELINE.md](../../docs/REFERENCE_BASELINE.md)，估算配方见 [scale-estimates.json](../../art/recipes/v001/scale-estimates.json)。原始实测字段保持 `null`；后续收到资料时保留 `v001`，新增参数版本并关联真实参考 ID。
 

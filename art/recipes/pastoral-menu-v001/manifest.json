@@ -34,7 +34,7 @@
       "将所列源文件、对应 meta 与 Resources Shader 一并导入正式 Unity 工程。",
       "OnGUI 使用 MobileTabletop.GuiMatrix，并在 EventType.Repaint 调用矢量风景绘制入口。",
       "提供同一显示时间值时，由固定参数重新生成相同布局；控件使用独立暖白与森林绿样式。",
-      "正式 Windows 构建及图形验收参照 docs/MENU_AUDIO_V001.md 和对应验证摘要。"
+      "正式 Windows 构建及图形验收参照 docs/archive/专项迭代/MENU_AUDIO_V001.md 和对应验证摘要。"
     ],
     "layoutRandomness": "固定序号加数学噪声；不调用 UnityEngine.Random，不访问规则随机状态",
     "animationClock": "Time.unscaledTime，仅参与显示",

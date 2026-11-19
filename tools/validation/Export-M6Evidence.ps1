@@ -50,7 +50,7 @@ $m6IdentityPaths = @(
     'tools\validation\Test-M6Rules.ps1',
     'tools\validation\Export-M6Evidence.ps1'
 )
-$m6IdentityPaths += @('README.md','docs\ROADMAP.md','docs\M6_ACCEPTANCE.md','docs\M6_ARCHITECTURE.md','docs\M6_PLAYTEST.md','docs\M6_STRATEGY.md')
+$m6IdentityPaths += @('README.md','docs\archive\里程碑\ROADMAP.md','docs\archive\里程碑\M6_ACCEPTANCE.md','docs\archive\里程碑\M6_ARCHITECTURE.md','docs\archive\里程碑\M6_PLAYTEST.md','docs\archive\里程碑\M6_STRATEGY.md')
 $m6IdentityPaths += Get-ChildItem -LiteralPath (Join-Path $m6RepoRoot 'src\Catan.AI') -File | ForEach-Object { $_.FullName.Substring($m6RepoRoot.Length+1) }
 $m6IdentityPaths += Get-ChildItem -LiteralPath (Join-Path $m6RepoRoot 'Unity\Catan\Assets\Scripts') -Filter '*.cs' | Where-Object { $_.Name -match '^M([2-5](App|LocalGameHost)|6)' } | ForEach-Object { $_.FullName.Substring($m6RepoRoot.Length+1) }
 $m6IdentityPaths += Get-ChildItem -LiteralPath (Join-Path $m6RepoRoot 'tools\development') -Filter 'Build-M*.ps1' | ForEach-Object { $_.FullName.Substring($m6RepoRoot.Length+1) }

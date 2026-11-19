@@ -68,7 +68,7 @@
 
 ## 条款与独立案例对应
 
-核心案例位于 [M4CoreRulesTests.cs](../tests/Catan.Rules.Tests/M4CoreRulesTests.cs)，卡牌案例位于 [M4ProgressCardTests.cs](../tests/Catan.Rules.Tests/M4ProgressCardTests.cs)，保存与权限案例位于 [M4PersistenceTests.cs](../tests/Catan.Rules.Tests/M4PersistenceTests.cs)。这里登记精确方法名，实际整套结果见 [M4 验收记录](M4_ACCEPTANCE.md)。
+核心案例位于 [M4CoreRulesTests.cs](../tests/Catan.Rules.Tests/M4CoreRulesTests.cs)，卡牌案例位于 [M4ProgressCardTests.cs](../tests/Catan.Rules.Tests/M4ProgressCardTests.cs)，保存与权限案例位于 [M4PersistenceTests.cs](../tests/Catan.Rules.Tests/M4PersistenceTests.cs)。这里登记精确方法名，实际整套结果见 [M4 验收记录](archive/里程碑/M4_ACCEPTANCE.md)。
 
 | 条款 | 独立案例 |
 | --- | --- |

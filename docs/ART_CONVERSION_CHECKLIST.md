@@ -21,7 +21,7 @@
 | [x] | 村庄 | 参数化模型 | 既有样板工程验证；单照近似、未知隐藏面 |
 | [x] | 道路 | 参数化模型 | 既有样板工程验证；单照近似、未知底面 |
 
-产物与入口：[第一批样板说明](PHOTO_SAMPLES_V001.md)。
+产物与入口：[第一批样板说明](archive/专项迭代/PHOTO_SAMPLES_V001.md)。
 
 ## 本轮分类型流水线
 
@@ -71,7 +71,7 @@
 ## 路径与运行
 
 - 来源索引：[目录清点与任务定义](../art/recipes/entity-conversion-v001/catalog.json)。
-- 本轮结果：[交付与验证说明](ART_CONVERSION_V001.md)；[跨类型审计](verification/entity-conversion-v001/pipeline-audit.json)。
+- 本轮结果：[交付与验证说明](archive/专项迭代/ART_CONVERSION_V001.md)；[跨类型审计](verification/entity-conversion-v001/pipeline-audit.json)。
 - 当前全量清点：[135 张原照来源与资产审计](../art/recipes/entity-conversion-v003/progress-politics/photo-coverage-audit.json)。
 - 通用生成与验证：`tools/art/Build-EntityAssets.ps1 -Type <类型ID>`。
 - 校正：`tools/art/rectify_entity_photos.py --recipe <recipe.json>`。
@@ -93,7 +93,7 @@
 | [x] | 三色骑士 `player-knights` | 18 | [配方](../art/recipes/entity-conversion-v002/player-knights/README.md)；[回读](../art/exports/entity-conversion-v002/player-knights/verification.json) | 已验证 |
 | [x] | 三色建筑与城墙组合 `player-buildings` | 18 | [配方](../art/recipes/entity-conversion-v002/player-buildings/README.md)；[回读](../art/exports/entity-conversion-v002/player-buildings/verification.json) | 已验证 |
 
-v002 公开视图渲染入口：已有验证通过记录。村庄、城市、城墙、大都会和骑士按玩家席位选择资产；规则与保存格式不变。本轮全资源正式运行状态见 v003；最终外观、实测尺寸及长局性能仍待验。[追加批次说明](ART_CONVERSION_V002.md)。
+v002 公开视图渲染入口：已有验证通过记录。村庄、城市、城墙、大都会和骑士按玩家席位选择资产；规则与保存格式不变。本轮全资源正式运行状态见 v003；最终外观、实测尺寸及长局性能仍待验。[追加批次说明](archive/专项迭代/ART_CONVERSION_V002.md)。
 
 
 ## 蓝色政治进步卡背面补转 v003
@@ -121,7 +121,7 @@ v002 公开视图渲染入口：已有验证通过记录。村庄、城市、城
 
 棋盘已接入八种有地块照片的板块；2026-10-15 高山照片 v006 替换了原先从矿石资源卡裁切的 v004 顶图，见文末。资源卡显示于本人手牌面板；城市与骑士及组合增加商品、进步卡、城市设施和公开奖励卡面。悬停放大、点击固定查看、已有背面翻面；私有卡面限定当前 PlayerView，换座或隐私幕清空。船、强盗、海盗、商人和蛮族轨道/船使用实体参考模型。八种照片板块是有厚度的印刷板块网格，不代表立体景观。
 
-查看与重建：`tools/development/Play-M6.ps1`；`tools/development/Build-EntityIntegration.ps1`；`tools/validation/Test-EntityIntegration.ps1`。当前 M6 是本轮正式入口，旧独立阶段程序和图库记录按原批次保留。[接入说明与验证范围](ART_INTEGRATION_V003.md)。
+查看与重建：`tools/development/Play-M6.ps1`；`tools/development/Build-EntityIntegration.ps1`；`tools/validation/Test-EntityIntegration.ps1`。当前 M6 是本轮正式入口，旧独立阶段程序和图库记录按原批次保留。[接入说明与验证范围](archive/专项迭代/ART_INTEGRATION_V003.md)。
 
 
 ## 铁矿卡片插画派生板块 v004（2026-10-11，历史记录；已由 v006 替换）
@@ -134,7 +134,7 @@ v002 公开视图渲染入口：已有验证通过记录。村庄、城市、城
 
 [配方与复现](../art/recipes/entity-conversion-v004/ore-tile/README.md)；[回读](../art/exports/entity-conversion-v004/ore-tile/verification.json)；[干净重建](../art/exports/entity-conversion-v004/ore-tile/clean-rebuild-verification.json)；[Unity 导入](verification/ore-tile-v004/unity-import.json)；[正式显示](verification/ore-tile-v004/runtime-integration.json)；[人工目检](verification/ore-tile-v004/visual-review.json)。
 
-运行通过要求 `oreUsesFlatCardArt=true`，且基础、航海家、城市骑士、组合四类各含俯视与游戏相机证据。本轮仅改外观，不重复宣称规则测试或完整 M6 保存恢复验收；最终外观与 M8 退出条件仍待确认。[本轮说明](ART_ORE_TILE_V004.md)。
+运行通过要求 `oreUsesFlatCardArt=true`，且基础、航海家、城市骑士、组合四类各含俯视与游戏相机证据。本轮仅改外观，不重复宣称规则测试或完整 M6 保存恢复验收；最终外观与 M8 退出条件仍待确认。[本轮说明](archive/专项迭代/ART_ORE_TILE_V004.md)。
 
 ## 实体港口、数字背面与卡坦分标记 v005（2026-10-14）
 
@@ -156,6 +156,6 @@ v002 公开视图渲染入口：已有验证通过记录。村庄、城市、城
 
 Blender 回读与干净重建、Unity 导入、Windows 构建、四模式俯视／游戏相机八张渲染图、矿石手牌来源隔离、预览／碰撞与独立保存恢复均通过；相关 .NET 112 项通过。用户最终外观、实物测量、未知背面及长期性能待验，M7／M8 状态保留。
 
-[原件归档](../assets/references/archives/mountain-tile-v006/README.md)；[配方与复现](../art/recipes/entity-conversion-v006/ore-tile/README.md)；[回读](../art/exports/entity-conversion-v006/ore-tile/verification.json)；[干净重建](../art/exports/entity-conversion-v006/ore-tile/clean-rebuild-verification.json)；[Unity 导入](verification/mountain-tile-v006/unity-import.json)；[正式显示](verification/mountain-tile-v006/runtime-integration.json)；[本轮说明](ART_MOUNTAIN_TILE_V006.md)；[验证摘要](verification/mountain-tile-v006/summary.json)。
+[原件归档](../assets/references/archives/mountain-tile-v006/README.md)；[配方与复现](../art/recipes/entity-conversion-v006/ore-tile/README.md)；[回读](../art/exports/entity-conversion-v006/ore-tile/verification.json)；[干净重建](../art/exports/entity-conversion-v006/ore-tile/clean-rebuild-verification.json)；[Unity 导入](verification/mountain-tile-v006/unity-import.json)；[正式显示](verification/mountain-tile-v006/runtime-integration.json)；[本轮说明](archive/专项迭代/ART_MOUNTAIN_TILE_V006.md)；[验证摘要](verification/mountain-tile-v006/summary.json)。
 
 当前入口：[CatanM6.exe](../.local/m6-mountain-v006/Builds/Windows/CatanM6.exe)。上方各旧批次的数量与程序链接属于历史记录。

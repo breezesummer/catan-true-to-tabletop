@@ -12,4 +12,4 @@
 
 Unity 导入与当前 Windows 构建：`powershell -NoProfile -ExecutionPolicy Bypass -File tools/development/Build-M6.ps1 -ImportMountainTile -VerifyPlayer`。
 
-完整验证与可玩入口见 [本轮说明](../../../../docs/ART_MOUNTAIN_TILE_V006.md)。
+完整验证与可玩入口见 [本轮说明](../../../../docs/archive/专项迭代/ART_MOUNTAIN_TILE_V006.md)。

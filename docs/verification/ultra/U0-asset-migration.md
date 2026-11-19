@@ -28,7 +28,7 @@
 
 三个航海家剧本并列最大，建议性能最大地图选四人 `wonders-of-catan`，另用拥挤的四人组合地图覆盖骑士、城墙、大都会和蛮族船。最大组合地图为 42 格。性能局面具体状态与镜头路线以 [U0 基线](U0-baseline.md) 为准。
 
-`CombinedScenarios.Ids` 仅包含表中两个剧本。其他七个航海家剧本、5–6 人扩充和收藏版特殊规则不因主题开发而成为组合模式支持项。航海家额外随机地形变体仍按 [M3 范围](../../M3_SCENARIOS.md) 登记；组合的新局随机化及旧固定存档兼容按 [M5 范围](../../M5_SCENARIOS.md) 登记。
+`CombinedScenarios.Ids` 仅包含表中两个剧本。其他七个航海家剧本、5–6 人扩充和收藏版特殊规则不因主题开发而成为组合模式支持项。航海家额外随机地形变体仍按 [M3 范围](../../M3_SCENARIOS.md) 登记；组合的新局随机化及旧固定存档兼容按 [M5 范围](../../archive/里程碑/M5_SCENARIOS.md) 登记。
 
 规则 PDF 的实际本地目录为 `.local/reference-cache/official-2025/v001/`；本文引用页码均从 PDF 第 1 页起计。参考入口见 [本地规则索引](../../../assets/references/rules/README.md)。
 

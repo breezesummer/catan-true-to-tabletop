@@ -16,14 +16,8 @@ from fetch_rule_references import restore
 from verify_three_kingdoms_b0 import source_inventory
 
 
-def verify_documents():
-    checks = []
-    def require(ok, label):
-        if not ok:
-            raise AssertionError(label)
-        checks.append(label)
-    folder = ROOT / 'docs/harbor-fishing'
-    manifest = json.loads((ROOT / 'assets/references/rules/traders-barbarians-v001/sources.json').read_text())
+def verify_sources(require):
+    manifest = json.loads((ROOT / 'assets/references/rules/traders-barbarians-v001/sources.json').read_text(encoding='utf-8'))
     require({s['id'] for s in manifest['sources']} == {'TB25','TB20','FCK','FSF','FAQ','INDEX'}, '四份PDF与FAQ／目录快照完整')
     for s in manifest['sources']:
         with contextlib.redirect_stdout(io.StringIO()):
@@ -31,29 +25,43 @@ def verify_documents():
         require(True, f"{s['id']}原始字节数及SHA-256一致")
         if 'pdfPageCount' in s:
             require(all(1 <= p <= s['pdfPageCount'] for p in s['applicablePages']), f"{s['id']}引用页码范围有效")
-    source = source_inventory((ROOT / 'docs/三国争霸游戏百科.md').read_text())['武将']
-    pinned = json.loads((folder / 'F0技能来源指纹.json').read_text())['武将']
-    require(source == pinned, '百科54将原文指纹一致')
-    audit = (folder / 'F0三国技能审查.md').read_text()
+
+
+def verify_contracts(require):
+    folder = ROOT / 'docs/harbor-fishing'
+    fingerprints = json.loads((folder / 'F0技能来源指纹.json').read_text(encoding='utf-8'))
+    source = source_inventory((ROOT / fingerprints['源文件']).read_text(encoding='utf-8'))['武将']
+    require(source == fingerprints['武将'], 'F0采用的54将资料与当期指纹一致')
+    audit = (folder / 'F0三国技能审查.md').read_text(encoding='utf-8')
     rows = re.findall(r'^\| W(\d{2}) \| (.+?) \| (.+?) \| (.+?) \|$', audit, re.M)
     require([int(r[0]) for r in rows] == list(range(1,55)), 'W01—W54逐将覆盖无遗漏')
     require(sum(len(g['技能']) for g in source) == 97, '97项技能完整')
     for row,g in zip(rows, source):
         require(row[2].split('、') == g['技能'] and bool(row[3].strip()), f"W{row[0]}技能与裁决登记一致")
-    contract = (folder / 'F0规则定稿.md').read_text()
+    contract = (folder / 'F0规则定稿.md').read_text(encoding='utf-8')
     require(re.findall(r'^### (D\d{2}) ', contract, re.M) == [f'D{i:02}' for i in range(1,8)], '七项闭合裁决完整')
-    cases = json.loads((folder / 'F0固定局面.json').read_text())['cases']
+    cases = json.loads((folder / 'F0固定局面.json').read_text(encoding='utf-8'))['cases']
     require(len(cases) == 32 and len({c['id'] for c in cases}) == 32, '32项固定案例无重复')
     require({c['decision'] for c in cases} == {f'D{i:02}' for i in range(1,8)}, '案例覆盖七项裁决')
     for c in cases:
         require(all(c.get(k) for k in ('given','expected','source','stage')), f"{c['id']}输入、预期、来源和执行边界齐全")
-    maps = (folder / 'F0地图兼容表.md').read_text()
+    maps = (folder / 'F0地图兼容表.md').read_text(encoding='utf-8')
     require(len(re.findall(r'^\| (?!地图|---).+? \|',maps,re.M)) == 10, '标准与九海图覆盖完整')
     for file in list(folder.glob('*.md')) + [ROOT/'docs/海港大师与捕鱼实施方案.md',ROOT/'assets/references/rules/README.md']:
-        for target in re.findall(r'\]\(([^)]+)\)',file.read_text()):
+        for target in re.findall(r'\]\(([^)]+)\)',file.read_text(encoding='utf-8')):
             if '://' in target or target.startswith('#'):
                 continue
             require((file.parent/target.split('#')[0]).resolve().exists(), f'{file.name}链接有效：{target}')
+
+
+def verify_documents():
+    checks = []
+    def require(ok, label):
+        if not ok:
+            raise AssertionError(label)
+        checks.append(label)
+    verify_contracts(require)
+    verify_sources(require)
     return checks
 
 

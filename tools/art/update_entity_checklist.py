@@ -121,7 +121,7 @@ def ore_section():
             '[画面核对](verification/mountain-tile-v006/visual-review.json)。', '',
             '运行通过要求 `oreUsesMountainTileArt=true`、`oreCardUnchanged=true`，且四类各含俯视与游戏相机证据。'
             '本轮验证范围以独立摘要为准；最终外观与 M8 退出条件仍待确认。'
-            '[本轮说明](ART_MOUNTAIN_TILE_V006.md)。', '']
+            '[本轮说明](archive/专项迭代/ART_MOUNTAIN_TILE_V006.md)。', '']
 
 
 def integration_section(coverage):
@@ -145,7 +145,7 @@ def integration_section(coverage):
              '查看与重建：`tools/development/Play-M6.ps1`；'
              '`tools/development/Build-EntityIntegration.ps1`；`tools/validation/Test-EntityIntegration.ps1`。'
              '当前 M6 是本轮正式入口，旧独立阶段程序和图库记录按原批次保留。'
-             '[接入说明与验证范围](ART_INTEGRATION_V003.md)。', '']
+             '[接入说明与验证范围](archive/专项迭代/ART_INTEGRATION_V003.md)。', '']
     return lines
 
 
@@ -193,7 +193,7 @@ def player_components_section():
         lines.append(f"| [{'x' if done else ' '}] | {label} `{key}` | {len(ids)} | {proof} | {'已验证' if ids and ids.issubset(imported) else '待验证'} |")
     lines += ['', 'v002 公开视图渲染入口：' + ('已有验证通过记录' if runtime.get('status') == 'passed' else '接入验证中') +
               '。村庄、城市、城墙、大都会和骑士按玩家席位选择资产；规则与保存格式不变。'
-              '本轮全资源正式运行状态见 v003；最终外观、实测尺寸及长局性能仍待验。[追加批次说明](ART_CONVERSION_V002.md)。', '']
+              '本轮全资源正式运行状态见 v003；最终外观、实测尺寸及长局性能仍待验。[追加批次说明](archive/专项迭代/ART_CONVERSION_V002.md)。', '']
     return lines
 
 
@@ -221,7 +221,7 @@ def update():
              '| [x] | 木头资源卡 | 正反贴图＋双面卡网格 | 既有样板工程验证；AI 清理候选、用户外观待确认 |',
              '| [x] | 村庄 | 参数化模型 | 既有样板工程验证；单照近似、未知隐藏面 |',
              '| [x] | 道路 | 参数化模型 | 既有样板工程验证；单照近似、未知底面 |', '',
-             '产物与入口：[第一批样板说明](PHOTO_SAMPLES_V001.md)。', '',
+             '产物与入口：[第一批样板说明](archive/专项迭代/PHOTO_SAMPLES_V001.md)。', '',
              '## 本轮分类型流水线', '',
              '| 进度 | 类型 / 子任务 ID | 内容与变体 | 照片数 | 产物和证据 | Unity 导入 |',
              '| --- | --- | --- | --- | --- | --- |']
@@ -272,7 +272,7 @@ def update():
               '| 城市与骑士 | 商品/保卫者卡背面；事件骰；三种大都会身份标记；独立城墙多视图 | 蓝色进步卡背面已提供并补转 v003；其余缺背面使用明确中性底色 |', '',
               '## 路径与运行', '',
               '- 来源索引：[目录清点与任务定义](../art/recipes/entity-conversion-v001/catalog.json)。',
-              '- 本轮结果：[交付与验证说明](ART_CONVERSION_V001.md)；[跨类型审计](verification/entity-conversion-v001/pipeline-audit.json)。',
+              '- 本轮结果：[交付与验证说明](archive/专项迭代/ART_CONVERSION_V001.md)；[跨类型审计](verification/entity-conversion-v001/pipeline-audit.json)。',
               '- 当前全量清点：[135 张原照来源与资产审计](../art/recipes/entity-conversion-v003/progress-politics/photo-coverage-audit.json)。',
               '- 通用生成与验证：`tools/art/Build-EntityAssets.ps1 -Type <类型ID>`。',
               '- 校正：`tools/art/rectify_entity_photos.py --recipe <recipe.json>`。',
