@@ -11,7 +11,6 @@ public sealed partial class TabletopUiVerification
     {
         int flag = Array.IndexOf(args, "--pier-views");
         mode = "combined";
-        BoardArtPreference.Select(false, persist: false);
         app.ReadSave(args[flag + 1]);
         yield return null;
         yield return null;

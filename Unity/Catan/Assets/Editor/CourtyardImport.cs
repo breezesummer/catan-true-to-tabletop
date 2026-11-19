@@ -9,7 +9,7 @@ using UnityEngine;
 public static class CourtyardImport
 {
     public const string Art="Assets/Art/Courtyard/v003/";
-    public const string Resource="Assets/Resources/ThreeKingdoms/v003/";
+    public const string Preview=Art+"Editor/";
     [Serializable] class Catalog {public Entry[] materials;}
     [Serializable] class Entry {public string name,baseColor,metalRough,normal;public float[] color;public float metallic,roughness,normalScale;}
     [Serializable] class PlayerColours { public PlayerColour[] colours; }
@@ -17,7 +17,7 @@ public static class CourtyardImport
     [MenuItem("Catan/美术/导入四色庭院")]
     public static void Run()
     {
-        Directory.CreateDirectory(Resource);AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        Directory.CreateDirectory(Preview);AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         var catalog=JsonUtility.FromJson<Catalog>(File.ReadAllText(Art+"materials.json"));
         var normals=new HashSet<string>(catalog.materials.Select(m=>m.normal));
         var data=new HashSet<string>(catalog.materials.Select(m=>m.metalRough));
@@ -62,15 +62,15 @@ public static class CourtyardImport
         float scale=.018f/Mathf.Max(bounds.size.x,bounds.size.z);model.transform.localScale*=scale;model.transform.localPosition=new Vector3(-bounds.center.x,-bounds.min.y,-bounds.center.z)*scale;
         bounds=renderers[0].bounds;foreach(var r in renderers)bounds.Encapsulate(r.bounds);
         if(Mathf.Abs(bounds.min.y)>.00001f||bounds.size.x>.0181f||bounds.size.z>.0181f||root.GetComponentsInChildren<Collider>().Length!=0)throw new InvalidOperationException("庭院尺寸/碰撞验收失败："+bounds);
-        PrefabUtility.SaveAsPrefabAsset(root,Resource+"courtyard-red.prefab");UnityEngine.Object.DestroyImmediate(root);
-        string thumbnail=Resource+"thumbnail-red.png";var imageImporter=(TextureImporter)AssetImporter.GetAtPath(thumbnail);imageImporter.isReadable=true;imageImporter.alphaIsTransparency=true;imageImporter.maxTextureSize=1024;imageImporter.wrapMode=TextureWrapMode.Clamp;imageImporter.SaveAndReimport();
+        PrefabUtility.SaveAsPrefabAsset(root,Preview+"courtyard-red.prefab");UnityEngine.Object.DestroyImmediate(root);
+        string thumbnail=Preview+"thumbnail-red.png";var imageImporter=(TextureImporter)AssetImporter.GetAtPath(thumbnail);imageImporter.isReadable=true;imageImporter.alphaIsTransparency=true;imageImporter.maxTextureSize=1024;imageImporter.wrapMode=TextureWrapMode.Clamp;imageImporter.SaveAndReimport();
         ImportPlayerColours();
         AssetDatabase.SaveAssets();Debug.Log("CATAN_COURTYARD_IMPORT_OK bounds="+bounds.size.ToString("F6")+" materials="+materials.Count);
     }
     static void ImportPlayerColours()
     {
         var colours=JsonUtility.FromJson<PlayerColours>(File.ReadAllText(Art+"player-colours.json"));
-        var red=AssetDatabase.LoadAssetAtPath<GameObject>(Resource+"courtyard-red.prefab");
+        var red=AssetDatabase.LoadAssetAtPath<GameObject>(Preview+"courtyard-red.prefab");
         foreach(var colour in colours.colours)
         {
             var root=UnityEngine.Object.Instantiate(red);root.name="courtyard-"+colour.key;
@@ -104,11 +104,11 @@ public static class CourtyardImport
                     EditorUtility.SetDirty(mat);cache.Add(source,mat);return mat;
                 }).ToArray();
             }
-            PrefabUtility.SaveAsPrefabAsset(root,Resource+"courtyard-"+colour.key+".prefab");UnityEngine.Object.DestroyImmediate(root);
+            PrefabUtility.SaveAsPrefabAsset(root,Preview+"courtyard-"+colour.key+".prefab");UnityEngine.Object.DestroyImmediate(root);
         }
         foreach(string key in new[]{"red","blue","orange","beige"})
         {
-            var ti=(TextureImporter)AssetImporter.GetAtPath(Resource+"thumbnail-"+key+".png");
+            var ti=(TextureImporter)AssetImporter.GetAtPath(Preview+"thumbnail-"+key+".png");
             ti.isReadable=true;ti.alphaIsTransparency=true;ti.maxTextureSize=1024;ti.wrapMode=TextureWrapMode.Clamp;ti.SaveAndReimport();
         }
     }

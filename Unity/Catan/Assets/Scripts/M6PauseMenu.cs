@@ -109,24 +109,6 @@ public sealed partial class M6App
         try{AcceptedSettings(ref tablePauseSettingsTab,true);}
         finally{GUI.matrix=matrix;}
     }
-    static readonly string[] boardArtNames={"2D 绘图","3D 模型"};
-
-    internal void SelectBoardArt(bool painted)
-    {
-        BoardArtPreference.Select(painted);
-        // 仅重绘公开的沿岸摆件，保留手中的棋子和正在进行的操作。
-        switch(presentation)
-        {
-            case M2App basic when basic.M6View!=null: basic.VerificationBoard.RefreshReferenceMarkers(basic.M6View);break;
-            case M3App sailing when sailing.M6View!=null:
-                sailing.VerificationBoard.RefreshReferenceMarkers(sailing.M6View);
-                sailing.VerificationBoard.RefreshSeafarers(sailing.M6View.Board.Ships,sailing.M6View.Board.PirateTileId);break;
-            case M4App cities when cities.M6View!=null: cities.VerificationBoard.RefreshReferenceMarkers(cities.M6View);break;
-            case M5App combined when combined.M6View!=null:
-                combined.VerificationBoard.RefreshReferenceMarkers(combined.M6View);
-                combined.VerificationBoard.RefreshSeafarers(combined.M6View.Board.Ships,combined.M6View.Board.PirateTileId);break;
-        }
-    }
     void DrawTablePauseView()
     {
         Caption(new Rect(203,328,289,56),"牌桌视角");

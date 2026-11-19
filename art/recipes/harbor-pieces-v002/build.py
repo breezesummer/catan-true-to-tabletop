@@ -169,7 +169,7 @@ scene.render.filepath=str(stage/('海盗精雕.png' if only_pirate else '模型�
 source_name='海盗精雕.blend' if only_pirate else '海湾棋子.blend'
 bpy.data.libraries.write(str(stage/source_name),{scene},fake_user=True,compress=True)
 for f in stage.iterdir():
-    dst=recipe if f.name in (source_name,'模型合照.png','海盗精雕.png') else RES if f.name.startswith('thumb-') else destination
+    dst=recipe if f.name in (source_name,'模型合照.png','海盗精雕.png') else destination
     shutil.copy2(f,dst/f.name)
 manifest=common/'几何.json';prior=json.loads(manifest.read_text('utf8'))
 by_kind={i['kind']:i for i in prior}

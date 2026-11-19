@@ -33,8 +33,8 @@ public sealed class TabletopPieceCache
     {
         foreach(var key in entries.Keys.Where(k=>k.StartsWith(prefix,StringComparison.Ordinal)&&!touched.Contains(k)).ToArray())Remove(key);
     }
-    static Material outline,paintedOutline;
-    static MaterialPropertyBlock inkProperties;
+    static Material outline;
+    static MaterialPropertyBlock outlineProperties;
     bool FindPiece(string target,out Entry entry)
     {
         entry=null;
@@ -61,24 +61,10 @@ public sealed class TabletopPieceCache
             if(mesh==null||!filter.gameObject.activeInHierarchy)continue;
             var r=filter.GetComponent<MeshRenderer>();
             if(r==null||!r.enabled||r.forceRenderingOff)continue;
-            var source=r.sharedMaterial;var material=outline;
-            if(inkProperties==null)inkProperties=new MaterialPropertyBlock();
-            inkProperties.Clear();
-            inkProperties.SetFloat("_Selected",selected?1:0);
-            MaterialPropertyBlock properties=inkProperties;
-            if(source!=null&&source.shader.name=="Catan/FantasyInk"){
-                if(paintedOutline==null){
-                    var shader=Resources.Load<Shader>("PaintedPieceTargetOutline");
-                    if(shader==null)continue;
-                    paintedOutline=new Material(shader){hideFlags=HideFlags.HideAndDontSave};
-                }
-                if(inkProperties==null)inkProperties=new MaterialPropertyBlock();
-                inkProperties.SetTexture("_BaseMap",source.mainTexture);
-                inkProperties.SetFloat("_Atlas",source.GetFloat("_Atlas"));
-                material=paintedOutline;properties=inkProperties;
-            }
+            if(outlineProperties==null)outlineProperties=new MaterialPropertyBlock();
+            outlineProperties.SetFloat("_Selected",selected?1:0);
             for(int sub=0;sub<mesh.subMeshCount;sub++)
-                Graphics.DrawMesh(mesh,filter.transform.localToWorldMatrix,material,filter.gameObject.layer,camera,sub,properties,UnityEngine.Rendering.ShadowCastingMode.Off,false);
+                Graphics.DrawMesh(mesh,filter.transform.localToWorldMatrix,outline,filter.gameObject.layer,camera,sub,outlineProperties,UnityEngine.Rendering.ShadowCastingMode.Off,false);
         }
     }
     public string BuildingUnderRay(Ray ray)

@@ -13,7 +13,6 @@ public sealed class ThreeKingdomsBoardPresentation
     {
         foreach(var pose in changed)if(pose.Item!=null){
             pose.Item.localRotation=pose.Rotation;pose.Item.localScale=pose.Scale;
-            pose.Item.GetComponentInChildren<FantasyBoardPiece>()?.SetDamaged(false);
         }
         changed.Clear();
     }
@@ -29,7 +28,6 @@ public sealed class ThreeKingdomsBoardPresentation
                 if(asset.Kind!="Road" && asset.Kind!="Ship" && asset.Kind!="Settlement")continue;
                 if(label!=(asset.Kind=="Ship"?"Ship ":"")+asset.LocationId)continue;
                 changed.Add(new Pose{Item=item,Rotation=item.localRotation,Scale=item.localScale});
-                item.GetComponentInChildren<FantasyBoardPiece>()?.SetDamaged(true);
                 if(asset.Kind=="Road"||asset.Kind=="Ship")item.localRotation*=Quaternion.Euler(0,90,0);
                 else if(asset.Kind=="Settlement")item.localScale=Vector3.Scale(item.localScale,new Vector3(1,.35f,1));
             }

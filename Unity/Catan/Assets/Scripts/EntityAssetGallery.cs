@@ -27,6 +27,14 @@ public sealed class EntityAssetGallery : MonoBehaviour
 
     static bool IsStandingPiece(EntityAssetCatalog.Entry entry) => entry.kind=="custom"&&entry.typeId!="barbarian-track";
 
+    // 旧卡的预制件由独立展厅场景持有，正式游戏只加载现行牌面。
+    public GameObject[] GalleryCards = Array.Empty<GameObject>();
+    GameObject LoadPrefab(EntityAssetCatalog.Entry entry)
+    {
+        return Array.Find(GalleryCards, card => card != null && card.name == entry.id)
+            ?? Resources.Load<GameObject>(entry.resource);
+    }
+
     void Awake()
     {
         var text=Resources.Load<TextAsset>(CatalogResource);
@@ -41,7 +49,7 @@ public sealed class EntityAssetGallery : MonoBehaviour
         if(Current!=null) {Current.SetActive(false);Destroy(Current);}
         Index=(index+Catalog.assets.Length)%Catalog.assets.Length;
         var entry=Catalog.assets[Index];
-        var prefab=Resources.Load<GameObject>(entry.resource);
+        var prefab=LoadPrefab(entry);
         if(prefab==null) throw new InvalidOperationException("Missing prefab "+entry.id);
         Current=Instantiate(prefab); Current.name=entry.id;
         supportHeight=entry.height;Back=false; Yaw=180; UpdateTransform(); SetView(View);
@@ -53,7 +61,7 @@ public sealed class EntityAssetGallery : MonoBehaviour
         var previous=Current.transform.Find("Assembly insert");
         if(previous!=null){previous.gameObject.SetActive(false);Destroy(previous.gameObject);}
         var entry=Catalog.assets.Single(a=>a.id==id);
-        var model=Resources.Load<GameObject>(entry.resource);
+        var model=LoadPrefab(entry);
         if(model==null)throw new InvalidOperationException("Assembly insert missing: "+id);
         var insert=Instantiate(model,Current.transform,false);insert.name="Assembly insert";
         var renderers=Current.GetComponentsInChildren<Renderer>();var bounds=renderers[0].bounds;
@@ -93,7 +101,7 @@ public sealed class EntityAssetGallery : MonoBehaviour
             }
             else
             {
-                var prefab=Resources.Load<GameObject>(entry.resource);
+                var prefab=LoadPrefab(entry);
                 for(var neighbour=-1;neighbour<=1;neighbour+=2)
                     Instantiate(prefab,new Vector3(neighbour*entry.width*1.05f,0,0),Quaternion.Euler(0,Yaw,0),context.transform);
                 span=Mathf.Max(entry.width*3.2f,entry.depth);

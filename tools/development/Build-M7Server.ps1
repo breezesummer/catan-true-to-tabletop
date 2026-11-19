@@ -1,5 +1,5 @@
 param(
-    [string]$OutputRoot = 'game version/1.7/Catan1.7.3-Combined-Scenarios',
+    [string]$OutputRoot = (& (Join-Path $PSScriptRoot 'Get-GameBuildRoot.ps1')),
     [ValidateSet('win-x64','linux-x64','linux-arm64')][string]$Runtime = 'win-x64'
 )
 $ErrorActionPreference = 'Stop'

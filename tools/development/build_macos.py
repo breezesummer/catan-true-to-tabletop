@@ -261,16 +261,18 @@ def retain():
     root = ROOT / 'game version'
     parents = [root] + [p for p in root.iterdir() if p.is_dir() and not p.is_symlink()
                        and re.fullmatch(r'\d+\.\d+', p.name)]
-    candidates = []
+    by_series = {}
     for parent in parents:
         for path in parent.iterdir():
             match = re.match(r'^Catan(\d+)\.(\d+)\.(\d+)(?:-.+)?$', path.name)
             if (match and path.is_dir() and not path.is_symlink() and
                     not (path / 'release').exists() and not (path / '正式发布.txt').exists()):
+                candidates = by_series.setdefault(match.groups()[:2], [])
                 candidates.append((tuple(map(int, match.groups())), path.stat().st_mtime, path))
-    for _, _, path in sorted(candidates, reverse=True)[5:]:
-        shutil.rmtree(path)
-        print(f'已清理超出最近五版的内测目录：{path.name}')
+    for candidates in by_series.values():
+        for _, _, path in sorted(candidates, reverse=True)[5:]:
+            shutil.rmtree(path)
+            print(f'已清理超出最近五版的内测目录：{path.name}')
 
 
 def main():
@@ -278,7 +280,7 @@ def main():
                                      add_help=False, usage='%(prog)s [选项]')
     parser.add_argument('-h', '--help', action='help', help='显示参数说明并退出')
     parser._optionals.title = '可选参数'
-    parser.add_argument('--target', choices=('all', 'windows', 'android', 'server'), default='all', help='构建目标，默认全部')
+    parser.add_argument('--target', choices=('all', 'windows', 'android', 'server'), default='windows', help='构建目标，默认 Windows')
     parser.add_argument('--output-root', type=Path, help='game version 内的输出目录')
     parser.add_argument('--arm64-only', action='store_true', help='Android 仅构建 ARM64')
     parser.add_argument('--runtime', choices=('win-x64', 'linux-x64', 'linux-arm64'), default='win-x64', help='服务端目标运行时')
@@ -305,7 +307,11 @@ def main():
         print(json.dumps({'游戏版本': value, '构建宿主': 'macOS', '工具路径': {k: str(v) for k, v in tool.items()},
                           '原内测签名文件存在': (LOCAL / 'credentials/android/catan-internal.keystore').exists()}, ensure_ascii=False, indent=2))
         return
-    suffix = '-CrossPlatformBuild' + ('-SigningTest' if args.test_signing else '')
+    settings = (ROOT / 'AGENTS.md').read_text(encoding='utf-8')
+    description = re.search(r'^构建短述：([A-Za-z0-9]+(?:-[A-Za-z0-9]+)*)$', settings, re.MULTILINE)
+    if not description:
+        raise RuntimeError('AGENTS.md 缺少有效的构建短述。')
+    suffix = '-' + description.group(1) + ('-SigningTest' if args.test_signing else '')
     requested = args.output_root or Path(f'game version/{".".join(value.split(".")[:2])}/Catan{value}{suffix}')
     output = (requested if requested.is_absolute() else ROOT / requested).resolve()
     if ROOT / 'game version' not in output.parents:

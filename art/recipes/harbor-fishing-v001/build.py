@@ -90,6 +90,8 @@ names=['fish-1','ground-4'] if STAGE=='sample' else ['fish-1','fish-2','fish-3',
 if STAGE=='boot':names=['old-boot']
 report=[]
 for name in names:
+    output = OUT if name in ('fish-back', 'harbormaster') else ROOT / 'Unity/Catan/Assets/Art/HarborFishing/v001'
+    output.mkdir(parents=True, exist_ok=True)
     objects=create(name)
     bpy.ops.object.select_all(action='DESELECT')
     for o in objects:o.select_set(True)
@@ -104,11 +106,11 @@ for name in names:
     bpy.ops.object.select_all(action='DESELECT')
     for o in objects:o.select_set(True)
     bpy.context.view_layer.objects.active=objects[0]
-    bpy.ops.export_scene.fbx(filepath=str(OUT/(name+'.fbx')),use_selection=True,object_types={'MESH'},apply_unit_scale=True,axis_forward='-Z',axis_up='Y',bake_anim=False)
+    bpy.ops.export_scene.fbx(filepath=str(output/(name+'.fbx')),use_selection=True,object_types={'MESH'},apply_unit_scale=True,axis_forward='-Z',axis_up='Y',bake_anim=False)
     camera.location=(0,-.06,.042) if name=='old-boot' else (0,-.06,.15)
     target=Vector((0,0,.006 if name=='old-boot' else 0));camera.rotation_euler=(target-camera.location).to_track_quat('-Z','Y').to_euler()
     camera.data.ortho_scale=max(hi[0]-lo[0],hi[1]-lo[1])*1.2
-    scene.render.filepath=str(OUT/(name+'.png'));bpy.ops.render.render(write_still=True)
+    scene.render.filepath=str(output/(name+'.png'));bpy.ops.render.render(write_still=True)
     report.append({'名称':name,'最小坐标':lo,'最大坐标':hi,'三角面数':sum(len(p.vertices)-2 for o in objects for p in o.data.polygons),'尺寸依据':'米制估算，非实体测量'})
     for o in objects:o.hide_render=True;o.hide_set(True)
 # 保存仅含新增场景的源文件，不覆盖输入文件。

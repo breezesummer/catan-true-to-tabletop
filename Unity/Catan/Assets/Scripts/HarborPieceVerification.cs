@@ -125,7 +125,7 @@ public sealed partial class TabletopUiVerification
             var metro=new M5.Metropolis{PlayerId=state.Metropolises[0].PlayerId,LocationId=state.Metropolises[0].LocationId,Track=track};
             board.RefreshProjectedPieces(state.Settlements,state.Roads,state.Cities,state.RobberTileId,walls,state.Knights,new[]{metro},view.MerchantTileId);
             var root=Piece("Metropolis "+track+" "+metro.LocationId);
-            Require(root.GetComponentsInChildren<MeshFilter>().Count(f=>f.name!="幻想棋子画面")==2,"带墙大都会缺件");
+            Require(root.GetComponentsInChildren<MeshFilter>().Length==2,"带墙大都会缺件");
             if(track==M5.ImprovementTrack.Trade)
             {
                 FocusDetail(board.Position(metro.LocationId),false);

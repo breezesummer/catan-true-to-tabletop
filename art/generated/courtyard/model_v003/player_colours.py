@@ -6,7 +6,8 @@ from mathutils import Vector
 ROOT=Path(__file__).resolve().parent
 REPO=ROOT.parents[3]
 ART=REPO/'Unity/Catan/Assets/Art/Courtyard/v003'
-RESOURCE=REPO/'Unity/Catan/Assets/Resources/ThreeKingdoms/v003'
+PREVIEW=ART/'Editor'
+PREVIEW.mkdir(parents=True,exist_ok=True)
 S=bpy.context.scene
 C=next(c for c in S.collection.children if c.name.startswith('庭院_高细节组件'))
 materials={m for o in C.objects for m in o.data.materials}
@@ -55,7 +56,7 @@ try:
                 mapping[m]=new
         for o,mats in original.items():
             for i,m in enumerate(mats):o.data.materials[i]=mapping.get(m,m)
-        S.render.filepath=str(RESOURCE/f'thumbnail-{key}.png');bpy.ops.render.render(write_still=True)
+        S.render.filepath=str(PREVIEW/f'thumbnail-{key}.png');bpy.ops.render.render(write_still=True)
 finally:
     for o,mats in original.items():
         for i,m in enumerate(mats):o.data.materials[i]=m

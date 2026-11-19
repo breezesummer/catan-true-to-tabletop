@@ -113,7 +113,7 @@ public sealed partial class TabletopUiVerification
         Require(projection.Clock.ActivePlayerId==own.PlayerId,"本席不是行动席");
         var skin=GeneralSkinArt.Get(own.ActiveGeneralId);
         Require(skin!=null,"本席缺少动皮");
-        bool oldStatic=skin.useStatic,painted=BoardArtPreference.Painted;
+        bool oldStatic=skin.useStatic;
         int theme=StrategyHudTheme.Selected;
         try
         {
@@ -164,23 +164,18 @@ public sealed partial class TabletopUiVerification
                 configurations++;
                 yield break;
             }
-            foreach(bool useArt in new[]{true,false})
+            yield return null;yield return new WaitForEndOfFrame();
+            foreach(var kind in new[]{"settlement","city","road","ship","wall","knight-1","knight-2","knight-3"})
             {
-                app.SelectBoardArt(useArt);
-                yield return null;yield return new WaitForEndOfFrame();
-                foreach(var kind in new[]{"settlement","city","road","ship","wall","knight-1","knight-2","knight-3"})
-                {
-                    int level=kind.StartsWith("knight")?kind[7]-'0':1;
-                    var tex=OperationPieceAssets.Texture(kind,own.PlayerId,level);
-                    Require(tex!=null,"缺少库存图 "+kind);
-                    if(!useArt||kind=="wall")
-                        Require(tex==Resources.Load<Texture2D>("StockModels/"+kind+"-"+PlayerComponentAssets.ColourKey(own.PlayerId)),"库存未切到实体模型 "+kind);
-                }
-                SaveOceanFrame(useArt?"绘图库存与外光.png":"模型库存与外光.png");
-                Require(authority==Authority,"切换库存样式改变对局");
+                int level=kind.StartsWith("knight")?kind[7]-'0':1;
+                var tex=OperationPieceAssets.Texture(kind,own.PlayerId,level);
+                Require(tex!=null,"缺少库存图 "+kind);
+                Require(tex==Resources.Load<Texture2D>("StockModels/"+kind+"-"+PlayerComponentAssets.ColourKey(own.PlayerId)),"库存未切到实体模型 "+kind);
             }
+            SaveOceanFrame("模型库存与外光.png");
+            Require(authority==Authority,"库存检查改变对局");
             configurations++;
         }
-        finally {app.SelectBoardArt(painted);GeneralSkinArt.SetStatic(skin,oldStatic);StrategyHudTheme.Select(theme);}
+        finally {GeneralSkinArt.SetStatic(skin,oldStatic);StrategyHudTheme.Select(theme);}
     }
 }

@@ -6,7 +6,7 @@
 
 manifest.json 已登记第一批五份样板来源。每项素材填写 id、originalPath、kind、edition、referenceRole、measuredDimensionsMm、estimatedDimensionsMm、mustPreserve 和 notes。没有测量的数据使用 null；实测与估算不能混填。其余原始照片先保留在 inbox，后续生产时再分配来源编号。
 
-先提供少量样板即可。完整采集规范见 ../../docs/ART_PIPELINE.md；卡牌精确文字需独立核对后进入规则数据。
+先提供少量样板即可。完整采集规范见 ../../docs/实体资产美术规范.md；卡牌精确文字需独立核对后进入规则数据。
 
 2026-10-08 用户已确认：M0 先采用官方 2025 规则与明确标注的估算尺寸，实体参考后补。2026-10-09 已收到原始照片并完成首批样板，见 [PHOTO_SAMPLES_V001.md](../../docs/archive/专项迭代/PHOTO_SAMPLES_V001.md)。实体版本和实测尺寸仍未知。官方规则来源另登记在 [rules/v001/sources.json](rules/v001/sources.json)，不冒充用户实物参考。
 

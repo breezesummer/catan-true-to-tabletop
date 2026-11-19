@@ -5,3 +5,5 @@ Noto Sans CJK SC Regular（简体中文）
 下载日期：2026-10-15（Asia/Shanghai）。
 SHA-256：2C76254F6FC379FDDFCE0A7E84FB5385BB135D3E399294F6EEB6680D0365B74B
 许可：SIL Open Font License 1.1，完整条款见同目录 OFL.txt。
+
+同目录 Noto Serif CJK SC Regular 使用相同的 OFL.txt，制作来源见 art/recipes/ui-operation-v002/font-source.json。

@@ -28,6 +28,7 @@ public static class EntityAssetBuild
         var exports = Path.Combine(repo,"art/exports/entity-conversion-v001");
         var entries = new List<EntityAssetCatalog.Entry>();
         var evidence = new List<ImportRecord>();
+        var galleryCards = new List<GameObject>();
         foreach (var directory in Directory.GetDirectories(exports).OrderBy(p=>p))
         {
             if (!File.Exists(Path.Combine(directory,"manifest.json")) || !File.Exists(Path.Combine(directory,"verification.json"))) continue;
@@ -35,12 +36,15 @@ public static class EntityAssetBuild
             var manifest = JsonUtility.FromJson<Manifest>(File.ReadAllText(Path.Combine(directory,"manifest.json")));
             var runtime = Runtime + manifest.typeId + "/";
             var models = Models + manifest.typeId + "/";
+            bool galleryCard = new[] { "resource-cards", "commodity-cards", "progress-science", "progress-trade", "progress-politics" }.Contains(manifest.typeId);
+            string TexturePath(string name) => (galleryCard && name.EndsWith("-front.png", StringComparison.Ordinal) ? models : runtime) + name;
             Directory.CreateDirectory(runtime); Directory.CreateDirectory(models+"Materials");
-            foreach (var texture in Directory.GetFiles(Path.Combine(directory,"textures"),"*.png"))
-                File.Copy(texture,runtime+Path.GetFileName(texture),true);
+            var textures = Directory.GetFiles(Path.Combine(directory,"textures"),"*.png");
+            foreach (var texture in textures)
+                File.Copy(texture,TexturePath(Path.GetFileName(texture)),true);
             foreach (var asset in manifest.assets) File.Copy(Path.Combine(directory,asset.id+".fbx"),models+asset.id+".fbx",true);
             AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-            foreach (var path in Directory.GetFiles(runtime,"*.png"))
+            foreach (var path in textures.Select(texture => TexturePath(Path.GetFileName(texture))))
             {
                 var importer = (TextureImporter)AssetImporter.GetAtPath(path.Replace('\\','/'));
                 importer.textureType=TextureImporterType.Default; importer.sRGBTexture=true;
@@ -76,14 +80,15 @@ public static class EntityAssetBuild
                         var c=spec.baseColorLinearRgba;
                         material.color=new Color(c[0],c[1],c[2],c[3]).gamma;
                         material.SetFloat("_Smoothness",1-spec.roughness); material.SetFloat("_Metallic",0);
-                        material.mainTexture=string.IsNullOrEmpty(spec.texture)?null:AssetDatabase.LoadAssetAtPath<Texture2D>(runtime+spec.texture);
+                        material.mainTexture=string.IsNullOrEmpty(spec.texture)?null:AssetDatabase.LoadAssetAtPath<Texture2D>(TexturePath(spec.texture));
                         if(!string.IsNullOrEmpty(spec.texture)&&material.mainTexture==null) throw new Exception("Missing bound PNG "+spec.texture);
                         EditorUtility.SetDirty(material); return material;
                     }).ToArray();
                 }
                 // Keep FBX conversion under a neutral metre-scale root. No interaction colliders.
                 var triangles=instance.GetComponentsInChildren<MeshFilter>().Sum(f=>f.sharedMesh.triangles.Length/3);
-                PrefabUtility.SaveAsPrefabAsset(instance,runtime+asset.id+".prefab");
+                var prefab = PrefabUtility.SaveAsPrefabAsset(instance,(galleryCard ? models : runtime)+asset.id+".prefab");
+                if (galleryCard) galleryCards.Add(prefab);
                 entries.Add(new EntityAssetCatalog.Entry { id=asset.id,typeId=manifest.typeId,typeLabel=manifest.label,
                     label=asset.label,kind=asset.kind,resource="EntityAssets/v001/"+manifest.typeId+"/"+asset.id,
                     width=bounds.size.x,depth=bounds.size.z,height=bounds.size.y });
@@ -107,7 +112,7 @@ public static class EntityAssetBuild
         light.intensity=1.25f; light.shadows=LightShadows.Soft; light.transform.rotation=Quaternion.Euler(45,-30,0);
         light.gameObject.AddComponent<UniversalAdditionalLightData>();
         RenderSettings.ambientMode=AmbientMode.Flat; RenderSettings.ambientLight=new Color(.58f,.60f,.64f);
-        var gallery=new GameObject("Entity Art Gallery"); gallery.AddComponent<EntityAssetGallery>(); gallery.AddComponent<EntityAssetPlayerVerification>();
+        var gallery=new GameObject("Entity Art Gallery"); gallery.AddComponent<EntityAssetGallery>().GalleryCards = galleryCards.ToArray(); gallery.AddComponent<EntityAssetPlayerVerification>();
         EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(),"Assets/EntityAssets-v001.unity");
         var output=Path.Combine(repo,".local/art-pipeline/Builds/Windows/CatanEntityAssets-v001.exe");
         Directory.CreateDirectory(Path.GetDirectoryName(output));

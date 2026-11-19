@@ -10,7 +10,8 @@ public sealed class EntityCardTextureImporter : AssetPostprocessor
         if(path.StartsWith("Assets/Resources/CardRedraw/",StringComparison.Ordinal)&&path.EndsWith(".png",StringComparison.OrdinalIgnoreCase))return true;
         if (path == "Assets/Resources/PhotoSamples/v001/wood-front.png" ||
             path == "Assets/Resources/PhotoSamples/v001/resource-back.png") return true;
-        return path.StartsWith("Assets/Resources/EntityAssets/", StringComparison.Ordinal) &&
+        return (path.StartsWith("Assets/Resources/EntityAssets/", StringComparison.Ordinal) ||
+            path.StartsWith("Assets/Art/EntityAssets/v001/", StringComparison.Ordinal)) &&
             path.EndsWith(".png", StringComparison.OrdinalIgnoreCase) &&
             (path.Contains("/resource-cards/") || path.Contains("/commodity-cards/") ||
              path.Contains("/progress-science/") || path.Contains("/progress-trade/") ||

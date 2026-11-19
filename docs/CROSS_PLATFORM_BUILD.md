@@ -27,8 +27,8 @@
 ./tools/development/Build-Game.command --target windows
 # Android 默认包含 ARM64 和 x86_64；可加 --arm64-only
 ./tools/development/Build-Game.command --target android
-# 默认同时构建 Windows、房间服务和 Android
-./tools/development/Build-Game.command
+# 同时构建 Windows、房间服务和 Android
+./tools/development/Build-Game.command --target all
 # 仅构建服务端，支持 win-x64、linux-x64、linux-arm64
 ./tools/development/Build-Game.command --target server --runtime linux-x64
 ```
@@ -56,7 +56,7 @@ Android 的 Unity 路径检查不接受中文工程目录，也会解析工程�
 ```zsh
 ./tools/development/Build-Game.command --target android --test-signing
 # 同时验证两个平台：
-./tools/development/Build-Game.command --test-signing
+./tools/development/Build-Game.command --target all --test-signing
 ```
 
 测试模式生成临时独立密钥，退出后删除；APK 元数据标记 `build-verification-only`，输出目录含 `SigningTest`。该 APK 不能覆盖安装旧内测版，也不用于正式发布。本轮用户确认没有原密钥备份，采用此模式验证。
@@ -66,7 +66,7 @@ Android 的 Unity 路径检查不接受中文工程目录，也会解析工程�
 原 `Start-Dev.ps1`、`Build-M7.ps1`、`Build-Android.ps1` 继续可用，新增统一入口：
 
 ```powershell
-# 全部；单端可用 -Target Windows、Android 或 Server
+# 默认构建 Windows 客户端及随包服务。双端构建使用 -Target All。
 pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-Game.ps1
 ```
 
@@ -74,11 +74,11 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-Game.ps1
 
 ## 产物与验证边界
 
-当前默认目录为 `game version/1.6/Catan1.6.7-CrossPlatformBuild`，测试签名追加 `-SigningTest`；程序与 APK 均名为 `Catan1.6.7`。自定义 `--output-root` 必须在本仓库 `game version` 下，目录名须包含当前版本；测试签名必须保留 `SigningTest` 标识。
+默认目录按 AGENTS.md 的版本号与构建短述生成，当前为 `game version/2.1/Catan2.1.17-Game-Encyclopedia`，测试签名追加 `-SigningTest`；程序与 APK 均名为 `Catan2.1.17`。自定义 `--output-root` 必须在本仓库 `game version` 下，目录名须包含当前版本；测试签名必须保留 `SigningTest` 标识。
 
-- Windows：`Builds/Windows/Catan1.6.7.exe` 与 `Builds/Windows/Server`。
-- Android：`Builds/Android/Catan1.6.7.apk` 与含签名／文件摘要的 `build-info.json`。
+- Windows：`Builds/Windows/Catan2.1.17.exe` 与 `Builds/Windows/Server`。
+- Android：`Builds/Android/Catan2.1.17.apk` 与含签名／文件摘要的 `build-info.json`。
 - 构建过程：`logs`；Mac 成功构建另写 `构建说明.json`。
-- 新统一入口成功后只保留最近五个内测目录；带 `release` 或 `正式发布.txt` 标记的正式发布目录保留，符号链接不参与清理。
+- 新统一入口成功后按二级版本各保留最近五个内测版本目录；带 `release` 或 `正式发布.txt` 标记的正式发布目录保留，符号链接不参与清理。
 
 构建成功说明工具链、编译及 APK 签名验证通过。Windows 游戏运行、完整界面、Android 真机安装与触控仍须在对应环境验收；不以 Mac 上生成文件替代目标平台运行验收。具体本轮结果见[开发日志](../The%20Farmer%27s%20Log.md)。

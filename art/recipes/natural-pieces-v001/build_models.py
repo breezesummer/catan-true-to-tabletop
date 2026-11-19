@@ -5,7 +5,7 @@ from mathutils import Vector
 
 ROOT=Path('D:/Project/catan-true-to-tabletop')
 ART=ROOT/'Unity/Catan/Assets/Art/NaturalPieces/v001'
-RES=ROOT/'Unity/Catan/Assets/Resources/NaturalPieces/v001'
+RES=ROOT/'Unity/Catan/Assets/Art/NaturalPieces/v001'
 OUT=ROOT/'art/recipes/natural-pieces-v001'
 random.seed(211105)
 scene=bpy.data.scenes.new('自然棋子_v001')

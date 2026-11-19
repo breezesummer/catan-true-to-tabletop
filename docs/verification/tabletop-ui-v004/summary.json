@@ -62,13 +62,13 @@
   "隐私": "只公开计数、标记与新建开发测试局画面；权威存档和私人状态仅留 .local",
   "人工截图": [
     {
-      "路径": "manual-city-window.png",
+      "路径": "manual-city-window.jpg",
       "宽": 2194,
       "高": 1234,
       "说明": "新建开发测试局的桌边窗口，Windows 逻辑像素，收尾骰面分配修正前"
     },
     {
-      "路径": "manual-city-top-window.png",
+      "路径": "manual-city-top-window.jpg",
       "宽": 2194,
       "高": 1234,
       "说明": "同一新建开发局的俯视窗口"

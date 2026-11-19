@@ -23,7 +23,7 @@ def require(condition, message):
         raise AssertionError(message)
 
 
-def main():
+def main(generator_script='entity_pipeline.py'):
     parser = argparse.ArgumentParser()
     parser.add_argument('--recipe', type=Path, required=True)
     parser.add_argument('--output-root', type=Path, default=REPO / 'art')
@@ -52,7 +52,7 @@ def main():
         w, h = struct.unpack('>II', data[16:24])
         require(w > 0 and h > 0, 'Empty PNG')
         textures.append({'path': record['path'], 'width': w, 'height': h, 'verified': True})
-    spec = importlib.util.spec_from_file_location('entity_pipeline_signature', REPO / 'tools/art/entity_pipeline.py')
+    spec = importlib.util.spec_from_file_location('entity_pipeline_signature', REPO / 'tools/art' / generator_script)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     reports = []

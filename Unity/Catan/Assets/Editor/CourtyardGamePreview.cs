@@ -18,7 +18,7 @@ public static class CourtyardGamePreview
     static double next;
     static readonly BindingFlags Flags=BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic;
     static CourtyardGamePreview(){EditorApplication.update+=Tick;}
-    [MenuItem("Catan/美术/查看四色庭院实机效果")]
+    [MenuItem("Catan/美术/预览旧版四色庭院")]
     public static void Run()
     {
         if(EditorApplication.isPlaying){EditorApplication.isPlaying=false;EditorApplication.delayCall+=Run;return;}
@@ -54,24 +54,35 @@ public static class CourtyardGamePreview
             var board=(BoardRenderer)Get(basic,"VerificationBoard");
             if(stage==2)
             {
-                var red=host.View("P1").Board.Settlements.First(p=>p.PlayerId=="P1");var instance=board.CommittedPieces.Cast<Transform>().First(t=>t.name.StartsWith(red.LocationId+" "));
-                if(instance.GetComponentsInChildren<MeshFilter>().Length!=45||instance.GetComponentsInChildren<Collider>().Length!=0)throw new Exception("红色庭院没有通过正式入口接入");
+                var settlements=host.View("P1").Board.Settlements;
+                var red=settlements.First(p=>p.PlayerId=="P1");
+                var meshes=Array.Empty<Mesh>();
                 foreach(string id in new[]{"P1","P2","P3","P4"})
                 {
                     string key=PlayerComponentAssets.ColourKey(id);
-                    if(PlayerComponentAssets.BuildingResource("village",id)!="ThreeKingdoms/v003/courtyard-"+key)throw new Exception("村庄配色资源错误："+id);
-                    var piece=board.CommittedPieces.Cast<Transform>().First(t=>t.name.Contains("[courtyard-"+key+"]"));
-                    if(piece.GetComponentsInChildren<MeshFilter>().Length!=45||piece.GetComponentsInChildren<Collider>().Length!=0)throw new Exception("庭院网格/碰撞错误："+id);
-                    if(!piece.GetComponentsInChildren<MeshFilter>().Select(f=>f.sharedMesh).SequenceEqual(instance.GetComponentsInChildren<MeshFilter>().Select(f=>f.sharedMesh)))throw new Exception("四色未共享网格");
-                    var colourMaterials=piece.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials).Where(m=>m.name.StartsWith("Village_Seat_Courtyard_")).Distinct().ToArray();
-                    if(colourMaterials.Length!=(key=="red"?1:3)||colourMaterials.Any(m=>m.name!="Village_Seat_Courtyard_Red"&&!m.name.StartsWith("Village_Seat_Courtyard_"+key)))throw new Exception("玩家材质错配："+id);
-                    if(OperationPieceAssets.Texture("settlement",id)==null)throw new Exception("玩家缩略图缺失："+id);
-                    Capture(board.BoardCamera,piece.position,Path.Combine(output,"庭院-"+key+".png"));
+                    var prefab=AssetDatabase.LoadAssetAtPath<GameObject>(CourtyardImport.Preview+"courtyard-"+key+".prefab");
+                    var thumbnail=AssetDatabase.LoadAssetAtPath<Texture2D>(CourtyardImport.Preview+"thumbnail-"+key+".png");
+                    if(prefab==null||thumbnail==null)throw new Exception("旧庭院预览资源缺失："+id);
+                    foreach(var settlement in settlements.Where(p=>p.PlayerId==id))
+                    {
+                        var village=board.CommittedPieces.Cast<Transform>().First(t=>t.name.StartsWith(settlement.LocationId+" ",StringComparison.Ordinal));
+                        var piece=UnityEngine.Object.Instantiate(prefab,village.position,village.rotation,village.parent);
+                        village.gameObject.SetActive(false);
+                        var pieceMeshes=piece.GetComponentsInChildren<MeshFilter>().Select(f=>f.sharedMesh).ToArray();
+                        if(pieceMeshes.Length!=45||piece.GetComponentsInChildren<Collider>().Length!=0)throw new Exception("庭院网格/碰撞错误："+id);
+                        if(meshes.Length==0)meshes=pieceMeshes;
+                        if(!pieceMeshes.SequenceEqual(meshes))throw new Exception("四色未共享网格");
+                        var materials=piece.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials).Distinct().ToArray();
+                        if(materials.Any(m=>m==null||m.shader.name!="Universal Render Pipeline/Lit"))throw new Exception("材质未适配URP");
+                        var colourMaterials=materials.Where(m=>m.name.StartsWith("Village_Seat_Courtyard_")).ToArray();
+                        if(colourMaterials.Length!=(key=="red"?1:3)||colourMaterials.Any(m=>!m.name.StartsWith("Village_Seat_Courtyard_"+(key=="red"?"Red":key))))throw new Exception("玩家材质错配："+id);
+                    }
+                    var first=settlements.First(p=>p.PlayerId==id);
+                    Capture(board.BoardCamera,board.Position(first.LocationId),Path.Combine(output,"庭院-"+key+".png"));
                 }
-                foreach(var renderer in instance.GetComponentsInChildren<Renderer>())if(renderer.sharedMaterials.Any(m=>m==null||m.shader.name!="Universal Render Pipeline/Lit"))throw new Exception("材质未适配URP");
                 ScreenCapture.CaptureScreenshot(Path.Combine(output,"游戏默认视角.png"));
                 Capture(board.BoardCamera,board.Position(red.LocationId),Path.Combine(output,"红色庭院游戏近景.png"));
-                File.WriteAllText(Path.Combine(output,"运行验证.txt"),"Unity="+Application.unityVersion+"\n图形设备="+SystemInfo.graphicsDeviceName+"\n正式村庄入口="+PlayerComponentAssets.BuildingResource("village","P1")+"\n红色村庄="+host.View("P1").Board.Settlements.Count(p=>p.PlayerId=="P1")+"\n网格=45；材质URP/Lit；无模型碰撞；四色正式入口均已接入；四色共享45个网格，各自玩家材质与缩略图存在。\n真实Unity临时对局，合法完成开局，AI暂停；没有写入用户存档。近景使用同一游戏模型、棋盘和光照的URP相机。\n");
+                File.WriteAllText(Path.Combine(output,"运行验证.txt"),"Unity="+Application.unityVersion+"\n图形设备="+SystemInfo.graphicsDeviceName+"\n旧庭院预览资源="+CourtyardImport.Preview+"\n网格=45，材质URP/Lit，四色共享网格，各自玩家材质与缩略图存在。\n在编辑器临时对局中叠放旧庭院预览，沿用正式棋盘和光照。\n");
                 board.ChangeZoom(-.14f);var screen=board.BoardCamera.WorldToScreenPoint(board.Position(red.LocationId));board.TableScene.PanFromScreen(new Vector2(screen.x,screen.y),new Vector2(Screen.width*.52f,Screen.height*.55f));board.TableScene.EndPan();stage=3;next=EditorApplication.timeSinceStartup+3;return;
             }
             ScreenCapture.CaptureScreenshot(Path.Combine(output,"游戏拉近视角.png"));

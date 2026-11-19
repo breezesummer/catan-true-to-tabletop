@@ -358,7 +358,6 @@ public sealed class M4BoardRenderer : MonoBehaviour
     public void PreviewPiece(string id,TabletopPointerPreview preview,string seat,bool legal)
     {
         string key=id+":"+preview.Kind+":"+preview.Level+":"+preview.Active+":"+preview.Track+":"+preview.Wall+":"+seat+":"+legal;
-        if(preview.Kind=="port")key+=":"+BoardArtPreference.Painted;
         if(ghost!=null&&pointerPreviewKey==key){if(legal)TabletopPointerCursor.Request();return;}
         ClearPreview();if(string.IsNullOrEmpty(id))return;pointerPreviewKey=key;
         var rotation=id.StartsWith("E")?rotations[id]:Quaternion.identity;
@@ -396,7 +395,6 @@ public sealed class M4BoardRenderer : MonoBehaviour
         {
             TopView=top; tableScene.Frame(BoardCamera,top,Zoom/.255f); return;
         }
-        FantasyBoardPiece.SetView(false);
         TopView=top; BoardCamera.orthographic=true; BoardCamera.orthographicSize=Zoom;
         BoardCamera.transform.position=displayCenter+(top?new Vector3(0,.65f,-.001f):new Vector3(0,.48f,-.4f));
         BoardCamera.transform.LookAt(displayCenter+new Vector3(0,.005f,0));

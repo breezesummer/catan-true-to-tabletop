@@ -10,4 +10,4 @@
 & 'D:\Development\Blender\blender-4.5.14-windows-x64\blender.exe' --background --python-exit-code 1 --python art/recipes/ui-operation-v002/render_pieces.py
 ```
 
-局内统一使用 `Noto Serif CJK SC Regular`，采用适合木桌、历史题材界面的宋体笔形；字体随 PC 与 Android 包携带。字体来自 [Noto CJK 官方仓库](https://github.com/notofonts/noto-cjk)，固定提交、来源与 SHA-256 见 `font-source.json`，SIL OFL 1.1 原始许可随字体保存在 `Unity/Catan/Assets/Resources/Fonts/NotoSerifCJKsc-OFL.txt`。界面程序不依赖系统安装字体；菜单仍保留原有字体。
+局内统一使用 `Noto Serif CJK SC Regular`，采用适合木桌、历史题材界面的宋体笔形；字体随 PC 与 Android 包携带。字体来自 [Noto CJK 官方仓库](https://github.com/notofonts/noto-cjk)，固定提交、来源与 SHA-256 见 `font-source.json`，SIL OFL 1.1 原始许可随字体保存在 `Unity/Catan/Assets/Resources/Fonts/OFL.txt`。界面程序不依赖系统安装字体；菜单仍保留原有字体。

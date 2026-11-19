@@ -29,7 +29,7 @@ public sealed class FantasyThumbnailImporter : ScriptedImporter
                     var tex=new Texture2D(width,height,TextureFormat.RGBA32,true)
                         { name=kind+"-"+colour, wrapMode=TextureWrapMode.Clamp,filterMode=FilterMode.Trilinear };
                     var pixels=new Color32[width*height];
-                    var pigment=FantasyBoardPiece.Pigment(colour).linear;
+                    var pigment=BoardRenderer.SeatColors[Array.IndexOf(new[]{"red","blue","orange","beige"},colour)].linear;
                     for(int y=0;y<height;y++)for(int x=0;x<width;x++)
                     {
                         var ink=source.GetPixelBilinear(rect.x+(x+.5f)/width*rect.width,

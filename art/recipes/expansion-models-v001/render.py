@@ -3,7 +3,7 @@ import bpy,math
 from pathlib import Path
 from mathutils import Vector
 root=Path('D:/Project/catan-true-to-tabletop')
-res=root/'Unity/Catan/Assets/Resources/ExpansionPieces/v001'
+res=root/'Unity/Catan/Assets/Art/ExpansionPieces/v001'
 out=root/'art/recipes/expansion-models-v001'
 scene=bpy.context.scene
 models={o.name.split('.')[0]:o for o in scene.objects if o.type=='MESH'}

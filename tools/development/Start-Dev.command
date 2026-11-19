@@ -9,6 +9,6 @@ case "${1:-code}" in
     unity) exec "$UNITY_EDITOR" -projectPath "$CATAN_PROJECT_ROOT/Unity/Catan" -logFile "$CATAN_LOCAL_ROOT/logs/unity-editor.log" ;;
     blender) exec "$CATAN_DEVELOPMENT_ROOT/Blender/Blender.app/Contents/MacOS/Blender" ;;
     build) exec dotnet build src/Catan.Server/Catan.Server.csproj --disable-build-servers -m:1 ;;
-    check) exec python3 "$CATAN_PROJECT_ROOT/tools/development/build_macos.py" --check ;;
+    check) exec python3 "$CATAN_PROJECT_ROOT/tools/development/build_macos.py" --target all --check ;;
     *) print -u2 '用法：Start-Dev.command [shell|code|hub|unity|blender|build|check]'; exit 2 ;;
 esac

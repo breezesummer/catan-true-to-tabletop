@@ -6,7 +6,7 @@ public sealed class TabletopTextureImporter : AssetPostprocessor
 {
     void OnPreprocessTexture()
     {
-        if(assetPath!="Assets/Resources/TabletopUI/v004/oak-albedo-8k.png")return;
+        if(assetPath!="Assets/Art/TabletopUI/v004/oak-albedo-8k.png")return;
         var importer=(TextureImporter)assetImporter;
         importer.textureType=TextureImporterType.Default;importer.sRGBTexture=true;
         importer.maxTextureSize=8192;importer.mipmapEnabled=true;

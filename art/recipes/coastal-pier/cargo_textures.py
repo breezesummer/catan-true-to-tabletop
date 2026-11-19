@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-DEST = Path(__file__).resolve().parents[3] / 'Unity/Catan/Assets/Resources/PaintedMap/Coast'
+DEST = Path(__file__).resolve().parents[3] / 'Unity/Catan/Assets/Art/PaintedMap/Coast'
 N = 512
 rng = np.random.default_rng(1729)
 v, u = np.mgrid[0:1:complex(N), 0:1:complex(N)]

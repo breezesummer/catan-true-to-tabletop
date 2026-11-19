@@ -148,7 +148,7 @@ v002 公开视图渲染入口：已有验证通过记录。村庄、城市、城
 
 [分类索引](../assets/references/catalogs/tabletop-markers-v005.json)；[分类原件](../assets/references/archives/tabletop-markers-v005/classification.json)；[配方](../art/recipes/entity-conversion-v005/tabletop-markers/README.md)；[回读](../art/exports/entity-conversion-v005/tabletop-markers/verification.json)；[干净重建](../art/exports/entity-conversion-v005/tabletop-markers/clean-rebuild-verification.json)；[Unity 导入](verification/tabletop-markers-v005/unity-import.json)；[运行摘要](verification/tabletop-markers-v005/summary.json)。
 
-本轮 151 项相关 .NET 检查、八件 Blender／Unity 验证、独立四模式保存恢复、1,903 项专项图形检查和既有桌面 28 配置／20,060 项检查通过。相机图和源模型细节已查看，完整 IMGUI 自动像素验收仍为 false；港口真实鼠标点击、用户整局、最终外观、实测尺度与长期性能仍待验。M7／M8 状态保留。当前入口：[CatanM6.exe](../.local/m6-entity-v005/Builds/Windows/CatanM6.exe)。
+本轮 151 项相关 .NET 检查、八件 Blender／Unity 验证、独立四模式保存恢复、1,903 项专项图形检查和既有桌面 28 配置／20,060 项检查通过。相机图和源模型细节已查看，完整 IMGUI 自动像素验收仍为 false；港口真实鼠标点击、用户整局、最终外观、实测尺度与长期性能仍待验。M7／M8 状态保留。当前试玩见[现行 Windows 试玩入口](../README.md#开始试玩)。
 
 ## 高山地图板块 v006（2026-10-15，当前矿石地形）
 
@@ -158,4 +158,4 @@ Blender 回读与干净重建、Unity 导入、Windows 构建、四模式俯视�
 
 [原件归档](../assets/references/archives/mountain-tile-v006/README.md)；[配方与复现](../art/recipes/entity-conversion-v006/ore-tile/README.md)；[回读](../art/exports/entity-conversion-v006/ore-tile/verification.json)；[干净重建](../art/exports/entity-conversion-v006/ore-tile/clean-rebuild-verification.json)；[Unity 导入](verification/mountain-tile-v006/unity-import.json)；[正式显示](verification/mountain-tile-v006/runtime-integration.json)；[本轮说明](archive/专项迭代/ART_MOUNTAIN_TILE_V006.md)；[验证摘要](verification/mountain-tile-v006/summary.json)。
 
-当前入口：[CatanM6.exe](../.local/m6-mountain-v006/Builds/Windows/CatanM6.exe)。上方各旧批次的数量与程序链接属于历史记录。
+当前试玩见[现行 Windows 试玩入口](../README.md#开始试玩)。上方各旧批次的数量与程序链接属于历史记录。

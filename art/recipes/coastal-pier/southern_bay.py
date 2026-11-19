@@ -3,7 +3,7 @@ import bpy, math, random
 from pathlib import Path
 from math import sin, cos, exp, pi
 bpy.ops.wm.read_factory_settings(use_empty=True)
-folder=Path('D:/Project/catan-true-to-tabletop/Unity/Catan/Assets/Resources/PaintedMap/Coast')
+folder=Path('D:/Project/catan-true-to-tabletop/Unity/Catan/Assets/Art/PaintedMap/Coast')
 rng=random.Random(809)
 def surface(name,points,faces,colors):
     mesh=bpy.data.meshes.new(name)

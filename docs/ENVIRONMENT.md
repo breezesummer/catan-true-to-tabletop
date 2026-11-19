@@ -34,7 +34,7 @@
 | 环境配置迁移记录与原登记备份 | 项目内 `.local/development/migration` |
 | 项目的配置与可复现脚本 | 仓库内 `global.json`、`.vscode`、`tools/development` |
 | 环境验证工程、模型、测试报告、日志和 Windows 构建 | 仓库内 `.local/environment`，由 Git 忽略 |
-| 后续正式工程、规则源码和美术资产 | 仓库内，按开发路线及 ART_PIPELINE.md 建立 |
+| 后续正式工程、规则源码和美术资产 | 仓库内，按开发路线及 实体资产美术规范.md 建立 |
 
 本次未全局改写 PATH、TEMP，也未修改原有 VS Code 的个人设置。脚本仅为当前进程及其子进程设置环境；直接从普通终端输入 `dotnet` 仍可能选到原有 C 盘运行时。后续开发应使用下列入口。
 

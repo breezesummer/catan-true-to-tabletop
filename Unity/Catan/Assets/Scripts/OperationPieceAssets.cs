@@ -6,7 +6,6 @@ using UnityEngine;
 public static class OperationPieceAssets
 {
     static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
-    static Dictionary<string, Texture2D> paintedStock;
 
     public static void DrawStock(Rect area,Texture2D texture)
     {
@@ -40,16 +39,6 @@ public static class OperationPieceAssets
         else if (icon.Contains("city")) kind = "city";
         else if (icon.Contains("settlement") || icon.Contains("village")) kind = "settlement";
         else return null;
-        if(BoardArtPreference.Painted && kind!="wall")
-        {
-            if(paintedStock==null)
-            {
-                paintedStock=new Dictionary<string,Texture2D>();
-                foreach(var iconTexture in Resources.LoadAll<Texture2D>("FantasyPieces/stock"))
-                    paintedStock[iconTexture.name]=iconTexture;
-            }
-            if(paintedStock.TryGetValue((kind=="settlement"?"village":kind)+"-"+colour,out var painted))return painted;
-        }
         string path="StockModels/"+kind+"-"+colour;
         if (!Textures.TryGetValue(path, out var texture))
         {

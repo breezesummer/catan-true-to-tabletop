@@ -16,8 +16,6 @@ public sealed partial class TabletopUiVerification
         for(int i=0;i<900&&!Table.Ocean.MaskReady;i++)yield return null;
         Require(Table.Ocean.MaskReady,"棋盘尚未就绪");
         string before=Authority;
-        bool painted=BoardArtPreference.Painted;
-        BoardArtPreference.Select(false,false);
         Table.SetPitch(45,false);Table.Frame(BoardCamera,false,1);
         while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
         yield return new WaitForSecondsRealtime(2);
@@ -48,7 +46,7 @@ public sealed partial class TabletopUiVerification
                         kind.StartsWith("knight-")?PlayerComponentAssets.Knight(id,kind[7]-'0',false,"四色骑士",pos,stand.transform):
                         PlayerComponentAssets.Building(kind.StartsWith("metro-")?"metropolis":kind,id,"四色建筑",pos,stand.transform,Mathf.Max(0,row-3));
                     Require(piece!=null,"四色棋子缺失："+kind);
-                    var solids=piece.GetComponentsInChildren<MeshFilter>().Where(f=>f.name!="幻想棋子画面").ToArray();
+                    var solids=piece.GetComponentsInChildren<MeshFilter>();
                     if(shared==null)shared=solids.Last().sharedMesh;
                     Require(solids.Any(f=>f.sharedMesh==shared),"四色没有共享原网格："+kind);
                     var materials=piece.GetComponentsInChildren<Renderer>().SelectMany(r=>r.sharedMaterials).Where(m=>m!=null).ToArray();
@@ -77,9 +75,8 @@ public sealed partial class TabletopUiVerification
                     Require(materials.All(m=>m.shader.isSupported),"棋子着色器不支持："+kind);
                     Require(owned.All(m=>m.enableInstancing||kind=="ship"),"归属材质未共享实例配置");
                     Require(piece.GetComponentsInChildren<Collider>().Length==0,"染色增加了碰撞器");
-                    Require(FantasyBoardPiece.Pigment(PlayerComponentAssets.ColourKey(id))==BoardRenderer.SeatColors[seat],"绘制视图色值不一致");
                     foreach(var r in piece.GetComponentsInChildren<Renderer>())
-                        Require(r.name=="幻想棋子画面"?r.forceRenderingOff:!r.forceRenderingOff,"实体模式显示异常");
+                        Require(!r.forceRenderingOff,"实体模式显示异常");
                     csv.AppendLine(labels[row]+","+id+","+owned.Length+","+solids.Length);
                     if(row<6)
                     {
@@ -114,7 +111,6 @@ public sealed partial class TabletopUiVerification
         finally
         {
             Destroy(stand);board.CommittedPieces.gameObject.SetActive(true);
-            BoardArtPreference.Select(painted,false);
             Table.ResetPan();Table.SetPitch(45,false);Table.Frame(BoardCamera,false,1);
         }
         Require(Authority==before,"染色或对照改变了权威对局状态");

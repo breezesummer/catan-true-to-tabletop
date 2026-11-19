@@ -359,14 +359,12 @@ public sealed partial class M6App
             }
         }else if(tab==2){
             for(int i=0;i<4;i++){
-                var r=new Rect(165+i*336,302,315,300);
+                var r=new Rect(165+i*336,350,315,300);
                 Surface(r,"card");
                 GUI.DrawTexture(new Rect(r.x+8,r.y+8,r.width-16,r.height-77),Art("theme-"+i),ScaleMode.ScaleAndCrop);
                 if(StrategyHudTheme.Selected==i)Illustration(new Rect(r.xMax-48,r.y+13,33,33),"check-on");
                 if(KeyButton(new Rect(r.x,r.yMax-60,r.width,57),StrategyHudTheme.Names[i],StrategyHudTheme.Selected==i)||Hit(new Rect(r.x,r.y,r.width,r.height-60)))StrategyHudTheme.Select(i);
             }
-            Caption(new Rect(205,650,310,62),"棋盘美术");
-            for(int i=0;i<2;i++)if(KeyButton(new Rect(590+i*344,644,310,59),boardArtNames[i],BoardArtPreference.Painted==(i==0)))SelectBoardArt(i==0);
         }else if(tab==3){
             for(int i=0;i<PastoralMenuScene.ThemeCount;i++){
                 int index=i==0?PastoralMenuScene.CollectorTable:i==1?PastoralMenuScene.ClassicHarbor:i-2;

@@ -4,7 +4,8 @@ using UnityEngine;
 // Blender 米制资产共享材质，模型无碰撞体；图标是同源模型的离线渲染。
 public sealed class FishingAssetImport : AssetPostprocessor
 {
-    bool Ours => assetPath.StartsWith("Assets/Resources/HarborFishing/v001/");
+    bool Ours => assetPath.StartsWith("Assets/Resources/HarborFishing/v001/") ||
+        assetPath.StartsWith("Assets/Art/HarborFishing/v001/");
     bool Photo => assetPath.StartsWith("Assets/Resources/HarborFishing/v002/");
     void OnPreprocessModel()
     {

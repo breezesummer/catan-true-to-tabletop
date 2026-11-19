@@ -90,7 +90,7 @@ public static class ExpansionPiecesImport
                 }
                 finally{UnityEngine.Object.DestroyImmediate(root);}
                 if(pirate||part.kind.StartsWith("metro-")||part.kind.EndsWith("-active"))continue;
-                var thumb=(TextureImporter)AssetImporter.GetAtPath(Root+"thumb-"+part.kind+"-"+colours[i]+".png");
+                var thumb=(TextureImporter)AssetImporter.GetAtPath(Art+"thumb-"+part.kind+"-"+colours[i]+".png");
                 thumb.isReadable=true;thumb.alphaIsTransparency=true;thumb.mipmapEnabled=true;thumb.wrapMode=TextureWrapMode.Clamp;
                 thumb.SaveAndReimport();
             }

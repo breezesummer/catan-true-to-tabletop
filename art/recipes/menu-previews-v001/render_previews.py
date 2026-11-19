@@ -131,7 +131,11 @@ def draw_tile(image, tile, x, y, radius):
 
 
 def paste_piece(image, kind, center, size, color='red'):
-    piece = Image.open(source(RES / f'OperationUI/v002/pieces/{kind}-{color}.png')).convert('RGBA')
+    relative = f'OperationUI/v002/pieces/{kind}-{color}.png'
+    path = RES / relative
+    if not path.is_file():
+        path = RES.parent / 'Art' / relative
+    piece = Image.open(source(path)).convert('RGBA')
     box = piece.getbbox()
     piece = piece.crop(box)
     piece.thumbnail((size, size), Image.Resampling.LANCZOS)

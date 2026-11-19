@@ -1,6 +1,6 @@
 param(
-    [ValidateSet('All','Windows','Android','Server')][string]$Target='All',
-    [string]$OutputRoot='game version/1.7/Catan1.7.3-Combined-Scenarios',
+    [ValidateSet('All','Windows','Android','Server')][string]$Target='Windows',
+    [string]$OutputRoot=(& (Join-Path $PSScriptRoot 'Get-GameBuildRoot.ps1')),
     [switch]$VerifyPlayer,
     [switch]$SkipVerification,
     [switch]$Arm64Only

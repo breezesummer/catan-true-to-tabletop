@@ -4,7 +4,7 @@ import runpy
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT=Path(__file__).resolve().parents[3]
-ART=ROOT/'Unity/Catan/Assets/Resources/PaintedMap/Coast'
+ART=ROOT/'Unity/Catan/Assets/Art/PaintedMap/Coast'
 SIZE=(1024,1250)
 # 轮廓来自同张港口画稿；只取货物，不带栈桥、桩头和固定投影。
 OUTLINE={

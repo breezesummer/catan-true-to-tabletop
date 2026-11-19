@@ -73,26 +73,22 @@ public static class EntityBoardAssets
     {
         var colour=PlayerComponentAssets.ColourKey(seatColour);
         if(colour==null)return null;
-        var ship=Instantiate(PlayerComponentAssets.ExpansionRoot+"ship-"+colour,label,bottom,edgeRotation,parent);
-
-        return FantasyBoardPiece.Attach(ship,"ship",colour);
+        return Instantiate(PlayerComponentAssets.ExpansionRoot+"ship-"+colour,label,bottom,edgeRotation,parent);
     }
 
     public static GameObject Robber(string label, Vector3 bottom, Transform parent)
     {
-        return FantasyBoardPiece.Attach(Instantiate(RobberResource, label, bottom, Quaternion.identity, parent),"robber","neutral");
+        return Instantiate(RobberResource, label, bottom, Quaternion.identity, parent);
     }
 
     public static GameObject Pirate(string label, Vector3 bottom, Transform parent, bool ocean=false,Quaternion? facing=null)
     {
-        var pirate=Instantiate(PirateResource,label,ocean?ShipWaterline(bottom):bottom,facing??Quaternion.Euler(0,153f,0),parent);
-
-        return FantasyBoardPiece.Attach(pirate,"pirate","neutral");
+        return Instantiate(PirateResource,label,ocean?ShipWaterline(bottom):bottom,facing??Quaternion.Euler(0,153f,0),parent);
     }
 
     public static GameObject Merchant(string label, Vector3 bottom, Transform parent)
     {
-        return FantasyBoardPiece.Attach(Instantiate(MerchantResource, label, bottom, Quaternion.identity, parent),"merchant","neutral");
+        return Instantiate(MerchantResource, label, bottom, Quaternion.identity, parent);
     }
 
     public static GameObject BarbarianTrack(Vector3 bottom, Transform parent)

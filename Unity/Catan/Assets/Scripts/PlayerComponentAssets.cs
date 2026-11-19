@@ -91,13 +91,7 @@ public static class PlayerComponentAssets
         string insertType=walled?type.Replace("-with-wall",""):type;
         var insert=Model(BuildingResource(insertType,playerId,track));
         if(insert==null)return null;
-        if(!walled)
-        {
-            var piece=Instantiate(insert,label,bottom,parent);
-            if(type=="metropolis")return FantasyBoardPiece.Attach(piece,MetropolisKinds[track],ColourKey(playerId));
-            return type=="village" || type=="city"
-                ? FantasyBoardPiece.Attach(piece,type,ColourKey(playerId)) : piece;
-        }
+        if(!walled)return Instantiate(insert,label,bottom,parent);
         var wall=Model(BuildingResource("city-wall",playerId));
         if(wall==null)return null;
         var root=new GameObject(label+" ["+type+"-"+ColourKey(playerId)+"]");
@@ -108,8 +102,6 @@ public static class PlayerComponentAssets
         var innerBuilding=Object.Instantiate(insert,root.transform,false);
         // 城内建筑落在夯土地表；外墙原有的门洞、街道朝向和棋盘支点保持配准。
         innerBuilding.transform.localPosition+=Vector3.up*(.00077f*enclosure.transform.localScale.y);
-        var ink=FantasyBoardPiece.Attach(innerBuilding,insertType=="metropolis"?MetropolisKinds[track]:"city",ColourKey(playerId));
-        ink.GetComponent<FantasyBoardPiece>()?.Align(root.transform.forward);
         return root;
     }
 
@@ -123,7 +115,7 @@ public static class PlayerComponentAssets
     {
         var model=Model(RoadResource(playerId));if(model==null)return null;
         var instance=Object.Instantiate(model,bottom,rotation,parent);instance.name=label;
-        return FantasyBoardPiece.Attach(instance,"road",ColourKey(playerId));
+        return instance;
     }
 
     public static GameObject Knight(string playerId, int level, bool active, string label, Vector3 bottom, Transform parent)
@@ -132,8 +124,7 @@ public static class PlayerComponentAssets
         if(model==null)return null;
         var instance = Instantiate(model,label,bottom,parent);
         ApplyKnightFinish(instance,playerId,level,active);
-        return FantasyBoardPiece.Attach(instance,"knights",ColourKey(playerId),
-            level-1+(active?3:0));
+        return instance;
     }
 
     static readonly Dictionary<(Material,string),Material> helmetFinishes = new();

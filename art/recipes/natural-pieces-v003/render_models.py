@@ -3,7 +3,7 @@ from pathlib import Path
 from mathutils import Vector
 ROOT=Path('D:/Project/catan-true-to-tabletop')
 OUT=ROOT/'art/recipes/natural-pieces-v003'
-RES=ROOT/'Unity/Catan/Assets/Resources/NaturalPieces/v001'
+RES=ROOT/'Unity/Catan/Assets/Art/NaturalPieces/v001'
 scene=bpy.context.scene
 models={o.name.split('.')[0]:o for o in scene.objects if o.type=='MESH'}
 camera=scene.camera

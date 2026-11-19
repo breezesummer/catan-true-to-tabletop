@@ -62,7 +62,7 @@ public static class NaturalPiecesImport
                     Debug.Log("CATAN_NATURAL_PIECE: "+kind+" "+Colours[seat]+" bounds="+b.size.ToString("F6"));
                 }
                 finally{UnityEngine.Object.DestroyImmediate(root);}
-                var thumbnail=(TextureImporter)AssetImporter.GetAtPath(Root+"thumbnail-"+kind+"-"+Colours[seat]+".png");
+                var thumbnail=(TextureImporter)AssetImporter.GetAtPath(Art+"thumbnail-"+kind+"-"+Colours[seat]+".png");
                 thumbnail.isReadable=true;thumbnail.alphaIsTransparency=true;thumbnail.mipmapEnabled=true;
                 thumbnail.maxTextureSize=512;thumbnail.wrapMode=TextureWrapMode.Clamp;thumbnail.SaveAndReimport();
             }

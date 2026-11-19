@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$BuildRoot)
+﻿param([Parameter(Mandatory=$true)][string]$BuildRoot)
 $ErrorActionPreference='Stop'
 $playerRepo=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $playerDirectory=Join-Path ([IO.Path]::GetFullPath((Join-Path $playerRepo $BuildRoot))) 'Builds/Windows'

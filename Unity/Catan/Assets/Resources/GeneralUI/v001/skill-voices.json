@@ -75,8 +75,8 @@
       "clips": [
         "GeneralUI/v001/Voices/tk-g07-s1/1",
         "GeneralUI/v001/Voices/tk-g07-s1/2",
-        "GeneralUI/v001/Voices/tk-g07-s1/3",
-        "GeneralUI/v001/Voices/tk-g07-s1/4"
+        "GeneralUI/v001/Voices/tk-g07-s1/1",
+        "GeneralUI/v001/Voices/tk-g07-s1/2"
       ]
     },
     {
@@ -242,7 +242,7 @@
       "clips": [
         "GeneralUI/v001/Voices/tk-g21-s2/1",
         "GeneralUI/v001/Voices/tk-g21-s2/2",
-        "GeneralUI/v001/Voices/tk-g21-s2/3"
+        "GeneralUI/v001/Voices/tk-g21-s2/1"
       ]
     },
     {
@@ -355,19 +355,19 @@
       "clips": [
         "GeneralUI/v001/Voices/tk-g30-s1/1",
         "GeneralUI/v001/Voices/tk-g30-s1/2",
-        "GeneralUI/v001/Voices/tk-g30-s1/3",
-        "GeneralUI/v001/Voices/tk-g30-s1/4",
-        "GeneralUI/v001/Voices/tk-g30-s1/5",
-        "GeneralUI/v001/Voices/tk-g30-s1/6"
+        "GeneralUI/v001/Voices/tk-g30-s1/1",
+        "GeneralUI/v001/Voices/tk-g30-s1/2",
+        "GeneralUI/v001/Voices/tk-g30-s1/1",
+        "GeneralUI/v001/Voices/tk-g30-s1/2"
       ]
     },
     {
       "skillId": "tk-g30-s2",
       "clips": [
         "GeneralUI/v001/Voices/tk-g30-s2/1",
-        "GeneralUI/v001/Voices/tk-g30-s2/2",
+        "GeneralUI/v001/Voices/tk-g30-s2/1",
         "GeneralUI/v001/Voices/tk-g30-s2/3",
-        "GeneralUI/v001/Voices/tk-g30-s2/4"
+        "GeneralUI/v001/Voices/tk-g30-s2/3"
       ]
     },
     {
@@ -456,7 +456,7 @@
       "clips": [
         "GeneralUI/v001/Voices/tk-g36-s2/1",
         "GeneralUI/v001/Voices/tk-g36-s2/2",
-        "GeneralUI/v001/Voices/tk-g36-s2/3"
+        "GeneralUI/v001/Voices/tk-g36-s2/1"
       ]
     },
     {

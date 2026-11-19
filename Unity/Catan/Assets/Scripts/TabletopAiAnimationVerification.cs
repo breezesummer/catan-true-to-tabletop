@@ -58,7 +58,6 @@ public sealed class TabletopAiAnimationVerification:MonoBehaviour
     }
     IEnumerator Verify()
     {
-        BoardArtPreference.Select(false, persist: false);
         VerifyCacheChanges();
         yield return new WaitForEndOfFrame();CaptureImage("00-开局AI速度选项");
         string[] modes={"base","seafarers","cities-knights","combined"};int[] speeds={0,1,2,1};
@@ -116,14 +115,9 @@ public sealed class TabletopAiAnimationVerification:MonoBehaviour
     }
     static void VerifyModelLayers()
     {
-        var pieces=UnityEngine.Object.FindObjectsByType<FantasyBoardPiece>(FindObjectsSortMode.None);
-        Require(pieces.Length>0,"未找到参与建造的棋子");
-        foreach(var piece in pieces)
-        {
-            var painting=piece.transform.Find("幻想棋子画面").GetComponent<Renderer>();
-            Require(!painting.enabled || painting.forceRenderingOff,"3D 模式出现绘图叠层："+piece.name);
-            Require(piece.GetComponentsInChildren<Renderer>().Any(r=>r!=painting && !r.forceRenderingOff),"3D 棋子缺少实体："+piece.name);
-        }
+        var root=GameObject.Find("Committed pieces");
+        Require(root!=null && root.GetComponentsInChildren<MeshRenderer>().Any(r=>r.enabled && !r.forceRenderingOff),"未找到可见实体棋子");
+        Require(root.GetComponentsInChildren<Transform>().All(t=>t.name!="幻想棋子画面"),"实体棋子残留绘图层");
     }
     void VerifyCacheChanges()
     {

@@ -137,7 +137,7 @@ bpy.data.libraries.write(str(stage/'骑士雕塑.blend'),{scene},fake_user=True,
 manifest=ROOT/'art/recipes/expansion-models-v001/几何.json'
 prior=json.loads(manifest.read_text('utf8'))
 for f in stage.iterdir():
-    dest=RES if f.name.startswith('thumb-') else OUT if f.suffix=='.blend' or '原模' in f.stem else old_art
+    dest=OUT if f.suffix=='.blend' or '原模' in f.stem else old_art
     shutil.copy2(f,dest/f.name)
 manifest.write_text(json.dumps([i for i in prior if not i['kind'].startswith('knight-')]+report,indent=2),encoding='utf8')
 (OUT/'几何.json').write_text(json.dumps(report,indent=2),encoding='utf8')

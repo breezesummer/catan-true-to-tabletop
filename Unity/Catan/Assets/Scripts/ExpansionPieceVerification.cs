@@ -27,13 +27,11 @@ public sealed partial class TabletopUiVerification
             var poses=vertices.Select((v,i)=>new M5.Knight{PlayerId="P2",Level=level,Active=i==1,LocationId=v}).ToArray();
             board.RefreshProjectedPieces(state.Settlements,state.Roads,state.Cities,state.RobberTileId,state.Walls,poses,
                 state.Metropolises,view.MerchantTileId);
-            FantasyBoardPiece.SetView(false);
             yield return new WaitForSeconds(1.8f);
-            var roots=board.CommittedPieces.GetComponentsInChildren<FantasyBoardPiece>();
-            var pair=vertices.Select(v=>roots.Single(p=>p.name.StartsWith("Knight L"+level+" "+v+" [")).transform).ToArray();
+            var roots=board.CommittedPieces.Cast<Transform>();
+            var pair=vertices.Select(v=>roots.Single(p=>p.name.StartsWith("Knight L"+level+" "+v+" ["))).ToArray();
             var wind=pair[1].GetComponentInChildren<ParticleSystem>();
             Require(wind!=null && wind.particleCount>0 && pair[0].GetComponentInChildren<ParticleSystem>()==null,"激活与休整气流不符");
-            FantasyBoardPiece.SetView(false);
             var rot=Quaternion.Euler(32,0,0);
             var center=(pair[0].position+pair[1].position)*.5f+Vector3.up*(level==3?.015f:.012f);
             cam.transform.SetPositionAndRotation(center-rot*Vector3.forward*.24f,rot);
@@ -71,52 +69,6 @@ public sealed partial class TabletopUiVerification
         for(int i=0;i<600&&!Table.Ocean.MaskReady;i++)yield return null;
         Require(Table.Ocean.MaskReady,"地图未就绪");
         string authority=Authority;
-        if(args.Contains("--fantasy-pieces"))
-        {
-            Require(app.PlayerCount==4 && app.ThreeKingdoms && app.Fishing && app.Harbormaster && app.ScenarioId=="through-the-desert","幻想棋子验收配置不符");
-            Table.SetPitch((int)TabletopCameraModel.DefaultAngle,false);
-            Table.Frame(BoardCamera,false,1);
-            while(!UnityEngine.Rendering.SplashScreen.isFinished)yield return null;
-            yield return new WaitForSeconds(2);
-            var pictures=board.CommittedPieces.GetComponentsInChildren<FantasyBoardPiece>();
-            var painted=pictures.Select(p=>p.transform.Find("幻想棋子画面").GetComponent<MeshRenderer>()).ToArray();
-            var state=view.Board;
-            foreach(var kind in new[]{"village","city","road","ship"})
-                Require(painted.Any(r=>!r.forceRenderingOff && r.sharedMaterial.name.Contains("-"+kind+"-")),"实局缺少"+kind);
-            foreach(var colour in new[]{"red","blue","orange","beige"})
-                Require(painted.Any(r=>!r.forceRenderingOff && r.sharedMaterial.name.EndsWith("-"+colour)),"实局缺少玩家色"+colour);
-            yield return new WaitForEndOfFrame();SaveOceanFrame("幻想棋子-全盘.png");
-            var coastalCity=state.Cities.First(p=>state.Ships.Any(s=>s.PlayerId==p.PlayerId && Edges.First(e=>e.Id==s.LocationId).Vertices.Contains(p.LocationId)));
-            FocusDetail(board.Position(coastalCity.LocationId),false);
-            ScrollBoard(-4,false,BoardCamera.pixelRect.center);
-            yield return new WaitForEndOfFrame();SaveOceanFrame("城市与海船.png");
-            var village=state.Settlements.OrderByDescending(p=>state.Roads.Any(r=>r.PlayerId==p.PlayerId && Edges.First(e=>e.Id==r.LocationId).Vertices.Contains(p.LocationId))).First();
-            FocusDetail(board.Position(village.LocationId),false);
-            ScrollBoard(-3,false,BoardCamera.pixelRect.center);
-            yield return new WaitForEndOfFrame();SaveOceanFrame("村庄与航路.png");
-            Require(board.BuildingAt(board.ScreenPoint(village.LocationId))==village.LocationId,"村庄顶点拾取错误");
-            var road=state.Roads.First(r=>r.PlayerId=="P2");
-            FocusDetail(board.Position(road.LocationId),false);
-            ScrollBoard(-4,false,BoardCamera.pixelRect.center);
-            yield return new WaitForEndOfFrame();SaveOceanFrame("蓝方道路与城市.png");
-            foreach(var kind in new[]{"village","city","road","ship"})
-                Require(OperationPieceAssets.Texture(kind,"P1").name==kind+"-red","库存图与棋盘不符："+kind);
-            ScrollBoard(1,true,BoardCamera.pixelRect.center);
-            Require(painted.All(r=>r.forceRenderingOff),"旋转后未切换实体棋子");
-            ScrollBoard(-1,true,BoardCamera.pixelRect.center);
-            Require(painted.All(r=>!r.forceRenderingOff),"返回原视角时画稿没有恢复");
-            Table.Frame(BoardCamera,true,1);
-            Require(painted.All(r=>r.forceRenderingOff),"改变俯角后未切换实体棋子");
-            Table.Frame(BoardCamera,false,1);
-            if(args.Contains("--fantasy-directions"))
-            {
-                var comparison=VerifyFantasyDirections(board,view);
-                while(comparison.MoveNext())yield return comparison.Current;
-            }
-            Require(Authority==authority,"视角或画稿改变了对局");
-            configurations++;
-            yield break;
-        }
         if(args.Contains("--neutral-pieces"))
         {
             Require(app.PlayerCount==4 && app.ScenarioId=="through-the-desert" && app.ThreeKingdoms && app.Harbormaster && app.Fishing,"中立棋子验收模式不符");
@@ -127,7 +79,7 @@ public sealed partial class TabletopUiVerification
             var merchantTile=view.MerchantTileId ?? state.Tiles.First(t=>t.Resource=="wheat" && t.Id!=robberTile).Id;
             if(view.MerchantTileId==null || state.RobberTileId==null)
                 board.RefreshProjectedPieces(state.Settlements,state.Roads,state.Cities,robberTile,state.Walls,state.Knights,state.Metropolises,merchantTile,skillAssets:view.ThreeKingdoms?.BoardAssets);
-            yield return new WaitForEndOfFrame();SaveOceanFrame("实局全盘.png");
+            yield return new WaitForEndOfFrame();CaptureCamera("实局全盘.png");
             foreach(var kind in new[]{"robber","merchant"})
             {
                 bool robber=kind=="robber";
@@ -144,17 +96,10 @@ public sealed partial class TabletopUiVerification
                 FocusDetail(piece.position,false);
                 yield return null;yield return new WaitForEndOfFrame();
                 var title=(robber?"强盗":"货郎")+((robber?state.RobberTileId:view.MerchantTileId)==null?"-公开投影":"-实局");
-                SaveOceanFrame(title+".png");
-                bool priorPainted=BoardArtPreference.Painted;
+                CaptureCamera(title+".png");
                 if(robber)
                 {
-                    BoardArtPreference.Select(true,false);
-                    var painting=piece.Find("幻想棋子画面").GetComponent<MeshRenderer>();
-                    Require(!painting.forceRenderingOff && renderer.forceRenderingOff &&
-                        painting.sharedMaterial.mainTexture==Resources.Load<Texture2D>("FantasyPieces/Views/robber"),"强盗绘制视图未使用同源画稿");
-                    yield return new WaitForEndOfFrame();SaveOceanFrame("强盗-绘制视图.png");
-                    BoardArtPreference.Select(false,false);
-                    Require(!renderer.forceRenderingOff && painting.forceRenderingOff &&
+                    Require(!renderer.forceRenderingOff &&
                         renderer.sharedMaterial.GetTexture("_BumpMap")==Resources.Load<Texture2D>("NeutralPieces/v001/robber-normal") &&
                         renderer.sharedMaterial.GetTexture("_MetallicGlossMap")==Resources.Load<Texture2D>("NeutralPieces/v001/robber-metal"),"强盗实体材质未完整加载");
                 }
@@ -162,8 +107,7 @@ public sealed partial class TabletopUiVerification
                 var centre=piece.position+Vector3.up*.009f;
                 BoardCamera.transform.SetPositionAndRotation(centre-facing*Vector3.forward*.18f,facing);
                 BoardCamera.orthographicSize=robber?.040f:.030f;
-                yield return new WaitForEndOfFrame();SaveOceanFrame(title+"-特写.png");
-                if(robber) BoardArtPreference.Select(priorPainted,false);
+                yield return new WaitForEndOfFrame();CaptureCamera(title+"-特写.png");
             }
             if(args.Contains("--detailed-pirate"))
             {
@@ -177,12 +121,12 @@ public sealed partial class TabletopUiVerification
                 Require(ghost.GetComponentInChildren<MeshFilter>().sharedMesh==mesh && Vector3.Distance(ghost.transform.position,pirate.position)<.00002f,"海盗落点预览错误");
                 Destroy(ghost);
                 FocusDetail(pirate.position,false);
-                yield return null;yield return new WaitForEndOfFrame();SaveOceanFrame("海盗-棋盘.png");
+                yield return null;yield return new WaitForEndOfFrame();CaptureCamera("海盗-棋盘.png");
                 var facing=Quaternion.LookRotation(-(pirate.rotation*new Vector3(.62f,.64f,1f)),Vector3.up);
                 var target=pirate.position+Vector3.up*.0045f;
                 BoardCamera.transform.SetPositionAndRotation(target-facing*Vector3.forward*.18f,facing);
                 BoardCamera.orthographicSize=.022f;
-                yield return new WaitForEndOfFrame();SaveOceanFrame("海盗-特写.png");
+                yield return new WaitForEndOfFrame();CaptureCamera("海盗-特写.png");
             }
             board.Refresh(view);
             Require(Authority==authority,"棋子投影影响存档");
@@ -396,7 +340,6 @@ public sealed partial class TabletopUiVerification
         void FaceStreet()
         {
             var aim=target+Vector3.up*.013f;
-            FantasyBoardPiece.SetView(false);
             BoardCamera.transform.SetPositionAndRotation(aim-streetAngle*Vector3.forward*.24f,streetAngle);
         }
         FaceStreet();yield return new WaitForEndOfFrame();SaveOceanFrame("普通主城-沿街.png");
@@ -415,7 +358,7 @@ public sealed partial class TabletopUiVerification
                 {
                     var spec=new TabletopPointerPreview{Kind="metropolis",Track=(int)track,Wall=hasWall};
                     var ghost=OperationPieceAssets.PointerPreview(spec,seat,target,Quaternion.identity,null,true);
-                    var meshes=ghost.GetComponentsInChildren<MeshFilter>().Where(f=>f.name!="幻想棋子画面").ToArray();
+                    var meshes=ghost.GetComponentsInChildren<MeshFilter>();
                     Require(meshes.Length==(hasWall?2:1)&&meshes.Any(f=>f.sharedMesh==mesh),"大都会建造预览缺件");
                     Destroy(ghost);
                 }
@@ -426,7 +369,7 @@ public sealed partial class TabletopUiVerification
             yield return new WaitForEndOfFrame();SaveOceanFrame(label+"-近景.png");
             var building=board.CommittedPieces.Cast<Transform>().Single(t=>t.name.StartsWith("Metropolis "+track+" "+city.LocationId+" ["));
             var entrance=building.forward;
-            Require(building.GetComponentsInChildren<MeshFilter>().Single(f=>f.name!="幻想棋子画面").sharedMesh==mesh,"大都会网格不符");
+            Require(building.GetComponentsInChildren<MeshFilter>().Single().sharedMesh==mesh,"大都会网格不符");
             var bounds=building.GetComponentInChildren<Renderer>().bounds;
             RecordHeight(label,bounds.size.y);
             Require(bounds.size.y>=cityHeight*1.5f,"大都会未形成足够的高度差");
@@ -439,7 +382,7 @@ public sealed partial class TabletopUiVerification
             yield return null;yield return new WaitForEndOfFrame();SaveOceanFrame(label+"-城墙.png");
             building=board.CommittedPieces.Cast<Transform>().Single(t=>t.name.StartsWith("Metropolis "+track+" "+city.LocationId+" ["));
             Require(Vector3.Angle(entrance,building.forward)<.05f,"城门与大都会入口错向");
-            Require(building.GetComponentsInChildren<MeshFilter>().Count(f=>f.name!="幻想棋子画面")==2,"城墙与大都会组合缺件");
+            Require(building.GetComponentsInChildren<MeshFilter>().Length==2,"城墙与大都会组合缺件");
         }
         board.Refresh(view);Table.ResetPan();SetTop(false);Table.Frame(BoardCamera,false,normalZoom);
         File.WriteAllText(Path.Combine(output,"实机高度.csv"),heights.ToString());

@@ -6,7 +6,7 @@ from pathlib import Path
 from mathutils import Vector
 
 ROOT = Path(__file__).resolve().parents[3]
-DEST = ROOT / "Unity/Catan/Assets/Resources/PaintedMap/Coast/pier.fbx"
+DEST = ROOT / "Unity/Catan/Assets/Art/PaintedMap/Coast/pier.fbx"
 rng = random.Random(429)
 scene = bpy.context.scene
 objects = []

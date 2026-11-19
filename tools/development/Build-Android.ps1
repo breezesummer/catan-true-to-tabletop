@@ -1,5 +1,5 @@
 param(
-    [string]$OutputRoot = 'game version/1.7/Catan1.7.3-Combined-Scenarios',
+    [string]$OutputRoot = (& (Join-Path $PSScriptRoot 'Get-GameBuildRoot.ps1')),
     [switch]$Arm64Only
 )
 $androidBuildClock = [Diagnostics.Stopwatch]::StartNew()

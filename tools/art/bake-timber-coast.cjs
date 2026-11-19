@@ -2,7 +2,7 @@
 const sharp = require('sharp');
 const path = require('node:path');
 const originals = 'art/concepts/木材港高清';
-const output = 'Unity/Catan/Assets/Resources/PaintedMap/Coast/Timber';
+const output = 'Unity/Catan/Assets/Art/PaintedMap/Coast/Timber';
 const frames = [['北',0],['东北',32],['东南',150],['南',180],['西南',212],['西北',330]];
 
 function smooth(low, high, value) {

@@ -52,7 +52,7 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
     readonly List<Vector3> oceanOutline=new List<Vector3>();
     void RefreshPortFootprints()
     {
-        string key=BoardArtPreference.Painted+"|"+string.Join("|",ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null).Select(p=>p.Resource+":"+p.Object.transform.localToWorldMatrix.ToString("F6")));
+        string key=string.Join("|",ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null).Select(p=>p.Resource+":"+p.Object.transform.localToWorldMatrix.ToString("F6")));
         if(key==portLayoutKey)return;
         portLayoutKey=key;PortLayoutRevision++;
         PublicPortFootprints=ports.Values.Concat(gifts.Values).Where(p=>p.Object!=null)
@@ -307,7 +307,7 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
             var delta=center-TileCenter(tile);delta.y=0;
             if(delta.sqrMagnitude<.006f)openWater+=delta;
         }
-        int direction=openWater.sqrMagnitude>.000001f?FantasyPieceFrames.Heading(openWater):3;
+        int direction=openWater.sqrMagnitude>.000001f?Mathf.RoundToInt(Mathf.Atan2(openWater.x,openWater.z)*Mathf.Rad2Deg/60):3;
         var facing=Quaternion.Euler(0,60*direction,0);
         var standard=Vector3.right*.012f;
         float Clearance(Vector3 candidate)

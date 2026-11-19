@@ -65,7 +65,7 @@ public sealed class TabletopFinishTextureImporterV005 : AssetPostprocessor
 {
     void OnPreprocessTexture()
     {
-        if (!assetPath.StartsWith("Assets/Resources/TabletopUI/v005/")) return;
+        if (!assetPath.StartsWith("Assets/Art/TabletopUI/v005/")) return;
         bool normal = assetPath.EndsWith("-normal.png");
         var importer = (TextureImporter)assetImporter;
         importer.textureType = normal ? TextureImporterType.NormalMap : TextureImporterType.Default;

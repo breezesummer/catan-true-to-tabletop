@@ -95,7 +95,7 @@ for name,pos in [('Origin',(0,0,0)),('End',(1,0,0)),('Sea',(0,1,0))]:
     obj=bpy.data.objects.new(name,None)
     bpy.context.collection.objects.link(obj)
     obj.location=pos
-folder=root/'Unity/Catan/Assets/Resources/PaintedMap/Coast'
+folder=root/'Unity/Catan/Assets/Art/PaintedMap/Coast'
 # 以同一个模型的接陆线为轴，分别塑造窄岸、偏心沙嘴与绕角沙肩。
 # 礁石和碎浪跟随同一横断面移动，岩体本身保留原比例。
 models=[o for o in bpy.context.scene.objects if o.type=='MESH']

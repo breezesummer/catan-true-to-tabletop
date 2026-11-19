@@ -2,7 +2,7 @@
   "title": "蓝色发展牌与基础牌重绘",
   "model": "内置 image_gen",
   "generatedAt": "2026-11-03",
-  "outputDirectory": "Unity/Catan/Assets/Art/CardRedraw/v002",
+  "outputDirectory": "Unity/Catan/Assets/Resources/CardRedraw/v002",
   "assets": [
     {
       "id": "diplomacy",
@@ -79,7 +79,7 @@
     {
       "id": "base-knight",
       "name": "骑士",
-      "source": "原创；风格参考 Unity/Catan/Assets/Art/CardRedraw/v002/mining.png 与 diplomacy.png",
+      "source": "原创；风格参考 Unity/Catan/Assets/Resources/CardRedraw/v002/mining.png 与 diplomacy.png",
       "output": "base-knight.png",
       "outputSize": "1024x1536",
       "prompt": "原创基础牌：身着钢甲、披蓝斗篷的中世纪骑士持剑警戒地站在城镇道路旁；顶部留空金色标题带、左上小徽章框、银灰绳纹内框，底部留空石雕说明区。暖米色哑光细纸纹，精细半写实手绘印刷质感，与同套参考一致。完整竖版卡面贴满画布，无文字、数字、水印、卡套和外部背景。"
@@ -87,7 +87,7 @@
     {
       "id": "base-road-building",
       "name": "道路工人",
-      "source": "原创；风格参考 Unity/Catan/Assets/Art/CardRedraw/v002/mining.png 与 base-knight.png",
+      "source": "原创；风格参考 Unity/Catan/Assets/Resources/CardRedraw/v002/mining.png 与 base-knight.png",
       "output": "base-road-building.png",
       "outputSize": "1024x1536",
       "prompt": "原创基础牌：两位中世纪工人在起伏的绿色乡间铺设石路，一人搬石、一人校准路面，远处通往小村；空白金色标题带、左上徽章框、银灰编织内框、底部空白弧顶石雕说明区。暖米色哑光细纸纹，精细半写实手绘印刷质感，与同套参考一致。无文字、水印、卡套和外部背景，完整卡面贴满画布。"
@@ -95,7 +95,7 @@
     {
       "id": "base-year-of-plenty",
       "name": "丰收农田",
-      "source": "原创；风格参考 Unity/Catan/Assets/Art/CardRedraw/v002/mining.png 与 base-knight.png",
+      "source": "原创；风格参考 Unity/Catan/Assets/Resources/CardRedraw/v002/mining.png 与 base-knight.png",
       "output": "base-year-of-plenty.png",
       "outputSize": "1024x1536",
       "prompt": "原创基础牌：夏末丰收的中世纪农田，金色麦浪、农人收割麦捆，前景有装满蔬果的篮子，远处是农舍；空白金色标题带、左上徽章框、银灰编织内框与底部空白石雕说明区。暖米色哑光细纸纹，精细半写实手绘印刷质感，与同套参考一致。无文字、水印、卡套、外部背景，完整竖版卡面。"
@@ -103,7 +103,7 @@
     {
       "id": "base-monopoly",
       "name": "收拢货物的商人",
-      "source": "原创；风格参考 Unity/Catan/Assets/Art/CardRedraw/v002/mining.png 与 base-knight.png",
+      "source": "原创；风格参考 Unity/Catan/Assets/Resources/CardRedraw/v002/mining.png 与 base-knight.png",
       "output": "base-monopoly.png",
       "outputSize": "1024x1536",
       "prompt": "原创基础牌：集市大厅里的中世纪商人将粮束、布料、陶罐和木料等多种货物揽入怀中并装进大布袋；空白金色标题带、左上徽章框、银灰编织内框、底部空白弧顶石雕说明区。暖米色哑光细纸纹，精细半写实手绘印刷质感，与同套参考一致。无文字、数字、水印、卡套和外部背景。"
@@ -111,7 +111,7 @@
     {
       "id": "base-victory-point",
       "name": "宏伟中世纪建筑",
-      "source": "原创；风格参考 Unity/Catan/Assets/Art/CardRedraw/v002/mining.png 与 base-knight.png",
+      "source": "原创；风格参考 Unity/Catan/Assets/Resources/CardRedraw/v002/mining.png 与 base-knight.png",
       "output": "base-victory-point.png",
       "outputSize": "1024x1536",
       "prompt": "原创基础牌：宏伟的中世纪石砌宫殿或大教堂耸立在坚固城镇上方，层叠高塔、华丽拱门与暖金色傍晚光线，仅以建筑表达胜利点；顶部空白金色标题带、左上徽章框、银灰绳纹内框、底部空白石雕说明区。暖米色哑光细纸纹，精细半写实手绘印刷质感，与同套参考一致。无任何文字、数字、水印、卡套和外部背景。"
