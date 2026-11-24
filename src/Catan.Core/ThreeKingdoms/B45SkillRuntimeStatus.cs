@@ -30,6 +30,8 @@ namespace Catan.Core.ThreeKingdoms
                 string specific=null;
                 switch(id)
                 {
+                    case "tk-g38-s2":summary=Remaining(general,"tishen",0);break;
+                    case "tk-g45-s1":summary=B2SkillEngine.WenjiUsed(state,general)?"剩余 0 / 1":"剩余 1 / 1";break;
                     case "tk-g04-s1":summary=Remaining(general,"huoxin",0);if(Left(general,"huoxin",0)==0)specific="本任惑心次数已用。";break;
                     case "tk-g46-s1":summary="剩余 "+Left(general,"fuqi",phase,2)+" / 2";if(Left(general,"fuqi",phase,2)==0)specific="本出牌阶段伏骑次数已用。";break;
                     case "tk-g46-s2":int adjustment=B2SkillEngine.JiaoziAdjustmentB6(host,viewerId);summary=adjustment>0?"建造费用 +1":adjustment<0?"建造费用 −1":"建造费用不变";break;

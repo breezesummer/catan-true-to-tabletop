@@ -35,9 +35,8 @@ public sealed partial class M3App
     OperationSnapshot TradeValidationSnapshot()
     {
         var source=Operations();
-        if(!dock.IsPortTrade||operationPortId==null)return source;
-        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
-        var port=view.Board.Ports.FirstOrDefault(p=>p.Id==operationPortId&&p.Vertices.Any(locations.Contains));
+        if(!dock.IsPortTrade||!source.TradePorts.Contains(operationPortId))return source;
+        var port=view.Board.Ports.FirstOrDefault(p=>p.Id==operationPortId);
         if(port==null)return source;
         var result=new OperationSnapshot{CanTrade=source.CanTrade,CanInteract=source.CanInteract,GoodCount=source.GoodCount,Goods=source.Goods,Bank=source.Bank,OtherPlayers=source.OtherPlayers,Offer=source.Offer};
         for(int i=0;i<source.GoodCount;i++)result.Rates[i]=port.Resource.HasValue?((int)port.Resource.Value==i?2:0):3;
@@ -48,13 +47,13 @@ public sealed partial class M3App
         if(!Operations().CanTrade)return false;
         string id=board.ReferenceMarkers.PickPort(mouse,board.BoardCamera);
         if(string.IsNullOrEmpty(id))return false;
-        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
         var port=view.Board.Ports.FirstOrDefault(p=>p.Id==id);
         if(port==null)return false;
-        if(!port.Vertices.Any(locations.Contains)){status="此港口未连接你的村庄或城市。";ai.ShowTablePrompt(status);return true;}
+        if(!operationSnapshot.TradePorts.Contains(id)){status="此港口未连接你的村庄或城市。";ai.ShowTablePrompt(status);return true;}
         CancelOperationDraft();
         int? good=port.Resource.HasValue?(int?)((int)port.Resource.Value):null;
-        dock.OpenPortTrade(good,good.HasValue?ResourceNames[good.Value]+"港口 · 2:1":"通用港口 · 3:1");
+        dock.OpenPortTrade(good,operationSnapshot);
+        if(dock.IsPortTrade) board.ReferenceMarkers.PressTradePlaque(id);
         operationPortId=id;return true;
     }
     bool PickTabletopObject(Vector2 mouse)
@@ -93,11 +92,10 @@ public sealed partial class M3App
     internal void VerificationChooseBuildingUpgrade()=>mapChoice.Choose(0);
     internal bool VerificationOpenPort(string id)
     {
-        if(view==null||!Operations().CanTrade)return false;
-        var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
-        var port=view.Board.Ports.FirstOrDefault(p=>p.Id==id&&p.Vertices.Any(locations.Contains));
+        if(view==null||!Operations().CanTrade||!operationSnapshot.TradePorts.Contains(id))return false;
+        var port=view.Board.Ports.FirstOrDefault(p=>p.Id==id);
         if(port==null)return false;
-        CancelOperationDraft();dock.OpenPortTrade(port.Resource.HasValue?(int?)((int)port.Resource.Value):null,"港口兑换");operationPortId=id;return true;
+        CancelOperationDraft();dock.OpenPortTrade(port.Resource.HasValue?(int?)((int)port.Resource.Value):null,operationSnapshot);operationPortId=id;return true;
     }
     OperationSnapshot Operations()
     {
@@ -107,6 +105,9 @@ public sealed partial class M3App
             operationView=view;
             var own=view.Players.First(p=>p.Id==seat);
             var s=new OperationSnapshot{Scope="M3:"+seat,Seat=seat,PublicSequence=view.Events.LastOrDefault()?.Sequence??0,Revision=view.Turn+":"+view.Phase+":"+view.Events.Length,Phase=PhaseName(view.Phase),RequiresSelection=TabletopSelectionPrompt.RequiredPhase(view.Phase.ToString()),GoodCount=5};
+            var locations=view.Board.Settlements.Concat(view.Board.Cities).Where(b=>b.PlayerId==seat).Select(b=>b.LocationId).ToArray();
+            foreach(var port in view.Board.Ports)
+                if(port.Vertices.Any(locations.Contains)) s.TradePorts.Add(port.Id);
             s.CollectionTiles=TabletopCollectionSources.Project(view.Board.Tiles,view.Board.Settlements,view.Board.Cities,view.Board.RobberTileId,s.GoodCount==8);s.CollectionPosition=id=>{var point=MobileTabletop.Logical(board.ScreenPoint(id));return new TabletopCardPose{X=point.x,Y=point.y};};
             s.Goods=DockCost(view.OwnResources.Wood,view.OwnResources.Brick,view.OwnResources.Wool,view.OwnResources.Wheat,view.OwnResources.Ore);
             s.Bank=DockCost(view.Bank.Wood,view.Bank.Brick,view.Bank.Wool,view.Bank.Wheat,view.Bank.Ore);

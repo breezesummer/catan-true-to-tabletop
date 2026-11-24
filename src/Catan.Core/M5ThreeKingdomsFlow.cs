@@ -93,6 +93,7 @@ namespace Catan.Core.M5
                     if (c.Kind == CommandKind.AttackFortress) Require(seafaring.Id == "pirate-islands" && CanAttackFortress(s, c.PlayerId), "FortressNotReached", "尚未连接己方要塞。");
                     Require(B2Unlimited(s, c.PlayerId) || B2Protected(s, c.PlayerId) || s.Players.Single(p => p.Id == c.PlayerId).ProgressCards.Length <= B5ProgressLimit(s,c.PlayerId), "ProgressHandLimit", "结束出牌阶段前须将发展卡减至当前上限。");
                     ThreeKingdomsEngine.AdvancePhase(tk, c.PlayerId, c.WindowId);
+                    B2SkillEngine.OnB4PlayEnded(host, "play-end-" + tk.Clock.PhaseId);
                     B2SkillEngine.OnEnd(host, "end-" + tk.Clock.TurnInstanceId);
                     FinishB2Work(s); RefreshB2(s); return;
                 }

@@ -116,6 +116,7 @@ public sealed partial class OperationDock
 
     public bool TradeOpen => tradeOpen;
     public bool IsPortTrade => tradeOpen&&portTrade;
+    internal bool CanOpenTrade(OperationSnapshot snapshot) => snapshot!=null && snapshot.CanTrade && snapshot.CanInteract && snapshot.Offer==null && !DirectSelecting;
     internal int VerificationFacilityTrack => facilityTrack;
     internal int[] VerificationTradeGiveGoods => tradeOpen?OperationPanelOptions.PaymentGoods(current,portTrade&&current.ValidateTradeDraft==null?portGood:null):Array.Empty<int>();
     public bool ResourceHandVisible => !specialHand&&!FishHandVisible&&!GeneralHandVisible;
@@ -179,7 +180,7 @@ public sealed partial class OperationDock
     {Vector2 release;return ConsumeBuildRelease(out release)&&(logicalMouse-release).sqrMagnitude<=24*24;}
     public void OpenTrade(string target=null)
     {
-        if(current==null||!current.CanTrade||!current.CanInteract||current.Offer!=null||DirectSelecting)return;
+        if(!CanOpenTrade(current))return;
         Windows?.Open();current.Cancel?.Invoke();raisedCard=null;tradeOpen=true;facilityTrack=-1;discardCard=null;Selection.BuildId=null;Selection.PieceOrdinal=-1;message="";
         portTrade=false;portGood=null;tradeTitle=target==null?"银行":"玩家交易";
         playerTrade=target!=null;
@@ -187,9 +188,10 @@ public sealed partial class OperationDock
         this.target=target==null?0:Math.Max(0,Array.IndexOf(current.OtherPlayers,target));
         if(playerTrade)Array.Copy(Selection.Selected,give,8);else Array.Clear(give,0,8);Array.Clear(receive,0,8);
     }
-    public void OpenPortTrade(int? resource,string title)
+    public void OpenPortTrade(int? resource,OperationSnapshot snapshot)
     {
-        if(resource.HasValue&&(resource.Value<0||resource.Value>=5))return;
+        if(!CanOpenTrade(snapshot) || resource.HasValue&&(resource.Value<0||resource.Value>=5))return;
+        BindSnapshot(snapshot);
         OpenTrade();if(!tradeOpen)return;
         portTrade=true;portGood=resource;tradeTitle=resource.HasValue?Names[resource.Value]+"港口":"通用港口";
     }
@@ -261,13 +263,17 @@ public sealed partial class OperationDock
     HitShape Register(Rect r,float angle=0,Texture2D texture=null){var hit=new HitShape{Rect=r,Angle=angle,Texture=texture};hits.Add(hit);return hit;}
     static void Paper(Rect r)
     {ModernOperationUI.Panel(r);}
+    void BindSnapshot(OperationSnapshot snapshot)
+    {
+        if(scope!=snapshot.Scope){hoverAmounts.Clear();hoveredHand=null;handHoverAnchor=Rect.zero;handUpdated=Time.unscaledTimeAsDouble;fallbackOrder=new TabletopHandOrder();specialOrder=new TabletopSpecialHandOrder();specialHand=false;resourceScroll=specialScroll=0;}
+        if(scope!=snapshot.Scope||revision!=snapshot.Revision){Reset();scope=snapshot.Scope;revision=snapshot.Revision;}
+        current=snapshot;Selection.Sync(snapshot);
+    }
     public void Draw(OperationSnapshot snapshot,Font font)
     {
         Styles(font);
         if(snapshot==null||string.IsNullOrEmpty(snapshot.Scope)){Reset();current=null;return;}
-        if(scope!=snapshot.Scope){hoverAmounts.Clear();hoveredHand=null;handHoverAnchor=Rect.zero;handUpdated=Time.unscaledTimeAsDouble;fallbackOrder=new TabletopHandOrder();specialOrder=new TabletopSpecialHandOrder();specialHand=false;resourceScroll=specialScroll=0;}
-        if(scope!=snapshot.Scope||revision!=snapshot.Revision){Reset();scope=snapshot.Scope;revision=snapshot.Revision;}
-        current=snapshot;Selection.Sync(snapshot);
+        BindSnapshot(snapshot);
         if(HasOverlay)Windows?.Describe(HasActionableOffer(snapshot)?"回应交易":tradeOpen?"继续交易":"城市设施");
         if(snapshot.Discard!=null){specialHand=snapshot.Discard.Special;Fishing?.Hide();}
         if(DirectSelecting)Fishing?.Hide();

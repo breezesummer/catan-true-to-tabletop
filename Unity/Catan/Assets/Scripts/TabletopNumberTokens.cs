@@ -11,7 +11,7 @@ public sealed class TabletopNumberTokens : MonoBehaviour
 
     public static TabletopNumberTokens Create(Transform parent, Tile[] tiles, Dictionary<string,Vector3> positions)
     {
-        var root = new GameObject("悬浮玉薄签");
+        var root = new GameObject("地块点数");
         root.transform.SetParent(parent, false);
         var tokens = root.AddComponent<TabletopNumberTokens>();
         tokens.assets = JadeNumberAssets.For(parent);
@@ -34,8 +34,8 @@ public sealed class TabletopNumberTokens : MonoBehaviour
         foreach (var tile in visible)
         {
             var slip = assets.CreateSlip(transform, "点数 " + tile.Number + " · " + tile.Id, tile.Number.Value);
-            var anchor = positions[tile.Id] + Vector3.up * (EntityBoardAssets.BoardSurfaceHeight + .012f);
-            slip.Place(anchor, new Vector2(0, .009f), JadeNumberSlip.LandWidth, .0083f);
+            var anchor = positions[tile.Id] + Vector3.up * EntityBoardAssets.BoardSurfaceHeight;
+            slip.Place(anchor, Vector2.zero);
         }
     }
 

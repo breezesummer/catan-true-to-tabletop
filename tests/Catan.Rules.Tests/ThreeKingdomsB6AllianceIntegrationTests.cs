@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Runtime.Serialization.Json;
 using Catan.Core;
 using Catan.Core.ThreeKingdoms;
+using Catan.Core.TradeModules;
 using M4=Catan.Core.M4;
 using M5=Catan.Core.M5;
 using Xunit;
@@ -42,6 +43,90 @@ public sealed class ThreeKingdomsB6AllianceIntegrationTests
     }
     private static dynamic Restore(dynamic game,string mode)
     {object s=game.GetAuthoritativeStateForTesting();using var stream=new MemoryStream();var serializer=new DataContractJsonSerializer(s.GetType());serializer.WriteObject(stream,s);stream.Position=0;var copy=serializer.ReadObject(stream)!;object restored=mode=="cities"?(object)M4CoreHarness.New():M5Harness.New();restored.GetType().GetField("state",BindingFlags.Instance|BindingFlags.NonPublic)!.SetValue(restored,copy);return restored;}
+    [Theory][InlineData(true)][InlineData(false)]
+    public void OpeningAllianceFinishesThroughPlayerAndAiChoices(bool allianceFirst)
+    {
+        for (uint seed = 1; seed <= 64; seed++)
+        {
+            var game = M5.CombinedGameSession.Create("through-the-desert", 4, seed, threeKingdoms: true,
+                threeKingdomsPackageVersion: GeneralCatalog.B6PackageVersion,
+                tradeModules: new TradeModuleOptions { Harbormaster = true, Fishing = true });
+            var seats = game.GetAuthoritativeStateForTesting().ThreeKingdoms.SeatPlayerIds;
+            if (!seats.Any(id => game.GetPlayerView(id).ThreeKingdoms.PendingDecision.CandidateIds.Contains("tk-g50"))) continue;
+            var ai = new Catan.AI.CombinedAi();
+            int joins = 0, accepts = 0;
+            for (int step = 0; step < 45; step++)
+            {
+                var view = game.GetPlayerView(seats[0]);
+                var tk = view.ThreeKingdoms;
+                if (view.Phase == M5.GamePhase.SetupSettlement && tk.SkillDecision == null)
+                {
+                    Assert.Equal(2, joins);
+                    Assert.Equal(2, accepts);
+                    return;
+                }
+                var actor = tk.WaitingSelectionPlayerIds.FirstOrDefault() ?? tk.SkillDecision?.PlayerId ?? view.ActivePlayerId;
+                view = game.GetPlayerView(actor);
+                tk = view.ThreeKingdoms;
+                M5.Command cmd;
+                if (tk.PendingDecision != null)
+                {
+                    cmd = view.LegalActions.Where(c => c.Kind == M5.CommandKind.ChooseGenerals || c.Kind == M5.CommandKind.DeployGeneral)
+                        .OrderByDescending(c => c.GeneralIds.Contains("tk-g50")).First();
+                }
+                else if (tk.SkillDecision?.Kind == "b4-order" && tk.SkillActions.Any(a => a.Label.Contains("自立")))
+                {
+                    var draft = new B45SelectionContext();
+                    draft.Begin(tk, actor, null, new int[8]);
+                    var option = draft.Options.Single(a => a.Label.Contains(allianceFirst ? "自立" : "排异"));
+                    Assert.True(draft.ShowOptionChoices);
+                    Assert.True(draft.ChooseOption(option));
+                    cmd = new M5.Command { PlayerId = actor, Kind = M5.CommandKind.UseGeneralSkill,
+                        SkillCommand = draft.FinishDirectPick(), WindowId = tk.WindowId };
+                }
+                else
+                {
+                    cmd = ai.Decide(game.GetAiPlayerView(actor));
+                    if (cmd.SkillCommand?.Option == "alliance-b6-join") joins++;
+                    if (cmd.SkillCommand?.Option == "alliance-b6-accept") accepts++;
+                }
+                cmd.Id = ThreeKingdomsTestGame.NextId();
+                var result = game.Execute(cmd);
+                Assert.True(result.Success, $"{actor} {tk.SkillDecision?.Kind} {cmd.SkillCommand?.Option} {result.Message}");
+                game.AssertInvariants();
+            }
+            Assert.Fail("自立未能返回初始摆放。");
+        }
+        Assert.Fail("候选中未找到钟会。");
+    }
+
+    [Theory][InlineData("cities","gift")][InlineData("combined","demand")]
+    public void NegotiatedTermsSurviveRestoreAndTransferOnce(string mode,string direction)
+    {
+        dynamic game=Fixture(mode,new[]{"tk-g50","tk-g12","tk-g09","tk-g22"},s=>{
+            Player(s,"P1").Resources.Wood=2;
+            Player(s,"P2").Resources.Wood=2;
+        });
+        dynamic state=game.GetAuthoritativeStateForTesting();
+        ThreeKingdomsState tk=state.ThreeKingdoms;
+        B2SkillEngine.OnAllianceB6GeneralActivated(tk,tk.Generals.Single(g=>g.Region==GeneralRegion.Active&&g.OwnerPlayerId=="P1"));
+        var host=(IThreeKingdomsCardHost)game.GetType().GetMethod("CardHost",BindingFlags.NonPublic|BindingFlags.Instance)!.Invoke(game,new object[]{state})!;
+        B2SkillEngine.Pump(host);Set(game,state);
+        Skill(game,mode,"P1","b4-order",(Func<B2SkillAction,bool>)(a=>a.Label.Contains("自立")));
+        Skill(game,mode,"P2","alliance-b6-join");
+        Skill(game,mode,"P1","alliance-b6-"+direction);
+        Skill(game,mode,"P1","alliance-b6-card",(Func<B2SkillAction,bool>)(a=>a.Command.CardType==0));
+        dynamic copy=Restore(game,mode);
+        Assert.Contains("木×1",(string)copy.GetPlayerView("P1").ThreeKingdoms.SkillDecision.Description);
+        Assert.DoesNotContain("木×1",(string)copy.GetPlayerView("P3").ThreeKingdoms.SkillDecision.Description);
+        SameSkill(game,copy,mode,"P1","alliance-b6-offer");
+        Assert.Equal(2,(int)copy.GetPlayerView("P1").OwnResources.Wood);
+        SameSkill(game,copy,mode,"P2","alliance-b6-confirm");
+        Assert.Equal(direction=="gift"?1:3,(int)copy.GetPlayerView("P1").OwnResources.Wood);
+        Assert.Equal("P3",(string)copy.GetPlayerView("P1").ThreeKingdoms.SkillDecision.PlayerId);
+        Assert.Equal((string)game.Save(),(string)copy.Save());
+    }
+
     private static void GiveProgress(dynamic s,string player,params string[] cards)
     {if(s is M4.GameState a)a.Players.Single(p=>p.Id==player).ProgressCards=cards.Select(Enum.Parse<M4.ProgressCardKind>).ToArray();else ((M5.GameState)s).Players.Single(p=>p.Id==player).ProgressCards=cards.Select(Enum.Parse<M5.ProgressCardKind>).ToArray();}
     private static dynamic Play(dynamic game,string mode,string card,string target="P2")

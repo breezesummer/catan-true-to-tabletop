@@ -46,7 +46,6 @@ function Export-Audio([string]$Relative,[single[]]$Samples,[string]$Kind,[string
 foreach($cue in ([Enum]::GetValues([TabletopAudioCue]) | Where-Object { $_ -le [TabletopAudioCue]::BarbarianSail })){Export-Audio ('Effects/'+$cue+'.wav') ([TabletopAudioSynth]::Render($cue)) 'effect' $cue.ToString()}
 $themes=@('晨光港湾：海浪与海鸟','金色麦田：微风与田鸟','林间溪谷：溪流与林鸟','雪山城堡：山间风声','月夜灯港：夜风与虫鸣')
 for($i=0;$i -lt 5;$i++){Export-Audio ('Ambience/Theme'+$i+'.wav') ([TabletopAudioSynth]::RenderAmbience($i)) 'ambience' $themes[$i]}
-Export-Audio 'Music/SeaBreezeHome.wav' ([TabletopAudioSynth]::RenderMusic()) 'music' '原创循环配乐：海风归途'
 $sourceRoot=Join-Path $projectRoot 'art/source/audio-v003/voices'
 $voiceManifest=Get-Content -LiteralPath (Join-Path $sourceRoot 'manifest.json') -Raw|ConvertFrom-Json
 foreach($voice in $voiceManifest.lines){

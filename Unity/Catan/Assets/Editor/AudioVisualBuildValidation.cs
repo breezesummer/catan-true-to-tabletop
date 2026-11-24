@@ -22,7 +22,8 @@ public static class AudioVisualBuildValidation
         foreach (TabletopAudioCue cue in Enum.GetValues(typeof(TabletopAudioCue)))
             Audio("Assets/Resources/" + TabletopAudio.EffectPath(cue) + (cue == TabletopAudioCue.ShipBuild ? ".mp3" : ".wav"));
         for (int theme = 0; theme < 5; theme++) Audio(audioRoot + "Ambience/Theme" + theme + ".wav");
-        Audio(audioRoot + "Music/SeaBreezeHome.wav");
+        foreach (string time in new[] { "150546", "150831", "151115" })
+            Audio(audioRoot + "Music/Sea_Breeze_Homecoming_2026-11-22T" + time + ".mp3");
         for (int level = 1; level <= 3; level++) for (int action = 1; action <= 6; action++)
         for (int variant = 0; variant < 2; variant++) Audio("Assets/Resources/" + KnightVoiceCatalog.Path((KnightVoiceAction)action, level, variant) + ".wav");
         Texture(Resources.Load<Texture2D>("PastoralMenu/v004/title"),"独立菜单标题");

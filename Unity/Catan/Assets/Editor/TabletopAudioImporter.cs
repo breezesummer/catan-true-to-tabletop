@@ -12,8 +12,9 @@ public sealed class TabletopAudioImporter : AssetPostprocessor
         if (!assetPath.StartsWith("Assets/Resources/TabletopAudio/", StringComparison.Ordinal)) return;
         var importer = (AudioImporter)assetImporter;
         var settings = importer.defaultSampleSettings;
-        settings.compressionFormat = AudioCompressionFormat.PCM;
-        settings.loadType = AudioClipLoadType.DecompressOnLoad;
+        bool music = assetPath.StartsWith("Assets/Resources/TabletopAudio/v003/Music/", StringComparison.Ordinal);
+        settings.compressionFormat = music ? AudioCompressionFormat.Vorbis : AudioCompressionFormat.PCM;
+        settings.loadType = music ? AudioClipLoadType.Streaming : AudioClipLoadType.DecompressOnLoad;
         settings.sampleRateSetting = AudioSampleRateSetting.PreserveSampleRate;
         settings.preloadAudioData = true;
         importer.defaultSampleSettings = settings;

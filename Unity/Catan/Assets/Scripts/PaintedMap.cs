@@ -59,6 +59,7 @@ public sealed class PaintedMap : MonoBehaviour
             map.ink.SetTexture("_RoadEdge",Resources.Load<Texture2D>(CoastalDecals.Root+"road-edge"));
             map.ink.SetTexture("_RoadVerges",Resources.Load<Texture2D>(CoastalDecals.Root+"road-verges"));
             map.ink.SetTexture("_BeachEdge",Resources.Load<Texture2D>(CoastalDecals.Root+"beach-edge"));
+            map.ink.SetTexture("_RobberContact",Resources.Load<Texture2D>("NeutralPieces/v001/robber-contact"));
         }
         var model = PlayerComponentAssets.Model(Root + "board-hex");
         var tile = Instantiate(model, center, model.transform.rotation, parent);

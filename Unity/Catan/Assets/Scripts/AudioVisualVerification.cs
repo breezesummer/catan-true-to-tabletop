@@ -85,10 +85,25 @@ public sealed class AudioVisualVerification : MonoBehaviour
         preferencesCaptured = true;
         audio.Muted = true;
         stage = "音频片段";
+        stage = "背景音乐轮播";
+        var musicSource = audio.GetComponents<AudioSource>().Single(s => s.clip != null && s.clip == audio.GetMusicClip());
+        var round = new HashSet<AudioClip>();
+        AudioClip previous = null;
+        for (int i = 0; i < 6; i++)
+        {
+            var track = musicSource.clip;
+            Require(track != null && track.length > 45 && !musicSource.loop && musicSource.isPlaying, "背景音乐播放异常");
+            Require(track != previous && round.Add(track), "随机播放重复曲目");
+            if (i % 3 == 2) round.Clear();
+            previous = track;
+            musicSource.time = track.length - .4f;
+            float deadline = Time.realtimeSinceStartup + 4f;
+            while (musicSource.clip == track && Time.realtimeSinceStartup < deadline) yield return null;
+            Require(musicSource.clip != track, "曲终未切歌");
+        }
+        Debug.Log("CATAN_MUSIC_PLAYLIST_OK");
+        stage = "音频片段";
         foreach (TabletopAudioCue cue in Enum.GetValues(typeof(TabletopAudioCue))) CheckClip(audio.GetClip(cue), cue.ToString());
-        CheckClip(audio.GetMusicClip(), "背景音乐");
-        Require(audio.GetMusicClip().length > 45, "完整乐句时长不足");
-        Require(audio.GetComponents<AudioSource>().Any(s => s.clip == audio.GetMusicClip() && s.loop), "背景音乐没有开启循环");
         while (!audio.KnightVoicesLoaded) yield return null;
         Require(audio.VoiceClipCount == KnightVoiceCatalog.ClipCount, "骑士分级语音不齐全");
         for (int theme = 0; theme < 5; theme++) CheckClip(audio.GetAmbienceClip(theme), "主题环境 " + theme);

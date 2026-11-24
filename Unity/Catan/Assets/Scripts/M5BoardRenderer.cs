@@ -141,11 +141,12 @@ public sealed class M5BoardRenderer : MonoBehaviour
     public void RefreshReferenceMarkers(PlayerView view)
     {
         shipCoast.ClearPorts();
-        foreach(var port in view.Board.Ports)shipCoast.Port(null,port.Vertices);
+        foreach(var port in view.Board.Ports)shipCoast.Port(null,port.Vertices,port.Resource);
         ReferenceMarkers.Refresh(view.Board.Tiles,view.Board.Ports.Select(p=>new TabletopReferenceMarkers.PortDisplay
             {Id=p.Id,Vertices=p.Vertices,Resource=p.Resource}).ToArray(),
             publicScores:view.Players.Select(p=>new TabletopReferenceMarkers.ScoreDisplay{PlayerId=p.Id,Points=p.BonusVictoryPoints}).ToArray(),
-            observerSeat:view.PlayerId,table:tableScene);
+            observerSeat:view.PlayerId,table:tableScene,settlements:view.Board.Settlements,cities:view.Board.Cities,
+            skillAssets:view.ThreeKingdoms?.BoardAssets);
         FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position);
     }
     // The live PlayerView and art verification share this public projection-only entrance.
@@ -253,7 +254,7 @@ public sealed class M5BoardRenderer : MonoBehaviour
         shipCoast.RefreshWakes(pieceCache,pieces,operationLayout?tableScene.Ocean:null,Position);
         pieceCache.Begin("ships",pieces);
         foreach(var ship in ships)
-        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+operationLayout+":"+shipCoast.HasDock(ship.LocationId)+":"+shipCoast.Reversed(ship.LocationId)))
+        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+operationLayout+":"+shipCoast.BerthDistance(ship.LocationId)+":"+shipCoast.Reversed(ship.LocationId)))
             if(change.Changed)Ship(ship.LocationId,SeatColor(ship.PlayerId),pieces);
         if(!string.IsNullOrEmpty(pirateTileId))
         using(var change=pieceCache.Update("pirate",pirateTileId+":"+operationLayout+":"+ReferenceMarkers.PortLayoutRevision))

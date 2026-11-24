@@ -114,6 +114,8 @@ namespace Catan.Core.ThreeKingdoms
         [DataMember(Order=43, EmitDefaultValue=false)] public B5CivilState CivilB5 { get; set; }
         [DataMember(Order=44, EmitDefaultValue=false)] public B6ControlGrant ControlB6 { get; set; }
         [DataMember(Order=45, EmitDefaultValue=false)] public B6AllianceState AllianceB6 { get; set; }
+        [DataMember(Order=46, EmitDefaultValue=false)] public long RevisedSkillsFromSequence { get; set; }
+        [IgnoreDataMember] internal bool ReplayOriginalSkills { get; set; }
     }
     [DataContract] public sealed class ThreeKingdomsPlayerView
     {

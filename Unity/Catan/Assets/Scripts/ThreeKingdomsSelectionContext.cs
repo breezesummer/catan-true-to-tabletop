@@ -68,6 +68,9 @@ public sealed class B45SelectionContext
     public bool CanCancel => Contract?.CanCancel==true && !submitting;
     public B2SkillCommand SkipCommand => submitting?null:B45SelectionContract.Copy(Contract?.SkipCommand);
     public string Description => Contract?.Description??"";
+    public bool Luoying => Contract?.DecisionKind=="luoying";
+    public int LuoyingCount => Luoying ? Contract.Actions.Where(a=>a.Command.Option=="luoying")
+        .Select(a=>a.Command.Counts[0]).DefaultIfEmpty(0).Max() : 0;
     public bool AwaitingEffectChoice => Contract?.DecisionKind=="b5m-zaiqi"&&optionKey==null;
     public string Notice {get;private set;}
     public string Summary => Shelie?"已选资源 "+shelieTypes.Count+" / 3 种":(RequiresBankCards?"已选银行牌 "+bankCounts.Sum()+" / "+RequiredBankCount+" 张 · ":"")+"已选手牌 "+SelectedCounts.Sum()+" 张"+(progress.Count>0?" · 发展牌 "+progress.Count+" 张":"")+(players.Count>0?" · 目标 "+players.Count+" 人":"")+(tiles.Count>0?" · 棋盘目标 "+tiles.Count+" 项":"")+(privateCounts.Sum()>0?" · 授权目标手牌 "+privateCounts.Sum()+" 张":"");
@@ -107,7 +110,6 @@ public sealed class B45SelectionContext
             case "optional":
             case "harvest":
             case "qianxun-response":
-            case "luoying":
             case "dice-modify":
             case "dice-fixed":
             case "dice-observe":
@@ -350,6 +352,12 @@ public sealed class B45SelectionContext
     }
     public B2SkillCommand BuildCommand()
     {
+        if(Luoying)
+        {
+            if(submitting)return null;
+            var claim=Contract.Actions.FirstOrDefault(a=>a.Command.Option=="luoying"&&a.Command.Counts[0]==LuoyingCount);
+            return B45SelectionContract.Copy(claim?.Command);
+        }
         if(Raid){
             if(RaidCount==0||players.Count!=RaidCount||submitting)return null;
             var match=RaidChoices().FirstOrDefault(a=>players.All(a.Command.TargetPlayerIds.Contains));

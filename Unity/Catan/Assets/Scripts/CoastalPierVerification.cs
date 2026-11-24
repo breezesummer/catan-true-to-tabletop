@@ -21,31 +21,35 @@ public sealed partial class TabletopUiVerification
         var markers = Table.transform.parent.GetComponentInChildren<TabletopReferenceMarkers>();
         var ports = GetComponent<M5App>().M6View.Board.Ports;
         string authority=Authority;
-        if (args.Contains("--wood-berth"))
+        bool commonBerth=args.Contains("--common-berth");
+        if (args.Contains("--wood-berth") || args.Contains("--brick-berth") || commonBerth)
         {
+            bool brick=args.Contains("--brick-berth");
+            string dockName=commonBerth?"吊楼商港":brick?"砖港":"木材港";
             var board=GetComponent<M5App>().VerificationBoard;
-            var port=ports.Single(p=>p.Resource==Catan.Core.Resource.Wood);
+            var ships=GetComponent<M5App>().M6View.Board.Ships;
+            var port=commonBerth ? ports.First(p=>!p.Resource.HasValue &&
+                Edges.Any(e=>p.Vertices.All(e.Vertices.Contains) && ships.Any(s=>s.LocationId==e.Id))) :
+                ports.Single(p=>p.Resource==(brick?Catan.Core.Resource.Brick:Catan.Core.Resource.Wood));
             var edge=Edges.Single(e=>port.Vertices.All(e.Vertices.Contains));
-            Require(Mathf.Abs(CoastalDecals.DockLength-CoastalDecals.PierModelLength)<.0002f,"栈桥模型与泊位长度不符");
-            var ship=GetComponent<M5App>().M6View.Board.Ships.SingleOrDefault(s=>s.LocationId==edge.Id);
-            Require(ship!=null,"木材港同边缺少实船 "+edge.Id);
+            var ship=ships.SingleOrDefault(s=>s.LocationId==edge.Id);
+            Require(ship!=null,dockName+"同边缺少实船 "+edge.Id);
             var root=markers.PortObject(port.Id).transform;
+            float deckEnd=CoastalDecals.Footprint(root).SelectMany(t=>t).Min(p=>root.InverseTransformPoint(p).z);
+            Require(Mathf.Abs(deckEnd-CoastalDecals.PlatformEnd(port.Resource))<.0001f,dockName+"模型与泊位外沿不符");
             var actual=board.CommittedPieces.Cast<Transform>().Single(t=>t.name.StartsWith("Ship "+edge.Id+" [",StringComparison.Ordinal));
             var berth=root.InverseTransformPoint(actual.position);
-            Require(Mathf.Abs(berth.x)<.00002f && Mathf.Abs(-berth.z-(CoastalDecals.DockLength-CoastalDecals.ShoreEnd)-ShipCoastLayout.HullBeam*.75f)<.00005f,"商船没有停靠在甲板外沿正中");
+            Require(Mathf.Abs(berth.x)<.00002f && Mathf.Abs(berth.z-deckEnd+ShipCoastLayout.HullBeam*.75f)<.00005f,"商船没有停靠在"+dockName+"平台外沿正中");
             Require(Mathf.Abs(Vector3.Dot(actual.forward,root.forward))<.01f,"船身未沿岸摆放");
             var wake=board.CommittedPieces.Find("船尾浪 "+edge.Id).GetComponent<MeshFilter>();
             var strip=wake.sharedMesh.vertices;
             var wakeStart=wake.transform.TransformPoint((strip[0]+strip[1])*.5f);
             Require(Mathf.Abs(Vector3.Dot(actual.forward,wakeStart-actual.position)+EntityBoardAssets.ShipLength*.48f)<.0001f,"尾浪未贴近艉部水线");
             var deck=actual.Find("主甲板最低点");
-            // 栈桥配方的水平桥板从 0.53 毫米起，高 0.69 毫米。
-            float pierY=root.TransformPoint(Vector3.up*.00122f).y;
             Require(deck!=null,"缺少主甲板测点");
-            float expectedDeckY=TabletopOcean.WaterHeight+(pierY-TabletopOcean.WaterHeight)*EntityBoardAssets.ShipScale;
+            float expectedDeckY=TabletopOcean.WaterHeight+EntityBoardAssets.ShipDeckAboveKeel-EntityBoardAssets.ShipDraft;
             Require(Mathf.Abs(deck.position.y-expectedDeckY)<.00005f,"主甲板未随船模等比缩小");
             Require(deck.position.y>TabletopOcean.WaterHeight&&actual.position.y<TabletopOcean.WaterHeight,"商船吃水异常");
-            Debug.Log($"安达卢西亚号甲板 {deck.position.y*1000:F2} 毫米，港口桥面 {pierY*1000:F2} 毫米");
             foreach(string key in new[]{"P1","P2","P3","P4","pirate"})
             {
                 var resource=key=="pirate"?EntityBoardAssets.PirateResource:EntityBoardAssets.ShipResource(key);
@@ -59,7 +63,7 @@ public sealed partial class TabletopUiVerification
             var sea=-root.forward;
             var size=.021f;
             // 两帧从海侧看向岸上，保持画幅一致，让斜视帧里的船帆位于贸易牌前方。
-            DetailFrame(center,"木材港靠泊-俯视",detailSize:size,eyeOffset:Vector3.up*.16f,viewUp:root.forward);
+            DetailFrame(center,dockName+"靠泊-俯视",detailSize:size,eyeOffset:Vector3.up*.16f,viewUp:root.forward);
             if(args.Contains("--pier-shadow-probe"))
             {
                 var pier=root.Find("PierDeck").GetComponent<Renderer>();
@@ -71,11 +75,11 @@ public sealed partial class TabletopUiVerification
                 }
                 finally { pier.shadowCastingMode=cast; }
             }
-            DetailFrame(center,"木材港靠泊-斜视45度",detailSize:size,eyeOffset:(sea+Vector3.up).normalized*.16f);
-            DetailFrame(center,"木材港靠泊-低角度",detailSize:size,eyeOffset:(sea+Vector3.up*.22f).normalized*.16f);
+            DetailFrame(center,dockName+"靠泊-斜视45度",detailSize:size,eyeOffset:(sea+Vector3.up).normalized*.16f);
+            DetailFrame(center,dockName+"靠泊-低角度",detailSize:size,eyeOffset:(sea+Vector3.up*.22f).normalized*.16f);
             // 从船首外舷看帆腹和护舷，保留栈桥作为尺寸参照。
             var bowView=(actual.forward*.92f+sea*.79f+Vector3.up*.44f).normalized;
-            DetailFrame(actual.position+Vector3.up*(EntityBoardAssets.ShipLength*.28f),"木材港靠泊-船首斜视",detailSize:.016f,eyeOffset:bowView*.16f,matchCameraMsaa:true);
+            DetailFrame(actual.position+Vector3.up*(EntityBoardAssets.ShipLength*.28f),dockName+"靠泊-船首斜视",detailSize:.016f,eyeOffset:bowView*.16f,matchCameraMsaa:true);
             Require(authority==Authority,"靠泊取景改变了权威对局");
             configurations++;
             yield break;
@@ -86,6 +90,7 @@ public sealed partial class TabletopUiVerification
         var fullView = new List<string>{"货物,屏幕中心X,屏幕中心Y"};
         markers.AlignPortSigns(BoardCamera);
         var signRects=new List<Rect>();
+        Require(Mathf.Abs(CoastalDecals.DockLength-CoastalDecals.PierModelLength)<.0002f,"通用栈桥模型与泊位长度不符");
         var signPixels=new List<string>{"货物,屏幕中心X,屏幕中心Y,吊旗宽像素,吊旗高像素"};
         var pieces=GetComponent<M5App>().VerificationBoard.CommittedPieces.GetComponentsInChildren<Renderer>();
         var slips=Table.transform.parent.GetComponentsInChildren<JadeNumberSlip>();
@@ -98,8 +103,16 @@ public sealed partial class TabletopUiVerification
             var center=BoardCamera.WorldToScreenPoint(root.GetComponentInChildren<HarborSign>().Face.bounds.center);
             fullView.Add(kind+","+Mathf.RoundToInt(center.x)+","+Mathf.RoundToInt(Screen.height-center.y));
             var sign=root.GetComponentInChildren<HarborSign>();
-            Require(sign!=null && sign.Face.sharedMaterial.mainTexture==Resources.Load<Texture2D>(
-                CoastalDecals.Root+"flag-"+(port.Resource?.ToString().ToLowerInvariant()??"generic")),"吊旗货物图错误");
+            string modelMaterial=!port.Resource.HasValue ? "CommonHarbor" : port.Resource==Catan.Core.Resource.Wood ? "LumberHarbor" :
+                port.Resource==Catan.Core.Resource.Wheat ? "GrainHarbor" :
+                port.Resource==Catan.Core.Resource.Wool ? "WoolHarbor" :
+                port.Resource==Catan.Core.Resource.Ore ? "OreHarbor" :
+                port.Resource==Catan.Core.Resource.Brick ? "BrickHarbor" : null;
+            Require(sign!=null && (modelMaterial!=null
+                ? sign.PickVolume!=null && root.Find("HarborHouse").GetComponent<Renderer>().sharedMaterial.name==modelMaterial &&
+                  sign.Face.sharedMaterials.Any(m=>m.name=="OreHarbor")
+                : sign.Face.sharedMaterial.mainTexture==Resources.Load<Texture2D>(
+                    CoastalDecals.Root+"flag-"+(port.Resource?.ToString().ToLowerInvariant()??"generic"))),"港口货物标识错误");
             var rect=CheckSignFrame(sign);
             Require(!signRects.Any(r=>r.Overlaps(rect)),"全盘吊旗相互覆盖");
             foreach (var piece in pieces)
@@ -206,7 +219,8 @@ public sealed partial class TabletopUiVerification
 
     Rect CheckSignFrame(HarborSign sign)
     {
-        Require(sign.transform.parent.Find("HarborMast") != null, "布旗未悬挂在旗杆上");
+        if (sign.PickVolume == null) Require(sign.transform.parent.Find("HarborMast") != null, "布旗未悬挂在旗杆上");
+        else Require(sign.name=="TradePlaque" && sign.transform.parent.Find("HarborHouse")!=null,"交易木牌缺少港仓");
         return TabletopReferenceMarkers.SignBounds(sign.Face,BoardCamera);
     }
 }

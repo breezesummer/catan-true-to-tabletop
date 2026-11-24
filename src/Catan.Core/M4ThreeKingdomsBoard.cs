@@ -98,11 +98,17 @@ namespace Catan.Core.M4
             }
             else if(kind=="return-knight")
             {
-                foreach(var knight in s.Knights.Where(k=>k.PlayerId==player&&(argument==null||k.LocationId==argument)&&!s.Roads.Any(r=>r.PlayerId==player&&EdgeAt(r.LocationId).Vertices.Contains(k.LocationId)&&B5Working(s,"Road",r.LocationId))))
+                var home=s.Roads.Where(r=>r.PlayerId==player&&B5Working(s,"Road",r.LocationId))
+                    .SelectMany(r=>EdgeAt(r.LocationId).Vertices).Distinct().ToArray();
+                var free=home.Where(v=>!Occupied(s,v)).ToArray();
+                foreach(var knight in s.Knights.Where(k=>k.PlayerId==player&&(argument==null||k.LocationId==argument)))
                 {
-                    var options=scenario.Topology.Vertices.Where(v=>!Occupied(s,v.Id)&&s.Roads.Any(r=>r.PlayerId==player&&EdgeAt(r.LocationId).Vertices.Contains(v.Id)&&B5Working(s,"Road",r.LocationId))).ToArray();
-                    if(options.Length==0)Add(new B5BoardOption{SourceId=knight.LocationId,TargetId=null,AssetKind="Knight",Label="无合法位置，骑士退回供应"});
-                    else foreach(var v in options)Add(new B5BoardOption{SourceId=knight.LocationId,TargetId=v.Id,AssetKind="Knight",Label="骑士归位 "+v.Id});
+                    bool atHome=home.Contains(knight.LocationId);
+                    bool legacy=s.ThreeKingdoms.ReplayOriginalSkills;
+                    if(legacy ? atHome : !atHome&&!knight.PlacedByLiyu&&!knight.ReplayedLiyuPlacement)continue;
+                    if(atHome)Add(new B5BoardOption{SourceId=knight.LocationId,TargetId=knight.LocationId,AssetKind="Knight",Label="留在原位"});
+                    else if(free.Length==0)Add(new B5BoardOption{SourceId=knight.LocationId,AssetKind="Knight",Label=legacy?"无合法位置，骑士退回供应":"退回供应"});
+                    foreach(var v in free)Add(new B5BoardOption{SourceId=knight.LocationId,TargetId=v,AssetKind="Knight",Label="骑士归位 "+v});
                 }
             }
             else if(kind.StartsWith("free-",StringComparison.Ordinal))
@@ -164,10 +170,13 @@ namespace Catan.Core.M4
                 var before=host.GetBoardAssets();var c=Json.Read<Command>(option.PayloadJson);c.Id="b5-free-"+s.ThreeKingdoms.NextId++;B5ApplyFree(s,c);B5RecordNativeConstruction(s,c,before,Array.Empty<B3NativePayment>(),root);RecalculateAwards(s);return;
             }
             if(option.Kind=="deploy-knight") {s.Knights=Append(s.Knights,new Knight{PlayerId=player,LocationId=option.TargetId,Level=option.Level,Active=true,ActivatedTurn=s.Turn});return;}
-            if(option.Kind=="return-knight") {var k=s.Knights.Single(x=>x.PlayerId==player&&x.LocationId==option.SourceId);if(option.TargetId==null)s.Knights=s.Knights.Where(x=>x!=k).ToArray();else k.LocationId=option.TargetId;RecalculateAwards(s);return;}
+            if(option.Kind=="return-knight") {var k=s.Knights.Single(x=>x.PlayerId==player&&x.LocationId==option.SourceId);if(option.TargetId==null)s.Knights=s.Knights.Where(x=>x!=k).ToArray();else k.PlaceAt(option.TargetId);RecalculateAwards(s);return;}
             if(option.Kind=="liyu")
             {
-                var k=s.Knights.Single(x=>x.PlayerId==option.OtherPlayerId&&x.LocationId==option.SourceId);k.LocationId=option.TargetId;B5Exhaust(s,k);
+                var k=s.Knights.Single(x=>x.PlayerId==option.OtherPlayerId&&x.LocationId==option.SourceId);
+                bool atHome=s.Roads.Any(r=>r.PlayerId==k.PlayerId&&B5Working(s,"Road",r.LocationId)&&EdgeAt(r.LocationId).Vertices.Contains(option.TargetId));
+                k.PlaceAt(option.TargetId,!atHome,s.ThreeKingdoms.ReplayOriginalSkills);
+                B5Exhaust(s,k);
                 if(option.PayloadJson?.StartsWith("kill:",StringComparison.Ordinal)==true){var target=option.PayloadJson.Substring(5);s.Knights=s.Knights.Where(x=>x.LocationId!=target||B3Immune(s,x.PlayerId)).ToArray();}
                 if(option.PayloadJson=="chase"){s.PendingDecision=new PendingDecision{Kind="Robber",PlayerId=player,ReturnPhase=GamePhase.Action};s.Phase=GamePhase.RobberMove;}RecalculateAwards(s);return;
             }

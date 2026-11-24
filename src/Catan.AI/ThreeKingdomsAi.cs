@@ -12,6 +12,28 @@ namespace Catan.AI
             if (view == null || !view.SkillsEnabled) return null;
             bool required = view.SkillDecision != null;
             var choices = view.SkillActions ?? Array.Empty<B2SkillAction>();
+            if (choices.Length == 0) return null;
+            if (view.SkillDecision?.Kind == "civil-fencheng-discard")
+            {
+                var confirm = choices.FirstOrDefault(a => a.Command.Option == "civil-fencheng-commit");
+                var select = choices.Where(a => a.Command.Option == "civil-select");
+                if (GeneralCatalog.UsesDirectPackage(view.PackageVersion))
+                {
+                    var action = confirm ?? select.First();
+                    var counts = new int[8];
+                    for (int n = 0; n < action.MinimumHandCount.Value; n++)
+                    {
+                        int type = Enumerable.Range(0, 8).Where(i => hand[i] > counts[i])
+                            .OrderByDescending(i => hand[i] - counts[i] - desired[i]).First();
+                        counts[type]++;
+                    }
+                    var batch = Copy(action.Command);
+                    batch.Option = "civil-selected-batch"; batch.CardType = -1; batch.Counts = counts;
+                    return batch;
+                }
+                if (confirm != null) return Copy(confirm.Command);
+                return Copy(select.OrderByDescending(a => a.AvailableCount.GetValueOrDefault() - desired[a.Command.CardType]).First().Command);
+            }
             if (view.SkillDecision?.Kind == "b4-reveal")
             {
                 var confirm = choices.FirstOrDefault(a => a?.Command?.Option == "b4-selected");

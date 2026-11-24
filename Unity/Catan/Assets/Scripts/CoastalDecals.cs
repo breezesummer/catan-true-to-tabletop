@@ -8,6 +8,19 @@ public static class CoastalDecals
     public const string Root = PaintedMap.Root + "Coast/";
     public const float ShoreEnd=.0115f;
     const float SeaEnd=-.0215f;
+    const float LumberSeaEnd = -.007f;
+    // 高仓下的木栈桥向海伸出，商船沿桥头外缘横向停靠。
+    const float BrickJettyEnd = -.00534f;
+    const float GrainJettyEnd = -.00545f;
+    const float OreJettyEnd = -.00680f;
+    const float WoolJettyEnd = -.00568f;
+    internal static float PlatformEnd(Catan.Core.Resource? kind) =>
+        kind==Catan.Core.Resource.Wool ? WoolJettyEnd :
+        !kind.HasValue ? -.012f :
+        kind==Catan.Core.Resource.Wheat ? GrainJettyEnd :
+        kind==Catan.Core.Resource.Ore ? OreJettyEnd :
+        kind==Catan.Core.Resource.Wood ? LumberSeaEnd :
+        kind==Catan.Core.Resource.Brick ? BrickJettyEnd : SeaEnd;
     public const float DockLength=ShoreEnd-SeaEnd;
     public const float DockInset=.0016f;
     static float pierModelLength;
@@ -41,6 +54,8 @@ public static class CoastalDecals
         return rectangle;
     }
     static readonly Dictionary<string, MeshFilter> parts = new Dictionary<string, MeshFilter>();
+    static readonly Dictionary<string, (GameObject model, GameObject selection)> landings =
+        new Dictionary<string, (GameObject, GameObject)>();
     static Material timber, waterShadow;
     static Texture2D linen;
     static Vector3 printCenter, printWidth, printHeight;
@@ -70,7 +85,6 @@ public static class CoastalDecals
         linen = Resources.Load<Texture2D>(Root+"flag-linen");
         timber = new Material(Resources.Load<Shader>(Root + "PierTimber"));
         timber.mainTexture = Resources.Load<Texture2D>("TabletopUI/v003/oak-table-albedo");
-        waterShadow = new Material(Resources.Load<Shader>(Root + "PierWaterShadow"));
     }
 
     static Transform Place(Transform parent, string partName, Material material)
@@ -88,9 +102,22 @@ public static class CoastalDecals
         return obj;
     }
 
+    internal static string ModelKind(string cargo) => cargo switch
+    {
+        "generic" => "common",
+        "wood" => "lumber",
+        "wool" => "wool",
+        "brick" => "brick",
+        "wheat" => "grain",
+        "ore" => "ore",
+        _ => null
+    };
+
     public static GameObject Dock(string resource, string label, Vector3 bottom, Quaternion rotation, Transform parent)
     {
         string cargo = resource.Substring(resource.LastIndexOf("port-", System.StringComparison.Ordinal) + 5);
+        var model = ModelKind(cargo);
+        if (model != null) return ModelDock(model, label, bottom, rotation, parent);
         var root = new GameObject(label).transform;
         root.SetParent(parent, false);
         root.SetPositionAndRotation(bottom, rotation);
@@ -115,26 +142,83 @@ public static class CoastalDecals
         return root.gameObject;
     }
 
+    static GameObject ModelDock(string kind, string label, Vector3 bottom, Quaternion rotation, Transform parent)
+    {
+        if (!landings.TryGetValue(kind, out var source))
+        {
+            source = (Resources.Load<GameObject>(Root + kind + "-harbor"),
+                Resources.Load<GameObject>(Root + kind + "-selection"));
+            landings.Add(kind, source);
+        }
+        var dock = Object.Instantiate(source.model, bottom, rotation, parent);
+        dock.name = label;
+        // 拾取和渔网避让只读简模。正式网格可留在 GPU，不给棋盘加碰撞器。
+        var proxy = Object.Instantiate(source.selection, dock.transform, false);
+        foreach (var renderer in proxy.GetComponentsInChildren<Renderer>()) renderer.enabled = false;
+        var sign = dock.transform.Find("TradePlaque").gameObject.AddComponent<HarborSign>();
+        sign.Initialize(proxy.transform.Find("PickVolume").GetComponent<MeshFilter>(),
+            proxy.transform.Find("ShoreFootprint").GetComponent<MeshFilter>());
+        AddWaterShadow(dock.transform, kind);
+        return dock;
+    }
+
     static readonly Dictionary<string, Material> flagMaterials = new Dictionary<string, Material>();
 
     static void AddPier(Transform root)
     {
         LoadPier();
         Place(root, "PierDeck", timber);
+        AddWaterShadow(root);
+    }
+
+    static void AddWaterShadow(Transform root, string kind=null)
+    {
         var shadow = new GameObject("栈桥水影").transform;
         shadow.SetParent(root,false);
-        shadow.localScale = new Vector3(.068f,1,.068f);
-        shadow.localPosition = Vector3.up*(TabletopOcean.WaterHeight+.00008f-EntityBoardAssets.BoardSurfaceHeight);
+        bool compact = kind!=null;
+        float width = compact ? .032f : .068f;
+        shadow.localScale = new Vector3(width,1,width);
+        shadow.localPosition = new Vector3(0,TabletopOcean.WaterHeight+.00008f-EntityBoardAssets.BoardSurfaceHeight,0);
         shadow.gameObject.AddComponent<MeshFilter>().sharedMesh = Rectangle();
         var renderer = shadow.gameObject.AddComponent<MeshRenderer>();
         var markers = root.GetComponentInParent<TabletopReferenceMarkers>();
-        renderer.sharedMaterial = markers != null && markers.PierWaterMaterial != null ? markers.PierWaterMaterial : waterShadow;
+        var surface = markers != null ? markers.PierWaterMaterial : null;
+        if (surface == null)
+        {
+            if (waterShadow == null) waterShadow = new Material(Resources.Load<Shader>(Root + "PierWaterShadow"));
+            surface = waterShadow;
+        }
+        renderer.sharedMaterial = surface;
+        if (compact)
+        {
+            var properties = new MaterialPropertyBlock();
+            properties.SetFloat("_CompactLanding",1);
+            if (kind=="wool") properties.SetFloat("_WoolQuay",1);
+            if (kind=="common") properties.SetFloat("_QuayLanding",1);
+            if (kind=="lumber") properties.SetFloat("_QuayLanding",2);
+            if (kind=="grain") properties.SetFloat("_GrainQuay",1);
+            if (kind=="ore") properties.SetFloat("_OreWharf",1);
+            if (kind=="brick") properties.SetFloat("_BrickQuay",1);
+            renderer.SetPropertyBlock(properties);
+        }
         renderer.shadowCastingMode = ShadowCastingMode.Off;
     }
 
-    // 避让渔场与取景只需桥面投影；每块木板、缆绳和货物都在这两段轮廓内。
+    // 各分件分别投影，保留船舷与码头间的水面。
     public static IEnumerable<Vector3[]> Footprint(Transform root)
     {
+        var filter = root.GetComponentInChildren<HarborSign>()?.Footprint;
+        if (filter != null)
+        {
+            var mesh = filter.sharedMesh;
+            var vertices = mesh.vertices;
+            var triangles = mesh.triangles;
+            for (int i = 0; i < triangles.Length; i += 3)
+                yield return new[] {filter.transform.TransformPoint(vertices[triangles[i]]),
+                    filter.transform.TransformPoint(vertices[triangles[i+1]]),
+                    filter.transform.TransformPoint(vertices[triangles[i+2]])};
+            yield break;
+        }
         foreach (var rect in DeckSections)
         {
             var a = root.TransformPoint(XZ(rect.xMin,rect.yMin));

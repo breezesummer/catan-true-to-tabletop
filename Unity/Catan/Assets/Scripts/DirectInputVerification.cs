@@ -13,12 +13,18 @@ public sealed partial class TabletopUiVerification
     int directStep;
     readonly List<string> directClickLog = new List<string>();
 
-    IEnumerable DirectClick(Vector2 point, string label, int button=0)
+    IEnumerable DirectClick(Vector2 point, string label, int button=0,Vector2? dragTo=null)
     {
         int step=++directStep;
         var screen=MobileTabletop.ScreenPoint(point);
         var request=Path.Combine(output,"pointer-"+step+".txt");
-        File.WriteAllText(request+".tmp", Mathf.RoundToInt(screen.x)+" "+Mathf.RoundToInt(screen.y)+" "+button);
+        string coordinates=Mathf.RoundToInt(screen.x)+" "+Mathf.RoundToInt(screen.y)+" "+button;
+        if(dragTo.HasValue)
+        {
+            var end=MobileTabletop.ScreenPoint(dragTo.Value);
+            coordinates+=" "+Mathf.RoundToInt(end.x)+" "+Mathf.RoundToInt(end.y);
+        }
+        File.WriteAllText(request+".tmp",coordinates);
         File.Move(request+".tmp",request);
         directClickLog.Add(label+","+step+","+Mathf.RoundToInt(screen.x)+","+Mathf.RoundToInt(screen.y));
         Debug.Log("DIRECT_INPUT waiting "+step+" "+label+" "+screen);

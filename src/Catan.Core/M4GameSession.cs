@@ -71,6 +71,7 @@ namespace Catan.Core.M4
         }
 
         private bool legacyInteractionReplay;
+        private bool replayOriginalGeneralSkills;
 
         public CommandResult Execute(Command command)
         {
@@ -82,6 +83,16 @@ namespace Catan.Core.M4
                 var prior = state.ProcessedCommands.FirstOrDefault(x => x.CommandId == command.Id);
                 if (prior != null) return PriorResult(prior, fingerprint);
                 var next = state.CopyForTransaction();
+                if (B4(next))
+                {
+                    next.ThreeKingdoms.ReplayOriginalSkills = replayOriginalGeneralSkills;
+                    if (!replayOriginalGeneralSkills && next.ThreeKingdoms.RevisedSkillsFromSequence == 0)
+                    {
+                        foreach(var knight in next.Knights.Where(k=>k.ReplayedLiyuPlacement))
+                            knight.PlaceAt(knight.LocationId,true);
+                        B2SkillEngine.BeginRevisedGeneralSkills(next.ThreeKingdoms,next.EventSequence+1);
+                    }
+                }
                 next.Harvest = new TileHarvest();
                 Command effective;
                 try { effective=AuthorizeControlB6(next,command); ValidateB6Trade(next,effective); Apply(next, effective); }
@@ -219,6 +230,8 @@ namespace Catan.Core.M4
                 if (record == null || record.Command == null) throw new InvalidDataException("Malformed command history.");
                 if (record.InteractionRevision < 0 || record.InteractionRevision > 1) throw new InvalidDataException("未知的交互规则修订。");
                 session.legacyInteractionReplay = record.InteractionRevision == 0;
+                long revisedFrom = saved.ThreeKingdoms?.RevisedSkillsFromSequence ?? 0;
+                session.replayOriginalGeneralSkills = revisedFrom == 0 || session.state.EventSequence + 1 < revisedFrom;
                 var result = session.Execute(record.Command);
                 if (!result.Success || result.IsDuplicate) throw new InvalidDataException("Invalid saved command history.");
             }
@@ -229,6 +242,8 @@ namespace Catan.Core.M4
                 saved.BarbarianDefenseStrength = session.state.BarbarianDefenseStrength;
             }
             session.legacyInteractionReplay = false;
+            session.replayOriginalGeneralSkills = false;
+            if (session.state.ThreeKingdoms != null) session.state.ThreeKingdoms.ReplayOriginalSkills = false;
             if (session.Save() != Json.Write(saved)) throw new InvalidDataException("Saved authority differs from deterministic replay.");
             return session;
         }

@@ -8,6 +8,7 @@ Shader "Catan/PaintedMap"
         _BeachEdge("沙滩岸线",2D)="white" {}
         _Tile("中心与地形", Vector) = (0,0,0,0)
         _RobberHex("强盗陆地", Vector) = (0,0,0,0)
+        _RobberContact("强盗靴底接触阴影", 2D) = "white" {}
         _PirateHex("海盗海格", Vector) = (0,0,0,0)
         _Glow("本人地块与常态倍产", Vector) = (0,-100,0,0)
         [HideInInspector] _HarvestClock("收取显示时钟", Float) = 0
@@ -30,6 +31,7 @@ Shader "Catan/PaintedMap"
             TEXTURE2D(_RoadEdge); SAMPLER(sampler_RoadEdge);
             TEXTURE2D(_RoadVerges); SAMPLER(sampler_RoadVerges);
             TEXTURE2D(_BeachEdge); SAMPLER(sampler_BeachEdge);
+            TEXTURE2D(_RobberContact); SAMPLER(sampler_RobberContact);
             CBUFFER_START(UnityPerMaterial)
             float4 _Tile, _NearA, _NearB, _Glow, _RobberHex, _PirateHex;
             float _HarvestClock;
@@ -150,6 +152,9 @@ Shader "Catan/PaintedMap"
                         }
                     }
                 }
+                // 同一地块上的六只靴底与杖端各自压暗脚下，边缘渐隐。
+                if (_RobberHex.z>.5 && all(abs(_Tile.xy-_RobberHex.xy)<.001))
+                    color*=SAMPLE_TEXTURE2D(_RobberContact,sampler_RobberContact,.5+delta/.08).r;
                 half sunlit=MainLightRealtimeShadow(TransformWorldToShadowCoord(i.world));
                 color*=lerp(half3(.57,.62,.67),half3(1,1,1),sunlit);
                 return half4(color*lerp(.70,1,saturate(i.up)),1);

@@ -62,8 +62,14 @@ def verify():
     generals = inventory["武将"]
     current = source_inventory(read(DOCS / "三国争霸游戏百科.md"))["武将"]
     latest = source_inventory(read(DOCS / "archive/三国实施/武将原始问答.md"))["武将"]
-    require([g["原文哈希"] for g in current] == [g["原文哈希"] for g in latest],
-            "现行百科54将牌文与归档原文逐项相同")
+    # 现行牌文包含后续裁定，B0 归档仍保留当时的全文。
+    amended = {
+        2: "2f1ccd3efdea7ef3bd7d41b815985b67364b5ddae863f74157395cc5a105604f",
+        38: "cf91982a5e015abb1ed545b88acb41418fd3314c67e9e15c3a2caa7c32b5d707",
+        45: "8023fa9a6686c70ee69dbb2fb7b5bfbba6df8ae7a7dc02f758329781d246b72a",
+    }
+    require([g["原文哈希"] for g in current] == [amended.get(g["编号"], g["原文哈希"]) for g in latest],
+            "现行百科54将牌文与归档及后续裁定逐项一致")
     require([g["编号"] for g in generals] == list(range(1, 55)), "武将01至54无缺失、重复或换序")
     require(sum(len(g["技能"]) for g in generals) == 97, "97个具名技能原文保留")
     require(sum(len(g["附注"]) for g in generals) == 2, "黄忠与鲁肃两条原附注保留")

@@ -70,7 +70,7 @@ namespace Catan.Core.ThreeKingdoms
             var s=host.State;if(!B5Enabled(s)||!Mark(s,"b5m-harvest:"+eventId))return;
             foreach(var player in Order(s))
             {
-                var g=Active(s,player);if(g?.GeneralId!="tk-g38"||IsDrawBlocked(s,player))continue;
+                var g=Active(s,player);if(g?.GeneralId!="tk-g38"||Value(g,"tishen",0)>0||IsDrawBlocked(s,player))continue;
                 var snapshot=s.Military?.TurnHandSnapshots.FirstOrDefault(x=>x.PlayerId==player);
                 if(snapshot==null||host.GetHand(player).Sum()>=Math.Min(7,snapshot.Value))continue;
                 var f=MilitaryFrame(s,g,"tk-g38-s2","b5m-tishen",eventId);f.Remaining=Math.Min(7,snapshot.Value);f.Optional=true;f.Started=false;Append(s,f);
@@ -191,11 +191,29 @@ namespace Catan.Core.ThreeKingdoms
         {
             waiting=false;if(f.Kind?.StartsWith("b5m-",StringComparison.Ordinal)!=true)return false;
             var s=host.State;Require(B5Enabled(s)&&host is IThreeKingdomsB5Host,"军事技能需要B5棋盘宿主。");var board=(IThreeKingdomsB5Host)host;
-            if(f.Kind=="b5m-deploy"||f.Kind=="b5m-return")
+            if(f.Kind=="b5m-return")
             {
-                var options=board.GetBoardOptions(f.PlayerId,f.Kind=="b5m-deploy"?"deploy-knight":"return-knight");
+                if(s.ReplayOriginalSkills)
+                {
+                    if(board.GetBoardOptions(f.PlayerId,"return-knight").Length==0){Remove(s,f);return true;}
+                    Decide(s,f,f.Kind,"选择骑士位置","吕布隐退：逐枚将离开己方道路的骑士归位；无位置则退回供应。");waiting=true;return true;
+                }
+                if(f.Step==0)
+                {
+                    f.Targets=board.GetBoardOptions(f.PlayerId,"return-knight").Select(o=>o.SourceId).Distinct().ToArray();
+                    f.Step=1;
+                }
+                if(f.Targets.Length==0){Remove(s,f);return true;}
+                bool place=f.Step==2;
+                string prompt=place?"请选择骑士的归位位置":"请选择要安置的骑士";
+                Decide(s,f,place?"b5m-return-place":f.Kind,prompt,prompt);
+                waiting=true;return true;
+            }
+            if(f.Kind=="b5m-deploy")
+            {
+                var options=board.GetBoardOptions(f.PlayerId,"deploy-knight");
                 if(options.Length==0){Remove(s,f);return true;}
-                Decide(s,f,f.Kind,"选择骑士位置",f.Kind=="b5m-deploy"?"无双：放置个人供应中最低实际等级的合法骑士，并激活。":"吕布隐退：逐枚将离开己方道路的骑士归位；无位置则退回供应。");waiting=true;return true;
+                Decide(s,f,f.Kind,"选择骑士位置","无双：放置个人供应中最低实际等级的合法骑士，并激活。");waiting=true;return true;
             }
             if(f.Kind=="b5m-liyu")
             {
@@ -208,7 +226,15 @@ namespace Catan.Core.ThreeKingdoms
                 var cards=new int[8];if(!IsDrawBlocked(s,f.PlayerId))foreach(int type in board.GetAllRedResourceTypes().Where(t=>t>=0&&t<5).Distinct())if(host.GetBank()[type]>0)cards[type]=1;
                 host.RemoveBank(cards);Remove(s,f);Gain(host,f.PlayerId,cards,f.SkillId,f.Id);return true;
             }
-            if(f.Kind=="b5m-tishen") { int count=Math.Max(0,f.Remaining-host.GetHand(f.PlayerId).Sum());Remove(s,f);Gain(host,f.PlayerId,TakeRandom(host,f.PlayerId,count),f.SkillId,f.Id);return true; }
+            if(f.Kind=="b5m-tishen")
+            {
+                var g=Active(s,f.PlayerId);
+                Remove(s,f);
+                if(g?.TenureId!=f.TenureId || Value(g,"tishen",0)>0)return true;
+                if(!s.ReplayOriginalSkills)Counter(g,"tishen",0).Value=1;
+                int count=Math.Max(0,f.Remaining-host.GetHand(f.PlayerId).Sum());
+                Gain(host,f.PlayerId,TakeRandom(host,f.PlayerId,count),f.SkillId,f.Id);return true;
+            }
             if(f.Kind=="b5m-tax")
             {
                 if(!B6AllianceRules.CanAttack(s,f.Targets[0],f.PlayerId)||!Enumerable.Range(0,8).Any(t=>host.GetHand(f.PlayerId)[t]>0&&CanGainB6(s,f.Targets[0],t))||IsProtected(s,f.PlayerId)||IsB4HandLossForbidden(s,f.PlayerId)){Remove(s,f);return true;}
@@ -258,7 +284,28 @@ namespace Catan.Core.ThreeKingdoms
         {
             if(d.Kind?.StartsWith("b5m-",StringComparison.Ordinal)!=true)return false;
             var s=host.State;var board=(IThreeKingdomsB5Host)host;
-            if(d.Kind=="b5m-deploy"||d.Kind=="b5m-return")foreach(var option in board.GetBoardOptions(f.PlayerId,d.Kind=="b5m-deploy"?"deploy-knight":"return-knight"))
+            if(d.Kind=="b5m-return")
+            {
+                if(s.ReplayOriginalSkills)
+                {
+                    foreach(var option in board.GetBoardOptions(f.PlayerId,"return-knight"))
+                    {var a=Action(s,f.SkillId,d.Kind,option.Label,d);a.Command.ProgressCardId=option.Id;actions.Add(B45SelectionMetadata.WithBoard(a,option));}
+                    return true;
+                }
+                // 兼容旧存档已打开、尚未记录待归位骑士的选择窗。
+                var sources=f.Step==0?board.GetBoardOptions(f.PlayerId,"return-knight").Select(o=>o.SourceId).Distinct():f.Targets;
+                foreach(var source in sources)
+                {
+                    var a=Action(s,f.SkillId,d.Kind,"选择骑士 "+source,d);
+                    a.Command.ProgressCardId=source;a.SelectionBoardIds=new[]{source};actions.Add(a);
+                }
+            }
+            if(d.Kind=="b5m-return-place")foreach(var option in board.GetBoardOptions(f.PlayerId,"return-knight",f.Targets[0]))
+            {
+                var a=Action(s,f.SkillId,d.Kind,option.Label,d);a.Command.ProgressCardId=option.Id;
+                a.SelectionBoardIds=option.TargetId==null?Array.Empty<string>():new[]{option.TargetId};actions.Add(a);
+            }
+            if(d.Kind=="b5m-deploy")foreach(var option in board.GetBoardOptions(f.PlayerId,"deploy-knight"))
             { var a=Action(s,f.SkillId,d.Kind,option.Label,d);a.Command.ProgressCardId=option.Id;actions.Add(B45SelectionMetadata.WithBoard(a,option)); }
             if(d.Kind=="b5m-tax"||d.Kind=="b5m-chuhai-discard")
             {
@@ -291,10 +338,26 @@ namespace Catan.Core.ThreeKingdoms
         {
             if(d.Kind?.StartsWith("b5m-",StringComparison.Ordinal)!=true)return false;
             var s=host.State;var actions=new List<B2SkillAction>();AddB5MilitaryDecisionActions(host,f,d,actions);Require(actions.Any(a=>SameB4Action(a.Command,c)),"军事技能选择、费用或目标已经失效。");var board=(IThreeKingdomsB5Host)host;
-            if(d.Kind=="b5m-deploy"||d.Kind=="b5m-return")
+            if(d.Kind=="b5m-return")
             {
-                var option=board.GetBoardOptions(f.PlayerId,d.Kind=="b5m-deploy"?"deploy-knight":"return-knight").Single(x=>x.Id==c.ProgressCardId);
-                if(d.Kind=="b5m-deploy")Remove(s,f);board.ApplyBoardOption(f.PlayerId,option);return true;
+                if(s.ReplayOriginalSkills)
+                {
+                    var option=board.GetBoardOptions(f.PlayerId,"return-knight").Single(x=>x.Id==c.ProgressCardId);
+                    board.ApplyBoardOption(f.PlayerId,option);return true;
+                }
+                f.Targets=new[]{c.ProgressCardId}.Concat(actions.Select(a=>a.Command.ProgressCardId).Where(id=>id!=c.ProgressCardId)).ToArray();
+                f.Step=2;return true;
+            }
+            if(d.Kind=="b5m-return-place")
+            {
+                var option=board.GetBoardOptions(f.PlayerId,"return-knight",f.Targets[0]).Single(x=>x.Id==c.ProgressCardId);
+                board.ApplyBoardOption(f.PlayerId,option);
+                f.Targets=f.Targets.Skip(1).ToArray();f.Step=1;return true;
+            }
+            if(d.Kind=="b5m-deploy")
+            {
+                var option=board.GetBoardOptions(f.PlayerId,"deploy-knight").Single(x=>x.Id==c.ProgressCardId);
+                Remove(s,f);board.ApplyBoardOption(f.PlayerId,option);return true;
             }
             if(d.Kind=="b5m-tax")
             {

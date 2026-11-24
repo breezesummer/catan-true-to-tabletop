@@ -26,6 +26,10 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
         public HarborSign Sign;
     }
     readonly Dictionary<string, Marker> ports = new Dictionary<string, Marker>();
+    readonly Dictionary<string, string> coastalBuildingOwners = new Dictionary<string, string>();
+    MaterialPropertyBlock roofProperties;
+    static readonly int RoofColor = Shader.PropertyToID("_RoofColor");
+    int tradeGlintFrame = -1;
     readonly Dictionary<string, Marker> gifts = new Dictionary<string, Marker>();
     readonly Dictionary<string, Marker> bonuses = new Dictionary<string, Marker>();
     readonly Dictionary<string, Marker> awards = new Dictionary<string, Marker>();
@@ -91,7 +95,8 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
     }
     public void Refresh(Tile[] publicTiles, PortDisplay[] publicPorts, PortDisplay[] publicGiftPorts = null,
         string[] publicBonusEdgeIds = null, ScoreDisplay[] publicScores = null, string observerSeat = null,
-        TabletopScene table = null)
+        TabletopScene table = null, PiecePlacement[] settlements = null, PiecePlacement[] cities = null,
+        Catan.Core.ThreeKingdoms.B5BoardAsset[] skillAssets = null)
     {
         if (publicTiles != null) tiles = publicTiles;
         this.table = table;
@@ -99,7 +104,14 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
         UpdateWheatCoast(publicPorts);
         RefreshOceanTiles();
         if (table != null && table.isActiveAndEnabled) table.Ocean.Refresh(tiles, vertices);
-        RefreshPorts(ports, portRoot, publicPorts, "港口 ");
+        coastalBuildingOwners.Clear();
+        foreach (var building in settlements ?? Array.Empty<PiecePlacement>())
+            coastalBuildingOwners[building.LocationId] = building.PlayerId;
+        foreach (var asset in skillAssets ?? Array.Empty<Catan.Core.ThreeKingdoms.B5BoardAsset>())
+            if (asset.Kind == "Settlement" && asset.Damaged) coastalBuildingOwners.Remove(asset.LocationId);
+        foreach (var building in cities ?? Array.Empty<PiecePlacement>())
+            coastalBuildingOwners[building.LocationId] = building.PlayerId;
+        RefreshPorts(ports, portRoot, publicPorts, "港口 ", showOwner: true);
         RefreshPorts(gifts, giftRoot, publicGiftPorts, "港礼 ");
         RefreshPortFootprints();
         if(table!=null && (outlinedTable!=table || outlineRevision!=PortLayoutRevision))
@@ -134,7 +146,7 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
         Prune(awards, wantedAwards);
         PositionAwards();
     }
-    void RefreshPorts(Dictionary<string, Marker> existing, Transform parent, PortDisplay[] publicPorts, string name)
+    void RefreshPorts(Dictionary<string, Marker> existing, Transform parent, PortDisplay[] publicPorts, string name, bool showOwner = false)
     {
         var wanted = new HashSet<string>(StringComparer.Ordinal);
         foreach (var port in publicPorts ?? Array.Empty<PortDisplay>())
@@ -150,7 +162,20 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
             var bottom = midpoint + normal * (CoastalDecals.ShoreEnd - CoastalDecals.DockInset);
             bottom.y = EntityBoardAssets.BoardSurfaceHeight;
             item.Object.transform.SetPositionAndRotation(bottom, Quaternion.LookRotation(-normal, Vector3.up));
-
+            if (showOwner)
+            {
+                if (!coastalBuildingOwners.TryGetValue(endpoints[0], out var owner))
+                    coastalBuildingOwners.TryGetValue(endpoints[1], out owner);
+                if (item.PlayerId != owner)
+                {
+                    var house = item.Object.transform.Find("HarborHouse").GetComponent<Renderer>();
+                    roofProperties ??= new MaterialPropertyBlock();
+                    house.GetPropertyBlock(roofProperties);
+                    roofProperties.SetColor(RoofColor, owner == null ? Color.clear : BoardRenderer.SeatColor(owner));
+                    house.SetPropertyBlock(roofProperties);
+                    item.PlayerId = owner;
+                }
+            }
             wanted.Add(port.Id);
         }
         Prune(existing, wanted);
@@ -388,6 +413,11 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
     }
     void LateUpdate()
     {
+        if (tradeGlintFrame>=0 && tradeGlintFrame!=Time.frameCount)
+        {
+            foreach(var port in ports.Values) port.Sign?.SetGlint(false,false);
+            tradeGlintFrame=-1;
+        }
         PositionAwards();
         var camera = Camera.main;
         if (camera != null) AlignPortSigns(camera);
@@ -417,6 +447,21 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
         }
     }
     public bool HasPort(string id) => ports.ContainsKey(id);
+    internal void ShowTradeGlints(HashSet<string> tradePorts,Camera camera,Vector2 pointer,bool allowHover)
+    {
+        tradeGlintFrame=Time.frameCount;
+        string hover=allowHover && tradePorts.Count>0 ? PickPort(pointer,camera) : null;
+        foreach(var pair in ports)
+        {
+            var marker=pair.Value;
+            bool available=tradePorts.Contains(pair.Key);
+            marker.Sign?.SetGlint(available,available && hover==pair.Key);
+        }
+    }
+    internal void PressTradePlaque(string id)
+    {
+        if(ports.TryGetValue(id,out var marker)) marker.Sign?.SetGlint(true,true,true);
+    }
     // 输入为左上原点的实际屏幕像素，仅命中已摆放的公开港口；赠送中的港口不能提前交易。
     public string PickPort(Vector2 screenMouse,Camera camera)
     {
@@ -428,8 +473,14 @@ public sealed partial class TabletopReferenceMarkers : MonoBehaviour
         foreach(var pair in ports)
         {
             if(pair.Value.Object==null||!pair.Value.Object.activeInHierarchy)continue;
-            var rect=PortScreenRect(pair.Key,camera);
-            if(!rect.Contains(logical))continue;
+            var volume = pair.Value.Sign?.PickVolume;
+            if (volume != null)
+            {
+                if (TryHitMesh(ray,volume,out float hit) && hit < distance)
+                { distance = hit; nearest = pair.Key; }
+                continue;
+            }
+            if(!PortScreenRect(pair.Key,camera).Contains(logical))continue;
             // 投影包围盒只用于粗筛。斜向海岸的包围盒会包含岸边道路/船，必须命中真实纸板轮廓。
             foreach(var filter in pair.Value.Object.GetComponentsInChildren<MeshFilter>())
             {

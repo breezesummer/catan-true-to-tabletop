@@ -7,6 +7,12 @@ public sealed class TabletopPointerPreview
     public bool Active;
     public int Track;
     public bool Wall;
+    public void EncloseMetropolis(int track)
+    {
+        Kind="metropolis";
+        Track=track;
+        Wall=true;
+    }
     public static TabletopPointerPreview ForCommand(string command,bool setupCity=false,int knightLevel=1,bool knightActive=false)
     {
         string kind;

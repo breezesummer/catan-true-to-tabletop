@@ -18,6 +18,19 @@ public sealed partial class TabletopUiVerification
         auditGame=GetComponent<M5App>();
         auditSession=(CombinedGameSession)typeof(M5LocalGameHost).GetField("session",PrivateInstance).GetValue(auditGame.VerificationHost);
         var state=auditSession.GetAuthoritativeStateForTesting();
+        if(args.Contains("--guan-yu-portrait"))
+        {
+            var active=state.ThreeKingdoms.Generals.Single(g=>g.Region==GeneralRegion.Active&&g.OwnerPlayerId==app.HumanSeat);
+            var guan=state.ThreeKingdoms.Generals.Single(g=>g.GeneralId=="tk-g18");
+            (active.GeneralId,guan.GeneralId)=(guan.GeneralId,active.GeneralId);
+            (active.InstanceId,guan.InstanceId)=(guan.InstanceId,active.InstanceId);
+            ActivateAudit(state);
+            var guanSkin=GeneralSkinArt.Get("tk-g18");
+            double deadline=Time.realtimeSinceStartupAsDouble+20;
+            while(!GeneralSkinArt.IdleReady(guanSkin)||app.OpeningOrderMessage.Length>0)
+            {Require(Time.realtimeSinceStartupAsDouble<deadline,"关羽动皮未就绪");yield return null;}
+            yield return new WaitForEndOfFrame();SaveOceanFrame("关羽待机.png");configurations++;yield break;
+        }
         if(args.Contains("--fixed-event-faces"))
         {
             var active=state.ThreeKingdoms.Generals.Single(g=>g.Region==GeneralRegion.Active&&g.OwnerPlayerId==app.HumanSeat);
@@ -36,17 +49,32 @@ public sealed partial class TabletopUiVerification
             Require(picker.Options.Where(a=>a.Command.Option=="fixed").Select(a=>a.Command.CardType).Distinct().Count()==4,"直谏四个候选未就绪");
             string before=Authority;
             int redBefore=app.FixedDieValue(0);
+            if(args.Contains("--dice-drag"))
+            {
+                var start=new Vector2(62,223);
+                var faces=TabletopWorldObjects.DieFaces(0,redBefore);
+                var drags=new[]{Vector2.down,Vector2.up,Vector2.right,Vector2.left};
+                int[] expected={faces[3],redBefore,faces[4],redBefore};
+                for(int i=0;i<drags.Length;i++)
+                {
+                    foreach(var step in DirectClick(start,"拖动红骰",0,start+36*drags[i]))yield return step;
+                    Require(app.FixedDieValue(0)==expected[i]&&app.FixedDieValue(1)==7-expected[i],"拖骰方向或联动骰面错误 "+i);
+                }
+            }
             foreach(var step in DirectClick(new Vector2(62,223),"拖转红骰"))yield return step;
             Require(app.FixedDieValue(0)!=redBefore&&app.FixedDieValue(0)+app.FixedDieValue(1)==7,"红白骰未联动");
             var eventPick=typeof(M6App).GetField("fixedChoiceEvent",PrivateInstance);
+            int nextSymbol=(app.FixedDieValue(2)+1)%4;
+            int expectedFace=nextSymbol==0?1:nextSymbol+3;
             foreach(var step in DirectClick(new Vector2(98,184),"转动事件骰"))yield return step;
-            Require((int)eventPick.GetValue(app)==4&&Authority==before,"事件骰未从船面转至贸易城堡");
+            Require((int)eventPick.GetValue(app)==expectedFace,"事件骰未切换到下一种骰面");
+            Require(Authority==before,"确认前改变了权威局面");
             yield return new WaitForEndOfFrame();
             SaveOceanFrame("直谏事件骰.png");
             int red=app.FixedDieValue(0);
             foreach(var step in DirectClick(TabletopUI.EndTurnRect.center,"确认直谏"))yield return step;
             var result=auditSession.GetAuthoritativeStateForTesting().ThreeKingdoms.Dice.FixedResult;
-            Require(result!=null&&result.Red==red&&result.White==7-red&&result.EventFace==4,"直谏确认结果错误");
+            Require(result!=null&&result.Red==red&&result.White==7-red&&result.EventFace==expectedFace,"直谏确认结果错误");
             configurations++;
             yield break;
         }

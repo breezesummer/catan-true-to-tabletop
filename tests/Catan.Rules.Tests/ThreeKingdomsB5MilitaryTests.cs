@@ -139,7 +139,9 @@ public sealed class ThreeKingdomsB5MilitaryTests
     [Fact]
     public void LiyuRetirementReturnsKnightAfterGeneralLeavesPlay()
     {
-        var h=B5MilitaryHost.Create("tk-g02");h.Options["return-knight"]=new[]{Option("return-knight")};var g=h.State.Generals[0];B2SkillEngine.OnB5MilitaryGeneralRetired(h.State,g);g.Region=GeneralRegion.Retired;B2SkillEngine.Pump(h);Choose(h,"P1","b5m-return");Drain(h);Assert.Single(h.Applied);
+        var h=B5MilitaryHost.Create("tk-g02");var location=Option("return-knight");location.SourceId="v-source";h.Options["return-knight"]=new[]{location};
+        var g=h.State.Generals[0];B2SkillEngine.OnB5MilitaryGeneralRetired(h.State,g);g.Region=GeneralRegion.Retired;
+        B2SkillEngine.Pump(h);Choose(h,"P1","b5m-return");Assert.Empty(h.Applied);Choose(h,"P1","b5m-return-place");Drain(h);Assert.Single(h.Applied);
     }
     [Fact]
     public void LuanjiAllPlayersMayResistAndNoVirtualBattleIsCreated()
@@ -199,7 +201,7 @@ public sealed class ThreeKingdomsB5MilitaryTests
         var action=Assert.Single(view.SkillActions,a=>a.Command.Option=="b5m-huoshou-move");
         Assert.Equal(new[]{"t1"},B45SelectionContract.Board(action));Assert.Equal(new[]{"P2"},B45SelectionContract.Players(action));
         var c=new B45SelectionContext();c.Begin(view,"P1",null,new int[8]);Assert.False(c.ShowOptionChoices);Assert.NotNull(c.SkipCommand);
-        Assert.True(c.ToggleTile("t1"));Assert.Null(c.FinishDirectPick());Assert.True(c.TogglePlayer("P2"));Assert.Equal("move",c.FinishDirectPick(true).ProgressCardId);
+        Assert.True(c.OpenActivationChoices());Assert.True(c.ToggleTile("t1"));Assert.Null(c.FinishDirectPick());Assert.True(c.TogglePlayer("P2"));Assert.Equal("move",c.FinishDirectPick(true).ProgressCardId);
     }
     [Fact]
     public void ZaiqiOnlyOffersSatisfiedBranchesAndKeepsTileEffectAfterRetirement()
@@ -223,7 +225,10 @@ public sealed class ThreeKingdomsB5MilitaryTests
     public void TishenUsesRealTurnSnapshotCapsAtSevenAndDoesNotDiscardSurplus()
     {
         var h=B5MilitaryHost.Create("tk-g38");h.Inner.Give("P1",9);B2SkillEngine.OnB5MilitaryTurnStart(h,"start","P1");h.RemoveHand("P1",new[]{6,0,0,0,0,0,0,0});h.AddBank(new[]{6,0,0,0,0,0,0,0});
-        B2SkillEngine.OnB5MilitaryHarvestStart(h,"harvest");B2SkillEngine.Pump(h);Choose(h,"P1","accept");Drain(h);Assert.Equal(7,h.GetHand("P1").Sum());B2SkillEngine.OnB5MilitaryHarvestStart(h,"other-harvest");Assert.Empty(h.State.Skills.Frames);
+        B2SkillEngine.OnB5MilitaryHarvestStart(h,"first");B2SkillEngine.Pump(h);Choose(h,"P1","skip");Drain(h);
+        B2SkillEngine.OnB5MilitaryHarvestStart(h,"harvest");B2SkillEngine.Pump(h);Choose(h,"P1","accept");Drain(h);Assert.Equal(7,h.GetHand("P1").Sum());
+        int[] loss=new int[8];loss[Array.FindIndex(h.GetHand("P1"),n=>n>0)]=1;h.RemoveHand("P1",loss);h.AddBank(loss);
+        B2SkillEngine.OnB5MilitaryHarvestStart(h,"other-harvest");Assert.Empty(h.State.Skills.Frames);
     }
     [Fact]
     public void TishenWithoutActualTurnSnapshotDoesNotOfferAndSnapshotSurvivesNewGeneral()

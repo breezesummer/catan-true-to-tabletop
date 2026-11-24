@@ -99,7 +99,8 @@ public sealed class BoardRenderer : MonoBehaviour
     public void RefreshReferenceMarkers(Catan.Core.M2.PlayerView view)
     {
         ReferenceMarkers.Refresh(view.Board.Tiles,view.Board.Ports.Select(p=>new TabletopReferenceMarkers.PortDisplay
-            {Id=p.Id,Vertices=p.Vertices,Resource=p.Resource}).ToArray(),observerSeat:view.PlayerId,table:tableScene);
+            {Id=p.Id,Vertices=p.Vertices,Resource=p.Resource}).ToArray(),observerSeat:view.PlayerId,table:tableScene,
+            settlements:view.Board.Settlements,cities:view.Board.Cities);
         FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position);
     }
     readonly TabletopPieceCache pieceCache=new TabletopPieceCache();

@@ -49,6 +49,7 @@ namespace Catan.Core.ThreeKingdoms
             return new ThreeKingdomsState
             {
                 RulesVersion = state.RulesVersion, PackageVersion = state.PackageVersion,
+                RevisedSkillsFromSequence = state.RevisedSkillsFromSequence, ReplayOriginalSkills = state.ReplayOriginalSkills,
                 PackageContentHash = state.PackageContentHash, SkillsEnabled = state.SkillsEnabled, Skills = state.Skills == null ? null : B2SkillEngine.Clone(state.Skills),
                 Generals = state.Generals?.Select(g => g == null ? null : new GeneralInstance
                 {

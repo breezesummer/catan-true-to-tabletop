@@ -14,6 +14,10 @@ namespace Catan.Core.ThreeKingdoms
         {
             switch(id)
             {
+                case "tk-g02-s2":return text.Replace("当吕布隐退后，骑士需任意放置在你的道路上。","吕布隐退时，因利驭离开己方道路的骑士须归位。已在己方道路上的骑士可留在原位，或移至己方任一道路的空端点一次。");
+                case "tk-g38-s2":return "限定技，"+text;
+                case "tk-g45-s1":return text.Replace("出牌阶段，","你的出牌阶段限一次，");
+                case "tk-g45-s2":return text.Replace("回合结束时，","你的出牌阶段结束后，");
                 case "tk-g03-s1":return "你的摸牌阶段，多摸一张任意资源牌（商品牌）和一张随机资源牌。";
                 case "tk-g28-s1":return "你的摸牌阶段，你可以放弃摸牌，亮出四张随机资源牌，然后获得其中不同的牌至多三张。";
                 case "tk-g34-s1":return "你的回合开始时，你可以弃置所有手牌，获得一张任意发展牌。";

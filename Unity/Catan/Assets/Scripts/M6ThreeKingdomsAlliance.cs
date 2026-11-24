@@ -5,6 +5,41 @@ using UnityEngine;
 
 public sealed partial class M6App
 {
+    bool AllianceDecision=>generalSelection.Contract?.DecisionKind?.StartsWith("alliance-b6-",StringComparison.Ordinal)==true;
+    static Rect AllianceArea=>new Rect(CandidateArea.x,CandidateArea.yMax-222,CandidateArea.width,222);
+
+    void DrawAllianceDecision()
+    {
+        var r=AllianceArea;
+        var decision=ThreeKingdomsProjection.SkillDecision;
+        var actions=generalSelection.Contract.Actions;
+        bool terms=decision.Kind=="alliance-b6-terms";
+        bool confirm=decision.Kind=="alliance-b6-confirm";
+        var cards=actions.Where(a=>a.Command.Option=="alliance-b6-card").ToArray();
+        var buttons=actions.Where(a=>a.Command.Option!="alliance-b6-card").ToArray();
+        var target=buttons.FirstOrDefault()?.SelectionPlayerIds?.FirstOrDefault();
+        string title=decision.Title;
+        if(decision.Kind=="alliance-b6-accept"&&target!=null)title=PlayerDisplayName(target)+"请求结盟";
+        TabletopResourceChoiceUI.DrawFrame(r,title,0,0);
+        if(terms||confirm)
+            GeneralFrameUI.Text(new Rect(r.x+12,r.y+45,r.width-24,30),DisplayPlayerText(decision.Description),18);
+        bool ready=GeneralCanSubmit&&!generalSelection.IsSubmitting;
+        // 逐张添加权威允许的条件。按钮留在固定的一行，选满八种牌也能立即提出或撤回。
+        for(int i=0;i<cards.Length;i++)
+        {
+            var c=cards[i].Command;
+            var face=new Rect(r.center.x+(i-(cards.Length-1)*.5f)*91-32,r.y+78,64,89);
+            EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(c.CardType));
+            if(ThreeKingdomsDirectInput.Read(face,ready,false)==1){SubmitGeneralSkill(c);return;}
+        }
+        float width=Mathf.Min(206,(r.width-40)/Math.Max(1,buttons.Length)-10);
+        for(int i=0;i<buttons.Length;i++)
+        {
+            var action=buttons[i];
+            var area=new Rect(r.center.x+(i-(buttons.Length-1)*.5f)*(width+10)-width/2,terms?r.yMax-45:r.center.y-8,width,37);
+            if(GeneralFrameUI.Choice(area,action.Label,ready)){SubmitGeneralSkill(action.Command);return;}
+        }
+    }
     internal static bool SharesAllianceAssetsB6(ThreeKingdomsView view,string seat,string owner) =>
         seat==owner||view?.PackageVersion==GeneralCatalog.B6PackageVersion&&view.AllianceMembers?.Contains(owner)==true;
     internal static string AllianceVictoryTextB6(ThreeKingdomsView view,string winner)

@@ -75,7 +75,7 @@ public sealed partial class TabletopUI
             if(dragStepped||delta.sqrMagnitude>=9)
             {
                 dragStepped=true;dragOrigin=e.mousePosition;
-                turn.pose=Quaternion.AngleAxis(delta.magnitude*2.5f,new Vector3(delta.y,0,-delta.x).normalized)*turn.pose;
+                turn.pose=Quaternion.AngleAxis(delta.magnitude*2.5f,new Vector3(-delta.y,0,-delta.x).normalized)*turn.pose;
             }
             e.Use();return;
         }

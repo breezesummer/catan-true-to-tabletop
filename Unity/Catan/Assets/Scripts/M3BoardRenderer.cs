@@ -145,7 +145,7 @@ public sealed class M3BoardRenderer : MonoBehaviour
         shipCoast.RefreshWakes(pieceCache,pieces,operationLayout?tableScene.Ocean:null,Position);
         pieceCache.Begin("ships",pieces);
         foreach(var ship in ships)
-        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+ship.IsWarship+":"+operationLayout+":"+shipCoast.HasDock(ship.LocationId)+":"+shipCoast.Reversed(ship.LocationId)))
+        using(var change=pieceCache.Update(ship.LocationId,ship.PlayerId+":"+ship.IsWarship+":"+operationLayout+":"+shipCoast.BerthDistance(ship.LocationId)+":"+shipCoast.Reversed(ship.LocationId)))
         {
             if(!change.Changed)continue;
             var mesh=Ship(ship.LocationId,SeatColor(ship.PlayerId),pieces);
@@ -174,14 +174,14 @@ public sealed class M3BoardRenderer : MonoBehaviour
     public void RefreshReferenceMarkers(Catan.Core.M3.PlayerView view)
     {
         shipCoast.ClearPorts();
-        foreach(var port in view.Board.Ports)shipCoast.Port(port.EdgeId,port.Vertices);
-        foreach(var port in view.Board.GiftPorts)shipCoast.Port(port.EdgeId,port.Vertices);
+        foreach(var port in view.Board.Ports)shipCoast.Port(port.EdgeId,port.Vertices,port.Resource);
+        foreach(var port in view.Board.GiftPorts)shipCoast.Port(port.EdgeId,port.Vertices,port.Resource);
         ReferenceMarkers.Refresh(view.Board.Tiles,view.Board.Ports.Select(p=>new TabletopReferenceMarkers.PortDisplay
             {Id=p.Id,Vertices=p.Vertices,EdgeId=p.EdgeId,Resource=p.Resource}).ToArray(),
             view.Board.GiftPorts.Select(p=>new TabletopReferenceMarkers.PortDisplay
             {Id=p.Id,Vertices=p.Vertices,EdgeId=p.EdgeId,Resource=p.Resource}).ToArray(),view.Board.BonusEdgeIds,
             view.Players.Select(p=>new TabletopReferenceMarkers.ScoreDisplay{PlayerId=p.Id,Points=p.BonusVictoryPoints}).ToArray(),
-            view.PlayerId,tableScene);
+            view.PlayerId,tableScene,settlements:view.Board.Settlements,cities:view.Board.Cities);
         FishingTabletopAssets.Refresh(transform,view.TradeModules?.Fishing,view.Board.Tiles,Position);
     }
     public Vector3 ShipPosition(string edge) => operationLayout

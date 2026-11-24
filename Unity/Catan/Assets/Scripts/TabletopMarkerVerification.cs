@@ -171,7 +171,14 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
         {
             Require(instance.Find("PierDeck")!=null && instance.Find("HarborHouse")!=null,"港屋或桥面缺失 "+id);
             var sign=instance.GetComponentInChildren<HarborSign>();
-            Require(sign!=null && sign.Face.sharedMaterial.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+"flag-"+id.Substring(5)), "吊旗类型不符 "+id);
+            var kind=CoastalDecals.ModelKind(id.Substring(5));
+            if(kind!=null)
+            {
+                var source=Resources.Load<GameObject>(CoastalDecals.Root+kind+"-harbor");
+                Require(sign!=null && sign.PickVolume!=null && sign.GetComponent<MeshFilter>().sharedMesh==
+                    source.transform.Find("TradePlaque").GetComponent<MeshFilter>().sharedMesh,"交易牌类型不符 "+id);
+            }
+            else Require(sign!=null && sign.Face.sharedMaterial.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+"flag-"+id.Substring(5)), "吊旗类型不符 "+id);
         }
         else
         {
@@ -220,8 +227,8 @@ public sealed class TabletopMarkerVerification : MonoBehaviour
             var obj = active.SingleOrDefault(t => t.name == "点数 " + tile.Number + " · " + tile.Id);
             Require(obj != null, "正常点数牌没有使用规则公开数字");
             var mesh = obj.GetComponent<MeshFilter>().sharedMesh; var materials = obj.GetComponent<MeshRenderer>().sharedMaterials;
-            Require(mesh == Resources.Load<GameObject>(JadeNumberSlip.ModelPath).GetComponentInChildren<MeshFilter>().sharedMesh, "点数没有使用玉签网格");
-            Require(materials.Length == 1 && materials[0].mainTexture == Resources.Load<Texture2D>(JadeNumberSlip.FacePath + tile.Number), "玉签点数与公开地块不符");
+            Require(mesh == CoastalDecals.Rectangle(), "点数没有使用透明字面");
+            Require(materials.Length == 2 && materials.All(m => m.mainTexture == Resources.Load<Texture2D>(JadeNumberSlip.FacePath + tile.Number)), "玉签点数与公开地块不符");
             Require(obj.GetComponentsInChildren<Collider>(true).Length == 0, "点数牌阻挡地图拾取");
         }
     }

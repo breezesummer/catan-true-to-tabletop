@@ -9,6 +9,18 @@ namespace Catan.Core.ThreeKingdoms
     {
         public static bool B4Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && ThreeKingdomsEngine.UsesB4Lifecycle(s);
         public static bool B5Enabled(ThreeKingdomsState s) => s?.SkillsEnabled == true && GeneralCatalog.UsesB5Rules(s.RulesVersion);
+        internal static void BeginRevisedGeneralSkills(ThreeKingdomsState s, long sequence)
+        {
+            s.RevisedSkillsFromSequence = sequence;
+            if (s.SkillHistory == null) return;
+            foreach (var g in s.Generals.Where(g => g.Region == GeneralRegion.Active))
+            {
+                if (g.GeneralId=="tk-g38" && s.SkillHistory.Any(e=>e.TenureId==g.TenureId && e.SkillId=="tk-g38-s2" && e.Complete))
+                    Counter(g,"tishen",0).Value=1;
+                if (g.GeneralId=="tk-g45" && s.SkillHistory.Any(e=>e.TenureId==g.TenureId && e.SkillId=="tk-g45-s1" && e.PhaseId==s.Clock.PhaseId))
+                    Counter(g,"wenji-used",s.Clock.PhaseId).Value=1;
+            }
+        }
         private static B4SkillPayload CloneB4Payload(B4SkillPayload p) => p == null ? null : new B4SkillPayload { Selection = Copy(p.Selection), OtherSelection = Copy(p.OtherSelection), DeclaredType = p.DeclaredType,
             OwnerPlayerId = p.OwnerPlayerId, LockedTargets = (string[])p.LockedTargets.Clone(), VirtualUse = p.VirtualUse == null ? null : new B4VirtualUse { CardId = p.VirtualUse.CardId, OptionId = p.VirtualUse.OptionId, Label = p.VirtualUse.Label, CardType = p.VirtualUse.CardType, TargetPlayerIds = (string[])p.VirtualUse.TargetPlayerIds.Clone(), PayloadJson = p.VirtualUse.PayloadJson, SourceEventId = p.VirtualUse.SourceEventId, SourceSkillId = p.VirtualUse.SourceSkillId, RewardRandomCount = p.VirtualUse.RewardRandomCount } };
 
@@ -51,13 +63,25 @@ namespace Catan.Core.ThreeKingdoms
             AddResponseEndFrames(host, g, eventId);
             if (g.GeneralId == "tk-g41" && Value(g, "wuku", 0) == 3 && Value(g, "sanchen", 0) == 0)
             { var f = Frame(s, g, "tk-g41-s2", "b4-sanchen", 0, eventId); Append(s, f); }
-            if (g.GeneralId == "tk-g45" && s.Clock.ActivePlayerId == g.OwnerPlayerId)
-            {
-                int count = Enumerable.Range(0, 8).Where(t => Value(g, "wenji:" + t, s.Clock.TurnInstanceId) > 0).Sum(t => host.GetHand(g.OwnerPlayerId)[t]);
-                bool lost = s.Skills.LossLedger.Any(l => l.PlayerId == g.OwnerPlayerId && l.TurnId == s.Clock.TurnInstanceId && l.LostHandCards > 0) || Value(g, "lost-progress", s.Clock.TurnInstanceId) > 0;
-                if (!lost && count > 0) { var f = Frame(s, g, "tk-g45-s2", "random", count, eventId); f.Started = true; Append(s, f); }
-                g.Counters = g.Counters.Where(c => !c.Key.StartsWith("wenji:", StringComparison.Ordinal)).ToArray();
-            }
+            if (s.ReplayOriginalSkills && g.GeneralId=="tk-g45" && g.OwnerPlayerId==s.Clock.ActivePlayerId)
+                QueueTunjiang(host,g,eventId);
+        }
+
+        public static void OnB4PlayEnded(IThreeKingdomsCardHost host, string eventId)
+        {
+            var s = host.State;
+            if (!B4Enabled(s) || s.ReplayOriginalSkills || s.Clock.Phase != ThreeKingdomsPhase.End) return;
+            var g = Active(s, s.Clock.ActivePlayerId);
+            if (g?.GeneralId == "tk-g45" && Mark(s, "play-ended:" + s.Clock.PhaseId))
+                QueueTunjiang(host,g,eventId);
+        }
+        private static void QueueTunjiang(IThreeKingdomsCardHost host, GeneralInstance g, string eventId)
+        {
+            var s=host.State;
+            int count = Enumerable.Range(0, 8).Where(t => Value(g, "wenji:" + t, s.Clock.TurnInstanceId) > 0).Sum(t => host.GetHand(g.OwnerPlayerId)[t]);
+            bool lost = s.Skills.LossLedger.Any(l => l.PlayerId == g.OwnerPlayerId && l.TurnId == s.Clock.TurnInstanceId && l.LostHandCards > 0) || Value(g, "lost-progress", s.Clock.TurnInstanceId) > 0;
+            if (!lost && count > 0) { var f = Frame(s, g, "tk-g45-s2", "random", count, eventId); f.Started = true; Append(s, f); }
+            g.Counters = g.Counters.Where(c => !c.Key.StartsWith("wenji:", StringComparison.Ordinal)).ToArray();
         }
         private static void OnB4OpportunityStart(IThreeKingdomsCardHost host, long opportunityId, string playerId) { OnResponseOpportunityStart(host, opportunityId, playerId); }
         public static void QueueB4ResourceChoice(IThreeKingdomsCardHost host, string playerId, string eventId, int count, string skillId)
@@ -116,7 +140,7 @@ namespace Catan.Core.ThreeKingdoms
             {
                 if (g.GeneralId == "tk-g26" && !lossForbidden && hand.Sum() > 0 && CanGainCardsB6(s,target,hand) && Value(g, "xiashu", s.Clock.PhaseId) == 0) AddB4TargetAction(s, actions, "tk-g26-s1", "b4-xiashu", "下书：交出全部手牌给 " + target, target);
                 if (g.GeneralId == "tk-g39" && hand.Sum() > 0) AddB4TargetAction(s, actions, "tk-g39-s1", "b4-quhu", "驱虎：声明并令 " + target + " 猜测", target);
-                if (g.GeneralId == "tk-g45" && host.GetHand(target).Sum() > 0 && !IsProtected(s, target) && !IsB4HandLossForbidden(s, target)) AddB4TargetAction(s, actions, "tk-g45-s1", "b4-wenji", "问计：令 " + target + " 交给一张牌", target);
+                if (g.GeneralId == "tk-g45" && !WenjiUsed(s,g) && host.GetHand(target).Sum() > 0 && !IsProtected(s, target) && !IsB4HandLossForbidden(s, target)) AddB4TargetAction(s, actions, "tk-g45-s1", "b4-wenji", "问计：令 " + target + " 交给一张牌", target);
                 if (g.GeneralId == "tk-g40" && Value(g, "daoshu", s.Clock.PhaseId) == 0 && host.GetHand(target).Sum() > 0 && !IsProtected(s, target) && !IsB4HandLossForbidden(s, target))
                     for (var type = 0; type < 8; type++) { var a = Action(s, "tk-g40-s1", "b4-daoshu", "盗书：猜" + CardNames[type] + "，抽取 " + target); a.Command.TargetPlayerIds = new[] { target }; a.Command.CardType = type; actions.Add(a); }
             }
@@ -139,6 +163,14 @@ namespace Catan.Core.ThreeKingdoms
         }
         private static void AddB4TargetAction(ThreeKingdomsState s, List<B2SkillAction> actions, string skill, string option, string label, string target)
         { var a = Action(s, skill, option, label); a.Command.TargetPlayerIds = new[] { target }; actions.Add(a); }
+        internal static bool WenjiUsed(ThreeKingdomsState s, GeneralInstance g)
+        {
+            if (s.ReplayOriginalSkills) return false;
+            var used = g.Counters.FirstOrDefault(c => c.Key == "wenji-used");
+            // 旧存档在交牌完成后只保存本回合的问计牌种。
+            return used != null ? used.TurnInstanceId == s.Clock.PhaseId && used.Value > 0 :
+                g.Counters.Any(c => c.Key.StartsWith("wenji:", StringComparison.Ordinal) && c.TurnInstanceId == s.Clock.TurnInstanceId && c.Value > 0);
+        }
         private static B2SkillAction[] AnnotateB4Actions(IThreeKingdomsCardHost host, List<B2SkillAction> actions)
         {
             if (B4Enabled(host.State)) foreach (var a in actions)
@@ -166,6 +198,7 @@ namespace Catan.Core.ThreeKingdoms
             Require(legal.Any(a => SameB4Action(a.Command, c)), "技能时机、目标、费用或次数无效。");
             var f = Frame(s, g, c.SkillId, c.Option, 0, null); f.Started = true; f.Targets = (string[])c.TargetPlayerIds.Clone(); f.B4 = new B4SkillPayload { OwnerPlayerId = g.OwnerPlayerId, DeclaredType = c.CardType };
             if (c.Option == "b4-xiashu") Counter(g, "xiashu", s.Clock.PhaseId).Value = 1;
+            if (c.Option == "b4-wenji" && !s.ReplayOriginalSkills) Counter(g, "wenji-used", s.Clock.PhaseId).Value = 1;
             if (c.Option == "b4-jieming") { Counter(g, "jieming", 0).Value = 1; int count = ((IThreeKingdomsB4Host)host).GetHandLimit(g.OwnerPlayerId) - host.GetHand(g.OwnerPlayerId).Sum(); f.Remaining = count / 2; f.Step = count - f.Remaining; }
             if (c.Option == "b4-quhu") { int seat = Array.IndexOf(s.SeatPlayerIds, f.Targets[0]); f.B4.LockedTargets = new[] { s.SeatPlayerIds[(seat + s.SeatPlayerIds.Length - 1) % s.SeatPlayerIds.Length], s.SeatPlayerIds[(seat + 1) % s.SeatPlayerIds.Length] }; }
             if (c.Option == "b4-miewu-progress" || c.Option == "b4-xiemu")

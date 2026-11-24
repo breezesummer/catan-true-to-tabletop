@@ -106,10 +106,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
     }
     void Apply(FishingView view,Tile[] tiles,Func<string,Vector3> position)
     {
-        var markers=GetComponentInChildren<TabletopReferenceMarkers>();
-        var portBounds=markers?.PublicPortFootprints??Array.Empty<Vector3[]>();
         string next=view==null?"":string.Join("|",view.Grounds.Select(g=>g.Id+":"+g.Number+":"+string.Join(",",g.VertexIds)))+string.Join("|",tiles.Select(t=>t.Id+":"+t.Resource));
-        next+="|ports:"+(markers?.PortLayoutRevision??0);
         next+="|lake:"+view?.LakeTileId+":"+string.Join(",",view?.LakeNumbers??Array.Empty<int>());
         if(next==layoutKey)return;layoutKey=next;
         if(numbers==null)numbers=JadeNumberAssets.For(transform);
@@ -119,12 +116,15 @@ public sealed class FishingTabletopAssets : MonoBehaviour
             lakeSlips=new GameObject("湖泊点数").transform;
             lakeSlips.SetParent(transform,false);
             var center=position(view.LakeTileId);
-            center.y=EntityBoardAssets.BoardSurfaceHeight+.009f;
+            center.y=EntityBoardAssets.BoardSurfaceHeight;
             for(int i=0;i<view.LakeNumbers.Length;i++)
             {
                 int n=view.LakeNumbers[i];
                 var slip=numbers.CreateSlip(lakeSlips,"湖泊点数 "+n,n);
-                slip.Place(center,new Vector2((i%2-.5f)*.0125f,(i/2-.5f)*.019f),.010f);
+                int count=view.LakeNumbers.Length;
+                int columns=Math.Min(2,count-(i/2)*2);
+                var offset=new Vector2((i%2-(columns-1)*.5f)*.75f,(i/2-((count-1)/2)*.5f)*.625f);
+                slip.Place(center,offset);
             }
         }
         retained.Clear();
@@ -145,7 +145,7 @@ public sealed class FishingTabletopAssets : MonoBehaviour
                 Debug.LogError("渔港接岸失败："+ground.Id+" / "+string.Join(",",ids));
             var a=position(ids[0]);var b=position(ids[1]);var c=position(ids[2]);
             var fold=model.Water.Refresh(a,b,c,n1,n2);
-            model.Number.Place(Vector3.Lerp(b,fold,.48f),outward,Vector3.Distance(a,b),portBounds);
+            model.Number.Place((b+fold)*.5f);
         }
         var removed=new List<string>();foreach(var pair in grounds)if(!retained.Contains(pair.Key)){Destroy(pair.Value.Root);removed.Add(pair.Key);}
         foreach(var key in removed)grounds.Remove(key);

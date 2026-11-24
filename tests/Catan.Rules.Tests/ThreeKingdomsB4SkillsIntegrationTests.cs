@@ -116,8 +116,8 @@ public sealed class ThreeKingdomsB4SkillsIntegrationTests
     [Theory][InlineData("cities")][InlineData("combined")]
     public void WenjiMarksTrueResourceAndNativeTwoForOneTradeConsumesExactlyTwo(string mode)
     {
-        dynamic game=Fixture(mode,"tk-g45",s=>modePlayer(s,"P2").Resources.Wood=2);
-        Skill(game,mode,"P1","b4-wenji");Skill(game,mode,"P2","b4-give",(Func<B2SkillAction,bool>)(a=>a.Command.CardType==0));Skill(game,mode,"P1","b4-wenji");Skill(game,mode,"P2","b4-give",(Func<B2SkillAction,bool>)(a=>a.Command.CardType==0));
+        dynamic game=Fixture(mode,"tk-g45",s=>{modePlayer(s,"P1").Resources.Wood=1;modePlayer(s,"P2").Resources.Wood=1;});
+        Skill(game,mode,"P1","b4-wenji");Skill(game,mode,"P2","b4-give",(Func<B2SkillAction,bool>)(a=>a.Command.CardType==0));
         dynamic c=Command(game,mode,"BankTrade");c.GiveResource=Resource.Wood;c.GiveAmount=2;c.ReceiveResource=Resource.Wool;c.ReceiveAmount=1;Accept(game,c);
         Assert.Equal(0,(int)Owner(game).Resources.Wood);Assert.Equal(1,(int)Owner(game).Resources.Wool);Assert.Equal(19,(int)game.GetAuthoritativeStateForTesting().Bank.Wood);
     }

@@ -13,6 +13,8 @@ out.mkdir(parents=True,exist_ok=False)
 mode=['--audit-all',str(fixtures),'--direct-input',str(save)]
 if '--skin-clicks' in sys.argv[5:]:
     mode=['--zhang-liao',str(fixtures),str(save),'--skin-catalog','--skin-clicks']
+elif '--dice-drag' in sys.argv[5:]:
+    mode=['--hud-effects',str(save),'--fixed-event-faces','--dice-drag']
 p=subprocess.Popen([str(exe),'-force-d3d11','-screen-fullscreen','0','-screen-width','1280','-screen-height','800','--ocean-view-verify',str(out),*mode,'-logFile',str(out/'player.log')] + (['--audit-items',os.environ['TABLE_ITEMS']] if os.environ.get('TABLE_ITEMS') else []))
 enum=c.WINFUNCTYPE(w.BOOL,w.HWND,w.LPARAM)
 u.WindowFromPoint.argtypes=[w.POINT]
@@ -60,7 +62,7 @@ try:
             finally:
                 if thread!=current:u.AttachThreadInput(current,thread,False)
             time.sleep(.25)
-        x,y,button=map(int,request.read_text().split())
+        x,y,button,*drag=map(int,request.read_text().split())
         point=w.POINT(x,y);u.ClientToScreen(h,c.byref(point))
         def valid():
             at=u.WindowFromPoint(point)
@@ -70,8 +72,15 @@ try:
         time.sleep(.05)
         if not valid():raise RuntimeError('失焦')
         u.mouse_event(8 if button else 2,0,0,0,0)
-        time.sleep(.075)
-        u.mouse_event(16 if button else 4,0,0,0,0)
+        try:
+            time.sleep(.075)
+            if drag:
+                end=w.POINT(*drag);u.ClientToScreen(h,c.byref(end))
+                for i in range(1,7):
+                    u.SetCursorPos(round(point.x+(end.x-point.x)*i/6),round(point.y+(end.y-point.y)*i/6))
+                    time.sleep(.035)
+        finally:
+            u.mouse_event(16 if button else 4,0,0,0,0)
         time.sleep(.17);snap(h,point,f'{step:04d}.jpg')
         (out/f'done-{step}').touch()
         step+=1

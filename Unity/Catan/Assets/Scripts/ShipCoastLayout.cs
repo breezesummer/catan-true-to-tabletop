@@ -8,7 +8,7 @@ internal sealed class ShipCoastLayout
 {
     readonly Dictionary<string,Vector3> normals=new Dictionary<string,Vector3>();
     readonly Dictionary<(string,string),string> edgeIds=new Dictionary<(string,string),string>();
-    readonly HashSet<string> docks=new HashSet<string>();
+    readonly Dictionary<string,float> docks=new Dictionary<string,float>();
     readonly Dictionary<string,Edge> topology=new Dictionary<string,Edge>();
     readonly Dictionary<string,List<Edge>> incident=new Dictionary<string,List<Edge>>();
     readonly Dictionary<string,string> owners=new Dictionary<string,string>();
@@ -45,12 +45,13 @@ internal sealed class ShipCoastLayout
         foreach(var pair in counts)if(pair.Value!=1)normals.Remove(pair.Key);
     }
     public void ClearPorts()=>docks.Clear();
-    public void Port(string edge,string[] endpoints)
+    public void Port(string edge,string[] endpoints,Resource? resource)
     {
-        if(!string.IsNullOrEmpty(edge))docks.Add(edge);
-        else if(endpoints!=null&&endpoints.Length==2&&edgeIds.TryGetValue((endpoints[0],endpoints[1]),out var id))docks.Add(id);
+        if (string.IsNullOrEmpty(edge) && (endpoints == null || endpoints.Length != 2 ||
+            !edgeIds.TryGetValue((endpoints[0],endpoints[1]),out edge))) return;
+        docks[edge] = CoastalDecals.ShoreEnd - CoastalDecals.PlatformEnd(resource) - CoastalDecals.DockInset;
     }
-    public bool HasDock(string edge)=>docks.Contains(edge);
+    public float BerthDistance(string edge) => docks.TryGetValue(edge,out float deck) ? deck + HullBeam * .75f : .0075f;
     public void SetHomes(PiecePlacement[] settlements,PiecePlacement[] cities)
     {
         homes.Clear();
@@ -97,7 +98,7 @@ internal sealed class ShipCoastLayout
             }
             // 两船船艉相对时，各自画至公共顶点，避免同一片水面叠两道泡沫。
             if(next!=null && next.Vertices[Reversed(next.Id)?1:0]==joint)next=null;
-            var signature=joint+":"+HasDock(edge.Id)+":"+next?.Id+":"+(next!=null&&HasDock(next.Id));
+            var signature=joint+":"+BerthDistance(edge.Id)+":"+next?.Id+":"+(next!=null?BerthDistance(next.Id):0);
             using(var change=cache.Update(edge.Id,signature))
             {
                 if(!change.Changed)continue;
@@ -114,8 +115,7 @@ internal sealed class ShipCoastLayout
     public Vector3 Offset(string edge)
     {
         if (!normals.TryGetValue(edge,out var normal)) return Vector3.zero;
-        float berth = CoastalDecals.DockLength - CoastalDecals.DockInset + HullBeam * .75f;
-        return normal * (HasDock(edge) ? berth : .0075f);
+        return normal * BerthDistance(edge);
     }
 }
 

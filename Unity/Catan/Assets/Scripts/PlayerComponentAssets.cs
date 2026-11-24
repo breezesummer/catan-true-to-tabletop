@@ -91,18 +91,70 @@ public static class PlayerComponentAssets
         string insertType=walled?type.Replace("-with-wall",""):type;
         var insert=Model(BuildingResource(insertType,playerId,track));
         if(insert==null)return null;
-        if(!walled)return Instantiate(insert,label,bottom,parent);
+        if(!walled)
+        {
+            var building=Instantiate(insert,label,bottom,parent);
+            if(insertType=="metropolis")AddRoofLight(building.transform,track);
+            return building;
+        }
         var wall=Model(BuildingResource("city-wall",playerId));
         if(wall==null)return null;
         var root=new GameObject(label+" ["+type+"-"+ColourKey(playerId)+"]");
         root.transform.SetParent(parent,false);
         root.transform.SetPositionAndRotation(bottom,Quaternion.Euler(0,180,0));
         var enclosure=Object.Instantiate(wall,root.transform,false);
-        if(insertType=="metropolis")enclosure.transform.localScale*=1.14f;
         var innerBuilding=Object.Instantiate(insert,root.transform,false);
-        // 城内建筑落在夯土地表；外墙原有的门洞、街道朝向和棋盘支点保持配准。
-        innerBuilding.transform.localPosition+=Vector3.up*(.00077f*enclosure.transform.localScale.y);
+        float streetOffset=.00025f;
+        if(insertType=="metropolis")
+        {
+            // 横纵等比展开，圆塔、拱门和垛口保持平面形制。宽商街和学宫需给侧翼让位。
+            bool palace=track==(int)Catan.Core.M5.ImprovementTrack.Politics;
+            float span=palace?1.21f:1.40f;
+            enclosure.transform.localScale=Vector3.Scale(enclosure.transform.localScale,new Vector3(span,1.14f,span));
+            if(palace)innerBuilding.transform.localScale*=.76f;
+            else streetOffset=track==(int)Catan.Core.M5.ImprovementTrack.Trade ? .00235f : .00170f;
+        }
+        // 正门沿本地 +Z 接道路，院地高 0.77 毫米。
+        innerBuilding.transform.localPosition+=new Vector3(0,.00077f*enclosure.transform.localScale.y,streetOffset);
+        if(insertType=="metropolis")AddRoofLight(innerBuilding.transform,track);
         return root;
+    }
+
+    // 正式预制件的局部坐标（米），依次取钟楼尖、主殿顶饰和侧楼浑仪的环顶。
+    static readonly Vector3[] RoofTips={
+        new(.00929f,.02792f,-.00447f),new(0,.02522f,-.00936f),new(-.01035f,.01876f,-.00209f)
+    };
+    static readonly Color32[] RoofColours={
+        new(255,190,22,255),new(34,114,255,255),new(26,222,95,255)
+    };
+    static Sprite roofLightQuad;
+    static readonly Material[] RoofLightMaterials=new Material[MetropolisKinds.Length];
+
+    static void AddRoofLight(Transform building,int track)
+    {
+        if(roofLightQuad==null)
+        {
+            var white=Texture2D.whiteTexture;
+            roofLightQuad=Sprite.Create(white,new Rect(0,0,white.width,white.height),
+                new Vector2(.5f,.5f),white.width,0,SpriteMeshType.FullRect);
+        }
+        if(RoofLightMaterials[track]==null)
+        {
+            var material=new Material(Resources.Load<Shader>(ExpansionRoot+"MetropolisRoofLight"));
+            material.SetColor("_LampTint",RoofColours[track]);
+            RoofLightMaterials[track]=material;
+        }
+        var light=new GameObject("大都会悬浮光球");
+        light.transform.SetParent(building,false);
+        // 浑仪在穹顶侧楼，额外抬高半个球径，让斜视时的光晕也离开主穹顶。
+        float hoverHeight=track==(int)Catan.Core.M5.ImprovementTrack.Science ? .031f : .024f;
+        light.transform.localPosition=RoofTips[track]+Vector3.up*hoverHeight;
+        light.transform.localScale=Vector3.one*.019f;
+        var sprite=light.AddComponent<SpriteRenderer>();
+        sprite.sprite=roofLightQuad;
+        sprite.sharedMaterial=RoofLightMaterials[track];
+        sprite.shadowCastingMode=UnityEngine.Rendering.ShadowCastingMode.Off;
+        sprite.receiveShadows=false;
     }
 
     public static string RoadResource(string playerId)

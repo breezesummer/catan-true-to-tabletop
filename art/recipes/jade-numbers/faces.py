@@ -1,4 +1,4 @@
-"""烘焙暖白玉、金边与点数。布局单位取自模型的宽度。"""
+"""生成居中的透明点数字面；保留港口图稿使用的玉面配方。"""
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -27,21 +27,23 @@ def jade_base():
 
 
 if __name__ == "__main__":
-    base = jade_base()
-    for n in (2,3,4,5,6,8,9,10,11,12):
-        image = base.copy()
-        # 用物理长宽比排字，再转回方形 UV 贴图。
-        design = image.resize((1024,1250),Image.Resampling.BICUBIC)
+    # 原型以 32 像素方图排 18 像素 Georgia 粗体，在高分辨率下烘焙轮廓。
+    factor = 32
+    font = ImageFont.truetype("C:/Windows/Fonts/georgiab.ttf", 18 * factor)
+    rim = "#f6e7c8"
+    for n in (2, 3, 4, 5, 6, 8, 9, 10, 11, 12):
+        design = Image.new("RGBA", (32 * factor, 32 * factor))
         draw = ImageDraw.Draw(design)
-        font = ImageFont.truetype("C:/Windows/Fonts/times.ttf",910 if n<10 else 740)
         text = str(n)
-        box = draw.textbbox((0,0),text,font=font)
-        center = (512,535)
-        xy = (center[0]-(box[0]+box[2])/2,center[1]-(box[1]+box[3])/2)
-        ink = (124,23,18) if n in (6,8) else (52,39,32)
-        draw.text(xy,text,font=font,fill=ink,stroke_width=2,stroke_fill=ink)
-        count = 6-abs(7-n)
+        left, top, right, bottom = draw.textbbox((0, 0), text, font=font)
+        origin = (512 - (left + right) / 2, 512 - (top + bottom) / 2)
+        ink = "#922b20" if n in (6, 8) else "#362a23"
+        draw.text(origin, text, font=font, fill=ink, stroke_width=30, stroke_fill=rim)
+        count = 6 - abs(7 - n)
         for i in range(count):
-            px = 512+(i-(count-1)/2)*127
-            draw.ellipse((px-39,948,px+39,1026),fill=ink)
-        design.resize((512,512),Image.Resampling.LANCZOS).save(out / f"number-{n}.png")
+            x = (16 + (i - (count - 1) / 2) * 2.8) * factor
+            y = (16 + 8.8) * factor
+            for radius, color in ((1.4, rim), (.85, ink)):
+                r = radius * factor
+                draw.ellipse((x-r, y-r, x+r, y+r), fill=color)
+        design.resize((512, 512), Image.Resampling.LANCZOS).save(out / f"number-{n}.png")

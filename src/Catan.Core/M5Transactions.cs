@@ -51,7 +51,8 @@ namespace Catan.Core.M5
         internal static Knight CopyKnight(Knight knight) => knight==null?null:new Knight
         {
             PlayerId=knight.PlayerId,LocationId=knight.LocationId,Level=knight.Level,Active=knight.Active,
-            ActivatedTurn=knight.ActivatedTurn,PromotedTurn=knight.PromotedTurn,ActedTurn=knight.ActedTurn
+            ActivatedTurn=knight.ActivatedTurn,PromotedTurn=knight.PromotedTurn,ActedTurn=knight.ActedTurn,
+            PlacedByLiyu=knight.PlacedByLiyu,ReplayedLiyuPlacement=knight.ReplayedLiyuPlacement
         };
     }
     public sealed partial class PlayerState

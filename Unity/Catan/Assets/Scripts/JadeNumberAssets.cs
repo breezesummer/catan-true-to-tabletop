@@ -1,46 +1,52 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
-// 同一棋盘的地块、渔场与港口共用玉签，只按签面分别缓存材质。
+// 同一棋盘上的同点数字共用透明字面与材质。
 public sealed class JadeNumberAssets : MonoBehaviour
 {
-    readonly Dictionary<string, Material> faces = new Dictionary<string, Material>();
-    Mesh mesh;
+    readonly Dictionary<int, Material[]> faces = new Dictionary<int, Material[]>();
+    Shader shader;
 
     internal static JadeNumberAssets For(Transform board)
     {
         var assets = board.GetComponent<JadeNumberAssets>();
         if (assets != null) return assets;
         assets = board.gameObject.AddComponent<JadeNumberAssets>();
-        assets.mesh = Resources.Load<GameObject>(JadeNumberSlip.ModelPath).GetComponentInChildren<MeshFilter>().sharedMesh;
+        assets.shader = Resources.Load<Shader>("TabletopUI/JadeNumbers/NumberInk");
         return assets;
     }
 
     internal JadeNumberSlip CreateSlip(Transform parent, string label, int number)
     {
-        var slip = CreateSlip(parent, label, JadeNumberSlip.FacePath + number);
-        slip.BindNumber();
-        return slip;
-    }
-
-    internal JadeNumberSlip CreateSlip(Transform parent, string label, string texturePath)
-    {
-        if (!faces.TryGetValue(texturePath, out var face))
+        if (!faces.TryGetValue(number, out var inks))
         {
-            face = BoardRenderer.Material(Color.white);
-            face.name = "暖白玉签 " + label;
-            face.mainTexture = Resources.Load<Texture2D>(texturePath);
-            face.SetFloat("_Smoothness", .26f);
-            face.SetFloat("_Metallic", .04f);
-            faces.Add(texturePath, face);
+            var face = new Material(shader) { name = "棋盘点数 " + number };
+            face.mainTexture = Resources.Load<Texture2D>(JadeNumberSlip.FacePath + number);
+            face.SetFloat("_BoardHeight", EntityBoardAssets.BoardSurfaceHeight + .001f);
+            var soft = new Material(face) { name = "遮挡中的点数 " + number, renderQueue = face.renderQueue + 1 };
+            soft.EnableKeyword("SOFT_NUMBER_INK");
+            soft.SetInt("_DepthTest", (int)CompareFunction.Always);
+            soft.SetInt("_StencilRef", 0);
+            soft.SetInt("_ReadMask", 2);
+            soft.SetInt("_WriteMask", 0);
+            inks = new[] { face, soft };
+            faces.Add(number, inks);
         }
         var obj = new GameObject(label);
         obj.transform.SetParent(parent, false);
-        obj.AddComponent<MeshFilter>().sharedMesh = mesh;
+        obj.AddComponent<MeshFilter>().sharedMesh = CoastalDecals.Rectangle();
         var renderer = obj.AddComponent<MeshRenderer>();
-        renderer.sharedMaterial = face;
+        // 同一张四边形先按深度与光效画清字，再在被遮住的像素补虚字。
+        renderer.sharedMaterials = inks;
+        renderer.shadowCastingMode = ShadowCastingMode.Off;
+        renderer.receiveShadows = false;
         return obj.AddComponent<JadeNumberSlip>();
     }
 
-    void OnDestroy() { foreach (var face in faces.Values) Destroy(face); }
+    void OnDestroy()
+    {
+        foreach (var inks in faces.Values)
+            foreach (var ink in inks) Destroy(ink);
+    }
 }

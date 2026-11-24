@@ -1,6 +1,6 @@
 # 卡坦岛之三国争霸
 
-内测版 **2.1.17**。玩法包括基础版、航海家、城市与骑士、九图双扩展，以及三国争霸、海港大师与捕鱼。
+内测版 **2.1.18**。玩法包括基础版、航海家、城市与骑士、九图双扩展，以及三国争霸、海港大师与捕鱼。
 
 ## 开始试玩
 
@@ -24,7 +24,7 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Play-M6.ps1
 | 改三国武将、选牌或技能结算   | [扩展玩法与选择流程](docs/扩展玩法.md) · [选择合同](docs/three-kingdoms/B4.5选择合同.md) · [武将原始牌文](docs/三国争霸游戏百科.md#三武将与技能)                                                                        |
 | 改海港、捕鱼或地图兼容       | [开局配置与地图裁定](docs/扩展玩法.md#海港大师与捕鱼)                                                                                                                                                                   |
 | 改百科内容或表现             | [发展卡牌文](docs/GAME_ENCYCLOPEDIA.md) · [武将与发展牌右栏](docs/百科武将与发展牌右栏规范.md) · [素材清单](docs/游戏百科全局素材清单.md)                                                                               |
-| 改菜单、棋子或实体素材       | [菜单打样流程](docs/菜单设计与实现模板.md) · [棋子制作流程](docs/三国风格棋子制作流程.md) · [实体资产规范](docs/实体资产美术规范.md)                                                                                    |
+| 改菜单                       | [菜单打样流程](docs/菜单设计与实现模板.md) ·                                                                                                                                                                           |
 | 改本地 AI 或托管决策         | [策略与可见信息](docs/AI_PATCH_2_0.md)                                                                                                                                                                                  |
 | 加入房间、改同步或部署       | [房间使用与重连](docs/ONLINE_STATE_SYNC.md) · [联机诊断](docs/ONLINE_DIAGNOSTICS.md) · [服务端部署](docs/M7_SERVER.md)                                                                                                  |
 | 构建、发布或整理仓库         | [跨平台构建](docs/CROSS_PLATFORM_BUILD.md) · [版本与发布约定](AGENTS.md) · [资料存储](docs/REPOSITORY_STORAGE.md)                                                                                                       |

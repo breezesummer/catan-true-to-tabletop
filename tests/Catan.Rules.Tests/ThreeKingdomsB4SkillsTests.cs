@@ -144,17 +144,27 @@ public sealed class ThreeKingdomsB4SkillsTests
         Resolve(h, "P2", "accept"); Resolve(h, "P2", "accept"); Drain(h); Assert.Equal(1, h.Hands["P2"].Sum()); Assert.Equal(2, h.RandomCalls); h.AssertConserved();
     }
     [Fact]
-    public void WenjiCanRepeatAndMarksAllCardsOfSelectedTrueTypeUntilEnd()
+    public void WenjiOncePerPlayPhaseAndTunjiangOnlyAfterPlayEnds()
     {
-        var h = Host("tk-g45"); h.Give("P2", 2); Resolve(h, "P1", "b4-wenji"); Resolve(h, "P2", "b4-give", 0);
-        Resolve(h, "P1", "b4-wenji"); Resolve(h, "P2", "b4-give", 0); Assert.Equal(2, B2SkillEngine.WenjiTradeRatio(h.State, "P1", 0));
-        B2SkillEngine.OnEnd(h, "end"); Drain(h); Assert.Equal(4, h.Hands["P1"].Sum()); Assert.Equal(0, B2SkillEngine.WenjiTradeRatio(h.State, "P1", 0)); h.AssertConserved();
+        var h = Host("tk-g45"); h.Give("P1", 1); h.Give("P2", 2);
+        var use = Action(h,"P1","b4-wenji");
+        B2SkillEngine.Resolve(h,"P1",use); Resolve(h, "P2", "b4-give", 0);
+        Assert.DoesNotContain(B2SkillEngine.Actions(h,"P1"), a=>a.Command.Option=="b4-wenji");
+        Assert.Throws<InvalidOperationException>(()=>B2SkillEngine.Resolve(h,"P1",use));
+        Assert.Equal(2, B2SkillEngine.WenjiTradeRatio(h.State, "P1", 0));
+        B2SkillEngine.OnB4PlayEnded(h,"early"); Drain(h); Assert.Equal(2,h.Hands["P1"].Sum());
+        h.State.Clock.Phase=ThreeKingdomsPhase.End; h.State.Clock.PhaseId++;
+        B2SkillEngine.OnB4PlayEnded(h,"ended"); B2SkillEngine.OnEnd(h,"end"); Drain(h);
+        Assert.Equal(4, h.Hands["P1"].Sum()); Assert.Equal(0, B2SkillEngine.WenjiTradeRatio(h.State, "P1", 0));
+        h.State.Clock.Phase=ThreeKingdomsPhase.Play; h.State.Clock.PhaseId++;
+        Assert.Contains(B2SkillEngine.Actions(h,"P1"),a=>a.Command.Option=="b4-wenji"); h.AssertConserved();
     }
     [Fact]
     public void TunjiangDoesNotDrawAfterUnusedProgressCardLoss()
     {
         var h = Host("tk-g45"); h.Give("P2", 1); Resolve(h, "P1", "b4-wenji"); Resolve(h, "P2", "b4-give", 0);
-        B2SkillEngine.OnCardsMoved(h, "progress-loss", new[] { new B2HandChange { PlayerId = "P1", BeforeCount = 1, AfterCount = 1, LostProgressCount = 1 } }); B2SkillEngine.OnEnd(h, "end"); Drain(h); Assert.Equal(1, h.Hands["P1"].Sum()); h.AssertConserved();
+        B2SkillEngine.OnCardsMoved(h, "progress-loss", new[] { new B2HandChange { PlayerId = "P1", BeforeCount = 1, AfterCount = 1, LostProgressCount = 1 } });
+        h.State.Clock.Phase=ThreeKingdomsPhase.End; B2SkillEngine.OnB4PlayEnded(h,"ended"); B2SkillEngine.OnEnd(h, "end"); Drain(h); Assert.Equal(1, h.Hands["P1"].Sum()); h.AssertConserved();
     }
     [Fact]
     public void ZishuTriggersOncePerBulkGainAndExcludesOwnRewardSource()

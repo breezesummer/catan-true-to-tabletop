@@ -14,6 +14,8 @@ const switcher = path.join(extension, '皮肤切换');
 const read = file => fs.readFileSync(file, 'utf8');
 const encoded = file => fs.readFileSync(file).toString('base64');
 const idleOnly = process.argv.includes('--idle-only');
+const idleGeneral = process.argv.find(arg=>arg.startsWith('--general='))?.slice(10);
+if(idleGeneral&&!idleOnly)throw new Error('单将采样需要 --idle-only');
 const camps={魏:'wei',蜀:'shu',吴:'wu',群:'qun',神:'shen',晋:'jin'};
 const configText = read(path.join(decade,'src/skins/dynamicSkin.js'));
 const config = vm.runInNewContext('('+configText.match(/export const dynamicSkinConfig = (\{[\s\S]*?\n\});/)[1]+')');
@@ -83,10 +85,13 @@ async function main(){
     }
     try {
         for(const [,id,name,title,camp] of catalog){
+            if(idleGeneral&&id!==idleGeneral)continue;
             const folder=(id==='tk-g08'?'神甘宁':name)+'/'+(id==='tk-g31'?'鸩杀少帝':title);
             const skin=skins.find(s=>s?.name?.startsWith(folder+'/'));
             if(!skin || !fs.existsSync(path.join(assets,folder))) continue;
-            const idle=skeleton(path.join(assets,skin.name),skin.action||'DaiJi',skin);
+            // 「明良千古」的骨骼原点位于马颈，牌窗对准骑手的面部与上身。
+            const portrait=id==='tk-g18'?{...skin,scale:.32,x:[-33,.5],y:[-49,.5]}:skin;
+            const idle=skeleton(path.join(assets,skin.name),skin.action||'DaiJi',portrait);
             const bg=skin.beijing && skeleton(path.join(assets,skin.beijing.name),null,skin.beijing);
             const configured=skin.gongji;
             const attack=configured?.name?skeleton(path.join(assets,configured.name),configured.action||'play',configured):null;
@@ -94,7 +99,7 @@ async function main(){
             entries.push(await bake(id,{idle,bg,attack,idleOnly,fallback,camp:camps[camp],
                 idleFrames:id==='tk-g01'?64:undefined,attackFrames:id==='tk-g01'?66:48}));
         }
-        if(entries.length!==33) throw new Error('动皮数量错误 '+entries.length);
+        if(entries.length!==(idleGeneral?1:33)) throw new Error('动皮数量错误 '+entries.length);
         if(idleOnly)return;
         importSounds(entries);
         fs.writeFileSync(path.join(output,'manifest.json'),JSON.stringify({entries},null,2)+'\n');

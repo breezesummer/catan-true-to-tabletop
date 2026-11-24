@@ -27,6 +27,23 @@ public sealed partial class M6App
         if(pick!=null)generalSelection.ChooseOption(pick);
     }
     Vector2 specialScroll;
+    static Rect LuoyingArea=>new Rect(CandidateArea.center.x-136,CandidateArea.yMax-244,272,244);
+    void DrawLuoying()
+    {
+        var r=LuoyingArea;
+        TabletopResourceChoiceUI.DrawFrame(r,"落英",0,0);
+        int count=generalSelection.LuoyingCount;
+        if(count>0)
+        {
+            var face=new Rect(r.center.x-51,r.y+46,102,146);
+            EntityCardAssets.DrawCardFace(face,EntityCardAssets.ResourceOrCommodityFront(0));
+            if(count>1)PastoralMenuUI.Label(new Rect(face.xMax+4,face.center.y-16,42,32),"×"+count,20,PastoralMenuUI.Ivory,true);
+        }
+        if(GeneralFrameUI.Choice(new Rect(r.center.x-104,r.yMax-43,98,34),"确定",GeneralCanSubmit&&generalSelection.CanConfirm,true))
+            FinishGeneralAction();
+        else if(GeneralFrameUI.Choice(new Rect(r.center.x+6,r.yMax-43,98,34),"取消",GeneralCanSubmit&&generalSelection.SkipCommand!=null))
+            SubmitGeneralSkill(generalSelection.SkipCommand);
+    }
     internal bool SpecialGeneralCandidatesContain(Vector2 p)=>!TurningFixedDice&&generalSelection.Active&&generalSelection.DiceIndices.Length>0&&
         (generalSelection.SelectedDie>=0&&!generalSelection.Options.Any(a=>a.Command.Option=="modify")&&DiceChoicesArea.Contains(p)||SkillDiceAreas.Any(r=>r.Contains(p)));
     bool DrawSpecialGeneralCandidates()
@@ -48,39 +65,58 @@ public sealed partial class M6App
     }
     void DrawGeneralTypeCandidates(B2SkillAction[] actions)
     {
-        if(generalSelection.Contract.DirectBatch&&generalSelection.Contract.DecisionKind=="shelie")actions=actions.Where(a=>a.Command.Option=="card").ToArray();
+        bool shelie=generalSelection.Contract.DecisionKind=="shelie";
+        if(shelie&&generalSelection.Contract.DirectBatch)actions=actions.Where(a=>a.Command.Option=="card").ToArray();
+        DrawCandidateRow(shelie?"涉猎 · 选择至多三种资源":GeneralActionCaption,actions,actions.Length,false);
+    }
+
+    void DrawCandidateRow(string title,B2SkillAction[] actions,int publicCount,bool labelCardActions)
+    {
         PastoralMenuUI.Panel(CandidateArea);
-        string title=generalSelection.Contract.DecisionKind=="shelie"?"涉猎 · 选择至多三种资源":
-            actions[0].Command.Option=="b4-daoshu"?"猜测牌种":
-            actions[0].Command.Option=="color"?"选择发展牌颜色":actions[0].Command.Option=="b4-declare"?"声明小麦张数":"选择响应";
-        PastoralMenuUI.Label(new Rect(354,480,900,22),title,14,PastoralMenuUI.Ink,true);
-        specialScroll=GUI.BeginScrollView(new Rect(350,505,916,130),specialScroll,new Rect(0,0,Mathf.Max(900,actions.Length*113),110));
+        PastoralMenuUI.Label(new Rect(CandidateArea.x,CandidateArea.y+3,CandidateArea.width,26),title,17,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
+        var viewport=new Rect(CandidateArea.x+8,CandidateArea.y+30,CandidateArea.width-16,CandidateArea.height-32);
+        float step=Mathf.Clamp(viewport.width/Math.Max(1,actions.Length),98,146);
+        float rowWidth=step*actions.Length;
+        float contentWidth=Mathf.Max(viewport.width,rowWidth);
+        bool scrolls=rowWidth>viewport.width;
+        float height=viewport.height-(scrolls?18:0);
+        candidateScroll=GUI.BeginScrollView(viewport,candidateScroll,new Rect(0,0,contentWidth,height));
         for(int i=0;i<actions.Length;i++)
         {
-            var action=actions[i];var c=action.Command;var r=new Rect(i*113+3,2,106,106);bool selected=generalSelection.IsOptionSelected(action);
-            CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
-            bool typed=c.Option=="card"||c.Option=="b4-daoshu"||c.Option=="claim"||c.Option=="luoying";
-            int type=c.Option=="luoying"?0:c.CardType;
-            string caption;
-            if(typed&&type>=0&&type<8)
+            var action=actions[i];
+            bool privateCard=i>=publicCount;
+            var c=action.Command;
+            int type=action.ResultCardType??action.RealCardType??-1;
+            if(privateCard||c.Option=="card"||c.Option=="b4-daoshu"||c.Option=="choose-card"||c.Option=="b4-guess"||c.Option=="claim")type=c.CardType;
+            Texture2D texture=null;
+            if(type>=0&&type<8)texture=EntityCardAssets.ResourceOrCommodityFront(type);
+            else if(c.Option=="color")texture=EntityCardAssets.ProgressBack(c.CardType);
+            else if(Enum.TryParse(action.VirtualCardId,out Catan.Core.M4.ProgressCardKind kind))texture=EntityCardAssets.ProgressFront((int)kind);
+            bool selected=privateCard?generalSelection.SelectedPrivateCounts[type]>0:generalSelection.IsOptionSelected(action);
+            float x=(contentWidth-rowWidth)/2+i*step;
+            Rect hit;
+            if(texture!=null)
             {
-                EntityCardAssets.DrawCardFace(new Rect(r.x+30,r.y+5,44,66),EntityCardAssets.ResourceOrCommodityFront(type));
-                caption=ThreeKingdomsCardNames[type]+(c.Option=="luoying"?" × "+c.Counts[0]:"");
-            }
-            else if(c.Option=="color")
-            {
-                var color=c.CardType==0?new Color(.72f,.52f,.12f):c.CardType==1?new Color(.15f,.38f,.65f):new Color(.2f,.52f,.28f);
-                PastoralMenuUI.Round(new Rect(r.x+26,r.y+7,54,61),color,4);caption=new[]{"黄色贸易","蓝色政治","绿色科学"}[Mathf.Clamp(c.CardType,0,2)];
+                bool caption=!privateCard&&(labelCardActions||c.Option=="color");
+                var slot=new Rect(x+3,selected?0:6,step-6,height-(caption?24:0)-9);
+                hit=EntityCardAssets.FitCardRect(slot,EntityCardAssets.FaceAspect(texture),GUI.matrix);
+                EntityCardAssets.DrawCardFace(hit,texture,selected?1:0);
+                if(selected)PastoralMenuUI.Label(new Rect(hit.xMax-23,hit.y+1,22,22),"✓",16,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
+                if(caption)PastoralMenuUI.Label(new Rect(x,height-24,step,24),OptionCaption(action),13,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
             }
             else
             {
-                caption=c.Option=="b4-declare"?c.CardType+" 张小麦":c.Option=="b4-true"?"声明为真":c.Option=="b4-false"?"声明为假":c.Option=="response-challenge"?"质疑":c.Option=="response-trust"?"不质疑":c.Option=="done"?"完成选择":DisplayPlayerText(action.Label);
-                PastoralMenuUI.Label(new Rect(r.x+6,r.y+8,r.width-12,58),caption,16,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
+                hit=new Rect(x+4,(height-54)/2,step-8,54);
+                GeneralFrameUI.Skill(hit,OptionCaption(action),true,GeneralCanInteract,selected,false);
             }
-            PastoralMenuUI.Label(new Rect(r.x+3,r.y+75,r.width-6,26),(selected?"✓ ":"")+caption,13,PastoralMenuUI.Ivory,false,TextAnchor.MiddleCenter);
-            int input=ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting);
-            if(input==1)ChooseGeneralOption(action);
-            if(input==2)Inspect(DisplayPlayerText(action.Label),new Rect(354+i*113-specialScroll.x,505,106,106));
+            int input=ThreeKingdomsDirectInput.Read(hit,GeneralCanInteract&&!generalSelection.IsSubmitting);
+            if(input==1)
+            {
+                if(privateCard){if(generalSelection.TogglePrivateCard(type))FinishGeneralPick();}
+                else ChooseGeneralOption(action);
+                break;
+            }
+            if(input==2)Inspect(DisplayPlayerText(action.Label),new Rect(viewport.x+hit.x-candidateScroll.x,viewport.y+hit.y,hit.width,hit.height));
         }
         GUI.EndScrollView();
     }
@@ -92,18 +128,20 @@ public sealed partial class M6App
         for(int i=0;i<actions.Length;i++)
         {
             var action=actions[i];bool shown=action.Command.Option=="b4-revealed";bool selected=generalSelection.IsOptionSelected(action);
-            var r=new Rect(354+i*450,509,438,118);CopperTabletopSkin.Panel(r,ModernOperationUI.Surface,selected);
+            var r=new Rect(354+i*450,509,438,118);
             if(shown)
             {
                 var types=Enumerable.Range(0,Math.Min(8,revealed.Length)).Where(t=>revealed[t]>0).ToArray();
                 for(int n=0;n<types.Length;n++)
                 {
-                    float x=r.x+8+n*50;EntityCardAssets.DrawCardFace(new Rect(x,r.y+7,42,63),EntityCardAssets.ResourceOrCommodityFront(types[n]));
-                    PastoralMenuUI.Label(new Rect(x,r.y+70,42,20),"×"+revealed[types[n]],12,PastoralMenuUI.Ivory,false,TextAnchor.MiddleCenter);
+                    float step=Mathf.Min(68,r.width/types.Length);
+                    float x=r.center.x+(n-(types.Length-1)*.5f)*step;
+                    EntityCardAssets.DrawCardFace(new Rect(x-step/2,r.y,step-2,80),EntityCardAssets.ResourceOrCommodityFront(types[n]));
+                    PastoralMenuUI.Label(new Rect(x-step/2,r.y+76,step,18),"×"+revealed[types[n]],12,PastoralMenuUI.Ivory,false,TextAnchor.MiddleCenter);
                 }
                 if(types.Length==0)PastoralMenuUI.Label(new Rect(r.x+12,r.y+20,r.width-24,50),"亮出堆为空",18,PastoralMenuUI.Muted,false,TextAnchor.MiddleCenter);
             }
-            else EntityCardAssets.DrawCardFace(new Rect(r.x+188,r.y+6,48,72),EntityCardAssets.Texture(EntityCardAssets.Good(0).Back));
+            else EntityCardAssets.DrawCardFace(new Rect(r.center.x-31,r.y,62,90),EntityCardAssets.Texture(EntityCardAssets.Good(0).Back));
             PastoralMenuUI.Label(new Rect(r.x+6,r.y+91,r.width-12,23),(selected?"✓ ":"")+(shown?"亮出堆 · "+revealed.Sum()+" 张":"未亮出堆"),14,PastoralMenuUI.Ivory,true,TextAnchor.MiddleCenter);
             int input=ThreeKingdomsDirectInput.Read(r,GeneralCanInteract&&!generalSelection.IsSubmitting);
             if(input==1)ChooseGeneralOption(action);

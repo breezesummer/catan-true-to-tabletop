@@ -169,6 +169,9 @@ public sealed partial class M5App : MonoBehaviour
         if(curtain||newGame||artOpen||ai!=null&&!ai.IsHumanTurn)return;
         var mouse=buildReleased?MobileTabletop.ScreenPoint(releasedMouse):MobileTabletop.Pointer;
         var logicalMouse=MobileTabletop.Logical(mouse);
+        if(ai!=null && draft==null && !DirectProgressActive && !FreeRoadPlacementActive && !mapChoice.Active && !dock.HasOverlay &&
+            !tabletop.OperationHidden && !tabletop.HistoryOpen && dock.CanOpenTrade(Operations()))
+            board.ReferenceMarkers.ShowTradeGlints(operationSnapshot.TradePorts,board.BoardCamera,pointer,canMap && !MobileTabletop.Enabled);
         if(DockBlocksMouse(logicalMouse)||cardArt.BlocksBoardInput(logicalMouse)){board.ClearPreview();return;}
         if(ai==null&&(mouse.x>Screen.width*.70f||mouse.y<Screen.height*.15f||mouse.y>Screen.height*.90f))return;
         if(ai!=null&&tabletop.OperationHidden){board.ClearPreview();return;}
@@ -218,6 +221,12 @@ public sealed partial class M5App : MonoBehaviour
     }
     void ConfigureMetropolisPreview(TabletopPointerPreview preview,string vertex)
     {
+        if(preview.Kind=="wall")
+        {
+            var existing=view.Board.Metropolises.FirstOrDefault(m=>m.LocationId==vertex);
+            if(existing!=null)preview.EncloseMetropolis((int)existing.Track);
+            return;
+        }
         if(preview.Kind!="metropolis"||view.PendingDecision==null)return;
         var decision=view.PendingDecision;
         var source=view.Board.Metropolises.FirstOrDefault(m=>m.LocationId==decision.AnchorVertexId);

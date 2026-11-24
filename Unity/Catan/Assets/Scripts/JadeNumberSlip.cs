@@ -1,28 +1,21 @@
 using UnityEngine;
 
-// 世界坐标锚定归属地块；只有镜头转向或锚点改变时才更新签面变换。
 public sealed class JadeNumberSlip : MonoBehaviour
 {
-    public const string ModelPath = "TabletopUI/JadeNumbers/jade-slip";
     public const string FacePath = "TabletopUI/v008/NumberTokens/number-";
-    public const float LandWidth = .015f;
+    // 900 像素高的全盘画面采用 32 像素字图，实际墨字约 13 像素高。
+    const float FullViewWidth = 32f * 2 / 900;
     Camera boardCamera;
-    Quaternion lastRotation;
+    Renderer numberFace;
     Vector3 anchor;
     Vector2 offset;
-    float width, minimumWidth, lastViewSize, sizeFactor, minimumPixels;
-    int lastPixelHeight;
-    Renderer numberFace;
+    Quaternion lastRotation;
+    float lastViewSize;
 
-    internal void BindNumber()
-    {
-        numberFace = GetComponent<Renderer>();
-        if (isActiveAndEnabled) OnEnable();
-    }
+    void Awake() => numberFace = GetComponent<Renderer>();
 
     void OnEnable()
     {
-        if (numberFace == null) return;
         Show(TabletopMapMarks.Visible);
         TabletopMapMarks.Changed += Show;
     }
@@ -30,47 +23,28 @@ public sealed class JadeNumberSlip : MonoBehaviour
     void OnDisable() => TabletopMapMarks.Changed -= Show;
     void Show(bool visible) => numberFace.enabled = visible;
 
-    public void Place(Vector3 center, Vector2 boardOffset, float width, float detailWidth = 0,
-        float sizeFactor = 1, float minimumPixels = 0)
+    // 偏移以整张字图的宽为单位；湖泊四个数字共用一个地块中心。
+    public void Place(Vector3 center, Vector2 faceOffset)
     {
         anchor = center;
-        offset = boardOffset;
-        this.width = width;
-        this.sizeFactor = sizeFactor;
-        this.minimumPixels = minimumPixels;
-        minimumWidth = detailWidth > 0 ? detailWidth : width;
-        if (boardCamera == null) boardCamera = Camera.main;
-        Resize(boardCamera);
-        Align(boardCamera == null ? Quaternion.identity : boardCamera.transform.rotation);
+        offset = faceOffset;
+        boardCamera = Camera.main;
+        if (boardCamera != null) Align();
     }
 
     void LateUpdate()
     {
-        if (boardCamera != null) FaceCamera(boardCamera);
+        if (boardCamera != null && (lastRotation != boardCamera.transform.rotation ||
+            lastViewSize != boardCamera.orthographicSize)) Align();
     }
 
-    internal void FaceCamera(Camera camera)
+    void Align()
     {
-        if (lastViewSize != camera.orthographicSize || lastPixelHeight != camera.pixelHeight)
-            Resize(camera);
-        if (camera.transform.rotation != lastRotation) Align(camera.transform.rotation);
-    }
-
-    void Resize(Camera camera)
-    {
-        lastViewSize = camera == null ? 0 : camera.orthographicSize;
-        lastPixelHeight = camera == null ? 0 : camera.pixelHeight;
-        float scale = sizeFactor * Mathf.Clamp(lastViewSize * .036f, minimumWidth, width);
-        float readableWidth = minimumPixels * 2 * lastViewSize / Mathf.Max(1, lastPixelHeight);
-        transform.localScale = Vector3.one * Mathf.Max(scale, readableWidth);
-    }
-
-    void Align(Quaternion rotation)
-    {
-        lastRotation = rotation;
-        var right = rotation * Vector3.right;
-        var away = Vector3.Cross(right, Vector3.up);
-        transform.SetPositionAndRotation(anchor + right * offset.x + away * offset.y,
-            rotation * Quaternion.Euler(0, 180, 0));
+        lastViewSize = boardCamera.orthographicSize;
+        lastRotation = boardCamera.transform.rotation;
+        float width = Mathf.Clamp(lastViewSize * FullViewWidth, .009f, .024f);
+        var shift = lastRotation * new Vector3(offset.x, offset.y, 0) * width;
+        transform.SetPositionAndRotation(anchor + shift, lastRotation * Quaternion.Euler(-90, 0, 0));
+        transform.localScale = Vector3.one * width;
     }
 }

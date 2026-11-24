@@ -50,6 +50,20 @@ public sealed class HandSelectionConfirmationTests
         B2SkillEngine.Resolve(h,"P2",next);Assert.All(B2SkillEngine.Actions(h,"P2").Where(a=>a.Command.Option=="civil-select"),a=>Assert.Equal(3,a.MinimumHandCount));
         string before=h.Snapshot();Assert.Throws<InvalidOperationException>(()=>B2SkillEngine.Resolve(h,"P1",command));Assert.Equal(before,h.Snapshot());h.Conserved();
     }
+    [Theory][InlineData(true,1)][InlineData(true,3)][InlineData(false,2)]
+    public void FenchengAiStopsAtTheMinimumAndKeepsNeededCards(bool direct,int minimum)
+    {
+        var h=Pending("civil-fencheng","civil-fencheng-discard",minimum);
+        if(!direct){h.State.PackageVersion=GeneralCatalog.B5PackageVersion;h.State.RulesVersion=GeneralCatalog.B5RulesVersion;}
+        var choose=typeof(Catan.AI.CombinedAi).Assembly.GetType("Catan.AI.ThreeKingdomsAi")!.GetMethod("Choose",System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Static)!;
+        for(int step=0;step<=minimum&&h.State.Skills.PendingDecision?.Kind=="civil-fencheng-discard";step++)
+        {
+            var v=View(h);v.SkillsEnabled=true;
+            var command=(B2SkillCommand)choose.Invoke(null,[v,h.GetHand("P1"),new[]{3,0,0,0,0,0,0,0},(Func<string,int>)(_=>0)])!;
+            B2SkillEngine.Resolve(h,"P1",command);
+        }
+        Assert.Equal(6-minimum,h.GetHand("P1").Sum());Assert.Equal(3,h.GetHand("P1")[0]);h.Conserved();
+    }
     [Theory][InlineData(0)][InlineData(1)][InlineData(7)][InlineData(-1)]
     public void InvalidBatchNeverMutatesPendingOrCards(int count)
     {

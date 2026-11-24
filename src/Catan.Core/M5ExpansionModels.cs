@@ -25,6 +25,15 @@ namespace Catan.Core.M5
         [DataMember(Order=5)] public int ActivatedTurn { get; set; }
         [DataMember(Order=6)] public int PromotedTurn { get; set; }
         [DataMember(Order=7)] public int ActedTurn { get; set; }
+        [DataMember(Order=8, EmitDefaultValue=false)] public bool PlacedByLiyu { get; set; }
+        [IgnoreDataMember] internal bool ReplayedLiyuPlacement { get; set; }
+
+        internal void PlaceAt(string vertex, bool awayByLiyu=false, bool legacyReplay=false)
+        {
+            LocationId=vertex;
+            PlacedByLiyu=awayByLiyu && !legacyReplay;
+            ReplayedLiyuPlacement=awayByLiyu && legacyReplay;
+        }
     }
     [DataContract] public sealed class Metropolis
     {

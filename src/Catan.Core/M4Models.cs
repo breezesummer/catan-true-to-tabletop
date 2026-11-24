@@ -148,6 +148,8 @@ namespace Catan.Core.M4
             lightweight.ProcessedCommands = Array.Empty<ProcessedCommand>(); lightweight.Events = Array.Empty<GameEvent>();
             lightweight.ThreeKingdoms = null;
             var copy = Json.Copy(lightweight);
+            // 旧版没有记录外派标志，重放得到的来源随骑士跨过事务副本。
+            for(int i=0;i<Knights.Length;i++)copy.Knights[i].ReplayedLiyuPlacement=Knights[i].ReplayedLiyuPlacement;
             copy.ThreeKingdoms = Catan.Core.ThreeKingdoms.ThreeKingdomsEngine.Clone(ThreeKingdoms);
             copy.ProcessedCommands = ProcessedCommands; copy.Events = Events;
             return copy;

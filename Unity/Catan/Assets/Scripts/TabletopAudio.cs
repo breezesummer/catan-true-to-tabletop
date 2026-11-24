@@ -42,7 +42,9 @@ public sealed partial class TabletopAudio : MonoBehaviour
     readonly float[] environmentWeights = new float[5];
     readonly List<AudioClip> generatedClips = new List<AudioClip>();
     AudioSource musicSource, speechSource;
-    AudioClip musicClip;
+    AudioClip[] musicTracks;
+    readonly System.Random musicRandom = new System.Random();
+    int remainingTracks;
     M6App owner;
     AudioListener fallbackListener;
     float master, effects, ambient, music, speech, musicDuck = 1;
@@ -100,9 +102,9 @@ public sealed partial class TabletopAudio : MonoBehaviour
             environmentSources[i] = NewSource("主题环境 " + i, true); environmentSources[i].clip = environmentClips[i];
         }
         environmentWeights[menuTheme] = 1;
-        musicClip = Resources.Load<AudioClip>(AssetRoot + "Music/SeaBreezeHome");
-        if (musicClip == null) musicClip = GeneratedClip("海风归途", TabletopAudioSynth.RenderMusic());
-        musicSource = NewSource("循环背景音乐", true); musicSource.clip = musicClip;
+        musicTracks = Resources.LoadAll<AudioClip>(AssetRoot + "Music");
+        musicSource = NewSource("背景音乐", false);
+        musicSource.priority = 220;
         speechSource = NewSource("骑士语音", false); speechSource.priority = 40;
         StartCoroutine(LoadKnightVoices());
         foreach (var clip in Resources.LoadAll<AudioClip>("TabletopAudio/CardNames"))
@@ -125,7 +127,21 @@ public sealed partial class TabletopAudio : MonoBehaviour
         return source;
     }
     public AudioClip GetClip(TabletopAudioCue cue) => clips.TryGetValue(cue, out var clip) ? clip : null;
-    public AudioClip GetMusicClip() => musicClip;
+    public AudioClip GetMusicClip() => musicSource.clip;
+
+    void PlayNextMusicTrack()
+    {
+        if (musicTracks.Length == 0) return;
+        bool newRound = remainingTracks == 0;
+        if (newRound) remainingTracks = musicTracks.Length;
+        // 每次抽中的曲目移到未播区末尾，上一轮尾曲最终位于下标 0。
+        int first = newRound && musicSource.clip != null && remainingTracks > 1 ? 1 : 0;
+        int pick = musicRandom.Next(first, remainingTracks);
+        musicSource.clip = musicTracks[pick];
+        remainingTracks--;
+        (musicTracks[pick], musicTracks[remainingTracks]) = (musicTracks[remainingTracks], musicTracks[pick]);
+        musicSource.Play();
+    }
     public AudioClip GetAmbienceClip(int theme) => theme >= 0 && theme < 5 ? environmentClips[theme] : null;
     public void SetMenuTheme(int index) { menuTheme = Mathf.Clamp(index, 0, 4); SettingsChanged(); }
     readonly Dictionary<string, AudioClip> cardNames = new Dictionary<string, AudioClip>(StringComparer.Ordinal);
@@ -266,7 +282,7 @@ public sealed partial class TabletopAudio : MonoBehaviour
         }
         // 音乐贯穿主页与对局，骑士讲话时自动降低，语音结束后平滑恢复。
         musicDuck = Mathf.MoveTowards(musicDuck, speechSource.isPlaying ? .40f : 1f, Time.unscaledDeltaTime * 2.5f);
-        if (!musicSource.isPlaying && !applicationPaused) musicSource.Play();
+        if (!musicSource.isPlaying && !applicationPaused) PlayNextMusicTrack();
         ApplyVolumes();
         bool connected = owner.NetworkGame && owner.Network != null && owner.Network.Connected;
         if (owner.NetworkGame && connected != wasConnected)

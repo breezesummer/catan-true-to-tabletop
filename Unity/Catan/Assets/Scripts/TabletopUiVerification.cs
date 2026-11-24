@@ -78,8 +78,13 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
         if(oceanViews&&args.Contains("--zhang-liao"))run=VerifyZhangLiao(args);
         if(oceanViews&&args.Contains("--hud-effects"))run=VerifyHudEffects(args);
         if(oceanViews&&args.Contains("--terrain-art"))run=VerifyTerrainArt();
-        if(oceanViews&&args.Contains("--timber-port"))run=VerifyTimberPort(args);
+        if(oceanViews&&(args.Contains("--timber-port")||args.Contains("--brick-port")))run=VerifyWarehousePort(args);
+        if(oceanViews&&args.Contains("--common-port"))run=VerifyCommonHarbor(args);
+        if(oceanViews&&args.Contains("--grain-port"))run=VerifyGrainPort(args);
+        if(oceanViews&&args.Contains("--wool-port"))run=VerifyWoolPort(args);
+        if(oceanViews&&args.Contains("--ore-port"))run=VerifyOrePort(args);
         if(oceanViews&&args.Contains("--player-colors"))run=VerifyPlayerColors(args);
+        if(oceanViews&&args.Contains("--harbor-glints"))run=VerifyHarborGlints(args);
         if(oceanViews&&args.Contains("--knight-updraft"))run=VerifyKnightUpdraft();
         while (true)
         {
@@ -101,7 +106,7 @@ public sealed partial class TabletopUiVerification : MonoBehaviour
             status = args.Contains("--audit-all") ? "completed" : "passed", configurations = configurations, checks = checks, cameraImages = cameraImages,
             guiAttempts = guiAttempts, guiImagesWithChanges = guiImagesWithChanges,
             unity = Application.unityVersion, graphics = captureCamera, fullUiPixelsVerified = false,
-            note = args.Contains("--painted-hud") ? "Windows 实机四人穿越沙漠，全窗口记录手绘、海洋和交易界面；核对四主题切换、本地偏好和对局一致性。" : args.Contains("--audit-all") ? "各项目的操作与结算见逐项结果.tsv。" : args.Contains("--direct-input") ? "四人穿越沙漠实际窗口，鼠标输入经过客户端正常入口，核对已确认城墙和赠牌。" : args.Contains("--tile-glow") ? "Windows 客户端读取四人穿越沙漠存档；检查常态产量与荧光层，共享材质，固定时间离屏截取沿边流动。未执行桌面鼠标操作或完整界面像素验收。" : args.Contains("--jade-numbers") ? "Windows 客户端从第 42 回合验收存档读取公开点数；四张图像取自完整游戏窗口。" : "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。"
+            note = args.Contains("--painted-hud") ? "Windows 实机四人穿越沙漠，全窗口记录手绘、海洋和交易界面；核对四主题切换、本地偏好和对局一致性。" : args.Contains("--audit-all") ? "各项目的操作与结算见逐项结果.tsv。" : args.Contains("--direct-input") ? "四人穿越沙漠实际窗口，鼠标输入经过客户端正常入口，核对已确认城墙和赠牌。" : args.Contains("--tile-glow") ? "Windows 客户端读取四人穿越沙漠存档；检查常态产量与荧光层，共享材质，固定时间离屏截取沿边流动。未执行桌面鼠标操作或完整界面像素验收。" : args.Contains("--jade-numbers") ? "Windows 客户端读取四人穿越沙漠对局的公开点数，记录默认视距、森林、湖泊和沿岸渔场。" : "通过固定规则入口、真实操作适配器与公开投影验证。camera-only 仅含三维场景；imgui-attempt 是独立 RT 内的界面合成尝试，需人工检查。未执行桌面操控或完整界面像素验收。"
         }, true));
         Debug.Log("CATAN_TABLETOP_UI_OK: configurations=" + configurations + " checks=" + checks + " cameraImages=" + cameraImages);
         if(oceanTheme&&args.Contains("--keep-ocean-preview")){StrategyHudTheme.Select(1);yield break;}

@@ -92,6 +92,9 @@ public sealed partial class M3App : MonoBehaviour
         if(!blocked&&(ai!=null||Input.mousePosition.x<Screen.width*.74f)&&Mathf.Abs(Input.mouseScrollDelta.y)>0)board.ScrollMap(Input.mouseScrollDelta.y,MapPanInput.ControlPressed,Input.mousePosition);
         if(curtain||newGameDialog||view==null||ai!=null&&(!ai.IsHumanTurn||tabletop.OperationHidden))return;
         var mouse=released?MobileTabletop.ScreenPoint(releasePoint):pointer;
+        if(ai!=null && !holding && !mapChoice.Active && !dock.HasOverlay &&
+            !tabletop.OperationHidden && !tabletop.HistoryOpen && dock.CanOpenTrade(Operations()))
+            board.ReferenceMarkers.ShowTradeGlints(operationSnapshot.TradePorts,board.BoardCamera,pointer,canMap && !MobileTabletop.Enabled);
         if(DockBlocksMouse(released?(Vector2?)releasePoint:null)||cardArt.BlocksBoardInput(MobileTabletop.Logical(mouse))){board.ClearPreview();hover="";return;}
         if(ai!=null&&!holding&&UpdateSetupPlacement(mouse,boardClick))return;
         if(ai!=null&&view.Phase==GamePhase.RoadBuilding){UpdateFreeRoadPlacement(mouse,boardClick);return;}

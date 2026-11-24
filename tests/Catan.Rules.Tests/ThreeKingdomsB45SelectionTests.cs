@@ -14,7 +14,6 @@ public sealed class ThreeKingdomsB45SelectionTests
     [InlineData("tk-g01-s1","harvest","raid","pass")]
     [InlineData("tk-g37-s1","harvest","tiles","pass")]
     [InlineData("tk-g23-s2","qianxun-response","discard","skip")]
-    [InlineData("tk-g30-s1","luoying","luoying","skip")]
     [InlineData("tk-g13-s2","dice-modify","modify","skip")]
     [InlineData("tk-g21-s2","dice-fixed","fixed","skip")]
     [InlineData("tk-g20-s1","dice-fixed","fixed","skip")]
@@ -251,9 +250,18 @@ public sealed class ThreeKingdomsB45SelectionTests
         c.RevalidateProgressCopies(new[]{"Invention","Invention"});Assert.Empty(c.SelectedProgress);Assert.False(c.IsProgressSelected("Invention",0));Assert.False(c.CanConfirm);Assert.NotNull(c.Notice);
     }
 
-    [Fact] public void LuoyingKeepsOneAndTwoWoodAsSeparateChoices()
+    [Fact] public void LuoyingConfirmsCurrentAllowanceWithoutPickingACard()
     {
-        var c=Start(View(Action("luoying","tk-g30-s1",type:0,count:1),Action("luoying","tk-g30-s1",type:0,count:2)),new int[8]);
-        Assert.Equal(2,c.Options.Length);Assert.False(c.CanConfirm);c.ChooseOption(c.Options.Single(a=>a.Command.Counts[0]==2));Assert.Equal(2,c.BuildCommand().Counts[0]);
+        var view=View(Action("luoying","tk-g30-s1",type:0,count:1),Action("luoying","tk-g30-s1",type:0,count:2),Action("skip","tk-g30-s1"));
+        view.SkillDecision=new(){PlayerId="p1",Kind="luoying",DecisionId="claim"};
+        var draft=Start(view,new int[8]);
+        Assert.False(draft.OpenActivationChoices());
+        Assert.Equal("skip",draft.SkipCommand.Option);
+        Assert.Equal(2,draft.BeginSubmit().Counts[0]);
+        Assert.Null(draft.BeginSubmit());
+        draft.AcknowledgeFailure();
+        view.SkillActions=view.SkillActions.Where(a=>a.Command.Counts[0]<2).ToArray();
+        draft.Refresh(view,new int[8]);
+        Assert.Equal(1,draft.BeginSubmit().Counts[0]);
     }
 }

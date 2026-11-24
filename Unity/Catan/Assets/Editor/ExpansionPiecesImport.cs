@@ -29,6 +29,22 @@ public static class ExpansionPiecesImport
         Import(kind=>kind.StartsWith("metro-",StringComparison.Ordinal));
     }
 
+    [MenuItem("Catan/美术/导入穹顶观星学宫")]
+    public static void ImportScience() => Import(kind=>kind=="metro-science");
+
+    [MenuItem("Catan/美术/导入哥特商会之都")]
+    public static void ImportTrade() => Import(kind=>kind=="metro-trade");
+
+    [MenuItem("Catan/美术/导入冠冕议政宫")]
+    public static void ImportPolitics() => Import(kind=>kind=="metro-politics");
+
+    [MenuItem("Catan/美术/导入王城石墙")]
+    public static void ImportWall()
+    {
+        Import(kind=>kind=="wall");
+        StockModelPictures.ExportKinds(new[]{"wall"});
+    }
+
     [MenuItem("Catan/美术/导入商船、海盗船与城墙")]
     public static void ImportHarborPieces()
     {
@@ -62,11 +78,29 @@ public static class ExpansionPiecesImport
             bool knight=part.kind.StartsWith("knight-");
             var steel=Material("Expansion_Metal_"+part.kind,texture,Color.white,knight ? .49f : .32f,knight ? .48f : .46f);
             var seats=pirate?new[]{neutral}:colours.Select((c,i)=>Material("Expansion_Seat_"+part.kind+"_"+c,texture,tints[i],0,.16f)).ToArray();
+            bool detailed=part.kind.StartsWith("metro-",StringComparison.Ordinal)||part.kind=="wall";
+            if(detailed)BuildingSurfaces(part.kind,neutral,seats,texture);
             var path=Art+part.kind+".fbx";
             var importer=(ModelImporter)AssetImporter.GetAtPath(path);
             importer.importAnimation=false;importer.addCollider=false;importer.isReadable=false;
+            if(detailed)
+            {
+                importer.generateMeshLods=true;
+                importer.maximumMeshLod=4;
+                importer.importTangents=ModelImporterTangents.CalculateMikk;
+            }
             importer.importNormals=ModelImporterNormals.Import;importer.SaveAndReimport();
             var source=AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if(detailed)
+            {
+                var mesh=source.GetComponentInChildren<MeshFilter>().sharedMesh;
+                if(mesh.subMeshCount!=2 || mesh.lodCount<2 || !mesh.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.TexCoord1))
+                    throw new InvalidOperationException("建筑缺少材质分区、遮蔽坐标或远景网格 "+part.kind);
+                var counts=Enumerable.Range(0,mesh.lodCount).Select(lod=>
+                    Enumerable.Range(0,mesh.subMeshCount).Sum(slot=>(long)mesh.GetIndexCount(slot,lod))/3);
+                string track=part.kind.Replace("metro-","").ToUpperInvariant();
+                Debug.Log("CATAN_"+track+"_LODS "+string.Join(", ",counts));
+            }
             for(int i=0;i<seats.Length;i++)
             {
                 var root=new GameObject(pirate?"pirate-black":part.kind+"-"+colours[i]);
@@ -98,6 +132,53 @@ public static class ExpansionPiecesImport
         AssetDatabase.SaveAssets();
         PlayerPieceColorImport.ApplyKinds(parts.Select(p=>p.kind).Where(k=>k!="pirate"&&k!="ship").ToArray());
         Debug.Log("CATAN_EXPANSION_IMPORT_OK meshes="+parts.Length+" prefabs="+prefabCount);
+    }
+
+    static void BuildingSurfaces(string kind,Material masonry,Material[] coloured,Texture2D atlas)
+    {
+        // 学宫石工沿用王城图集，商会与议政宫分别使用自己的建筑图集。
+        var city=AssetDatabase.LoadAssetAtPath<Material>("Assets/Art/NaturalPieces/v001/Natural_Masonry_city.mat");
+        if(city==null||!city.HasProperty("_DetailMask")||ShaderUtil.ShaderHasError(city.shader))
+            throw new InvalidOperationException("建筑表面材质缺失 "+kind);
+        masonry.shader=city.shader;
+        masonry.CopyPropertiesFromMaterial(city);
+        bool metropolis=kind.StartsWith("metro-",StringComparison.Ordinal);
+        if(metropolis)masonry.EnableKeyword("_METROPOLIS_FINISH");
+        EditorUtility.SetDirty(masonry);
+        Texture2D SurfaceMap(string suffix,TextureImporterType type)
+        {
+            string path=Art+kind+"-"+suffix+".png";
+            var importer=(TextureImporter)AssetImporter.GetAtPath(path);
+            importer.textureType=type;importer.sRGBTexture=false;importer.mipmapEnabled=true;
+            importer.wrapMode=TextureWrapMode.Clamp;importer.filterMode=FilterMode.Trilinear;importer.anisoLevel=4;
+            importer.alphaIsTransparency=false;importer.textureCompression=TextureImporterCompression.CompressedHQ;
+            importer.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+        var normal=SurfaceMap("normal",TextureImporterType.NormalMap);
+        var finish=SurfaceMap("finish",TextureImporterType.Default);
+        var mask=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Art/PlayerColors/"+kind+"-mask.png");
+        if(mask==null)throw new InvalidOperationException("建筑缺少玩家色遮罩 "+kind);
+        void ApplyAtlas(Material material)
+        {
+            material.SetTexture("_BaseMap",atlas);
+            material.SetTexture("_BumpMap",normal);
+            material.SetTexture("_MetallicGlossMap",finish);
+            material.SetTexture("_DetailMask",mask);
+        }
+        if(kind!="metro-science")ApplyAtlas(masonry);
+        if(kind=="metro-politics")masonry.EnableKeyword("_PALACE_COURTYARD");
+        for(int seat=0;seat<coloured.Length;seat++)
+        {
+            var surface=coloured[seat];
+            surface.shader=city.shader;
+            surface.CopyPropertiesFromMaterial(city);
+            if(metropolis)surface.EnableKeyword("_METROPOLIS_FINISH");
+            ApplyAtlas(surface);
+            surface.SetColor("_BaseColor",BoardRenderer.SeatColors[seat]);
+            surface.EnableKeyword("_CITY_TINTED_SLATE");
+            EditorUtility.SetDirty(surface);
+        }
     }
 
     static void ImportSurfaceTexture(string kind)

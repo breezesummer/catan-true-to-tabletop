@@ -18,6 +18,7 @@ public sealed class OperationSnapshot
         return historyOutput=entries.Length==0||entries.All(e=>e.Sequence<=PublicSequence)?entries:entries.Where(e=>e.Sequence<=PublicSequence).ToArray();
     }
     public bool CanTrade, CanInteract, RequiresSelection;
+    public readonly HashSet<string> TradePorts = new HashSet<string>();
     public int[] Goods = new int[8], Bank = new int[8], Rates = new int[8];
     public int GoodCount = 5;
     public TabletopCollectionTile[] CollectionTiles = Array.Empty<TabletopCollectionTile>();

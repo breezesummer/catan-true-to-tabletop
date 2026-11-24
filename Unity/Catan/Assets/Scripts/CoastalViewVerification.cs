@@ -53,29 +53,94 @@ public sealed partial class TabletopUiVerification
         }
         configurations++;
     }
-    IEnumerator VerifyTimberPort(string[] args)
+    IEnumerator VerifyWarehousePort(string[] args)
     {
+        bool brick=args.Contains("--brick-port");
+        string label=brick?"砖港":"木材港";
+        var resource=brick?Catan.Core.Resource.Brick:Catan.Core.Resource.Wood;
         mode="combined";
-        app.ReadSave(args[System.Array.IndexOf(args,"--timber-port")+1]);
+        int save = System.Array.IndexOf(args,brick?"--brick-port":"--timber-port")+1;
+        if (save < args.Length && !args[save].StartsWith("-")) app.ReadSave(args[save]);
+        else app.StartGame(mode,"through-the-desert",4,"P1",true,threeKingdoms:true,harbormaster:true,fishing:true);
         yield return null; yield return null;
-        Require(app.PlayerCount==4 && app.ThreeKingdoms && app.Fishing && app.Harbormaster && app.ScenarioId=="through-the-desert","木材港验收配置错误");
+        Require(app.PlayerCount==4 && app.ThreeKingdoms && app.Fishing && app.Harbormaster && app.ScenarioId=="through-the-desert",label+"验收配置错误");
         for(int i=0;i<900&&!Table.Ocean.MaskReady;i++)yield return null;
         Require(Table.Ocean.MaskReady,"海岸遮罩未就绪");
         var markers=Table.transform.parent.GetComponentInChildren<TabletopReferenceMarkers>();
-        var wood=GetComponent<M5App>().M6View.Board.Ports.First(p=>p.Resource==Catan.Core.Resource.Wood);
-        var port=markers.PortObject(wood.Id);
+        var trade=GetComponent<M5App>().M6View.Board.Ports.First(p=>p.Resource==resource);
+        var port=markers.PortObject(trade.Id);
         var surface=port.transform.Find("HarborHouse");
-        var flag=port.GetComponentInChildren<HarborSign>();
-        Require(flag.Face.sharedMaterial.mainTexture==Resources.Load<Texture2D>(CoastalDecals.Root+"flag-wood"),"木材旗图错误");
+        var sign=port.GetComponentInChildren<HarborSign>();
+        Require(sign != null && sign.name=="TradePlaque" && sign.PickVolume != null && sign.Footprint != null,label+"缺少交易牌或拾取轮廓");
+        var mat=surface.GetComponent<Renderer>().sharedMaterial;
+        Require(mat.name==(brick?"BrickHarbor":"LumberHarbor") && mat.GetTexture("_BaseMap") && mat.GetTexture("_BumpMap") &&
+            mat.GetTexture("_MetallicGlossMap"),label+"表面贴图未绑定");
+        var deck=port.transform.Find("PierDeck").GetComponent<Renderer>();
+        var stock=port.transform.Find(brick?"BrickStack":"LogStack").GetComponent<Renderer>();
+        var house=surface.GetComponent<Renderer>();
+        Vector3 LocalCenter(Renderer part) => port.transform.InverseTransformPoint(part.transform.TransformPoint(part.localBounds.center));
+        var shed=LocalCenter(house); var cargo=LocalCenter(stock);
+        var shore=CoastalDecals.ShoreEnd-CoastalDecals.DockInset;
+        var footprint=CoastalDecals.Footprint(port.transform).SelectMany(t=>t).Select(p=>port.transform.InverseTransformPoint(p).z).ToArray();
+        Require(Mathf.Abs(footprint.Min()-CoastalDecals.PlatformEnd(resource))<.0001f,label+"平台与商船泊位边缘不一致");
+        Require(deck.bounds.min.y<TabletopOcean.WaterHeight && shed.x<cargo.x,label+"栈桩或货场位置错误");
+        Require(port.GetComponentsInChildren<Collider>().Length==0 &&
+            port.GetComponentsInChildren<MeshRenderer>().Count(r=>r.enabled && r.sharedMaterials.Contains(mat))==(brick?6:5),label+"呈现或拾取组件异常");
+        var parts=new List<Renderer>{house,stock,deck};
+        if(brick)
+        {
+            var quay=port.transform.Find("QuayWall").GetComponent<Renderer>();
+            var hoist=port.transform.Find("LoadingCrane").GetComponent<Renderer>();
+            var crane=LocalCenter(hoist);
+            Require(footprint.Max()>=shore && footprint.Max()<shore+.0012f &&
+                cargo.z<shed.z && shed.z<shore,"砖港石岸与陆缘未接合或卸货面朝向错误");
+            Require(quay.bounds.min.y<TabletopOcean.WaterHeight && quay.bounds.max.y>TabletopOcean.WaterHeight &&
+                house.bounds.min.y>TabletopOcean.WaterHeight,"砖港驳岸或仓底水线错误");
+            Require(crane.x<cargo.x && crane.z<shed.z && hoist.bounds.min.y>port.transform.position.y+.0007f &&
+                LocalCenter(deck).x<0 && LocalCenter(sign.Face).y>.006f,"砖港吊盘、挑栈或屋坡牌位置错误");
+            Debug.Log($"CATAN_BRICK_QUAY_MM 仓心 {shed*1000} 货垛 {cargo*1000} 吊架 {crane*1000} 岸线 {shore*1000:F2} 石岸后沿 {footprint.Max()*1000:F2}");
+            parts.Add(quay);
+            parts.Add(hoist);
+        }
+        else
+        {
+            var hoist=port.transform.Find("TimberHoist").GetComponent<Renderer>();
+            var crane=LocalCenter(hoist);
+            float back=footprint.Max();
+            Require(shed.z<shore && cargo.z<shed.z && back>=shore && back<shore+.001f,"木材港后檐没有贴岸或货场未临海");
+            Require(house.bounds.min.y<TabletopOcean.WaterHeight && stock.bounds.min.y>TabletopOcean.WaterHeight,"仓脚与备货水线错误");
+            Require(crane.x<cargo.x && crane.z<shed.z && hoist.bounds.min.y>port.transform.position.y+.0007f,"吊臂或悬货落位错误");
+            Require(LocalCenter(sign.Face).y>.007f,"交易牌未在石仓屋坡上");
+            Debug.Log($"CATAN_TIMBER_QUAY_MM 仓心 {shed*1000} 货垛 {cargo*1000} 吊架 {crane*1000} 岸线 {shore*1000:F2} 后檐 {back*1000:F2}");
+            parts.Add(hoist);
+        }
+        foreach (var part in parts)
+        {
+            var mesh=part.GetComponent<MeshFilter>().sharedMesh;
+            Require(!mesh.isReadable && mesh.lodCount>1 && mesh.subMeshCount==1,label+"远景网格或材质槽错误 "+part.name);
+        }
         Table.Frame(BoardCamera,false,1);
         yield return new WaitForEndOfFrame();
-        var pixel=BoardCamera.WorldToScreenPoint(flag.Face.bounds.center);
-        Require(markers.PickPort(new Vector2(pixel.x,Screen.height-pixel.y),BoardCamera)==wood.Id,"木材港吊旗未命中");
+        var pose=sign.transform.rotation;
+        parts.Add(sign.Face);
+        foreach (var part in parts)
+        {
+            var pixel=BoardCamera.WorldToScreenPoint(port.transform.TransformPoint(LocalCenter(part)));
+            Require(markers.PickPort(new Vector2(pixel.x,Screen.height-pixel.y),BoardCamera)==trade.Id,label+"部件未命中 "+part.name);
+        }
+        Require(Quaternion.Angle(pose,sign.transform.rotation)<.01f,"交易牌未固定在仓房");
         yield return new WaitForSecondsRealtime(2);
         yield return new WaitForEndOfFrame();
         if(args.Contains("--board-art-views")) DetailFrame(Vector3.zero,"穿越沙漠-全盘",true);
         else SaveOceanFrame("穿越沙漠-全盘.png");
-        DetailFrame(surface.GetComponent<Renderer>().bounds.center,"木材港-近景",detailSize:.044f);
+        var centerOfPort=port.transform.TransformPoint(brick ? new Vector3(0,.0047f,.0028f) : new Vector3(0,.0054f,.0021f));
+        var sea=-port.transform.forward;
+        DetailFrame(centerOfPort,label+"-近景",detailSize:brick ? .0130f : .0146f,
+            eyeOffset:(sea+port.transform.right*(brick ? .48f : .42f)+Vector3.up*.48f).normalized*.16f,matchCameraMsaa:true);
+        DetailFrame(centerOfPort,label+"-俯视",detailSize:.0205f,eyeOffset:Vector3.up*.16f,
+            viewUp:port.transform.forward,matchCameraMsaa:true);
+        DetailFrame(centerOfPort,label+"-棋盘视距",detailSize:.057f,
+            eyeOffset:(sea+Vector3.up*2.25f).normalized*.16f,matchCameraMsaa:true);
         if(args.Contains("--board-art-views"))
         {
             var center=surface.GetComponent<Renderer>().bounds.center;

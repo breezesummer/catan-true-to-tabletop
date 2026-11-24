@@ -89,4 +89,57 @@ public sealed class ThreeKingdomsB5MilitaryIntegrationTests
         ThreeKingdomsState tk=s.ThreeKingdoms;var general=tk.Generals.Single(g=>g.Region==GeneralRegion.Active&&g.OwnerPlayerId=="P1");B2SkillEngine.OnB5MilitaryGeneralActivated(tk,general);B2SkillEngine.Pump((IThreeKingdomsCardHost)Host(game,s));Put(game,s);
         Skill((object)game,mode,"P1","b5m-deploy");dynamic after=game.GetAuthoritativeStateForTesting();Assert.Single((Array)after.Knights);var knight=((Array)after.Knights).GetValue(0)!;Assert.Equal(true,knight.GetType().GetProperty("Active")!.GetValue(knight));Assert.Equal(1,knight.GetType().GetProperty("Level")!.GetValue(knight));
     }
+
+    [Theory][InlineData("cities")][InlineData("combined")]
+    public void LiyuRetirementSelectsEachKnightThenItsDestinationAcrossRestore(string mode)
+    {
+        dynamic game=Fixture(mode,"tk-g02");
+        dynamic state=game.GetAuthoritativeStateForTesting();
+        var board=game.GetPlayerView("P1").Board;
+        Tile[] tiles=board.Tiles;
+        Edge[] edges=((Edge[])board.Edges).Where(e=>tiles.Any(t=>t.Resource!="sea"&&e.Vertices.All(t.Vertices.Contains))).ToArray();
+        var home=edges.First();
+        var next=edges.First(e=>!e.Vertices.Intersect(home.Vertices).Any());
+        var far=edges.First(e=>!e.Vertices.Intersect(home.Vertices.Concat(next.Vertices)).Any());
+        string first=home.Vertices[0],away=far.Vertices[0],enemy=far.Vertices[1];
+        if(state is M4.GameState a)
+        {
+            a.Roads=[M4CoreHarness.Piece(home.Id),M4CoreHarness.Piece(next.Id)];
+            a.Knights=[new(){PlayerId="P1",LocationId=first,Level=1},new(){PlayerId="P1",LocationId=away,Level=2,Active=true,PlacedByLiyu=true},new(){PlayerId="P2",LocationId=enemy,Level=1}];
+            M4CoreHarness.Balance(a);
+        }
+        else
+        {
+            var b=(M5.GameState)state;
+            b.Roads=[M5Harness.Piece(home.Id),M5Harness.Piece(next.Id)];
+            b.Knights=[new(){PlayerId="P1",LocationId=first,Level=1},new(){PlayerId="P1",LocationId=away,Level=2,Active=true,PlacedByLiyu=true},new(){PlayerId="P2",LocationId=enemy,Level=1}];
+            M5Harness.Balance(b);
+        }
+        ThreeKingdomsState tk=state.ThreeKingdoms;
+        var general=tk.Generals.Single(g=>g.Region==GeneralRegion.Active&&g.OwnerPlayerId=="P1");
+        B2SkillEngine.OnB5MilitaryGeneralRetired(tk,general);
+        B2SkillEngine.Pump((IThreeKingdomsCardHost)Host(game,state));Put(game,state);
+        void PickOnBoard(string vertex)
+        {
+            var draft=new B45SelectionContext();
+            draft.Begin((ThreeKingdomsView)game.GetPlayerView("P1").ThreeKingdoms,"P1",null,new int[8]);
+            Assert.True(draft.ToggleTile(vertex));
+            dynamic command=Command(game,mode,"UseGeneralSkill");command.SkillCommand=draft.FinishDirectPick();
+            Assert.NotNull(command.SkillCommand);Accept(game,command);
+        }
+        PickOnBoard(away);
+        Assert.Equal(3,((Array)game.GetAuthoritativeStateForTesting().Knights).Length);
+        game=Restore(game,mode);
+        PickOnBoard(next.Vertices[0]);
+        PickOnBoard(first);
+        B2SkillAction[] options=game.GetPlayerView("P1").ThreeKingdoms.SkillActions;
+        Assert.Contains(options,a=>a.SelectionBoardIds.Single()==first);
+        PickOnBoard(home.Vertices[1]);
+        dynamic result=game.GetAuthoritativeStateForTesting();
+        var knights=((Array)result.Knights).Cast<dynamic>().ToArray();
+        Assert.Equal(3,knights.Length);
+        Assert.Contains(knights,k=>k.PlayerId=="P1"&&k.LocationId==next.Vertices[0]&&k.Level==2&&k.Active);
+        Assert.Contains(knights,k=>k.PlayerId=="P2"&&k.LocationId==enemy);
+        Assert.Null(result.ThreeKingdoms.Skills.PendingDecision);
+    }
 }

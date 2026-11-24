@@ -74,10 +74,10 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File .\tools\development\Build-Game.ps1
 
 ## 产物与验证边界
 
-默认目录按 AGENTS.md 的版本号与构建短述生成，当前为 `game version/2.1/Catan2.1.17-Game-Encyclopedia`，测试签名追加 `-SigningTest`；程序与 APK 均名为 `Catan2.1.17`。自定义 `--output-root` 必须在本仓库 `game version` 下，目录名须包含当前版本；测试签名必须保留 `SigningTest` 标识。
+默认目录按 AGENTS.md 的版本号与构建短述生成，当前为 `game version/2.1/Catan2.1.18-Tabletop-Pieces-and-Harbors`，测试签名追加 `-SigningTest`；程序与 APK 均名为 `Catan2.1.18`。自定义 `--output-root` 必须在本仓库 `game version` 下，目录名须包含当前版本；测试签名必须保留 `SigningTest` 标识。
 
-- Windows：`Builds/Windows/Catan2.1.17.exe` 与 `Builds/Windows/Server`。
-- Android：`Builds/Android/Catan2.1.17.apk` 与含签名／文件摘要的 `build-info.json`。
+- Windows：`Builds/Windows/Catan2.1.18.exe` 与 `Builds/Windows/Server`。
+- Android：`Builds/Android/Catan2.1.18.apk` 与含签名／文件摘要的 `build-info.json`。
 - 构建过程：`logs`；Mac 成功构建另写 `构建说明.json`。
 - 新统一入口成功后按二级版本各保留最近五个内测版本目录；带 `release` 或 `正式发布.txt` 标记的正式发布目录保留，符号链接不参与清理。
 

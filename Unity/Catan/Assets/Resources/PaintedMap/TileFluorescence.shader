@@ -4,6 +4,8 @@ Shader "Catan/地块荧光"
     SubShader
     {
         Tags { "RenderPipeline"="UniversalPipeline" "Queue"="Transparent+5" "RenderType"="Transparent" }
+        // 仅给通过深度测试、实际发光的像素标记点数避让。
+        Stencil { Ref 1 ReadMask 1 WriteMask 1 Comp Always Pass Replace }
         Pass
         {
             Blend One One
@@ -70,6 +72,7 @@ Shader "Catan/地块荧光"
                 // 光丝附近的细小荧光亮点随周长方向一起移动。
                 float beads=pow(saturate(sin((u-t*.21)*339.292+seed)),24);
                 emission+=light*beads*exp2(-pow((path-.0022*wave2)/(.00016+aa),2))*.32;
+                clip(max(emission.r,max(emission.g,emission.b)) - .012h);
                 return half4(emission,1);
             }
             ENDHLSL

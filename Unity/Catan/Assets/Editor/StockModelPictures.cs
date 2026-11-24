@@ -26,7 +26,7 @@ public static class StockModelPictures
     [MenuItem("Catan/美术/导出库存模型正视图")]
     public static void Export() => ExportKinds(new[]{"settlement","city","road","ship","wall","knight-1","knight-2","knight-3"});
     public static void ExportShips() => ExportKinds(new[]{"ship"});
-    static void ExportKinds(string[] kinds)
+    internal static void ExportKinds(string[] kinds)
     {
         const string folder="Assets/Resources/StockModels";
         Directory.CreateDirectory(folder);
@@ -46,9 +46,12 @@ public static class StockModelPictures
         var target=RenderTexture.GetTemporary(256,256,24,RenderTextureFormat.ARGB32);
         var image=new Texture2D(256,256,TextureFormat.RGBA32,false);
         var previous=RenderTexture.active;
+        bool asyncCompilation=ShaderUtil.allowAsyncCompilation;
         try
         {
+            ShaderUtil.allowAsyncCompilation=false;
             camera.targetTexture=target;
+            bool firstCapture=true;
             for(int seat=1;seat<=4;seat++)
             foreach(var kind in kinds)
             {
@@ -67,11 +70,15 @@ public static class StockModelPictures
                     camera.transform.position=bounds.center+(kind=="ship"?new Vector3(1,.20f,.48f).normalized:lateral?Vector3.right:Vector3.forward)*.5f;
                     camera.transform.LookAt(bounds.center);
                     camera.orthographicSize=.54f*Mathf.Max(bounds.size.y,lateral?bounds.size.z:bounds.size.x);
+                    // 首次离屏渲染会初始化 URP 光照缓冲，待其就绪再读回第一张库存图。
+                    if(firstCapture){camera.Render();firstCapture=false;}
                     camera.Render();RenderTexture.active=target;
                     image.ReadPixels(new Rect(0,0,256,256),0,0);image.Apply();
                     var pixels=image.GetPixels32();
                     int left=256,right=-1,bottom=256,top=-1;
-                    for(int i=0;i<pixels.Length;i++)if(pixels[i].a>8)
+                    // 正立面库存图只取棋盘表面以上，临海使用的地下石基在实局由地形遮住。
+                    int firstRow=kind=="wall"?Mathf.Clamp(Mathf.CeilToInt(camera.WorldToViewportPoint(piece.transform.position).y*256),0,255):0;
+                    for(int i=firstRow*256;i<pixels.Length;i++)if(pixels[i].a>8)
                     {left=Mathf.Min(left,i%256);right=Mathf.Max(right,i%256);bottom=Mathf.Min(bottom,i/256);top=Mathf.Max(top,i/256);}
                     if(right<=left||top<=bottom)throw new System.InvalidOperationException("模型正视图为空 "+path);
                     var cropped=new Texture2D(right-left+1,top-bottom+1,TextureFormat.RGBA32,false);
@@ -84,6 +91,7 @@ public static class StockModelPictures
         }
         finally
         {
+            ShaderUtil.allowAsyncCompilation=asyncCompilation;
             camera.targetTexture=null;RenderTexture.active=previous;RenderTexture.ReleaseTemporary(target);
             Object.DestroyImmediate(image);Object.DestroyImmediate(camera.gameObject);Object.DestroyImmediate(light.gameObject);
         }

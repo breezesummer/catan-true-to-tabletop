@@ -144,7 +144,7 @@ namespace Catan.Core.M5
                 case "DefenderProgress": Require(Enum.IsDefined(typeof(ImprovementTrack),c.Track),"InvalidTrack","请选择发展卡牌堆。"); DrawProgressCard(s,p,c.Track); break;
                 case "DisplacedKnight":
                     Require(d.Options.Contains(c.TargetId)&&!Occupied(s,c.TargetId),"InvalidKnightDestination","请选择合法的骑士撤退位置。");
-                    d.DisplacedKnight.LocationId=c.TargetId; s.Knights=Append(s.Knights,d.DisplacedKnight); break;
+                    d.DisplacedKnight.PlaceAt(c.TargetId); s.Knights=Append(s.Knights,d.DisplacedKnight); break;
                 default: throw new RuleException("WrongDecision","当前选择需要对应发展卡操作。");
             }
             CheckVictory(s);if(s.Phase!=GamePhase.Finished) ContinueDecisions(s);
@@ -213,7 +213,7 @@ namespace Catan.Core.M5
             Require(ReachableKnightVertices(s,p.Id,c.SourceId).Contains(c.TargetId),"DisconnectedKnight","骑士必须沿连续的己方道路移动。");
             if(c.Kind==CommandKind.MoveKnight) Require(!Occupied(s,c.TargetId),"OccupiedVertex","骑士需要空顶点。");
             else {var defender=s.Knights.FirstOrDefault(k=>k.LocationId==c.TargetId&&k.PlayerId!=p.Id);Require(defender!=null&&B6AllianceRules.CanAttack(s.ThreeKingdoms,p.Id,defender.PlayerId)&&(B5KnightLevel(s,defender)<B5KnightLevel(s,knight)||B5(s)&&B2SkillEngine.B5IgnoreKnightDisplacementLevel(s.ThreeKingdoms,p.Id)),"CannotDisplace","只能驱逐较弱的对方骑士。");if(B3Immune(s,defender.PlayerId)){B5Exhaust(s,knight);return;}knight.LocationId=c.TargetId;DisplaceForProgress(s,defender);}
-            knight.LocationId=c.TargetId;B5Exhaust(s,knight);
+            knight.PlaceAt(c.TargetId);B5Exhaust(s,knight);
             if(s.DecisionQueue.Length>0) ContinueDecisions(s);
         }
         private void DisplaceForProgress(GameState s,Knight knight)

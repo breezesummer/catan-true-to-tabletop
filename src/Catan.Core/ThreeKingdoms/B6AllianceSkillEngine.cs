@@ -107,7 +107,20 @@ namespace Catan.Core.ThreeKingdoms
             return true;
         }
         public static void ProjectAllianceB6(IThreeKingdomsCardHost host,ThreeKingdomsView view,string viewer)
-        {if(!B6AllianceRules.Enabled(host.State))return;view.AllianceMembers=B6AllianceRules.Members(host.State,viewer);view.AllianceWinnerPlayerIds=host.State.AllianceB6?.WinnerPlayerIds??Array.Empty<string>();}
+        {
+            var state=host.State;
+            if(!B6AllianceRules.Enabled(state))return;
+            view.AllianceMembers=B6AllianceRules.Members(state,viewer);
+            view.AllianceWinnerPlayerIds=state.AllianceB6?.WinnerPlayerIds??Array.Empty<string>();
+            var decision=view.SkillDecision;
+            if(decision?.PlayerId!=viewer||decision.Kind!="alliance-b6-terms")return;
+            var frame=state.Skills.Frames.Single(f=>f.Id==decision.FrameId);
+            var target=frame.Targets[frame.Step];
+            var counts=frame.Remaining==2?frame.Cards:frame.SelectedCards;
+            var direction=frame.Remaining==2?"向"+target+"索取":"赠予"+target;
+            var items=Enumerable.Range(0,counts.Length).Where(t=>counts[t]>0).Select(t=>CardNames[t]+"×"+counts[t]);
+            decision.Description=counts.Sum()==0?direction+" · 请选择牌种":direction+" · "+string.Join("、",items);
+        }
         public static string[] ValidateAllianceB6(ThreeKingdomsState s)
         {
             if(s.AllianceB6==null)return Array.Empty<string>();if(!B6AllianceRules.Enabled(s))return new[]{"旧规则包不能包含联盟状态。"};var a=s.AllianceB6;
